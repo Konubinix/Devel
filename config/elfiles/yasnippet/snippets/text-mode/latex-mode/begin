@@ -1,0 +1,11 @@
+#contributor : Rodrigo Setti <rodrigosetti@gmail.com>
+#name : \begin{environment} ... \end{environment}
+# --
+
+\begin{${1:${environment$$(yas/choose-value '(
+  "abstract",
+  "itemize",
+  "enumerate"
+  ))}}}
+	$0
+\end{$1}

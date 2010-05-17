@@ -1,0 +1,16 @@
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+proc            /proc           proc    defaults        0       0
+/dev/sda5       /               ext3    errors=remount-ro 0       1
+/dev/sda6       /home           ext3    defaults        0       2
+/dev/sda4       /home/snake/Documents ntfs-3g default,locale=fr_FR.utf8 0 0
+/dev/sda8       /usr           ext3    defaults        0       2
+/dev/sda7       none            swap    sw              0       0
+/dev/hda        /media/cdrom0   udf,iso9660 user,noauto     0       0
+sshfs#lourys@ensisun.imag.fr: /mnt/ensisun fuse user,noauto 0 0
+
+# /dev/sdc1       /mnt/temp1      vfat    user,noauto,utf8     0  0
+# /dev/sdd1       /mnt/temp2      vfat    user,noauto     0       0
+# /dev/sde1       /mnt/temp3      vfat    user,noauto     0       0
+

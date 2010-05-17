@@ -1,0 +1,10 @@
+table Icon
+  Caption: Firefox
+  Icon: /usr/share/pixmaps/firefox-bin-icon.png
+  Width: 48
+  Height: 48
+  X: 55
+  Y: 7
+  Command[0]: /usr/bin/firefox 
+end
+

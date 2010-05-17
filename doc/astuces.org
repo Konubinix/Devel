@@ -1,0 +1,15 @@
+* GTK
+** Utiliser GTK en dehors de gnome2
+   Si on utilise une application utilisant les librairies gtk  hors de gnome2. Les polices peuvent paraître un peu beaucoup
+   grandes.
+
+   Pour résoudre ça, il faut dire explicitement à gtk quel police prendre.
+
+   Créer un fichier ~/.gtkrc-2.0 et lui donner des bons arguments
+
+   gtk-font-name = "Arial 8"
+   gtk-icon-theme-name = "Delta" # A installer à la main dans ~/.icons/Delta
+   gtk-theme-name = "Mist" # Dans les thèmes gnome par défaut
+   gtk-font-name = "Sans Serif 7"
+
+

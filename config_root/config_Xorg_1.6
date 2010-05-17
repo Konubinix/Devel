@@ -1,0 +1,111 @@
+Section "ServerLayout"
+	Identifier     "X.org Configured"
+	Screen      0  "Screen0" 0 0
+	InputDevice    "Mouse0" "CorePointer"
+	InputDevice    "Keyboard0" "CoreKeyboard"
+EndSection
+
+Section "ServerFlags"
+	Option "AutoAddDevices" "false"
+	Option "DontZap" "no"
+EndSection
+
+Section "Files"
+	ModulePath   "/usr/lib/xorg/modules"
+	FontPath     "/usr/share/fonts/misc/"
+	FontPath     "/usr/share/fonts/TTF/"
+	FontPath     "/usr/share/fonts/OTF"
+	FontPath     "/usr/share/fonts/Type1/"
+	FontPath     "/usr/share/fonts/100dpi/"
+	FontPath     "/usr/share/fonts/75dpi/"
+EndSection
+
+Section "Module"
+	Load  "record"
+	Load  "glx"
+	Load  "dbe"
+	Load  "extmod"
+	Load  "dri"
+	Load "synaptics"
+#	Load  "xtrap"
+EndSection
+
+# Ne sera plus utilisé dans l'avenir (remplacé par evdev)
+
+Section "InputDevice"
+	Identifier  "Keyboard0"
+	Driver      "kbd"
+	Option      "XkbModel"    "pc105"
+	Option      "XkbLayout"    "fr"
+	Option      "XkbVariant" "latin9"
+        Option      "CoreKeyboard"
+        Option      "XkbOptions"    "ctrl:swapcaps"
+	Option      "AutoRepeat" "500 30"
+EndSection
+
+Section "InputDevice"
+	Identifier  "Mouse0"
+	Driver      "synaptics"
+	Option	    "Protocol" "auto"
+	Option	    "Device" "/dev/input/mice"
+	Option	    "ZAxisMapping" "4 5 6 7"
+EndSection
+
+Section "Monitor"
+	Identifier   "Monitor0"
+	VendorName   "Monitor Vendor"
+	ModelName    "Monitor Model"
+EndSection
+
+Section "Device"
+        ### Available Driver options are:-
+        ### Values: <i>: integer, <f>: float, <bool>: "True"/"False",
+        ### <string>: "String", <freq>: "<f> Hz/kHz/MHz"
+        ### [arg]: arg optional
+        #Option     "NoAccel"            	# [<bool>]
+        #Option     "SWcursor"           	# [<bool>]
+        #Option     "ColorKey"           	# <i>
+        #Option     "CacheLines"         	# <i>
+        #Option     "Dac6Bit"            	# [<bool>]
+        #Option     "DRI"                	# [<bool>]
+        #Option     "NoDDC"              	# [<bool>]
+        #Option     "ShowCache"          	# [<bool>]
+        #Option     "XvMCSurfaces"       	# <i>
+        #Option     "PageFlip"           	# [<bool>]
+	Identifier  "Card0"
+	Driver      "intel"
+	VendorName  "Intel Corporation"
+	BoardName   "Mobile GM965/GL960 Integrated Graphics Controller"
+	BusID       "PCI:0:2:0"
+EndSection
+
+Section "Screen"
+	Identifier "Screen0"
+	Device     "Card0"
+	Monitor    "Monitor0"
+	SubSection "Display"
+		Viewport   0 0
+		Depth     1
+	EndSubSection
+	SubSection "Display"
+		Viewport   0 0
+		Depth     4
+	EndSubSection
+	SubSection "Display"
+		Viewport   0 0
+		Depth     8
+	EndSubSection
+	SubSection "Display"
+		Viewport   0 0
+		Depth     15
+	EndSubSection
+	SubSection "Display"
+		Viewport   0 0
+		Depth     16
+	EndSubSection
+	SubSection "Display"
+		Viewport   0 0
+		Depth     24
+	EndSubSection
+EndSection
+

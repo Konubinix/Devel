@@ -1,0 +1,31 @@
+[gui]
+	fontui = -family helvetica -size 7 -weight bold -slant roman -underline 0 -overstrike 0
+	fontdiff = -family Courier -size 7 -weight normal -slant roman -underline 0 -overstrike 0
+[user]
+	name = konubinix
+	mail = konubinix@gmail.com
+
+[alias]
+	ci = commit
+	st = status
+	cl = clone
+	co = checkout
+	k = !gitk --all
+	up = pull --rebase
+	wu = log --stat origin..@{0}
+	wup = log -p origin..@{0}
+#	fetch = fetch --upload-pack="git upload-pack"
+
+[remote "origin"]
+#	uploadpack = git upload-pack
+#	receivepack = git receive-pack
+	gitsvn = git svn
+[diff]
+	tool = meld
+[difftool]
+	prompt = 
+[color]
+	ui = true
+	status = auto
+	diff = auto
+	branch = auto

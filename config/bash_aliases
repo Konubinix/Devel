@@ -1,0 +1,40 @@
+alias ls='ls --color=auto'
+alias ll='ls -l'
+alias la='ls -A'
+alias l='ls -CF'
+alias sun='ssh lourys@ensisun.imag.fr'
+alias bull='ssh lourys@ensibull.imag.fr'
+alias Prog='cd ~/Prog'
+alias DL="cd ~/DL"
+alias CheStorm='ssh konubinix@ssh.chemicalstorm.org'
+alias CH='grep --color -i -n -r'
+alias CHnr='grep --color -n -i'
+alias SVND="svn status | grep ! | sed 's/!//' | xargs svn delete"
+alias SVNA="svn status | grep ? | sed 's/?//' | xargs svn add"
+alias ARRODU="ssh root@arrodu.doesntexist.org"
+alias ARRODU_ADMIN="ssh admin@arrodu.doesntexist.org"
+alias ARR="ssh snake@arrodu.doesntexist.org"
+alias perso="cd ~/Prog/site_perso"
+alias tkcon="tkcon -load Tk"
+alias TUNNELS_SUDO="sudo $HOME/Prog/devel_konix/KONIX/config_iptables.sh ;
+                    ssh -L 1236:smtp.cvdm-solutions.com:25 -L 1235:smtp.gmail.com:587 -L 1234:localhost:25 -L 6667:irc.efnet.fr:6667 -L 11371:91.189.94.173:11371 -L 8001:irc.ubuntu.com:8001 -L 5222:209.85.137.125:5222 lourys@ensisun.imag.fr"
+alias TUNNELS="ssh -L 11371:91.189.94.173:11371 -L 1234:localhost:25 -L 1235:smtp.gmail.com:587 -L 6667:irc.efnet.fr:6667 -L 8001:irc.ubuntu.com:8001 -L 5222:209.85.137.125:5222 lourys@ensibull.imag.fr"
+alias cur="cd $CURRENT_DEVEL"
+alias GEN_PASS8='echo $(cat /dev/urandom | tr -dc _A-Z-a-z-0-9 | head -c8)'
+# alias pour que meld fonctionne, il nécessite l'UTF-8
+alias meld="LC_ALL=fr_FR.UTF-8 python /usr/bin/meld"
+alias CD="cd -P ."
+alias test_cvdm="ssh samuel@cvdm_test"
+alias prod_cvdm="ssh samuel@cvdm_prod"
+alias essids="(iwlist scan | grep ESSID ) 2> /dev/null"
+alias git-upload-pack="git upload-pack"
+alias re_wifi="sudo ~/bin/re_wifi.sh 100"
+alias huoc='ssh lourys@www.huoc.org -p 13022'
+alias PSMTP="python -m smtpd -n -c DebuggingServer localhost:1025"
+alias TSOCKS="tsocks_KONIX"
+alias tlt="cur ; CD ; emacs ./ & git k &"
+alias REmake="make clean && make"
+alias MAYA="modprobe vboxdrv && "
+alias DDE_search="locate -d /data/DDE "
+alias xmod="xmodmap ~/.fluxbox/xmod_swap_caps_lock"
+alias ec="emacsclient"

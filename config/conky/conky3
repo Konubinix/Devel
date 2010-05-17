@@ -1,0 +1,133 @@
+# # Conky sample configuration
+# #
+# # the list of variables has been removed from this file in favour
+# # of keeping the documentation more maintainable.
+# # Check http://conky.sf.net for an up-to-date-list.
+
+# # set to yes if you want Conky to be forked in the background
+# background yes
+
+# # X font when Xft is disabled, you can pick one with program xfontsel
+# #font 5x7
+# #font 6x10
+# #font 7x13
+# #font 8x13
+# #font 9x15
+# #font *mintsmild.se*
+# #font -*-*-*-*-*-*-34-*-*-*-*-*-*-*
+
+
+# # Use Xft?
+# use_xft yes
+
+# # Set conky on the bottom of all other applications
+# on_bottom yes
+
+# # Xft font when Xft is enabled
+# xftfont Bitstream Vera Sans Mono:size=8
+
+# # Text alpha when using Xft
+# xftalpha 0.8
+
+# # Print everything to stdout?
+# # out_to_console no
+
+# # MPD host/port
+# # mpd_host localhost
+# # mpd_port 6600
+# # mpd_password tinker_bell
+
+# # Print everything to console?
+# # out_to_console no
+
+# # mail spool
+# mail_spool $MAIL
+
+# # Update interval in seconds
+# update_interval 2.0
+
+# # This is the number of times Conky will update before quitting.
+# # Set to zero to run forever.
+# total_run_times 0
+
+# # Create own window instead of using desktop (required in nautilus)
+# own_window yes
+
+# # Use pseudo transparency with own_window?
+# own_window_transparent yes
+
+# # If own_window_transparent is set to no, you can set the background colour here
+# own_window_colour hotpink
+
+# # Use double buffering (reduces flicker, may not work for everyone)
+# double_buffer yes
+
+# # Minimum size of text area
+# minimum_size 160 3
+
+# # Draw shades?
+# draw_shades no
+
+# # Draw outlines?
+# draw_outline no
+
+# # Draw borders around text
+# draw_borders no
+
+# # Stippled borders?
+# stippled_borders 8
+
+# # border margins
+# border_margin 4
+
+# # border width
+# border_width 1
+
+# # Default colors and also border colors
+# default_color white
+# default_shade_color black
+# default_outline_color black
+
+# # Text alignment, other possible values are commented
+# alignment center_left
+# #alignment top_right
+# #alignment bottom_left
+# #alignment bottom_right
+# #alignment none
+
+own_window no
+# own_window_type desktop
+# own_window_type override
+# own_window_transparent yes
+#own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+
+default_color white
+
+background no
+
+double_buffer yes
+draw_outline yes
+
+gap_x 15
+gap_y 50
+alignment bottom_left
+use_xft yes
+xftfont Comic sans MS:size=8
+
+short_units yes
+
+update_interval 5
+
+
+
+color1 123456
+color2 green
+color3 green
+
+maximum_width 600
+minimum_size 600
+
+default_bar_size 0 10
+default_graph_size 0 25
+TEXT
+${exec /home/snake/test.sh}BOU

@@ -1,0 +1,11 @@
+#name : function template
+#contributor : Xah Lee
+# --
+(defun ${1:funcname} (${2:arg})
+  ${3:"${4:description}."}
+	${5:(interactive)}
+	${6:(let (${7:var1})
+    (setq $7 ${8:some})
+    $0
+  )}
+)

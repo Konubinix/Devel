@@ -1,0 +1,8 @@
+#name : class ... { ... }
+# --
+class ${2:API} ${1:Name}${3:: public ${4:class}}{
+public:
+    ${1:$(yas/substr text "[^: ]*")}($5);
+    virtual ~${1:$(yas/substr text "[^: ]*")}();
+	$0
+};

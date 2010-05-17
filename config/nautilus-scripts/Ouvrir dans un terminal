@@ -1,0 +1,38 @@
+#!/bin/bash
+    #
+    # Ce script ouvre le terminal gnome dans le répertoire que vous sélectionnez.
+    #
+    # Distribué selon les termes de GNU GPL version 2 ou ultérieur
+    #
+    # Installez le dans votre répertoire ~/Nautilus/scripts.
+    # Vous devez utiliser Nautilus 1.0.3+ pour utiliser ce script.
+    
+    # Lorsqu'un répertoire est selectionné ouvre celui-ci. Sinon ouvre le répertoire courant
+    # Si plus d'un répertoire est sélectionné affiche une erreur.
+    if [ -n "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" ]; then
+        set "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS"
+        if [ $# -eq 1 ]; then
+            destination="$1"
+            # Va dans le répertoire d'un fichier si un fichier est selectionné
+            if [ ! -d "$destination" ]; then
+                destination="`dirname "$destination"`"
+            fi
+        else
+            zenity --error --title="Erreur - Ouvre un terminal ici" \
+               --text="Vous ne pouvez selectionner qu'un repertoire."
+            exit 1
+        fi
+    else
+        destination="`echo "$NAUTILUS_SCRIPT_CURRENT_URI" | sed 's/^file:\/\///'`"
+    fi
+    
+    # Seuls les repertoires locaux peuvent etre ouverts
+    if [ -n "`echo "$destination" | grep '^[a-zA-Z0-9]\+:'`" ]; then
+        zenity --error --title="Erreur - Ouvre un terminal ici" \
+           --text="Seuls les repertoires locaux peuvent etre ouverts."
+        exit 1
+    fi
+    
+    cd "$destination"
+    exec x-terminal-emulator
+

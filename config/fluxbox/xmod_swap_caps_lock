@@ -1,0 +1,4 @@
+clear lock
+clear control
+add lock = Control_L
+add control = Control_R Caps_Lock

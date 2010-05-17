@@ -1,0 +1,11 @@
+#!/bin/bash
+    # De Johnathan Bailes
+    # Ce script ouvre l'outil de recherche gnome dans le répertoire que vous sélectionnez.
+    #
+    # Distribué selon les termes de GNU GPL version 2 ou ultérieur
+    #
+    # Installez le dans votre répertoire ~/Nautilus/scripts.
+    # Vous devez utiliser Nautilus 1.0.3+ pour utiliser ce script.
+    
+cd $NAUTILUS_SCRIPT_CURRENT_URI
+exec gnome-search-tool

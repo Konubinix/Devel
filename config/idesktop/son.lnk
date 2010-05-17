@@ -1,0 +1,10 @@
+table Icon
+  Caption: Réglages sonore
+  Icon: /usr/share/pixmaps/gnome-alsamixer/gnome-alsamixer-icon.png
+  Width: 48
+  Height: 48
+  X: 55
+  Y: 107
+  Command[0]: gnome-alsamixer
+end
+

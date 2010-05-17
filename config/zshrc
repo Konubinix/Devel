@@ -1,0 +1,66 @@
+# Historique
+HISTFILE=~/.histfile
+HISTSIZE=5000
+SAVEHIST=5000
+setopt hist_ignore_all_dups # ignore les commandes doublons
+
+. ~/.shrc
+
+# Aliases
+if [ -f ~/.zsh_aliases ]; then
+   . ~/.zsh_aliases
+fi
+
+# Touches comme emacs
+bindkey -e
+
+# Complétion
+zstyle :compinstall filename '/home/snake/.zshrc'
+autoload -Uz compinit
+compinit
+
+# Pour avoir des jolis promts
+autoload -U promptinit
+promptinit
+prompt fire
+
+# Récup complétion bash
+autoload -U bashcompinit
+bashcompinit
+
+# Custo completion
+zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
+zstyle ':completion:*:warnings' format '%BDésolé, pas de résultats pour : %d%b'
+#zstyle ':completion:*' menu select=3
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+
+# Correction des fautes de frappes
+setopt correctall
+# Fuzzy match
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+
+# Utilisation d'un cache pour aller plus vite
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh_cache
+zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin
+# Completion pour kill
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*'   force-list always
+
+# Jokers étendus
+setopt extendedglob
+
+# Colorie les lignes stderr en rouge
+exec 2>>(while read line; do
+  print '\e[91m'${(q)line}'\e[0m' > /dev/tty; print -n $'\0'; done &)
+
+# ################################################################################
+# KEYS
+# ################################################################################
+# C-Left C-Right
+bindkey "[1;5D" backward-word
+bindkey "[1;5C" forward-word
+
+bindkey "" kill-region

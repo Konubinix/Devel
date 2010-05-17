@@ -1,0 +1,61 @@
+RELEASE=-O3
+L1_FLAGS = -Wall -Werror -W -Wextra
+L2_FLAGS = ${L1_FLAGS} -pedantic
+L3_FLAGS = ${L2_FLAGS} -ansi -fno-builtin
+DEBUG = -g
+
+FLAGS=${L3_FLAGS} ${DEBUG} # ${RELEASE}
+
+CC=gcc
+CFLAGS=${DEBUG}
+LD=gcc
+LDFLAGS=${DEBUG}
+
+MAIN_EXEC=main
+EXEC=${MAIN_EXEC}
+
+all: ${EXEC}
+
+# ################################################################################
+# EXEC
+# ################################################################################
+main: fichiers.o
+	${LD} ${LDFLAGS} $^ -o $@
+
+# ################################################################################
+# Creation des objets
+# ################################################################################
+# %.o : %.cpp
+# 	${CC} ${CFLAGS} -c $^ -o $@
+# %.o : %.c++
+# 	${CC} ${CFLAGS} -c $^ -o $@
+# %.o : %.cplusplus
+# 	${CC} ${CFLAGS} -c $^ -o $@
+# %.o : %.cc
+# 	${CC} ${CFLAGS} -c $^ -o $@
+# %.o : %.cxx
+# 	${CC} ${CFLAGS} -c $^ -o $@
+%.o : %.c
+	${CC} ${CFLAGS} -c $^ -o $@
+
+# ################################################################################
+# PHONY
+# ################################################################################
+.PHONY: clean re clean_all clean_tmp all nclean ex
+
+clean_tmp:
+	rm -f *.o
+
+clean: clean_tmp
+	rm -f ${EXEC}
+
+clean_all: clean
+
+all: ${EXEC}
+
+nclean: ${EXEC} clean_tmp
+
+re: clean_all all
+
+nexecute: all
+	./${MAIN_EXEC}

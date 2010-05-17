@@ -1,0 +1,17 @@
+ARCHIVES=truc.jar
+
+all: ${ARCHIVES}
+	
+
+truc.jar: TestFile.class Test.class
+	jar cf $@ $^
+
+%.class: %.java
+	javac $<
+
+signe:
+	$(foreach jar,${ARCHIVES},\
+	jarsigner -verbose $(jar) Snake)
+
+clean:
+	rm -rf ${ARCHIVES} *.class 

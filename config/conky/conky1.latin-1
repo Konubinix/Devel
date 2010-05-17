@@ -1,0 +1,160 @@
+# # Conky sample configuration
+# #
+# # the list of variables has been removed from this file in favour
+# # of keeping the documentation more maintainable.
+# # Check http://conky.sf.net for an up-to-date-list.
+
+# # set to yes if you want Conky to be forked in the background
+# background yes
+
+# # X font when Xft is disabled, you can pick one with program xfontsel
+# #font 5x7
+# #font 6x10
+# #font 7x13
+# #font 8x13
+# #font 9x15
+# #font *mintsmild.se*
+# #font -*-*-*-*-*-*-34-*-*-*-*-*-*-*
+
+
+# # Use Xft?
+# use_xft yes
+
+# # Set conky on the bottom of all other applications
+# on_bottom yes
+
+# # Xft font when Xft is enabled
+# xftfont Bitstream Vera Sans Mono:size=8
+
+# # Text alpha when using Xft
+# xftalpha 0.8
+
+# # Print everything to stdout?
+# # out_to_console no
+
+# # MPD host/port
+# # mpd_host localhost
+# # mpd_port 6600
+# # mpd_password tinker_bell
+
+# # Print everything to console?
+# # out_to_console no
+
+# # mail spool
+# mail_spool $MAIL
+
+# # Update interval in seconds
+# update_interval 2.0
+
+# # This is the number of times Conky will update before quitting.
+# # Set to zero to run forever.
+# total_run_times 0
+
+# # Create own window instead of using desktop (required in nautilus)
+# own_window yes
+
+# # Use pseudo transparency with own_window?
+# own_window_transparent yes
+
+# # If own_window_transparent is set to no, you can set the background colour here
+# own_window_colour hotpink
+
+# # Use double buffering (reduces flicker, may not work for everyone)
+# double_buffer yes
+
+# # Minimum size of text area
+# minimum_size 160 3
+
+# # Draw shades?
+# draw_shades no
+
+# # Draw outlines?
+# draw_outline no
+
+# # Draw borders around text
+# draw_borders no
+
+# # Stippled borders?
+# stippled_borders 8
+
+# # border margins
+# border_margin 4
+
+# # border width
+# border_width 1
+
+# # Default colors and also border colors
+# default_color white
+# default_shade_color black
+# default_outline_color black
+
+# # Text alignment, other possible values are commented
+# alignment center_left
+# #alignment top_right
+# #alignment bottom_left
+# #alignment bottom_right
+# #alignment none
+
+own_window yes
+#own_window_type desktop
+own_window_type override
+own_window_transparent yes
+#own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+
+default_color white
+
+background yes
+
+double_buffer yes
+draw_outline yes
+
+gap_x 15
+gap_y 50
+alignment top_right
+use_xft yes
+xftfont Comic sans MS:size=8
+
+short_units yes
+
+update_interval 5
+use_spacer none
+
+
+color1 123456
+color2 green
+color3 green
+
+maximum_width 600
+minimum_size 600
+
+# default_bar_size 0 10
+# default_graph_size 0 25
+TEXT
+${color yellow}${font Comic sans MS:size=20}$alignc${time %A %d %B %Y} - ${time %H:%M:%S}$color$font
+${font Comic sans MS : size=11}$alignc${color2}Archi$color $font${outlinecolor}
+$sysname $kernel sur $machine $freq_g GHz
+${font Comic sans MS:size=11}$alignc${color2}Réseau$color $font
+${color3}Eth0 : ${outlinecolor blue}$color${if_up eth0}IP : ${addr eth0}, gateway: ${if_gw}${gw_ip}${else}aucune passerelle${endif}${else}Down$endif${outlinecolor}
+${color3}Wlan0 : ${outlinecolor blue}$color${if_up wlan0}IP : ${addr wlan0}, gateway: ${if_gw}${gw_ip}${else}aucune passerelle${endif}
+             AP:${wireless_ap wlan0}, ESSID:${wireless_essid wlan0}${else}Down$endif${outlinecolor}
+${font Comic sans MS:size=11}$alignc${color2}Système$color $font
+$alignc$color3 CPU0 $color: ${outlinecolor blue}${cpu cpu0}% / ${freq 0}MHz
+${cpugraph cpu0}${outlinecolor}
+$alignc$color3 CPU1$color :${outlinecolor blue} ${cpu cpu1}% / ${freq 1}MHz
+${cpugraph cpu1}${outlinecolor}
+${color3}RAM $color: ${outlinecolor blue}$alignr$mem/$memmax(${memperc}%)${outlinecolor}
+${color3}SWAP $color: ${outlinecolor blue}$alignr$swap/$swapmax($swapperc%)${outlinecolor}
+${color3}Température moyenne du PC $color: ${outlinecolor blue}$alignr${acpitemp}°C${outlinecolor}
+${color3}${alignc}${outlinecolor blue}Top 4 des process les plus gourmands ($running_processes/$processes)${color}
+${top name 1}$alignr${top cpu 1}%
+${top name 2}$alignr${top cpu 2}%
+${top name 3}$alignr${top cpu 3}%
+${top name 4}$alignr${top cpu 4}%
+Temps d'ordinateur : ${outlinecolor blue}$uptime${outlinecolor}
+${color3}Batterie :$color${outlinecolor blue}
+${battery_bar BAT0}${outlinecolor}
+/             $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /}/${fs_size /}(${fs_used_perc /}%)${outlinecolor}$font
+/home         $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /home/snake}/${fs_size /home/snake}(${fs_used_perc /home/snake}%)${outlinecolor}$font
+/data    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /data}/${fs_size /data}(${fs_used_perc /data}%)${outlinecolor}$font
+/usr    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /usr}/${fs_size /usr}(${fs_used_perc /usr}%)${outlinecolor}$font
+/var    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /var}/${fs_size /var}(${fs_used_perc /var}%)${outlinecolor}$font

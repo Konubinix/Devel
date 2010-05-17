@@ -1,0 +1,2991 @@
+
+/home/snake/.elfiles/cedet/semantic/semantic-example.el,124
+(defun se-jump 31,1101
+(defcustom se-summary-function 80,2537
+(defun se-show 87,2782
+(defun se-db-apropos-show 108,3497
+
+/home/snake/.elfiles/cedet/semantic/semantic-tag-ls.el,829
+(define-overloadable-function semantic-tag-calculate-parent 45,1699
+(defun semantic-tag-calculate-parent-default 51,2005
+(define-overloadable-function semantic-tag-protection 62,2322
+(defun semantic-tag-protection-default 84,3296
+(defun semantic-tag-protected-p 106,3925
+(define-overloadable-function semantic-tag-abstract-p 136,4720
+(defun semantic-tag-abstract-p-default 148,5251
+(define-overloadable-function semantic-tag-leaf-p 161,5680
+(defun semantic-tag-leaf-p-default 172,6111
+(define-overloadable-function semantic-tag-static-p 186,6562
+(defun semantic-tag-static-p-default 193,6896
+(define-overloadable-function semantic-tag-prototype-p 205,7290
+(defun semantic-tag-prototype-p-default 211,7497
+(define-overloadable-function semantic-tag-full-name 232,8143
+(defun semantic-tag-full-name-default 251,9191
+
+/home/snake/.elfiles/cedet/semantic/ctags/semanticdb-ectag.el,119
+(defun semanticdb-enable-exuberent-ctags 44,1567
+(defun semanticdb-ectag-create-table-for-file-not-in-buffer 72,2534
+
+/home/snake/.elfiles/cedet/semantic/ctags/semantic-ectag-lang2.el,304
+(defvar-mode-local c-mode 36,1226
+(defvar-mode-local c++-mode 39,1317
+(defvar-mode-local c-mode 42,1412
+(defvar-mode-local c-mode 45,1520
+(defvar-mode-local emacs-lisp-mode 108,3768
+(defvar-mode-local emacs-lisp-mode 111,3871
+(defun semantic-load-enable-secondary-exuberent-ctags-support 118,4006
+
+/home/snake/.elfiles/cedet/semantic/ctags/semantic-ectag-parse.el,969
+(defvar semantic-ectag-lang 37,1401
+(defvar semantic-ectag-lang-kind 39,1504
+(defvar semantic-ectag-lang-extra-flags 41,1617
+(defvar semantic-ectag-collect-errors 44,1733
+(defun semantic-ectag-parse-buffer 48,1826
+(defun semantic-ectag-parse-file-with-mode 77,2835
+(defun semantic-ectag-parse-tags 109,4242
+(defun semantic-ectag-add-child 210,8232
+(defun semantic-ectag-add-parent 218,8490
+(defun semantic-ectag-parse-one-tag 225,8732
+(defun semantic-ectag-split-fields 309,12327
+(define-overloadable-function semantic-ectag-split-signature-summary 354,14056
+(defun semantic-ectag-split-signature-summary-default 359,14304
+(define-overloadable-function semantic-ectag-set-language-attributes 364,14503
+(defun semantic-ectag-set-language-attributes-default 368,14695
+(defun semantic-ectag-setup-parse-table 377,14923
+(defun semantic-ectag-parse-region 390,15438
+(defun semantic-ectag-parse-changes 402,15870
+(defun semantic-ectag-expand-tag 411,16168
+
+/home/snake/.elfiles/cedet/semantic/ctags/semantic-ectag-lang.el,168
+(defun semantic-ectag-simple-setup 35,1193
+(defmacro semantic-ectag-add-language-support 42,1513
+(defun semantic-load-enable-primary-exuberent-ctags-support 79,3227
+
+/home/snake/.elfiles/cedet/semantic/ctags/semantic-ectag-util.el,341
+(defcustom semantic-ectag-program-list 35,1198
+(defcustom semantic-ectag-program 42,1403
+(defun semantic-ectag-program 47,1519
+(defun semantic-ectag-run 62,1958
+(defun semantic-ectag-lang-and-kinds 83,2608
+(defun semantic-ectag-version 131,3794
+(defvar semantic-ectag-min-version 175,4877
+(defun semantic-ectag-test-version 178,4968
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-ref.el,421
+(defmethod semanticdb-add-reference 41,1574
+(defmethod semanticdb-check-references 63,2415
+(defmethod semanticdb-includes-in-table 69,2656
+(defmethod semanticdb-check-references 74,2851
+(defmethod semanticdb-refresh-references 105,3741
+(defmethod semanticdb-refresh-references 111,3933
+(defmethod semanticdb-notify-references 124,4260
+(defclass semanticdb-ref-adebug 136,4632
+(defun semanticdb-ref-test 142,4837
+
+/home/snake/.elfiles/cedet/semantic/symref/semantic-symref-global.el,161
+(defclass semantic-symref-tool-global 32,1114
+(defmethod semantic-symref-perform-search 42,1465
+(defmethod semantic-symref-parse-tool-output-one-line 53,1807
+
+/home/snake/.elfiles/cedet/semantic/symref/semantic-symref-filter.el,200
+(defun semantic-symref-filter-hit 42,1513
+(defun semantic-symref-hits-in-region 58,2017
+(defun semantic-symref-test-count-hits-in-tag 84,2980
+(defun semantic-symref-rename-local-variable 106,3777
+
+/home/snake/.elfiles/cedet/semantic/symref/semantic-symref-idutils.el,162
+(defclass semantic-symref-tool-idutils 32,1121
+(defmethod semantic-symref-perform-search 42,1469
+(defmethod semantic-symref-parse-tool-output-one-line 53,1794
+
+/home/snake/.elfiles/cedet/semantic/symref/semantic-symref-grep.el,372
+(defclass semantic-symref-tool-grep 41,1388
+(defvar semantic-symref-filepattern-alist51,1696
+(defun semantic-symref-derive-find-filepatterns 59,1950
+(defvar semantic-symref-grep-expand-keywords94,3153
+(defun semantic-symref-grep-use-template 105,3466
+(defmethod semantic-symref-perform-search 124,4294
+(defmethod semantic-symref-parse-tool-output-one-line 183,6327
+
+/home/snake/.elfiles/cedet/semantic/symref/semantic-symref-cscope.el,161
+(defclass semantic-symref-tool-cscope 32,1107
+(defmethod semantic-symref-perform-search 42,1446
+(defmethod semantic-symref-parse-tool-output-one-line 60,2031
+
+/home/snake/.elfiles/cedet/semantic/symref/semantic-symref-list.el,870
+(defun semantic-symref 41,1452
+(defun semantic-symref-symbol 64,2348
+(defun semantic-symref-produce-list-on-results 82,3017
+(defgroup semantic-symref-results-mode 98,3511
+(defvar semantic-symref-results-mode-map102,3601
+(defcustom semantic-symref-results-mode-hook 116,4212
+(defvar semantic-symref-current-results 121,4361
+(defun semantic-symref-results-mode 125,4472
+(defun semantic-symref-hide-buffer 144,5118
+(defcustom semantic-symref-results-summary-function 149,5235
+(defun semantic-symref-results-dump 155,5505
+(defun semantic-symref-list-toggle-showing 200,6606
+(defun semantic-symref-rb-toggle-expand-tag 208,6847
+(defun semantic-symref-rb-goto-file 272,8431
+(defun semantic-symref-rb-goto-tag 285,8845
+(defun semantic-symref-rb-goto-match 300,9305
+(defun semantic-symref-list-next-line 316,9794
+(defun semantic-symref-list-prev-line 322,9945
+
+/home/snake/.elfiles/cedet/semantic/symref/semantic-symref.el,1029
+(defvar semantic-symref-tool 73,2683
+(defvar semantic-symref-tool-alist81,2947
+(defun semantic-symref-detect-symref-tool 98,3575
+(defun semantic-symref-instantiate 119,4334
+(defvar semantic-symref-last-result 131,4793
+(defun semantic-symref-data-debug-last-result 134,4874
+(defun semantic-symref-find-references-by-name 147,5227
+(defun semantic-symref-find-tags-by-name 171,6145
+(defun semantic-symref-find-tags-by-regexp 191,6856
+(defun semantic-symref-find-tags-by-completion 211,7571
+(defun semantic-symref-find-file-references-by-name 231,8295
+(defun semantic-symref-find-text 251,9016
+(defclass semantic-symref-result 274,9849
+(defmethod semantic-symref-result-get-files 301,10748
+(defmethod semantic-symref-result-get-tags 320,11410
+(defclass semantic-symref-tool-baseclass 418,14602
+(defmethod semantic-symref-get-result 448,15640
+(defmethod semantic-symref-perform-search 466,16166
+(defmethod semantic-symref-parse-tool-output 470,16386
+(defmethod semantic-symref-parse-tool-output-one-line 485,16897
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-file.el,1176
+(defvar semanticdb-file-version 36,1229
+(defvar semanticdb-file-incompatible-version 38,1340
+(defcustom semanticdb-default-file-name 44,1486
+(defcustom semanticdb-default-save-directory 50,1639
+(defcustom semanticdb-persistent-path 62,2207
+(defcustom semanticdb-save-database-hooks 76,2913
+(defvar semanticdb-dir-sep-char 83,3136
+(defun semanticdb-fix-pathname 90,3407
+(defclass semanticdb-project-database-file 105,3936
+(defmethod semanticdb-create-database 128,4876
+(defun semanticdb-load-database 157,6016
+(defun semanticdb-file-loaded-p 192,7168
+(defmethod semanticdb-file-directory-exists-p 196,7357
+(defmethod semanticdb-save-db 219,8163
+(defmethod semanticdb-live-p 260,9573
+(defmethod semanticdb-live-p 266,9866
+(defvar semanticdb-data-debug-on-write-error 273,10193
+(defmethod object-write 278,10385
+(defmethod semanticdb-write-directory-p 327,11874
+(defmethod semanticdb-file-table 364,13221
+(defmethod semanticdb-file-name-non-directory 370,13558
+(defmethod semanticdb-file-name-directory 376,13774
+(defmethod semanticdb-cache-filename 388,14315
+(defmethod semanticdb-full-filename 399,14806
+(defun semanticdb-cleanup-cache-files 405,14974
+
+/home/snake/.elfiles/cedet/semantic/semantic-decorate-mode.el,2540
+(defcustom semantic-decoration-styles 48,1668
+(defsubst semantic-decorate-style-predicate 61,2085
+(defsubst semantic-decorate-style-highlighter 65,2215
+(defsubst semantic-decoration-p 71,2384
+(defsubst semantic-decoration-set-property 76,2571
+(defsubst semantic-decoration-get-property 83,2792
+(defsubst semantic-decoration-set-face 88,2981
+(defsubst semantic-decoration-face 93,3149
+(defsubst semantic-decoration-set-priority 97,3285
+(defsubst semantic-decoration-priority 103,3507
+(defsubst semantic-decoration-move 107,3655
+(defun semantic-decorate-tag 116,3899
+(defun semantic-decorate-clear-tag 129,4491
+(defun semantic-decorate-tag-decoration 141,5022
+(defun semantic-decorate-flush-decorations 147,5213
+(defun semantic-decorate-clear-decorations 157,5659
+(defun semantic-decorate-add-decorations 165,5949
+(defvar semantic-decorate-pending-decoration-hook 198,7366
+(defun semantic-decorate-add-pending-decoration 204,7624
+(defun semantic-decorate-flush-pending-decorations 214,8057
+(defcustom global-semantic-decoration-mode 230,8553
+(defun global-semantic-decoration-mode 243,8995
+(defcustom semantic-decoration-mode-hook 254,9436
+(defvar semantic-decoration-mode 260,9596
+(defun semantic-decoration-mode-setup 265,9820
+(defun semantic-decoration-mode 301,11581
+(defun semantic-decorate-tags-after-full-reparse 333,12703
+(defun semantic-decorate-tags-after-partial-reparse 344,13161
+(defun semantic-decoration-style-enabled-p 354,13536
+(defun semantic-toggle-decoration-style 360,13779
+(defvar semantic-decoration-menu-cache 387,14913
+(defun semantic-decoration-build-style-menu 390,14992
+(defun semantic-build-decoration-mode-menu 401,15329
+(defmacro define-semantic-decoration-style 413,15702
+(define-semantic-decoration-style semantic-tag-boundary466,17908
+(defface semantic-tag-boundary-face470,18058
+(defun semantic-tag-boundary-p-default 479,18339
+(defun semantic-tag-boundary-highlight-default 498,18919
+(define-semantic-decoration-style semantic-decoration-on-private-members515,19378
+(defface semantic-decoration-on-private-members-face519,19535
+(defun semantic-decoration-on-private-members-highlight-default 528,19876
+(defun semantic-decoration-on-private-members-p-default 534,20108
+(defface semantic-decoration-on-protected-members-face541,20369
+(define-semantic-decoration-style semantic-decoration-on-protected-members550,20714
+(defun semantic-decoration-on-protected-members-p-default 554,20875
+(defun semantic-decoration-on-protected-members-highlight-default 559,21105
+
+/home/snake/.elfiles/cedet/semantic/semantic-decorate-include.el,1702
+(defvar semantic-decoratiton-mouse-3 39,1439
+(defface semantic-decoration-on-includes44,1648
+(defvar semantic-decoration-on-include-map50,1856
+(defvar semantic-decoration-on-include-menu 57,2057
+(defface semantic-decoration-on-unknown-includes111,4051
+(defvar semantic-decoration-on-unknown-include-map120,4394
+(defvar semantic-decoration-on-unknown-include-menu 127,4698
+(defface semantic-decoration-on-unparsed-includes174,6554
+(defvar semantic-decoration-on-unparsed-include-map183,6908
+(defvar semantic-decoration-on-unparsed-include-menu 190,7136
+(define-semantic-decoration-style semantic-decoration-on-includes257,9717
+(defun semantic-decoration-on-includes-p-default 262,9911
+(defun semantic-decoration-on-includes-highlight-default 266,10075
+(defun semantic-decoration-include-describe 315,11595
+(defun semantic-decoration-include-visit 381,13858
+(defun semantic-decoration-include-menu 398,14414
+(defun semantic-decoration-unknown-include-describe 417,14976
+(defun semantic-decoration-unknown-include-menu 480,17185
+(defun semantic-decoration-unparsed-include-describe 500,17815
+(defun semantic-decoration-unparsed-include-menu 545,19302
+(defun semantic-decoration-unparsed-include-parse-include 561,19847
+(defun semantic-decoration-unparsed-include-parse-all-includes 569,20147
+(defun semantic-decoration-all-include-summary 578,20371
+(defclass semantic-decoration-unparsed-include-cache 702,24165
+(defmethod semantic-reset 709,24398
+(defmethod semanticdb-partial-synchronize 719,24744
+(defmethod semanticdb-synchronize 725,24984
+(defun semantic-decoration-unparsed-include-refrence-reset 730,25158
+(defun semantic-decoration-unparsed-include-do-reset 748,25810
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-el.el,1275
+(defclass semanticdb-table-emacs-lisp 45,1561
+(defmethod semanticdb-refresh-table 50,1729
+(defmethod semanticdb-needs-refresh-p 55,1891
+(defclass semanticdb-project-database-emacs-lisp59,2014
+(defvar-mode-local emacs-lisp-mode 69,2398
+(defvar-mode-local emacs-lisp-mode 74,2567
+(defmethod semanticdb-get-database-tables 82,2850
+(defmethod semanticdb-file-table 95,3450
+(defmethod semanticdb-get-tags 101,3691
+(defmethod semanticdb-equivalent-mode 106,3879
+(defmethod semanticdb-full-filename 114,4229
+(defmethod semanticdb-normalize-tags 121,4418
+(defmethod semanticdb-normalize-one-tag 131,4803
+(defun semanticdb-elisp-sym-function-arglist 176,6412
+(defun semanticdb-elisp-sym->tag 201,7240
+(defvar semanticdb-elisp-mapatom-collector 246,8534
+(defmethod semanticdb-find-tags-by-name-method249,8629
+(defmethod semanticdb-find-tags-by-name-regexp-method270,9409
+(defmethod semanticdb-find-tags-for-completion-method280,9810
+(defmethod semanticdb-find-tags-by-class-method289,10200
+(defmethod semanticdb-deep-find-tags-by-name-method301,10629
+(defmethod semanticdb-deep-find-tags-by-name-regexp-method308,10948
+(defmethod semanticdb-deep-find-tags-for-completion-method315,11298
+(defmethod semanticdb-find-tags-external-children-of-type-method324,11688
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-javascript.el,1104
+(defvar semanticdb-javascript-tags42,1422
+(defclass semanticdb-table-javascript 84,2534
+(defclass semanticdb-project-database-javascript89,2713
+(defvar-mode-local javascript-mode 101,3159
+(defvar-mode-local javascript-mode 108,3414
+(defmethod semanticdb-get-database-tables 116,3697
+(defmethod semanticdb-file-table 134,4479
+(defmethod semanticdb-get-tags 140,4732
+(defmethod semanticdb-equivalent-mode 147,5088
+(define-mode-local-override semanticdb-find-translate-path 160,5607
+(defun semanticdb-javascript-regexp-search 188,6705
+(defmethod semanticdb-find-tags-by-name-method198,7023
+(defmethod semanticdb-find-tags-by-name-regexp-method208,7356
+(defmethod semanticdb-find-tags-for-completion-method219,7718
+(defmethod semanticdb-find-tags-by-class-method229,8120
+(defmethod semanticdb-deep-find-tags-by-name-method250,8897
+(defmethod semanticdb-deep-find-tags-by-name-regexp-method257,9207
+(defmethod semanticdb-deep-find-tags-for-completion-method264,9557
+(defmethod semanticdb-find-tags-external-children-of-type-method273,9947
+(defun semanticdb-javascript-strip-tags 292,10603
+
+/home/snake/.elfiles/cedet/semantic/semantic-analyze-fcn.el,800
+(define-overloadable-function semantic-analyze-tag-prototype-p 33,1139
+(defun semantic-analyze-tag-prototype-p-default 37,1248
+(define-overloadable-function semantic-analyze-split-name 52,1697
+(defun semantic-analyze-split-name-default 59,2020
+(define-overloadable-function semantic-analyze-unsplit-name 63,2115
+(defun semantic-analyze-unsplit-name-default 67,2306
+(defun semantic-analyze-select-best-tag 77,2597
+(defun semantic-analyze-find-tags-by-prefix 133,4373
+(defun semantic-analyze-type-to-name 152,5113
+(defun semantic-analyze-tag-type 164,5400
+(defun semantic-analyze-type 174,5909
+(defun semantic-analyze-dereference-metatype-stack 236,8148
+(define-overloadable-function semantic-analyze-dereference-metatype 257,9097
+(defun semantic-analyze-dereference-metatype-1 279,10258
+
+/home/snake/.elfiles/cedet/semantic/semantic-elp.el,1767
+(defvar semantic-elp-emacs-core-list41,1373
+(defvar semantic-elp-eieio-core-list62,1731
+(defvar semantic-elp-ede-core-list74,1979
+(defvar semantic-elp-semantic-core-list89,2348
+(defvar semantic-elp-semantic-find-core-list132,3702
+(defvar semantic-elp-semanticdb-core-list145,4095
+(defvar semantic-elp-include-path-list163,4604
+(defvar semantic-elp-semanticdb-find-list176,5075
+(defun semantic-elp-core-enable 191,5568
+(defun semantic-elp-include-path-enable 204,6073
+(defvar semantic-elp-typecache-list210,6268
+(defun semantic-elp-profile-typecache 222,6621
+(defun semantic-elp-typecache-enable 229,6855
+(defvar semantic-elp-scope-list236,7093
+(defun semantic-elp-scope-enable 253,7596
+(defvar semantic-elp-analyze-list261,7866
+(defun semantic-elp-analyze-enable 278,8409
+(defvar semantic-elp-symref-list285,8648
+(defun semantic-elp-analyze-symref-hits 292,8816
+(defvar semantic-elp-complete-list299,9067
+(defun semantic-elp-complete-enable 309,9375
+(defclass semantic-elp-data 319,9649
+(defmethod semantic-elp-change-sort 338,10124
+(defun semantic-elp-goto-function 377,11121
+(defmethod semantic-elp-dump-table 385,11360
+(defmethod data-debug/eieio-insert-slots 412,12190
+(defun semantic-elp-change-sort-adebug 456,13492
+(defclass semantic-elp-object-base 477,14123
+(defclass semantic-elp-object 486,14392
+(defclass semantic-elp-object-analyze 496,14700
+(defvar semantic-elp-last-results 523,15490
+(defun semantic-elp-results 526,15598
+(defvar semantic-elp-last-run 556,16456
+(defun semantic-elp-analyze 560,16546
+(defun semantic-elp-idle-work 646,19404
+(defun semantic-elp-searchdb 676,20357
+(defun semantic-elp-symref-hit-count 715,21504
+(defun semantic-elp-show-last-run 758,22704
+(defun semantic-elp-load-old-run 766,22914
+
+/home/snake/.elfiles/cedet/semantic/semantic-grammar.el,6415
+(defconst semantic-grammar-lex-c-char-re 51,1486
+(define-lex-regex-analyzer semantic-grammar-lex-prologue57,1708
+(defsubst semantic-grammar-epilogue-start 70,2080
+(define-lex-regex-analyzer semantic-grammar-lex-epilogue78,2340
+(defun semantic-grammar-lex-buffer 95,2865
+(defun semantic-grammar-ASSOC 112,3366
+(defsubst semantic-grammar-quote-p 125,3778
+(defsubst semantic-grammar-backquote-p 132,3992
+(defvar-mode-local semantic-grammar-mode143,4262
+(define-mode-local-override semantic-tag-components147,4409
+(defun semantic-grammar-first-tag-name 152,4574
+(defun semantic-grammar-tag-symbols 164,5001
+(defsubst semantic-grammar-item-text 178,5506
+(defsubst semantic-grammar-item-value 184,5705
+(defun semantic-grammar-prologue 194,6084
+(defun semantic-grammar-epilogue 214,6707
+(defsubst semantic-grammar-buffer-file 241,7680
+(defun semantic-grammar-package 246,7913
+(defsubst semantic-grammar-languagemode 258,8482
+(defsubst semantic-grammar-start 262,8638
+(defsubst semantic-grammar-scopestart 266,8773
+(defsubst semantic-grammar-quotemode 270,8937
+(defsubst semantic-grammar-keywords 274,9098
+(defun semantic-grammar-keyword-properties 284,9504
+(defun semantic-grammar-tokens 311,10522
+(defun semantic-grammar-token-%type-properties 357,12364
+(defun semantic-grammar-token-%put-properties 372,13014
+(defsubst semantic-grammar-token-properties 387,13684
+(defun semantic-grammar-use-macros 397,14162
+(defvar semantic-grammar-macros 413,14770
+(defun semantic-grammar-macros 417,14912
+(defun semantic-grammar-keywordtable-builder-default 431,15232
+(define-overloadable-function semantic-grammar-keywordtable-builder 438,15501
+(defun semantic-grammar-tokentable-builder-default 443,15643
+(define-overloadable-function semantic-grammar-tokentable-builder 450,15907
+(defun semantic-grammar-parsetable-builder-default 455,16059
+(define-overloadable-function semantic-grammar-parsetable-builder 459,16226
+(defun semantic-grammar-setupcode-builder-default 464,16365
+(define-overloadable-function semantic-grammar-setupcode-builder 468,16534
+(defvar semantic--grammar-input-buffer 474,16680
+(defvar semantic--grammar-output-buffer 475,16725
+(defsubst semantic-grammar-keywordtable 477,16771
+(defsubst semantic-grammar-tokentable 484,17019
+(defsubst semantic-grammar-parsetable 491,17261
+(defsubst semantic-grammar-setupfunction 498,17503
+(defmacro semantic-grammar-as-string 505,17752
+(defun semantic-grammar-insert-defconst 512,17927
+(defun semantic-grammar-insert-defun 520,18218
+(defun semantic-grammar-insert-define 528,18505
+(defconst semantic-grammar-header-template545,19021
+(defconst semantic-grammar-footer-template584,20265
+(defun semantic-grammar-copyright-line 595,20471
+(defun semantic-grammar-header 605,20874
+(defun semantic-grammar-footer 625,21673
+(defun semantic-grammar-token-data 638,22096
+(defun semantic-grammar-keyword-data 643,22268
+(defun semantic-grammar-parser-data 648,22438
+(defun semantic-grammar-setup-data 653,22598
+(defvar semantic-grammar--lex-block-specs)660,22807
+(defsubst semantic-grammar--lex-delim-spec 662,22851
+(defun semantic-grammar--lex-block-specs 676,23397
+(defsubst semantic-grammar-quoted-form 717,25279
+(defun semantic-grammar-insert-defanalyzer 724,25498
+(defun semantic-grammar-insert-defanalyzers 782,27710
+(defcustom semantic-grammar-file-regexp 797,28321
+(defsubst semantic-grammar-noninteractive 802,28457
+(defun semantic-grammar-create-package 808,28632
+(defun semantic-grammar-recreate-package 929,33172
+(defun semantic-grammar-batch-build-one-package 935,33406
+(defun semantic-grammar-batch-build-packages 964,34634
+(defvar semantic--grammar-macros-regexp-1 1007,36360
+(defun semantic--grammar-macros-regexp-1 1010,36472
+(defconst semantic--grammar-macdecl-re1025,37063
+(defvar semantic--grammar-macros-regexp-2 1029,37220
+(defun semantic--grammar-clear-macros-regexp-2 1032,37332
+(defun semantic--grammar-macros-regexp-2 1039,37606
+(defun semantic--grammar-macros-matcher 1062,38561
+(defvar semantic-grammar-syntax-table1074,38946
+(defvar semantic-grammar-mode-hook 1094,39970
+(defvar semantic-grammar-mode-keywords-11097,40061
+(defvar semantic-grammar-mode-keywords-21128,41167
+(defvar semantic-grammar-mode-keywords-31133,41357
+(defvar semantic-grammar-mode-keywords1138,41547
+(defvar semantic-grammar-map1142,41690
+(defvar semantic-grammar-menu1163,42635
+(defun semantic-grammar-setup-menu-emacs 1176,43069
+(defun semantic-grammar-setup-menu-xemacs 1192,43693
+(defmacro semantic-grammar-setup-menu 1212,44440
+(defsubst semantic-grammar-in-lisp-p 1221,44832
+(defun semantic-grammar-edits-new-change-hook-fcn 1230,45086
+(defun semantic-grammar-mode 1243,45762
+(defvar semantic-grammar-skip-quoted-syntax-table1314,48574
+(defsubst semantic-grammar-backward-item 1322,48898
+(defun semantic-grammar-anchored-indentation 1335,49441
+(defun semantic-grammar-do-grammar-indent 1356,50047
+(defvar semantic-grammar-brackets-as-parens-syntax-table1391,51063
+(defun semantic-grammar-do-lisp-indent 1399,51384
+(defun semantic-grammar-indent 1426,52365
+(defun semantic-grammar-electric-punctuation 1441,52851
+(defun semantic-grammar-complete 1448,53046
+(defun semantic-grammar-insert-keyword 1478,54280
+(defsubst semantic--grammar-macro-function-tag 1491,54635
+(defsubst semantic--grammar-macro-lib-part 1501,55073
+(defun semantic--grammar-macro-compl-elt 1507,55345
+(defun semantic--grammar-macro-compl-dict 1518,55762
+(defun semantic-grammar-find-macro-expander 1534,56297
+(defvar semantic-grammar-syntax-help1564,57610
+(defun semantic-grammar-eldoc-get-macro-docstring 1630,60831
+(define-mode-local-override semantic-idle-summary-current-symbol-info1658,61833
+(define-mode-local-override semantic-tag-boundary-p1693,63312
+(define-mode-local-override semantic-ctxt-current-function1700,63572
+(define-mode-local-override semantic-ctxt-current-argument1709,63906
+(define-mode-local-override semantic-ctxt-current-assignment1718,64249
+(define-mode-local-override semantic-ctxt-current-class-list1727,64582
+(define-mode-local-override semantic-ctxt-current-mode1737,64953
+(define-mode-local-override semantic-format-tag-abbreviate1749,65406
+(define-mode-local-override semantic-format-tag-summarize1766,65970
+(define-mode-local-override semantic-analyze-current-context1840,68767
+(define-mode-local-override semantic-analyze-possible-completions1876,69776
+
+/home/snake/.elfiles/cedet/semantic/semantic-analyze-debug.el,784
+(defun semantic-analyze-debug-assist 34,1177
+(defun semantic-analyzer-debug-found-prefix 52,1666
+(defun semantic-analyzer-debug-global-symbol 86,2894
+(defun semantic-analyzer-debug-missing-datatype 145,4617
+(defun semantic-analyzer-debug-missing-innertype 198,6373
+(defun semantic-analyzer-debug-test-local-context 332,10383
+(defun semantic-analyzer-debug-show-completions 364,11344
+(defun semantic-analyzer-debug-insert-include-summary 380,11748
+(defun semantic-analyzer-debug-describe-scope 474,14480
+(defun semantic-analyzer-debug-global-miss-text 511,15663
+(defun semantic-analyzer-debug-insert-tag-list 535,16411
+(defun semantic-analyzer-debug-insert-tag 546,16725
+(defvar semantic-analyzer-debug-orig 575,17602
+(defun semantic-analyzer-debug-add-buttons 578,17691
+
+/home/snake/.elfiles/cedet/semantic/semantic-chart.el,226
+(defun semantic-chart-tags-by-class 38,1235
+(defun semantic-chart-database-size 62,2054
+(defun semantic-chart-token-complexity 101,3243
+(defun semantic-chart-tag-complexity108,3420
+(defun semantic-chart-analyzer 149,4876
+
+/home/snake/.elfiles/cedet/semantic/semantic-ede-grammar.el,617
+(defclass semantic-ede-proj-target-grammar 35,1165
+(defvar semantic-ede-source-grammar-wisent52,1718
+(defclass semantic-ede-grammar-compiler-class 59,1935
+(defvar semantic-ede-grammar-compiler-wisent63,2052
+(defvar semantic-ede-source-grammar-bovine86,2933
+(defvar semantic-ede-grammar-compiler-bovine93,3157
+(defmethod ede-buffer-mine 118,4086
+(defmethod project-compile-target 128,4531
+(defmethod ede-proj-makefile-sourcevar 148,5243
+(defmethod ede-proj-makefile-insert-variables 154,5521
+(defmethod ede-proj-makefile-insert-rules 174,6226
+(defmethod ede-proj-makefile-insert-dist-dependencies 187,6631
+
+/home/snake/.elfiles/cedet/semantic/semantic-utest.el,2216
+(defvar semantic-utest-temp-directory 35,1297
+(defun semantic-utest-fname 40,1474
+(defvar semantic-utest-C-buffer-contents47,1701
+(defvar semantic-utest-C-h-buffer-contents91,2460
+(defvar semantic-utest-C-filename 99,2658
+(defvar semantic-utest-C-filename-h102,2779
+(defvar semantic-utest-C-name-contents108,2921
+(defvar semantic-utest-Python-buffer-contents163,4454
+(defvar semantic-utest-Python-name-contents262,5724
+(defvar semantic-utest-Java-buffer-contents407,10440
+(defvar semantic-utest-Java-name-contents422,10603
+(defvar semantic-utest-Javascript-buffer-contents461,11732
+(defvar semantic-utest-Javascript-name-contents474,11872
+(defvar semantic-utest-Makefile-buffer-contents502,12656
+(defvar semantic-utest-Makefile-name-contents515,12748
+(defvar semantic-utest-Scheme-buffer-contents528,13155
+(defvar semantic-utest-Scheme-name-contents536,13263
+(defvar semantic-utest-Html-buffer-contents549,13652
+(defvar semantic-utest-Html-name-contents559,13768
+(defvar semantic-utest-PHP-buffer-contents571,14112
+(defvar semantic-utest-PHP-name-contents595,14432
+(defvar semantic-utest-Csharp-buffer-contents628,15620
+(defvar semantic-utest-Csharp-name-contents638,15778
+(defun semantic-utest-makebuffer 677,16735
+(defun semantic-utest-C 693,17253
+(defun semantic-utest-generic 734,18384
+(defun semantic-utest-Python(773,19755
+(defun semantic-utest-Javascript(786,20106
+(defun semantic-utest-Java(793,20458
+(defun semantic-utest-Makefile(801,20850
+(defun semantic-utest-Scheme(806,21088
+(defun semantic-utest-Html(812,21318
+(defun semantic-utest-PHP(819,21645
+(defun semantic-utest-Csharp(827,21988
+(defun semantic-utest-main(859,23479
+(defun semantic-utest-match-attributes 887,24272
+(defun semantic-utest-equivalent-tag-p 912,24939
+(defun semantic-utest-taglists-equivalent-p 922,25373
+(defun semantic-utest-verify-names 945,26196
+(defun semantic-utest-verify-names-jave 960,26730
+(defun semantic-utest-verify-names-2 968,27078
+(defvar semantic-utest-last-kill-text 983,27472
+(defvar semantic-utest-last-kill-pos 986,27549
+(defun semantic-utest-kill-indicator 989,27627
+(defun semantic-utest-unkill-indicator 1003,28147
+(defun semantic-utest-last-invalid 1014,28387
+
+/home/snake/.elfiles/cedet/semantic/semantic-decorate.el,1052
+(defun semantic-highlight-tag 41,1359
+(defun semantic-unhighlight-tag 52,1753
+(defun semantic-momentary-highlight-one-tag-line 62,2101
+(defun semantic-momentary-highlight-tag 73,2497
+(defun semantic-set-tag-face 87,3130
+(defun semantic-set-tag-invisible 92,3300
+(defun semantic-tag-invisible-p 99,3550
+(defun semantic-set-tag-intangible 104,3708
+(defun semantic-tag-intangible-p 113,4081
+(defun semantic-overlay-signal-read-only119,4344
+(defun semantic-set-tag-read-only 131,4824
+(defun semantic-tag-read-only-p 145,5460
+(defun semantic-tag-secondary-overlays 195,7184
+(defun semantic-tag-create-secondary-overlay 200,7356
+(defun semantic-tag-get-secondary-overlay 225,8552
+(defun semantic-tag-delete-secondary-overlay 237,8978
+(defun semantic--tag-unlink-copy-secondary-overlays 254,9749
+(defun semantic--tag-unlink-secondary-overlays 271,10554
+(defun semantic--tag-link-secondary-overlays 293,11564
+(defun semantic-set-tag-folded 308,12040
+(defun semantic-set-tag-folded-isearch 338,13168
+(defun semantic-tag-folded-p 345,13390
+
+/home/snake/.elfiles/cedet/semantic/semanticdb.el,3642
+(defgroup semanticdb 43,1399
+(defvar semanticdb-database-list 48,1509
+(defvar semanticdb-new-database-class 51,1582
+(defvar semanticdb-default-find-index-class 58,1917
+(defclass semanticdb-abstract-table 66,2216
+(defmethod semanticdb-in-buffer-p 102,3652
+(defmethod semanticdb-get-buffer 106,3793
+(defmethod semanticdb-full-filename 111,3976
+(defmethod semanticdb-dirty-p 116,4163
+(defmethod semanticdb-set-dirty 120,4273
+(defmethod semanticdb-normalize-tags 127,4522
+(defmethod semanticdb-normalize-one-tag 135,4894
+(defmethod object-print 146,5341
+(defclass semanticdb-abstract-search-index 157,5683
+(defmethod semanticdb-get-table-index 167,6075
+(defmethod semanticdb-synchronize 181,6501
+(defmethod semanticdb-partial-synchronize 187,6698
+(defclass semanticdb-search-results-table 199,7042
+(defmethod semanticdb-refresh-table 206,7321
+(defclass semanticdb-table 213,7578
+(defmethod semanticdb-in-buffer-p 258,9429
+(defmethod semanticdb-get-buffer 266,9678
+(defmethod semanticdb-set-buffer 275,10078
+(defmethod semanticdb-full-filename 280,10284
+(defmethod semanticdb-dirty-p 285,10486
+(defmethod semanticdb-set-dirty 289,10600
+(defmethod object-print 294,10722
+(defclass semanticdb-project-database 302,11014
+(defmethod semanticdb-full-filename 331,12157
+(defmethod semanticdb-dirty-p 336,12346
+(defmethod object-print 347,12753
+(defmethod semanticdb-create-database 358,13163
+(defmethod semanticdb-flush-database-tables 372,13821
+(defmethod semanticdb-create-table 376,13965
+(defmethod semanticdb-file-table 393,14647
+(defun semanticdb-get-database 400,14936
+(defun semanticdb-directory-loaded-p 405,15131
+(defun semanticdb-create-table-for-file 409,15328
+(defclass semanticdb-abstract-cache 429,15914
+(defmethod semanticdb-cache-get 443,16489
+(defmethod semanticdb-cache-remove 462,17203
+(defmethod semanticdb-synchronize 467,17383
+(defmethod semanticdb-partial-synchronize 473,17562
+(defclass semanticdb-abstract-db-cache 479,17758
+(defmethod semanticdb-cache-get 493,18347
+(defmethod semanticdb-cache-remove 512,19048
+(defmethod semanticdb-synchronize 518,19225
+(defmethod semanticdb-partial-synchronize 524,19407
+(defmethod semanticdb-refresh-table 532,19619
+(defmethod semanticdb-needs-refresh-p 558,20626
+(defmethod semanticdb-synchronize 590,21653
+(defmethod semanticdb-partial-synchronize 621,22660
+(defmethod semanticdb-save-db 654,23746
+(defun semanticdb-save-current-db 662,24030
+(defvar semanticdb--inhibit-create-file-directory)671,24391
+(defun semanticdb-save-all-db 673,24443
+(defun semanticdb-save-all-db-idle 681,24718
+(defvar semanticdb-project-predicate-functions 694,25137
+(defmethod semanticdb-write-directory-p 703,25602
+(defun semanticdb-current-database 713,25961
+(defvar semanticdb-match-any-mode 722,26215
+(defmacro semanticdb-with-match-any-mode 728,26497
+(defmethod semanticdb-equivalent-mode-for-search 735,26818
+(defmethod semanticdb-equivalent-mode 746,27284
+(defmethod semanticdb-equivalent-mode 752,27530
+(defcustom semanticdb-project-roots 775,28334
+(defvar semanticdb-project-root-functions 783,28697
+(defvar semanticdb-project-system-databases 791,29154
+(defvar semanticdb-search-system-databases 799,29533
+(defun semanticdb-current-database-list 802,29645
+(defvar semanticdb-file-table-hash 857,31764
+(defun semanticdb-file-table-object-from-hash 860,31886
+(defun semanticdb-file-table-object-put-hash 865,32071
+(defun semanticdb-file-table-object 870,32251
+(defvar semanticdb-out-of-buffer-create-table-fcn 980,36164
+(defun semanticdb-create-table-for-file-not-in-buffer 985,36396
+(defun semanticdb-file-stream 1022,37800
+
+/home/snake/.elfiles/cedet/semantic/semantic-utest-c.el,211
+(defvar semantic-utest-c-comparisons27,1007
+(defvar semantic-utest-c-conditionals32,1159
+(defun semantic-utest-c 38,1293
+(defun semantic-utest-c-compare 47,1491
+(defun semantic-utest-c-conditionals 81,2835
+
+/home/snake/.elfiles/cedet/semantic/semantic-analyze-complete.el,319
+(define-overloadable-function semantic-analyze-type-constants 42,1257
+(defun semantic-analyze-type-constants-default 46,1420
+(defun semantic-analyze-tags-of-class-list 69,2043
+(define-overloadable-function semantic-analyze-possible-completions 84,2506
+(defun semantic-analyze-possible-completions-default 119,3997
+
+/home/snake/.elfiles/cedet/semantic/semantic-ctxt.el,2489
+(defvar semantic-command-separation-character41,1460
+(defvar semantic-function-argument-separation-character47,1680
+(define-overloadable-function semantic-up-context 57,2015
+(defun semantic-up-context-default 74,2832
+(define-overloadable-function semantic-beginning-of-context 85,3151
+(defun semantic-beginning-of-context-default 90,3381
+(define-overloadable-function semantic-end-of-context 99,3660
+(defun semantic-end-of-context-default 105,3918
+(defun semantic-narrow-to-context 130,4709
+(defmacro semantic-with-buffer-narrowed-to-context 143,5036
+(define-overloadable-function semantic-get-local-variables 157,5461
+(defun semantic-get-local-variables-default 173,6113
+(define-overloadable-function semantic-get-local-arguments 233,8171
+(defun semantic-get-local-arguments-default 264,9552
+(define-overloadable-function semantic-get-all-local-variables 271,9860
+(defun semantic-get-all-local-variables-default 277,10200
+(define-overloadable-function semantic-end-of-command 303,11281
+(defun semantic-end-of-command-default 307,11442
+(define-overloadable-function semantic-beginning-of-command 322,12016
+(defun semantic-beginning-of-command-default 326,12189
+(defsubst semantic-point-at-beginning-of-command 344,12871
+(defsubst semantic-point-at-end-of-command 348,13046
+(defsubst semantic-narrow-to-command 352,13209
+(defmacro semantic-with-buffer-narrowed-to-command 357,13408
+(define-overloadable-function semantic-ctxt-current-symbol 369,13808
+(defun semantic-ctxt-current-symbol-default 380,14270
+(define-overloadable-function semantic-ctxt-current-symbol-and-bounds 452,16541
+(defun semantic-ctxt-current-symbol-and-bounds-default 457,16807
+(define-overloadable-function semantic-ctxt-current-assignment 485,17729
+(defun semantic-ctxt-current-assignment-default 490,17966
+(define-overloadable-function semantic-ctxt-current-function 508,18717
+(defun semantic-ctxt-current-function-default 514,19045
+(define-overloadable-function semantic-ctxt-current-argument 527,19495
+(defun semantic-ctxt-current-argument-default 530,19649
+(defun semantic-ctxt-current-thing 548,20307
+(define-overloadable-function semantic-ctxt-current-class-list 558,20762
+(defun semantic-ctxt-current-class-list-default 565,21118
+(define-overloadable-function semantic-ctxt-current-mode 582,21621
+(defun semantic-ctxt-current-mode-default 588,21902
+(define-overloadable-function semantic-ctxt-scoped-types 598,22306
+(defun semantic-ctxt-scoped-types-default 604,22606
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-find.el,3665
+(defvar semanticdb-find-throttle-custom-list129,4920
+(defcustom semanticdb-find-default-throttle140,5227
+(defun semanticdb-find-throttle-active-p 168,6778
+(defclass semanticdb-find-search-index 181,7270
+(defmethod semantic-reset 194,7769
+(defmethod semanticdb-synchronize 205,8116
+(defmethod semanticdb-partial-synchronize 217,8491
+(define-overloadable-function semanticdb-find-translate-path 255,9715
+(defun semanticdb-find-translate-path-default 298,11533
+(define-overloadable-function semanticdb-find-table-for-include 310,12031
+(defun semanticdb-find-translate-path-brutish-default 317,12397
+(defun semanticdb-find-incomplete-cache-entries-p 353,13650
+(defun semanticdb-find-need-cache-update-p 363,13931
+(defun semanticdb-find-translate-path-includes-default 388,14626
+(defvar semanticdb-find-lost-includes 421,15975
+(defvar semanticdb-find-scanned-include-tags 425,16146
+(defvar semanticdb-implied-include-tags 433,16471
+(defun semanticdb-find-translate-path-includes--internal 441,16824
+(define-overloadable-function semanticdb-find-load-unloaded 586,21825
+(defun semanticdb-find-load-unloaded-default 595,22214
+(defun semanticdb-find-table-for-include-default 600,22435
+(defun semanticdb-find-test-translate-path 719,26828
+(defun semanticdb-find-test-translate-path-no-loading 737,27471
+(defun semanticdb-find-adebug-lost-includes 759,28268
+(defun semanticdb-find-adebug-insert-scanned-tag-cons 776,28774
+(defun semanticdb-find-adebug-scanned-includes 812,30030
+(defun semanticdb-strip-find-results 855,31195
+(defun semanticdb-fast-strip-find-results 904,33064
+(defun semanticdb-find-results-p 912,33410
+(defun semanticdb-find-result-prin1-to-string 922,33858
+(defun semanticdb-find-result-with-nil-p 938,34422
+(defun semanticdb-find-result-length 955,35131
+(defun semanticdb-find-result-nth 964,35352
+(defun semanticdb-find-result-test 988,36213
+(defun semanticdb-find-result-nth-in-buffer 1001,36679
+(defun semanticdb-find-result-mapc 1028,37567
+(defvar semanticdb-find-log-flag 1043,37999
+(defvar semanticdb-find-log-buffer-name 1046,38085
+(defun semanticdb-find-toggle-logging 1049,38187
+(defun semanticdb-reset-log 1056,38437
+(defun semanticdb-find-log-move-to-end 1065,38666
+(defun semanticdb-find-log-new-search 1078,39090
+(defun semanticdb-find-log-activity 1087,39394
+(defun semanticdb-find-tags-collector 1103,39890
+(defun semanticdb-find-tags-by-name 1169,42875
+(defun semanticdb-find-tags-by-name-regexp 1180,43338
+(defun semanticdb-find-tags-for-completion 1191,43821
+(defun semanticdb-find-tags-by-class 1202,44304
+(defun semanticdb-deep-find-tags-by-name 1215,44787
+(defun semanticdb-deep-find-tags-by-name-regexp 1227,45316
+(defun semanticdb-deep-find-tags-for-completion 1239,45865
+(defun semanticdb-brute-deep-find-tags-by-name 1253,46445
+(defun semanticdb-brute-deep-find-tags-for-completion 1266,47020
+(defun semanticdb-brute-find-tags-by-class 1279,47615
+(defun semanticdb-find-tags-external-children-of-type1294,48213
+(defun semanticdb-find-tags-subclasses-of-type1306,48736
+(defmethod semanticdb-find-tags-by-name-method 1323,49401
+(defmethod semanticdb-find-tags-by-name-regexp-method 1329,49723
+(defmethod semanticdb-find-tags-for-completion-method 1335,50069
+(defmethod semanticdb-find-tags-by-class-method 1341,50415
+(defmethod semanticdb-find-tags-external-children-of-type-method 1347,50740
+(defmethod semanticdb-find-tags-subclasses-of-type-method 1353,51126
+(defmethod semanticdb-deep-find-tags-by-name-method 1360,51516
+(defmethod semanticdb-deep-find-tags-by-name-regexp-method 1368,51948
+(defmethod semanticdb-deep-find-tags-for-completion-method 1376,52404
+
+/home/snake/.elfiles/cedet/semantic/semantic-util-modes.el,3818
+(defgroup semantic-modes 52,1635
+(defcustom semantic-update-mode-line 59,1786
+(defcustom semantic-mode-line-prefix73,2258
+(defvar semantic-minor-modes-status 81,2506
+(defvar semantic-minor-mode-alist 86,2707
+(defun semantic-mode-line-update 90,2849
+(defun semantic-desktop-ignore-this-minor-mode 129,4454
+(defun semantic-add-minor-mode 134,4643
+(defun semantic-toggle-minor-mode-globally 176,6531
+(defun global-semantic-highlight-edits-mode 213,7775
+(defcustom global-semantic-highlight-edits-mode 223,8157
+(defcustom semantic-highlight-edits-mode-hook 235,8610
+(defface semantic-highlight-edits-face240,8765
+(defun semantic-highlight-edits-new-change-hook-fcn 249,9099
+(defvar semantic-highlight-edits-mode-map255,9407
+(defvar semantic-highlight-edits-mode 260,9537
+(defun semantic-highlight-edits-mode-setup 265,9768
+(defun semantic-highlight-edits-mode 289,10719
+(defun global-semantic-show-unmatched-syntax-mode 326,12054
+(defcustom global-semantic-show-unmatched-syntax-mode 336,12460
+(defcustom semantic-show-unmatched-syntax-mode-hook 348,12957
+(defface semantic-unmatched-syntax-face353,13124
+(defsubst semantic-unmatched-syntax-overlay-p 362,13425
+(defun semantic-showing-unmatched-syntax-p 366,13600
+(defun semantic-show-unmatched-lex-tokens-fetch 375,13931
+(defun semantic-clean-unmatched-syntax-in-region 391,14475
+(defsubst semantic-clean-unmatched-syntax-in-buffer 399,14780
+(defsubst semantic-clean-token-of-unmatched-syntax 404,14976
+(defun semantic-show-unmatched-syntax 409,15203
+(defun semantic-next-unmatched-syntax 428,16144
+(defvar semantic-show-unmatched-syntax-mode-map448,16844
+(defvar semantic-show-unmatched-syntax-mode 454,17065
+(defun semantic-show-unmatched-syntax-mode-setup 460,17320
+(defun semantic-show-unmatched-syntax-mode 494,18894
+(defun semantic-show-unmatched-syntax-next 528,20297
+(defcustom global-semantic-show-parser-state-mode 541,20617
+(defun global-semantic-show-parser-state-mode 554,21124
+(defcustom semantic-show-parser-state-mode-hook 563,21499
+(defvar semantic-show-parser-state-mode-map568,21658
+(defvar semantic-show-parser-state-mode 573,21792
+(defun semantic-show-parser-state-mode-setup 578,22031
+(defun semantic-show-parser-state-mode 653,25321
+(defvar semantic-show-parser-state-string 688,26811
+(defun semantic-show-parser-state-marker 693,27029
+(defun semantic-show-parser-state-auto-marker 715,27879
+(defun global-semantic-stickyfunc-mode 732,28306
+(defcustom global-semantic-stickyfunc-mode 742,28668
+(defcustom semantic-stickyfunc-mode-hook 757,29256
+(defvar semantic-stickyfunc-mode-map762,29401
+(defvar semantic-stickyfunc-popup-menu 768,29596
+(defvar semantic-stickyfunc-mode 803,30868
+(defcustom semantic-stickyfunc-indent-string808,31079
+(defvar semantic-stickyfunc-old-hlf 875,33233
+(defconst semantic-stickyfunc-header-line-format878,33336
+(defun semantic-stickyfunc-mode-setup 892,33799
+(defun semantic-stickyfunc-mode 927,35420
+(defvar semantic-stickyfunc-sticky-classes956,36578
+(defun semantic-stickyfunc-tag-to-stick 961,36782
+(defun semantic-stickyfunc-fetch-stickyline 973,37151
+(defun semantic-stickyfunc-menu 1017,38945
+(defun global-semantic-highlight-func-mode 1047,39809
+(defcustom global-semantic-highlight-func-mode 1057,40187
+(defcustom semantic-highlight-func-mode-hook 1068,40595
+(defvar semantic-highlight-func-mode-map1073,40748
+(defvar semantic-highlight-func-popup-menu 1081,40986
+(defun semantic-highlight-func-menu 1114,42185
+(defvar semantic-highlight-func-mode 1130,42703
+(defvar semantic-highlight-func-ct-overlay 1135,42930
+(defface semantic-highlight-func-current-tag-face1139,43100
+(defun semantic-highlight-func-mode-setup 1149,43425
+(defun semantic-highlight-func-mode 1169,44210
+(defun semantic-highlight-func-highlight-current-tag 1200,45443
+
+/home/snake/.elfiles/cedet/semantic/semantic-texi.el,1602
+(defvar semantic-texi-super-regex44,1523
+(defvar semantic-texi-name-field-list50,1833
+(defun semantic-texi-parse-region 64,2173
+(defun semantic-texi-parse-changes 77,2617
+(defun semantic-texi-expand-tag 83,2834
+(defun semantic-texi-parse-headings 91,3103
+(defsubst semantic-texi-new-section-tag 108,3705
+(defsubst semantic-texi-new-def-tag 117,4086
+(defun semantic-texi-set-endpoint 124,4345
+(defun semantic-texi-recursive-combobulate-list 137,4874
+(defun semantic-texi-forward-deffn 222,7902
+(define-mode-local-override semantic-tag-components230,8190
+(defvar semantic-texi-environment-regexp240,8424
+(define-mode-local-override semantic-up-context 255,9037
+(define-mode-local-override semantic-beginning-of-context 287,10164
+(define-mode-local-override semantic-ctxt-current-class-list302,10697
+(define-mode-local-override semantic-format-tag-abbreviate320,11256
+(define-mode-local-override semantic-format-tag-prototype331,11618
+(defun semantic-tag-texi-section-text-bounds 339,11836
+(defun semantic-texi-current-environment 353,12449
+(define-mode-local-override semantic-analyze-current-context371,12977
+(defvar semantic-texi-command-completion-list392,13602
+(define-mode-local-override semantic-analyze-possible-completions417,14310
+(defun semantic-default-texi-setup 447,15300
+(defun semantic-texi-associated-files 482,16624
+(defun semantic-texi-find-documentation 507,17480
+(defun semantic-texi-update-doc-from-texi 527,18328
+(defun semantic-texi-update-doc-from-source 598,20999
+(defun semantic-texi-update-doc 641,22540
+(defun semantic-texi-goto-source 653,23008
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-mode.el,609
+(defvar semanticdb-current-database 30,1071
+(defvar semanticdb-current-table 35,1249
+(defcustom semanticdb-global-mode 40,1427
+(defcustom semanticdb-mode-hook 50,1744
+(defvar semanticdb-hooks62,2092
+(defun semanticdb-minor-mode-p 77,2749
+(defun global-semanticdb-minor-mode 83,2950
+(defun semanticdb-toggle-global-mode 110,3701
+(defun semanticdb-semantic-init-hook-fcn 124,4140
+(defun semanticdb-revert-hook 175,6048
+(defun semanticdb-kill-hook 185,6429
+(defun semanticdb-kill-emacs-hook 226,7861
+(defun semanticdb-synchronize-table 233,8022
+(defun semanticdb-partial-synchronize-table 239,8247
+
+/home/snake/.elfiles/cedet/semantic/semantic-ia-utest.el,439
+(defvar semantic-ia-utest-file-list40,1397
+(defvar semantic-ia-utest-error-log-list 56,1811
+(defun semantic-ia-utest 60,1915
+(defun semantic-ia-utest-ffns 137,3869
+(defun semantic-ia-utest-buffer 165,4703
+(defun semantic-ia-utest-buffer-refs 241,6613
+(defun semantic-sr-utest-buffer-refs 350,9469
+(defun semantic-src-utest-buffer-refs 450,12210
+(defun semantic-ia-utest-start-log 525,14129
+(defun semantic-ia-utest-log 530,14292
+
+/home/snake/.elfiles/cedet/semantic/semantic-debug.el,2019
+(defvar semantic-debug-parser-source 49,1826
+(defvar semantic-debug-parser-class 57,2113
+(defvar semantic-debug-enabled 63,2300
+(defvar semantic-debug-current-interface 67,2417
+(defvar semantic-debug-current-parser 70,2525
+(defclass semantic-debug-interface 75,2646
+(defmethod semantic-debug-set-frame 116,4057
+(defmethod semantic-debug-set-parser-location 122,4277
+(defmethod semantic-debug-set-source-location 131,4628
+(defmethod semantic-debug-interface-layout 140,4979
+(defmethod semantic-debug-highlight-lexical-token 169,5974
+(defmethod semantic-debug-highlight-rule 180,6357
+(defmethod semantic-debug-unhighlight 228,8045
+(defvar semantic-debug-user-command 234,8279
+(defun semantic-debug-break 238,8376
+(defclass semantic-debug-frame 269,9471
+(defmethod semantic-debug-frame-highlight 274,9546
+(defmethod semantic-debug-frame-info 279,9657
+(defvar semantic-debug-mode-map286,9795
+(defun semantic-debug-mode 307,10613
+(defun semantic-debug 346,11752
+(defun semantic-debug-find-parser-source 380,12900
+(defun semantic-debug-next 392,13404
+(defun semantic-debug-step 403,13729
+(defun semantic-debug-up 412,13934
+(defun semantic-debug-down 418,14069
+(defun semantic-debug-fail-match 424,14208
+(defun semantic-debug-print-state 433,14426
+(defun semantic-debug-jump-to-source 441,14620
+(defun semantic-debug-jump-to-parser 455,15093
+(defun semantic-debug-quit 469,15534
+(defun semantic-debug-abort 479,15820
+(defun semantic-debug-go 488,16047
+(defun semantic-debug-set-breakpoint 497,16262
+(defclass semantic-debug-parser 513,16629
+(defmethod semantic-debug-parser-next 523,16946
+(defmethod semantic-debug-parser-step 528,17099
+(defmethod semantic-debug-parser-go 533,17254
+(defmethod semantic-debug-parser-fail 538,17435
+(defmethod semantic-debug-parser-quit 543,17620
+(defmethod semantic-debug-parser-abort 548,17805
+(defmethod semantic-debug-parser-print-state 553,17992
+(defmethod semantic-debug-parser-break 560,18275
+(defmethod semantic-debug-parser-frames 565,18405
+
+/home/snake/.elfiles/cedet/semantic/semantic-analyze-refs.el,674
+(defclass semantic-analyze-references 39,1547
+(define-overloadable-function semantic-analyze-tag-references 58,2194
+(defun semantic-analyze-tag-references-default 67,2486
+(defmethod semantic-analyze-refs-impl 96,3349
+(defmethod semantic-analyze-refs-proto 115,4038
+(defun semantic--analyze-refs-full-lookup 135,4732
+(defun semantic--analyze-refs-find-child-in-find-results 149,5313
+(defun semantic--analyze-refs-find-tags-with-parent 172,6167
+(defun semantic--analyze-refs-full-lookup-with-parents 190,6753
+(defun semantic--analyze-refs-full-lookup-simple 237,8531
+(defun semantic-analyze-current-tag 276,9776
+(defun semantic-analyze-proto-impl-toggle 292,10265
+
+/home/snake/.elfiles/cedet/semantic/semantic-tag.el,5220
+(defconst semantic-tag-version 52,1959
+(defconst semantic-tag-incompatible-version 55,2066
+(defsubst semantic-tag-name 84,3071
+(defsubst semantic-tag-class 92,3387
+(defsubst semantic-tag-attributes 117,4137
+(defsubst semantic-tag-properties 122,4313
+(defsubst semantic-tag-overlay 127,4488
+(defsubst semantic--tag-overlay-cdr 134,4767
+(defsubst semantic--tag-set-overlay 139,4931
+(defsubst semantic-tag-start 144,5120
+(defsubst semantic-tag-end 151,5320
+(defsubst semantic-tag-bounds 158,5514
+(defun semantic-tag-set-bounds 163,5676
+(defun semantic-tag-in-buffer-p 170,5964
+(defsubst semantic--tag-get-property 179,6321
+(defun semantic-tag-buffer 186,6593
+(defun semantic-tag-mode 202,7176
+(defsubst semantic--tag-attributes-cdr 223,8086
+(defsubst semantic-tag-put-attribute 228,8256
+(defun semantic-tag-put-attribute-no-side-effect 242,8782
+(defsubst semantic-tag-get-attribute 257,9414
+(defsubst semantic--tag-properties-cdr 265,9751
+(defun semantic--tag-put-property 270,9921
+(defun semantic--tag-put-property-no-side-effect 283,10397
+(defun semantic-tag-file-name 299,11063
+(defsubst semantic-tag-p 312,11547
+(defsubst semantic-tag-of-class-p 324,11970
+(defsubst semantic-tag-type-members 328,12101
+(defsubst semantic-tag-type 333,12291
+(defun semantic-tag-with-position-p 341,12618
+(defun semantic-equivalent-tag-p 349,12883
+(defun semantic-tag-similar-p 364,13568
+(defun semantic-tag-similar-with-subtags-p 404,14882
+(defun semantic-tag-of-type-p 433,15748
+(defun semantic-tag-type-compound-p 471,17077
+(defun semantic-tag-faux-p 483,17526
+(defun semantic-tag-make-plist 497,17952
+(defsubst semantic-tag 518,18680
+(defsubst semantic-tag-new-variable 526,19051
+(defsubst semantic-tag-new-function 537,19566
+(defsubst semantic-tag-new-type 549,20065
+(defsubst semantic-tag-new-include 574,21137
+(defsubst semantic-tag-new-package 584,21590
+(defsubst semantic-tag-new-code 594,21978
+(defsubst semantic-tag-set-faux 603,22307
+(defsubst semantic-tag-set-name 609,22545
+(defsubst semantic-tag-clone 615,22669
+(defun semantic-tag-copy 626,23087
+(defun semantic--tag-copy-properties 674,24847
+(defun semantic-tag-deep-copy-one-tag 686,25195
+(defun semantic--tag-deep-copy-attributes 701,25895
+(defun semantic--tag-deep-copy-value 714,26492
+(defun semantic--tag-deep-copy-tag-list 733,27100
+(defsubst semantic-tag-modifiers 752,27747
+(defun semantic-tag-docstring 756,27901
+(defsubst semantic-tag-named-parent 781,28744
+(defun semantic-tag-type-superclasses 790,29073
+(defun semantic--tag-find-parent-by-name 807,29704
+(defun semantic-tag-type-superclass-protection 827,30274
+(defsubst semantic-tag-type-interfaces 856,31382
+(defsubst semantic-tag-function-arguments 863,31621
+(defsubst semantic-tag-function-throws 868,31827
+(defsubst semantic-tag-function-parent 873,32032
+(defsubst semantic-tag-function-destructor-p 880,32336
+(defsubst semantic-tag-function-constructor-p 885,32555
+(defsubst semantic-tag-variable-default 892,32810
+(defsubst semantic-tag-variable-constant-p 897,33026
+(defsubst semantic-tag-include-system-p 904,33280
+(define-overloadable-function semantic-tag-include-filename 909,33501
+(defun semantic-tag-include-filename-default 919,33934
+(defsubst semantic-tag-code-detail 926,34115
+(defsubst semantic-tag-new-alias 933,34336
+(defsubst semantic-tag-alias-class 944,34771
+(define-overloadable-function semantic-tag-alias-definition 949,34921
+(define-overloadable-function semantic-tag-components 962,35405
+(defun semantic-tag-components-default 970,35691
+(define-overloadable-function semantic-tag-components-with-overlays 980,36024
+(defun semantic-tag-components-with-overlays-default 993,36557
+(defun semantic-tag-children-compatibility 1019,37754
+(defun semantic-narrow-to-tag 1032,38245
+(defmacro semantic-with-buffer-narrowed-to-current-tag 1040,38519
+(defmacro semantic-with-buffer-narrowed-to-tag 1051,38945
+(defvar semantic--tag-hook-value)1071,39655
+(defun semantic-tag-add-hook 1073,39690
+(defun semantic-tag-remove-hook 1085,40306
+(defun semantic--tag-run-hooks 1096,40881
+(defsubst semantic--tag-unlink-list-from-buffer 1113,41593
+(defun semantic--tag-unlink-from-buffer 1118,41806
+(defsubst semantic--tag-link-list-to-buffer 1134,42469
+(defun semantic--tag-link-to-buffer 1139,42674
+(defun semantic--tag-unlink-cache-from-buffer 1157,43475
+(defun semantic--tag-link-cache-to-buffer 1164,43732
+(defsubst semantic--tag-expanded-p 1183,44490
+(defvar semantic-tag-expand-function 1195,44948
+(defun semantic--tag-expand 1210,45521
+(defmacro semantic-foreign-tag-invalid 1266,47586
+(defsubst semantic-foreign-tag-p 1270,47744
+(defsubst semantic-foreign-tag-check 1277,48029
+(defun semantic-foreign-tag 1283,48218
+(define-overloadable-function semantic-obtain-foreign-tag 1305,49103
+(defun semantic-insert-foreign-tag-default 1311,49345
+(define-overloadable-function semantic-insert-foreign-tag 1320,49735
+(define-mode-local-override semantic-insert-foreign-tag1329,50123
+(define-mode-local-override semantic-insert-foreign-tag1334,50324
+(defconst semantic-token-version1354,50905
+(defconst semantic-token-incompatible-version1356,50962
+(defsubst semantic-token-type-parent 1419,53085
+
+/home/snake/.elfiles/cedet/semantic/semantic-grammar-wy.el,952
+(defconst semantic-grammar-wy--keyword-table43,1331
+(defconst semantic-grammar-wy--token-table64,1919
+(defconst semantic-grammar-wy--parse-table111,3078
+(defun semantic-grammar-wy--install-parser 412,9770
+(define-lex-sexp-type-analyzer semantic-grammar-wy--<sexp>-sexp-analyzer431,10450
+(define-lex-sexp-type-analyzer semantic-grammar-wy--<qlist>-sexp-analyzer436,10578
+(define-lex-keyword-type-analyzer semantic-grammar-wy--<keyword>-keyword-analyzer441,10724
+(define-lex-block-type-analyzer semantic-grammar-wy--<block>-block-analyzer445,10874
+(define-lex-regex-type-analyzer semantic-grammar-wy--<char>-regexp-analyzer454,11106
+(define-lex-sexp-type-analyzer semantic-grammar-wy--<string>-sexp-analyzer460,11275
+(define-lex-regex-type-analyzer semantic-grammar-wy--<symbol>-regexp-analyzer465,11411
+(define-lex-string-type-analyzer semantic-grammar-wy--<punctuation>-string-analyzer471,11603
+(define-lex semantic-grammar-lexer484,11879
+
+/home/snake/.elfiles/cedet/semantic/semantic-html.el,696
+(defvar semantic-html-super-regex50,1667
+(defvar semantic-html-section-list54,1828
+(define-mode-local-override semantic-parse-region71,2109
+(define-mode-local-override semantic-parse-changes82,2463
+(defun semantic-html-expand-tag 87,2625
+(defun semantic-html-components 95,2892
+(defun semantic-html-parse-headings 99,3016
+(defun semantic-html-set-endpoint 116,3611
+(defsubst semantic-html-new-section-tag 129,4137
+(defun semantic-html-extract-section-name 143,4650
+(defun semantic-html-recursive-combobulate-list 168,5327
+(define-mode-local-override semantic-sb-tag-children-to-expand225,7282
+(defun semantic-default-html-setup 231,7446
+(define-child-mode html-helper-mode 257,8303
+
+/home/snake/.elfiles/cedet/semantic/semantic-regtest.el,1760
+(defgroup semantic-regtest 68,2549
+(defcustom semantic-regtest-functions73,2690
+(defcustom semantic-regtest-print-tag-boundaries 85,3284
+(defcustom semantic-regtest-highlight-tag 97,3882
+(defcustom semantic-regtest-find-file-function 104,4130
+(defface semantic-regtest-test-button-face114,4548
+(defface semantic-regtest-reference-button-face123,4884
+(defun semantic-regtest-run-test 132,5204
+(defun semantic-regtest-run-test--internal 147,6070
+(defun semantic-regtest-excessive-trim 195,8473
+(defun semantic-regtest-normalize-whitespace 206,8862
+(defun semantic-regtest-create-output 213,9122
+(defun semantic-regtest-create-output--internal 226,9709
+(defun semantic-regtest-convert-difference 335,14872
+(defun semantic-regtest-1-diffdata2str 376,16944
+(defun semantic-regtest-2-diffdata2str 389,17563
+(defun semantic-regtest-ediff 437,20163
+(defun semantic-regtest-cmp-results 472,21832
+(defun semantic-regtest-cmp-results--internal 526,24780
+(defun semantic-regtest-goto-tag 654,31212
+(defun semantic-regtest-mouse-open-source-file 672,31877
+(defun semantic-regtest-mouse-open-output-file 678,32055
+(defun semantic-regtest-open-source-file 684,32239
+(defun semantic-regtest-open-output-file 690,32457
+(defun semantic-regtest-goto-file 697,32706
+(defun semantic-regtest-mode-init 727,34143
+(define-derived-mode semantic-regtest-mode827,38936
+(define-key semantic-regtest-mode-map836,39286
+(define-key semantic-regtest-mode-map840,39416
+(define-key semantic-regtest-mode-map845,39568
+(define-key semantic-regtest-mode-map849,39657
+(defun semantic-regtest-convert-tag-table 865,40215
+(defun semantic-regtest--convert-tag 869,40368
+(define-overload semantic-regtest-convert-tag 903,42025
+(defun semantic-regtest-prin1 908,42200
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-skel.el,940
+(defclass semanticdb-table-SKEL 41,1354
+(defclass semanticdb-project-database-SKEL46,1515
+(defvar-mode-local YOUR-MAJOR-mode 60,2031
+(defvar-mode-local YOUR-MAJOR-mode 67,2269
+(defmethod semanticdb-get-database-tables 75,2552
+(defmethod semanticdb-file-table 92,3320
+(defmethod semanticdb-get-tags 98,3567
+(defmethod semanticdb-equivalent-mode 105,3894
+(define-mode-local-override semanticdb-find-translate-path 118,4401
+(defmethod semanticdb-find-tags-by-name-method146,5488
+(defmethod semanticdb-find-tags-by-name-regexp-method156,5795
+(defmethod semanticdb-find-tags-for-completion-method165,6106
+(defmethod semanticdb-find-tags-by-class-method174,6435
+(defmethod semanticdb-deep-find-tags-by-name-method195,7207
+(defmethod semanticdb-deep-find-tags-by-name-regexp-method202,7505
+(defmethod semanticdb-deep-find-tags-for-completion-method209,7843
+(defmethod semanticdb-find-tags-external-children-of-type-method218,8221
+
+/home/snake/.elfiles/cedet/semantic/senator.el,6398
+(defgroup senator 106,3856
+(defcustom global-senator-minor-mode 111,3938
+(defcustom senator-minor-mode-hook 120,4211
+(defcustom senator-step-at-tag-classes 126,4357
+(defcustom senator-step-at-start-end-tag-classes 139,4887
+(defcustom senator-highlight-found 155,5728
+(defface senator-momentary-highlight-face165,6050
+(defface senator-intangible-face173,6302
+(defface senator-read-only-face181,6536
+(defsubst senator-parse 193,6803
+(defun senator-force-refresh 197,6924
+(defsubst senator-current-tag 205,7159
+(defun senator-momentary-highlight-tag 212,7421
+(defun senator-step-at-start-end-p 219,7667
+(defun senator-skip-p 226,7934
+(defun senator-middle-of-tag-p 233,8139
+(defun senator-step-at-parent 238,8322
+(defun senator-previous-tag-or-parent 254,8897
+(defun senator-full-tag-name 273,9706
+(defvar senator-completion-cache 288,10322
+(defun senator-completion-cache-flush-fcn 292,10468
+(defun senator-completion-flatten-stream 298,10690
+(defun senator-completion-function-args 319,11588
+(defun senator-completion-refine-name 328,11961
+(defun senator-completion-uniquify-names 375,13732
+(defun senator-completion-stream 412,15136
+(defun senator-current-type-context 431,15979
+(defun senator-completion-list 439,16289
+(defun senator-find-tag-for-completion 455,16989
+(defun senator-find-nonterminal-by-name 479,17914
+(defun senator-find-nonterminal-by-name-regexp 482,18032
+(defun senator-search-tag-name 489,18190
+(defcustom senator-search-ignore-tag-classes513,19239
+(defun senator-search-default-tag-filter 520,19442
+(defvar senator-search-tag-filter-functions526,19689
+(defun senator-search 532,19930
+(defun senator-next-tag 577,21725
+(defun senator-previous-tag 617,23177
+(defvar senator-jump-completion-list 656,24626
+(defun senator-jump-interactive 660,24790
+(defun senator-jump-noselect 707,26733
+(defun senator-jump 722,27342
+(defun senator-jump-regexp 746,28266
+(defvar senator-last-completion-stats 770,29291
+(defsubst senator-current-symbol-start 774,29431
+(defun senator-complete-symbol 785,29769
+(defcustom senator-completion-menu-summary-function842,32225
+(defcustom senator-completion-menu-insert-function850,32572
+(defun senator-completion-menu-insert-default 859,32951
+(defun senator-completion-menu-do-complete 863,33090
+(defun senator-completion-menu-item 877,33706
+(defun senator-completion-menu-window-offsets 887,34146
+(defun senator-completion-menu-point-as-event(926,35857
+(defun senator-completion-menu-popup 959,37154
+(defun senator-search-forward 1022,39689
+(defun senator-re-search-forward 1031,40087
+(defun senator-word-search-forward 1040,40520
+(defun senator-search-backward 1049,40932
+(defun senator-re-search-backward 1058,41349
+(defun senator-word-search-backward 1067,41801
+(defvar senator-last-search-type 1111,43706
+(defun senator-nonincremental-repeat-search-forward 1114,43801
+(defun senator-nonincremental-repeat-search-backward 1127,44235
+(defun senator-nonincremental-search-forward 1140,44673
+(defun senator-nonincremental-search-backward 1149,45007
+(defun senator-nonincremental-re-search-forward 1158,45352
+(defun senator-nonincremental-re-search-backward 1167,45722
+(defvar senator--search-filter 1176,46104
+(defun senator-search-set-tag-class-filter 1178,46141
+(defun senator-toggle-read-only 1215,47454
+(defun senator-toggle-intangible 1225,47790
+(defun senator-set-face 1235,48124
+(defun senator-set-foreground 1245,48512
+(defun senator-set-background 1255,48872
+(defun senator-clear-tag 1265,49232
+(defun senator-fold-tag 1279,49706
+(defun senator-unfold-tag 1284,49852
+(defun senator-fold-tag-toggle 1289,50002
+(defun senator-pulse-tag 1301,50297
+(defun senator-adebug-tag 1311,50594
+(defun senator-go-to-up-reference 1331,51144
+(define-overloadable-function semantic-up-reference 1361,52225
+(defun semantic-up-reference-default 1369,52593
+(defalias 'senator-menu-item senator-menu-item1426,54481
+(defvar senator-registered-mode-entries 1431,54593
+(defvar senator-registered-mode-settings 1432,54639
+(defvar senator-modes-menu-cache 1433,54685
+(defun senator-register-command-menu 1435,54724
+(defun senator-register-custom-menu 1491,56796
+(defun senator-register-mode-menu-entry 1568,59820
+(defsubst senator-build-command-menu-item 1603,61572
+(defcustom senator-mode-menu-local-toggle-label 1609,61823
+(defcustom senator-mode-menu-global-toggle-label 1617,62095
+(defun senator-build-mode-sub-menu 1625,62362
+(defun senator-build-modes-menu 1652,63283
+(defun senator-save-registered-mode-settings 1670,64059
+(defvar senator-status 1872,69827
+(defvar senator-isearch-semantic-mode 1876,69951
+(defvar senator-prefix-key 1881,70133
+(defvar senator-prefix-map1884,70229
+(defvar senator-menu-bar1912,71468
+(defvar senator-minor-menu 2353,85375
+(defvar senator-mode-map2356,85455
+(defvar senator-minor-mode 2365,85797
+(defconst senator-minor-mode-name 2370,85987
+(defconst senator-minor-mode-isearch-suffix 2374,86143
+(defun senator-mode-line-update 2377,86263
+(defun senator-minor-mode-setup 2391,86846
+(defun senator-minor-mode 2429,88508
+(defun global-senator-minor-mode 2477,90089
+(defun senator-beginning-of-defun 2490,90434
+(defun senator-end-of-defun 2506,91042
+(defun senator-narrow-to-defun 2524,91696
+(defun senator-mark-defun 2537,92067
+(defadvice beginning-of-defun 2552,92615
+(defadvice end-of-defun 2559,92885
+(defadvice narrow-to-defun 2566,93135
+(defadvice mark-defun 2574,93451
+(defadvice c-mark-function 2582,93764
+(defvar senator-add-log-tags 2590,94082
+(defadvice add-log-current-defun 2597,94390
+(defvar senator-tag-ring 2623,95271
+(defun senator-copy-tag 2632,95579
+(defun senator-kill-tag 2646,96061
+(defun senator-yank-tag 2659,96620
+(defun senator-copy-tag-to-register 2674,97170
+(defadvice insert-register 2689,97734
+(defadvice jump-to-register 2698,98089
+(defun senator-transpose-tags-up 2709,98521
+(defun senator-transpose-tags-down 2740,99728
+(defvar senator-try-function-already-enabled 2764,100481
+(defun senator-hippie-expand-hook 2770,100803
+(defun senator-try-expand-semantic 2796,101987
+(defmacro senator-define-search-advice 2886,104969
+(defun senator-isearch-search-fun 2915,106481
+(defun senator-isearch-toggle-semantic-mode 2942,107465
+(define-key isearch-mode-map2963,108324
+(defvar senator-old-isearch-search-fun 2967,108412
+(defun senator-isearch-mode-hook 2970,108515
+
+/home/snake/.elfiles/cedet/semantic/semantic-util.el,844
+(defvar semantic-type-relation-separator-character 44,1337
+(defvar semantic-equivalent-major-modes 53,1876
+(defun semantic-file-tag-table 62,2349
+(defun semantic-something-to-tag-table 87,3214
+(defun semantic-recursive-find-nonterminal-by-name 144,5186
+(defvar semantic-read-symbol-history 183,6655
+(defun semantic-read-symbol 186,6729
+(defun semantic-read-variable 209,7642
+(defun semantic-read-function 222,8110
+(defun semantic-read-type 235,8576
+(defun semantic-describe-tag 251,9061
+(defun semantic-add-label 262,9373
+(defun semantic-show-label 273,9755
+(defun semantic-describe-buffer-var-helper 287,10141
+(defun semantic-describe-buffer 307,10736
+(defun semantic-current-tag-interactive 352,12029
+(defun semantic-hack-search 362,12362
+(defun semantic-assert-valid-token 388,13085
+(defun semantic-sanity-check 404,13595
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-search.el,1197
+(defun semanticdb-collect-find-results 63,2169
+(defun semanticdb-find-nonterminal-by-token116,4064
+(defun semanticdb-find-nonterminal-by-name134,4817
+(defun semanticdb-find-nonterminal-by-name-regexp152,5558
+(defun semanticdb-find-nonterminal-by-type171,6337
+(defun semanticdb-find-nonterminal-by-property190,7074
+(defun semanticdb-find-nonterminal-by-extra-spec208,7853
+(defun semanticdb-find-nonterminal-by-extra-spec-value226,8599
+(defun semanticdb-find-nonterminal-external-children-of-type245,9407
+(defun semanticdb-find-nonterminal-by-function264,10116
+(defmethod semanticdb-find-nonterminal-by-token-method292,11450
+(defmethod semanticdb-find-nonterminal-by-name-method305,12129
+(defmethod semanticdb-find-nonterminal-by-name-regexp-method318,12753
+(defmethod semanticdb-find-nonterminal-by-type-method331,13401
+(defmethod semanticdb-find-nonterminal-by-property-method344,14014
+(defmethod semanticdb-find-nonterminal-by-extra-spec-method357,14666
+(defmethod semanticdb-find-nonterminal-by-extra-spec-value-method370,15282
+(defmethod semanticdb-find-nonterminal-external-children-of-type-method385,15962
+(defmethod semanticdb-find-nonterminal-by-function-method405,16720
+
+/home/snake/.elfiles/cedet/semantic/semantic-doc.el,183
+(define-overloadable-function semantic-documentation-for-tag 39,1404
+(defun semantic-documentation-comment-preceeding-tag 67,2647
+(defun semantic-doc-snarf-comment-for-tag 92,3619
+
+/home/snake/.elfiles/cedet/semantic/semantic.el,3110
+(defun semantic-require-version 45,1605
+(defgroup semantic 61,2162
+(defgroup semantic-faces 65,2245
+(defvar semantic--parse-table 76,2411
+(defvar semantic-symbol->name-assoc-list84,2751
+(defvar semantic-symbol->name-assoc-list-for-type-parts 98,3355
+(defvar semantic-case-fold 107,3869
+(defvar semantic-expand-nonterminal 111,3998
+(defvar semantic--buffer-cache 122,4550
+(defvar semantic-unmatched-syntax-cache 136,5111
+(defvar semantic-unmatched-syntax-cache-check 140,5265
+(defvar semantic-edits-are-safe 145,5492
+(defvar semantic-unmatched-syntax-hook 153,5844
+(defvar semantic--before-fetch-tags-hook 164,6472
+(defvar semantic-after-toplevel-bovinate-hook 173,6884
+(defvar semantic-after-toplevel-cache-change-hook 183,7313
+(defvar semantic-before-toplevel-cache-flush-hook 194,7755
+(defcustom semantic-dump-parse 201,8107
+(defvar semantic-parser-name 206,8224
+(defvar semantic-parse-tree-state 212,8411
+(defmacro semantic-parse-tree-unparseable 216,8555
+(defmacro semantic-parse-tree-unparseable-p 222,8840
+(defmacro semantic-parse-tree-set-needs-update 226,9006
+(defmacro semantic-parse-tree-needs-update-p 231,9229
+(defmacro semantic-parse-tree-set-needs-rebuild 235,9393
+(defmacro semantic-parse-tree-needs-rebuild-p 240,9618
+(defmacro semantic-parse-tree-set-up-to-date 244,9784
+(defmacro semantic-parse-tree-up-to-date-p 248,9930
+(defcustom semantic-inhibit-functions 254,10109
+(defvar semantic-init-hook 261,10352
+(defvar semantic-init-mode-hook 264,10449
+(defvar semantic-init-db-hook 268,10605
+(defvar semantic-new-buffer-fcn-was-run 281,11182
+(defsubst semantic-active-p 285,11353
+(defsubst semantic--umatched-syntax-needs-refresh-p 289,11485
+(defun semantic-new-buffer-fcn 295,11771
+(defun semantic-fetch-tags-fast 331,13307
+(defvar semantic-edebug 347,13740
+(defun semantic-elapsed-time 351,13881
+(defun bovinate 358,14183
+(define-overloadable-function semantic-parse-stream 382,15011
+(define-overloadable-function semantic-parse-changes 394,15597
+(define-overloadable-function semantic-parse-region400,15846
+(defun semantic-parse-region-default420,16690
+(defun semantic-set-unmatched-syntax-cache 446,17786
+(defun semantic-clear-unmatched-syntax-cache 457,18335
+(defun semantic-unmatched-syntax-tokens 462,18526
+(defun semantic-clear-toplevel-cache 479,19151
+(defun semantic--set-buffer-cache 504,20129
+(defvar semantic-working-type 522,20953
+(defvar semantic-minimum-working-buffer-size 529,21251
+(defsubst semantic-parser-working-message 534,21489
+(defun semantic-fetch-tags 549,22075
+(defun semantic-refresh-tags-safe 625,24927
+(defun semantic-bovinate-toplevel 668,26254
+(defsubst semantic-fetch-available-tags 680,26725
+(defun semantic-repeat-parse-whole-stream698,27438
+(defvar semantic-parser-warnings 755,29834
+(defun semantic-clear-parser-warnings 759,29987
+(defun semantic-push-parser-warning 763,30131
+(defun semantic-dump-parser-warnings 769,30356
+(defsubst semantic-bovinate-region-until-error789,30867
+(defsubst semantic-bovinate-from-nonterminal804,31570
+(defsubst semantic-bovinate-from-nonterminal-full817,32117
+
+/home/snake/.elfiles/cedet/semantic/semantic-imenu.el,1504
+(defgroup semantic-imenu 71,2411
+(defcustom semantic-imenu-summary-function 78,2533
+(defcustom semantic-imenu-bucketize-file 86,2871
+(defcustom semantic-imenu-adopt-external-members 92,3081
+(defcustom semantic-imenu-buckets-to-submenu 99,3329
+(defcustom semantic-imenu-expand-type-members 107,3629
+(defcustom semantic-imenu-bucketize-type-members 115,3978
+(defcustom semantic-imenu-sort-bucket-function 125,4440
+(defcustom semantic-imenu-index-directory 141,5192
+(defcustom semantic-imenu-auto-rebuild-directory-indexes 149,5521
+(defvar semantic-imenu-directory-current-file 156,5813
+(defvar semantic-imenu-auto-rebuild-running 159,5942
+(defvar semantic-imenu-expandable-tag-classes 163,6077
+(defun semantic-imenu-tag-overlay 173,6542
+(defun semantic-imenu-goto-function 186,6972
+(defun semantic-imenu-flush-fcn 234,8878
+(defun semantic-create-imenu-index 248,9414
+(defun semantic-create-imenu-directory-index 268,10409
+(defun semantic-create-imenu-index-1 319,12429
+(defun semantic-create-imenu-subindex 379,14518
+(defun semantic-imenu-rebuild-directory-indexes 445,16907
+(defun semantic-imenu-semanticdb-hook 474,18006
+(defun semantic-imenu-toggle-bucketize-file 489,18523
+(defun semantic-imenu-toggle-buckets-to-submenu 496,18778
+(defun semantic-imenu-toggle-bucketize-type-parts 503,19045
+(defvar semantic-which-function 519,19678
+(defcustom semantic-which-function-use-color 522,19811
+(defun semantic-default-which-function 527,19979
+(defadvice which-function 545,20810
+
+/home/snake/.elfiles/cedet/semantic/semantic-lex.el,5549
+(defmacro with-syntax-table 194,7852
+(defun semantic-lex-map-symbols 215,8530
+(defvar semantic-flex-keywords-obarray 231,9120
+(defmacro semantic-lex-keyword-invalid 236,9360
+(defsubst semantic-lex-keyword-symbol 240,9522
+(defsubst semantic-lex-keyword-p 246,9753
+(defsubst semantic-lex-keyword-set 252,9970
+(defsubst semantic-lex-keyword-value 256,10141
+(defsubst semantic-lex-keyword-put 264,10426
+(defsubst semantic-lex-keyword-get 271,10690
+(defun semantic-lex-make-keyword-table 278,10942
+(defsubst semantic-lex-map-keywords 303,11879
+(defun semantic-lex-keywords 310,12202
+(defsubst semantic-lex-token-bounds 322,12539
+(defsubst semantic-lex-token-start 329,12761
+(defsubst semantic-lex-token-end 334,12949
+(defsubst semantic-lex-unterminated-syntax-detected 339,13133
+(defvar semantic-lex-types-obarray 358,13918
+(defmacro semantic-lex-type-invalid 362,14073
+(defsubst semantic-lex-type-symbol 366,14234
+(defsubst semantic-lex-type-p 372,14446
+(defsubst semantic-lex-type-set 377,14618
+(defsubst semantic-lex-type-value 381,14786
+(defsubst semantic-lex-type-put 391,15164
+(defsubst semantic-lex-type-get 402,15652
+(defun semantic-lex-preset-default-types 412,16052
+(defun semantic-lex-make-type-table 428,16921
+(defsubst semantic-lex-map-types 476,18689
+(defun semantic-lex-types 483,19002
+(defvar semantic-lex-analyzer 497,19364
+(defvar semantic-lex-tokens503,19619
+(defvar semantic-lex-syntax-modifications 583,22965
+(defvar semantic-lex-syntax-table 593,23402
+(defvar semantic-lex-comment-regex 598,23587
+(defvar semantic-lex-number-expression604,23887
+(defvar semantic-lex-depth 655,25224
+(defvar semantic-lex-unterminated-syntax-end-function660,25381
+(defun semantic-lex-test 673,25989
+(defun semantic-lex-test-full-depth 691,26505
+(defun semantic-lex-test-region 711,27087
+(defvar semantic-lex-debug 723,27424
+(defun semantic-lex-debug 726,27509
+(defun semantic-lex-highlight-token 737,27990
+(defsubst semantic-lex-debug-break 746,28305
+(defmacro semantic-lex-one-token 771,29051
+(defvar semantic-lex-end-point 777,29309
+(defvar semantic-lex-current-depth 780,29402
+(defvar semantic-lex-maximum-depth 783,29503
+(defvar semantic-lex-token-stream 786,29619
+(defvar semantic-lex-analysis-bounds 789,29707
+(defvar semantic-lex-block-streams 792,29790
+(defvar semantic-lex-reset-hooks 798,30022
+(defvar semantic-lex-block-stack 804,30279
+(defmacro define-lex 809,30421
+(defun semantic-lex-start-block 886,33949
+(defun semantic-lex-end-block 894,34334
+(defmacro semantic-lex-token 947,36887
+(defun semantic-lex-token-p 964,37639
+(defun semantic-lex-token-with-text-p 977,37987
+(defun semantic-lex-token-without-text-p 988,38301
+(defun semantic-lex-expand-block-specs 998,38587
+(defmacro semantic-lex-push-token 1027,39781
+(defsubst semantic-lex-token-class 1045,40617
+(defsubst semantic-lex-token-text 1050,40768
+(defun semantic-lex-init 1060,41103
+(define-overloadable-function semantic-lex 1074,41607
+(defsubst semantic-lex-buffer 1089,42444
+(defsubst semantic-lex-list 1094,42626
+(defcustom semantic-lex-debug-analyzers 1108,43120
+(defmacro semantic-lex-unterminated-syntax-protection 1114,43315
+(defmacro define-lex-analyzer 1133,44140
+(defmacro define-lex-regex-analyzer 1179,46324
+(defmacro define-lex-simple-regex-analyzer 1190,46662
+(defmacro define-lex-block-analyzer 1212,47457
+(define-lex-analyzer semantic-lex-default-action1273,49706
+(define-lex-analyzer semantic-lex-beginning-of-line1279,49915
+(define-lex-simple-regex-analyzer semantic-lex-newline1292,50457
+(define-lex-regex-analyzer semantic-lex-newline-as-whitespace1296,50589
+(define-lex-regex-analyzer semantic-lex-ignore-newline1313,51378
+(define-lex-regex-analyzer semantic-lex-whitespace1320,51648
+(define-lex-regex-analyzer semantic-lex-ignore-whitespace1338,52387
+(define-lex-simple-regex-analyzer semantic-lex-number1345,52651
+(define-lex-regex-analyzer semantic-lex-symbol-or-keyword1351,52875
+(define-lex-simple-regex-analyzer semantic-lex-charquote1359,53156
+(define-lex-simple-regex-analyzer semantic-lex-punctuation1364,53331
+(define-lex-analyzer semantic-lex-punctuation-type1368,53476
+(define-lex-regex-analyzer semantic-lex-paren-or-list1396,54728
+(define-lex-simple-regex-analyzer semantic-lex-open-paren1418,55424
+(define-lex-simple-regex-analyzer semantic-lex-close-paren1422,55623
+(define-lex-regex-analyzer semantic-lex-string1426,55817
+(define-lex-regex-analyzer semantic-lex-comments1439,56138
+(define-lex-regex-analyzer semantic-lex-comments-as-whitespace1456,56794
+(define-lex-regex-analyzer semantic-lex-ignore-comments1473,57482
+(define-lex semantic-comment-lexer1499,58312
+(define-lex semantic-simple-lexer1511,58682
+(defmacro define-lex-keyword-type-analyzer 1532,59347
+(defmacro define-lex-sexp-type-analyzer 1546,59885
+(defmacro define-lex-regex-type-analyzer 1562,60407
+(defmacro define-lex-string-type-analyzer 1594,61665
+(defmacro define-lex-block-type-analyzer 1632,63244
+(defmacro semantic-lex-catch-errors 1741,67282
+(defvar semantic-flex-tokens 1828,70796
+(defvar semantic-flex-unterminated-syntax-end-function1832,70924
+(defvar semantic-flex-extensions 1843,71502
+(defvar semantic-flex-syntax-modifications 1854,71974
+(defvar semantic-ignore-comments 1864,72413
+(defvar semantic-flex-enable-newlines 1870,72632
+(defvar semantic-flex-enable-whitespace 1876,72912
+(defvar semantic-flex-enable-bol 1882,73192
+(defvar semantic-number-expression 1888,73468
+(defvar semantic-flex-depth 1892,73644
+(defun semantic-flex 1897,73804
+
+/home/snake/.elfiles/cedet/semantic/semantic-find.el,2095
+(defun semantic-find-tag-by-overlay 59,2011
+(defun semantic-find-tag-by-overlay-in-region 86,3121
+(defun semantic-find-tag-by-overlay-next 105,3789
+(defun semantic-find-tag-by-overlay-prev 132,4806
+(defun semantic-find-tag-parent-by-overlay 162,5883
+(defun semantic-current-tag 173,6349
+(defun semantic-current-tag-parent 180,6608
+(defun semantic-current-tag-of-class 187,6895
+(defsubst semantic--find-tags-by-function 230,8387
+(defmacro semantic--find-tags-by-macro 250,9223
+(defsubst semantic-find-first-tag-by-name 264,9672
+(defmacro semantic-find-tags-by-name 273,10073
+(defmacro semantic-find-tags-for-completion 283,10419
+(defmacro semantic-find-tags-by-name-regexp 299,11007
+(defmacro semantic-find-tags-by-class 311,11511
+(defmacro semantic-find-tags-by-type 321,11877
+(defmacro semantic-find-tags-of-compound-type 332,12333
+(define-overloadable-function semantic-find-tags-by-scope-protection 342,12688
+(defun semantic-find-tags-by-scope-protection-default357,13456
+(defsubst semantic-find-tags-included 375,14263
+(defmacro semantic-deep-find-tags-by-name 384,14526
+(defmacro semantic-deep-find-tags-for-completion 394,14898
+(defmacro semantic-deep-find-tags-by-name-regexp 403,15296
+(defun semantic-find-tags-external-children-of-type 416,15851
+(defun semantic-find-tags-subclasses-of-type 425,16227
+(defun semantic-brute-find-first-tag-by-name450,17175
+(defmacro semantic-brute-find-tag-by-class481,18157
+(defmacro semantic-brute-find-tag-standard495,18724
+(defun semantic-brute-find-tag-by-type507,19217
+(defun semantic-brute-find-tag-by-type-regexp525,19892
+(defun semantic-brute-find-tag-by-name-regexp544,20619
+(defun semantic-brute-find-tag-by-property555,21064
+(defun semantic-brute-find-tag-by-attribute566,21531
+(defun semantic-brute-find-tag-by-attribute-value578,22007
+(defun semantic-brute-find-tag-by-function591,22567
+(defun semantic-brute-find-first-tag-by-function629,24004
+(defun semantic-brute-find-tag-by-position 657,24916
+(defun semantic-brute-find-innermost-tag-by-position693,26086
+(defun semantic-find-benchmark 807,29789
+
+/home/snake/.elfiles/cedet/semantic/semantic-edit.el,1537
+(defvar semantic-after-partial-cache-change-hook 66,2393
+(defvar semantic-change-hooks 78,2841
+(defvar semantic-reparse-needed-change-hook 83,3036
+(defvar semantic-no-reparse-needed-change-hook 89,3283
+(defvar semantic-edits-new-change-hooks 96,3606
+(defvar semantic-edits-delete-change-hooks 100,3767
+(defvar semantic-edits-move-change-hooks 105,3994
+(defvar semantic-edits-reparse-change-hooks 111,4244
+(defvar semantic-edits-incremental-reparse-failed-hook 116,4432
+(defcustom semantic-edits-verbose-flag 124,4777
+(defun semantic-change-function 135,5118
+(defun semantic-changes-in-region 144,5457
+(defun semantic-edits-change-function-handle-changes 160,6071
+(defsubst semantic-edits-flush-change 204,7929
+(defun semantic-edits-flush-changes 213,8172
+(defun semantic-edits-change-in-one-tag-p 221,8439
+(defsubst semantic-edits-os 244,9415
+(defsubst semantic-edits-oe 249,9611
+(defun semantic-edits-change-leaf-tag 254,9802
+(defun semantic-edits-change-between-tags 289,11196
+(defun semantic-edits-change-over-tags 340,13402
+(defun semantic-parse-changes-failed 462,18165
+(defsubst semantic-edits-incremental-fail 471,18564
+(defun semantic-edits-incremental-parser 481,18944
+(defmacro semantic-edits-assert-valid-region 506,20027
+(defun semantic-edits-incremental-parser-1 514,20306
+(defalias 'semantic-parse-changes-defaultsemantic-parse-changes-default832,33714
+(defun semantic-edits-splice-remove 844,34256
+(defun semantic-edits-splice-insert 905,36512
+(defun semantic-edits-splice-replace 937,37844
+
+/home/snake/.elfiles/cedet/semantic/semantic-custom.el,521
+(define-widget 'tag-edit tag-edit49,1656
+(defun semantic-tag-widget-match 63,2064
+(defun semantic-tag-widget-value-create 69,2189
+(defun semantic-tag-widget-value-get 142,3874
+(define-widget 'tag tag169,4628
+(defun semantic-tag-widget-to-internal 178,4857
+(defun semantic-tag-widget-to-external 188,5083
+(defvar semantic-tag-wo 195,5290
+(defvar semantic-tag-co 197,5394
+(defun semantic-tag-customize 201,5511
+(defun semantic-tag-custom-apply-reset 236,6683
+(defun semantic-tag-custom-widget-insert 269,7719
+
+/home/snake/.elfiles/cedet/semantic/semantic-scope.el,1385
+(defclass semantic-scope-cache 56,1850
+(defmethod semantic-reset 97,3410
+(defmethod semanticdb-synchronize 110,3752
+(defmethod semanticdb-partial-synchronize 116,3905
+(defun semantic-scope-reset-cache 127,4318
+(defmethod semantic-scope-set-typecache 134,4559
+(defun semantic-scope-tag-clone-with-scope 156,5378
+(defun semantic-scope-tag-get-scope 164,5679
+(define-overloadable-function semantic-analyze-scoped-types 173,5904
+(defun semantic-analyze-scoped-types-default 178,6118
+(define-overloadable-function semantic-analyze-scope-nested-tags 212,7378
+(defun semantic-analyze-scope-nested-tags-default 219,7742
+(define-overloadable-function semantic-analyze-scope-lineage-tags 342,11859
+(defun semantic-analyze-scope-lineage-tags-default 349,12230
+(define-overloadable-function semantic-analyze-scoped-tags 380,13290
+(defun semantic-analyze-scoped-tags-default 387,13653
+(define-overloadable-function  semantic-analyze-scope-calculate-access 446,15872
+(defun semantic-analyze-scope-calculate-access-default 452,16242
+(defun semantic-completable-tags-from-type 492,17683
+(defun semantic-analyze-scoped-type-parts 506,18199
+(defun semantic-analyze-scoped-inherited-tags 551,19985
+(defun semantic-analyze-scoped-inherited-tag-map 581,21126
+(defun semantic-calculate-scope 654,23844
+(defun semantic-scope-find 732,26538
+(defmethod semantic-analyze-show 794,28717
+
+/home/snake/.elfiles/cedet/semantic/semantic-ast.el,217
+(defsubst semantic-ast-get 39,1254
+(defsubst semantic-ast-get1 44,1413
+(defsubst semantic-ast-get-string 49,1592
+(defun semantic-ast-add 57,1884
+(defun semantic-ast-put 74,2505
+(defun semantic-ast-merge 90,3087
+
+/home/snake/.elfiles/cedet/semantic/semantic-ia.el,764
+(defcustom semantic-ia-completion-format-tag-function54,1665
+(define-overloadable-function semantic-ia-insert-tag 70,2238
+(defun semantic-ia-insert-tag-default 73,2359
+(defalias 'semantic-ia-get-completions semantic-ia-get-completions81,2599
+(defun semantic-ia-get-completions-deprecated 85,2780
+(defun semantic-ia-complete-symbol 93,3135
+(defcustom semantic-ia-completion-menu-format-tag-function148,5273
+(defun semantic-ia-complete-symbol-menu 155,5521
+(defun semantic-ia-complete-tip 199,6951
+(defun semantic-ia-show-summary 232,7820
+(defun semantic-ia--fast-jump-helper 252,8488
+(defun semantic-ia-fast-jump 289,9813
+(defun semantic-ia-fast-mouse-jump 346,11989
+(defun semantic-ia-show-doc 361,12487
+(defun semantic-ia-describe-class 398,13741
+
+/home/snake/.elfiles/cedet/semantic/semantic-loaddefs.el,2721
+(defsubst semantic-fetch-available-tags 106,3526
+(defvar semantic-bovinate-nonterminal-check-obarray 313,11256
+(defalias 'semantic-parse-stream-default semantic-parse-stream-default333,12100
+(defvar semantic-lex-c-preprocessor-symbol-map 343,12493
+(defvar semantic-lex-c-preprocessor-symbol-file 372,13680
+(defvar semantic-c-member-of-autocast 381,14134
+(defvar semantic-command-separation-character 621,23504
+(define-widget 'tag-edit tag-edit633,23987
+(define-widget 'tag tag651,24762
+(defvar semantic-debug-parser-source 679,25693
+(defvar semantic-debug-parser-class 686,25951
+(defvar semantic-debug-enabled 691,26109
+(defvar global-semantic-decoration-mode 881,33016
+(defvar semantic-decoration-mode 897,33636
+(defvar semantic-dependency-include-path 927,34864
+(defvar semantic-dependency-system-include-path 945,35534
+(defvar semantic-edits-verbose-flag 1101,41546
+(defalias 'semantic-parse-changes-default semantic-parse-changes-default1135,42818
+(defsubst semantic-find-first-tag-by-name 1254,47459
+(defsubst semantic-find-tags-included 1323,50415
+(defvar semantic-format-tag-functions 1532,59845
+(defvar semantic-format-tag-custom-list 1544,60749
+(defvar global-semantic-idle-scheduler-mode 1784,69340
+(defvar semantic-idle-scheduler-mode 1798,69904
+(defvar semantic-imenu-summary-function 1833,71239
+(defvar semantic-imenu-bucketize-file 1839,71503
+(defvar semantic-imenu-expand-type-members 1844,71677
+(defvar semantic-imenu-expandable-tag-classes 1849,71863
+(defvar semantic-lex-analyzer 1870,72708
+(defvar global-semantic-mru-bookmark-mode 2033,79590
+(defvar semantic-orphaned-member-metaparent-type 2269,88392
+(defsubst semantic-tag-p 2529,99583
+(defvar global-semantic-highlight-edits-mode 2786,109059
+(defvar global-semantic-show-unmatched-syntax-mode 2813,110214
+(defvar global-semantic-show-parser-state-mode 2836,111239
+(defvar global-semantic-stickyfunc-mode 2875,112902
+(defvar global-semantic-highlight-func-mode 2907,114265
+(defalias 'semanticdb-adebug-database-list semanticdb-adebug-database-list2973,116804
+(defvar semanticdb-default-file-name 3053,119331
+(defvar semanticdb-default-save-directory 3058,119498
+(defvar semanticdb-persistent-path 3066,119917
+(defvar semanticdb-find-throttle-custom-list 3116,122477
+(defvar semanticdb-find-default-throttle 3120,122747
+(defvar semanticdb-current-database 3387,134424
+(defvar semanticdb-current-table 3390,134529
+(defvar semanticdb-global-mode 3393,134637
+(defvar global-senator-minor-mode 3589,143332
+(defvar senator-step-at-tag-classes 3594,143489
+(defvar senator-step-at-start-end-tag-classes 3603,143843
+(defvar wisent-parse-verbose-flag 3756,149504
+(defvar wisent-verbose-flag 3788,150361
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-javascript-jv-wy.el,825
+(defconst wisent-javascript-jv-wy--keyword-table39,1178
+(defconst wisent-javascript-jv-wy--token-table75,2501
+(defconst wisent-javascript-jv-wy--parse-table149,4517
+(defun wisent-javascript-jv-wy--install-parser 373,12430
+(define-lex-keyword-type-analyzer wisent-javascript-jv-wy--<keyword>-keyword-analyzer392,13130
+(define-lex-block-type-analyzer wisent-javascript-jv-wy--<block>-block-analyzer396,13284
+(define-lex-regex-type-analyzer wisent-javascript-jv-wy--<symbol>-regexp-analyzer407,13617
+(define-lex-sexp-type-analyzer wisent-javascript-jv-wy--<string>-sexp-analyzer413,13783
+(define-lex-regex-type-analyzer wisent-javascript-jv-wy--<number>-regexp-analyzer418,13923
+(define-lex-string-type-analyzer wisent-javascript-jv-wy--<punctuation>-string-analyzer424,14097
+(define-lex javascript-lexer-jv475,15423
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-python-wy.el,632
+(defconst wisent-python-wy--keyword-table39,1167
+(defconst wisent-python-wy--token-table100,3642
+(defconst wisent-python-wy--parse-table174,5300
+(defun wisent-python-wy--install-parser 660,15716
+(define-lex-keyword-type-analyzer wisent-python-wy--<keyword>-keyword-analyzer679,16381
+(define-lex-block-type-analyzer wisent-python-wy--<block>-block-analyzer683,16528
+(define-lex-regex-type-analyzer wisent-python-wy--<symbol>-regexp-analyzer694,16804
+(define-lex-regex-type-analyzer wisent-python-wy--<number>-regexp-analyzer700,16959
+(define-lex-string-type-analyzer wisent-python-wy--<punctuation>-string-analyzer706,17134
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-calc.el,382
+(define-lex-simple-regex-analyzer wisent-calc-lex-number57,1776
+(define-lex-simple-regex-analyzer wisent-calc-lex-punctuation61,1910
+(define-lex wisent-calc-lexer65,2058
+(defun wisent-calc 74,2280
+(defun wisent-calc-factorial 91,2807
+(defun wisent-calc-not 97,2993
+(defun wisent-calc-=102,3137
+(defvar wisent-calc-test-expressions108,3282
+(defun wisent-calc-utest 126,3838
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-comp.el,5093
+(defmacro wisent-context-name 62,2109
+(defmacro wisent-context-bindings 68,2320
+(defmacro wisent-defcontext 72,2451
+(defmacro wisent-with-context 81,2794
+(defmacro wisent-struct 89,3072
+(defsubst wisent-pad-string 126,4462
+(defconst wisent-BITS-PER-WORD141,4922
+(defsubst wisent-WORDSIZE 147,5035
+(defsubst wisent-SETBIT 151,5171
+(defsubst wisent-RESETBIT 157,5388
+(defsubst wisent-BITISSET 163,5619
+(defsubst wisent-noninteractive 174,5962
+(defvar wisent-debug-flag 180,6127
+(defconst wisent-log-buffer-name 186,6263
+(defvar wisent-new-log-flag 189,6341
+(defvar wisent-verbose-flag 193,6431
+(defun wisent-toggle-verbose-flag 197,6550
+(defmacro wisent-log-buffer 205,6843
+(defmacro wisent-clear-log 210,7007
+(defun wisent-source 217,7210
+(defun wisent-new-log 225,7507
+(defsubst wisent-log 235,7875
+(defconst wisent-log-file 243,8199
+(defun wisent-append-to-log-file 247,8309
+(defcustom wisent-state-table-size 305,10830
+(defmacro wisent-ISTOKEN 330,11991
+(defmacro wisent-ISVAR(335,12130
+(defsubst wisent-tag 340,12263
+(defsubst wisent-put 346,12410
+(defsubst wisent-get 353,12705
+(defsubst wisent-item-number 358,12875
+(defsubst wisent-set-item-number 362,12984
+(defsubst wisent-assoc 366,13103
+(defsubst wisent-set-assoc 370,13206
+(defsubst wisent-prec 374,13319
+(defsubst wisent-set-prec 378,13423
+(defun wisent-bits-equal 481,17717
+(defun wisent-nbits 491,18013
+(defun wisent-bits-size 500,18257
+(defun wisent-useful-production 510,18537
+(defun wisent-useless-nonterminals 521,18869
+(defun wisent-inaccessable-symbols 566,20668
+(defun wisent-reduce-grammar-tables 644,23698
+(defun wisent-nonterminals-reduce 652,23937
+(defun wisent-total-useless 697,25481
+(defun wisent-reduce-grammar 714,26247
+(defun wisent-print-useless 736,27108
+(defun wisent-set-derives 776,28504
+(defun wisent-print-nullable 816,29845
+(defun wisent-set-nullable 828,30167
+(defun wisent-print-fderives 901,32823
+(defun wisent-set-fderives 916,33240
+(defun wisent-print-firsts 950,34374
+(defun wisent-TC 966,34847
+(defun wisent-RTC 986,35424
+(defun wisent-set-firsts 997,35702
+(defun wisent-initialize-closure 1033,36850
+(defun wisent-print-closure 1043,37209
+(defun wisent-closure 1052,37451
+(defun wisent-allocate-itemsets 1116,39697
+(defun wisent-allocate-storage 1148,40984
+(defun wisent-new-itemsets 1155,41238
+(defun wisent-new-state 1184,42359
+(defun wisent-get-state 1209,43148
+(defun wisent-append-states 1256,44945
+(defun wisent-initialize-states 1279,45768
+(defun wisent-save-shifts 1287,45951
+(defun wisent-insert-start-shift 1306,46511
+(defun wisent-augment-automaton 1325,47214
+(defun wisent-save-reductions 1468,53935
+(defun wisent-generate-states 1500,55052
+(defun wisent-traverse 1565,57820
+(defun wisent-digraph 1607,59122
+(defun wisent-set-state-table 1621,59539
+(defun wisent-set-accessing-symbol 1630,59775
+(defun wisent-set-shift-table 1639,60059
+(defun wisent-set-reduction-table 1648,60299
+(defun wisent-set-maxrhs 1657,60567
+(defun wisent-initialize-LA 1672,60897
+(defun wisent-set-goto-map 1737,62901
+(defun wisent-map-goto 1799,64760
+(defun wisent-initialize-F 1820,65433
+(defun wisent-add-lookback-edge 1874,67150
+(defun wisent-transpose 1893,67742
+(defun wisent-build-relations 1938,69009
+(defun wisent-compute-FOLLOWS 2005,71262
+(defun wisent-compute-lookaheads 2009,71346
+(defun wisent-lalr 2027,71849
+(defsubst wisent-log-resolution 2047,72515
+(defun wisent-flush-shift 2056,72933
+(defun wisent-resolve-sr-conflict 2070,73455
+(defun wisent-set-conflicts 2138,76259
+(defun wisent-resolve-conflicts 2192,78236
+(defun wisent-count-sr-conflicts 2205,78662
+(defun wisent-count-rr-conflicts 2250,80101
+(defvar wisent-expected-conflicts 2271,80692
+(defun wisent-total-conflicts 2278,81042
+(defun wisent-print-conflicts 2298,81910
+(defun wisent-print-grammar 2330,82983
+(defun wisent-print-reductions 2410,85548
+(defun wisent-print-actions 2551,90299
+(defun wisent-print-core 2615,92392
+(defun wisent-print-state 2644,93296
+(defun wisent-print-states 2650,93463
+(defun wisent-print-results 2657,93621
+(defun wisent-action-row 2676,94263
+(defconst wisent-default-tag 2799,98726
+(defun wisent-state-actions 2810,99110
+(defun wisent-goto-actions 2845,100565
+(defsubst wisent-quote-p 2867,101350
+(defsubst wisent-backquote-p 2874,101554
+(defun wisent-check-$N 2881,101770
+(defun wisent-semantic-action-expand-body 2900,102532
+(defun wisent-semantic-action 2940,104020
+(defun wisent-parser-automaton 3033,107871
+(defconst wisent-reserved-symbols 3063,108873
+(defconst wisent-reserved-capitals 3068,109080
+(defconst wisent-starts-nonterm 3073,109247
+(defvar wisent-single-start-flag 3077,109351
+(defsubst wisent-ISVALID-VAR 3083,109586
+(defsubst wisent-ISVALID-TOKEN 3089,109820
+(defun wisent-push-token 3094,109972
+(defun wisent-push-var 3110,110548
+(defun wisent-parse-nonterminals 3125,111041
+(defun wisent-parse-grammar 3221,114931
+(defun wisent-compile-grammar 3432,122694
+(defun wisent-byte-compile-grammar 3495,125177
+(defun wisent-automaton-lisp-form 3508,125737
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-grammar.el,437
+(defun wisent-grammar-assocs 41,1301
+(defun wisent-grammar-terminals 50,1642
+(defvar wisent--grammar-macros 67,2247
+(defun wisent-grammar-expand-macros 69,2284
+(defun wisent-grammar-nonterminals 80,2764
+(defun wisent-grammar-grammar 123,4610
+(defun wisent-grammar-parsetable-builder 130,4886
+(defun wisent-grammar-setupcode-builder 139,5191
+(defvar wisent-grammar-menu158,5936
+(define-derived-mode wisent-grammar-mode 169,6296
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-java.el,216
+(defun wisent-java-init-parser-context 45,1394
+(defun wisent-java-default-setup 51,1606
+(define-mode-local-override semantic-tag-components 92,3078
+(define-mode-local-override semantic-get-local-variables99,3384
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-awk-wy.el,184
+(defconst wisent-awk-wy--keyword-table39,1143
+(defconst wisent-awk-wy--token-table43,1262
+(defconst wisent-awk-wy--parse-table86,2028
+(defun wisent-awk-wy--install-parser 329,7638
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-java-tags-wy.el,878
+(defconst wisent-java-tags-wy--keyword-table39,1161
+(defconst wisent-java-tags-wy--token-table192,6961
+(defconst wisent-java-tags-wy--parse-table265,8643
+(defun wisent-java-tags-wy--install-parser 559,15634
+(define-lex-keyword-type-analyzer wisent-java-tags-wy--<keyword>-keyword-analyzer578,16314
+(define-lex-block-type-analyzer wisent-java-tags-wy--<block>-block-analyzer582,16464
+(define-lex-regex-type-analyzer wisent-java-tags-wy--<symbol>-regexp-analyzer593,16743
+(define-lex-sexp-type-analyzer wisent-java-tags-wy--<string>-sexp-analyzer599,16907
+(define-lex-regex-type-analyzer wisent-java-tags-wy--<number>-regexp-analyzer604,17051
+(define-lex-string-type-analyzer wisent-java-tags-wy--<punctuation>-string-analyzer610,17229
+(define-lex-regex-type-analyzer wisent-java-tags-wy--<unicode>-regexp-analyzer655,18156
+(define-lex wisent-java-tags-lexer665,18402
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-java-wy.el,742
+(defconst wisent-java-wy--keyword-table43,1343
+(defconst wisent-java-wy--token-table200,7301
+(defconst wisent-java-wy--parse-table274,9000
+(defun wisent-java-wy--install-parser 1412,43378
+(define-lex-keyword-type-analyzer wisent-java-wy--<keyword>-keyword-analyzer1431,44033
+(define-lex-block-type-analyzer wisent-java-wy--<block>-block-analyzer1435,44178
+(define-lex-regex-type-analyzer wisent-java-wy--<symbol>-regexp-analyzer1446,44452
+(define-lex-sexp-type-analyzer wisent-java-wy--<string>-sexp-analyzer1454,44715
+(define-lex-regex-type-analyzer wisent-java-wy--<number>-regexp-analyzer1459,44854
+(define-lex-string-type-analyzer wisent-java-wy--<punctuation>-string-analyzer1465,45027
+(define-lex wisent-java-lexer1516,46042
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-cim-wy.el,186
+(defconst wisent-cim-wy--keyword-table39,1143
+(defconst wisent-cim-wy--token-table43,1262
+(defconst wisent-cim-wy--parse-table141,2858
+(defun wisent-cim-wy--install-parser 683,14145
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-java-tags.el,147
+(defun wisent-java-parse-error 50,1442
+(define-mode-local-override semantic-get-local-variables64,1770
+(defun wisent-java-default-setup 90,2652
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent.el,1499
+(defgroup wisent 48,1559
+(defconst wisent-escape-sequence-strings71,2109
+(defsubst wisent-item-to-string 86,2827
+(defsubst wisent-token-to-string 94,3129
+(defconst wisent-eoi-term 101,3395
+(defconst wisent-error-term 104,3453
+(defconst wisent-accept-tag 107,3516
+(defconst wisent-error-tag 110,3605
+(defun wisent-automaton-p 114,3691
+(defsubst wisent-region 124,4084
+(defvar wisent-parse-verbose-flag 136,4534
+(defun wisent-parse-toggle-verbose-flag 140,4646
+(defsubst wisent-message 148,4963
+(defcustom wisent-parse-max-stack-size 158,5273
+(defcustom wisent-parse-max-recover 163,5379
+(defvar wisent-discarding-token-functions 168,5516
+(defvar wisent-pre-parse-hook 179,6040
+(defvar wisent-post-parse-hook 182,6139
+(defvar wisent-loop 185,6240
+(defvar wisent-nerrs 190,6390
+(defvar wisent-lookahead 193,6468
+(defvar wisent-parse-lexer-function 199,6675
+(defvar wisent-parse-error-function 204,6854
+(defvar wisent-input 209,7055
+(defvar wisent-recovering 213,7170
+(defvar $region 219,7443
+(defvar $nterm 220,7464
+(defvar $action 221,7485
+(defmacro wisent-lexer 223,7507
+(defmacro wisent-error 227,7615
+(defmacro wisent-errok 231,7762
+(defmacro wisent-clearin 236,7962
+(defmacro wisent-abort 242,8169
+(defmacro wisent-set-region 248,8371
+(defun wisent-skip-token 257,8774
+(defun wisent-skip-block 271,9260
+(defsubst wisent-production-bounds 316,11279
+(defmacro wisent-parse-action 336,12117
+(defsubst wisent-parse-start 343,12389
+(defun wisent-parse 359,13078
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-debug.el,349
+(defsubst wisent-debug-on-entry-p 47,1494
+(defun wisent-debug-on-automaton-p 53,1700
+(defsubst wisent-debug-semantic-action-source 62,1975
+(defun wisent-debug-read-entry 67,2164
+(defun wisent-debug-check-entry 98,3412
+(defun wisent-debug-on-entry 108,3792
+(defun wisent-cancel-debug-on-entry 116,4150
+(defun wisent-debug-show-entry 135,4781
+
+/home/snake/.elfiles/cedet/semantic/wisent/semantic-wisent.el,462
+(defvar wisent-lex-istream 43,1301
+(defvar wisent-lex-lookahead 46,1387
+(defmacro wisent-lex-eoi 55,1731
+(defmacro define-wisent-lexer 62,1957
+(define-wisent-lexer wisent-lex91,2813
+(defvar wisent-error-function 105,3374
+(defvar wisent-lexer-function 110,3549
+(defsubst wisent-raw-tag 117,3792
+(defsubst wisent-cook-tag 127,4167
+(defun wisent-collect-unmatched-syntax 140,4577
+(defun wisent-parse-stream 170,5690
+(defun wisent-parse-region 265,10119
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-python.el,983
+(defconst wisent-python-string-re56,2036
+(defvar wisent-python-EXPANDING-block 61,2206
+(defun wisent-python-implicit-line-joining-p 64,2320
+(defsubst wisent-python-forward-string 70,2540
+(defun wisent-python-forward-line 83,2969
+(defun wisent-python-forward-line-skip-indented 117,4518
+(defun wisent-python-end-of-block 126,4921
+(defvar wisent-python-indent-stack)153,6258
+(define-lex-analyzer wisent-python-lex-beginning-of-line155,6295
+(define-lex-regex-analyzer wisent-python-lex-end-of-line212,8602
+(define-lex-regex-analyzer wisent-python-lex-string222,9009
+(define-lex-regex-analyzer wisent-python-lex-ignore-backslash233,9334
+(define-lex wisent-python-lexer244,9796
+(define-mode-local-override semantic-lex 266,10592
+(define-mode-local-override semantic-get-local-variables 282,11414
+(defun wisent-python-default-setup 296,11845
+(define-child-mode python-2-mode 329,13072
+(define-child-mode python-3-mode 330,13134
+(defun wisent-python-lex-buffer 335,13211
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-javascript.el,169
+(defun wisent-javascript-jv-expand-tag 36,1156
+(define-mode-overload-implementation semantic-get-local-variables69,2640
+(defun wisent-javascript-setup-parser 82,2961
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-expr.el,241
+(defconst wisent-expr-parser-tables40,1270
+(defconst wisent-expr-operators80,2438
+(defconst wisent-expr-number-regexp90,2641
+(defvar wisent-expr-lexer-input-stream 100,2938
+(defun wisent-expr-lexer 103,3032
+(defun wisent-expr 126,3817
+
+/home/snake/.elfiles/cedet/semantic/wisent/bison-wisent.el,403
+(defalias 'yacc->wisent yacc->wisent32,1301
+(defun bison->wisent 36,1376
+(defun bison->wisent-program-delete 49,1865
+(defun bison->wisent-in-c-action 56,2087
+(defun bison->wisent-action-replace-once 67,2369
+(defun bison->wisent-action-replace 87,2915
+(defun bison->wisent-comment-replace-once 94,3131
+(defun bison->wisent-comment-replace 133,4143
+(defun bison->wisent-command-replace 138,4335
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-grammar-macros.el,894
+(defsubst wisent-grammar-region-placeholder 38,1240
+(defun wisent-grammar-EXPAND 45,1553
+(defun wisent-grammar-EXPANDFULL 60,2177
+(defun wisent-grammar-TAG 74,2787
+(defun wisent-grammar-VARIABLE-TAG 82,3087
+(defun wisent-grammar-FUNCTION-TAG 90,3482
+(defun wisent-grammar-TYPE-TAG 98,3862
+(defun wisent-grammar-INCLUDE-TAG 106,4245
+(defun wisent-grammar-PACKAGE-TAG 114,4612
+(defun wisent-grammar-CODE-TAG 122,4964
+(defun wisent-grammar-ALIAS-TAG 130,5301
+(defun wisent-grammar-EXPANDTAG 138,5690
+(defun wisent-grammar-AST-ADD 144,5896
+(defun wisent-grammar-AST-PUT 150,6132
+(defun wisent-grammar-AST-GET 156,6368
+(defun wisent-grammar-AST-GET1 163,6606
+(defun wisent-grammar-AST-GET-STRING 170,6854
+(defun wisent-grammar-AST-MERGE 177,7132
+(defun wisent-grammar-SKIP-BLOCK 183,7368
+(defun wisent-grammar-SKIP-TOKEN 195,7865
+(defvar-mode-local wisent-grammar-mode 201,8059
+
+/home/snake/.elfiles/cedet/semantic/wisent/wisent-calc-wy.el,230
+(defconst wisent-calc-wy--keyword-table39,1157
+(defconst wisent-calc-wy--token-table43,1277
+(defconst wisent-calc-wy--parse-table50,1416
+(defun wisent-calc-wy--install-parser 103,2237
+(defun wisent-calc-setup-parser 125,2910
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-ebrowse.el,1516
+(defvar semanticdb-ebrowse-default-file-name 71,2616
+(defcustom semanticdb-ebrowse-file-match 74,2722
+(defclass semanticdb-table-ebrowse 85,3155
+(defclass semanticdb-project-database-ebrowse100,3624
+(defun semanticdb-ebrowse-C-file-p 117,4230
+(defun semanticdb-create-ebrowse-database 134,4779
+(defun semanticdb-load-ebrowse-caches 189,6570
+(defun semanticdb-ebrowse-load-helper 200,6899
+(defvar-mode-local c++-mode 233,7983
+(defmethod semanticdb-needs-refresh-p 237,8086
+(defun semanticdb-ebrowse-file-for-directory 256,8590
+(defun semanticdb-ebrowse-get-ebrowse-structure 268,9028
+(defmethod semanticdb-create-database 295,10000
+(defmethod semanticdb-ebrowse-strip-trees 337,11516
+(defun semanticdb-ebrowse-add-globals-to-table 372,12843
+(defun semanticdb-ebrowse-add-tree-to-table 409,14005
+(defmethod semanticdb-normalize-tags 491,16620
+(defmethod semanticdb-normalize-one-tag 533,18302
+(defmethod semanticdb-find-tags-by-name-method581,20127
+(defmethod semanticdb-find-tags-by-name-regexp-method596,20665
+(defmethod semanticdb-find-tags-for-completion-method606,20998
+(defmethod semanticdb-find-tags-by-class-method616,21353
+(defmethod semanticdb-deep-find-tags-by-name-method633,21902
+(defmethod semanticdb-deep-find-tags-by-name-regexp-method641,22229
+(defmethod semanticdb-deep-find-tags-for-completion-method649,22596
+(defmethod semanticdb-find-tags-external-children-of-type-method659,23003
+(defun semanticdb-ebrowse-run-tests 675,23496
+(defun semanticdb-ebrowse-dump 697,24280
+
+/home/snake/.elfiles/cedet/semantic/semantic-sb.el,915
+(defcustom semantic-sb-autoexpand-length 42,1448
+(defcustom semantic-sb-button-format-tag-function 48,1659
+(defcustom semantic-sb-info-format-tag-function 53,1866
+(defun semantic-sb-tag-set-buffer 62,2141
+(defmacro semantic-sb-with-tag-buffer 70,2458
+(define-overloadable-function semantic-sb-tag-children-to-expand 97,3054
+(defun semantic-sb-tag-children-to-expand-default 102,3285
+(defun semantic-sb-one-button 107,3481
+(defun semantic-sb-speedbar-data-line 149,5081
+(defun semantic-sb-maybe-token-to-button 169,5830
+(defun semantic-sb-insert-details 190,6642
+(defun semantic-sb-detail-parent 255,8814
+(defun semantic-sb-show-extra 276,9455
+(defun semantic-sb-token-jump 294,10200
+(defun semantic-sb-expand-group 326,11500
+(defun semantic-sb-buttons-plain 343,12172
+(defun semantic-sb-insert-tag-table 359,12756
+(defun semantic-sb-buttons 365,13028
+(defun semantic-sb-fetch-tag-table 382,13579
+
+/home/snake/.elfiles/cedet/semantic/semantic-fw.el,1164
+(defalias 'semantic-run-mode-hookssemantic-run-mode-hooks138,5708
+(defalias 'semantic-subst-char-in-string semantic-subst-char-in-string144,5866
+(defun semantic-delete-overlay-maybe 147,5932
+(defalias 'semantic-compile-warnsemantic-compile-warn152,6123
+(defun semantic-menu-item 163,6372
+(defvar semantic-cache-data-overlays 182,6904
+(defun semantic-cache-data-to-buffer 185,6995
+(defun semantic-cache-data-post-command-hook 211,8283
+(defun semantic-get-cache-data 236,9276
+(defun semantic-test-data-cache 249,9727
+(defun semantic-overload-symbol-from-function 267,10328
+(defun semantic-alias-obsolete 274,10594
+(defun semantic-varalias-obsolete 295,11395
+(defmacro semantic-safe 320,12242
+(defsubst semantic-map-buffers 343,13082
+(defalias 'semantic-map-mode-bufferssemantic-map-mode-buffers349,13360
+(defun semantic-install-function-overrides 364,13837
+(defvar semantic-current-input-throw-symbol 390,14922
+(defmacro semantic-exit-on-input 393,15031
+(defmacro semantic-throw-on-input 404,15540
+(defun semantic-test-throw-on-input 413,15981
+(defun semantic-find-file-noselect 433,16498
+(defconst semantic-fw-font-lock-keywords473,17946
+
+/home/snake/.elfiles/cedet/semantic/bovine/bovine-debug.el,456
+(defclass semantic-bovine-debug-frame 37,1151
+(defun semantic-bovine-debug-create-frame 63,1934
+(defmethod semantic-debug-frame-highlight 89,2773
+(defmethod semantic-debug-frame-info 108,3500
+(defclass semantic-bovine-debug-error-frame 115,3692
+(defun semantic-create-bovine-debug-error-frame 122,3944
+(defmethod semantic-debug-frame-highlight 131,4283
+(defmethod semantic-debug-frame-info 136,4479
+(defclass semantic-bovine-debug-parser 143,4704
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-erlang-by.el,207
+(defconst semantic-erlang-by--keyword-table39,1159
+(defconst semantic-erlang-by--token-table86,2226
+(defconst semantic-erlang-by--parse-table137,3532
+(defun semantic-erlang-by--install-parser 1805,30810
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-c.el,5168
+(define-child-mode c++-mode 67,2024
+(defcustom semantic-default-c-path 78,2320
+(defvar-mode-local c-mode 86,2563
+(defvar semantic-lex-c-preprocessor-symbol-map-builtin101,2943
+(defvar semantic-c-in-reset-preprocessor-table 110,3233
+(defun semantic-c-reset-preprocessor-symbol-map 115,3434
+(defcustom semantic-lex-c-preprocessor-symbol-map 153,4772
+(defcustom semantic-lex-c-preprocessor-symbol-file 191,6145
+(defcustom semantic-c-member-of-autocast 208,6737
+(define-lex-spp-macro-declaration-analyzer semantic-lex-cpp-define227,7151
+(define-lex-spp-macro-undeclaration-analyzer semantic-lex-cpp-undef263,8358
+(defcustom semantic-c-obey-conditional-section-parsing-flag 272,8645
+(defun semantic-c-skip-conditional-section 279,8911
+(defun semantic-c-convert-spp-value-to-hideif-value 329,10655
+(defun semantic-c-evaluate-symbol-for-hideif 356,11621
+(defun semantic-c-hideif-lookup 400,13189
+(defun semantic-c-hideif-defined 413,13616
+(defvar semantic-c-takeover-hideif 433,14261
+(defadvice hif-defined 436,14360
+(defadvice hif-lookup 443,14567
+(define-lex-regex-analyzer semantic-lex-c-if456,14985
+(defun semantic-c-do-lex-if 462,15202
+(define-lex-regex-analyzer semantic-lex-c-ifdef501,16601
+(defun semantic-c-do-lex-ifdef 507,16848
+(define-lex-regex-analyzer semantic-lex-c-macro-else542,18085
+(define-lex-regex-analyzer semantic-lex-c-macrobits556,18631
+(define-lex-spp-include-analyzer semantic-lex-c-include-system563,18877
+(define-lex-spp-include-analyzer semantic-lex-c-include573,19259
+(define-lex-regex-analyzer semantic-lex-c-ignore-ending-backslash584,19633
+(define-lex-regex-analyzer semantic-lex-c-namespace-begin-macro590,19818
+(defcustom semantic-lex-c-nested-namespace-ignore-second 615,20799
+(define-lex-regex-analyzer semantic-lex-c-VC++-begin-std-namespace627,21329
+(define-lex-regex-analyzer semantic-lex-c-VC++-end-std-namespace644,21966
+(define-lex-regex-analyzer semantic-lex-c-namespace-begin-nested-macro650,22171
+(define-lex-regex-analyzer semantic-lex-c-namespace-end-macro696,23922
+(define-lex-regex-analyzer semantic-lex-c-string702,24167
+(define-lex-regex-analyzer semantic-c-lex-ignore-newline717,24573
+(define-lex semantic-c-lexer727,24934
+(define-lex-simple-regex-analyzer semantic-lex-cpp-hashhash762,26117
+(define-lex semantic-cpp-lexer766,26242
+(define-mode-local-override semantic-parse-region 796,27182
+(defvar semantic-c-parse-token-hack-depth 859,29379
+(defun semantic-c-parse-lexical-token 862,29498
+(defvar semantic-c-debug-mode-init-last-mode 938,32043
+(defun semantic-c-debug-mode-init 941,32138
+(defun semantic-c-debug-mode-init-pch 956,32619
+(defun semantic-expand-c-tag 973,33189
+(defun semantic-expand-c-tag-namelist 1051,36198
+(defvar-mode-local c-mode 1164,39815
+(defvar semantic-c-classname 1167,39962
+(defun semantic-c-reconstitute-token 1175,40281
+(defun semantic-c-reconstitute-template 1269,43429
+(define-mode-local-override semantic-format-tag-name1277,43654
+(define-mode-local-override semantic-format-tag-canonical-name1289,44042
+(define-mode-local-override semantic-format-tag-type 1299,44427
+(define-mode-local-override semantic-find-tags-by-scope-protection1328,45471
+(define-mode-local-override semantic-tag-protection1358,46337
+(define-mode-local-override semantic-tag-components 1401,47912
+(defun semantic-c-tag-template 1412,48461
+(defun semantic-c-tag-template-specifier 1416,48600
+(defun semantic-c-template-string-body 1420,48769
+(defun semantic-c-template-string 1430,49128
+(define-mode-local-override semantic-format-tag-concise-prototype1451,49922
+(define-mode-local-override semantic-format-tag-uml-prototype1460,50361
+(define-mode-local-override semantic-tag-abstract-p1469,50777
+(defun semantic-c-dereference-typedef 1497,51830
+(defun semantic-c--instantiate-template 1515,52708
+(defun semantic-c--template-name-1 1527,53283
+(defun semantic-c--template-name 1535,53647
+(defun semantic-c-dereference-template 1542,53941
+(defun semantic-c-dereference-member-of 1564,54913
+(defun semantic-c-dereference-namespace 1581,55789
+(defun semantic-c-dereference-namespace-alias 1619,57694
+(defun semantic-c-check-type-namespace-using 1652,59030
+(define-mode-local-override semantic-analyze-dereference-metatype1696,60979
+(define-mode-local-override semantic-analyze-type-constants 1720,62156
+(define-mode-local-override semantic-analyze-split-name 1727,62466
+(define-mode-local-override semantic-analyze-unsplit-name 1734,62682
+(define-mode-local-override semantic-ctxt-scoped-types 1738,62861
+(define-mode-local-override semanticdb-expand-nested-tag 1783,64712
+(define-mode-local-override semantic-get-local-variables 1806,65571
+(define-mode-local-override semantic-idle-summary-current-symbol-info1820,66133
+(defvar-mode-local c-mode 1843,66908
+(defvar-mode-local c-mode 1846,67067
+(defvar-mode-local c-mode 1854,67300
+(defvar-mode-local c-mode 1862,67564
+(defvar-mode-local c-mode 1865,67681
+(defvar-mode-local c-mode 1869,67844
+(defvar-mode-local c-mode 1872,67952
+(defun semantic-default-c-setup 1876,68096
+(defun semantic-c-add-preprocessor-symbol 1889,68532
+(defun semantic-c-describe-environment 1911,69190
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-bovine.el,384
+(defvar semantic-bovinate-nonterminal-check-obarray 41,1455
+(defmacro semantic-lambda 52,1887
+(defsubst semantic-bovinate-symbol-nonterminal-p 64,2376
+(defmacro semantic-bovinate-nonterminal-db-nt 69,2586
+(defun semantic-bovinate-nonterminal-check 77,2856
+(defun semantic-bovinate-stream 97,3742
+(defalias 'semantic-parse-stream-default semantic-parse-stream-default282,12201
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-el.el,2459
+(define-lex semantic-emacs-lisp-lexer41,1255
+(defvar semantic--elisp-parse-table59,1766
+(defun semantic-elisp-desymbolify 82,2600
+(defun semantic-elisp-desymbolify-args 98,3025
+(defun semantic-elisp-clos-slot-property-string 107,3277
+(defun semantic-elisp-clos-args-to-semantic 122,3634
+(defun semantic-elisp-form-to-doc-string 143,4589
+(defvar semantic-elisp-store-documentation-in-tag 154,4971
+(defun semantic-elisp-do-doc 157,5095
+(defmacro semantic-elisp-setup-form-parser 162,5289
+(defmacro semantic-elisp-reuse-form-parser 177,5964
+(defun semantic-elisp-use-read 189,6495
+(define-mode-local-override semantic-dependency-tag-file461,14358
+(defun semantic-emacs-lisp-overridable-doc 488,15280
+(defun semantic-emacs-lisp-obsoleted-doc 498,15744
+(define-mode-local-override semantic-documentation-for-tag514,16379
+(define-mode-local-override semantic-tag-include-filename 557,17906
+(define-mode-local-override semantic-insert-foreign-tag565,18231
+(define-mode-local-override semantic-tag-protection575,18547
+(define-mode-local-override semantic-tag-static-p591,19202
+(define-mode-local-override semantic-up-context 602,19652
+(define-mode-local-override semantic-get-local-variables 621,20330
+(define-mode-local-override semantic-end-of-command 680,21908
+(define-mode-local-override semantic-beginning-of-command 688,22154
+(define-mode-local-override semantic-ctxt-current-symbol 698,22454
+(define-mode-local-override semantic-ctxt-current-function 708,22733
+(define-mode-local-override semantic-ctxt-current-assignment 752,23976
+(define-mode-local-override semantic-ctxt-current-argument 804,25360
+(define-mode-local-override semantic-ctxt-current-class-list 823,25826
+(define-mode-local-override semantic-format-tag-abbreviate 849,26587
+(define-mode-local-override semantic-format-tag-prototype 861,26981
+(define-mode-local-override semantic-format-tag-concise-prototype 883,27795
+(define-mode-local-override semantic-format-tag-uml-prototype 889,28084
+(define-mode-local-override semantic-ia-insert-tag897,28384
+(defvar-mode-local emacs-lisp-mode 912,28850
+(defvar-mode-local emacs-lisp-mode 915,28938
+(defvar-mode-local emacs-lisp-mode 918,29027
+(defvar-mode-local emacs-lisp-mode 921,29107
+(defvar-mode-local emacs-lisp-mode 924,29198
+(defvar-mode-local emacs-lisp-mode 933,29415
+(defvar-mode-local emacs-lisp-mode 936,29511
+(define-child-mode lisp-mode 941,29689
+(defun semantic-default-elisp-setup 945,29825
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-scm.el,350
+(define-mode-local-override semantic-format-tag-prototype 43,1446
+(define-mode-local-override semantic-documentation-for-tag 54,1828
+(define-mode-local-override semantic-insert-foreign-tag 62,2128
+(define-lex-regex-analyzer semantic-lex-scheme-symbol72,2500
+(define-lex semantic-scheme-lexer82,2848
+(defun semantic-default-scheme-setup 99,3364
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-java.el,1386
+(defconst semantic-java-number-regexp38,1229
+(defsubst semantic-java-dim 87,2343
+(defsubst semantic-java-type 98,2751
+(defun semantic-java-expand-tag 108,3063
+(define-mode-local-override semantic-ctxt-scoped-types154,4983
+(defun semantic-java-prototype-function 163,5279
+(defun semantic-java-prototype-variable 191,6439
+(defun semantic-java-prototype-type 206,7028
+(define-mode-local-override semantic-format-tag-prototype220,7610
+(define-mode-local-override semantic-tag-include-filename 239,8302
+(defsubst semantic-java-skip-spaces-backward 247,8572
+(defsubst semantic-java-skip-spaces-forward 251,8708
+(define-mode-local-override semantic-documentation-for-tag255,8841
+(defvar semantic-java-doc-line-tags 301,10733
+(defvar semantic-java-doc-with-name-tags 306,10919
+(defvar semantic-java-doc-with-ref-tags 309,11002
+(defvar semantic-java-doc-extra-type-tags 314,11144
+(defvar semantic-java-doc-extra-function-tags 318,11289
+(defvar semantic-java-doc-extra-variable-tags 322,11441
+(defvar semantic-java-doc-type-tags 328,11630
+(defvar semantic-java-doc-function-tags 332,11763
+(defvar semantic-java-doc-variable-tags 336,11903
+(defmacro semantic-java-doc-tag 342,12063
+(defsubst semantic-java-doc-tag-name 347,12171
+(defun semantic-java-doc-keyword-before-p 352,12340
+(defun semantic-java-doc-keywords-map 369,13098
+(defun semantic-java-doc-setup 389,13850
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-c-by.el,188
+(defconst semantic-c-by--keyword-table39,1203
+(defconst semantic-c-by--token-table145,6232
+(defconst semantic-c-by--parse-table189,7342
+(defun semantic-c-by--install-parser 2183,39767
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-make.el,871
+(define-lex-analyzer semantic-lex-make-backslash-no-newline40,1285
+(define-lex-regex-analyzer semantic-lex-make-command53,1812
+(define-lex-regex-analyzer semantic-lex-make-ignore-automake-conditional63,2207
+(define-lex semantic-make-lexer69,2431
+(defun semantic-make-expand-tag 86,2924
+(define-mode-local-override semantic-get-local-variables105,3504
+(define-mode-local-override semantic-ctxt-current-class-list111,3722
+(define-mode-local-override semantic-format-tag-abbreviate132,4373
+(defvar-mode-local makefile-mode 145,4813
+(define-mode-local-override semantic-format-tag-prototype149,4941
+(define-mode-local-override semantic-format-tag-concise-prototype166,5512
+(define-mode-local-override semantic-format-tag-uml-prototype172,5785
+(define-mode-local-override semantic-analyze-possible-completions178,6050
+(defun semantic-default-make-setup 210,7235
+
+/home/snake/.elfiles/cedet/semantic/bovine/bovine-grammar-macros.el,460
+(defun bovine-grammar-EXPAND 38,1243
+(defun bovine-grammar-EXPANDFULL 45,1530
+(defun bovine-grammar-TAG 52,1809
+(defun bovine-grammar-VARIABLE-TAG 59,2088
+(defun bovine-grammar-FUNCTION-TAG 66,2462
+(defun bovine-grammar-TYPE-TAG 73,2821
+(defun bovine-grammar-INCLUDE-TAG 80,3183
+(defun bovine-grammar-PACKAGE-TAG 87,3529
+(defun bovine-grammar-CODE-TAG 94,3860
+(defun bovine-grammar-ALIAS-TAG 101,4176
+(defvar-mode-local bovine-grammar-mode 108,4544
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-erlang.el,155
+(define-lex-simple-regex-analyzer semantic-erlang-lex-char48,1437
+(define-lex semantic-erlang-lexer53,1604
+(defun semantic-erlang-default-setup 72,2180
+
+/home/snake/.elfiles/cedet/semantic/bovine/bovine-grammar.el,321
+(defvar bovine--grammar-macros 40,1314
+(defun bovine-grammar-expand-form 42,1351
+(defun bovine-grammar-expand-action 155,5496
+(defun bovine-grammar-parsetable-builder 183,6497
+(defun bovine-grammar-setupcode-builder 316,11806
+(defvar bovine-grammar-menu333,12414
+(define-derived-mode bovine-grammar-mode 340,12569
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-gcc.el,436
+(defun semantic-gcc-query 31,1139
+(defun semantic-gcc-get-include-paths 60,2171
+(defun semantic-cpp-defs 94,3654
+(defun semantic-gcc-fields 104,3984
+(defvar semantic-gcc-setup-data 133,5146
+(defun semantic-gcc-setup 143,5500
+(defvar semantic-gcc-test-strings214,9102
+(defvar semantic-gcc-test-strings-fail270,14016
+(defun semantic-gcc-test-output-parser 278,14325
+(defun semantic-gcc-test-output-parser-this-machine 311,15519
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-skel.el,191
+(define-lex-regex-analyzer semantic-lex-skel-if-054,1605
+(define-lex semantic-skeleton-lexer63,1854
+(defun semantic-skeleton-expand-tag 80,2386
+(defun semantic-default-skel-setup 98,2872
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-make-by.el,196
+(defconst semantic-make-by--keyword-table39,1179
+(defconst semantic-make-by--token-table59,2058
+(defconst semantic-make-by--parse-table70,2337
+(defun semantic-make-by--install-parser 379,7033
+
+/home/snake/.elfiles/cedet/semantic/bovine/semantic-scm-by.el,192
+(defconst semantic-scm-by--keyword-table39,1156
+(defconst semantic-scm-by--token-table49,1547
+(defconst semantic-scm-by--parse-table58,1749
+(defun semantic-scm-by--install-parser 184,3819
+
+/home/snake/.elfiles/cedet/semantic/semantic-tag-file.el,191
+(define-overloadable-function semantic-go-to-tag 38,1270
+(define-overloadable-function semantic-dependency-tag-file 109,4184
+(define-overloadable-function semantic-prototype-file 182,7086
+
+/home/snake/.elfiles/cedet/semantic/semantic-complete.el,6135
+(defvar semantic-complete-inline-overlay 141,5323
+(defun semantic-completion-inline-active-p 145,5443
+(defun semantic-completion-text 156,5899
+(defun semantic-completion-delete-text 165,6249
+(defun semantic-completion-message 172,6539
+(defvar semantic-completion-collector-engine 181,6917
+(defvar semantic-completion-display-engine 186,7110
+(defvar semantic-complete-key-map190,7252
+(defvar semantic-completion-default-history 204,7836
+(defun semantic-complete-read-tag-engine 210,7994
+(defvar semantic-complete-active-default 273,10267
+(defun semantic-complete-default-to-tag 276,10370
+(defvar semantic-complete-current-matched-tag 329,12280
+(defun semantic-complete-current-match 332,12396
+(defun semantic-complete-done 412,15215
+(defun semantic-complete-complete-space 421,15449
+(defun semantic-complete-complete-tab 426,15598
+(defun semantic-complete-hack-word-boundaries 435,15865
+(defun semantic-complete-try-completion 454,16554
+(defun semantic-complete-do-completion 502,18337
+(defvar semantic-complete-inline-map562,20610
+(defface semantic-complete-inline-face577,21241
+(defun semantic-complete-inline-text 586,21559
+(defun semantic-complete-inline-delete-text 595,21919
+(defun semantic-complete-inline-done 601,22175
+(defun semantic-complete-inline-quit 625,22909
+(defun semantic-complete-inline-exit 631,23044
+(defun semantic-complete-pre-command-hook 669,24342
+(defun semantic-complete-post-command-hook 683,24928
+(defun semantic-complete-inline-force-display 733,26691
+(defun semantic-complete-inline-tag-engine753,27452
+(defun semantic-complete-inline-TAB 788,28908
+(defun semantic-complete-inline-down(800,29208
+(defun semantic-complete-inline-up 808,29467
+(defun semantic-complete-next-action 823,29969
+(defvar semantic-collector-per-buffer-list 877,31999
+(defvar semantic-collector-list 881,32159
+(defclass semantic-collector-abstract 884,32248
+(defmethod semantic-collector-cleanup 923,33899
+(defmethod semantic-collector-next-action927,34028
+(defmethod semantic-collector-last-prefix=952,34998
+(defmethod semantic-collector-get-cache 958,35242
+(defmethod semantic-collector-calculate-completions-raw964,35477
+(defmethod semantic-collector-calculate-completions981,36092
+(defmethod semantic-collector-try-completion-whitespace1041,38107
+(defmethod semantic-collector-current-exact-match 1073,39440
+(defmethod semantic-collector-current-whitespace-completion 1081,39824
+(defmethod semantic-collector-get-match 1086,40070
+(defmethod semantic-collector-all-completions1094,40485
+(defmethod semantic-collector-try-completion1102,40788
+(defmethod semantic-collector-calculate-cache1113,41181
+(defmethod semantic-collector-flush 1119,41320
+(defclass semantic-collector-buffer-abstract 1130,41682
+(defmethod constructor 1136,41885
+(defun semantic-collector-buffer-flush 1154,42530
+(defclass semantic-collector-buffer-deep1169,42975
+(defmethod semantic-collector-calculate-cache1176,43223
+(defclass semantic-collector-project-abstract 1189,43625
+(defclass semantic-collector-project 1201,44053
+(defmethod semantic-collector-calculate-completions-raw1206,44181
+(defclass semantic-collector-project-brutish 1212,44450
+(defmethod semantic-collector-calculate-completions-raw1216,44585
+(defclass semantic-collector-analyze-completions 1221,44846
+(defmethod semantic-collector-calculate-completions-raw1236,45492
+(defclass semantic-displayor-abstract 1274,47084
+(defmethod semantic-displayor-cleanup 1289,47619
+(defmethod semantic-displayor-next-action 1293,47748
+(defmethod semantic-displayor-set-completions 1301,48064
+(defmethod semantic-displayor-show-request 1307,48286
+(defmethod semantic-displayor-focus-request 1311,48422
+(defmethod semantic-displayor-scroll-request 1315,48577
+(defmethod semantic-displayor-focus-previous 1319,48762
+(defmethod semantic-displayor-focus-next 1323,48899
+(defmethod semantic-displayor-current-focus 1327,49028
+(defcustom semantic-completion-displayor-format-tag-function1333,49255
+(defclass semantic-displayor-traditional 1339,49466
+(defmethod semantic-displayor-show-request 1346,49766
+(defclass semantic-displayor-focus-abstract 1359,50235
+(defmethod semantic-displayor-next-action 1377,50879
+(defmethod semantic-displayor-set-completions 1393,51440
+(defmethod semantic-displayor-focus-previous 1399,51664
+(defmethod semantic-displayor-focus-next 1411,52106
+(defmethod semantic-displayor-focus-tag 1424,52556
+(defmethod semantic-displayor-current-focus 1430,52829
+(defclass semantic-displayor-traditional-with-focus-highlight1450,53699
+(defmethod semantic-displayor-focus-request1459,54190
+(defclass semantic-displayor-tooltip 1527,56616
+(defmethod initialize-instance 1565,57916
+(defmethod semantic-displayor-show-request 1572,58110
+(defun semantic-displayor-point-position 1637,60487
+(defun semantic-displayor-tooltip-show 1649,60947
+(defmethod semantic-displayor-scroll-request 1662,61398
+(defclass semantic-displayor-ghost 1674,61749
+(defmethod semantic-displayor-next-action 1688,62254
+(defmethod semantic-displayor-cleanup 1700,62626
+(defmethod semantic-displayor-set-completions 1706,62844
+(defmethod semantic-displayor-show-request 1715,63067
+(defmethod semantic-displayor-focus-request1730,63525
+(defvar semantic-complete-inline-custom-type1772,65004
+(defcustom semantic-complete-inline-analyzer-displayor-class1788,65459
+(defun semantic-complete-read-tag-buffer-deep 1796,65694
+(defun semantic-complete-read-tag-project 1819,66573
+(defun semantic-complete-inline-tag-project 1844,67460
+(defun semantic-complete-read-tag-analyzer 1892,69297
+(defun semantic-complete-inline-analyzer 1926,70678
+(defcustom semantic-complete-inline-analyzer-idle-displayor-class1976,72663
+(defun semantic-complete-inline-analyzer-idle 1984,72910
+(defun semantic-complete-test 2004,73683
+(defun semantic-complete-jump-local 2013,73898
+(defun semantic-complete-jump 2026,74345
+(defun semantic-complete-analyze-and-replace 2040,74805
+(defun semantic-complete-analyze-inline 2056,75508
+(defun semantic-complete-analyze-inline-idle 2079,76469
+(defun semantic-complete-self-insert 2099,77288
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-global.el,877
+(defun semanticdb-enable-gnu-global-databases 42,1349
+(defun semanticdb-enable-gnu-global-hook 66,2112
+(defclass semanticdb-project-database-global71,2315
+(defun semanticdb-enable-gnu-global-in-buffer 77,2518
+(defclass semanticdb-table-global 99,3334
+(defmethod semanticdb-equivalent-mode 104,3497
+(defmethod semanticdb-get-database-tables 113,3804
+(defmethod semanticdb-file-table 127,4401
+(defmethod semanticdb-find-tags-by-name-method137,4764
+(defmethod semanticdb-find-tags-by-name-regexp-method154,5335
+(defmethod semanticdb-find-tags-for-completion-method167,5791
+(defmethod semanticdb-deep-find-tags-by-name-method193,6645
+(defmethod semanticdb-deep-find-tags-by-name-regexp-method200,6947
+(defmethod semanticdb-deep-find-tags-for-completion-method207,7289
+(defvar semanticdb-test-gnu-global-startfile 217,7732
+(defun semanticdb-test-gnu-global 220,7845
+
+/home/snake/.elfiles/cedet/semantic/semantic-idle.el,2852
+(defvar semantic-idle-scheduler-timer 50,1797
+(defvar semantic-idle-scheduler-work-timer 53,1888
+(defcustom semantic-idle-scheduler-verbose-flag 56,2006
+(defcustom semantic-idle-scheduler-idle-time 62,2213
+(defcustom semantic-idle-scheduler-work-idle-time 75,2723
+(defun semantic-idle-scheduler-setup-timers 88,3272
+(defun semantic-idle-scheduler-kill-timer 103,3884
+(defcustom global-semantic-idle-scheduler-mode 116,4269
+(defun global-semantic-idle-scheduler-mode 127,4611
+(defcustom semantic-idle-scheduler-mode-hook 138,5113
+(defvar semantic-idle-scheduler-mode 144,5281
+(defcustom semantic-idle-scheduler-max-buffer-size 149,5508
+(defsubst semantic-idle-scheduler-enabled-p 156,5778
+(defun semantic-idle-scheduler-mode-setup 166,6247
+(defun semantic-idle-scheduler-mode 183,7000
+(defvar semantic-idle-scheduler-queue 225,8541
+(defun semantic-idle-scheduler-add 233,8840
+(defun semantic-idle-scheduler-remove 238,9008
+(defun semantic-idle-core-handler 245,9219
+(defun semantic-debug-idle-function 314,12062
+(defun semantic-idle-scheduler-function 321,12247
+(defcustom semantic-idle-work-parse-neighboring-files-flag 335,12738
+(defcustom semantic-idle-work-update-headers-flag 341,12971
+(defun semantic-idle-work-for-one-buffer 348,13240
+(defun semantic-idle-work-core-handler 383,14292
+(defun semantic-debug-idle-work-function 449,16382
+(defun semantic-idle-scheduler-work-function 456,16582
+(defun semantic-idle-scheduler-work-parse-neighboring-files 469,17140
+(defun semantic-idle-pnf-test 482,17613
+(defcustom semantic-idle-scheduler-no-working-message 498,18077
+(defcustom semantic-idle-scheduler-working-in-modeline-flag 503,18238
+(defvar semantic-before-idle-scheduler-reparse-hook 510,18508
+(defvar semantic-after-idle-scheduler-reparse-hook 515,18743
+(defun semantic-idle-scheduler-refresh-tags 525,19263
+(defmacro define-semantic-idle-service 610,22370
+(defcustom semantic-idle-summary-function722,25733
+(defsubst semantic-idle-summary-find-current-symbol-tag 729,26018
+(defun semantic-idle-summary-current-symbol-info-brutish 737,26438
+(defun semantic-idle-summary-current-symbol-keyword 746,26819
+(defun semantic-idle-summary-current-symbol-info-context 754,27147
+(defun semantic-idle-summary-current-symbol-info-default 763,27508
+(defvar semantic-idle-summary-out-of-context-faces783,28136
+(defun semantic-idle-summary-useful-context-p 805,28972
+(define-overloadable-function semantic-idle-summary-current-symbol-info 816,29356
+(define-semantic-idle-service semantic-idle-summary822,29622
+(defvar semantic-idle-summary-highlight-face 854,30971
+(defun semantic-idle-summary-maybe-highlight 857,31067
+(define-semantic-idle-service semantic-idle-tag-highlight910,32902
+(defun semantic-idle-completion-list-default 947,34332
+(define-semantic-idle-service semantic-idle-completions968,34989
+
+/home/snake/.elfiles/cedet/semantic/semantic-adebug.el,694
+(defun data-debug-insert-tag-parts 48,1493
+(defun data-debug-insert-tag-parts-from-point 88,2746
+(defun data-debug-insert-tag 106,3242
+(defun data-debug-insert-tag-list 132,4216
+(defun data-debug-insert-taglist-from-point 145,4756
+(defun data-debug-insert-tag-list-button 164,5242
+(defun data-debug-insert-find-results 189,6248
+(defun data-debug-insert-find-results-from-point 203,6709
+(defun data-debug-insert-find-results-button 220,7169
+(defun data-debug-insert-db-and-tag-button 241,8028
+(defun data-debug-insert-db-and-tag-from-point 265,8968
+(defun semantic-adebug-bovinate 286,9596
+(defun semantic-adebug-searchdb 301,10023
+(defun semanticdb-debug-file-tag-check 318,10543
+
+/home/snake/.elfiles/cedet/semantic/semantic-format.el,2844
+(defvar semantic-format-tag-functions46,1678
+(defvar semantic-format-tag-custom-list73,2669
+(defcustom semantic-format-use-images-flag 84,3067
+(defvar semantic-function-argument-separator 90,3290
+(defvar semantic-format-parent-separator 94,3474
+(defvar semantic-format-face-alist98,3664
+(defun semantic--format-colorize-text 134,4937
+(defun semantic--format-colorize-merge-text 148,5451
+(defun semantic--format-tag-arguments 177,6332
+(define-overloadable-function semantic-format-tag-type 198,6986
+(defun semantic-format-tag-type-default 202,7180
+(defun semantic-format-tag-prin1 233,7960
+(defun semantic-format-tag-name-from-anything 238,8134
+(define-overloadable-function semantic-format-tag-name 264,9342
+(defun semantic-format-tag-name-default 270,9662
+(defun semantic--format-tag-parent-tree 284,10230
+(define-overloadable-function semantic-format-tag-canonical-name 312,11312
+(defun semantic-format-tag-canonical-name-default 319,11671
+(define-overloadable-function semantic-format-tag-abbreviate 349,12802
+(defun semantic-format-tag-abbreviate-default 356,13189
+(define-overloadable-function semantic-format-tag-summarize 391,14310
+(defun semantic-format-tag-summarize-default 396,14581
+(define-overloadable-function semantic-format-tag-summarize-with-file 412,15253
+(defun semantic-format-tag-summarize-with-file-default 417,15561
+(define-overloadable-function semantic-format-tag-short-doc 438,16425
+(defun semantic-format-tag-short-doc-default 443,16732
+(define-overloadable-function semantic-format-tag-prototype 478,17993
+(defun semantic-format-tag-prototype-default 486,18398
+(define-overloadable-function semantic-format-tag-concise-prototype 537,19991
+(defun semantic-format-tag-concise-prototype-default 542,20271
+(defcustom semantic-uml-colon-string 574,21384
+(defcustom semantic-uml-no-protection-string 581,21637
+(defun semantic--format-uml-post-colorize 587,21840
+(defun semantic-uml-attribute-string 597,22246
+(defvar semantic-format-tag-protection-image-alist606,22557
+(defvar semantic-format-tag-protection-symbol-to-string-assoc-list613,22750
+(define-overloadable-function semantic-format-tag-uml-protection-to-string 621,23031
+(defun semantic-format-tag-uml-protection-to-string-default 633,23510
+(defsubst semantic-format-tag-uml-protection 647,24266
+(defun semantic--format-tag-uml-type 655,24563
+(define-overloadable-function semantic-format-tag-uml-abbreviate 663,24845
+(defun semantic-format-tag-uml-abbreviate-default 668,25127
+(define-overloadable-function semantic-format-tag-uml-prototype 686,25776
+(defun semantic-format-tag-uml-prototype-default 691,26054
+(define-overloadable-function semantic-format-tag-uml-concise-prototype 718,26930
+(defun semantic-format-tag-uml-concise-prototype-default 723,27224
+(defun semantic-test-all-format-tag-functions 741,27862
+
+/home/snake/.elfiles/cedet/semantic/semantic-tag-write.el,323
+(defun semantic-tag-write-one-tag 38,1402
+(defun semantic-tag-write-tag-list 100,2995
+(defun semantic-tag-write-one-attribute 129,4011
+(defun semantic-tag-write-one-value 140,4444
+(defun semantic-tag-write-list-slot-value 164,5175
+(defun semantic-tag-write-test 175,5430
+(defun semantic-tag-write-list-test 181,5650
+
+/home/snake/.elfiles/cedet/semantic/semantic-dep.el,437
+(defvar semantic-dependency-include-path 46,1650
+(defvar semantic-dependency-system-include-path 66,2398
+(defmacro defcustom-mode-local-semantic-dependency-system-include-path82,3050
+(defun semantic-add-system-include 125,4632
+(defun semantic-remove-system-include 142,5217
+(defun semantic-reset-system-include 163,5899
+(defun semantic-customize-system-include-path 174,6242
+(defun semantic-dependency-find-file-on-path 212,7417
+
+/home/snake/.elfiles/cedet/semantic/semantic-analyze.el,1434
+(defvar semantic-analyze-error-stack 84,3231
+(defun semantic-analyze-push-error 87,3327
+(defclass semantic-analyze-context 98,3656
+(defclass semantic-analyze-context-assignment 132,5027
+(defclass semantic-analyze-context-functionarg 142,5463
+(defclass semantic-analyze-context-return 165,6405
+(defmethod semantic-analyze-type-constraint175,6689
+(defmethod semantic-analyze-type-constraint196,7515
+(defmethod semantic-analyze-type-constraint201,7735
+(defmethod semantic-analyze-interesting-tag206,7964
+(defmethod semantic-analyze-interesting-tag216,8390
+(defmethod semantic-analyze-interesting-tag221,8621
+(define-overloadable-function semantic-analyze-find-tag-sequence 233,9068
+(defun semantic-analyze-find-tag-sequence-default 246,9814
+(defun semantic-analyze-find-tag 349,13273
+(define-overloadable-function semantic-analyze-current-symbol406,15451
+(defun semantic-analyze-current-symbol-default 432,16506
+(define-overloadable-function semantic-analyze-current-context 477,17979
+(defun semantic-analyze-current-context-default 519,19502
+(defun semantic-adebug-analyze 689,24448
+(defmethod semantic-analyze-pulse 713,25163
+(defcustom semantic-analyze-summary-function 721,25464
+(defun semantic-analyze-princ-sequence 727,25720
+(defmethod semantic-analyze-show 748,26362
+(defmethod semantic-analyze-show 762,27138
+(defmethod semantic-analyze-show 767,27373
+(defun semantic-analyze-pop-to-context 776,27757
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-debug.el,435
+(defun semanticdb-dump-all-table-summary 33,1110
+(defalias 'semanticdb-adebug-database-list semanticdb-adebug-database-list42,1386
+(defun semanticdb-adebug-current-database 45,1481
+(defun semanticdb-adebug-current-table 55,1758
+(defun semanticdb-adebug-project-database-list 65,2028
+(defun semanticdb-table-oob-sanity-check 79,2340
+(defun semanticdb-table-sanity-check 90,2775
+(defun semanticdb-database-sanity-check 104,3293
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-typecache.el,1649
+(defclass semanticdb-typecache 40,1290
+(defmethod semantic-reset 61,2104
+(defmethod semanticdb-typecache-notify-reset 73,2359
+(defmethod semanticdb-partial-synchronize 80,2596
+(defun semanticdb-typecache-add-dependant 99,3130
+(defun semanticdb-typecache-length(107,3412
+(defmethod semanticdb-get-typecache 122,3763
+(defmethod semanticdb-have-typecache-p 138,4323
+(defclass semanticdb-database-typecache 152,4772
+(defmethod semantic-reset 159,4986
+(defmethod semanticdb-synchronize 164,5103
+(defmethod semanticdb-partial-synchronize 169,5242
+(defmethod semanticdb-get-typecache 175,5413
+(defun semanticdb-typecache-apply-filename 188,5808
+(defsubst semanticdb-typecache-safe-tag-members 200,6198
+(defsubst semanticdb-typecache-safe-tag-list 208,6504
+(defun semanticdb-typecache-faux-namespace 215,6751
+(defun semanticdb-typecache-merge-streams 224,7113
+(define-overloadable-function semanticdb-expand-nested-tag 304,9972
+(defmethod semanticdb-typecache-file-tags 310,10174
+(defmethod semanticdb-typecache-file-tags 314,10310
+(defmethod semanticdb-typecache-include-tags 336,11087
+(defmethod semanticdb-typecache-include-tags 340,11226
+(define-overloadable-function semanticdb-typecache-find 388,12904
+(defun semanticdb-typecache-find-default 395,13307
+(defun semanticdb-typecache-find-by-name-helper 404,13730
+(defmethod semanticdb-typecache-find-method 412,14098
+(defmethod semanticdb-typecache-for-database 531,18065
+(defun semanticdb-typecache-refresh-for-buffer 552,18656
+(defun semanticdb-typecache-complete-flush 566,19036
+(defun semanticdb-typecache-dump 575,19335
+(defun semanticdb-db-typecache-dump 591,19766
+
+/home/snake/.elfiles/cedet/semantic/semantic-sort.el,1635
+(defun semantic-string-lessp-ci 49,1670
+(defun semantic-sort-tag-type 58,2037
+(defun semantic-tag-lessp-name-then-type 67,2254
+(defun semantic-sort-tags-by-name-increasing 98,3093
+(defun semantic-sort-tags-by-name-decreasing 106,3351
+(defun semantic-sort-tags-by-type-increasing 114,3609
+(defun semantic-sort-tags-by-type-decreasing 122,3877
+(defun semantic-sort-tags-by-name-increasing-ci 130,4145
+(defun semantic-sort-tags-by-name-decreasing-ci 138,4416
+(defun semantic-sort-tags-by-type-increasing-ci 146,4687
+(defun semantic-sort-tags-by-type-decreasing-ci 154,4968
+(defun semantic-sort-tags-by-name-then-type-increasing 162,5249
+(defun semantic-sort-tags-by-name-then-type-decreasing 168,5493
+(defun semantic-unique-tag-table-by-name 201,6868
+(defun semantic-unique-tag-table 219,7504
+(defun semantic-flatten-tags-table 254,8706
+(defvar semantic-bucketize-tag-class284,9785
+(defun semantic-bucketize 297,10385
+(defvar semantic-orphaned-member-metaparent-type 353,12342
+(defvar semantic-mark-external-member-function 359,12660
+(defun semantic-adopt-external-members 370,13246
+(define-overloadable-function semantic-tag-external-member-parent 486,17424
+(defun semantic-tag-external-member-parent-default 501,17957
+(define-overloadable-function semantic-tag-external-member-p 514,18422
+(defun semantic-tag-external-member-p-default 529,18962
+(define-overloadable-function semantic-tag-external-member-children 542,19425
+(defun semantic-tag-external-member-children-default 563,20302
+(define-overloadable-function semantic-tag-external-class 582,21017
+(defun semantic-tag-external-class-default 595,21540
+
+/home/snake/.elfiles/cedet/semantic/semantic-lex-spp.el,2548
+(defvar semantic-lex-spp-macro-symbol-obarray 75,2409
+(defvar semantic-lex-spp-project-macro-symbol-obarray 81,2692
+(defvar semantic-lex-spp-dynamic-macro-symbol-obarray 87,2974
+(defvar semantic-lex-spp-dynamic-macro-symbol-obarray-stack 94,3337
+(defvar semantic-lex-spp-expanded-macro-stack 98,3547
+(defmacro semantic-lex-with-macro-used 107,3928
+(defsubst semantic-lex-spp-symbol 135,4774
+(defsubst semantic-lex-spp-symbol-p 160,5611
+(defsubst semantic-lex-spp-dynamic-map 165,5773
+(defsubst semantic-lex-spp-dynamic-map-stack 171,6010
+(defun semantic-lex-spp-symbol-set 177,6265
+(defsubst semantic-lex-spp-symbol-remove 186,6636
+(defun semantic-lex-spp-symbol-push 193,6892
+(defun semantic-lex-spp-symbol-pop 212,7546
+(defsubst semantic-lex-spp-symbol-stream 230,8170
+(defun semantic-lex-make-spp-table 236,8357
+(defun semantic-lex-spp-save-table 256,9022
+(defun semantic-lex-spp-macros 269,9456
+(defun semantic-lex-spp-set-dynamic-table 290,10211
+(defun semantic-lex-spp-reset-hook 297,10494
+(defun semantic-lex-spp-extract-regex-and-compare 315,11135
+(defun semantic-lex-spp-simple-macro-to-macro-stream 327,11492
+(defun semantic-lex-spp-one-token-to-txt 382,13704
+(defun semantic-lex-spp-macro-with-args 431,15119
+(defun semantic-lex-spp-token-macro-to-macro-stream 437,15352
+(defun semantic-lex-spp-merge-streams 613,21242
+(defun semantic-lex-spp-macro-to-macro-stream 651,22361
+(defun semantic-lex-spp-anlyzer-do-replace 683,23529
+(defvar semantic-lex-spp-replacements-enabled 724,24797
+(defun semantic-lex-spp-analyzer-push-tokens-for-symbol 728,24961
+(define-lex-regex-analyzer semantic-lex-spp-replace-or-symbol-or-keyword775,26529
+(defun semantic-lex-spp-first-token-arg-list 791,27103
+(defun semantic-lex-spp-one-token-and-move-for-macro 803,27522
+(defun semantic-lex-spp-stream-for-arglist 817,27967
+(defvar semantic-lex-spp-hack-depth 845,28974
+(defun semantic-lex-spp-lex-text-string 848,29090
+(defun semantic-lex-spp-stream-for-macro 952,33007
+(defmacro define-lex-spp-macro-declaration-analyzer 975,33676
+(defmacro define-lex-spp-macro-undeclaration-analyzer 1012,35136
+(defcustom semantic-lex-spp-use-headers-flag 1045,36315
+(defun semantic-lex-spp-merge-header 1055,36656
+(defmacro define-lex-spp-include-analyzer 1064,36976
+(defvar semantic-lex-spp-macro-max-length-to-save 1113,38854
+(defun semantic-lex-spp-table-write-slot-value 1117,38991
+(defun semantic-lex-spp-write-test 1163,40073
+(defun semantic-lex-spp-write-utest 1171,40336
+(defun semantic-lex-spp-describe 1184,40733
+
+/home/snake/.elfiles/cedet/semantic/semantic-ia-sb.el,670
+(defvar semantic-ia-sb-key-map 35,1171
+(defvar semantic-ia-sb-easymenu-definition47,1530
+(defun semantic-speedbar-analysis 69,2260
+(defun semantic-ia-speedbar 80,2637
+(defmethod semantic-ia-sb-show-doc 144,4574
+(defun semantic-ia-sb-show-scope 157,4975
+(defmethod semantic-ia-sb-more-buttons 169,5319
+(defmethod semantic-ia-sb-more-buttons 179,5657
+(defmethod semantic-ia-sb-more-buttons 189,6032
+(defun semantic-ia-sb-string-list 217,6959
+(defun semantic-ia-sb-completion-list 247,7952
+(defun semantic-ia-sb-show-tag-info 269,8631
+(defun semantic-ia-sb-tag-info 281,9009
+(defun semantic-ia-sb-line-path 330,10641
+(defun semantic-ia-sb-complete 339,10929
+
+/home/snake/.elfiles/cedet/semantic/semantic-mru-bookmark.el,1132
+(defclass semantic-bookmark 64,2050
+(defmethod initialize-instance 91,3012
+(defmethod semantic-mrub-visit 101,3391
+(defmethod semantic-mrub-update 121,4039
+(defmethod semantic-mrub-preflush 136,4515
+(defclass semantic-bookmark-ring 151,5083
+(defvar semantic-mru-bookmark-ring 169,5719
+(defun semantic-mrub-find-nearby-tag 175,5910
+(defmethod semantic-mrub-push 187,6439
+(defun semantic-mrub-cache-flush-fcn 210,7272
+(defvar semantic-mrub-last-overlay 226,7736
+(defun semantic-mru-bookmark-change-hook-fcn 229,7849
+(defun global-semantic-mru-bookmark-mode 245,8314
+(defcustom global-semantic-mru-bookmark-mode 255,8684
+(defcustom semantic-mru-bookmark-mode-hook 267,9128
+(defvar semantic-mru-bookmark-mode-map272,9277
+(defvar semantic-mru-bookmark-mode 278,9456
+(defun semantic-mru-bookmark-mode-setup 283,9675
+(defun semantic-mru-bookmark-mode 311,10879
+(defun semantic-mrub-read-history 346,12121
+(defun semantic-mrub-ring-to-assoc-list 349,12209
+(defun semantic-mrub-completing-read 361,12537
+(defun semantic-mrub-switch-tags 405,14065
+(defadvice push-mark 422,14573
+(defun semantic-adebug-mrub 444,15251
+
+/home/snake/.elfiles/cedet/semantic/semantic-load.el,551
+(defvar semantic-load-imenu-string 49,1659
+(defvar semantic-load-turn-everything-on 52,1771
+(defvar semantic-load-turn-useful-things-on 55,1882
+(defvar semantic-load-system-cache-loaded 60,2063
+(defun semantic-load-enable-minimum-features 64,2218
+(defun semantic-load-enable-code-helpers 96,3355
+(defun semantic-load-enable-gaudy-code-helpers 135,4728
+(defun semantic-load-enable-excessive-code-helpers 169,5960
+(defun semantic-load-enable-semantic-debugging-helpers 193,6937
+(defun semantic-load-enable-all-exuberent-ctags-support 221,7992
+
+/home/snake/.elfiles/cedet/semantic/semanticdb-mk.el,0

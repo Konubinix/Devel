@@ -40,6 +40,7 @@
 ;;Indentation
 (global-set-key (kbd "M-g i") 'konix/indent-region-or-buffer)
 
+(global-set-key (kbd "M-g M-g") 'goto-line)
 ;; La séquence « C-< t » insère l'horodate
 (global-set-key (kbd "C-< C-t") 'konix/insert-iso-time-string)
 

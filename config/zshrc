@@ -1,3 +1,4 @@
+# -*- mode:sh -*-
 # Historique
 HISTFILE=~/.histfile
 HISTSIZE=5000

@@ -133,3 +133,9 @@ function trouve_KONIX(){
     file="$*"
     find ./ -iname "*$file*"
 }
+
+function parse_git_branch {
+  ref=$(git symbolic-ref HEAD 2> /dev/null) || return
+  echo "("${ref#refs/heads/}")"
+}
+

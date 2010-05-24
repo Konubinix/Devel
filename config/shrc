@@ -32,7 +32,7 @@ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/paraview/lib
 #ogre
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/ogre/lib
 
-PKG_CONFIG_PATH=/usr/local/ogre/lib/pkgconfig
+PKG_CONFIG_PATH=/usr/local/ogre/lib/pkgconfig:/usr/lib/pkgconfig
 
 # MON Path
 # En priorité, mes binaires persos

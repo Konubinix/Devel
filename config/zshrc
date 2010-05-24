@@ -20,10 +20,15 @@ zstyle :compinstall filename '/home/snake/.zshrc'
 autoload -Uz compinit
 compinit
 
-# Pour avoir des jolis promts
-autoload -U promptinit
-promptinit
-prompt fire
+# Pour avoir joli promt
+#autoload -U promptinit
+#promptinit
+setopt prompt_subst # Pour pouvoir utiliser des variables et fonctions dans le prompt
+export prompt='%? %F{green}%B%n%F{red}@%F{white}%M%F{cyan} %W %* %F{red}%{$(parse_git_branch)%}
+%F{yellow}%~ %A%k%f%F{cyan}%# %f%B%b'
+
+#' $(parse_git_branch) > '
+
 
 # Récup complétion bash
 autoload -U bashcompinit

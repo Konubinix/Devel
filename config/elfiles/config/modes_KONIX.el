@@ -162,6 +162,9 @@
 		(add-to-list 'TeX-command-list
 					 '("Glossary" "makeindex '%s.glo' -s 'glossaire.ist' -t '%s.glg' -o '%s.glx'" TeX-run-command TeX-run-command TeX-run-command TeX-run-command t t
 					   :help "Run Glossary Maker"))
+		(add-to-list 'TeX-command-list
+					 '("PsToPdf" "ps2pdf '%s.ps' '%s.pdf'" TeX-run-command TeX-run-command t t
+					   :help "Run PDF Maker from PS"))
 		)
 	  )
 

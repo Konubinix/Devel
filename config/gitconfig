@@ -2,8 +2,8 @@
 	fontui = -family helvetica -size 7 -weight bold -slant roman -underline 0 -overstrike 0
 	fontdiff = -family Courier -size 7 -weight normal -slant roman -underline 0 -overstrike 0
 [user]
-	name = konubinix
-	mail = konubinix@gmail.com
+	name = Konubinix
+	email = konubinix@gmail.com
 
 [alias]
 	ci = commit

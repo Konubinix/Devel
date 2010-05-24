@@ -1,0 +1,43 @@
+% ################################################################################
+% Glossaire environnement, pour afficher un joli glossaire à la fin du
+% fichier avec des jolies fancy box
+% ################################################################################
+\newenvironment{leglossaire}{%
+  \begin{list}{}{%
+      \setlength{\labelwidth}{.5\textwidth}%
+      \setlength{\labelsep}{-.8\labelwidth}%
+      \setlength{\itemindent}{\parindent}%
+      \setlength{\leftmargin}{25pt}%
+      \setlength{\rightmargin}{0pt}%
+      \setlength{\itemsep}{.8\baselineskip}%
+      \renewcommand{\makelabel}[1]{\boiteentreeglossaire{##1}
+      }
+    }
+  }
+  {\end{list}}
+
+\newcommand{\boiteentreeglossaire}[1]{%
+  \parbox[b]{\labelwidth}{%
+    \setlength{\fboxsep}{3pt}%
+    \setlength{\fboxrule}{.4pt}%
+    \shadowbox{\sffamily#1}\\\hfill\mbox{}}
+}
+
+\newcommand{\pasdenumerodepage}[1]{}% mange l'argument
+\newcommand{\entreeglossaire}[2]{%
+  \glossary{[#1] #2|pasdenumerodepage}}
+
+
+\newcommand{\printglossary}{\section{Glossaire}
+  \label{chap-glossaire}
+  \markboth{Glossaire}{Glossaire}% entête de page
+  % insertion du fichier . glx
+  \InputIfFileExists{\jobname.glx}{%
+    \typeout{Glossaire trié}}{%
+    \typeout{Pas de fichier \jobname.glx}}
+}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../rapport"
+%%% End:

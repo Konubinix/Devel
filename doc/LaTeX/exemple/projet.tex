@@ -1,0 +1,125 @@
+\section{Le projet Human}
+Le projet consiste en l'étude et l'implémentation de comportement humain au sein de l'application 3DVia de Dassault Systèmes.
+
+L'idée aurait été à terme d'avoir un outil simple d'utilisation permettant d'animer un personnage pour une personne non experte. On retrouve cette idée dans le logiciel Endorphin de Natural Motion.
+
+Pour animer de façon réaliste un personnage, deux approches sont employées : l'une est basée sur les motions captures, l'autre est plutôt orientée physique et simulation.
+
+\subsection{Motion capture}
+
+On utilise des données de mouvements obtenues grâce à un vrai acteur, qu'on applique sur le squelette de notre personnage.
+
+On cherche alors à placer toutes les données de motion capture dans des graphes dont
+\begin{itemize}
+\item les points sont des séquences de poses représentant des mouvements (obtenues par motion capture ou générées en tant que transitions),
+\item les arrêtes reliant deux points représentent des couples de points de distance assez proche pour que l'on puisse appliquer une transition de l'un vers l'autre.
+\end{itemize}
+
+Ces graphes (appelés communément motion graphs) impliquent de définir une mesure sur l'ensemble des données de motion capture. Nous utilisons la distance référence dans le domaine appelée distance de Kovar (voir le compte rendu de Nicolas Garnier pour plus d'explications).
+
+Il s'agit ensuite de regrouper ces données par classes de mouvement, afin de réaliser un espace de mouvements utilisables.
+
+On peut ensuite éventuellement créer des nouvelles données de mouvement.
+
+On anime ensuite le personnage en reproduisant la donnée de capture de mouvement désirée.
+
+Les points fort de cette méthode sont:
+\begin{itemize}
+\item sa rapidité,
+\item son réalisme,
+\item la possibilité d'enregistrer le style et les finesses de détails de l'animation,
+\item la possibilité de générer de nouvelles informations de motion capture à partir d'informations existantes,
+\item le faible effort à fournir pour obtenir des résultats.
+\end{itemize}
+
+Cependant elle
+\begin{itemize}
+\item ne permet pas de gérer les conditions extérieures imprévues,
+\item ne permet de jouer qu'un ensemble de mouvements déterminé,
+\item nécessite un équipement sophistiqué pour permettre l'acquisition des données de mouvement,
+\item peut nécessiter une recherche complexe au sein du graphe si les informations sont assez denses.
+\end{itemize}
+
+Le projet propose une extension des motion graph, les parametric motion graphs.
+
+\subsection{Simulation physique}
+
+L'autre approche est plus simple au niveau du concept. On crée un modèle simplifié d'un être humain (environ 20 os au lieu de 206 dans un corps réel) et on effectue une simulation physique. Ensuite, on décide quels couples appliquer sur les différentes partie du corps (correspondant aux couples générées par des muscles) pour amener le personnage à bouger. Le ragdoll est l'un des premiers exemples d'utilisation de la simulation physique.
+
+Cette façon de procéder possède les avantages suivant:
+\begin{itemize}
+\item elle est réaliste,
+\item elle est simple dans le principe : les articulations peuvent être simplement simulées par des rotules ou des pivots avec des limites,
+\item elle permet d'avoir un contrôle très fin sur l'interaction avec l'environnement (puisqu'on joue une véritable simulation physique),
+\item elle permet en théorie de générer tous les mouvements possibles (dans la limite du modèle et à condition de connaître la physique inhérente au mouvement).
+\end{itemize}
+
+Cependant, elle est fortement contrainte par:
+\begin{itemize}
+\item son temps de calcul,
+\item la difficulté de choisir les forces à appliquer sur chaque os pour obtenir une animation correcte,
+\item la difficulté de créer des mouvements complexes,
+\item la difficulté de la combiner avec d'autres type de données de mouvement,
+\item les problèmes d'équilibre du personnage (soumis à la constante pesanteur et aux aléas du terrain).
+\end{itemize}
+
+En ajoutant la notion de comportement, on peut ensuite enregistrer des comportements physiques associés à des besoins particuliers sur le personnage.
+
+En théorie, cette approche est assez polyvalente. Elle fait appel notamment à :
+\begin{itemize}
+\item l'informatique graphique,
+\item la biomécanique,
+\item la simulation dynamique,
+\item l'intelligence artificielle,
+\item la robotique.
+\end{itemize}
+
+\subsection{L'approche hybride}
+Il serait très intéressant de pouvoir combiner les avantages des deux méthodes, en activant l'une ou l'autre suivant les besoins de la simulation.
+
+C'est ce que propose le projet. On se base sur l'idée que les motion captures permettent une animation rapide alors que l'interaction avec l'environnement et le réalismes seront plutôt assurés par une simulation physique. L'algorithme serait donc:
+\begin{itemize}
+\item Le personnage est principalement piloté par motion capture,
+  permettant ainsi une animation très rapide.
+\item Si une interaction avec l'environnement est nécessaire et si
+  aucune donnée de motion capture ne nous permet d'avoir d'animation,
+  alors on lance la simulation physique.
+\item La physique tournant, on cherche à attirer le personnage vers une donnée de motion capture assez proche (l'espace métrique avec la distance de Kovar étant défini) pour revenir à un état de motion capture.
+\item Les muscles sont activés pour atteindre ce nouvel objectif en
+  défiant les actions extérieures (comme la pesanteur).
+\item Si le personnage est vraiment trop loin d'une quelconque donnée de motion capture, alors on lance un (ou des) ``comportement'' qui régit la simulation physique du personnage. On lui demande par exemple de se protéger le visage lors d'une chute, de garder l'équilibre s'il est encore debout, etc.
+\item On se ramène dès que l'on peut sur la motion capture.
+\end{itemize}
+
+L'aspect temps réel est recherché en minimisant la durée de la simulation pour passer un maximum de temps en motion capture.
+
+Ce genre d'approche est traitée par les articles \cite{1073249},\cite{Zordan99trackingand},\cite{946930},\cite{237229}.
+
+Un autre aspect intéressant de la fusion des deux méthode réside dans l'apprentissage de la physique par la motion capture. En effet, la simulation physique nécessite de fixer un grand nombre de paramètres, que le style peut définir. Une marche de style ``calme'' n'activera pas les même articulations et avec la même intensité qu'une marche énergique. En analysant les données de marche obtenues par motion capture, on peut alors donner une estimation des paramètres à fixer pour obtenir un style particulier.
+
+Ce ce que l'on retrouve dans les articles \cite{Liu05abstracttowards},\cite{311536},\cite{Muico:2009:CNC},\cite{1272723},
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[height=5cm]{gfx/hybrid}
+  \caption{Exemple de situation de transition entre motion capture et physique (provient de \cite{1073249})}
+  \label{fig:hybride}
+\end{figure}
+
+
+\subsection{Recherche}
+Comme l'animation de personnages virtuels est depuis longtemps
+étudiée, il existe beaucoup d'articles qui traitent le sujet. Pour la
+partie physique, il s'agit non seulement d'articles d'informatique
+graphique mais aussi des travaux concernant la robotique
+anthropomorphique. Ce type de projet nécessite en conséquence une
+phase conséquente de bibliographie.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "rapport"
+%%% End:
+
+% LocalWords:  ragdoll graph Kovar Human Natural parametric graphs Endorphin
+% LocalWords:  d'Euler-Lagrange DVia Dassault TeX-master End Nicolas Garnier
+% LocalWords:  height gfx hybrid

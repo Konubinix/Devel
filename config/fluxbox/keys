@@ -193,6 +193,7 @@ XF86Launch1 :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/iceweasel
 Control Mod1 p :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/pidgin
 Control Mod1 v :ExecCommand ~/.fluxbox/bin/goto.sh         /usr/bin/vlc
 Control Mod1 e :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/emacs
+Shift Control Mod1 e :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/exaile
 #Control Mod1 x :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/xchat
 Mod4 t :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/icedove
 

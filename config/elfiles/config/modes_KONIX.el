@@ -88,7 +88,8 @@
 (setq html-mode-hook
       (lambda ()
 		(auto-complete-mode t)
-		(auto-fill-mode 0)
+		(konix/text-hoox)
+		(flyspell-mode t)
 		))
 
 ;; Scilab

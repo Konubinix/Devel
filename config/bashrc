@@ -52,6 +52,6 @@ fi
 # Variables
 # ************************************************************
 # Le prompt, joli et en couleur
-export PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[01;33m\]@\[\033[01;37m\]\h\[\033[00m\]\[\033[01;36m\]:\w:\[\033[00m\]\$ '
+export PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32;40m\]\u\[\033[01;33;40m\]@\[\033[01;37;40m\]\h\[\033[00m\]\[\033[01;36;40m\]|\w|\[\033[00m\]\n\$ '
 export http_proxy="" #"www-cache.ujf-grenoble.fr:3128"
 

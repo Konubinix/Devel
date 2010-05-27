@@ -42,6 +42,11 @@
   )
 (ad-activate 'appt-delete-window)
 
+(defadvice find-tag (before push-mark ())
+  (push-mark)
+)
+(ad-activate 'find-tag)
+
 (defadvice flyspell-goto-next-error (before push-mark ())
   "Met une marque avant d'aller sur l'erreur prochaine"
   (push-mark)

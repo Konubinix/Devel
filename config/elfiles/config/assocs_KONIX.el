@@ -28,9 +28,20 @@
 ;;mode lisp sur le .emacs
 (add-to-list 'auto-mode-alist (cons "emacs$" 'lisp-mode))
 
-;; Mode maxima
+;; Maxima
+(add-to-list 'auto-mode-alist (cons "\\.max$" 'maxima-mode))
+(add-to-list 'auto-mode-alist (cons "\\.mac$" 'maxima-mode))
 (add-to-list 'auto-mode-alist (cons "\\.wxm$" 'maxima-mode))
 
 ;; Pour les eclasses
 (add-to-list 'auto-mode-alist (cons "\\.eclass$" 'sh-mode))
 (add-to-list 'auto-mode-alist (cons "\\.ebuild$" 'sh-mode))
+
+;; LUA
+(add-to-list 'auto-mode-alist (cons "\\.lua$" 'lua-mode))
+
+;; Gnuplot
+(add-to-list 'auto-mode-alist (cons "\\.gp$" 'gnuplot-mode))
+
+;; Makefile
+(add-to-list 'auto-mode-alist (cons "\\.make$" 'make-mode))

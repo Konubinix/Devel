@@ -442,8 +442,8 @@ contained c, h, cpp, cc.."
 (defun konix/text-hoox ()
   "Hook à appeler quand je veux manipuler du texte, du vrai qui tient sur beaucoup de lignes."
   (interactive)
-  (setq-default truncate-partial-width-windows nil)
-  (setq-default truncate-lines nil)
+  (setq truncate-partial-width-windows nil)
+  (setq truncate-lines nil)
   (setq word-wrap t)
   )
 

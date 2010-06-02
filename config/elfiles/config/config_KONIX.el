@@ -98,9 +98,9 @@
 ;;Virer la scrollbar (que j'utilise jamais)
 (scroll-bar-mode -1)
 ;;Lorsqu'on découpe en fenêtres, tronque
-(setq-default truncate-partial-width-windows t)
-(setq-default truncate-lines t)
-(setq word-wrap t)
+;; (setq-default truncate-partial-width-windows t)
+;; (setq-default truncate-lines t)
+;; (setq word-wrap t)
 ;; Troncature des lines sur les mots plutôt que sur les lettres
 (setq-default word-wrap t)
 ;;Virer le message d'accueil

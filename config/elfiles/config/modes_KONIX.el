@@ -165,6 +165,12 @@
 		(add-to-list 'TeX-command-list
 					 '("PsToPdf" "ps2pdf '%s.ps' '%s.pdf'" TeX-run-command TeX-run-command t t
 					   :help "Run PDF Maker from PS"))
+		(add-to-list 'TeX-command-list
+					 '("ViewPdf" "evince '%s.pdf'" TeX-run-command t t
+					   :help "View the resulting pdf"))
+		(add-to-list 'TeX-command-list
+					 '("Make" "latex '%s.tex' && dvips '%s.dvi' && ps2pdf '%s.ps'" TeX-run-command TeX-run-command TeX-run-command t t
+					   :help "Make from tex to pdf"))
 		)
 	  )
 

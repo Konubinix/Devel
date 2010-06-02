@@ -181,6 +181,7 @@
 (add-hook 'org-mode-hook (lambda ()
 						   (add-hook 'before-save-hook 'org-update-all-dblocks)
 						   (local-set-key (kbd "C-c a") 'org-agenda)
+						   (konix/text-hoox)
 						   (flyspell-mode 1)
 						   ))
 

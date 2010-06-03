@@ -454,6 +454,8 @@ contained c, h, cpp, cc.."
 							 ac-source-yasnippet
 							 ac-source-files-in-current-dir
 							 )))
+  (global-set-key (kbd "C-e") 'end-of-line)
+  (global-set-key (kbd "C-a") 'beginning-of-line)
   )
 
 (defun konix/text-hoox ()
@@ -462,6 +464,8 @@ contained c, h, cpp, cc.."
   (setq truncate-partial-width-windows nil)
   (setq truncate-lines nil)
   (setq word-wrap t)
+  (global-set-key (kbd "C-e") 'end-of-visual-line)
+  (global-set-key (kbd "C-a") 'beginning-of-visual-line)
   )
 
 ;; Ajout de raccourcis dans le mode actuel pour manipuler gud

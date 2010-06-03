@@ -141,6 +141,11 @@
 ;;Changer de buffer par C-x b plus facilement
 (ido-mode t)
 
+;; Ne cahce pas les commentaires quand on fait TOUT cacher
+(setq hs-hide-comments-when-hiding-all nil)
+;; quand on fait une recherche, ouvre les bloc de code correspondant
+(setq hs-isearch-open t)
+
 ;; ************************************************************
 ;; Encodage
 ;; ************************************************************

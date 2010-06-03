@@ -61,15 +61,16 @@
 (global-set-key (kbd "C-< t") 'konix/todo-org)
 (global-set-key (kbd "C-< e") 'konix/diary-org)
 (add-hook 'org-mode-hook
-	  '(lambda ()
-	     (local-set-key (kbd "<f11>") 'org-cycle)
-	     (local-set-key (kbd "C-j") 'org-complete)
-	     (local-set-key (kbd "C-c e") 'org-table-edit-field)
-	     ))
+		  '(lambda ()
+			 (local-set-key (kbd "<f11>") 'org-cycle)
+			 (local-set-key (kbd "C-j") 'org-complete)
+			 (local-set-key (kbd "C-c e") 'org-table-edit-field)
+			 ))
 
 (define-prefix-command  'konix/org-global-map)
 (global-set-key (kbd "C-< o") 'konix/org-global-map)
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
+(define-key 'konix/org-global-map "o" 'org-clock-out)
 
 ;; Montre moi l'agenda
 (global-set-key (kbd "C-< c") 'calendar)

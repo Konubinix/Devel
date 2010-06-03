@@ -63,8 +63,7 @@
   [Jump]	{yes}
 [end]
 [app] (name=Qt-subapplication) (class=VirtualBox)
-  [Workspace]	{5}
-  [Jump]	{yes}
+  [Workspace]	{4}
 [end]
 [app] (name=evince) (class=Evince)
   [Workspace]	{5}

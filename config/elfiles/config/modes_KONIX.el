@@ -152,6 +152,7 @@
 	    (local-set-key [(f1)] 'TeX-fold-dwim)
 	    (local-set-key [(f2) (f1)] 'TeX-fold-env)
 		(turn-on-reftex)
+		(outline-minor-mode)
 		(konix/text-hoox)
 		(setq ac-sources (append ac-sources
 								 '(

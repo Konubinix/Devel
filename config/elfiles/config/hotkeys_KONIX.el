@@ -101,8 +101,10 @@
 ;; outline
 (define-key outline-minor-mode-map (kbd "<S-M-left>") 'outline-promote)
 (define-key outline-minor-mode-map (kbd "<S-M-right>") 'outline-demote)
-
-
+(define-key outline-minor-mode-map (kbd "<f1>") 'hide-leaves)
+(define-key outline-minor-mode-map (kbd "<f3>") 'show-subtree)
+(define-key outline-minor-mode-map (kbd "<f2> <f1>") 'hide-body)
+(define-key outline-minor-mode-map (kbd "<f2> <f3>") 'show-all)
 ;; ************************************************************
 ;; TERM & SHELL
 ;; ************************************************************

@@ -87,21 +87,26 @@
 
 ;; HIDE SHOW
 (add-hook 'hs-minor-mode-hook
-	  (lambda ()
-	    (local-set-key [(f2) (f1)] 'hs-hide-all)
-	    (local-set-key [(f2) (f3)] 'hs-show-all)
-	    (local-set-key [(f3)] 'hs-hide-level)
-	    (local-set-key [(f1)] 'hs-toggle-hiding)
-	    ))
+		  (lambda ()
+			(local-set-key [(f2) (f1)] 'hs-hide-all)
+			(local-set-key [(f2) (f3)] 'hs-show-all)
+			(local-set-key [(f3)] 'hs-hide-level)
+			(local-set-key [(f1)] 'hs-toggle-hiding)
+			))
 
 ;; Auto complete
 (global-set-key (kbd "C-j") 'auto-complete)
 (global-set-key (kbd "C-S-j") 'ac-stop)
 
+;; outline
+(define-key outline-minor-mode-map (kbd "<S-M-left>") 'outline-promote)
+(define-key outline-minor-mode-map (kbd "<S-M-right>") 'outline-demote)
+
+
 ;; ************************************************************
 ;; TERM & SHELL
 ;; ************************************************************
-;(global-set-key (kbd "M-g t") 'multi-term-dedicated-toggle)
+										;(global-set-key (kbd "M-g t") 'multi-term-dedicated-toggle)
 (global-set-key (kbd "<C-next>") 'multi-eshell-switch-to-next-live-shell)
 (global-set-key (kbd "<C-prior>") 'multi-eshell-switch)
 (define-key 'konix/global-fast-key-map "e" 'multi-eshell)

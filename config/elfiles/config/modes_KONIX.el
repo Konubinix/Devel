@@ -347,6 +347,9 @@
 (autoload 'maxima-mode "maxima" "Mode maxima" t)
 
 (add-hook 'lua-mode-hook
-		  '(lambda () (auto-complete-mode t) ))
+		  '(lambda ()
+			 (auto-complete-mode t)
+			 )
+		  )
 
 (autoload 'lua-mode "lua-mode")

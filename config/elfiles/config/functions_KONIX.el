@@ -375,6 +375,12 @@ lieu de find-file."
   (start-process "gitk" nil "gitk" "--all")
   )
 
+(defun konix/git-gui ()
+  "Lance gitk --all."
+  (interactive)
+  (start-process "git-gui" nil "git"  "gui")
+  )
+
 (defun konix/git-add (file)
   "Lance la commande git add sur le rep ou le fichier."
   (interactive "fFichier : ")

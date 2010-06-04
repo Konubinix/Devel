@@ -9,7 +9,7 @@
       (lambda ()
 		(konix/prog-hook)
 		)
-	  )
+      )
 
 ;;Mode C
 (setq c-mode-hook
@@ -115,10 +115,10 @@
 
 ;; Conf Mode
 (setq conf-mode-hook
-	  (lambda ()
-	    (konix/prog-hook)
-	    )
-	  )
+      (lambda ()
+		(konix/prog-hook)
+		)
+      )
 
 ;; ************************************************************
 ;; Compil et debug
@@ -143,10 +143,16 @@
 ;;Mode LATEX
 (setq LaTeX-mode-hook
       (lambda ()
-		(define-key LaTeX-mode-map (kbd "<f5>")
+		(define-key LaTeX-mode-map (kbd "<C-f5>")
 		  '(lambda()
+			 (interactive)
 			 (TeX-fold-buffer)
 			 (preview-document)
+			 ))
+		(define-key LaTeX-mode-map (kbd "<f5>")
+		  '(lambda()
+			 (interactive)
+			 (preview-at-point)
 			 ))
 		(flyspell-mode t)
 		(TeX-source-specials-mode t)
@@ -177,7 +183,7 @@
 					 '("Make" "latex '%s.tex' && dvips '%s.dvi' && ps2pdf '%s.ps'" TeX-run-command TeX-run-command TeX-run-command t t
 					   :help "Make from tex to pdf"))
 		)
-	  )
+      )
 
 
 ;; Mode ORG
@@ -191,10 +197,10 @@
 						   ))
 
 (setq org-agenda-mode-hook
-	  (lambda()
+      (lambda()
 		(hl-line-mode t)
 		)
-	  )
+      )
 
 ;; fundamental
 (add-hook 'fundamental-mode
@@ -218,7 +224,7 @@
 
 ;; shell
 (setq  shell-mode-hook
-	   (lambda()
+       (lambda()
 		 (auto-complete-mode t)
 		 (setq ac-sources '(
 							ac-source-files-in-current-dir
@@ -229,4 +235,4 @@
 		 (dirtrack-mode t)
 		 (setq dirtrack-list '("^\\([^:]*\\):\\([^:]*\\):\\(.*\\)" 2 nil))
 		 )
-	   )
+       )

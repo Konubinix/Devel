@@ -142,7 +142,12 @@
 ;; ************************************************************
 ;;Mode LATEX
 (setq LaTeX-mode-hook
-	  (lambda ()
+      (lambda ()
+		(define-key LaTeX-mode-map (kbd "<f5>")
+		  '(lambda()
+			 (TeX-fold-buffer)
+			 (preview-document)
+			 ))
 		(flyspell-mode t)
 		(TeX-source-specials-mode t)
 		(auto-complete-mode t)

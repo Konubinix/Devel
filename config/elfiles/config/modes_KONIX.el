@@ -154,8 +154,6 @@
 		(local-set-key (kbd "C-j") 'auto-complete)
 		(local-set-key (kbd "C-c r") 'reftex-toc-Rescan)
 		(TeX-fold-mode t)
-	    (local-set-key [(f1)] 'TeX-fold-dwim)
-	    (local-set-key [(f2) (f1)] 'TeX-fold-env)
 		(turn-on-reftex)
 		(outline-minor-mode)
 		(konix/text-hoox)

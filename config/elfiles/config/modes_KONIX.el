@@ -159,6 +159,7 @@
 		(turn-on-reftex)
 		(outline-minor-mode)
 		(konix/text-hoox)
+		(preview-install-styles ".")
 		(setq ac-sources (append ac-sources
 								 '(
 								   ac-source-files-in-current-dir

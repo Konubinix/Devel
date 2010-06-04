@@ -904,20 +904,29 @@ retourne ('fichier','extension')."
   (konix/gnuplot/plot-file-dat buffer-file-name)
   )
 
+(defun konix/gnuplot/file-dat-command (filedat)
+  "Return the file dat command string"
+  (mapconcat '(lambda(x)x)
+			 (list
+			  "plot"
+			  (concat "'"filedat"'")
+			  konix/gnuplot/arguments
+			  "title"
+			  (concat "'"(file-name-nondirectory filedat)"'")
+			  )
+			 " ")
+  )
+
 (defun konix/gnuplot/plot-file-dat (filedat)
   "Plot le fichier dat."
   (interactive "fFichier : ")
-  (konix/gnuplot (concat "\
--e \"plot '"filedat"';\
-pause -1;\
+  (konix/gnuplot
+   (concat "-e \
+\"\
+"(konix/gnuplot/file-dat-command filedat)"\
+;pause -1;\
 \""))
   )
-
-;; (defun konix/gnuplot/folder-dat-to-png (folder)
-;;   "Prend tous les dat du dossier et en fait des png."
-;;   (interactive "DDossier : ")
-;;   (list
-;;   )
 
 (defun konix/gnuplot/file-dat-to-png (fichier)
   (interactive "fFichier : ")
@@ -929,7 +938,7 @@ pause -1;\
 set terminal push;\
 set terminal png;\
 set output '"pdf"';\
-plot '"fichier"';\
+"(konix/gnuplot/file-dat-command fichier)";
 set output;\
 set terminal pop;\
 \""))

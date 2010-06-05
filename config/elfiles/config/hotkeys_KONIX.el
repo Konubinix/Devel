@@ -132,10 +132,6 @@
 (global-set-key  "\M-gu" 'uncomment-region)
 (global-set-key  "\M-gc" 'comment-region)
 
-(global-set-key [f8] 'head)
-(global-set-key [(control f8)] 'sub_head)
-(global-set-key [(shift   f8)] 'sub_sub_head)
-
 ;; recherche semantic
 (global-set-key (kbd "C-S-S") 'senator-search-forward)
 (global-set-key (kbd "C-< i") 'semantic-analyze-proto-impl-toggle)
@@ -166,6 +162,41 @@
 ;; VRAC
 ;; ************************************************************
 (global-set-key (kbd "C-< C-k") 'konix/quit-window)
+
+;; ////////////////////////////////////////
+;; Header
+;; ////////////////////////////////////////
+(global-set-key [f8] 'konix/header)
+
+(global-set-key [(control f8)]
+				(lambda()
+				  (interactive)
+				  (konix/header konix/header-marker-2)
+				  )
+				)
+
+(global-set-key [(shift f8)]
+				(lambda()
+				  (interactive)
+				  (konix/header konix/header-marker-3)
+				  )
+				)
+
+(global-set-key (kbd "<f2> <f8>") 'konix/header-wrap)
+
+(global-set-key (kbd "<f2> <C-f8>")
+				(lambda()
+				  (interactive)
+				  (konix/header-wrap konix/header-marker-2 )
+				  )
+				)
+
+(global-set-key (kbd "<f2> <S-f8>")
+				(lambda()
+				  (interactive)
+				  (konix/header-wrap konix/header-marker-3 )
+				  )
+				)
 
 
 ;; ************************************************************

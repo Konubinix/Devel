@@ -477,6 +477,113 @@ contained c, h, cpp, cc.."
   (interactive)
   (find-file "~/.elfiles/config")
   )
+
+;; ************************************************************
+;; Header
+;; ************************************************************
+(defun konix/header (&optional marker)
+  (interactive)
+  (let (beg end)
+	(if (use-region-p)
+		()
+	  (progn()
+			(backward-paragraph)
+			(forward-char)
+			(beginning-of-line)
+			(set-mark (point))
+			(forward-paragraph)
+			(backward-char)
+			(end-of-line)
+			)
+	  )
+	(narrow-to-region (point) (mark))
+	(if marker
+		()
+	  (setq marker konix/header-marker-1)
+	  )
+										; Ajout de la marque au début
+	(beginning-of-buffer)
+	(insert marker)
+	(newline)
+										; Ajout de la marque à la fin
+	(end-of-buffer)
+	(newline)
+	(insert marker)
+										; Commente la région
+	(setq end (point))
+	(beginning-of-buffer)
+	(setq beg (point))
+	(comment-region beg end)
+
+										; On update les pointeurs
+	(beginning-of-buffer)
+	(setq beg (point))
+	(end-of-buffer)
+	(setq end (point))
+										; On widen avant d'indenter puisque ça dépend du contexte
+	(widen)
+	(indent-region beg end)
+	(forward-char)
+	(indent-for-tab-command)
+	)
+  )
+
+(defun konix/header-wrap (marker)
+  "wrap."
+  (interactive "sMessage : ")
+  (let (beg end)
+	(if marker
+		()
+	  (setq marker konix/header-marker-1)
+	  )
+	(if (use-region-p)
+										; région définie, on init beg et end
+		(progn()
+			  (if (< (point) (mark))
+				  (progn()
+						(setq beg (point))
+						(setq end (mark)))
+				(progn()
+					  (setq beg (mark))
+					  (setq end (point)))
+				)
+			  )
+										; region pas def
+	  (progn()
+			(backward-paragraph)
+			(forward-char)
+			(beginning-of-line)
+			(setq beg (point))
+			(forward-paragraph)
+			(backward-char)
+			(end-of-line)
+			(setq end (point))
+			)
+	  )
+										; Ajout fin de wrap
+	(goto-char end)
+	(let (av_marker)
+	  (setq av_marker (point))
+										;(newline)
+	  (insert marker)
+	  (comment-region av_marker (point))
+	  (indent-region av_marker (point))
+	  )
+										; Ajout début de wrap
+	(goto-char beg)
+	(newline)
+	(backward-char)
+	(set-mark (point))
+	(setq beg (point))
+	(insert "Message")
+	(save-excursion
+	  (konix/header marker)
+	  )
+	(push-mark (point))
+	(backward-word)
+	)
+  )
+
 ;; ************************************************************
 ;; VRAC
 ;; ************************************************************

@@ -72,3 +72,6 @@
 [app] (name=VCLSalFrame.DocumentWindow) (class=OpenOffice.org 3.2)
   [Workspace]	{5}
 [end]
+[app] (name=meld) (class=Meld)
+  [Maximized]	{yes}
+[end]

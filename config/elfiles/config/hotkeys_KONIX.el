@@ -62,7 +62,7 @@
 (global-set-key (kbd "C-< e") 'konix/diary-org)
 (add-hook 'org-mode-hook
 		  '(lambda ()
-			 (local-set-key (kbd "<f11>") 'org-cycle)
+			 (local-set-key (kbd "<f1>") 'org-cycle)
 			 (local-set-key (kbd "C-j") 'org-complete)
 			 (local-set-key (kbd "C-c e") 'org-table-edit-field)
 			 ))

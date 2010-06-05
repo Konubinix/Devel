@@ -205,6 +205,14 @@
  )
 
 (global-set-key
+ (kbd "<f5>")
+ '(lambda()
+	(interactive)
+	(konix/make konix/proj-makefile "start run")
+	)
+ )
+
+(global-set-key
  (kbd "<C-M-f7>")
  '(lambda()
 	(interactive)

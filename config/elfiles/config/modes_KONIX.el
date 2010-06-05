@@ -143,6 +143,18 @@
 ;;Mode LATEX
 (setq LaTeX-mode-hook
       (lambda ()
+		(add-to-list 'TeX-command-list
+					 '("Glossary" "makeindex '%s.glo' -s 'glossaire.ist' -t '%s.glg' -o '%s.glx'" TeX-run-command TeX-run-command TeX-run-command TeX-run-command t t
+					   :help "Run Glossary Maker"))
+		(add-to-list 'TeX-command-list
+					 '("PsToPdf" "ps2pdf '%s.ps' '%s.pdf'" TeX-run-command TeX-run-command t t
+					   :help "Run PDF Maker from PS"))
+		(add-to-list 'TeX-command-list
+					 '("ViewPdf" "evince '%s.pdf'" TeX-run-command t t
+					   :help "View the resulting pdf"))
+		(add-to-list 'TeX-command-list
+					 '("Make" "latex '%s.tex' && dvips '%s.dvi' && ps2pdf '%s.ps'" TeX-run-command TeX-run-command TeX-run-command t t
+					   :help "Make from tex to pdf"))
 		(define-key LaTeX-mode-map (kbd "<C-f5>")
 		  '(lambda()
 			 (interactive)
@@ -154,6 +166,7 @@
 			 (interactive)
 			 (preview-at-point)
 			 ))
+		(setq preview-auto-cache-preamble t)
 		(flyspell-mode t)
 		(TeX-source-specials-mode t)
 		(auto-complete-mode t)
@@ -170,18 +183,6 @@
 								   ac-source-filename
 								   ac-source-dabbrev
 								   )))
-		(add-to-list 'TeX-command-list
-					 '("Glossary" "makeindex '%s.glo' -s 'glossaire.ist' -t '%s.glg' -o '%s.glx'" TeX-run-command TeX-run-command TeX-run-command TeX-run-command t t
-					   :help "Run Glossary Maker"))
-		(add-to-list 'TeX-command-list
-					 '("PsToPdf" "ps2pdf '%s.ps' '%s.pdf'" TeX-run-command TeX-run-command t t
-					   :help "Run PDF Maker from PS"))
-		(add-to-list 'TeX-command-list
-					 '("ViewPdf" "evince '%s.pdf'" TeX-run-command t t
-					   :help "View the resulting pdf"))
-		(add-to-list 'TeX-command-list
-					 '("Make" "latex '%s.tex' && dvips '%s.dvi' && ps2pdf '%s.ps'" TeX-run-command TeX-run-command TeX-run-command t t
-					   :help "Make from tex to pdf"))
 		)
       )
 

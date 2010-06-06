@@ -69,6 +69,7 @@
 (add-hook 'org-mode-hook
 		  '(lambda ()
 			 (local-set-key (kbd "<f1>") 'org-cycle)
+			 (local-set-key (kbd "<f3>") 'org-shifttab)
 			 (local-set-key (kbd "C-j") 'org-complete)
 			 (local-set-key (kbd "C-c e") 'org-table-edit-field)
 			 ))

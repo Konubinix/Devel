@@ -161,6 +161,12 @@
 			 (TeX-fold-buffer)
 			 (preview-document)
 			 ))
+		(define-key LaTeX-mode-map (kbd "<S-f5>")
+		  '(lambda()
+			 (interactive)
+			 (TeX-fold-clearout-buffer)
+			 (preview-clearout-document)
+			 ))
 		(define-key LaTeX-mode-map (kbd "<f5>")
 		  '(lambda()
 			 (interactive)
@@ -176,13 +182,13 @@
 		(turn-on-reftex)
 		(outline-minor-mode)
 		(konix/text-hoox)
-		(preview-install-styles ".")
 		(setq ac-sources (append ac-sources
 								 '(
 								   ac-source-files-in-current-dir
 								   ac-source-filename
 								   ac-source-dabbrev
 								   )))
+		(preview-install-styles ".")
 		)
       )
 

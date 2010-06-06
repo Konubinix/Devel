@@ -225,8 +225,8 @@ Print : MacroCmd { Exec /home/snake/bin/display.py 'impression ecran' } { ExecCo
 # ************************************************************
 # Shortcuts to launch thunar with some paths
 Mod4 e : ExecCommand thunar
-Mod4 m : ExecCommand thunar /home/snake/data/Musiques
-Mod4 v : ExecCommand thunar /home/snake/data/Videos
+Mod4 m : ExecCommand thunar ~/data/Musiques
+Mod4 v : ExecCommand thunar ~/data/Videos
 
 # let's go to Program
 Mod4 p : ExecCommand gnome-terminal --working-directory /home/snake/Prog

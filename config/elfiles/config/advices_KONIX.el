@@ -42,5 +42,10 @@
   )
 (ad-activate 'appt-delete-window)
 
+(defadvice flyspell-goto-next-error (before push-mark ())
+  "Met une marque avant d'aller sur l'erreur prochaine"
+  (push-mark)
+  )
+(ad-activate 'flyspell-goto-next-error)
 
 ;;; advices_KONIX.el ends here

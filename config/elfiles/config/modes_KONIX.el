@@ -346,8 +346,10 @@
 
 (autoload 'maxima-mode "maxima" "Mode maxima" t)
 
+(setq lua-mode-hook nil)
 (add-hook 'lua-mode-hook
 		  '(lambda ()
+			 (konix/prog-hook)
 			 (auto-complete-mode t)
 			 )
 		  )

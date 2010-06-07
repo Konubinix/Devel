@@ -161,7 +161,8 @@
 ;; veux l'avoir en local...)
 (defadvice flyspell-mode (after define-hotkeys ())
   "define hotkeys to the flyspell mode"
-  (define-key flyspell-mode-map (kbd "M-£") 'flyspell-buffer)
+  (define-key flyspell-mode-map (kbd "M-£") 'ispell-buffer)
+  (define-key flyspell-mode-map (kbd "C-?") 'flyspell-buffer)
   )
 (ad-activate 'flyspell-mode)
 

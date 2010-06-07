@@ -243,3 +243,10 @@
 		 (setq dirtrack-list '("^\\([^:]*\\):\\([^:]*\\):\\(.*\\)" 2 nil))
 		 )
        )
+
+;; BibTeX
+(setq bibtex-mode-hook
+	  (lambda()
+		(konix/prog-hook)
+		)
+	  )

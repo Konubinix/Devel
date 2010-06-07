@@ -1,6 +1,6 @@
 [gui]
-	fontui = -family helvetica -size 7 -weight bold -slant roman -underline 0 -overstrike 0
-	fontdiff = -family Courier -size 7 -weight normal -slant roman -underline 0 -overstrike 0
+	fontui = -family helvetica -size 12 -weight bold -slant roman -underline 0 -overstrike 0
+	fontdiff = -family Courier -size 12 -weight normal -slant roman -underline 0 -overstrike 0
 [user]
 	name = Konubinix
 	email = konubinix@gmail.com

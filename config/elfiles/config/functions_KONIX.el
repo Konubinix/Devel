@@ -299,38 +299,6 @@ lieu de find-file."
   (shell-command "git mergetool &")
   )
 
-;; (defun konix/magit--tags-view-details (dir)
-;;   "Trouve les tag d'un rep git. Le retourne dans une liste de
-;; même type que magit--branch-view-details"
-;; ;;
-;; ;; Example
-;; ;; (
-;; ;;  ((sha1 . "d398446") (msg . "Correction dans la recherche du top dir de magit pour pouvoir fonctionner avec les symlinks. J'utilise git rev-parse --git-dir au lieu de git rev-parse --show-cdup") (current . "* ") (remote) (branch . "master"))
-;; ;;  ((sha1 . "d4acccb") (msg . "ajout du wiki") (current . "  ") (remote . t) (branch . "origin/master"))
-;; ;;   )
-;;   (let (
-;; 		topdir
-;; 		tagsdir
-;; 		tagsfiles
-;; 		tags
-;; 		)
-;; 	(setq topdir (magit-get-top-dir dir))
-;; 	(when topdir
-;; 	  (setq tagsdir (concat topdir ".git/refs/tags/"))
-;; 	  (setq tagsfiles (konix/list-dir tagsdir))
-;; 	  (setq tags
-;; 			(mapcar '(lambda (elem)
-;; 					   (let (shortsha1 msg current remote tag)
-;; 						 (setq shortsha1 (substring (konix/read-file (concat tagsdir elem)) 0 7))
-;; 						 (setq msg
-;; 						 )
-;; 					   )
-;; 					tagsfiles)
-;; 			)
-;; 	  )
-;; 	)
-;;   )
-
 (defun konix/gitk ()
   "Lance gitk --all."
   (interactive)

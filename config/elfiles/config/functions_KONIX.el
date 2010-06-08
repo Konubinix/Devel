@@ -287,6 +287,8 @@ mieux voir."
 	  )
 	(compile command)
 	(switch-to-buffer-other-window "*compilation*")
+	(highlight-regexp "error" 'compilation-error)
+	(highlight-regexp "warning" 'compilation-warning)
 	(end-of-buffer)
 	(if (equal buf_name "*compilation*")
 		nil

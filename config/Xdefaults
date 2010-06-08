@@ -1,21 +1,9 @@
-!!! Global application defaults for XDvik
-!!! Install this file into $TEXMF/xdvi/XDvi
-!!! (use kpsewhich --expand-path '$TEXMF' to determine the location of
-!!! $TEXMF on you system).
-!!!
-!!! Lines commented out (starting with `!') are examples of
-!!! how to customize Xdvi for your personal needs.
-!!! To use these settings, copy them into your $HOME/.Xdefaults file
-!!! (remove the comments), prefix each line with `xdvi', and activate
-!!! them with:
-!!! $ xrdb -merge $HOME/.Xdefaults
-
 !!!------------------------------------------------------------------------------
 !!!------------------------ useful global settings ------------------------------
 !!!------------------------------------------------------------------------------
 
 !!! Use `logical' (TeX) pages instead of physical pages for the `g' keystroke:
-*useTeXPages: True
+!! *useTeXPages: True
 
 !!! A fairly high resolution, which usually gives better results for anti-aliasing
 !!! and greater flexibility for shrink values. Generating MF fonts shouldn't be an
@@ -135,9 +123,9 @@
 !!!------------------------------------------------------------------------------
 !!!------------------------------ Fonts and colors ------------------------------
 !!!------------------------------------------------------------------------------
-*font:     -*-helvetica-medium-r-*-*-12-*-*-*-*-*-*
-!!! Use a smaller font for the statusline in the Xaw version:
-*statusline.font: -*-helvetica-medium-r-*-*-10-*-*-*-*-*-*
+! *font:     -*-helvetica-medium-r-*-*-12-*-*-*-*-*-*
+! !!! Use a smaller font for the statusline in the Xaw version:
+! *statusline.font: -*-helvetica-medium-r-*-*-10-*-*-*-*-*-*
 
 !!! Motif fonts. Meaning of the tags is:
 !!! NORMAL: Ordinary text, labels etc.
@@ -159,6 +147,34 @@
 
 !!! Color used for the magnifier and its rulers:
 *rulecolor: blue
+
+! tangoesque scheme
+*background: #FFFFFF
+*foreground: #000000
+! Black (not tango) + DarkGrey
+*color0:  #000000
+*color8:  #555753
+! DarkRed + Red
+*color1:  #ff6565
+*color9:  #ff8d8d
+! DarkGreen + Green
+*color2:  #93d44f
+*color10: #c8e7a8
+! DarkYellow + Yellow
+*color3:  #eab93d
+*color11: #ffc123
+! DarkBlue + Blue
+*color4:  #204a87
+*color12: #3465a4
+! DarkMangenta + Mangenta
+*color5:  #ce5c00
+*color13: #f57900
+!DarkCyan + Cyan (both not tango)
+*color6:  #89b6e2
+*color14: #46a4ff
+! LightGrey + White
+*color7:  #cccccc
+*color15: #ffffff
 
 !!!------------------------------------------------------------------------------
 !!!---------------------------------- hyperlinks  -------------------------------
@@ -187,6 +203,102 @@
 *editor: emacsclient --no-wait +%l %f
 !!! and this for current emacs or xemacs that come with gnuclient (which is much better):
 !*editor: gnuclient -q +%l %f
+
+! ####################################################################################################
+! Per application
+! ####################################################################################################
+! ************************************************************
+! xdvi
+! ************************************************************
+xdvi.background: #eeeeee                 /* -bg */
+xdvi.wwwbrowser: firefox                 /* -browser: same syntax as $BROWSER */
+xdvi.gsAlpha: true                       /* -gsalpha: uses x11alpha driver for nicer appearance */
+xdvi.unique: true                        /* -unique: make other instance act as 'server' */
+xdvi.watchFile: 10                       /* -watchfile: watch dvi file for changes */
+
+! ************************************************************
+! xterm
+! ************************************************************
+xterm*geometry:           80x25
+xterm*faceName:           terminusbold:pixelsize=14
+!xterm*font:             -*-dina-medium-r-*-*-16-*-*-*-*-*-*-*
+xterm*dynamicColors:      true
+xterm*utf8:               2
+xterm*eightBitInput:      true
+xterm*saveLines:          512
+xterm*scrollTtyKeypress:  true
+xterm*scrollTtyOutput:    false
+xterm*scrollBar:          true
+xterm*rightScrollBar:     true
+xterm*jumpScroll:         true
+xterm*multiScroll:        true
+xterm*toolBar:            false
+
+! ************************************************************
+! xpdf
+! ************************************************************
+xpdf*enableFreetype:    yes
+xpdf*antialias:         yes
+xpdf*foreground:        black
+xpdf*background:        white
+xpdf*urlCommand:        /usr/bin/firefox %s
+
+! ************************************************************
+! xcalc
+! ************************************************************
+xcalc*geometry:                        200x275
+xcalc.ti.bevel.background:             #111111
+xcalc.ti.bevel.screen.background:      #000000
+xcalc.ti.bevel.screen.DEG.background:  #000000
+xcalc.ti.bevel.screen.DEG.foreground:  LightSeaGreen
+xcalc.ti.bevel.screen.GRAD.background: #000000
+xcalc.ti.bevel.screen.GRAD.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.RAD.background:  #000000
+xcalc.ti.bevel.screen.RAD.foreground:  LightSeaGreen
+xcalc.ti.bevel.screen.INV.background:  #000000
+xcalc.ti.bevel.screen.INV.foreground:  Red
+xcalc.ti.bevel.screen.LCD.background:  #000000
+xcalc.ti.bevel.screen.LCD.foreground:  LightSeaGreen
+xcalc.ti.bevel.screen.LCD.shadowWidth: 0
+xcalc.ti.bevel.screen.M.background:    #000000
+xcalc.ti.bevel.screen.M.foreground:    LightSeaGreen
+xcalc.ti.bevel.screen.P.background:    #000000
+xcalc.ti.bevel.screen.P.foreground:    Yellow
+xcalc.ti.Command.foreground:  White
+xcalc.ti.Command.background:  #777777
+xcalc.ti.button5.background:  Orange3
+xcalc.ti.button19.background: #611161
+xcalc.ti.button18.background: #611161
+xcalc.ti.button20.background: #611111
+!uncomment to change label on division button
+!xcalc.ti.button20.label:      /
+xcalc.ti.button25.background: #722222
+xcalc.ti.button30.background: #833333
+xcalc.ti.button35.background: #944444
+xcalc.ti.button40.background: #a55555
+xcalc.ti.button22.background: #222262
+xcalc.ti.button23.background: #222262
+xcalc.ti.button24.background: #222272
+xcalc.ti.button27.background: #333373
+xcalc.ti.button28.background: #333373
+xcalc.ti.button29.background: #333373
+xcalc.ti.button32.background: #444484
+xcalc.ti.button33.background: #444484
+xcalc.ti.button34.background: #444484
+xcalc.ti.button37.background: #555595
+xcalc.ti.button38.background: #555595
+xcalc.ti.button39.background: #555595
+XCalc*Cursor:                 hand2
+XCalc*ShapeStyle:             rectangle
+
+! ************************************************************
+! emacs
+! ************************************************************
+emacs*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
+emacs*background: #111111
+emacs*foreground: #babdb6
+emacsclient*background: #111111
+emacsclient*foreground: #babdb6
 
 !!!------------------------------------------------------------------------------
 !!!------------------------------ Xaw buttons and helptexts ---------------------
@@ -362,8 +474,6 @@
 !!!------------------------------
 !!! end of helptexts
 !!!------------------------------
-
-
 !!!------------------------------------------------------------------------------
 !!!-------------- used for internal checking - DO NOT CHANGE THIS! --------------
 !!!------------------------------------------------------------------------------

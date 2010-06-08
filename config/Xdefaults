@@ -2,11 +2,11 @@
 !!!------------------------ useful global settings ------------------------------
 !!!------------------------------------------------------------------------------
 
-!!! Use `logical' (TeX) pages instead of physical pages for the `g' keystroke:
+!!! Use `logical (TeX) pages instead of physical pages for the `g keystroke:
 !! *useTeXPages: True
 
 !!! A fairly high resolution, which usually gives better results for anti-aliasing
-!!! and greater flexibility for shrink values. Generating MF fonts shouldn't be an
+!!! and greater flexibility for shrink values. Generating MF fonts shouldnt be an
 !!! issue when using T1lib.
 !*mfMode: ljfour
 *paper: a4
@@ -25,7 +25,7 @@
 !!! when the mouse is over a button, as in e.g. Netscape 4.x:
 *toolbarButtonsRaised: False
 
-!!! don't draw a border around armed buttons:
+!!! dont draw a border around armed buttons:
 *button*highlightThickness: 0
 
 !!! no extra margin above/below buttons
@@ -36,7 +36,7 @@
 *toolBar*button*marginWidth: 2
 
 
-!!! don't draw the small grey rectangle inside the armed button:
+!!! dont draw the small grey rectangle inside the armed button:
 *button*fillOnArm: false
 
 !!! Or, for a more traditional Motif look, use something like:
@@ -142,7 +142,7 @@
 -*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*=TOPIC_HEADING
 
 
-!!! Color used for page border, image bounding boxes and the ruler in `Ruler mode'.
+!!! Color used for page border, image bounding boxes and the ruler in `Ruler mode.
 *highlight: red
 
 !!! Color used for the magnifier and its rulers:
@@ -196,9 +196,9 @@
 !!!------------------------------ helper applications ---------------------------
 !!!------------------------------------------------------------------------------
 
-!!! the editor used for `forward search'; can also be set via $EDITOR, $VISUAL
+!!! the editor used for `forward search; can also be set via $EDITOR, $VISUAL
 !!! or $XEDITOR. Setting the X resource will override the environment variables.
-!!! The format strings `%l' and `%f' are optional.
+!!! The format strings `%l and `%f are optional.
 !!! You could use this for older emacsen that come with emacsclient:
 *editor: emacsclient --no-wait +%l %f
 !!! and this for current emacs or xemacs that come with gnuclient (which is much better):
@@ -210,10 +210,10 @@
 ! ************************************************************
 ! xdvi
 ! ************************************************************
-xdvi.background: #eeeeee                 /* -bg */
+xdvi.background: #ffffff
 xdvi.wwwbrowser: firefox                 /* -browser: same syntax as $BROWSER */
 xdvi.gsAlpha: true                       /* -gsalpha: uses x11alpha driver for nicer appearance */
-xdvi.unique: true                        /* -unique: make other instance act as 'server' */
+xdvi.unique: true                        /* -unique: make other instance act as server */
 xdvi.watchFile: 10                       /* -watchfile: watch dvi file for changes */
 
 ! ************************************************************
@@ -297,8 +297,32 @@ XCalc*ShapeStyle:             rectangle
 emacs*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
 emacs*background: #111111
 emacs*foreground: #babdb6
+
+emacs.modeline*attributeForeground:     MidnightBlue
+emacs.modeline*attributeBackground:     Bisque
+
+emacs.cursorColor:  					White
+emacs.pointerColor:						White
+
+! reserve 0 lignes pour la toolbar, donc pas despace en quand je démarre en full ou en max
+emacs.toolBar:							0
+
+emacs.fullscreen:						fullboth
+
+emacsclient*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
 emacsclient*background: #111111
 emacsclient*foreground: #babdb6
+
+emacsclient.modeline*attributeForeground:     MidnightBlue
+emacsclient.modeline*attributeBackground:     Bisque
+
+emacsclient.cursorColor:  					  White
+emacsclient.pointerColor:					  White
+
+! reserve 0 lignes pour la toolbar, donc pas despace en quand je démarre en full ou en max
+emacsclient.toolBar:							0
+
+emacsclient.fullscreen:						fullboth
 
 !!!------------------------------------------------------------------------------
 !!!------------------------------ Xaw buttons and helptexts ---------------------
@@ -354,7 +378,7 @@ emacsclient*foreground: #babdb6
 ! \n\
 ! Getting help and exiting xdvi\n\
 ! \n\
-! h or ? or `Help' button\n\
+! h or ? or `Help button\n\
 !      Displays this help text.\n\
 ! \n\
 ! q or Control-C or Control-D or Cancel or Stop or Control-Z (VAX VMS)\n\
@@ -379,7 +403,7 @@ emacsclient*foreground: #babdb6
 !      Prints bitmap unit, bit order, and byte order.\n\
 ! \n\
 ! ^ or Home\n\
-!      Move to the ``home'' position of the page.  This is\n\
+!      Move to the ``home position of the page.  This is\n\
 !      normally the upper left-hand corner of the page,\n\
 !      depending on the margins as described in the -margins\n\
 !      option, above.\n\
@@ -390,13 +414,13 @@ emacsclient*foreground: #babdb6
 ! \n\
 ! G    This key toggles the use of greyscale anti-aliasing for\n\
 !      displaying shrunken bitmaps.  In addition, the key\n\
-!      sequences `0G' and `1G' clear and set this flag,\n\
+!      sequences `0G and `1G clear and set this flag,\n\
 !      respectively.  See also the -nogrey option.\n\
 ! \n\
 ! k    Normally when xdvi switches pages, it moves to the home\n\
-!      position as well.  The `k' keystroke toggles a `keep-\n\
-!      position' flag which, when set, will keep the same\n\
-!      position when moving between pages.  Also `0k' and `1k'\n\
+!      position as well.  The `k keystroke toggles a `keep-\n\
+!      position flag which, when set, will keep the same\n\
+!      position when moving between pages.  Also `0k and `1k\n\
 !      clear and set this flag, respectively.  See also the\n\
 !      -keep option.\n\
 ! \n\
@@ -406,8 +430,8 @@ emacsclient*foreground: #babdb6
 !      image at all.  For details on how the margins are used,\n\
 !      see the -margins option.\n\
 ! \n\
-! P    ``This is page number n.''  This can be used to make\n\
-!      the `g' keystroke refer to actual page numbers instead\n\
+! P    ``This is page number n.  This can be used to make\n\
+!      the `g keystroke refer to actual page numbers instead\n\
 !      of absolute page numbers.\n\
 ! \n\
 ! R    Forces the dvi file to be reread.  This allows you to\n\
@@ -426,12 +450,12 @@ emacsclient*foreground: #babdb6
 ! t    Toggles to the next unit in a sorted list of TeX dimension\n\
 !      units for the popup magnifier ruler.\n\
 ! \n\
-! V    Toggles Ghostscript anti-aliasing.  Also `0V' and `1V' clear\n\
+! V    Toggles Ghostscript anti-aliasing.  Also `0V and `1V clear\n\
 !      and enables this mode, respectively.  See also the the\n\
 !      -gsalpha option.\n\
 ! \n\
 ! x    Toggles expert mode (in which the buttons do not appear).\n\
-!      `1x' toggles display of the statusline at the bottom of\n\
+!      `1x toggles display of the statusline at the bottom of\n\
 !      the window.\n
 
 !!!------------------------------
@@ -465,7 +489,7 @@ emacsclient*foreground: #babdb6
 ! g or j or End\n\
 !      Moves to the page with the given number.  Initially,\n\
 !      the first page is assumed to be page number 1, but this\n\
-!      can be changed with the `P' keystroke, below.  If no\n\
+!      can be changed with the `P keystroke, below.  If no\n\
 !      page number is given, then it goes to the last page.\n\
 ! \n\
 ! <    Move to first page in document.\n\

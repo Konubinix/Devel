@@ -134,10 +134,15 @@ control shift Mod1 Left : TakeToPrevWorkspace 1
 Control Mod4 KP_0  : ArrangeWindows # 0
 
 # move windows with the keyboard
-Mod4 Left  : MoveLeft 10
-Mod4 Right  : MoveRight 10
-Mod4 Up  : MoveUp 10
-Mod4 Down  : MoveDown 10
+Mod4 Mod1 Left      	    :MoveLeft 10
+Mod4 Mod1 Right     :MoveRight 10
+Mod4 Mod1 Up	    :MoveUp 10
+Mod1 Mod4 Down	    :MoveDown 10
+
+Mod4 Left 	    :MoveTo 0 * Left
+Mod4 Right	    :MoveTo 0 * Right
+Mod4 Up		    :MoveTo * 0 Top
+Mod4 Down	    :MoveTo * 0 Bottom
 
 # resize windows with the keyboard
 control Mod4 Left  : Resize -5 0

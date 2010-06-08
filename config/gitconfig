@@ -29,3 +29,6 @@
 	status = auto
 	diff = auto
 	branch = auto
+[core]
+	safecrlf = warn
+	autocrlf = input

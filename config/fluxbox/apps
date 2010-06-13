@@ -75,3 +75,6 @@
 [app] (name=meld) (class=Meld)
   [Maximized]	{yes}
 [end]
+[app] (name=emacsclient) (class=Emacs)
+  [Workspace]	{0}
+[end]

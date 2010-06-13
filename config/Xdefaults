@@ -149,7 +149,7 @@
 *rulecolor: blue
 
 ! tangoesque scheme
-*background: #FFFFFF
+*background: #67cdb7
 *foreground: #000000
 ! Black (not tango) + DarkGrey
 *color0:  #000000
@@ -303,11 +303,14 @@ emacs.modeline*attributeBackground:     Bisque
 
 emacs.cursorColor:  					White
 emacs.pointerColor:						White
+emacs.menuBar:							false
 
 ! reserve 0 lignes pour la toolbar, donc pas despace en quand je démarre en full ou en max
 emacs.toolBar:							0
+emacs.scrollBarWidth:					0
 
-emacs.fullscreen:						fullboth
+
+!emacs.fullscreen:						fullboth
 
 emacsclient*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
 emacsclient*background: #111111
@@ -318,11 +321,13 @@ emacsclient.modeline*attributeBackground:     Bisque
 
 emacsclient.cursorColor:  					  White
 emacsclient.pointerColor:					  White
+emacsclient.scrollBarWidth:					  0
+emacsclient.menuBar:						  false
 
 ! reserve 0 lignes pour la toolbar, donc pas despace en quand je démarre en full ou en max
 emacsclient.toolBar:							0
 
-emacsclient.fullscreen:						fullboth
+!emacsclient.fullscreen:						fullboth
 
 !!!------------------------------------------------------------------------------
 !!!------------------------------ Xaw buttons and helptexts ---------------------

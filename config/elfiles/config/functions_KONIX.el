@@ -313,7 +313,7 @@ lieu de find-file."
 (defun konix/gitk ()
   "Lance gitk --all."
   (interactive)
-  (shell-command "gitk --all&")
+  (start-process "gitk" nil "gitk" "--all")
   )
 
 (defun konix/git-add (file)

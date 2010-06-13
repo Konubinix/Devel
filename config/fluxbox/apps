@@ -75,6 +75,9 @@
 [app] (name=meld) (class=Meld)
   [Maximized]	{yes}
 [end]
+[app] (name=xdvi) (class=XDvi)
+  [Deco]	{NONE}
+[end]
 [app] (name=emacsclient) (class=Emacs)
   [Workspace]	{0}
 [end]

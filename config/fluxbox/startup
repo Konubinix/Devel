@@ -4,7 +4,10 @@ fluxbox &
 
 fbpid=$!
 
-gnome-terminal --maximize &
+
+#gnome-terminal --maximize &
+guake &
+numlockx
 sleep 4
 {
     killall conky

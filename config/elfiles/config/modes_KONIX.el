@@ -72,24 +72,27 @@
 		))
 
 ;;Mode lisp
-(setq lisp-mode-hook
-      (lambda ()
-		(konix/prog-hook)
-		(setq ac-sources (append ac-sources
-								 '(
-								   ac-source-functions
-								   ac-source-symbols
-								   ac-source-variables
-								   )))
-		(local-set-key (kbd "C-j") 'auto-complete)
-
-		))
+(setq lisp-mode-hook nil)
+(add-hook 'lisp-mode-hook
+		  '(lambda ()
+			 (konix/prog-hook)
+			 (setq ac-sources (append ac-sources
+									  '(
+										ac-source-functions
+										ac-source-symbols
+										ac-source-variables
+										)))
+			 (local-set-key (kbd "C-j") 'auto-complete)
+			 (auto-complete-mode t)
+			 ))
 
 ;;Mode elisp
-(setq emacs-lisp-mode-hook
-      (lambda ()
-		(funcall lisp-mode-hook)
-		))
+(setq emacs-lisp-mode-hook nil)
+(add-hook 'emacs-lisp-mode-hook
+		  '(lambda ()
+			 (run-hooks 'lisp-mode-hook)
+			 )
+)
 
 ;; HTML
 (setq html-mode-hook

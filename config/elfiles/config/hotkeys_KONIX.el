@@ -153,6 +153,9 @@
 (global-set-key (kbd "M-<pause>") 'konix/cedet-load)
 
 (define-key 'konix/global-key-map "h" 'konix/hack-on-emacs)
+;; ************************************************************
+
+(define-key 'konix/global-key-map (kbd "M-t") 'toggle-source-header-konix)
 
 ;; ################################################################################
 ;; Raccourcis spécifiques à un mode

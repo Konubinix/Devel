@@ -24,7 +24,7 @@ function update_file(){
 }
 
 update_file $git_dir/hooks/post-commit
-update_file $git_dir/hooks/post-rebase
+update_file $git_dir/hooks/post-rewrite
 
 echo "Initialisation OK" &&
 echo OK > $git_dir/kgit_inited

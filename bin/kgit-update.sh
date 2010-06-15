@@ -57,6 +57,7 @@ then
 	exit 2
 fi
 
+echo "git rebase $parent_nom $enfant_nom"
 git rebase $parent_nom $enfant_nom
 res=$?
 if [ $res != 0 ]

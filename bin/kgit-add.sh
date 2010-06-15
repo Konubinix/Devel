@@ -28,22 +28,40 @@ function get_name(){
 	git name-rev --name-only $1
 }
 
+git_dir=$(git rev-parse --git-dir)
+
 assert_empty $1
 assert_empty $2
 
-enfant=$2
-parent=$1
+enfant=$(git rev-parse $2)
+parent=$(git rev-parse $1)
 
-assert_commitish $parent
-assert_commitish $enfant
+enfant_nom=$(get_name $enfant )
+parent_nom=$(get_name $parent )
 
-enfant_name=$(get_name $enfant)
-assert_commitish $enfant_name
+assert_commitish $enfant_nom
+assert_commitish $parent_nom
 
-file_to_create=$(git rev-parse --git-dir)/parent/$enfant_name
+file_to_create=$(git rev-parse --git-dir)/parent/$enfant_nom
 
-[ ! -e "$file_to_create" ] &&
-git rev-parse $parent > $file_to_create &&
-echo "'$file_to_create' créé" ||
-echo "'$file_to_create' existe déjà, faire './del.sh $enfant' d'abord" &&
-./parent.sh $enfant
+{
+	[ ! -e "$file_to_create" ] &&
+	git rev-parse $parent > $file_to_create &&
+	echo "'$file_to_create' créé"
+} || {
+	echo "'$file_to_create' existe déjà, faire './del.sh $enfant' d'abord" &&
+	exit 1
+}
+
+[ ! -e $git_dir/refs/parent ] && mkdir $git_dir/refs/parent
+file_to_create=$git_dir/refs/parent/$enfant_nom
+{
+	echo $parent > $file_to_create &&
+	echo "'$file_to_create' créé"
+} || {
+	echo "'$file_to_create' pose un problème à la création je voulais juste mettre '$parent' dedans..."
+	exit 1
+}
+
+bash "$(which kgit-parent.sh)" "$enfant"
+

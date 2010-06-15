@@ -81,3 +81,6 @@
 [app] (name=emacsclient) (class=Emacs)
   [Workspace]	{0}
 [end]
+[app] (name=Mail) (class=Icedove) (role=3pane)
+  [Workspace]	{5}
+[end]

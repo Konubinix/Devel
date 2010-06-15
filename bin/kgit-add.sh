@@ -47,7 +47,7 @@ assert_commitish $parent_nom
 file_to_create=$(git rev-parse --git-dir)/parent/$enfant_nom
 {
 	[ ! -e "$file_to_create" ] &&
-	git rev-parse $parent > $file_to_create &&
+	echo $parent_nom > $file_to_create &&
 	echo "'$file_to_create' créé"
 } || {
 	echo "'$file_to_create' existe déjà, faire './del.sh $enfant' d'abord" &&

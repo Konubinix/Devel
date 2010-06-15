@@ -24,6 +24,9 @@
 (define-key global-map (kbd "C-<f11>") 'konix/dedicated-windows/add)
 (define-key global-map (kbd "S-<f11>") 'konix/dedicated-windows/reset)
 
+;; grep
+(define-key global-map (kbd "C-< C-s") 'lgrep)
+
 ;;pour bouger facilement entre les fenêtres avec M-keypad
 (windmove-default-keybindings 'meta)
 (define-key 'konix/global-fast-key-map (kbd "<left>") 'windmove-left)

@@ -42,8 +42,9 @@ parent_nom=$(get_name $parent )
 assert_commitish $enfant_nom
 assert_commitish $parent_nom
 
+[ ! -e $git_dir/refs/parent ] && mkdir $git_dir/refs/parent
+[ ! -e $git_dir/parent ] && mkdir $git_dir/parent
 file_to_create=$(git rev-parse --git-dir)/parent/$enfant_nom
-
 {
 	[ ! -e "$file_to_create" ] &&
 	git rev-parse $parent > $file_to_create &&
@@ -53,7 +54,6 @@ file_to_create=$(git rev-parse --git-dir)/parent/$enfant_nom
 	exit 1
 }
 
-[ ! -e $git_dir/refs/parent ] && mkdir $git_dir/refs/parent
 file_to_create=$git_dir/refs/parent/$enfant_nom
 {
 	echo $parent > $file_to_create &&

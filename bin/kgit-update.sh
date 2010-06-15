@@ -64,4 +64,7 @@ if [ $res != 0 ]
 then
 	# on signale l'echec pour arréter le rebase
 	exit 2
+else
+	# update the ref
+	echo $parent > $git_dir/refs/parent/$enfant_nom
 fi

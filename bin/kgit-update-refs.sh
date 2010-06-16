@@ -31,7 +31,7 @@ function get_name(){
 
 git_dir=$(git rev-parse --git-dir)
 
-for enfant_nom in "$(ls $git_dir/parent/)"
+for enfant_nom in $(ls $git_dir/parent/)
 do
 	# pour chaque enfant
 	parent_nom=$(cat $git_dir/parent/$enfant_nom)

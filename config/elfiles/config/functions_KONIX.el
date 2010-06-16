@@ -1030,3 +1030,14 @@ set terminal pop;\
     (setq buffer-read-only t)
     (raise-frame (selected-frame))
     (select-window this-window)))
+(defun konix/select-lowest-window ()
+  "APPT : Select the lowest window on the frame."
+  (let ((lowest-window (selected-window))
+        (bottom-edge (nth 3 (window-edges)))
+        next-bottom-edge)
+    (walk-windows (lambda (w)
+                    (when (< bottom-edge (setq next-bottom-edge
+                                               (nth 3 (window-edges w))))
+                      (setq bottom-edge next-bottom-edge
+                            lowest-window w))) 'nomini)
+    (select-window lowest-window)))

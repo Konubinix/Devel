@@ -366,7 +366,7 @@ lieu de find-file."
 	  (setq cedet-loaded t)
 	  (load-file "~/Prog/devel/config/elfiles/cedet/common/cedet.el")
 	  (global-ede-mode t)
-	  (semantic-load-enable-excessive-code-helpers)
+	  (semantic-load-enable-code-helpers)
 	  (require 'semantic-ia)
 	  (require 'semantic-gcc)
 	  (require 'semanticdb)

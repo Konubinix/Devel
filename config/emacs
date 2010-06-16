@@ -46,6 +46,9 @@
 (require 'ffap)
 (load-library "find-file")
 
+;; Association environnement -> type de fichier (à faire en fin)
+(load "assocs_KONIX.el")
+
 ;; serveur
 (server-start)
 

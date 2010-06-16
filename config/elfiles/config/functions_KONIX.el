@@ -383,6 +383,7 @@ lieu de find-file."
 	  (add-hook 'semantic-init-hooks 'my-semantic-hook)
 	  ;; Pour que le buffer courant soit rechargé avec semantic
 	  (revert-buffer)
+	  (semantic-speedbar-analysis)
 	  )
 	)
   )

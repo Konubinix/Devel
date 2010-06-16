@@ -194,6 +194,14 @@
 ;; ################################################################################
 ;; Ispell, flyspell
 ;; ################################################################################
+;; ################################################################################
+;; Gnuplot
+;; ################################################################################
+;; (define-key gnuplot-mode-map "\C-xp" 'konix/gnuplot-mode-map)
+;; (define-prefix-command 'konix/gnuplot-mode-map)
+;; (define-key konix/gnuplot-mode-map "l" 'konix/gnuplot/load-current-file)
+;; (define-key konix/gnuplot-mode-map "g" 'konix/gnuplot)
+
 (global-set-key (kbd "M-£") 'konix/ispell-region-or-buffer)
 (global-set-key (kbd "C-?") 'konix/flyspell-region-or-buffer)
 

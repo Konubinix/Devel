@@ -136,6 +136,10 @@ retourne ('fichier','extension')."
   (interactive)
   (insert (format-time-string "<%Y-%m-%d %a>")))
 
+(defun replace-in-string (target old new)
+  (replace-regexp-in-string old new target)
+  )
+
 (defun konix/point-incr-number (number)
   "Incrémente le number !"
   (interactive "p")

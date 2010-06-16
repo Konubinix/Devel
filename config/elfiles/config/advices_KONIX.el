@@ -72,4 +72,6 @@ Dedicated window can't be deleted by command `delete-other-windows'."
 	)
   )
 (ad-activate 'delete-other-windows)
+
+(provide 'advices_KONIX)
 ;;; advices_KONIX.el ends here

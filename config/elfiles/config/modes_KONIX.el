@@ -95,7 +95,36 @@
 		  '(lambda ()
 			 (run-hooks 'lisp-mode-hook)
 			 )
-)
+		  )
+
+;; Mode custom
+(setq Custom-mode-hook
+	  (lambda ()
+		(auto-complete-mode t)
+		(setq ac-sources
+			  '(
+				ac-source-files-in-current-dir ;eshell
+				ac-source-filename ; eshell
+				ac-source-dabbrev
+				)
+			  )
+		)
+	  )
+
+;; GNUPLOT
+(add-hook 'gnuplot-mode-hook
+		  '(lambda()
+			 (auto-complete-mode t)
+			 (setq ac-sources
+				   '(
+					 ac-source-files-in-current-dir ;eshell
+					 ac-source-filename ; eshell
+					 ac-source-dabbrev
+					 )
+				   )
+			 )
+		  )
+
 
 ;; HTML
 (setq html-mode-hook
@@ -126,6 +155,22 @@
     )
   )
 
+;; shell-mode
+(setq shell-mode-hook
+	  (lambda ()
+		(dirtrack-mode t)
+		(auto-complete-mode t)
+		(ansi-color-for-comint-mode-on)
+		(setq ac-sources
+			  '(
+				ac-source-files-in-current-dir
+				ac-source-filename
+				ac-source-filename-cygwin
+				)
+			  )
+		)
+	  )
+
 ;; Conf Mode
 (setq conf-mode-hook
       (lambda ()
@@ -149,6 +194,13 @@
 			(gud-def gud-run "run" "r" "Run the program in the debugger")
 			(shrink-window-horizontally 40)
 			))
+
+(add-hook 'compilation-mode-hook
+		  '(lambda ()
+			 (hl-line-mode t)
+			 )
+		  )
+
 
 ;; ************************************************************
 ;; Edition
@@ -263,3 +315,38 @@
 		(konix/prog-hook)
 		)
 	  )
+
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+										;(add-hook 'before-save-hook 'delete-blank-lines)
+(defun org-summary-todo (n-done n-not-done)
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+	(org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+(add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
+(add-hook 'org-mode-hook
+		  '(lambda ()
+			 (auto-complete-mode t)
+			 (setq ac-sources (append ac-sources
+									  '(
+										ac-source-files-in-current-dir
+										ac-source-filename
+										)))
+			 )
+
+		  )
+
+(add-hook 'maxima-mode-hook
+		  '(lambda nil
+			 (hs-minor-mode)
+			 (auto-complete-mode)
+			 )
+		  )
+
+
+(autoload 'maxima-mode "maxima" "Mode maxima" t)
+
+(add-hook 'lua-mode-hook
+		  '(lambda () (auto-complete-mode t) ))
+
+(autoload 'lua-mode "lua-mode")

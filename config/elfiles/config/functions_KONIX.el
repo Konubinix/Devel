@@ -364,7 +364,7 @@ lieu de find-file."
 	(progn (message "cedet already loaded"))
 	(progn
 	  (setq cedet-loaded t)
-	  (load-file "~/Prog/devel/config/elfiles/cedet/common/cedet.el")
+	  (load-file "~/.elfiles/cedet/common/cedet.el")
 	  (global-ede-mode t)
 	  (semantic-load-enable-code-helpers)
 	  (require 'semantic-ia)

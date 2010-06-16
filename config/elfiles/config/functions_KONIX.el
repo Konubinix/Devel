@@ -465,6 +465,13 @@ lieu de find-file."
   (interactive)
   (konix/git/command "--name-only HEAD")
   )
+(defun konix/egg-hunk-section-cmd-view-file-other-window (file hunk-header hunk-beg
+															   &rest ignored)
+  "Visit FILE in other-window and goto the current line of the hunk."
+  (interactive (egg-hunk-info-at (point)))
+  (let ((line (egg-hunk-compute-line-no hunk-header hunk-beg)))
+    (view-file file)
+    (goto-line line)))
 (setq ecb-activated nil)
 (defun konix/switch-ecb ()
   (interactive)

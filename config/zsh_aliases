@@ -1,3 +1,4 @@
+alias -g ec="emacsclient"
 alias -s pdf="evince"
 alias -s zshrc="emacsclient"
 alias -s py="python "

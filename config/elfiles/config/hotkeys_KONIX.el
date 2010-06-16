@@ -123,8 +123,6 @@
 (global-set-key (kbd "<C-prior>") 'multi-eshell-switch)
 (define-key 'konix/global-fast-key-map "e" 'multi-eshell)
 
-;; Find-file ido
-(global-set-key (kbd "M-g M-f") 'ido-find-file)
 
 (global-set-key (kbd "<f6>") 'kmacro-end-or-call-macro)
 

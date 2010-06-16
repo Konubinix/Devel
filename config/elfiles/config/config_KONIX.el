@@ -45,7 +45,7 @@
 ;; ************************************************************
 (require 'auto-complete-config)
 (require 'ac-dabbrev)
-(add-to-list 'ac-dictionary-directories "~/.elfiles//ac-dict")
+(add-to-list 'ac-dictionary-directories "~/.elfiles/ac-dict")
 (setq-default hippie-expand-try-functions-list '(auto-complete))
 (setq-default ac-sources
 			  '(

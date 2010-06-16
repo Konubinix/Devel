@@ -431,7 +431,7 @@ contained c, h, cpp, cc.."
 (defun konix/prog-hook ()
   "Mes configuration communes à tous les mode de programmation."
   (interactive)
-  (hs-minor-mode)
+  (hs-minor-mode t)
   (konix/tab-size 4)
   (auto-complete-mode t)
   (setq truncate-lines t)

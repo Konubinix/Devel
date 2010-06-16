@@ -165,6 +165,8 @@
 ;; quand on fait une recherche, ouvre les bloc de code correspondant
 (setq hs-isearch-open t)
 
+(setq set-mark-command-repeat-pop t)
+
 ;; ************************************************************
 ;; Encodage
 ;; ************************************************************

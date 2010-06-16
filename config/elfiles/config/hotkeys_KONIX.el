@@ -167,16 +167,10 @@
 (define-key 'konix/global-key-map (kbd "M-t") 'toggle-source-header-konix)
 
 ;; ################################################################################
-;; Raccourcis spécifiques à un mode
+;; Ispell, flyspell
 ;; ################################################################################
-;; Flyspell raccourcis (pas le choix de le faire dans un advice si je
-;; veux l'avoir en local...)
-(defadvice flyspell-mode (after define-hotkeys ())
-  "define hotkeys to the flyspell mode"
-  (define-key flyspell-mode-map (kbd "M-£") 'ispell-buffer)
-  (define-key flyspell-mode-map (kbd "C-?") 'flyspell-buffer)
-  )
-(ad-activate 'flyspell-mode)
+(global-set-key (kbd "M-£") 'konix/ispell-region-or-buffer)
+(global-set-key (kbd "C-?") 'konix/flyspell-region-or-buffer)
 
 ;; ************************************************************
 ;; VRAC

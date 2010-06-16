@@ -177,6 +177,27 @@
   (org-clock-goto)
   )
 
+;; ####################################################################################################
+;; Ispell, aspell, flyspell etc.
+;; ####################################################################################################
+(defun konix/ispell-region-or-buffer ()
+  (interactive)
+  (if mark-active
+	  (ispell-region (point) (mark))
+    (ispell-buffer)
+	)
+  )
+
+(defun konix/flyspell-region-or-buffer ()
+  (interactive)
+  (if mark-active
+      (flyspell-region (point) (mark))
+    (flyspell-buffer)
+	)
+  )
+
+
+
 ;; ################################################################################
 ;; Org
 ;; ################################################################################

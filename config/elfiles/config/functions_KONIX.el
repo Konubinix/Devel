@@ -780,6 +780,16 @@ contained c, h, cpp, cc.."
   (delete-window)
   )
 
+(defun konix/confirm (msg)
+  "Demande confirmation."
+  (let (confirm)
+	(setq confirm (read-char (concat "Sur de "msg" (o/n) ? ") "n"))
+	(if (equal confirm 111) ;  111 = ascii("o")
+		t
+	  nil
+	  )
+	)
+  )
 ;; ************************************************************
 ;; DRAFT
 ;; ************************************************************

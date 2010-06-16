@@ -105,7 +105,7 @@
 			))
 
 ;; Auto complete
-(global-set-key (kbd "C-j") 'auto-complete)
+(global-set-key (kbd "C-j") 'hippie-expand)
 (global-set-key (kbd "C-S-j") 'ac-stop)
 
 ;; outline

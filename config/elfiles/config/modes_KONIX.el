@@ -8,6 +8,9 @@
 (setq c-mode-common-hook
       (lambda ()
 		(konix/prog-hook)
+		(hide-ifdef-mode t)
+		(setq hide-ifdef-initially t)
+		(setq hide-ifdef-shadow t)
 		(add-to-list 'ac-omni-completion-sources
 					 (cons "\\." '(ac-source-semantic)))
 		(add-to-list 'ac-omni-completion-sources

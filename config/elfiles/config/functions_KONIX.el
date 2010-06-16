@@ -868,3 +868,90 @@ retourne ('fichier','extension')."
 	(list noext-file-name ext)
 	)
   )
+;; ################################################################################
+;; GNUPLOT
+;; ################################################################################
+(defvar konix/gnuplot/program "wgnuplot" "Program to launch when attempting to use gnuplot")
+
+(defun konix/gnuplot/load-file (fichier)
+  "Lance gnuplot avec le fichier."
+  (interactive "fFichier : ")
+  (shell-command (concat gnuplot-program " " fichier"&"))
+  )
+
+(defun konix/gnuplot (cmd)
+  "Lance wgnuplot avec une ligne de commande."
+  (interactive "sLigne de commande : ")
+  (shell-command (concat konix/gnuplot/program " " cmd"&" ))
+  )
+
+(defun konix/gnuplot-async (cmd)
+  "Lance wgnuplot avec une ligne de commande."
+  (interactive "sLigne de commande : ")
+  (shell-command (concat konix/gnuplot/program " " cmd"&" ))
+  )
+
+(defun konix/gnuplot/plot-current-file-dat ()
+  "Charge le fichier pointé par le buffer courant dans gnuplot."
+  (interactive )
+  (konix/gnuplot/plot-file-dat buffer-file-name)
+  )
+
+(defun konix/gnuplot/plot-file-dat (filedat)
+  "Plot le fichier dat."
+  (interactive "fFichier : ")
+  (konix/gnuplot (concat "\
+-e \"plot '"filedat"';\
+pause -1;\
+\""))
+  )
+
+;; (defun konix/gnuplot/folder-dat-to-png (folder)
+;;   "Prend tous les dat du dossier et en fait des png."
+;;   (interactive "DDossier : ")
+;;   (list
+;;   )
+
+(defun konix/gnuplot/file-dat-to-png (fichier)
+  (interactive "fFichier : ")
+  (let (fichier_sans_ext pdf)
+	(setq fichier_sans_ext (car (konix/split-ext fichier)))
+	(setq pdf (concat fichier_sans_ext ".png"))
+	(konix/gnuplot (concat "-e \
+\"\
+set terminal push;\
+set terminal png;\
+set output '"pdf"';\
+plot '"fichier"';\
+set output;\
+set terminal pop;\
+\""))
+	(message "%s créé" pdf)
+	)
+  )
+
+(defun konix/gnuplot/folder-dats-to-pngs (folder)
+
+  (interactive "DFolder : ")
+  (let (list-files)
+	(setq list-files (split-string (shell-command-to-string (concat "ls "folder)) "\n"))
+	(mapc '(lambda (elem)
+			 (if (equal "dat" (car (cdr (konix/split-ext elem))))
+				 (progn
+				   (message (format "%s" elem))
+				   (konix/gnuplot/file-dat-to-png (expand-file-name elem folder))
+				   )
+			   ""
+			   )
+			 )
+		  list-files
+		  )
+	)
+  )
+
+(defun konix/gnuplot/load-current-file ()
+  "Lance le fichier actuel dans gnuplot."
+  (interactive)
+  (save-buffer)
+  (konix/gnuplot/load-file buffer-file-truename)
+  )

@@ -964,3 +964,9 @@ set terminal pop;\
   (quit-window)
   (delete-window)
   )
+(defun konix/describe-bindings ()
+  "Comme pour l'aide, mais switche sur la window créée."
+  (interactive )
+  (describe-bindings)
+  (other-window 1)
+  )

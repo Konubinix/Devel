@@ -591,6 +591,14 @@ contained c, h, cpp, cc.."
   (shell-command (concat "find " dir "  -iname \"*.el\" | xargs etags -o " dir"/TAGS &"))
   )
 
+(defun konix/tag-next ()
+  (interactive)
+  (find-tag 'arg t nil))
+
+(defun konix/tag-prev ()
+  (interactive)
+  (find-tag 'arg '- nil))
+
 (defun konix/prog-hook ()
   "Mes configuration communes à tous les mode de programmation."
   (interactive)

@@ -841,3 +841,14 @@ Will prompt you shell name when you type `C-u' before this command."
            ;; Otherwise focus current window.
            current-window)))
     (message "`multi-term' dedicated window has exist.")))
+
+
+(defun konix/toggle-debug ()
+  "debug-on-error qui devient t ou nil."
+  (interactive)
+  (if debug-on-error
+	  (setq debug-on-error nil)
+	(setq debug-on-error t)
+	)
+  (message "debug-on-error passe à %s" debug-on-error)
+  )

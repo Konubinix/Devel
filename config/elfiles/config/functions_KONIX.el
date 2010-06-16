@@ -992,3 +992,41 @@ set terminal pop;\
 		)
 	)
   )
+(defun konix/disp-window (msg)
+  "Tiré de appt, affiche une petite window en dessous de l'écran pour afficher un message"
+  (let ((this-window (selected-window))
+        (disp-buf (get-buffer-create "Message")))
+    ;; Make sure we're not in the minibuffer before splitting the window.
+    ;; FIXME this seems needlessly complicated?
+    (when (minibufferp)
+      (other-window 1)
+      (and (minibufferp) (display-multi-frame-p) (other-frame 1)))
+    (if (cdr (assq 'unsplittable (frame-parameters)))
+        ;; In an unsplittable frame, use something somewhere else.
+		(progn
+		  (set-buffer disp-buf)
+		  (display-buffer disp-buf))
+      (unless (or (special-display-p (buffer-name disp-buf))
+                  (same-window-p (buffer-name disp-buf)))
+        ;; By default, split the bottom window and use the lower part.
+        (konix/select-lowest-window)
+        ;; Split the window, unless it's too small to do so.
+        (when (>= (window-height) (* 2 window-min-height))
+          (select-window (split-window))))
+      (switch-to-buffer disp-buf))
+    ;; FIXME Link to diary entry?
+    ;; (calendar-set-mode-line
+    ;;  (format " Appointment %s. %s "
+    ;;          (if (string-equal "0" min-to-app) "now"
+    ;;            (format "in %s minute%s" min-to-app
+    ;;                    (if (string-equal "1" min-to-app) "" "s")))
+    ;;          new-time))
+    (setq buffer-read-only nil
+          buffer-undo-list t)
+    (erase-buffer)
+    (insert msg)
+    (shrink-window-if-larger-than-buffer (get-buffer-window disp-buf t))
+    (set-buffer-modified-p nil)
+    (setq buffer-read-only t)
+    (raise-frame (selected-frame))
+    (select-window this-window)))

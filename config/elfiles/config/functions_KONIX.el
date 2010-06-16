@@ -374,6 +374,97 @@ lieu de find-file."
   (shell-command (concat "git add "file"&"))
   )
 
+(defun konix/git/stash-save (msg)
+  "Lance git stash."
+  (interactive "sMessage : ")
+  (shell-command (concat "git stash save "msg))
+  )
+
+(defun konix/git/stash-pop ()
+  "git stash pop."
+  (interactive)
+  (shell-command (konix/git/command "stash pop"))
+  )
+
+(defun konix/git/checkout (ref)
+  "Lance git checkout."
+  (interactive "sCheckout ref : ")
+  (shell-command (concat "git checkout "ref))
+  )
+
+(defun konix/git/reset ()
+  "Reset le depot git en virant toutes les modifs locales."
+  (interactive)
+  (if (konix/confirm "reseter")
+	  (shell-command "git reset HEAD && git co $(git rev-parse --show-cdup)")
+	)
+  )
+
+(defun konix/git/rebase (cmd)
+  "Lance un rebase."
+  (interactive "sgit rebase ")
+  (konix/git/command (concat "rebase "cmd))
+  )
+
+(defun konix/git/difftool ()
+  "lance git difftool."
+  (interactive)
+  (shell-command "git difftool")
+  )
+
+(defun konix/git/difftool-file (file)
+  "Lance difftool sur le fichier."
+  (interactive (list buffer-file-truename) )
+  (konix/git/command (concat "difftool "file))
+  )
+
+(defun konix/git/svn-fetch ()
+  "Lance git svn fetch."
+  (interactive)
+  (konix/git/command "svn fetch")
+  )
+
+(defun konix/git/svn-dcommit ()
+  "Lance git svn dcommit."
+  (interactive)
+  (konix/git/command "svn dcommit")
+  )
+
+(defun konix/git/mergetool ()
+  "Lance la commande mergetool de git."
+  (interactive)
+  (shell-command "git mergetool &")
+  )
+
+(defun konix/git/command (command)
+  "Lance une commande git."
+  (interactive "sCommande : ")
+  (shell-command (concat "git " command"&"))
+  )
+
+(defun konix/git/command-to-string (command)
+  "Lance une commande git."
+  (interactive "sCommande : ")
+  (shell-command-to-string (concat "git " command"&"))
+  )
+
+(defun konix/git/irebase (ref)
+  "Rebase interactif sur ref."
+  (interactive "sRef : ")
+  (konix/git/command (concat "rebase -i " ref))
+  )
+
+(defun konix/git/reset-file (file)
+  "description."
+  (interactive "fFichier : ")
+  (konix/git/command (concat "co "file))
+  )
+
+(defun konix/git/modified-files ()
+  "git diff-index --name-only."
+  (interactive)
+  (konix/git/command "--name-only HEAD")
+  )
 (setq ecb-activated nil)
 (defun konix/switch-ecb ()
   (interactive)

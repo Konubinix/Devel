@@ -257,6 +257,48 @@
 ;; ################################################################################
 ;; Functions de programmation
 ;; ################################################################################
+;; ################################################################################
+;; Gestion d'un projet
+
+(defun konix/compile (command)
+  "Lance une compilation et fait deux trois trucs en plus pour
+mieux voir."
+  (interactive "sCompile-command : ")
+  (kill3DVIA)
+  (let (old-compile-command)
+	(setq old-compile-command compile-command)
+	(compile command)
+	(message "Compilation en cours...")
+	(switch-to-buffer-other-window "*compilation*")
+	(end-of-buffer)
+	(other-window 1)
+	)
+  )
+
+
+(defun konix/make (makefile &optional param)
+  "Lance un make sur le makefile avec les param."
+  (interactive "fMakefile : ")
+  (let ((command (concat "make -f "makefile" "param)))
+	(message "Make en cours...")
+	(compile command)
+	(switch-to-buffer-other-window "*compilation*")
+	(end-of-buffer)
+	(other-window 1)
+	)
+)
+
+(defun konix/make-shell (makefile &optional param)
+  "Lance un make dans un shell."
+  (interactive "fMakefile : ")
+  (shell-command (concat "make -f " makefile " "param"&"))
+)
+
+(defun konix/make-shell-to-string (makefile &optional param)
+  "Lance un make dans un shell."
+  (interactive "fMakefile : ")
+  (shell-command-to-string (concat "make -f " makefile " "param"&"))
+  )
 ;; ************************************************************
 ;; Git
 ;; ************************************************************

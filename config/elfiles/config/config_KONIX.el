@@ -368,6 +368,7 @@
 (add-to-list 'revert-without-query "TAGS")
 (setq-default tags-table-list nil)
 
+;; VRAC
 (setq konix/header-marker-1 "####################################################################################################")
 (setq konix/header-marker-2 "************************************************************")
 (setq konix/header-marker-3 "--------------------------------------------------")

@@ -191,6 +191,25 @@
 
 (define-key 'konix/global-key-map (kbd "M-t") 'toggle-source-header-konix)
 
+;; ************************************************************
+;; Gestion projet
+;; ************************************************************
+(global-set-key
+ (kbd "<f7>")
+ '(lambda()
+	(interactive)
+	(konix/make konix/proj-makefile)
+	)
+ )
+
+(global-set-key
+ (kbd "<C-M-f7>")
+ '(lambda()
+	(interactive)
+	(konix/make konix/proj-makefile "re")
+	)
+ )
+
 ;; ################################################################################
 ;; Ispell, flyspell
 ;; ################################################################################

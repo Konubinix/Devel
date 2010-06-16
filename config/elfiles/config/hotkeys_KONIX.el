@@ -229,6 +229,10 @@
 ;; VRAC
 ;; ************************************************************
 (global-set-key (kbd "C-< C-k") 'konix/quit-window)
+(global-unset-key [C-down-mouse-1])
+(global-set-key [C-mouse-1] 'ffap-at-mouse)
+(global-unset-key (kbd "C-c C-f"))
+(global-set-key (kbd "C-c C-f") 'ff-find-other-file)
 
 ;; ////////////////////////////////////////
 ;; Header

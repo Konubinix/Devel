@@ -852,3 +852,19 @@ Will prompt you shell name when you type `C-u' before this command."
 	)
   (message "debug-on-error passe à %s" debug-on-error)
   )
+(defun konix/split-ext (filename)
+  "Prend en entrée un nom de fichier avec extension,
+retourne ('fichier','extension')."
+  (let (file-nondir-file-name noext-file-name new-file-name ext)
+	(setq noext-file-name "")
+	(setq ext "")
+	(if (string-match "^\\(.*\\)\\.\\([^\.]*\\)$" filename)
+		(progn
+		  (setq noext-file-name (match-string 1 filename))
+		  (setq ext (match-string 2 filename))
+		  )
+	  ""
+	  )
+	(list noext-file-name ext)
+	)
+  )

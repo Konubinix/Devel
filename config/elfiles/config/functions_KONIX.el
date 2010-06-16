@@ -794,6 +794,21 @@ contained c, h, cpp, cc.."
   (forward-sexp -1)
   (format "%s" (read (current-buffer)))
   )
+(defun konix/tab-size (size)
+  "change la taille du tab."
+  (interactive "nTab Size : ")
+  (let (indice list)
+	(setq indice 0)
+	(setq list ())
+	(while (< indice (* size 15))
+	  (setq indice (+ indice size))
+	  (setq list (append list (list indice)))
+	  )
+	(setq tab-width size)
+	(setq c-basic-offset size)
+	(setq tab-stop-list list)
+	)
+  )
 ;; ************************************************************
 ;; DRAFT
 ;; ************************************************************

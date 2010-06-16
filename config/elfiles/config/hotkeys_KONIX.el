@@ -121,8 +121,6 @@
 										;(global-set-key (kbd "M-g t") 'multi-term-dedicated-toggle)
 (global-set-key (kbd "<C-next>") 'multi-eshell-switch-to-next-live-shell)
 (global-set-key (kbd "<C-prior>") 'multi-eshell-switch)
-(global-set-key (kbd "C-< C-k") 'bury-buffer)
-
 (define-key 'konix/global-fast-key-map "e" 'multi-eshell)
 
 
@@ -140,6 +138,24 @@
 ;; Lance gitk
 (global-set-key (kbd "<S-f9>") 'konix/gitk)
 
+;; ////////////////////////////////////////
+;; VC
+;; ////////////////////////////////////////
+(define-prefix-command 'konix/git-global-map)
+(define-key global-map "\C-xv" 'konix/git-global-map)
+(define-key konix/git-global-map "O" 'egg-checkout-ref)
+(define-key konix/git-global-map "m" 'konix/git-modified-files)
+(define-key konix/git-global-map "B" 'git-blame-mode)
+(define-key konix/git-global-map "R" 'konix/git/reset)
+(define-key konix/git-global-map "r" 'konix/git/rebase)
+(define-key konix/git-global-map "D" 'konix/git/difftool-file)
+
+(define-prefix-command 'konix/git-global-map-stash)
+(define-key global-map "\C-xgs" 'konix/git-global-map-stash)
+(define-key konix/git-global-map-stash "p" 'konix/git/stash/pop)
+(define-key konix/git-global-map-stash "s" 'konix/git/stash/save)
+
+(global-set-key (kbd "C-< g") 'konix/git/command)
 ;;commentaires
 (global-set-key  "\M-gu" 'uncomment-region)
 (global-set-key  "\M-gc" 'comment-region)

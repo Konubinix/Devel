@@ -970,3 +970,25 @@ set terminal pop;\
   (describe-bindings)
   (other-window 1)
   )
+(defun konix/git/status-file (file)
+  "retourne le status du fichier (sous forme d'une lettre."
+  (interactive "fFichier : ")
+										;  (let (status)
+  (setq status
+		(konix/git/command (concat "status -s "buffer-file-name)))
+
+
+										;	)
+  )
+
+(defun konix/git/reset-file (file)
+  "reset le fichier courrant à sa version HEAD."
+  (interactive "fFichier : ")
+  (if (konix/confirm "reseter le fichier")
+	  (progn
+		(konix/git/command (concat "reset HEAD "buffer-file-name))
+		(konix/git/command (concat "-- "buffer-file-name))
+		(revert-buffer)
+		)
+	)
+  )

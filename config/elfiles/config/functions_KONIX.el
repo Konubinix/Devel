@@ -955,3 +955,12 @@ set terminal pop;\
   (save-buffer)
   (konix/gnuplot/load-file buffer-file-truename)
   )
+;; ################################################################################
+;; VRAC & DRAFTS
+;; ################################################################################
+(defun konix/quit-and-delete-window ()
+  "Quitte la window et en profite pour la deleter."
+  (interactive )
+  (quit-window)
+  (delete-window)
+  )

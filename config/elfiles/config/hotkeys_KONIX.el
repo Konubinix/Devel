@@ -121,6 +121,8 @@
 										;(global-set-key (kbd "M-g t") 'multi-term-dedicated-toggle)
 (global-set-key (kbd "<C-next>") 'multi-eshell-switch-to-next-live-shell)
 (global-set-key (kbd "<C-prior>") 'multi-eshell-switch)
+(global-set-key (kbd "C-< C-k") 'bury-buffer)
+
 (define-key 'konix/global-fast-key-map "e" 'multi-eshell)
 
 

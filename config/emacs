@@ -39,6 +39,8 @@
 
 ;; ADVICES
 (load "advices_KONIX.el")
+;; Pour copie et paste dans dired
+(load "wuxch-dired-copy-paste.el")
 
 ;; serveur
 (server-start)

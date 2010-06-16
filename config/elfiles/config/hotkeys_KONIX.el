@@ -205,7 +205,27 @@
 (global-set-key (kbd "M-£") 'konix/ispell-region-or-buffer)
 (global-set-key (kbd "C-?") 'konix/flyspell-region-or-buffer)
 
-;; ************************************************************
+;; ################################################################################
+(define-key global-map (kbd "M-g M-f") 'konix/find)
+(define-key global-map (kbd "<f4>") 'repeat)
+(define-prefix-command 'compilation-mode-map)
+(define-key compilation-mode-map (kbd "q") 'konix/quit-and-delete-window)
+
+(global-set-key (kbd "<S-f10>") 'window-configuration-to-register)
+(global-set-key (kbd "<C-f10>") 'point-to-register)
+(global-set-key (kbd "<f10>") 'jump-to-register)
+
+(global-set-key (kbd "M-?") 'tags-search )
+(global-set-key (kbd "M-§") 'semantic-ia-fast-jump)
+
+(define-key help-mode-map "q" 'konix/quit-and-delete-window)
+(define-key help-map "b" 'konix/describe-bindings)
+
+(define-key compilation-mode-map (kbd "TAB") 'next-error-no-select)
+(define-key compilation-mode-map (kbd "<backtab>") 'previous-error-no-select)
+
+(global-set-key (kbd "C-< C-e") 'konix/explorer)
+
 ;; VRAC
 ;; ************************************************************
 (global-set-key (kbd "C-< C-k") 'konix/quit-window)

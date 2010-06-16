@@ -42,6 +42,10 @@
 ;; Pour copie et paste dans dired
 (load "wuxch-dired-copy-paste.el")
 
+;; ffap
+(require 'ffap)
+(load-library "find-file")
+
 ;; serveur
 (server-start)
 

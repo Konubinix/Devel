@@ -37,9 +37,6 @@
 (global-set-key (kbd "C-e") 'end-of-visual-line)
 (global-set-key (kbd "C-a") 'beginning-of-visual-line)
 
-;; You are a WINNER !!
-(global-set-key (kbd "<f11>") 'winner-undo)
-
 ;; repeat !
 (global-set-key [f4] 'repeat)
 

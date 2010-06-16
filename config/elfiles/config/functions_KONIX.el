@@ -382,6 +382,7 @@ lieu de find-file."
 		(imenu-add-to-menubar "TAGS"))
 	  (add-hook 'semantic-init-hooks 'my-semantic-hook)
 	  ;; Pour que le buffer courant soit rechargé avec semantic
+	  (add-to-list 'hippie-expand-try-functions-list 'semantic-ia-complete-symbol-menu t)
 	  (revert-buffer)
 	  (semantic-speedbar-analysis)
 	  )

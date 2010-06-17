@@ -303,6 +303,7 @@
 							ac-source-filename
 							))
 		 (local-set-key (kbd "C-j") 'auto-complete)
+		 (local-set-key (kbd "<S-return>") 'newline)
 		 (ansi-color-for-comint-mode-on)
 		 (dirtrack-mode t)
 		 (setq dirtrack-list '("^\\([^:]*\\):\\([^:]*\\):\\(.*\\)" 2 nil))

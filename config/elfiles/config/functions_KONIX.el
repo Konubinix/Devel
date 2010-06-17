@@ -1,3 +1,4 @@
+
 ;; ################################################################################
 ;; Fonctions d'intérêt général
 ;; ################################################################################
@@ -275,11 +276,29 @@ mieux voir."
 	)
   )
 
+(defun konix/find-makefile (&optional makefile)
+  "Trouve un makefile pour maker."
+  (if (and makefile (file-exists-p makefile))
+	  (setq konix/proj-makefile (expand-file-name makefile))
+	;; else
+	(if (file-exists-p "Makefile")
+		(setq konix/proj-makefile (expand-file-name "Makefile"))
+	  ;; else
+	  (if (file-exists-p "~/Makefile")
+		  (setq konix/proj-makefile (expand-file-name "~/Makefile"))
+		;; else
+		(if (not (file-exists-p konix/proj-makefile))
+			(error "No available makefile")
+		  )
+		)
+	  )
+	)
+  )
 
-(defun konix/make (makefile &optional param)
+(defun konix/make (&optional makefile param)
   "Lance un make sur le makefile avec les param."
-  (interactive "fMakefile : ")
-  (let ((command (concat "make -f "makefile" "param))
+  (konix/find-makefile makefile)
+  (let ((command (concat "make -C '"(file-name-directory konix/proj-makefile)"' "param))
 		(buf_name (buffer-name)))
 	(message "Make en cours...")
 	(if (equal buf_name "*compilation*")

@@ -542,7 +542,7 @@ lieu de find-file."
 
   (interactive)
   (if cedet-loaded t
-	(progn (message "cedet already loaded"))
+	(message "cedet already loaded")
 	(progn
 	  (setq cedet-loaded t)
 	  (load-file "~/.elfiles/cedet/common/cedet.el")

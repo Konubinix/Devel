@@ -554,10 +554,9 @@ lieu de find-file."
 	  (global-semanticdb-minor-mode 1)
 	  (semantic-add-system-include "/usr/include" 'c-mode-common-hook)
 	  (semantic-add-system-include "/usr/local/include" 'c-mode-common-hook)
-
 	  ;; enable ctags for some languages:
 	  ;;  Unix Shell, Perl, Pascal, Tcl, Fortran, Asm
-	  (semantic-load-enable-primary-exuberent-ctags-support)
+	  ;(semantic-load-enable-primary-exuberent-ctags-support)
 	  (setq semantic-idle-completions-mode nil)
 	  (defun my-semantic-hook ()
 		(imenu-add-to-menubar "TAGS"))

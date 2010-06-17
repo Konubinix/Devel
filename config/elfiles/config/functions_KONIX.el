@@ -626,13 +626,17 @@ contained c, h, cpp, cc.."
   (auto-complete-mode t)
   (setq truncate-lines t)
   (setq truncate-partial-width-windows t)
-  (setq ac-sources (append ac-sources
-						   '(
-							 ac-source-gtags
-							 ac-source-semantic
-							 ac-source-yasnippet
-							 ac-source-files-in-current-dir
-							 )))
+  (setq ac-sources '(
+										;							 ac-source-gtags
+					 ac-source-semantic
+					 ac-source-yasnippet
+					 ac-source-files-in-current-dir
+					 ac-source-dictionary
+					 ac-source-words-in-same-mode-buffers
+					 ;; ac-source-words-in-all-buffer
+					 ac-source-words-in-buffer
+					 )
+		)
   (global-set-key (kbd "C-e") 'end-of-line)
   (global-set-key (kbd "C-a") 'beginning-of-line)
   )

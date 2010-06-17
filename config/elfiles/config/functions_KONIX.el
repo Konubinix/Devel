@@ -286,13 +286,13 @@ mieux voir."
 	(end-of-buffer)
 	(other-window 1)
 	)
-)
+  )
 
 (defun konix/make-shell (makefile &optional param)
   "Lance un make dans un shell."
   (interactive "fMakefile : ")
   (shell-command (concat "make -f " makefile " "param"&"))
-)
+  )
 
 (defun konix/make-shell-to-string (makefile &optional param)
   "Lance un make dans un shell."
@@ -354,7 +354,7 @@ lieu de find-file."
      (pop-to-buffer "*magit-stash*"))
     ((topic)
      (magit-checkout info)))
-)
+  )
 
 (defun konix/git-mergetool ()
   "Lance la commande mergetool de git."
@@ -789,6 +789,10 @@ contained c, h, cpp, cc.."
 	  nil
 	  )
 	)
+  )
+(defun konix/word-at-point ()
+  (forward-sexp -1)
+  (format "%s" (read (current-buffer)))
   )
 ;; ************************************************************
 ;; DRAFT

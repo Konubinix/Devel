@@ -191,7 +191,7 @@
 
 ;; ************************************************************
 
-(define-key 'konix/global-key-map (kbd "M-t") 'toggle-source-header-konix)
+(define-key 'konix/global-key-map (kbd "M-t") 'konix/toggle-source-header)
 
 (define-key global-map (kbd "<pause>") 'speedbar)
 

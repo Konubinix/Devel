@@ -846,6 +846,44 @@ contained c, h, cpp, cc.."
 	(setq tab-stop-list list)
 	)
   )
+(defun konix/toggle-source-header ()
+  "From a source file, switch to the corresponding header if it
+has the same name with the .h extension"
+  (interactive)
+  (let (buffer-nondir-file-name noext-file-name new-file-name ext)
+	(setq buffer-nondir-file-name (file-name-nondirectory buffer-file-name))
+	(setq noext-file-name "")
+	(if (string-match "^\\([^\.]*\\)\\.\\([^\.]*\\)$" buffer-nondir-file-name)
+		(progn
+		  (setq noext-file-name (match-string 1 buffer-nondir-file-name))
+		  (setq ext (match-string 2 buffer-nondir-file-name))
+		  )
+	  (return "")
+	  )
+	(if (equal ext "h")
+		(setq ext "cpp")
+	  (setq ext "h")
+	  )
+	(setq new-file-name (concat noext-file-name "." ext))
+
+	(let (prefixes file-name)
+	  (setq file-name new-file-name)
+
+	  (if (equal ext "h")
+		  (setq prefixes (list "." "../include/"))
+		(setq prefixes (list "." "../src/"))
+		)
+
+	  (mapc (lambda (prefix)
+			  (if (file-exists-p (concat prefix file-name))
+				  (setq new-file-name (concat prefix file-name))
+				))
+			prefixes
+			)
+	  )
+	(find-file-existing new-file-name)
+	)
+  )
 ;; ************************************************************
 ;; DRAFT
 ;; ************************************************************

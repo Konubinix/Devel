@@ -2,6 +2,56 @@
 ;; ################################################################################
 ;; Fonctions d'intérêt général
 ;; ################################################################################
+(defun konix/quit-window ()
+  "Fait comme quit window, mais delete la window au passage."
+  (interactive)
+  (quit-window)
+  (delete-window)
+  )
+
+(defun konix/confirm (msg)
+  "Demande confirmation."
+  (let (confirm)
+	(setq confirm (read-char (concat "Sur de "msg" (o/n) ? ") "n"))
+	(if (equal confirm 111) ;  111 = ascii("o")
+		t
+	  nil
+	  )
+	)
+  )
+
+(defun konix/toggle-debug ()
+  "debug-on-error qui devient t ou nil."
+  (interactive)
+  (if debug-on-error
+	  (setq debug-on-error nil)
+	(setq debug-on-error t)
+	)
+  (message "debug-on-error passe à %s" debug-on-error)
+  )
+
+(defun konix/split-ext (filename)
+  "Prend en entrée un nom de fichier avec extension,
+retourne ('fichier','extension')."
+  (let (file-nondir-file-name noext-file-name new-file-name ext)
+	(setq noext-file-name "")
+	(setq ext "")
+	(if (string-match "^\\(.*\\)\\.\\([^\.]*\\)$" filename)
+		(progn
+		  (setq noext-file-name (match-string 1 filename))
+		  (setq ext (match-string 2 filename))
+		  )
+	  ""
+	  )
+	(list noext-file-name ext)
+	)
+  )
+
+(defun konix/word-at-point ()
+  (forward-sexp -1)
+  (format "%s" (read (current-buffer)))
+  )
+
 ;; ************************************************************
 ;; dedicated window
 ;; ************************************************************
@@ -178,6 +228,39 @@
   (org-clock-goto)
   )
 
+(defun konix/prog-hook ()
+  "Mes configuration communes à tous les mode de programmation."
+  (interactive)
+  (hs-minor-mode t)
+  (konix/tab-size 4)
+  (auto-complete-mode t)
+  (setq truncate-lines t)
+  (setq truncate-partial-width-windows t)
+  (setq ac-sources '(
+										;							 ac-source-gtags
+					 ac-source-semantic
+					 ac-source-yasnippet
+					 ac-source-files-in-current-dir
+					 ac-source-dictionary
+					 ac-source-words-in-same-mode-buffers
+					 ;; ac-source-words-in-all-buffer
+					 ac-source-words-in-buffer
+					 )
+		)
+  (global-set-key (kbd "C-e") 'end-of-line)
+  (global-set-key (kbd "C-a") 'beginning-of-line)
+  )
+
+(defun konix/text-hoox ()
+  "Hook à appeler quand je veux manipuler du texte, du vrai qui tient sur beaucoup de lignes."
+  (interactive)
+  (setq truncate-partial-width-windows nil)
+  (setq truncate-lines nil)
+  (setq word-wrap t)
+  (global-set-key (kbd "C-e") 'end-of-visual-line)
+  (global-set-key (kbd "C-a") 'beginning-of-visual-line)
+  )
+
 ;; ####################################################################################################
 ;; Ispell, aspell, flyspell etc.
 ;; ####################################################################################################
@@ -196,8 +279,6 @@
     (flyspell-buffer)
 	)
   )
-
-
 
 ;; ################################################################################
 ;; Org
@@ -311,7 +392,7 @@ mieux voir."
 	(end-of-buffer)
 	(if (equal buf_name "*compilation*")
 		nil
-		(switch-to-buffer-other-window buf_name)
+	  (switch-to-buffer-other-window buf_name)
 	  )
 	)
   )
@@ -327,6 +408,7 @@ mieux voir."
   (interactive "fMakefile : ")
   (shell-command-to-string (concat "make -f " makefile " "param"&"))
   )
+
 (defun konix/set-compilation-success-run-hook ()
   (setq konix/compilation-success-hook
 		'((lambda()
@@ -334,6 +416,7 @@ mieux voir."
 			(setq konix/compilation-success-hook nil)
 			)))
   )
+
 (defvar konix/compilation-success-hook nil)
 ;; Close the compilation window if there was no error at all.
 (setq compilation-exit-message-function
@@ -499,6 +582,7 @@ lieu de find-file."
   (interactive)
   (konix/git/command "--name-only HEAD")
   )
+
 (defun konix/egg-hunk-section-cmd-view-file-other-window (file hunk-header hunk-beg
 															   &rest ignored)
   "Visit FILE in other-window and goto the current line of the hunk."
@@ -506,11 +590,13 @@ lieu de find-file."
   (let ((line (egg-hunk-compute-line-no hunk-header hunk-beg)))
     (view-file file)
     (goto-line line)))
+
 (defun konix/egg-status ()
   (interactive)
   (egg-status)
   (other-window 1)
   )
+
 (setq ecb-activated nil)
 (defun konix/switch-ecb ()
   (interactive)
@@ -569,13 +655,13 @@ lieu de find-file."
 	  (require 'semantic-ia)
 	  (require 'semantic-gcc)
 	  (require 'semanticdb)
-;	  (semantic-load-enable-code-helpers)
+										;	  (semantic-load-enable-code-helpers)
 	  (global-semanticdb-minor-mode 1)
 	  (semantic-add-system-include "/usr/include" 'c-mode-common-hook)
 	  (semantic-add-system-include "/usr/local/include" 'c-mode-common-hook)
 	  ;; enable ctags for some languages:
 	  ;;  Unix Shell, Perl, Pascal, Tcl, Fortran, Asm
-	  ;(semantic-load-enable-primary-exuberent-ctags-support)
+										;(semantic-load-enable-primary-exuberent-ctags-support)
 	  (setq semantic-idle-completions-mode nil)
 	  (defun my-semantic-hook ()
 		(imenu-add-to-menubar "TAGS"))
@@ -637,39 +723,6 @@ contained c, h, cpp, cc.."
   (interactive)
   (find-tag 'arg '- nil))
 
-(defun konix/prog-hook ()
-  "Mes configuration communes à tous les mode de programmation."
-  (interactive)
-  (hs-minor-mode t)
-  (konix/tab-size 4)
-  (auto-complete-mode t)
-  (setq truncate-lines t)
-  (setq truncate-partial-width-windows t)
-  (setq ac-sources '(
-										;							 ac-source-gtags
-					 ac-source-semantic
-					 ac-source-yasnippet
-					 ac-source-files-in-current-dir
-					 ac-source-dictionary
-					 ac-source-words-in-same-mode-buffers
-					 ;; ac-source-words-in-all-buffer
-					 ac-source-words-in-buffer
-					 )
-		)
-  (global-set-key (kbd "C-e") 'end-of-line)
-  (global-set-key (kbd "C-a") 'beginning-of-line)
-  )
-
-(defun konix/text-hoox ()
-  "Hook à appeler quand je veux manipuler du texte, du vrai qui tient sur beaucoup de lignes."
-  (interactive)
-  (setq truncate-partial-width-windows nil)
-  (setq truncate-lines nil)
-  (setq word-wrap t)
-  (global-set-key (kbd "C-e") 'end-of-visual-line)
-  (global-set-key (kbd "C-a") 'beginning-of-visual-line)
-  )
-
 ;; Ajout de raccourcis dans le mode actuel pour manipuler gud
 (defun konix/gud-hook-keys ()
   "Définition of the local keys of gud"
@@ -699,6 +752,61 @@ contained c, h, cpp, cc.."
   "Va dans le repertoire ~/.elfiles pour aller hacker un peu."
   (interactive)
   (find-file "~/.elfiles/config")
+  )
+
+(defun konix/tab-size (size)
+  "change la taille du tab."
+  (interactive "nTab Size : ")
+  (let (indice list)
+	(setq indice 0)
+	(setq list ())
+	(while (< indice (* size 15))
+	  (setq indice (+ indice size))
+	  (setq list (append list (list indice)))
+	  )
+	(setq tab-width size)
+	(setq c-basic-offset size)
+	(setq tab-stop-list list)
+	)
+  )
+
+(defun konix/toggle-source-header ()
+  "From a source file, switch to the corresponding header if it
+has the same name with the .h extension"
+  (interactive)
+  (let (buffer-nondir-file-name noext-file-name new-file-name ext)
+	(setq buffer-nondir-file-name (file-name-nondirectory buffer-file-name))
+	(setq noext-file-name "")
+	(if (string-match "^\\([^\.]*\\)\\.\\([^\.]*\\)$" buffer-nondir-file-name)
+		(progn
+		  (setq noext-file-name (match-string 1 buffer-nondir-file-name))
+		  (setq ext (match-string 2 buffer-nondir-file-name))
+		  )
+	  (return "")
+	  )
+	(if (equal ext "h")
+		(setq ext "cpp")
+	  (setq ext "h")
+	  )
+	(setq new-file-name (concat noext-file-name "." ext))
+
+	(let (prefixes file-name)
+	  (setq file-name new-file-name)
+
+	  (if (equal ext "h")
+		  (setq prefixes (list "." "../include/"))
+		(setq prefixes (list "." "../src/"))
+		)
+
+	  (mapc (lambda (prefix)
+			  (if (file-exists-p (concat prefix file-name))
+				  (setq new-file-name (concat prefix file-name))
+				))
+			prefixes
+			)
+	  )
+	(find-file-existing new-file-name)
+	)
   )
 
 ;; ************************************************************
@@ -807,142 +915,6 @@ contained c, h, cpp, cc.."
 	)
   )
 
-;; ************************************************************
-;; VRAC
-;; ************************************************************
-(defun konix/quit-window ()
-  "Fait comme quit window, mais delete la window au passage."
-  (interactive)
-  (quit-window)
-  (delete-window)
-  )
-
-(defun konix/confirm (msg)
-  "Demande confirmation."
-  (let (confirm)
-	(setq confirm (read-char (concat "Sur de "msg" (o/n) ? ") "n"))
-	(if (equal confirm 111) ;  111 = ascii("o")
-		t
-	  nil
-	  )
-	)
-  )
-(defun konix/word-at-point ()
-  (forward-sexp -1)
-  (format "%s" (read (current-buffer)))
-  )
-(defun konix/tab-size (size)
-  "change la taille du tab."
-  (interactive "nTab Size : ")
-  (let (indice list)
-	(setq indice 0)
-	(setq list ())
-	(while (< indice (* size 15))
-	  (setq indice (+ indice size))
-	  (setq list (append list (list indice)))
-	  )
-	(setq tab-width size)
-	(setq c-basic-offset size)
-	(setq tab-stop-list list)
-	)
-  )
-(defun konix/toggle-source-header ()
-  "From a source file, switch to the corresponding header if it
-has the same name with the .h extension"
-  (interactive)
-  (let (buffer-nondir-file-name noext-file-name new-file-name ext)
-	(setq buffer-nondir-file-name (file-name-nondirectory buffer-file-name))
-	(setq noext-file-name "")
-	(if (string-match "^\\([^\.]*\\)\\.\\([^\.]*\\)$" buffer-nondir-file-name)
-		(progn
-		  (setq noext-file-name (match-string 1 buffer-nondir-file-name))
-		  (setq ext (match-string 2 buffer-nondir-file-name))
-		  )
-	  (return "")
-	  )
-	(if (equal ext "h")
-		(setq ext "cpp")
-	  (setq ext "h")
-	  )
-	(setq new-file-name (concat noext-file-name "." ext))
-
-	(let (prefixes file-name)
-	  (setq file-name new-file-name)
-
-	  (if (equal ext "h")
-		  (setq prefixes (list "." "../include/"))
-		(setq prefixes (list "." "../src/"))
-		)
-
-	  (mapc (lambda (prefix)
-			  (if (file-exists-p (concat prefix file-name))
-				  (setq new-file-name (concat prefix file-name))
-				))
-			prefixes
-			)
-	  )
-	(find-file-existing new-file-name)
-	)
-  )
-;; ************************************************************
-;; DRAFT
-;; ************************************************************
-
-(defun konix/dedicated-window-open ()
-  "Open dedicated `multi-term' window.
-Will prompt you shell name when you type `C-u' before this command."
-  (interactive)
-  (if (not (multi-term-dedicated-exist-p))
-      (let ((current-window (selected-window)))
-        (if (multi-term-buffer-exist-p multi-term-dedicated-buffer)
-            (unless (multi-term-window-exist-p multi-term-dedicated-window)
-              (multi-term-dedicated-get-window))
-          ;; Set buffer.
-          (setq multi-term-dedicated-buffer (multi-term-get-buffer current-prefix-arg t))
-          (set-buffer (multi-term-dedicated-get-buffer-name))
-          ;; Get dedicate window.
-          (multi-term-dedicated-get-window)
-          ;; Whether skip `other-window'.
-          (multi-term-dedicated-handle-other-window-advice multi-term-dedicated-skip-other-window-p)
-          ;; Internal handle for `multi-term' buffer.
-          (multi-term-internal))
-        (set-window-buffer multi-term-dedicated-window (get-buffer (multi-term-dedicated-get-buffer-name)))
-        (set-window-dedicated-p multi-term-dedicated-window t)
-        ;; Select window.
-        (select-window
-         (if multi-term-dedicated-select-after-open-p
-             ;; Focus dedicated terminal window if option `multi-term-dedicated-select-after-open-p' is enable.
-             multi-term-dedicated-window
-           ;; Otherwise focus current window.
-           current-window)))
-    (message "`multi-term' dedicated window has exist.")))
-
-
-(defun konix/toggle-debug ()
-  "debug-on-error qui devient t ou nil."
-  (interactive)
-  (if debug-on-error
-	  (setq debug-on-error nil)
-	(setq debug-on-error t)
-	)
-  (message "debug-on-error passe à %s" debug-on-error)
-  )
-(defun konix/split-ext (filename)
-  "Prend en entrée un nom de fichier avec extension,
-retourne ('fichier','extension')."
-  (let (file-nondir-file-name noext-file-name new-file-name ext)
-	(setq noext-file-name "")
-	(setq ext "")
-	(if (string-match "^\\(.*\\)\\.\\([^\.]*\\)$" filename)
-		(progn
-		  (setq noext-file-name (match-string 1 filename))
-		  (setq ext (match-string 2 filename))
-		  )
-	  ""
-	  )
-	(list noext-file-name ext)
-	)
-  )
 ;; ################################################################################
 ;; GNUPLOT
 ;; ################################################################################
@@ -1039,9 +1011,9 @@ set terminal pop;\
   (save-buffer)
   (konix/gnuplot/load-file buffer-file-truename)
   )
-;; ################################################################################
-;; VRAC & DRAFTS
-;; ################################################################################
+;; ************************************************************
+;; DRAFT
+;; ************************************************************
 (defun konix/quit-and-delete-window ()
   "Quitte la window et en profite pour la deleter."
   (interactive )
@@ -1125,3 +1097,32 @@ set terminal pop;\
                       (setq bottom-edge next-bottom-edge
                             lowest-window w))) 'nomini)
     (select-window lowest-window)))
+
+(defun konix/dedicated-window-open ()
+  "Open dedicated `multi-term' window.
+Will prompt you shell name when you type `C-u' before this command."
+  (interactive)
+  (if (not (multi-term-dedicated-exist-p))
+      (let ((current-window (selected-window)))
+        (if (multi-term-buffer-exist-p multi-term-dedicated-buffer)
+            (unless (multi-term-window-exist-p multi-term-dedicated-window)
+              (multi-term-dedicated-get-window))
+          ;; Set buffer.
+          (setq multi-term-dedicated-buffer (multi-term-get-buffer current-prefix-arg t))
+          (set-buffer (multi-term-dedicated-get-buffer-name))
+          ;; Get dedicate window.
+          (multi-term-dedicated-get-window)
+          ;; Whether skip `other-window'.
+          (multi-term-dedicated-handle-other-window-advice multi-term-dedicated-skip-other-window-p)
+          ;; Internal handle for `multi-term' buffer.
+          (multi-term-internal))
+        (set-window-buffer multi-term-dedicated-window (get-buffer (multi-term-dedicated-get-buffer-name)))
+        (set-window-dedicated-p multi-term-dedicated-window t)
+        ;; Select window.
+        (select-window
+         (if multi-term-dedicated-select-after-open-p
+             ;; Focus dedicated terminal window if option `multi-term-dedicated-select-after-open-p' is enable.
+             multi-term-dedicated-window
+           ;; Otherwise focus current window.
+           current-window)))
+    (message "`multi-term' dedicated window has exist.")))

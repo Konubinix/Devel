@@ -356,6 +356,7 @@
 ;; ************************************************************
 (setq explicit-shell-file-name "/bin/bash")
 (setq-default dirtrack-list (quote ("^.*[^|]*|\\([^|]*\\)|.*$" 1 nil)))
+(add-to-list 'ac-modes 'shell-mode)
 
 ;; ************************************************************
 ;; Git

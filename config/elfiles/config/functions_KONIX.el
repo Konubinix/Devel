@@ -340,8 +340,96 @@ retourne ('fichier','extension')."
 ;; Functions de programmation
 ;; ################################################################################
 ;; ################################################################################
-;; Gestion d'un projet
+;; hide-ifdef perso
+(defun konix/hide-ifdef-current-block ()
+  (interactive)
+  (let ((res nil) (nb_blocks_to_cross 0) (found nil))
+	(if (looking-at (concat hif-ifx-regexp "\\([A-Za-Z0-9\\-_]+\\)"))
+		(progn
+		  (setq found t)
+		  (setq res (buffer-substring (match-beginning 3) (match-end 3)))
+		  )
+	  (save-excursion
+		(ignore-errors
+		  (while (not found)
+			(previous-ifdef)
+			(message (format "%s" nb_blocks_to_cross))
+			(cond
+			 ((hif-looking-at-ifX)
+			  ;; Sur un ifdef
+			  (if (> nb_blocks_to_cross 0)
+				  ;; Sur pas celui que je veux
+				  (setq nb_blocks_to_cross (- nb_blocks_to_cross 1))
+				;; Sur celui que je veux, je le dis
+				(setq found t)
+				)
+			  )
+			 ((hif-looking-at-endif)
+			  ;; Sur un endif, j'entre dand un block que je veux pas
+			  (setq nb_blocks_to_cross (+ nb_blocks_to_cross 1))
+			  )
+			 ;; Sur un else, m'en fous
+			 )
+			)
+		  )
+		(if (and found (looking-at (concat hif-ifx-regexp "\\([A-Za-Z0-9\\-_]+\\)")))
+			(progn
+			  (setq res (buffer-substring (match-beginning 3) (match-end 3)))
+			  )
+		  )
+		)
+	  )
+	(intern res)
+	)
+  )
 
+(defun konix/hide-ifdef-find-block ()
+  (interactive)
+  (let (res (konix/hide-ifdef-current-block))
+	(if (not res)
+		;; On est peut être en dehors d'un endif, auquel cas on prend le précédent
+		(save-excursion
+		  (backward-ifdef)
+		  (if (looking-at (concat hif-ifx-regexp "\\([A-Za-Z0-9\\-_]+\\)"))
+			  (setq res (intern (buffer-substring (match-beginning 3) (match-end 3))))
+			(error "Pas de ifdef trouvé")
+			)
+		  )
+	  )
+	)
+  )
+
+(defun konix/hide-ifdef-define (var)
+  (interactive (list
+				(let ((block_courant (konix/hide-ifdef-find-block)))
+				  (setq var (read-string "Definer quoi ? " block_courant))
+				  )
+				)
+			   )
+  (hide-ifdef-define var)
+  )
+
+(defun konix/hide-ifdef-undef (var)
+  (interactive (list
+				(let ((block_courant (konix/hide-ifdef-find-block)))
+				  (setq var (read-string "Undefiner quoi ? " block_courant))
+				  )
+				)
+			   )
+  (hide-ifdef-undef var)
+  )
+
+(defun konix/hide-ifdef-toggle-block ()
+  (interactive)
+  (let ((ifdef_block (konix/hide-ifdef-current-block)))
+	(if (hif-lookup ifdef_block)
+		(hide-ifdef-undef ifdef_block)
+	  (hide-ifdef-define ifdef_block)
+	  )
+	)
+  )
+
+;; Gestion d'un projet
 (defun konix/compile (command)
   "Lance une compilation et fait deux trois trucs en plus pour
 mieux voir."

@@ -149,7 +149,7 @@
 *rulecolor: blue
 
 ! tangoesque scheme
-*background: #67cdb7
+*background: #ffffff
 *foreground: #000000
 ! Black (not tango) + DarkGrey
 *color0:  #000000
@@ -295,14 +295,14 @@ XCalc*ShapeStyle:             rectangle
 ! emacs
 ! ************************************************************
 emacs*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
-emacs*background: #111111
-emacs*foreground: #babdb6
+! emacs*background: #111111
+! emacs*foreground: #babdb6
 
 emacs.modeline*attributeForeground:     MidnightBlue
 emacs.modeline*attributeBackground:     Bisque
 
-emacs.cursorColor:  					White
-emacs.pointerColor:						White
+! emacs.cursorColor:  					White
+! emacs.pointerColor:						White
 emacs.menuBar:							false
 
 ! reserve 0 lignes pour la toolbar, donc pas despace en quand je démarre en full ou en max
@@ -313,14 +313,14 @@ emacs.scrollBarWidth:					0
 !emacs.fullscreen:						fullboth
 
 emacsclient*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
-emacsclient*background: #111111
-emacsclient*foreground: #babdb6
+! emacsclient*background: #111111
+! emacsclient*foreground: #babdb6
 
 emacsclient.modeline*attributeForeground:     MidnightBlue
 emacsclient.modeline*attributeBackground:     Bisque
 
-emacsclient.cursorColor:  					  White
-emacsclient.pointerColor:					  White
+! emacsclient.cursorColor:  					  White
+! emacsclient.pointerColor:					  White
 emacsclient.scrollBarWidth:					  0
 emacsclient.menuBar:						  false
 

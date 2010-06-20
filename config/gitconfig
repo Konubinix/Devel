@@ -23,7 +23,9 @@
 [diff]
 	tool = meld
 [difftool]
-	prompt = 
+	prompt =
+[apply]
+	whitespace = error
 [color]
 	ui = true
 	status = auto
@@ -32,3 +34,4 @@
 [core]
 	safecrlf = warn
 	autocrlf = input
+	whitespace = -space-before-tab,-indent-with-non-tab,-tab-in-indent,trailing-space,cr-at-eol

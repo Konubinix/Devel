@@ -14,6 +14,7 @@
 	up = pull --rebase
 	wu = log --stat origin..@{0}
 	wup = log -p origin..@{0}
+	sm = submodule
 #	fetch = fetch --upload-pack="git upload-pack"
 
 [remote "origin"]

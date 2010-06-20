@@ -9,6 +9,7 @@
 (add-to-list 'load-path (expand-file-name "~/.elfiles/config" ))
 (add-to-list 'load-path "~/.elfiles/yasnippet")
 (add-to-list 'load-path (expand-file-name "~/.elfiles/git" ))
+(add-to-list 'load-path (expand-file-name "~/.elfiles/magit" ))
 ;; Pour org
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 

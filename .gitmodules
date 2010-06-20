@@ -1,3 +1,6 @@
 [submodule "config/elfiles/magit"]
 	path = config/elfiles/magit
 	url = git://github.com/philjackson/magit.git
+[submodule "config/elfiles/egg"]
+	path = config/elfiles/egg
+	url = http://github.com/bogolisk/egg.git

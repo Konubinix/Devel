@@ -404,7 +404,7 @@ retourne ('fichier','extension')."
 
 (defun konix/hide-ifdef-find-block ()
   (interactive)
-  (let (res (konix/hide-ifdef-current-block))
+  (let ((res (konix/hide-ifdef-current-block)))
 	(if (not res)
 		;; On est peut être en dehors d'un endif, auquel cas on prend le précédent
 		(save-excursion
@@ -415,6 +415,7 @@ retourne ('fichier','extension')."
 			)
 		  )
 	  )
+	res
 	)
   )
 

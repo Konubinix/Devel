@@ -611,18 +611,26 @@ lieu de find-file."
   (shell-command (konix/git/command "stash pop"))
   )
 
+(defun konix/git/stash/apply ()
+  "git stash apply."
+  (interactive)
+  (shell-command (konix/git/command "stash apply"))
+  )
+
+(defun konix/git/stash/clear ()
+  (interactive)
+  (shell-command (konix/git/command "stash clear"))
+  )
+
 (defun konix/git/checkout (ref)
   "Lance git checkout."
   (interactive "sCheckout ref : ")
   (shell-command (concat "git checkout "ref))
   )
 
-(defun konix/git/reset ()
-  "Reset le depot git en virant toutes les modifs locales."
-  (interactive)
-  (if (konix/confirm "reseter")
-	  (shell-command "git reset HEAD && git co $(git rev-parse --show-cdup)")
-	)
+(defun konix/git/reset (cmd)
+  (interactive "sgit reset ")
+  (konix/git/command (concat "reset "cmd))
   )
 
 (defun konix/git/rebase (cmd)

@@ -152,13 +152,20 @@
 (define-key konix/git-global-map "B" 'git-blame-mode)
 (define-key konix/git-global-map "R" 'konix/git/reset)
 (define-key konix/git-global-map "r" 'konix/git/rebase)
-(define-key konix/git-global-map "D" 'konix/git/difftool-file)
 (define-key konix/git-global-map "c" 'konix/git/checkout)
+(define-key konix/git-global-map "M" 'konix/git/mergetool)
+
+(define-prefix-command 'konix/git-global-map-diff)
+(define-key konix/git-global-map "d" 'konix/git-global-map-diff)
+(define-key konix/git-global-map-diff "d" 'konix/git/difftool)
+(define-key konix/git-global-map-diff "D" 'konix/git/difftool-file)
 
 (define-prefix-command 'konix/git-global-map-stash)
 (define-key konix/git-global-map "s" 'konix/git-global-map-stash)
 (define-key konix/git-global-map-stash "p" 'konix/git/stash/pop)
 (define-key konix/git-global-map-stash "s" 'konix/git/stash/save)
+(define-key konix/git-global-map-stash "a" 'konix/git/stash/apply)
+(define-key konix/git-global-map-stash "c" 'konix/git/stash/clear)
 
 (global-set-key (kbd "C-< g") 'konix/git/command)
 ;;commentaires

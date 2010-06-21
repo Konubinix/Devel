@@ -398,7 +398,7 @@ retourne ('fichier','extension')."
 		  )
 		)
 	  )
-	(intern res)
+	res
 	)
   )
 
@@ -410,7 +410,7 @@ retourne ('fichier','extension')."
 		(save-excursion
 		  (backward-ifdef)
 		  (if (looking-at (concat hif-ifx-regexp "\\([A-Za-Z0-9\\-_]+\\)"))
-			  (setq res (intern (buffer-substring (match-beginning 3) (match-end 3))))
+			  (setq res (buffer-substring (match-beginning 3) (match-end 3)))
 			(error "Pas de ifdef trouvé")
 			)
 		  )
@@ -425,7 +425,7 @@ retourne ('fichier','extension')."
 				  )
 				)
 			   )
-  (hide-ifdef-define var)
+  (hide-ifdef-define (intern var))
   )
 
 (defun konix/hide-ifdef-undef (var)
@@ -435,15 +435,18 @@ retourne ('fichier','extension')."
 				  )
 				)
 			   )
-  (hide-ifdef-undef var)
+  (hide-ifdef-undef (intern var))
   )
 
 (defun konix/hide-ifdef-toggle-block ()
   (interactive)
   (let ((ifdef_block (konix/hide-ifdef-current-block)))
-	(if (hif-lookup ifdef_block)
-		(hide-ifdef-undef ifdef_block)
-	  (hide-ifdef-define ifdef_block)
+	(if ifdef_block
+		(if (hif-lookup ifdef_block)
+			(hide-ifdef-undef (intern ifdef_block))
+		  (hide-ifdef-define (intern ifdef_block))
+		  )
+	  (error "Pas dans un block")
 	  )
 	)
   )

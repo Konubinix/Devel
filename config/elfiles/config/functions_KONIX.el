@@ -468,6 +468,24 @@ mieux voir."
 	)
   )
 
+(defun konix/find-makefile-recursive (directory)
+  (let ((res nil)
+		(parent (expand-file-name (concat directory "/..")))
+		(me (expand-file-name directory)))
+	;; Condition de terminaison
+	(if (equal me parent)
+		(setq res nil)
+	  ;; Regarde pour le rep courant
+	  (if (and (file-exists-p (concat me "/Makefile")) (not (file-directory-p makefile)))
+		  (setq res (concat me "/Makefile"))
+		;; Si pas ici, peut être dans le parent
+		(setq res (konix/find-makefile-recursive parent))
+		)
+	  )
+	res
+	)
+  )
+
 (defun konix/find-makefile (&optional makefile)
   "Trouve un makefile pour maker."
   (if (and makefile (file-exists-p makefile))

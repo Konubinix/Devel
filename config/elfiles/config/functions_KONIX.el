@@ -585,7 +585,7 @@ lieu de find-file."
   (shell-command (concat "git stash save '"msg"'"))
   )
 
-(defun konix/git/stash-pop ()
+(defun konix/git/stash/pop ()
   "git stash pop."
   (interactive)
   (shell-command (konix/git/command "stash pop"))

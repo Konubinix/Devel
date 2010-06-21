@@ -367,6 +367,9 @@ retourne ('fichier','extension')."
 		  (setq res (buffer-substring (match-beginning 3) (match-end 3)))
 		  )
 	  (save-excursion
+		(beginning-of-line)
+		(if (hif-looking-at-ifX)
+			(setq found t))
 		(ignore-errors
 		  (while (not found)
 			(previous-ifdef)

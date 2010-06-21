@@ -579,10 +579,10 @@ lieu de find-file."
   (shell-command (concat "git add "file"&"))
   )
 
-(defun konix/git/stash-save (msg)
+(defun konix/git/stash/save (msg)
   "Lance git stash."
   (interactive "sMessage : ")
-  (shell-command (concat "git stash save "msg))
+  (shell-command (concat "git stash save '"msg"'"))
   )
 
 (defun konix/git/stash-pop ()

@@ -52,6 +52,22 @@ retourne ('fichier','extension')."
   (format "%s" (read (current-buffer)))
   )
 
+(defun konix/transpose-split-word ()
+  "Transpose la partie à droite du mot et la partie à gauche. Attention, si appelée entre deux mots, fait pas la même chose que transpose-words"
+  (interactive)
+  (let ((middle-word (point)) end-word)
+	(save-excursion
+	  (forward-word 1)
+	  (setq end-word (buffer-substring middle-word (point)))
+	  (delete-region middle-word (point))
+	  (goto-char middle-word)
+	  (backward-word 1)
+	  (insert end-word)
+	  )
+	(goto-char middle-word)
+	)
+  )
+
 ;; ************************************************************
 ;; dedicated window
 ;; ************************************************************

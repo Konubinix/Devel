@@ -154,7 +154,7 @@
 (define-key konix/git-global-map "c" 'konix/git/checkout)
 
 (define-prefix-command 'konix/git-global-map-stash)
-(define-key global-map "\C-xgs" 'konix/git-global-map-stash)
+(define-key konix/git-global-map "s" 'konix/git-global-map-stash)
 (define-key konix/git-global-map-stash "p" 'konix/git/stash/pop)
 (define-key konix/git-global-map-stash "s" 'konix/git/stash/save)
 

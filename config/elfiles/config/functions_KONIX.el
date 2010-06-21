@@ -373,7 +373,6 @@ retourne ('fichier','extension')."
 		(ignore-errors
 		  (while (not found)
 			(previous-ifdef)
-			(message (format "%s" nb_blocks_to_cross))
 			(cond
 			 ((hif-looking-at-ifX)
 			  ;; Sur un ifdef

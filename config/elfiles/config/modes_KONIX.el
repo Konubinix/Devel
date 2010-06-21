@@ -306,7 +306,7 @@
 		 (local-set-key (kbd "<S-return>") 'newline)
 		 (ansi-color-for-comint-mode-on)
 		 (dirtrack-mode t)
-		 (setq dirtrack-list '("^\\([^:]*\\):\\([^:]*\\):\\(.*\\)" 2 nil))
+		 (setq dirtrack-list '("|\\([^|]*\\)|" 1 nil))
 		 (truncate-lines t)
 		 (truncate-partial-width-windows t)
 		 )

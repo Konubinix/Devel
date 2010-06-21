@@ -151,6 +151,7 @@
 (define-key konix/git-global-map "R" 'konix/git/reset)
 (define-key konix/git-global-map "r" 'konix/git/rebase)
 (define-key konix/git-global-map "D" 'konix/git/difftool-file)
+(define-key konix/git-global-map "c" 'konix/git/checkout)
 
 (define-prefix-command 'konix/git-global-map-stash)
 (define-key global-map "\C-xgs" 'konix/git-global-map-stash)

@@ -469,28 +469,29 @@ mieux voir."
   )
 
 (defun konix/find-makefile-recursive (directory)
-  (let ((res nil)
-		(parent (expand-file-name (concat directory "/..")))
-		(me (expand-file-name directory)))
-	;; Condition de terminaison
-	(if (equal me parent)
-		(setq res nil)
-	  ;; Regarde pour le rep courant
-	  (if (and (file-exists-p (concat me "/Makefile")) (not (file-directory-p makefile)))
-		  (setq res (concat me "/Makefile"))
-		;; Si pas ici, peut être dans le parent
-		(setq res (konix/find-makefile-recursive parent))
+  (if (not (and directory (file-directory-p directory)))
+	  nil
+	(let ((res nil)
+		  (parent (expand-file-name (concat directory "/..")))
+		  (me (expand-file-name directory)))
+	  ;; Condition de terminaison
+	  (if (equal me parent)
+		  (setq res nil)
+		;; Regarde pour le rep courant
+		(if (and (file-exists-p (concat me "/Makefile")) (not (file-directory-p (concat me "/Makefile"))))
+			(setq res (concat me "/Makefile"))
+		  ;; Si pas ici, peut être dans le parent
+		  (setq res (konix/find-makefile-recursive parent))
+		  )
 		)
+	  res
 	  )
-	res
 	)
   )
 
 (defun konix/find-makefile (&optional makefile)
   "Trouve un makefile pour maker."
   (cond
-   ;; L'actuel makefile
-   ((and (file-exists-p makefile) (not (file-directory-p makefile))))
    ;; L'arbo du makefile donné
    ((setq makefile (konix/find-makefile-recursive makefile)))
    ;; Cherche dans rep courant et parents
@@ -509,7 +510,7 @@ mieux voir."
 	  (error "Pas de Makefile trouvé")
 	)
   (setq konix/proj-makefile (expand-file-name makefile))
-)
+  )
 
 (defun konix/make (&optional param makefile)
   "Lance un make sur le makefile avec les param."

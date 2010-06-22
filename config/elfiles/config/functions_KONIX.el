@@ -470,7 +470,10 @@ mieux voir."
 
 (defun konix/find-makefile-recursive (directory)
   (if (not (and directory (file-directory-p directory)))
-	  nil
+	  (if (file-exists-p directory)
+		  directory
+		(konix/find-makefile-recursive (expand-file-name (file-name-directory)))
+		  )
 	(let ((res nil)
 		  (parent (expand-file-name (concat directory "/..")))
 		  (me (expand-file-name directory)))

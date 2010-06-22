@@ -219,22 +219,46 @@
  (kbd "<f5>")
  '(lambda()
 	(interactive)
-	(konix/make "start run" konix/proj-makefile)
+	(konix/make "run" konix/proj-makefile)
 	)
  )
 
 (global-set-key
- (kbd "<C-M-f7>")
+ (kbd "<C-f7>")
  '(lambda()
 	(interactive)
 	(konix/make "re" konix/proj-makefile)
 	)
  )
 
+(global-set-key
+ (kbd "<C-S-f7>")
+ '(lambda()
+	(interactive)
+	(konix/make "re_all" konix/proj-makefile)
+	)
+ )
+
+(global-set-key
+ (kbd "<C-f5>")
+ '(lambda()
+	(interactive)
+	(konix/make "re run" konix/proj-makefile)
+	)
+ )
+
+(global-set-key
+ (kbd "<C-S-f5>")
+ '(lambda()
+	(interactive)
+	(konix/make "re_all run" konix/proj-makefile)
+	)
+ )
+
 (define-key 'konix/global-fast-key-map (kbd "<f7>")
   '(lambda()
 	 (interactive)
-	 (konix/make "")
+	 (konix/make "" )
 	 )
   )
 
@@ -242,17 +266,42 @@
   (kbd "<f5>")
   '(lambda()
 	 (interactive)
-	 (konix/make "start run")
+	 (konix/make "run" )
 	 )
   )
 
 (define-key 'konix/global-fast-key-map
-  (kbd "<C-M-f7>")
+  (kbd "<C-f7>")
   '(lambda()
 	 (interactive)
-	 (konix/make "re")
+	 (konix/make "re" )
 	 )
   )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<C-S-f7>")
+  '(lambda()
+	 (interactive)
+	 (konix/make "re_all" )
+	 )
+  )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<C-f5>")
+  '(lambda()
+	 (interactive)
+	 (konix/make "re run" )
+	 )
+  )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<C-S-f5>")
+  '(lambda()
+	 (interactive)
+	 (konix/make "re_all run" )
+	 )
+  )
+
 
 
 ;; ################################################################################

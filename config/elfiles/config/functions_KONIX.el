@@ -469,27 +469,40 @@ mieux voir."
   )
 
 (defun konix/find-makefile-recursive (directory)
-  (if (not (and directory (file-directory-p directory)))
-	  (if (file-exists-p directory)
-		  directory
-		(konix/find-makefile-recursive (expand-file-name (file-name-directory)))
-		  )
+  (cond
+   ;; Nil -> nil
+   ((not directory)
+	nil)
+   ;; un rep -> cherche le rep
+   ((file-directory-p directory)
 	(let ((res nil)
 		  (parent (expand-file-name (concat directory "/..")))
 		  (me (expand-file-name directory)))
-	  ;; Condition de terminaison
-	  (if (equal me parent)
-		  (setq res nil)
-		;; Regarde pour le rep courant
-		(if (and (file-exists-p (concat me "/Makefile")) (not (file-directory-p (concat me "/Makefile"))))
-			(setq res (concat me "/Makefile"))
-		  ;; Si pas ici, peut être dans le parent
-		  (setq res (konix/find-makefile-recursive parent))
-		  )
+	  (cond
+	   ;; Condition de terminaison
+	   ((equal me parent)
+		nil
 		)
-	  res
+	   ;; Regarde pour le rep courant
+	   ((and (file-exists-p (concat me "/Makefile")) (not (file-directory-p (concat me "/Makefile"))))
+		(concat me "/Makefile")
+		)
+	   ;; Si pas ici, peut être dans le parent
+	   (t
+		(konix/find-makefile-recursive parent)
+		)
+	   )
 	  )
 	)
+	;; Un fichier -> ok
+   ((file-exists-p directory)
+	directory
+	)
+   ;; Sinon -> tente quand même de chercher dans le directory du fichier (même s'il existe pas)
+   (t
+	(konix/find-makefile-recursive (expand-file-name (file-name-directory)))
+	)
+   )
   )
 
 (defun konix/find-makefile (&optional makefile)

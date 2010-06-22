@@ -307,6 +307,8 @@
 		 (ansi-color-for-comint-mode-on)
 		 (dirtrack-mode t)
 		 (setq dirtrack-list '("^\\([^:]*\\):\\([^:]*\\):\\(.*\\)" 2 nil))
+		 (truncate-lines t)
+		 (truncate-partial-width-windows t)
 		 )
        )
 

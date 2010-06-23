@@ -187,7 +187,7 @@ retourne ('fichier','extension')."
 (defun konix/find (file)
   "Find, comme il faut bien."
   (interactive "sChercher quoi ? ")
-  (find-dired "." (concat "-iname *" file "*"))
+  (find-dired "." (concat "-iname '*" file "*'"))
   )
 
 (defun konix/horizontal-recenter ()

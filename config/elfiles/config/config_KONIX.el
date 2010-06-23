@@ -195,6 +195,9 @@
 ;; Pour les fins de ligne qui commences
 (setq track-eol nil)
 
+;; Pour utiliser préférentiellement l'indentation par tab au lieu de " "
+(setq-default indent-tabs-mode t)
+
 ;; ************************************************************
 ;; Edition
 ;; ************************************************************

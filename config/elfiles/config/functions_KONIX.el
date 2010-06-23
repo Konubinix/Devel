@@ -234,6 +234,7 @@ retourne ('fichier','extension')."
   (hs-minor-mode t)
   (konix/tab-size 4)
   (auto-complete-mode t)
+  (setq indent-tabs-mode t)
   (setq truncate-lines t)
   (setq truncate-partial-width-windows t)
   (setq ac-sources '(

@@ -6,6 +6,7 @@ fbpid=$!
 
 
 #gnome-terminal --maximize &
+setxkbmap -option ctrl:swapcaps
 guake &
 numlockx
 sleep 4

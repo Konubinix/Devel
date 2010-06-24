@@ -42,13 +42,25 @@
 ;;Mode C++
 (setq c++-mode-hook
       (lambda ()
-		))
+		#'(lambda ()
+			(push '(?< . ?>)
+				  (getf autopair-extra-pairs :code))
+			)
+		)
+	  )
 
 ;;Mode Python
 (setq python-mode-hook
       (lambda ()
 		(konix/prog-hook)
-		))
+		;; Autopair des """ en python
+		(setq autopair-handle-action-fns
+			  (list #'autopair-default-handle-action
+					#'autopair-python-triple-quote-action)
+			  )
+		)
+	  )
+
 
 ;; Mode java
 (setq java-mode-hook

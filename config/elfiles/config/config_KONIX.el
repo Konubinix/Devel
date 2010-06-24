@@ -33,6 +33,14 @@
 (yas/load-directory "~/.elfiles/yasnippet/snippets")
 
 ;; ************************************************************
+;; Autopair (parenthèsage automatique et bien pensé)
+;; ************************************************************
+(require 'autopair)
+(autopair-global-mode)
+(setq autopair-autowrap t) ;; Pour qu'un mot sélectionnée puisse être wrappé par ( ou "
+(setq autopair-blink nil)
+
+;; ************************************************************
 ;; Enregistrement de la position dans le texte quand on quitte
 ;; ************************************************************
 (require 'saveplace)

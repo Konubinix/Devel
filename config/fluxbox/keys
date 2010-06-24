@@ -248,3 +248,8 @@ Mod4 p : ExecCommand gnome-terminal --working-directory /home/snake/Prog
 Mod4 k a :Exec setxkbmap fr bepo
 Mod4 s b :Exec setxkbmap fr
 Mod4 s c :Exec eog ~/Prog/devel/doc/bepo.png
+
+# ************************************************************
+# Décoration
+# ************************************************************
+Mod4 Control d : ToggleDecor

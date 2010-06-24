@@ -199,19 +199,18 @@
 ;; ************************************************************
 ;; Gestion projet
 ;; ************************************************************
-(global-set-key
- (kbd "<f7>")
- '(lambda()
-	(interactive)
-	(konix/make konix/proj-makefile)
-	)
- )
+(global-set-key (kbd "<f7>")
+				'(lambda()
+				   (interactive)
+				   (konix/make "" konix/proj-makefile)
+				   )
+				)
 
 (global-set-key
  (kbd "<f5>")
  '(lambda()
 	(interactive)
-	(konix/make konix/proj-makefile "start run")
+	(konix/make "start run" konix/proj-makefile)
 	)
  )
 
@@ -219,9 +218,33 @@
  (kbd "<C-M-f7>")
  '(lambda()
 	(interactive)
-	(konix/make konix/proj-makefile "re")
+	(konix/make "re" konix/proj-makefile)
 	)
  )
+
+(define-key 'konix/global-fast-key-map (kbd "<f7>")
+  '(lambda()
+	 (interactive)
+	 (konix/make "")
+	 )
+  )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<f5>")
+  '(lambda()
+	 (interactive)
+	 (konix/make "start run")
+	 )
+  )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<C-M-f7>")
+  '(lambda()
+	 (interactive)
+	 (konix/make "re")
+	 )
+  )
+
 
 ;; ################################################################################
 ;; Ispell, flyspell

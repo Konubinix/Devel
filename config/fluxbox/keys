@@ -241,3 +241,9 @@ Mod4 p : ExecCommand gnome-terminal --working-directory /home/snake/Prog
 #162 Touche play
 162 : Exec gnome-alsamixer
 #223 Touche mise en veille
+
+# ************************************************************
+# Keyboard
+# ************************************************************
+Mod4 k a :Exec setxkbmap fr bepo
+Mod4 s b :Exec setxkbmap fr

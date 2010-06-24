@@ -41,6 +41,12 @@
 (setq autopair-blink nil)
 
 ;; ************************************************************
+;; Cua (pour la selection rectangulaire avec C-RET, trop bien !)
+;; ************************************************************
+(setq cua-enable-cua-keys nil) ;; Pour enlever les C-c C-v C-x tous pourris
+(cua-mode t)
+
+;; ************************************************************
 ;; Enregistrement de la position dans le texte quand on quitte
 ;; ************************************************************
 (require 'saveplace)

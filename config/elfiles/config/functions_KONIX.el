@@ -488,25 +488,32 @@ mieux voir."
 
 (defun konix/find-makefile (&optional makefile)
   "Trouve un makefile pour maker."
-  (if (and makefile (file-exists-p makefile))
-	  (setq konix/proj-makefile (expand-file-name makefile))
-	;; else
-	(if (file-exists-p "Makefile")
-		(setq konix/proj-makefile (expand-file-name "Makefile"))
-	  ;; else
-	  (if (file-exists-p "~/Makefile")
-		  (setq konix/proj-makefile (expand-file-name "~/Makefile"))
-		;; else
-		(if (not (file-exists-p konix/proj-makefile))
-			(error "No available makefile")
-		  )
-		)
-	  )
+  (cond
+   ;; L'actuel makefile
+   ((and (file-exists-p makefile) (not (file-directory-p makefile))))
+   ;; L'arbo du makefile donné
+   ((setq makefile (konix/find-makefile-recursive makefile)))
+   ;; Cherche dans rep courant et parents
+   ((setq makefile (konix/find-makefile-recursive ".")))
+   ;; HOME
+   ((and (file-exists-p "~Makefile") (not (file-directory-p "~Makefile")))
+	(setq makefile "~/Makefile"))
+   ;; Sinon ancien proj-makefile
+   ((and (file-exists-p konix/proj-makefile) (not (file-directory-p konix/proj-makefile)))
+	(setq makefile konix/proj-makefile)
 	)
-  )
+   ;; sinon, rien du tout
+   ((setq makefile nil))
+   )
+  (if (not makefile)
+	  (error "Pas de Makefile trouvé")
+	)
+  (setq konix/proj-makefile (expand-file-name makefile))
+)
 
-(defun konix/make (&optional makefile param)
+(defun konix/make (&optional param makefile)
   "Lance un make sur le makefile avec les param."
+  (interactive "sParam : \nfMakefile :")
   (konix/find-makefile makefile)
   (let ((command (concat "make -C '"(file-name-directory konix/proj-makefile)"' "param))
 		(buf_name (buffer-name)))

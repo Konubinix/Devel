@@ -185,8 +185,8 @@ Mod1 82	:Exec /home/snake/bin/display.py "Master Volume : $(amixer set Master,0 
 Mod1 86	:Exec /home/snake/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
 
 # poweroff and reboot
-Control Mod1 Delete :MacroCmd {Exec /home/snake/bin/display.py 'extinction'} {ExecCommand /home/snake/bin/ask_poweroff.sh }
-Control Shift Mod1 Delete : ExecCommand /home/snake/bin/ask_reboot.sh
+Mod4 b p : Exec poweroff
+Mod4 b r : Exec reboot
 Control Mod1 BackSpace :ExecCommand /usr/bin/pkill fluxbox
 
 # ////////////////////////////////////////

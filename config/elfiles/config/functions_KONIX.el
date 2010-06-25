@@ -1262,7 +1262,12 @@ set terminal pop;\
     (set-buffer-modified-p nil)
     (setq buffer-read-only t)
     (raise-frame (selected-frame))
-    (select-window this-window)))
+    (select-window this-window))
+  (sit-for 86400)
+  (delete-windows-on "Message")
+  (bury-buffer "Message")
+)
+
 (defun konix/select-lowest-window ()
   "APPT : Select the lowest window on the frame."
   (let ((lowest-window (selected-window))

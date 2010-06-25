@@ -18,6 +18,7 @@
 		(add-to-list 'ac-omni-completion-sources
 					 (cons "::" '(ac-source-semantic)))
 		(local-set-key (kbd "C-c C-v") 'compile)
+		(doc-mode t)
 		)
       )
 

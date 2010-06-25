@@ -653,7 +653,7 @@ lieu de find-file."
   (interactive "sMessage : ")
   (if (= (length msg) 0)
 	  (konix/git/command "ci")
-	(konix/git/command-to-string (concat "ci -m '"msg"'"))
+	(konix/git/command-to-string (concat "ci -m \""msg"\""))
 	)
   )
 

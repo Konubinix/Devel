@@ -141,6 +141,10 @@
 (global-set-key (kbd "<S-f9>") 'konix/gitk)
 (global-set-key (kbd "<C-f9>") 'konix/git-gui)
 
+;; commentaires
+(define-key 'konix/global-key-map "c" 'comment-region)
+(define-key 'konix/global-key-map "u" 'uncomment-region)
+
 ;; ////////////////////////////////////////
 ;; VC
 ;; ////////////////////////////////////////

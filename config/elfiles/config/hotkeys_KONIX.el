@@ -136,11 +136,10 @@
 ;; Magit
 (global-set-key (kbd "<f9>") 'konix/magit-status)
 (define-key magit-mode-map (kbd "V") 'konix/magit-visit-item-view)
-;; Egg
-(global-set-key (kbd "<C-f9>") 'egg-status)
 
-;; Lance gitk
+;; Lance gitk et git gui
 (global-set-key (kbd "<S-f9>") 'konix/gitk)
+(global-set-key (kbd "<C-f9>") 'konix/git-gui)
 
 ;; ////////////////////////////////////////
 ;; VC

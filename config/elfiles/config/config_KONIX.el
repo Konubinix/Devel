@@ -41,7 +41,7 @@
 ;; Autopair (parenthèsage automatique et bien pensé)
 ;; ************************************************************
 (require 'autopair)
-(autopair-global-mode)
+(autopair-global-mode t)
 (setq autopair-autowrap t) ;; Pour qu'un mot sélectionnée puisse être wrappé par ( ou "
 (setq autopair-blink nil)
 

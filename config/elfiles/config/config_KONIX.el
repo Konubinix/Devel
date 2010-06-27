@@ -4,6 +4,11 @@
 (setq konix/proj-makefile "~/Makefile")
 
 ;; ************************************************************
+;; Je requiert le help mode parce que j'en ai besoin dans mon init
+;; ************************************************************
+(require 'help-mode)
+
+;; ************************************************************
 ;; Dedicated windows
 ;; ************************************************************
 (defvar konix/dedicated-windows nil)

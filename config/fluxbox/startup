@@ -18,9 +18,4 @@ sleep 4
     conky -d -c ~/.conky.d/conky1
 } &
 
-{
-	sleep 20
-	xmodmap /home/snake/.fluxbox/xmod_swap_caps_lock
-	}
-
 wait $fbpid

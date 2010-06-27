@@ -319,8 +319,8 @@
 		 (ansi-color-for-comint-mode-on)
 		 (dirtrack-mode t)
 		 (setq dirtrack-list '("|\\([^|]*\\)|" 1 nil))
-		 (truncate-lines t)
-		 (truncate-partial-width-windows t)
+		 (setq truncate-lines t)
+		 (setq truncate-partial-width-windows t)
 		 )
        )
 

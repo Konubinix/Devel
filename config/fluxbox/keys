@@ -24,11 +24,11 @@ OnTitlebar Mouse2 :MacroCmd {Raise} {Focus} {StartTabbing}
 OnWindow Control Shift Mod1 Mod4 Mouse1 : kill
 
 # Focus
-OnWindow Control Mod1 Mouse4 :MacroCmd {RaiseLayer} {Exec /home/snake/bin/display.py 'upper'} {Focus}
-OnWindow Control Mod1 Mouse5 :MacroCmd {Exec /home/snake/bin/display.py 'lower' }{LowerLayer} {unFocus}
+OnWindow Control Mod1 Mouse4 :MacroCmd {RaiseLayer} {Exec ~/bin/display.py 'upper'} {Focus}
+OnWindow Control Mod1 Mouse5 :MacroCmd {Exec ~/bin/display.py 'lower' }{LowerLayer} {unFocus}
 
 # Stick
-OnWindow Control Mod1 Mouse2 :MacroCmd {Exec /home/snake/bin/display.py 'stick' } { Stick }
+OnWindow Control Mod1 Mouse2 :MacroCmd {Exec ~/bin/display.py 'stick' } { Stick }
 
 # When the transparence is activated
 OnWindow Mod1 Mouse4 :SetAlpha +20
@@ -155,19 +155,19 @@ Mod4 Insert : AddWorkspace
 Mod4 Del : RemoveLastWorkspace
 
 # focus and stick
-control Mod4 Prior : MacroCmd {RaiseLayer} {Exec /home/snake/bin/display.py 'upper'} {Focus}
-control Mod4 Next : MacroCmd {Exec /home/snake/bin/display.py 'lower' }{LowerLayer} {unFocus}
-control Mod4 asterisk : MacroCmd {Exec /home/snake/bin/display.py 'stick' }{Stick}
+control Mod4 Prior : MacroCmd {RaiseLayer} {Exec ~/bin/display.py 'upper'} {Focus}
+control Mod4 Next : MacroCmd {Exec ~/bin/display.py 'lower' }{LowerLayer} {unFocus}
+control Mod4 asterisk : MacroCmd {Exec ~/bin/display.py 'stick' }{Stick}
 
 # ************************************************************
 # Special window keys
 # ************************************************************
 XF86WWW :Exec x-www-browser
-None 160       :ToggleCmd {Exec amixer sset Master,0 toggle && /home/snake/bin/display.py "Mute on" } {Exec amixer sset Master,0 toggle && /home/snake/bin/display.py "Mute off"}
-None 174	:Exec /home/snake/bin/display.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-None 176	:Exec /home/snake/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-XF86AudioLowerVolume    :Exec /home/snake/bin/display.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-XF86AudioRaiseVolume	:Exec /home/snake/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+None 160       :ToggleCmd {Exec amixer sset Master,0 toggle && ~/bin/display.py "Mute on" } {Exec amixer sset Master,0 toggle && ~/bin/display.py "Mute off"}
+None 174	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+None 176	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+XF86AudioLowerVolume    :Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+XF86AudioRaiseVolume	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
 
 # ************************************************************
 # Common keyboard shortcut
@@ -176,13 +176,13 @@ XF86AudioRaiseVolume	:Exec /home/snake/bin/display.py "Master Volume : $(amixer 
 Mod1 F2 :Exec fbrun
 
 # Reconfigure
-control Mod1 f : MacroCmd {Reconfigure} {Exec /home/snake/bin/display.py 'reconfigure done'}
-control Mod4 f : MacroCmd {Exec /usr/bin/fluxbox-generate_menu -is -su -t gnome-terminal -m Menu} {Exec /home/snake/bin/display.py 'regenerate menu'}
+control Mod1 f : MacroCmd {Reconfigure} {Exec ~/bin/display.py 'reconfigure done'}
+control Mod4 f : MacroCmd {Exec /usr/bin/fluxbox-generate_menu -is -su -t gnome-terminal -m Menu} {Exec ~/bin/display.py 'regenerate menu'}
 
 # volume settings
-Mod1 82	:Exec /home/snake/bin/display.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+Mod1 82	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
 
-Mod1 86	:Exec /home/snake/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+Mod1 86	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
 
 # poweroff and reboot
 Mod4 b p : Exec poweroff
@@ -223,7 +223,7 @@ Control Mod4 e :Exec /usr/bin/emacs
 # Miscelaneous shortcuts
 # ************************************************************
 Control Mod1 D : ShowDesktop
-Print : MacroCmd { Exec /home/snake/bin/display.py 'impression ecran' } { ExecCommand /usr/bin/import /home/snake/Capture.png }
+Print : MacroCmd { Exec ~/bin/display.py 'impression ecran' } { ExecCommand /usr/bin/import ~/Capture.png }
 
 # ************************************************************
 # File hierarchy dependend shortcuts
@@ -235,7 +235,7 @@ Mod4 m : ExecCommand thunar ~/data/Musiques
 Mod4 v : ExecCommand thunar ~/data/Videos
 
 # let's go to Program
-Mod4 p : ExecCommand gnome-terminal --working-directory /home/snake/Prog
+Mod4 p : ExecCommand gnome-terminal --working-directory ~/Prog
 
 
 #162 Touche play

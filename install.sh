@@ -25,6 +25,7 @@ remplace $HOME/.zsh_aliases      $CONFIG/zsh_aliases
 remplace $HOME/.shrc             $CONFIG/shrc
 remplace $HOME/.Xdefaults        $CONFIG/Xdefaults
 remplace $HOME/Makefile          $CONFIG/Makefile
+remplace $HOME/.gconf/apps/gnome-terminal/profiles/Default/%gconf.xml        $CONFIG/config/gnome-terminal-conf.xml
 
 remplace $HOME/bin               $(pwd)/bin
 remplace $HOME/lib               $(pwd)/lib

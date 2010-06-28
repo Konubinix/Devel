@@ -851,6 +851,11 @@ lieu de find-file."
 	)
   )
 
+(defun konix/semantic-add-system-include-me ()
+  (interactive)
+  (semantic-add-system-include (file-name-directory buffer-file-name))
+  )
+
 ;; Change la valeur du tab-width, mais aussi les tab stop list et le
 ;; c-basic-offset (car c'est cool quand même quad ils vont ensembles)
 (defun konix/tab-size (size)

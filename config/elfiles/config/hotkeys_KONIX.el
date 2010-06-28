@@ -194,7 +194,6 @@
 (add-hook 'senator-minor-mode-hook
 	  (lambda ()
 	    (local-set-key (kbd "C-< j") 'semantic-complete-jump)
-	    (local-set-key (kbd "C-u C-< j") 'semantic-complete-jump-local)
 	    (local-set-key (kbd "M-g s") 'semantic-symref )
 	    ))
 

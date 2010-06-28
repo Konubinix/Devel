@@ -504,7 +504,7 @@ mieux voir."
 	)
    ;; Sinon -> tente quand même de chercher dans le directory du fichier (même s'il existe pas)
    (t
-	(konix/find-makefile-recursive (expand-file-name (file-name-directory)))
+	(konix/find-makefile-recursive (expand-file-name (file-name-directory directory)))
 	)
    )
   )

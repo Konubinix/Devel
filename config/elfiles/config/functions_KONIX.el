@@ -832,6 +832,10 @@ lieu de find-file."
 	  (require 'semantic-ia)
 	  (require 'semantic-gcc)
 	  (require 'semanticdb)
+	  (defun senator-hippie-expand-hook ()
+		;; Don't want the senator-hippie-expand-hook to be called, degueu hack
+		;; tout pourri... I know
+		)
 	  (semantic-load-enable-excessive-code-helpers)
 	  (global-semanticdb-minor-mode 1)
 	  (semantic-add-system-include "/usr/include" 'c-mode-common-hook)

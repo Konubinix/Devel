@@ -480,7 +480,7 @@ mieux voir."
    ;; un rep -> cherche le rep
    ((file-directory-p directory)
 	(let ((res nil)
-		  (parent (expand-file-name (concat directory "/..")))
+		  (parent (expand-file-name (concat directory "../")))
 		  (me (expand-file-name directory)))
 	  (cond
 	   ;; Condition de terminaison
@@ -488,8 +488,8 @@ mieux voir."
 		nil
 		)
 	   ;; Regarde pour le rep courant
-	   ((and (file-exists-p (concat me "/Makefile")) (not (file-directory-p (concat me "/Makefile"))))
-		(concat me "/Makefile")
+	   ((and (file-exists-p (concat me "Makefile")) (not (file-directory-p (concat me "Makefile"))))
+		(concat me "Makefile")
 		)
 	   ;; Si pas ici, peut être dans le parent
 	   (t
@@ -515,7 +515,7 @@ mieux voir."
    ;; L'arbo du makefile donné
    ((setq makefile (konix/find-makefile-recursive makefile)))
    ;; Cherche dans rep courant et parents
-   ((setq makefile (konix/find-makefile-recursive ".")))
+   ((setq makefile (konix/find-makefile-recursive "./")))
    ;; HOME
    ((and (file-exists-p "~Makefile") (not (file-directory-p "~Makefile")))
 	(setq makefile "~/Makefile"))

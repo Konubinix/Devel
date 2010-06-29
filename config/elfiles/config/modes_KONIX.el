@@ -18,7 +18,6 @@
 		(add-to-list 'ac-omni-completion-sources
 					 (cons "::" '(ac-source-semantic)))
 		(local-set-key (kbd "C-c C-v") 'compile)
-		(doc-mode t)
 		)
       )
 
@@ -387,5 +386,6 @@
 		  '(lambda()
 			 (define-key senator-prefix-map "j" 'semantic-ia-fast-jump)
 			 (define-key senator-prefix-map "s" 'semantic-ia-show-summary)
+			 (doc-mode t)
 			 )
 		  )

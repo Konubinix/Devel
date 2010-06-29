@@ -189,12 +189,8 @@
 
 ;; recherche semantic
 (global-set-key (kbd "C-S-S") 'senator-search-forward)
-(global-set-key (kbd "C-< i") 'semantic-analyze-proto-impl-toggle)
 
 (global-set-key (kbd "M-<pause>") 'konix/cedet-load)
-(define-key 'konix/global-slow-key-map "j" 'semantic-complete-jump)
-(define-key 'konix/global-key-map "j" 'semantic-ia-fast-jump)
-(define-key 'konix/global-key-map "s" 'semantic-symref )
 
 (define-key 'konix/global-key-map "h" 'konix/hack-on-emacs)
 

@@ -381,3 +381,11 @@
 			 (define-key hide-ifdef-mode-submap "t" 'konix/hide-ifdef-toggle-block)
 			 )
 		  )
+
+;; semantic
+(add-hook 'semantic-init-hook
+		  '(lambda()
+			 (define-key senator-prefix-map "j" 'semantic-ia-fast-jump)
+			 (define-key senator-prefix-map "s" 'semantic-ia-show-summary)
+			 )
+		  )

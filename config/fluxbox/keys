@@ -163,11 +163,11 @@ control Mod4 asterisk : MacroCmd {Exec ~/bin/display.py 'stick' }{Stick}
 # Special window keys
 # ************************************************************
 XF86WWW :Exec x-www-browser
-None 160       :ToggleCmd {Exec amixer sset Master,0 toggle && ~/bin/display.py "Mute on" } {Exec amixer sset Master,0 toggle && ~/bin/display.py "Mute off"}
-None 174	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-None 176	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-XF86AudioLowerVolume    :Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-XF86AudioRaiseVolume	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+None 160       :ToggleCmd {Exec amixer sset Master,0 toggle && ~/bin/display_unique.py "Mute on" } {Exec amixer sset Master,0 toggle && ~/bin/display_unique.py "Mute off"}
+None 174	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+None 176	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+XF86AudioLowerVolume    :Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+XF86AudioRaiseVolume	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
 
 # ************************************************************
 # Common keyboard shortcut
@@ -180,9 +180,9 @@ control Mod1 f : MacroCmd {Reconfigure} {Exec ~/bin/display.py 'reconfigure done
 control Mod4 f : MacroCmd {Exec /usr/bin/fluxbox-generate_menu -is -su -t gnome-terminal -m Menu} {Exec ~/bin/display.py 'regenerate menu'}
 
 # volume settings
-Mod1 82	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+Mod1 82	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
 
-Mod1 86	:Exec ~/bin/display.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+Mod1 86	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
 
 # poweroff and reboot
 Mod4 b p : Exec poweroff

@@ -194,6 +194,7 @@ Control Mod1 BackSpace :ExecCommand /usr/bin/pkill fluxbox
 # ////////////////////////////////////////
 Control Mod1 t :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/gnome-terminal
 Control Mod1 i :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/iceweasel
+Control Mod1 c :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/google-chrome
 XF86Launch1 :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/iceweasel
 Control Mod1 p :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/pidgin
 Control Mod1 v :ExecCommand ~/.fluxbox/bin/goto.sh         /usr/bin/vlc

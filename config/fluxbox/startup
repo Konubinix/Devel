@@ -9,6 +9,7 @@ fbpid=$!
 setxkbmap -option ctrl:swapcaps
 guake &
 numlockx
+
 sleep 4
 {
     killall conky
@@ -17,5 +18,8 @@ sleep 4
     idesk &
     conky -d -c ~/.conky.d/conky1
 } &
+
+~/bin/notify_daemon.py &
+
 
 wait $fbpid

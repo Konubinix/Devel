@@ -402,6 +402,12 @@
 			 )
 		  )
 
+(add-hook 'csharp-mode-hook
+		  '(lambda ()
+			 ;; The csharp-insert-open-brace function is quite annoying
+			 (local-unset-key "{")
+			 ))
+
 ;; isearch
 (setq isearch-mode-hook nil)
 (add-hook 'isearch-mode-hook

@@ -1047,7 +1047,7 @@ has the same name with the .h extension"
 
 (defun konix/header-wrap (marker)
   "wrap."
-  (interactive "sMessage : ")
+  (interactive)
   (let (beg end)
 	(if marker
 		()
@@ -1092,12 +1092,14 @@ has the same name with the .h extension"
 	(backward-char)
 	(set-mark (point))
 	(setq beg (point))
-	(insert "Message")
+	(let (message)
+	  (setq message (read-string "Message : " "" nil "J'aime les fruits au sirop"))
+	  (insert message)
+	)
 	(save-excursion
 	  (konix/header marker)
 	  )
 	(push-mark (point))
-	(backward-word)
 	)
   )
 

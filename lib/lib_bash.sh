@@ -1,3 +1,5 @@
+SSH_AGENT_SOURCE=/tmp/ssh-agent-source
+
 function path2dir_KONIX(){
 	PWD="$(pwd)"
 	test="$(echo "$*" | sed 's-^/--')"
@@ -64,20 +66,20 @@ function timer_on_KONIX(){
 }
 
 function run_ssh_agent_KONIX(){
-	ssh-agent > ~/.source
-	. ~/.source
+	ssh-agent > $SSH_AGENT_SOURCE
+	. $SSH_AGENT_SOURCE
 	ssh-add
 	res=$?
 	if [[ $res != 0 ]]
 	then
-		rm ~/.source
+		rm $SSH_AGENT_SOURCE
 	fi
 }
 
 function key_KONIX(){
-	if [ -e ~/.source ]
+	if [ -e $SSH_AGENT_SOURCE ]
 	then
-		. ~/.source
+		. $SSH_AGENT_SOURCE
 		if [[ ! $(ps ho command $SSH_AGENT_PID) == "ssh-agent" ]]
 		then
 			echo "PID de l'agent SSH obsolete, démarrage d'un nouvel agent"

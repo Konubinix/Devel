@@ -230,7 +230,7 @@ Print : MacroCmd { Exec ~/bin/display.py 'impression ecran' } { ExecCommand /usr
 # File hierarchy dependend shortcuts
 # ************************************************************
 # Shortcuts to launch thunar with some paths
-Mod4 e : ExecCommand thunar
+Mod4 e : ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/thunar
 Mod4 i : ExecCommand thunar ~/data/Images
 Mod4 m : ExecCommand thunar ~/data/Musiques
 Mod4 v : ExecCommand thunar ~/data/Videos

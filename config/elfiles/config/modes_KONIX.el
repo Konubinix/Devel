@@ -320,6 +320,7 @@
 		  )
 
 ;; shell
+(add-to-list 'ac-modes 'shell-mode)
 (setq  shell-mode-hook
        (lambda()
 		 (auto-complete-mode t)

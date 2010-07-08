@@ -7,6 +7,7 @@
 ;; Mode commun programmation
 (setq c-mode-common-hook
       (lambda ()
+		(doc-mode t)
 		(konix/prog-hook)
 		(hide-ifdef-mode t)
 		(setq hide-ifdef-initially t)

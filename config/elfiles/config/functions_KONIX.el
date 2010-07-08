@@ -730,7 +730,7 @@ lieu de find-file."
 (defun konix/git/command (command)
   "Lance une commande git."
   (interactive "sCommande : ")
-  (shell-command (concat "cd \"$(git rev-parse --git-dir)\" && git " command"&"))
+  (shell-command (concat "cd \"./$(git rev-parse --show-cdup)\" && git " command"&"))
   )
 
 (defun konix/git/command-to-string (command)

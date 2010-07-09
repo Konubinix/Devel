@@ -816,7 +816,7 @@ lieu de find-file."
 	  (require 'semantic-ia)
 	  (require 'semantic-gcc)
 	  (require 'semanticdb)
-										;	  (semantic-load-enable-code-helpers)
+	  (semantic-load-enable-excessive-code-helpers)
 	  (global-semanticdb-minor-mode 1)
 	  (semantic-add-system-include "/usr/include" 'c-mode-common-hook)
 	  (semantic-add-system-include "/usr/local/include" 'c-mode-common-hook)

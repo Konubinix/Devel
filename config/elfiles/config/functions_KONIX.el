@@ -648,6 +648,15 @@ lieu de find-file."
   (konix/git/command-to-string (concat "add '"buffer-file-name"'"))
   )
 
+(defun konix/git/commit (msg)
+  "Lance un git commit."
+  (interactive "sMessage : ")
+  (if (= (length msg) 0)
+	  (konix/git/command-to-string "ci")
+	(konix/git/command-to-string "ci -m '"msg"'")
+	)
+  )
+
 (defun konix/git/stash/save (msg)
   "Lance git stash."
   (interactive "sMessage : ")

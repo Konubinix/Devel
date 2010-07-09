@@ -154,6 +154,7 @@
 (define-key konix/git-global-map "c" 'konix/git/checkout)
 (define-key konix/git-global-map "M" 'konix/git/mergetool)
 (define-key konix/git-global-map "a" 'konix/git/add-me)
+(define-key konix/git-global-map "C" 'konix/git/commit)
 
 (define-prefix-command 'konix/git-global-map-diff)
 (define-key konix/git-global-map "d" 'konix/git-global-map-diff)

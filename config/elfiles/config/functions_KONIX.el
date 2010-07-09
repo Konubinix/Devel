@@ -823,7 +823,7 @@ lieu de find-file."
   ;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qmessagebox.h"))
 
   (interactive)
-  (if cedet-loaded t
+  (if cedet-loaded
 	(message "cedet already loaded")
 	(progn
 	  (setq cedet-loaded t)

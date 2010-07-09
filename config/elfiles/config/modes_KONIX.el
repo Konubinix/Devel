@@ -7,7 +7,7 @@
 ;; Mode commun programmation
 (setq c-mode-common-hook
       (lambda ()
-		(if cedet-loaded t
+		(if cedet-loaded
 		  (doc-mode t)
 		  )
 		(konix/prog-hook)

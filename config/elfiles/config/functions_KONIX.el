@@ -642,10 +642,10 @@ lieu de find-file."
   (start-process "git-gui" nil "git"  "gui")
   )
 
-(defun konix/git-add (file)
-  "Lance la commande git add sur le rep ou le fichier."
-  (interactive "fFichier : ")
-  (shell-command (concat "git add "file"&"))
+(defun konix/git/add-me ()
+  "Stage le fichier courant"
+  (interactive)
+  (konix/git/command-to-string (concat "add '"buffer-file-name"'"))
   )
 
 (defun konix/git/stash/save (msg)

@@ -727,7 +727,10 @@ lieu de find-file."
 (defun konix/git/command-to-string (command)
   "Lance une commande git."
   (interactive "sCommande : ")
-  (shell-command-to-string (concat "git " command"&"))
+  (let (res)
+	(setq res (shell-command-to-string (concat "git " command"&& echo OK || echo PB&")))
+	(konix/disp-window res)
+	)
   )
 
 (defun konix/git/irebase (ref)

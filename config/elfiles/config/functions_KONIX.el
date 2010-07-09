@@ -652,8 +652,8 @@ lieu de find-file."
   "Lance un git commit."
   (interactive "sMessage : ")
   (if (= (length msg) 0)
-	  (konix/git/command-to-string "ci")
-	(konix/git/command-to-string "ci -m '"msg"'")
+	  (konix/git/command "ci")
+	(konix/git/command-to-string (concat "ci -m '"msg"'"))
 	)
   )
 
@@ -737,7 +737,7 @@ lieu de find-file."
   "Lance une commande git."
   (interactive "sCommande : ")
   (let (res)
-	(setq res (shell-command-to-string (concat "git " command"&& echo OK || echo PB&")))
+	(setq res (shell-command-to-string (concat "git " command" && echo OK || echo PB&")))
 	(konix/disp-window res)
 	)
   )

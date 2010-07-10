@@ -84,3 +84,6 @@
 [app] (name=Mail) (class=Icedove) (role=3pane)
   [Workspace]	{5}
 [end]
+[app] (name=google-chrome) (class=Google-chrome)
+  [Workspace]	{1}
+[end]

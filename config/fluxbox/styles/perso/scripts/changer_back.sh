@@ -1,6 +1,6 @@
 #!/bin/bash
 DISPLAY=:0.0
-BACKGROUND_PATH='/home/snake/.fluxbox/styles/perso/backgrounds/'
+BACKGROUND_PATH='~/.fluxbox/styles/perso/backgrounds/'
 SWITCHER=`which fbsetbg`
 
 NB=$(ls -1 $BACKGROUND_PATH | wc -l)

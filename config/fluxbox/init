@@ -7,8 +7,8 @@ session.screen0.iconbar.iconWidth:	200
 session.screen0.iconbar.mode:	{static groups} (workspace)
 session.screen0.menu.alpha:	230
 session.screen0.clientMenu.usePixmap:	true
-session.screen0.titlebar.left:	MenuIcon Stick 
-session.screen0.titlebar.right:	Minimize Maximize Close 
+session.screen0.titlebar.left:	MenuIcon Stick
+session.screen0.titlebar.right:	Minimize Maximize Close
 session.screen0.tabs.usePixmap:	true
 session.screen0.tabs.maxOver:	false
 session.screen0.tabs.intitlebar:	true
@@ -50,13 +50,13 @@ session.screen0.windowScrollAction:	shade
 session.screen0.tooltipDelay:	500
 session.screen0.opaqueMove:	true
 session.screen0.colPlacementDirection:	TopToBottom
-session.screen0.windowMenu:	/home/snake/.fluxbox/windowmenu
+session.screen0.windowMenu:	~/.fluxbox/windowmenu
 session.screen0.menuDelayClose:	0
 session.screen0.maxDisableMove:	false
 session.screen0.rowPlacementDirection:	LeftToRight
 session.screen0.showwindowposition:	true
 session.screen0.demandsAttentionTimeout:	500
-session.screen0.rootCommand:	
+session.screen0.rootCommand:
 session.screen0.autoRaise:	true
 session.screen0.focusModel:	ClickFocus
 session.screen0.followModel:	SemiFollow
@@ -74,13 +74,13 @@ session.ignoreBorder:	false
 session.keyFile:	~/.fluxbox/keys
 session.groupFile:	~/.fluxbox/groups
 session.tabPadding:	0
-session.styleFile:	/home/snake/.fluxbox/styles/perso
+session.styleFile:	~/.fluxbox/styles/perso
 session.forcePseudoTransparency:	false
 session.cacheLife:	5l
 session.autoRaiseDelay:	250
 session.styleOverlay:	~/.fluxbox/overlay
 session.colorsPerChannel:	4
-session.slitlistFile:	/home/snake/.fluxbox/slitlist
+session.slitlistFile:	~/.fluxbox/slitlist
 session.configVersion:	10
 session.tabsAttachArea:	Window
 session.doubleClickInterval:	250

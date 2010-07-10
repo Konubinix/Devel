@@ -1,4 +1,4 @@
-session.styleFile:	/home/snake/.fluxbox/styles/perso
+session.styleFile:	~/.fluxbox/styles/perso
 fbdesk.textPlacement:	Bottom
 fbdesk.font:	fixed
 fbdesk.lockPositions:	false

@@ -970,24 +970,30 @@ has the same name with the .h extension"
 		  )
 	  (return "")
 	  )
-	(if (equal ext "h")
-		(setq ext "cpp")
-	  (setq ext "h")
-	  )
-	(setq new-file-name (concat noext-file-name "." ext))
 
-	(let (prefixes file-name)
-	  (setq file-name new-file-name)
-
+	(let (prefixes suffixes)
 	  (if (equal ext "h")
-		  (setq prefixes (list "." "../include/"))
-		(setq prefixes (list "." "../src/"))
+		  (progn
+			(setq prefixes (list "./" "../src/"))
+			(setq suffixes (list "C" "c" "cc" "cpp"))
+			)
+		(progn
+		  (setq prefixes (list "./" "../include/"))
+		  (setq suffixes (list "h" "hpp"))
+		  )
 		)
 
 	  (mapc (lambda (prefix)
-			  (if (file-exists-p (concat prefix file-name))
-				  (setq new-file-name (concat prefix file-name))
-				))
+			  (mapc (lambda (suffix)
+					  (let ((name-test (concat prefix noext-file-name "." suffix)))
+					  	(if (file-exists-p name-test)
+							(setq new-file-name name-test)
+					  	  )
+					  	)
+					  )
+					suffixes
+					)
+			  )
 			prefixes
 			)
 	  )

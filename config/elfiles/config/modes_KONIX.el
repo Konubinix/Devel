@@ -200,6 +200,8 @@
 (setq gud-mode-hook
       (lambda ()
 		(konix/gud-hook-keys)
+		(tooltip-mode t)
+		(gud-tooltip-dereference t)
 		)
       )
 

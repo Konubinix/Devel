@@ -155,7 +155,6 @@
 (define-key konix/git-global-map "O" 'egg-checkout-ref)
 (define-key konix/git-global-map "m" 'konix/git-modified-files)
 (define-key konix/git-global-map "B" 'git-blame-mode)
-(define-key konix/git-global-map "R" 'konix/git/reset)
 (define-key konix/git-global-map "M" 'konix/git/mergetool)
 (define-key konix/git-global-map "C" 'konix/git/commit)
 
@@ -192,6 +191,11 @@
 (define-key konix/git-global-map "S" 'konix/git-global-map-status)
 (define-key konix/git-global-map-status "s" 'konix/git/status)
 
+(define-prefix-command 'konix/git-global-map-reset)
+(define-key konix/git-global-map "R" 'konix/git-global-map-reset)
+(define-key konix/git-global-map-reset "r" 'konix/git/reset)
+;;(define-key konix/git-global-map-reset "f" 'konix/git/reset/file)
+;;(define-key konix/git-global-map-reset "m" 'konix/git/reset/me)
 
 (define-prefix-command 'konix/git-global-map-branch)
 (define-key konix/git-global-map "b" 'konix/git-global-map-branch)

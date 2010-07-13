@@ -159,7 +159,6 @@
 (define-key konix/git-global-map "r" 'konix/git/rebase)
 (define-key konix/git-global-map "c" 'konix/git/checkout)
 (define-key konix/git-global-map "M" 'konix/git/mergetool)
-(define-key konix/git-global-map "a" 'konix/git/add-me)
 (define-key konix/git-global-map "C" 'konix/git/commit)
 
 (define-prefix-command 'konix/git-global-map-commit)
@@ -178,6 +177,11 @@
 (define-key konix/git-global-map-stash "s" 'konix/git/stash/save)
 (define-key konix/git-global-map-stash "a" 'konix/git/stash/apply)
 (define-key konix/git-global-map-stash "c" 'konix/git/stash/clear)
+(define-prefix-command 'konix/git-global-map-add)
+(define-key konix/git-global-map "a" 'konix/git-global-map-add)
+(define-key konix/git-global-map-add "m" 'konix/git/add-me)
+(define-key konix/git-global-map-add "u" 'konix/git/add/update-tracked-files)
+
 
 (global-set-key (kbd "C-< g") 'konix/git/command)
 ;;commentaires

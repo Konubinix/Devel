@@ -156,7 +156,6 @@
 (define-key konix/git-global-map "m" 'konix/git-modified-files)
 (define-key konix/git-global-map "B" 'git-blame-mode)
 (define-key konix/git-global-map "R" 'konix/git/reset)
-(define-key konix/git-global-map "r" 'konix/git/rebase)
 (define-key konix/git-global-map "M" 'konix/git/mergetool)
 (define-key konix/git-global-map "C" 'konix/git/commit)
 
@@ -182,6 +181,12 @@
 (define-key konix/git-global-map "a" 'konix/git-global-map-add)
 (define-key konix/git-global-map-add "m" 'konix/git/add-me)
 (define-key konix/git-global-map-add "u" 'konix/git/add/update-tracked-files)
+
+(define-prefix-command 'konix/git-global-map-rebase)
+(define-key konix/git-global-map "r" 'konix/git-global-map-rebase)
+(define-key konix/git-global-map-rebase "r" 'konix/git/rebase)
+(define-key konix/git-global-map-rebase "c" 'konix/git/rebase/continue)
+(define-key konix/git-global-map-rebase "i" 'konix/git/irebase)
 
 
 (define-prefix-command 'konix/git-global-map-branch)

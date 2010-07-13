@@ -724,10 +724,22 @@ lieu de find-file."
   (konix/git/command (concat "rebase "cmd))
   )
 
-(defun konix/git/difftool ()
+(defun konix/git/irebase (ref)
+  "Rebase interactif sur ref."
+  (interactive "sRef : ")
+  (konix/git/command (concat "rebase -i " ref))
+  )
+
+(defun konix/git/rebase/continue ()
+  "no comment."
+  (interactive )
+  (konix/git/command "rebase --continue")
+  )
+
+(defun konix/git/difftool (args)
   "lance git difftool."
-  (interactive)
-  (shell-command "git difftool")
+  (interactive "sArgs : ")
+  (konix/git/command (concat "difftool " args))
   )
 
 (defun konix/git/difftool-file (file)
@@ -767,12 +779,6 @@ lieu de find-file."
 	(setq res (shell-command-to-string (concat "git " command" && echo OK || echo PB&")))
 	(konix/disp-window res)
 	)
-  )
-
-(defun konix/git/irebase (ref)
-  "Rebase interactif sur ref."
-  (interactive "sRef : ")
-  (konix/git/command (concat "rebase -i " ref))
   )
 
 (defun konix/git/reset-file (file)

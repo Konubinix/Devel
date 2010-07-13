@@ -703,8 +703,9 @@ lieu de find-file."
 
 (defun konix/git/checkout (ref)
   "Lance git checkout."
-  (interactive "sCheckout ref : ")
-  (shell-command (concat "git checkout "ref))
+  (interactive "sgit checkout ")
+  (konix/git/command-to-string (concat "checkout "ref))
+  )
 
 (defun konix/git/checkout/me ()
   "Checkout le fichier courant (pour virer les changement non stagés)."

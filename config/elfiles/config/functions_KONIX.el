@@ -775,8 +775,12 @@ lieu de find-file."
 (defun konix/git/command-to-string (command)
   "Lance une commande git."
   (interactive "sCommande : ")
-  (let (res)
-	(setq res (shell-command-to-string (concat "git " command" && echo OK || echo PB&")))
+  (let (res git_command)
+	(setq git_command (concat "git " command))
+	(setq res
+		  (concat
+		   "Commande : " git_command "\n"
+		   (shell-command-to-string (concat git_command " && echo OK || echo PB&"))))
 	(konix/disp-window res)
 	)
   )

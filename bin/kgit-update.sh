@@ -68,3 +68,5 @@ else
 	# update the ref
 	echo $parent > $git_dir/refs/parent/$enfant_nom
 fi
+
+kgit-update-refs.sh

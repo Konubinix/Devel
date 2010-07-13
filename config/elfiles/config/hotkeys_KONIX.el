@@ -177,6 +177,8 @@
 (define-key konix/git-global-map-stash "s" 'konix/git/stash/save)
 (define-key konix/git-global-map-stash "a" 'konix/git/stash/apply)
 (define-key konix/git-global-map-stash "c" 'konix/git/stash/clear)
+(define-key konix/git-global-map-stash "d" 'konix/git/stash/drop)
+
 (define-prefix-command 'konix/git-global-map-add)
 (define-key konix/git-global-map "a" 'konix/git-global-map-add)
 (define-key konix/git-global-map-add "m" 'konix/git/add-me)

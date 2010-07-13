@@ -684,6 +684,12 @@ lieu de find-file."
   (shell-command (konix/git/command "stash pop"))
   )
 
+(defun konix/git/stash/drop ()
+  "git stash pop."
+  (interactive)
+  (shell-command (konix/git/command "stash drop"))
+  )
+
 (defun konix/git/stash/apply ()
   "git stash apply."
   (interactive)

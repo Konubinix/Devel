@@ -657,6 +657,15 @@ lieu de find-file."
 	)
   )
 
+(defun konix/git/commit/amend (edit)
+  "Lance un git commit."
+  (interactive "sEdit message (empty for yes, anything else for no) : ")
+  (if (= (length edit) 0)
+	  (konix/git/command "commit --amend")
+	(konix/git/command-to-string (concat "commit --amend -C HEAD"))
+	)
+  )
+
 (defun konix/git/stash/save (msg)
   "Lance git stash."
   (interactive "sMessage : ")

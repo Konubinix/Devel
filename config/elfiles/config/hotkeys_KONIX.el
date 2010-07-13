@@ -162,6 +162,11 @@
 (define-key konix/git-global-map "a" 'konix/git/add-me)
 (define-key konix/git-global-map "C" 'konix/git/commit)
 
+(define-prefix-command 'konix/git-global-map-commit)
+(define-key konix/git-global-map "c" 'konix/git-global-map-commit)
+(define-key konix/git-global-map-commit "c" 'konix/git/commit)
+(define-key konix/git-global-map-commit "a" 'konix/git/commit/amend)
+
 (define-prefix-command 'konix/git-global-map-diff)
 (define-key konix/git-global-map "d" 'konix/git-global-map-diff)
 (define-key konix/git-global-map-diff "d" 'konix/git/difftool)

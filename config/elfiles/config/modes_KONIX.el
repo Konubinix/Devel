@@ -358,7 +358,7 @@
 
 (add-hook 'maxima-mode-hook
 		  '(lambda nil
-			 (hs-minor-mode)
+			 (hs-minor-mode t)
 			 (auto-complete-mode)
 			 )
 		  )

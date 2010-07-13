@@ -705,6 +705,11 @@ lieu de find-file."
   "Lance git checkout."
   (interactive "sCheckout ref : ")
   (shell-command (concat "git checkout "ref))
+
+(defun konix/git/checkout/me ()
+  "Checkout le fichier courant (pour virer les changement non stagés)."
+  (interactive )
+  (konix/git/command-to-string (concat "checkout " buffer-file-name))
   )
 
 (defun konix/git/reset (cmd)

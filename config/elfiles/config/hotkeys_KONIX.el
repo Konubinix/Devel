@@ -155,7 +155,6 @@
 (define-key konix/git-global-map "O" 'egg-checkout-ref)
 (define-key konix/git-global-map "m" 'konix/git-modified-files)
 (define-key konix/git-global-map "B" 'git-blame-mode)
-(define-key konix/git-global-map "M" 'konix/git/mergetool)
 (define-key konix/git-global-map "C" 'konix/git/commit)
 
 (define-prefix-command 'konix/git-global-map-commit)
@@ -167,6 +166,7 @@
 (define-key konix/git-global-map "d" 'konix/git-global-map-diff)
 (define-key konix/git-global-map-diff "d" 'konix/git/difftool)
 (define-key konix/git-global-map-diff "D" 'konix/git/difftool-file)
+(define-key konix/git-global-map-diff "m" 'konix/git/mergetool)
 
 (define-prefix-command 'konix/git-global-map-stash)
 (define-key konix/git-global-map "s" 'konix/git-global-map-stash)

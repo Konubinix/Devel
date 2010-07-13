@@ -791,6 +791,11 @@ lieu de find-file."
   (konix/git/command (concat "co "file))
   )
 
+(defun konix/git/status ()
+  (interactive )
+  (konix/git/command "status")
+  )
+
 (defun konix/git/modified-files ()
   "git diff-index --name-only."
   (interactive)
@@ -1257,16 +1262,7 @@ set terminal pop;\
   (describe-bindings)
   (other-window 1)
   )
-(defun konix/git/status-file (file)
-  "retourne le status du fichier (sous forme d'une lettre."
-  (interactive "fFichier : ")
-										;  (let (status)
-  (setq status
-		(konix/git/command (concat "status -s "buffer-file-name)))
 
-
-										;	)
-  )
 
 (defun konix/git/reset-file (file)
   "reset le fichier courrant à sa version HEAD."

@@ -188,6 +188,10 @@
 (define-key konix/git-global-map-rebase "c" 'konix/git/rebase/continue)
 (define-key konix/git-global-map-rebase "i" 'konix/git/irebase)
 
+(define-prefix-command 'konix/git-global-map-status)
+(define-key konix/git-global-map "S" 'konix/git-global-map-status)
+(define-key konix/git-global-map-status "s" 'konix/git/status)
+
 
 (define-prefix-command 'konix/git-global-map-branch)
 (define-key konix/git-global-map "b" 'konix/git-global-map-branch)

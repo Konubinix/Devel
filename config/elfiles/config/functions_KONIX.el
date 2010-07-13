@@ -1039,7 +1039,10 @@ has the same name with the .h extension"
 			prefixes
 			)
 	  )
-	(find-file-existing new-file-name)
+	(if new-file-name
+		(find-file-existing new-file-name)
+	  (message "Cannot find corresponding file")
+	  )
 	)
   )
 

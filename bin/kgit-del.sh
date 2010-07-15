@@ -21,12 +21,17 @@ function get_name(){
 	git name-rev --name-only $1
 }
 
+function delete_file(){
+	file_to_del="$1"
+	[ -e "$file_to_del" ] &&
+	rm -f "$file_to_del" &&
+	echo "'$file_to_del' remové" ||
+	echo "'$file_to_del' n'existe pas"
+}
+
 enfant=$1
 assert_commitish $1
 enfant_name=$(get_name $enfant)
-file_to_del=$(git rev-parse --git-dir)/parent/$enfant_name
 
-[ -e "$file_to_del" ] &&
-rm -f "$file_to_del" &&
-echo "'$file_to_del' remové" ||
-echo "'$file_to_del' n'existe pas"
+delete_file "$(git rev-parse --git-dir)/parent/$enfant_name"
+delete_file "$(git rev-parse --git-dir)/refs/parent/$enfant_name"

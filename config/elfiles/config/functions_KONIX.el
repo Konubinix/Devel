@@ -624,12 +624,6 @@ lieu de find-file."
      (magit-checkout info)))
   )
 
-(defun konix/git-mergetool ()
-  "Lance la commande mergetool de git."
-  (interactive)
-  (shell-command "git mergetool &")
-  )
-
 (defun konix/gitk ()
   "Lance gitk --all."
   (interactive)
@@ -640,6 +634,26 @@ lieu de find-file."
   "Lance gitk --all."
   (interactive)
   (start-process "git-gui" nil "git"  "gui")
+  )
+
+
+(defun konix/git/command (command)
+  "Lance une commande git."
+  (interactive "sCommande : ")
+  (shell-command (concat "cd \"./$(git rev-parse --show-cdup)\" && git " command"&"))
+  )
+
+(defun konix/git/command-to-string (command)
+  "Lance une commande git."
+  (interactive "sCommande : ")
+  (let (res git_command)
+	(setq git_command (concat "git " command))
+	(setq res
+		  (concat
+		   "Commande : " git_command "\n"
+		   (shell-command-to-string (concat git_command " && echo OK || echo PB&"))))
+	(konix/disp-window res)
+	)
   )
 
 (defun konix/git/add/file ()
@@ -767,29 +781,14 @@ lieu de find-file."
   (shell-command "git mergetool &")
   )
 
-(defun konix/git/command (command)
-  "Lance une commande git."
-  (interactive "sCommande : ")
-  (shell-command (concat "cd \"./$(git rev-parse --show-cdup)\" && git " command"&"))
+(defun konix/git/reset (cmd)
+  (interactive "sgit reset ")
+  (konix/git/command-to-string (concat "reset "cmd))
   )
 
-(defun konix/git/command-to-string (command)
-  "Lance une commande git."
-  (interactive "sCommande : ")
-  (let (res git_command)
-	(setq git_command (concat "git " command))
-	(setq res
-		  (concat
-		   "Commande : " git_command "\n"
-		   (shell-command-to-string (concat git_command " && echo OK || echo PB&"))))
-	(konix/disp-window res)
-	)
-  )
-
-(defun konix/git/reset-file (file)
-  "description."
-  (interactive "fFichier : ")
-  (konix/git/command (concat "co "file))
+(defun konix/git/reset/HEAD ()
+  (interactive)
+  (konix/git/command-to-string (concat "reset HEAD" ))
   )
 
 (defun konix/git/status ()

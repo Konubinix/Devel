@@ -713,11 +713,6 @@ lieu de find-file."
   (konix/git/command-to-string (concat "checkout " buffer-file-name))
   )
 
-(defun konix/git/reset (cmd)
-  (interactive "sgit reset ")
-  (konix/git/command (concat "reset "cmd))
-  )
-
 (defun konix/git/rebase (cmd)
   "Lance un rebase."
   (interactive "sgit rebase ")

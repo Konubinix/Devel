@@ -731,6 +731,12 @@ lieu de find-file."
   (konix/git/command "rebase --continue")
   )
 
+(defun konix/git/rebase/abort ()
+  "no comment."
+  (interactive )
+  (konix/git/command-to-string "rebase --abort")
+  )
+
 (defun konix/git/difftool (args)
   "lance git difftool."
   (interactive "sArgs : ")

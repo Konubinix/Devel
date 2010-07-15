@@ -642,7 +642,7 @@ lieu de find-file."
   (start-process "git-gui" nil "git"  "gui")
   )
 
-(defun konix/git/add-me ()
+(defun konix/git/add/file ()
   "Stage le fichier courant"
   (interactive)
   (konix/git/command-to-string (concat "add '"buffer-file-name"'"))
@@ -707,7 +707,7 @@ lieu de find-file."
   (konix/git/command-to-string (concat "checkout "ref))
   )
 
-(defun konix/git/checkout/me ()
+(defun konix/git/checkout/file ()
   "Checkout le fichier courant (pour virer les changement non stagés)."
   (interactive )
   (konix/git/command-to-string (concat "checkout " buffer-file-name))

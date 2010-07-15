@@ -178,7 +178,7 @@
 
 (define-prefix-command 'konix/git-global-map-add)
 (define-key konix/git-global-map "a" 'konix/git-global-map-add)
-(define-key konix/git-global-map-add "m" 'konix/git/add-me)
+(define-key konix/git-global-map-add "f" 'konix/git/add/file)
 (define-key konix/git-global-map-add "u" 'konix/git/add/update-tracked-files)
 
 (define-prefix-command 'konix/git-global-map-rebase)
@@ -201,7 +201,7 @@
 (define-key konix/git-global-map "b" 'konix/git-global-map-branch)
 (define-prefix-command 'konix/git-global-map-checkout)
 (define-key konix/git-global-map-branch "c" 'konix/git-global-map-checkout)
-(define-key konix/git-global-map-checkout "m" 'konix/git/checkout/me)
+(define-key konix/git-global-map-checkout "f" 'konix/git/checkout/file)
 (define-key konix/git-global-map-checkout "c" 'konix/git/checkout)
 
 (global-set-key (kbd "C-< g") 'konix/git/command)

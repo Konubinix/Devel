@@ -235,7 +235,7 @@
 					 '("ViewPdf" "evince '%s.pdf'" TeX-run-command t t
 					   :help "View the resulting pdf"))
 		(add-to-list 'TeX-command-list
-					 '("Make" "latex '%s.tex' && dvips '%s.dvi' && ps2pdf '%s.ps'" TeX-run-command TeX-run-command TeX-run-command t t
+					 '("MakePDF" "latex '%s.tex' && dvips '%s.dvi' && ps2pdf '%s.ps'" TeX-run-command TeX-run-command TeX-run-command t t
 					   :help "Make from tex to pdf"))
 		(define-key LaTeX-mode-map (kbd "<C-f5>")
 		  '(lambda()

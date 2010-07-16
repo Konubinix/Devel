@@ -94,7 +94,7 @@
 				)
 			  )
 (setq-default ac-ignore-case 'smart)
-(setq-default ac-auto-start 4)
+(setq-default ac-auto-start 10)
 (setq-default ac-auto-show-menu nil)
 (ac-set-trigger-key "TAB")
 (setq-default ac-dwim-enable t)

@@ -268,7 +268,7 @@
 		(set (make-local-variable 'truncate-partial-width-windows) nil)
 		(setq truncate-lines nil)
 		(turn-on-reftex)
-		(outline-minor-mode)
+		(outline-minor-mode t)
 		(konix/text-hook)
 		(setq ac-sources (append ac-sources
 								 '(

@@ -45,3 +45,6 @@
 
 ;; Makefile
 (add-to-list 'auto-mode-alist (cons "\\.make$" 'make-mode))
+
+;; Ogre scenes are xml files
+(add-to-list 'auto-mode-alist (cons "\\.scene$" 'xml-mode))

@@ -351,7 +351,7 @@
 (define-key global-map (kbd "M-g M-f") 'konix/find)
 (define-key global-map (kbd "<f4>") 'repeat)
 (define-prefix-command 'compilation-mode-map)
-(define-key compilation-mode-map (kbd "q") 'konix/quit-and-delete-window)
+(define-key compilation-mode-map (kbd "Q") 'konix/quit-and-delete-window)
 
 (global-set-key (kbd "<S-f10>") 'window-configuration-to-register)
 (global-set-key (kbd "<C-f10>") 'point-to-register)

@@ -2,9 +2,9 @@
 ;; ################################################################################
 ;; Fonctions d'intérêt général
 ;; ################################################################################
-(defun konix/quit-window ()
-  "Fait comme quit window, mais delete la window au passage."
-  (interactive)
+(defun konix/quit-and-delete-window ()
+  "Quitte la window et en profite pour la deleter."
+  (interactive )
   (quit-window)
   (delete-window)
   )
@@ -1253,12 +1253,6 @@ set terminal pop;\
 ;; ************************************************************
 ;; DRAFT
 ;; ************************************************************
-(defun konix/quit-and-delete-window ()
-  "Quitte la window et en profite pour la deleter."
-  (interactive )
-  (quit-window)
-  (delete-window)
-  )
 (defun konix/describe-bindings ()
   "Comme pour l'aide, mais switche sur la window créée."
   (interactive )

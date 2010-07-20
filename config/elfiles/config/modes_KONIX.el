@@ -403,6 +403,7 @@
 			 )
 		  )
 
+(add-to-list 'ac-modes 'csharp-mode)
 (add-hook 'csharp-mode-hook
 		  '(lambda ()
 			 ;; The csharp-insert-open-brace function is quite annoying

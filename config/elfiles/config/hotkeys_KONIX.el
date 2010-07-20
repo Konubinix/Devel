@@ -371,7 +371,7 @@
 ;; ################################################################################
 ;; Gnuplot
 ;; ################################################################################
-(define-prefix-command gnuplot-mode-map)
+(define-prefix-command 'gnuplot-mode-map)
 (define-key gnuplot-mode-map "\C-xp" 'konix/gnuplot-mode-map)
 
 (define-prefix-command 'konix/gnuplot-mode-map)

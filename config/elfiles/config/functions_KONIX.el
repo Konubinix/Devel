@@ -732,6 +732,10 @@ lieu de find-file."
   (shell-command (konix/git/command "stash clear"))
   )
 
+(defun konix/git/remote/list ()
+  (split-string (substring (shell-command-to-string "git remote") 0 -1))
+  )
+
 (defun konix/git/checkout (ref)
   "Lance git checkout."
   (interactive

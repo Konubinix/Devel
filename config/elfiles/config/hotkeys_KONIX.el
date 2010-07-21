@@ -196,6 +196,10 @@
 (define-key konix/git-global-map-tag "t" 'konix/git/tag)
 (define-key konix/git-global-map-tag "d" 'konix/git/tag/delete)
 
+(define-prefix-command 'konix/git-global-map-push)
+(define-key konix/git-global-map "p" 'konix/git-global-map-push)
+(define-key konix/git-global-map-push "p" 'konix/git/push)
+
 (define-prefix-command 'konix/git-global-map-commit)
 (define-key konix/git-global-map "c" 'konix/git-global-map-commit)
 (define-key konix/git-global-map-commit "c" 'konix/git/commit)

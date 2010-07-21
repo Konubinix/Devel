@@ -686,6 +686,23 @@ lieu de find-file."
   (konix/git/command-to-string (concat "add -u"))
   )
 
+(defun konix/git/branch/list ()
+  (let (branches)
+	 (setq branches
+		   (split-string
+			(substring (shell-command-to-string "git branch -l") 0 -1)
+			"\n"
+			)
+		   )
+	(mapcar
+	 '(lambda(e)
+	   (substring e 2)
+	   )
+	 branches
+	 )
+	)
+  )
+
 (defun konix/git/stash/save (msg)
   "Lance git stash."
   (interactive "sMessage : ")

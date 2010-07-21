@@ -796,6 +796,11 @@ lieu de find-file."
   (konix/git/command "status")
   )
 
+(defun konix/git/tag (cmd)
+  (interactive "sgit tag ")
+  (konix/git/command-to-string (concat "tag " cmd))
+  )
+
 (defun konix/git/modified-files ()
   "git diff-index --name-only."
   (interactive)

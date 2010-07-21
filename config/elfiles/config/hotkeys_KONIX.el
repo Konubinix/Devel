@@ -98,13 +98,12 @@
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
 (define-key 'konix/org-global-map "o" 'org-clock-out)
 
-(define-prefix-command 'org-mode-map)
-(define-key 'org-mode-map (kbd "C-< t") 'konix/todo-org)
-(define-key 'org-mode-map (kbd "C-< e") 'konix/diary-org)
-(define-key 'org-mode-map (kbd "<f1>") 'org-cycle)
-(define-key 'org-mode-map (kbd "<f3>") 'org-shifttab)
-(define-key 'org-mode-map (kbd "C-j") 'org-complete)
-(define-key 'org-mode-map (kbd "C-c e") 'org-table-edit-field)
+(define-key org-mode-map (kbd "C-< t") 'konix/todo-org)
+(define-key org-mode-map (kbd "C-< e") 'konix/diary-org)
+(define-key org-mode-map (kbd "<f1>") 'org-cycle)
+(define-key org-mode-map (kbd "<f3>") 'org-shifttab)
+(define-key org-mode-map (kbd "C-j") 'org-complete)
+(define-key org-mode-map (kbd "C-c e") 'org-table-edit-field)
 
 ;; Montre moi l'agenda
 (global-set-key (kbd "C-< c") 'calendar)

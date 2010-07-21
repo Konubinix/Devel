@@ -805,6 +805,13 @@ lieu de find-file."
   (split-string (shell-command-to-string "git tag -l") "\n")
   )
 
+(defun konix/git/tag/delete (tag)
+  (interactive
+   (list (completing-read "Tag : " (konix/git/tag/list)))
+   )
+  (konix/git/tag (concat "-d " tag))
+  )
+
 (defun konix/git/modified-files ()
   "git diff-index --name-only."
   (interactive)

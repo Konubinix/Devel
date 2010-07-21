@@ -191,6 +191,11 @@
 (define-key konix/git-global-map "B" 'git-blame-mode)
 (define-key konix/git-global-map "C" 'konix/git/commit)
 
+(define-prefix-command 'konix/git-global-map-tag)
+(define-key konix/git-global-map "t" 'konix/git-global-map-tag)
+(define-key konix/git-global-map-tag "t" 'konix/git/tag)
+(define-key konix/git-global-map-tag "d" 'konix/git/tag/delete)
+
 (define-prefix-command 'konix/git-global-map-commit)
 (define-key konix/git-global-map "c" 'konix/git-global-map-commit)
 (define-key konix/git-global-map-commit "c" 'konix/git/commit)

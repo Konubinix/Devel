@@ -801,6 +801,10 @@ lieu de find-file."
   (konix/git/command-to-string (concat "tag " cmd))
   )
 
+(defun konix/git/tag/list ()
+  (split-string (shell-command-to-string "git tag -l") "\n")
+  )
+
 (defun konix/git/modified-files ()
   "git diff-index --name-only."
   (interactive)

@@ -250,6 +250,7 @@
 ;; ************************************************************
 ;; Org
 ;; ************************************************************
+(require 'org)
 (setq org-hide-leading-stars t)
 (setq org-agenda-include-diary t)
 (setq org-agenda-files (quote ("~/wiki/todo.org" "~/wiki/diary.org")))

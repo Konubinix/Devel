@@ -824,7 +824,9 @@ lieu de find-file."
   )
 
 (defun konix/git/tag/list ()
-  (split-string (shell-command-to-string "git tag -l") "\n")
+  (split-string
+   (substring (shell-command-to-string "git tag -l") 0 -1)
+   "\n")
   )
 
 (defun konix/git/tag/delete (tag)

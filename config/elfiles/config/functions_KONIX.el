@@ -636,6 +636,13 @@ lieu de find-file."
   (start-process "git-gui" nil "git"  "gui")
   )
 
+(defun konix/git/completing-read-refs (prefix)
+  (let (branches tags)
+	(setq branches (konix/git/branch/list))
+	(setq tags (konix/git/tag/list))
+	(list (completing-read prefix (concatenate 'list branches tags) nil nil))
+	)
+  )
 
 (defun konix/git/command (command)
   "Lance une commande git."

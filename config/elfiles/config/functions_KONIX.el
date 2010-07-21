@@ -646,7 +646,7 @@ lieu de find-file."
 
 (defun konix/git/command (command)
   "Lance une commande git."
-  (interactive "sCommande : ")
+  (interactive "sgit ")
   (shell-command (concat "cd \"./$(git rev-parse --show-cdup)\" && git " command"&"))
   )
 

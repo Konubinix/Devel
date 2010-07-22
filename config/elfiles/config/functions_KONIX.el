@@ -751,6 +751,11 @@ lieu de find-file."
   (konix/git/command "reflog")
   )
 
+(defun konix/git/cherry-pick (ref)
+  (interactive "sgit cherry-pick ")
+  (konix/git/command-to-string (concat "cherry-pick " ref))
+  )
+
 (defun konix/git/stash/save (msg)
   "Lance git stash."
   (interactive "sMessage : ")

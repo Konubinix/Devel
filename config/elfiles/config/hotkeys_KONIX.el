@@ -200,6 +200,10 @@
 (define-key konix/git-global-map "l" 'konix/git-global-map-log)
 (define-key konix/git-global-map-log "r" 'konix/git/reflog)
 
+(define-prefix-command 'konix/git-global-map-cherry)
+(define-key konix/git-global-map "C" 'konix/git-global-map-cherry)
+(define-key konix/git-global-map-cherry "p" 'konix/git/cherry-pick)
+
 (define-prefix-command 'konix/git-global-map-push)
 (define-key konix/git-global-map "p" 'konix/git-global-map-push)
 (define-key konix/git-global-map-push "p" 'konix/git/push)

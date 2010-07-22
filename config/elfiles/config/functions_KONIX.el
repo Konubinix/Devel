@@ -746,6 +746,11 @@ lieu de find-file."
   (konix/git/command-to-string (concat "branch -D " branch))
   )
 
+(defun konix/git/reflog ()
+  (interactive)
+  (konix/git/command "reflog")
+  )
+
 (defun konix/git/stash/save (msg)
   "Lance git stash."
   (interactive "sMessage : ")

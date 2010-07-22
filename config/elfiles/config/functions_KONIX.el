@@ -768,6 +768,26 @@ lieu de find-file."
   (konix/git/command-to-string (concat "checkout " buffer-file-name))
   )
 
+(defun konix/git/bisect/start ()
+  (interactive)
+  (konix/git/command-to-string "bisect start" t)
+  )
+
+(defun konix/git/bisect/reset ()
+  (interactive)
+  (konix/git/command-to-string "bisect reset" t)
+  )
+
+(defun konix/git/bisect/bad ()
+  (interactive)
+  (konix/git/command-to-string "bisect bad" t)
+  )
+
+(defun konix/git/bisect/good ()
+  (interactive)
+  (konix/git/command-to-string "bisect good" t)
+  )
+
 (defun konix/git/rebase (cmd)
   "Lance un rebase."
   (interactive "sgit rebase ")

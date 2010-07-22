@@ -800,6 +800,14 @@ lieu de find-file."
   (konix/git/command-to-string (concat "checkout "ref))
   )
 
+(defun konix/git/checkout/parent (arg)
+  (interactive "P")
+  (if (not arg)
+	  (setq arg 1)
+	)
+  (konix/git/checkout (concat "HEAD~"(format "%s" arg)))
+  )
+
 (defun konix/git/checkout/file ()
   "Checkout le fichier courant (pour virer les changement non stagés)."
   (interactive )

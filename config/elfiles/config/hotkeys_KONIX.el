@@ -257,6 +257,7 @@
 (define-key konix/git-global-map-branch "c" 'konix/git-global-map-checkout)
 (define-key konix/git-global-map-checkout "f" 'konix/git/checkout/file)
 (define-key konix/git-global-map-checkout "c" 'konix/git/checkout)
+(define-key konix/git-global-map-checkout (kbd "<down>") 'konix/git/checkout/parent)
 
 (global-set-key (kbd "C-< g") 'konix/git/command)
 

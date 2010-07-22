@@ -204,6 +204,13 @@
 (define-key konix/git-global-map "C" 'konix/git-global-map-cherry)
 (define-key konix/git-global-map-cherry "p" 'konix/git/cherry-pick)
 
+(define-prefix-command 'konix/git-global-map-bisect)
+(define-key konix/git-global-map "B" 'konix/git-global-map-bisect)
+(define-key konix/git-global-map-bisect "s" 'konix/git/bisect/start)
+(define-key konix/git-global-map-bisect "r" 'konix/git/bisect/reset)
+(define-key konix/git-global-map-bisect "b" 'konix/git/bisect/bad)
+(define-key konix/git-global-map-bisect "g" 'konix/git/bisect/good)
+
 (define-prefix-command 'konix/git-global-map-push)
 (define-key konix/git-global-map "p" 'konix/git-global-map-push)
 (define-key konix/git-global-map-push "p" 'konix/git/push)

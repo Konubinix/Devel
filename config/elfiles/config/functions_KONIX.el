@@ -2,6 +2,23 @@
 ;; ################################################################################
 ;; Fonctions d'intérêt général
 ;; ################################################################################
+(defun keys (assoc)
+  (mapcar
+   '(lambda (e)
+	  (car e)
+	  )
+   assoc
+   )
+  )
+
+(defun hash-values (hashtable)
+  "Return all values in hashtable."
+  (let (allvals)
+    (maphash (lambda (kk vv) (setq allvals (cons vv allvals))) hashtable)
+    allvals
+	)
+  )
+
 (defun konix/quit-and-delete-window ()
   "Quitte la window et en profite pour la deleter."
   (interactive )

@@ -650,11 +650,14 @@ lieu de find-file."
   (shell-command (concat "cd \"./$(git rev-parse --show-cdup)\" && git " command"&"))
   )
 
-(defun konix/git/command-to-string (command)
+(defun konix/git/command-to-string (command &optional cdup)
   "Lance une commande git."
   (interactive "sCommande : ")
-  (let (res git_command)
-	(setq git_command (concat "git " command))
+  (let (res git_command (pre_command ""))
+	(if cdup
+		(setq pre_command "cd \"./$(git rev-parse --show-cdup)\" && ")
+	  )
+	(setq git_command (concat pre_command "git " command))
 	(setq res
 		  (concat
 		   "Commande : " git_command "\n"

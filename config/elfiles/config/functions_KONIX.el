@@ -827,13 +827,19 @@ lieu de find-file."
 (defun konix/git/difftool (args)
   "lance git difftool."
   (interactive "sArgs : ")
-  (konix/git/command (concat "difftool " args))
+  (konix/git/command-to-string (concat "difftool " args) t)
   )
 
 (defun konix/git/difftool-file (file)
   "Lance difftool sur le fichier."
   (interactive (list buffer-file-truename) )
-  (konix/git/command (concat "difftool "file))
+  (konix/git/command-to-string (concat "difftool "file))
+  )
+
+(defun konix/git/mergetool ()
+  "Lance la commande mergetool de git."
+  (interactive)
+  (shell-command-to-string "git mergetool &" t)
   )
 
 (defun konix/git/svn-fetch ()
@@ -846,12 +852,6 @@ lieu de find-file."
   "Lance git svn dcommit."
   (interactive)
   (konix/git/command "svn dcommit")
-  )
-
-(defun konix/git/mergetool ()
-  "Lance la commande mergetool de git."
-  (interactive)
-  (shell-command "git mergetool &")
   )
 
 (defun konix/git/reset (cmd)

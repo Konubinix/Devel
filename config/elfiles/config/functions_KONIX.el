@@ -753,12 +753,7 @@ lieu de find-file."
 
 (defun konix/git/checkout (ref)
   "Lance git checkout."
-  (interactive
-   (completing-read "git checkout "
-					(concatenate 'list
-								 (konix/git/branch/list)
-								 (konix/git/tag/list)))
-   )
+  (interactive "sgit checkout ")
   (konix/git/command-to-string (concat "checkout "ref))
   )
 

@@ -734,6 +734,18 @@ lieu de find-file."
 	)
   )
 
+(defun konix/git/branch (cmd)
+  (interactive "sgit branch ")
+  (konix/git/command-to-string (concat "branch " cmd))
+  )
+
+(defun konix/git/branch/delete (branch)
+  (interactive
+   (konix/git/completing-read-refs "git branch -D " nil t)
+   )
+  (konix/git/command-to-string (concat "branch -D " branch))
+  )
+
 (defun konix/git/stash/save (msg)
   "Lance git stash."
   (interactive "sMessage : ")

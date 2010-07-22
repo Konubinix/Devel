@@ -242,6 +242,9 @@
 
 (define-prefix-command 'konix/git-global-map-branch)
 (define-key konix/git-global-map "b" 'konix/git-global-map-branch)
+(define-key konix/git-global-map-branch "b" 'konix/git/branch)
+(define-key konix/git-global-map-branch "d" 'konix/git/branch/delete)
+
 (define-prefix-command 'konix/git-global-map-checkout)
 (define-key konix/git-global-map-branch "c" 'konix/git-global-map-checkout)
 (define-key konix/git-global-map-checkout "f" 'konix/git/checkout/file)

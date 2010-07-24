@@ -185,8 +185,8 @@ Mod1 82	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%-
 Mod1 86	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
 
 # poweroff and reboot
-Mod4 b p : Exec poweroff
-Mod4 b r : Exec reboot
+Mod4 b p : Exec /sbin/poweroff
+Mod4 b r : Exec /sbin/reboot
 Control Mod1 BackSpace :ExecCommand /usr/bin/pkill fluxbox
 
 # ////////////////////////////////////////

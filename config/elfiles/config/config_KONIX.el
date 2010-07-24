@@ -269,7 +269,6 @@
 (setq org-enforce-todo-checkbox-dependencies t)
 (setq org-enforce-todo-dependencies t)
 (setq org-export-html-with-timestamp t)
-(setq org-hide-leading-stars nil)
 (setq org-insert-labeled-timestamps-at-point nil)
 (setq org-log-done (quote time))
 (setq org-log-done-with-time t)

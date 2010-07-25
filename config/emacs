@@ -14,10 +14,11 @@
 ;; Les diff libs
 (add-to-list 'load-path (expand-file-name elfiles ))
 ; config perso
-(add-to-list 'load-path (expand-file-name (concat elfiles "/config") ))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/yasnippet") ))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/git") ))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/magit") ))
+(add-to-list 'load-path (expand-file-name "~/.elfiles/config" ))
+(add-to-list 'load-path "~/.elfiles/yasnippet")
+(add-to-list 'load-path (expand-file-name "~/.elfiles/git" ))
+(add-to-list 'load-path (expand-file-name "~/.elfiles/magit" ))
+(add-to-list 'load-path (expand-file-name "~/.elfiles/csharp" ))
 
 ;; ################################################################################
 ;; Fichiers de config

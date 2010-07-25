@@ -54,4 +54,5 @@
 (add-to-list 'auto-mode-alist (cons "\\.nsi$" 'nsi-mode))
 
 ;; cs -> java
-(add-to-list 'auto-mode-alist (cons "\\.cs$" 'java-mode))
+(autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
+(add-to-list 'auto-mode-alist (cons "\\.cs$" 'csharp-mode))

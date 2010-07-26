@@ -653,6 +653,15 @@ lieu de find-file."
   (start-process "git-gui" nil "git"  "gui")
   )
 
+(defun konix/git/adjust-command (cmd cdup)
+  (let ((pre_command ""))
+	(if cdup
+		(setq pre_command "cd \"./$(git rev-parse --show-cdup)\" && ")
+	  )
+	(concat pre_command "git " cmd)
+	)
+  )
+
 (defun konix/git/completing-read-refs (prefix &optional no_branch no_tag )
   (let ((branches "") (tags ""))
 	(if (not no_branch)

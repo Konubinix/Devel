@@ -662,6 +662,44 @@ lieu de find-file."
 	)
   )
 
+(defun konix/git/complete (string filter flag)
+  (let (pos_word before_word word completion compl)
+	(setq pos_word (string-match " [^ ]*$" string))
+	(setq before_word
+		  (if pos_word
+			  (substring string 0 pos_word)
+			""
+			)
+		  )
+	(setq word
+		  (if pos_word
+			  (substring string (+ 1 pos_word))
+			string
+			)
+		  )
+	(setq completion (konix/git/get-completion-list-from-context before_word))
+	(if (or (not completion) (not (all-completions word completion)))
+		(setq completion (list (concat word " ")))
+	  )
+	(setq compl
+		  (cond
+		   ((not flag)
+			;; try completion
+			(setq try_comp (try-completion word completion))
+			(if (and pos_word (stringp try_comp))
+				(setq try_comp (concat before_word " " try_comp))
+			  )
+			try_comp
+			)
+		   (flag
+			;; all completionq
+			(all-completions word completion)
+			)
+		   )
+		  )
+	)
+  )
+
 (defun konix/git/completing-read-refs (prefix &optional no_branch no_tag )
   (let ((branches "") (tags ""))
 	(if (not no_branch)

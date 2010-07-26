@@ -802,14 +802,29 @@ lieu de find-file."
   )
 
 (defun konix/git/get-completion-list-from-symbol (symbol)
-  (cond
-   ((functionp e)
-	(funcall e)
+  (if (not (hash-table-p konix/git/cache-completion))
+	  (setq konix/git/cache-completion (make-hash-table :test 'equal))
 	)
-   ((listp (eval e))
-	(eval e)
+
+  (let (res)
+	(setq res (gethash symbol konix/git/cache-completion ))
+	(if (not res)
+		(block nil
+			(setq res
+				  (cond
+				   ((functionp e)
+					(funcall e)
+					)
+				   ((listp (eval e))
+					(eval e)
+					)
+				   )
+				  )
+		  (puthash symbol res konix/git/cache-completion)
+		  )
+	  )
+	res
 	)
-   )
   )
 
 (defun konix/git/add/file ()

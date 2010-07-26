@@ -110,10 +110,37 @@
 (setq multi-eshell-shell-function '(shell))
 
 ;; ************************************************************
-;; Magit
+;; Git
 ;; ************************************************************
+;; --------------------------------------------------
+;; Magit
+;; --------------------------------------------------
 (require 'magit)
 (setq magit-process-popup-time 4)
+;; --------------------------------------------------
+;; My Git hacks
+;; --------------------------------------------------
+(setq konix/git/regexp-command
+	  '(
+		("^rebase" . (konix/git/command-to-string . nil))
+		(".*" . (konix/git/command .nil))
+		)
+	  )
+
+
+(setq konix/git/completions
+	  '(
+		"commit "
+		"rebase "
+		"reset "
+		)
+	  )
+
+(setq konix/git/completion/rebase
+	  '(
+		"--abort "
+		)
+	  )
 
 ;; ************************************************************
 ;; Git blame

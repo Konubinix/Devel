@@ -242,9 +242,10 @@
 (define-prefix-command 'konix/git-global-map-rebase)
 (define-key konix/git-global-map "r" 'konix/git-global-map-rebase)
 (define-key konix/git-global-map-rebase "r" 'konix/git/rebase)
+(define-key konix/git-global-map-rebase "i" 'konix/git/irebase)
 (define-key konix/git-global-map-rebase "c" 'konix/git/rebase/continue)
 (define-key konix/git-global-map-rebase "a" 'konix/git/rebase/abort)
-(define-key konix/git-global-map-rebase "i" 'konix/git/irebase)
+(define-key konix/git-global-map-rebase "s" 'konix/git/rebase/skip)
 
 (define-prefix-command 'konix/git-global-map-status)
 (define-key konix/git-global-map "S" 'konix/git-global-map-status)

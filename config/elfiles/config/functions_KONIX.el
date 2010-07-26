@@ -683,11 +683,8 @@ lieu de find-file."
 (defun konix/git/command-to-string (command &optional cdup)
   "Lance une commande git."
   (interactive "sCommande : ")
-  (let (res git_command (pre_command ""))
-	(if cdup
-		(setq pre_command "cd \"./$(git rev-parse --show-cdup)\" && ")
-	  )
-	(setq git_command (concat pre_command "git " command))
+  (let (res git_command)
+	(setq git_command (konix/git/adjust-command command cdup))
 	(setq res
 		  (concat
 		   "Commande : " git_command "\n"

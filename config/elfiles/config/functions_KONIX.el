@@ -766,13 +766,12 @@ lieu de find-file."
   )
 
 (defun konix/git/get-completion-list-from-context (context)
-  (let (last_word completion_assoc)
-	(setq last_word (first (last (split-string context " "))))
+  (let (completion_assoc)
 	(setq completion_list
 		  (block nil
 			(mapcar
 			 '(lambda(e)
-				(if (string-match (car e) last_word)
+				(if (string-match (car e) context)
 					(return  (cdr e))
 				  )
 				)

@@ -753,6 +753,18 @@ lieu de find-file."
 	)
   )
 
+(defun konix/git/command-with-completion (&optional cmd)
+  (interactive)
+  (if (not cmd)
+	  (setq cmd "")
+	)
+  (setq konix/git/cache-completion nil)
+  (let (command)
+	(setq command (completing-read "git " 'konix/git/complete nil nil cmd))
+	(konix/git/launch/command command)
+	)
+  )
+
 (defun konix/git/get-completion-list-from-context (context)
   (let (last_word completion_assoc)
 	(setq last_word (first (last (split-string context " "))))

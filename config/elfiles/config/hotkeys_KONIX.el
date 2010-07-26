@@ -268,7 +268,7 @@
 (define-key konix/git-global-map-checkout "c" 'konix/git/checkout)
 (define-key konix/git-global-map-checkout (kbd "<down>") 'konix/git/checkout/parent)
 
-(global-set-key (kbd "C-< g") 'konix/git/command)
+(global-set-key (kbd "C-< g") 'konix/git/command-with-completion)
 
 ;; TAGS
 (global-set-key (kbd "M-?") 'tags-search )

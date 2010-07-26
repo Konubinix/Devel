@@ -138,7 +138,7 @@
 (setq konix/git/context-completion
 	  '(
 		("^rebase" konix/git/completion/rebase konix/git/branch/list)
-		(".*" konix/git/completions)
+		("^ *$" konix/git/completions)
 		)
 	  )
 

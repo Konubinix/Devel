@@ -884,7 +884,9 @@ lieu de find-file."
 (defun konix/git/mergetool ()
   "Lance la commande mergetool de git."
   (interactive)
-  (shell-command-to-string "git mergetool &" t)
+  (konix/git/command "mergetool")
+  )
+
   )
 
 (defun konix/git/svn-fetch ()

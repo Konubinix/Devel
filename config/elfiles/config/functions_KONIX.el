@@ -693,6 +693,44 @@ lieu de find-file."
 	)
   )
 
+(defun konix/git/get-completion-list-from-context (context)
+  (let (last_word completion_assoc)
+	(setq last_word (first (last (split-string context " "))))
+	(setq completion_list
+		  (block nil
+			(mapcar
+			 '(lambda(e)
+				(if (string-match (car e) last_word)
+					(return  (cdr e))
+				  )
+				)
+			 konix/git/context-completion
+			 )
+			nil
+			)
+		  )
+	(if completion_list
+		(let (comp_list)
+		  (setq comp_list ())
+		  (mapcar
+		   '(lambda(e)
+			  (cond
+			   ((functionp e)
+				(setq comp_list (concatenate 'list (funcall e) comp_list))
+				)
+			   ((listp (eval e))
+				(setq comp_list (concatenate 'list (eval e) comp_list))
+				)
+			   )
+			  )
+		   completion_list
+		   )
+		  comp_list
+		  )
+	  )
+	)
+  )
+
 (defun konix/git/add/file ()
   "Stage le fichier courant"
   (interactive)

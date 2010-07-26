@@ -127,12 +127,18 @@
 		)
 	  )
 
-
 (setq konix/git/completions
 	  '(
 		"commit "
 		"rebase "
 		"reset "
+		)
+	  )
+
+(setq konix/git/context-completion
+	  '(
+		("^rebase" konix/git/completion/rebase konix/git/branch/list)
+		(".*" konix/git/completions)
 		)
 	  )
 

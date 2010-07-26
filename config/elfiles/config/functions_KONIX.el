@@ -720,7 +720,7 @@ lieu de find-file."
 (defun konix/git/add/update-tracked-files ()
   "Stage tous les fichiers modifiés."
   (interactive )
-  (konix/git/command-to-string (concat "add -u"))
+  (konix/git/command-to-string (concat "add -u") t)
   )
 
 (defun konix/git/branch/list ()

@@ -785,13 +785,12 @@ lieu de find-file."
 		  (setq comp_list ())
 		  (mapcar
 		   '(lambda(e)
-			  (cond
-			   ((functionp e)
-				(setq comp_list (concatenate 'list (funcall e) comp_list))
-				)
-			   ((listp (eval e))
-				(setq comp_list (concatenate 'list (eval e) comp_list))
-				)
+			  (setq
+			   comp_list
+			   (concatenate
+				'list
+				(konix/git/get-completion-list-from-symbol e)
+				comp_list)
 			   )
 			  )
 		   completion_list
@@ -800,6 +799,17 @@ lieu de find-file."
 		  )
 	  )
 	)
+  )
+
+(defun konix/git/get-completion-list-from-symbol (symbol)
+  (cond
+   ((functionp e)
+	(funcall e)
+	)
+   ((listp (eval e))
+	(eval e)
+	)
+   )
   )
 
 (defun konix/git/add/file ()

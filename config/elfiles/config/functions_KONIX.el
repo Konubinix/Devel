@@ -785,16 +785,20 @@ lieu de find-file."
 
 (defun konix/git/branch/list ()
   (let (branches)
-	 (setq branches
-		   (split-string
-			(substring (shell-command-to-string "git branch -l") 0 -1)
-			"\n"
-			)
-		   )
+	(setq branches
+		  (shell-command-to-string "git branch -l 2> /dev/null")
+		  )
+	(if (not (equal 0 (length branches)))
+		(setq branches
+			  (split-string (substring branches 0 -1)
+							"\n"
+							)
+			  )
+	  )
 	(mapcar
 	 '(lambda(e)
-	   (substring e 2)
-	   )
+		(substring e 2)
+		)
 	 branches
 	 )
 	)

@@ -674,10 +674,10 @@ lieu de find-file."
 	)
   )
 
-(defun konix/git/command (command)
+(defun konix/git/command (command &optional cdup)
   "Lance une commande git."
   (interactive "sgit ")
-  (shell-command (concat "cd \"./$(git rev-parse --show-cdup)\" && git " command"&"))
+  (shell-command (concat (konix/git/adjust-command command cdup) "&"))
   )
 
 (defun konix/git/command-to-string (command &optional cdup)

@@ -674,6 +674,28 @@ lieu de find-file."
 	)
   )
 
+(defun konix/git/launch/command (cmd)
+  "According to the cmd, decides wich kind of git command to call."
+  (let (command)
+	(setq command
+		  (block 'command
+			(mapcar
+			 '(lambda(e)
+				(if (string-match e cmd)
+					(return-from 'command (assoc e konix/git/regexp-command))
+				  )
+				)
+			 (keys konix/git/regexp-command)
+			 )
+			nil
+			)
+		  )
+	(if command
+		(funcall (car (cdr command)) cmd (cdr (cdr command)))
+	  )
+	)
+  )
+
 (defun konix/git/command (command &optional cdup)
   "Lance une commande git."
   (interactive "sgit ")

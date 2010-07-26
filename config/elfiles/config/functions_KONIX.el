@@ -887,6 +887,9 @@ lieu de find-file."
   (konix/git/command "mergetool")
   )
 
+(defun konix/git/blame/file ()
+  (interactive)
+  (konix/git/command (concat "blame " buffer-file-name))
   )
 
 (defun konix/git/svn-fetch ()

@@ -1077,11 +1077,9 @@ lieu de find-file."
 	)
   )
 
-(defun konix/git/tag/delete (tag)
-  (interactive
-   (list (completing-read "Tag : " (konix/git/tag/list)))
-   )
-  (konix/git/tag (concat "-d " tag))
+(defun konix/git/tag/delete ()
+  (interactive)
+  (konix/git/command-with-completion "tag -d ")
   )
 
 (defun konix/git/modified-files ()

@@ -1046,7 +1046,7 @@ lieu de find-file."
 
 (defun konix/git/blame/file ()
   (interactive)
-  (konix/git/command (concat "blame " buffer-file-name))
+  (konix/git/command (concat "blame '" buffer-file-name"'") t)
   )
 
 (defun konix/git/svn-fetch ()

@@ -151,7 +151,7 @@
 		("^tag .*-d" konix/git/completion/tag konix/git/tag/list)
 		("^tag .*-m" nil)
 		("^tag" konix/git/completion/tag)
-		("^push" konix/git/remote/list)
+		("^push" konix/git/branch/list konix/git/completion/push)
 		("^ *$" konix/git/completions)
 		)
 	  )
@@ -159,12 +159,20 @@
 (setq konix/git/completion/rebase
 	  '(
 		"--abort"
+		"--interactive"
+		"-i"
 		)
 	  )
 
 (setq konix/git/completion/reset
 	  '(
 		"--hard"
+		)
+	  )
+
+(setq konix/git/completion/push
+	  '(
+		"--force"
 		)
 	  )
 

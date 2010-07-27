@@ -952,9 +952,9 @@ lieu de find-file."
   (split-string (substring (shell-command-to-string "git remote") 0 -1))
   )
 
-(defun konix/git/push (remote)
-  (interactive "sgit push ")
-  (konix/git/command-to-string (concat "push " remote))
+(defun konix/git/push ()
+  (interactive)
+  (konix/git/command-with-completion "push ")
   )
 
 (defun konix/git/checkout (ref)

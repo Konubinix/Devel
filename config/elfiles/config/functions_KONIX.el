@@ -808,8 +808,8 @@ lieu de find-file."
 	)
 
   (let (res)
-	(setq res (gethash symbol konix/git/cache-completion ))
-	(if (not res)
+	(setq res (gethash symbol konix/git/cache-completion -1))
+	(if (equal res -1)
 		(block nil
 			(setq res
 				  (cond

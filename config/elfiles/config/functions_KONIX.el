@@ -678,7 +678,8 @@ lieu de find-file."
 			)
 		  )
 	(setq completion (konix/git/get-completion-list-from-context before_word))
-	(if (or (not completion) (not (all-completions word completion)))
+	;; If no word exists, I can complete with a space
+	(if (not (all-completions word completion))
 		(setq completion (list (concat word " ")))
 	  )
 	(setq compl

@@ -868,7 +868,7 @@ lieu de find-file."
 (defun konix/git/branch/list ()
   (let (branches)
 	(setq branches
-		  (shell-command-to-string "git branch -l 2> /dev/null")
+		  (shell-command-to-string "git branch -l -a 2> /dev/null")
 		  )
 	(if (not (equal 0 (length branches)))
 		(setq branches
@@ -879,7 +879,7 @@ lieu de find-file."
 	  )
 	(mapcar
 	 '(lambda(e)
-		(substring e 2)
+		(replace-regexp-in-string " .*$" "" (substring e 2))
 		)
 	 branches
 	 )

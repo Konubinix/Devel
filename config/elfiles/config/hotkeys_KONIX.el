@@ -23,6 +23,7 @@
 ;; ################################################################################
 ;; quit windows
 (global-set-key (kbd "C-< C-k") 'konix/quit-and-delete-window)
+(define-key 'konix/global-slow-key-map "k" 'bury-buffer)
 
 ;; FFAP
 (global-set-key [C-mouse-1] 'ffap-at-mouse)

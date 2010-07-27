@@ -130,11 +130,11 @@
 
 (setq konix/git/completions
 	  '(
-		"commit "
-		"rebase "
-		"reset "
-		"tag "
-		"push "
+		"commit"
+		"rebase"
+		"reset"
+		"tag"
+		"push"
 		)
 	  )
 
@@ -152,13 +152,13 @@
 
 (setq konix/git/completion/rebase
 	  '(
-		"--abort "
+		"--abort"
 		)
 	  )
 
 (setq konix/git/completion/reset
 	  '(
-		"--hard "
+		"--hard"
 		)
 	  )
 

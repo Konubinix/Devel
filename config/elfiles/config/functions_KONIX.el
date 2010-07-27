@@ -811,16 +811,23 @@ lieu de find-file."
 	(setq res (gethash symbol konix/git/cache-completion -1))
 	(if (equal res -1)
 		(block nil
-			(setq res
-				  (cond
-				   ((functionp e)
-					(funcall e)
+		  (setq res
+				(mapcar
+				 '(lambda (e)
+					;; addition of a trailing space in all elements
+					(concat e " ")
 					)
-				   ((listp (eval e))
-					(eval e)
-					)
+				 ;; result list without trailing space
+				 (cond
+				  ((functionp e)
+				   (funcall e)
+				   )
+				  ((listp (eval e))
+				   (eval e)
 				   )
 				  )
+				 )
+				)
 		  (puthash symbol res konix/git/cache-completion)
 		  )
 	  )

@@ -896,6 +896,17 @@ lieu de find-file."
   (konix/git/command "reflog")
   )
 
+(defun konix/git/log (&optional history_size)
+  (interactive "P")
+  (let (history_cmd)
+	(if (not history_size)
+		(setq history_cmd "")
+	  (setq history_cmd (concat "-" (format "%s" history_size)))
+		)
+	(konix/git/command (concat "log " history_cmd))
+	)
+  )
+
 (defun konix/git/cherry-pick (ref)
   (interactive "sgit cherry-pick ")
   (konix/git/command-to-string (concat "cherry-pick " ref))

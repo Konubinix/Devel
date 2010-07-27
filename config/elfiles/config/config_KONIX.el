@@ -4,6 +4,12 @@
 (setq konix/proj-makefile "~/Makefile")
 
 ;; ************************************************************
+;; Comint
+;; ************************************************************
+(require 'comint)
+(add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
+
+;; ************************************************************
 ;; Je requiert le help mode parce que j'en ai besoin dans mon init
 ;; ************************************************************
 (require 'help-mode)
@@ -164,8 +170,8 @@
 
 (setq konix/git/completion/tag
 	  '(
-		"-d "
-		"-m "
+		"-d"
+		"-m"
 		)
 	  )
 

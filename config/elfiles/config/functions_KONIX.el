@@ -1057,9 +1057,9 @@ lieu de find-file."
   (konix/git/command "status")
   )
 
-(defun konix/git/tag (cmd)
-  (interactive "sgit tag ")
-  (konix/git/command-to-string (concat "tag " cmd))
+(defun konix/git/tag ()
+  (interactive)
+  (konix/git/command-with-completion "tag ")
   )
 
 (defun konix/git/tag/list ()

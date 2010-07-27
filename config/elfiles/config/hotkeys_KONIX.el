@@ -21,6 +21,9 @@
 ;; ###########################################################################v#####
 ;; Raccourcis globaux
 ;; ################################################################################
+;; revert buffer
+(define-key 'konix/global-slow-key-map (kbd "C-r") 'revert-buffer)
+
 ;; quit windows
 (global-set-key (kbd "C-< C-k") 'konix/quit-and-delete-window)
 (define-key 'konix/global-slow-key-map "k" 'bury-buffer)

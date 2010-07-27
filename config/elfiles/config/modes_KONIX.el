@@ -261,6 +261,8 @@
 		(local-set-key (kbd "C-j") 'auto-complete)
 		(local-set-key (kbd "C-c r") 'reftex-toc-Rescan)
 		(TeX-fold-mode t)
+		(setq truncate-partial-width-windows nil)
+		(setq truncate-lines nil)
 		(turn-on-reftex)
 		(outline-minor-mode)
 		(konix/text-hoox)

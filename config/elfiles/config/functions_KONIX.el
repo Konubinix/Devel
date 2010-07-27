@@ -997,10 +997,10 @@ lieu de find-file."
   (konix/git/command-to-string "bisect good" t)
   )
 
-(defun konix/git/rebase (cmd)
+(defun konix/git/rebase ()
   "Lance un rebase."
-  (interactive "sgit rebase ")
-  (konix/git/command (concat "rebase "cmd))
+  (interactive)
+  (konix/git/command-with-completion "rebase ")
   )
 
 (defun konix/git/irebase (ref)

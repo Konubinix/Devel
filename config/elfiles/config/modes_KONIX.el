@@ -396,3 +396,11 @@
 			 (doc-mode t)
 			 )
 		  )
+
+;; isearch
+(setq isearch-mode-hook nil)
+(add-hook 'isearch-mode-hook
+		  '(lambda ()
+			 (cua-set-mark)
+			 (cua-set-mark)
+			 ))

@@ -1063,9 +1063,18 @@ lieu de find-file."
   )
 
 (defun konix/git/tag/list ()
-  (split-string
-   (substring (shell-command-to-string "git tag -l") 0 -1)
-   "\n")
+  (let (tags)
+	(setq tags
+		  (shell-command-to-string "git tag -l 2> /dev/null")
+		  )
+	(if (not (equal 0 (length tags)))
+		(setq tags
+			  (split-string (substring tags 0 -1)
+							"\n"
+							)
+			  )
+	  )
+	)
   )
 
 (defun konix/git/tag/delete (tag)

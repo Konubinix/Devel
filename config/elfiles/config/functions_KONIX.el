@@ -1043,9 +1043,9 @@ lieu de find-file."
   (konix/git/command "svn dcommit")
   )
 
-(defun konix/git/reset (cmd)
-  (interactive "sgit reset ")
-  (konix/git/command-to-string (concat "reset "cmd))
+(defun konix/git/reset ()
+  (interactive)
+  (konix/git/command-with-completion "reset ")
   )
 
 (defun konix/git/reset/HEAD ()

@@ -128,7 +128,8 @@
 ;; --------------------------------------------------
 (setq konix/git/regexp-command
 	  '(
-		("^re" . (konix/git/command-to-string . nil))
+		("^rebase" . (konix/git/command . nil))
+		("^reset" . (konix/git/command-to-string . nil))
 		("^tag" . (konix/git/command-to-string . nil))
 		(".*" . (konix/git/command .nil))
 		)

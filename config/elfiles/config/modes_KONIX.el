@@ -261,7 +261,7 @@
 		(local-set-key (kbd "C-j") 'auto-complete)
 		(local-set-key (kbd "C-c r") 'reftex-toc-Rescan)
 		(TeX-fold-mode t)
-		(setq truncate-partial-width-windows nil)
+		(set (make-local-variable 'truncate-partial-width-windows) nil)
 		(setq truncate-lines nil)
 		(turn-on-reftex)
 		(outline-minor-mode)
@@ -327,7 +327,7 @@
 		 (dirtrack-mode t)
 		 (setq dirtrack-list '("|\\([^|]*\\)|" 1 nil))
 		 (setq truncate-lines t)
-		 (setq truncate-partial-width-windows t)
+		 (set (make-local-variable 'truncate-partial-width-windows) t)
 		 )
        )
 

@@ -1041,7 +1041,7 @@ lieu de find-file."
 (defun konix/git/mergetool ()
   "Lance la commande mergetool de git."
   (interactive)
-  (konix/git/command "mergetool")
+  (konix/git/command "mergetool" t)
   )
 
 (defun konix/git/blame/file ()

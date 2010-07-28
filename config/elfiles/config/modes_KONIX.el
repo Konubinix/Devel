@@ -404,3 +404,11 @@
 			 (cua-set-mark)
 			 (cua-set-mark)
 			 ))
+
+;; dired
+(setq dired-mode-hook nil)
+(add-hook 'dired-mode-hook
+		  '(lambda ()
+			 (setq truncate-lines t)
+			 (set (make-local-variable 'truncate-partial-width-windows) t)
+ ))

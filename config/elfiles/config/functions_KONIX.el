@@ -877,6 +877,7 @@ lieu de find-file."
 							)
 			  )
 	  )
+	(add-to-list 'branches "  HEAD")
 	(setq branches (remove "* (no branch)" branches))
 	(mapcar
 	 '(lambda(e)

@@ -957,10 +957,10 @@ lieu de find-file."
   (konix/git/command-with-completion "push ")
   )
 
-(defun konix/git/checkout (ref)
+(defun konix/git/checkout ()
   "Lance git checkout."
-  (interactive "sgit checkout ")
-  (konix/git/command-to-string (concat "checkout "ref))
+  (interactive)
+  (konix/git/command-with-completion "checkout ")
   )
 
 (defun konix/git/checkout/parent (arg)

@@ -131,6 +131,7 @@
 		("^rebase" . (konix/git/command . nil))
 		("^reset" . (konix/git/command-to-string . nil))
 		("^tag" . (konix/git/command-to-string . nil))
+		("^checkout" . (konix/git/command-to-string . nil))
 		(".*" . (konix/git/command .nil))
 		)
 	  )
@@ -140,6 +141,7 @@
 		"commit"
 		"rebase"
 		"reset"
+		"checkout"
 		"tag"
 		"push"
 		)
@@ -148,6 +150,7 @@
 (setq konix/git/context-completion
 	  '(
 		("^rebase" konix/git/completion/rebase konix/git/branch/list konix/git/tag/list)
+		("^checkout" konix/git/branch/list konix/git/tag/list)
 		("^reset" konix/git/completion/reset konix/git/branch/list konix/git/tag/list)
 		("^tag .*-d" konix/git/completion/tag konix/git/tag/list)
 		("^tag .*-m" nil)

@@ -877,6 +877,7 @@ lieu de find-file."
 							)
 			  )
 	  )
+	(setq branches (remove "* (no branch)" branches))
 	(mapcar
 	 '(lambda(e)
 		(replace-regexp-in-string " .*$" "" (substring e 2))

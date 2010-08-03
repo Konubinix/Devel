@@ -283,8 +283,8 @@ retourne ('fichier','extension')."
 					 ac-source-words-in-buffer
 					 )
 		)
-  (global-set-key (kbd "C-e") 'end-of-line)
-  (global-set-key (kbd "C-a") 'beginning-of-line)
+  (local-set-key (kbd "C-e") 'end-of-line)
+  (local-set-key (kbd "C-a") 'beginning-of-line)
   )
 
 (defun konix/text-hoox ()
@@ -295,8 +295,8 @@ retourne ('fichier','extension')."
   (auto-fill-mode nil)
   (setq fill-column 8000)
   (setq word-wrap t)
-  (global-set-key (kbd "C-e") 'end-of-visual-line)
-  (global-set-key (kbd "C-a") 'beginning-of-visual-line)
+  (local-set-key (kbd "C-e") 'end-of-visual-line)
+  (local-set-key (kbd "C-a") 'beginning-of-visual-line)
   )
 
 ;; ####################################################################################################

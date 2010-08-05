@@ -293,7 +293,7 @@ retourne ('fichier','extension')."
   (local-set-key (kbd "C-a") 'beginning-of-line)
   )
 
-(defun konix/text-hoox ()
+(defun konix/text-hook ()
   "Hook à appeler quand je veux manipuler du texte, du vrai qui tient sur beaucoup de lignes."
   (interactive)
   (setq truncate-partial-width-windows nil)

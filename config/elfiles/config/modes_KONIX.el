@@ -147,7 +147,7 @@
 (setq html-mode-hook
       (lambda ()
 		(auto-complete-mode t)
-		(konix/text-hoox)
+		(konix/text-hook)
 		(flyspell-mode t)
 		))
 
@@ -267,7 +267,7 @@
 		(setq truncate-lines nil)
 		(turn-on-reftex)
 		(outline-minor-mode)
-		(konix/text-hoox)
+		(konix/text-hook)
 		(setq ac-sources (append ac-sources
 								 '(
 								   ac-source-files-in-current-dir
@@ -285,7 +285,7 @@
 (add-hook 'org-mode-hook (lambda ()
 						   (add-hook 'before-save-hook 'org-update-all-dblocks)
 						   (local-set-key (kbd "C-c a") 'org-agenda)
-						   (konix/text-hoox)
+						   (konix/text-hook)
 						   (flyspell-mode 1)
 						   ))
 

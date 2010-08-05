@@ -321,7 +321,7 @@
  (kbd "<C-f7>")
  '(lambda()
 	(interactive)
-	(konix/make "re" konix/proj-makefile)
+	(konix/make "clean all" konix/proj-makefile)
 	)
  )
 

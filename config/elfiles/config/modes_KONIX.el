@@ -416,3 +416,9 @@
 			 (setq truncate-lines t)
 			 (set (make-local-variable 'truncate-partial-width-windows) t)
  ))
+
+;; Makefile
+(add-hook 'makefile-mode-hook
+		  '(lambda()
+			 (konix/text-hook)
+))

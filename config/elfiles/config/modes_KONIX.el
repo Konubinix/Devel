@@ -329,6 +329,8 @@
 		 (dirtrack-mode t)
 		 (setq dirtrack-list '("|\\([^|]*\\)|" 1 nil))
 		 (setq truncate-lines t)
+		 (local-set-key (kbd "C-e") 'end-of-line)
+		 (local-set-key (kbd "C-a") 'beginning-of-line)
 		 (set (make-local-variable 'truncate-partial-width-windows) t)
 		 )
        )

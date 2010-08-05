@@ -128,7 +128,7 @@
 ;; --------------------------------------------------
 (setq konix/git/regexp-command
 	  '(
-		("^rebase" . (konix/git/command . nil))
+		("^.?rebase" . (konix/git/command . nil))
 		("^reset" . (konix/git/command-to-string . nil))
 		("^cherry-pick" . (konix/git/command-to-string . nil))
 		("^tag" . (konix/git/command-to-string . nil))

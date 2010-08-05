@@ -1011,10 +1011,10 @@ lieu de find-file."
   (konix/git/command-with-completion "rebase ")
   )
 
-(defun konix/git/irebase (ref)
+(defun konix/git/irebase ()
   "Rebase interactif sur ref."
-  (interactive "sRef : ")
-  (konix/git/command (concat "rebase -i " ref))
+  (interactive)
+  (konix/git/command-with-completion "rebase -i ")
   )
 
 (defun konix/git/rebase/continue ()

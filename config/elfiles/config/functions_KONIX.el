@@ -916,9 +916,9 @@ lieu de find-file."
 	)
   )
 
-(defun konix/git/cherry-pick (ref)
-  (interactive "sgit cherry-pick ")
-  (konix/git/command-to-string (concat "cherry-pick " ref))
+(defun konix/git/cherry-pick ()
+  (interactive)
+  (konix/git/command-with-completion "cherry-pick ")
   )
 
 (defun konix/git/stash/save (msg)

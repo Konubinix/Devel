@@ -48,3 +48,7 @@
 
 ;; Ogre scenes are xml files
 (add-to-list 'auto-mode-alist (cons "\\.scene$" 'xml-mode))
+
+;; nsi files
+(autoload 'nsi-mode "nsi-mode" "Loading nsi mode" t nil)
+(add-to-list 'auto-mode-alist (cons "\\.nsi$" 'nsi-mode))

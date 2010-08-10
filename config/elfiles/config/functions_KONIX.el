@@ -970,7 +970,7 @@ lieu de find-file."
   (if (not arg)
 	  (setq arg 1)
 	)
-  (konix/git/checkout (concat "HEAD~"(format "%s" arg)))
+  (konix/git/command-to-string (concat "checkout HEAD~"(format "%s" arg)))
   )
 
 (defun konix/git/checkout/file ()

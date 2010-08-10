@@ -132,6 +132,7 @@
 		("^reset" . (konix/git/command-to-string . nil))
 		("^cherry-pick" . (konix/git/command-to-string . nil))
 		("^revert" . (konix/git/command . nil))
+		("^cherry-pick" . (konix/git/command-to-string . nil))
 		("^tag" . (konix/git/command-to-string . nil))
 		("^checkout" . (konix/git/command-to-string . nil))
 		(".*" . (konix/git/command .nil))
@@ -145,6 +146,7 @@
 		"reset"
 		"cherry-pick"
 		"revert"
+		"cherry-pick"
 		"checkout"
 		"tag"
 		"push"

@@ -1084,6 +1084,11 @@ lieu de find-file."
   (konix/git/command-to-string (concat "reset HEAD" ))
   )
 
+(defun konix/git/reset/hard ()
+  (interactive)
+  (konix/git/command-with-completion "reset --hard " )
+  )
+
 (defun konix/git/status ()
   (interactive )
   (konix/git/command "status")

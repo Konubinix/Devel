@@ -260,7 +260,7 @@
 (define-prefix-command 'konix/git-global-map-reset)
 (define-key konix/git-global-map "R" 'konix/git-global-map-reset)
 (define-key konix/git-global-map-reset "r" 'konix/git/reset)
-(define-key konix/git-global-map-reset "h" 'konix/git/reset/HEAD)
+(define-key konix/git-global-map-reset "h" 'konix/git/reset/hard)
 
 (define-prefix-command 'konix/git-global-map-branch)
 (define-key konix/git-global-map "b" 'konix/git-global-map-branch)

@@ -217,6 +217,8 @@
 (add-hook 'compilation-mode-hook
 		  '(lambda ()
 			 (hl-line-mode t)
+			 (local-set-key (kbd "C-e") 'end-of-line)
+			 (local-set-key (kbd "C-a") 'beginning-of-line)
 			 )
 		  )
 

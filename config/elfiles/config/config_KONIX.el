@@ -162,6 +162,7 @@
 		("^tag .*-m" nil)
 		("^tag" konix/git/completion/tag)
 		("^push" konix/git/remote/list)
+		("^branch" konix/git/branch/list)
 		("^ *$" konix/git/completions)
 		)
 	  )
@@ -177,6 +178,12 @@
 (setq konix/git/completion/reset
 	  '(
 		"--hard"
+		)
+	  )
+
+(setq konix/git/completion/branch
+	  '(
+		"-m"
 		)
 	  )
 

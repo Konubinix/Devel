@@ -906,6 +906,11 @@ lieu de find-file."
   (konix/git/command-to-string (concat "branch -D " branch))
   )
 
+(defun konix/git/branch/rename ()
+  (interactive)
+  (konix/git/command-with-completion "branch -m ")
+  )
+
 (defun konix/git/reflog ()
   (interactive)
   (konix/git/command "reflog")

@@ -131,6 +131,7 @@
 		("^.?rebase" . (konix/git/command . nil))
 		("^reset" . (konix/git/command-to-string . nil))
 		("^cherry-pick" . (konix/git/command-to-string . nil))
+		("^revert" . (konix/git/command . nil))
 		("^tag" . (konix/git/command-to-string . nil))
 		("^checkout" . (konix/git/command-to-string . nil))
 		(".*" . (konix/git/command .nil))
@@ -143,6 +144,7 @@
 		"rebase"
 		"reset"
 		"cherry-pick"
+		"revert"
 		"checkout"
 		"tag"
 		"push"
@@ -155,6 +157,7 @@
 		("^checkout" konix/git/branch/list konix/git/tag/list)
 		("^cherry-pick" konix/git/branch/list konix/git/tag/list)
 		("^reset" konix/git/completion/reset konix/git/branch/list konix/git/tag/list)
+		("^revert" konix/git/branch/list konix/git/tag/list)
 		("^tag .*-d" konix/git/completion/tag konix/git/tag/list)
 		("^tag .*-m" nil)
 		("^tag" konix/git/completion/tag)

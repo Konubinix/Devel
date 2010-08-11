@@ -851,8 +851,8 @@ lieu de find-file."
   "Lance un git commit."
   (interactive "sMessage : ")
   (if (= (length msg) 0)
-	  (konix/git/command "ci")
-	(konix/git/command-to-string (concat "ci -m \""msg"\""))
+	  (konix/git/command "ci" t)
+	(konix/git/command-to-string (concat "ci -m \""msg"\"") t)
 	)
   )
 
@@ -860,8 +860,8 @@ lieu de find-file."
   "Lance un git commit."
   (interactive "sEdit message (empty for yes, anything else for no) : ")
   (if (= (length edit) 0)
-	  (konix/git/command "commit --amend")
-	(konix/git/command-to-string (concat "commit --amend -C HEAD"))
+	  (konix/git/command "commit --amend" t)
+	(konix/git/command-to-string (concat "commit --amend -C HEAD") t)
 	)
   )
 

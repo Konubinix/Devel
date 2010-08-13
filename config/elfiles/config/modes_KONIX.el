@@ -56,6 +56,8 @@
 (setq python-mode-hook
       (lambda ()
 		(konix/prog-hook)
+		(setq fill-column 8000)
+		(setq indent-tabs-mode nil)
 		;; Autopair des """ en python
 		(setq autopair-handle-action-fns
 			  (list #'autopair-default-handle-action

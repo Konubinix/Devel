@@ -165,7 +165,7 @@
 		("^tag .*-d" konix/git/completion/tag konix/git/tag/list)
 		("^tag .*-m" nil)
 		("^tag" konix/git/completion/tag)
-		("^push" konix/git/branch/list konix/git/completion/push)
+		("^push" konix/git/remote/list konix/git/completion/push)
 		("^branch" konix/git/branch/list)
 		("^ *$" konix/git/completions)
 		)

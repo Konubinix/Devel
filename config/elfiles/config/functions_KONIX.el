@@ -64,6 +64,12 @@ retourne ('fichier','extension')."
 	)
   )
 
+(defun konix/explorer ()
+  "Lance un explorer."
+  (interactive )
+  (shell-command "Thunar")
+  )
+
 (defun konix/word-at-point ()
   (forward-sexp -1)
   (format "%s" (read (current-buffer)))

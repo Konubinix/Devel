@@ -277,7 +277,7 @@ retourne ('fichier','extension')."
   (setq fill-column 80)
   (setq indent-tabs-mode t)
   (setq truncate-lines t)
-  (setq truncate-partial-width-windows t)
+  (set (make-local-variable 'truncate-partial-width-windows) t)
   (setq ac-sources '(
 										;							 ac-source-gtags
 					 ac-source-semantic
@@ -296,7 +296,7 @@ retourne ('fichier','extension')."
 (defun konix/text-hook ()
   "Hook à appeler quand je veux manipuler du texte, du vrai qui tient sur beaucoup de lignes."
   (interactive)
-  (setq truncate-partial-width-windows nil)
+  (set (make-local-variable 'truncate-partial-width-windows) nil)
   (setq truncate-lines nil)
   (konix/tab-size 4)
   (auto-fill-mode nil)

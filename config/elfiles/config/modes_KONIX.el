@@ -288,6 +288,7 @@
 						   (add-hook 'before-save-hook 'org-update-all-dblocks)
 						   (local-set-key (kbd "C-c a") 'org-agenda)
 						   (konix/text-hook)
+						   (setq indent-tabs-mode nil)
 						   (flyspell-mode 1)
 						   ))
 

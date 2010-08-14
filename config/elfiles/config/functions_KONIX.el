@@ -298,6 +298,7 @@ retourne ('fichier','extension')."
   (interactive)
   (setq truncate-partial-width-windows nil)
   (setq truncate-lines nil)
+  (konix/tab-size 4)
   (auto-fill-mode nil)
   (setq fill-column 8000)
   (setq word-wrap t)

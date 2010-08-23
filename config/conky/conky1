@@ -154,7 +154,6 @@ ${battery_bar BAT0}${outlinecolor}
 ${font Comic sans MS : size=15}$alignc${color2}Système de fichiers$color $font
 
 /             $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /}/${fs_size /}(${fs_used_perc /}%)${outlinecolor}$font
-/home         $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /home/snake}/${fs_size /home/snake}(${fs_used_perc /home/snake}%)${outlinecolor}$font
 /data    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /data}/${fs_size /data}(${fs_used_perc /data}%)${outlinecolor}$font
 /usr    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /usr}/${fs_size /usr}(${fs_used_perc /usr}%)${outlinecolor}$font
 /var    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /var}/${fs_size /var}(${fs_used_perc /var}%)${outlinecolor}$font

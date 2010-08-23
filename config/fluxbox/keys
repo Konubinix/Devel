@@ -247,8 +247,8 @@ Mod4 p : ExecCommand gnome-terminal --working-directory ~/Prog
 # ************************************************************
 # Keyboard
 # ************************************************************
-Mod4 k a :Exec setxkbmap fr bepo
-Mod4 s b :Exec setxkbmap fr
+Mod4 k a :MacroCmd { Exec setxkbmap fr bepo } { Exec setxkbmap -option ctrl:swapcaps } { Exec display.py "Switch to BEPO" }
+Mod4 s b :MacroCmd { Exec setxkbmap fr } { Exec setxkbmap -option ctrl:swapcaps } { Exec display.py "Switch to AZERTY" }
 Mod4 s c :Exec eog ~/Prog/devel/doc/bepo.png
 
 # ************************************************************

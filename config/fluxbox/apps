@@ -87,3 +87,6 @@
 [app] (name=google-chrome) (class=Google-chrome)
   [Workspace]	{1}
 [end]
+[app] (name=nautilus) (class=Nautilus)
+  [Workspace]	{2}
+[end]

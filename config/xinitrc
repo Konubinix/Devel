@@ -1,1 +1,1 @@
-exec ~/.fluxbox/startup
+dbus-launch gnome-session

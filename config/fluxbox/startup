@@ -9,17 +9,16 @@ fbpid=$!
 setxkbmap -option ctrl:swapcaps
 guake &
 numlockx
+~/bin/notify_daemon.py &
+
 
 sleep 4
 {
     killall conky
-    Thunar --daemon &
     nm-applet &
-    idesk &
     conky -d -c ~/.conky.d/conky1
+	gnome-setting-daemon
+	nautilus --no-default-window
 } &
-
-~/bin/notify_daemon.py &
-
 
 wait $fbpid

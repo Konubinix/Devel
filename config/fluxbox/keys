@@ -162,7 +162,7 @@ control Mod4 asterisk : MacroCmd {Exec ~/bin/display.py 'stick' }{Stick}
 # ************************************************************
 # Special window keys
 # ************************************************************
-XF86WWW :Exec x-www-browser
+XF86WWW :Exec display_n_launch.sh x-www-browser
 None 160       :ToggleCmd {Exec amixer sset Master,0 toggle && ~/bin/display_unique.py "Mute on" } {Exec amixer sset Master,0 toggle && ~/bin/display_unique.py "Mute off"}
 None 174	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
 None 176	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
@@ -193,9 +193,7 @@ Control Mod1 BackSpace :ExecCommand /usr/bin/pkill fluxbox
 # GOTO SHORTCUTS
 # ////////////////////////////////////////
 Control Mod1 t :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/gnome-terminal
-Control Mod1 i :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/iceweasel
-Control Mod1 c :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/google-chrome
-XF86Launch1 :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/iceweasel
+Control Mod1 i :Exec display_n_launch.sh x-www-browser
 Control Mod1 p :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/pidgin
 Control Mod1 v :ExecCommand ~/.fluxbox/bin/goto.sh         /usr/bin/vlc
 Control Mod1 e :ExecCommand ~/.fluxbox/bin/goto.sh /usr/bin/emacs

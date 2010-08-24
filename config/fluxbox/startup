@@ -1,5 +1,6 @@
 #!/bin/bash
 
+pkill -9 fluxbox
 fluxbox &
 
 fbpid=$!

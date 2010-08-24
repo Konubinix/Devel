@@ -67,7 +67,7 @@ retourne ('fichier','extension')."
 (defun konix/explorer ()
   "Lance un explorer."
   (interactive )
-  (shell-command "Thunar")
+  (shell-command "gnome-open .")
   )
 
 (defun konix/word-at-point ()

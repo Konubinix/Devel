@@ -68,6 +68,7 @@
 [app] (name=evince) (class=Evince)
   [Workspace]	{5}
   [Maximized]	{yes}
+  [Jump]	{yes}
 [end]
 [app] (name=VCLSalFrame.DocumentWindow) (class=OpenOffice.org 3.2)
   [Workspace]	{5}
@@ -83,6 +84,7 @@
 [end]
 [app] (name=Mail) (class=Icedove) (role=3pane)
   [Workspace]	{5}
+  [Jump]	{yes}
 [end]
 [app] (name=google-chrome) (class=Google-chrome)
   [Workspace]	{1}

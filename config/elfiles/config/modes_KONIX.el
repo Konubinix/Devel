@@ -77,6 +77,7 @@
 (setq css-mode-hook
       (lambda ()
 		(konix/gud-hook-keys)
+		(konix/prog-hook)
 		))
 
 ;;Mode Octave

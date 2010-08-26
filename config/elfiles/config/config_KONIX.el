@@ -455,7 +455,7 @@
 ;; ************************************************************
 (setq erc-autojoin-channels-alist (quote (("irc.efnet.fr" "#Tapiiis"))))
 (setq erc-email-userid "samuel.loury")
-(setq erc-encoding-coding-alist (quote (("Tapiiis" . latin-1))))
+(setq erc-encoding-coding-alist '(("Tapiiis" . iso-8859-15) ("agoctrl" . iso-8859-15)))
 (setq erc-log-insert-log-on-open t)
 (setq erc-log-mode t)
 (setq erc-log-write-after-insert t)

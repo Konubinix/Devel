@@ -66,5 +66,6 @@ remplace "$HOME/lib"               "$(pwd)/lib"
 # ####################################################################################################
 install_icon_theme "$TUNNING/Delta_Gnome_Icons.tar.gz"
 install_gtk_theme "$TUNNING/Theme.tar.gz"
+gconftool --load "$TUNNING/gnome-terminal-profile.xml" /apps/gnome-terminal/profiles/Default
 
 chmod +x -Rv "$HOME/bin" "$HOME/.fluxbox/startup" "$HOME/.fluxbox/bin"

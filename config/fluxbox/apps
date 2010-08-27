@@ -93,3 +93,7 @@
   [Workspace]	{2}
   [Jump]	{yes}
 [end]
+[app] (name=x-www-browser) (class=X-www-browser)
+  [Workspace]	{1}
+  [Jump]	{yes}
+[end]

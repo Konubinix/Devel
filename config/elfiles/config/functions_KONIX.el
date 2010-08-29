@@ -665,6 +665,12 @@ lieu de find-file."
   (start-process "git-gui" nil "git"  "gui")
   )
 
+(defun konix/meld ()
+  "Lance meld."
+  (interactive)
+  (start-process "meld" nil "meld"  ".")
+  )
+
 (defun konix/git/adjust-command (cmd cdup)
   (let ((pre_command ""))
 	(if cdup

@@ -182,6 +182,7 @@
 ;; Lance gitk et git gui
 (global-set-key (kbd "<S-f9>") 'konix/gitk)
 (global-set-key (kbd "<C-f9>") 'konix/git-gui)
+(global-set-key (kbd "<C-S-f9>") 'konix/meld)
 
 ;; commentaires
 (define-key 'konix/global-key-map "c" 'comment-region)

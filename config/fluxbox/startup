@@ -9,6 +9,8 @@ fbpid=$!
 #gnome-terminal --maximize &
 setxkbmap -option ctrl:swapcaps
 guake &
+volwheel &
+wallpaper-tray &
 numlockx
 ~/bin/notify_daemon.py &
 

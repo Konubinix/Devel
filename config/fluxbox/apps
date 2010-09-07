@@ -1,3 +1,7 @@
+[app] (title=.*[Mm]usiques.*)
+  [Workspace]	{5}
+  [Jump]	{yes}
+[end]
 [app] (name=fbrun)
   [Position]	(CENTER)	{0 0}
   [Layer]	{2}
@@ -7,7 +11,7 @@
 [end]
 [group]  (workspace=[current])
  [app] (name=gnome-terminal)
-  [Workspace]	{0}
+  [Workspace]	{6}
   [Maximized]	{yes}
   [Jump]	{yes}
   [Close]	{yes}
@@ -38,21 +42,20 @@
   [Close]	{yes}
 [end]
 [app] (name=) (class=)
-  [Position]	(UPPERLEFT)	{60 0}
+  [Position]	(UPPERLEFT)	{0 0}
   [Layer]	{2}
   [Close]	{yes}
 [end]
 [app] (name=vlc) (class=Vlc)
+  [Dimensions]	{614 487}
 [end]
 [app] (name=gimp) (class=Gimp) (role=gimp-toolbox)
-  [Position]	(UPPERLEFT)	{1000 28}
+  [Position]	(UPPERLEFT)	{1026 291}
   [Close]	{yes}
 [end]
 [app] (name=gimp) (class=Gimp) (role=gimp-dock)
   [Position]	(UPPERLEFT)	{950 -163}
   [Close]	{yes}
-[end]
-[app] (name=emacs) (title=test)
 [end]
 [app] (name=emacs) (class=Emacs)
   [Workspace]	{0}
@@ -63,15 +66,16 @@
   [Jump]	{yes}
 [end]
 [app] (name=Qt-subapplication) (class=VirtualBox)
-  [Workspace]	{4}
+  [Workspace]	{3}
 [end]
 [app] (name=evince) (class=Evince)
-  [Workspace]	{5}
+  [Workspace]	{6}
   [Maximized]	{yes}
   [Jump]	{yes}
 [end]
 [app] (name=VCLSalFrame.DocumentWindow) (class=OpenOffice.org 3.2)
-  [Workspace]	{5}
+  [Workspace]	{6}
+  [Jump]	{yes}
 [end]
 [app] (name=meld) (class=Meld)
   [Maximized]	{yes}
@@ -83,7 +87,7 @@
   [Workspace]	{0}
 [end]
 [app] (name=Mail) (class=Icedove) (role=3pane)
-  [Workspace]	{5}
+  [Workspace]	{4}
   [Jump]	{yes}
 [end]
 [app] (name=google-chrome) (class=Google-chrome)
@@ -96,4 +100,21 @@
 [app] (name=x-www-browser) (class=X-www-browser)
   [Workspace]	{1}
   [Jump]	{yes}
+[end]
+[app] (name=gimp-2.6) (class=Gimp-2.6) (role=gimp-toolbox)
+  [Position]	(UPPERLEFT)	{928 0}
+  [Layer]	{7}
+[end]
+[app] (name=gimp-2.6) (class=Gimp-2.6) (role=gimp-dock)
+  [Position]	(UPPERLEFT)	{1154 0}
+  [Layer]	{7}
+[end]
+[app] (name=Pidgin) (class=Pidgin) (role=conversation)
+  [Workspace]	{4}
+[end]
+[app] (name=Pidgin) (class=Pidgin) (role=buddy_list)
+  [Workspace]	{4}
+[end]
+[app] (name=exaile.py) (class=Exaile.py)
+  [Workspace]	{5}
 [end]

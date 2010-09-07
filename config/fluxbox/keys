@@ -222,7 +222,7 @@ Control Mod4 e :Exec /usr/bin/emacs
 # Miscelaneous shortcuts
 # ************************************************************
 Control Mod1 D : ShowDesktop
-Print : MacroCmd { Exec ~/bin/display.py 'impression ecran' } { ExecCommand /usr/bin/import ~/Capture.png }
+Print : MacroCmd { Exec ~/bin/display.py 'impression ecran' } { ExecCommand /usr/bin/import ~/Desktop/Capture.png }
 
 # ************************************************************
 # File hierarchy dependend shortcuts

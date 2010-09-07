@@ -252,3 +252,14 @@ Mod4 s c :Exec eog ~/Prog/devel/doc/bepo.png
 # Décoration
 # ************************************************************
 Mod4 Control d : ToggleDecor
+
+# ####################################################################################################
+# Macro
+# ###################################################################################################
+Mod4 x k s :MacroCmd { Exec pkill cnee } { Exec display_n_launch.sh cnee --record --keyboard --mouse --stop-key F1 --out-file ~/.xmacro }
+Mod4 x k k :MacroCmd { Exec pkill cnee } { Exec display_n_launch.sh cnee --replay --keyboard --mouse --stop-key F1 --speed-percent 50 --file ~/.xmacro }
+Mod4 x k n :MacroCmd { Exec python ~/bin/macro.py -n && display.py $(readlink ~/.xmacro) }
+Mod4 x k p :MacroCmd { Exec python ~/bin/macro.py -p && display.py $(readlink ~/.xmacro) }
+Mod4 x k v :MacroCmd { Exec python ~/bin/macro.py -s && display.py $(readlink ~/.xmacro) }
+Mod4 x k a :MacroCmd { Exec python ~/bin/macro.py -a && display.py $(readlink ~/.xmacro) }
+

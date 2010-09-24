@@ -157,7 +157,7 @@
       <key>keybindings/global/show_hide</key>
       <schema_key>/schemas/apps/guake/keybindings/global/show_hide</schema_key>
       <value>
-        <string>F12</string>
+        <string>Pause</string>
       </value>
     </entry>
     <entry>
@@ -220,7 +220,7 @@
       <key>keybindings/local/toggle_fullscreen</key>
       <schema_key>/schemas/apps/guake/keybindings/local/toggle_fullscreen</schema_key>
       <value>
-        <string>&lt;Control&gt;F12</string>
+        <string>Break</string>
       </value>
     </entry>
     <entry>

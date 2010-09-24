@@ -9,13 +9,6 @@
 [app] (name=thunar) (class=Thunar)
   [Workspace]	{2}
 [end]
-[group]  (workspace=[current])
- [app] (name=gnome-terminal)
-  [Workspace]	{6}
-  [Maximized]	{yes}
-  [Jump]	{yes}
-  [Close]	{yes}
-[end]
 [app] (name=gecko) (class=Thunderbird-bin)
   [Maximized]	{yes}
   [Close]	{yes}
@@ -45,9 +38,6 @@
   [Position]	(UPPERLEFT)	{0 0}
   [Layer]	{2}
   [Close]	{yes}
-[end]
-[app] (name=vlc) (class=Vlc)
-  [Dimensions]	{614 487}
 [end]
 [app] (name=gimp) (class=Gimp) (role=gimp-toolbox)
   [Position]	(UPPERLEFT)	{1026 291}
@@ -99,6 +89,7 @@
 [end]
 [app] (name=x-www-browser) (class=X-www-browser)
   [Workspace]	{1}
+  [Maximized]	{yes}
   [Jump]	{yes}
 [end]
 [app] (name=gimp-2.6) (class=Gimp-2.6) (role=gimp-toolbox)
@@ -117,4 +108,8 @@
 [end]
 [app] (name=exaile.py) (class=Exaile.py)
   [Workspace]	{5}
+[end]
+[app] (name=gnome-terminal)
+  [Workspace]	{0}
+  [Maximized]	{yes}
 [end]

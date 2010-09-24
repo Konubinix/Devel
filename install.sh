@@ -69,5 +69,6 @@ install_gtk_theme "$TUNNING/Theme.tar.gz"
 gconftool --load "$TUNNING/gnome-terminal-profile.xml" /apps/gnome-terminal/profiles/Default
 gconftool --load "$TUNNING/gnome-desktop-session.xml" /desktop/gnome/session
 gconftool --load "$TUNNING/guake.xml" /apps/guake
+gcc config/gnome-run.c -o $HOME/bin/gnome-run -L/usr/X11R6/lib -lX11
 
 chmod +x -Rv "$HOME/bin" "$HOME/.fluxbox/startup" "$HOME/.fluxbox/bin"

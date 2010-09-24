@@ -173,7 +173,7 @@ XF86AudioRaiseVolume	:Exec ~/bin/display_unique.py "Master Volume : $(amixer set
 # Common keyboard shortcut
 # ************************************************************
 # Open a dialog to run programs
-Mod1 F2 :Exec fbrun
+Mod1 F2 :Exec gnome-run
 
 # Reconfigure
 control Mod1 f : MacroCmd {Reconfigure} {Exec ~/bin/display.py 'reconfigure done'}

@@ -266,8 +266,7 @@
 		(local-set-key (kbd "C-j") 'auto-complete)
 		(local-set-key (kbd "C-c r") 'reftex-toc-Rescan)
 		(TeX-fold-mode t)
-		(set (make-local-variable 'truncate-partial-width-windows) nil)
-		(setq truncate-lines nil)
+		(konix/truncate_lines t)
 		(turn-on-reftex)
 		(outline-minor-mode t)
 		(konix/text-hook)
@@ -289,6 +288,7 @@
 						   (add-hook 'before-save-hook 'org-update-all-dblocks)
 						   (local-set-key (kbd "C-c a") 'org-agenda)
 						   (konix/text-hook)
+						   (konix/truncate_lines t)
 						   (setq indent-tabs-mode nil)
 						   (flyspell-mode 1)
 						   ))
@@ -332,10 +332,7 @@
 		 (ansi-color-for-comint-mode-on)
 		 (dirtrack-mode t)
 		 (setq dirtrack-list '("|\\([^|]*\\)|" 1 nil))
-		 (setq truncate-lines t)
-		 (local-set-key (kbd "C-e") 'end-of-line)
-		 (local-set-key (kbd "C-a") 'beginning-of-line)
-		 (set (make-local-variable 'truncate-partial-width-windows) t)
+		 (konix/truncate_lines t)
 		 )
        )
 
@@ -417,8 +414,7 @@
 (setq dired-mode-hook nil)
 (add-hook 'dired-mode-hook
 		  '(lambda ()
-			 (setq truncate-lines t)
-			 (set (make-local-variable 'truncate-partial-width-windows) t)
+			 (konix/truncate_lines t)
  ))
 
 ;; Makefile

@@ -19,6 +19,22 @@
 	)
   )
 
+(defun konix/truncate_lines (yes)
+  "Modifie les variables locales pour avec un truncate ou pas."
+  (setq truncate-lines yes)
+  (set (make-local-variable 'truncate-partial-width-windows) yes)
+  (if yes
+	  (progn
+	   (local-set-key (kbd "C-e") 'end-of-line)
+	   (local-set-key (kbd "C-a") 'beginning-of-line)
+	   )
+	(progn
+	 (local-set-key (kbd "C-e") 'end-of-visual-line)
+	 (local-set-key (kbd "C-a") 'beginning-of-visual-line)
+	 )
+	)
+  )
+
 (defun konix/quit-and-delete-window ()
   "Quitte la window et en profite pour la deleter."
   (interactive )

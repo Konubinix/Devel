@@ -113,4 +113,5 @@
 [app] (name=gnome-terminal)
   [Workspace]	{0}
   [Maximized]	{yes}
+  [Jump]	{yes}
 [end]

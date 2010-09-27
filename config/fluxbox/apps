@@ -75,6 +75,7 @@
 [end]
 [app] (name=emacsclient) (class=Emacs)
   [Workspace]	{0}
+  [Maximized]	{yes}
 [end]
 [app] (name=Mail) (class=Icedove) (role=3pane)
   [Workspace]	{4}

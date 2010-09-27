@@ -106,6 +106,7 @@
 [end]
 [app] (name=Pidgin) (class=Pidgin) (role=buddy_list)
   [Workspace]	{4}
+  [Jump]	{yes}
 [end]
 [app] (name=exaile.py) (class=Exaile.py)
   [Workspace]	{5}

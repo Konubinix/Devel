@@ -276,7 +276,7 @@
 ;; Buffers
 ;; ************************************************************
 ;;Changer de buffer par C-x b plus facilement
-(ido-mode t)
+(ido-mode 'buffer)
 
 ;; Ne cahce pas les commentaires quand on fait TOUT cacher
 (setq hs-hide-comments-when-hiding-all nil)
@@ -434,6 +434,17 @@
 ;; IDO
 ;; ************************************************************
 (setq ido-enable-last-directory-history nil)
+
+;; ************************************************************
+;; TEX
+;; ************************************************************
+(setq reftex-plug-into-AUCTeX t)
+
+;; ************************************************************
+;; TERM
+;; ************************************************************
+(setq term-default-bg-color "black")
+(setq term-default-fg-color "grey")
 
 ;; ************************************************************
 ;; Maxima

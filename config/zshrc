@@ -1,15 +1,16 @@
 # -*- mode:sh -*-
+
 # Historique
 HISTFILE=~/.histfile
 HISTSIZE=5000
 SAVEHIST=5000
 setopt hist_ignore_all_dups # ignore les commandes doublons
 
-. ~/.shrc
+source "$CONFIG_DIR/shrc"
 
 # Aliases
-if [ -f ~/.zsh_aliases ]; then
-   . ~/.zsh_aliases
+if [ -f "$CONFIG_DIR/zsh_aliases" ]; then
+	source "$CONFIG_DIR/zsh_aliases"
 fi
 
 # Touches comme emacs
@@ -107,4 +108,4 @@ _git-reset () {
 # ####################################################################################################
 # Lib PERSO
 # ####################################################################################################
-source ~/lib/lib_zsh.sh
+source "$DEVEL_DIR/lib/lib_zsh.sh"

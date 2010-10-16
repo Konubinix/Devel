@@ -1,10 +1,11 @@
-# -*- mode: sh -*-
 #!/bin/bash
+# -*- mode: sh -*-
+
 # ####################################################################################################
 # Personal info
 # ####################################################################################################
-if [ -f ~/.perso ]; then
-   . ~/.perso
+if [ -f "$PERSO_DIR/perso" ]; then
+	source "$PERSO_DIR/perso"
 fi
 
 # ################################################################################
@@ -12,8 +13,8 @@ fi
 # ################################################################################
 
 # Take the aliases from a special file
-if [ -f ~/.bash_aliases ]; then
-   . ~/.bash_aliases
+if [ -f "$CONFIG_DIR/bash_aliases" ]; then
+	source "$CONFIG_DIR/bash_aliases"
 fi
 
 # ************************************************************
@@ -30,8 +31,6 @@ export LANG='fr_FR.UTF-8'
 # ////////////////////////////////////////
 # Environnement d'execution et de developpement
 # ////////////////////////////////////////
-# Pour QT, projet ARV
-export QMAKEFEATURES=${HOME}/Prog/api_arv/qmake
 # Pour le link dynamique
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib:/usr/local/lib
 # ajout de lib perso
@@ -39,11 +38,11 @@ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/paraview/lib
 #ogre
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/ogre/lib
 
-PKG_CONFIG_PATH=/usr/local/ogre/lib/pkgconfig:/usr/lib/pkgconfig:~/.pkgconfig
+PKG_CONFIG_PATH=/usr/local/ogre/lib/pkgconfig:/usr/lib/pkgconfig:"$CONFIG_DIR/pkgconfig"
 
 # MON Path
 # En priorité, mes binaires persos
-PATH=${HOME}/bin:$PATH
+PATH="${CONFIG_DIR}/bin:$PATH"
 # Puis les endroits de base
 PATH=$PATH:/usr/games/bin:/usr/local/games:/bin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/opt/bin
 # Ajout de cas particuliers
@@ -59,7 +58,7 @@ export PKG_CONFIG_PATH
 # ################################################################################
 # Importation de mes fonctions persos
 # ################################################################################
-. ${HOME}/lib/lib_bash.sh
+source "${CONFIG_DIR}/lib/lib_bash.sh"
 
 # Log sur l'agent SSH
 key_KONIX

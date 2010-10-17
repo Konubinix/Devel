@@ -34,7 +34,7 @@ function findwindow {
                 fi;
         done
 }
-findwindow $BASENAME $WMCTRL $GREP; 
+findwindow $BASENAME $WMCTRL $GREP;
 if [ $FOUND -eq 0 ]
 then
     $APPLICATION $ARGS

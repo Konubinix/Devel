@@ -60,6 +60,8 @@ remplace "$HOME/.gconf/apps/gnome-terminal/profiles/Default/%gconf.xml"        "
 remplace "$HOME/.xinitrc"          "$CONFIG/xinitrc"
 remplace "$HOME/.xsession"         "$HOME/.xinitrc"
 
+remplace "$HOME/bin"               "$(pwd)/bin"
+remplace "$HOME/lib"               "$(pwd)/lib"
 
 # ####################################################################################################
 # Gnome conf

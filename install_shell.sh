@@ -5,9 +5,7 @@
 #  \author Konubinix  (konubinix@gmail.com)
 #  \date sam. 18:31:08 16/10/2010
 ######################################################################
-DEVEL_DIR="$(pwd)"
-CONFIG_DIR="$(pwd)/config"
-PERSO_DIR="$(pwd)/perso"
+source install_var.sh
 
 cat <<EOF  > $HOME/.custo.sh
 DEVEL_DIR="${DEVEL_DIR}"

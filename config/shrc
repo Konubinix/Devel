@@ -42,7 +42,7 @@ PKG_CONFIG_PATH=/usr/local/ogre/lib/pkgconfig:/usr/lib/pkgconfig:"$CONFIG_DIR/pk
 
 # MON Path
 # En priorité, mes binaires persos
-PATH="${CONFIG_DIR}/bin:$PATH"
+PATH="${DEVEL_DIR}/bin:$PATH"
 # Puis les endroits de base
 PATH=$PATH:/usr/games/bin:/usr/local/games:/bin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/opt/bin
 # Ajout de cas particuliers

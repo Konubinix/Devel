@@ -58,7 +58,7 @@ export PKG_CONFIG_PATH
 # ################################################################################
 # Importation de mes fonctions persos
 # ################################################################################
-source "${CONFIG_DIR}/lib/lib_bash.sh"
+source "${DEVEL_DIR}/lib/lib_bash.sh"
 
 # Log sur l'agent SSH
 key_KONIX

@@ -56,7 +56,6 @@ remplace "$HOME/.ideskrc"          "$CONFIG/ideskrc"
 remplace "$HOME/.idesktop"         "$CONFIG/idesktop"
 remplace "$HOME/.Xdefaults"        "$CONFIG/Xdefaults"
 remplace "$HOME/Makefile"          "$CONFIG/Makefile"
-remplace "$HOME/.gconf/apps/gnome-terminal/profiles/Default/%gconf.xml"        "$CONFIG/config/gnome-terminal-conf.xml"
 remplace "$HOME/.xinitrc"          "$CONFIG/xinitrc"
 remplace "$HOME/.xsession"         "$HOME/.xinitrc"
 

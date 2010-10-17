@@ -344,21 +344,15 @@ retourne ('fichier','extension')."
 ;; ################################################################################
 ;; Org
 ;; ################################################################################
-(defun konix/perso-org ()
-  (interactive)
-  (switch-to-buffer (find-file-noselect "~/wiki/perso.org"))
-  (org-mode)
-  )
-
 (defun konix/todo-org ()
   (interactive)
-  (switch-to-buffer (find-file-noselect "~/wiki/todo.org"))
+  (switch-to-buffer (find-file-noselect (concat perso-dir "/wiki/todo.org")))
   (org-mode)
   )
 
 (defun konix/diary-org ()
   (interactive)
-  (switch-to-buffer (find-file-noselect "~/wiki/diary.org"))
+  (switch-to-buffer (find-file-noselect (concat perso-dir "/wiki/diary.org")))
   (org-mode)
   )
 
@@ -1233,7 +1227,7 @@ lieu de find-file."
 	(message "cedet already loaded")
 	(progn
 	  (setq cedet-loaded t)
-	  (load-file "~/.elfiles/cedet/common/cedet.el")
+	  (load-file (concat elfiles "/cedet/common/cedet.el"))
 	  (global-ede-mode t)
 	  (require 'semantic-ia)
 	  (require 'semantic-gcc)
@@ -1343,7 +1337,7 @@ contained c, h, cpp, cc.."
 (defun konix/hack-on-emacs ()
   "Va dans le repertoire ~/.elfiles pour aller hacker un peu."
   (interactive)
-  (find-file "~/.elfiles/config")
+  (find-file (concat elfiles "/config"))
   )
 
 (defun konix/tab-size (size)

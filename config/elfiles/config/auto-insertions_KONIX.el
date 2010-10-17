@@ -1,5 +1,5 @@
 (add-hook 'find-file-hooks 'auto-insert)
-(setq auto-insert-directory (expand-file-name "~/.elfiles/autoinsert/"))
+(setq auto-insert-directory (expand-file-name (concat elfiles "/autoinsert/")))
 
 (define-auto-insert
   (cons "\\.\\([hH]\\|hh\\|hpp\\)\\'" "Mon en-tête C/C++")

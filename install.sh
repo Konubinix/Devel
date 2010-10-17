@@ -4,6 +4,7 @@
 # SHELL INSTALL
 # ************************************************************
 ./install_shell.sh
+./install_emacs.sh
 
 # ************************************************************
 # OLD INSTALL
@@ -47,11 +48,8 @@ function install_gtk_theme(){
 
 remplace "$HOME/.gitk"             "$CONFIG/gitk"
 remplace "$HOME/.gitconfig"        "$CONFIG/gitconfig"
-remplace "$HOME/.emacs"            "$CONFIG/emacs"
-remplace "$HOME/.emacs-custom.el"  "$CONFIG/emacs-custom.el"
 remplace "$HOME/.fluxbox"          "$CONFIG/fluxbox"
 remplace "$HOME/.pyrc.py"          "$CONFIG/pyrc.py"
-remplace "$HOME/.elfiles"          "$CONFIG/elfiles"
 remplace "$HOME/.conky.d"          "$CONFIG/conky"
 remplace "$HOME/.B.blend"          "$CONFIG/B.blend"
 remplace "$HOME/.ideskrc"          "$CONFIG/ideskrc"

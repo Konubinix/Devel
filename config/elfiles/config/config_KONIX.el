@@ -45,7 +45,7 @@
 ;; ************************************************************
 (require 'yasnippet)
 (yas/initialize)
-(yas/load-directory "~/.elfiles/yasnippet/snippets")
+(yas/load-directory (concat elfiles "/yasnippet/snippets"))
 
 ;; ************************************************************
 ;; Autopair (parenthèsage automatique et bien pensé)
@@ -79,7 +79,7 @@
 ;; ************************************************************
 (require 'auto-complete-config)
 (require 'ac-dabbrev)
-(add-to-list 'ac-dictionary-directories "~/.elfiles/ac-dict")
+(add-to-list 'ac-dictionary-directories (concat elfiles "/ac-dict"))
 (setq-default hippie-expand-try-functions-list '(auto-complete))
 (setq-default ac-sources
 			  '(
@@ -104,7 +104,7 @@
 (setq-default ac-auto-show-menu nil)
 (ac-set-trigger-key "TAB")
 (setq-default ac-dwim-enable t)
-(setq-default ac-comphist-file "~/.elfiles/comphist.dat")
+(setq-default ac-comphist-file (concat elfiles "/comphist.dat"))
 (setq-default global-auto-complete-mode t)
 (setq-default ac-candidate-max 1000)
 
@@ -342,8 +342,8 @@
 (require 'org)
 (setq org-hide-leading-stars t)
 (setq org-agenda-include-diary t)
-(setq org-agenda-files (quote ("~/wiki/todo.org" "~/wiki/diary.org")))
-(setq org-agenda-diary-file "~/wiki/diary.org")
+(setq org-agenda-files (list (concat perso-dir "/wiki/todo.org") (concat perso-dir "/wiki/diary.org")))
+(setq org-agenda-diary-file (concat perso-dir "/wiki/diary.org"))
 (setq org-agenda-include-all-todo t)
 (setq org-agenda-include-diary nil)
 (setq org-agenda-insert-diary-strategy (quote date-tree))
@@ -354,7 +354,7 @@
 (setq org-clock-in-resume t)
 (setq org-clock-out-remove-zero-time-clocks t)
 (setq org-clock-persist (quote clock))
-(setq org-clock-persist-file "~/.elfiles/org-clock-save.el")
+(setq org-clock-persist-file (concat elfiles "/org-clock-save.el"))
 (setq org-clock-persist-query-save t)
 (setq org-enforce-todo-checkbox-dependencies t)
 (setq org-enforce-todo-dependencies t)

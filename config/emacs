@@ -15,7 +15,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/yasnippet") ))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/git") ))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/magit") ))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/egg") ))
+
 ;; Pour org
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 

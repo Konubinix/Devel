@@ -19,3 +19,5 @@ cat <<EOF > "$HOME/.emacs"
 (load-file "$HOME/.custo.el")
 (load-file "$CONFIG_DIR/emacs.el")
 EOF
+
+echo "Successfully installed $0"

@@ -27,3 +27,5 @@ cat <<EOF > "$HOME/.zshrc"
 source "$HOME/.custo.sh"
 source "${CONFIG_DIR}/zshrc"
 EOF
+
+echo "Successful installed $0"

@@ -7,23 +7,23 @@
 ######################################################################
 source install_var.sh
 
-cat <<EOF  > $HOME/.custo.sh
+cat <<EOF  > "$HOME/.custo.sh"
 DEVEL_DIR="${DEVEL_DIR}"
 CONFIG_DIR="${CONFIG_DIR}"
 PERSO_DIR="${PERSO_DIR}"
 EOF
 
-cat <<EOF > $HOME/.bashrc
+cat <<EOF > "$HOME/.bashrc"
 source "$HOME/.custo.sh"
 source "${CONFIG_DIR}/bashrc"
 EOF
 
-cat <<EOF > $HOME/.shrc
+cat <<EOF > "$HOME/.shrc"
 source "$HOME/.custo.sh"
 source "${CONFIG_DIR}/shrc"
 EOF
 
-cat <<EOF > $HOME/.zshrc
+cat <<EOF > "$HOME/.zshrc"
 source "$HOME/.custo.sh"
 source "${CONFIG_DIR}/zshrc"
 EOF

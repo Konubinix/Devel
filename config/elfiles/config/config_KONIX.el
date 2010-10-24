@@ -210,22 +210,6 @@
 (require 'git-blame)
 
 ;; ************************************************************
-;; Egg
-;; ************************************************************
-(require 'egg)
-(setq egg-background-idle-period 30)
-(setq egg-buffer-hide-help-on-start (quote (egg-status-buffer-mode egg-log-buffer-mode egg-file-log-buffer-mode egg-reflog-buffer-mode egg-diff-buffer-mode egg-commit-buffer-mode)))
-(setq egg-buffer-hide-section-type-on-start (quote ((egg-status-buffer-mode . :hunk) (egg-commit-buffer-mode . :hunk) (egg-diff-buffer-mode . :hunk))))
-(setq egg-buffer-hide-sub-blocks-on-start (quote (egg-status-buffer-mode egg-log-buffer-mode egg-file-log-buffer-mode egg-reflog-buffer-mode egg-diff-buffer-mode egg-commit-buffer-mode)))
-(setq egg-confirm-next-action t)
-(setq egg-enable-tooltip t)
-(setq egg-refresh-index-in-backround t)
-(setq egg-show-key-help-in-buffers (quote (:status :log :file-log :reflog :diff :commit)))
-(define-key egg-hide-show-map (kbd "TAB") 'egg-section-cmd-toggle-hide-show)
-(define-key egg-hide-show-map (kbd "S-TAB") 'egg-section-cmd-toggle-hide-show-children)
-
-
-;; ************************************************************
 ;; MenuBufferPlus
 ;; ************************************************************
 (require 'buff-menu+)

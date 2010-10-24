@@ -284,17 +284,6 @@
 ;; toggle source header
 (define-key 'konix/global-key-map (kbd "M-t") 'konix/toggle-source-header)
 
-;; EGG
-(define-key egg-hide-show-map (kbd "TAB") 'egg-section-cmd-toggle-hide-show)
-(define-key egg-hide-show-map (kbd "<backtab>") 'egg-section-cmd-toggle-hide-show-children)
-(define-key egg-hunk-section-map (kbd "V") 'konix/egg-hunk-section-cmd-view-file-other-window)
-(define-key egg-status-buffer-mode-map (kbd "l") 'magit-log)
-(define-key egg-file-cmd-map (kbd "l") 'magit-log)
-(define-key egg-buffer-mode-map "q" 'konix/quit-and-delete-window)
-(define-key egg-file-cmd-map "s" 'konix/egg-status)
-(global-set-key  "\M-gu" 'uncomment-region)
-(global-set-key  "\M-gc" 'comment-region)
-
 ;; recherche semantic
 (global-set-key (kbd "C-S-S") 'senator-search-forward)
 

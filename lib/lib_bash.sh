@@ -1,6 +1,6 @@
 SSH_AGENT_SOURCE=/tmp/ssh-agent-source
 
-function path2dir_KONIX(){
+function path2dir_KONIX {
 	PWD="$(pwd)"
 	test="$(echo "$*" | sed 's-^/--')"
 	if [[ "$test" == "$*" ]]
@@ -18,15 +18,15 @@ function path2dir_KONIX(){
 	fi
 }
 
-function path2file_KONIX(){
+function path2file_KONIX {
 	echo "$*" | sed -r 's-.*/([^/]*)$-\1-'
 }
 
-function remove_trailing_slash_KONIX(){
+function remove_trailing_slash_KONIX {
 	echo "$1" | sed 's-/$--'
 }
 
-function est_nombre_KONIX(){
+function est_nombre_KONIX {
 	if [ -z $1 ]
 	then
 		return 1
@@ -42,7 +42,7 @@ function est_nombre_KONIX(){
 	fi
 }
 
-function timer_on_KONIX(){
+function timer_on_KONIX {
 	timeout=$1
 	shift
 	command=$*
@@ -65,7 +65,7 @@ function timer_on_KONIX(){
 	return $result_wait
 }
 
-function run_ssh_agent_KONIX(){
+function run_ssh_agent_KONIX {
 	ssh-agent > $SSH_AGENT_SOURCE
 	. $SSH_AGENT_SOURCE
 	ssh-add
@@ -76,7 +76,7 @@ function run_ssh_agent_KONIX(){
 	fi
 }
 
-function key_KONIX(){
+function key_KONIX {
 	if [ -e $SSH_AGENT_SOURCE ]
 	then
 		. $SSH_AGENT_SOURCE
@@ -91,7 +91,7 @@ function key_KONIX(){
 	fi
 }
 
-function est_connecte_KONIX(){
+function est_connecte_KONIX {
 	WGET_WAIT=$1
 	SITE="http://www.google.fr/index.html"
 	echo "Test de la connexion en tentant de se connecter à $SITE"
@@ -107,7 +107,7 @@ function est_connecte_KONIX(){
 	return $?
 }
 
-function tsocks_KONIX(){
+function tsocks_KONIX {
 	. /usr/bin/tsocks off
 	if [ -e ~/.pid_ssh_tsock ]
 	then
@@ -131,7 +131,7 @@ function tsocks_KONIX(){
 	. /usr/bin/tsocks on
 }
 
-function trouve_KONIX(){
+function trouve_KONIX {
 	file="$*"
 	find ./ -iname "*$file*"
 }

@@ -1408,6 +1408,12 @@ has the same name with the .h extension"
 	)
   )
 
+(defun konix/cygwin-to-windows-path (dir)
+  (if (string-match "^/\\([a-z]\\)\\(.*\\)" dir)
+      (concat (match-string 1 dir) ":" (match-string 2 dir))
+    dir)
+  )
+
 ;; ************************************************************
 ;; Header
 ;; ************************************************************

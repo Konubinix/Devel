@@ -1,16 +1,19 @@
 ;; ##################################################
-;; Bibliothèques
+;; Libraries path
 ;; ##################################################
 ;; Les diff libs
-(add-to-list 'load-path (expand-file-name elfiles ))
-; config perso
-(add-to-list 'load-path (expand-file-name (concat elfiles "/config") ))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/yasnippet") ))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/git") ))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/magit") ))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/egg") ))
-;; Pour org
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
+(setq load-path
+      (append
+       (list
+        (expand-file-name elfiles)
+        (expand-file-name (concat elfiles "/config"))
+        (expand-file-name (concat elfiles "/yasnippet"))
+        (expand-file-name (concat elfiles "/git"))
+        (expand-file-name (concat elfiles "/magit"))
+        )
+       load-path
+       )
+      )
 
 ;; ################################################################################
 ;; Fichiers de config
@@ -52,5 +55,5 @@
 ;; serveur
 (server-start)
 
-;(find-file "~/.emacs")
-;(find-file "~/.elfiles/config/config_KONIX.el")
+;;(find-file "~/.emacs")
+;;(find-file "~/.elfiles/config/config_KONIX.el")

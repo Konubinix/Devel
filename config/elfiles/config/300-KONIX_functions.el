@@ -63,6 +63,19 @@
   (message "debug-on-error passe à %s" debug-on-error)
   )
 
+(defun konix/kill-current-buffer ()
+  "Kill the current buffer."
+	(interactive)
+	(kill-buffer (current-buffer))
+  )
+
+(defun konix/kill-current-buffer-and-delete-window ()
+  "Kill the current buffer and delete the corresponding window."
+	(interactive)
+	(konix/kill-current-buffer)
+  (delete-window)
+  )
+
 (defun konix/split-ext (filename)
   "Prend en entrée un nom de fichier avec extension,
 retourne ('fichier','extension')."

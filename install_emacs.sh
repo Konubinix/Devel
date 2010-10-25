@@ -7,7 +7,7 @@
 ######################################################################
 source ./install_var.sh
 
-cat <<EOF > "$HOME/.custo.el"
+cat <<EOF > "$HOME/.emacs_var"
 (defvar config-dir "$CONFIG_DIR" "where I put my config files")
 (defvar elfiles "$CONFIG_DIR/elfiles" "where I put my emacs files")
 (defvar emacs-config-dir "$CONFIG_DIR/elfiles/config" "where I put my emacs custom config files")
@@ -16,7 +16,7 @@ cat <<EOF > "$HOME/.custo.el"
 EOF
 
 cat <<EOF > "$HOME/.emacs"
-(load-file "$HOME/.custo.el")
+(load-file "$HOME/.emacs_var")
 (load-file "$CONFIG_DIR/emacs.el")
 EOF
 

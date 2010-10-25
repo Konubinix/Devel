@@ -146,20 +146,6 @@
 (define-key outline-minor-mode-map (kbd "<f2> <f1>") 'hide-body)
 (define-key outline-minor-mode-map (kbd "<f2> <f3>") 'show-all)
 
-;; Compilation
-(define-prefix-command 'compilation-mode-map)
-(define-key compilation-mode-map (kbd "Q") 'konix/quit-and-delete-window)
-(define-key compilation-mode-map (kbd "k")
-  '(lambda()
-	 (interactive)
-	 (kill-buffer (current-buffer))
-	 ))
-(define-key compilation-mode-map (kbd "K")
-  '(lambda()
-	 (interactive)
-	 (kill-buffer (current-buffer))
-	 (delete-window)
-	 ))
 (define-key compilation-mode-map (kbd "TAB") 'next-error-no-select)
 (define-key compilation-mode-map (kbd "<backtab>") 'previous-error-no-select)
 

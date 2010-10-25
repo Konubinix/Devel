@@ -507,143 +507,6 @@ retourne ('fichier','extension')."
 	)
   )
 
-;; Gestion d'un projet
-(defun konix/compile (command)
-  "Lance une compilation et fait deux trois trucs en plus pour
-mieux voir."
-  (interactive "sCompile-command : ")
-  (kill3DVIA)
-  (let (old-compile-command)
-	(setq old-compile-command compile-command)
-	(compile command t)
-	(message "Compilation en cours...")
-	(switch-to-buffer-other-window "*compilation*")
-	(end-of-buffer)
-	(other-window 1)
-	)
-  )
-
-(defun konix/find-makefile-recursive (directory)
-  (cond
-   ;; Nil -> nil
-   ((not directory)
-	nil)
-   ;; un rep -> cherche le rep
-   ((file-directory-p directory)
-	(let ((res nil)
-		  (parent (expand-file-name (concat directory "../")))
-		  (me (expand-file-name directory)))
-	  (cond
-	   ;; Condition de terminaison
-	   ((equal me parent)
-		nil
-		)
-	   ;; Regarde pour le rep courant
-	   ((and (file-exists-p (concat me "Makefile")) (not (file-directory-p (concat me "Makefile"))))
-		(concat me "Makefile")
-		)
-	   ;; Si pas ici, peut être dans le parent
-	   (t
-		(konix/find-makefile-recursive parent)
-		)
-	   )
-	  )
-	)
-	;; Un fichier -> ok
-   ((file-exists-p directory)
-	directory
-	)
-   ;; Sinon -> tente quand même de chercher dans le directory du fichier (même s'il existe pas)
-   (t
-	(konix/find-makefile-recursive (expand-file-name (file-name-directory directory)))
-	)
-   )
-  )
-
-(defun konix/find-makefile (&optional makefile)
-  "Trouve un makefile pour maker."
-  (cond
-   ;; L'arbo du makefile donné
-   ((setq makefile (konix/find-makefile-recursive makefile)))
-   ;; Cherche dans rep courant et parents
-   ((setq makefile (konix/find-makefile-recursive "./")))
-   ;; HOME
-   ((and (file-exists-p "~Makefile") (not (file-directory-p "~Makefile")))
-	(setq makefile "~/Makefile"))
-   ;; Sinon ancien proj-makefile
-   ((and (file-exists-p konix/proj-makefile) (not (file-directory-p konix/proj-makefile)))
-	(setq makefile konix/proj-makefile)
-	)
-   ;; sinon, rien du tout
-   ((setq makefile nil))
-   )
-  (if (not makefile)
-	  (error "Pas de Makefile trouvé")
-	)
-  (setq konix/proj-makefile (expand-file-name makefile))
-  )
-
-(defun konix/make (&optional param makefile)
-  "Lance un make sur le makefile avec les param."
-  (interactive "sParam : \nfMakefile :")
-  (konix/find-makefile makefile)
-  (let ((command (concat "make -C '"(file-name-directory konix/proj-makefile)"' "param))
-		(buf_name (buffer-name))
-		)
-	(let (window)
-	  (setq window (get-buffer-window "*compilation*"))
-	  (if window
-		  (select-window window)
-		(progn
-		  (setq window (split-window))
-		  (select-window window)
-		  (switch-to-buffer "*compilation*")
-		  )
-		)
-	  )
-	(message "Make en cours...")
-	(compile command)
-	(highlight-regexp "error" 'compilation-error)
-	(highlight-regexp "warning" 'compilation-warning)
-	(end-of-buffer)
-	(select-window (get-buffer-window buf_name))
-	)
-  )
-
-(defun konix/make-shell (makefile &optional param)
-  "Lance un make dans un shell."
-  (interactive "fMakefile : ")
-  (shell-command (concat "make -f " makefile " "param"&"))
-  )
-
-(defun konix/make-shell-to-string (makefile &optional param)
-  "Lance un make dans un shell."
-  (interactive "fMakefile : ")
-  (shell-command-to-string (concat "make -f " makefile " "param"&"))
-  )
-
-(defun konix/set-compilation-success-run-hook ()
-  (setq konix/compilation-success-hook
-		'((lambda()
-			(konix/make-shell konix/proj-makefile "run")
-			(setq konix/compilation-success-hook nil)
-			)))
-  )
-
-(defvar konix/compilation-success-hook nil)
-;; Close the compilation window if there was no error at all.
-(setq compilation-exit-message-function
-	  (lambda (status code msg)
-		;; If M-x compile exists with a 0
-		(when (and (eq status 'exit) (zerop code))
-		  ;; then bury the *compilation* buffer, so that C-x b doesn't go there
-										;		  (bury-buffer "*compilation*")
-		  ;; and return to whatever were looking at before
-										;		  (replace-buffer-in-windows "*compilation*")
-		  (run-hooks 'konix/compilation-success-hook)
-		  )
-		;; Always return the anticipated result of compilation-exit-message-function
-		(cons msg code)))
 ;; ************************************************************
 ;; Git
 ;; ************************************************************
@@ -814,14 +677,6 @@ lieu de find-file."
 	(setq c-basic-offset size)
 	(setq tab-stop-list list)
 	)
-  )
-
-(defun konix/re-compile ()
-  "re compile"
-  (interactive)
-  (set 'prev-compile-command compile-command)
-  (compile "make clean ; make")
-  (set 'compile-command prev-compile-command)
   )
 
 ;; TAGS
@@ -1162,7 +1017,6 @@ set terminal pop;\
   (other-window 1)
   )
 
-
 (defun konix/git/reset-file (file)
   "reset le fichier courrant à sa version HEAD."
   (interactive "fFichier : ")
@@ -1174,6 +1028,7 @@ set terminal pop;\
 		)
 	)
   )
+
 (defun konix/disp-window (msg)
   "Tiré de appt, affiche une petite window en dessous de l'écran pour afficher un message"
   (let ((this-window (selected-window))

@@ -61,4 +61,8 @@ export PKG_CONFIG_PATH
 source "${DEVEL_DIR}/lib/lib_bash.sh"
 
 # Log sur l'agent SSH
-key_KONIX
+if is_on_linux
+then
+    key_KONIX
+fi
+

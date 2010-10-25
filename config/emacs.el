@@ -1,13 +1,6 @@
-;; ####################################################################################################
-;; Custom file
-;; ####################################################################################################
-(load-file "~/.custo.el")
-
 ;; ##################################################
 ;; Bibliothèques
 ;; ##################################################
-;;Config du custom dans un fichier séparé
-(setq custom-file (concat config-dir "/emacs-custom.el"))
 ;; Les diff libs
 (add-to-list 'load-path (expand-file-name elfiles ))
 ; config perso
@@ -58,9 +51,6 @@
 
 ;; serveur
 (server-start)
-
-;; On finit par loader les customs
-(load custom-file)
 
 ;(find-file "~/.emacs")
 ;(find-file "~/.elfiles/config/config_KONIX.el")

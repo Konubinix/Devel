@@ -15,9 +15,18 @@ cat <<EOF > "$HOME/.emacs_var"
 (defvar perso-dir "$PERSO_DIR" "My personnal stuff")
 EOF
 
+if test ! -e "$EMACS_CUSTOM_FILE"
+then
+    cp "./config/emacs-custom.el" "$EMACS_CUSTOM_FILE"
+fi
+
 cat <<EOF > "$HOME/.emacs"
 (load-file "$HOME/.emacs_var")
+;;Config du custom dans un fichier séparé
+(setq custom-file "~/emacs_custo")
 (load-file "$CONFIG_DIR/emacs.el")
+;; On finit par loader les customs
+(load custom-file)
 EOF
 
 echo "Successfully installed $0"

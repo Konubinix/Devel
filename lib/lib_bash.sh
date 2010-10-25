@@ -1,5 +1,9 @@
 SSH_AGENT_SOURCE=/tmp/ssh-agent-source
 
+function is_on_linux {
+    uname -a|grep -i "linux">/dev/null
+}
+
 function path2dir_KONIX {
 	PWD="$(pwd)"
 	test="$(echo "$*" | sed 's-^/--')"

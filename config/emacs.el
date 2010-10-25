@@ -16,32 +16,31 @@
       )
 
 ;; ################################################################################
-;; Fichiers de config
+;; Config files
 ;; ################################################################################
-;; Association environnement -> type de fichier (à faire en fin)
-(load "assocs_KONIX.el")
+(mapc
+ ;; Load every file
+ '(lambda(elt)
+    (load-file (concat elfiles "/config/" elt))
+    )
+ (sort
+  ;; That is not of the form
+  (remove-if
+   '(lambda(elt)
+      (or
+       ;; unix hidden
+       (string= "." (substring elt 0 1))
+       ;; or not finishing by .el
+       (not (string= ".el" (substring elt -3)))
+       )
+      )
+   ;; among all the files in config
+   (directory-files (concat elfiles "/config"))
+   )
+  'string<
+  )
+ )
 
-;; AUTO INSERTION DE TEXTES EN DEBUT DE FICHIERS
-;; http://www.linux-france.org/article/lgazette/issue-39/lg39-fr-4.html
-(load "auto-insertions_KONIX.el")
-
-;; Les fonctions, persos et celles trouvées sur le net aussi
-(load "functions_KONIX.el")
-
-;; Configuration globale
-(load "config_KONIX.el")
-
-;; Mes macros
-(load "macros_KONIX.el")
-
-;; Mes raccourcis clavier
-(load "hotkeys_KONIX.el")
-
-;; MODES
-(load "modes_KONIX.el")
-
-;; ADVICES
-(load "advices_KONIX.el")
 ;; Pour copie et paste dans dired
 (load "wuxch-dired-copy-paste.el")
 
@@ -56,4 +55,3 @@
 (server-start)
 
 ;;(find-file "~/.emacs")
-;;(find-file "~/.elfiles/config/config_KONIX.el")

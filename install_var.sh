@@ -8,4 +8,5 @@
 export DEVEL_DIR="$(pwd)"
 export CONFIG_DIR="$(pwd)/config"
 export PERSO_DIR="$(pwd)/perso"
-export HOME=$(cd ~ ; pwd)
+export HOME="$(cd ~ ; pwd)"
+export CUSTOM_FILE="$HOME/.shrc_custo"

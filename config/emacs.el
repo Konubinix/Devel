@@ -16,7 +16,7 @@
       )
 
 ;; ################################################################################
-;; Config files
+;; Load config files
 ;; ################################################################################
 (mapc
  ;; Load every file
@@ -41,17 +41,9 @@
   )
  )
 
-;; Pour copie et paste dans dired
-(load "wuxch-dired-copy-paste.el")
-
-;; ffap
-(require 'ffap)
-(load-library "find-file")
-
-;; Association environnement -> type de fichier (à faire en fin)
-(load "assocs_KONIX.el")
-
-;; serveur
+;; ####################################################################################################
+;; Starts the serveur
+;; ####################################################################################################
 (server-start)
 
 ;;(find-file "~/.emacs")

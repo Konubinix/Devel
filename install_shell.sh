@@ -5,7 +5,7 @@
 #  \author Konubinix  (konubinix@gmail.com)
 #  \date sam. 18:31:08 16/10/2010
 ######################################################################
-./install_var.sh
+source ./install_var.sh
 
 cat <<EOF  > "$HOME/.custo.sh"
 DEVEL_DIR="${DEVEL_DIR}"

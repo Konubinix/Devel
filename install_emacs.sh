@@ -5,7 +5,7 @@
 #  \author Konubinix  (konubinix@gmail.com)
 #  \date sam. 20:43:42 16/10/2010
 ######################################################################
-source install_var.sh
+source ./install_var.sh
 
 cat <<EOF > "$HOME/.custo.el"
 (defvar config-dir "$CONFIG_DIR" "where I put my config files")

@@ -421,9 +421,12 @@
 ;; dired
 (setq dired-mode-hook nil)
 (add-hook 'dired-mode-hook
-		  '(lambda ()
-			 (konix/truncate_lines t)
- ))
+          '(lambda ()
+             ;; copy and paste in dired
+             (require 'wuxch-dired-copy-paste)
+             (konix/truncate_lines t)
+             )
+          )
 
 ;; Makefile
 (add-hook 'makefile-mode-hook

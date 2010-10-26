@@ -1,4 +1,4 @@
-;;; KONIX_Compilation.el --- Compilation facilities
+;;; KONIX_compilation.el --- Compilation facilities
 
 ;; Copyright (C) 2010
 
@@ -176,5 +176,5 @@ PARAM : a string with parameters given to make
 (define-key konix/compil/map (kbd "k") 'konix/kill-current-buffer)
 (define-key konix/compil/map (kbd "K") 'konix/kill-current-buffer-and-delete-window)
 
-(provide 'KONIX_Compilation)
-;;; KONIX_Compilation.el ends here
+(provide 'KONIX_compilation)
+;;; KONIX_compilation.el ends here

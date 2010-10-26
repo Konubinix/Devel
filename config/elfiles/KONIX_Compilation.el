@@ -33,16 +33,16 @@
 
 (defvar konix/compil/exit-message-function
   (lambda (status code msg)
-	;; If M-x compile exists with a 0
-	(when (and (eq status 'exit) (zerop code))
-	  ;; then bury the *compilation* buffer, so that C-x b doesn't go there
-										;		  (bury-buffer "*compilation*")
-	  ;; and return to whatever were looking at before
-										;		  (replace-buffer-in-windows "*compilation*")
-	  (run-hooks 'konix/compil/success-hook)
-	  )
-	;; Always return the anticipated result of compilation-exit-message-function
-	(cons msg code))
+    ;; If M-x compile exists with a 0
+    (when (and (eq status 'exit) (zerop code))
+      ;; then bury the *compilation* buffer, so that C-x b doesn't go there
+                                        ;		  (bury-buffer "*compilation*")
+      ;; and return to whatever were looking at before
+                                        ;		  (replace-buffer-in-windows "*compilation*")
+      (run-hooks 'konix/compil/success-hook)
+      )
+    ;; Always return the anticipated result of compilation-exit-message-function
+    (cons msg code))
   "Close the compilation window if there was no error at all."
   )
 
@@ -58,36 +58,36 @@ DIRECTORY : Folder from which the research is made
   (cond
    ;; Nil -> nil
    ((not directory)
-	nil)
+    nil)
    ;; un rep -> cherche le rep
    ((file-directory-p directory)
-	(let ((res nil)
-		  (parent (expand-file-name (concat directory "../")))
-		  (me (expand-file-name directory)))
-	  (cond
-	   ;; Condition de terminaison
-	   ((equal me parent)
-		nil
-		)
-	   ;; Regarde pour le rep courant
-	   ((and (file-exists-p (concat me "Makefile")) (not (file-directory-p (concat me "Makefile"))))
-		(concat me "Makefile")
-		)
-	   ;; Si pas ici, peut être dans le parent
-	   (t
-		(konix/find-makefile-recursive parent)
-		)
-	   )
-	  )
-	)
+    (let ((res nil)
+          (parent (expand-file-name (concat directory "../")))
+          (me (expand-file-name directory)))
+      (cond
+       ;; Condition de terminaison
+       ((equal me parent)
+        nil
+        )
+       ;; Regarde pour le rep courant
+       ((and (file-exists-p (concat me "Makefile")) (not (file-directory-p (concat me "Makefile"))))
+        (concat me "Makefile")
+        )
+       ;; Si pas ici, peut être dans le parent
+       (t
+        (konix/find-makefile-recursive parent)
+        )
+       )
+      )
+    )
    ;; Un fichier -> ok
    ((file-exists-p directory)
-	directory
-	)
+    directory
+    )
    ;; Sinon -> tente quand même de chercher dans le directory du fichier (même s'il existe pas)
    (t
-	(konix/find-makefile-recursive (expand-file-name (file-name-directory directory)))
-	)
+    (konix/find-makefile-recursive (expand-file-name (file-name-directory directory)))
+    )
    )
   )
 
@@ -103,17 +103,17 @@ MAKEFILE : the folder or the file I want to handle, if not given take PWD instea
    ((setq makefile (konix/compil/find-makefile-recursive "./")))
    ;; HOME
    ((and (file-exists-p "~/Makefile") (not (file-directory-p "~Makefile")))
-	(setq makefile "~/Makefile"))
+    (setq makefile "~/Makefile"))
    ;; Sinon ancien proj-makefile
    ((and (file-exists-p konix/compil/makefile-proj) (not (file-directory-p konix/compil/makefile-proj)))
-	(setq makefile konix/compil/makefile-proj)
-	)
+    (setq makefile konix/compil/makefile-proj)
+    )
    ;; sinon, rien du tout
    ((setq makefile nil))
    )
   (if (not makefile)
-	  (error "Pas de Makefile trouvé")
-	)
+      (error "Pas de Makefile trouvé")
+    )
   (setq konix/compil/makefile-proj (expand-file-name makefile))
   )
 
@@ -125,26 +125,26 @@ PARAM : a string with parameters given to make
   (interactive "sParam : \nfMakefile :")
   (konix/compil/find-makefile makefile)
   (let ((command (concat "make -C '"(file-name-directory konix/compil/makefile-proj)"' "param))
-		(buf_name (buffer-name))
-		)
-	(let (window)
-	  (setq window (get-buffer-window "*compilation*"))
-	  (if window
-		  (select-window window)
-		(progn
-		  (setq window (split-window))
-		  (select-window window)
-		  (switch-to-buffer "*compilation*")
-		  )
-		)
-	  )
-	(message "Make en cours...")
-	(compile command)
-	(highlight-regexp "error" 'compilation-error)
-	(highlight-regexp "warning" 'compilation-warning)
-	(end-of-buffer)
-	(select-window (get-buffer-window buf_name))
-	)
+        (buf_name (buffer-name))
+        )
+    (let (window)
+      (setq window (get-buffer-window "*compilation*"))
+      (if window
+          (select-window window)
+        (progn
+          (setq window (split-window))
+          (select-window window)
+          (switch-to-buffer "*compilation*")
+          )
+        )
+      )
+    (message "Make en cours...")
+    (compile command)
+    (highlight-regexp "error" 'compilation-error)
+    (highlight-regexp "warning" 'compilation-warning)
+    (end-of-buffer)
+    (select-window (get-buffer-window buf_name))
+    )
   )
 
 (defun konix/compil/make-shell (makefile &optional param)
@@ -162,10 +162,10 @@ PARAM : a string with parameters given to make
 (defun konix/compil/set-success-run-hook ()
   "when next compilation succeeds, automatically launch make run after"
   (setq konix/compil/success-hook
-		'((lambda()
-			(konix/compil/make-shell konix/compil/makefile-proj "run")
-			(setq konix/compil/success-hook nil)
-			)))
+        '((lambda()
+            (konix/compil/make-shell konix/compil/makefile-proj "run")
+            (setq konix/compil/success-hook nil)
+            )))
   )
 
 ;; ####################################################################################################
@@ -175,6 +175,101 @@ PARAM : a string with parameters given to make
 (define-key konix/compil/map (kbd "Q") 'konix/quit-and-delete-window)
 (define-key konix/compil/map (kbd "k") 'konix/kill-current-buffer)
 (define-key konix/compil/map (kbd "K") 'konix/kill-current-buffer-and-delete-window)
+
+(global-set-key
+ (kbd "<f7>")
+ '(lambda()
+    (interactive)
+    (konix/compil/make "" konix/compil/makefile-proj)
+    )
+ )
+
+(global-set-key
+ (kbd "<f5>")
+ '(lambda()
+    (interactive)
+    (konix/compil/make "run" konix/compil/makefile-proj)
+    )
+ )
+
+(global-set-key
+ (kbd "<C-f7>")
+ '(lambda()
+    (interactive)
+    (konix/compil/make "clean" konix/compil/makefile-proj)
+    )
+ )
+
+(global-set-key
+ (kbd "<C-S-f7>")
+ '(lambda()
+    (interactive)
+    (konix/compil/make "re_all" konix/compil/makefile-proj)
+    )
+ )
+
+(global-set-key
+ (kbd "<C-f5>")
+ '(lambda()
+    (interactive)
+    (konix/compil/make "re run" konix/compil/makefile-proj)
+    )
+ )
+
+(global-set-key
+ (kbd "<C-S-f5>")
+ '(lambda()
+    (interactive)
+    (konix/compil/make "re_all run" konix/compil/makefile-proj)
+    )
+ )
+
+(define-key 'konix/global-fast-key-map (kbd "<f7>")
+  '(lambda()
+     (interactive)
+     (konix/compil/make "" )
+     )
+  )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<f5>")
+  '(lambda()
+     (interactive)
+     (konix/compil/make "run" )
+     )
+  )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<C-f7>")
+  '(lambda()
+     (interactive)
+     (konix/compil/make "re" )
+     )
+  )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<C-S-f7>")
+  '(lambda()
+     (interactive)
+     (konix/compil/make "re_all" )
+     )
+  )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<C-f5>")
+  '(lambda()
+     (interactive)
+     (konix/compil/make "re run" )
+     )
+  )
+
+(define-key 'konix/global-fast-key-map
+  (kbd "<C-S-f5>")
+  '(lambda()
+     (interactive)
+     (konix/compil/make "re_all run" )
+     )
+  )
 
 (provide 'KONIX_compilation)
 ;;; KONIX_compilation.el ends here

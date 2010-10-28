@@ -15,10 +15,6 @@
 ;; ************************************************************
 (require 'help-mode)
 
-;; ************************************************************
-;; Dedicated windows
-;; ************************************************************
-(defvar konix/dedicated-windows nil)
 
 ;; ************************************************************
 ;; J'aime bien l'outline mode qui permet de gérer des structures hierarchiques

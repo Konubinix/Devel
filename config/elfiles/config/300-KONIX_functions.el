@@ -120,23 +120,6 @@ retourne ('fichier','extension')."
 	)
   )
 
-;; ************************************************************
-;; dedicated window
-;; ************************************************************
-(defun konix/dedicated-windows/add ()
-  "Ajout d'une window à la liste des dedicated."
-  (interactive)
-  (setq konix/dedicated-windows (selected-window))
-  (message (concat "Added "(format "%s" (selected-window))" to dedicated windows"))
-  )
-
-(defun konix/dedicated-windows/reset ()
-  "Ne dedicate plus de window"
-  (interactive)
-  (setq konix/dedicated-windows nil)
-  (message (concat "Reset dedicated windows"))
-  )
-
 ;; Insertion de date en clair JJ Mois AAAA
 (defun konix/insert-text-date-string ()
   "Insert a nicely formated date string."

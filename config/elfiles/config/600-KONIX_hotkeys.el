@@ -150,9 +150,6 @@
 (global-set-key (kbd "<S-f10>") 'window-configuration-to-register)
 (global-set-key (kbd "<C-f10>") 'point-to-register)
 (global-set-key (kbd "<f10>") 'jump-to-register)
-;; Dedicated window
-(global-set-key (kbd "C-<f11>") 'konix/dedicated-windows/add)
-(global-set-key (kbd "S-<f11>") 'konix/dedicated-windows/reset)
 
 ;; ####################################################################################################
 ;; Org Mode

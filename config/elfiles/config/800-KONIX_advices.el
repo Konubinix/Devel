@@ -31,18 +31,3 @@
   (push-mark)
   )
 (ad-activate 'flyspell-goto-next-error)
-
-(defadvice delete-other-windows (around konix/dedicated-windows activate)
-  "This is advice to make konix/dedicated-windows avoid being deleted.
-Dedicated window can't be deleted by command `delete-other-windows'."
-  (let ((current-window (selected-window)))
-	(dolist (win (window-list))
-	  (when (and (window-live-p win)
-				 (not (eq current-window win))
-				 (not (eq win konix/dedicated-windows) ))
-		(delete-window win)
-		)
-	  )
-	)
-  )
-(ad-activate 'delete-other-windows)

@@ -1,10 +1,11 @@
-;; ################################################################################
-;; Modes par type de fichier
-;; ################################################################################
+;; ####################################################################################################
+;; Here are the mode specific configurations that were not complex enough to get
+;; a proper file
+;; ####################################################################################################
 ;; ************************************************************
 ;; Prog
 ;; ************************************************************
-;; Mode commun programmation
+;; Mode commun programmation C, C++ etc
 (setq c-mode-common-hook
       (lambda ()
         (if cedet-loaded
@@ -24,25 +25,25 @@
         )
       )
 
-;;Mode C
+;; C
 (setq c-mode-hook
       (lambda ()
         ))
 
-;;Mode sh
+;; sh
 (setq sh-mode-hook
       (lambda ()
         (konix/prog-hook)
         ))
 
-;;Mode TCL
+;; TCL
 (setq tcl-mode-hook
       (lambda ()
         (konix/prog-hook)
         (local-set-key (kbd "C-c C-c") 'run-tcl)
         ))
 
-;;Mode C++
+;; C++
 (setq c++-mode-hook
       (lambda ()
         #'(lambda ()
@@ -52,7 +53,7 @@
         )
       )
 
-;;Mode Python
+;; Python
 (setq python-mode-hook
       (lambda ()
         (konix/prog-hook)
@@ -66,21 +67,18 @@
         )
       )
 
-
-;; Mode java
+;; Java
 (setq java-mode-hook
       (lambda ()
-        (konix/gud-hook-keys)
         ))
 
-;; Mode CSS
+;; CSS
 (setq css-mode-hook
       (lambda ()
-        (konix/gud-hook-keys)
         (konix/prog-hook)
         ))
 
-;;Mode Octave
+;; Octave
 (setq octave-mode-hook
       (lambda ()
         (abbrev-mode 1)
@@ -92,30 +90,28 @@
         (local-set-key (kbd "C-c C-m") 'octave-close-block)
         ))
 
-;;Mode lisp
-(setq lisp-mode-hook nil)
-(add-hook 'lisp-mode-hook
-          '(lambda ()
-             (konix/prog-hook)
-             (setq ac-sources (append ac-sources
-                                      '(
-                                        ac-source-functions
-                                        ac-source-symbols
-                                        ac-source-variables
-                                        )))
-             (local-set-key (kbd "C-j") 'auto-complete)
-             (auto-complete-mode t)
-             ))
+;; Lisp
+(setq lisp-mode-hook
+      (lambda ()
+        (konix/prog-hook)
+        (setq ac-sources (append ac-sources
+                                 '(
+                                   ac-source-functions
+                                   ac-source-symbols
+                                   ac-source-variables
+                                   )))
+        (local-set-key (kbd "C-j") 'auto-complete)
+        (auto-complete-mode t)
+        ))
 
-;;Mode elisp
-(setq emacs-lisp-mode-hook nil)
-(add-hook 'emacs-lisp-mode-hook
-          '(lambda ()
-             (run-hooks 'lisp-mode-hook)
-             )
-          )
+;; Elisp
+(setq emacs-lisp-mode-hook
+      (lambda ()
+        (run-hooks 'lisp-mode-hook)
+        )
+      )
 
-;; Mode custom
+;; Custom
 (setq Custom-mode-hook
       (lambda ()
         (auto-complete-mode t)
@@ -129,24 +125,23 @@
         )
       )
 
-;; GNUPLOT
-(add-hook 'gnuplot-mode-hook
-          '(lambda()
-             (auto-complete-mode t)
-             (setq ac-sources
-                   '(
-                     ac-source-files-in-current-dir ;eshell
-                     ac-source-filename ; eshell
-                     ac-source-dabbrev
-                     )
-                   )
-             (define-key gnuplot-mode-map "\C-xp" 'konix/gnuplot-mode-map)
-             (define-prefix-command 'konix/gnuplot-mode-map)
-             (define-key konix/gnuplot-mode-map "l" 'konix/gnuplot/load-current-file)
-             (define-key konix/gnuplot-mode-map "g" 'konix/gnuplot)
-             )
-          )
-
+;; Gnuplot
+(setq gnuplot-mode-hook
+      (lambda()
+        (auto-complete-mode t)
+        (setq ac-sources
+              '(
+                ac-source-files-in-current-dir ;eshell
+                ac-source-filename ; eshell
+                ac-source-dabbrev
+                )
+              )
+        (define-key gnuplot-mode-map "\C-xp" 'konix/gnuplot-mode-map)
+        (define-prefix-command 'konix/gnuplot-mode-map)
+        (define-key konix/gnuplot-mode-map "l" 'konix/gnuplot/load-current-file)
+        (define-key konix/gnuplot-mode-map "g" 'konix/gnuplot)
+        )
+      )
 
 ;; HTML
 (setq html-mode-hook
@@ -162,22 +157,7 @@
         (local-set-key (kbd "C-c C-v") 'ferme_ouvre_scilab)
         ))
 
-;; PHP
-(setq php-loaded nil)
-(defun php-mode-hook ()
-  "Hook de php"
-  (if php-loaded
-      (progn (message "php already loaded"))
-    (progn
-      (load "php-mode")
-      (require 'php-mode)
-      (php-mode)
-      (setq php-loaded t)
-      )
-    )
-  )
-
-;; shell-mode
+;; Shell
 (setq shell-mode-hook
       (lambda ()
         (dirtrack-mode t)
@@ -206,7 +186,6 @@
 ;; Gud
 (setq gud-mode-hook
       (lambda ()
-        (konix/gud-hook-keys)
         (tooltip-mode t)
         (gud-tooltip-dereference t)
         )
@@ -219,21 +198,21 @@
             (shrink-window-horizontally 40)
             ))
 
+;; Compilation
 (add-hook 'compilation-mode-hook
-          '(lambda ()
-             (hl-line-mode t)
-             (local-set-key (kbd "C-e") 'end-of-line)
-             (local-set-key (kbd "C-a") 'beginning-of-line)
-             (local-set-key (kbd "<tab>") 'next-error-no-select)
-             (local-set-key (kbd "<backtab>") 'previous-error-no-select)
-             )
+          (lambda ()
+            (hl-line-mode t)
+            (local-set-key (kbd "C-e") 'end-of-line)
+            (local-set-key (kbd "C-a") 'beginning-of-line)
+            (local-set-key (kbd "<tab>") 'next-error-no-select)
+            (local-set-key (kbd "<backtab>") 'previous-error-no-select)
+            )
           )
-
 
 ;; ************************************************************
 ;; Edition
 ;; ************************************************************
-;;Mode LATEX
+;; LATEX
 (setq LaTeX-mode-hook
       (lambda ()
         (add-to-list 'TeX-command-list
@@ -286,31 +265,38 @@
         )
       )
 
-;; Mode ORG
+;; ORG
 ;; un parent est DONE quand à 100%
 (add-hook 'org-after-todo-statistics-hook 'konix/org-summary-todo)
-(add-hook 'org-mode-hook (lambda ()
-                           (add-hook 'before-save-hook 'org-update-all-dblocks)
-                           (local-set-key (kbd "C-c a") 'org-agenda)
-                           (local-set-key (kbd "C-< t") 'konix/todo-org)
-                           (local-set-key (kbd "C-< e") 'konix/diary-org)
-                           (local-set-key (kbd "<f1>") 'org-cycle)
-                           (local-set-key (kbd "<f3>") 'org-shifttab)
-                           (local-set-key (kbd "C-j") 'org-complete)
-                           (local-set-key (kbd "C-c e") 'org-table-edit-field)
-                           (konix/text-hook)
-                           (konix/truncate_lines t)
-                           (setq indent-tabs-mode nil)
-                           (flyspell-mode 1)
-                           ))
+(add-hook 'org-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook 'org-update-all-dblocks)
+            (local-set-key (kbd "C-c a") 'org-agenda)
+            (local-set-key (kbd "C-< t") 'konix/todo-org)
+            (local-set-key (kbd "C-< e") 'konix/diary-org)
+            (local-set-key (kbd "<f1>") 'org-cycle)
+            (local-set-key (kbd "<f3>") 'org-shifttab)
+            (local-set-key (kbd "C-j") 'org-complete)
+            (local-set-key (kbd "C-c e") 'org-table-edit-field)
+            (konix/text-hook)
+            (konix/truncate_lines t)
+            (setq indent-tabs-mode nil)
+            (flyspell-mode 1)
+            (auto-complete-mode t)
+            (setq ac-sources (append ac-sources
+                                     '(
+                                       ac-source-files-in-current-dir
+                                       ac-source-filename
+                                       )))
 
+            ))
 (setq org-agenda-mode-hook
       (lambda()
         (hl-line-mode t)
         )
       )
 
-;; fundamental
+;; Fundamental
 (add-hook 'fundamental-mode
           (lambda()
             (flyspell-mode t)
@@ -330,7 +316,6 @@
           )
 
 ;; shell
-(add-to-list 'ac-modes 'shell-mode)
 (setq  shell-mode-hook
        (lambda()
          (auto-complete-mode t)
@@ -344,6 +329,7 @@
          (dirtrack-mode t)
          (setq dirtrack-list '("|\\([^|]*\\)|" 1 nil))
          (konix/truncate_lines t)
+         (add-to-list 'ac-modes 'shell-mode)
          )
        )
 
@@ -354,55 +340,30 @@
         )
       )
 
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-                                        ;(add-hook 'before-save-hook 'delete-blank-lines)
-(defun org-summary-todo (n-done n-not-done)
-  "Switch entry to DONE when all subentries are done, to TODO otherwise."
-  (let (org-log-done org-log-states)   ; turn off logging
-    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+;; Maxima
+(setq maxima-mode-hook
+      (lambda nil
+        (hs-minor-mode t)
+        (auto-complete-mode)
+        )
+      )
 
-(add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
-
-(add-hook 'org-mode-hook
-          '(lambda ()
-             (auto-complete-mode t)
-             (setq ac-sources (append ac-sources
-                                      '(
-                                        ac-source-files-in-current-dir
-                                        ac-source-filename
-                                        )))
-             )
-
-          )
-
-(add-hook 'maxima-mode-hook
-          '(lambda nil
-             (hs-minor-mode t)
-             (auto-complete-mode)
-             )
-          )
-
-(autoload 'maxima-mode "maxima" "Mode maxima" t)
-
-(setq lua-mode-hook nil)
-(add-hook 'lua-mode-hook
-          '(lambda ()
-             (konix/prog-hook)
-             (auto-complete-mode t)
-             )
-          )
-
-(autoload 'lua-mode "lua-mode")
+;; Lua
+(setq lua-mode-hook
+      (lambda ()
+        (konix/prog-hook)
+        (auto-complete-mode t)
+        )
+      )
 
 ;; hide-ifdef
-(setq hide-ifdef-mode-hook nil)
-(add-hook 'hide-ifdef-mode-hook
-          '(lambda ()
-             (substitute-key-definition 'hide-ifdef-define 'konix/hide-ifdef-define hide-ifdef-mode-map)
-             (substitute-key-definition 'hide-ifdef-undef 'konix/hide-ifdef-undef hide-ifdef-mode-map)
-             (define-key hide-ifdef-mode-submap "t" 'konix/hide-ifdef-toggle-block)
-             )
-          )
+(setq hide-ifdef-mode-hook
+      (lambda ()
+        (substitute-key-definition 'hide-ifdef-define 'konix/hide-ifdef-define hide-ifdef-mode-map)
+        (substitute-key-definition 'hide-ifdef-undef 'konix/hide-ifdef-undef hide-ifdef-mode-map)
+        (define-key hide-ifdef-mode-submap "t" 'konix/hide-ifdef-toggle-block)
+        )
+      )
 
 ;; semantic
 (add-hook 'semantic-init-hook
@@ -413,30 +374,29 @@
              )
           )
 
-(add-to-list 'ac-modes 'csharp-mode)
-(add-hook 'csharp-mode-hook
-          '(lambda ()
-             ;; The csharp-insert-open-brace function is quite annoying
-             (local-unset-key "{")
-             ))
+;; CHSARP
+(setq csharp-mode-hook
+      (lambda ()
+        ;; The csharp-insert-open-brace function is quite annoying
+        (local-unset-key "{")
+        (add-to-list 'ac-modes 'csharp-mode)
+        ))
 
 ;; isearch
-(setq isearch-mode-hook nil)
-(add-hook 'isearch-mode-hook
-          '(lambda ()
-             (cua-set-mark)
-             (cua-set-mark)
-             ))
+(setq isearch-mode-hook
+      '(lambda ()
+         (cua-set-mark)
+         (cua-set-mark)
+         ))
 
 ;; dired
-(setq dired-mode-hook nil)
-(add-hook 'dired-mode-hook
-          '(lambda ()
-             ;; copy and paste in dired
-             (require 'wuxch-dired-copy-paste)
-             (konix/truncate_lines t)
-             )
-          )
+(setq dired-mode-hook
+      (lambda ()
+        ;; copy and paste in dired
+        (require 'wuxch-dired-copy-paste)
+        (konix/truncate_lines t)
+        )
+      )
 
 ;; Makefile
 (add-hook 'makefile-mode-hook
@@ -498,7 +458,7 @@
              (local-set-key "q" 'konix/quit-and-delete-window)
              ))
 
-
+;; Magit
 (add-hook 'magit-mode-hook
           '(lambda()
              (local-set-key (kbd "V") 'konix/magit-visit-item-view)

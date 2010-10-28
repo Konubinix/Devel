@@ -1,9 +1,13 @@
+;; ####################################################################################################
+;; Here stands the needed information to load the good files when they are required
+;; ####################################################################################################
 ;;Faire que les .h soient lus en mode c++
 (add-to-list 'auto-mode-alist (cons "\\.h$" 'c++-mode))
 
 ;; Php
-(add-to-list 'auto-mode-alist (cons "\\.php5$" 'php-mode-hook))
-(add-to-list 'auto-mode-alist (cons "\\.php$" 'php-mode-hook))
+(autoload 'php-mode "php-mode" "Major mode for editing php code." t)
+(add-to-list 'auto-mode-alist (cons "\\.php5$" 'php-mode))
+(add-to-list 'auto-mode-alist (cons "\\.php$" 'php-mode))
 
 ;; Assembleur
 (add-to-list 'auto-mode-alist (cons "\\.deca$" 'java-mode))
@@ -29,6 +33,7 @@
 (add-to-list 'auto-mode-alist (cons "emacs$" 'lisp-mode))
 
 ;; Maxima
+(autoload 'maxima-mode "maxima" "Mode maxima" t)
 (add-to-list 'auto-mode-alist (cons "\\.max$" 'maxima-mode))
 (add-to-list 'auto-mode-alist (cons "\\.mac$" 'maxima-mode))
 (add-to-list 'auto-mode-alist (cons "\\.wxm$" 'maxima-mode))
@@ -38,6 +43,7 @@
 (add-to-list 'auto-mode-alist (cons "\\.ebuild$" 'sh-mode))
 
 ;; LUA
+(autoload 'lua-mode "lua-mode")
 (add-to-list 'auto-mode-alist (cons "\\.lua$" 'lua-mode))
 
 ;; Gnuplot

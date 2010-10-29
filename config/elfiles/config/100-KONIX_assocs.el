@@ -62,3 +62,6 @@
 ;; cs -> java
 (autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
 (add-to-list 'auto-mode-alist (cons "\\.cs$" 'csharp-mode))
+
+;; Doc Mode (doxygen purpose)
+(autoload 'doc-mode "doc-mode" "Loading doc mode" t nil)

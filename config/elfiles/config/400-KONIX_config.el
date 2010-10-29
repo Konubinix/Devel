@@ -5,37 +5,10 @@
 ;; (add-hook 'before-save-hook 'delete-blank-lines)
 
 ;; ************************************************************
-;; Comint
-;; ************************************************************
-(require 'comint)
-(add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
-
-;; ************************************************************
-;; Je requiert le help mode parce que j'en ai besoin dans mon init
-;; ************************************************************
-(require 'help-mode)
-
-
-;; ************************************************************
-;; J'aime bien l'outline mode qui permet de gérer des structures hierarchiques
-;; ************************************************************
-(require 'outline)
-
-;; ************************************************************
-;; Doc Mode (doxygen purpose)
-;; ************************************************************
-(autoload 'doc-mode "doc-mode" "Loading doc mode" t nil)
-
-;; ************************************************************
-;; Because I am a winner !
+;; Usage of winner to undo windows configurations
 ;; ************************************************************
 (require 'winner)
 (winner-mode t)
-
-;; ************************************************************
-;; Bash
-;; ************************************************************
-(require 'bashdb)
 
 ;; ************************************************************
 ;; YASnippet
@@ -48,14 +21,14 @@
 ;; Autopair (parenthèsage automatique et bien pensé)
 ;; ************************************************************
 (require 'autopair)
+(setq-default autopair-autowrap t) ;; Pour qu'un mot sélectionnée puisse être wrappé par ( ou "
+(setq-default autopair-blink nil)
 (autopair-global-mode t)
-(setq autopair-autowrap t) ;; Pour qu'un mot sélectionnée puisse être wrappé par ( ou "
-(setq autopair-blink nil)
 
 ;; ************************************************************
 ;; Cua (pour la selection rectangulaire avec C-RET, trop bien !)
 ;; ************************************************************
-(setq cua-enable-cua-keys nil) ;; Pour enlever les C-c C-v C-x tous pourris
+(setq-default cua-enable-cua-keys nil) ;; Pour enlever les C-c C-v C-x tous pourris
 (cua-mode t)
 
 ;; ************************************************************
@@ -79,23 +52,23 @@
 (add-to-list 'ac-dictionary-directories (concat elfiles "/ac-dict"))
 (setq-default hippie-expand-try-functions-list '(auto-complete))
 (setq-default ac-sources
-			  '(
-				;; ac-source-imenu
-				;; ac-source-files-in-current-dir ;eshell
-				;; ac-source-filename ; eshell
-				;; ac-source-functions ; fct elisp
-				;; ac-source-symbols ; elisp symbols
-				;; ac-source-variables ; elisp
-				;; ac-source-gtags
-				;; ac-source-semantic ; Prog
-				;; ac-source-yasnippet
-				ac-source-dictionary
-				ac-source-words-in-same-mode-buffers
-				;; ac-source-words-in-all-buffer
-				ac-source-words-in-buffer
-				;; ac-source-dabbrev
-				)
-			  )
+              '(
+                ;; ac-source-imenu
+                ;; ac-source-files-in-current-dir ;eshell
+                ;; ac-source-filename ; eshell
+                ;; ac-source-functions ; fct elisp
+                ;; ac-source-symbols ; elisp symbols
+                ;; ac-source-variables ; elisp
+                ;; ac-source-gtags
+                ;; ac-source-semantic ; Prog
+                ;; ac-source-yasnippet
+                ac-source-dictionary
+                ac-source-words-in-same-mode-buffers
+                ;; ac-source-words-in-all-buffer
+                ac-source-words-in-buffer
+                ;; ac-source-dabbrev
+                )
+              )
 (setq-default ac-ignore-case 'smart)
 (setq-default ac-auto-start 10)
 (setq-default ac-auto-show-menu nil)
@@ -109,8 +82,8 @@
 ;; Multi eshell
 ;; ************************************************************
 (require 'multi-eshell)
-(setq multi-eshell-name "*shell*")
-(setq multi-eshell-shell-function '(shell))
+(setq-default multi-eshell-name "*shell*")
+(setq-default multi-eshell-shell-function '(shell))
 
 ;; ************************************************************
 ;; Git
@@ -119,7 +92,7 @@
 ;; Magit
 ;; --------------------------------------------------
 (require 'magit)
-(setq magit-process-popup-time 4)
+(setq-default magit-process-popup-time 4)
 
 ;; ************************************************************
 ;; Git blame
@@ -140,35 +113,32 @@
 (scroll-bar-mode -1)
 ;; virer le menu-bar
 (menu-bar-mode nil)
-
-;;Lorsqu'on découpe en fenêtres, tronque
-(setq-default truncate-partial-width-windows t)
-(setq-default truncate-lines t)
-(setq word-wrap t)
-;; Troncature des lines sur les mots plutôt que sur les lettres
+;; when truncating window, truncate words and not characters
 (setq-default word-wrap t)
 ;;Virer le message d'accueil
-(setq inhibit-splash-screen t)
+(setq-default inhibit-splash-screen t)
 ;;Taper y et n à la place de yes et no
 (fset 'yes-or-no-p 'y-or-n-p)
 ;; Affiche l'heure au format 24h
-(setq display-time-24hr-format t)
-(setq display-time-day-and-date t)
+(setq-default display-time-24hr-format t)
+(setq-default display-time-day-and-date t)
 ;; Activer la coloration syntaxique
 (global-font-lock-mode t)
-;;Affiche les numéros des colonnes
+;;Affiche les numéros des colonnes et des lignes
 (column-number-mode t)
 (line-number-mode t)
 ;; Mise en surbrillance de la zone sélectionnée
 (transient-mark-mode 1)
 ;; on change le nom de la fenetre par le nom du fichier edité
-(setq frame-title-format '(buffer-file-name "Emacs: %b (%f)" "Emacs: %b"))
+(setq-default frame-title-format '(buffer-file-name "Emacs: %b (%f)" "Emacs: %b"))
 ;;pour que ca ne fasse pas bip !
-(setq visible-bell t)
+(setq-default visible-bell t)
 ;; Suppression de la scroll bar sur la gauche
 (put 'scroll-left 'disabled nil)
 ;; Ne plus permettre par défaut d'auto filler
 (setq-default fill-column 8000)
+;; For the cursor to move naturally
+(setq-default line-move-visual t)
 
 ;; Default font, jolie!!
 (set-default-font "-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1" t)
@@ -179,53 +149,42 @@
 ;;Changer de buffer par C-x b plus facilement
 (ido-mode 'buffer)
 
-;; Ne cahce pas les commentaires quand on fait TOUT cacher
-(setq hs-hide-comments-when-hiding-all nil)
-;; quand on fait une recherche, ouvre les bloc de code correspondant
-(setq hs-isearch-open t)
-
-(setq set-mark-command-repeat-pop t)
+;; Ne cache pas les commentaires quand on fait TOUT cacher
+(setq-default hs-hide-comments-when-hiding-all nil)
+;; quand on fait une recherche, ouvre les blocs de code correspondant
+(setq-default hs-isearch-open t)
+;; C-u C-Space C-space ...
+(setq-default set-mark-command-repeat-pop t)
+;; Supprimer les espaces en trop lorsqu'on save
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; ************************************************************
 ;; Encodage
 ;; ************************************************************
 ;; pour les accents, et tout ce qui s'en suit...
-(set-language-environment 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-language-environment 'utf-8)
-(prefer-coding-system 'utf-8)
+(set-language-environment 'utf-8-unix)
+(set-terminal-coding-system 'utf-8-unix)
+(set-keyboard-coding-system 'utf-8-unix)
+(set-language-environment 'utf-8-unix)
+(prefer-coding-system 'utf-8-unix)
 
 ;; ************************************************************
 ;; Gestion des fichiers
 ;; ************************************************************
 ;;Supprimer les fichier de sauvegarde en quittant (les *.~)
-(setq make-backup-files nil)
-
-;; ************************************************************
-;; Je sais pas trop
-;; ************************************************************
-;; Pour les fins de ligne qui commences
-(setq track-eol nil)
-
-;; Pour utiliser préférentiellement l'indentation par tab au lieu de " "
-(setq-default indent-tabs-mode t)
+;;(setq-default make-backup-files nil)
 
 ;; ************************************************************
 ;; Edition
 ;; ************************************************************
 ;; Lorsqu'on saisit un texte alors qu'une zone est sélectionnée, cette
 ;; dernière est écrasée par le texte saisi.
-(delete-selection-mode 1)
+(delete-selection-mode t)
 ;; Dictionnaire par défaut en français
-(setq ispell-dictionary "francais")
+(setq-default ispell-dictionary "francais")
 ;; Le clique du milieu colle à l'emplacement du curseur de texte et
 ;; pas de la souris
-(setq mouse-yank-at-point t)
-;; Pour que Dired permette de faire la touche a qui ne duplique pas les buffer quand on navigue dedans
-(put 'dired-find-alternate-file 'disabled nil)
-;; Supprimer les espaces en trop lorsqu'on save
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(setq-default mouse-yank-at-point t)
 
 ;; ************************************************************
 ;; Touches disabled -> enabled
@@ -234,63 +193,62 @@
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 
-;; ################################################################################
-;; Custo modes
-;; ################################################################################
+;; ####################################################################################################
+;; Config MODES
+;; ####################################################################################################
 ;; ************************************************************
 ;; Org
 ;; ************************************************************
-(require 'org)
-(setq org-hide-leading-stars t)
-(setq org-agenda-include-diary t)
-(setq org-agenda-files (list (concat perso-dir "/wiki/todo.org") (concat perso-dir "/wiki/diary.org")))
-(setq org-agenda-diary-file (concat perso-dir "/wiki/diary.org"))
-(setq org-agenda-include-all-todo t)
-(setq org-agenda-include-diary nil)
-(setq org-agenda-insert-diary-strategy (quote date-tree))
-(setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-(setq org-agenda-start-with-clockreport-mode t)
-(setq org-agenda-todo-ignore-deadlines t)
-(setq org-agenda-todo-ignore-scheduled t)
-(setq org-clock-in-resume t)
-(setq org-clock-out-remove-zero-time-clocks t)
-(setq org-clock-persist (quote clock))
-(setq org-clock-persist-file (concat elfiles "/org-clock-save.el"))
-(setq org-clock-persist-query-save t)
-(setq org-enforce-todo-checkbox-dependencies t)
-(setq org-enforce-todo-dependencies t)
-(setq org-export-html-with-timestamp t)
-(setq org-insert-labeled-timestamps-at-point nil)
-(setq org-log-done (quote time))
-(setq org-log-done-with-time t)
-(setq org-log-into-drawer t)
-(setq org-log-note-headings (quote ((done . "CLOSING NOTE %t") (state . "State %-12s %t") (note . "Note prise le %t") (clock-out . ""))))
-(setq org-log-states-order-reversed t)
+(setq-default org-hide-leading-stars t)
+(setq-default org-agenda-include-diary t)
+(setq-default org-agenda-files (list (concat perso-dir "/wiki/todo.org") (concat perso-dir "/wiki/diary.org")))
+(setq-default org-agenda-diary-file (concat perso-dir "/wiki/diary.org"))
+(setq-default org-agenda-include-all-todo t)
+(setq-default org-agenda-include-diary nil)
+(setq-default org-agenda-insert-diary-strategy (quote date-tree))
+(setq-default org-agenda-skip-scheduled-if-deadline-is-shown t)
+(setq-default org-agenda-start-with-clockreport-mode t)
+(setq-default org-agenda-todo-ignore-deadlines t)
+(setq-default org-agenda-todo-ignore-scheduled t)
+(setq-default org-clock-in-resume t)
+(setq-default org-clock-out-remove-zero-time-clocks t)
+(setq-default org-clock-persist (quote clock))
+(setq-default org-clock-persist-file (concat elfiles "/org-clock-save.el"))
+(setq-default org-clock-persist-query-save t)
+(setq-default org-enforce-todo-checkbox-dependencies t)
+(setq-default org-enforce-todo-dependencies t)
+(setq-default org-export-html-with-timestamp t)
+(setq-default org-insert-labeled-timestamps-at-point nil)
+(setq-default org-log-done (quote time))
+(setq-default org-log-done-with-time t)
+(setq-default org-log-into-drawer t)
+(setq-default org-log-note-headings (quote ((done . "CLOSING NOTE %t") (state . "State %-12s %t") (note . "Note prise le %t") (clock-out . ""))))
+(setq-default org-log-states-order-reversed t)
 ;; Pour les appointments
 (org-agenda-to-appt)
-;(appt-activate)
+;; (appt-activate)
 
 ;; ************************************************************
 ;; Python
 ;; ************************************************************
-(setq python-guess-indent nil)
-(setq python-indent 4)
+(setq-default python-guess-indent nil)
+(setq-default python-indent 4)
 
 ;; ************************************************************
 ;;  Appt
 ;; ************************************************************
-(setq appt-display-duration 10)
-(setq appt-display-format (quote window))
-(setq appt-message-warning-time 180)
+(setq-default appt-display-duration 10)
+(setq-default appt-display-format (quote window))
+(setq-default appt-message-warning-time 180)
 
 ;; ************************************************************
 ;; Calendar
 ;; ************************************************************
-(setq calendar-mark-diary-entries-flag t)
-(setq calendar-view-diary-initially-flag t)
+(setq-default calendar-mark-diary-entries-flag t)
+(setq-default calendar-view-diary-initially-flag t)
 ;; Pour avoir le calendar en français
-(setq european-calendar-style t)
-(setq calendar-week-start-day 1)
+(setq-default european-calendar-style t)
+(setq-default calendar-week-start-day 1)
 (defvar calendar-day-name-array
   ["dimanche" "lundi" "mardi" "mercredi" "jeudi" "vendredi" "samedi"])
 (defvar calendar-day-abbrev-array
@@ -305,91 +263,91 @@
 ;; ************************************************************
 ;; Compilation
 ;; ************************************************************
-(setq compilation-auto-jump-to-first-error t)
-(setq compilation-context-lines nil)
-(setq compilation-read-command nil)
-(setq compilation-scroll-output (quote first-error))
-(setq compilation-skip-threshold 2)
-(setq compilation-window-height 10)
-(setq compile-command "make")
+(setq-default compilation-auto-jump-to-first-error t)
+(setq-default compilation-context-lines nil)
+(setq-default compilation-read-command nil)
+(setq-default compilation-scroll-output (quote first-error))
+(setq-default compilation-skip-threshold 2)
+(setq-default compilation-window-height 10)
+(setq-default compile-command "make")
 
 ;; ************************************************************
 ;; Debug
 ;; ************************************************************
-(setq gdb-many-windows nil)
-(setq gdb-same-frame t)
-(setq gdb-show-main nil)
-(setq gdb-speedbar-auto-raise nil)
-(setq gdb-use-separate-io-buffer t)
-(setq gud-tooltip-echo-area nil)
-(setq gud-tooltip-mode t)
+(setq-default gdb-many-windows nil)
+(setq-default gdb-same-frame t)
+(setq-default gdb-show-main nil)
+(setq-default gdb-speedbar-auto-raise nil)
+(setq-default gdb-use-separate-io-buffer t)
+(setq-default gud-tooltip-echo-area nil)
+(setq-default gud-tooltip-mode t)
 
 ;; ************************************************************
 ;; Grep
 ;; ************************************************************
-(setq grep-command "grep -nH -r -e ")
-(setq grep-find-command "find . -type f -print0 | xargs -0 -e grep -nH -e ")
-(setq grep-template "grep <C> -nH -r -e  <R> <F>")
+(setq-default grep-command "grep -nH -r -e ")
+(setq-default grep-find-command "find . -type f -print0 | xargs -0 -e grep -nH -e ")
+(setq-default grep-template "grep <C> -nH -r -e  <R> <F>")
 
 ;; ************************************************************
 ;; IDO
 ;; ************************************************************
-(setq ido-enable-last-directory-history nil)
+(setq-default ido-enable-last-directory-history nil)
 
 ;; ************************************************************
 ;; TEX
 ;; ************************************************************
-(setq reftex-plug-into-AUCTeX t)
+(setq-default reftex-plug-into-AUCTeX t)
 
 ;; ************************************************************
 ;; TERM
 ;; ************************************************************
-(setq term-default-bg-color "black")
-(setq term-default-fg-color "grey")
+(setq-default term-default-bg-color "black")
+(setq-default term-default-fg-color "grey")
 
 ;; ************************************************************
 ;; Maxima
 ;; ************************************************************
-(setq imaxima-use-maxima-mode-flag t)
-(setq maxima-command "maxima")
+(setq-default imaxima-use-maxima-mode-flag t)
+(setq-default maxima-command "maxima")
 
 ;; ************************************************************
 ;; ECB
 ;; ************************************************************
-(setq ecb-analyse-buffer-sync-delay 1)
-(setq ecb-layout-name "perso3")
-(setq ecb-layout-window-sizes (quote (("perso3" (ecb-directories-buffer-name 0.13839285714285715 . 0.1509433962264151) (ecb-sources-buffer-name 0.13839285714285715 . 0.16981132075471697) (ecb-methods-buffer-name 0.13839285714285715 . 0.20754716981132076) (ecb-analyse-buffer-name 0.13839285714285715 . 0.4528301886792453)) ("perso" (ecb-directories-buffer-name 0.3283582089552239 . 0.36363636363636365) (ecb-analyse-buffer-name 0.3283582089552239 . 0.36363636363636365) (ecb-sources-buffer-name 0.3283582089552239 . 0.24242424242424243)))))
-(setq ecb-options-version "2.40")
-(setq ecb-tip-of-the-day nil)
+(setq-default ecb-analyse-buffer-sync-delay 1)
+(setq-default ecb-layout-window-sizes (quote (("perso3" (ecb-directories-buffer-name 0.13839285714285715 . 0.1509433962264151) (ecb-sources-buffer-name 0.13839285714285715 . 0.16981132075471697) (ecb-methods-buffer-name 0.13839285714285715 . 0.20754716981132076) (ecb-analyse-buffer-name 0.13839285714285715 . 0.4528301886792453)) ("perso" (ecb-directories-buffer-name 0.3283582089552239 . 0.36363636363636365) (ecb-analyse-buffer-name 0.3283582089552239 . 0.36363636363636365) (ecb-sources-buffer-name 0.3283582089552239 . 0.24242424242424243)))))
+(setq-default ecb-layout-name "perso3")
+(setq-default ecb-options-version "2.40")
+(setq-default ecb-tip-of-the-day nil)
 
 ;; ************************************************************
 ;;  ERC
 ;; ************************************************************
-(setq erc-autojoin-channels-alist (quote (("irc.efnet.fr" "#Tapiiis"))))
-(setq erc-email-userid "samuel.loury")
-(setq erc-encoding-coding-alist '(("Tapiiis" . iso-8859-15) ("agoctrl" . iso-8859-15)))
-(setq erc-log-insert-log-on-open t)
-(setq erc-log-mode t)
-(setq erc-log-write-after-insert t)
-(setq erc-log-write-after-send t)
-(setq erc-modules (quote (autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands notify readonly ring smiley sound stamp spelling track)))
-(setq erc-nick "konubinix")
-(setq erc-port 6667)
-(setq erc-server "irc.efnet.fr")
-(setq erc-user-mode (quote ignore))
+(setq-default erc-autojoin-channels-alist (quote (("irc.efnet.fr" "#Tapiiis"))))
+(setq-default erc-email-userid "samuel.loury")
+(setq-default erc-encoding-coding-alist '(("Tapiiis" . iso-8859-15) ("agoctrl" . iso-8859-15)))
+(setq-default erc-log-insert-log-on-open t)
+(setq-default erc-log-mode t)
+(setq-default erc-log-write-after-insert t)
+(setq-default erc-log-write-after-send t)
+(setq-default erc-modules (quote (autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands notify readonly ring smiley sound stamp spelling track)))
+(setq-default erc-nick "konubinix")
+(setq-default erc-port 6667)
+(setq-default erc-server "irc.efnet.fr")
+(setq-default erc-user-mode (quote ignore))
 
 ;; ************************************************************
 ;; Shell
 ;; ************************************************************
-(setq explicit-shell-file-name "/bin/bash")
+(setq-default explicit-shell-file-name "/bin/bash")
 (setq-default dirtrack-list (quote ("^.*[^|]*|\\([^|]*\\)|.*$" 1 nil)))
 (add-to-list 'ac-modes 'shell-mode)
 
 ;; ************************************************************
 ;; gnuplot
 ;; ************************************************************
-(require 'gnuplot)
 (defvar konix/gnuplot/arguments "smooth cspline with lines")
+
 ;; ************************************************************
 ;; TAGS
 ;; ************************************************************
@@ -400,9 +358,9 @@
 ;; ************************************************************
 ;; Coding
 ;; ************************************************************
-(add-to-list 'auto-coding-alist (cons "\\.\\tex" 'latin-1))
+(add-to-list 'auto-coding-alist (cons "\\.\\tex" 'latin-1-unix))
 
 ;; VRAC
-(setq konix/header-marker-1 "####################################################################################################")
-(setq konix/header-marker-2 "************************************************************")
-(setq konix/header-marker-3 "--------------------------------------------------")
+(setq-default konix/header-marker-1 "####################################################################################################")
+(setq-default konix/header-marker-2 "************************************************************")
+(setq-default konix/header-marker-3 "--------------------------------------------------")

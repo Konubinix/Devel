@@ -159,8 +159,3 @@
 
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
 (define-key 'konix/org-global-map "o" 'org-clock-out)
-
-;; ####################################################################################################
-;; Help
-;; ####################################################################################################
-(define-key help-map "b" 'konix/describe-bindings)

@@ -269,27 +269,27 @@
 ;; un parent est DONE quand à 100%
 (add-hook 'org-after-todo-statistics-hook 'konix/org-summary-todo)
 (add-hook 'org-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook 'org-update-all-dblocks)
-            (local-set-key (kbd "C-c a") 'org-agenda)
-            (local-set-key (kbd "C-< t") 'konix/todo-org)
-            (local-set-key (kbd "C-< e") 'konix/diary-org)
-            (local-set-key (kbd "<f1>") 'org-cycle)
-            (local-set-key (kbd "<f3>") 'org-shifttab)
-            (local-set-key (kbd "C-j") 'org-complete)
-            (local-set-key (kbd "C-c e") 'org-table-edit-field)
-            (konix/text-hook)
-            (konix/truncate_lines t)
-            (setq indent-tabs-mode nil)
-            (flyspell-mode 1)
-            (auto-complete-mode t)
-            (setq ac-sources (append ac-sources
-                                     '(
-                                       ac-source-files-in-current-dir
-                                       ac-source-filename
-                                       )))
+          '(lambda ()
+             (add-hook 'before-save-hook 'org-update-all-dblocks)
+             (local-set-key (kbd "C-c a") 'org-agenda)
+             (local-set-key (kbd "C-< t") 'konix/todo-org)
+             (local-set-key (kbd "C-< e") 'konix/diary-org)
+             (local-set-key (kbd "<f1>") 'org-cycle)
+             (local-set-key (kbd "<f3>") 'org-shifttab)
+             (local-set-key (kbd "C-j") 'org-complete)
+             (local-set-key (kbd "C-c e") 'org-table-edit-field)
+             (konix/text-hook)
+             (konix/truncate_lines t)
+             (setq indent-tabs-mode nil)
+             (flyspell-mode 1)
+             (auto-complete-mode t)
+             (setq ac-sources (append ac-sources
+                                      '(
+                                        ac-source-files-in-current-dir
+                                        ac-source-filename
+                                        )))
 
-            ))
+             ))
 (setq org-agenda-mode-hook
       (lambda()
         (hl-line-mode t)
@@ -395,6 +395,8 @@
         ;; copy and paste in dired
         (require 'wuxch-dired-copy-paste)
         (konix/truncate_lines t)
+        ;; with "a", replace existing buffer
+        (put 'dired-find-alternate-file 'disabled nil)
         )
       )
 
@@ -456,6 +458,7 @@
 (add-hook 'help-mode-hook
           '(lambda()
              (local-set-key "q" 'konix/quit-and-delete-window)
+             (define-key help-map "b" 'konix/describe-bindings)
              ))
 
 ;; Magit
@@ -463,3 +466,10 @@
           '(lambda()
              (local-set-key (kbd "V") 'konix/magit-visit-item-view)
              ))
+
+;; Comint
+(setq comint-mode-hook
+      (lambda()
+        (add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
+        )
+      )

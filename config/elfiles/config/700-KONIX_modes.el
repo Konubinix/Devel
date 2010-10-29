@@ -1,11 +1,16 @@
 ;; ####################################################################################################
 ;; Here are the mode specific configurations that were not complex enough to get
-;; a proper file
+;; a proper file,
+;;
+;; The configuration of a mode is put here only and only if there is at least a
+;; hook set over the mode. If it is not, its configuration is set to the config
+;; file. If its configuration is really big (and then potentially slowing
+;; emacs), it is set to a dedicated file and autoloaded
 ;; ####################################################################################################
+;; ************************************************************ Prog
 ;; ************************************************************
-;; Prog
-;; ************************************************************
-;; Mode commun programmation C, C++ etc
+;; -------------------------------------------------- Mode commun programmation
+;; C, C++ etc --------------------------------------------------
 (setq c-mode-common-hook
       (lambda ()
         (if cedet-loaded
@@ -25,25 +30,33 @@
         )
       )
 
+;; --------------------------------------------------
 ;; C
+;; --------------------------------------------------
 (setq c-mode-hook
       (lambda ()
         ))
 
+;; --------------------------------------------------
 ;; sh
+;; --------------------------------------------------
 (setq sh-mode-hook
       (lambda ()
         (konix/prog-hook)
         ))
 
+;; --------------------------------------------------
 ;; TCL
+;; --------------------------------------------------
 (setq tcl-mode-hook
       (lambda ()
         (konix/prog-hook)
         (local-set-key (kbd "C-c C-c") 'run-tcl)
         ))
 
+;; --------------------------------------------------
 ;; C++
+;; --------------------------------------------------
 (setq c++-mode-hook
       (lambda ()
         #'(lambda ()
@@ -53,7 +66,11 @@
         )
       )
 
+;; --------------------------------------------------
 ;; Python
+;; --------------------------------------------------
+(setq-default python-guess-indent nil)
+(setq-default python-indent 4)
 (setq python-mode-hook
       (lambda ()
         (konix/prog-hook)
@@ -67,18 +84,24 @@
         )
       )
 
+;; --------------------------------------------------
 ;; Java
+;; --------------------------------------------------
 (setq java-mode-hook
       (lambda ()
         ))
 
+;; --------------------------------------------------
 ;; CSS
+;; --------------------------------------------------
 (setq css-mode-hook
       (lambda ()
         (konix/prog-hook)
         ))
 
+;; --------------------------------------------------
 ;; Octave
+;; --------------------------------------------------
 (setq octave-mode-hook
       (lambda ()
         (abbrev-mode 1)
@@ -90,7 +113,9 @@
         (local-set-key (kbd "C-c C-m") 'octave-close-block)
         ))
 
+;; --------------------------------------------------
 ;; Lisp
+;; --------------------------------------------------
 (setq lisp-mode-hook
       (lambda ()
         (konix/prog-hook)
@@ -104,14 +129,18 @@
         (auto-complete-mode t)
         ))
 
+;; --------------------------------------------------
 ;; Elisp
+;; --------------------------------------------------
 (setq emacs-lisp-mode-hook
       (lambda ()
         (run-hooks 'lisp-mode-hook)
         )
       )
 
+;; --------------------------------------------------
 ;; Custom
+;; --------------------------------------------------
 (setq Custom-mode-hook
       (lambda ()
         (auto-complete-mode t)
@@ -125,7 +154,10 @@
         )
       )
 
+;; --------------------------------------------------
 ;; Gnuplot
+;; --------------------------------------------------
+(defvar konix/gnuplot/arguments "smooth cspline with lines")
 (setq gnuplot-mode-hook
       (lambda()
         (auto-complete-mode t)
@@ -143,7 +175,9 @@
         )
       )
 
+;; --------------------------------------------------
 ;; HTML
+;; --------------------------------------------------
 (setq html-mode-hook
       (lambda ()
         (auto-complete-mode t)
@@ -151,13 +185,17 @@
         (flyspell-mode t)
         ))
 
+;; --------------------------------------------------
 ;; Scilab
+;; --------------------------------------------------
 (setq scilab-mode-hook
       (lambda ()
         (local-set-key (kbd "C-c C-v") 'ferme_ouvre_scilab)
         ))
 
+;; --------------------------------------------------
 ;; Shell
+;; --------------------------------------------------
 (setq shell-mode-hook
       (lambda ()
         (dirtrack-mode t)
@@ -173,7 +211,9 @@
         )
       )
 
+;; --------------------------------------------------
 ;; Conf Mode
+;; --------------------------------------------------
 (setq conf-mode-hook
       (lambda ()
         (konix/prog-hook)
@@ -183,7 +223,11 @@
 ;; ************************************************************
 ;; Compil et debug
 ;; ************************************************************
+;; --------------------------------------------------
 ;; Gud
+;; --------------------------------------------------
+(setq-default gud-tooltip-echo-area nil)
+(setq-default gud-tooltip-mode t)
 (setq gud-mode-hook
       (lambda ()
         (tooltip-mode t)
@@ -191,14 +235,30 @@
         )
       )
 
+;; --------------------------------------------------
 ;; Gdb
+;; --------------------------------------------------
+(setq-default gdb-many-windows nil)
+(setq-default gdb-same-frame t)
+(setq-default gdb-show-main nil)
+(setq-default gdb-speedbar-auto-raise nil)
+(setq-default gdb-use-separate-io-buffer t)
 (add-hook 'gdb-mode-hook
           (lambda ()
             (gud-def gud-run "run" "r" "Run the program in the debugger")
             (shrink-window-horizontally 40)
             ))
 
+;; --------------------------------------------------
 ;; Compilation
+;; --------------------------------------------------
+(setq-default compilation-auto-jump-to-first-error t)
+(setq-default compilation-context-lines nil)
+(setq-default compilation-read-command nil)
+(setq-default compilation-scroll-output (quote first-error))
+(setq-default compilation-skip-threshold 2)
+(setq-default compilation-window-height 10)
+(setq-default compile-command "make")
 (add-hook 'compilation-mode-hook
           (lambda ()
             (hl-line-mode t)
@@ -212,7 +272,10 @@
 ;; ************************************************************
 ;; Edition
 ;; ************************************************************
+;; --------------------------------------------------
 ;; LATEX
+;; --------------------------------------------------
+(setq-default reftex-plug-into-AUCTeX t)
 (setq LaTeX-mode-hook
       (lambda ()
         (add-to-list 'TeX-command-list
@@ -265,7 +328,38 @@
         )
       )
 
-;; ORG
+;; --------------------------------------------------
+;; Org
+;; --------------------------------------------------
+(setq-default org-hide-leading-stars t)
+(setq-default org-agenda-include-diary t)
+(setq-default org-agenda-files (list (concat perso-dir "/wiki/todo.org") (concat perso-dir "/wiki/diary.org")))
+(setq-default org-agenda-diary-file (concat perso-dir "/wiki/diary.org"))
+(setq-default org-agenda-include-all-todo t)
+(setq-default org-agenda-include-diary nil)
+(setq-default org-agenda-insert-diary-strategy (quote date-tree))
+(setq-default org-agenda-skip-scheduled-if-deadline-is-shown t)
+(setq-default org-agenda-start-with-clockreport-mode t)
+(setq-default org-agenda-todo-ignore-deadlines t)
+(setq-default org-agenda-todo-ignore-scheduled t)
+(setq-default org-clock-in-resume t)
+(setq-default org-clock-out-remove-zero-time-clocks t)
+(setq-default org-clock-persist (quote clock))
+(setq-default org-clock-persist-file (concat elfiles "/org-clock-save.el"))
+(setq-default org-clock-persist-query-save t)
+(setq-default org-enforce-todo-checkbox-dependencies t)
+(setq-default org-enforce-todo-dependencies t)
+(setq-default org-export-html-with-timestamp t)
+(setq-default org-insert-labeled-timestamps-at-point nil)
+(setq-default org-log-done (quote time))
+(setq-default org-log-done-with-time t)
+(setq-default org-log-into-drawer t)
+(setq-default org-log-note-headings (quote ((done . "CLOSING NOTE %t") (state . "State %-12s %t") (note . "Note prise le %t") (clock-out . ""))))
+(setq-default org-log-states-order-reversed t)
+;; Pour les appointments
+(org-agenda-to-appt)
+;; (appt-activate)
+
 ;; un parent est DONE quand à 100%
 (add-hook 'org-after-todo-statistics-hook 'konix/org-summary-todo)
 (add-hook 'org-mode-hook
@@ -296,14 +390,25 @@
         )
       )
 
+;; --------------------------------------------------
+;; Appt
+;; --------------------------------------------------
+(setq-default appt-display-duration 10)
+(setq-default appt-display-format (quote window))
+(setq-default appt-message-warning-time 180)
+
+;; --------------------------------------------------
 ;; Fundamental
+;; --------------------------------------------------
 (add-hook 'fundamental-mode
           (lambda()
             (flyspell-mode t)
             )
           )
 
+;; --------------------------------------------------
 ;; eshell
+;; --------------------------------------------------
 (add-hook 'eshell-mode-hook
           (lambda()
             (auto-complete-mode t)
@@ -315,7 +420,12 @@
             )
           )
 
+;; --------------------------------------------------
 ;; shell
+;; --------------------------------------------------
+(setq-default explicit-shell-file-name "/bin/bash")
+(setq-default dirtrack-list (quote ("^.*[^|]*|\\([^|]*\\)|.*$" 1 nil)))
+(add-to-list 'ac-modes 'shell-mode)
 (setq  shell-mode-hook
        (lambda()
          (auto-complete-mode t)
@@ -333,14 +443,20 @@
          )
        )
 
+;; --------------------------------------------------
 ;; BibTeX
+;; --------------------------------------------------
 (setq bibtex-mode-hook
       (lambda()
         (konix/prog-hook)
         )
       )
 
+;; --------------------------------------------------
 ;; Maxima
+;; --------------------------------------------------
+(setq-default imaxima-use-maxima-mode-flag t)
+(setq-default maxima-command "maxima")
 (setq maxima-mode-hook
       (lambda nil
         (hs-minor-mode t)
@@ -348,7 +464,9 @@
         )
       )
 
+;; --------------------------------------------------
 ;; Lua
+;; --------------------------------------------------
 (setq lua-mode-hook
       (lambda ()
         (konix/prog-hook)
@@ -356,7 +474,9 @@
         )
       )
 
+;; --------------------------------------------------
 ;; hide-ifdef
+;; --------------------------------------------------
 (setq hide-ifdef-mode-hook
       (lambda ()
         (substitute-key-definition 'hide-ifdef-define 'konix/hide-ifdef-define hide-ifdef-mode-map)
@@ -365,7 +485,9 @@
         )
       )
 
+;; --------------------------------------------------
 ;; semantic
+;; --------------------------------------------------
 (add-hook 'semantic-init-hook
           '(lambda()
              (define-key senator-prefix-map "j" 'semantic-ia-fast-jump)
@@ -374,7 +496,9 @@
              )
           )
 
+;; --------------------------------------------------
 ;; CHSARP
+;; --------------------------------------------------
 (setq csharp-mode-hook
       (lambda ()
         ;; The csharp-insert-open-brace function is quite annoying
@@ -382,14 +506,18 @@
         (add-to-list 'ac-modes 'csharp-mode)
         ))
 
+;; --------------------------------------------------
 ;; isearch
+;; --------------------------------------------------
 (setq isearch-mode-hook
       '(lambda ()
          (cua-set-mark)
          (cua-set-mark)
          ))
 
+;; --------------------------------------------------
 ;; dired
+;; --------------------------------------------------
 (setq dired-mode-hook
       (lambda ()
         ;; copy and paste in dired
@@ -400,13 +528,17 @@
         )
       )
 
+;; --------------------------------------------------
 ;; Makefile
+;; --------------------------------------------------
 (add-hook 'makefile-mode-hook
           '(lambda()
              (konix/text-hook)
              ))
 
+;; --------------------------------------------------
 ;; EGG Load
+;; --------------------------------------------------
 (add-hook 'egg-load-hook
           '(lambda()
              ;; Variables
@@ -434,7 +566,9 @@
              )
           )
 
+;; --------------------------------------------------
 ;; HIDE SHOW
+;; --------------------------------------------------
 (add-hook 'hs-minor-mode-hook
           (lambda ()
             (local-set-key (kbd "<f2> <f1>") 'hs-hide-all)
@@ -443,7 +577,9 @@
             (local-set-key (kbd "<f1>") 'hs-toggle-hiding)
             ))
 
+;; --------------------------------------------------
 ;; OUTLINE
+;; --------------------------------------------------
 (add-hook 'outline-mode-hook
           '(lambda()
              (local-set-key (kbd "<S-M-left>") 'outline-promote)
@@ -454,20 +590,26 @@
              (local-set-key (kbd "<f2> <f3>") 'show-all)
              ))
 
+;; --------------------------------------------------
 ;; HELP
+;; --------------------------------------------------
 (add-hook 'help-mode-hook
           '(lambda()
              (local-set-key "q" 'konix/quit-and-delete-window)
              (define-key help-map "b" 'konix/describe-bindings)
              ))
 
+;; --------------------------------------------------
 ;; Magit
+;; --------------------------------------------------
 (add-hook 'magit-mode-hook
           '(lambda()
              (local-set-key (kbd "V") 'konix/magit-visit-item-view)
              ))
 
+;; --------------------------------------------------
 ;; Comint
+;; --------------------------------------------------
 (setq comint-mode-hook
       (lambda()
         (add-to-list 'comint-dynamic-complete-functions 'auto-complete t)

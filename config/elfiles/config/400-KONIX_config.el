@@ -1,3 +1,11 @@
+;; ####################################################################################################
+;; Configuration file
+
+;; It contains general configuration settings but also some mode config. If the
+;; configuration of a mode uses a hook over the mode or is too big to be here,
+;; it is then put into the mode file or into a dedicated file
+;; ####################################################################################################
+
 ;; ************************************************************
 ;; Cleaning file before saving
 ;; ************************************************************
@@ -193,54 +201,6 @@
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 
-;; ####################################################################################################
-;; Config MODES
-;; ####################################################################################################
-;; ************************************************************
-;; Org
-;; ************************************************************
-(setq-default org-hide-leading-stars t)
-(setq-default org-agenda-include-diary t)
-(setq-default org-agenda-files (list (concat perso-dir "/wiki/todo.org") (concat perso-dir "/wiki/diary.org")))
-(setq-default org-agenda-diary-file (concat perso-dir "/wiki/diary.org"))
-(setq-default org-agenda-include-all-todo t)
-(setq-default org-agenda-include-diary nil)
-(setq-default org-agenda-insert-diary-strategy (quote date-tree))
-(setq-default org-agenda-skip-scheduled-if-deadline-is-shown t)
-(setq-default org-agenda-start-with-clockreport-mode t)
-(setq-default org-agenda-todo-ignore-deadlines t)
-(setq-default org-agenda-todo-ignore-scheduled t)
-(setq-default org-clock-in-resume t)
-(setq-default org-clock-out-remove-zero-time-clocks t)
-(setq-default org-clock-persist (quote clock))
-(setq-default org-clock-persist-file (concat elfiles "/org-clock-save.el"))
-(setq-default org-clock-persist-query-save t)
-(setq-default org-enforce-todo-checkbox-dependencies t)
-(setq-default org-enforce-todo-dependencies t)
-(setq-default org-export-html-with-timestamp t)
-(setq-default org-insert-labeled-timestamps-at-point nil)
-(setq-default org-log-done (quote time))
-(setq-default org-log-done-with-time t)
-(setq-default org-log-into-drawer t)
-(setq-default org-log-note-headings (quote ((done . "CLOSING NOTE %t") (state . "State %-12s %t") (note . "Note prise le %t") (clock-out . ""))))
-(setq-default org-log-states-order-reversed t)
-;; Pour les appointments
-(org-agenda-to-appt)
-;; (appt-activate)
-
-;; ************************************************************
-;; Python
-;; ************************************************************
-(setq-default python-guess-indent nil)
-(setq-default python-indent 4)
-
-;; ************************************************************
-;;  Appt
-;; ************************************************************
-(setq-default appt-display-duration 10)
-(setq-default appt-display-format (quote window))
-(setq-default appt-message-warning-time 180)
-
 ;; ************************************************************
 ;; Calendar
 ;; ************************************************************
@@ -261,28 +221,6 @@
    "jul" "aoû" "sep" "oct" "nov" "déc"])
 
 ;; ************************************************************
-;; Compilation
-;; ************************************************************
-(setq-default compilation-auto-jump-to-first-error t)
-(setq-default compilation-context-lines nil)
-(setq-default compilation-read-command nil)
-(setq-default compilation-scroll-output (quote first-error))
-(setq-default compilation-skip-threshold 2)
-(setq-default compilation-window-height 10)
-(setq-default compile-command "make")
-
-;; ************************************************************
-;; Debug
-;; ************************************************************
-(setq-default gdb-many-windows nil)
-(setq-default gdb-same-frame t)
-(setq-default gdb-show-main nil)
-(setq-default gdb-speedbar-auto-raise nil)
-(setq-default gdb-use-separate-io-buffer t)
-(setq-default gud-tooltip-echo-area nil)
-(setq-default gud-tooltip-mode t)
-
-;; ************************************************************
 ;; Grep
 ;; ************************************************************
 (setq-default grep-command "grep -nH -r -e ")
@@ -295,21 +233,10 @@
 (setq-default ido-enable-last-directory-history nil)
 
 ;; ************************************************************
-;; TEX
-;; ************************************************************
-(setq-default reftex-plug-into-AUCTeX t)
-
-;; ************************************************************
 ;; TERM
 ;; ************************************************************
 (setq-default term-default-bg-color "black")
 (setq-default term-default-fg-color "grey")
-
-;; ************************************************************
-;; Maxima
-;; ************************************************************
-(setq-default imaxima-use-maxima-mode-flag t)
-(setq-default maxima-command "maxima")
 
 ;; ************************************************************
 ;; ECB
@@ -335,18 +262,6 @@
 (setq-default erc-port 6667)
 (setq-default erc-server "irc.efnet.fr")
 (setq-default erc-user-mode (quote ignore))
-
-;; ************************************************************
-;; Shell
-;; ************************************************************
-(setq-default explicit-shell-file-name "/bin/bash")
-(setq-default dirtrack-list (quote ("^.*[^|]*|\\([^|]*\\)|.*$" 1 nil)))
-(add-to-list 'ac-modes 'shell-mode)
-
-;; ************************************************************
-;; gnuplot
-;; ************************************************************
-(defvar konix/gnuplot/arguments "smooth cspline with lines")
 
 ;; ************************************************************
 ;; TAGS

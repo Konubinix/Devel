@@ -150,9 +150,6 @@
 ;; For the cursor to move naturally
 (setq-default line-move-visual t)
 
-;; Default font, jolie!!
-(set-default-font "-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1" t)
-
 ;; ************************************************************
 ;; Buffers
 ;; ************************************************************

@@ -99,8 +99,10 @@
 ;; --------------------------------------------------
 ;; Magit
 ;; --------------------------------------------------
-(require 'magit)
-(setq-default magit-process-popup-time 4)
+(ignore-errors
+  (require 'magit)
+  (setq-default magit-process-popup-time 4)
+  )
 
 ;; ************************************************************
 ;; Git blame

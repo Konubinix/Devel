@@ -26,21 +26,21 @@ fi
 cat <<EOF > "$HOME/.bashrc"
 #!/bin/bash
 source "$HOME/.shrc_var"
-source "$CUSTOM_FILE
+source "$CUSTOM_FILE"
 source "${CONFIG_DIR}/bashrc"
 EOF
 
 cat <<EOF > "$HOME/.shrc"
 #!/bin/bash
 source "$HOME/.shrc_var"
-source "$CUSTOM_FILE
+source "$CUSTOM_FILE"
 source "${CONFIG_DIR}/shrc"
 EOF
 
 cat <<EOF > "$HOME/.zshrc"
 #!/bin/bash
 source "$HOME/.shrc_var"
-source "$CUSTOM_FILE
+source "$CUSTOM_FILE"
 source "${CONFIG_DIR}/zshrc"
 EOF
 

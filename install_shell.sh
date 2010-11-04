@@ -26,22 +26,22 @@ fi
 cat <<EOF > "$HOME/.bashrc"
 #!/bin/bash
 source "$HOME/.shrc_var"
-source "$CUSTOM_FILE"
 source "${CONFIG_DIR}/bashrc"
+source "$CUSTOM_FILE"
 EOF
 
 cat <<EOF > "$HOME/.shrc"
 #!/bin/bash
 source "$HOME/.shrc_var"
-source "$CUSTOM_FILE"
 source "${CONFIG_DIR}/shrc"
+source "$CUSTOM_FILE"
 EOF
 
 cat <<EOF > "$HOME/.zshrc"
 #!/bin/bash
 source "$HOME/.shrc_var"
-source "$CUSTOM_FILE"
 source "${CONFIG_DIR}/zshrc"
+source "$CUSTOM_FILE"
 EOF
 
 echo "Successful installed $0"

@@ -55,8 +55,6 @@
 (define-key 'konix/global-slow-key-map "k" 'bury-buffer)
 ;; grep
 (define-key 'konix/global-slow-key-map (kbd "C-s") 'lgrep)
-;; find
-(define-key 'konix/global-key-map (kbd "M-f") 'konix/find)
 ;; insert the date
 (define-key 'konix/global-slow-key-map (kbd "C-t") 'konix/insert-iso-time-string)
 ;; insert date and time
@@ -89,6 +87,8 @@
 (define-key 'konix/global-key-map "u" 'uncomment-region)
 ;; toggle source header
 (define-key 'konix/global-key-map (kbd "M-t") 'konix/toggle-source-header)
+;; find
+(define-key 'konix/global-key-map (kbd "M-f") 'konix/find)
 
 ;; ####################################################################################################
 ;; Fast keymap keys

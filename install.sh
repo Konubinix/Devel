@@ -13,23 +13,24 @@
 CONFIG="$(pwd)/config"
 TUNNING="$(pwd)/tunning"
 
-function is_on_linux(){
+function is_on_linux {
     uname -a|grep -i "linux">/dev/null
 }
 
-function substitute()
+function substitute {
 if is_on_linux
 then
-    {
+   
         rm -vrf "$1"
         ln -sv "$2" "$1"
-    }
+    
 else
-    {
+    
         rm -vrf "$1"
         cp -r "$2" "$1"
-    }
+    
 fi
+}
 
 substitute "$HOME/.pyrc.py"          "$CONFIG/pyrc.py"
 substitute "$HOME/Makefile"          "$CONFIG/Makefile"
@@ -52,7 +53,7 @@ then
 # ####################################################################################################
 # Gnome conf
 # ####################################################################################################
-    function install_icon_theme(){
+    function install_icon_theme {
 	      archive="$1"
 	      icons_dir="$HOME/.icons"
 	      echo "install $archive icon theme"
@@ -66,7 +67,7 @@ then
 	      rm -rf "$tmp_dir"
     }
 
-    function install_gtk_theme(){
+    function install_gtk_theme {
 	      archive="$1"
 	      themes_dir="$HOME/.themes"
 	      echo "install $archive theme"

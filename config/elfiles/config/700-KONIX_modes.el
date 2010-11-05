@@ -128,7 +128,6 @@
                                    ac-source-symbols
                                    ac-source-variables
                                    )))
-        (local-set-key (kbd "C-j") 'auto-complete)
         (auto-complete-mode t)
         ))
 
@@ -149,8 +148,8 @@
         (auto-complete-mode t)
         (setq ac-sources
               '(
-                ac-source-files-in-current-dir ;eshell
-                ac-source-filename ; eshell
+                ac-source-files-in-current-dir
+                ac-source-filename
                 ac-source-dabbrev
                 )
               )
@@ -419,7 +418,6 @@
                                ac-source-files-in-current-dir
                                ac-source-filename
                                ))
-            (local-set-key (kbd "C-j") 'auto-complete)
             )
           )
 
@@ -436,13 +434,10 @@
                             ac-source-files-in-current-dir
                             ac-source-filename
                             ))
-         (local-set-key (kbd "C-j") 'auto-complete)
          (local-set-key (kbd "<S-return>") 'newline)
          (ansi-color-for-comint-mode-on)
          (dirtrack-mode t)
-         (setq dirtrack-list '("|\\([^|]*\\)|" 1 nil))
          (konix/truncate_lines t)
-         (add-to-list 'ac-modes 'shell-mode)
          )
        )
 
@@ -463,7 +458,7 @@
 (setq maxima-mode-hook
       (lambda nil
         (hs-minor-mode t)
-        (auto-complete-mode)
+        (auto-complete-mode t)
         )
       )
 
@@ -491,22 +486,22 @@
 ;; --------------------------------------------------
 ;; semantic
 ;; --------------------------------------------------
-(add-hook 'semantic-init-hook
-          '(lambda()
-             (define-key senator-prefix-map "j" 'semantic-ia-fast-jump)
-             (define-key senator-prefix-map "s" 'semantic-ia-show-summary)
-             (doc-mode t)
-             )
-          )
+(setq semantic-init-hook
+	  (lambda()
+		(define-key senator-prefix-map "j" 'semantic-ia-fast-jump)
+		(define-key senator-prefix-map "s" 'semantic-ia-show-summary)
+		(doc-mode t)
+		)
+	  )
 
 ;; --------------------------------------------------
 ;; CHSARP
 ;; --------------------------------------------------
+(add-to-list 'ac-modes 'csharp-mode)
 (setq csharp-mode-hook
       (lambda ()
         ;; The csharp-insert-open-brace function is quite annoying
         (local-unset-key "{")
-        (add-to-list 'ac-modes 'csharp-mode)
         ))
 
 ;; --------------------------------------------------
@@ -615,6 +610,6 @@
 ;; --------------------------------------------------
 (setq comint-mode-hook
       (lambda()
-        (add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
+		(add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
         )
       )

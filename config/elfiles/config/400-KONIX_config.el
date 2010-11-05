@@ -99,15 +99,13 @@
 ;; --------------------------------------------------
 ;; Magit
 ;; --------------------------------------------------
-(ignore-errors
-  (require 'magit)
-  (setq-default magit-process-popup-time 4)
-  )
+(require 'magit "magit" t)
+(setq-default magit-process-popup-time 4)
 
 ;; ************************************************************
 ;; Git blame
 ;; ************************************************************
-(require 'git-blame)
+;; (require 'git-blame)
 
 ;; ************************************************************
 ;; MenuBufferPlus

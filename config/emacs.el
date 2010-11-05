@@ -11,6 +11,7 @@
       (append
        (list
         (expand-file-name elfiles)
+        (expand-file-name "~/.elfiles") ;; for custom files
         (expand-file-name (concat elfiles "/config"))
         (expand-file-name (concat elfiles "/yasnippet"))
         (expand-file-name (concat elfiles "/git"))

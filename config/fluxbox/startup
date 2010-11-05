@@ -10,7 +10,7 @@ fbpid=$!
 setxkbmap -option ctrl:swapcaps
 guake &
 volwheel &
-wallpaper-tray &
+# wallpaper-tray &
 numlockx
 ~/bin/notify_daemon.py &
 

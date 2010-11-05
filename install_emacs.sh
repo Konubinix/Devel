@@ -23,7 +23,7 @@ fi
 cat <<EOF > "$HOME/.emacs"
 (load-file "$HOME/.emacs_var")
 ;;Config du custom dans un fichier séparé
-(setq custom-file "~/emacs_custo")
+(setq custom-file "$EMACS_CUSTOM_FILE")
 (load-file "$CONFIG_DIR/emacs.el")
 ;; On finit par loader les customs
 (load custom-file)

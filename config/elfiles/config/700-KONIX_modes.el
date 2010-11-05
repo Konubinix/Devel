@@ -21,8 +21,6 @@
           )
         (konix/prog-hook)
         (hide-ifdef-mode t)
-        (setq hide-ifdef-initially t)
-        (setq hide-ifdef-shadow t)
         (add-to-list 'ac-omni-completion-sources
                      (cons "\\." '(ac-source-semantic)))
         (add-to-list 'ac-omni-completion-sources
@@ -519,12 +517,16 @@
 (setq dired-mode-hook
       (lambda ()
         ;; copy and paste in dired
-        (require 'wuxch-dired-copy-paste)
         (konix/truncate_lines t)
         ;; with "a", replace existing buffer
         (put 'dired-find-alternate-file 'disabled nil)
         )
       )
+(eval-after-load "dired"
+  '(progn
+	 (require 'wuxch-dired-copy-paste)
+	 )
+  )
 
 ;; --------------------------------------------------
 ;; Makefile
@@ -594,22 +596,33 @@
 (add-hook 'help-mode-hook
           '(lambda()
              (local-set-key "q" 'konix/quit-and-delete-window)
-             (define-key help-map "b" 'konix/describe-bindings)
              ))
+(eval-after-load "help-mode"
+  '(progn
+	 (define-key help-map "b" 'konix/describe-bindings)
+	 )
+  )
+
 
 ;; --------------------------------------------------
 ;; Magit
 ;; --------------------------------------------------
-(add-hook 'magit-mode-hook
-          '(lambda()
-             (local-set-key (kbd "V") 'konix/magit-visit-item-view)
-             ))
+(require 'magit "magit" t)
+(setq-default magit-process-popup-time 4)
+(setq magit-mode-hook
+	  (lambda()
+		(local-set-key (kbd "V") 'konix/magit-visit-item-view)
+		))
 
 ;; --------------------------------------------------
 ;; Comint
 ;; --------------------------------------------------
 (setq comint-mode-hook
       (lambda()
-		(add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
         )
       )
+(eval-after-load "comint"
+  '(progn
+	 (add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
+	 )
+  )

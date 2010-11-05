@@ -94,15 +94,6 @@
 (setq-default multi-eshell-shell-function '(shell))
 
 ;; ************************************************************
-;; Git
-;; ************************************************************
-;; --------------------------------------------------
-;; Magit
-;; --------------------------------------------------
-(require 'magit "magit" t)
-(setq-default magit-process-popup-time 4)
-
-;; ************************************************************
 ;; Git blame
 ;; ************************************************************
 ;; (require 'git-blame)
@@ -147,6 +138,9 @@
 (setq-default fill-column 8000)
 ;; For the cursor to move naturally
 (setq-default line-move-visual t)
+;; hide ifdef
+(setq-default hide-ifdef-initially t)
+(setq-default hide-ifdef-shadow t)
 
 ;; ************************************************************
 ;; Buffers

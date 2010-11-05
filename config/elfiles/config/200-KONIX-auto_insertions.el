@@ -1,3 +1,6 @@
+;; ####################################################################################################
+;; Here are defined the texts used to fill files when they are first created
+;; ####################################################################################################
 (add-hook 'find-file-hooks 'auto-insert)
 (setq auto-insert-directory (expand-file-name (concat elfiles "/autoinsert/")))
 

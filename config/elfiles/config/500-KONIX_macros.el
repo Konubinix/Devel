@@ -1,5 +1,6 @@
-;;; macros.el --- Mes macros
-;;Entete
+;; ####################################################################################################
+;; A bunch of macros
+;; ####################################################################################################
 (fset 'head
       [?\C-w ?< ?d ?e ?b ?u ?t ?> ?\C-u ?8 ?0 ?# return ?\C-y return ?\C-u ?8 ?0 ?# ?< ?f ?i ?n ?> ?\C- ?\C-r ?< ?d ?e ?b ?u ?t ?> ?\M-g ?c ?\C-s ?< ?d ?e ?b ?u ?t ?> left right backspace backspace backspace backspace backspace backspace backspace ?\C-s ?< ?f ?i ?n ?> left right backspace backspace backspace backspace backspace ?\C-e return])
 (fset 'sub_head

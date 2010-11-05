@@ -29,4 +29,12 @@ cat <<EOF > "$HOME/.emacs"
 (load custom-file)
 EOF
 
+if [ ! -e "$PERSO_DIR/wiki" ]
+then
+	mkdir -p "$PERSO_DIR/wiki"
+fi
+
+touch "$PERSO_DIR/wiki/diary.org"
+touch "$PERSO_DIR/wiki/todo.org"
+
 echo "Successfully installed $0"

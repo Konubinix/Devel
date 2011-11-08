@@ -134,6 +134,8 @@
 (autoload 'ack "full-ack" nil t)
 (autoload 'ack-find-same-file "full-ack" nil t)
 (autoload 'ack-find-file "full-ack" nil t)
+;; grin
+(autoload 'grin "grin" nil t)
 
 ;; ******************************************************************************************
 ;; Magic modes

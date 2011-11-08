@@ -7,3 +7,6 @@
 [submodule "lib/ftputil"]
 	path = lib/ftputil
 	url = https://github.com/mafalb/python-ftputil.git
+[submodule "config/elfiles/cedet"]
+	path = config/elfiles/cedet
+	url = https://github.com/emacs-pkg-mirrors/cedet.git

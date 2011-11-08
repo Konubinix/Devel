@@ -1,0 +1,46 @@
+#!/bin/bash
+source "${LIB_DIR}/lib_bash.sh"
+findEmacsWindow () {
+	wmctrl -l -x|grep -q emacs.Emacs
+}
+
+findEmacsclientProcess () {
+	if on_windows_p
+	then
+		# no notion of emacs daemon on windows
+		return 1
+	else
+		ps -A -o comm|grep -q '^emacsclient$'
+	fi
+}
+
+findEmacsProcess () {
+	if on_windows_p
+	then
+		ps -aW |grep -q 'emacs.exe'
+	else
+		ps -A -o comm|grep -q '^emacs$'
+	fi
+}
+
+findEmacs () {
+	if konix_on_linux_p
+	then
+		findEmacsWindow
+	else
+		findEmacsProcess
+	fi
+}
+
+if findEmacsProcess
+then
+	echo "Already an emacs daemon" 1>&2
+else
+	emacs --daemon
+fi
+if findEmacs
+then
+	emacsclient "$@"
+else
+	emacsclient -c "$@"
+fi >> ~/ec.log 2>> ~/ec.err

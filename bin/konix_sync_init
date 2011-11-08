@@ -1,0 +1,50 @@
+#!/bin/bash
+
+source _konix_sync_variables.sh
+
+usage () {
+    cat <<EOF
+$0 <remote_dir> ...
+Given a list of remote directories, it declares them to be synced with current
+    working directory
+EOF
+}
+
+if [ "$#" == "0" ]
+then
+    usage
+    exit 1
+fi
+
+if [ -e "$KONIX_SYNC_MAIN_DIR_FILE" ]
+then
+    echo "Already associated to main dir $(cat $KONIX_SYNC_MAIN_DIR_FILE), replace ?"
+    read res
+    if [ "$res" != "y" ]
+    then
+	echo "exiting to prevent overriding of current main dir"
+	exit 2
+    fi
+fi
+
+rm -f "${KONIX_SYNC_MAIN_DIR_FILE}"
+for dir in "$*"
+do
+    ADD_FILE=1
+    if [ ! -e "$dir" ]
+    then
+	echo "$dir does not exist, make it ? (y/.)"
+	read res
+	if [ "$res" == "y" ]
+	then
+	    mkdir -p "${dir}"
+	fi
+    fi
+    if [ ! -d $dir ]
+    then
+	echo "$dir is not an existing directory, quitting"
+	exit 3
+    fi
+    echo "$dir" > "${KONIX_SYNC_MAIN_DIR_FILE}"
+    echo "Set $dir in main sync directory"
+done

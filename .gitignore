@@ -1,0 +1,8 @@
+*.pyc
+/config/fluxbox/lastwallpaper
+/config/elfiles/comphist.dat
+/config/fluxbox/menu
+/config/fluxbox/slitlist
+*~
+*.elc
+*#

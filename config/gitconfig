@@ -1,0 +1,48 @@
+[gui]
+	fontui = -family helvetica -size 12 -weight bold -slant roman -underline 0 -overstrike 0
+	fontdiff = -family Courier -size 12 -weight normal -slant roman -underline 0 -overstrike 0
+	encoding = utf-8
+[alias]
+	ci = commit
+	st = status
+	cl = clone
+	co = checkout
+	k = !gitk --all
+	ka = !gitk --all `git reflog | cut -c1-7`
+	up = pull --rebase
+	wu = log --stat origin..@{0}
+	wup = log -p origin..@{0}
+	diffc = diff --cached
+	civ = commit -v
+	sm = submodule
+#	fetch = fetch --upload-pack="git upload-pack"
+
+[remote "origin"]
+#	uploadpack = git upload-pack
+#	receivepack = git receive-pack
+	gitsvn = git svn
+[diff]
+  	tool = meld #konix_emacs_diff
+[difftool]
+	prompt =
+[difftool "konix_emacs_diff"]
+	cmd = python \"$(which konix_emacs_diff.py)\" \"$LOCAL\" \"$REMOTE\"
+[apply]
+	whitespace = fix
+	ignorewhitespace = change
+[color]
+	ui = true
+	status = auto
+	diff = auto
+	branch = auto
+[core]
+	safecrlf = warn
+	autocrlf = input
+	whitespace = -space-before-tab,-indent-with-non-tab,-tab-in-indent,trailing-space,cr-at-eol
+[merge]
+	summary = true
+	tool = konix_emacs_merge
+[mergetool "konix_emacs_merge"]
+        cmd = python \"$(which konix_emacs_merge.py)\" \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
+[diff "gpg"]
+	textconv = gpg -d

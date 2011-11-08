@@ -1,0 +1,11 @@
+#!/bin/bash
+#set -x
+source _konix_sync_variables.sh
+if [ -e "$KONIX_SYNC_PUSH_PRE_HOOK" ]
+then
+    chmod +x "$KONIX_SYNC_PUSH_PRE_HOOK"
+    echo "Evaluating pre push hook"
+    eval "./$KONIX_SYNC_PUSH_PRE_HOOK"
+fi
+
+. _konix_sync_do_recurse.sh "PUSH"

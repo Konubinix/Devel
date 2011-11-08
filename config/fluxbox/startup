@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# For flash to be fully functionnal
+export GDK_NATIVE_WINDOWS=1
+export PATH="$(dirname "$0")/bin:$(dirname "$0")/devel_bin:$PATH"
+
+pkill -9 fluxbox
+
+fluxbox &
+
+fbpid=$!
+
+#gnome-terminal --maximize &
+setxkbmap -option ctrl:swapcaps
+volwheel &
+
+emacs --daemon > ~/.emacs_log 2>&1 &
+numlockx
+konix_notify_daemon > ~/.notify_daemon_log 2>&1 &
+
+sleep 4
+{
+    killall conky
+    wicd-gtk -t &
+    conky -d -c ~/.conky.d/conky1 > ~/conky.log 2> ~/conky.err
+    gnome-setting-daemon
+    gnome-panel &
+    nautilus --no-default-window
+} &
+
+wait $fbpid

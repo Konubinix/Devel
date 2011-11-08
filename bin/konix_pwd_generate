@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# -*- coding:utf-8 -*-
+
+_konix_pwd_generate "$@" | konix_copy_to_clipboard
+echo "Password set in your clipboard"

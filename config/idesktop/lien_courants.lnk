@@ -1,0 +1,12 @@
+table Icon
+  Caption: Liens courants
+  Icon: /usr/share/pixmaps/doxywizard.png
+  Width: 48
+  Height: 48
+  X: 155
+  Y: 657
+  Command[0]: 
+  Command[1]: thunar
+  Command[2]: emacs ~/.idesktop/lien_courants.lnk
+end
+

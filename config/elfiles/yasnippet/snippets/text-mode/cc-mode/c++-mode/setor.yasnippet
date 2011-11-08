@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: setor (mutator+accessor)
+# key: setor
+# --
+void set${2:$(capitalize text)}(const ${1:type} $2) { m_${2:Member} = $2;}
+$1 get${2:$(capitalize text)}()const{ return m_$2;}

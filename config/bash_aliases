@@ -1,0 +1,29 @@
+#! -*- mode:sh -*-
+if ls --color > /dev/null 2>&1
+then
+    # some version of ls do not support color
+    alias ls='ls --color'
+fi
+alias ll='ls -l'
+alias la='ls -A'
+alias l='ls -CF'
+alias CH='grep --color -i -n -r'
+alias CHnr='grep --color -n -i'
+alias SVND="svn status | grep ! | sed 's/!//' | xargs svn delete"
+alias SVNA="svn status | grep ? | sed 's/?//' | xargs svn add"
+alias tkcon="tkcon -load Tk"
+alias cur="cd $KONIX_CURRENT_DEVEL"
+alias GEN_PASS8='_konix_pwd_generate'
+# alias pour que meld fonctionne, il nécessite l'UTF-8
+alias meld="LC_ALL=fr_FR.UTF-8 python /usr/bin/meld"
+alias CD="cd -P ."
+alias KONIX_ESSIDS="(iwlist scan | grep ESSID ) 2> /dev/null"
+alias git-upload-pack="git upload-pack"
+alias PSMTP="python -m smtpd -n -c DebuggingServer localhost:1025"
+alias HABIT="cur ; CD ; ec ./ & git k &"
+alias REmake="make clean && make"
+alias CTRL_CAPS="setxkbmap -option ctrl:swapcaps"
+alias pud="pushd"
+alias pod="popd"
+alias dia="dia --integrated"
+alias go="gnome-open"

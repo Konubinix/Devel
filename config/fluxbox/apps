@@ -1,0 +1,118 @@
+[app] (title=.*[Mm]usiques.*)
+  [Workspace]	{5}
+  [Jump]	{yes}
+[end]
+[app] (name=fbrun)
+  [Position]	(CENTER)	{0 0}
+  [Layer]	{2}
+[end]
+[app] (name=thunar) (class=Thunar)
+  [Workspace]	{2}
+[end]
+[app] (name=gecko) (class=Thunderbird-bin)
+  [Maximized]	{yes}
+  [Close]	{yes}
+[end]
+[app] (name=pidgin) (class=Pidgin) (role=buddy_list)
+  [Minimized]	{no}
+[end]
+[app] (name=Navigator) (class=Iceweasel) (role=browser)
+  [Workspace]	{1}
+  [Jump]	{yes}
+[end]
+[app] (name=rt) (class=Rt)
+  [Dimensions]	{633 445}
+  [Position]	(UPPERLEFT)	{0 0}
+  [Layer]	{2}
+  [Close]	{yes}
+[end]
+[app] (name=Appearance) (class=TopLevelShell)
+  [Position]	(UPPERLEFT)	{8 253}
+  [Close]	{yes}
+[end]
+[app] (name=Material) (class=TopLevelShell)
+  [Position]	(UPPERLEFT)	{140 203}
+  [Close]	{yes}
+[end]
+[app] (name=) (class=)
+  [Position]	(UPPERLEFT)	{0 0}
+  [Layer]	{2}
+  [Close]	{yes}
+[end]
+[app] (name=gimp) (class=Gimp) (role=gimp-toolbox)
+  [Position]	(UPPERLEFT)	{1026 291}
+  [Close]	{yes}
+[end]
+[app] (name=gimp) (class=Gimp) (role=gimp-dock)
+  [Position]	(UPPERLEFT)	{950 -163}
+  [Close]	{yes}
+[end]
+[app] (name=emacs) (class=Emacs)
+  [Workspace]	{0}
+  [Jump]	{yes}
+[end]
+[app] (name=Thunar) (class=Thunar)
+  [Workspace]	{2}
+  [Jump]	{yes}
+[end]
+[app] (name=Qt-subapplication) (class=VirtualBox)
+  [Workspace]	{3}
+[end]
+[app] (name=evince) (class=Evince)
+  [Workspace]	{6}
+  [Maximized]	{yes}
+  [Jump]	{yes}
+[end]
+[app] (name=VCLSalFrame.DocumentWindow) (class=OpenOffice.org 3.2)
+  [Workspace]	{6}
+  [Jump]	{yes}
+[end]
+[app] (name=meld) (class=Meld)
+  [Maximized]	{yes}
+[end]
+[app] (name=xdvi) (class=XDvi)
+  [Deco]	{NONE}
+[end]
+[app] (name=emacsclient) (class=Emacs)
+  [Workspace]	{0}
+  [Maximized]	{yes}
+[end]
+[app] (name=Mail) (class=Icedove) (role=3pane)
+  [Workspace]	{4}
+  [Jump]	{yes}
+[end]
+[app] (name=google-chrome) (class=Google-chrome)
+  [Workspace]	{1}
+[end]
+[app] (name=nautilus) (class=Nautilus)
+  [Workspace]	{2}
+  [Jump]	{yes}
+[end]
+[app] (name=x-www-browser) (class=X-www-browser)
+  [Workspace]	{1}
+  [Maximized]	{yes}
+  [Jump]	{yes}
+[end]
+[app] (name=gimp-2.6) (class=Gimp-2.6) (role=gimp-toolbox)
+  [Position]	(UPPERLEFT)	{928 0}
+  [Layer]	{7}
+[end]
+[app] (name=gimp-2.6) (class=Gimp-2.6) (role=gimp-dock)
+  [Position]	(UPPERLEFT)	{1154 0}
+  [Layer]	{7}
+[end]
+[app] (name=Pidgin) (class=Pidgin) (role=conversation)
+  [Workspace]	{4}
+[end]
+[app] (name=Pidgin) (class=Pidgin) (role=buddy_list)
+  [Workspace]	{4}
+  [Jump]	{yes}
+[end]
+[app] (name=exaile.py) (class=Exaile.py)
+  [Workspace]	{5}
+[end]
+[app] (name=gnome-terminal)
+  [Workspace]	{0}
+  [Maximized]	{yes}
+  [Jump]	{yes}
+[end]

@@ -1,0 +1,5 @@
+#name : ... m_attr...
+# --
+${1:type} m_${2:attribute};
+$1& get${2:$(capitalize text)}()const{return m_$2;};
+void set${2:$(capitalize text)}(const $1 $2){m_$2 = $2;};

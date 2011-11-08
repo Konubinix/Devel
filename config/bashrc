@@ -1,0 +1,45 @@
+#!/bin/bash
+
+source "$CONFIG_DIR/shrc"
+
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# don't put duplicate lines in the history. See bash(1) for more
+# options
+export HISTCONTROL=ignoredups
+
+# make less more friendly for non-text input files
+LESSPIPE="$(which lesspipe)"
+[ -e "$LESSFILE" -a -x "$LESSFILE" ] && eval "$(lesspipe)"
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"'
+    ;;
+*)
+    ;;
+esac
+
+# ################################################################################
+# Others
+# ################################################################################
+# ************************************************************
+# Bash Comp
+# ************************************************************
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
+if [ -f /etc/profile.d/bash-completion.sh ]; then
+    . /etc/profile.d/bash-completion.sh
+fi
+
+# unset bash bmajor bminor
+
+# ************************************************************
+# Variables
+# ************************************************************
+# Le prompt, joli et en couleur
+export PS1='$?\[\033[01;32;40m\]\u\[\033[01;33;40m\]@\[\033[01;37;40m\]\h\[\033[00m\]\[\033[01;36;40m\]|path=\w|\[\033[00m\]$(parse_git_branch) $(date "+%H:%M:%S - %d/%m/%y")\n\$ '

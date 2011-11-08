@@ -1,0 +1,12 @@
+table Icon
+  Caption: Playlist
+  Icon: /usr/share/vlc/vlc128x128-christmas.png
+  Width: 48
+  Height: 48
+  X: 155
+  Y: 7
+  Command[0]: 
+  Command[1]: /usr/bin/vlc /home/snake/perso.m3u
+  Command[2]: emacs ~/.idesktop/fff.lnk
+end
+

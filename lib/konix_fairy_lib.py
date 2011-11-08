@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+import os
+import re
+import sys
+
+def get_files(MATCH, ALL):
+        result = []
+        for match in MATCH:
+                # take extensions into account
+                match = match+"(\.[^\.]+)?$"
+                for directory in os.environ["PATH"].split(os.pathsep):
+                        if not (os.path.exists(directory) and os.path.isdir(directory)):
+                                if os.environ.get("DEBUG_FAIRY"):
+                                        sys.stderr.write(directory+" does not exist or is not a directory\n")
+                                continue
+                        files = os.listdir(directory)
+                        found_files = [os.path.join(directory,fil) for fil in files if re.match(match, fil)]
+                        if found_files:
+                                result += found_files
+                                if not ALL:
+                                        break
+        return result

@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+import sys
+import os
+import subprocess
+import re
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+if len(sys.argv) > 1:
+        INFO = sys.argv[1]
+else:
+        INFO = "Info"
+
+info = sys.stdin.read()
+if re.findall("win",sys.platform):
+        import win32clipboard
+        win32clipboard.OpenClipboard()
+        win32clipboard.EmptyClipboard()
+        win32clipboard.SetClipboardData(win32clipboard.CF_TEXT,info)
+        win32clipboard.CloseClipboard()
+else:
+        try:
+                env = os.environ
+                env.update({'DISPLAY':':0.0'})
+                p = subprocess.Popen(["xsel", "-i"], stdin=subprocess.PIPE, env=env)
+                p.stdin.write(info)
+                p.stdin.close()
+                p.wait()
+        except OSError:
+                logging.error("xsel not found")
+                exit(1)
+logging.info(INFO+" copied to the clipboard")

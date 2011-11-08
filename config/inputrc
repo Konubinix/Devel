@@ -1,0 +1,81 @@
+# -*- mode:sh -*-
+# ####################################################################################################
+# VARIABLES SET
+# ####################################################################################################
+set completion-ignore-case on
+set bell-style none
+# If set to On, and completion-ignore-case is enabled, readline treats hyphens (-) and underscores (_) as equivalent when  performing
+# case-insensitive filename matching and completion.
+set completion-map-case on
+set editing-mode emacs
+# When  set  to On, readline will try to enable the application keypad when it is called.  Some systems need this to enable the arrow
+# keys.
+set enable-keypad on
+set expand-tilde on
+# When  set  to  On,  makes  readline use a single line for display, scrolling the input horizontally on a single screen line when it
+# becomes longer than the screen width rather than wrapping to a new line.
+set horizontal-scroll-mode on
+set keymap emacs
+# If set to On, completed directory names have a slash appended.
+set mark-directories on
+# If set to On, completed names which are symbolic links to directories have a slash appended (subject to the value of  mark-directories).
+set mark-symlinked-directories on
+# This  variable, when set to On, causes readline to match files whose names begin with a `.' (hidden files) when performing filename
+# completion.  If set to Off, the leading `.' must be supplied by the user in the filename to be completed.
+set match-hidden-files on
+# If set to On, menu completion displays the common prefix of the list of possible completions (which may be  empty)  before  cycling
+# through the list.
+set menu-complete-display-prefix on
+# If set to On, readline uses an internal more-like pager to display a screenful of possible completions at a time.
+set page-completions on
+# If  set  to  On,  readline  will  display  completions with matches sorted horizontally in alphabetical order, rather than down the
+# screen.
+set print-completions-horizontally on
+# This  alters  the  default  behavior of the completion functions.  If set to On, words which have more than one possible completion
+# cause the matches to be listed immediately instead of ringing the bell.
+set show-all-if-ambiguous on
+# This alters the default behavior of the completion functions in a fashion similar to show-all-if-ambiguous.  If set  to  On,  words
+# which have more than one possible completion without any possible partial completion (the possible completions don't share a common
+# prefix) cause the matches to be listed immediately instead of ringing the bell.
+set show-all-if-unmodified on
+# If set to On, this alters the default completion behavior when inserting a single match into the line.  It's only active when  per‐
+# forming completion in the middle of a word.  If enabled, readline does not insert characters from the completion that match charac‐
+# ters after point in the word being completed, so portions of the word following the cursor are not duplicated.
+set skip-completed-text on
+# If set to On, a character denoting a file's type as reported by stat(2) is appended to the filename when listing  possible  comple‐
+# tions.
+set visible-stats on
+# ####################################################################################################
+# BINDINGS, to know the console character used when typing something, use cat
+# and change ^[ by \e ou \033
+# ####################################################################################################
+# tab does standard completion
+TAB:complete
+# shift-tab does navigate in menu-complete
+"\e[Z":menu-complete
+#C-w kill-region
+"\C-w":kill-region
+#M-w roughly the same as kill-ring-save
+"\M-w":copy-region-as-kill
+# C-space to set-mark
+"\C-Space":set-mark
+"\C-o":"> log"
+"\e\C-l":"\C-e | less\C-m"
+#This example wraps the line in su -c '', if Alt+S is pressed:
+"\es":"\C-a su -c '\C-e'\C-m"
+# As a last example, quickly send a command in the background with Ctrl+Alt+B, discarding all of its output:
+"\e\C-b":"\C-e > /dev/null 2>&1 &\C-m"
+# C-p and C-n to navigate in completion
+"\C-n":menu-complete
+"\C-p":"\e-1\C-n"
+# C-left and C-right to move among words
+"\e[5C": forward-word
+"\e[5D": backward-word
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+# C-up and C-down to menu-complete
+"\e[1;5A": "\e-1\C-n"
+"\e[1;5B": menu-complete
+# C-s and C-r like in emacs
+"\C-r":reverse-search-history
+"\C-s":forward-search-history

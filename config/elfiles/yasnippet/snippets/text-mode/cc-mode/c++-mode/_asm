@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: _asm
+# --
+$>_asm {
+$>$0
+$>}

@@ -1,0 +1,111 @@
+# -*- mode:sh -*-
+
+# Historique
+HISTFILE=~/.histfile
+HISTSIZE=5000
+SAVEHIST=5000
+setopt hist_ignore_all_dups # ignore les commandes doublons
+
+source "$CONFIG_DIR/shrc"
+
+# Aliases
+if [ -f "$CONFIG_DIR/zsh_aliases" ]; then
+	source "$CONFIG_DIR/zsh_aliases"
+fi
+
+# Touches comme emacs
+bindkey -e
+
+# Complétion
+zstyle :compinstall filename '/home/snake/.zshrc'
+autoload -Uz compinit
+compinit
+
+# Pour avoir joli promt
+#autoload -U promptinit
+#promptinit
+setopt prompt_subst # Pour pouvoir utiliser des variables et fonctions dans le prompt
+export prompt='%? %F{green}%B%n%F{red}@%F{white}%M%F{cyan} %W %* %F{red}%{$(parse_git_branch)%}
+%F{yellow}%~ %A%k%f%F{cyan}%# %f%B%b'
+
+#' $(parse_git_branch) > '
+
+
+# Récup complétion bash
+autoload -U bashcompinit
+bashcompinit
+
+# Custo completion
+zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
+zstyle ':completion:*:warnings' format '%BDésolé, pas de résultats pour : %d%b'
+#zstyle ':completion:*' menu select=3
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+
+# Correction des fautes de frappes
+setopt correctall
+# Fuzzy match
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
+# Utilisation d'un cache pour aller plus vite
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh_cache
+zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin
+# Completion pour kill
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*'   force-list always
+compdef pkill=killall
+# Pour la création de la liste des processus
+zstyle ':completion:*:processes' command 'ps x -o pid,pcpu,tt,args'
+#zstyle ':completion:*:processes' command 'ps -aux'
+
+# Jokers étendus
+setopt extendedglob
+
+# Colorie les lignes stderr en rouge
+# exec 2>>(while read line; do
+#   print '\e[91m'${(q)line}'\e[0m' > /dev/tty; print -n $'\0'; done &)
+
+# ################################################################################
+# KEYS
+# ################################################################################
+# C-Left C-Right
+bindkey "[1;5D" backward-word
+bindkey "[1;5C" forward-word
+
+bindkey "" kill-region
+
+# ################################################################################
+# COMPDEF
+# ################################################################################
+compdef '_files -g "*.pdf"' evince
+compdef '_files -g "*.odg"' ooffice
+compdef '_files -g "*.planner"' planner
+
+
+_git-reset () {
+	local commit_arg path_arg
+
+	if [[ $words[2] == --mixed ]]; then
+		commit_arg=':commit:__git_revisions'
+		path_arg="*:file:__git_tree_files . $words[3]"
+	else
+		commit_arg='::commit:__git_revisions'
+	fi
+
+	_arguments -S -A '--*' \
+		'(        --soft --hard)--mixed[like --soft but report what has not been updated (default)]' \
+		'(--mixed        --hard)--soft[do not touch the index file nor the working tree]' \
+		'(--mixed --soft       )--hard[match the working tree and index to the given tree]' \
+		'--merge[bring local changes along to new commit]' \
+		$commit_arg \
+		$path_arg \
+		'*:fichiers:__git_files' && ret=0
+}
+
+# ####################################################################################################
+# Lib PERSO
+# ####################################################################################################
+source "$DEVEL_DIR/lib/lib_zsh.sh"

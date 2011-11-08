@@ -1,0 +1,7 @@
+--sort=yes
+--python-kinds=cfmvi
+--c++-kinds=+cdefglmnpstuv
+--extra=+fq
+--fields=+ialStmnsz
+--file-scope=yes
+--regex-c++=/^.+public[ \t]+([^ \t]+).*$/\1 PARENT/

@@ -1,0 +1,21 @@
+# P > 1000 cette priorité entraîne l'installation du paquet même s'il s'agit d'un retour en arrière.
+# 990 < P <=1000 la version sera installée, même si elle n'appartient pas à la distribution par défaut ; mais elle ne sera pas installée si la version installée est plus récente.
+# 500 < P <=990 La version sera installée, sauf s'il existe une version appartenant à la distribution par défaut ou si la version installée est plus récente.
+# 100 < P <=500 la version sera installée, sauf s'il existe une version appartenant à une autre distribution ou si la version installée est plus récente.
+# 0 < P <=100 la version sera installée si aucune version du paquet n'est installée.
+# P < 0 cette priorité empêche l'installation de la version.
+
+# Installée, sauf si on décide de mettre celle de testing
+Package: *
+Pin: release a=stable
+Pin-Priority: 600
+
+# Installée par défault
+Package: *
+Pin: release a=testing
+Pin-Priority: 900
+
+# Installée si rien d'autre
+Package: *
+Pin: release a=unstable
+Pin-Priority: 50

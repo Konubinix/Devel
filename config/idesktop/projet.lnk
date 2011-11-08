@@ -1,0 +1,12 @@
+table Icon
+  Caption: Projet actuel
+  Icon: /usr/share/pixmaps/emacs.png
+  Width: 48
+  Height: 48
+  X: 35
+  Y: 657
+  Command[0]: 
+  Command[1]: 
+  Command[2]: emacs ~/.idesktop/projet.lnk
+end
+

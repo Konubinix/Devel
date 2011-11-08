@@ -1,0 +1,83 @@
+# ##################################################
+# Variables à customiser
+# ##################################################
+RELEASE=-O3
+L1_FLAGS = -Wall -Werror -W -Wextra
+L2_FLAGS = ${L1_FLAGS} -pedantic
+L3_FLAGS = ${L2_FLAGS} -ansi -fno-builtin
+DEBUG = -g
+
+FLAGS=${L3_FLAGS} ${DEBUG} # ${RELEASE}
+
+CC=gcc
+CFLAGS=${DEBUG}
+LD=gcc
+LDFLAGS=${DEBUG}
+
+MAIN_EXEC=main.exe
+EXEC=${MAIN_EXEC}
+
+SRC=./src
+INCLUDE=./include
+LIB=./lib
+
+OBJ_DIR=.obj
+OBJ=main.o
+
+# ##################################################
+# Variables à ne pas customiser
+# ##################################################
+OBJS=$(patsubst %,$(OBJ_DIR)/%,$(OBJ))
+
+.PHONY: start all $(OBJ_DIR)
+start: all
+
+all: $(OBJ_DIR) ${EXEC}
+
+# ################################################################################
+# EXEC
+# ################################################################################
+main.exe: $(OBJS)
+	${LD} ${LDFLAGS} $^ -o $@
+
+# ################################################################################
+# Creation des objets
+# ################################################################################
+# %.o : %.cpp
+# 	${CC} ${CFLAGS} -c $^ -o $@
+# %.o : %.c++
+# 	${CC} ${CFLAGS} -c $^ -o $@
+# %.o : %.cplusplus
+# 	${CC} ${CFLAGS} -c $^ -o $@
+# %.o : %.cc
+# 	${CC} ${CFLAGS} -c $^ -o $@
+# %.o : %.cxx
+# 	${CC} ${CFLAGS} -c $^ -o $@
+$(OBJ_DIR)/%.o : $(SRC)/%.cpp
+	${CC} ${CFLAGS} -c $^ -o $@
+
+$(OBJ_DIR):
+	test -d $(OBJ_DIR) || mkdir $(OBJ_DIR)
+# ################################################################################
+# PHONY
+# ################################################################################
+.PHONY: clean re clean_all clean_tmp all nclean ex
+
+clean_tmp:
+	rm -fr $(OBJ_DIR)
+
+clean: clean_tmp
+	rm -f ${EXEC}
+
+clean_all: clean
+
+all: ${EXEC}
+
+nclean: ${EXEC} clean_tmp
+
+re: clean_all all
+
+run:
+	./${MAIN_EXEC}
+
+nrun: all run

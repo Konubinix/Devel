@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+import os
+#check the PATH
+for dir in os.environ['PATH'].split(os.pathsep):
+        if not os.path.exists(dir):
+                print "WARNING :",dir,"does not exist and yet it is in your path"

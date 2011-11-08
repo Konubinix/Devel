@@ -1,0 +1,16 @@
+#name : class
+# --
+class ${200:API }${100:`(file-name-sans-extension (file-name-nondirectory (buffer-name)))`}${300:: public ${400:MOTHER}}{
+public:
+ $>// ####################################################################################################
+ $>// Constructors and destructors
+ $>// ####################################################################################################
+$>${100:$(yas/substr text "[^: ]*")}();
+$>virtual ~${100:$(yas/substr text "[^: ]*")}();
+$>$0
+
+private:
+ $>// For the copy methods not to be automatically constructed
+$>$100& operator = ( const $100&);
+$>$100(const $100&);
+};

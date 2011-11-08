@@ -1,0 +1,45 @@
+#!/bin/bash
+# -*- mode: sh -*-
+# set -x
+python "${DEVEL_DIR}/bin/konix_check_env"
+
+# ####################################################################################################
+# Readline
+# ####################################################################################################
+if ! on_windows_p.sh
+then
+    # this supposed that GNU stty is installed and that the special chars are the same on your terminal as on mine
+    # undef C-s and C-r  I don't like C-s to stop my terminal, and find it more usefull for incremental search
+	stty stop undef
+	stty rprnt undef
+    #undef C-w , readline automagically binds the special terminal chars to their equivalent commands
+	stty werase undef
+fi
+
+# ####################################################################################################
+# Personal info
+# ####################################################################################################
+if [ -f "$PERSO_DIR/perso" ]; then
+	source "$PERSO_DIR/perso"
+fi
+
+# ################################################################################
+# Aliases
+# ################################################################################
+# Take the aliases from a special file
+if [ -f "$CONFIG_DIR/bash_aliases" ]; then
+	source "$CONFIG_DIR/bash_aliases"
+fi
+
+# ################################################################################
+# Importation de mes fonctions persos
+# ################################################################################
+source "${LIB_DIR}/lib_bash.sh"
+
+# Log sur l'agent SSH
+if is_on_linux
+then
+	gpg_agent_start_KONIX
+	GPG_TTY=$(tty)
+    export GPG_TTY
+fi

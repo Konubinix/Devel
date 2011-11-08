@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+import os
+import getpass
+import subprocess
+import string
+import re
+import logging
+import sys
+import readline                 # to have readline support in raw_input
+logging.basicConfig(level=logging.DEBUG)
+
+INFO_CHUNK_TEXT="> "
+LOGIN_TEXT="Get login : "
+MDP_TEXT="Get password (empty to auto generate) : "
+INFO_TEXT="Get additionnal info, empty line to finish"
+
+p = subprocess.Popen(["konix_gpgdir_default_key.py"], stdout=subprocess.PIPE)
+DEFAULT_RECIPIENT = p.stdout.readline()[:-1]
+
+perso_dir = os.environ["PERSO_DIR"]
+mdp_dir = os.path.join(perso_dir, "mdp_nd")
+
+def get_file_name():
+        file_name = raw_input("Mdp file name : ")
+        if not file_name.endswith(".gpg"):
+                print file_name,"does not end with gpg, auto append it"
+                file_name += ".gpg"
+                print "The new file name is then",file_name
+        return os.path.join(mdp_dir,file_name)
+mdp_file_name = get_file_name()
+while os.path.exists(mdp_file_name):
+        print "This file name is already taken, choose another"
+        mdp_file_name = get_file_name()
+
+login = raw_input(LOGIN_TEXT)
+while login == "":
+        print "Login must not be empty"
+        login = raw_input(LOGIN_TEXT)
+
+mdp = getpass.getpass(MDP_TEXT)
+if mdp == "":
+        logging.info("Empty password, generating one")
+        p = subprocess.Popen(["_konix_pwd_generate"], stdout=subprocess.PIPE)
+        mdp = p.stdout.read()
+        p = subprocess.Popen(["konix_copy_to_clipboard","Password"], stdin=subprocess.PIPE)
+        p.stdin.write(mdp)
+        p.stdin.close()
+
+info = ""
+print(INFO_TEXT)
+info_chunk = raw_input(INFO_CHUNK_TEXT)
+while info_chunk != "":
+        info += info_chunk+"\n"
+        info_chunk = raw_input(INFO_CHUNK_TEXT)
+
+GPGTemplate = string.Template("""\
+LOGIN : ${LOGIN}
+MDP   : ${MDP}
+${INFO}""")
+
+mdp_file = open(mdp_file_name, "wb")
+logging.info("Writing encrypted info in "+mdp_file_name)
+p = subprocess.Popen(["gpg", "-e", "-r", DEFAULT_RECIPIENT], stdin=subprocess.PIPE, stdout=mdp_file)
+p.stdin.write(GPGTemplate.substitute({
+                        'LOGIN' : login,
+                        'MDP'   : mdp,
+                        'INFO'  : info
+                        }))
+p.stdin.close()
+p.wait()
+mdp_file.close()
+print "Password file added"

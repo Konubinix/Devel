@@ -6,3 +6,5 @@
 *~
 *.elc
 *#
+gnome-run
+devel_bin

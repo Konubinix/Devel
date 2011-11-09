@@ -15,9 +15,9 @@ def install_shell():
 # put the python of this platform in front of the path
 # the only hacky stuf I need is the platform
 export WANTED_PLATFORM="$(source "${HOME}/init_bin/_konix_platform.sh")"
-PATH_SEPARATOR="$("${HOME}/init_bin/_konix_get_default_env.py" PATH_SEPARATOR)"
-PYTHON_BIN="$("${HOME}/init_bin/_konix_get_default_env.py" PYTHON_BIN)"
-PYTHON_PATH="$(dirname "$PYTHON_BIN")"
+PATH_SEPARATOR="$(cd "${HOME}/init_bin" && "./_konix_get_default_env.py" PATH_SEPARATOR)"
+PYTHON_BIN="$(cd "${HOME}/init_bin" && "./_konix_get_default_env.py" PYTHON_BIN)"
+PYTHON_PATH="$(cd "${HOME}/init_bin" && ./konix_dirname.py "$PYTHON_BIN")"
 export PATH="$PYTHON_PATH${PATH_SEPARATOR}$PATH"
 # now, I am sure the python path is in first position before running the import env
 # Import env variables

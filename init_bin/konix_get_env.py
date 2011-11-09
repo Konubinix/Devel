@@ -89,7 +89,7 @@ def main():
         # - the platforms are differents
         # or
         # - env_done is not set to 1
-        logging.debug("the config is for "+config["PLATFORM"]+", the environ says "+os.environ.get("PLATFORM"))
+        logging.debug("the config is for "+config["PLATFORM"]+", the environ says "+os.environ.get("PLATFORM", "nothing"))
         if config["PLATFORM"] != os.environ.get("PLATFORM") or os.environ.get("KONIX_ENV_DONE") != "1":
             logging.debug("Parsing the env")
             devel_dir = config["DEVEL_DIR"]

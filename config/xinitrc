@@ -1,1 +1,2 @@
-dbus-launch gnome-session>~/.xinit_log 2>&1
+~/.fluxbox/startup
+#dbus-launch gnome-session>~/.xinit_log 2>&1

@@ -5,6 +5,9 @@ notmuch new
 # sync maildir flags up with notmuch
 notmuchsync -d -s --all --sync-deleted-tag
 
+# do a rss -> imap work
+feed2imap
+
 #sync with imap server
 offlineimap
 #get messages from pop server

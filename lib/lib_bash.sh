@@ -101,14 +101,14 @@ gpg_agent_start_KONIX () {
 		&& pgrep -u "$LOGNAME" gpg-agent > /dev/null 2>&1
 	then
 		echo "Using current gpg-agent conf from $GPG_INFO_FILE_NAME"
-        . "$GPG_INFO_FILE_NAME"
-        export GPG_AGENT_INFO
-        export SSH_AUTH_SOCK
     else
 		echo "Starting a new gpg-agent"
 		gpg-agent --daemon --enable-ssh-support \
-			--write-env-file "$GPG_INFO_FILE_NAME" >/dev/null 2>&1
+			--write-env-file "$GPG_INFO_FILE_NAME" >/dev/null
 	fi
+	. "$GPG_INFO_FILE_NAME"
+    export GPG_AGENT_INFO
+    export SSH_AUTH_SOCK
 }
 
 function est_connecte_KONIX {

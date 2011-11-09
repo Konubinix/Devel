@@ -1325,7 +1325,8 @@
 				("inbox" . "tag:inbox AND -tag:deleted")
 				("unread" . "tag:unread AND NOT tag:rss")
 				("unread rss" . "tag:rss AND tag:unread")
-				)
+				("flagged" . "tag:flagged")
+			)
 			  )
 (setq notmuch-address-command "notmuch_addresses.py")
 (setq notmuch-search-line-faces '(

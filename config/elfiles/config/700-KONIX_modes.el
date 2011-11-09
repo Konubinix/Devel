@@ -1323,8 +1323,8 @@
 (setq-default notmuch-saved-searches
 			  '(
 				("inbox" . "tag:inbox AND -tag:deleted")
-				("unread" . "tag:unread")
-				("deleted" . "tag:deleted")
+				("unread" . "tag:unread AND NOT tag:rss")
+				("unread rss" . "tag:rss AND tag:unread")
 				)
 			  )
 (setq notmuch-address-command "notmuch_addresses.py")

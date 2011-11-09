@@ -16,5 +16,5 @@ for line in ENV_FILE.readlines():
     if match:
         RES=match.group(1)
         break
-print RES
+sys.stdout.write(RES)
 ENV_FILE.close()

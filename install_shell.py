@@ -14,7 +14,7 @@ def install_shell():
         SHRC_VAR_FILE_CONTENT = """#!/bin/bash
 # put the python of this platform in front of the path
 # the only hacky stuf I need is the platform
-export PLATFORM="$(source "${HOME}/init_bin/_konix_platform.sh")"
+export WANTED_PLATFORM="$(source "${HOME}/init_bin/_konix_platform.sh")"
 PATH_SEPARATOR="$("${HOME}/init_bin/_konix_get_default_env.py" PATH_SEPARATOR)"
 PYTHON_BIN="$("${HOME}/init_bin/_konix_get_default_env.py" PYTHON_BIN)"
 PYTHON_PATH="$(dirname "$PYTHON_BIN")"

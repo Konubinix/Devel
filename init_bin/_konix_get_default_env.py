@@ -6,7 +6,7 @@ import os
 import sys
 
 SEARCH=sys.argv[1]
-PLATFORM=os.environ["PLATFORM"]
+PLATFORM=os.environ["WANTED_PLATFORM"]
 assert(PLATFORM)
 
 ENV_FILE = open(os.path.join(os.path.expanduser("~"), ".env_"+PLATFORM+".conf"), "r")

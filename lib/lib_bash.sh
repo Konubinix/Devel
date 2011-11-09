@@ -96,7 +96,7 @@ function ssh_agent_start_maybe_KONIX {
 }
 
 gpg_agent_start_KONIX () {
-	local GPG_INFO_FILE_NAME="${HOME}/.gnupg/gpg-agent-info"
+	local GPG_INFO_FILE_NAME="${HOME}/.gnupg/gpg-agent-info-${HOSTNAME}"
     if [ -f "$GPG_INFO_FILE_NAME" ] \
 		&& pgrep -u "$LOGNAME" gpg-agent > /dev/null 2>&1
 	then

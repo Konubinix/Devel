@@ -28,7 +28,10 @@ findEmacs () {
 	then
 		findEmacsWindow
 	else
-		findEmacsProcess
+		if ! findEmacsProcess
+		then
+			source konix_assert.sh
+		fi
 	fi
 }
 

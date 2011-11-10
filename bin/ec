@@ -32,11 +32,20 @@ findEmacs () {
 	fi
 }
 
+startEmacsProcess ( ) {
+	if on_windows_p
+	then
+		emacs.exe
+	else
+		emacs --daemon
+	fi
+}
+
 if findEmacsProcess
 then
 	echo "Already an emacs daemon" 1>&2
 else
-	emacs --daemon
+	startEmacsProcess
 fi
 if findEmacs
 then

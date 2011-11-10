@@ -23,10 +23,15 @@ findEmacsProcess () {
 	fi
 }
 
-findEmacs () {
+noNeedToCreateANewFrame ( ) {
 	if konix_on_linux_p
 	then
-		findEmacsWindow
+		if [ -n "$DISPLAY" ]
+		then
+			findEmacsWindow
+		else
+			return 0
+		fi
 	else
 		if ! findEmacsProcess
 		then
@@ -50,7 +55,7 @@ then
 else
 	startEmacsProcess
 fi
-if findEmacs
+if noNeedToCreateANewFrame
 then
 	emacsclient "$@"
 else

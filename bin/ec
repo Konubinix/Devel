@@ -48,16 +48,19 @@ startEmacsProcess ( ) {
 		emacs --daemon
 	fi
 }
-
 if findEmacsProcess
 then
 	echo "Already an emacs daemon" 1>&2
 else
 	startEmacsProcess
 fi
+
+printf "Starting an emacsclient " 1>&2
 if noNeedToCreateANewFrame
 then
+	printf "with no frame\n" >&2
 	emacsclient "$@"
 else
+	printf "within a new frame\n" >&2
 	emacsclient -c "$@"
-fi >> ~/ec.log 2>> ~/ec.err
+fi

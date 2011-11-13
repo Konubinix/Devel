@@ -1,5 +1,13 @@
 # -*- mode:sh -*-
 
+# ####################################################################################################
+# Some variables customization to get a behavior like bash
+# ####################################################################################################
+if [ -z "$HOSTNAME" -a -n "$HOST" ]
+then
+	export HOSTNAME="$HOST"
+fi
+
 # Historique
 HISTFILE=~/.histfile
 HISTSIZE=5000

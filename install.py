@@ -45,6 +45,7 @@ substitute(os.path.join(environ["CONFIG_DIR"], "Makefile"),   os.path.join(envir
 substitute(os.path.join(environ["CONFIG_DIR"], "gitk"),       os.path.join(environ["HOME"], ".gitk"))
 substitute(os.path.join(environ["CONFIG_DIR"], "inputrc"),    os.path.join(environ["HOME"], ".inputrc"))
 substitute(os.path.join(environ["CONFIG_DIR"], "B.blend"),    os.path.join(environ["HOME"], ".B.blend"))
+substitute(os.path.join(environ["CONFIG_DIR"], "screenrc"),    os.path.join(environ["HOME"], ".screenrc"))
 substitute(os.path.join(environ["CONFIG_DIR"], "vimrc"),      os.path.join(environ["HOME"], ".vimrc"))
 
 if is_on_linux():

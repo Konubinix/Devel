@@ -1,0 +1,17 @@
+# display a hardstatus info bar
+hardstatus lastline
+hardstatus string "%w %{ry}%` %=%{rc} %d/%m/%Y %c:%s"
+# display in the hardstatus the battery status
+backtick 0 15 15 acpi
+# monitor activity in other windows
+defmonitor on
+# when searching in copy mode, ignore case
+ignorecase on
+# some emacs keybindings in copy mode
+markkeys "h=^B:l=^F:$=^E"
+# keep logs of everything that's done
+deflog on
+# every 2 minutes, a stamp is added in logs
+logstamp on
+# do not display the annoying startup message
+startup_message off

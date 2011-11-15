@@ -23,9 +23,6 @@ sleep 4
     killall conky
     wicd-gtk -t &
     conky -d -c ~/.conky.d/conky1 > ~/conky.log 2> ~/conky.err
-    # gnome-setting-daemon
-    # gnome-panel &
-    nautilus --no-default-window
 } &
 
 wait $fbpid

@@ -239,10 +239,10 @@ Control Mod4 Mod1 e :Exec $(konix_find_true_exec.sh emacs)
 # ************************************************************
 # Open specific folders (Mod4 o ...)
 # ************************************************************
-Mod4 o e : ExecCommand konix_display_n_launch.sh gnome-open ~
-Mod4 o i : ExecCommand konix_display_n_launch.sh gnome-open ~/data/Images
-Mod4 o m : ExecCommand konix_display_n_launch.sh gnome-open ~/data/Musiques
-Mod4 o v : ExecCommand konix_display_n_launch.sh gnome-open ~/data/Videos
+Mod4 o e : ExecCommand konix_display_n_launch.sh pcmanfm ~
+Mod4 o i : ExecCommand konix_display_n_launch.sh pcmanfm ~/data/Images
+Mod4 o m : ExecCommand konix_display_n_launch.sh pcmanfm ~/data/Musiques
+Mod4 o v : ExecCommand konix_display_n_launch.sh pcmanfm ~/data/Videos
 # let's go Program
 Mod4 p : ExecCommand gnome-terminal --working-directory ~/Prog
 

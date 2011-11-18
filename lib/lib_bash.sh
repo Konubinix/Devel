@@ -176,4 +176,44 @@ cygpath2dos () {
     fi
 }
 
+konix_var_points_to_file_or_null_p () {
+# ####################################################################################################
+# This function checks if the file whose name is stored in variable whose name
+# is in $1 exists, if not so, it replace the content of the variable by ""
+# ####################################################################################################
+	local TAGDIR_VAR="$1"
+	eval local TAGDIR_FILE="\$$TAGDIR_VAR"
+	if [ ! -f "$TAGDIR_FILE" ]
+	then
+		echo "$TAGDIR_VAR=$TAGDIR_FILE does not point to existing file, ignore it" >&2
+		eval "$TAGDIR_VAR"=""
+	fi
+}
+
+konix_file_to_lines () {
+# ####################################################################################################
+# Param 1 : file
+# Param 2 : sep
+#
+# Reads the content of the file, split its lines and put in the RES global
+# variable something of the form "line1"$SEP"line2"$SEP...
+# ####################################################################################################
+	local FILE="$1"
+	local SEP="$2"
+	source konix_assert_var.sh "$FILE"
+	source konix_assert_var.sh "$SEP"
+	source konix_assert.sh "-f '$FILE'"
+	RES=""
+	IFS=$'\n'
+	for LINE in $(<$FILE)
+	do
+		if [ -z "$RES" ]
+		then
+			RES="\"$LINE\""
+		else
+			RES="$RES$SEP\"$LINE\""
+		fi
+	done
+}
+
 #generate_new_name

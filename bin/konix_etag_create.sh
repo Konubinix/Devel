@@ -1,12 +1,23 @@
 #!/bin/bash
-source konix_assert_var.sh "$CONFIG_DIR"
-source konix_assert_var.sh "$LIB_DIR"
-
-source "${LIB_DIR}/lib_bash.sh"
-
 usage () {
 	cat<<EOF
-TODO
+$0 [-d TAGDIR_FILE] [-f TAGFILE] [-i TAGINCLUDE_FILE] [-h]
+
+Generate a new tag file for emacs with name TAGFILE that recursively parses the
+	directories found in TAGDIR_FILE and add the directories found in
+	TAGINCLUDE_FILE as includes
+
+-d : Set TAGDIR_FILE, defaults to ./TAGS_DIR
+-f : Set TAGFILE, defaults to ./TAGS
+-i : Set TAGINCLUDE_FILE, defaults to ./TAGS_INCLUDES
+-h : Display this help and exits
+
+TAGDIR_FILE and TAGINCLUDE_FILE format :
+They contain newline separated paths
+For instance, if the content is
+A
+B
+Then the directories A and B will be took into account
 EOF
 }
 
@@ -37,6 +48,15 @@ while getopts "hi:d:f:av" opt; do
 			VERBOSE_CMD="--verbose=yes"
 	esac
 done
+
+# ####################################################################################################
+# INCLUDES
+# ####################################################################################################
+source konix_assert_var.sh "$CONFIG_DIR"
+source konix_assert_var.sh "$LIB_DIR"
+
+source "${LIB_DIR}/lib_bash.sh"
+
 # ####################################################################################################
 # If a tag files or tag include files does not exists, empty it
 # ####################################################################################################

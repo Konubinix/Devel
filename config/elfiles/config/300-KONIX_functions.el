@@ -56,7 +56,7 @@
 	(setq increment 1)
 	)
   (save-excursion
-	(skip-chars-backward "[0-9]")
+	(skip-chars-backward "0123456789")
 	(when (looking-at "[0-9]+")
 	  (let* (
 			 (number (string-to-int (match-string-no-properties 0)))

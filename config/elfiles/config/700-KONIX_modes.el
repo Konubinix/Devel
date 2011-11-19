@@ -1453,3 +1453,11 @@
 	 (define-key emacs-lisp-mode-map (kbd "<f7>") 'elk-test-run-a-buffer)
 	 )
   )
+
+;; ####################################################################################################
+;; Maximize frame when visiting a file from emacs client
+;; ####################################################################################################
+(defun konix/server-visit-hook ()
+  (maxframe/maximize-frame)
+  )
+(add-hook 'server-visit-hook 'konix/server-visit-hook)

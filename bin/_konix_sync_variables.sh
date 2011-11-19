@@ -7,6 +7,7 @@ then
     KONIX_SYNC_INCLUDE_FILE=".konix_sync_include"
     KONIX_SYNC_FILES_FILE=".konix_sync_files"
     KONIX_SYNC_PUSH_PRE_HOOK=".konix_sync_push_pre_hook"
+    KONIX_SYNC_PUSH_POST_HOOK=".konix_sync_push_post_hook"
     KONIX_SYNC_PULL_POST_HOOK=".konix_sync_pull_post_hook"
     KONIX_SYNC_LAST_PUSHER_FILE=".konix_sync_last_pusher"
 	KONIX_SYNC_SYNCER=".konix_sync_syncer"

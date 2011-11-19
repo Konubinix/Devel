@@ -119,6 +119,8 @@
 			 '(konix/delete-trailing-whitespace . t))
 (add-to-list 'safe-local-variable-values
 			 '(konix/delete-trailing-whitespace . nil))
+(add-to-list 'safe-local-variable-values
+			 '(auto-revert-mode . t))
 (add-hook 'before-save-hook 'konix/delete-trailing-whitespace)
 (add-hook 'before-save-hook 'konix/adjust-new-lines-at-end-of-file)
 (add-hook 'before-save-hook 'konix/check-paren-warn)

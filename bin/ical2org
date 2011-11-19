@@ -90,6 +90,7 @@ BEGIN {
     indescription = 0;
     lasttimestamp=-1;
 
+    print "# -*- auto-revert-mode:t -*-"
     print "#+TITLE:     Main Google calendar entries"
     print "#+AUTHOR:    Eric S Fraga"
     print "#+EMAIL:     e.fraga@ucl.ac.uk"

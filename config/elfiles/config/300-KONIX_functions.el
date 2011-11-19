@@ -1812,7 +1812,11 @@ Will prompt you shell name when you type `C-u' before this command."
 		 (boundp 'konix/check-paren-warn)
 		 konix/check-paren-warn
 		 )
-	(ignore-errors (check-parens))
+	(save-excursion
+	  (and (ignore-errors (check-parens))
+		   (konix/notify "Error in parenthesis")
+		   )
+	  )
 	)
   )
 

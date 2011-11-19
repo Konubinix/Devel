@@ -1,0 +1,25 @@
+# -*- mode: snippet -*-
+# name: new-file-tpl-h
+# --
+///========================================================================================================
+///
+/// ${100:\brief     ${150:Brief description}}
+/// ${300:\author    ${350:`user-real-login-name`}}
+/// ${400:\version   ${450:0.0}}
+/// ${500:\date      ${550:`(konix/insert-text-date-string)`}}
+/// ${600:\copyright ${650:GNU Public License.}}
+///
+///========================================================================================================
+///
+///  `(file-name-nondirectory (buffer-file-name))`
+///  ${200:\details   ${250:Details}}
+///
+///========================================================================================================
+
+#ifndef ${700:_`(replace-regexp-in-string "\\\\." "_" (upcase(file-name-nondirectory(buffer-file-name))))`_}
+#define $700
+
+$0
+
+#endif $700
+

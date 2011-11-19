@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd "${HOME}"
 # For flash to be fully functionnal
 export GDK_NATIVE_WINDOWS=1
 export PATH="$(dirname "$0")/bin:$(dirname "$0")/devel_bin:$PATH"

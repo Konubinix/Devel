@@ -47,32 +47,33 @@ class Terminal:
     codes["save"] = "\x1b[s"
     codes["restore"] = "\x1b[u"
 
-    colors_fg = { 0 : "30m",
-                  1 : "31m",
-                  2 : "32m",
-                  3 : "33m",
-                  4 : "34m",
-                  5 : "35m",
-                  6 : "36m",
-                  7 : "37m",
-                  8 : "1;30m",
-                  9 : "1;31m",
-                 10 : "1;32m",
-                 11 : "1;33m",
-                 12 : "1;34m",
-                 13 : "1;35m",
-                 14 : "1;36m",
-                 15 : "1;37m"
+    # correspondances can be found here http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+    colors_fg = { 0 : "30m", # BLACK
+                  1 : "34m", # BLUE
+                  2 : "32m", # GREEN
+                  3 : "36m", # CYAN
+                  4 : "31m", # RED
+                  5 : "35m", # PURPLE
+                  6 : "33m", # BROWN
+                  7 : "37m", # LGREY
+                  8 : "1;30m", # DGRAY
+                  9 : "1;34m", # LBLUE
+                 10 : "1;32m", # LGREEN
+                 11 : "1;36m", # LCYAN
+                 12 : "1;31m", # LRED
+                 13 : "1;35m", # LPURPLE
+                 14 : "1;33m", # YELLOW
+                 15 : "1;37m" # WHITE
                   }
 
-    colors_bk = { 0 : "40m",
-                  1 : "41m",
-                  2 : "42m",
-                  3 : "43m",
-                  4 : "44m",
-                  5 : "45m",
-                  6 : "46m",
-                  7 : "47m",
+    colors_bk = { 0 : "40m", # BLACK
+                  1 : "44m", # BLUE
+                  2 : "42m", # GREEN
+                  3 : "46m", # CYAN
+                  4 : "41m", # RED
+                  5 : "45m", # PURPLE
+                  6 : "43m", # BROWN
+                  7 : "47m", # LGREY
                   }
 
     def __init__(self):

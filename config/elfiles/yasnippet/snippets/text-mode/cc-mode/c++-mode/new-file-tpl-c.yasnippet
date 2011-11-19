@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: new-file-tpl-h
+# name: new-file-tpl-c
 # --
 ///========================================================================================================
 ///
@@ -16,10 +16,6 @@
 ///
 ///========================================================================================================
 
-#ifndef ${700:_`(replace-regexp-in-string "\\\\." "_" (upcase(file-name-nondirectory(buffer-file-name))))`_}
-#define $700
+${700:#include "`(file-name-sans-extension (file-name-nondirectory (buffer-file-name)))`.h"}
 
 $0
-
-#endif $700
-

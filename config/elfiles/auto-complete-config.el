@@ -153,13 +153,24 @@
         (if table
             (ac-yasnippet-candidate-1 table))))))
 
-(ac-define-source yasnippet
-  '((depends yasnippet)
+(defun ac-prefix-yasnippet ()
+  (if (ignore-errors(looking-back "\\([a-zA-Z0-9_-]+\\)" 10 t))
+      (match-beginning 1)
+	)
+  )
+
+(setq ac-source-yasnippet
+  '(
+	(prefix . ac-prefix-yasnippet)
+	(depends yasnippet)
     (candidates . ac-yasnippet-candidates)
     (action . yas/expand)
     (candidate-face . ac-yasnippet-candidate-face)
     (selection-face . ac-yasnippet-selection-face)
-    (symbol . "a")))
+    (symbol . "a")
+	(requires . 3)
+	)
+  )
 
 ;; semantic
 

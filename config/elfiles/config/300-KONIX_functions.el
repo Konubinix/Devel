@@ -614,7 +614,7 @@ retourne ('fichier','extension')."
 		(key (car elem))
 		(value (cdr elem))
 		(_assoc (assoc key (eval alist)))
-	   )
+		)
 	(if _assoc
 		(setcdr _assoc value)
 	  (add-to-list alist elem)
@@ -1661,17 +1661,42 @@ set terminal pop;\
 	)
   )
 
-(defun konix/notify (msg &optional intrusive)
+(defun konix/notify (msg &optional intrusivity_level remove_date)
   (let (
 		(visible-bell nil)
 		)
 	(beep t)
 	)
-  (setq msg (concat (format-time-string "<%Y-%m-%d %a %H:%M:%S> : ") msg))
-  (if intrusive
-	  (display-warning 'notification msg)
+  (unless remove_date
+	(setq msg (concat (format-time-string "<%Y-%m-%d %a %H:%M:%S> : ") msg))
+	)
+  (cond
+   ((or (equal intrusivity_level 0) (not intrusivity_level))
 	(message msg)
 	)
+   ((equal intrusivity_level 1)
+	(let (
+		  (notify_buffer_name "*konix notify*")
+		  notify_buffer
+		  )
+	  (ignore-errors (kill-buffer notify_buffer_name))
+	  (setq notify_buffer (get-buffer-create notify_buffer_name))
+	  (save-window-excursion
+		(with-current-buffer notify_buffer
+		  (insert msg)
+		  (goto-char 0)
+		  )
+		(pop-to-buffer notify_buffer)
+		(fit-window-to-buffer)
+		(sit-for 60)
+		(kill-buffer notify_buffer)
+		)
+	  )
+	)
+   (t
+	(display-warning 'notification msg)
+	)
+   )
   )
 
 (defun konix/select-lowest-window ()
@@ -1875,89 +1900,89 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
       file
     (when (file-exists-p file)
       (with-temp-buffer
-	(let ((tokens '("machine" "default" "login"
-			"password" "account" "macdef" "force"
-			"port"))
-	      alist elem result pair)
-	  (insert-file-contents file)
-	  (goto-char (point-min))
-	  ;; Go through the file, line by line.
-	  (while (not (eobp))
-	    (narrow-to-region (point) (point-at-eol))
-	    ;; For each line, get the tokens and values.
-	    (while (not (eobp))
-	      (skip-chars-forward "\t ")
-	      ;; Skip lines that begin with a "#".
-	      (if (eq (char-after) ?#)
-		  (goto-char (point-max))
-		(unless (eobp)
-		  (setq elem
-			(if (= (following-char) ?\")
-			    (read (current-buffer))
-			  (buffer-substring
-			   (point) (progn (skip-chars-forward "^\t ")
-					  (point)))))
-		  (cond
-		   ((equal elem "macdef")
-		    ;; We skip past the macro definition.
-		    (widen)
-		    (while (and (zerop (forward-line 1))
-				(looking-at "$")))
-		    (narrow-to-region (point) (point)))
-		   ((member elem tokens)
-		    ;; Tokens that don't have a following value are ignored,
-		    ;; except "default".
-		    (when (and pair (or (cdr pair)
-					(equal (car pair) "default")))
-		      (push pair alist))
-		    (setq pair (list elem)))
-		   (t
-		    ;; Values that haven't got a preceding token are ignored.
-		    (when pair
-		      (setcdr pair elem)
-		      (push pair alist)
-		      (setq pair nil)))))))
-	    (when alist
-	      (push (nreverse alist) result))
-	    (setq alist nil
-		  pair nil)
-	    (widen)
-	    (forward-line 1))
-	  (setq result (nreverse result))
-	  ;; result is now an list of alists looking like
-	  ;; (
-	  ;;   (("machine" . "value") ("token2" . "value2"))
-	  ;;   (("machine" . "value3"))
-	  ;;   (("login" . "****"))
-	  ;; )
-	  ;; I want to reassemble it into something like
-	  ;; (
-	  ;;   (("machine" . "value") ("token2" . "value2"))
-	  ;;   (("machine" . "value3") ("login" . "****"))
-	  ;; )
-	  ;; for each element in result
-	  ;;     if its caar is "machine", it is recorded to be the last "machine"
-	  ;;     alist
-	  ;;     else, its appended to the last recorded "machine" alist
-	  (let (
-			(result_iter result)
-			(new_result '())
-			(last_machine_record '())
-			)
-		(while result_iter
-		  (if (string-equal (car (caar result_iter)) "machine")
-			  (progn
-				(setq last_machine_record result_iter)
+		(let ((tokens '("machine" "default" "login"
+						"password" "account" "macdef" "force"
+						"port"))
+			  alist elem result pair)
+		  (insert-file-contents file)
+		  (goto-char (point-min))
+		  ;; Go through the file, line by line.
+		  (while (not (eobp))
+			(narrow-to-region (point) (point-at-eol))
+			;; For each line, get the tokens and values.
+			(while (not (eobp))
+			  (skip-chars-forward "\t ")
+			  ;; Skip lines that begin with a "#".
+			  (if (eq (char-after) ?#)
+				  (goto-char (point-max))
+				(unless (eobp)
+				  (setq elem
+						(if (= (following-char) ?\")
+							(read (current-buffer))
+						  (buffer-substring
+						   (point) (progn (skip-chars-forward "^\t ")
+										  (point)))))
+				  (cond
+				   ((equal elem "macdef")
+					;; We skip past the macro definition.
+					(widen)
+					(while (and (zerop (forward-line 1))
+								(looking-at "$")))
+					(narrow-to-region (point) (point)))
+				   ((member elem tokens)
+					;; Tokens that don't have a following value are ignored,
+					;; except "default".
+					(when (and pair (or (cdr pair)
+										(equal (car pair) "default")))
+					  (push pair alist))
+					(setq pair (list elem)))
+				   (t
+					;; Values that haven't got a preceding token are ignored.
+					(when pair
+					  (setcdr pair elem)
+					  (push pair alist)
+					  (setq pair nil)))))))
+			(when alist
+			  (push (nreverse alist) result))
+			(setq alist nil
+				  pair nil)
+			(widen)
+			(forward-line 1))
+		  (setq result (nreverse result))
+		  ;; result is now an list of alists looking like
+		  ;; (
+		  ;;   (("machine" . "value") ("token2" . "value2"))
+		  ;;   (("machine" . "value3"))
+		  ;;   (("login" . "****"))
+		  ;; )
+		  ;; I want to reassemble it into something like
+		  ;; (
+		  ;;   (("machine" . "value") ("token2" . "value2"))
+		  ;;   (("machine" . "value3") ("login" . "****"))
+		  ;; )
+		  ;; for each element in result
+		  ;;     if its caar is "machine", it is recorded to be the last "machine"
+		  ;;     alist
+		  ;;     else, its appended to the last recorded "machine" alist
+		  (let (
+				(result_iter result)
+				(new_result '())
+				(last_machine_record '())
 				)
-			(progn
-			  ;; else, append it
-			  (setcdr (car last_machine_record) (append (cdar last_machine_record)(car result_iter)))
-			  (setcdr last_machine_record (cdr result_iter))
+			(while result_iter
+			  (if (string-equal (car (caar result_iter)) "machine")
+				  (progn
+					(setq last_machine_record result_iter)
+					)
+				(progn
+				  ;; else, append it
+				  (setcdr (car last_machine_record) (append (cdar last_machine_record)(car result_iter)))
+				  (setcdr last_machine_record (cdr result_iter))
+				  )
+				)
+			  (setq result_iter (cdr result_iter))
 			  )
-		   )
-		  (setq result_iter (cdr result_iter))
-		  )
-		)
-	  result
-	  )))))
+			)
+		  result
+		  )))))
 (defalias 'netrc-parse 'konix/netrc-parse)

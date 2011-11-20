@@ -5,6 +5,11 @@
 ;; configuration of a mode uses a hook over the mode or is too big to be here,
 ;; it is then put into the mode file or into a dedicated file
 ;; ####################################################################################################
+
+;; My notifyings facilities use popwin
+(require 'popwin)
+(push '("*konix notify*" :regexp t :height 10) popwin:special-display-config)
+
 ;; Configuration of mail sending
 (setq message-send-mail-function 'message-send-mail-with-sendmail)
 (setq-default message-sendmail-envelope-from 'header)

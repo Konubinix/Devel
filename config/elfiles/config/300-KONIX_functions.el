@@ -1,6 +1,68 @@
 ;; ################################################################################
 ;; General use function
 ;; ################################################################################
+(defun konix/keymap/help ()
+  (interactive)
+  (let (
+		(help_string "")
+		(text_keymap (get-text-property (point) 'keymap))
+		)
+	(defun add_keymap_to_help_string (keymap)
+	  (map-keymap
+	   (lambda (event function)
+		 (setq help_string
+			   (concat
+				help_string
+				(format "%s : %s (%s)"
+						(propertize
+						 (substitute-command-keys
+						 (format "\\[%s]" function))
+						 'face
+						 font-lock-function-name-face
+						 )
+						function
+						(condition-case nil
+							(let (
+								  (doc (documentation function))
+								  )
+							  (if doc
+								  (first (split-string doc "\n"))
+								"Not documented"
+								)
+							  )
+						  (error (propertize "Not implemented."
+											 'face
+											 compilation-error-face
+											 )
+								 )
+						  )
+						)
+				"\n"
+				)
+			   )
+		 )
+	   keymap
+	   )
+	  )
+	(setq help_string (concat help_string
+							  (propertize "# Relative to the buffer :\n"
+										  'face
+										  'konix/face-normal-message
+										  )))
+	(add_keymap_to_help_string (current-local-map))
+	(when text_keymap
+	  (setq help_string (concat help_string
+								(propertize
+								 "# Relative to the pointed file :\n"
+								 'face
+								 'konix/face-normal-message
+								 )))
+	  (add_keymap_to_help_string text_keymap)
+	  )
+	(konix/notify help_string 1 t)
+	)
+  )
+
 (defun konix/icy-mode (arg)
   (when (not (equal arg icicle-mode))
 	(icy-mode)

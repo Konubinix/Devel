@@ -5,6 +5,11 @@
 ;; configuration of a mode uses a hook over the mode or is too big to be here,
 ;; it is then put into the mode file or into a dedicated file
 ;; ####################################################################################################
+;; Some custom faces
+(defface konix/face-normal-message
+  '((((class color)) (:foreground "dark green")))
+  ""
+  )
 
 ;; My notifyings facilities use popwin
 (require 'popwin)

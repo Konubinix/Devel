@@ -768,7 +768,7 @@ You can not use it in source definition like (prefix . `NAME')."
     (ac-inline-delete)))
 
 (defun ac-put-prefix-overlay ()
-  (unless ac-prefix-overlay
+  (when (and (not ac-prefix-overlay) ac-point)
     (let (newline)
       ;; Insert newline to make sure that cursor always on the overlay
       (when (and (eq ac-point (point-max))
@@ -1385,6 +1385,7 @@ that have been made before in this function."
               ac-limit ac-candidate-limit
               ac-triggered t
               ac-current-prefix-def prefix-def)
+		(setq ac-point point)
         (when (or init (null ac-prefix-overlay))
           (ac-init))
         (ac-set-timer)

@@ -361,7 +361,7 @@
 									   (if (file-directory-p file)
 										   "-r"
 										 ""
-										   )
+										 )
 									   file
 									   ))
   )
@@ -663,12 +663,12 @@
 									 " -w"
 								   ""
 								   )
-								 (if file
-									 (concat " '"file"'")
-								   ""
-								   )
 								 (if cached
 									 " --cached"
+								   ""
+								   )
+								 (if file
+									 (concat " '"file"'")
 								   ""
 								   )
 								 )
@@ -702,6 +702,15 @@
 (defun konix/git/diff-cached ()
   (interactive)
   (konix/git/diff nil t)
+  )
+
+(defun konix/git/diff-file-cached (file)
+  (interactive
+   (list
+	(konix/git/_get-file-name "diff cached file")
+	)
+   )
+  (konix/git/diff file t)
   )
 
 (defun konix/git/diff-file (filename)
@@ -769,6 +778,15 @@
   (konix/git/command-to-string (concat "reset HEAD" ))
   )
 
+(defun konix/git/reset/HEAD/file (filename)
+  (interactive
+   (list
+	(konix/git/_get-file-name "reset HEAD file")
+	)
+   )
+  (konix/git/command-to-string (format "reset HEAD \"%s\"" filename))
+  )
+
 (defun konix/git/reset/hard ()
   (interactive)
   (konix/git/command-with-completion "reset --hard " )
@@ -783,9 +801,359 @@
   (konix/git/command (format "revert \"%s\"" commit))
   )
 
-(defun konix/git/status ()
-  (interactive )
-  (konix/compile "git status" t)
+(defun konix/git/status-buffer/diff-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(konix/git/diff-file file-name)
+	)
+  )
+
+(defun konix/git/status-buffer/diff-file-cached ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(konix/git/diff-file-cached file-name)
+	)
+  )
+
+(defun konix/git/status-buffer/reset-head-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(konix/git/reset/HEAD/file file-name)
+	)
+  )
+
+(defun konix/git/status-buffer/add-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(konix/git/add/file file-name)
+	)
+  )
+
+(defun konix/git/status-buffer/add-edit-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(konix/git/add/edit/file file-name)
+	)
+  )
+
+(defun konix/git/status-buffer/delete-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(konix/delete-file-or-directory file-name)
+	)
+  )
+
+(defun konix/git/status-buffer/rm-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(konix/git/rm/file file-name)
+	)
+  )
+
+(defun konix/git/status-buffer/find-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(find-file file-name)
+	)
+  )
+
+(defun konix/git/status-buffer/view-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(view-file file-name)
+	)
+  )
+
+(defun konix/git/status-buffer/checkout-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(konix/git/checkout/file file-name)
+	)
+  )
+
+(defun konix/git/status-decorate-buffer ()
+  (defun decorate_file_type (keymap regexp face)
+	(goto-char 0)
+	(font-lock-add-keywords nil
+							`(
+							  (,regexp 1 ,face)
+							  )
+							)
+	(while (re-search-forward regexp nil t)
+	  (set-text-properties
+	   (match-beginning 1)
+	   (match-end 1)
+	   `(konix/git/status/filename
+		 ,(match-string 1)
+		 keymap ,keymap
+		 face ,face
+		 custom_elem t
+		 )
+	   )
+	  )
+	)
+  (defun narrow_to_block (start_block_string)
+	(goto-char 0)
+	(if (search-forward start_block_string nil t)
+		(let (
+			  (narrow_end (or
+						   (save-excursion (re-search-forward "^# [^ ]" nil t))
+						   (point-max)
+						   )
+						  )
+			  )
+		  (narrow-to-region (point) narrow_end)
+		  t
+		  )
+	  nil
+	  )
+	)
+  (goto-char 0)
+  (when (narrow_to_block "# Changes to be committed:")
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
+						  (define-key map "d" 'konix/git/status-buffer/diff-file-cached)
+						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+						  map
+						  )
+						"^#	modified:   \\(.+\\)$"
+						compilation-info-face)
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
+						  (define-key map "d" 'konix/git/status-buffer/diff-file)
+						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+						  map
+						  )
+						"^#	new file:   \\(.+\\)$"
+						compilation-info-face)
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
+						  (define-key map "d" 'konix/git/status-buffer/diff-file)
+						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+						  map
+						  )
+						"^#	renamed:    .+ -> \\(.+\\)$"
+						compilation-info-face)
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
+						  map
+						  )
+						"^#	deleted:    \\(.+\\)$"
+						compilation-error-face)
+	(widen)
+ 	)
+  (when (narrow_to_block "# Changes not staged for commit:")
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "a" 'konix/git/status-buffer/add-file)
+						  (define-key map "e" 'konix/git/status-buffer/add-edit-file)
+						  (define-key map "d" 'konix/git/status-buffer/diff-file)
+						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+						  (define-key map "C" 'konix/git/status-buffer/checkout-file)
+						  map
+						  )
+						"^#	modified:   \\(.+\\)$"
+						compilation-info-face)
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "D" 'konix/git/status-buffer/delete-file)
+						  (define-key map "a" 'konix/git/status-buffer/add-file)
+						  (define-key map "C" 'konix/git/status-buffer/checkout-file)
+						  (define-key map "r" 'konix/git/status-buffer/rm-file)
+						  map
+						  )
+						"^#	deleted:    \\(.+\\)$"
+						compilation-error-face)
+	(widen)
+	)
+  (when (narrow_to_block "# Untracked files:")
+	;; untracked decoration
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "D" 'konix/git/status-buffer/delete-file)
+						  (define-key map "a" 'konix/git/status-buffer/add-file)
+						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+						  map
+						  )
+						"^#	\\(.+\\)$"
+						compilation-warning-face
+						)
+	(widen)
+	)
+  (goto-char 0)
+  )
+
+(defvar konix/git/status-buffer/after-process-hooks '(konix/git/status-buffer/after-process/prepare-buffer))
+
+(defun konix/git/status-buffer/after-process/prepare-buffer ()
+  (let (
+		(inhibit-read-only 1)
+		(local_map (make-sparse-keymap))
+		)
+	(define-key local_map "g" 'konix/git/status-buffer/redo)
+	(define-key local_map "?" 'konix/keymap/help)
+	(define-key local_map "q" 'bury-buffer)
+	(define-key local_map (kbd "C-d") 'konix/git/diff)
+	(define-key local_map "k" 'kill-buffer)
+	(define-key local_map "c" 'konix/git/commit)
+	(define-key local_map "P" 'konix/git/push)
+	(define-key local_map (kbd"<SPC>") 'konix/git/status-buffer/next)
+	(define-key local_map (kbd"<DEL>") 'konix/git/status-buffer/prev)
+
+	(define-prefix-command 'konix/git/status/buffer/stash-prefix-map)
+	(define-key local_map (kbd "s") 'konix/git/status/buffer/stash-prefix-map)
+	(define-key konix/git/status/buffer/stash-prefix-map "s" 'konix/git/stash/save)
+	(define-key konix/git/status/buffer/stash-prefix-map "p" 'konix/git/stash/pop)
+
+	(define-prefix-command 'konix/git/status/buffer/rebase-prefix-map)
+	(define-key local_map (kbd "R") 'konix/git/status/buffer/rebase-prefix-map)
+	(define-key konix/git/status/buffer/rebase-prefix-map "i" 'konix/git/irebase)
+
+	(use-local-map local_map)
+	(konix/git/status-decorate-buffer)
+	)
+  (toggle-read-only 1)
+  )
+
+(defun konix/git/status-buffer/redo ()
+  "Relaunch the git status."
+  (interactive)
+  (let (
+		(buffer_name (buffer-name))
+		)
+	(konix/git/status buffer_name)
+	)
+  )
+
+(defun konix/git/status-sentinel(process string)
+  (if (string-equal "finished\n" string)
+	  (when (buffer-name (process-buffer process)) ;check the buffer is alive
+		(with-current-buffer (process-buffer process)
+		  (setq konix/git/status-buffer/ended t)
+		  (run-hooks 'konix/git/status-buffer/after-process-hooks)
+		  )
+		)
+	(konix/notify "Git status exited abnormaly")
+	)
+  )
+
+(defmacro konix/git/status-buffer/next-or-previous (moving_function text_prop)
+  ;; I need to do it twice If I was already on a custom elem (one to quit it,
+  ;; one again to go to next), I need to do it only once If I was not already on
+  ;; a custom elem
+  `(let (
+		 (prev_point (point))
+		 )
+	 (condition-case nil
+		 (progn
+		   (goto-char (,moving_function (point) (quote ,text_prop)))
+		   (unless (get-text-property (point) (quote ,text_prop))
+			 (goto-char (,moving_function (point) (quote ,text_prop)))
+			 )
+		   )
+	   (error (goto-char prev_point))
+	   )
+	 )
+  )
+
+(defun konix/git/status-buffer/next ()
+  "Go to next file.
+Uses the macro konix/git/status-buffer/next-or-previous
+"
+  (interactive)
+  (konix/git/status-buffer/next-or-previous
+   next-single-property-change custom_elem)
+  )
+
+(defun konix/git/status-buffer/prev ()
+  "Go to previous file."
+  (interactive)
+  (konix/git/status-buffer/next-or-previous
+   previous-single-property-change custom_elem)
+  )
+
+(defun konix/git/status (&optional buffer_or_name)
+  (interactive)
+  (let* (
+		 (git_status_buffer_name (or buffer_or_name "*git status*"))
+		 (konix/git/status-process nil)
+		 (current-default-directory default-directory)
+		 )
+	;; first, tries to erase the buffer content
+	(when (buffer-name (get-buffer git_status_buffer_name))
+	  (unless (ignore-errors
+				(with-current-buffer git_status_buffer_name
+				  (toggle-read-only -1)
+				  (erase-buffer)
+				  )
+				t
+				)
+		(ignore-errors(kill-buffer git_status_buffer_name))
+		)
+	  )
+	;; here, the buffer is erased of killed, I want it to be alive
+	(setq git_status_buffer_name (get-buffer-create git_status_buffer_name))
+	;; Addition of a trace in the buffer in order to communicate with the sentinel
+	(with-current-buffer git_status_buffer_name
+	  (set (make-local-variable 'konix/git/status-buffer/ended) nil)
+	  (setq default-directory current-default-directory)
+	  )
+	(setq konix/git/status-process (start-process "git status"
+												  git_status_buffer_name
+												  "git"
+												  "status"
+												  ))
+	(set-process-sentinel konix/git/status-process 'konix/git/status-sentinel)
+	;; if the process ended before the sentinel was put in place, I have to
+	;; handle that here
+	(with-current-buffer git_status_buffer_name
+	  (when (and
+			 (string-equal (process-status konix/git/status-process) "exit")
+			 (not konix/git/status-buffer/ended)
+			 )
+		;; the sentinel did not have time to setUp and the process ended
+		(run-hooks 'konix/git/status-buffer/after-process-hooks)
+		)
+	  )
+	(pop-to-buffer git_status_buffer_name)
+	(delete-other-windows)
+	)
   )
 
 (defun konix/git/tag ()
@@ -873,7 +1241,7 @@
 (define-key konix/git-global-map-diff "m" 'konix/git/mergetool)
 
 (define-prefix-command 'konix/git-global-map-stash)
-(define-key konix/git-global-map "s" 'konix/git-global-map-stash)
+(define-key konix/git-global-map "S" 'konix/git-global-map-stash)
 (define-key konix/git-global-map-stash "p" 'konix/git/stash/pop)
 (define-key konix/git-global-map-stash "s" 'konix/git/stash/save)
 (define-key konix/git-global-map-stash "a" 'konix/git/stash/apply)
@@ -898,7 +1266,7 @@
 (define-key konix/git-global-map-rebase "s" 'konix/git/rebase/skip)
 
 (define-prefix-command 'konix/git-global-map-status)
-(define-key konix/git-global-map "S" 'konix/git-global-map-status)
+(define-key konix/git-global-map "s" 'konix/git-global-map-status)
 (define-key konix/git-global-map-status "s" 'konix/git/status)
 
 (define-prefix-command 'konix/git-global-map-reset)

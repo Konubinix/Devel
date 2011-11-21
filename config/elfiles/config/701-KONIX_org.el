@@ -68,7 +68,7 @@
 (setq-default org-insert-labeled-timestamps-at-point nil)
 (setq org-infojs-options '((path . "http://orgmode.org/org-info.js")
 						   (view . "info")
-						   (toc)
+						   (toc . t)
 						   (ftoc . "0")
 						   (tdepth . "max")
 						   (sdepth . "max")

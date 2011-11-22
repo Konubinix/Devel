@@ -13,6 +13,6 @@ fi
 if [ -e "$KONIX_SYNC_PUSH_POST_HOOK" ]
 then
     chmod +x "$KONIX_SYNC_PUSH_POST_HOOK"
-    echo "Evaluating pre push hook"
+    echo "Evaluating post push hook"
     eval "./$KONIX_SYNC_PUSH_POST_HOOK"
 fi

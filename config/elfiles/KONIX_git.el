@@ -1032,6 +1032,7 @@
 	(define-key local_map (kbd "C-d") 'konix/git/diff)
 	(define-key local_map "k" 'kill-buffer)
 	(define-key local_map "c" 'konix/git/commit)
+	(define-key local_map "m" 'konix/git/commit/message)
 	(define-key local_map "P" 'konix/git/push)
 	(define-key local_map (kbd"<SPC>") 'konix/git/status-buffer/next)
 	(define-key local_map (kbd"<DEL>") 'konix/git/status-buffer/prev)

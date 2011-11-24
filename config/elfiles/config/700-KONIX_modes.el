@@ -777,6 +777,13 @@
 
 	 ;; Hotkeys
 	 (define-key dired-mode-map "o" 'konix/dired-find-file-other-windows)
+	 ;; epa-dired maps
+	 (define-prefix-command 'konix/dired/epa-dired-map)
+	 (define-key dired-mode-map "c" 'konix/dired/epa-dired-map)
+	 (define-key konix/dired/epa-dired-map "e" 'epa-dired-do-encrypt)
+	 (define-key konix/dired/epa-dired-map "d" 'epa-dired-do-decrypt)
+	 (define-key konix/dired/epa-dired-map "s" 'epa-dired-do-sign)
+	 (define-key konix/dired/epa-dired-map "v" 'epa-dired-do-verify)
 	 )
   )
 ;; --------------------------------------------------------------------------------

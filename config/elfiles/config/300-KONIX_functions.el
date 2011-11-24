@@ -990,152 +990,70 @@ lieu de find-file."
   )
 
 ;; TAGS
-(defun konix/tags/create-from-dirs (dirs &optional tagdir no_append)
-  "From a directory name, create the tags file from all the
-contained c, h, cpp, cc.."
-  (interactive (list (list (read-directory-name "Ddir : " default-directory
-												default-directory t default-directory))))
-  (let (
-		buffer_name
-		buffer_
-		command_
-		tagfile
-		tagdir_file
-		)
-	(setq tagdir (or
-				  tagdir
-				  (and current-prefix-arg (expand-file-name "~"))
-				  (expand-file-name default-directory)
-				  )
-		  )
-	(setq buffer_name (format "*Gen tags for %s*" tagdir))
-	(setq tagfile (expand-file-name "TAGS" tagdir))
-	(setq tagdir_file (expand-file-name "TAGS_DIR" tagdir))
-	(ignore-errors(kill-buffer buffer_name))
-	(setq buffer_ (get-buffer-create buffer_name))
-	(when no_append
-	  (ignore-errors(delete-file tagfile))
-	  )
-	(setq dirs (mapcar
-				(lambda (dir)
-				  (replace-regexp-in-string "[\\/]$" "" (expand-file-name dir tagdir))
-				  )
-				dirs
-				)
-		  )
-	(setq dirs (remove-duplicates dirs :test 'string=))
-	(setq command_
-		  (format "ctags --verbose=yes --options='%s' -e %s -f '%s' -R %s
-echo UPDATING TAGS
-konix_etags_add_kinds.sh '%s'
-echo TAGS UPDATED
-"
-				  (expand-file-name "ctags" config-dir)
-				  (if no_append
-					  ""
-					"-a"
-					)
-				  tagfile
-				  (mapconcat
-				   (lambda (dir)
-					 (concat "'"dir"'")
-					 )
-				   dirs
-				   " "
-				   )
-				  tagfile
-				  )
-		  )
-	(async-shell-command command_ buffer_ buffer_)
-	(with-temp-buffer
-	  (ignore-errors(insert-file-literally tagdir_file))
-	  (goto-char (point-max))
-	  (mapc
-	   (lambda(dir)
-		 (unless (re-search-backward
-				  (concat
-				   "^"
-				   (replace-regexp-in-string "/$" "" dir)
-				   "/?$"
-				   )
-				  nil t)
-		   (insert (replace-regexp-in-string "/$" "" dir))
-		   (newline)
-		   )
-		 )
-	   dirs
-	   )
-	  (write-region (point-min) (point-max) tagdir_file)
-	  )
-	)
+(defun konix/tags/add-include (include &optional tags_directory)
+  (interactive "fInclude tags file :")
+  (konix/notify
+   (shell-command-to-string (format "konix_etags_add.py -i '%s' %s"
+									include
+									(if tags_directory
+										(format "--cwd '%s'"tags_directory)
+										)
+									))
+   0
+   )
   )
 
-(defun konix/tags/update-from-tag-dir (tagdir)
-  (interactive "DDir : ")
-  (let (
-		(command_ nil)
-		(tagdir_file (expand-file-name "TAGS_DIR" tagdir))
-		(tag_file (expand-file-name "TAGS" tagdir))
-		list_of_dirs
-		)
-	(unless (file-exists-p tagdir_file)
-	  (error "No TAGSDIR file for %s"tagdir)
-	  )
-	(setq list_of_dirs
-		  (split-string
-		   (with-temp-buffer
-			 (insert-file-contents tagdir_file)
-			 (buffer-string)
-			 )
-		   "\n"
-		   )
-		  )
-	(setq list_of_dirs (remove-if (lambda (dir) (string-match "^[\t ]*$" dir)) list_of_dirs))
-	(ignore-errors(delete-file tagdir_file))
-	(ignore-errors(delete-file tag_file))
-	(let (
-		  (tag_file_buffer (find-buffer-visiting tag_file))
-		  )
-	  (when tag_file_buffer
-		(kill-buffer tag_file_buffer)
-		)
-	  )
-	(condition-case nil
-		(let (
-			  (default-directory tagdir)
-			  )
-		  (konix/tags/create-from-dirs list_of_dirs tagdir)
-		  )
-	  (error
-	   ;; re create the TAGSDIR file in case it has not been recreated
-	   (unless (file-exists-p tagdir_file)
-		 (with-temp-buffer
-		   (insert
-			(mapconcat
-			 'identity
-			 list_of_dirs
-			 "\n"
-			 )
-			)
-		   (write-region (point-min) (point-max) tagdir_file)
-		   )
-		 )
-	   )
-	  )
-	)
+(defun konix/tags/add-include-current-head (include)
+  (interactive
+   (list (konix/_get-file-name "Include file :" t t))
+   )
+  (konix/tags/_assert-current-head)
+  (konix/tags/add-include include (file-name-directory (first tags-table-list)))
   )
 
-(defun konix/tags/update ()
+(defun konix/tags/add-tags-dirs (tags_dirs &optional tags_directory)
+  (interactive "DTags dir :")
+  (konix/notify
+   (shell-command-to-string (format "konix_etags_add.py -d '%s' %s"
+									tags_dirs
+									(if tags_directory
+										(format "--cwd '%s'"tags_directory)
+									  )
+									)
+							)
+   0
+   )
+  )
+
+(defun konix/tags/add-tags-dirs-current-head (tags_dir)
+  (interactive "DTags dir :")
+  (konix/tags/_assert-current-head)
+  (konix/tags/add-tags-dirs tags_dir (file-name-directory (first tags-table-list)))
+  )
+
+(defun konix/tags/_assert-current-head()
+  (or tags-table-list (error "At least one tags file must be in use"))
+  )
+
+(defun konix/tags/create (&optional tags_dir)
   (interactive)
-  (mapcar
-   (lambda (file)
-	 (let (
-		   (dir (file-name-directory file))
-		   )
-	   (konix/tags/update-from-tag-dir dir)
-	   )
-	 )
-   tags-table-list
+  (let (
+		(default-directory default-directory)
+		)
+	(when (and tags_dir (file-exists-p tags_dir))
+	  (setq default-directory tags_dir)
+	  )
+	(async-shell-command "konix_etags_create.sh -v")
+	)
+  )
+
+(defun konix/tags/update-current-head ()
+  (interactive)
+  (konix/tags/_assert-current-head)
+  (let (
+		(default-directory (file-name-directory (first tags-table-list)))
+		)
+	(konix/tags/create)
    )
   )
 
@@ -1160,92 +1078,6 @@ echo TAGS UPDATED
 (defun konix/tags/restore-window-configuration ()
   (interactive)
   (set-window-configuration konix/tags/windows-configuration-saved)
-  )
-
-(defun konix/tags/add-include (tags_file_or_directory)
-  "Add the DIRECTORY TAGS file in the list of includes of the first TAGS file of
-the tags-table-list. If no such file exists, where to put the file is asked."
-  (interactive
-   (list (konix/_get-file-name "tags file or directory"))
-   )
-  (when (file-directory-p tags_file_or_directory)
-	(setq tags_file_or_directory (expand-file-name "TAGS" tags_file_or_directory))
-	)
-  (unless (file-exists-p tags_file_or_directory)
-	(or	(y-or-n-p (format "No such file %s, create one ? "
-						  tags_file_or_directory))
-		(error "Cannot deal with non existent TAG"))
-	(konix/tags/create-from-dirs (list (file-name-directory tags_file_or_directory)) (file-name-directory tags_file_or_directory))
-	)
-  (let (
-		(current_tag_file (first tags-table-list))
-		line_to_insert
-		(already_included nil)
-		current_tag_include_file
-		)
-	(when (not current_tag_file)
-	  (setq current_tag_file (read-file-name "In what file/directory do you want to place the include statement ? "))
-	  (if (file-directory-p current_tag_file)
-		  (setq current_tag_file (expand-file-name "TAGS" current_tag_file))
-		)
-	  )
-	(setq current_tag_include_file (expand-file-name "TAGS_INCLUDES" (file-name-directory current_tag_file)))
-	(or (file-directory-p (file-name-directory current_tag_file))
-		(error "This file (%s) is in non existing directory" current_tag_file)
-		)
-	(setq line_to_insert (format "%s,include" (file-relative-name
-											   tags_file_or_directory
-											   (file-name-directory current_tag_file)
-											   ))
-		  )
-	;; write the tags file
-	(with-temp-buffer
-	  (when (file-exists-p current_tag_file)
-		(progn
-		  (insert-file-contents current_tag_file)
-		  (goto-char 0)
-		  (setq already_included (re-search-forward line_to_insert nil t))
-		  )
-		)
-	  (if (not already_included)
-		  (progn
-			(message "Adding %s to %s" line_to_insert current_tag_file)
-			(erase-buffer)
-			(insert "")
-			(newline)
-			(insert line_to_insert)
-			(newline)
-			(write-region (point-min) (point-max) current_tag_file t)
-			)
-		(progn
-		  (message "There is already the include line '%s' in %s" line_to_insert
-				   current_tag_file)
-		  )
-		)
-	  )
-	;; write the include tags file
-	(setq already_included nil)
-	(with-temp-buffer
-	  (when (file-exists-p current_tag_include_file)
-		(insert-file-contents current_tag_include_file)
-		(goto-char 0)
-		(setq already_included (re-search-forward tags_file_or_directory nil t))
-		)
-	  (if (not already_included)
-		  (progn
-			(message "Adding %s to %s" tags_file_or_directory current_tag_include_file)
-			(erase-buffer)
-			(insert tags_file_or_directory)
-			(newline)
-			(write-region (point-min) (point-max) current_tag_include_file t)
-			)
-		(progn
-		  (message "There is already the include line '%s' in %s" tags_file_or_directory
-				   current_tag_include_file)
-		  )
-		)
-	  )
-	)
   )
 
 (defun konix/tags/echo-tags-table-list ()

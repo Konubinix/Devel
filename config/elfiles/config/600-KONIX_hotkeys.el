@@ -325,17 +325,17 @@
 (define-key 'konix/tags/map (kbd "n") 'konix/tags/find-next)
 (define-key 'konix/tags/map (kbd "p") 'konix/tags/find-prev)
 (define-key 'konix/tags/map (kbd "w") 'konix/tags/restore-window-configuration)
-(define-key 'konix/tags/map (kbd "i") 'konix/tags/add-include)
+(define-key 'konix/tags/map (kbd "i") 'konix/tags/add-include-current-head)
+(define-key 'konix/tags/map (kbd "d") 'konix/tags/add-tags-dirs-current-head)
 (define-key 'konix/tags/map (kbd "R") 'konix/tags/find-references)
-(define-key 'konix/tags/map (kbd "c") 'konix/tags/create-from-dirs)
+(define-key 'konix/tags/map (kbd "c") 'konix/tags/create)
 (define-key 'konix/tags/map (kbd "v") 'visit-tags-table)
 (define-key 'konix/tags/map (kbd "r") 'tags-reset-tags-tables)
 (define-key 'konix/tags/map (kbd "e") 'konix/tags/echo-tags-table-list)
 (define-key 'konix/tags/map (kbd "M-%") 'tags-query-replace)
 (define-key 'konix/tags/map (kbd "l") 'list-tags)
 (define-key 'konix/tags/map (kbd "a") 'tags-apropos)
-(define-key 'konix/tags/map (kbd "u") 'konix/tags/update)
-(define-key 'konix/tags/map (kbd "U") 'konix/tags/update-from-tag-dir)
+(define-key 'konix/tags/map (kbd "u") 'konix/tags/update-current-head)
 
 ;; ************************************************************
 ;; Icicle

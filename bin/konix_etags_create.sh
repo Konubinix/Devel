@@ -22,8 +22,8 @@ EOF
 }
 
 TAGS_FILE="./TAGS"
-TAGDIRS_FILE="./TAGS_DIR"
-TAGINCLUDES_FILE="./TAGS_INCLUDE"
+TAGDIRS_FILE="./TAGS_DIRS"
+TAGINCLUDES_FILE="./TAGS_INCLUDES"
 APPEND_CMD=""
 VERBOSE_CMD=""
 while getopts "hi:d:f:av" opt; do
@@ -85,6 +85,6 @@ eval ctags $VERBOSE_CMD \
 	-f "$TAGS_FILE" \
 	$TAGDIRS_CMD \
 	$TAGINCLUDES_CMD
-# echo UPDATING TAGS
-# konix_etags_add_kinds.sh '%s'
-# echo TAGS UPDATED
+echo ADDING KINDS FOR UPDATING TAGS
+konix_etags_add_kinds.sh 'TAGS'
+echo KINDS ADDED

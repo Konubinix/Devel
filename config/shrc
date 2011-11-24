@@ -1,6 +1,9 @@
 #!/bin/bash
 # -*- mode: sh -*-
 # set -x
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
 python "${DEVEL_DIR}/bin/konix_check_env"
 
 # ####################################################################################################

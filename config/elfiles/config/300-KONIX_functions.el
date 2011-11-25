@@ -1,6 +1,25 @@
 ;; ################################################################################
 ;; General use function
 ;; ################################################################################
+(defun konix/wrap-sexp-at-point ()
+  (interactive)
+  (let (
+		(beg nil)
+		(end nil)
+		)
+	(save-excursion
+	  (insert "(")
+	  (setq beg (point))
+	  (newline)
+	  (forward-sexp)
+	  (newline)
+	  (insert ")")
+	  (setq end (point))
+	  )
+	(indent-region beg end)
+	)
+  )
+
 (defun konix/keymap/help ()
   (interactive)
   (let (

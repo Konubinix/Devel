@@ -882,6 +882,15 @@
 	)
   )
 
+(defun konix/git/status-buffer/commit-file ()
+  (interactive)
+  (let (
+		(file-name (get-text-property (point) 'konix/git/status/filename))
+		)
+	(konix/git/commit/file file-name (read-string "Commit message : ") nil)
+	)
+  )
+
 (defun konix/git/status-buffer/checkout-file ()
   (interactive)
   (let (
@@ -980,6 +989,7 @@
 						  (define-key map "a" 'konix/git/status-buffer/add-file)
 						  (define-key map "e" 'konix/git/status-buffer/add-edit-file)
 						  (define-key map "df" 'konix/git/status-buffer/diff-file)
+						  (define-key map "cf" 'konix/git/status-buffer/commit-file)
 						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  (define-key map "C" 'konix/git/status-buffer/checkout-file)
@@ -1031,8 +1041,6 @@
 	(define-key local_map "q" 'bury-buffer)
 	(define-key local_map (kbd "C-d") 'konix/git/diff)
 	(define-key local_map "k" 'kill-buffer)
-	(define-key local_map "c" 'konix/git/commit)
-	(define-key local_map "m" 'konix/git/commit/message)
 	(define-key local_map "P" 'konix/git/push)
 	(define-key local_map (kbd"<SPC>") 'konix/git/status-buffer/next)
 	(define-key local_map (kbd"<DEL>") 'konix/git/status-buffer/prev)
@@ -1049,6 +1057,11 @@
 	(define-prefix-command 'konix/git/status/diff-map)
 	(define-key local_map "d" 'konix/git/status/diff-map)
 	(define-key konix/git/status/diff-map "c" 'konix/git/diff-cached)
+
+	(define-prefix-command 'konix/git/status/commit-map)
+	(define-key local_map "c" 'konix/git/status/commit-map)
+	(define-key konix/git/status/commit-map "c" 'konix/git/commit)
+	(define-key konix/git/status/commit-map "m" 'konix/git/commit/message)
 
 	(use-local-map local_map)
 	(konix/git/status-decorate-buffer)

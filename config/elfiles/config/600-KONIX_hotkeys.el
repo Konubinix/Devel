@@ -23,6 +23,8 @@
 (global-set-key (kbd "<C-M-S-left>") 'konix/windmove-bring-buffer-left)
 (global-set-key (kbd "<C-M-S-up>") 'konix/windmove-bring-buffer-up)
 (global-set-key (kbd "<C-M-S-down>") 'konix/windmove-bring-buffer-down)
+;; wrap sexp at point
+(global-set-key (kbd "C-M-g") 'konix/wrap-sexp-at-point)
 ;; Other frame
 (global-set-key (kbd "<C-M-tab>") 'other-frame)
 ;; Move buffer to other frame

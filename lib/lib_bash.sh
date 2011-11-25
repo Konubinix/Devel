@@ -185,7 +185,7 @@ konix_var_points_to_file_or_null_p () {
 	eval local TAGDIR_FILE="\$$TAGDIR_VAR"
 	if [ ! -f "$TAGDIR_FILE" ]
 	then
-		echo "$TAGDIR_VAR=$TAGDIR_FILE does not point to existing file, ignore it" >&2
+		echo "$TAGDIR_VAR=$TAGDIR_FILE does not point to existing file, empty it" >&2
 		eval "$TAGDIR_VAR"=""
 	fi
 }

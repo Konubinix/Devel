@@ -1,6 +1,6 @@
 # display a hardstatus info bar
 hardstatus lastline
-hardstatus string "%w %{ry}%` %=%{rc} %d/%m/%Y %c:%s"
+hardstatus string "%w %{kg}%` %=%{kc} %d/%m/%Y %c:%s"
 # display in the hardstatus the battery status
 backtick 0 15 15 acpi
 # monitor activity in other windows

@@ -7,8 +7,8 @@
 		(beg nil)
 		(end nil)
 		)
+	(insert "(")
 	(save-excursion
-	  (insert "(")
 	  (setq beg (point))
 	  (newline)
 	  (forward-sexp)
@@ -35,7 +35,7 @@
 				(format "%s : %s (%s)"
 						(propertize
 						 (substitute-command-keys
-						 (format "\\[%s]" function))
+						  (format "\\[%s]" function))
 						 'face
 						 font-lock-function-name-face
 						 )
@@ -1073,7 +1073,7 @@ lieu de find-file."
 		(default-directory (file-name-directory (first tags-table-list)))
 		)
 	(konix/tags/create)
-   )
+	)
   )
 
 (defun konix/tags/find-next ()

@@ -7,7 +7,7 @@ Generate a new tag file for emacs with name TAGFILE that recursively parses the
 	directories found in TAGDIR_FILE and add the directories found in
 	TAGINCLUDE_FILE as includes
 
--d : Set TAGDIR_FILE, defaults to ./TAGS_DIR
+-d : Set TAGDIR_FILE, defaults to ./TAGS_DIRS
 -o : Set output TAGFILE, defaults to ./TAGS
 -i : Set TAGINCLUDE_FILE, defaults to ./TAGS_INCLUDES
 -h : Display this help and exits
@@ -66,8 +66,8 @@ if [ -z "$TAGDIRS_FILE" -a -z "$TAGINCLUDES_FILE" ]
 then
 	echo "TAGDIRS_FILE and TAGINCLUDES_FILE are empty, adding a new TAGS_DIR
 with . in it and use it" >&2
-	TAGDIR_FILE="."
-	konix_etags_add.py -d "$TAGDIR_FILE"
+	konix_etags_add.py -d "."
+	TAGDIRS_FILE="./TAGS_DIRS"
 fi
 if [ -n "$TAGDIRS_FILE" ]
 then
@@ -87,6 +87,11 @@ eval ctags $VERBOSE_CMD \
 	-f "$TAGS_FILE" \
 	$TAGDIRS_CMD \
 	$TAGINCLUDES_CMD
-echo ADDING KINDS FOR UPDATING TAGS
+echo updating tags with kinds
 konix_etags_add_kinds.sh 'TAGS'
-echo KINDS ADDED
+if [ $? == 0 ]
+then
+	echo kinds added
+else
+	echo failed to add kinds
+fi

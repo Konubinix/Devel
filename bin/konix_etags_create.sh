@@ -64,8 +64,10 @@ konix_var_points_to_file_or_null_p TAGDIRS_FILE
 konix_var_points_to_file_or_null_p TAGINCLUDES_FILE
 if [ -z "$TAGDIRS_FILE" -a -z "$TAGINCLUDES_FILE" ]
 then
-	echo "One of $TAGDIRS_FILE or $TAGINCLUDES_FILE must point to an existing file" >&2
-	exit 1
+	echo "TAGDIRS_FILE and TAGINCLUDES_FILE are empty, adding a new TAGS_DIR
+with . in it and use it" >&2
+	TAGDIR_FILE="."
+	konix_etags_add.py -d "$TAGDIR_FILE"
 fi
 if [ -n "$TAGDIRS_FILE" ]
 then

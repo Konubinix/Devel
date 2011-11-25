@@ -1009,14 +1009,39 @@ lieu de find-file."
   )
 
 ;; TAGS
+(defun konix/tags/init (tags_file_name)
+  "If TAGS_FILE_NAME does not exist, create an empty one. Then visit
+TAGS_FILE_NAMETHE"
+  (interactive
+   (list (read-file-name "TAGS file : "
+						 default-directory
+						 (expand-file-name "TAGS" default-directory)
+						 )
+		 )
+   )
+  (unless (file-exists-p tags_file_name)
+	(with-temp-buffer
+	  (write-file tags_file_name)
+	  )
+	)
+  (visit-tags-table tags_file_name)
+  )
+
 (defun konix/tags/add-include (include &optional tags_directory)
-  (interactive "fInclude tags file :")
+  (interactive
+   (list
+	(read-file-name "Include tags file :"
+					default-directory
+					(expand-file-name "TAGS" default-directory)
+					)
+	)
+   )
   (konix/notify
    (shell-command-to-string (format "konix_etags_add.py -i '%s' %s"
 									include
 									(if tags_directory
 										(format "--cwd '%s'"tags_directory)
-										)
+									  )
 									))
    0
    )
@@ -1024,7 +1049,12 @@ lieu de find-file."
 
 (defun konix/tags/add-include-current-head (include)
   (interactive
-   (list (konix/_get-file-name "Include file :" t t))
+   (list
+	(read-file-name "Include tags file :"
+					default-directory
+					(expand-file-name "TAGS" default-directory)
+					)
+	)
    )
   (konix/tags/_assert-current-head)
   (konix/tags/add-include include (file-name-directory (first tags-table-list)))

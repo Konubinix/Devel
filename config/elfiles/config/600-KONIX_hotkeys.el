@@ -172,6 +172,15 @@
 (define-key 'konix/ediff-key-map (kbd "M") 'ediff-merge-with-ancestor)
 
 ;; ************************************************************
+;; diff-mode
+;; ************************************************************
+(eval-after-load "diff-mode"
+  '(progn
+	 (define-key diff-mode-map (kbd "C-M-q") 'konix/kill-current-buffer-and-delete-window)
+	 )
+  )
+
+;; ************************************************************
 ;; Backup
 ;; ************************************************************
 (define-prefix-command 'konix/backup-key-map)

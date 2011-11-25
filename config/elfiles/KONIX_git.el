@@ -934,7 +934,7 @@
 							  (map (make-sparse-keymap))
 							  )
 						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-						  (define-key map "d" 'konix/git/status-buffer/diff-file-cached)
+						  (define-key map "df" 'konix/git/status-buffer/diff-file-cached)
 						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
@@ -945,7 +945,7 @@
 							  (map (make-sparse-keymap))
 							  )
 						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-						  (define-key map "d" 'konix/git/status-buffer/diff-file)
+						  (define-key map "df" 'konix/git/status-buffer/diff-file)
 						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
@@ -956,7 +956,7 @@
 							  (map (make-sparse-keymap))
 							  )
 						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-						  (define-key map "d" 'konix/git/status-buffer/diff-file)
+						  (define-key map "df" 'konix/git/status-buffer/diff-file)
 						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
@@ -979,7 +979,7 @@
 							  )
 						  (define-key map "a" 'konix/git/status-buffer/add-file)
 						  (define-key map "e" 'konix/git/status-buffer/add-edit-file)
-						  (define-key map "d" 'konix/git/status-buffer/diff-file)
+						  (define-key map "df" 'konix/git/status-buffer/diff-file)
 						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  (define-key map "C" 'konix/git/status-buffer/checkout-file)
@@ -1045,6 +1045,10 @@
 	(define-prefix-command 'konix/git/status/buffer/rebase-prefix-map)
 	(define-key local_map (kbd "R") 'konix/git/status/buffer/rebase-prefix-map)
 	(define-key konix/git/status/buffer/rebase-prefix-map "i" 'konix/git/irebase)
+
+	(define-prefix-command 'konix/git/status/diff-map)
+	(define-key local_map "d" 'konix/git/status/diff-map)
+	(define-key konix/git/status/diff-map "c" 'konix/git/diff-cached)
 
 	(use-local-map local_map)
 	(konix/git/status-decorate-buffer)

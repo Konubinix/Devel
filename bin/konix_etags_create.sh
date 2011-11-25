@@ -1,14 +1,14 @@
 #!/bin/bash
 usage () {
 	cat<<EOF
-$0 [-d TAGDIR_FILE] [-f TAGFILE] [-i TAGINCLUDE_FILE] [-h]
+$0 [-h] [-d TAGDIR_FILE] [-i TAGINCLUDE_FILE] [-o TAGFILE]
 
 Generate a new tag file for emacs with name TAGFILE that recursively parses the
 	directories found in TAGDIR_FILE and add the directories found in
 	TAGINCLUDE_FILE as includes
 
 -d : Set TAGDIR_FILE, defaults to ./TAGS_DIR
--f : Set TAGFILE, defaults to ./TAGS
+-o : Set output TAGFILE, defaults to ./TAGS
 -i : Set TAGINCLUDE_FILE, defaults to ./TAGS_INCLUDES
 -h : Display this help and exits
 
@@ -26,7 +26,7 @@ TAGDIRS_FILE="./TAGS_DIRS"
 TAGINCLUDES_FILE="./TAGS_INCLUDES"
 APPEND_CMD=""
 VERBOSE_CMD=""
-while getopts "hi:d:f:av" opt; do
+while getopts "hi:d:o:av" opt; do
 	case $opt in
 		h)
 			usage
@@ -38,7 +38,7 @@ while getopts "hi:d:f:av" opt; do
 		d)
 			TAGDIRS_FILE="$OPTARG"
 			;;
-		f)
+		o)
 			TAGS_FILE="$OPTARG"
 			;;
 		a)

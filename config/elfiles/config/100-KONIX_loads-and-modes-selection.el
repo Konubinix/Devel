@@ -136,6 +136,7 @@
 (autoload 'ack-find-file "full-ack" nil t)
 ;; grin
 (autoload 'grin "grin" nil t)
+(autoload 'hide/show-comments "hide-comnt" nil t)
 
 ;; ******************************************************************************************
 ;; Magic modes

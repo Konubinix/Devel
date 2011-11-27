@@ -1481,6 +1481,7 @@
 (defun konix/message-mode-hook ()
   (auto-fill-mode -1)
   (visual-line-mode 1)
+  (flyspell-mode 1)
   )
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)

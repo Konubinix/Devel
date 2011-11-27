@@ -348,6 +348,7 @@
 (define-key 'konix/tags/map (kbd "l") 'list-tags)
 (define-key 'konix/tags/map (kbd "a") 'tags-apropos)
 (define-key 'konix/tags/map (kbd "u") 'konix/tags/update-current-head)
+(define-key 'konix/tags/map (kbd ".") 'find-tag)
 
 ;; ************************************************************
 ;; Icicle

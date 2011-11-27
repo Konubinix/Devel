@@ -306,7 +306,7 @@
 
 (defun konix/yas-expand (prefix)
   (let* (
-		 (templates	(mapcan #'(lambda (table)
+		 (templates (mapcan #'(lambda (table)
 								(yas/fetch table prefix))
 							(yas/get-snippet-tables)))
 		 (template (or (and (rest templates) ;; more than one
@@ -350,8 +350,8 @@
 (defun hash-values (hashtable)
   "Return all values in hashtable."
   (let (allvals)
-    (maphash (lambda (kk vv) (setq allvals (cons vv allvals))) hashtable)
-    allvals
+	(maphash (lambda (kk vv) (setq allvals (cons vv allvals))) hashtable)
+	allvals
 	)
   )
 
@@ -605,24 +605,24 @@ retourne ('fichier','extension')."
   (message "Counting words in region ... ")
 ;;; 1. Set up appropriate conditions.
   (save-excursion
-    (let ((count 0))
-      (goto-char beginning)
+	(let ((count 0))
+	  (goto-char beginning)
 
 ;;; 2. Run the while loop.
-      (while (and (< (point) end)
-                  (re-search-forward "\\w+\\W*" end t))
-        (setq count (1+ count)))
+	  (while (and (< (point) end)
+				  (re-search-forward "\\w+\\W*" end t))
+		(setq count (1+ count)))
 
 ;;; 3. Send a message to the user.
-      (cond ((zerop count)
-             (message
-              "The region does NOT have any words."))
-            ((= 1 count)
-             (message
-              "The region has 1 word."))
-            (t
-             (message
-              "The region has %d words." count))))))
+	  (cond ((zerop count)
+			 (message
+			  "The region does NOT have any words."))
+			((= 1 count)
+			 (message
+			  "The region has 1 word."))
+			(t
+			 (message
+			  "The region has %d words." count))))))
 
 (defun konix/indent-region-or-buffer ()
   (interactive)
@@ -641,11 +641,11 @@ retourne ('fichier','extension')."
   "make the point horizontally centered in the window"
   (interactive)
   (let ((mid (/ (window-width) 2))
-        (line-len (save-excursion (end-of-line) (current-column)))
-        (cur (current-column)))
-    (if (< mid cur)
-        (set-window-hscroll (selected-window)
-                            (- cur mid)))))
+		(line-len (save-excursion (end-of-line) (current-column)))
+		(cur (current-column)))
+	(if (< mid cur)
+		(set-window-hscroll (selected-window)
+							(- cur mid)))))
 
 (defun konix/rm-file (file)
   "Supprime un fichier ou un dossier."
@@ -925,7 +925,7 @@ lieu de find-file."
 (defun konix/meld ()
   "Lance meld."
   (interactive)
-  (start-process "meld" nil "meld"  ".")
+  (start-process "meld" nil "meld"	".")
   )
 
 (defun konix/egg-hunk-section-cmd-view-file-other-window (file hunk-header hunk-beg
@@ -1084,7 +1084,7 @@ TAGS_FILE_NAMETHE"
   (or tags-table-list (error "At least one tags file must be in use"))
   )
 
-(defun konix/tags/create (&optional tags_dir)
+(defun konix/tags/create (&optional tags_dir output_buffer)
   (interactive)
   (let (
 		(default-directory default-directory)
@@ -1092,7 +1092,21 @@ TAGS_FILE_NAMETHE"
 	(when (and tags_dir (file-exists-p tags_dir))
 	  (setq default-directory tags_dir)
 	  )
-	(async-shell-command "konix_etags_create.sh -v")
+	(async-shell-command "konix_etags_create.sh -v" output_buffer)
+	)
+  )
+
+(defun konix/tags/update-tags-visit ()
+  (interactive)
+  (let (
+		(tags_table tags-table-list)
+		)
+	(tags-reset-tags-tables)
+	(mapc (lambda (table)
+			(visit-tags-table table)
+			)
+		  tags_table
+		  )
 	)
   )
 
@@ -1101,8 +1115,29 @@ TAGS_FILE_NAMETHE"
   (konix/tags/_assert-current-head)
   (let (
 		(default-directory (file-name-directory (first tags-table-list)))
+		(tags_table tags-table-list)
+		(tags_created_hook
+		 (lambda (process status)
+		   (cond
+			((string-equal "finished\n" status)
+			 (konix/tags/update-tags-visit)
+			 (message "Update of tags terminated")
+			 )
+			(t
+			 (konix/notify "Something went wront when updating tags"
+						   2
+						   )
+			 )
+			)
+		   )
+		 )
+		(tags_update_buffer_name "*TAGS UPDATE*")
+		tags_update_buffer
 		)
-	(konix/tags/create)
+	(ignore-errors (kill-buffer tags_update_buffer_name))
+	(setq tags_update_buffer (get-buffer-create tags_update_buffer_name))
+	(konix/tags/create nil tags_update_buffer)
+	(set-process-sentinel (get-buffer-process tags_update_buffer) tags_created_hook)
 	)
   )
 
@@ -1487,14 +1522,14 @@ set terminal pop;\
 ;; ####################################################################################################
 (defun konix/face-list-regexp (&optional regexp)
   (interactive (list (and current-prefix-arg
-                          (read-regexp "List faces matching regexp"))))
+						  (read-regexp "List faces matching regexp"))))
   (let ((all-faces (zerop (length regexp)))
 		(frame (selected-frame))
 		(max-length 0)
 		faces line-format
 		disp-frame window face-name)
-    ;; We filter and take the max length in one pass
-    (setq faces
+	;; We filter and take the max length in one pass
+	(setq faces
 		  (delq nil
 				(mapcar (lambda (f)
 						  (let ((s (symbol-name f)))
@@ -1502,8 +1537,8 @@ set terminal pop;\
 							  (setq max-length (max (length s) max-length))
 							  f)))
 						(sort (face-list) #'string-lessp))))
-    (unless faces
-      (error "No faces matching \"%s\"" regexp))
+	(unless faces
+	  (error "No faces matching \"%s\"" regexp))
 	faces
 	))
 
@@ -1840,9 +1875,9 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
   (interactive "fFile to Parse: ")
   "Parse FILE and return a list of all entries in the file."
   (if (listp file)
-      file
-    (when (file-exists-p file)
-      (with-temp-buffer
+	  file
+	(when (file-exists-p file)
+	  (with-temp-buffer
 		(let ((tokens '("machine" "default" "login"
 						"password" "account" "macdef" "force"
 						"port"))
@@ -1904,9 +1939,9 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 		  ;;   (("machine" . "value3") ("login" . "****"))
 		  ;; )
 		  ;; for each element in result
-		  ;;     if its caar is "machine", it is recorded to be the last "machine"
-		  ;;     alist
-		  ;;     else, its appended to the last recorded "machine" alist
+		  ;;	 if its caar is "machine", it is recorded to be the last "machine"
+		  ;;	 alist
+		  ;;	 else, its appended to the last recorded "machine" alist
 		  (let (
 				(result_iter result)
 				(new_result '())

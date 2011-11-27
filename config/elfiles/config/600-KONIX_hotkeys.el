@@ -345,10 +345,10 @@
 (define-key 'konix/tags/map (kbd "r") 'tags-reset-tags-tables)
 (define-key 'konix/tags/map (kbd "e") 'konix/tags/echo-tags-table-list)
 (define-key 'konix/tags/map (kbd "M-%") 'tags-query-replace)
-(define-key 'konix/tags/map (kbd "l") 'list-tags)
 (define-key 'konix/tags/map (kbd "a") 'tags-apropos)
 (define-key 'konix/tags/map (kbd "u") 'konix/tags/update-current-head)
 (define-key 'konix/tags/map (kbd ".") 'find-tag)
+(define-key 'konix/tags/map (kbd "l") 'tags-loop-continue)
 
 ;; ************************************************************
 ;; Icicle

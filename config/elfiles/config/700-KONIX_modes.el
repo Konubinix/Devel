@@ -1468,3 +1468,19 @@
   (maxframe/maximize-frame)
   )
 (add-hook 'server-visit-hook 'konix/server-visit-hook)
+
+;; ####################################################################################################
+;; Mail
+;; ####################################################################################################
+;; Configuration of mail sending
+(setq message-send-mail-function 'message-send-mail-with-sendmail)
+(setq-default message-sendmail-envelope-from 'header)
+(setq-default sendmail-program "msmtp")
+(setq-default mm-text-html-renderer 'w3m
+			  gnus-inhibit-images t)
+(defun konix/message-mode-hook ()
+  (auto-fill-mode -1)
+  (visual-line-mode 1)
+  )
+(add-hook 'message-mode-hook
+		  'konix/message-mode-hook)

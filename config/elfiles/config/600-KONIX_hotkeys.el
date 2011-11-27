@@ -571,3 +571,12 @@
 (global-set-key (kbd "<C-f3>") 'highlight-symbol-at-point)
 (global-set-key (kbd "<S-f3>") 'highlight-symbol-next)
 (global-set-key (kbd "<M-f3>") 'highlight-symbol-prev)
+
+;; ####################################################################################################
+;; hide show with hide comments
+;; ####################################################################################################
+(eval-after-load "hide-comnt"
+  '(progn
+	 (define-key hs-minor-mode-map "\C-c@C" 'hide/show-comments)
+	 )
+  )

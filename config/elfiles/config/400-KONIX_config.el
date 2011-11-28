@@ -12,7 +12,12 @@
 (keep-buffers-mode 1)
 
 ;; protect all buffers starting with "*scratch"
-(add-to-list 'keep-buffers-protected-alist '("\\`*scratch" . erase))
+(setq keep-buffers-protected-alist
+	  '(
+		("\\`*scratch")
+		("\\`\\*Messages\\*\\'")
+		)
+	  )
 
 ;; ******************************************************************************************
 ;; Some custom faces

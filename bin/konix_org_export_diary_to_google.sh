@@ -5,7 +5,11 @@ source konix_assert_var.sh "$KONIX_SITE_LOGIN"
 source konix_assert_var.sh "$KONIX_SITE_MDP"
 source konix_assert_var.sh "$KONIX_SITE_SERVER"
 
-emacsclient -e "(save-excursion (org-mycal-export))"
+emacsclient -e "(save-excursion
+ (kill-buffer \"google.org\")
+ (org-mycal-export)
+
+)"
 # the org file is by default in ~/org.ics
 (
 	cd "${HOME}"

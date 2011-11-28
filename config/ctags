@@ -1,6 +1,7 @@
 --sort=yes
 --python-kinds=cfmvi
 --c++-kinds=+cdefglmnpstuv
+--Java-kinds=cefgilmp
 --extra=+fq
 --fields=+ialStmnsz
 --file-scope=yes

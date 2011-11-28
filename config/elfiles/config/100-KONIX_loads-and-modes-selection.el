@@ -71,6 +71,7 @@
 (autoload 'elk-test-mode "elk-test" nil t)
 (autoload 'macro-math-eval-and-round-region "macro-math" t nil)
 (autoload 'macro-math-eval-region "macro-math" t nil)
+(autoload 'highlight-symbol-at-point "highlight-symbol" t nil)
 
 ;; ************************************************************
 ;; Automodes

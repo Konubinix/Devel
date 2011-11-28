@@ -51,6 +51,8 @@ def add_uniquely_entry_to_file (entry, filename):
     # particular case : the file does not exists yet
     # import pdb
     # pdb.set_trace()
+    # I don't want backslash style paths
+    entry = entry.replace("\\","/")
     if not os.path.exists(filename):
         fil = open(filename, "w")
         fil.close()

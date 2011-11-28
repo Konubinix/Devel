@@ -5,13 +5,26 @@
 ;; configuration of a mode uses a hook over the mode or is too big to be here,
 ;; it is then put into the mode file or into a dedicated file
 ;; ####################################################################################################
+;; ******************************************************************************************
+;; Keeping buffers
+;; ******************************************************************************************
+(require 'keep-buffers)
+(keep-buffers-mode 1)
+
+;; protect all buffers starting with "*scratch"
+(add-to-list 'keep-buffers-protected-alist '("\\`*scratch" . erase))
+
+;; ******************************************************************************************
 ;; Some custom faces
+;; ******************************************************************************************
 (defface konix/face-normal-message
   '((((class color)) (:foreground "dark green")))
   ""
   )
 
+;; ******************************************************************************************
 ;; My notifyings facilities use popwin
+;; ******************************************************************************************
 (require 'popwin)
 (push '("*konix notify*" :regexp t :height 10) popwin:special-display-config)
 

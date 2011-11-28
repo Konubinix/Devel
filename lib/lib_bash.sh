@@ -216,4 +216,48 @@ konix_file_to_lines () {
 	done
 }
 
-#generate_new_name
+konix_int_to_color() {
+#####################################################################################################
+# cf http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+#
+# |-----------+-------+-----+-------+-----------+------+---------+------+-------|
+# | Intensity | 0     | 1   | 2     | 3         | 4    | 5       | 6    | 7     |
+# |-----------+-------+-----+-------+-----------+------+---------+------+-------|
+# | Normal    | Black | Red | Green | Yellow[7] | Blue | Magenta | Cyan | White |
+# | Bright    | Black | Red | Green | Yellow    | Blue | Magenta | Cyan | White |
+# |-----------+-------+-----+-------+-----------+------+---------+------+-------|
+# Bright = +8
+# Foreground accepts 16 values (light and dark)
+# Background accepts 8 values (only dark)
+# Negative values mean default
+######################################################################################################
+	local FG_VALUE="$1"
+	local BG_VALUE="$2"
+	if [ ! $FG_VALUE -lt 16 ]
+	then
+		echo "Bad foreground value">&2
+		caller
+		return 1
+	fi
+	if [ ! $FG_VALUE -lt 8 ]
+	then
+		echo "Bad background value">&2
+		caller
+		return 1
+	fi
+	RES="\033["
+	if [ $FG_VALUE -lt 0 ]
+	then
+		RES="${RES}00;00"
+	else
+		FG_BRIGHT=$((FG_VALUE/8))
+		FG_COLOR=$((FG_VALUE%8))
+		RES="${RES}0${FG_BRIGHT};3${FG_COLOR}"
+	fi
+	if [ $BG_VALUE -lt 0 ]
+	then
+		RES="${RES}m"
+	else
+		RES="${RES};4${BG_VALUE}m"
+	fi
+}

@@ -72,19 +72,21 @@ fi
 if [ -n "$TAGDIRS_FILE" ]
 then
 	konix_file_to_lines "$TAGDIRS_FILE" " "
+	RES="${RES//\\//}"
 	TAGDIRS_CMD="-R $RES"
 fi
 if [ -n "$TAGINCLUDES_FILE" ]
 then
 	konix_file_to_lines "$TAGINCLUDES_FILE" " --etags-include="
+	RES="${RES//\\//}"
 	TAGINCLUDES_CMD="--etags-include=$RES"
 fi
 
 eval ctags $VERBOSE_CMD \
-	--options="$CONFIG_DIR/ctags" \
+	--options="'$CONFIG_DIR/ctags'" \
 	-e \
 	"$APPEND_CMD" \
-	-f "$TAGS_FILE" \
+	-f "'$TAGS_FILE'" \
 	$TAGDIRS_CMD \
 	$TAGINCLUDES_CMD
 echo updating tags with kinds

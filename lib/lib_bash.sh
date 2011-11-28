@@ -216,6 +216,23 @@ konix_file_to_lines () {
 	done
 }
 
+export COLOR_BLACK=0
+export COLOR_BLUE=4
+export COLOR_GREEN=2
+export COLOR_CYAN=6
+export COLOR_RED=1
+export COLOR_PURPLE=5
+export COLOR_BROWN=3
+export COLOR_LIGHT_GRAY=7
+export COLOR_DARK_GRAY=8
+export COLOR_LIGHT_BLUE=12
+export COLOR_LIGHT_GREEN=10
+export COLOR_LIGHT_CYAN=14
+export COLOR_LIGHT_RED=9
+export COLOR_LIGHT_PURPLE=13
+export COLOR_YELLOW=11
+export COLOR_WHITE=15
+
 konix_int_to_color() {
 #####################################################################################################
 # cf http://en.wikipedia.org/wiki/ANSI_escape_code#Colors

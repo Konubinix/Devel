@@ -39,4 +39,12 @@ fi
 # Variables
 # ************************************************************
 # Le prompt, joli et en couleur
-export PS1='$?\[\033[01;32;40m\]\u\[\033[01;33;40m\]@\[\033[01;37;40m\]\h\[\033[00m\]\[\033[01;36;40m\]|path=\w|\[\033[00m\]$(parse_git_branch) $(date "+%H:%M:%S - %d/%m/%y")\n\$ '
+#set -x
+konix_string_to_color_index "$HOSTNAME"
+konix_int_to_color "$RES" 0
+HOST_COLOR="$RES"
+konix_string_to_color_index "$LOGNAME"
+konix_int_to_color "$RES" 0
+LOGNAME_COLOR="$RES"
+#set +x
+export PS1="\$?\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\[\033[01;36;40m\]|path=\w|\[\033[00m\]$(parse_git_branch) $(date "+%H:%M:%S - %d/%m/%y")\n\$ "

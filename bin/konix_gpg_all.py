@@ -20,7 +20,13 @@ args = parser.parse_args()
 # ####################################################################################################
 # Real script
 # ####################################################################################################
-gpg_path=which.which("gpg")
+gpg_path=None
+for gpg_exe_name in ["gpg", "gpg2"]:
+    try:
+        gpg_path=which.which(gpg_exe_name)
+        break
+    except:
+        pass
 if not gpg_path:
     print "No gpg found, cannot go further"
     exit(2)
@@ -39,7 +45,7 @@ def load_gpg_env_file():
 def new_gpg_agent(gpg_env_file):
     retcode = subprocess.call([gpg_agent_path,"--daemon","--write-env-file",gpg_env_file])
     if retcode != 0:
-        print >>sys.stderr, "Error when trying to run gpg-agen in daemon mode"
+        print >>sys.stderr, "Error when trying to run gpg-agent in daemon mode"
         return False
     else:
         return True

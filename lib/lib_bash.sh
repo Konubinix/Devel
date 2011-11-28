@@ -256,7 +256,7 @@ konix_int_to_color() {
 		caller
 		return 1
 	fi
-	if [ ! $FG_VALUE -lt 8 ]
+	if [ ! $BG_VALUE -lt 8 ]
 	then
 		echo "Bad background value">&2
 		caller

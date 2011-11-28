@@ -104,7 +104,7 @@ gpg_agent_start_KONIX () {
     else
 		echo "Starting a new gpg-agent"
 		gpg-agent --daemon --enable-ssh-support \
-			--write-env-file "$GPG_INFO_FILE_NAME" >/dev/null
+			--write-env-file "$GPG_INFO_FILE_NAME" >/dev/null &
 	fi
 	. "$GPG_INFO_FILE_NAME"
     export GPG_AGENT_INFO

@@ -278,3 +278,20 @@ konix_int_to_color() {
 		RES="${RES};4${BG_VALUE}m"
 	fi
 }
+
+ord() {
+    RES="$(printf '%d' "'$1")"
+}
+
+konix_string_to_color_index () {
+	local STRING="$1"
+	local FUNCT_RES=0
+	while [ -n "$STRING" ]
+	do
+		NEXT_LETTER="${STRING:0:1}"
+		STRING="${STRING#?}"
+		ord $NEXT_LETTER
+		FUNCT_RES=$(( (FUNCT_RES+RES)%16 ))
+	done
+	RES=$FUNCT_RES
+}

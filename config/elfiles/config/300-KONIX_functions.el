@@ -1,6 +1,16 @@
 ;; ################################################################################
 ;; General use function
 ;; ################################################################################
+(defun konix/kill-all ()
+  (interactive)
+  (mapcar
+   (lambda (buffer)
+	 (ignore-errors (kill-buffer buffer))
+	 )
+   (buffer-list)
+   )
+  )
+
 (defun konix/wrap-sexp-at-point ()
   (interactive)
   (let (

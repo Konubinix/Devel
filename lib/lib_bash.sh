@@ -280,7 +280,7 @@ konix_int_to_color() {
 }
 
 ord() {
-    RES="$(printf '%d' "'$1")"
+    RES="$(printf '%d' "'$1'")"
 }
 
 konix_string_to_color_index () {

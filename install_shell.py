@@ -27,29 +27,39 @@ import_env
 """
         replace_file_content(SHRC_VAR_FILE_NAME, SHRC_VAR_FILE_CONTENT)
 
+        # ####################################################################################################
+        # Install SH_CUSTOM_FILE
+        # ####################################################################################################
         if not os.path.exists(environ["SH_CUSTOM_FILE"]):
                 replace_file_content(environ["SH_CUSTOM_FILE"], """#!/bin/bash
 # custom sh commands
 """)
 
+        # ####################################################################################################
+        # Install bashrc
+        # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".bashrc"), """#!/bin/bash
 source "${HOME}/.shrc_var"
 source "${CONFIG_DIR}/bashrc"
 source "${SH_CUSTOM_FILE}"
 """)
 
+        # ####################################################################################################
+        # SHRC
+        # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".shrc"), """#!/bin/sh
 source "${HOME}/.shrc_var"
 source "${CONFIG_DIR}/shrc"
 source "${SH_CUSTOM_FILE}"
 """)
-
+        # ####################################################################################################
+        # ZSHRC
+        # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".zshrc"), """#!/bin/zsh
 source "${HOME}/.shrc_var"
 source "${CONFIG_DIR}/zshrc"
 source "${SH_CUSTOM_FILE}"
 """)
-
         print "Successful installed shell config"
 if __name__ == '__main__':
         install_shell()

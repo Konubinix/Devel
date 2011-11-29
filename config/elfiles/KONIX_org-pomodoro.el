@@ -14,21 +14,25 @@
 ;; ####################################################################################################
 (defun konix/org-pomodoro-insert-table ()
   (interactive)
-  (insert "
-  |---+--------------------+-----------+------------+-----------|
-  | _ |                    | TOTPREV   |        TOT |       RES |
-  | # | TOTAL              | 0         |          0 |         0 |
-  |---+--------------------+-----------+------------+-----------|
-  |   | TO DO TODAY        | PREVISION | SPENT TIME | REMAINING |
-  |---+--------------------+-----------+------------+-----------|
-  | # |                    |           |          0 |         0 |
-  |---+--------------------+-----------+------------+-----------|
-  |   | UNPLANNED & URGENT |           |          0 |         0 |
-  |---+--------------------+-----------+------------+-----------|
-  | # |                    |           |          0 |         0 |
-  |---+--------------------+-----------+------------+-----------|
-  #+TBLFM: $TOTPREV=vsum(@+2..@6)::$TOT=vsum(@+2..@6)::$RES=vsum(@+2..@6)::$5=$3-$4
-")
+  (save-excursion
+	(newline-and-indent)
+	(insert "|---+--------------------+-----------+------------+-----------|
+| _ |                    | TOTPREV   |        TOT |       RES |
+| # | TOTAL              | 0         |          0 |         0 |
+|---+--------------------+-----------+------------+-----------|
+|   | TO DO TODAY        | PREVISION | SPENT TIME | REMAINING |
+|---+--------------------+-----------+------------+-----------|
+| # |                    |           |          0 |         0 |
+|---+--------------------+-----------+------------+-----------|
+|   | UNPLANNED & URGENT |           |          0 |         0 |
+|---+--------------------+-----------+------------+-----------|
+| # |                    |           |          0 |         0 |
+|---+--------------------+-----------+------------+-----------|")
+	(org-table-align)
+	(newline-and-indent)
+	(insert "#+TBLFM: $TOTPREV=vsum(@+2..@6)::$TOT=vsum(@+2..@6)::$RES=vsum(@+2..@6)::$5=$3-$4")
+	(newline-and-indent)
+	)
   )
 
 (defun konix/org-pomodoro-reset-count ()
@@ -340,14 +344,14 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 	(error "Time must be of format HH:MM")
 	)
   (let* (
-		(hh (string-to-int (match-string 1 time_string)))
-		(mm (string-to-int (match-string 2 time_string)))
-		(total_mm (+ (* 60 hh) mm))
-		(nb_half_hour (/ total_mm 30))
-		(nb_sets (/ nb_half_hour 5))
-		(nb_left_pomodoros (mod nb_half_hour 5))
-		(nb_pomodoro (+ (* 4 nb_sets) nb_left_pomodoros))
-		)
+		 (hh (string-to-int (match-string 1 time_string)))
+		 (mm (string-to-int (match-string 2 time_string)))
+		 (total_mm (+ (* 60 hh) mm))
+		 (nb_half_hour (/ total_mm 30))
+		 (nb_sets (/ nb_half_hour 5))
+		 (nb_left_pomodoros (mod nb_half_hour 5))
+		 (nb_pomodoro (+ (* 4 nb_sets) nb_left_pomodoros))
+		 )
 	nb_pomodoro
 	)
   )

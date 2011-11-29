@@ -3,7 +3,9 @@
 
 import os
 import sys
+import re
 import subprocess
+import socket                   # for hostname
 import which
 
 # ####################################################################################################
@@ -36,11 +38,12 @@ except:
     print "No gpg-agent found, you'll to write your password for each action"
     gpg_agent_path = None
 
-gpg_env_file = os.path.expanduser("~/.gpg-agent-info")
+gpg_env_file = os.path.expanduser("~/.gnupg/gpg-agent-info-%s" % socket.gethostname())
 def load_gpg_env_file():
     with open(gpg_env_file,"r") as f:
         gpg_agent_info = f.readline().partition("=")
         os.environ[gpg_agent_info[0]] = gpg_agent_info[2]
+        print os.environ[gpg_agent_info[0]]
 
 def new_gpg_agent(gpg_env_file):
     retcode = subprocess.call([gpg_agent_path,"--daemon","--write-env-file",gpg_env_file])
@@ -49,6 +52,17 @@ def new_gpg_agent(gpg_env_file):
         return False
     else:
         return True
+
+def get_default_recipient_from_gpgdirrc():
+    with open(os.path.expanduser("~/.gpgdirrc")) as f:
+        for line in f.readlines():
+            m = re.match("^use_key (.+)$",line)
+            if m:
+                global DEFAULT_RECIPIENT
+                DEFAULT_RECIPIENT=m.group(1)
+                break
+
+get_default_recipient_from_gpgdirrc()
 
 if os.path.exists(gpg_env_file):
     load_gpg_env_file()
@@ -93,7 +107,7 @@ def process_file(abs_file, decrypt):
                 print "already a gpg file for",abs_file,", replace it"
                 os.remove(encrypted_file_name)
             print "encrypt",abs_file,"to",encrypted_file_name
-            retcode = subprocess.call([gpg_path,"-o",encrypted_file_name,"-r","Loury","-e",abs_file])
+            retcode = subprocess.call([gpg_path,"-o",encrypted_file_name,"-r",DEFAULT_RECIPIENT,"-e",abs_file])
             if retcode == 0:
                 print "removing old file ",abs_file
                 os.remove(abs_file)

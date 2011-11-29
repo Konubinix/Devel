@@ -1066,7 +1066,6 @@
 	(use-local-map local_map)
 	(konix/git/status-decorate-buffer)
 	)
-  (toggle-read-only 1)
   )
 
 (defun konix/git/status-buffer/redo ()

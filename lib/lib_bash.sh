@@ -103,8 +103,12 @@ gpg_agent_start_KONIX () {
 		echo "Using current gpg-agent conf from $GPG_INFO_FILE_NAME"
     else
 		echo "Starting a new gpg-agent"
-		gpg-agent --daemon --enable-ssh-support \
-			--write-env-file "$GPG_INFO_FILE_NAME" >/dev/null &
+		local GPG_AGENT_STARTING_CMD='gpg-agent --daemon --enable-ssh-support --write-env-file "$GPG_INFO_FILE_NAME" >/dev/null'
+		if ! is_on_linux
+		then
+			GPG_AGENT_STARTING_CMD="$GPG_AGENT_STARTING_CMD \&"
+		fi
+		eval $GPG_AGENT_STARTING_CMD
 	fi
 	. "$GPG_INFO_FILE_NAME"
     export GPG_AGENT_INFO

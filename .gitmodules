@@ -13,3 +13,6 @@
 [submodule "config/elfiles/w3m"]
 	path = config/elfiles/w3m
 	url = https://github.com/id774-2/emacs-w3m.git
+[submodule "notmuch"]
+	path = notmuch
+	url = git://notmuchmail.org/git/notmuch

@@ -37,3 +37,10 @@
 	(message "Set the proxy values to host : %s, port %s" http-proxy-host http-proxy-port)
 	)
   )
+;; use the KONIX_EMACSLOADPATH env variable to extends load-path
+(setq load-path
+	  (append
+	   load-path
+	   (split-string (getenv "KONIX_EMACSLOADPATH") path-separator)
+	   )
+	  )

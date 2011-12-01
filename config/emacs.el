@@ -2,6 +2,8 @@
 ;; Standard requirements
 ;; ##################################################
 (require 'cl)
+(require 'cl) ; a rare necessary use of REQUIRE
+(defvar *emacs-load-start* (current-time))
 
 ;; ####################################################################################################
 ;; Needed library paths
@@ -62,4 +64,9 @@
 ;; ####################################################################################################
 (server-start)
 
+;; rest of your .emacs goes here
+
+(message "My emacs configuration loaded in %ds"
+		 (destructuring-bind (hi lo ms) (current-time)
+		   (- (+ hi lo) (+ (first *emacs-load-start*) (second *emacs-load-start*)))))
 ;;(find-file "~/.emacs")

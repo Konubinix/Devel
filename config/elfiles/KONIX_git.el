@@ -939,6 +939,31 @@
 	  )
 	)
   (goto-char 0)
+  (when (narrow_to_block "# Unmerged paths:")
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "r" 'konix/git/status-buffer/rm-file)
+						  (define-key map "a" 'konix/git/status-buffer/add-file)
+						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+						  map
+						  )
+						"^#	both modified:      \\(.+\\)$"
+						compilation-info-face)
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "r" 'konix/git/status-buffer/rm-file)
+						  (define-key map "a" 'konix/git/status-buffer/add-file)
+						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+						  map
+						  )
+						"^#	both added:         \\(.+\\)$"
+						compilation-info-face)
+	(widen)
+ 	)
   (when (narrow_to_block "# Changes to be committed:")
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))

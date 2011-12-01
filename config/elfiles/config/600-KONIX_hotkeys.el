@@ -445,6 +445,7 @@
 (define-key 'konix/org-global-map "z" 'konix/org-add-note)
 (define-key 'konix/org-global-map "u" 'org-id-update-id-locations)
 (define-key 'konix/org-global-map "L" 'konix/org-store-link-at-point)
+(define-key 'konix/org-global-map "T" 'konix/org-goto-todo)
 (define-key 'konix/org-global-map "i" 'org-id-copy)
 (define-key 'konix/org-global-map "/" 'org-sparse-tree)
 

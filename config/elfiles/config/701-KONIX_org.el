@@ -195,6 +195,11 @@
   (org-clock-goto)
   )
 
+(defun konix/org-goto-todo ()
+  (interactive)
+  (find-file (expand-file-name "todo.org" org-directory))
+  )
+
 (defun konix/org-add-note ()
   (interactive)
   (save-window-excursion

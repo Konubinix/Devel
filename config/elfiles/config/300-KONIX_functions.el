@@ -1,6 +1,19 @@
 ;; ################################################################################
 ;; General use function
 ;; ################################################################################
+(defun konix/kill-all-dired-buffers()
+  "Kill all dired buffers. (took from http://www.emacswiki.org/emacs/KillingBuffers#toc3)"
+  (interactive)
+  (save-excursion
+	(let((count 0))
+	  (dolist(buffer (buffer-list))
+		(set-buffer buffer)
+		(when (equal major-mode 'dired-mode)
+		  (setq count (1+ count))
+		  (kill-buffer buffer)))
+	  (message "Killed %i dired buffer(s)." count )))
+  )
+
 (defun konix/kill-all ()
   (interactive)
   (mapcar

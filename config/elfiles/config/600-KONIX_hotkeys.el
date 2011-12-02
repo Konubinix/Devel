@@ -581,3 +581,12 @@
 	 (define-key hs-minor-mode-map "\C-c@C" 'hide/show-comments)
 	 )
   )
+
+;; ####################################################################################################
+;; special bs custo
+;; ####################################################################################################
+(eval-after-load "bs"
+  '(progn
+	 (define-key bs-mode-map (kbd "D D") 'konix/kill-all-dired-buffers)
+	 )
+  )

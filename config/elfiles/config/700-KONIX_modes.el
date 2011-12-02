@@ -1333,7 +1333,7 @@
 				("unread" . "tag:unread AND NOT tag:rss")
 				("unread rss" . "tag:rss AND tag:unread")
 				("flagged" . "tag:flagged")
-			)
+				)
 			  )
 (setq notmuch-address-command "notmuch_addresses.py")
 (setq notmuch-search-line-faces '(
@@ -1485,3 +1485,30 @@
   )
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)
+
+;; ####################################################################################################
+;; ICICLES
+;; ####################################################################################################
+;; ******************************************************************************************
+;; Org mode with icicle (took from http://www.emacswiki.org/emacs/Icicles_-_Key_Binding_Discussion)
+;; ******************************************************************************************
+(defun konix/icicles/unbind-icicle-occur ()
+  (setq my-icicle-top-level-key-bindings
+		(mapcar (lambda (lst)
+				  (unless (string= "icicle-occur" (nth 1 lst)) lst))
+				icicle-top-level-key-bindings))
+  (setq icicle-top-level-key-bindings
+		my-icicle-top-level-key-bindings)
+  )
+
+(defun konix/icicle-mode-hook ()
+  (when icicle-mode
+	(konix/icicles/unbind-icicle-occur)
+	)
+  )
+
+(eval-after-load "icicles"
+  '(progn
+	 (add-hook 'icicle-mode-hook 'konix/icicle-mode-hook)
+	 )
+  )

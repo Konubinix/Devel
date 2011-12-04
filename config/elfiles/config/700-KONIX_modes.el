@@ -1009,6 +1009,13 @@
 ;; Ediff
 ;; --------------------------------------------------
 (setq-default ediff-ignore-similar-regions t)
+;; replace the ediff-patch-file-internal function with the one that does not
+;; edit the orignal file by default
+(eval-after-load "ediff-ptch"
+  '(progn
+	 (defalias 'ediff-patch-file-internal 'konix/ediff-patch-file-internal-for-viewing)
+	 )
+  )
 
 ;; --------------------------------------------------
 ;; View

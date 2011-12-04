@@ -247,6 +247,7 @@
 ;; --------------------------------------------------
 (defun konix/Custom-mode-hook()
   (auto-complete-mode t)
+  (turn-on-tempbuf-mode)
   (setq ac-sources
 		'(
 		  ac-source-files-in-current-dir
@@ -741,6 +742,7 @@
   ;; copy and paste in dired
   (auto-revert-mode 1)
   (dired-omit-mode t)
+  (turn-on-tempbuf-mode)
   )
 (add-hook 'dired-mode-hook 'konix/dired-mode-hook)
 
@@ -1022,6 +1024,7 @@
 ;; --------------------------------------------------
 (defun konix/view-mode-hook()
   (auto-revert-mode 1)
+  (turn-on-tempbuf-mode)
   )
 (add-hook 'view-mode-hook 'konix/view-mode-hook)
 
@@ -1207,6 +1210,7 @@
 	)
   )
 (defun konix/w3m-mode-hook()
+  (turn-on-tempbuf-mode)
   (local-set-key (kbd "<up>") 'previous-line)
   (local-set-key (kbd "<down>") 'next-line)
   (local-set-key (kbd "<C-right>") 'w3m-view-next-page)
@@ -1519,3 +1523,12 @@
 	 (add-hook 'icicle-mode-hook 'konix/icicle-mode-hook)
 	 )
   )
+
+;; ####################################################################################################
+;; Man mode
+;; ####################################################################################################
+(defun konix/Man-mode-hook ()
+  (turn-on-tempbuf-mode)
+  )
+(add-hook 'Man-mode-hook
+		  'konix/Man-mode-hook)

@@ -15,3 +15,4 @@ git ls-files -o | while read FILE
 do
 	git add "$FILE"
 done
+git commit -m "Freezing repo"

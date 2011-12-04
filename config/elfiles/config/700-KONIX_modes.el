@@ -212,6 +212,7 @@
 ;; --------------------------------------------------
 (defun konix/lisp-mode-hook ()
   (setq indent-tabs-mode t)
+  (rainbow-delimiters-mode)
   (konix/prog/config)
   (konix/tab-size 4)
   (setq ac-sources (append

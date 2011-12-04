@@ -1987,3 +1987,200 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 		  result
 		  )))))
 (defalias 'netrc-parse 'konix/netrc-parse)
+
+(defun konix/ediff-patch-file-internal-for-viewing (patch-buf source-filename
+															  &optional startup-hooks)
+  "Copy of `ediff-patch-file-internal', but do not modify the original file.
+
+Sometimes, I like to make reviews, seeing differences induced by
+patches without really applying them
+
+The ediff-patch-file-internal behavior is :
+
+1. patching the file, generating the orig file file.orig
+
+2. ediff file.orig file
+
+Two problems occur in this scenario :
+
+1. some SCM tools do not allow the files to be edited without being checked out
+and the action of checking out a file may be considerd as a unneeded overhead
+just to see a patch,
+
+2. the file is prefixed with orig and no anymore the original
+extension, them normal-mode won't put it to the correct mode
+
+The behavior I want is :
+
+1. patching the file, outputing to a new file file.new.ext
+
+2. diff the file with the new file
+"
+  (setq source-filename (expand-file-name source-filename))
+  (let* (
+		 (shell-file-name ediff-shell)
+		 (patch-diagnostics (get-buffer-create "*ediff patch diagnostics*"))
+		 ;; ediff-find-file may use a temp file to do the patch
+		 ;; so, we save source-filename and true-source-filename as a var
+		 ;; that initially is source-filename but may be changed to a temp
+		 ;; file for the purpose of patching.
+		 (true-source-filename source-filename)
+		 (target-filename source-filename)
+		 ;; this ensures that the patch process gets patch buffer in the
+		 ;; encoding that Emacs thinks is right for that type of text
+		 (coding-system-for-write
+		  (if (boundp 'buffer-file-coding-system) buffer-file-coding-system))
+		 target-buf buf-to-patch file-name-magic-p
+		 patch-return-code ctl-buf backup-style aux-wind
+		 (konix/ediff-patch-new-filename
+		  (format "%s.new.%s"
+				  (file-name-sans-extension source-filename)
+				  (or (file-name-extension source-filename)
+					  ""
+					  )
+				  )
+		  )
+		 )
+
+    (if (string-match "V" ediff-patch-options)
+		(error
+		 "Ediff doesn't take the -V option in `ediff-patch-options'--sorry"))
+
+    ;; Make a temp file, if source-filename has a magic file handler (or if
+    ;; it is handled via auto-mode-alist and similar magic).
+    ;; Check if there is a buffer visiting source-filename and if they are in
+    ;; sync; arrange for the deletion of temp file.
+    (ediff-find-file 'true-source-filename 'buf-to-patch
+					 'ediff-last-dir-patch 'startup-hooks)
+
+    ;; Check if source file name has triggered black magic, such as file name
+    ;; handlers or auto mode alist, and make a note of it.
+    ;; true-source-filename should be either the original name or a
+    ;; temporary file where we put the after-product of the file handler.
+    (setq file-name-magic-p (not (equal (file-truename true-source-filename)
+										(file-truename source-filename))))
+
+    ;; Checkout orig file, if necessary, so that the patched file
+    ;; could be checked back in.
+    (ediff-maybe-checkout buf-to-patch)
+
+    (ediff-with-current-buffer patch-diagnostics
+      (insert-buffer-substring patch-buf)
+      (message "Applying patch ... ")
+      ;; fix environment for gnu patch, so it won't make numbered extensions
+      (setq backup-style (getenv "VERSION_CONTROL"))
+      (setenv "VERSION_CONTROL" nil)
+      (setq patch-return-code
+			(call-process-region
+			 (point-min) (point-max)
+			 shell-file-name
+			 t   ; delete region (which contains the patch
+			 t   ; insert output (patch diagnostics) in current buffer
+			 nil ; don't redisplay
+			 shell-command-switch   ; usually -c
+			 (format "%s %s %s -o '%s' %s"
+					 ediff-patch-program
+					 ediff-patch-options
+					 ediff-backup-specs
+					 konix/ediff-patch-new-filename
+					 (expand-file-name true-source-filename))
+			 ))
+
+      ;; restore environment for gnu patch
+      (setenv "VERSION_CONTROL" backup-style))
+
+    (message "Applying patch ... done")
+    (message "")
+
+    (switch-to-buffer patch-diagnostics)
+    (sit-for 0) ; synchronize - let the user see diagnostics
+
+    (or (and (ediff-patch-return-code-ok patch-return-code)
+			 (file-exists-p
+			  (concat true-source-filename ediff-backup-extension)))
+		(progn
+		  (with-output-to-temp-buffer ediff-msg-buffer
+			(ediff-with-current-buffer standard-output
+			  (fundamental-mode))
+			(princ (format
+					"Patch program has failed due to a bad patch file,
+it couldn't apply all hunks, OR
+it couldn't create the backup for the file being patched.
+
+The former could be caused by a corrupt patch file or because the %S
+program doesn't understand the format of the patch file in use.
+
+The second problem might be due to an incompatibility among these settings:
+    ediff-patch-program    = %S             ediff-patch-options    = %S
+    ediff-backup-extension = %S             ediff-backup-specs     = %S
+
+See Ediff on-line manual for more details on these variables.
+In particular, check the documentation for `ediff-backup-specs'.
+
+In any of the above cases, Ediff doesn't compare files automatically.
+However, if the patch was applied partially and the backup file was created,
+you can still examine the changes via M-x ediff-files"
+					ediff-patch-program
+					ediff-patch-program
+					ediff-patch-options
+					ediff-backup-extension
+					ediff-backup-specs
+					)))
+		  (beep 1)
+		  (if (setq aux-wind (get-buffer-window ediff-msg-buffer))
+			  (progn
+				(select-window aux-wind)
+				(goto-char (point-max))))
+		  (switch-to-buffer-other-window patch-diagnostics)
+		  (error "Patch appears to have failed")))
+
+    ;; If black magic is involved, apply patch to a temp copy of the
+    ;; file.  Otherwise, apply patch to the orig copy.  If patch is applied
+    ;; to temp copy, we name the result old-name_patched for local files
+    ;; and temp-copy_patched for remote files.  The orig file name isn't
+    ;; changed, and the temp copy of the original is later deleted.
+    ;; Without magic, the original file is renamed (usually into
+    ;; old-name_orig) and the result of patching will have the same name as
+    ;; the original.
+    (if (not file-name-magic-p)
+		;; (ediff-with-current-buffer buf-to-patch
+		;;   (set-visited-file-name
+		;;    (concat source-filename ediff-backup-extension))
+		;;   (set-buffer-modified-p nil))
+		nil
+
+      ;; Black magic in effect.
+      ;; If orig file was remote, put the patched file in the temp directory.
+      ;; If orig file is local, put the patched file in the directory of
+      ;; the orig file.
+      (setq target-filename
+			(concat
+			 (if (ediff-file-remote-p (file-truename source-filename))
+				 true-source-filename
+			   source-filename)
+			 "_patched"))
+
+      (rename-file true-source-filename target-filename t)
+
+      ;; arrange that the temp copy of orig will be deleted
+      (rename-file (concat true-source-filename ediff-backup-extension)
+				   true-source-filename t))
+
+    ;; make orig buffer read-only
+    (setq startup-hooks
+		  (cons 'ediff-set-read-only-in-buf-A startup-hooks))
+
+    ;; set up a buf for the patched file
+    (setq target-buf (find-file-noselect konix/ediff-patch-new-filename))
+
+    (setq ctl-buf
+		  (ediff-buffers-internal
+		   buf-to-patch target-buf nil
+		   startup-hooks 'epatch))
+    (ediff-with-current-buffer ctl-buf
+      (setq ediff-patchbufer patch-buf
+			ediff-patch-diagnostics patch-diagnostics))
+
+    (bury-buffer patch-diagnostics)
+    (message "Type `P', if you need to see patch diagnostics")
+    ctl-buf))

@@ -183,6 +183,10 @@ killed too early."
   :group 'tempbuf :type '(choice (const :tag "No indicator." nil)
 				 string))
 
+(defcustom konix/tempbuf-grace-client-files t
+  "t if wanting to grace client files."
+  )
+
 (or (assq 'tempbuf-mode minor-mode-alist)
     (setq minor-mode-alist
 	  (cons '(tempbuf-mode tempbuf-mode-line-string) minor-mode-alist)))
@@ -276,7 +280,10 @@ value."
     (when (buffer-live-p buffer)
       (if (or buffer-offer-save
 	      (and buffer-file-name (buffer-modified-p))
-	      (get-buffer-process buffer))
+	      (get-buffer-process buffer)
+		  ;; grace it if is is associated with a client
+		  (and konix/tempbuf-grace-client-files (konix/server-buffer-still-has-client-p))
+		  )
 	  (progn
 	    (tempbuf-post-command)
 	    (tempbuf-grace ct))

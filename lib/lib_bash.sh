@@ -323,3 +323,7 @@ konix_assert_last_command () {
 		exit 1
 	fi
 }
+
+pinfo () {
+	echo "# $*" >&2
+}

@@ -312,3 +312,14 @@ popd ( ) {
     cd "${DIR_STACK%%;*}"
     echo "$PWD"
 }
+
+konix_assert_last_command () {
+	local LAST_RES=$?
+	local MSG="$*"
+	if [ ! $LAST_RES -eq 0 ]
+	then
+		echo "$MSG">&2
+		caller
+		exit 1
+	fi
+}

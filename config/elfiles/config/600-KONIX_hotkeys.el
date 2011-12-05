@@ -13,6 +13,7 @@
 ;; ################################################################################
 ;; yank pop to more recent kill
 (define-key global-map (kbd "M-Y") 'konix/yank-pop-more-recent)
+(define-key global-map (kbd "C-M-y") 'icicle-completing-yank)
 
 ;;to move easily between windows with C-M-Arrows
 (global-set-key (kbd "<C-M-left>") 'windmove-left)

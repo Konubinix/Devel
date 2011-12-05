@@ -1238,6 +1238,75 @@ TAGS_FILE_NAMETHE"
 ;; semantic uses it
 (defalias 'push-tag-mark 'konix/push-tags-mark)
 
+(defun konix/tags/find-tags-file (&optional starting_directory)
+  "recursively searches each parent directory for a file named 'TAGS' and returns the
+path to that file or nil if a tags file is not found. Returns nil if it finds nothing.
+Start the search at starting_directory, defaulting to `default-directory'
+mostly INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
+"
+  (unless starting_directory
+	(setq starting_directory default-directory)
+	)
+  (progn
+	(defun find-tags-file-r (path)
+	  "find the tags file from the parent directories"
+	  (let* (
+			 (parent (file-name-directory path))
+			 (possible-tags-file (expand-file-name "TAGS" parent))
+			 )
+		(cond
+		 ;; termination conditions
+		 ((file-exists-p possible-tags-file) (throw 'found-it possible-tags-file))
+		 ((string= "/TAGS" possible-tags-file) (error "no tags file found"))
+		 ;; going on
+		 (t (find-tags-file-r (directory-file-name parent))))))
+
+	(catch 'found-it
+	  (find-tags-file-r starting_directory)
+	  )
+	)
+  )
+
+(defun konix/tags/visit-tags-file ()
+  "calls `konix/find-tags-file' to recursively search up the
+directory tree to find a file named 'TAGS'. It then asks the user
+if he is ok for that file. If not, the serach continues till the
+user likes the result or the search do not find any more
+result. Eventually, it updates the tags list so that the user
+won't be disturbed by previously cached results
+
+INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
+"
+  (interactive)
+  (let (
+		(found_tags_file (konix/tags/find-tags-file))
+		)
+	(while (and found_tags_file
+				(not
+				 (y-or-n-p (format "Found tag file here %s, use it ?" found_tags_file))
+				 )
+				)
+	  (setq found_tags_file
+			(konix/tags/find-tags-file
+			 ;; get the parent directory a/b/TAGS -> a/
+			 (expand-file-name
+			  "../"
+			  (file-name-directory found_tags_file)
+			  )
+			 )
+			)
+	  )
+	(when found_tags_file
+	  (visit-tags-table found_tags_file)
+	  (konix/tags/update-tags-visit)
+	  )
+	)
+  )
+
+;; delay search the TAGS file after open the source file
+(add-hook 'emacs-startup-hook
+		  '(lambda () (jds-set-tags-file-path)))
+
 ;; Ajout de raccourcis dans le mode actuel pour manipuler gud
 (defun konix/gud-hook-keys ()
   "Définition of the local keys of gud"

@@ -51,7 +51,7 @@ def install_emacs():
 (defvar elfiles (expand-file-name "elfiles" (getenv "CONFIG_DIR")) "where I put my emacs files")
 (defvar emacs-config-dir (expand-file-name "config" elfiles) "where I put my emacs custom config files")
 (defvar devel-dir (getenv "DEVEL_DIR") "Where I pu my devel files (the installation path)")
-(setq konix/custom-file (getenv "EMACS_CUSTOM_FILE"))
+(setq custom-file (getenv "EMACS_CUSTOM_FILE"))
 """)
 
     if not os.path.exists(environ["EMACS_CUSTOM_FILE"]):
@@ -60,8 +60,8 @@ def install_emacs():
     replace_file_content(os.path.join(environ["HOME"], ".emacs"),"""(load-file "%(HOME)s/.emacs_var")
 (load-file "%(CONFIG_DIR)s/emacs.el")
 ;; On finit par loader les customs
-(if konix/custom-file
-	(load konix/custom-file)
+(if custom-file
+	(load custom-file)
   (display-warning 'No-custom "No custom file found")
   )
 """ % environ)

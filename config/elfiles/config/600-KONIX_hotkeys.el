@@ -378,6 +378,14 @@
 (define-key 'konix/www/map (kbd "g") 'konix/www/search-in-google)
 (define-key 'konix/www/map (kbd "f") 'konix/www/brows-url-of-file-at-point)
 
+;; ******************************************************************************************
+;; anything
+;; ******************************************************************************************
+(define-prefix-command 'konix/anything/map)
+(define-key 'konix/global-fast-key-map (kbd "a") 'konix/anything/map)
+
+(define-key 'konix/anything/map (kbd "a") 'anything)
+
 ;; ####################################################################################################
 ;; F1-F12 keys
 ;; ####################################################################################################

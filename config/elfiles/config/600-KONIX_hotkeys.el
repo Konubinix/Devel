@@ -225,6 +225,14 @@
 (define-key 'konix/global-fast-key-map (kbd "C-s") 'sort-lines)
 ;; SHELL
 (define-key 'konix/global-fast-key-map "e" 'multi-eshell)
+;; ******************************************************************************************
+;; Occur
+;; ******************************************************************************************
+(define-prefix-command 'konix/occur/map)
+(define-key 'konix/global-fast-key-map (kbd "o") 'konix/occur/map)
+
+(define-key 'konix/occur/map "s" 'konix/occur-symbol-at-point)
+
 ;; ************************************************************
 ;; semantic
 ;; ************************************************************

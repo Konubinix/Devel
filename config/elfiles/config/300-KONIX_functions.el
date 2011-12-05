@@ -2199,3 +2199,12 @@ you can still examine the changes via M-x ediff-files"
     (bury-buffer patch-diagnostics)
     (message "Type `P', if you need to see patch diagnostics")
     ctl-buf))
+
+(defun konix/occur-symbol-at-point (symbol)
+  (interactive
+   (list
+	(thing-at-point 'sexp)
+	)
+   )
+  (occur symbol)
+  )

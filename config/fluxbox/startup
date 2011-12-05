@@ -23,6 +23,7 @@ sleep 4
 {
     killall conky
     wicd-gtk -t &
+	pcmanfm --desktop # nice and simple desktop manager
     conky -d -c ~/.conky.d/conky1 > ~/conky.log 2> ~/conky.err
 } &
 

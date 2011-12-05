@@ -7,9 +7,13 @@ import ConfigParser
 import string
 import re
 import logging
+import socket
+
 logging.basicConfig(level=logging.DEBUG)
 default_config_file = os.path.join(os.path.expanduser("~"),".env_"+os.sys.platform+".conf")
-DEFAULT_CONFIG={'KONIX_PWD' : os.getcwd()}
+DEFAULT_CONFIG={
+    'KONIX_PWD' : os.getcwd()
+    }
 
 def mergeItemsOfSection(items):
     new_items = {}
@@ -85,12 +89,17 @@ def main():
         config = getConfigFromEnvFile(GIVEN_CONFIG_FILE, config)
     else:
         config = getConfigFromEnvFile(default_config_file,config) # get the default config to know the platform
+
         # changing of platform must force a new env to be loaded. Then the env loading is done if
         # - the platforms are differents
         # or
         # - env_done is not set to 1
         logging.debug("the config is for "+config["PLATFORM"]+", the environ says "+os.environ.get("PLATFORM", "nothing"))
         if config["PLATFORM"] != os.environ.get("PLATFORM") or os.environ.get("KONIX_ENV_DONE") != "1":
+            # ####################################################################################################
+            # Hardcoded ones
+            # ####################################################################################################
+            config["HOSTNAME"] = socket.gethostname()
             logging.debug("Parsing the env")
             devel_dir = config["DEVEL_DIR"]
             konix_config = os.path.join(devel_dir,"config")

@@ -44,3 +44,22 @@
 	   (split-string (getenv "KONIX_EMACSLOADPATH") path-separator)
 	   )
 	  )
+;; get the gpg environment variable from the GPG_INFO_FILE_NAME file
+(let (
+	  (gpg_env_file (getenv "GPG_INFO_FILE_NAME"))
+	  )
+  (if (and gpg_env_file (file-exists-p gpg_env_file))
+   (with-temp-buffer
+	 (insert-file-contents-literally gpg_env_file)
+	 (goto-char 0)
+	 (while (re-search-forward "^\\(.+\\)=\\(.+\\)$" nil t)
+	   (setenv (match-string-no-properties 1) (match-string-no-properties 2))
+	   )
+	 )
+   (display-warning
+	'loading-env
+	(format "%s cannot be loaded, gpg env not initialized"
+			gpg_env_file)
+	)
+   )
+ )

@@ -494,6 +494,7 @@
 (define-key 'konix/org-pomodoro-map "r" 'konix/org-pomodoro-reset-count)
 (define-key 'konix/org-pomodoro-map "s" 'konix/org-pomodoro-start)
 (define-key 'konix/org-pomodoro-map "t" 'konix/org-pomodoro-insert-table)
+(define-key 'konix/org-pomodoro-map "T" 'konix/org-pomodoro-insert-week-planning-table)
 (define-key 'konix/org-pomodoro-map "C" 'konix/org-pomodoro-convert-time-before-point-into-pomodoro)
 
 ;; ####################################################################################################

@@ -35,6 +35,24 @@
 	)
   )
 
+(defun konix/org-pomodoro-insert-week-planning-table ()
+  (interactive)
+  (save-excursion
+	(newline-and-indent)
+	(insert "|---+------+------+-------+-----|
+| _ | Task | PREV | SPENT | RES |
+| # |      |    0 |     0 |   0 |
+|---+------+------+-------+-----|
+| # |      |      |       |   0 |
+| # |      |      |       |   0 |
+|---+------+------+-------+-----|")
+	(org-table-align)
+	(newline-and-indent)
+	(insert "#+TBLFM: $PREV=vsum(@+1..@3)::$SPENT=vsum(@+1..@3)::$RES=vsum(@+1..@3)::$5=$3-$4")
+	(newline-and-indent)
+	)
+  )
+
 (defun konix/org-pomodoro-reset-count ()
   (interactive)
   (setq konix/org-pomodoro-set-count 0)

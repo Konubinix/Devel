@@ -1267,6 +1267,13 @@
   (local-set-key (kbd "<C-right>") 'forward-word)
   (konix/flyspell-mode t)
   (visual-line-mode t)
+  (setq ac-sources
+		'(
+		  ac-source-dictionary
+		  ac-source-words-in-same-mode-buffers
+		  )
+		)
+  (auto-complete-mode 1)
   )
 (add-hook 'wikipedia-mode-hook 'konix/wikipedia-mode-hook)
 

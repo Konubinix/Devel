@@ -5,6 +5,9 @@
 ;; configuration of a mode uses a hook over the mode or is too big to be here,
 ;; it is then put into the mode file or into a dedicated file
 ;; ####################################################################################################
+;; ******************************************************************************************
+;; bs custo
+;; ******************************************************************************************
 (require 'bs)
 (konix/push-or-replace-in-alist 'bs-configurations "same-mode-files"
 								nil 'konix/buffer-same-mode-p
@@ -73,7 +76,11 @@
 	(write-file diary-file)
 	)
   )
+(add-hook 'list-diary-entries-hook 'diary-sort-entries t)
 
+;; ******************************************************************************************
+;; Auto install custo
+;; ******************************************************************************************
 (setq-default auto-install-directory elfiles)
 ;; ******************************************************************************************
 ;; Find file

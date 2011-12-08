@@ -2278,3 +2278,102 @@ you can still examine the changes via M-x ediff-files"
    )
   (occur symbol)
   )
+
+;; ####################################################################################################
+;; icalendar
+;; ####################################################################################################
+(defun konix/icalendar-export-region (min max ical-filename)
+  "Export region in diary file to iCalendar format.
+All diary entries in the region from MIN to MAX in the current buffer are
+converted to iCalendar format.  The result is appended to the file
+ICAL-FILENAME.
+This function attempts to return t if something goes wrong.  In this
+case an error string which describes all the errors and problems is
+written into the buffer `*icalendar-errors*'."
+  (interactive "r
+FExport diary data into iCalendar file: ")
+  (let ((result "")
+        (start 0)
+        (entry-main "")
+        (entry-rest "")
+        (header "")
+        (contents-n-summary)
+        (contents)
+        (found-error nil)
+        (nonmarker (concat "^" (regexp-quote diary-nonmarking-symbol)
+                           "?"))
+        (other-elements nil))
+    ;; prepare buffer with error messages
+    (save-current-buffer
+      (set-buffer (get-buffer-create "*icalendar-errors*"))
+      (erase-buffer))
+
+    ;; here we go
+    (save-excursion
+      (goto-char min)
+      (while (re-search-forward
+              "^\\([^ \t\n].+\\)\\(\\(\n[ \t].*\\)*\\)" max t)
+        (setq entry-main (match-string 1))
+        (if (match-beginning 2)
+            (setq entry-rest (match-string 2))
+          (setq entry-rest ""))
+        (setq header (format "\nBEGIN:VEVENT\nUID:emacs%d%d%d"
+                             (car (current-time))
+                             (cadr (current-time))
+                             (car (cddr (current-time)))))
+        (condition-case error-val
+            (progn
+              (setq contents-n-summary
+                    (icalendar--convert-to-ical nonmarker entry-main))
+              (setq other-elements (icalendar--parse-summary-and-rest
+                                    (concat entry-main entry-rest)))
+              (setq contents (concat (car contents-n-summary)
+                                     "\nSUMMARY:" (cadr contents-n-summary)))
+              (let ((cla (cdr (assoc 'cla other-elements)))
+                    (des (cdr (assoc 'des other-elements)))
+                    (loc (cdr (assoc 'loc other-elements)))
+                    (org (cdr (assoc 'org other-elements)))
+                    (sta (cdr (assoc 'sta other-elements)))
+                    (sum (cdr (assoc 'sum other-elements)))
+                    (uid (cdr (assoc 'uid other-elements))))
+                (if cla
+                    (setq contents (concat contents "\nCLASS:" cla)))
+                (if des
+                    (setq contents (concat contents "\nDESCRIPTION:" des)))
+                (if loc
+                    (setq contents (concat contents "\nLOCATION:" loc)))
+                (if org
+                    (setq contents (concat contents "\nORGANIZER:" org)))
+                (if sta
+                    (setq contents (concat contents "\nSTATUS:" sta)))
+                ;;(if sum
+                ;;    (setq contents (concat contents "\nSUMMARY:" sum)))
+                (if uid
+                    (setq contents (concat contents "\nUID:" uid))))
+              (setq result (concat result header contents "\nEND:VEVENT")))
+          ;; handle errors
+          (error
+           (setq found-error t)
+           (save-current-buffer
+             (set-buffer (get-buffer-create "*icalendar-errors*"))
+             (insert (format "Error in line %d -- %s: `%s'\n"
+                             (count-lines (point-min) (point))
+                             (cadr error-val)
+                             entry-main))))))
+
+      ;; we're done, insert everything into the file
+      (save-current-buffer
+        (let ((coding-system-for-write 'utf-8))
+          (set-buffer (find-file ical-filename))
+          (goto-char (point-max))
+          (insert "BEGIN:VCALENDAR")
+          (insert "\nPRODID:-//Emacs//NONSGML icalendar.el//EN")
+          (insert "\nVERSION:2.0")
+          (insert result)
+          (insert "\nEND:VCALENDAR\n")
+          ;; save the diary file
+          (save-buffer)
+          (unless found-error
+            (bury-buffer)))))
+    found-error))
+(defalias 'icalendar-export-region 'konix/icalendar-export-region)

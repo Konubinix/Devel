@@ -1,6 +1,15 @@
 ;; ################################################################################
 ;; General use function
 ;; ################################################################################
+(defun konix/buffer-same-mode-p (buffer)
+  (equal
+   (with-current-buffer buffer
+	 major-mode
+	 )
+   major-mode
+   )
+  )
+
 (defun konix/server-buffer-still-has-client-p ()
   "Function extracted from `server-kill-buffer-query-function' to know of the
 current buffer still has clients"

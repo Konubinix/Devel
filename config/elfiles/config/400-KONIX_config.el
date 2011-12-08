@@ -5,6 +5,13 @@
 ;; configuration of a mode uses a hook over the mode or is too big to be here,
 ;; it is then put into the mode file or into a dedicated file
 ;; ####################################################################################################
+(require 'bs)
+(konix/push-or-replace-in-alist 'bs-configurations "same-mode-files"
+								nil 'konix/buffer-same-mode-p
+								".*" nil
+								'bs-sort-buffer-interns-are-last
+								)
+
 ;; ******************************************************************************************
 ;; Rainbow delimiters : Highlight nested parens, brackets, braces a different color
 ;; at each depth

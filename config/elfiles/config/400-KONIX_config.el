@@ -64,11 +64,13 @@
 ;; 			  )
 
 ;; ******************************************************************************************
-;; If the diary file does not exists, touch it
+;; Set the diary file and touch it if does not exist
 ;; ******************************************************************************************
-(unless (file-exists-p "~/diary")
+(setq-default diary-file (expand-file-name "diary" perso-dir))
+(unless (file-exists-p diary-file)
   (with-temp-buffer
-	(write-file "~/diary")
+	(insert "My Diary")
+	(write-file diary-file)
 	)
   )
 

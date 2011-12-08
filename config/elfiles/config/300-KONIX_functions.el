@@ -1303,10 +1303,6 @@ INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
 	)
   )
 
-;; delay search the TAGS file after open the source file
-(add-hook 'emacs-startup-hook
-		  '(lambda () (jds-set-tags-file-path)))
-
 ;; Ajout de raccourcis dans le mode actuel pour manipuler gud
 (defun konix/gud-hook-keys ()
   "Définition of the local keys of gud"

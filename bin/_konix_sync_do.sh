@@ -117,12 +117,13 @@ set_sync_command () {
 	else
 		TYPE_OF_SYNC="git-sync"
 	fi
+	set -x
 	case $TYPE_OF_SYNC in
 		rsync*)
-			SYNC_COMMMAND="rsync ${RSYNC_ARGS}"
+			SYNC_COMMAND="rsync ${RSYNC_ARGS}"
 			;;
 		git-sync*)
-			SYNC_COMMMAND="git-sync.sh"
+			SYNC_COMMAND="git-sync.sh"
 			;;
 		unison*)
 			SYNC_COMMAND="unison"
@@ -134,7 +135,7 @@ set_sync_command () {
 			SYNC_COMMAND="git-sync.sh"
 			;;
 	esac
-	SYNC_COMMMAND="$SYNC_COMMMAND \"$FROM\" \"$TO\""
+	SYNC_COMMAND="$SYNC_COMMAND \"$FROM\" \"$TO\""
 }
 
 IFS=$'\n'
@@ -162,10 +163,10 @@ do
 	if check_may_sync "$KONIX_SYNC_PWD" "${main_dir}"
 	then
 		set_sync_command "$FROM" "$TO"
-		# this will set the SYNC_COMMMAND env variable
+		# this will set the SYNC_COMMAND env variable
 		echo "evaluating sync command"
-		echo "$SYNC_COMMMAND"
-		eval $SYNC_COMMMAND
+		echo "$SYNC_COMMAND"
+		eval $SYNC_COMMAND
 		set_last_pusher "${main_dir}"
 	fi
 done

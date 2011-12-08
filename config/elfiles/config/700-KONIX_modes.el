@@ -1545,3 +1545,73 @@
   )
 (add-hook 'Man-mode-hook
 		  'konix/Man-mode-hook)
+;; ####################################################################################################
+;; diary
+;; ####################################################################################################
+(defvar konix/diary-shared (expand-file-name "diary_shared" perso-dir))
+(defvar konix/diary-anniversary (expand-file-name "diary_anniversary" perso-dir))
+
+(setq-default diary-file (expand-file-name "diary" perso-dir))
+(unless (file-exists-p diary-file)
+  (with-temp-buffer
+	(insert "My Diary")
+	(write-file diary-file)
+	)
+  )
+(add-hook 'list-diary-entries-hook 'diary-sort-entries t)
+(add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
+(add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
+
+(defun konix/diary-insert-entry (arg &optional event)
+  "Insert a diary entry for the date indicated by point.
+Prefix argument ARG makes the entry nonmarking."
+  (interactive
+   (list current-prefix-arg last-nonmenu-event))
+  (diary-make-entry (calendar-date-string (calendar-cursor-to-date t event) t t)
+                    arg konix/diary-shared)
+  )
+
+(defun konix/diary-insert-anniversary-entry (arg)
+  "Insert an anniversary diary entry for the date given by point.
+Prefix argument ARG makes the entry nonmarking."
+  (interactive "P")
+  (let ((calendar-date-display-form (diary-date-display-form)))
+    (diary-make-entry
+     (format "%s(diary-anniversary %s)"
+             diary-sexp-entry-symbol
+             (calendar-date-string (calendar-cursor-to-date t) nil t))
+     arg
+	 konix/diary-anniversary
+	 )))
+
+(defun konix/diary-ics-export ()
+  (interactive)
+  (save-window-excursion
+	(icalendar-export-file konix/diary-shared (format "%s.ics"
+													  konix/diary-shared))
+	)
+  )
+(defun konix/diary-ics-import ()
+  (interactive)
+  (save-window-excursion
+	(icalendar-import-file (format "%s.ics"
+								   konix/diary-shared)
+						   konix/diary-shared
+						   )
+	)
+  )
+
+(defun konix/diary-goto-shared ()
+  (interactive)
+  (switch-to-buffer-other-window (find-file-noselect konix/diary-shared))
+  )
+
+(eval-after-load "calendar"
+  '(progn
+	 (define-key calendar-mode-map "id" 'konix/diary-insert-entry)
+	 (define-key calendar-mode-map "ia" 'konix/diary-insert-anniversary-entry)
+	 (define-key calendar-mode-map "ie" 'konix/diary-ics-export)
+	 (define-key calendar-mode-map "ii" 'konix/diary-ics-import)
+	 (define-key calendar-mode-map "gs" 'konix/diary-goto-shared)
+	 )
+  )

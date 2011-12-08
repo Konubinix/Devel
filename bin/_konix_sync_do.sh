@@ -127,6 +127,9 @@ set_sync_command () {
 		unison*)
 			SYNC_COMMAND="unison"
 			;;
+		git-priv*)
+			SYNC_COMMAND="git-priv-sync.sh"
+			;;
 		*)
 			SYNC_COMMAND="git-sync.sh"
 			;;

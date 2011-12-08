@@ -2296,6 +2296,7 @@ FExport diary data into iCalendar file: ")
         (start 0)
         (entry-main "")
         (entry-rest "")
+		(headerUID "")
         (header "")
         (contents-n-summary)
         (contents)
@@ -2317,10 +2318,20 @@ FExport diary data into iCalendar file: ")
         (if (match-beginning 2)
             (setq entry-rest (match-string 2))
           (setq entry-rest ""))
-        (setq header (format "\nBEGIN:VEVENT\nUID:emacs%d%d%d"
-                             (car (current-time))
-                             (cadr (current-time))
-                             (car (cddr (current-time)))))
+		;; get the stored uid if it is defined, else, generate a new one
+		(setq headerUID
+			  (if (string-match "(UID: \\([^)]+\\))" entry-main)
+				  (match-string-no-properties 1 entry-main)
+				(format "emacs%d%d%d"
+						(car (current-time))
+						(cadr (current-time))
+						(car (cddr (current-time)))
+						)
+				  )
+			  )
+        (setq header (format "\nBEGIN:VEVENT\nUID:%s"
+                             headerUID
+                             ))
         (condition-case error-val
             (progn
               (setq contents-n-summary

@@ -67,20 +67,6 @@
 ;; 			  )
 
 ;; ******************************************************************************************
-;; Set the diary file and touch it if does not exist
-;; ******************************************************************************************
-(setq-default diary-file (expand-file-name "diary" perso-dir))
-(unless (file-exists-p diary-file)
-  (with-temp-buffer
-	(insert "My Diary")
-	(write-file diary-file)
-	)
-  )
-(add-hook 'list-diary-entries-hook 'diary-sort-entries t)
-(add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
-(add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
-
-;; ******************************************************************************************
 ;; Auto install custo
 ;; ******************************************************************************************
 (setq-default auto-install-directory elfiles)

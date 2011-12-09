@@ -10,7 +10,6 @@
 				("w" "What is important ?"
 				 (
 				  (todo "WAIT")
-				  (tags "blocked")
 				  )
 				 )
 				("W" todo "WAIT" nil)

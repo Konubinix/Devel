@@ -1351,6 +1351,7 @@
 				("inbox" . "tag:inbox AND -tag:deleted")
 				("unread" . "tag:unread AND NOT tag:rss")
 				("unread rss" . "tag:rss AND tag:unread")
+				("TOReadList" . "tag:TOReadList")
 				("flagged" . "tag:flagged")
 				)
 			  )

@@ -237,13 +237,17 @@ After mode activation, `tempbuf-mode-hook' is run."
   "Extend the life expectancy of the current buffer.
 
 The optional argument CT specifies a pre-calculated `current-time'
-value."
+value.
+
+If DT is the time since the activation of tempbuf mode, the timeout is set to
+`tempbuf-life-extension-ratio' * DT + `tempbuf-minimum-timeout'
+"
   (setq tempbuf-timeout
 	(+ tempbuf-minimum-timeout
 	   (* tempbuf-life-extension-ratio
 	      (tempbuf-time-diff
 	       (or ct (current-time))
-	       tempbuf-activation-time)))))
+	       tempbuf-activation-time) ))))
 
 (defun tempbuf-check-buffers ()
   "Check all the buffers with tempbuf mode turned on.

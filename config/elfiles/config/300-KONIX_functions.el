@@ -1212,6 +1212,11 @@ TAGS_FILE_NAMETHE"
   (message "%s" tags-table-list)
   )
 
+(defun konix/tags/goto-dir ()
+  (interactive)
+  (find-file (file-name-directory (first tags-table-list)))
+  )
+
 (defun konix/tags/find-references (elem &optional tags)
   (interactive
    (list (konix/_get-string "Elem : "))

@@ -349,6 +349,7 @@
 (define-key 'konix/tags/map (kbd "I") 'konix/tags/init)
 (define-key 'konix/tags/map (kbd "d") 'konix/tags/add-tags-dirs-current-head)
 (define-key 'konix/tags/map (kbd "R") 'konix/tags/find-references)
+(define-key 'konix/tags/map (kbd "g") 'konix/tags/goto-dir)
 (define-key 'konix/tags/map (kbd "c") 'konix/tags/create)
 (define-key 'konix/tags/map (kbd "v") 'konix/tags/visit-tags-file)
 (define-key 'konix/tags/map (kbd "r") 'tags-reset-tags-tables)

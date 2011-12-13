@@ -1,11 +1,6 @@
 #!/bin/bash
 
 . "${LIB_DIR}/lib_bash.sh"
-. bash_optparse << EOF
-DESCRIPTION_BEGIN
-  Bi directional synchronization with priv remote
-DESCRIPTION_END
-EOF
 
 pinfo "Freezing current repo"
 git-freeze.sh

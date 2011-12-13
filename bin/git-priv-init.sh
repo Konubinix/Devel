@@ -1,22 +1,8 @@
 #!/bin/bash
 
 . "${LIB_DIR}/lib_bash.sh"
-. bash_optparse << EOF
-DESCRIPTION_BEGIN
-  A simple script that init the private repo
-DESCRIPTION_END
 
-ARGUMENTS_BEGIN
-
-# VARIABLE   IS         ARG
-# NAME       MANDATORY  NAME
-
-  remote_repo  TRUE      "Remote repository"
-
-ARGUMENTS_END
-
-EOF
-
+remote_repo="$1"
 pinfo () {
 	echo "$*" >&2
 }

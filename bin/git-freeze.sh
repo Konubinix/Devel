@@ -14,7 +14,12 @@ done
 print "# Adding untracked files"
 git ls-files -o | while read FILE
 do
-	print "Adding $FILE"
-	git add "$FILE"
+	if [ -s "$FILE" ]
+	then
+		print "Adding $FILE"
+		git add "$FILE"
+	else
+		print "Skipping the addition of $FILE because it is empty"
+	fi
 done
 git commit -m "Freezing repo"

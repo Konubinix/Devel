@@ -158,6 +158,7 @@
 				 )
 				)
 			  )
+(setq-default org-icalendar-store-UID t)
 (setq-default org-timer-default-timer 25)
 (setq-default org-tag-persistent-alist nil)
 (when (and (getenv "PERSO_DIR")

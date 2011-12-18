@@ -1,6 +1,21 @@
 ;; ################################################################################
 ;; General use function
 ;; ################################################################################
+(defun konix/delete-paren-at-point ()
+  (interactive)
+  (or (looking-at "(") (error "Point must be just before a ( character"))
+  (save-excursion
+	(let (
+		  (beg (point))
+		  )
+	  (forward-list)
+	  (delete-backward-char 1)
+	  (goto-char beg)
+	  (delete-char 1)
+	  )
+	)
+  )
+
 (defun konix/buffer-same-mode-p (buffer)
   (equal
    (with-current-buffer buffer

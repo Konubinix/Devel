@@ -26,6 +26,7 @@
 (global-set-key (kbd "<C-M-S-down>") 'konix/windmove-bring-buffer-down)
 ;; wrap sexp at point
 (global-set-key (kbd "C-M-m") 'konix/wrap-sexp-at-point)
+(global-set-key (kbd "C-M-S-m") 'konix/delete-paren-at-point)
 ;; Other frame
 (global-set-key (kbd "<C-M-tab>") 'other-frame)
 ;; Move buffer to other frame

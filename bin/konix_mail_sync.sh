@@ -9,7 +9,7 @@ else
 fi
 
 # make notmuch db consistent (earlier removed mail files etc)
-notmuch new
+notmuch new --verbose
 # sync maildir flags up with notmuch
 notmuchsync -d -s --all --sync-deleted-tag
 

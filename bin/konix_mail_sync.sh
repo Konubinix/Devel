@@ -1,4 +1,12 @@
 #!/bin/bash
+LOCK_FILE="/var/lock/$(basename "$0").lock"
+if [ -f "$LOCK_FILE" ]
+then
+	echo "Already a $0 running"
+	exit 1
+else
+	touch "$LOCK_FILE"
+fi
 
 # make notmuch db consistent (earlier removed mail files etc)
 notmuch new
@@ -29,3 +37,5 @@ mb2md -s "/var/spool/mail/${LOGNAME}" -d "${HOME}/Mail/mail.spool_${LOGNAME}"
 
 # this is useless since 0.5 -> notmuchsync -d -r --all --sync-deleted-tag
 konix_mail_init_tags.sh
+
+rm "$LOCK_FILE"

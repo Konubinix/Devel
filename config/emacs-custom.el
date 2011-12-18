@@ -1,5 +1,5 @@
-;; Default font, jolie!!
-(set-default-font "-adobe-courier-medium-r-normal--15-*-100-100-m-90-iso8859-1" t)
+;; Default font, simple and nice!!
+(set-default-font "Monospace 10")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

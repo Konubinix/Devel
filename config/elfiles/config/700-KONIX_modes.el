@@ -1455,6 +1455,31 @@
   (define-key notmuch-show-mode-map key function)
   (define-key notmuch-search-mode-map key function)
   )
+(defun konix/notmuch-show-remove-tag-and-next (tag show-next)
+  "Remove the tag from the current set of messages and go to next.
+inspired from `notmuch-show-archive-thread-internal'"
+  (goto-char (point-min))
+  (loop do (notmuch-show-remove-tag tag)
+	until (not (notmuch-show-goto-message-next)))
+  ;; Move to the next item in the search results, if any.
+  (let ((parent-buffer notmuch-show-parent-buffer))
+    (notmuch-kill-this-buffer)
+    (if parent-buffer
+	(progn
+	  (switch-to-buffer parent-buffer)
+	  (forward-line)
+	  (if show-next
+	      (notmuch-search-show-thread))))))
+
+(defun konix/notmuch-show-unflag-and-next ()
+  (interactive)
+  (konix/notmuch-show-remove-tag-and-next "flagged" t)
+  )
+(defun konix/notmuch-show-read-delete-and-next ()
+  (interactive)
+  (notmuch-show-add-tag "deleted")
+  (konix/notmuch-show-remove-tag-and-next "TOReadList" t)
+  )
 (eval-after-load "notmuch"
   '(progn
 	 (require 'notmuch-address)
@@ -1466,8 +1491,11 @@
 	 (konix/notmuch-define-key-search-show "u" 'konix/notmuch-toggle-unread-tag)
 	 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
 	 (define-key notmuch-show-mode-map (kbd "M") 'konix/notmuch-show-open-in-external-browser)
+	 (define-key notmuch-show-mode-map (kbd "F") 'konix/notmuch-show-unflag-and-next)
+	 (define-key notmuch-show-mode-map (kbd "U") 'konix/notmuch-show-read-delete-and-next)
 	 )
   )
+
 ;; ####################################################################################################
 ;; Message mode
 ;; ####################################################################################################

@@ -32,8 +32,10 @@ fi
 
 #get messages from the spool, but after notmuch new because I don't want to be
 #informed the cron jobs that did $0 ended...
-mkdir -p "${HOME}/Mail/mail.spool_${LOGNAME}"
-mb2md -s "/var/spool/mail/${LOGNAME}" -d "${HOME}/Mail/mail.spool_${LOGNAME}"
+# commented the things below because I don't like the cron messages that pollute
+#my maildirs
+# mkdir -p "${HOME}/Mail/mail.spool_${LOGNAME}"
+# mb2md -s "/var/spool/mail/${LOGNAME}" -d "${HOME}/Mail/mail.spool_${LOGNAME}"
 
 # this is useless since 0.5 -> notmuchsync -d -r --all --sync-deleted-tag
 konix_mail_init_tags.sh

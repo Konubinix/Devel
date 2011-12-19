@@ -1487,7 +1487,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 (konix/notmuch-define-key-search-show (kbd "<deletechar>") 'konix/notmuch-toggle-deleted-tag)
 	 (konix/notmuch-define-key-search-show "S" 'konix/notmuch-toggle-spam-tag)
 	 (konix/notmuch-define-key-search-show "i" 'konix/notmuch-toggle-inbox-tag)
-	 (konix/notmuch-define-key-search-show "F" 'konix/notmuch-toggle-flagged-tag)
+	 (konix/notmuch-define-key-search-show (kbd "C-f") 'konix/notmuch-toggle-flagged-tag)
 	 (konix/notmuch-define-key-search-show "u" 'konix/notmuch-toggle-unread-tag)
 	 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
 	 (define-key notmuch-show-mode-map (kbd "M") 'konix/notmuch-show-open-in-external-browser)

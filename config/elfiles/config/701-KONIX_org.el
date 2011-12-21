@@ -10,6 +10,7 @@
 				("w" "What is important ?"
 				 (
 				  (todo "WAIT")
+				  (todo)
 				  )
 				 )
 				("W" todo "WAIT" nil)

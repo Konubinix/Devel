@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import os
+import konix_gpg
 import sys
 import re
 import subprocess
@@ -53,16 +54,7 @@ def new_gpg_agent(gpg_env_file):
     else:
         return True
 
-def get_default_recipient_from_gpgdirrc():
-    with open(os.path.expanduser("~/.gpgdirrc")) as f:
-        for line in f.readlines():
-            m = re.match("^use_key (.+)$",line)
-            if m:
-                global DEFAULT_RECIPIENT
-                DEFAULT_RECIPIENT=m.group(1)
-                break
-
-get_default_recipient_from_gpgdirrc()
+DEFAULT_RECIPIENT=konix_gpg.get_default_key()
 
 if os.path.exists(gpg_env_file):
     load_gpg_env_file()

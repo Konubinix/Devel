@@ -3,10 +3,6 @@
 
 import re
 import os
+import konix_gpg
 
-gpgdirrc_name = os.path.expanduser("~/.gpgdirrc")
-gpgdirrc = open(gpgdirrc_name, "r")
-for line in gpgdirrc.readlines():
-        match = re.match("^use_key +(.+)$", line)
-        if match:
-                print match.group(1)
+print konix_gpg.get_default_key()

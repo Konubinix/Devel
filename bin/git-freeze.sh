@@ -22,4 +22,4 @@ do
 		print "Skipping the addition of $FILE because it is empty"
 	fi
 done
-git commit -m "Freezing repo"
+git commit -m "Freezing of repo by $LOGNAME at $HOSTNAME"

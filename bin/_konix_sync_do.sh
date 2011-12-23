@@ -117,7 +117,6 @@ set_sync_command () {
 	else
 		TYPE_OF_SYNC="git-sync"
 	fi
-	set -x
 	case $TYPE_OF_SYNC in
 		rsync*)
 			SYNC_COMMAND="rsync ${RSYNC_ARGS}"

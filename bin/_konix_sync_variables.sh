@@ -30,7 +30,7 @@ then
 	    RSYNC_INCLUDE_ARGS=""
 	fi
     fi
-    RSYNC_ARGS="-rucz --delete --progress --exclude ${KONIX_SYNC_DIR_FILE} --exclude ${KONIX_SYNC_MAIN_DIR_FILE} --exclude ${KONIX_SYNC_EXCLUDE_FILE} $FILES_ARG $RSYNC_INCLUDE_ARGS $RSYNC_EXCLUDE_ARGS"
+    RSYNC_ARGS="-rucz --delete --progress --exclude ${KONIX_SYNC_DIR_FILE} --exclude ${KONIX_SYNC_SYNCER} --exclude ${KONIX_SYNC_MAIN_DIR_FILE} --exclude ${KONIX_SYNC_EXCLUDE_FILE} $FILES_ARG $RSYNC_INCLUDE_ARGS $RSYNC_EXCLUDE_ARGS"
     KONIX_SYNC_PWD="$(konix_add_trailing_slash.py "$(pwd)")"
     KONIX_SYNC_ALREADY_SOURCED=1
 fi

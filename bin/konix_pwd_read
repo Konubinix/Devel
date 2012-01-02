@@ -43,6 +43,9 @@ if mdp_file_name is None:
 print "Looking for mdp file : "+mdp_file_name
 
 mdp_file_name_abs = os.path.join(MDP_DIR, mdp_file_name)
+# ####################################################################################################
+# Decrypt the mdp file
+# ####################################################################################################
 if mdp_file_name_abs.endswith(".gpg"):
     print "Decrypt file"
     mdp_file = tempfile.TemporaryFile()
@@ -50,16 +53,20 @@ if mdp_file_name_abs.endswith(".gpg"):
     p.wait()
 else:
     mdp_file = open(mdp_file_name_abs,"r")
+# ####################################################################################################
+# Get the login and mdp info out of it
+# ####################################################################################################
 mdp_file.seek(0)
 for line in mdp_file.readlines():
     login_match = re.match("^[Ll][Oo][Gg][Ii][Nn] *: *(.+)$",line)
     if login_match:
         print "Login :",login_match.group(1)
-        match = re.match("^[Mm][dD][pP] *: *(.+)$", line)
-        if match:
-            mdp = match.group(1)
-            p = subprocess.Popen(["konix_copy_to_clipboard", "Password"],stdin=subprocess.PIPE)
-            p.stdin.write(mdp)
-            p.stdin.close()
-            break
+        continue
+    mdp_match = re.match("^[Mm][dD][pP] *: *(.+)$", line)
+    if mdp_match:
+        mdp = mdp_match.group(1)
+        p = subprocess.Popen(["konix_copy_to_clipboard", "Password"],stdin=subprocess.PIPE)
+        p.stdin.write(mdp)
+        p.stdin.close()
+        break
 mdp_file.close()

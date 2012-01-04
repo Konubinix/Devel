@@ -1661,6 +1661,16 @@ don't change the value of the default browser"
   (browse-url-of-file (expand-file-name file))
   )
 
+(defun konix/www/browse-link-at-point (link)
+  "Browses the link at point."
+  (interactive
+   (list
+	(konix/_get-url "browse")
+	)
+   )
+  (konix/www/browse-url link)
+  )
+
 ;; ####################################################################################################
 ;; Face manipulation
 ;; ####################################################################################################
@@ -2363,7 +2373,7 @@ FExport diary data into iCalendar file: ")
 						(cadr (current-time))
 						(car (cddr (current-time)))
 						)
-				  )
+				)
 			  )
         (setq header (format "\nBEGIN:VEVENT\nUID:%s"
                              headerUID

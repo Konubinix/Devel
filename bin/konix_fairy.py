@@ -16,9 +16,18 @@ if __name__ == '__main__':
                           default=False,
                           action="store_true"
                           )
+        parser.add_option("-n", "--no-apropos",
+                          dest="no_apropos",
+                          help="Remove the automatic .* put before and after the request",
+                          default=False,
+                          action="store_true"
+                          )
         (options, args) = parser.parse_args()
         ALL=options.all
-
+        NO_APROPOS=options.no_apropos
+        # set the args for apropos matching
+        if not NO_APROPOS:
+            args = [".*"+arg+".*" for arg in args]
         files = get_files(args, ALL)
         for fil in files:
                 print fil

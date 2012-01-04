@@ -304,6 +304,19 @@ current buffer still has clients"
 				   )
   )
 
+(defun konix/_get-url (&optional prompt)
+  (completing-read (concat "Get url "(when prompt prompt)": ")
+				   nil
+				   nil
+				   nil
+				   nil
+				   nil
+				   (format "%s"
+						   (thing-at-point 'url)
+						   )
+				   )
+  )
+
 (defun konix/narrow-next-paragraph (&optional previous)
   (interactive "P")
   (widen)

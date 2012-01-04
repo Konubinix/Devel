@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ${HOME}/init_bin/konix_import_env.sh .
+source ${HOME}/init_bin/konix_init_lib.sh .
 import_env t
 
 export DISPLAY=:0.0

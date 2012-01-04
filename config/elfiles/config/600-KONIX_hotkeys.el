@@ -453,6 +453,7 @@
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
 (define-key 'konix/org-global-map "o" 'org-clock-out)
 (define-key 'konix/org-global-map "c" 'org-capture)
+(define-key 'konix/org-global-map "n" 'konix/org-goto-notes)
 (define-key 'konix/org-global-map "x" 'konix/org-link-toggle-cross)
 (define-key 'konix/org-global-map (kbd "<up>") 'org-mark-ring-push)
 (define-key 'konix/org-global-map (kbd "<left>") 'org-mark-ring-goto)

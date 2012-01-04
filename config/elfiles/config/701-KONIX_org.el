@@ -204,6 +204,11 @@
   (find-file (expand-file-name "todo.org" org-directory))
   )
 
+(defun konix/org-goto-notes ()
+  (interactive)
+  (find-file (expand-file-name "notes.org" org-directory))
+  )
+
 (defun konix/org-add-note ()
   (interactive)
   (save-window-excursion

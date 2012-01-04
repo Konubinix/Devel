@@ -144,6 +144,9 @@
 "
 				 :kill-buffer
 				 )
+				("n" "Note" entry (file (expand-file-name "notes.org" org-directory)) "* %?"
+				 :kill-buffer
+				 )
 				("B" "Bookmark (use with org-protocol)" entry (file (expand-file-name "bookmarks.org" org-directory))
 				 "* %:description
    %:link

@@ -166,14 +166,6 @@ current buffer still has clients"
   (message (shell-command-to-string (format "chmod +x \"%s\"" file)))
   )
 
-(defun konix/browse-url (URL)
-  (interactive "sUrl : ")
-  (if current-prefix-arg
-	  (w3m-browse-url URL)
-	(browse-url URL)
-	)
-  )
-
 (defun konix/make-directories (directory-list)
   (mapc
    '(lambda(elt)
@@ -1654,7 +1646,7 @@ don't change the value of the default browser"
 	(konix/_get-string "Google search")
 	)
    )
-  (konix/browse-url (format "http://www.google.com/search?q=%s"
+  (konix/www/browse-url (format "http://www.google.com/search?q=%s"
 					  (replace-regexp-in-string " " "+" string)
 					  )
 			  )

@@ -21,7 +21,7 @@ PYTHON_PATH="$(cd "${HOME}/init_bin" && ./konix_dirname.py "$PYTHON_BIN")"
 export PATH="$PYTHON_PATH${PATH_SEPARATOR}$PATH"
 # now, I am sure the python path is in first position before running the import env
 # Import env variables
-source "${HOME}/init_bin/konix_import_env.sh"
+source "${HOME}/init_bin/konix_init_lib.sh"
 # importing custom environnement variables
 import_env
 """

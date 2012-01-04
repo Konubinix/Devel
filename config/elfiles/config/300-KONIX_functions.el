@@ -1624,13 +1624,24 @@ set terminal pop;\
 ;; ####################################################################################################
 ;; WEB search
 ;; ####################################################################################################
+(defun konix/www/browse-url (url &rest args)
+  "Browse the url. With prefix argument, forces w3m. Else, uses the default method."
+  (let (
+		(browse-url-browser-function (if current-prefix-arg 'w3m-browse-url browse-url-browser-function))
+		)
+	(browse-url url args)
+	)
+  )
+
 (defun konix/www/search-in-google (string)
+  "Search the string at point in google. If prefix arg is given, use w3m, else
+don't change the value of the default browser"
   (interactive
    (list
 	(konix/_get-string "Google search")
 	)
    )
-  (browse-url (format "http://www.google.com/search?q=%s"
+  (konix/browse-url (format "http://www.google.com/search?q=%s"
 					  (replace-regexp-in-string " " "+" string)
 					  )
 			  )

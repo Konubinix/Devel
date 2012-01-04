@@ -25,6 +25,6 @@ for i in "$dir"/part*; do
 		sleep 3
 		exit 0
 	else
-		echo "No html par t in $i" >> "$ERR_FILE"
+		echo "No html part in $i" >> "$ERR_FILE"
 	fi
 done

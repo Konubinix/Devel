@@ -1652,3 +1652,96 @@ Prefix argument ARG makes the entry nonmarking."
 	 (define-key calendar-mode-map "gs" 'konix/diary-goto-shared)
 	 )
   )
+
+;; ####################################################################################################
+;; bbdb
+;; ####################################################################################################
+(defun konix/bbdb-add-aka ()
+  "Add an aka to the current record.
+Inspired from `bbdb-edit-current-field'
+"
+  (interactive)
+  (let (
+		(record (bbdb-current-record))
+		)
+    (setq need-to-sort
+		  (apply 'bbdb-record-edit-field-internal record '(aka)))
+    (bbdb-change-record record need-to-sort)
+    (bbdb-redisplay-one-record record)
+	)
+  )
+
+(defcustom bbdb-completion-type nil
+  "*Controls the behaviour of `bbdb-complete-name'.  If nil, completion is
+done across the set of all full-names and user-ids in the bbdb-database;
+if the symbol 'name, completion is done on names only; if the symbol 'net,
+completion is done on network addresses only; if it is 'primary, then
+completion is done only across the set of primary network addresses (the
+first address in the list of addresses for a given user).  If it is
+'primary-or-name, completion is done across primaries and real names."
+  :group 'bbdb-record-use
+  :type '(choice (const :tag "Complete across names and net addresses" nil)
+				 (const :tag "Complete across names,akas and net addresses" aka)
+                 (const :tag "Complete across names" name)
+                 (const :tag "Complete across net addresses" net)
+                 (const :tag "Complete across primary net addresses" primary)
+                 (const :tag "Complete across names and primary net addresses"
+                        primary-or-name)))
+
+(defun konix/bbdb-completion-check-record (sym rec)
+  (let ((name (or (bbdb-record-name rec)
+				  (bbdb-record-company rec)
+				  ""))
+		(nets (bbdb-record-net rec))
+		(akas (bbdb-record-aka rec))
+		ok)
+
+    (if (null bbdb-completion-type)
+		(setq ok 't)
+
+      (if (memq bbdb-completion-type
+				'(name primary-or-name name-or-primary))
+		  (setq ok (string= sym (downcase name))))
+
+      ;; #### handle AKA, mail-name or mail-alias here?
+      (if ok '()
+		(when (eq bbdb-completion-type 'net)
+		  (while (and nets (not ok))
+			(setq ok (string= sym (downcase (car nets)))
+				  nets (cdr nets))))
+		(when (and nets (memq bbdb-completion-type
+							  '(primary primary-or-name name-or-primary)))
+		  (setq ok (string= sym (downcase (car nets)))
+				)
+		  )
+		(when (and akas (memq bbdb-completion-type
+							  '(aka)))
+		  (setq ok (member sym (mapcar 'downcase akas)))
+		  )
+		)
+	  )
+    ok
+	)
+  )
+
+(defalias 'bbdb-completion-check-record 'konix/bbdb-completion-check-record)
+
+(defun konix/bbdb-completion-predicate (symbol)
+  "For use as the third argument to `completing-read'.
+Obey the semantics of `bbdb-completion-type'."
+  (cond
+   ((null bbdb-completion-type)
+	t)
+   ((not (boundp symbol))
+	nil)
+   (t
+	(let* ((sym  (symbol-name symbol))
+		   (recs (symbol-value symbol))
+		   (aka  (bbdb-record-aka (first recs)))
+		   ok)
+	  (while (and recs (not ok))
+		(setq ok   (bbdb-completion-check-record sym (car recs))
+			  recs (cdr recs)))
+	  ok))))
+
+(defalias 'bbdb-completion-predicate 'konix/bbdb-completion-predicate)

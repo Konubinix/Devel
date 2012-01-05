@@ -1647,9 +1647,9 @@ don't change the value of the default browser"
 	)
    )
   (konix/www/browse-url (format "http://www.google.com/search?q=%s"
-					  (replace-regexp-in-string " " "+" string)
-					  )
-			  )
+								(replace-regexp-in-string " " "+" string)
+								)
+						)
   )
 
 (defun konix/www/brows-url-of-file-at-point (file)
@@ -2434,3 +2434,21 @@ FExport diary data into iCalendar file: ")
             (bury-buffer)))))
     found-error))
 (defalias 'icalendar-export-region 'konix/icalendar-export-region)
+
+;; ####################################################################################################
+;; bbdb
+;; ####################################################################################################
+(defun konix/bbdb-add-aka ()
+  "Add an aka to the current record.
+Inspired from `bbdb-edit-current-field'
+"
+  (interactive)
+  (let (
+		(record (bbdb-current-record))
+		)
+    (setq need-to-sort
+		  (apply 'bbdb-record-edit-field-internal record '(aka)))
+    (bbdb-change-record record need-to-sort)
+    (bbdb-redisplay-one-record record)
+	)
+  )

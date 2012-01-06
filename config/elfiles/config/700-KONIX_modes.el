@@ -1437,6 +1437,7 @@
   (notmuch-show-pipe-message nil "konix_view_html.sh")
   )
 (defun konix/notmuch-message-completion-toggle ()
+  (require 'notmuch)
   (interactive)
   (let (
 		(need_to_remove (not (not (member notmuch-address-message-alist-member message-completion-alist))))
@@ -1510,7 +1511,6 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 (konix/notmuch-define-key-search-show (kbd "C-f") 'konix/notmuch-toggle-flagged-tag)
 	 (konix/notmuch-define-key-search-show "u" 'konix/notmuch-toggle-unread-tag)
 	 (konix/notmuch-define-key-search-show (kbd "a") 'konix/notmuch-read-and-archive)
-	 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
 	 (define-key notmuch-show-mode-map (kbd "M") 'konix/notmuch-show-open-in-external-browser)
 	 (define-key notmuch-show-mode-map (kbd "F") 'konix/notmuch-show-unflag-and-next)
 	 (define-key notmuch-show-mode-map (kbd "U") 'konix/notmuch-show-read-delete-and-next)
@@ -1523,6 +1523,11 @@ inspired from `notmuch-show-archive-thread-internal'"
 ;; ####################################################################################################
 (defun konix/message-mode-hook ()
   (konix/flyspell-mode 1)
+  )
+(eval-after-load "message"
+  '(progn
+	(define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
+	)
   )
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)

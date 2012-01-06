@@ -22,6 +22,7 @@
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -33,7 +34,16 @@ GdkPixbuf *pixbuf_normal;
 GdkPixbuf *pixbuf_beeping;
 
 char *fifo = FIFO_PATH;
-int fifo_fd;
+int fifo_fd = -1;
+
+/** close the fifo and remove the associated file */
+void clean_fifo() {
+	if (fifo_fd != -1) {
+		close(fifo_fd);
+		unlink(fifo);
+	}
+}
+
 //called every FIFO_TIMEOUT. Processes available commands in the fifo and returns
 gint timeout_callback( gpointer data ) {
 	char command = 0;
@@ -58,18 +68,22 @@ gint timeout_callback( gpointer data ) {
 	}
 	return TRUE;
 }
+
 int main(int argc, char **argv)
 {
 	//init fifo
-	if((fifo_fd = open(fifo, O_RDONLY | O_NONBLOCK)) == -1) {
-		if(mkfifo(fifo, 0600) == 0) {
+	// the fifo must not be already there
+	assert((fifo_fd = open(fifo, O_RDONLY | O_NONBLOCK)) == -1);
+	if(mkfifo(fifo, 0600) == 0) {
 			fifo_fd = open(fifo, O_RDONLY | O_NONBLOCK);
 		}
-		else {
-			printf("Unable to create fifo, aborting\n");
-			exit(1);
-		}
+	else {
+		printf("Unable to create fifo, aborting\n");
+		exit(1);
 	}
+	// make sure the fifo will be deleted at the end of the daemon
+	atexit(&clean_fifo);
+
 	//daemonize
 #if DAEMONIZE
 	if(fork() != 0)

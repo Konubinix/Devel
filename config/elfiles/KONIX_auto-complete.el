@@ -180,16 +180,17 @@
 		   (method (match-string-no-properties 2))
 		   (class_dir nil)
 		   ;; find something similar in the cache
-		   (cache (first
-				   (mapcar
-					(lambda (cache_cons)
-					  (when (string= (car cache_cons) class)
-						(cdr cache_cons)
-						)
-					  )
-					konix/python/ac-cache
+		   (cache (catch 'cache
+					(mapc
+					 (lambda (cache_cons)
+					   (when (string= (car cache_cons) class)
+						 (throw 'cache (cdr cache_cons))
+						 )
+					   )
+					 konix/python/ac-cache
+					 )
+					nil
 					)
-				   )
 				  )
 		   )
 	  (if cache

@@ -326,3 +326,7 @@ konix_assert_last_command () {
 pinfo () {
 	echo "# $*" >&2
 }
+
+cdd () {
+    builtin cd "$@" && ls --color=auto
+}

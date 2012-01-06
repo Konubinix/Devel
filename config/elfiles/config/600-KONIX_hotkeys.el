@@ -181,8 +181,8 @@
 ;; ************************************************************
 (eval-after-load "diff-mode"
   '(progn
-	 (define-key diff-mode-map (kbd "C-M-q") 'konix/kill-current-buffer-and-delete-window)
-	 )
+     (define-key diff-mode-map (kbd "C-M-q") 'konix/kill-current-buffer-and-delete-window)
+     )
   )
 
 ;; ************************************************************
@@ -414,29 +414,29 @@
 ;; Header
 (global-set-key (kbd "<f8>") 'konix/header)
 (global-set-key (kbd "<C-f8>")
-				(lambda()
-				  (interactive)
-				  (konix/header konix/header-marker-2)
-				  )
-				)
+		(lambda()
+		  (interactive)
+		  (konix/header konix/header-marker-2)
+		  )
+		)
 (global-set-key (kbd "<S-f8>")
-				(lambda()
-				  (interactive)
-				  (konix/header konix/header-marker-3)
-				  )
-				)
+		(lambda()
+		  (interactive)
+		  (konix/header konix/header-marker-3)
+		  )
+		)
 (define-key 'konix/global-fast-key-map (kbd "<f8>") 'konix/header-wrap)
 (define-key 'konix/global-fast-key-map (kbd "<C-f8>")
   (lambda()
-	(interactive)
-	(konix/header-wrap konix/header-marker-2 )
-	)
+    (interactive)
+    (konix/header-wrap konix/header-marker-2 )
+    )
   )
 (define-key 'konix/global-fast-key-map (kbd "<S-f8>")
   (lambda()
-	(interactive)
-	(konix/header-wrap konix/header-marker-3 )
-	)
+    (interactive)
+    (konix/header-wrap konix/header-marker-3 )
+    )
   )
 ;; Lance gitk et git gui
 (global-set-key (kbd "<S-f9>") 'konix/gitk)
@@ -509,17 +509,17 @@
 ;; ####################################################################################################
 (eval-after-load "xcscope"
   '(progn
-	 (define-key global-map (kbd "C-c s") cscope-list-entry-keymap)
-	 (define-key cscope-list-entry-keymap "b" '(lambda()(interactive)
-												 (when (string-match "^\*" (buffer-name(current-buffer)))
-												   (rename-buffer
-													(generate-new-buffer-name
-													 "cscope_result")
-													)
-												   )
-												 )
-	   )
-	 )
+     (define-key global-map (kbd "C-c s") cscope-list-entry-keymap)
+     (define-key cscope-list-entry-keymap "b" '(lambda()(interactive)
+						 (when (string-match "^\*" (buffer-name(current-buffer)))
+						   (rename-buffer
+						    (generate-new-buffer-name
+						     "cscope_result")
+						    )
+						   )
+						 )
+       )
+     )
   )
 
 ;; ####################################################################################################
@@ -543,10 +543,10 @@
 ;; speedbar
 ;; ####################################################################################################
 (setq speedbar-mode-hook
-	  (lambda ()
-		(local-set-key "-" 'speedbar-contract-line)
-		)
-	  )
+      (lambda ()
+	(local-set-key "-" 'speedbar-contract-line)
+	)
+      )
 
 ;; ####################################################################################################
 ;; Semantic
@@ -564,7 +564,7 @@
   (local-set-key (kbd "<C-right>") 'forward-word)
   )
 (add-hook 'wikipedia-mode-hook
-		  'konix/wikipedia-mode-set-keywords-hook)
+	  'konix/wikipedia-mode-set-keywords-hook)
 
 ;; ####################################################################################################
 ;; outline
@@ -604,8 +604,8 @@
 ;; ####################################################################################################
 (eval-after-load "hide-comnt"
   '(progn
-	 (define-key hs-minor-mode-map "\C-c@C" 'hide/show-comments)
-	 )
+     (define-key hs-minor-mode-map "\C-c@C" 'hide/show-comments)
+     )
   )
 
 ;; ####################################################################################################
@@ -613,10 +613,14 @@
 ;; ####################################################################################################
 (eval-after-load "bs"
   '(progn
-	 (define-key bs-mode-map (kbd "D D") 'konix/kill-all-dired-buffers)
-	 )
+     (define-key bs-mode-map (kbd "D D") 'konix/kill-all-dired-buffers)
+     )
   )
 ;; ####################################################################################################
 ;; bbdb
 ;; ####################################################################################################
-(define-key bbdb-mode-map (kbd "A") 'konix/bbdb-add-aka)
+(eval-after-load "bbdb"
+  '(progn
+     (define-key bbdb-mode-map (kbd "A") 'konix/bbdb-add-aka)
+     )
+  )

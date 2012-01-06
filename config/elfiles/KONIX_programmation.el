@@ -360,7 +360,7 @@ elsen set it to nil
   (setq konix/python/dir_filter_buffer (concat konix/python/dir_filter_buffer
 											   string))
   (setq got_result
-		(if (looking-back "\n.*" 100)
+		(if (string-match-p "\n" string)
 			t
 		  nil
 		  )
@@ -383,7 +383,7 @@ elsen set it to nil
       )
 	;; here, the whole dir line is got
 	;; restore old filter
-	(set-process-filter proc (quote ,old_process_filter))
+	(set-process-filter proc old_process_filter)
 	(with-temp-buffer
 	  (insert konix/python/dir_filter_buffer)
 	  (goto-char (point-min))

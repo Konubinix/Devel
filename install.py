@@ -117,6 +117,12 @@ if is_on_linux():
         # Set emacs style bindings to firefox
         subprocess.call(["gconftool-2", "--set", "/desktop/gnome/interface/gtk_key_theme Emacs", "--type", "string"])
         subprocess.call(["gcc", "config/gnome-run.c", "-o", os.path.join(environ["HOME"],".fluxbox/bin/gnome-run"), "-L/usr/X11R6/lib", "-lX11"])
+        # install the emacs_tray_daemon
+        subprocess.call(["sh","-c", "gcc %s/emacs_tray_daemon.c `pkg-config --cflags --libs gtk+-2.0` -o %s/emacs_tray_daemon"
+                         %(os.environ["CONFIG_DIR"],
+                           os.path.join(os.environ["HOME"],"bin")
+                           )
+                         ])
 
         subprocess.call(["chmod", "+x", "-Rv",
                          os.path.join(environ["HOME"], "bin"),

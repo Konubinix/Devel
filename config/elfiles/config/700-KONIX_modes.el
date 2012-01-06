@@ -1726,7 +1726,7 @@ first address in the list of addresses for a given user).  If it is
 		(setq ok 't)
 
       (if (memq bbdb-completion-type
-				'(name primary-or-name name-or-primary))
+				'(name primary-or-name name-or-primary aka))
 		  (setq ok (string= sym (downcase name))))
 
       ;; #### handle AKA, mail-name or mail-alias here?
@@ -1736,7 +1736,7 @@ first address in the list of addresses for a given user).  If it is
 			(setq ok (string= sym (downcase (car nets)))
 				  nets (cdr nets))))
 		(when (and nets (memq bbdb-completion-type
-							  '(primary primary-or-name name-or-primary)))
+							  '(primary primary-or-name name-or-primary aka)))
 		  (setq ok (string= sym (downcase (car nets)))
 				)
 		  )

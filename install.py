@@ -119,10 +119,10 @@ if is_on_linux():
         subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNNING_DIR"], "notification-daemon.xml"), "/apps/notification-daemon"])
         # Set emacs style bindings to firefox
         subprocess.call(["gconftool-2", "--set", "/desktop/gnome/interface/gtk_key_theme Emacs", "--type", "string"])
-        subprocess.call(["gcc", "config/gnome-run.c", "-o", os.path.join(environ["HOME"],".fluxbox/bin/gnome-run"), "-L/usr/X11R6/lib", "-lX11"])
+        subprocess.call(["gcc", os.path.join(environ["KONIX_SRC_DIR"],"gnome-run.c"), "-o", os.path.join(environ["HOME"],".fluxbox/bin/gnome-run"), "-L/usr/X11R6/lib", "-lX11"])
         # install the emacs_tray_daemon
         # export the code from the template
-        TRAY_PROGRAM_TPL_FILE = open(os.path.join(environ["KONIX_CONFIG_DIR"],"emacs_tray_daemon.c.tpl"), "r")
+        TRAY_PROGRAM_TPL_FILE = open(os.path.join(environ["KONIX_SRC_DIR"],"emacs_tray_daemon.c.tpl"), "r")
         TRAY_PROGRAM_FILE = NamedTemporaryFile(delete=False, suffix=".c")
         TRAY_PROGRAM_TPL = Template(TRAY_PROGRAM_TPL_FILE.read())
         TRAY_PROGRAM_FILE.write(TRAY_PROGRAM_TPL.substitute(environ))

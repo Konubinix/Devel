@@ -353,16 +353,18 @@ They can be relative or absolute
 ;; PYTHON
 ;; ******************************************************************************************
 (defun konix/python/dir_filter (proc string)
-  (setq konix/python/dir_filter_result nil)
-  (with-temp-buffer
-    (insert string)
-    (goto-char (point-min))
-    (when (re-search-forward "\\[" nil t)
-      (while (re-search-forward "'\\([^']+\\)'" nil t)
-		(add-to-list 'konix/python/dir_filter_result (match-string 1) t)
+  "Fill the `konix/python/dir_filter_buffer' buffer until the character \n is received
+When receiving the character \n at the end of the output, set got_result to t,
+elsen set it to nil
+"
+  (setq konix/python/dir_filter_buffer (concat konix/python/dir_filter_buffer
+											   string))
+  (setq got_result
+		(if (looking-back "\n.*" 100)
+			t
+		  nil
+		  )
 		)
-      )
-    )
   )
 
 (defun konix/python/dir(class)
@@ -370,20 +372,27 @@ They can be relative or absolute
 		 (proc (get-buffer-process (current-buffer)))
 		 (old_process_filter (process-filter proc))
 		 (konix/python/dir_filter_result nil)
+		 (konix/python/dir_filter_buffer "")
 		 (got_result nil)
 		 )
-    (set-process-filter proc
-						`(lambda(proc string)
-						   (konix/python/dir_filter proc string)
-						   (setq got_result t)
-						   (set-process-filter proc (quote ,old_process_filter))
-						   )
-						)
+    (set-process-filter proc 'konix/python/dir_filter)
     (process-send-string proc
 						 (format "dir(%s)\n" class))
     (while (not got_result)
       (accept-process-output proc 1)
       )
+	;; here, the whole dir line is got
+	;; restore old filter
+	(set-process-filter proc (quote ,old_process_filter))
+	(with-temp-buffer
+	  (insert konix/python/dir_filter_buffer)
+	  (goto-char (point-min))
+	  (when (re-search-forward "\\[" nil t)
+		(while (re-search-forward "'\\([^']+\\)'" nil t)
+		  (add-to-list 'konix/python/dir_filter_result (match-string 1) t)
+		  )
+		)
+	  )
     konix/python/dir_filter_result
     )
   )

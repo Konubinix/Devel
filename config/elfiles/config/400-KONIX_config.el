@@ -9,6 +9,7 @@
 ;; bbdb custom
 ;; ******************************************************************************************
 (setq-default bbdb-file (expand-file-name "bbdb" (getenv "KONIX_PERSO_DIR")))
+(setq-default bbdb-completion-type nil)
 
 ;; ******************************************************************************************
 ;; bs custo

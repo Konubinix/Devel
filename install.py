@@ -10,6 +10,8 @@ import subprocess
 import logging
 logging.basicConfig(level=logging.DEBUG)
 import tempfile
+from string import Template
+from tempfile import NamedTemporaryFile
 
 # ####################################################################################################
 # Fill the environ variables
@@ -118,12 +120,18 @@ if is_on_linux():
         subprocess.call(["gconftool-2", "--set", "/desktop/gnome/interface/gtk_key_theme Emacs", "--type", "string"])
         subprocess.call(["gcc", "config/gnome-run.c", "-o", os.path.join(environ["HOME"],".fluxbox/bin/gnome-run"), "-L/usr/X11R6/lib", "-lX11"])
         # install the emacs_tray_daemon
-        subprocess.call(["sh","-c", "gcc %s/emacs_tray_daemon.c `pkg-config --cflags --libs gtk+-2.0` -o %s/emacs_tray_daemon"
-                         %(environ["CONFIG_DIR"],
+        # export the code from the template
+        TRAY_PROGRAM_TPL_FILE = open(os.path.join(environ["CONFIG_DIR"],"emacs_tray_daemon.c.tpl"), "r")
+        TRAY_PROGRAM_FILE = NamedTemporaryFile(delete=False, suffix=".c")
+        TRAY_PROGRAM_TPL = Template(TRAY_PROGRAM_TPL_FILE.read())
+        TRAY_PROGRAM_FILE.write(TRAY_PROGRAM_TPL.substitute(environ))
+        TRAY_PROGRAM_FILE.close()
+        subprocess.call(["sh","-c", "gcc '%s' `pkg-config --cflags --libs gtk+-2.0` -o %s/emacs_tray_daemon"
+                         %(TRAY_PROGRAM_FILE.name,
                            os.path.join(os.environ["HOME"],"bin")
                            )
                          ])
-
+        os.remove(TRAY_PROGRAM_FILE.name)
         subprocess.call(["chmod", "+x", "-Rv",
                          os.path.join(environ["HOME"], "bin"),
                          os.path.join(environ["HOME"], ".fluxbox/startup"),

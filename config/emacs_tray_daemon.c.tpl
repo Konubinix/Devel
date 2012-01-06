@@ -12,8 +12,8 @@
 // BUGS : timeout is ugly. Should find a way to use select(1) in gtk_main instead
 
 #define FIFO_PATH "/tmp/tray_daemon_control"
-#define NORMAL_ICON "icon_blue.png"
-#define BEEPING_ICON "icon_red.png"
+#define NORMAL_ICON "${SHARE_DIR}/icons/emacs_icon_blue.png"
+#define BEEPING_ICON "${SHARE_DIR}/icons/emacs_icon_red.png"
 #define FIFO_TIMEOUT 200
 //if 1, fork and return
 #define DAEMONIZE 0

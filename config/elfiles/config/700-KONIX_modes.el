@@ -1526,8 +1526,8 @@ inspired from `notmuch-show-archive-thread-internal'"
   )
 (eval-after-load "message"
   '(progn
-	(define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
-	)
+	 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
+	 )
   )
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)
@@ -1749,9 +1749,6 @@ first address in the list of addresses for a given user).  If it is
     ok
 	)
   )
-
-(defalias 'bbdb-completion-check-record 'konix/bbdb-completion-check-record)
-
 (defun konix/bbdb-completion-predicate (symbol)
   "For use as the third argument to `completing-read'.
 Obey the semantics of `bbdb-completion-type'."
@@ -1770,8 +1767,12 @@ Obey the semantics of `bbdb-completion-type'."
 			  recs (cdr recs)))
 	  ok))))
 
-(defalias 'bbdb-completion-predicate 'konix/bbdb-completion-predicate)
-
+(eval-after-load "bbdb-com"
+  '(progn
+	 (defalias 'bbdb-completion-predicate 'konix/bbdb-completion-predicate)
+	 (defalias 'bbdb-completion-check-record 'konix/bbdb-completion-check-record)
+	 )
+  )
 ;; ####################################################################################################
 ;; ERC
 ;; ####################################################################################################
@@ -1828,14 +1829,14 @@ erc-modified-channels-alist, filtered by konix/erc-tray-ignored-channels."
     ;;filter list according to konix/erc-tray-ignored-channels
     (let ((filtered-list erc-modified-channels-alist))
       (mapc (lambda (el)
-	      (mapc (lambda (reg)
-		      (when (string-match reg (buffer-name (car el)))
-			(setq filtered-list
-			      (remove el filtered-list))))
-		    konix/erc-tray-ignored-channels))
-	    filtered-list)
+			  (mapc (lambda (reg)
+					  (when (string-match reg (buffer-name (car el)))
+						(setq filtered-list
+							  (remove el filtered-list))))
+					konix/erc-tray-ignored-channels))
+			filtered-list)
       (when filtered-list
-	(konix/erc-tray-change-state t)))))
+		(konix/erc-tray-change-state t)))))
 
 ;; --------------------------------------------------------------------------------
 

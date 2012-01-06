@@ -29,6 +29,8 @@ sleep 4
     wicd-gtk -t &
     conky -d -c ~/.conky.d/conky1 > ~/conky.log 2> ~/conky.err
 	pcmanfm --desktop & # nice and simple desktop manager
+	# start de emacs_tray_daemon if possible
+	emacs_tray_daemon &
 } &
 
 skype &

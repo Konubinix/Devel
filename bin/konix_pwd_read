@@ -9,8 +9,8 @@ import re
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-PERSO_DIR = os.environ["PERSO_DIR"]
-MDP_DIR = os.path.join(PERSO_DIR, "mdp_nd")
+KONIX_PERSO_DIR = os.environ["KONIX_PERSO_DIR"]
+MDP_DIR = os.path.join(KONIX_PERSO_DIR, "mdp_nd")
 MDP_FILES = os.listdir(MDP_DIR)
 MDP_FILES.sort()
 

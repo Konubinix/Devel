@@ -28,7 +28,7 @@ def install_git():
     # Install a new git config file
     # ####################################################################################################
     GITCONFIG_FILE=open(GITCONFIG_FILE_NAME, "w")
-    GITCONFIG_DEFAULT_FILE=open(os.path.join(environ["CONFIG_DIR"], "gitconfig"), "r")
+    GITCONFIG_DEFAULT_FILE=open(os.path.join(environ["KONIX_CONFIG_DIR"], "gitconfig"), "r")
     GITCONFIG_FILE.write("""[user]
 	name = %s
 	email = %s

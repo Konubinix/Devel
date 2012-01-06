@@ -5,7 +5,7 @@ import os
 import re
 
 def get_default_key():
-    GPGDIRRCFILENAME=os.environ["PERSO_DIR"]
+    GPGDIRRCFILENAME=os.environ["KONIX_PERSO_DIR"]
 
     gpgdirrc_name = os.path.expanduser(os.path.join(GPGDIRRCFILENAME, "gpgdirrc"))
     gpgdirrc = open(gpgdirrc_name, "r")

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "${LIB_DIR}/lib_bash.sh"
+. "${KONIX_LIB_DIR}/lib_bash.sh"
 
 remote_repo="$1"
 pinfo () {

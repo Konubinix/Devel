@@ -1554,7 +1554,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 (setq-default message-sendmail-extra-arguments
 			  (list "-C"
 					(expand-file-name "msmtprc"
-									  (getenv "PERSO_DIR")
+									  (getenv "KONIX_PERSO_DIR")
 									  )
 					)
 			  )

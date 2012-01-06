@@ -164,10 +164,10 @@
 (setq-default org-icalendar-store-UID t)
 (setq-default org-timer-default-timer 25)
 (setq-default org-tag-persistent-alist nil)
-(when (and (getenv "PERSO_DIR")
+(when (and (getenv "KONIX_PERSO_DIR")
 		   (not (boundp 'konix/org-meta-context/meta-contexts))
 		   )
-  (setq-default konix/org-meta-context/meta-contexts (list (expand-file-name "wiki" (getenv "PERSO_DIR"))))
+  (setq-default konix/org-meta-context/meta-contexts (list (expand-file-name "wiki" (getenv "KONIX_PERSO_DIR"))))
   )
 (setq org-timer-timer-is-countdown nil)
 

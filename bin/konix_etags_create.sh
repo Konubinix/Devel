@@ -52,10 +52,10 @@ done
 # ####################################################################################################
 # INCLUDES
 # ####################################################################################################
-source konix_assert_var.sh "$CONFIG_DIR"
-source konix_assert_var.sh "$LIB_DIR"
+source konix_assert_var.sh "$KONIX_CONFIG_DIR"
+source konix_assert_var.sh "$KONIX_LIB_DIR"
 
-source "${LIB_DIR}/lib_bash.sh"
+source "${KONIX_LIB_DIR}/lib_bash.sh"
 
 # ####################################################################################################
 # If a tag files or tag include files does not exists, empty it
@@ -83,7 +83,7 @@ then
 fi
 
 eval ctags $VERBOSE_CMD \
-	--options="'$CONFIG_DIR/ctags'" \
+	--options="'$KONIX_CONFIG_DIR/ctags'" \
 	-e \
 	"$APPEND_CMD" \
 	-f "'$TAGS_FILE'" \

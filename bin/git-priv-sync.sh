@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "${LIB_DIR}/lib_bash.sh"
+. "${KONIX_LIB_DIR}/lib_bash.sh"
 
 pinfo "Freezing current repo"
 git-freeze.sh

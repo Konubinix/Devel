@@ -72,6 +72,14 @@
 (autoload 'macro-math-eval-and-round-region "macro-math" t nil)
 (autoload 'macro-math-eval-region "macro-math" t nil)
 (autoload 'highlight-symbol-at-point "highlight-symbol" t nil)
+;; full ack autoloads
+(autoload 'ack-same "full-ack" nil t)
+(autoload 'ack "full-ack" nil t)
+(autoload 'ack-find-same-file "full-ack" nil t)
+(autoload 'ack-find-file "full-ack" nil t)
+;; grin
+(autoload 'grin "grin" nil t)
+(autoload 'hide/show-comments "hide-comnt" nil t)
 
 ;; ************************************************************
 ;; Automodes
@@ -130,14 +138,6 @@
 (add-to-list 'auto-mode-alist '(".+\.mail$" . message-mode))
 ;; elk
 (add-to-list 'auto-mode-alist '("\\.elk\\'" . elk-test-mode))
-;; full ack autoloads
-(autoload 'ack-same "full-ack" nil t)
-(autoload 'ack "full-ack" nil t)
-(autoload 'ack-find-same-file "full-ack" nil t)
-(autoload 'ack-find-file "full-ack" nil t)
-;; grin
-(autoload 'grin "grin" nil t)
-(autoload 'hide/show-comments "hide-comnt" nil t)
 
 ;; ******************************************************************************************
 ;; Magic modes

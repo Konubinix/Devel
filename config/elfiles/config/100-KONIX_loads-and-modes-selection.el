@@ -138,6 +138,8 @@
 (add-to-list 'auto-mode-alist '(".+\.mail$" . message-mode))
 ;; elk
 (add-to-list 'auto-mode-alist '("\\.elk\\'" . elk-test-mode))
+;; c templates in c mode
+(add-to-list 'auto-mode-alist '("\\.c\\.tpl$" . c-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

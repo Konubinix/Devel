@@ -16,6 +16,7 @@ def get_environ():
         environ["DEVEL_DIR"] = KONIX_PWD
         environ["BIN_DIR"] = environ["DEVEL_DIR"]+"/"+"bin"
         environ["LIB_DIR"] = environ["DEVEL_DIR"]+"/"+"lib"
+        environ["SHARE_DIR"] = environ["DEVEL_DIR"]+"/"+"share"
         # add the lib dir to sys path in order to use the which lib so that I
         # can find python executable. sys.executable won't work with cygwin
         sys.path.insert(0, environ["LIB_DIR"])

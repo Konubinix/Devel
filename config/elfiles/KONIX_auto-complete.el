@@ -166,18 +166,21 @@
   )
 
 (defun konix/python/ac-dir-candidates ()
-  (save-excursion
-	(re-search-backward
-	 konix/python/ac-dir-prefix
-	 nil t)
-	)
-  (let* (
-		 (class (match-string-no-properties 1))
-		 (method (match-string-no-properties 2))
-		 (class_dir (konix/python/dir class))
-		 )
-	;;(message "%s - %s - %s" (match-string-no-properties 0)class method)
-	(all-completions method class_dir)
+  (when
+	  (save-excursion
+		(re-search-backward
+		 konix/python/ac-dir-prefix
+		 (save-excursion (beginning-of-line) (1- (point))) t)
+		)
+
+	(let* (
+		   (class (match-string-no-properties 1))
+		   (method (match-string-no-properties 2))
+		   (class_dir (konix/python/dir class))
+		   )
+	  ;;(message "%s - %s - %s" (match-string-no-properties 0)class method)
+	  (all-completions method class_dir)
+	  )
 	)
   )
 

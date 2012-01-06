@@ -1460,16 +1460,16 @@
 inspired from `notmuch-show-archive-thread-internal'"
   (goto-char (point-min))
   (loop do (notmuch-show-remove-tag tag)
-	until (not (notmuch-show-goto-message-next)))
+		until (not (notmuch-show-goto-message-next)))
   ;; Move to the next item in the search results, if any.
   (let ((parent-buffer notmuch-show-parent-buffer))
     (notmuch-kill-this-buffer)
     (if parent-buffer
-	(progn
-	  (switch-to-buffer parent-buffer)
-	  (forward-line)
-	  (if show-next
-	      (notmuch-search-show-thread))))))
+		(progn
+		  (switch-to-buffer parent-buffer)
+		  (forward-line)
+		  (if show-next
+			  (notmuch-search-show-thread))))))
 
 (defun konix/notmuch-show-unflag-and-next ()
   (interactive)
@@ -1480,6 +1480,26 @@ inspired from `notmuch-show-archive-thread-internal'"
   (notmuch-show-add-tag "deleted")
   (konix/notmuch-show-remove-tag-and-next "TOReadList" t)
   )
+(defun konix/notmuch-archive ()
+  (cond
+   ((eq major-mode 'notmuch-search-mode)
+	(notmuch-search-archive-thread)
+	)
+   ((eq major-mode 'notmuch-show-mode)
+	(notmuch-show-archive-thread)
+	)
+   (t
+	(error "Could not found a suitable tag function for mode %s"
+		   (symbol-name major-mode)
+		   )
+	)
+   )
+  )
+(defun konix/notmuch-read-and-archive ()
+  (interactive)
+  (konix/notmuch-remove-tag "unread")
+  (konix/notmuch-archive)
+  )
 (eval-after-load "notmuch"
   '(progn
 	 (require 'notmuch-address)
@@ -1489,6 +1509,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 (konix/notmuch-define-key-search-show "i" 'konix/notmuch-toggle-inbox-tag)
 	 (konix/notmuch-define-key-search-show (kbd "C-f") 'konix/notmuch-toggle-flagged-tag)
 	 (konix/notmuch-define-key-search-show "u" 'konix/notmuch-toggle-unread-tag)
+	 (konix/notmuch-define-key-search-show (kbd "a") 'konix/notmuch-read-and-archive)
 	 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
 	 (define-key notmuch-show-mode-map (kbd "M") 'konix/notmuch-show-open-in-external-browser)
 	 (define-key notmuch-show-mode-map (kbd "F") 'konix/notmuch-show-unflag-and-next)
@@ -1745,3 +1766,104 @@ Obey the semantics of `bbdb-completion-type'."
 	  ok))))
 
 (defalias 'bbdb-completion-predicate 'konix/bbdb-completion-predicate)
+
+;; ####################################################################################################
+;; ERC
+;; ####################################################################################################
+(setq-default erc-log-insert-log-on-open t)
+(setq-default erc-log-mode t)
+(setq-default erc-log-write-after-insert t)
+(setq-default erc-log-write-after-send t)
+(setq-default erc-modules '(autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands notify readonly ring smiley sound stamp spelling track))
+(setq-default erc-user-mode 'ignore)
+
+;; ******************************************************************************************
+;; tracking channels
+;; ******************************************************************************************
+(setq erc-track-visibility 'visible)
+
+;; --------------------------------------------------------------------------------
+;; erc-tray, taken from
+;; https://github.com/antoine-levitt/perso/blob/master/.emacs.d/erc.el
+;; --------------------------------------------------------------------------------
+(setq konix/erc-tray-inhibit-one-activation nil)
+(setq konix/erc-tray-ignored-channels nil)
+(setq konix/erc-tray-state nil)
+(setq konix/erc-tray-enable t)
+
+(defun konix/erc-tray-change-state-aux (arg)
+  "Enables or disable blinking, depending on arg (non-nil or nil)"
+  (unless (eq konix/erc-tray-state arg)
+	(with-temp-buffer
+	  (insert (if arg "B" "b"))
+	  (write-file "/tmp/tray_daemon_control")
+	  )
+    (setq konix/erc-tray-state arg)
+	)
+  )
+
+(defun konix/erc-tray-change-state (arg)
+  "Enables or disable blinking, depending on arg (t or nil).
+Additional support for inhibiting one activation (quick hack)"
+  (when konix/erc-tray-enable
+    (if konix/erc-tray-inhibit-one-activation
+		(setq konix/erc-tray-inhibit-one-activation nil)
+      (konix/erc-tray-change-state-aux arg))))
+
+(defun konix/erc-tray-update-state ()
+  "Update the state of the tray icon. Blink when some new event
+appears when you're not looking. Events are changes to
+erc-modified-channels-alist, filtered by konix/erc-tray-ignored-channels."
+  (interactive)
+  ;;stop blinking tray when there're no channels in list
+  (unless erc-modified-channels-alist
+    (konix/erc-tray-change-state nil))
+  ;;maybe make tray blink
+  (unless (eq nil (frame-visible-p (selected-frame)))
+    ;;filter list according to konix/erc-tray-ignored-channels
+    (let ((filtered-list erc-modified-channels-alist))
+      (mapc (lambda (el)
+	      (mapc (lambda (reg)
+		      (when (string-match reg (buffer-name (car el)))
+			(setq filtered-list
+			      (remove el filtered-list))))
+		    konix/erc-tray-ignored-channels))
+	    filtered-list)
+      (when filtered-list
+	(konix/erc-tray-change-state t)))))
+
+;; --------------------------------------------------------------------------------
+
+(defun konix/erc-track-list-changed-hook ()
+  (when (or (not (eq t (frame-visible-p (selected-frame))))
+			(not
+			 (equal (window-buffer) (current-buffer))
+			 )
+			)
+	(call-process "notify-send" nil nil nil (substring-no-properties string))
+	)
+  (konix/erc-tray-update-state)
+  )
+
+(defun konix/erc-track-switch-buffer (arg)
+  "If there are unread messages, switch to them. Else, switch to latest seen non-erc buffer.
+Differs a bit from erc's implementation : robust to buffer kills and stuff like
+  that
+GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blob/master/.emacs.d/erc.el
+"
+  (interactive "p")
+  (if erc-modified-channels-alist
+      (erc-track-switch-buffer arg)
+    (let ((blist (buffer-list)))
+      (while blist
+		(unless (or (eq 'erc-mode (buffer-local-value 'major-mode (car blist)))
+					(minibufferp (car blist))
+					(string-match "^ " (buffer-name (car blist))))
+		  (switch-to-buffer (car blist))
+		  (setq blist nil))
+		(setq blist (cdr blist)))))
+  )
+
+(add-hook 'erc-track-list-changed-hook 'konix/erc-track-list-changed-hook)
+
+(global-set-key (kbd "<escape>") 'konix/erc-track-switch-buffer)

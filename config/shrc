@@ -4,7 +4,7 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-python "${DEVEL_DIR}/bin/konix_check_env"
+python "${KONIX_DEVEL_DIR}/bin/konix_check_env"
 
 # ####################################################################################################
 # Readline
@@ -22,22 +22,22 @@ fi
 # ####################################################################################################
 # Personal info
 # ####################################################################################################
-if [ -f "$PERSO_DIR/perso" ]; then
-	source "$PERSO_DIR/perso"
+if [ -f "$KONIX_PERSO_DIR/perso" ]; then
+	source "$KONIX_PERSO_DIR/perso"
 fi
 
 # ################################################################################
 # Aliases
 # ################################################################################
 # Take the aliases from a special file
-if [ -f "$CONFIG_DIR/bash_aliases" ]; then
-	source "$CONFIG_DIR/bash_aliases"
+if [ -f "$KONIX_CONFIG_DIR/bash_aliases" ]; then
+	source "$KONIX_CONFIG_DIR/bash_aliases"
 fi
 
 # ################################################################################
 # Importation de mes fonctions persos
 # ################################################################################
-source "${LIB_DIR}/lib_bash.sh"
+source "${KONIX_LIB_DIR}/lib_bash.sh"
 
 # Log sur l'agent SSH
 if is_on_linux

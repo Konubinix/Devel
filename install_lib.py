@@ -10,16 +10,16 @@ logging.basicConfig(level=logging.DEBUG)
 
 def get_environ():
         environ = {}
-        environ["PLATFORM"] = sys.platform
-        logging.info("Installing for platform "+environ["PLATFORM"])
+        environ["KONIX_PLATFORM"] = sys.platform
+        logging.info("Installing for platform "+environ["KONIX_PLATFORM"])
         KONIX_PWD = os.getcwd().replace("\\","/")
-        environ["DEVEL_DIR"] = KONIX_PWD
-        environ["BIN_DIR"] = environ["DEVEL_DIR"]+"/"+"bin"
-        environ["LIB_DIR"] = environ["DEVEL_DIR"]+"/"+"lib"
-        environ["SHARE_DIR"] = environ["DEVEL_DIR"]+"/"+"share"
+        environ["KONIX_DEVEL_DIR"] = KONIX_PWD
+        environ["KONIX_BIN_DIR"] = environ["KONIX_DEVEL_DIR"]+"/"+"bin"
+        environ["KONIX_LIB_DIR"] = environ["KONIX_DEVEL_DIR"]+"/"+"lib"
+        environ["KONIX_SHARE_DIR"] = environ["KONIX_DEVEL_DIR"]+"/"+"share"
         # add the lib dir to sys path in order to use the which lib so that I
         # can find python executable. sys.executable won't work with cygwin
-        sys.path.insert(0, environ["LIB_DIR"])
+        sys.path.insert(0, environ["KONIX_LIB_DIR"])
         import which
         python_bin = which.which("python").replace("\\", "/")
         if python_bin == "":
@@ -29,13 +29,13 @@ def get_environ():
         logging.info("Python bin is : "+python_bin)
         environ["PYTHON_PATH"] = os.path.dirname(python_bin)
         environ["KONIX_PWD"] = KONIX_PWD
-        environ["CONFIG_DIR"] = KONIX_PWD+"/"+"config"
-        environ["TUNNING_DIR"] = KONIX_PWD+"/"+"tunning"
-        environ["PERSO_DIR"] = KONIX_PWD+"/"+".."+"/"+"perso"
+        environ["KONIX_CONFIG_DIR"] = KONIX_PWD+"/"+"config"
+        environ["KONIX_TUNNING_DIR"] = KONIX_PWD+"/"+"tunning"
+        environ["KONIX_PERSO_DIR"] = KONIX_PWD+"/"+".."+"/"+"perso"
         environ["PATH_SEPARATOR"] = os.pathsep
         environ["HOME"] = os.path.expanduser("~").replace("\\","/")
-        environ["SH_CUSTOM_FILE"] = environ["HOME"]+"/"+".shrc_custo"
-        environ["EMACS_CUSTOM_FILE"] = environ["HOME"]+"/"+".emacs_custo"
+        environ["KONIX_SH_CUSTOM_FILE"] = environ["HOME"]+"/"+".shrc_custo"
+        environ["KONIX_EMACS_CUSTOM_FILE"] = environ["HOME"]+"/"+".emacs_custo"
         return environ
 
 def is_on_linux():

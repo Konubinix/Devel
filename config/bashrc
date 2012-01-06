@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "$CONFIG_DIR/shrc"
+source "$KONIX_CONFIG_DIR/shrc"
 
 # don't put duplicate lines in the history. See bash(1) for more
 # options

@@ -94,14 +94,14 @@ def main():
         # - the platforms are differents
         # or
         # - env_done is not set to 1
-        logging.debug("the config is for "+config["PLATFORM"]+", the environ says "+os.environ.get("PLATFORM", "nothing"))
-        if config["PLATFORM"] != os.environ.get("PLATFORM") or os.environ.get("KONIX_ENV_DONE") != "1":
+        logging.debug("the config is for "+config["KONIX_PLATFORM"]+", the environ says "+os.environ.get("KONIX_PLATFORM", "nothing"))
+        if config["KONIX_PLATFORM"] != os.environ.get("KONIX_PLATFORM") or os.environ.get("KONIX_ENV_DONE") != "1":
             # ####################################################################################################
             # Hardcoded ones
             # ####################################################################################################
             config["HOSTNAME"] = socket.gethostname()
             logging.debug("Parsing the env")
-            devel_dir = config["DEVEL_DIR"]
+            devel_dir = config["KONIX_DEVEL_DIR"]
             konix_config = os.path.join(devel_dir,"config")
             config_file = os.path.join(konix_config, "env.conf")
             config_user_file = os.path.join(os.path.expanduser("~"),"env.conf")

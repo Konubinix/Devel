@@ -1,5 +1,5 @@
 #!/bin/bash
-source "${LIB_DIR}/lib_bash.sh"
+source "${KONIX_LIB_DIR}/lib_bash.sh"
 findEmacsWindow () {
 	wmctrl -l -x|grep -q emacs.Emacs
 }

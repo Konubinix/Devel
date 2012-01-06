@@ -28,10 +28,10 @@ import_env
         replace_file_content(SHRC_VAR_FILE_NAME, SHRC_VAR_FILE_CONTENT)
 
         # ####################################################################################################
-        # Install SH_CUSTOM_FILE
+        # Install KONIX_SH_CUSTOM_FILE
         # ####################################################################################################
-        if not os.path.exists(environ["SH_CUSTOM_FILE"]):
-                replace_file_content(environ["SH_CUSTOM_FILE"], """#!/bin/bash
+        if not os.path.exists(environ["KONIX_SH_CUSTOM_FILE"]):
+                replace_file_content(environ["KONIX_SH_CUSTOM_FILE"], """#!/bin/bash
 # custom sh commands
 """)
 
@@ -40,8 +40,8 @@ import_env
         # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".bashrc"), """#!/bin/bash
 source "${HOME}/.shrc_var"
-source "${CONFIG_DIR}/bashrc"
-source "${SH_CUSTOM_FILE}"
+source "${KONIX_CONFIG_DIR}/bashrc"
+source "${KONIX_SH_CUSTOM_FILE}"
 """)
 
         # ####################################################################################################
@@ -49,16 +49,16 @@ source "${SH_CUSTOM_FILE}"
         # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".shrc"), """#!/bin/sh
 source "${HOME}/.shrc_var"
-source "${CONFIG_DIR}/shrc"
-source "${SH_CUSTOM_FILE}"
+source "${KONIX_CONFIG_DIR}/shrc"
+source "${KONIX_SH_CUSTOM_FILE}"
 """)
         # ####################################################################################################
         # ZSHRC
         # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".zshrc"), """#!/bin/zsh
 source "${HOME}/.shrc_var"
-source "${CONFIG_DIR}/zshrc"
-source "${SH_CUSTOM_FILE}"
+source "${KONIX_CONFIG_DIR}/zshrc"
+source "${KONIX_SH_CUSTOM_FILE}"
 """)
         print "Successful installed shell config"
 if __name__ == '__main__':

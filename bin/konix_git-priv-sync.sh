@@ -1,5 +1,5 @@
 #!/bin/bash
 
-pushd "$PERSO_DIR"
+pushd "$KONIX_PERSO_DIR"
 git-priv-sync.sh
 popd

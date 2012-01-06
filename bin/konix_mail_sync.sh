@@ -14,10 +14,10 @@ notmuch new --verbose
 notmuchsync -d -s --all --sync-deleted-tag
 
 # do a rss -> imap work
-feed2imap -f "$PERSO_DIR/feed2imaprc"
+feed2imap -f "$KONIX_PERSO_DIR/feed2imaprc"
 
 #sync with imap server
-offlineimap -c "$PERSO_DIR/offlineimaprc"
+offlineimap -c "$KONIX_PERSO_DIR/offlineimaprc"
 #get messages from pop server
 # getmail
 

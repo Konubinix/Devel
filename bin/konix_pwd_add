@@ -19,7 +19,7 @@ INFO_TEXT="Get additionnal info, empty line to finish"
 p = subprocess.Popen(["konix_gpgdir_default_key.py"], stdout=subprocess.PIPE)
 DEFAULT_RECIPIENT = p.stdout.readline()[:-1]
 
-perso_dir = os.environ["PERSO_DIR"]
+perso_dir = os.environ["KONIX_PERSO_DIR"]
 mdp_dir = os.path.join(perso_dir, "mdp_nd")
 
 def get_file_name():

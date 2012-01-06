@@ -156,6 +156,10 @@
 (defvar konix/python/ac-dir-prefix
   "[^\.a-zA-Z_0-9-]\\([\.a-zA-Z_0-9-]+\\)\\.\\([a-zA-Z_0-9-]*\\)")
 
+(defvar konix/python/ac-cache '()
+  "An alist of the form ((prefix . completion))"
+  )
+
 (defun konix/python/ac-dir-prefix ()
   (when
 	  (re-search-backward
@@ -166,19 +170,36 @@
   )
 
 (defun konix/python/ac-dir-candidates ()
-  (when
-	  (save-excursion
-		(re-search-backward
-		 konix/python/ac-dir-prefix
-		 (save-excursion (beginning-of-line) (1- (point))) t)
-		)
-
+  (when (save-excursion
+		  (re-search-backward
+		   konix/python/ac-dir-prefix
+		   (save-excursion (beginning-of-line) (1- (point))) t)
+		  )
 	(let* (
 		   (class (match-string-no-properties 1))
 		   (method (match-string-no-properties 2))
-		   (class_dir (konix/python/dir class))
+		   (class_dir nil)
+		   ;; find something similar in the cache
+		   (cache (first
+				   (mapcar
+					(lambda (cache_cons)
+					  (when (string= (car cache_cons) class)
+						(cdr cache_cons)
+						)
+					  )
+					konix/python/ac-cache
+					)
+				   )
+				  )
 		   )
-	  ;;(message "%s - %s - %s" (match-string-no-properties 0)class method)
+	  (if cache
+		  (setq class_dir cache)
+		(progn
+		  (setq class_dir
+				(konix/python/dir class))
+		  (add-to-list 'konix/python/ac-cache (cons class class_dir))
+		  )
+		)
 	  (all-completions method class_dir)
 	  )
 	)

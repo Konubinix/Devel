@@ -38,6 +38,8 @@
 (require 'inversion)
 (require 'speedbar)
 
+(require 'cedet-compat) ;; semantic-c need it via gcc helpers
+
 (require 'semantic)
 
 (require 'eieio)
@@ -137,7 +139,6 @@
 (require 'ede-cpp-root)
 (require 'ede-simple)
 (require 'ede-locate)
-(require 'ede-custom)
 
 (require 'wisent-python)
 (require 'semantic-make)

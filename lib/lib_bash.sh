@@ -327,6 +327,18 @@ pinfo () {
 	echo "# $*" >&2
 }
 
-cdd () {
-    builtin cd "$@" && ls --color=auto
+c () {
+    cd "$@" && ls
+}
+
+u () {
+    cd .. && ls
+}
+
+p () {
+	pushd "$@" && ls
+}
+
+b () {
+	popd && ls
 }

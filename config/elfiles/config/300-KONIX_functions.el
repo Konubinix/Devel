@@ -1,6 +1,30 @@
 ;; ################################################################################
 ;; General use function
 ;; ################################################################################
+(defun konix/readlines (filename &optional empty_line_as_well)
+  "Get a list of lines from a file.
+
+If empty_line_as_well is t, get an entry for each empty
+line. Else get entries only for non empty lines. An empty line is
+considered to be a line with nothing in it. Any line with only
+spaces, tab or anything falling in blank syntax category will
+make the line non empty"
+  (let* (
+		(result '())
+		(wildcard (if empty_line_as_well "*" "+"))
+		(regexp (format "^.%s$" wildcard))
+		)
+	(with-temp-buffer
+	  (insert-file-contents-literally filename)
+	  (goto-char 0)
+	  (while (re-search-forward regexp nil t)
+		(add-to-list 'result (match-string 0) t)
+		)
+	  )
+	result
+	)
+  )
+
 (defun konix/delete-paren-at-point ()
   (interactive)
   (or (looking-at "(") (error "Point must be just before a ( character"))

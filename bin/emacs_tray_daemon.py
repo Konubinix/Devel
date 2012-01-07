@@ -78,5 +78,5 @@ class EmacsTrayDaemon(object):
         self.clean()
 
 if __name__ == "__main__":
-    etd = EmacsTrayDaemon(os.path.join(tempfile.gettempdir(), "tray_daemon_control"))
+    etd = EmacsTrayDaemon(os.path.join(tempfile.gettempdir(), "emacs_tray_daemon_control"))
     etd.main()

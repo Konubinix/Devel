@@ -1709,7 +1709,7 @@ Prefix argument ARG makes the entry nonmarking."
   (unless (eq konix/erc-tray-state arg)
 	(with-temp-buffer
 	  (insert (if arg "B" "b"))
-	  (write-file "/tmp/tray_daemon_control")
+	  (write-file "/tmp/emacs_tray_daemon_control")
 	  )
     (setq konix/erc-tray-state arg)
 	)

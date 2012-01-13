@@ -31,7 +31,7 @@ def get_environ():
         environ["PYTHON_PATH"] = os.path.dirname(python_bin)
         environ["KONIX_PWD"] = KONIX_PWD
         environ["KONIX_CONFIG_DIR"] = KONIX_PWD+"/"+"config"
-        environ["KONIX_TUNNING_DIR"] = KONIX_PWD+"/"+"tunning"
+        environ["KONIX_TUNING_DIR"] = KONIX_PWD+"/"+"tuning"
         environ["KONIX_PERSO_DIR"] = KONIX_PWD+"/"+".."+"/"+"perso"
         environ["PATH_SEPARATOR"] = os.pathsep
         environ["HOME"] = os.path.expanduser("~").replace("\\","/")

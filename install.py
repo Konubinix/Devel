@@ -111,12 +111,12 @@ if is_on_linux():
                 subprocess.call(["gconftool", "-s", "/desktop/gnome/interface/gtk_theme", "-t", "string", theme_name])
                 shutil.rmtree(tempdir)
 
-        install_icon_theme (os.path.join(environ["KONIX_TUNNING_DIR"], "Delta_Gnome_Icons.tar.gz"))
-        install_gtk_theme  (os.path.join(environ["KONIX_TUNNING_DIR"], "Theme.tar.gz"))
-        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNNING_DIR"], "gnome-terminal-profile.xml"), "/apps/gnome-terminal/profiles/Default"])
-        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNNING_DIR"], "gnome-desktop-session.xml"), "/desktop/gnome/session"])
-        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNNING_DIR"], "guake.xml"), "/apps/guake"])
-        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNNING_DIR"], "notification-daemon.xml"), "/apps/notification-daemon"])
+        install_icon_theme (os.path.join(environ["KONIX_TUNING_DIR"], "Delta_Gnome_Icons.tar.gz"))
+        install_gtk_theme  (os.path.join(environ["KONIX_TUNING_DIR"], "Theme.tar.gz"))
+        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNING_DIR"], "gnome-terminal-profile.xml"), "/apps/gnome-terminal/profiles/Default"])
+        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNING_DIR"], "gnome-desktop-session.xml"), "/desktop/gnome/session"])
+        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNING_DIR"], "guake.xml"), "/apps/guake"])
+        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNING_DIR"], "notification-daemon.xml"), "/apps/notification-daemon"])
         # Set emacs style bindings to firefox
         subprocess.call(["gconftool-2", "--set", "/desktop/gnome/interface/gtk_key_theme Emacs", "--type", "string"])
         subprocess.call(["chmod", "+x", "-Rv",

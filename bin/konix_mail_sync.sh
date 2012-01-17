@@ -22,7 +22,7 @@ then
 fi
 
 #sync with imap server
-offlineimap -c "$KONIX_PERSO_DIR/offlineimaprc"
+offlineimap -c "$KONIX_OFFLINEIMAPRC"
 #get messages from pop server
 # getmail
 

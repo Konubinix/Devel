@@ -1617,6 +1617,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 
 (setq-default diary-file (expand-file-name "diary" perso-dir))
 (unless (file-exists-p diary-file)
+  (make-directory (file-name-directory diary-file) t)
   (with-temp-buffer
 	(insert "My Diary")
 	(write-file diary-file)
@@ -1753,7 +1754,7 @@ erc-modified-channels-alist, filtered by konix/erc-tray-ignored-channels."
 			 (equal (window-buffer) (current-buffer))
 			 )
 			)
-	(call-process "notify-send" nil nil nil (substring-no-properties string))
+	(call-process "konix_display.py" nil nil nil (substring-no-properties string))
 	)
   (konix/erc-tray-update-state)
   )

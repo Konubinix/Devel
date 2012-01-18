@@ -5,7 +5,7 @@ then
     alias ls='ls --color'
 fi
 alias ll='ls -l'
-alias la='ls -A'
+alias la='ls -Al'
 alias l='ls -CF'
 alias CH='grep --color -i -n -r'
 alias CHnr='grep --color -n -i'

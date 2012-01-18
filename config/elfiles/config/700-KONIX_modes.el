@@ -1143,22 +1143,6 @@
 	 (add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
 	 )
   )
-;; --------------------------------------------------
-;; Nxml
-;; --------------------------------------------------
-(add-to-list 'hs-special-modes-alist
-			 '(nxml-mode
-			   "<!--\\|<[^/>]*[^/]>"                    ;; regexp for start block
-			   "-->\\|</[^/>]*[^/]>"                    ;; regexp for end block
-
-			   "<!--"                                   ;; regexp for comment start. (need this??)
-			   nxml-forward-element
-			   nil)
-			 )
-(defun konix/nxml-mode-hook()
-  (hs-minor-mode 1)
-  )
-(add-hook 'nxml-mode-hook 'konix/nxml-mode-hook)
 
 ;; --------------------------------------------------
 ;; Iswitchb

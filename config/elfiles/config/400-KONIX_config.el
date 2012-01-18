@@ -5,6 +5,9 @@
 ;; configuration of a mode uses a hook over the mode or is too big to be here,
 ;; it is then put into the mode file or into a dedicated file
 ;; ####################################################################################################
+;; Default font, simple, nice!!
+(set-default-font "Monospace 10")
+
 ;; ******************************************************************************************
 ;; bbdb custom
 ;; ******************************************************************************************

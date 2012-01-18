@@ -296,7 +296,7 @@ XCalc*ShapeStyle:             rectangle
 ! ************************************************************
 ! emacs
 ! ************************************************************
-emacs*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
+! emacs*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
 ! emacs*background: #111111
 ! emacs*foreground: #babdb6
 
@@ -311,10 +311,9 @@ emacs.menuBar:							false
 emacs.toolBar:							0
 emacs.scrollBarWidth:					0
 
+! emacs.fullscreen:						fullboth
 
-!emacs.fullscreen:						fullboth
-
-emacsclient*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
+! emacsclient*Font:		-adobe-courier-medium-r-normal--20-*-100-100-m-90-iso8859-1
 ! emacsclient*background: #111111
 ! emacsclient*foreground: #babdb6
 

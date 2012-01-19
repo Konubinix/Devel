@@ -180,6 +180,8 @@ Mod4 F10 :Maximize
 Mod4 F5 :Maximize
 Mod4 F11 :Fullscreen
 Mod4 d : ShowDesktop
+# Lock the screen
+Mod4 l : Exec xlock
 Control Mod4 d : ShowDesktop
 Print : MacroCmd { Exec konix_display.py 'impression ecran' } { ExecCommand $(konix_find_true_exec.sh import) ~/Desktop/Capture.png }
 

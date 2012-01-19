@@ -81,7 +81,7 @@ if is_on_linux():
                         theme_name = theme_name[0]
                 new_icons_dir = os.path.join(icons_dir, theme_name)
                 if confirm(prompt="Remove old icons dir "+new_icons_dir):
-                        shutil.rmtree(new_icons_dir)
+                        shutil.rmtree(new_icons_dir, True)
                 else:
                         return False
                 shutil.move(os.path.join(tempdir, theme_name), new_icons_dir)

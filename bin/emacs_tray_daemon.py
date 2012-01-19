@@ -28,8 +28,9 @@ class EmacsTrayDaemon(object):
         self.blue_pixbuf = gtk.gdk.pixbuf_new_from_file(self.blue_icon_file_name)
         self.red_pixbuf = gtk.gdk.pixbuf_new_from_file(self.red_icon_file_name)
 
-    def __init__(self, fifo_file_name):
+    def __init__(self, fifo_file_name, period):
         """Make sure the fifo exists and is a fifo"""
+        self.period = period
         # ####################################################################################################
         # Init the icons
         # ####################################################################################################
@@ -66,7 +67,7 @@ class EmacsTrayDaemon(object):
         return True
 
     def main(self):
-        gobject.timeout_add(EMACS_TRAY_PERIOD, EmacsTrayDaemon.update_tray, self)
+        gobject.timeout_add(self.period, EmacsTrayDaemon.update_tray, self)
         gtk.main()
 
     def clean(self):
@@ -78,5 +79,5 @@ class EmacsTrayDaemon(object):
         self.clean()
 
 if __name__ == "__main__":
-    etd = EmacsTrayDaemon(os.path.join(tempfile.gettempdir(), "emacs_tray_daemon_control"))
+    etd = EmacsTrayDaemon(os.path.join(tempfile.gettempdir(), "emacs_tray_daemon_control"), EMACS_TRAY_PERIOD)
     etd.main()

@@ -237,8 +237,6 @@ Mod4 o e : ExecCommand konix_display_n_launch.sh pcmanfm ~
 Mod4 o i : ExecCommand konix_display_n_launch.sh pcmanfm ~/data/Images
 Mod4 o m : ExecCommand konix_display_n_launch.sh pcmanfm ~/data/Musiques
 Mod4 o v : ExecCommand konix_display_n_launch.sh pcmanfm ~/data/Videos
-# let's go Program
-Mod4 p : ExecCommand gnome-terminal --working-directory ~/Prog
 
 # ************************************************************
 # Special window keys

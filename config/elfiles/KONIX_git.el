@@ -509,6 +509,12 @@
   (konix/compile "git stash list")
   )
 
+(defun konix/git/stash/show (&optional number)
+  (interactive)
+  (setq number (or number 0))
+  (konix/compile (format "git stash show -u stash@{%s}" number))
+  )
+
 (defun konix/git/remote/list ()
   (split-string (substring (shell-command-to-string "git remote") 0 -1))
   )
@@ -1288,6 +1294,7 @@ Uses the macro konix/git/status-buffer/next-or-previous
 (define-key konix/git-global-map "S" 'konix/git-global-map-stash)
 (define-key konix/git-global-map-stash "p" 'konix/git/stash/pop)
 (define-key konix/git-global-map-stash "s" 'konix/git/stash/save)
+(define-key konix/git-global-map-stash "S" 'konix/git/stash/show)
 (define-key konix/git-global-map-stash "a" 'konix/git/stash/apply)
 (define-key konix/git-global-map-stash "c" 'konix/git/stash/clear)
 (define-key konix/git-global-map-stash "d" 'konix/git/stash/drop)

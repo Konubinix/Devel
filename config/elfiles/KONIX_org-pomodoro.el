@@ -421,12 +421,12 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 	  )
 	(setq konix/org-pomodoro-in-pomodoro nil)
 	(konix/org-pomodoro-report-finish-pomodoro)
-	(konix/notify (format "Mark pomodoro and take a%s break (%s)" _long konix/org-pomodoro-set-count) t))
+	(konix/notify (format "Mark pomodoro and take a%s break (%s)" _long konix/org-pomodoro-set-count) 3))
   )
 
 (defun konix/org-timer-done-break-pomodoro-hook ()
   (konix/org-pomodoro-goto)
-  (konix/notify "Break done, go back to work" t)
+  (konix/notify "Break done, go back to work" 3)
   )
 (defalias 'konix/org-timer-done-hook 'konix/org-timer-done-pomodoro-hook)
 

@@ -1849,6 +1849,13 @@ don't change the value of the default browser"
 		)
 	  )
 	)
+   ((equal intrusivity_level 2)
+	(shell-command-to-string (format "konix_display.py '%s'" msg))
+	)
+   ((equal intrusivity_level 3)
+	(konix/notify msg 1 remove_date)
+	(konix/notify msg 2 remove_date)
+	)
    (t
 	(display-warning 'notification msg)
 	)

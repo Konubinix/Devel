@@ -133,7 +133,7 @@
 ;; Blinking cursor
 ;; ************************************************************
 (when blink-cursor-mode
-  (blink-cursor-mode nil)
+  (blink-cursor-mode 0)
   )
 ;; (setq-default blink-cursor-delay 0.2)	;in case I reactivate it
 ;; (setq-default blink-cursor-interval 0.2)

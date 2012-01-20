@@ -19,7 +19,6 @@ fbpid=$!
 setxkbmap -option ctrl:swapcaps
 volwheel &
 
-emacs --daemon > ~/.emacs_log 2>&1 &
 numlockx
 konix_notify_daemon > ~/.notify_daemon_log 2>&1 &
 

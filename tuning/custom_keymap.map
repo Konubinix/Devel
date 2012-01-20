@@ -1,0 +1,11 @@
+# CAPS LOCK used as Control
+keycode  58 = Control
+
+# Left control used as CAPS LOCK
+keycode  29 = Caps_Lock
+        shift   keycode  29 = Shift_Lock
+        control keycode  29 = Control_Lock
+        alt     keycode  29 = Alt_Lock
+        altgr   keycode  29 = AltGr_Lock
+
+keycode  27

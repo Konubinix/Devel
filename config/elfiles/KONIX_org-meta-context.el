@@ -1,6 +1,7 @@
 (defcustom konix/org-meta-context/meta-contexts '()
-  "A user defined list of directories pointing to directories of org files. The
-  default one is the first in the list
+  "A user defined list of directories pointing to directories of org files.
+
+The default one is the first in the list
 "
   :type '(repeat file)
   )

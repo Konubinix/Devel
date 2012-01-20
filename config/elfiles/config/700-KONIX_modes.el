@@ -1273,6 +1273,9 @@
 ;; --------------------------------------------------------------------------------
 ;; nXML mode
 ;; --------------------------------------------------------------------------------
+(setq-default nxml-bind-meta-tab-to-complete-flag t)
+(setq-default nxml-auto-insert-xml-declaration-flag t)
+(setq-default nxml-child-indent 2)
 (defun konix/hs-nxml-forward-sexp-func (dummy)
   (save-match-data
 	(unless (looking-at "<\\([a-zA-Z0-9_-]+\\)[ >]")
@@ -1320,6 +1323,7 @@
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
   (hs-minor-mode t)
+  (turn-on-tempbuf-mode)
   )
 (add-hook 'nxml-mode-hook
 		  'konix/nxml-mode-hook)

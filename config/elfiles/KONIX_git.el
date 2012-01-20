@@ -691,7 +691,12 @@
 								   (with-current-buffer ,diff_buffer
 									 (diff-mode)
 									 )
-								   (pop-to-buffer ,diff_buffer)
+								   (let (
+										 (previous_window (selected-window))
+										 )
+									 (pop-to-buffer ,diff_buffer)
+									 (select-window previous_window)
+									 )
 								   )
 							   (display-warning 'diff-warning
 												(format

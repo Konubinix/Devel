@@ -28,6 +28,7 @@ def by_pyosd(message):
     p.display(message)
 
 def main(message,unique=False):
+    message = message.replace("<", "-")
     try:
         by_konubinix_notificator(message,unique)
     except:

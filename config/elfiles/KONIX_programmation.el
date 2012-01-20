@@ -68,7 +68,7 @@ They can be relative or absolute
   )
 
 (defcustom konix/prog/toggle-source-header-hdr-extensions
-  (list "h" "hpp")
+  (list "h" "hpp" "hh")
   "A list of extensions used to search header files"
   :type '(repeat string)
   :group 'konix/prog

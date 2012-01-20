@@ -266,6 +266,7 @@ PARAM : a string with parameters given to make
   (konix/compile/find-makefile makefile)
   (let ((command (concat "make -C '"(file-name-directory konix/compile/makefile-proj)"' "param))
         (buf_name (buffer-name))
+		(default-directory (file-name-directory konix/compile/makefile-proj))
         )
     (let (window)
       (setq window (get-buffer-window "*compilation*"))

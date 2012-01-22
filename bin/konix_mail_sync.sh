@@ -13,13 +13,7 @@ notmuch new --verbose
 # sync maildir flags up with notmuch
 notmuchsync -d -s --all --sync-deleted-tag
 
-if [ -z "$KONIX_FEED2IMAP_SKIP" ]
-then
-# do a rss -> imap work
-	feed2imap -f "$KONIX_PERSO_DIR/feed2imaprc"
-# clean the old rss
-	feed2imap-cleaner -f "$KONIX_PERSO_DIR/feed2imaprc"
-fi
+konix_feed_sync.sh
 
 #sync with imap server
 offlineimap -c "$KONIX_OFFLINEIMAPRC"

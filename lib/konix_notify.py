@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+import logging
+logging.basicConfig(level=logging.DEBUG)
+LOGGER = logging.getLogger(__name__)
 
 def by_konubinix_notificator(message,unique=False):
     import dbus
@@ -8,10 +11,10 @@ def by_konubinix_notificator(message,unique=False):
         path = "/UniqueNotification"
     else:
         path = "/Notification"
-    logging.info("Opening communication with "+path)
+    LOGGER.info("Opening communication with "+path)
     notification = session.get_object('konubinix.notificator',
                                       path)
-    logging.info("Displaying message "+message)
+    LOGGER.info("Displaying message "+message)
     notification.Notify(message)
 
 def by_pynotify(message):

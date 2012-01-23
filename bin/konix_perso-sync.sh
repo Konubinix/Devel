@@ -11,6 +11,9 @@
 # - go back to working directory
 
 . "${KONIX_LIB_DIR}/lib_bash.sh"
+# sanity check
+source konix_assert_var.sh "$KONIX_PERSO_RAW_DIR"
+source konix_assert.sh "-d '$KONIX_PERSO_RAW_DIR'"
 
 TMP_PERSO_DECRYPT="$(mktemp -d)"
 trap "rm -rvf '$TMP_PERSO_DECRYPT'" 0

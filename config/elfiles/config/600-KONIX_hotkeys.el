@@ -2,6 +2,7 @@
 ;; Unset the keys I want to free
 ;; ####################################################################################################
 (global-unset-key (kbd "C-<"))
+(global-unset-key (kbd "C-à"))			;for bépo keyboards
 (global-unset-key (kbd "<f2>"))
 (global-unset-key (kbd "<f10>"))
 (global-unset-key (kbd "<f1>"))
@@ -88,6 +89,7 @@
 ;; ####################################################################################################
 (define-prefix-command 'konix/global-slow-key-map)
 (global-set-key (kbd "C-<") 'konix/global-slow-key-map)
+(global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
 
 ;; calc
 (define-key 'konix/global-slow-key-map (kbd "C-c") 'calc)
@@ -451,7 +453,7 @@
 ;; Org Mode
 ;; ####################################################################################################
 (define-prefix-command  'konix/org-global-map)
-(define-key 'konix/global-slow-key-map(kbd "o") 'konix/org-global-map)
+(define-key 'konix/global-slow-key-map (kbd "o") 'konix/org-global-map)
 
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
 (define-key 'konix/org-global-map "o" 'org-clock-out)

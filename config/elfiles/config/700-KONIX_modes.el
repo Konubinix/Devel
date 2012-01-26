@@ -1322,8 +1322,11 @@
   )
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
-  (hs-minor-mode t)
   (turn-on-tempbuf-mode)
+  (local-set-key (kbd "<f1>") 'nxml-hide-direct-text-content)
+  (local-set-key (kbd "<f2> <f1>") 'nxml-hide-all-text-content)
+  (local-set-key (kbd "<f2> <f3>") 'nxml-show-all)
+  (local-set-key (kbd "<f3>") 'nxml-show-direct-text-content)
   )
 (add-hook 'nxml-mode-hook
 		  'konix/nxml-mode-hook)

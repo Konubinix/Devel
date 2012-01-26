@@ -13,8 +13,6 @@ notmuch new --verbose
 # sync maildir flags up with notmuch
 notmuchsync -d -s --all --sync-deleted-tag
 
-konix_feed_sync.sh
-
 #sync with imap server
 offlineimap -c "$KONIX_OFFLINEIMAPRC"
 #get messages from pop server

@@ -1682,6 +1682,13 @@ Prefix argument ARG makes the entry nonmarking."
 (setq-default erc-modules '(autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands notify readonly ring smiley sound stamp spelling track))
 (setq-default erc-user-mode 'ignore)
 
+(defun konix/erc-mode-hook ()
+  (local-set-key (kbd "<C-up>") 'erc-previous-command)
+  (local-set-key (kbd "<C-down>") 'erc-next-command)
+  )
+(add-hook 'erc-mode-hook
+		  'konix/erc-mode-hook)
+
 ;; ******************************************************************************************
 ;; tracking channels
 ;; ******************************************************************************************

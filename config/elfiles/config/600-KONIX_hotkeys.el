@@ -103,8 +103,8 @@
 (define-key 'konix/global-slow-key-map (kbd "C-s") 'grin)
 ;; insert the date
 (define-key 'konix/global-slow-key-map (kbd "C-t") 'konix/insert-iso-time-string)
-;; insert date and time
-(define-key 'konix/global-slow-key-map (kbd "C-d") 'konix/insert-text-date-string)
+;; insert the number of second since the 00:00 1/1/1970
+(define-key 'konix/global-slow-key-map (kbd "C-d") 'konix/insert-seconds-since-1970)
 ;; Lance l'explorer
 (define-key 'konix/global-slow-key-map (kbd "C-e") 'konix/explorer)
 ;; compte les mots de la region

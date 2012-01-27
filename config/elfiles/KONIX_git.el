@@ -465,7 +465,7 @@
 
 (defun konix/git/log/file (file)
   (interactive
-   (list (file-name-nondirectory (buffer-file-name)))
+   (list (konix/_get-file-name "git log file : "))
    )
   (konix/git/command (concat "log -- " file))
   )

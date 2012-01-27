@@ -80,6 +80,7 @@
 ;; grin
 (autoload 'grin "grin" nil t)
 (autoload 'hide/show-comments "hide-comnt" nil t)
+(autoload 'dired-visit-history-enable "dired-visit-history")
 
 ;; ************************************************************
 ;; Automodes

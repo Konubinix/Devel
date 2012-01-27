@@ -91,6 +91,8 @@
 (global-set-key (kbd "C-<") 'konix/global-slow-key-map)
 (global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
 
+;; open recent file
+(define-key 'konix/global-slow-key-map (kbd "f") 'recentf-open-files)
 ;; calc
 (define-key 'konix/global-slow-key-map (kbd "C-c") 'calc)
 ;; revert buffer

@@ -1341,10 +1341,12 @@
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
   (turn-on-tempbuf-mode)
+  (autopair-mode 1)
   (local-set-key (kbd "<f1>") 'nxml-hide-direct-text-content)
   (local-set-key (kbd "<f2> <f1>") 'nxml-hide-all-text-content)
   (local-set-key (kbd "<f2> <f3>") 'nxml-show-all)
   (local-set-key (kbd "<f3>") 'nxml-show-direct-text-content)
+  (setq show-trailing-whitespace t)
   (setq indent-line-function 'konix/nxml-indent-line)
   (setq ac-sources
 		'(

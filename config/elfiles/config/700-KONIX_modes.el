@@ -1704,6 +1704,10 @@ Prefix argument ARG makes the entry nonmarking."
 ;; tracking channels
 ;; ******************************************************************************************
 (setq erc-track-visibility 'visible)
+(setq-default erc-track-exclude-types '("JOIN" "KICK" "NICK" "PART" "QUIT"
+										"MODE" "333" "353"))
+(setq-default erc-track-exclude-server-buffer t)
+(setq-default erc-track-showcount t)
 
 ;; --------------------------------------------------------------------------------
 ;; erc-tray, taken from

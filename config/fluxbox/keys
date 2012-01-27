@@ -265,6 +265,7 @@ Mod4 s b :MacroCmd { Exec setxkbmap fr } { Exec konix_display.py "Switch to AZER
 Mod4 s c :Exec eog ~/Prog/devel/doc/bepo.png
 
 Mod4 k c :MacroCmd { Exec setxkbmap -option ctrl:swapcaps } { Exec konix_display.py "switch CTRL CAPS" }
+Mod4 k shift c :MacroCmd { Exec setxkbmap -option } { Exec konix_display.py "Cancel xkb options" }
 
 # ####################################################################################################
 # Macro (Mod4 x k)
@@ -278,7 +279,10 @@ Mod4 x k a :MacroCmd { Exec python konix_xmacro.py -a && konix_display.py $(read
 # ####################################################################################################
 # Sound specific (Mod4 m ...)
 # ####################################################################################################
-Mod4 m t :ExecCommand exaile -t
-Mod4 m n :ExecCommand exaile -n
-Mod4 m p :ExecCommand exaile -p
-Mod4 m q :ExecCommand pkill exaile
+Mod4 m t :ExecCommand exaile -t && konix_display.py "Pause/resume"
+XF86AudioPlay :ExecCommand exaile -t && konix_display.py "Pause/resume"
+Mod4 m n :ExecCommand exaile -n && konix_display.py "Next music"
+XF86AudioNext :ExecCommand exaile -n && konix_display.py "Next music"
+Mod4 m p :ExecCommand exaile -p && konix_display.py "Previous music"
+XF86AudioPrev :ExecCommand exaile -p && konix_display.py "Previous music"
+Mod4 m q :ExecCommand pkill exaile && konix_display.py "Kill exaile"

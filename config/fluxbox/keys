@@ -258,10 +258,10 @@ XF86AudioRaiseVolume	:Exec konix_display_unique.py "Master Volume : $(amixer set
 # Keyboard (Mod4 k)
 # ************************************************************
 # Change layout
-Mod4 k a :MacroCmd { Exec setxkbmap fr bepo } { Exec setxkbmap -option ctrl:swapcaps } { Exec konix_display.py "Switch to BEPO" }
+Mod4 k a :MacroCmd { Exec setxkbmap fr bepo } { Exec konix_display.py "Switch to BEPO" }
 Mod4 k h :Exec eog ~/Prog/devel/doc/bepo.png
 # Same thing in BEPO
-Mod4 s b :MacroCmd { Exec setxkbmap fr } { Exec setxkbmap -option ctrl:swapcaps } { Exec konix_display.py "Switch to AZERTY" }
+Mod4 s b :MacroCmd { Exec setxkbmap fr } { Exec konix_display.py "Switch to AZERTY" }
 Mod4 s c :Exec eog ~/Prog/devel/doc/bepo.png
 
 Mod4 k c :MacroCmd { Exec setxkbmap -option ctrl:swapcaps } { Exec konix_display.py "switch CTRL CAPS" }

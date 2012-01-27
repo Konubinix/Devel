@@ -215,4 +215,36 @@
 	)
   )
 
+;; ####################################################################################################
+;; rng
+;; ####################################################################################################
+(defvar konix/rng/ac-prefix "<\\([a-zA-Z]*\\)" "")
+
+(defun konix/rng/ac-prefix ()
+  (when (looking-back
+		 konix/rng/ac-prefix nil t)
+	(match-beginning 1)
+	)
+  )
+
+(defun konix/rng/ac-candidates ()
+  (konix/rng/ac-prefix)
+  (let (
+		(prefix (match-string-no-properties 1))
+		(rng-complete-target-names (rng-match-possible-start-tag-names))
+		)
+	(all-completions prefix 'rng-complete-qname-function)
+	)
+  )
+
+(ac-define-source konix/rng
+  '(
+	(prefix . konix/rng/ac-prefix)
+	(candidates . konix/rng/ac-candidates)
+
+	(symbol . "kr")
+	(requires . 0)
+	)
+  )
+
 (provide 'KONIX_auto-complete)

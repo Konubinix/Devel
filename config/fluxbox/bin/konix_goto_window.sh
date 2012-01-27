@@ -1,21 +1,26 @@
 #!/bin/bash
-# Find_app
 # Author: Lucas van Staden (lvs at dedmeet.com / www.dedmeet.com)
+# Edited by: Konubinix
 # This little script will try and find the application attempting to start
 # in the running processes, and if found, focus the application
 # if not found, a new instance will start
-# usage:
-# find_app.sh <application with full path>
-# params
-# 1 - application to start (full path)
-# helper applications
-konix_display.py "goto $1" &
+# 1 - windows name pattern to match
+# 2 - application to call if the windows pattern is not found (defaults to $1)
+
 WMCTRL=`which wmctrl`;
 GREP=`which grep`;
-APPLICATION=$1;
-shift
+WINDOW_MATCH="$1"
+FALLBACK="$2"
+if [ "$FALLBACK" == "" ]
+then
+	FALLBACK="$WINDOW_MATCH"
+fi
+
+konix_display.py "goto $WINDOW_MATCH " &
+
+shift 2
 ARGS="$*"
-BASENAME=`basename $APPLICATION`;
+BASENAME=`basename $WINDOW_MATCH`;
 BASENAME=`echo $BASENAME | tr "[:upper:]" "[:lower:]"`
 FOUND=0;
 function findwindow {
@@ -25,7 +30,7 @@ function findwindow {
         IFS=$'\n';
         for RUNNING in `$2 -l -x`
         do
-                if [ `echo $RUNNING | tr "[:upper:]" "[:lower:]" | $3 -c $1` -gt 0 ]
+                if [ `echo $RUNNING | tr "[:upper:]" "[:lower:]" | $3 -c $WINDOW_MATCH` -gt 0 ]
                 then
                         HOSTNAME=`hostname`
                         WINDOW=${RUNNING#*${HOSTNAME} }
@@ -35,9 +40,10 @@ function findwindow {
         done
 }
 findwindow $BASENAME $WMCTRL $GREP;
+
 if [ $FOUND -eq 0 ]
 then
-    $APPLICATION $ARGS
+    $FALLBACK $ARGS
     sleep 2;
     findwindow $BASENAME $WMCTRL $GREP;
     if [ $FOUND -eq 0 ]

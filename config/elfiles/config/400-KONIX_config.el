@@ -499,3 +499,7 @@
 (setq-default gnus-select-method '(nntp "news.gmane.org"))
 (setq-default gnus-inhibit-startup-message t)
 (setq-default gnus-group-line-format "%M%S%p%P%5y:%B%(%g%)%O\n")
+;; ####################################################################################################
+;; flyspell
+;; ####################################################################################################
+(setq-default flyspell-use-meta-tab nil)

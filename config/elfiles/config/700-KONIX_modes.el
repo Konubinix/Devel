@@ -766,6 +766,7 @@
 	 (require 'wuxch-dired-copy-paste)
 	 (require 'dired-sort)
 	 (require 'diredful)
+	 (dired-visit-history-enable)
 	 ;; with "a", replace existing buffer
 	 (put 'dired-find-alternate-file 'disabled nil)
 	 (defvar dired-sort-map (make-sparse-keymap))

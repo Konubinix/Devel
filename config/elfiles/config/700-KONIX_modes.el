@@ -1328,6 +1328,16 @@
   (local-set-key (kbd "<f2> <f1>") 'nxml-hide-all-text-content)
   (local-set-key (kbd "<f2> <f3>") 'nxml-show-all)
   (local-set-key (kbd "<f3>") 'nxml-show-direct-text-content)
+  (setq ac-sources
+		'(
+		  ac-source-konix/rng
+		  ac-source-yasnippet
+		  ac-source-dictionary
+		  ac-source-words-in-same-mode-buffers
+		  ac-source-files-in-current-dir
+		  )
+		)
+  (auto-complete-mode 1)
   )
 (add-hook 'nxml-mode-hook
 		  'konix/nxml-mode-hook)

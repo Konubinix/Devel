@@ -1321,6 +1321,23 @@
 	  'hs-special-modes-alist
 	  konix/hs-xml-mode-info))
   )
+
+(defun konix/nxml-indent-line ()
+  "Indent only relevent lines"
+  ;; fill in the value of xmltok-type
+  (nxml-token-before)
+  (or
+   ;; cases where special indentation or no indentation will be performed
+   (case xmltok-type
+	 ('cdata-section
+	  t
+	  )
+	 )
+   ;; else, perform the default nxml indentation function
+   (nxml-indent-line)
+   )
+  )
+
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
   (turn-on-tempbuf-mode)
@@ -1328,6 +1345,7 @@
   (local-set-key (kbd "<f2> <f1>") 'nxml-hide-all-text-content)
   (local-set-key (kbd "<f2> <f3>") 'nxml-show-all)
   (local-set-key (kbd "<f3>") 'nxml-show-direct-text-content)
+  (setq indent-line-function 'konix/nxml-indent-line)
   (setq ac-sources
 		'(
 		  ac-source-konix/rng

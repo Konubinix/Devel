@@ -756,7 +756,7 @@
 	(konix/_get-file-name "Blame file" t)
 	)
    )
-  (konix/git/command (concat "blame '"file"'"))
+  (konix/git/command (concat "blame -w '"file"'"))
   )
 
 (defun konix/git/svn-fetch ()

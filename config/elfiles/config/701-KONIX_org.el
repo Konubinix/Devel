@@ -356,6 +356,60 @@
 	)
   )
 
+(defun konix/org-load-hook()
+  ;; better dimmed org agenda face
+  (set-face-attribute 'org-agenda-dimmed-todo-face nil
+					  :foreground "orange3"
+					  )
+  ;; With remember
+  (org-remember-insinuate)
+  ;; For dependencies
+  (require 'org-depend)
+
+  (add-hook 'before-save-hook 'org-update-all-dblocks)
+  ;; Pour les appointments
+  (require 'appt)
+  (org-agenda-to-appt)
+  (appt-activate 1)
+
+  ;; set hook to remember clock when exiting
+  (org-clock-persistence-insinuate)
+
+  (defadvice  org-agenda-redo (after org-agenda-redo-add-appts)
+	"Pressing `r' on the agenda will also add appointments."
+	(progn
+	  (setq appt-time-msg-list nil)
+	  (org-agenda-to-appt)
+	  (appt-check)
+	  )
+	)
+  (ad-activate 'org-agenda-redo)
+
+  (defun konix/org-open-at-point ()
+	"Like `org-open-at-point` exept that the file is opened in read only and the
+cursor stays in the org buffer."
+	(interactive)
+	(let(
+		 (org_buffer (current-buffer))
+		 )
+	  (org-open-at-point)
+	  (switch-to-buffer-other-window org_buffer)
+	  )
+	)
+
+  (defun org-info ()
+	(interactive)
+	(info (expand-file-name (concat elfiles "/org/doc/org")))
+	)
+
+  (define-key org-mode-map (kbd "C-c o") 'konix/org-open-at-point)
+
+  ;; (set 'org-open-at-mouse 'org-open-at-point)
+  ;; (ad-activate 'org-open-at-mouse)
+
+  )
+(add-hook 'org-load-hook 'konix/org-load-hook)
+
 ;; un parent est DONE quand à 100%
 (setq org-after-todo-statistics-hook 'konix/org-summary-todo)
 (defcustom konix/org-mode-font-lock-keywords
@@ -419,60 +473,6 @@
 	  )
 	)
   )
-
-(defun konix/org-load-hook()
-  ;; better dimmed org agenda face
-  (set-face-attribute 'org-agenda-dimmed-todo-face nil
-					  :foreground "orange3"
-					  )
-  ;; With remember
-  (org-remember-insinuate)
-  ;; For dependencies
-  (require 'org-depend)
-
-  (add-hook 'before-save-hook 'org-update-all-dblocks)
-  ;; Pour les appointments
-  (require 'appt)
-  (org-agenda-to-appt)
-  (appt-activate 1)
-
-  ;; set hook to remember clock when exiting
-  (org-clock-persistence-insinuate)
-
-  (defadvice  org-agenda-redo (after org-agenda-redo-add-appts)
-	"Pressing `r' on the agenda will also add appointments."
-	(progn
-	  (setq appt-time-msg-list nil)
-	  (org-agenda-to-appt)
-	  (appt-check)
-	  )
-	)
-  (ad-activate 'org-agenda-redo)
-
-  (defun konix/org-open-at-point ()
-	"Like `org-open-at-point` exept that the file is opened in read only and the
-cursor stays in the org buffer."
-	(interactive)
-	(let(
-		 (org_buffer (current-buffer))
-		 )
-	  (org-open-at-point)
-	  (switch-to-buffer-other-window org_buffer)
-	  )
-	)
-
-  (defun org-info ()
-	(interactive)
-	(info (expand-file-name (concat elfiles "/org/doc/org")))
-	)
-
-  (define-key org-mode-map (kbd "C-c o") 'konix/org-open-at-point)
-
-  ;; (set 'org-open-at-mouse 'org-open-at-point)
-  ;; (ad-activate 'org-open-at-mouse)
-
-  )
-(add-hook 'org-load-hook 'konix/org-load-hook)
 
 ;; ####################################################################################################
 ;; ANNOTATE

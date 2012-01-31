@@ -30,6 +30,4 @@ sleep 4
 	emacs_tray_daemon.py &
 } &
 
-skype &
-
 wait $fbpid

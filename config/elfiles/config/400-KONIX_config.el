@@ -287,8 +287,8 @@
 (setq-default visible-bell t)
 ;; Suppression de la scroll bar sur la gauche
 (put 'scroll-left 'disabled nil)
-;; Ne plus permettre par défaut d'auto filler
-(setq-default fill-column 8000)
+;; default auto-fill
+(setq-default fill-column 80)
 ;; For the cursor to move naturally
 (setq-default line-move-visual t)
 ;; hide ifdef

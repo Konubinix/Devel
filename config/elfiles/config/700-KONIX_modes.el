@@ -1817,3 +1817,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 (add-hook 'erc-track-list-changed-hook 'konix/erc-track-list-changed-hook)
 
 (global-set-key (kbd "<escape>") 'konix/erc-track-switch-buffer)
+;; ####################################################################################################
+;; Trac wiki
+;; ####################################################################################################
+(add-hook 'trac-wiki-mode-hook 'konix/outline-mode-hook)

@@ -32,6 +32,7 @@
 (global-set-key (kbd "<C-M-tab>") 'other-frame)
 ;; Move buffer to other frame
 (global-set-key (kbd "<S-C-M-tab>") 'konix/switch-buffer-other-frame)
+(global-set-key (kbd "<C-M-S-iso-lefttab>") 'konix/switch-buffer-other-frame)
 ;; list buffers with bs-show instead of list-buffer
 (global-set-key (kbd "C-x C-b") 'bs-show)
 ;; Undo sur CTRL-Z (habitude...)

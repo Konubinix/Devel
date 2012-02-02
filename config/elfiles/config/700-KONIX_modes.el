@@ -345,7 +345,6 @@
 (setq-default gdb-use-separate-io-buffer t)
 (defun konix/gdb-mode-hook ()
   (gud-def gud-run "run" "r" "Run the program in the debugger")
-  (shrink-window-horizontally 40)
   )
 (add-hook 'gdb-mode-hook
 		  'konix/gdb-mode-hook)

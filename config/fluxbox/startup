@@ -30,4 +30,9 @@ sleep 4
 	emacs_tray_daemon.py &
 } &
 
+if [ -n "$KONIX_X_INIT" ]
+then
+	eval "$KONIX_X_INIT"
+fi
+
 wait $fbpid

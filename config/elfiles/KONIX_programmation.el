@@ -61,14 +61,14 @@ They can be relative or absolute
   )
 
 (defcustom konix/prog/toggle-source-header-src-extensions
-  (list "cpp" "c" "C" "cc" "c++")
+  (list "cpp" "c" "C" "cc" "c++" "cxx" "txx" "ixx")
   "A list of extensions used to search source files"
   :type '(repeat string)
   :group 'konix/prog
   )
 
 (defcustom konix/prog/toggle-source-header-hdr-extensions
-  (list "h" "hpp" "hh")
+  (list "h" "hpp" "hh" "hxx")
   "A list of extensions used to search header files"
   :type '(repeat string)
   :group 'konix/prog

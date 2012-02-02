@@ -1277,6 +1277,7 @@
 (setq-default nxml-bind-meta-tab-to-complete-flag t)
 (setq-default nxml-auto-insert-xml-declaration-flag t)
 (setq-default nxml-child-indent 2)
+(setq-default nxml-end-tag-indent-scan-distance 20000)
 (defun konix/hs-nxml-forward-sexp-func (dummy)
   (save-match-data
 	(unless (looking-at "<\\([a-zA-Z0-9_-]+\\)[ >]")

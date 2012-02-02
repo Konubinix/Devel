@@ -141,6 +141,9 @@
 (add-to-list 'auto-mode-alist '("\\.elk\\'" . elk-test-mode))
 ;; c templates in c mode
 (add-to-list 'auto-mode-alist '("\\.c\\.tpl$" . c-mode))
+;; txx and ixx are c++ files
+(add-to-list 'auto-mode-alist (cons "\\.ixx$" 'c++-mode))
+(add-to-list 'auto-mode-alist (cons "\\.txx$" 'c++-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

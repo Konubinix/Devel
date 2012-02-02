@@ -229,6 +229,10 @@
 
 (defun konix/rng/ac-candidates ()
   (konix/rng/ac-prefix)
+  ;; initialize rng for completion
+  (save-match-data
+	(rng-set-state-after (match-beginning 0))
+	)
   (let (
 		(prefix (match-string-no-properties 1))
 		(rng-complete-target-names (rng-match-possible-start-tag-names))

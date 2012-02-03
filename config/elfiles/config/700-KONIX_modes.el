@@ -1820,4 +1820,8 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; ####################################################################################################
 ;; Trac wiki
 ;; ####################################################################################################
-(add-hook 'trac-wiki-mode-hook 'konix/outline-mode-hook)
+(defun konix/trac-wiki-mode-hook ()
+  (konix/outline-mode-hook)
+  (autopair-mode 1)
+  )
+(add-hook 'trac-wiki-mode-hook 'konix/trac-wiki-mode-hook)

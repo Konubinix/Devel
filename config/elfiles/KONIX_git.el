@@ -510,7 +510,7 @@
   )
 
 (defun konix/git/stash/show (&optional number)
-  (interactive)
+  (interactive "sNumber : ")
   (setq number (or number 0))
   (konix/compile (format "git stash show -u stash@{%s}" number))
   )

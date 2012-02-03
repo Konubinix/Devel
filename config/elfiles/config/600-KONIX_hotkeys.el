@@ -157,6 +157,15 @@
 (define-key 'konix/global-key-map "u" 'uncomment-region)
 ;; find
 (define-key 'konix/global-key-map (kbd "M-f") 'konix/find)
+;; ******************************************************************************************
+;; dictionary lookup
+;; ******************************************************************************************
+(define-prefix-command 'konix/dictionary-key-map)
+(define-key konix/global-key-map (kbd "d") 'konix/dictionary-key-map)
+(define-key 'konix/dictionary-key-map (kbd "d") 'dictionary)
+(define-key 'konix/dictionary-key-map (kbd "s") 'dictionary-search)
+
+
 ;; ************************************************************
 ;; hide region
 ;; ************************************************************
@@ -200,8 +209,6 @@
 (define-key 'konix/backup-key-map (kbd "e") 'pick-backup-and-ediff)
 (define-key 'konix/backup-key-map (kbd "r") 'pick-backup-and-revert)
 
-;; diff buffer with backup
-(define-key 'konix/global-key-map (kbd "d") 'ediff-backup)
 ;; ************************************************************
 
 ;; find recent file

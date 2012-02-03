@@ -16,6 +16,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/org/contrib/lisp")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/icicles")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/full-ack")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/dictionary")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)

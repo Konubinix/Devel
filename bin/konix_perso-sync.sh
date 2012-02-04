@@ -20,6 +20,11 @@ trap "rm -rvf '$TMP_PERSO_DECRYPT'" 0
 
 # init
 pushd "$KONIX_PERSO_DIR"
+if [ -n "$KONIX_PERSO_PRE_PUSH_HOOK" ]
+then
+	eval "$KONIX_PERSO_PRE_PUSH_HOOK"
+fi
+
 git-freeze.sh
 if [ -f "$KONIX_PERSO_PASS" ]
 then

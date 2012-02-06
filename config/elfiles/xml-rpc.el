@@ -857,7 +857,7 @@ Understands the following styles:
             (vector year month day time zone)
           (vector "0" "0" "0" "0" nil))))))
 
-(provide 'xml-rpc-savannah)
+(provide 'xml-rpc)
 
 ;; Local Variables:
 ;; time-stamp-pattern: "20/^;; Last Modified: <%%>$"

@@ -33,6 +33,14 @@ if [ -f /etc/profile.d/bash-completion.sh ]; then
     . /etc/profile.d/bash-completion.sh
 fi
 
+# source custom bash completions
+OLD_IFS=$IFS
+IFS=$'\n'
+for bashcomp_file in $KONIX_CONFIG_DIR/bash-completion/*
+do
+	source "$bashcomp_file"
+done
+IFS=$OLD_IFS
 # unset bash bmajor bminor
 
 # ************************************************************

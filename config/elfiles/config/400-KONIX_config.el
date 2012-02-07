@@ -512,6 +512,7 @@
 	  '(
 		("evince" "\\.pdf$")
 		("evince" "\\.ps$")
+		("gimp" "\\.png$")
 		("vlc" "\\.mp3$")
 		("dia" "\\.dia$")
 		((lambda (file)

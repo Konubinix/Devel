@@ -472,15 +472,38 @@
 (setq-default appt-display-format 'window)
 (setq-default appt-display-interval 10)
 (defun konix/appt-delete-window ()
-  (when (y-or-n-p "Have you seen your appt ?")
+  (let (
+		(appt_elem (second (first appt-time-msg-list)))
+		)
+	(unless (y-or-n-p-with-timeout (format "Recall this appt : '%s' ?"
+										   appt_elem) 5 t)
+	  (pop appt-time-msg-list)
+	  (appt-check)
+	  )
 	(let (
-		  (current_window (get-buffer-window))
+		  (current_window (and
+						   (not (minibufferp))
+						   (get-buffer-window)
+						   )
+						  )
 		  )
-	  (appt-delete-window)
-	  (pop-to-buffer (window-buffer current_window))
+	  (ignore-errors (appt-delete-window))
+	  (when current_window
+	   (pop-to-buffer (window-buffer current_window))
+	   )
 	  )
 	)
   )
+
+(defun konix/appt-disp-window (min-to-app new-time appt-msg)
+  (appt-disp-window min-to-app new-time appt-msg)
+  (set-window-dedicated-p (get-buffer-window "*appt-buf*") t)
+  (save-window-excursion
+	(pop-to-buffer "*appt-buf*")
+	(setq window-size-fixed t)
+	)
+  )
+(setq-default appt-disp-window-function 'konix/appt-disp-window)
 (setq-default appt-delete-window-function 'konix/appt-delete-window)
 
 ;; --------------------------------------------------

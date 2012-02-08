@@ -19,12 +19,15 @@ offlineimap -c "$KONIX_OFFLINEIMAPRC"
 # getmail
 
 #finally reflect externally changed maildir flags in notmuch tags
-NOTMUCH_RESP="$(notmuch new)"
-echo "$NOTMUCH_RESP"
-if ! echo "$NOTMUCH_RESP" | grep -q -r "^No new mail.$"
+notmuch new
+INBOX_ELEMENTS="$(notmuch search tag:inbox | wc -l)"
+UNREAD_ELEMENTS="$(notmuch search tag:unread | wc -l)"
+if [ "$INBOX_ELEMENTS" != "0" -o "$UNREAD_ELEMENTS" != "0" ]
 then
 	# new mails, display some message
-	konix_display.py "$NOTMUCH_RESP"
+	konix_display.py "Mail info :
+$INBOX_ELEMENTS in the inbox
+$UNREAD_ELEMENTS not read"
 fi
 
 #get messages from the spool, but after notmuch new because I don't want to be

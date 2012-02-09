@@ -20,15 +20,6 @@ offlineimap -c "$KONIX_OFFLINEIMAPRC"
 
 #finally reflect externally changed maildir flags in notmuch tags
 notmuch new
-INBOX_ELEMENTS="$(notmuch search tag:inbox | wc -l)"
-UNREAD_ELEMENTS="$(notmuch search tag:unread | wc -l)"
-if [ "$INBOX_ELEMENTS" != "0" -o "$UNREAD_ELEMENTS" != "0" ]
-then
-	# new mails, display some message
-	konix_display.py "Mail info :
-$INBOX_ELEMENTS in the inbox
-$UNREAD_ELEMENTS not read"
-fi
 
 #get messages from the spool, but after notmuch new because I don't want to be
 #informed the cron jobs that did $0 ended...
@@ -39,5 +30,15 @@ fi
 
 # this is useless since 0.5 -> notmuchsync -d -r --all --sync-deleted-tag
 konix_mail_init_tags.sh
+
+INBOX_ELEMENTS="$(notmuch search tag:inbox | wc -l)"
+UNREAD_ELEMENTS="$(notmuch search tag:unread | wc -l)"
+if [ "$INBOX_ELEMENTS" != "0" -o "$UNREAD_ELEMENTS" != "0" ]
+then
+	# new mails, display some message
+	konix_display.py "Mail info :
+$INBOX_ELEMENTS in the inbox
+$UNREAD_ELEMENTS not read"
+fi
 
 rm "$LOCK_FILE"

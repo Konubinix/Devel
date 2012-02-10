@@ -338,21 +338,21 @@
 
 (defun konix/org-pomodoro-report-cancel-pomodoro ()
   (interactive)
-  (konix/org-pomodoro-report-finish-pomodoro "canceled"
-											 (lambda ()
-											   (save-restriction
-												 (org-narrow-to-subtree)
-												 (goto-char (point-max))
-												 (newline)
-												 (let* (
-														(msg "Stopped due to ")
-														(reason (read-string msg))
-														)
-												   (insert (format "   %s - %s%s" (konix/org-today-time-stamp t) msg reason))
+  (let* (
+		 (msg "Stopped due to : ")
+		 (reason (read-string msg))
+		 )
+	(konix/org-pomodoro-report-finish-pomodoro "canceled"
+											   `(lambda ()
+												   (save-restriction
+													 (org-narrow-to-subtree)
+													 (goto-char (point-max))
+													 (newline)
+													 (insert (format "   %s - %s%s" (konix/org-today-time-stamp t) ,msg ,reason))
+													 )
 												   )
-												 )
 											   )
-											 )
+	)
   )
 
 (defun konix/org-pomodoro-convert-time-into-pomodoro (time_string)

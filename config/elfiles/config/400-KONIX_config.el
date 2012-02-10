@@ -510,7 +510,8 @@
 (require 'run-assoc)
 (setq-default associated-program-alist
 	  '(
-		("evince" "\\.pdf$")
+		("epdfview" "\\.pdf$")
+		("lowriter" "\\.odt$")
 		("evince" "\\.ps$")
 		("gimp" "\\.png$")
 		("vlc" "\\.mp3$")

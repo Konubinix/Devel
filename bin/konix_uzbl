@@ -1,0 +1,3 @@
+#!/bin/bash
+
+uzbl --config="$KONIX_CONFIG_DIR/uzbl" "$@"

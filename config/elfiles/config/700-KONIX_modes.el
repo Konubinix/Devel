@@ -1768,7 +1768,7 @@ Prefix argument ARG makes the entry nonmarking."
   "Enables or disable blinking, depending on arg (non-nil or nil)"
   (unless (eq konix/erc-tray-state arg)
 	(with-temp-buffer
-	  (insert (if arg "B" "b"))
+	  (insert (if arg "n" "i"))
 	  (write-file "/tmp/emacs_tray_daemon_control")
 	  )
     (setq konix/erc-tray-state arg)

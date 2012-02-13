@@ -41,10 +41,10 @@ class EmacsTrayDaemon(object):
 
     def update_tray(self):
         command = self.fifo.read(1)
-        if command == 'b':
+        if command == 'i':
             LOGGER.info("No more notification")
             self.tray_icon.set_from_pixbuf(self.idle_pixbuf)
-        elif command == 'B':
+        elif command == 'n':
             LOGGER.info("Notification coming")
             self.tray_icon.set_from_pixbuf(self.notify_pixbuf)
         elif command == 'v':

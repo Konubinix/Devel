@@ -28,6 +28,7 @@ sleep 4
 	pcmanfm --desktop & # nice and simple desktop manager
 	# start de emacs_tray_daemon if possible
 	emacs_tray_daemon.py &
+	konix_mail_tray_daemon.py &
 } &
 
 if [ -n "$KONIX_X_INIT" ]

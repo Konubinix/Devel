@@ -513,7 +513,7 @@
 		("epdfview" "\\.pdf$")
 		("lowriter" "\\.odt$")
 		("evince" "\\.ps$")
-		("gimp" "\\.png$")
+		("gimp" "\\.\\(png\\|jpg\\)$")
 		("vlc" "\\.mp3$")
 		("dia" "\\.dia$")
 		((lambda (file)

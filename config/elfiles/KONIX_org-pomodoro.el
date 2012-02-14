@@ -416,7 +416,10 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
   (let (
 		(_long "")
 		)
-	(when (equal (mod konix/org-pomodoro-set-count 4) 0)
+	;; Ask the pomodorow user to take a long break when there has been more than
+	;; 4 pomodorow without pauses. It assumes that the long pause will be taken
+	;; with `konix/org-pomodoro-long-break'
+	(when (>= konix/org-pomodoro-set-count 4)
 	  (setq _long " LONG")
 	  )
 	(setq konix/org-pomodoro-in-pomodoro nil)

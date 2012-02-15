@@ -28,7 +28,7 @@
 |---+--------------------+------+-------+-----|")
 	(org-table-align)
 	(newline-and-indent)
-	(insert "#+TBLFM: $PREV=vsum(@+1..@4)::$SPENT=vsum(@+1..@4)::$RES=vsum(@+1..@4)::$5=$3-$4")
+	(insert "#+TBLFM: $PREV=vsum(@+1..@5)::$SPENT=vsum(@+1..@5)::$RES=vsum(@+1..@5)::$5=$3-$4")
 	(newline-and-indent)
 	)
   )

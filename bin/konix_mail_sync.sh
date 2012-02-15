@@ -31,25 +31,6 @@ notmuch new
 # this is useless since 0.5 -> notmuchsync -d -r --all --sync-deleted-tag
 konix_mail_init_tags.sh
 
-INBOX_ELEMENTS="$(notmuch search tag:inbox | wc -l)"
-UNREAD_ELEMENTS="$(notmuch search tag:unread | wc -l)"
-MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
-if [ "$INBOX_ELEMENTS" != "0" -o "$UNREAD_ELEMENTS" != "0" ]
-then
-	# new mails, display some message
-	konix_display.py "Mail info :
-$INBOX_ELEMENTS in the inbox
-$UNREAD_ELEMENTS not read"
-fi
-
-if [ -p "$MAIL_TRAY_DAEMON_CTRL" ]
-then
-	if [ "$INBOX_ELEMENTS" != "0" ]
-	then
-		echo n > "$MAIL_TRAY_DAEMON_CTRL"
-	else
-		echo i > "$MAIL_TRAY_DAEMON_CTRL"
-	fi
-fi
+konix_mail_tray_daemon_update.sh -d
 
 rm "$LOCK_FILE"

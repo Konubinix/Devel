@@ -1356,12 +1356,26 @@
   "Indent only relevent lines"
   ;; fill in the value of xmltok-type
   (nxml-token-before)
+  (rng-set-state-after (point))
   (or
    ;; cases where special indentation or no indentation will be performed
    (case xmltok-type
 	 ('cdata-section
 	  t
 	  )
+	 )
+   (let* (
+		 (rng-open-elements_tmp rng-open-elements)
+		 (my_elem (pop rng-open-elements_tmp))
+		 (found nil)
+		 )
+	 (while (and my_elem (not found))
+	   (when (string-equal (cdr my_elem) "screen")
+		 (setq found t)
+		 )
+	   (setq my_elem (pop rng-open-elements_tmp))
+	   )
+	 found
 	 )
    ;; else, perform the default nxml indentation function
    (nxml-indent-line)

@@ -1347,6 +1347,11 @@
 	  konix/hs-xml-mode-info))
   )
 
+(defun konix/nxml-in-cdata-p ()
+  (nxml-token-before)
+  (equal xmltok-type 'cdata-section)
+  )
+
 (defun konix/nxml-indent-line ()
   "Indent only relevent lines"
   ;; fill in the value of xmltok-type

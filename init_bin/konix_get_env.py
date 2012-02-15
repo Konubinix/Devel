@@ -49,6 +49,7 @@ def getConfigFromEnvFile(envfile, previous_config):
             substitute_config.update(previous_config)
             value_template = string.Template(value)
             value = value_template.safe_substitute(substitute_config)
+
             #env_value = env_value.replace("\\","\\\\")
             #value = value.replace('\\','\\\\')
 
@@ -59,18 +60,25 @@ def getConfigFromEnvFile(envfile, previous_config):
             # or got from the env_value
             else:
                 previous_value = env_value
+
+            logging.debug("analysing ["+key+"] = "+value+" (previous was "+previous_value+")")
             if section == "replace" or previous_value == "":
+                logging.debug("Replace previous value")
                 new_config[key] = value
             elif section == "prefix":
                 if not previous_value.startswith(value):
                     new_config[key] = "".join((value,previous_value,))
+                    logging.debug("Prepending to previous value to get "+new_config[key])
                 else:
                     new_config[key] = previous_value
+                    logging.debug("Not prepended")
             elif section == "suffix":
                 if not previous_value.endswith(value):
                     new_config[key] = "".join((previous_value,value,))
+                    logging.debug("Appending to previous value to get "+new_config[key])
                 else:
                     new_config[key] = previous_value
+                    logging.debug("Not appended")
             else:
                 assert(False)
 
@@ -107,9 +115,13 @@ def main():
             config_user_file = os.path.join(os.path.expanduser("~"),"env.conf")
             config_os_file = os.path.join(konix_config, "env_"+os.sys.platform+".conf")
             config_os_user_file = os.path.join(os.path.expanduser("~"),"env_"+os.sys.platform+".conf")
+            logging.debug("Parsing "+config_file)
             config = getConfigFromEnvFile(config_file,config)
+            logging.debug("Parsing "+config_user_file)
             config = getConfigFromEnvFile(config_user_file,config)
+            logging.debug("Parsing "+config_os_file)
             config = getConfigFromEnvFile(config_os_file,config)
+            logging.debug("Parsing "+config_os_user_file)
             config = getConfigFromEnvFile(config_os_user_file,config)
             config["KONIX_ENV_DONE"] = "1"
         else:

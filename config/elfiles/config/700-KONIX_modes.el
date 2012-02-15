@@ -1550,6 +1550,15 @@ inspired from `notmuch-show-archive-thread-internal'"
   (konix/notmuch-remove-tag "unread")
   (konix/notmuch-archive)
   )
+
+(defun konix/notmuch-hello-refresh-hook ()
+  ;; launches an update on the mail daemon
+  (shell-command "konix_mail_tray_daemon_update.sh")
+  )
+(add-hook 'notmuch-hello-refresh-hook
+		  'konix/notmuch-hello-refresh-hook)
+
+
 (eval-after-load "notmuch"
   '(progn
 	 (require 'notmuch-address)

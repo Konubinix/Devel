@@ -26,7 +26,7 @@ fi
 
 if [ -p "$MAIL_TRAY_DAEMON_CTRL" ]
 then
-	if [ "$INBOX_ELEMENTS" != "0" ]
+	if [ "$INBOX_ELEMENTS" != "0" -a "$UNREAD_ELEMENTS" != "0" ]
 	then
 		echo n > "$MAIL_TRAY_DAEMON_CTRL"
 	else

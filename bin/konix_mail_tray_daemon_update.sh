@@ -14,6 +14,7 @@ done
 
 INBOX_ELEMENTS="$(notmuch search tag:inbox | wc -l)"
 UNREAD_ELEMENTS="$(notmuch search tag:unread | wc -l)"
+UNREAD_N_INBOX_ELEMENTS="$(notmuch search tag:unread and tag:inbox| wc -l)"
 MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
 if [ "$DISPLAY" == "1" ] \
 	&& [ "$INBOX_ELEMENTS" != "0" -o "$UNREAD_ELEMENTS" != "0" ]
@@ -26,7 +27,7 @@ fi
 
 if [ -p "$MAIL_TRAY_DAEMON_CTRL" ]
 then
-	if [ "$INBOX_ELEMENTS" != "0" -a "$UNREAD_ELEMENTS" != "0" ]
+	if [ "$UNREAD_N_INBOX_ELEMENTS" != "0" ]
 	then
 		echo n > "$MAIL_TRAY_DAEMON_CTRL"
 	else

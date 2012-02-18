@@ -26,6 +26,10 @@ The default one is the first in the list
 	(completing-read "Wich context : " konix/org-meta-context/meta-contexts)
 	)
    )
+  (when (string-equal name
+					  org-directory)
+	(error "Already in this context : %s" org-directory)
+	)
   (let (
 		temp_context
 		)
@@ -73,10 +77,6 @@ The default one is the first in the list
 		(or (cdr konix/org-meta-context/meta-contexts-pointer) ; next context
 			konix/org-meta-context/meta-contexts)			   ; or reset it
 		)
-  (when (string-equal (car konix/org-meta-context/meta-contexts-pointer)
-					  org-directory)
-	(error "Already in this context : %s" org-directory)
-	)
   (konix/org-meta-context/switch-to-context
    (car konix/org-meta-context/meta-contexts-pointer)
    )

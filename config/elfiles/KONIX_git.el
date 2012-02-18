@@ -69,6 +69,7 @@
 		("^tag .*-m" nil)
 		("^tag" konix/git/completion/tag)
 		("^push" konix/git/remote/list konix/git/completion/push)
+		("^pull" konix/git/remote/list konix/git/completion/push)
 		("^fetch*" konix/git/remote/list)
 		("^branch" konix/git/branch/list)
 		("^ *$" konix/git/completions)

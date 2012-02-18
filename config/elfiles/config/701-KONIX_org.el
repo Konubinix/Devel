@@ -60,18 +60,33 @@ cursor stays in the org buffer."
 ;; ####################################################################################################
 (setq-default org-directory (concat perso-dir "/wiki"))
 (setq-default org-agenda-clockreport-parameter-plist `(:link t :maxlevel 5 :emphasize t :link t :timestamp t))
+(defun konix/org-skip-other-meta-context ()
+  "Skip trees that are not in current meta context"
+  (if (string-match org-directory default-directory)
+	  nil
+	(save-excursion
+	  (end-of-buffer)
+	  (point)
+	  )
+	)
+  )
 (setq-default org-agenda-custom-commands
 			  '(
-				("w" "What is important ?"
+				("w" todo nil
 				 (
-				  (todo "WAIT")
-				  (todo)
+				  (org-agenda-skip-function 'konix/org-skip-other-meta-context)
+				  (org-agenda-overriding-header "Things to do (current context) :")
 				  )
 				 )
-				("W" todo "WAIT" nil)
+				("W" agenda nil
+				 (
+				  (org-agenda-skip-function 'konix/org-skip-other-meta-context)
+				  (org-agenda-overriding-header "Things to do (current context) :")
+				  )
+				 )
 				("r" todo "TO-READ" nil)
  				("b" tags "blocked" nil)
- 				("d" tags "DOC" nil)
+				("d" tags "DOC" nil)
  				("c" tags "TO_CHECK" nil)
  				("A" tags "ARCHIVE" nil)
 				)

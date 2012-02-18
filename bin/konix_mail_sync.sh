@@ -33,4 +33,6 @@ konix_mail_init_tags.sh
 
 konix_mail_tray_daemon_update.sh -d
 
+echo "" > /tmp/konix_mail_tray_stamp
+
 rm "$LOCK_FILE"

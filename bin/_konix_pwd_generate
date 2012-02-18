@@ -10,8 +10,10 @@ rng = Random()
 
 righthand_complicated='&<>'
 lefthand_complicated='+(-_@=$*%!:/;.,?)'
-righthand = '23456qwertasdfgzxcvbQWERTASDFGZXCVB'
-lefthand = '789yuiophjknmYUIPHJKLNM'
+numbers_lefthand="23456"
+numbers_righthand="7890"
+righthand = 'qwertasdfgzxcvbQWERTASDFGZXCVB'
+lefthand = 'yuiophjknmYUIPHJKLNM'
 
 parser = OptionParser()
 parser.add_option("-l", "--length", dest="passwordLength",
@@ -33,12 +35,23 @@ parser.add_option("-s", "--simple-characters",
                   default=False,
                   help="Use only simple characters"
                   )
+parser.add_option("-n", "--numbers",
+                  dest="numbers",
+                  action="store_const",
+                  const=True,
+                  default=False,
+                  help="Use only numbers"
+                  )
 (options, args) = parser.parse_args()
 alternate_hands = options.alternate_hands
 simple_chars = options.simple_chars
 passwordLength = options.passwordLength
+numbers = options.numbers
 
-if not simple_chars:
+if numbers:
+        lefthand = numbers_lefthand
+        righthand = numbers_righthand
+elif not simple_chars:
         lefthand += lefthand_complicated
         righthand += righthand_complicated
 allchars = righthand + lefthand

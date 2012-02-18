@@ -1,3 +1,6 @@
+;; The meta context library allows the user to easily change the value of
+;; `org-directory' cycling into the `org-agenda-files' list
+
 (defun konix/org-meta-context/initialize ()
   (interactive)
   (unless (member org-directory org-agenda-files)

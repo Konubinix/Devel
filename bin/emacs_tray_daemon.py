@@ -14,9 +14,11 @@ if __name__ == "__main__":
     icons_dir = os.path.join(share_dir, "icons")
 
     etd = TrayDaemon(os.path.join(tempfile.gettempdir(),
-                                       "emacs_tray_daemon_control"),
-                          EMACS_TRAY_PERIOD,
-                          os.path.join(icons_dir, "emacs_icon_blue.png"),
-                          os.path.join(icons_dir, "emacs_icon_red.png")
-                          )
+                                  "emacs_tray_daemon_control"),
+                     EMACS_TRAY_PERIOD,
+                     {"i" : os.path.join(icons_dir, "emacs_icon_blue.png"),
+                      "n" : os.path.join(icons_dir, "emacs_icon_red.png")
+                      },
+                     "i"
+                     )
     etd.main()

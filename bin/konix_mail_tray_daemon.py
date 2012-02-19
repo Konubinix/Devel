@@ -14,11 +14,13 @@ def main():
     icons_dir = os.path.join(share_dir, "icons")
 
     mtd = TrayDaemon(os.path.join(tempfile.gettempdir(),
-                                       "mail_tray_daemon_control"),
-                          200,
-                          os.path.join(icons_dir, "mail_icon_empty.png"),
-                          os.path.join(icons_dir, "mail_icon_new_mail.png")
-                          )
+                                  "mail_tray_daemon_control"),
+                     200,
+                     {"i" : os.path.join(icons_dir, "mail_icon_empty.png"),
+                      "n" : os.path.join(icons_dir, "mail_icon_new_mail.png")
+                      },
+                     "i"
+                     )
     mtd.main()
 
 if __name__ == "__main__":

@@ -17,7 +17,9 @@ def main():
                                   "mail_tray_daemon_control"),
                      200,
                      {"i" : os.path.join(icons_dir, "mail_icon_empty.png"),
-                      "n" : os.path.join(icons_dir, "mail_icon_new_mail.png")
+                      "n" : os.path.join(icons_dir, "mail_icon_new_mail.png"),
+                      "f" : os.path.join(icons_dir, "mail_icon_flagged.png"),
+                      "u" : os.path.join(icons_dir, "mail_icon_unread.png")
                       },
                      "i"
                      )

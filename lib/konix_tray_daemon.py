@@ -18,19 +18,21 @@ class TrayDaemon(object):
         os.mkfifo(self.fifo_file_name)
         self.fifo = os.fdopen(os.open(self.fifo_file_name, os.O_RDONLY|os.O_NONBLOCK))
 
-    def __init__(self, fifo_file_name, period, idle_icon_file_name, notify_icon_file_name):
-        """Make sure the fifo exists and is a fifo"""
+    def __init__(self, fifo_file_name, period, command_dict, default_command):
+        """Make sure the fifo exists and is a fifo
+        command_dict : must be a dict of the form { "command" : "icon file name" }
+        default_command : the default icon to display
+        """
         self.period = period
         # ####################################################################################################
         # Init the icons
         # ####################################################################################################
-        self.idle_icon_file_name = idle_icon_file_name
-        self.notify_icon_file_name = notify_icon_file_name
-        self.idle_pixbuf = gtk.gdk.pixbuf_new_from_file(self.idle_icon_file_name)
-        self.notify_pixbuf = gtk.gdk.pixbuf_new_from_file(self.notify_icon_file_name)
-
+        self.command_dict = command_dict
+        # replace the file names with the associated pixbuf
+        for command in command_dict.keys():
+            command_dict[command] = gtk.gdk.pixbuf_new_from_file(command_dict[command])
         self.tray_icon = gtk.StatusIcon()
-        self.tray_icon.set_from_pixbuf(self.idle_pixbuf)
+        self.tray_icon.set_from_pixbuf(command_dict[default_command])
         self.tray_icon.set_visible(True)
         # ####################################################################################################
 
@@ -38,12 +40,10 @@ class TrayDaemon(object):
 
     def update_tray(self):
         command = self.fifo.read(1)
-        if command == 'i':
-            LOGGER.info("No more notification")
-            self.tray_icon.set_from_pixbuf(self.idle_pixbuf)
-        elif command == 'n':
-            LOGGER.info("Notification coming")
-            self.tray_icon.set_from_pixbuf(self.notify_pixbuf)
+        custom_icon = self.command_dict.get(command, None)
+        if custom_icon:
+            LOGGER.info("Custom command "+command)
+            self.tray_icon.set_from_pixbuf(custom_icon)
         elif command == 'v':
             LOGGER.info("Becoming invisible")
             self.tray_icon.set_visible(False)

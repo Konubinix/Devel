@@ -9,7 +9,8 @@
 	co = checkout
 	k = !gitk --all
 	ka = !gitk --all `git reflog | cut -c1-7`
-	up = pull --rebase
+      	kaa = !gitk --all `git fsck --no-reflog | awk '/dangling commit/ {print $3}'`
+        up = pull --rebase
 	wu = log --stat origin..@{0}
 	wup = log -p origin..@{0}
 	diffc = diff --cached

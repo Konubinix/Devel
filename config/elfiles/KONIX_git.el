@@ -55,6 +55,7 @@
 		"checkout"
 		"tag"
 		"push"
+		"svn"
 		)
 	  )
 
@@ -72,6 +73,7 @@
 		("^pull" konix/git/remote/list konix/git/completion/push)
 		("^fetch*" konix/git/remote/list)
 		("^branch" konix/git/branch/list)
+		("^svn" konix/git/svn/list)
 		("^ *$" konix/git/completions)
 		)
 	  )
@@ -770,6 +772,10 @@
   "Lance git svn dcommit."
   (interactive)
   (konix/git/command "svn dcommit")
+  )
+
+(defun konix/git/svn/list ()
+  '("rebase" "dcommit")
   )
 
 (defun konix/git/reset ()

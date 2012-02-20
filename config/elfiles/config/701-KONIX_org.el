@@ -234,6 +234,7 @@ cursor stays in the org buffer."
 (setq-default org-icalendar-store-UID t)
 (setq-default org-timer-default-timer 25)
 (setq-default org-tag-persistent-alist nil)
+(setq org-tag-alist '(("project" . ?p) ))
 (when (and (getenv "KONIX_PERSO_DIR")
 		   (not (boundp 'konix/org-meta-context/meta-contexts))
 		   )

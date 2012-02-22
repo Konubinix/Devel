@@ -3,13 +3,12 @@
 
 (defun konix/org-meta-context/initialize ()
   (interactive)
-  (unless (member org-directory org-agenda-files)
+  (unless (member (expand-file-name org-directory) org-agenda-files)
 	(konix/notify (format "Your org-directory (%s) is not a member of org-agenda-files (%s), you\
   should add it"
 						  org-directory
 						  org-agenda-files
 						  )
-				  1
 				  )
 	)
   )

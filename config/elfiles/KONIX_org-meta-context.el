@@ -1,13 +1,18 @@
 ;; The meta context library allows the user to easily change the value of
-;; `org-directory' cycling into the `org-agenda-files' list
+;; `org-directory' cycling into the `konix/org-meta-contexts' list
+
+(defcustom konix/org-meta-contexts '()
+  "The list of contexts
+The first element of the list is the default context
+")
 
 (defun konix/org-meta-context/initialize ()
   (interactive)
-  (unless (member (expand-file-name org-directory) org-agenda-files)
-	(konix/notify (format "Your org-directory (%s) is not a member of org-agenda-files (%s), you\
+  (unless (member (expand-file-name org-directory) konix/org-meta-contexts)
+	(konix/notify (format "Your org-directory (%s) is not a member of konix/org-meta-contexts (%s), you\
   should add it"
 						  org-directory
-						  org-agenda-files
+						  konix/org-meta-contexts
 						  )
 				  )
 	)
@@ -23,8 +28,8 @@
 					  org-directory)
 	(error "Already in this context : %s" org-directory)
 	)
-  (unless (member name org-agenda-files)
-	(error "%s not in org-agenda-files" name)
+  (unless (member name konix/org-meta-contexts)
+	(error "%s not in konix/org-meta-contexts" name)
 	)
   (setq org-directory name)
   (message "Initialized %s context" name)
@@ -32,7 +37,7 @@
 
 (defun konix/org-meta-context/next-context ()
   (interactive)
-  ;; find the element after org-directory in the org-agenda-files
+  ;; find the element after org-directory in the konix/org-meta-contexts
   (let*(
 		(found nil)
 		(new_name
@@ -46,14 +51,14 @@
 				(setq found t)
 				)
 			  )
-			org-agenda-files
+			konix/org-meta-contexts
 			)
 		   nil
 		   )
 		 )
 		)
 	(unless new_name
-	  (setq new_name (first org-agenda-files))
+	  (setq new_name (first konix/org-meta-contexts))
 	  )
 	(konix/org-meta-context/switch-to-context new_name)
 	)

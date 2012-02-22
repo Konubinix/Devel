@@ -241,6 +241,20 @@
 	)
   )
 
+(defun konix/rng/ac-action ()
+  (insert ">")
+  (save-excursion (nxml-finish-element))
+  (let (
+		(beg (point))
+		(end (save-excursion
+			   (skip-syntax-forward "-")
+			   (point)
+			   ))
+		)
+	(delete-region beg end)
+	)
+  )
+
 (ac-define-source konix/rng
   '(
 	(prefix . konix/rng/ac-prefix)
@@ -248,6 +262,7 @@
 
 	(symbol . "kr")
 	(requires . 0)
+	(action . konix/rng/ac-action)
 	)
   )
 

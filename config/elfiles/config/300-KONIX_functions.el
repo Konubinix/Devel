@@ -1,6 +1,34 @@
 ;; ################################################################################
 ;; General use function
 ;; ################################################################################
+
+(defvar konix/indirect-mode-name nil
+  "Mode to set for indirect buffers.")
+(make-variable-buffer-local 'konix/indirect-mode-name)
+
+(defun konix/indirect-region (start end)
+  "Edit the current region in another buffer.
+    If the buffer-local variable `konix/indirect-mode-name' is not set, prompt
+    for mode name to choose for the indirect buffer interactively.
+    Otherwise, use the value of said variable as argument to a funcall."
+  (interactive "r")
+  (let ((buffer-name (generate-new-buffer-name "*indirect*"))
+		(mode
+		 (if (not konix/indirect-mode-name)
+			 (setq konix/indirect-mode-name
+				   (intern
+					(completing-read
+					 "Mode: "
+					 (mapcar (lambda (e)
+							   (list (symbol-name e)))
+							 (apropos-internal "-mode$" 'commandp))
+					 nil t)))
+		   konix/indirect-mode-name)))
+	(pop-to-buffer (make-indirect-buffer (current-buffer) buffer-name))
+	(funcall mode)
+	(narrow-to-region start end)
+	(shrink-window-if-larger-than-buffer)))
+
 (defun konix/insert-seconds-since-1970 ()
   "insert the number of second since the 00:00 1/1/1970"
   (interactive)

@@ -176,11 +176,19 @@
 (add-hook 'before-save-hook 'konix/delete-trailing-whitespace)
 (add-hook 'before-save-hook 'konix/adjust-new-lines-at-end-of-file)
 (add-hook 'before-save-hook 'konix/check-paren-warn)
-(setq-default whitespace-style '(empty indentation space-before-tab trailing space-after-tab
-									   ;; untill here, values are used by
-									   ;; whitespace-cleanup
-									   tabs spaces
-									   ))
+(setq-default whitespace-style '(
+								 face
+								 empty
+								 indentation
+								 space-before-tab
+								 trailing
+								 space-after-tab
+								 lines-tail
+								 ;; untill here, values are used by
+								 ;; whitespace-cleanup
+								 tabs spaces
+								 )
+			  )
 ;; (add-hook 'before-save-hook 'delete-blank-lines)
 
 ;; ************************************************************

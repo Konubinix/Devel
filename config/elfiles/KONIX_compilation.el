@@ -132,6 +132,29 @@ If the file exists, it is automatically deleted
   :set 'konix/set-custom-compilation-regexp-alists
   )
 
+(defvar konix/compilation-error-regexp-alist-alist-default
+  `(
+	;; this one matches also if beginning with '[0-9]+: ', meaning it has been
+	;; launched in ctest
+	(gnu
+	 ,(concat"^\\([0-9]+: \\)?"
+			 ;; then, the default one
+			 "\\(?:[[:alpha:]][-[:alnum:].]+: ?\\)?\
+\\([0-9]*[^0-9\n]\\(?:[^\n ]\\| [^-/\n]\\)*?\\): ?\
+\\([0-9]+\\)\\(?:\\([.:]\\)\\([0-9]+\\)\\)?\
+\\(?:-\\([0-9]+\\)?\\(?:\\.\\([0-9]+\\)\\)?\\)?:\
+\\(?: *\\(\\(?:Future\\|Runtime\\)?[Ww]arning\\|W:\\)\\|\
+ *\\([Ii]nfo\\(?:\\>\\|rmationa?l?\\)\\|I:\\|instantiated from\\|[Nn]ote\\)\\|\
+\[0-9]?\\(?:[^0-9\n]\\|$\\)\\|[0-9][0-9][0-9]\\)"
+			 )
+	 2
+	 (3 . 6)
+	 (5 . 7)
+	 (8 . 9))
+	)
+  ""
+  )
+
 ;; ####################################################################################################
 ;; VARIABLES
 ;; ####################################################################################################
@@ -189,6 +212,10 @@ recognizable"
 ;; ####################################################################################################
 ;; FUNCTIONS
 ;; ####################################################################################################
+(defun konix/compilation-buffer/setup-default-values ()
+  (konix/push-custom-compilation-regexp-alists konix/compilation-error-regexp-alist-alist-default)
+  )
+
 (defun konix/compile/find-makefile-recursive (directory)
   "
 Look in parent folder for a Makefile file to launch
@@ -347,18 +374,18 @@ PARAM : a string with parameters given to make
 		 )
 	;; Decide what to do with the buffer if it already exists
 	(if (and
-		   _buffer
+		 _buffer
+		 (or
+		  (not _process)
+		  (and
+		   (string-equal "run" (process-status _process))
 		   (or
-			(not _process)
-			(and
-			 (string-equal "run" (process-status _process))
-			 (or
-			  (y-or-n-p (format "'%s' already exists and has process running, kill it ?" new_buffer_name))
-			  (error "Abandonned compilation")
-			  )
-			 )
+			(y-or-n-p (format "'%s' already exists and has process running, kill it ?" new_buffer_name))
+			(error "Abandonned compilation")
 			)
 		   )
+		  )
+		 )
 		(kill-buffer _buffer)
 	  )
 	(setq _buffer (get-buffer-create new_buffer_name))

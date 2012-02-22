@@ -1354,6 +1354,29 @@
   (equal xmltok-type 'cdata-section)
   )
 
+(defun konix/nxml/indirect-buffer-cdata ()
+  (interactive)
+  (unless (konix/nxml-in-cdata-p)
+	(error "This works only in cdata section")
+	)
+  (let (
+		beg
+		end
+		)
+	(save-excursion
+	  (nxml-move-outside-backwards)
+	  (setq beg (+ 10 (point)))			;moves just after <![CDATA[
+	  (xmltok-forward)
+	  (setq end (-
+				 (point)
+				 3						;moves just before ]]>
+				 ))
+	  )
+	(konix/indirect-region beg end)
+	(delete-other-windows)
+	)
+  )
+
 (defun konix/nxml-indent-line ()
   "Indent only relevent lines"
   ;; fill in the value of xmltok-type
@@ -1367,10 +1390,10 @@
 	  )
 	 )
    (let* (
-		 (rng-open-elements_tmp rng-open-elements)
-		 (my_elem (pop rng-open-elements_tmp))
-		 (found nil)
-		 )
+		  (rng-open-elements_tmp rng-open-elements)
+		  (my_elem (pop rng-open-elements_tmp))
+		  (found nil)
+		  )
 	 (while (and my_elem (not found))
 	   (when (string-equal (cdr my_elem) "screen")
 		 (setq found t)
@@ -1384,6 +1407,28 @@
    )
   )
 
+(defun konix/nxml-newline-dwim ()
+  (interactive)
+  (cond
+   ((and (looking-at-p "<") (looking-back ">"))
+	(newline)
+	(save-excursion
+	  (newline-and-indent)
+	  )
+	(indent-for-tab-command)
+	)
+   ((or
+	 (looking-at-p "[\n\r]")
+	 (looking-at-p "<")
+	 )
+	(newline-and-indent)
+	)
+   (t
+	(newline)
+	)
+   )
+  )
+
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
   (turn-on-tempbuf-mode)
@@ -1392,6 +1437,8 @@
   (setq show-trailing-whitespace t)
   (setq indent-line-function 'konix/nxml-indent-line)
   (ac-flyspell-workaround)
+  (local-set-key (kbd "<C-return>") 'konix/nxml-newline-dwim)
+  (local-set-key (kbd "C-c C-d") 'konix/nxml/indirect-buffer-cdata)
   (setq ac-sources
 		'(
 		  ac-source-konix/rng
@@ -1405,6 +1452,19 @@
   )
 (add-hook 'nxml-mode-hook
 		  'konix/nxml-mode-hook)
+
+(eval-after-load "nxml-mode"
+  '(progn
+	 (set-face-attribute 'nxml-text nil
+						 :weight 'bold
+						 )
+	 (set-face-attribute 'nxml-cdata-section-content nil
+						 :inherit nil)
+	 (set-face-foreground 'nxml-element-local-name
+						  "dodger blue"
+						  )
+	 )
+  )
 
 ;; ####################################################################################################
 ;; Not much of a config

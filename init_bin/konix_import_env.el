@@ -5,7 +5,7 @@
 	  (setenv "KONIX_ENV_DONE")
 	  (message "Forcing the environment loading ")
 	  )
-	(call-process "python" nil (list t nil) nil (expand-file-name
+	(call-process  python-bin nil (list t nil) nil (expand-file-name
 													 "~/init_bin/konix_get_env.py"
 													 )
 				  (if file file "")

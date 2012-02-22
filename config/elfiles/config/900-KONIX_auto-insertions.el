@@ -45,7 +45,7 @@ Add a yasnippet template with key %s"
 							  )
 						   )
 
-	 (redefine-auto-insert (cons "\\.\\(c\\|cpp\\|cc\\)\\'" "Mon implémentation C")
+	 (redefine-auto-insert (cons "\\.\\(c\\|cpp\\|cc\\|cxx\\)\\'" "Mon implémentation C")
 						   '(lambda()
 							  (auto-insert-use-yasnippet-template "c")
 							  )

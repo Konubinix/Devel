@@ -1134,7 +1134,7 @@ lieu de find-file."
   "If TAGS_FILE_NAME does not exist, create an empty one. Then visit
 TAGS_FILE_NAMETHE"
   (interactive
-   (list (read-file-name "TAGS file : "
+   (list (read-file-name "Init TAGS file : "
 						 default-directory
 						 (expand-file-name "TAGS" default-directory)
 						 )

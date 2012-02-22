@@ -352,6 +352,7 @@
 ;; --------------------------------------------------
 ;; Compilation
 ;; --------------------------------------------------
+(require 'KONIX_compilation)
 (setq-default compilation-auto-jump-to-first-error t)
 (setq-default compilation-context-lines nil)
 (setq-default compilation-read-command nil)
@@ -359,6 +360,7 @@
 (setq-default compilation-skip-threshold 2)
 (setq-default compilation-window-height 10)
 (setq-default compile-command "make")
+(konix/compilation-buffer/setup-default-values)
 (defcustom konix/compilation-font-lock-keywords '() "")
 (defun konix/compilation-mode-hook()
   ;;(hl-line-mode t)

@@ -61,6 +61,7 @@ TAB:complete
 "\C-Space":set-mark
 "\C-o":"> log"
 "\e\C-l":"\C-e | less\C-m"
+"\e\C-m":"\C-aman \C-m"
 #This example wraps the line in su -c '', if Alt+S is pressed:
 "\es":"\C-a su -c '\C-e'\C-m"
 # As a last example, quickly send a command in the background with Ctrl+Alt+B, discarding all of its output:

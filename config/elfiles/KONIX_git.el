@@ -1101,6 +1101,7 @@
 	(define-prefix-command 'konix/git/status/diff-map)
 	(define-key local_map "d" 'konix/git/status/diff-map)
 	(define-key konix/git/status/diff-map "c" 'konix/git/diff-cached)
+	(define-key konix/git/status/diff-map "d" 'konix/git/diff)
 
 	(define-prefix-command 'konix/git/status/commit-map)
 	(define-key local_map "c" 'konix/git/status/commit-map)

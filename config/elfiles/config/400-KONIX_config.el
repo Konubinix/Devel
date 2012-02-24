@@ -525,6 +525,7 @@
 	  '(
 		("epdfview" "\\.pdf$")
 		("lowriter" "\\.odt$")
+		("localc" "\\.xlsx$")
 		("evince" "\\.ps$")
 		("gimp" "\\.\\(png\\|jpg\\)$")
 		("vlc" "\\.mp3$")

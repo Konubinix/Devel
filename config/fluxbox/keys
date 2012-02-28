@@ -208,7 +208,7 @@ Control Mod4 Delete :ExecCommand konix_ask_poweroff.sh
 # ////////////////////////////////////////
 # GOTO SHORTCUTS (Control Mod4)
 # ////////////////////////////////////////
-Control Mod4 t :ExecCommand $(konix_goto_true_exec.sh gnome-terminal)
+Control Mod4 t :ExecCommand $(konix_goto_true_exec.sh terminator)
 Control Mod4 i :ExecCommand $(konix_goto_true_exec.sh x-www-browser)
 Control Mod4 u :ExecCommand $(konix_goto_window.sh \.uzbl konix_uzbl)
 Control Mod4 p :ExecCommand $(konix_goto_true_exec.sh pidgin)

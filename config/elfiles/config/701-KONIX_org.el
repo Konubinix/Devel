@@ -62,9 +62,13 @@ cursor stays in the org buffer."
 (setq-default org-agenda-clockreport-parameter-plist `(:link t :maxlevel 5 :emphasize t :link t :timestamp t))
 (defun konix/org-skip-other-meta-context ()
   "Skip trees that are not in current meta context"
-  (if (string-match org-directory default-directory)
-	  nil
+  (if (string-match (expand-file-name org-directory) (expand-file-name default-directory))
+	  (progn
+		(message "Allowing for file %s" (buffer-file-name))
+		nil
+		)
 	(save-excursion
+	  (message "Skipping for file %s" (buffer-file-name))
 	  (end-of-buffer)
 	  (point)
 	  )
@@ -75,7 +79,6 @@ cursor stays in the org buffer."
 				("w" todo nil
 				 (
 				  (org-agenda-skip-function 'konix/org-skip-other-meta-context)
-				  (org-agenda-overriding-header "Things to do (current context) :")
 				  )
 				 )
 				("W" agenda nil

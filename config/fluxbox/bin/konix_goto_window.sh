@@ -17,9 +17,8 @@ then
 fi
 
 konix_display.py "goto $WINDOW_MATCH " &
-
 shift 2
-ARGS="$*"
+ARGS="$@"
 BASENAME=`basename $WINDOW_MATCH`;
 BASENAME=`echo $BASENAME | tr "[:upper:]" "[:lower:]"`
 FOUND=0;
@@ -43,7 +42,8 @@ findwindow $BASENAME $WMCTRL $GREP;
 
 if [ $FOUND -eq 0 ]
 then
-    $FALLBACK $ARGS
+    $FALLBACK # $ARGS do not give the args till I find a way to get shift and $*
+			  # or $@ working
     sleep 2;
     findwindow $BASENAME $WMCTRL $GREP;
     if [ $FOUND -eq 0 ]

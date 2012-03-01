@@ -8,6 +8,8 @@
 (defvar konix/org-pomodoro-current-pomodoro-report-entry-id "pomodoro_report")
 (defvar konix/org-pomodoro-break-clocks-out nil)
 (defvar konix/org-pomodoro-in-pomodoro nil)
+(defcustom konix/org-pomodoro-tray-daemon-controller
+  "/tmp/pomodorow_tray_daemon_control" "")
 
 ;; ####################################################################################################
 ;; FUNCTIONS
@@ -95,6 +97,7 @@
   (setq-default org-timer-default-timer time)
   (message "Canceling current timer")
   (org-timer-cancel-timer)
+  (konix/org-pomodoro-tray-daemon-put "i")
   (when konix/org-pomodoro-break-clocks-out
 	(message "Clocking out of current task")
 	(when org-clock-current-task
@@ -135,6 +138,7 @@
 	(pop-tag-mark)
 	)
   (konix/org-pomodoro-set-bookmark)
+  (konix/org-pomodoro-tray-daemon-put "i")
   (when (y-or-n-p "Go in the entry (to clock it in etc...) ?")
 	(org-open-at-point)
 	)
@@ -344,13 +348,13 @@
 		 )
 	(konix/org-pomodoro-report-finish-pomodoro "canceled"
 											   `(lambda ()
-												   (save-restriction
-													 (org-narrow-to-subtree)
-													 (goto-char (point-max))
-													 (newline)
-													 (insert (format "   %s - %s%s" (konix/org-today-time-stamp t) ,msg ,reason))
-													 )
-												   )
+												  (save-restriction
+													(org-narrow-to-subtree)
+													(goto-char (point-max))
+													(newline)
+													(insert (format "   %s - %s%s" (konix/org-today-time-stamp t) ,msg ,reason))
+													)
+												  )
 											   )
 	)
   )
@@ -391,6 +395,15 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 	)
   )
 
+(defun konix/org-pomodoro-tray-daemon-put (command)
+  (when (file-exists-p konix/org-pomodoro-tray-daemon-controller)
+	(with-temp-buffer
+	  (insert command)
+	  (write-file konix/org-pomodoro-tray-daemon-controller)
+	  )
+	)
+  )
+
 ;; ####################################################################################################
 ;; HOOKS
 ;; ####################################################################################################
@@ -424,11 +437,13 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 	  )
 	(setq konix/org-pomodoro-in-pomodoro nil)
 	(konix/org-pomodoro-report-finish-pomodoro)
+	(konix/org-pomodoro-tray-daemon-put "r")
 	(konix/notify (format "Mark pomodoro and take a%s break (%s)" _long konix/org-pomodoro-set-count) 3))
   )
 
 (defun konix/org-timer-done-break-pomodoro-hook ()
   (konix/org-pomodoro-goto)
+  (konix/org-pomodoro-tray-daemon-put "b")
   (konix/notify "Break done, go back to work" 3)
   )
 (defalias 'konix/org-timer-done-hook 'konix/org-timer-done-pomodoro-hook)

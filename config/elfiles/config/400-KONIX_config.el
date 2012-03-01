@@ -524,7 +524,7 @@
 (setq-default associated-program-alist
 	  '(
 		("epdfview" "\\.pdf$")
-		("lowriter" "\\.odt$")
+		("lowriter" "\\.\\(odt\\|docx?\\)$")
 		("localc" "\\.xlsx$")
 		("evince" "\\.ps$")
 		("gimp" "\\.\\(png\\|jpg\\)$")

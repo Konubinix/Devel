@@ -775,7 +775,7 @@
   )
 
 (defun konix/git/svn/list ()
-  '("rebase" "dcommit")
+  '("rebase" "dcommit" "fetch")
   )
 
 (defun konix/git/reset ()

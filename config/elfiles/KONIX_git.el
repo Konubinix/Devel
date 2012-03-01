@@ -1090,9 +1090,7 @@
 	(define-key local_map (kbd"<DEL>") 'konix/git/status-buffer/prev)
 
 	(define-prefix-command 'konix/git/status/buffer/stash-prefix-map)
-	(define-key local_map (kbd "s") 'konix/git/status/buffer/stash-prefix-map)
-	(define-key konix/git/status/buffer/stash-prefix-map "s" 'konix/git/stash/save)
-	(define-key konix/git/status/buffer/stash-prefix-map "p" 'konix/git/stash/pop)
+	(define-key local_map (kbd "s") 'konix/git-global-map-stash)
 
 	(define-prefix-command 'konix/git/status/buffer/rebase-prefix-map)
 	(define-key local_map (kbd "R") 'konix/git/status/buffer/rebase-prefix-map)

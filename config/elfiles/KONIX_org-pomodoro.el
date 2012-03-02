@@ -138,10 +138,10 @@
 	(pop-tag-mark)
 	)
   (konix/org-pomodoro-set-bookmark)
-  (konix/org-pomodoro-tray-daemon-put "i")
   (when (y-or-n-p "Go in the entry (to clock it in etc...) ?")
 	(org-open-at-point)
 	)
+  (konix/org-pomodoro-tray-daemon-put "i")
   (org-timer-set-timer '(16))
   )
 

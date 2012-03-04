@@ -86,11 +86,14 @@
 (autoload 'dictionary "dictionary")
 (autoload 'dictionary-search "dictionary")
 
+;; dummy h
+(autoload 'dummy-h-mode "dummy-h-mode")
+
 ;; ************************************************************
 ;; Automodes
 ;; ************************************************************
 ;; .h -> cpp-mode
-(add-to-list 'auto-mode-alist (cons "\\.h$" 'c++-mode))
+(add-to-list 'auto-mode-alist (cons "\\.h$" 'dummy-h-mode))
 ;; .php
 (add-to-list 'auto-mode-alist (cons "\\.php5$" 'php-mode))
 (add-to-list 'auto-mode-alist (cons "\\.php$" 'php-mode))

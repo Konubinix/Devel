@@ -51,9 +51,12 @@ numbers = options.numbers
 if numbers:
         lefthand = numbers_lefthand
         righthand = numbers_righthand
-elif not simple_chars:
-        lefthand += lefthand_complicated
-        righthand += righthand_complicated
+else:
+        lefthand += numbers_lefthand
+        righthand += numbers_righthand
+        if not simple_chars:
+            lefthand += lefthand_complicated
+            righthand += righthand_complicated
 allchars = righthand + lefthand
 
 pwd = ""

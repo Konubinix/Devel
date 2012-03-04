@@ -20,6 +20,13 @@ trap "rm -rvf '$TMP_PERSO_DECRYPT'" 0
 
 # init
 pushd "$KONIX_PERSO_DIR"
+# crypt what need to be
+for tobecrypted in *nd
+do
+	pushd "$tobecrypted"
+	konix_gpg_all.py
+	popd
+done
 if [ -n "$KONIX_PERSO_PRE_PUSH_HOOK" ]
 then
 	eval "$KONIX_PERSO_PRE_PUSH_HOOK"

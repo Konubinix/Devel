@@ -98,7 +98,7 @@
 ;;    `icicle-search-tags-menu-map'.
 ;;
 ;;  For descriptions of changes to this file, see `icicles-chg.el'.
- 
+
 ;;(@> "Index")
 ;;
 ;;  If you have library `linkd.el' and Emacs 22 or later, load
@@ -112,7 +112,7 @@
 ;;  (@> "Internal variables (alphabetical)")
 ;;  (@> "Icicle mode command")
 ;;  (@> "Other Icicles functions that define Icicle mode")
- 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; This program is free software; you can redistribute it and/or modify
@@ -229,7 +229,7 @@
 (defvar sh-mode-map)                    ; In `sh-script.el'.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 
+
 ;;(@* "User Options (alphabetical)")
 
 ;;; User Options (alphabetical) --------------------------------------
@@ -248,7 +248,7 @@ use either \\[customize] or command `icy-mode' (aka `icicle-mode')."
 (defcustom icicle-mode-hook nil
   "*Functions run after entering and exiting Icicle mode."
   :type 'hook :group 'Icicles-Miscellaneous)
- 
+
 ;;(@* "Internal variables (alphabetical)")
 
 ;;; Internal variables (alphabetical) --------------------------------
@@ -257,7 +257,7 @@ use either \\[customize] or command `icy-mode' (aka `icicle-mode')."
   "Keymap for Icicle mode.  These are top-level key bindings.
 See also `icicle-define-minibuffer-maps' for minibuffer bindings and
 bindings in `*Completions*'.")
- 
+
 ;;(@* "Icicle mode command")
 
 ;;; Icicle mode command ----------------------------------------------
@@ -419,7 +419,7 @@ In many cases there are also `other-window' versions.
 `icicle-reset-option-to-nil'           - Set binary option(s) to nil
 `icicle-save-string-to-variable'       - Save text for use with `C-='
 `icicle-search'                        - Search with regexps & cycling
-`icicle-search-all-tags-bookmark'      - Search tagged bookmarks 
+`icicle-search-all-tags-bookmark'      - Search tagged bookmarks
 `icicle-search-all-tags-regexp-bookmark'
 `icicle-search-bookmark'               - Search bookmarks separately
 `icicle-search-bookmark-list-bookmark' - Search bookmark lists
@@ -442,7 +442,7 @@ In many cases there are also `other-window' versions.
 `icicle-search-region-bookmark'        - Search bookmarked regions
 `icicle-search-remote-file-bookmark'   - Search remote bookmarks
 `icicle-search-sentences'              - Search sentences as contexts
-`icicle-search-some-tags-bookmark'     - Search tagged bookmarks 
+`icicle-search-some-tags-bookmark'     - Search tagged bookmarks
 `icicle-search-some-tags-regexp-bookmark'
 `icicle-search-text-property'          - Search for faces etc.
 `icicle-search-url-bookmark'           - Search bookmarked URLs
@@ -716,7 +716,7 @@ In many cases there are also `other-window' versions.
 `icicle-save-string-to-variable'       - Save text for use with `C-='
 `icicle-search'                        - Search with regexps & cycling
 `icicle-search-bookmark'               - Search bookmarks separately
-`icicle-search-all-tags-bookmark'      - Search tagged bookmarks 
+`icicle-search-all-tags-bookmark'      - Search tagged bookmarks
 `icicle-search-all-tags-regexp-bookmark'
 `icicle-search-bookmark-list-bookmark' - Search bookmark lists
 `icicle-search-bookmarks-together'     - Search bookmarks together
@@ -738,7 +738,7 @@ In many cases there are also `other-window' versions.
 `icicle-search-region-bookmark'        - Search bookmarked regions
 `icicle-search-remote-file-bookmark'   - Search remote bookmarks
 `icicle-search-sentences'              - Search sentences as contexts
-`icicle-search-some-tags-bookmark'     - Search tagged bookmarks 
+`icicle-search-some-tags-bookmark'     - Search tagged bookmarks
 `icicle-search-some-tags-regexp-bookmark'
 `icicle-search-text-property'          - Search for faces etc.
 `icicle-search-url-bookmark'           - Search bookmarked URLs
@@ -2179,7 +2179,7 @@ Used on `pre-command-hook'."
                                         (listify-key-sequence (icicle-kbd "m"))))) ; `M-s M-s m'
            (def  (lookup-key bookmark-bmenu-mode-map key)))
       (unless (and def  (not (integerp def)))
-        (define-key bookmark-bmenu-mode-map key 'icicle-search-bookmark-list-marked))))    
+        (define-key bookmark-bmenu-mode-map key 'icicle-search-bookmark-list-marked))))
 
   ;; Bind some keys in Dired mode.
   (when (boundp 'dired-mode-map)
@@ -2368,7 +2368,7 @@ keymap.  If KEYMAP-VAR is not bound to a keymap, it is ignored."
         (dolist (key icicle-key-complete-keys)
           (when (eq (lookup-key map key) 'icicle-complete-keys)
             (condition-case nil (define-key map key nil) (error nil))))))))
- 
+
 ;;(@* "Other Icicles functions that define Icicle mode")
 
 ;;; Other Icicles functions that define Icicle mode ------------------
@@ -3289,7 +3289,7 @@ complete)"))
   (define-key map (icicle-kbd "C-pause") 'icicle-toggle-highlight-historical-candidates) ;`C-pause'
   (define-key map (icicle-kbd "S-pause")   'icicle-toggle-highlight-saved-candidates) ; `S-pause'
   (define-key map (icicle-kbd "C-M-pause") 'icicle-other-history) ; `C-M-pause'
-  (define-key map (icicle-kbd "C-insert")  'icicle-switch-to-Completions-buf) ; `C-insert'
+  (define-key map (icicle-kbd "C-\"")  'icicle-switch-to-Completions-buf) ; `C-insert'
   (define-key map (icicle-kbd "insert")    'icicle-save/unsave-candidate) ; `insert'
 
   ;; In Emacs 22+, local is parent of local-completion
@@ -4122,7 +4122,7 @@ if `icicle-change-region-background-flag' is non-nil."
                (when icyp (icicle-mode 1)))))
   (if (featurep 'recentf) (eval-after-load "icicles-mode" form) (eval-after-load "recentf" form)))
 
-      
+
 ;; Do this last.
 ;;
 ;; When these libraries are first loaded, toggle Icicle mode to pick up the definitions

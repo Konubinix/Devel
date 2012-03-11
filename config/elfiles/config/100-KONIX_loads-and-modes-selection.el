@@ -85,9 +85,11 @@
 ;; dictionnary
 (autoload 'dictionary "dictionary")
 (autoload 'dictionary-search "dictionary")
-
 ;; dummy h
 (autoload 'dummy-h-mode "dummy-h-mode")
+;; trac-wiki
+(autoload 'trac-wiki-mode "trac-wiki" nil t)
+(autoload 'trac-wiki "trac-wiki" nil t)
 
 ;; ************************************************************
 ;; Automodes

@@ -22,13 +22,15 @@
 ;; ******************************************************************************************
 ;; bs custo
 ;; ******************************************************************************************
-(require 'bs)
-(konix/push-or-replace-in-alist 'bs-configurations "same-mode-files"
-								nil 'konix/buffer-same-mode-p
-								".*" nil
-								'bs-sort-buffer-interns-are-last
-								)
-
+(eval-after-load "bs"
+  '(progn
+	(konix/push-or-replace-in-alist 'bs-configurations "same-mode-files"
+								  nil 'konix/buffer-same-mode-p
+								  ".*" nil
+								  'bs-sort-buffer-interns-are-last
+								  )
+   )
+)
 ;; ******************************************************************************************
 ;; Rainbow delimiters : Highlight nested parens, brackets, braces a different color
 ;; at each depth
@@ -38,7 +40,6 @@
 ;; Automagically killing unused buffers
 ;; ******************************************************************************************
 (require 'tempbuf)
-
 ;; ******************************************************************************************
 ;; Keeping buffers
 ;; ******************************************************************************************
@@ -109,7 +110,7 @@
 ;; Dired in human readable format
 (setq-default dired-listing-switches "-alh")
 ;; Sometimes, display-warning may fail because this is not set
-(setq warning-suppress-types '())
+(setq-default warning-suppress-types '())
 
 ;; Calendar display show the week numbers
 (setq calendar-week-start-day 1
@@ -204,6 +205,7 @@
 
 ;; ************************************************************
 ;; YASnippet
+;; TODO : Do that only when it is needed because it is time consuming
 ;; ************************************************************
 (require 'yasnippet)
 (yas/initialize)
@@ -522,18 +524,18 @@
 ;; ####################################################################################################
 (require 'run-assoc)
 (setq-default associated-program-alist
-	  '(
-		("epdfview" "\\.pdf$")
-		("lowriter" "\\.\\(odt\\|docx?\\)$")
-		("localc" "\\.xlsx$")
-		("evince" "\\.ps$")
-		("gimp" "\\.\\(png\\|jpg\\)$")
-		("vlc" "\\.mp3$")
-		("dia" "\\.dia$")
-		((lambda (file)
-		   (browse-url (concat "file:///" (expand-file-name file))))
-		 "\\.html?$"))
-	  )
+			  '(
+				("epdfview" "\\.pdf$")
+				("lowriter" "\\.\\(odt\\|docx?\\)$")
+				("localc" "\\.xlsx$")
+				("evince" "\\.ps$")
+				("gimp" "\\.\\(png\\|jpg\\)$")
+				("vlc" "\\.mp3$")
+				("dia" "\\.dia$")
+				((lambda (file)
+				   (browse-url (concat "file:///" (expand-file-name file))))
+				 "\\.html?$"))
+			  )
 ;; ####################################################################################################
 ;; diredful
 ;; ####################################################################################################

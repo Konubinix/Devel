@@ -7,7 +7,8 @@ then
 else
 	touch "$LOCK_FILE"
 fi
-
+MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
+echo "?" > "$MAIL_TRAY_DAEMON_CTRL"
 # make notmuch db consistent (earlier removed mail files etc)
 notmuch new --verbose
 # sync maildir flags up with notmuch

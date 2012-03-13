@@ -15,6 +15,11 @@ DEFAULT_CONFIG={
     'KONIX_PWD' : os.getcwd()
     }
 
+ENV_BACKUP_FILE=os.path.join(os.path.expanduser("~"),".env_backup_"+os.sys.platform+".conf")
+
+# by default, get the values from os.environ
+DEFAULT_ENVIRON = os.environ
+
 def mergeItemsOfSection(items):
     new_items = {}
     for key,value in items:
@@ -38,14 +43,14 @@ def getConfigFromEnvFile(envfile, previous_config):
         items = mergeItemsOfSection(config.items(section))
         for key in items.keys():
             value = items[key]
-            env_value = os.environ.get(key)
+            env_value = DEFAULT_ENVIRON.get(key)
             if env_value == None:
                 env_value = ""
 
             value = value.replace('\n','')
             substitute_config = {}
             substitute_config.update(DEFAULT_CONFIG)
-            substitute_config.update(os.environ)
+            substitute_config.update(DEFAULT_ENVIRON)
             substitute_config.update(previous_config)
             value_template = string.Template(value)
             value = value_template.safe_substitute(substitute_config)

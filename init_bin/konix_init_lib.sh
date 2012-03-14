@@ -13,11 +13,6 @@ export PYTHON_PATH="$(cd "${HOME}/init_bin" && ./konix_dirname.py "$PYTHON_BIN")
 # Function needed to import my custom env
 # ####################################################################################################
 import_env () {
-    FORCE=$1
-    if [ -n "$FORCE" ]
-    then
-        unset KONIX_ENV_DONE
-    fi
     ENV_CUSTOM_FILE="$2"
     TEMP_FILE=$(mktemp -t "temp_file_for_import_env.XXXX")
     rm -f "${TEMP_FILE}"

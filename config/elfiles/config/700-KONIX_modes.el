@@ -1431,6 +1431,78 @@
    )
   )
 
+(defun konix/nxml-narrow-to-element ()
+  (interactive)
+  (skip-chars-backward "[:blank:]")
+  (let (
+		(beg (point))
+		(end (save-excursion (nxml-forward-element) (point)))
+		)
+	(narrow-to-region beg end)
+	)
+  )
+
+(defun konix/nxml-kill-element ()
+  (interactive)
+  (let (
+		(beg (point))
+		(end (save-excursion (nxml-forward-element) (point)))
+		)
+	(kill-region beg end)
+	)
+  )
+
+(defun konix/nxml-show-context ()
+  (interactive)
+  (nxml-token-before)
+  (unless rng-validate-mode
+	(rng-validate-mode 1)
+	)
+  (rng-set-state-after (point))
+  (let* (
+		 (rng-open-elements_tmp rng-open-elements)
+		 (my_elem (pop rng-open-elements_tmp))
+		 (message_ "")
+		 )
+	(while my_elem
+	  (setq message_ (concat message_ " in " (car my_elem) ":" (cdr my_elem)))
+	  (setq my_elem (pop rng-open-elements_tmp))
+	  )
+	(message message_)
+	)
+  )
+
+(defun konix/nxml-zoom-in ()
+  (interactive)
+  (condition-case nil
+	  (nxml-show-direct-subheadings)
+	(error
+	 (nxml-forward-element)
+	 (nxml-backward-element)
+	 (nxml-show-direct-subheadings)
+	 )
+	)
+  (next-line)
+  (beginning-of-line)
+  )
+
+(defun konix/nxml-zoom-out ()
+  (interactive)
+  (nxml-backward-up-element)
+  (nxml-hide-subheadings)
+  )
+
+(defun konix/nxml-hide-all ()
+  (interactive)
+  (if (not current-prefix-arg)
+	  (nxml-hide-all-text-content)
+	(save-excursion
+	  (goto-char (point-min))
+	  (nxml-hide-other)
+	  )
+	)
+  )
+
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
   (turn-on-tempbuf-mode)
@@ -1450,6 +1522,13 @@
 		  ac-source-words-in-same-mode-buffers
 		  )
 		)
+  (local-set-key (kbd "<f1>") 'konix/nxml-zoom-out)
+  (local-set-key (kbd "<f3>") 'konix/nxml-zoom-in)
+  (local-set-key (kbd "<f2> <f3>") 'nxml-show-all)
+  (local-set-key (kbd "<f2> <f1>") 'konix/nxml-hide-all)
+  (local-set-key (kbd "C-x n e") 'konix/nxml-narrow-to-element)
+  (local-set-key (kbd "C-M-k") 'konix/nxml-kill-element)
+  (local-set-key (kbd "C-c C-c") 'konix/nxml-show-context)
   (auto-complete-mode 1)
   )
 (add-hook 'nxml-mode-hook
@@ -1465,6 +1544,8 @@
 	 (set-face-foreground 'nxml-element-local-name
 						  "dodger blue"
 						  )
+	 (define-key nxml-outline-showing-tag-map (kbd "<C-tab>") 'nxml-hide-subheadings)
+	 (define-key nxml-outline-hiding-tag-map (kbd "<C-tab>") 'nxml-show-direct-subheadings)
 	 )
   )
 

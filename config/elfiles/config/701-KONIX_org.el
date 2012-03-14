@@ -76,12 +76,12 @@ cursor stays in the org buffer."
   )
 (setq-default org-agenda-custom-commands
 			  '(
-				("w" todo nil
+				("W" todo nil
 				 (
 				  (org-agenda-skip-function 'konix/org-skip-other-meta-context)
 				  )
 				 )
-				("W" agenda nil
+				("w" agenda nil
 				 (
 				  (org-agenda-skip-function 'konix/org-skip-other-meta-context)
 				  (org-agenda-overriding-header "Things to do (current context) :")

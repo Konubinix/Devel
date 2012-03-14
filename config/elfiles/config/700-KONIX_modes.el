@@ -1304,6 +1304,8 @@
 (setq-default nxml-child-indent 2)
 (setq-default nxml-end-tag-indent-scan-distance 400000)
 (setq-default nxml-heading-scan-distance nxml-end-tag-indent-scan-distance)
+(add-to-list 'safe-local-variable-values
+			 '(nxml-section-element-name-regexp . t))
 (defun konix/hs-nxml-forward-sexp-func (dummy)
   (save-match-data
 	(unless (looking-at "<\\([a-zA-Z0-9_-]+\\)[ >]")

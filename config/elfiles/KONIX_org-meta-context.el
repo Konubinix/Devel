@@ -31,7 +31,9 @@ The first element of the list is the default context
   (unless (member name konix/org-meta-contexts)
 	(error "%s not in konix/org-meta-contexts" name)
 	)
-  (setq org-directory name)
+  (setq org-directory name
+		org-agenda-diary-file (expand-file-name "diary.org" name)
+		)
   (message "Initialized %s context" name)
   )
 

@@ -447,7 +447,7 @@ current buffer still has clients"
 
 (defun konix/yas/update-directory ()
   (konix/make-directories yas/root-directory)
-  (mapc 'yas/load-directory yas/root-directory)
+  (mapc 'yas/load-directory (reverse yas/root-directory))
   )
 
 (defun konix/find (name)

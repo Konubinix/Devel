@@ -1,10 +1,10 @@
 #!/bin/bash
 
-DISPLAY=0
+DO_DISPLAY=0
 while getopts ":d" opt; do
 	case $opt in
 		d)
-			DISPLAY=1
+			DO_DISPLAY=1
 			;;
 		\?)
 			echo "Invalid option: -$OPTARG" >&2
@@ -17,7 +17,7 @@ UNREAD_ELEMENTS="$(notmuch search tag:unread | wc -l)"
 FLAGGED_ELEMENTS="$(notmuch search tag:flagged | wc -l)"
 UNREAD_N_INBOX_ELEMENTS="$(notmuch search tag:unread and tag:inbox| wc -l)"
 MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
-if [ "$DISPLAY" == "1" ] \
+if [ "$DO_DISPLAY" == "1" ] \
 	&& [ "$INBOX_ELEMENTS" != "0" -o "$UNREAD_ELEMENTS" != "0" ]
 then
 	# new mails, display some message

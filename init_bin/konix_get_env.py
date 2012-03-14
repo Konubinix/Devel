@@ -8,6 +8,7 @@ import string
 import re
 import logging
 import socket
+import random
 
 logging.basicConfig(level=logging.DEBUG)
 default_config_file = os.path.join(os.path.expanduser("~"),".env_"+os.sys.platform+".conf")
@@ -15,7 +16,7 @@ DEFAULT_CONFIG={
     'KONIX_PWD' : os.getcwd()
     }
 
-ENV_BACKUP_FILE=os.path.join(os.path.expanduser("~"),".env_backup_"+os.sys.platform+".conf")
+ENV_BACKUP_FILE_TEMPLATE=os.path.join(os.path.expanduser("~"),".env_backup_%s_"+os.sys.platform+".conf")
 
 # by default, get the values from os.environ
 DEFAULT_ENVIRON = os.environ
@@ -90,6 +91,30 @@ def getConfigFromEnvFile(envfile, previous_config):
 
     return new_config
 
+def getBackupEnvFileName(stamp):
+    return ENV_BACKUP_FILE_TEMPLATE % stamp
+
+def createBackupEnvFile(stamp):
+    env_backup_file_name = getBackupEnvFileName(stamp)
+    if os.path.exists(env_backup_file_name):
+        os.remove(env_backup_file_name)
+    f = open(env_backup_file_name, "w")
+    f.write("[replace]\n")
+    for item in os.environ.items():
+        f.write(item[0]+"="+item[1]+"\n")
+    f.close()
+
+def createBackupFileOrUseIt(stamp):
+    backup_file = None
+    if not stamp or not os.path.exists(getBackupEnvFileName(stamp)):
+        stamp = str(random.randint(0,300000))
+        logging.debug("Creating new backup env file with stamp "+stamp)
+        createBackupEnvFile(stamp)
+    else:
+        logging.debug("Using backup env file with stamp "+stamp)
+        backup_file = getBackupEnvFileName(stamp)
+    return (stamp, backup_file)
+
 def main():
     config = {}
     GIVEN_CONFIG_FILE = None
@@ -113,6 +138,8 @@ def main():
             # Hardcoded ones
             # ####################################################################################################
             config["HOSTNAME"] = socket.gethostname()
+            (stamp, backup_file) = createBackupFileOrUseIt(os.environ.get("KONIX_ENV_STAMP", None))
+            config["KONIX_ENV_STAMP"] = stamp
             logging.debug("Parsing the env")
             devel_dir = config["KONIX_DEVEL_DIR"]
             konix_config = os.path.join(devel_dir,"config")
@@ -120,6 +147,9 @@ def main():
             config_user_file = os.path.join(os.path.expanduser("~"),"env.conf")
             config_os_file = os.path.join(konix_config, "env_"+os.sys.platform+".conf")
             config_os_user_file = os.path.join(os.path.expanduser("~"),"env_"+os.sys.platform+".conf")
+            if backup_file:
+                logging.debug("Beginning with the backup env "+backup_file+" that will override the default env")
+                config = getConfigFromEnvFile(backup_file,config)
             logging.debug("Parsing "+config_file)
             config = getConfigFromEnvFile(config_file,config)
             logging.debug("Parsing "+config_user_file)

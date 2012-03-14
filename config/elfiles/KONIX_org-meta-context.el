@@ -16,16 +16,19 @@ The first element of the list is the default context
 						  )
 				  )
 	)
+  (konix/org-meta-context/switch-to-context (first konix/org-meta-contexts) t)
   )
 
-(defun konix/org-meta-context/switch-to-context (name)
+(defun konix/org-meta-context/switch-to-context (name &optional force)
   (interactive
    (list
 	(completing-read "Wich context : " konix/org-meta-context/meta-contexts)
 	)
    )
-  (when (string-equal name
-					  org-directory)
+  (when (and (not force)
+			 (string-equal name
+						   org-directory)
+			 )
 	(error "Already in this context : %s" org-directory)
 	)
   (unless (member name konix/org-meta-contexts)

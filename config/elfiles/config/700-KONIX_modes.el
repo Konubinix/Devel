@@ -2039,3 +2039,18 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
   )
 (add-hook 'cmake-mode-hook
 		  'konix/cmake-mode-hook)
+
+;; ####################################################################################################
+;; bitlbee
+;; ####################################################################################################
+(defcustom konix/bitlbee-password "" "")
+
+(add-hook 'erc-join-hook 'konix/bitlbee-identify)
+(defun konix/bitlbee-identify ()
+  "If we're on the bitlbee server, send the identify command to the
+ &bitlbee channel."
+  (when (and (string= "localhost" erc-session-server)
+			 (string= "&bitlbee" (buffer-name)))
+	(erc-message "PRIVMSG" (format "%s identify %s"
+								   (erc-default-target)
+								   konix/bitlbee-password))))

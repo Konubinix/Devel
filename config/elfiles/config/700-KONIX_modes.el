@@ -477,8 +477,8 @@
   (let (
 		(appt_elem (second (first appt-time-msg-list)))
 		)
-	(unless (y-or-n-p-with-timeout (format "Recall this appt : '%s' ?"
-										   appt_elem) 5 t)
+	(unless (y-or-n-p (format "Recall this appt : '%s' ?"
+							  appt_elem))
 	  (pop appt-time-msg-list)
 	  (appt-check)
 	  )
@@ -491,8 +491,8 @@
 		  )
 	  (ignore-errors (appt-delete-window))
 	  (when current_window
-	   (pop-to-buffer (window-buffer current_window))
-	   )
+		(pop-to-buffer (window-buffer current_window))
+		)
 	  )
 	)
   )

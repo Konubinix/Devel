@@ -1712,13 +1712,24 @@ inspired from `notmuch-show-archive-thread-internal'"
   (konix/notmuch-archive)
   )
 
+(defun konix/notmuch-search-no-tag ()
+  (interactive)
+  (let (
+		(search_string
+		 (shell-command-to-string "konix_notmuch_no_tag_search.sh")
+		 )
+		)
+	(notmuch-search search_string)
+	(rename-buffer "*notmuch-search-no-tag*")
+	)
+  )
+
 (defun konix/notmuch-hello-refresh-hook ()
   ;; launches an update on the mail daemon
   (shell-command "konix_mail_tray_daemon_update.sh")
   )
 (add-hook 'notmuch-hello-refresh-hook
 		  'konix/notmuch-hello-refresh-hook)
-
 
 (eval-after-load "notmuch"
   '(progn
@@ -1734,6 +1745,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 (define-key notmuch-show-mode-map (kbd "F") 'konix/notmuch-show-unflag-and-next)
 	 (define-key notmuch-show-mode-map (kbd "U") 'konix/notmuch-show-read-delete-and-next)
 	 (define-key notmuch-show-mode-map (kbd "<C-return>") 'w3m-view-url-with-external-browser)
+	 (define-key notmuch-hello-mode-map (kbd "N") 'konix/notmuch-search-no-tag)
 	 )
   )
 

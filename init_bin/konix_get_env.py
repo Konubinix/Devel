@@ -133,7 +133,7 @@ def main():
         # or
         # - env_done is not set to 1
         logging.debug("the config is for "+config["KONIX_PLATFORM"]+", the environ says "+os.environ.get("KONIX_PLATFORM", "nothing"))
-        if config["KONIX_PLATFORM"] != os.environ.get("KONIX_PLATFORM") or os.environ.get("KONIX_ENV_DONE") != "1":
+        if config["KONIX_PLATFORM"] != os.environ.get("KONIX_PLATFORM") or os.environ.get("KONIX_ENV_IGNORE", None) == None:
             # ####################################################################################################
             # Hardcoded ones
             # ####################################################################################################
@@ -158,7 +158,6 @@ def main():
             config = getConfigFromEnvFile(config_os_file,config)
             logging.debug("Parsing "+config_os_user_file)
             config = getConfigFromEnvFile(config_os_user_file,config)
-            config["KONIX_ENV_DONE"] = "1"
         else:
             logging.debug("Ignoring the env")
             config = {}

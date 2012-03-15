@@ -29,3 +29,4 @@ alias pod="popd"
 alias dia="dia --integrated"
 alias go="gnome-open"
 alias dmake="PATH=/usr/lib/distcc:$PATH cmake"
+alias makej=konix_makej.sh

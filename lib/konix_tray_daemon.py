@@ -44,6 +44,12 @@ class TrayDaemon(object):
         if custom_icon:
             LOGGER.info("Custom command "+command)
             self.tray_icon.set_from_pixbuf(custom_icon)
+        elif command == 'b':
+            LOGGER.info("Start blinking")
+            self.tray_icon.set_blinking(True)
+        elif command == 'B':
+            LOGGER.info("Stop blinking")
+            self.tray_icon.set_blinking(False)
         elif command == 'v':
             LOGGER.info("Becoming invisible")
             self.tray_icon.set_visible(False)

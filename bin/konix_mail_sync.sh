@@ -9,6 +9,7 @@ else
 fi
 MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
 echo "?" > "$MAIL_TRAY_DAEMON_CTRL"
+echo "b" > "$MAIL_TRAY_DAEMON_CTRL"
 # make notmuch db consistent (earlier removed mail files etc)
 notmuch new --verbose
 # sync maildir flags up with notmuch
@@ -33,6 +34,7 @@ notmuch new
 konix_mail_init_tags.sh
 
 konix_mail_tray_daemon_update.sh -d
+echo "B" > "$MAIL_TRAY_DAEMON_CTRL"
 
 echo "" > /tmp/konix_mail_tray_stamp
 

@@ -24,11 +24,10 @@ DEFAULT_ENVIRON = os.environ
 def mergeItemsOfSection(items):
     new_items = {}
     for key,value in items:
-        new_value = value.replace(",",os.pathsep)
         if new_items.get(key) == None:
-            new_items[key] = new_value
+            new_items[key] = value
         else:
-            new_items[key] = os.pathsep.join((new_items[key],new_value,))
+            new_items[key] = "".join((new_items[key],value,))
     return new_items
 
 def getConfigFromEnvFile(envfile, previous_config):
@@ -87,8 +86,6 @@ def getConfigFromEnvFile(envfile, previous_config):
                     logging.debug("Not appended")
             else:
                 assert(False)
-
-
     return new_config
 
 def getBackupEnvFileName(stamp):

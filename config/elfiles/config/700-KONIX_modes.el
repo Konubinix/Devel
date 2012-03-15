@@ -1503,6 +1503,13 @@
 	)
   )
 
+(defun konix/nxml-mark-element ()
+  (interactive)
+  (nxml-forward-element)
+  (push-mark (point) nil t)
+  (nxml-backward-element)
+  )
+
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
   (turn-on-tempbuf-mode)
@@ -1528,6 +1535,7 @@
   (local-set-key (kbd "<f2> <f1>") 'konix/nxml-hide-all)
   (local-set-key (kbd "C-x n e") 'konix/nxml-narrow-to-element)
   (local-set-key (kbd "C-M-k") 'konix/nxml-kill-element)
+  (local-set-key (kbd "C-M-h") 'konix/nxml-mark-element)
   (local-set-key (kbd "C-c C-c") 'konix/nxml-show-context)
   (auto-complete-mode 1)
   )
@@ -1674,8 +1682,8 @@ inspired from `notmuch-show-archive-thread-internal'"
 		until (not (notmuch-show-goto-message-next)))
   ;; Move to the next item in the search results, if any.
   (let ((parent-buffer notmuch-show-parent-buffer))
-    (notmuch-kill-this-buffer)
-    (if parent-buffer
+	(notmuch-kill-this-buffer)
+	(if parent-buffer
 		(progn
 		  (switch-to-buffer parent-buffer)
 		  (forward-line)
@@ -1863,7 +1871,7 @@ Prefix argument ARG makes the entry nonmarking."
   (interactive
    (list current-prefix-arg last-nonmenu-event))
   (diary-make-entry (calendar-date-string (calendar-cursor-to-date t event) t t)
-                    arg konix/diary-shared)
+					arg konix/diary-shared)
   )
 
 (defun konix/diary-insert-anniversary-entry (arg)
@@ -1871,11 +1879,11 @@ Prefix argument ARG makes the entry nonmarking."
 Prefix argument ARG makes the entry nonmarking."
   (interactive "P")
   (let ((calendar-date-display-form (diary-date-display-form)))
-    (diary-make-entry
-     (format "%s(diary-anniversary %s)"
-             diary-sexp-entry-symbol
-             (calendar-date-string (calendar-cursor-to-date t) nil t))
-     arg
+	(diary-make-entry
+	 (format "%s(diary-anniversary %s)"
+			 diary-sexp-entry-symbol
+			 (calendar-date-string (calendar-cursor-to-date t) nil t))
+	 arg
 	 konix/diary-anniversary
 	 )))
 
@@ -1953,7 +1961,7 @@ Prefix argument ARG makes the entry nonmarking."
 	  (insert (if arg "n" "i"))
 	  (write-file "/tmp/emacs_tray_daemon_control")
 	  )
-    (setq konix/erc-tray-state arg)
+	(setq konix/erc-tray-state arg)
 	)
   )
 
@@ -1961,9 +1969,9 @@ Prefix argument ARG makes the entry nonmarking."
   "Enables or disable blinking, depending on arg (t or nil).
 Additional support for inhibiting one activation (quick hack)"
   (when konix/erc-tray-enable
-    (if konix/erc-tray-inhibit-one-activation
+	(if konix/erc-tray-inhibit-one-activation
 		(setq konix/erc-tray-inhibit-one-activation nil)
-      (konix/erc-tray-change-state-aux arg))))
+	  (konix/erc-tray-change-state-aux arg))))
 
 (defun konix/erc-tray-update-state ()
   "Update the state of the tray icon. Blink when some new event
@@ -1972,19 +1980,19 @@ erc-modified-channels-alist, filtered by konix/erc-tray-ignored-channels."
   (interactive)
   ;;stop blinking tray when there're no channels in list
   (unless erc-modified-channels-alist
-    (konix/erc-tray-change-state nil))
+	(konix/erc-tray-change-state nil))
   ;;maybe make tray blink
   (unless (eq nil (frame-visible-p (selected-frame)))
-    ;;filter list according to konix/erc-tray-ignored-channels
-    (let ((filtered-list erc-modified-channels-alist))
-      (mapc (lambda (el)
+	;;filter list according to konix/erc-tray-ignored-channels
+	(let ((filtered-list erc-modified-channels-alist))
+	  (mapc (lambda (el)
 			  (mapc (lambda (reg)
 					  (when (string-match reg (buffer-name (car el)))
 						(setq filtered-list
 							  (remove el filtered-list))))
 					konix/erc-tray-ignored-channels))
 			filtered-list)
-      (when filtered-list
+	  (when filtered-list
 		(konix/erc-tray-change-state t)))))
 
 ;; --------------------------------------------------------------------------------
@@ -2008,9 +2016,9 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 "
   (interactive "p")
   (if erc-modified-channels-alist
-      (erc-track-switch-buffer arg)
-    (let ((blist (buffer-list)))
-      (while blist
+	  (erc-track-switch-buffer arg)
+	(let ((blist (buffer-list)))
+	  (while blist
 		(unless (or (eq 'erc-mode (buffer-local-value 'major-mode (car blist)))
 					(minibufferp (car blist))
 					(string-match "^ " (buffer-name (car blist))))

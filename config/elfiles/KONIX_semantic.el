@@ -473,7 +473,7 @@
 (defcustom-mode-local-semantic-dependency-system-include-path c++-mode konix/semantic-custom-include-path-cpp nil)
 (defcustom-mode-local-semantic-dependency-system-include-path emacs-lisp-mode konix/semantic-custom-include-path-elisp nil)
 
-(semanticdb-load-ebrowse-caches)
+(ignore-errors (semanticdb-load-ebrowse-caches))
 
 (load-file (concat elfiles "/cedet/common/cedet.el"))
 

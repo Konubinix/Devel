@@ -166,7 +166,7 @@
 ;; by default not displaying trailing whitespaces
 (setq-default show-trailing-whitespace nil)
 (set-face-attribute 'trailing-whitespace nil
-					:background "gray75")
+					:background "gray92")
 (setq-default konix/delete-trailing-whitespace t)
 (add-to-list 'safe-local-variable-values
 			 '(konix/delete-trailing-whitespace . t))

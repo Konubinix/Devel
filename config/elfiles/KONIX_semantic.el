@@ -465,7 +465,9 @@
 	(delete-frame speedbar-frame)
 	)
   )
-(when (locate-file "ctags" exec-path)
+(when (ignore-errors
+	   (semantic-ectag-test-version)
+	   )
   (semantic-load-enable-all-exuberent-ctags-support)
   )
 (defcustom-mode-local-semantic-dependency-system-include-path c++-mode konix/semantic-custom-include-path-cpp nil)

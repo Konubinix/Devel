@@ -4,7 +4,7 @@ sed -i -n -e '
 /^.*class .*\(.\+\).*.*\(::\)\?\1/ {	# Class déclaration (C++,Python)
        s/\(.\+\)/\1 CLASS/
 }
-/^.*#define .*\(.\+\).*\1/ {	# C Preprocessor macro
+/^.*# *define .*\(.\+\).*\1/ {	# C Preprocessor macro
        s/\(.\+\)/\1 DEFINE/
 }
 /^.*def .*\(.\+\).*\1/ { # Python function définition
@@ -12,6 +12,9 @@ sed -i -n -e '
 }
 /^.*enum .*\(.\+\).*.*\(::\)\?\1/ { # C enum
        s/\(.\+\)/\1 ENUM/
+}
+/^.*struct .*\(.\+\).*.*\(::\)\?\1/ { # C struct
+       s/\(.\+\)/\1 STRUCT/
 }
 p
 ' "$1"

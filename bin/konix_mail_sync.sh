@@ -32,6 +32,7 @@ notmuch new
 
 # this is useless since 0.5 -> notmuchsync -d -r --all --sync-deleted-tag
 konix_mail_init_tags.sh
+konix_mail_unnew.sh
 
 konix_mail_tray_daemon_update.sh -d
 echo "B" > "$MAIL_TRAY_DAEMON_CTRL"

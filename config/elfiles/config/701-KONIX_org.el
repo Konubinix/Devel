@@ -80,7 +80,11 @@ cursor stays in the org buffer."
   )
 (setq-default org-agenda-custom-commands
 			  '(
-				("W" todo nil
+				("W" "Important stuff"
+				 (
+				  (todo "WAIT")
+				  (todo nil)
+				  )
 				 (
 				  (org-agenda-skip-function 'konix/org-skip-other-meta-context)
 				  )

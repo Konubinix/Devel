@@ -18,12 +18,15 @@ FLAGGED_ELEMENTS="$(notmuch search tag:flagged | wc -l)"
 UNREAD_N_INBOX_ELEMENTS="$(notmuch search tag:unread and tag:inbox| wc -l)"
 MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
 if [ "$DO_DISPLAY" == "1" ] \
-	&& [ "$INBOX_ELEMENTS" != "0" -o "$UNREAD_ELEMENTS" != "0" ]
+	&& [ "$INBOX_ELEMENTS" != "0" \
+	-o "$UNREAD_ELEMENTS" != "0" \
+	-o "$FLAGGED_ELEMENTS" != "0" ]
 then
 	# new mails, display some message
 	konix_display.py "Mail info :
 $INBOX_ELEMENTS in the inbox
-$UNREAD_ELEMENTS not read"
+$UNREAD_ELEMENTS not read
+$FLAGGED_ELEMENTS flagged"
 fi
 
 if [ -p "$MAIL_TRAY_DAEMON_CTRL" ]

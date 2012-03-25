@@ -1731,6 +1731,11 @@ inspired from `notmuch-show-archive-thread-internal'"
 	(rename-buffer "*notmuch-search-no-tag*")
 	)
   )
+(defun konix/notmuch-search-unflag-and-next ()
+  (interactive)
+  (konix/notmuch-remove-tag "flagged")
+  (next-line)
+  )
 
 (defun konix/notmuch-hello-refresh-hook ()
   ;; launches an update on the mail daemon
@@ -1749,6 +1754,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 (konix/notmuch-define-key-search-show (kbd "C-f") 'konix/notmuch-toggle-flagged-tag)
 	 (konix/notmuch-define-key-search-show "u" 'konix/notmuch-toggle-unread-tag)
 	 (konix/notmuch-define-key-search-show (kbd "a") 'konix/notmuch-read-and-archive)
+	 (define-key notmuch-search-mode-map (kbd "F") 'konix/notmuch-search-unflag-and-next)
 	 (define-key notmuch-show-mode-map (kbd "M") 'konix/notmuch-show-open-in-external-browser)
 	 (define-key notmuch-show-mode-map (kbd "F") 'konix/notmuch-show-unflag-and-next)
 	 (define-key notmuch-show-mode-map (kbd "U") 'konix/notmuch-show-read-delete-and-next)

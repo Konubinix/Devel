@@ -89,6 +89,12 @@ cursor stays in the org buffer."
 				  (org-agenda-skip-function 'konix/org-skip-other-meta-context)
 				  )
 				 )
+				("a" "Agenda and wait"
+				 (
+				  (todo "WAIT")
+				  (agenda nil)
+				  )
+				 )
 				("w" "Agenda and wait"
 				 (
 				  (todo "WAIT")

@@ -1579,11 +1579,11 @@
 								  ("unread" . '(:foreground "dark green"))
 								  )
 	  )
-(defun konix/notmuch-search-tag-change (tag change)
+(defun konix/notmuch-search-tag-change (tag_change)
   (notmuch-search-tag-region
    (save-excursion (beginning-of-line) (point))
    (save-excursion (end-of-line) (point))
-   tag
+   tag_change
    )
   )
 
@@ -1695,7 +1695,7 @@
   "Remove the tag from the current set of messages and go to next.
 inspired from `notmuch-show-archive-thread-internal'"
   (goto-char (point-min))
-  (loop do (notmuch-show-remove-tag tag)
+  (loop do (notmuch-show-tag-message (format "-%s"tag))
 		until (not (notmuch-show-goto-message-next)))
   ;; Move to the next item in the search results, if any.
   (let ((parent-buffer notmuch-show-parent-buffer))

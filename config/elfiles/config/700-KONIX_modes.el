@@ -1582,7 +1582,10 @@
 (defun konix/notmuch-remove-tag (tag)
   (cond
    ((eq major-mode 'notmuch-search-mode)
-	(notmuch-search-remove-tag tag)
+	(notmuch-search-tag-region
+	 (save-excursion (beginning-of-line) (point))
+	 (save-excursion (end-of-line) (point))
+	 (format "-%s" tag))
 	)
    ((eq major-mode 'notmuch-show-mode)
 	(notmuch-show-remove-tag tag)

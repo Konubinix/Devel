@@ -1579,36 +1579,50 @@
 								  ("unread" . '(:foreground "dark green"))
 								  )
 	  )
+(defun konix/notmuch-search-tag-change (tag change)
+  (notmuch-search-tag-region
+   (save-excursion (beginning-of-line) (point))
+   (save-excursion (end-of-line) (point))
+   tag
+   )
+  )
+
 (defun konix/notmuch-remove-tag (tag)
-  (cond
-   ((eq major-mode 'notmuch-search-mode)
-	(notmuch-search-tag-region
-	 (save-excursion (beginning-of-line) (point))
-	 (save-excursion (end-of-line) (point))
-	 (format "-%s" tag))
-	)
-   ((eq major-mode 'notmuch-show-mode)
-	(notmuch-show-remove-tag tag)
-	)
-   (t
-	(error "Could not found a suitable tag function for mode %s"
-		   (symbol-name major-mode)
-		   )
+  (let (
+		(tag_change (format "-%s" tag))
+		)
+   (cond
+	((eq major-mode 'notmuch-search-mode)
+	 (konix/notmuch-search-tag-change tag_change)
+	 )
+	((eq major-mode 'notmuch-show-mode)
+	 (notmuch-show-tag-message tag_change)
+	 )
+	(t
+	 (error "Could not found a suitable tag function for mode %s"
+			(symbol-name major-mode)
+			)
+	 )
 	)
    )
   )
+
 (defun konix/notmuch-add-tag (tag)
-  (cond
-   ((eq major-mode 'notmuch-search-mode)
-	(notmuch-search-add-tag tag)
-	)
-   ((eq major-mode 'notmuch-show-mode)
-	(notmuch-show-add-tag tag)
-	)
-   (t
-	(error "Could not found a suitable tag function for mode %s"
-		   (symbol-name major-mode)
-		   )
+  (let (
+		(tag_change (format "+%s" tag))
+		)
+   (cond
+	((eq major-mode 'notmuch-search-mode)
+	 (konix/notmuch-search-tag-change tag_change)
+	 )
+	((eq major-mode 'notmuch-show-mode)
+	 (notmuch-show-tag-message tag_change)
+	 )
+	(t
+	 (error "Could not found a suitable tag function for mode %s"
+			(symbol-name major-mode)
+			)
+	 )
 	)
    )
   )

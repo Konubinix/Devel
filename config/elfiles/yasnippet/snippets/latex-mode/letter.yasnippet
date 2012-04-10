@@ -1,0 +1,28 @@
+# -*- mode: snippet -*-
+# name: letter
+# --
+\documentclass[11pt]{lettre}
+
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[${100:$$(yas/choose-value '("francais" "english"))}]{babel}
+
+${150:${175:\institut{id}}}
+
+\date{${200:\today}}
+
+\begin{document}
+\begin{letter}{${300:
+${350:PeopleName}\\\\
+${375:PeopleAddress}\\\\
+${382:PeoplePostalCode}\\\\
+}}
+\conc{${400:object}}
+\opening{${500:Madame, Monsieur,}}
+
+${600:body}
+
+\closing{${700:Cordialement,}}
+
+\end{letter}
+\end{document}

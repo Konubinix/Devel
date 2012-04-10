@@ -13,7 +13,8 @@ import random
 logging.basicConfig(level=logging.DEBUG)
 default_config_file = os.path.join(os.path.expanduser("~"),".env_"+os.sys.platform+".conf")
 DEFAULT_CONFIG={
-    'KONIX_PWD' : os.getcwd()
+    'KONIX_PWD' : os.getcwd(),
+    'DOLLAR' : '$'
     }
 
 ENV_BACKUP_FILE_TEMPLATE=os.path.join(os.path.expanduser("~"),".env_backup_%s_"+os.sys.platform+".conf")

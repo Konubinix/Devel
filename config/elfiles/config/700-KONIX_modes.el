@@ -1722,7 +1722,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 	(notmuch-search-archive-thread)
 	)
    ((eq major-mode 'notmuch-show-mode)
-	(notmuch-show-archive-thread)
+	(notmuch-show-archive-thread-then-next)
 	)
    (t
 	(error "Could not found a suitable tag function for mode %s"

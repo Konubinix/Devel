@@ -7,7 +7,7 @@
 				  (if file (expand-file-name file) "")
 				  )
 	(goto-char (point-min))
-	(while (re-search-forward "^\\([^=]+\\)=\"\\(.+\\)\"$" nil t)
+	(while (re-search-forward "^\\([^=]+\\)=\'\\(.+\\)\'$" nil t)
 	  (setenv (match-string 1) (match-string 2))
 	  )
 	)

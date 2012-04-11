@@ -79,6 +79,10 @@ The first element of the list is the default context
   (message "Current context is %s" org-directory)
   )
 
+(defun konix/org-meta-context/return-restricted-agenda-files ()
+  (list (first org-agenda-files))
+  )
+
 ;; ####################################################################################################
 ;; INIT
 ;; ####################################################################################################

@@ -35,6 +35,7 @@ def getConfigFromEnvFile(envfile, previous_config):
     if not os.path.exists(envfile):
         print >>sys.stderr,"Config file",envfile,"does not exist"
         return previous_config
+
     config = ConfigParser.ConfigParser()
     config.optionxform = str    # keys not converted into lower case
     config.read(envfile)
@@ -44,6 +45,10 @@ def getConfigFromEnvFile(envfile, previous_config):
         items = mergeItemsOfSection(config.items(section))
         for key in items.keys():
             value = items[key]
+            # first step is to make sure to correctly unquote the values
+            value = re.sub('^"(.*)"$', r"'\1'", value, flags=re.DOTALL)
+            value = re.sub("^'(.*)'$", r"\1", value, flags=re.DOTALL)
+
             env_value = DEFAULT_ENVIRON.get(key)
             if env_value == None:
                 env_value = ""
@@ -107,9 +112,10 @@ def createBackupEnvFile(stamp):
 
 def createBackupFileOrUseIt(stamp):
     backup_file = None
-    if not stamp or not os.path.exists(getBackupEnvFileName(stamp)):
+    if not stamp:
         stamp = str(random.randint(0,300000))
         logging.debug("Creating new backup env file with stamp "+stamp)
+    if not os.path.exists(getBackupEnvFileName(stamp)):
         createBackupEnvFile(stamp)
     else:
         logging.debug("Using backup env file with stamp "+stamp)
@@ -164,7 +170,8 @@ def main():
             config = {}
     # Now, I can display the env
     for key in config.keys():
-        print "%s=\"%s\"" % (key, config[key])
+        # make sure the final value will be correctly quoted
+        print "%s='%s'" % (key, config[key])
 
 if __name__ == '__main__':
     main()

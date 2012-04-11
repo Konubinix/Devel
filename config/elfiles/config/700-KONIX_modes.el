@@ -1509,6 +1509,98 @@
   (nxml-backward-element)
   )
 
+(defun konix/nxml-down-element ()
+  (interactive)
+  (nxml-down-element)
+  (skip-chars-forward " \t\n\r")
+  )
+
+(defun konix/nxml-forward-element ()
+  (interactive)
+  (nxml-forward-element)
+  (skip-chars-forward " \t\n\r")
+  )
+
+(defun konix/nxml-heading-start-position_get-attribute (&optional bound)
+  (interactive)
+  (progn
+	(when (re-search-backward " \\([^ ]+\\)=.+" bound t)
+	  (cons
+	   (match-string-no-properties 1)
+	   (match-beginning 1)
+	   )
+	  )
+	)
+  )
+
+(defun nxml-heading-start-position ()
+  "Return the position of the start of the content of a heading element.
+Adjust the position to be after initial leading whitespace.
+Return nil if no heading element is found.  Requires point to be
+immediately after the section's start-tag."
+  (let ((depth 0)
+		(heading-regexp (concat "\\`\\("
+								nxml-heading-element-name-regexp
+								"\\)\\'"))
+
+		(section-regexp (concat "\\`\\("
+								nxml-section-element-name-regexp
+								"\\)\\'"))
+		(start (point))
+		found
+		(start-current-section (save-excursion
+								 (search-backward "<")
+								 (point)
+								 ))
+		attribute
+		)
+
+	;; check the header in the current attributes="truc"
+	(save-excursion
+	  (while (and
+			  (not found)
+			  (setq attribute (konix/nxml-heading-start-position_get-attribute start-current-section))
+			  )
+		(when (string-match-p
+			   heading-regexp
+			   (car attribute)
+			   )
+		  (setq found (cdr attribute))
+		  )
+		)
+	  )
+	(save-excursion
+      (while (and (not found) (xmltok-forward)
+				  (cond
+				   ((memq xmltok-type '(end-tag partial-end-tag))
+					(and (not (string-match section-regexp
+											(xmltok-end-tag-local-name)))
+						 (> depth 0)
+						 (setq depth (1- depth))))
+				   ;; XXX Not sure whether this is a good idea
+				   ;;((eq xmltok-type 'empty-element)
+				   ;; nil)
+				   ((not (memq xmltok-type
+							   '(start-tag partial-start-tag)))
+					t)
+				   ((string-match section-regexp
+								  (xmltok-start-tag-local-name))
+					nil)
+				   ((string-match heading-regexp
+								  (xmltok-start-tag-local-name))
+					(skip-chars-forward " \t\r\n")
+					(setq found (point))
+					nil)
+				   (t
+					(setq depth (1+ depth))
+					t))
+				  (<= (- (point) start) nxml-heading-scan-distance)))
+	  )
+    found)
+  )
+(byte-compile 'konix/nxml-heading-start-position_get-attribute)
+(byte-compile 'nxml-heading-start-position)
+
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
   (turn-on-tempbuf-mode)
@@ -1535,6 +1627,8 @@
   (local-set-key (kbd "C-x n e") 'konix/nxml-narrow-to-element)
   (local-set-key (kbd "C-M-k") 'konix/nxml-kill-element)
   (local-set-key (kbd "C-M-h") 'konix/nxml-mark-element)
+  (local-set-key (kbd "C-M-d") 'konix/nxml-down-element)
+  (local-set-key (kbd "C-M-n") 'konix/nxml-forward-element)
   (local-set-key (kbd "C-c C-c") 'konix/nxml-show-context)
   (auto-complete-mode 1)
   )

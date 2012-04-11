@@ -45,7 +45,13 @@ konix_assert_last_command "Failed to get an enc fs"
 trap "fusermount -u '$TMP_PERSO_DECRYPT' && rm -rvf '$TMP_PERSO_DECRYPT'" 0
 
 # sync
-git pull "$TMP_PERSO_DECRYPT"
+# special case for the first sync : create the distant repo if it is empty
+if [ ! -e "${TMP_PERSO_DECRYPT}/hooks" ]
+then
+	git clone . "${TMP_PERSO_DECRYPT}"
+else
+	git pull "$TMP_PERSO_DECRYPT"
+fi
 konix_assert_last_command "Failed to pull from the temp dir"
 git push "$TMP_PERSO_DECRYPT"
 konix_assert_last_command "Failed to push to the temp dir"

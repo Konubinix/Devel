@@ -51,6 +51,7 @@
 	  '(
 		("\\`*scratch")
 		("\\`\\*Messages\\*\\'")
+		(".*jabber-groupchat.*")
 		)
 	  )
 

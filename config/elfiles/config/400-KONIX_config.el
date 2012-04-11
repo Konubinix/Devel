@@ -8,6 +8,10 @@
 ;; Default font, simple, nice!!
 (set-default-font "Monospace 10")
 
+(defcustom konix/explorer "pcmanfm"
+  "The program to launch when wanting to explore the file system"
+)
+
 (setq-default default-justification 'left)
 ;; ####################################################################################################
 ;; abbrev

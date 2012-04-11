@@ -594,7 +594,7 @@ retourne ('fichier','extension')."
 					   )
 					  )
 					 )
-	(call-process "gnome-open" nil nil nil ".")
+	(start-process konix/explorer nil konix/explorer ".")
 	)
   )
 

@@ -261,14 +261,14 @@ cursor stays in the org buffer."
 
 (setq-default org-todo-keywords
 			  '(
-				(sequence "WAIT(w@/!)" "TODO(t!)" "|" "DONE(d!)" "NOT-DONE(u@)")
+				(sequence "WAIT(w@/!)" "TODO(t!)" "|" "DONE(d!)" "NOT_DONE(u@)")
 				(sequence "MEETING(m!)" "REPORT(o!)" "|" "MET(M!)" "CANCELED(c@)")
 				(sequence
 				 "SPECIFY(S!)" "CREATE_VALIDATOR(v!)" "PROGRAM(P!)" "VALIDATE(V@/!)" "|" "END(E!)" "ABORTED(A@)")
 				(sequence "INSPECT_PROBLEM(p!)" "|" "SOLVED(s!)" "UNSOLVED(U@)")
-				(sequence "DEBUG(B!)" "|" "CORRECTED(C!)" "NOT-CORRECTED(N@)")
-				(sequence "TO-READ(r!)" "|" "READ(R!)" "HS(h@)")
-				(sequence "TO-WRITE(e!)" "|" "WRITTEN(W!)" "ABANDONNED(@)")
+				(sequence "DEBUG(B!)" "|" "CORRECTED(C!)" "NOT_CORRECTED(N@)")
+				(sequence "TO_READ(r!)" "|" "READ(R!)" "HS(h@)")
+				(sequence "TO_WRITE(e!)" "|" "WRITTEN(W!)" "ABANDONNED(@)")
 				)
 			  )
 

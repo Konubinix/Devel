@@ -2044,6 +2044,9 @@ Prefix argument ARG makes the entry nonmarking."
 (setq-default erc-log-write-after-send t)
 (setq-default erc-modules '(autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands notify readonly ring smiley sound stamp spelling track))
 (setq-default erc-user-mode 'ignore)
+(defcustom konix/chat-silent nil ""
+  :type 'boolean
+)
 
 (defun konix/erc-mode-hook ()
   (local-set-key (kbd "<C-up>") 'erc-previous-command)
@@ -2119,7 +2122,9 @@ erc-modified-channels-alist, filtered by konix/erc-tray-ignored-channels."
 			 (equal (window-buffer) (current-buffer))
 			 )
 			)
-	(call-process "konix_display.py" nil nil nil (substring-no-properties string))
+	(unless konix/chat-silent
+	 (call-process "konix_display.py" nil nil nil (substring-no-properties string))
+	 )
 	)
   (konix/erc-tray-update-state)
   )
@@ -2140,12 +2145,77 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 					(string-match "^ " (buffer-name (car blist))))
 		  (switch-to-buffer (car blist))
 		  (setq blist nil))
-		(setq blist (cdr blist)))))
+		(setq blist (cdr blist)))
+	  (konix/erc-tray-update-state)
+	  )
+	)
   )
 
 (add-hook 'erc-track-list-changed-hook 'konix/erc-track-list-changed-hook)
 
-(global-set-key (kbd "<escape>") 'konix/erc-track-switch-buffer)
+;; ####################################################################################################
+;; Jabber
+;; ####################################################################################################
+(setq-default jabber-history-enabled t)
+(defun konix/jabber-notify (from buffer text)
+  (unless konix/chat-silent
+   (call-process "konix_display.py" nil nil nil (format "MESSAGE %s : %s" from
+														text))
+   )
+  (konix/erc-tray-change-state t)
+  )
+
+(defun konix/jabber-muc-alert (nick group buffer text)
+  (unless konix/chat-silent
+   (call-process "konix_display.py" nil nil nil (format "MUC %s in %s : %s" nick
+														group
+														text
+														))
+   )
+  (konix/erc-tray-change-state t)
+  )
+
+(defun konix/jabber-activity-switch-to ()
+  (interactive)
+  (let (
+		(info (jabber-activity-switch-to))
+		)
+	(cond
+	 ((stringp info)
+	  ;; "No new activity"
+	  (konix/erc-track-switch-buffer 1)
+	  )
+	 ((null info)
+	  (konix/erc-track-switch-buffer 1)
+	  )
+	 ((bufferp info)
+	  (konix/erc-track-switch-buffer 1)
+	  )
+	 )
+	)
+  )
+
+(defun konix/jabber-chat-mode-hook ()
+  (flyspell-mode 1)
+  )
+
+(add-hook 'jabber-chat-mode-hook
+		  'konix/jabber-chat-mode-hook)
+
+(setq-default jabber-alert-message-function
+			  'konix/jabber-notify
+			  )
+(setq-default jabber-alert-muc-function
+			  'konix/jabber-muc-alert
+			  )
+
+(eval-after-load "jabber"
+  '(progn
+	 (define-key jabber-global-keymap (kbd "j") 'jabber-muc-autojoin)
+	 (global-set-key (kbd "<escape>") 'konix/jabber-activity-switch-to)
+	 )
+  )
+
 ;; ####################################################################################################
 ;; Trac wiki
 ;; ####################################################################################################

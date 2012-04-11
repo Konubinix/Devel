@@ -1323,6 +1323,17 @@ TAGS_FILE_NAMETHE"
   (ring-insert find-tag-marker-ring (point-marker))
   )
 
+(defun konix/tags/next-head ()
+  (interactive)
+  (setq tags-table-list
+		(append
+		 (cdr tags-table-list)
+		 (list (car tags-table-list))
+		 )
+		)
+  (message "New head : %s" (car tags-table-list))
+  )
+
 ;; semantic uses it
 (defalias 'push-tag-mark 'konix/push-tags-mark)
 

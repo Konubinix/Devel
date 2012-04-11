@@ -86,30 +86,63 @@ cursor stays in the org buffer."
 				  (todo nil)
 				  )
 				 (
-				  (org-agenda-skip-function 'konix/org-skip-other-meta-context)
+				  (org-agenda-files (konix/org-meta-context/return-restricted-agenda-files))
 				  )
 				 )
-				("a" "Agenda and wait"
+				("y" "Yesterday time sheet"
+				 (
+				  (agenda)
+				  )
+				 (
+				  (org-agenda-start-day 'konix/org-yesterday)
+				  (org-agenda-show-log 'clockcheck)
+				  (org-agenda-files (konix/org-meta-context/return-restricted-agenda-files))
+				  )
+				 )
+				("c" "Weekly schedule" agenda ""
+				 (
+				  (org-agenda-start-day 'org-today)
+				  (org-agenda-span 7)
+				  (org-agenda-repeating-timestamp-show-all t)
+				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
+																	   'scheduled)
+											)
+				  )
+				 )
+				("l" "log today"
+				 (
+				  (agenda nil)
+				  )
+				 (
+				  (org-agenda-start-with-log-mode t)
+				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
+																	   'scheduled)
+											)
+				  )
+				 )
+				("a" "Agenda and wait (all agenda files)"
 				 (
 				  (todo "WAIT")
 				  (agenda nil)
+				  (todo)
 				  )
 				 )
-				("w" "Agenda and wait"
+				("w" "Agenda and wait (head agenda files)"
 				 (
 				  (todo "WAIT")
 				  (agenda nil)
+				  (todo)
 				  )
 				 (
-				  (org-agenda-skip-function 'konix/org-skip-other-meta-context)
-				  (org-agenda-overriding-header "Things to do (current context) :")
+				  (org-agenda-files (konix/org-meta-context/return-restricted-agenda-files))
+				  (org-agenda-overriding-header "Things to do (head agenda files) :")
 				  )
 				 )
 				("r" todo "TO-READ" nil)
- 				("b" tags "blocked" nil)
+				("b" tags "blocked" nil)
 				("d" tags "DOC" nil)
- 				("c" tags "TO_CHECK" nil)
- 				("A" tags "ARCHIVE" nil)
+				("c" tags "TO_CHECK" nil)
+				("A" tags "ARCHIVE" nil)
 				)
 			  )
 (setq-default org-agenda-diary-file (concat org-directory "/diary.org"))
@@ -442,6 +475,10 @@ cursor stays in the org buffer."
 		)
 	(message "No timer currently run")
 	)
+  )
+
+(defun konix/org-yesterday ()
+  (- (org-today) 1)
   )
 
 ;; un parent est DONE quand à 100%

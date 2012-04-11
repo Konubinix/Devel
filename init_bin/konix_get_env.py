@@ -17,7 +17,7 @@ DEFAULT_CONFIG={
     'DOLLAR' : '$'
     }
 
-ENV_BACKUP_FILE_TEMPLATE=os.path.join(os.path.expanduser("~"),".env_backup_%s_"+os.sys.platform+".conf")
+ENV_BACKUP_FILE_TEMPLATE=os.path.join(os.path.expanduser("~"),"env_backups",".env_backup_%s_"+os.sys.platform+".conf")
 
 # by default, get the values from os.environ
 DEFAULT_ENVIRON = os.environ
@@ -94,12 +94,15 @@ def getBackupEnvFileName(stamp):
 
 def createBackupEnvFile(stamp):
     env_backup_file_name = getBackupEnvFileName(stamp)
+    # create the dir
+    if not os.path.exists(os.path.dirname(env_backup_file_name)):
+        os.makedirs(os.path.dirname(env_backup_file_name))
     if os.path.exists(env_backup_file_name):
         os.remove(env_backup_file_name)
     f = open(env_backup_file_name, "w")
     f.write("[replace]\n")
     for item in os.environ.items():
-        f.write(item[0]+"="+item[1]+"\n")
+        f.write(item[0]+"='"+item[1]+"'\n")
     f.close()
 
 def createBackupFileOrUseIt(stamp):

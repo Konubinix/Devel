@@ -528,9 +528,10 @@
 			  '(
 				("epdfview" "\\.pdf$")
 				("lowriter" "\\.\\(odt\\|docx?\\)$")
-				("localc" "\\.xlsx$")
+				("localc" "\\.\\(xlsx\\|csv\\|ods\\)$")
 				("evince" "\\.ps$")
 				("gimp" "\\.\\(png\\|jpg\\)$")
+				("qgis" "\\.shp$")
 				("vlc" "\\.mp3$")
 				("dia" "\\.dia$")
 				((lambda (file)

@@ -6,6 +6,11 @@
   "Mode to set for indirect buffers.")
 (make-variable-buffer-local 'konix/indirect-mode-name)
 
+(defun konix/kill-ring-insert ()
+  (interactive)
+  (insert (completing-read "Yank : " kill-ring))
+  )
+
 (defun konix/indirect-region (start end)
   "Edit the current region in another buffer.
     If the buffer-local variable `konix/indirect-mode-name' is not set, prompt

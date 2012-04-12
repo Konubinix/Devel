@@ -33,7 +33,7 @@ Add a yasnippet template with key %s"
 	   (define-auto-insert condition action after)
 	   )
 
-	 (redefine-auto-insert (cons "\\.\\([hH]\\|hh\\|hpp\\)\\'" "Mon en-tête C/C++")
+	 (redefine-auto-insert (cons "\\.\\([hH]\\|hh\\|hxx\\|hpp\\)\\'" "Mon en-tête C/C++")
 						   '(lambda()
 							  (auto-insert-use-yasnippet-template "h")
 							  )

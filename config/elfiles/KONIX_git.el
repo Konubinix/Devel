@@ -393,6 +393,12 @@
   (konix/git/commit t)
   )
 
+(defun konix/git/commit/untracked ()
+  (interactive)
+  (konix/git/add/update-tracked-files)
+  (call-interactively 'konix/git/commit/message)
+  )
+
 (defun konix/git/commit/file (file message amend)
   (interactive
    (list
@@ -406,7 +412,7 @@
 
 (defun konix/git/add/update-tracked-files ()
   "Stage tous les fichiers modifiés."
-  (interactive )
+  (interactive)
   (konix/git/command-to-string (concat "add -u") t)
   )
 
@@ -1103,11 +1109,7 @@
 
 	(define-key local_map "p" 'konix/git-global-map-push)
 
-	(define-prefix-command 'konix/git/status/commit-map)
-	(define-key local_map "c" 'konix/git/status/commit-map)
-	(define-key konix/git/status/commit-map "c" 'konix/git/commit)
-	(define-key konix/git/status/commit-map "a" 'konix/git/commit/amend)
-	(define-key konix/git/status/commit-map "m" 'konix/git/commit/message)
+	(define-key local_map "c" 'konix/git-global-map-commit)
 
 	(define-key local_map "a" 'konix/git-global-map-add)
 
@@ -1294,6 +1296,7 @@ Uses the macro konix/git/status-buffer/next-or-previous
 (define-key konix/git-global-map-commit "c" 'konix/git/commit)
 (define-key konix/git-global-map-commit "m" 'konix/git/commit/message)
 (define-key konix/git-global-map-commit "a" 'konix/git/commit/amend)
+(define-key konix/git-global-map-commit "u" 'konix/git/commit/untracked)
 (define-key konix/git-global-map-commit "f" 'konix/git/commit/file)
 
 (define-prefix-command 'konix/git-global-map-diff)

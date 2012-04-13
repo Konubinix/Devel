@@ -45,7 +45,16 @@
   :type 'string
   :group 'multi-eshell)
 
-(defun multi-eshell-function () "This function opens the appropriate shell." (eval multi-eshell-shell-function) )
+(defun multi-eshell-function ()
+  "This function opens the appropriate shell and restores the default-directory
+after"
+  (let(
+	   (cur_dir default-directory)
+	   )
+   (eval multi-eshell-shell-function)
+   (setq default-directory cur_dir)
+   )
+)
 ;;;(defvar multi-eshell-function `(shell) ) ;;; Defines the shell. ('shell) or ('eshell)
 ;(defvar multi-eshell-name "*eshell*") ;;; Name of default shell or eshell buffer
 

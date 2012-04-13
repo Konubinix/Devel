@@ -450,7 +450,7 @@ PARAM : a string with parameters given to make
 		)
 	(mapc
 	 (lambda (buf_)
-	   (when (string-match "\*compilation of " (buffer-name buf_))
+	   (when (string-match "\*compilation" (buffer-name buf_))
 		 (add-to-list 'result_ buf_)
 		 )
 	   )

@@ -1109,6 +1109,8 @@
 	(define-key konix/git/status/commit-map "a" 'konix/git/commit/amend)
 	(define-key konix/git/status/commit-map "m" 'konix/git/commit/message)
 
+	(define-key local_map "a" 'konix/git-global-map-add)
+
 	(use-local-map local_map)
 	(konix/git/status-decorate-buffer)
 	)

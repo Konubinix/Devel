@@ -115,9 +115,6 @@ cursor stays in the org buffer."
 				  )
 				 (
 				  (org-agenda-start-with-log-mode t)
-				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
-																	   'scheduled)
-											)
 				  )
 				 )
 				("a" "Agenda and wait (all agenda files)"

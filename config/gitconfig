@@ -25,6 +25,7 @@
 	gitsvn = git svn
 [diff]
   	tool = meld #konix_emacs_diff
+	renamelimit = 888
 [difftool]
 	prompt =
 [difftool "konix_emacs_diff"]

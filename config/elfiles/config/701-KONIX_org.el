@@ -115,9 +115,10 @@ cursor stays in the org buffer."
 				  )
 				 (
 				  (org-agenda-start-with-log-mode t)
+				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )
-				("a" "Agenda and wait (all agenda files)"
+				("A" "Agenda and wait (all agenda files)"
 				 (
 				  (todo "WAIT")
 				  (agenda nil)
@@ -139,7 +140,6 @@ cursor stays in the org buffer."
 				("b" tags "blocked" nil)
 				("d" tags "DOC" nil)
 				("c" tags "TO_CHECK" nil)
-				("A" tags "ARCHIVE" nil)
 				)
 			  )
 (setq-default org-agenda-diary-file (concat org-directory "/diary.org"))

@@ -1684,40 +1684,40 @@ immediately after the section's start-tag."
   (let (
 		(tag_change (format "-%s" tag))
 		)
-   (cond
-	((eq major-mode 'notmuch-search-mode)
-	 (konix/notmuch-search-tag-change tag_change)
-	 )
-	((eq major-mode 'notmuch-show-mode)
-	 (notmuch-show-tag-message tag_change)
-	 )
-	(t
-	 (error "Could not found a suitable tag function for mode %s"
-			(symbol-name major-mode)
-			)
+	(cond
+	 ((eq major-mode 'notmuch-search-mode)
+	  (konix/notmuch-search-tag-change tag_change)
+	  )
+	 ((eq major-mode 'notmuch-show-mode)
+	  (notmuch-show-tag-message tag_change)
+	  )
+	 (t
+	  (error "Could not found a suitable tag function for mode %s"
+			 (symbol-name major-mode)
+			 )
+	  )
 	 )
 	)
-   )
   )
 
 (defun konix/notmuch-add-tag (tag)
   (let (
 		(tag_change (format "+%s" tag))
 		)
-   (cond
-	((eq major-mode 'notmuch-search-mode)
-	 (konix/notmuch-search-tag-change tag_change)
-	 )
-	((eq major-mode 'notmuch-show-mode)
-	 (notmuch-show-tag-message tag_change)
-	 )
-	(t
-	 (error "Could not found a suitable tag function for mode %s"
-			(symbol-name major-mode)
-			)
+	(cond
+	 ((eq major-mode 'notmuch-search-mode)
+	  (konix/notmuch-search-tag-change tag_change)
+	  )
+	 ((eq major-mode 'notmuch-show-mode)
+	  (notmuch-show-tag-message tag_change)
+	  )
+	 (t
+	  (error "Could not found a suitable tag function for mode %s"
+			 (symbol-name major-mode)
+			 )
+	  )
 	 )
 	)
-   )
   )
 (defun konix/notmuch-get-tags ()
   (cond
@@ -2046,7 +2046,13 @@ Prefix argument ARG makes the entry nonmarking."
 (setq-default erc-user-mode 'ignore)
 (defcustom konix/chat-silent nil ""
   :type 'boolean
-)
+  )
+
+(defcustom konix/chat-to-me (getenv "USER") ""
+  :type 'string
+  )
+
+(defvar konix/chat-old-notif 0 "")
 
 (defun konix/erc-mode-hook ()
   (local-set-key (kbd "<C-up>") 'erc-previous-command)
@@ -2077,7 +2083,17 @@ Prefix argument ARG makes the entry nonmarking."
   "Enables or disable blinking, depending on arg (non-nil or nil)"
   (unless (eq konix/erc-tray-state arg)
 	(with-temp-buffer
-	  (insert (if arg "n" "i"))
+	  (insert (cond
+			   ((eq arg 2)
+				"N"
+				)
+			   ((eq arg 1)
+				"n"
+				)
+			   ((eq arg 0)
+				"i"
+				)
+			   ))
 	  (write-file "/tmp/emacs_tray_daemon_control")
 	  )
 	(setq konix/erc-tray-state arg)
@@ -2090,7 +2106,13 @@ Additional support for inhibiting one activation (quick hack)"
   (when konix/erc-tray-enable
 	(if konix/erc-tray-inhibit-one-activation
 		(setq konix/erc-tray-inhibit-one-activation nil)
-	  (konix/erc-tray-change-state-aux arg))))
+	  (progn
+		(konix/erc-tray-change-state-aux arg)
+		(setq konix/chat-old-notif arg)
+	   )
+	  )
+	)
+  )
 
 (defun konix/erc-tray-update-state ()
   "Update the state of the tray icon. Blink when some new event
@@ -2099,7 +2121,7 @@ erc-modified-channels-alist, filtered by konix/erc-tray-ignored-channels."
   (interactive)
   ;;stop blinking tray when there're no channels in list
   (unless erc-modified-channels-alist
-	(konix/erc-tray-change-state nil))
+	(konix/erc-tray-change-state 0))
   ;;maybe make tray blink
   (unless (eq nil (frame-visible-p (selected-frame)))
 	;;filter list according to konix/erc-tray-ignored-channels
@@ -2112,7 +2134,11 @@ erc-modified-channels-alist, filtered by konix/erc-tray-ignored-channels."
 					konix/erc-tray-ignored-channels))
 			filtered-list)
 	  (when filtered-list
-		(konix/erc-tray-change-state t)))))
+		(konix/erc-tray-change-state 1)
+		)
+	  )
+	)
+  )
 
 ;; --------------------------------------------------------------------------------
 
@@ -2123,8 +2149,8 @@ erc-modified-channels-alist, filtered by konix/erc-tray-ignored-channels."
 			 )
 			)
 	(unless konix/chat-silent
-	 (call-process "konix_display.py" nil nil nil (substring-no-properties string))
-	 )
+	  (call-process "konix_display.py" nil nil nil (substring-no-properties string))
+	  )
 	)
   (konix/erc-tray-update-state)
   )
@@ -2159,20 +2185,42 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 (setq-default jabber-history-enabled t)
 (defun konix/jabber-notify (from buffer text)
   (unless konix/chat-silent
-   (call-process "konix_display.py" nil nil nil (format "MESSAGE %s : %s" from
-														text))
-   )
-  (konix/erc-tray-change-state t)
+	(call-process "konix_display.py" nil nil nil (format "MESSAGE %s : %s" from
+														 text))
+	)
+  (let (
+		(arg (if (string-match konix/chat-to-me text)
+				 2
+			   1
+			   ))
+		)
+	(when (or
+		   (> arg konix/chat-old-notif)
+		   )
+	  (konix/erc-tray-change-state arg)
+	  )
+	)
   )
 
 (defun konix/jabber-muc-alert (nick group buffer text)
   (unless konix/chat-silent
-   (call-process "konix_display.py" nil nil nil (format "MUC %s in %s : %s" nick
-														group
-														text
-														))
-   )
-  (konix/erc-tray-change-state t)
+	(call-process "konix_display.py" nil nil nil (format "MUC %s in %s : %s" nick
+														 group
+														 text
+														 ))
+	)
+  (let (
+		(arg (if (string-match konix/chat-to-me text)
+				 2
+			   1
+			   ))
+		)
+	(when (or
+		   (> arg konix/chat-old-notif)
+		   )
+	  (konix/erc-tray-change-state arg)
+	  )
+	)
   )
 
 (defun konix/jabber-activity-switch-to ()

@@ -137,7 +137,7 @@
 (defun konix/git/adjust-command (cmd cdup)
   (let ((pre_command ""))
 	(if cdup
-		(setq pre_command "cd \"./$(git rev-parse --show-cdup)\" && ")
+		(setq pre_command "cd \"$(git rev-parse --show-toplevel)\" && ")
 	  )
 	(concat pre_command "git " cmd)
 	)
@@ -239,6 +239,13 @@
 		   (shell-command-to-string (concat git_command " && echo OK || echo PB&"))))
 	(konix/disp-window res)
 	)
+  )
+
+(defun konix/git/_get-toplevel ()
+  (replace-regexp-in-string
+   "[\n\r]" ""
+   (shell-command-to-string "git rev-parse --show-toplevel")
+   )
   )
 
 (defun konix/git/command-with-completion (&optional cmd)

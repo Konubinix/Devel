@@ -675,6 +675,11 @@
 			)
 		  )
 		 )
+		(top_level (concat
+				   (konix/git/_get-toplevel)
+				   "/"
+				   )
+				   )
 		;;)
 		)
 	(when (get-buffer diff_buffer)
@@ -706,6 +711,7 @@
 								 (progn
 								   (with-current-buffer ,diff_buffer
 									 (diff-mode)
+									 (setq default-directory ,top_level)
 									 )
 								   (let (
 										 (previous_window (selected-window))

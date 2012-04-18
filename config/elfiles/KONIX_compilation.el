@@ -155,6 +155,10 @@ If the file exists, it is automatically deleted
   ""
   )
 
+(defcustom konix/compile/nb-cpu t
+  ""
+  )
+
 ;; ####################################################################################################
 ;; VARIABLES
 ;; ####################################################################################################
@@ -291,7 +295,26 @@ PARAM : a string with parameters given to make
 "
   (interactive "sParam : \nfMakefile :")
   (konix/compile/find-makefile makefile)
-  (let ((command (concat "make -C '"(file-name-directory konix/compile/makefile-proj)"' "param))
+  (let (
+		(command (format
+				  "make -j%s -C '%s' %s"
+				  (cond
+				   ((numberp konix/compile/nb-cpu)
+					konix/compile/nb-cpu
+					)
+				   (konix/compile/nb-cpu
+					(1+
+					 (string-to-number (shell-command-to-string "konix_nb_cpu.py"))
+					 )
+					)
+				   (t
+					1
+					)
+				   )
+				  (file-name-directory konix/compile/makefile-proj)
+				  (or param "")
+				  )
+				 )
         (buf_name (buffer-name))
 		(default-directory (file-name-directory konix/compile/makefile-proj))
         )

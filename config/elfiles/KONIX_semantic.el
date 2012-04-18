@@ -222,7 +222,6 @@
 		  )
 		 )
 		)
-  (message "ac sources use semantic = %s" konix/global-semantic-ac-sources)
   (if konix/global-semantic-ac-sources
 	  (progn
 		(add-to-list 'konix/prog/ac-sources 'ac-source-semantic-raw)
@@ -241,6 +240,7 @@
 	  )
 	)
   (konix/prog/config)
+  (message "ac sources use semantic = %s" konix/global-semantic-ac-sources)
   )
 
 (setq konix/semantic-mode nil)

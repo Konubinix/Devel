@@ -2200,18 +2200,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 	(call-process "konix_display.py" nil nil nil (format "MESSAGE %s : %s" from
 														 text))
 	)
-  (let (
-		(arg (if (string-match konix/chat-to-me text)
-				 2
-			   1
-			   ))
-		)
-	(when (or
-		   (> arg konix/chat-old-notif)
-		   )
-	  (konix/erc-tray-change-state arg)
-	  )
-	)
+  (konix/erc-tray-change-state 2)
   )
 
 (defun konix/jabber-muc-alert (nick group buffer text)
@@ -2227,8 +2216,9 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 			   1
 			   ))
 		)
-	(when (or
+	(when (and
 		   (> arg konix/chat-old-notif)
+		   (not (string-match konix/chat-to-me nick))
 		   )
 	  (konix/erc-tray-change-state arg)
 	  )

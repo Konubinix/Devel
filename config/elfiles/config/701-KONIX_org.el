@@ -96,7 +96,7 @@ cursor stays in the org buffer."
 				 (
 				  (org-agenda-start-day 'konix/org-yesterday)
 				  (org-agenda-show-log 'clockcheck)
-				  (org-agenda-files (konix/org-meta-context/return-restricted-agenda-files))
+				  (org-agenda-files (list org-directory))
 				  )
 				 )
 				("c" "Weekly schedule" agenda ""
@@ -125,15 +125,15 @@ cursor stays in the org buffer."
 				  (todo)
 				  )
 				 )
-				("w" "Agenda and wait (head agenda files)"
+				("w" "Agenda and wait (org-directory)"
 				 (
 				  (todo "WAIT")
 				  (agenda nil)
 				  (todo)
 				  )
 				 (
-				  (org-agenda-files (konix/org-meta-context/return-restricted-agenda-files))
-				  (org-agenda-overriding-header "Things to do (head agenda files) :")
+				  (org-agenda-files (list org-directory))
+				  (org-agenda-overriding-header "Things to do (org-directory) :")
 				  )
 				 )
 				("r" todo "TO-READ" nil)

@@ -66,7 +66,7 @@ make the line non empty"
 
 (defun konix/delete-paren-at-point ()
   (interactive)
-  (or (looking-at "(") (error "Point must be just before a ( character"))
+  (or (looking-at "[({]") (error "Point must be just before a ( or { character"))
   (save-excursion
 	(let (
 		  (beg (point))

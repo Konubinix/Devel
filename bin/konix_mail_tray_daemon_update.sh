@@ -34,12 +34,12 @@ then
 	if [ "$UNREAD_N_INBOX_ELEMENTS" != "0" ]
 	then
 		echo n > "$MAIL_TRAY_DAEMON_CTRL"
-	elif [ "$UNREAD_ELEMENTS" != "0" ]
-	then
-		echo u > "$MAIL_TRAY_DAEMON_CTRL"
 	elif [ "$FLAGGED_ELEMENTS" != "0" ]
 	then
 		echo f > "$MAIL_TRAY_DAEMON_CTRL"
+	elif [ "$UNREAD_ELEMENTS" != "0" ]
+	then
+		echo u > "$MAIL_TRAY_DAEMON_CTRL"
 	else
 		echo i > "$MAIL_TRAY_DAEMON_CTRL"
 	fi

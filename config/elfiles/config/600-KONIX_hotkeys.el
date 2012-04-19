@@ -261,16 +261,23 @@
 (define-key 'konix/semantic-key-map "j" 'semantic-ia-fast-jump)
 (define-key 'konix/semantic-key-map (kbd "C-j") 'senator-jump)
 (define-key 'konix/semantic-key-map "d" 'semantic-ia-show-doc)
-(define-key 'konix/semantic-key-map "v" 'semantic-decoration-include-visit)
-(define-key 'konix/semantic-key-map "p" 'semantic-decoration-unparsed-include-parse-include)
-(define-key 'konix/semantic-key-map "P" 'semantic-decoration-unparsed-include-parse-all-includes)
 (define-key 'konix/semantic-key-map "f" 'semantic-symref-symbol)
 (define-key 'konix/semantic-key-map "a" 'semantic-speedbar-analysis)
+(define-key 'konix/semantic-key-map "t" 'konix/semantic-analyze-proto-impl-toggle)
 (define-key 'konix/semantic-key-map "l" 'konix/semantic-add-lex-c-preprocessor-symbol-map)
 (define-key 'konix/semantic-key-map (kbd "TAB") 'semantic-complete-analyze-inline)
-(define-key 'konix/semantic-key-map "I" 'konix/semantic-add-custom-include-path)
 (define-key 'konix/semantic-key-map (kbd "V") 'konix/prog/semantic-toggle-verbose)
 (define-key 'konix/semantic-key-map (kbd "A") 'konix/global-semantic-ac-sources)
+(define-key 'konix/semantic-key-map (kbd "C-a") 'semantic-analyze-current-context)
+
+(define-prefix-command 'konix/semantic-include-key-map)
+(define-key 'konix/semantic-key-map (kbd "i") 'konix/semantic-include-key-map)
+(define-key 'konix/semantic-include-key-map (kbd "d") 'semantic-decoration-include-describe)
+(define-key 'konix/semantic-include-key-map (kbd "v") 'semantic-decoration-include-visit)
+(define-key 'konix/semantic-include-key-map "p" 'semantic-decoration-unparsed-include-parse-include)
+(define-key 'konix/semantic-include-key-map "P" 'semantic-decoration-unparsed-include-parse-all-includes)
+(define-key 'konix/semantic-include-key-map "I" 'konix/semantic-add-custom-include-path)
+(define-key 'konix/semantic-include-key-map "R" 'konix/semantic-remove-custom-include-path)
 
 ;; --------------------------------------------------------------------------------
 ;; Semantic modes

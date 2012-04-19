@@ -299,6 +299,7 @@ cursor stays in the org buffer."
 				(sequence "DEBUG(B!)" "|" "CORRECTED(C!)" "NOT_CORRECTED(N@)")
 				(sequence "TO_READ(r!)" "|" "READ(R!)" "HS(h@)")
 				(sequence "TO_WRITE(e!)" "|" "WRITTEN(W!)" "ABANDONNED(@)")
+				(sequence "CALL(k!)" "|" "CALLED(@)")
 				)
 			  )
 

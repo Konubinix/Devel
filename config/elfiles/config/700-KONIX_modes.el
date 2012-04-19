@@ -743,6 +743,18 @@
 (setq-default semantic-idle-work-update-headers-flag t)
 (setq-default semantic-lex-c-preprocessor-symbol-file '("~/macros.h"))
 
+(defun konix/semantic-analyze-proto-impl-toggle()
+  (interactive)
+  (push-tag-mark)
+  (condition-case error_value
+	  (semantic-analyze-proto-impl-toggle)
+	  (error
+	   (pop-tag-mark)
+	   (error "%s" error_value)
+	   )
+	)
+  )
+
 (defun konix/semantic-init-hook()
   (doc-mode)
   )

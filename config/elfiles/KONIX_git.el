@@ -483,7 +483,11 @@
   (interactive
    (list (konix/_get-file-name "git log file : "))
    )
-  (konix/git/command (concat "log -- " file))
+  (let (
+		(output_buffer (konix/kill-and-new-buffer "*GIT log file*"))
+		)
+   (konix/git/command (concat "log -- " file) nil output_buffer t)
+   )
   )
 
 (defun konix/git/cherry-pick ()

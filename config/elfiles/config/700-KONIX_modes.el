@@ -2300,3 +2300,13 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 	(erc-message "PRIVMSG" (format "%s identify %s"
 								   (erc-default-target)
 								   konix/bitlbee-password))))
+
+;; ######################################################################
+;; perl
+;; ######################################################################
+(defun konix/perl-mode-hook ()
+  (hs-minor-mode 1)
+  )
+
+(add-hook 'perl-mode-hook
+		  'konix/perl-mode-hook)

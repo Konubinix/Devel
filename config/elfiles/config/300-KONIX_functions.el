@@ -287,11 +287,20 @@ current buffer still has clients"
 		(buffer_name (buffer-file-name))
 		(file_under_cursor (thing-at-point 'filename))
 		(directory_ default-directory)
-		(proposition (list
-					  file_under_cursor
-					  buffer_name
-					  directory_
-					  )
+		(proposition (if (file-exists-p file_under_cursor)
+						 (list
+						  file_under_cursor
+						  buffer_name
+						  directory_
+						  )
+					   ;; if the file under cursor does not exist, propose
+					   ;;preferentialy the buffer file name
+					   (list
+						buffer_name
+						file_under_cursor
+						directory_
+						)
+					   )
 					 )
 		(new_propositions '())
 		)

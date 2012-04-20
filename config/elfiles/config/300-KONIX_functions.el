@@ -6,6 +6,13 @@
   "Mode to set for indirect buffers.")
 (make-variable-buffer-local 'konix/indirect-mode-name)
 
+(defun konix/kill-and-new-buffer (name)
+  (when (get-buffer name)
+	(kill-buffer name)
+	)
+  (get-buffer-create name)
+  )
+
 (defun konix/kill-ring-insert ()
   (interactive)
   (insert (completing-read "Yank : " kill-ring))

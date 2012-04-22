@@ -19,3 +19,6 @@
 [submodule "bash_optparse"]
 	path = bash_optparse
 	url = https://github.com/carlobaldassi/bash_optparse.git
+[submodule "config/elfiles/cc-mode"]
+	path = config/elfiles/cc-mode
+	url = https://github.com/emacsmirror/cc-mode.git

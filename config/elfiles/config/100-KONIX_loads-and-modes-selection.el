@@ -17,7 +17,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/icicles")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/full-ack")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/dictionary")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/wcheck-mode")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/cc-mode")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)

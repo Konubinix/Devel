@@ -336,6 +336,18 @@ cursor stays in the org buffer."
 	)
   )
 
+(defun konix/org-jump-to ()
+  (interactive)
+  (let (
+		(place_to_go (org-refile-get-location "Jump to"))
+		)
+	(find-file (second place_to_go))
+	(goto-char (fourth place_to_go))
+	(org-show-context 'org-goto)
+	(push-tag-mark)
+	)
+  )
+
 (defun konix/org-mark-ring-goto-newest ()
   (interactive)
   (org-mark-ring-goto -1)

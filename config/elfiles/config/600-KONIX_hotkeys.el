@@ -473,6 +473,7 @@
 (define-prefix-command  'konix/org-global-map)
 (define-key 'konix/global-slow-key-map (kbd "o") 'konix/org-global-map)
 
+(define-key 'konix/org-global-map "j" 'konix/org-jump-to)
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
 (define-key 'konix/org-global-map "o" 'org-clock-out)
 (define-key 'konix/org-global-map "c" 'org-capture)

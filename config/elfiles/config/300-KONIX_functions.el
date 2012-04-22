@@ -6,6 +6,101 @@
   "Mode to set for indirect buffers.")
 (make-variable-buffer-local 'konix/indirect-mode-name)
 
+(defun konix/diff/_assert-old-diff-line ()
+  (and
+   (string-match-p
+	"^\\+.+$"
+	(buffer-substring-no-properties
+	 (save-excursion
+	   (beginning-of-line)
+	   (point)
+	   )
+	 (save-excursion
+	   (end-of-line)
+	   (point)
+	   )
+	 )
+	)
+   (error "In addition line")
+   )
+  )
+
+(defun konix/diff/_get-old-file-name ()
+  (konix/diff/_assert-old-diff-line)
+  (save-excursion
+	(re-search-backward "^--- a/\\(.+\\)$")
+	(match-string-no-properties 1)
+	)
+  )
+
+(defun konix/diff/_compute-delta-line (start end)
+  (let (
+		(delta_line (- end start))
+		(end_point (save-excursion (goto-line end) (point)))
+		)
+	(save-excursion
+	  (goto-line start)
+	  (while (re-search-forward "^\\+.+$" end_point t)
+		(setq delta_line (- delta_line 1))
+		)
+	  )
+	delta_line
+	)
+  )
+
+(defun konix/diff/_get-old-line ()
+  (konix/diff/_assert-old-diff-line)
+  (let* (
+		 (old_line_number (line-number-at-pos))
+		 (diff_info
+		  (save-excursion
+			(re-search-backward "^@@ -\\([0-9]+\\),[0-9]+ \\+[0-9]+,[0-9]+ @@$")
+			(cons (line-number-at-pos) (match-string-no-properties 1))
+			)
+		  )
+		 (delta_line (konix/diff/_compute-delta-line (car diff_info) old_line_number))
+		 (start_diff_line (cdr diff_info))
+		 )
+	(- (+ delta_line (string-to-number start_diff_line)) 1)
+	)
+  )
+
+(defun konix/diff/_get-commit ()
+  (save-excursion
+	(goto-char 0)
+	(re-search-forward "^commit \\(.+\\)$")
+	(match-string-no-properties 1)
+	)
+  )
+
+(defun konix/diff/_get-origin-commit ()
+  (let* (
+		 (file (konix/diff/_get-old-file-name))
+		 (line (konix/diff/_get-old-line))
+		 (commit (konix/diff/_get-commit))
+		 (blame_output (shell-command-to-string (format "git blame -p -L%s,+1 %s~1 -- %s" line commit file)))
+		 )
+	(string-match "^\\([^ \t\n]+\\) [0-9]+ [0-9]+ [0-9]+$" blame_output)
+	(match-string-no-properties 1 blame_output)
+	)
+  )
+
+(defun konix/diff/_show-origin-commit ()
+  (let* (
+		 (line_start (save-excursion (beginning-of-line) (forward-char) (point)))
+		 (line_end (save-excursion (end-of-line) (point)))
+		 (line (buffer-substring-no-properties line_start line_end))
+		 )
+	(konix/git/show (konix/diff/_get-origin-commit) `(lambda ()
+													   (goto-char 0)
+													   (re-search-forward
+														(format "^\\+%s$" ,line))
+													   (beginning-of-line)
+													   )
+					)
+	)
+  )
+
 (defun konix/kill-and-new-buffer (name)
   (when (get-buffer name)
 	(kill-buffer name)

@@ -19,6 +19,3 @@
 [submodule "bash_optparse"]
 	path = bash_optparse
 	url = https://github.com/carlobaldassi/bash_optparse.git
-[submodule "config/elfiles/wcheck-mode"]
-	path = config/elfiles/wcheck-mode
-	url = https://github.com/tlikonen/wcheck-mode.git

@@ -624,7 +624,7 @@
   (konix/git/command "rebase --skip")
   )
 
-(defun konix/git/show (commit)
+(defun konix/git/show (commit &optional when_done_hook)
   "Launch a simple diff and view it in some buffer."
   (interactive
    (list
@@ -650,6 +650,13 @@
 								 (progn
 								   (with-current-buffer ,show_buffer
 									 (diff-mode)
+									 (setq default-directory ,(concat
+															   (konix/git/_get-toplevel)
+															   "/"
+															   ))
+									 (when ,when_done_hook
+									   (funcall ,when_done_hook)
+									   )
 									 )
 								   (pop-to-buffer ,show_buffer)
 								   )

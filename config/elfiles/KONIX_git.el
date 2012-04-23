@@ -640,6 +640,7 @@
 	(save-window-excursion
 	  (konix/git/command (format "show \"%s\"" commit) nil show_buffer t)
 	  )
+	(push-tag-mark)
 	(set-process-sentinel (get-buffer-process show_buffer)
 						  `(lambda (process string)
 							 (if (string-equal "finished\n" string)

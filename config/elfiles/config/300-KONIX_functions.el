@@ -54,7 +54,7 @@
 		 (old_line_number (line-number-at-pos))
 		 (diff_info
 		  (save-excursion
-			(re-search-backward "^@@ -\\([0-9]+\\),[0-9]+ \\+[0-9]+,[0-9]+ @@.+$")
+			(re-search-backward "^@@ -\\([0-9]+\\),[0-9]+ \\+[0-9]+,[0-9]+ @@.*$")
 			(cons (line-number-at-pos) (match-string-no-properties 1))
 			)
 		  )

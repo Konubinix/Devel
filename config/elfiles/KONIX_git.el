@@ -486,8 +486,8 @@
   (let (
 		(output_buffer (konix/kill-and-new-buffer "*GIT log file*"))
 		)
-   (konix/git/command (concat "log -- " file) nil output_buffer t)
-   )
+	(konix/git/command (concat "log -- " file) nil output_buffer t)
+	)
   )
 
 (defun konix/git/cherry-pick ()
@@ -632,11 +632,7 @@
 	)
    )
   (let (
-		(show_buffer
-		 (format
-		  "*GIT Show Buffer*"
-		  )
-		 )
+		(show_buffer (format "*GIT Show Buffer %s*" commit))
 		)
 	(when (get-buffer show_buffer)
 	  (kill-buffer show_buffer)
@@ -687,9 +683,9 @@
 		  )
 		 )
 		(top_level (concat
-				   (konix/git/_get-toplevel)
-				   "/"
-				   )
+					(konix/git/_get-toplevel)
+					"/"
+					)
 				   )
 		;;)
 		)
@@ -805,11 +801,11 @@
 		 (line (buffer-substring-no-properties line_start line_end))
 		 )
 	(konix/git/show (konix/git/diff/_get-origin-commit) `(lambda ()
-													   (goto-char 0)
-													   (re-search-forward
-														(format "^\\+%s$" ,line))
-													   (beginning-of-line)
-													   )
+														   (goto-char 0)
+														   (re-search-forward
+															(format "^\\+%s$" ,line))
+														   (beginning-of-line)
+														   )
 					)
 	)
   )
@@ -849,7 +845,7 @@
 							   )
 							 )
 						  )
-   )
+	)
   )
 
 (defun konix/git/svn-fetch ()

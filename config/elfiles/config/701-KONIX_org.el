@@ -341,10 +341,10 @@ cursor stays in the org buffer."
   (let (
 		(place_to_go (org-refile-get-location "Jump to"))
 		)
+	(org-mark-ring-push)
 	(find-file (second place_to_go))
 	(goto-char (fourth place_to_go))
 	(org-show-context 'org-goto)
-	(push-tag-mark)
 	)
   )
 

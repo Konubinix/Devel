@@ -774,7 +774,7 @@
 (defun konix/git/difftool-file (file)
   "Lance difftool sur le fichier."
   (interactive (list buffer-file-truename) )
-  (konix/git/command-to-string (concat "difftool "file))
+  (konix/git/command (concat "difftool "file))
   )
 
 (defun konix/git/mergetool ()

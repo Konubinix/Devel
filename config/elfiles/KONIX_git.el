@@ -789,7 +789,30 @@
 	(konix/_get-file-name "Blame file" t)
 	)
    )
-  (konix/git/command (concat "blame -w '"file"'"))
+  (let (
+		(blame_buffer (konix/kill-and-new-buffer "*GIT blame*"))
+		)
+	(konix/git/command (concat "blame -w '"file"'") nil blame_buffer t)
+	(set-process-sentinel (get-buffer-process blame_buffer)
+						  `(lambda (process string)
+							 (if (string-equal "finished\n" string)
+								 (progn
+								   (pop-to-buffer ,blame_buffer)
+								   (with-current-buffer ,blame_buffer
+									 (goto-line ,(line-number-at-pos))
+									 )
+								   )
+							   (display-warning 'show-warning
+												(format
+												 "Show exited abnormaly : '%s'"
+												 (substring-no-properties string
+																		  0 -1)
+												 )
+												)
+							   )
+							 )
+						  )
+   )
   )
 
 (defun konix/git/svn-fetch ()

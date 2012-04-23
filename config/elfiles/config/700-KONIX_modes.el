@@ -1672,10 +1672,9 @@ immediately after the section's start-tag."
 (setq-default notmuch-saved-searches
 			  '(
 				("inbox" . "tag:inbox AND -tag:deleted")
+				("flagged" . "tag:flagged")
 				("unread" . "tag:unread AND NOT tag:rss")
 				("unread rss" . "tag:rss AND tag:unread")
-				("TOReadList" . "tag:TOReadList")
-				("flagged" . "tag:flagged")
 				)
 			  )
 (setq notmuch-address-command "notmuch_addresses.py")

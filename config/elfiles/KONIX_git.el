@@ -777,6 +777,43 @@
   (konix/git/command (concat "difftool "file))
   )
 
+(defun konix/git/diff/_get-commit ()
+  (save-excursion
+	(goto-char 0)
+	(re-search-forward "^commit \\(.+\\)$")
+	(match-string-no-properties 1)
+	)
+  )
+
+(defun konix/git/diff/_get-origin-commit ()
+  (let* (
+		 (file (konix/diff/_get-old-file-name))
+		 (line (konix/diff/_get-old-line))
+		 (commit (konix/git/diff/_get-commit))
+		 (blame_output (shell-command-to-string (format "git blame -p -L%s,+1 %s~1 -- %s" line commit file)))
+		 )
+	(string-match "^\\([^ \t\n]+\\) [0-9]+ [0-9]+ [0-9]+$" blame_output)
+	(match-string-no-properties 1 blame_output)
+	)
+  )
+
+(defun konix/git/diff/show-origin-commit ()
+  (interactive)
+  (let* (
+		 (line_start (save-excursion (beginning-of-line) (forward-char) (point)))
+		 (line_end (save-excursion (end-of-line) (point)))
+		 (line (buffer-substring-no-properties line_start line_end))
+		 )
+	(konix/git/show (konix/git/diff/_get-origin-commit) `(lambda ()
+													   (goto-char 0)
+													   (re-search-forward
+														(format "^\\+%s$" ,line))
+													   (beginning-of-line)
+													   )
+					)
+	)
+  )
+
 (defun konix/git/mergetool ()
   "Lance la commande mergetool de git."
   (interactive)
@@ -1354,6 +1391,7 @@ Uses the macro konix/git/status-buffer/next-or-previous
 (define-key konix/git-global-map-diff "t" 'konix/git/difftool)
 (define-key konix/git-global-map-diff "T" 'konix/git/difftool-file)
 (define-key konix/git-global-map-diff "m" 'konix/git/mergetool)
+(define-key konix/git-global-map-diff "o" 'konix/git/diff/show-origin-commit)
 
 (define-prefix-command 'konix/git-global-map-stash)
 (define-key konix/git-global-map "S" 'konix/git-global-map-stash)

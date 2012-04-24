@@ -624,6 +624,15 @@
   (konix/git/command "rebase --skip")
   )
 
+(defun konix/git/_get-origin-commit (file line commit)
+  (let* (
+		 (blame_output (shell-command-to-string (format "git blame -p -L%s,+1 %s -- %s" line commit file)))
+		 )
+	(string-match "^\\([^ \t\n]+\\) [0-9]+ [0-9]+ [0-9]+$" blame_output)
+	(match-string-no-properties 1 blame_output)
+	)
+  )
+
 (defun konix/git/show (commit &optional when_done_hook)
   "Launch a simple diff and view it in some buffer."
   (interactive
@@ -667,6 +676,41 @@
 							   )
 							 )
 						  )
+	)
+  )
+
+(defun konix/git/show/commit (commit line_to_search)
+  (konix/git/show commit
+				  `(lambda ()
+					 (goto-char 0)
+					 (or
+					  (re-search-forward
+					   (format "^\\+%s$" ,line_to_search)
+					   nil
+					   t
+					   )
+					  (message "Unable to find '%s' in commit" ,line_to_search)
+					  )
+					 (beginning-of-line)
+					 )
+				  )
+  )
+
+(defun konix/git/show/origin-commit-at-pos ()
+  (interactive)
+  (if (eq major-mode 'diff-mode)
+	  (konix/git/diff/show-origin-commit)
+	(konix/git/show/commit
+	 (konix/git/_get-origin-commit
+	  (buffer-file-name)
+	  (line-number-at-pos)
+	  "HEAD"
+	  )
+	 (buffer-substring-no-properties
+	  (save-excursion (beginning-of-line) (point))
+	  (save-excursion (end-of-line) (point))
+	  )
+	 )
 	)
   )
 
@@ -782,32 +826,17 @@
 	)
   )
 
-(defun konix/git/diff/_get-origin-commit ()
-  (let* (
-		 (file (konix/diff/_get-old-file-name))
-		 (line (konix/diff/_get-old-line))
-		 (commit (konix/git/diff/_get-commit))
-		 (blame_output (shell-command-to-string (format "git blame -p -L%s,+1 %s~1 -- %s" line commit file)))
-		 )
-	(string-match "^\\([^ \t\n]+\\) [0-9]+ [0-9]+ [0-9]+$" blame_output)
-	(match-string-no-properties 1 blame_output)
-	)
-  )
-
 (defun konix/git/diff/show-origin-commit ()
   (interactive)
   (let* (
 		 (line_start (save-excursion (beginning-of-line) (forward-char) (point)))
 		 (line_end (save-excursion (end-of-line) (point)))
-		 (line (buffer-substring-no-properties line_start line_end))
+		 (line_to_search (buffer-substring-no-properties line_start line_end))
+		 (file (konix/diff/_get-old-file-name))
+		 (line (konix/diff/_get-old-line))
+		 (commit (konix/git/diff/_get-commit))
 		 )
-	(konix/git/show (konix/git/diff/_get-origin-commit) `(lambda ()
-														   (goto-char 0)
-														   (re-search-forward
-															(format "^\\+%s$" ,line))
-														   (beginning-of-line)
-														   )
-					)
+	(konix/git/show/commit (konix/git/_get-origin-commit file line (format "%s~1" commit)) line_to_search)
 	)
   )
 

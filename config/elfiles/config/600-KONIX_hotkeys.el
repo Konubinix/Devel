@@ -226,6 +226,7 @@
 (define-prefix-command 'konix/global-fast-key-map)
 (global-set-key (kbd "<f2>") 'konix/global-fast-key-map)
 
+(define-key 'konix/global-fast-key-map (kbd "m") 'man)
 ;;to move easily between windows with M-Arrows
 (windmove-default-keybindings 'meta)
 ;; In case the previous keywords are already taken by the mode (like in org-mode)

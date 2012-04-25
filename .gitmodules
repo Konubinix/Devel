@@ -22,3 +22,6 @@
 [submodule "config/elfiles/cc-mode"]
 	path = config/elfiles/cc-mode
 	url = https://github.com/emacsmirror/cc-mode.git
+[submodule "config/elfiles/rebox2"]
+	path = config/elfiles/rebox2
+	url = https://github.com/lewang/rebox2.git

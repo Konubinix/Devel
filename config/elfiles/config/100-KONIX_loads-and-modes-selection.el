@@ -18,6 +18,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/full-ack")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/dictionary")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/cc-mode")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/rebox2")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)
@@ -92,8 +93,9 @@
 ;; trac-wiki
 (autoload 'trac-wiki-mode "trac-wiki" nil t)
 (autoload 'trac-wiki "trac-wiki" nil t)
-;; wcheck-mode
-(autoload 'wcheck-mode "wcheck-mode" nil t)
+;; rebox
+(autoload 'rebox-dwim "rebox2" nil t)
+(autoload 'rebox-cycle "rebox2" nil t)
 
 ;; ************************************************************
 ;; Automodes

@@ -739,7 +739,10 @@
 	  )
 	(save-window-excursion
 	  (konix/git/command (format "diff%s%s%s"
-								 (if  konix/git/diff/ignore-all-space
+								 (if (and
+									  konix/git/diff/ignore-all-space
+									  (null current-prefix-arg)
+									  )
 									 " -w"
 								   ""
 								   )

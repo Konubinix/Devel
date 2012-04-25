@@ -225,15 +225,19 @@
   (if konix/global-semantic-ac-sources
 	  (progn
 		(add-to-list 'konix/prog/ac-sources 'ac-source-semantic-raw)
+		(add-to-list 'konix/prog/ac-sources 'ac-source-semantic)
 		(add-to-list 'konix/prog/ac-sources 'ac-source-konix/semantic-etags)
 		)
 	(progn
 	  (setq konix/prog/ac-sources
 			(delq
-			 'ac-source-konix/semantic-etags
+			 'ac-source-semantic
 			 (delq
-			  'ac-source-semantic-raw
-			  konix/prog/ac-sources
+			  'ac-source-konix/semantic-etags
+			  (delq
+			   'ac-source-semantic-raw
+			   konix/prog/ac-sources
+			   )
 			  )
 			 )
 			)
@@ -476,8 +480,8 @@
 	)
   )
 (when (ignore-errors
-	   (semantic-ectag-test-version)
-	   )
+		(semantic-ectag-test-version)
+		)
   (semantic-load-enable-all-exuberent-ctags-support)
   )
 (defcustom-mode-local-semantic-dependency-system-include-path c++-mode konix/semantic-custom-include-path-cpp nil)

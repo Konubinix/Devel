@@ -139,7 +139,7 @@ They can be relative or absolute
   (setq show-trailing-whitespace t)
   (hs-minor-mode t)
   ;; highlight parentheses in prog
-  (highlight-parentheses-mode)
+  (highlight-parentheses-mode 1)
   (auto-complete-mode t)
   (auto-fill-mode t)
   (setq fill-column 80)

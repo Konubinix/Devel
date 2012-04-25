@@ -57,6 +57,12 @@
 ;; ####################################################################################################
 ;; Sources
 ;; ####################################################################################################
+(defun konix/prefix-symbol ()
+  (if (looking-back "[a-zA-Z]+" 100 t)
+	  (match-beginning 0)
+	nil
+	)
+  )
 (setq ac-source-yasnippet
 	  '((depends yasnippet)
 		(candidates . ac-yasnippet-candidates)
@@ -81,7 +87,9 @@
 	  '((available . (or (require 'semantic-ia nil t)
 						 (require 'semantic/ia nil t)))
 		(candidates . (ac-semantic-candidates ac-prefix))
-		(requires . 10)
+		(prefix . konix/prefix-symbol)
+		(cache)
+		(requires . 5)
 		(symbol . "sr")))
 
 (setq ac-source-imenu

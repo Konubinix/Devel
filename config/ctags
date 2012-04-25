@@ -5,4 +5,5 @@
 --extra=+fq
 --fields=+ialStmnsz
 --file-scope=yes
+--langmap=c++:.c++.cc.cp.cpp.cxx.h.h++.hh.hp.hpp.hxx.C.H.txx.ixx
 --regex-c++=/^.+public[ \t]+([^ \t]+).*$/\1 PARENT/

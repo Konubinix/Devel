@@ -703,7 +703,7 @@
 	(konix/git/show/commit
 	 (konix/git/_get-origin-commit
 	  (buffer-file-name)
-	  (line-number-at-pos)
+	  (konix/line-number-at-pos-widen)
 	  "HEAD"
 	  )
 	 (buffer-substring-no-properties
@@ -865,7 +865,7 @@
 								 (progn
 								   (pop-to-buffer ,blame_buffer)
 								   (with-current-buffer ,blame_buffer
-									 (goto-line ,(line-number-at-pos))
+									 (goto-line ,(konix/line-number-at-pos-widen))
 									 )
 								   )
 							   (display-warning 'show-warning

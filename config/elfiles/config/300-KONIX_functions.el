@@ -6,6 +6,13 @@
   "Mode to set for indirect buffers.")
 (make-variable-buffer-local 'konix/indirect-mode-name)
 
+(defun konix/line-number-at-pos-widen ()
+  (save-restriction
+	(widen)
+	(line-number-at-pos)
+	)
+  )
+
 (defun konix/diff/_assert-old-diff-line ()
   (and
    (string-match-p

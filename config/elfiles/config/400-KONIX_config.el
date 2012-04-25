@@ -383,8 +383,9 @@
 ;; ************************************************************
 (setq-default calendar-mark-diary-entries-flag t)
 (setq-default calendar-view-diary-initially-flag t)
+
 ;; Pour avoir le calendar en français
-(setq-default calendar-date-style t)
+(setq-default calendar-date-style 'european)
 (setq-default calendar-week-start-day 1)
 (setq calendar-day-name-array
 	  ["dimanche" "lundi" "mardi" "mercredi" "jeudi" "vendredi" "samedi"])

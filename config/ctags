@@ -7,3 +7,7 @@
 --file-scope=yes
 --langmap=c++:.c++.cc.cp.cpp.cxx.h.h++.hh.hp.hpp.hxx.C.H.txx.ixx
 --regex-c++=/^.+public[ \t]+([^ \t]+).*$/\1 PARENT/
+--langdef=cmake
+--langmap=cmake:.cmake
+--regex-cmake=/[Mm][Aa][Cc][Rr][Oo][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_-]+)/\1 MACRO_CMAKE/
+--regex-cmake=/[sS][eE][tT][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_-]+)/\1 SET_CMAKE/

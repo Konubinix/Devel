@@ -1229,7 +1229,10 @@ Note that return nil if MD5 is equal althogh `buffer-modified-p' is non-nil."
   (interactive)
   (if (not (trac-wiki-modified-p))
       (message "Nothing changed.")
-    (let ((config (current-window-configuration)))
+    (let (
+		  (config (current-window-configuration))
+		  (line_position (line-number-at-pos))
+		  )
       (trac-wiki-diff nil)
       (if (not (y-or-n-p "Really revert these changes? "))
 	  (message "canceled.")
@@ -1241,6 +1244,7 @@ Note that return nil if MD5 is equal althogh `buffer-modified-p' is non-nil."
 	  (goto-char 1)
 	  (message "Reverted to original (version=%s)" ver)))
       (set-window-configuration config)
+	  (goto-line line_position)
       ;; erase diff buffer
       (let ((win (get-buffer-window trac-wiki-diff-buffer-name)))
 	(if win

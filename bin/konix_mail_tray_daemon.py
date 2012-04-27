@@ -18,8 +18,10 @@ def main():
                      200,
                      {"i" : os.path.join(icons_dir, "mail_icon_empty.png"),
                       "n" : os.path.join(icons_dir, "mail_icon_new_mail.png"),
-                      "f" : os.path.join(icons_dir, "mail_icon_flagged.png"),
+                      "N" : os.path.join(icons_dir, "mail_icon_new_mail_unread.png"),
                       "u" : os.path.join(icons_dir, "mail_icon_unread.png"),
+                      "f" : os.path.join(icons_dir, "mail_icon_flagged.png"),
+                      "F" : os.path.join(icons_dir, "mail_icon_flagged_unread.png"),
                       "?" : os.path.join(icons_dir, "mail_icon_fetching.png")
                       },
                      "?"

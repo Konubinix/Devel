@@ -59,7 +59,7 @@ printf "Starting an emacsclient " 1>&2
 if noNeedToCreateANewFrame
 then
 	printf "with no frame\n" >&2
-	if [ -z "$@" ]
+	if [ -z "$*" ]
 	then
 		# Need at least an argument when launching without -c
 		set "."

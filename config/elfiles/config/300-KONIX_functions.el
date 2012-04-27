@@ -425,9 +425,9 @@ current buffer still has clients"
 	)
   )
 
-(defun konix/_get-string (&optional prompt)
+(defun konix/_get-string (&optional prompt collection)
   (completing-read (concat "Get "(when prompt prompt)": ")
-				   nil
+				   collection
 				   nil
 				   nil
 				   nil

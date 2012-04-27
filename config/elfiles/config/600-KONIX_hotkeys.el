@@ -530,6 +530,12 @@
 (define-key 'konix/org-pomodoro-map "T" 'konix/org-pomodoro-insert-week-planning-table)
 (define-key 'konix/org-pomodoro-map "C" 'konix/org-pomodoro-convert-time-before-point-into-pomodoro)
 
+(eval-after-load "org-agenda"
+  '(progn
+	 (define-key org-agenda-mode-map (kbd "T") 'org-agenda-todo-yesterday)
+	 )
+  )
+
 ;; ####################################################################################################
 ;; Cscope
 ;; ####################################################################################################

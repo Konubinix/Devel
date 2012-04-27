@@ -76,7 +76,7 @@
 (global-set-key (kbd "<C-next>") 'multi-eshell-switch-to-next-live-shell)
 (global-set-key (kbd "<C-prior>") 'multi-eshell-switch)
 ;; ISPELL
-(global-set-key (kbd "M-£") 'konix/ispell-region-or-buffer)
+(global-set-key (kbd "C-$") 'konix/ispell-region-or-buffer)
 (global-set-key (kbd "C-?") 'konix/flyspell-region-or-buffer)
 (global-set-key (kbd "C-M-$") 'ispell-change-dictionary)
 ;; redefining C-x 0 and C-x 1 in order to use sticky windows

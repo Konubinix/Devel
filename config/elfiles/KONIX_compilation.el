@@ -427,7 +427,7 @@ PARAM : a string with parameters given to make
 	)
   )
 
-(defun konix/compile (command &optional full_window)
+(defun konix/compile (command &optional full_window _mode)
   (interactive
    (list
 	(read-string "Command : " konix/compile-command 'konix/compile-command-history)
@@ -451,12 +451,11 @@ PARAM : a string with parameters given to make
 								)
 		 )
 	(run-hooks 'konix/compile-before-hook)
-	(setq buffer_ (compile (format compile-command-wrap_
-								   command
-								   )
-						   ;; t Not used yet because no error highlighting... But I want it
-						   ;; to be able to kill cmd
-						   )
+	(setq buffer_ (compilation-start (format compile-command-wrap_
+											 command
+											 )
+									 _mode
+									 )
 		  )
 	(setq konix/in-compile-command nil)
 	(when full_window

@@ -625,6 +625,7 @@
 (define-key 'konix/global-fast-news-key-map "m" 'notmuch)
 (define-key 'konix/global-fast-news-key-map "M" 'konix/notmuch-search-no-tag)
 (define-key 'konix/global-fast-news-key-map "t" 'newsticker-treeview)
+(define-key 'konix/global-fast-news-key-map "f" 'konix/open-mail-follow)
 ;; ####################################################################################################
 ;; highlight-symbol
 ;; ####################################################################################################

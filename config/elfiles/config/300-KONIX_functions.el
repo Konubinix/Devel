@@ -1404,6 +1404,7 @@ TAGS_FILE_NAMETHE"
 
   (let(
 	   (konix/compile-command-wrap "%s")
+	   (default-directory (file-name-directory(first tags-table-list)))
 	   )
 	(konix/compile (format "konix_etags_find_references.sh -t \"%s\" %s"
 						   (mapconcat
@@ -1413,6 +1414,8 @@ TAGS_FILE_NAMETHE"
 							)
 						   elem
 						   )
+				   nil
+				   'grep-mode
 				   )
 	)
   )
@@ -2371,29 +2374,29 @@ The behavior I want is :
     (ediff-maybe-checkout buf-to-patch)
 
     (ediff-with-current-buffer patch-diagnostics
-							   (insert-buffer-substring patch-buf)
-							   (message "Applying patch ... ")
-							   ;; fix environment for gnu patch, so it won't make numbered extensions
-							   (setq backup-style (getenv "VERSION_CONTROL"))
-							   (setenv "VERSION_CONTROL" nil)
-							   (setq patch-return-code
-									 (call-process-region
-									  (point-min) (point-max)
-									  shell-file-name
-									  t   ; delete region (which contains the patch
-									  t   ; insert output (patch diagnostics) in current buffer
-									  nil ; don't redisplay
-									  shell-command-switch   ; usually -c
-									  (format "%s %s %s -o '%s' %s"
-											  ediff-patch-program
-											  ediff-patch-options
-											  ediff-backup-specs
-											  konix/ediff-patch-new-filename
-											  (expand-file-name true-source-filename))
-									  ))
+	  (insert-buffer-substring patch-buf)
+	  (message "Applying patch ... ")
+	  ;; fix environment for gnu patch, so it won't make numbered extensions
+	  (setq backup-style (getenv "VERSION_CONTROL"))
+	  (setenv "VERSION_CONTROL" nil)
+	  (setq patch-return-code
+			(call-process-region
+			 (point-min) (point-max)
+			 shell-file-name
+			 t   ; delete region (which contains the patch
+			 t   ; insert output (patch diagnostics) in current buffer
+			 nil ; don't redisplay
+			 shell-command-switch   ; usually -c
+			 (format "%s %s %s -o '%s' %s"
+					 ediff-patch-program
+					 ediff-patch-options
+					 ediff-backup-specs
+					 konix/ediff-patch-new-filename
+					 (expand-file-name true-source-filename))
+			 ))
 
-							   ;; restore environment for gnu patch
-							   (setenv "VERSION_CONTROL" backup-style))
+	  ;; restore environment for gnu patch
+	  (setenv "VERSION_CONTROL" backup-style))
 
     (message "Applying patch ... done")
     (message "")
@@ -2407,7 +2410,7 @@ The behavior I want is :
 		(progn
 		  (with-output-to-temp-buffer ediff-msg-buffer
 			(ediff-with-current-buffer standard-output
-									   (fundamental-mode))
+			  (fundamental-mode))
 			(princ (format
 					"Patch program has failed due to a bad patch file,
 it couldn't apply all hunks, OR
@@ -2484,8 +2487,8 @@ you can still examine the changes via M-x ediff-files"
 		   buf-to-patch target-buf nil
 		   startup-hooks 'epatch))
     (ediff-with-current-buffer ctl-buf
-							   (setq ediff-patchbufer patch-buf
-									 ediff-patch-diagnostics patch-diagnostics))
+	  (setq ediff-patchbufer patch-buf
+			ediff-patch-diagnostics patch-diagnostics))
 
     (bury-buffer patch-diagnostics)
     (message "Type `P', if you need to see patch diagnostics")

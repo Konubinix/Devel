@@ -6,6 +6,13 @@
   "Mode to set for indirect buffers.")
 (make-variable-buffer-local 'konix/indirect-mode-name)
 
+(defvar konix/mail_follow (expand-file-name "~/mail_follow") "")
+
+(defun konix/open-mail-follow ()
+  (interactive)
+  (find-file konix/mail_follow)
+  )
+
 (defun konix/line-number-at-pos-widen ()
   (save-restriction
 	(widen)

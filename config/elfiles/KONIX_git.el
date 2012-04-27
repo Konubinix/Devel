@@ -38,6 +38,7 @@
 		("^cherry-pick" . (konix/git/command-to-string . nil))
 		("^revert" . (konix/git/command . nil))
 		("^tag" . (konix/git/command-to-string . nil))
+		("^show" . (konix/git/command-to-string . nil))
 		("^checkout" . (konix/git/command-to-string . nil))
 		(".*" . (konix/git/command .nil))
 		)
@@ -56,6 +57,7 @@
 		"tag"
 		"push"
 		"svn"
+		"show"
 		)
 	  )
 
@@ -73,6 +75,7 @@
 		("^pull" konix/git/remote/list konix/git/completion/push)
 		("^fetch*" konix/git/remote/list)
 		("^branch" konix/git/branch/list)
+		("^show" konix/git/completion/show konix/git/branch/list konix/git/tag/list)
 		("^svn" konix/git/svn/list)
 		("^ *$" konix/git/completions)
 		)
@@ -83,6 +86,12 @@
 		"--abort"
 		"--interactive"
 		"-i"
+		)
+	  )
+
+(setq konix/git/completion/show
+	  '(
+		"--stat"
 		)
 	  )
 
@@ -423,7 +432,7 @@
   (konix/git/command-to-string (concat "add -u") t)
   )
 
-(defun konix/git/branch/list ()
+(defun konix/git/branch/list (&rest args)
   (let (branches)
 	(setq branches
 		  (shell-command-to-string "git branch -l -a 2> /dev/null")
@@ -654,18 +663,18 @@
 						  `(lambda (process string)
 							 (if (string-equal "finished\n" string)
 								 (progn
-								   (with-current-buffer ,show_buffer
-									 (diff-mode)
-									 (setq default-directory ,(concat
-															   (konix/git/_get-toplevel)
-															   "/"
-															   ))
-									 (when ,when_done_hook
-									   (funcall ,when_done_hook)
-									   )
-									 )
-								   (pop-to-buffer ,show_buffer)
-								   )
+		(with-current-buffer ,show_buffer
+		  (diff-mode)
+		  (setq default-directory ,(concat
+									(konix/git/_get-toplevel)
+									"/"
+									))
+		  (when ,when_done_hook
+			(funcall ,when_done_hook)
+			)
+		  )
+		(pop-to-buffer ,show_buffer)
+		)
 							   (display-warning 'show-warning
 												(format
 												 "Show exited abnormaly : '%s'"
@@ -675,11 +684,17 @@
 												)
 							   )
 							 )
-						  )
+	 )
 	)
   )
 
 (defun konix/git/show/commit (commit line_to_search)
+  ;; strip the beginning and end blanks out of the line to search
+  (setq line_to_search
+		;;		(konix/strip-blank-line-regexp
+		(regexp-quote line_to_search)
+		;;		 )
+		)
   (konix/git/show commit
 				  `(lambda ()
 					 (goto-char 0)

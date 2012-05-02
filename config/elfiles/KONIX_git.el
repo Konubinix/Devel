@@ -904,16 +904,22 @@
 	)
   )
 
-(defun konix/git/svn-fetch ()
+(defun konix/git/svn/fetch ()
   "Lance git svn fetch."
   (interactive)
   (konix/git/command "svn fetch")
   )
 
-(defun konix/git/svn-dcommit ()
+(defun konix/git/svn/dcommit ()
   "Lance git svn dcommit."
   (interactive)
   (konix/git/command "svn dcommit")
+  )
+
+(defun konix/git/svn/rebase ()
+  "Lance git svn rebase."
+  (interactive)
+  (konix/git/command "svn rebase")
   )
 
 (defun konix/git/svn/list ()

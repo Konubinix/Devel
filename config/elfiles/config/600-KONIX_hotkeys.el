@@ -673,6 +673,12 @@
 (define-key konix/git-global-map-tag "t" 'konix/git/tag)
 (define-key konix/git-global-map-tag "d" 'konix/git/tag/delete)
 
+(define-prefix-command 'konix/git-global-map-svn)
+(define-key konix/git-global-map "v" 'konix/git-global-map-svn)
+(define-key konix/git-global-map-svn "d" 'konix/git/svn/dcommit)
+(define-key konix/git-global-map-svn "r" 'konix/git/svn/rebase)
+(define-key konix/git-global-map-svn "f" 'konix/git/svn/fetch)
+
 (define-prefix-command 'konix/git-global-map-log)
 (define-key konix/git-global-map "l" 'konix/git-global-map-log)
 (define-key konix/git-global-map-log "r" 'konix/git/reflog)

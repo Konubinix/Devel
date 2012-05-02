@@ -2348,6 +2348,10 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
   (autopair-mode 1)
   (visual-line-mode 1)
   (setq show-trailing-whitespace t)
+  (local-set-key (kbd "C-<left>") 'backward-word)
+  (local-set-key (kbd "C-<right>") 'forward-word)
+  (local-set-key (kbd "M-<left>") 'mediawiki-simple-outline-promote)
+  (local-set-key (kbd "M-<right>") 'mediawiki-simple-outline-demote)
   )
 (add-hook 'trac-wiki-mode-hook 'konix/trac-wiki-mode-hook)
 ;; ####################################################################################################

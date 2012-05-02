@@ -25,3 +25,6 @@
 [submodule "config/elfiles/rebox2"]
 	path = config/elfiles/rebox2
 	url = https://github.com/lewang/rebox2.git
+[submodule "config/elfiles/helm"]
+	path = config/elfiles/helm
+	url = https://github.com/emacs-helm/helm.git

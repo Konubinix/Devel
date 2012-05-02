@@ -420,12 +420,13 @@
 (define-key 'konix/www/map (kbd "l") 'konix/www/browse-link-at-point)
 
 ;; ******************************************************************************************
-;; anything
+;; helm
 ;; ******************************************************************************************
-(define-prefix-command 'konix/anything/map)
-(define-key 'konix/global-fast-key-map (kbd "a") 'konix/anything/map)
+(define-prefix-command 'konix/helm/map)
+(define-key 'konix/global-fast-key-map (kbd "a") 'konix/helm/map)
 
-(define-key 'konix/anything/map (kbd "a") 'anything)
+(define-key 'konix/helm/map (kbd "a") 'helm-mini)
+(define-key 'konix/helm/map (kbd "f") 'helm-find-files)
 
 ;; ####################################################################################################
 ;; F1-F12 keys

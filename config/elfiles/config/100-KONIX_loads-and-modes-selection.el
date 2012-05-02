@@ -19,6 +19,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/dictionary")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/cc-mode")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/rebox2")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/helm")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)
@@ -96,6 +97,8 @@
 ;; rebox
 (autoload 'rebox-dwim "rebox2" nil t)
 (autoload 'rebox-cycle "rebox2" nil t)
+;; helm
+(autoload 'helm-mini "helm-config" nil t)
 
 ;; ************************************************************
 ;; Automodes

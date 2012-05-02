@@ -477,15 +477,23 @@
   (konix/git/command "reflog")
   )
 
-(defun konix/git/log (&optional history_size)
+(defun konix/git/log (&optional history_size alog)
   (interactive "P")
-  (let (history_cmd)
+  (let (
+		history_cmd
+		(log_command (if alog "alog" "log"))
+		)
 	(if (not history_size)
 		(setq history_cmd "")
 	  (setq history_cmd (concat "-" (format "%s" history_size)))
 	  )
-	(konix/git/command (concat "log " history_cmd))
+	(konix/git/command (format "%s %s" log_command history_cmd))
 	)
+  )
+
+(defun konix/git/alog (&optional history_size)
+  (interactive "P")
+  (konix/git/log history_size t)
   )
 
 (defun konix/git/log/file (file)

@@ -679,6 +679,7 @@
 (define-key konix/git-global-map-log "l" 'konix/git/log)
 (define-key konix/git-global-map-log "f" 'konix/git/log/file)
 (define-key konix/git-global-map-log "b" 'konix/git/blame/file)
+(define-key konix/git-global-map-log "a" 'konix/git/alog)
 
 (define-prefix-command 'konix/git-global-map-cherry)
 (define-key konix/git-global-map "C" 'konix/git-global-map-cherry)

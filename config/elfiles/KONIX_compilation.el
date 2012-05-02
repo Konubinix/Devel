@@ -159,6 +159,8 @@ If the file exists, it is automatically deleted
   ""
   )
 
+(defvar konix/compile/search-makefile-subdir '("build" "Build" "BUILD") "")
+
 ;; ####################################################################################################
 ;; VARIABLES
 ;; ####################################################################################################
@@ -232,17 +234,28 @@ DIRECTORY : Folder from which the research is made
     nil)
    ;; un rep -> cherche le rep
    ((file-directory-p directory)
-    (let ((res nil)
-          (parent (expand-file-name (concat directory "../")))
-          (me (expand-file-name directory)))
+    (let* (
+		   (res nil)
+		   (parent (expand-file-name (concat directory "../")))
+		   (me (expand-file-name directory))
+		   (locate_makefile_level (locate-file "Makefile"
+											   (mapcar
+												(lambda (dir)
+												  (expand-file-name dir me)
+												  )
+												(append (list ".") konix/compile/search-makefile-subdir)
+												)
+											   )
+								  )
+		   )
       (cond
        ;; Condition de terminaison
        ((equal me parent)
         nil
         )
-       ;; Regarde pour le rep courant
-       ((and (file-exists-p (concat me "Makefile")) (not (file-directory-p (concat me "Makefile"))))
-        (concat me "Makefile")
+       ;; Regarde dans un rep du niveau actuel
+       (locate_makefile_level
+		locate_makefile_level
         )
        ;; Si pas ici, peut être dans le parent
        (t

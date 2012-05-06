@@ -1765,7 +1765,6 @@ immediately after the section's start-tag."
    tag_change
    )
   )
-
 (defun konix/notmuch-remove-tag (tag)
   (let (
 		(tag_change (format "-%s" tag))
@@ -1785,7 +1784,12 @@ immediately after the section's start-tag."
 	 )
 	)
   )
-
+(defun konix/notmuch-remove-unread ()
+  (when (member "unread" (konix/notmuch-get-tags))
+	(konix/notmuch-add-tag "wontread")
+	(konix/notmuch-remove-tag "unread")
+	)
+  )
 (defun konix/notmuch-add-tag (tag)
   (let (
 		(tag_change (format "+%s" tag))
@@ -1820,10 +1824,20 @@ immediately after the section's start-tag."
 	)
    )
   )
-(defun konix/notmuch-toggle-tag (tag)
+(defun konix/notmuch-toggle-tag (tag &optional toggle_tag)
   (if (member tag (konix/notmuch-get-tags))
-	  (konix/notmuch-remove-tag tag)
-	(konix/notmuch-add-tag tag)
+	  (progn
+		(konix/notmuch-remove-tag tag)
+		(when toggle_tag
+		  (konix/notmuch-add-tag toggle_tag)
+		  )
+	   )
+	(progn
+	 (konix/notmuch-add-tag tag)
+	 (when toggle_tag
+	   (konix/notmuch-remove-tag toggle_tag)
+	   )
+	 )
 	)
   )
 (defun konix/notmuch-toggle-deleted-tag ()
@@ -1834,9 +1848,9 @@ immediately after the section's start-tag."
   (interactive)
   (konix/notmuch-toggle-tag "spam")
   )
-(defun konix/notmuch-toggle-unread-tag ()
-  (interactive)
-  (konix/notmuch-toggle-tag "unread")
+(defun konix/notmuch-toggle-unread-tag (&optional no_wontread)
+  (interactive "P")
+  (konix/notmuch-toggle-tag "unread" (if no_wontread nil "wontread"))
   )
 (defun konix/notmuch-toggle-inbox-tag ()
   (interactive)
@@ -1896,6 +1910,7 @@ inspired from `notmuch-show-archive-thread-internal'"
   (konix/notmuch-show-remove-tag-and-next "TOReadList" t)
   )
 (defun konix/notmuch-archive ()
+  (konix/notmuch-remove-unread)
   (cond
    ((eq major-mode 'notmuch-search-mode)
 	(notmuch-search-archive-thread)
@@ -1912,7 +1927,7 @@ inspired from `notmuch-show-archive-thread-internal'"
   )
 (defun konix/notmuch-read-and-archive ()
   (interactive)
-  (konix/notmuch-remove-tag "unread")
+  (konix/notmuch-remove-unread)
   (konix/notmuch-archive)
   )
 
@@ -1927,9 +1942,10 @@ inspired from `notmuch-show-archive-thread-internal'"
 	(rename-buffer "*notmuch-search-no-tag*")
 	)
   )
-(defun konix/notmuch-search-unflag-and-next ()
+(defun konix/notmuch-search-unflag-remove-read-and-next ()
   (interactive)
   (konix/notmuch-remove-tag "flagged")
+  (konix/notmuch-remove-unread)
   (next-line)
   )
 
@@ -1950,7 +1966,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 (konix/notmuch-define-key-search-show (kbd "C-f") 'konix/notmuch-toggle-flagged-tag)
 	 (konix/notmuch-define-key-search-show "u" 'konix/notmuch-toggle-unread-tag)
 	 (konix/notmuch-define-key-search-show (kbd "a") 'konix/notmuch-read-and-archive)
-	 (define-key notmuch-search-mode-map (kbd "F") 'konix/notmuch-search-unflag-and-next)
+	 (define-key notmuch-search-mode-map (kbd "F") 'konix/notmuch-search-unflag-remove-read-and-next)
 	 (define-key notmuch-show-mode-map (kbd "M") 'konix/notmuch-show-open-in-external-browser)
 	 (define-key notmuch-show-mode-map (kbd "F") 'konix/notmuch-show-unflag-and-next)
 	 (define-key notmuch-show-mode-map (kbd "U") 'konix/notmuch-show-read-delete-and-next)

@@ -8,6 +8,9 @@
 ;; Default font, simple, nice!!
 (set-default-font "Monospace 10")
 
+;; use the cua selection mode
+(cua-selection-mode 1)
+
 (defcustom konix/explorer "pcmanfm"
   "The program to launch when wanting to explore the file system"
 )

@@ -16,13 +16,14 @@ The first element of the list is the default context
 						  )
 				  )
 	)
+  (setq org-agenda-files konix/org-meta-contexts)
   (konix/org-meta-context/switch-to-context (first konix/org-meta-contexts) t)
   )
 
 (defun konix/org-meta-context/switch-to-context (name &optional force)
   (interactive
    (list
-	(completing-read "Wich context : " konix/org-meta-context/meta-contexts)
+	(completing-read "Wich context : " konix/org-meta-contexts)
 	)
    )
   (when (and (not force)
@@ -37,6 +38,9 @@ The first element of the list is the default context
   (setq org-directory name
 		org-agenda-diary-file (expand-file-name "diary.org" name)
 		)
+  (when konix/org-meta-context/restricted
+	(setq org-agenda-files (list org-directory))
+	)
   (message "Initialized %s context" name)
   )
 
@@ -77,6 +81,24 @@ The first element of the list is the default context
 (defun konix/org-meta-context/echo-current-context ()
   (interactive)
   (message "Current context is %s" org-directory)
+  )
+
+(setq konix/org-meta-context/restricted nil)
+(defun konix/org-meta-context/toggle-restrict ()
+  (interactive)
+  (if konix/org-meta-context/restricted
+	  (progn
+		(setq org-agenda-files konix/org-meta-contexts
+			  konix/org-meta-context/restricted nil
+			  )
+		)
+	(progn
+	  (setq org-agenda-files (list org-directory)
+			konix/org-meta-context/restricted t
+			)
+	  )
+	)
+  (message "Restriction is %s" konix/org-meta-context/restricted)
   )
 
 ;; ####################################################################################################

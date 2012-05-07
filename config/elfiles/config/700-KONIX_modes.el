@@ -1956,6 +1956,12 @@ inspired from `notmuch-show-archive-thread-internal'"
 (add-hook 'notmuch-hello-refresh-hook
 		  'konix/notmuch-hello-refresh-hook)
 
+(defun konix/notmuch-show-mark-read ()
+  "Mark the current message as read. (edited to remove also wontread)"
+  (konix/notmuch-remove-tag "wontread")
+  (konix/notmuch-remove-tag "unread")
+  )
+
 (eval-after-load "notmuch"
   '(progn
 	 (require 'notmuch-address)
@@ -1972,6 +1978,8 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 (define-key notmuch-show-mode-map (kbd "U") 'konix/notmuch-show-read-delete-and-next)
 	 (define-key notmuch-show-mode-map (kbd "<C-return>") 'w3m-view-url-with-external-browser)
 	 (define-key notmuch-hello-mode-map (kbd "N") 'konix/notmuch-search-no-tag)
+	 ;; redefine notmuch-show-mark-read so that it removes also the wontread tag
+	 (defalias 'notmuch-show-mark-read 'konix/notmuch-show-mark-read)
 	 )
   )
 

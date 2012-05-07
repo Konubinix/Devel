@@ -1293,7 +1293,7 @@ If with prefix ARG, invoke `ediff' instead of `diff'."
 	    (with-temp-file tmpb
 	      (insert str1))
 	    (condition-case nil
-		(diff tmpa tmpb nil 'no-async) ; for emacs 22.50 or later
+		(diff tmpa tmpb "-u" 'no-async) ; for emacs 22.50 or later
 	      (error
 	       ;; for emacs 21 or before
 	       (diff tmpa tmpb))))

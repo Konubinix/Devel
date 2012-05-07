@@ -2047,7 +2047,14 @@ inspired from `notmuch-show-archive-thread-internal'"
 (defun konix/icicles/unbind-icicle-occur ()
   (setq my-icicle-top-level-key-bindings
 		(mapcar (lambda (lst)
-				  (unless (string= "icicle-occur" (nth 1 lst)) lst))
+				  (unless
+					  (or
+					   (string= "icicle-occur" (nth 1 lst))
+					   (string= "icicle-imenu" (nth 1 lst))
+					   )
+					lst
+					)
+				  )
 				icicle-top-level-key-bindings))
   (setq icicle-top-level-key-bindings
 		my-icicle-top-level-key-bindings)

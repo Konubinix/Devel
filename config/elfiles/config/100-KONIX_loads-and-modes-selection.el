@@ -6,7 +6,6 @@
 ;; Libraries path
 ;; ************************************************************
 (add-to-list 'load-path (expand-file-name (concat elfiles "/ecb")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/notmuch")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/w3m")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/csharp")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/yasnippet")))
@@ -20,6 +19,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/cc-mode")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/rebox2")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/helm")))
+(add-to-list 'load-path (expand-file-name (concat devel-dir "/notmuch/emacs")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)

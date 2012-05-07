@@ -508,6 +508,7 @@
 (define-key 'konix/org-meta-context-map "e" 'konix/org-meta-context/echo-current-context)
 (define-key 'konix/org-meta-context-map "i" 'konix/org-meta-context/initialize)
 (define-key 'konix/org-meta-context-map "g" 'konix/org-meta-context/goto-root)
+(define-key 'konix/org-meta-context-map "t" 'konix/org-meta-context/toggle-restrict)
 
 (define-prefix-command 'konix/org-timer-map)
 (define-key 'konix/org-global-map (kbd "t") 'konix/org-timer-map)

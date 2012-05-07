@@ -144,7 +144,7 @@ cursor stays in the org buffer."
 			  )
 (setq-default org-agenda-diary-file (concat org-directory "/diary.org"))
 (setq-default org-agenda-include-all-todo nil)
-(setq-default org-agenda-include-diary t)
+(setq-default org-agenda-include-diary nil)
 (setq-default org-agenda-insert-diary-strategy (quote date-tree))
 ;; to have entries of type * 9pm stuff to timed entry
 (setq-default org-agenda-insert-diary-extract-time t)

@@ -282,11 +282,6 @@ cursor stays in the org buffer."
 (setq-default org-timer-default-timer 25)
 (setq-default org-tag-persistent-alist nil)
 (setq org-tag-alist '(("project" . ?p) ))
-(when (and (getenv "KONIX_PERSO_DIR")
-		   (not (boundp 'konix/org-meta-contexts))
-		   )
-  (setq-default konix/org-meta-contexts (list (expand-file-name "wiki" (getenv "KONIX_PERSO_DIR"))))
-  )
 (setq org-timer-timer-is-countdown nil)
 
 (setq-default org-todo-keywords

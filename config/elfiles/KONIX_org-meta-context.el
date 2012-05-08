@@ -18,6 +18,11 @@ The first element of the list is the default context
 	)
   (setq org-agenda-files konix/org-meta-contexts)
   (konix/org-meta-context/switch-to-context (first konix/org-meta-contexts) t)
+  (when (and (getenv "KONIX_PERSO_DIR")
+			 (not (boundp 'konix/org-meta-contexts))
+			 )
+	(setq-default konix/org-meta-contexts (list (expand-file-name "wiki" (getenv "KONIX_PERSO_DIR"))))
+	)
   )
 
 (defun konix/org-meta-context/switch-to-context (name &optional force)

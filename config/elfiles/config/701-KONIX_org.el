@@ -137,7 +137,7 @@ cursor stays in the org buffer."
 				  (org-agenda-overriding-header "Things to do (org-directory) :")
 				  )
 				 )
-				("r" todo "TO-READ" nil)
+				("r" todo "TO_READ" nil)
 				("b" tags "blocked" nil)
 				("d" tags "DOC" nil)
 				("c" tags "TO_CHECK" nil)

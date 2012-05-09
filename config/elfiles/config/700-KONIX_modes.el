@@ -231,6 +231,9 @@
   (local-set-key (kbd "C-h C-f") 'find-function)
   (local-set-key (kbd "C-h C-v") 'find-variable)
   (turn-on-eldoc-mode)
+  ;; (require 'button-lock)
+  ;; (button-lock-mode 1)
+  ;; (button-lock-set-button "(def[^(]+(" 'hs-toggle-hiding )
   )
 (add-hook 'lisp-mode-hook
 		  'konix/lisp-mode-hook)

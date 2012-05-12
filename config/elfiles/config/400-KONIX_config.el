@@ -8,7 +8,9 @@
 ;; Default font, simple, nice!!
 (set-default-font "Monospace 10")
 
-;; use the cua selection mode
+;; use the cua selection moden but set the cua-set-rectangle-mark on C-x r T
+;; instead of C-return
+(setq-default cua-rectangle-mark-key (kbd "C-x r T"))
 (cua-selection-mode 1)
 
 (defcustom konix/explorer "pcmanfm"

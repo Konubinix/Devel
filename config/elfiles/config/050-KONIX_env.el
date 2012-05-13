@@ -4,9 +4,13 @@
 ;; In order to have programs like git not to complain about the fact it is not a
 ;; valid terminal
 (setenv "PAGER" "cat")
-;; adapt the exec-path to fit the PATH env
-(setq-default exec-path (split-string (getenv "PATH") path-separator))
-;; check the env
+;; adapt the exec-path to merge with the PATH env
+;; include the PATH values before exec-path
+(setq-default exec-path (append
+						 (split-string (getenv "PATH") path-separator)
+						 exec-path
+						 ))
+;; TODO, remove duplicates from the exec-path
 (message "%s" (with-output-to-string
 				(with-current-buffer
 					standard-output

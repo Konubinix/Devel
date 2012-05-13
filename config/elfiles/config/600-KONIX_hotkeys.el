@@ -782,3 +782,10 @@
 (define-key konix/git-global-map-checkout (kbd "<down>") 'konix/git/checkout/parent)
 
 (global-set-key (kbd "C-< g") 'konix/git/command-with-completion)
+
+;;;;;;;;;;;;;;;;
+;; key chords ;;
+;;;;;;;;;;;;;;;;
+(require 'key-chord)
+(key-chord-mode 1)
+(key-chord-define-global ",;" 'info)

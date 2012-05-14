@@ -75,7 +75,7 @@
 		 (delta_line (konix/diff/_compute-delta-line (car diff_info) old_line_number))
 		 (start_diff_line (cdr diff_info))
 		 )
-	(- (+ delta_line (string-to-number start_diff_line)) 1)
+	(- (+ delta_line (string-to-number start_diff_line)) 2)
 	)
   )
 

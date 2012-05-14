@@ -155,7 +155,6 @@
   (setq tab-width 4)
   (konix/prog/config)
   ;; fed up with auto line breaks
-  (setq fill-column 8000)
   (setq indent-tabs-mode nil)
   (auto-complete-mode 1)
   (setq ac-sources

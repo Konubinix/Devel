@@ -1,3 +1,21 @@
+export COLOR_RESET=-1
+export COLOR_BLACK=0
+export COLOR_BLUE=4
+export COLOR_GREEN=2
+export COLOR_CYAN=6
+export COLOR_RED=1
+export COLOR_PURPLE=5
+export COLOR_BROWN=3
+export COLOR_LIGHT_GRAY=7
+export COLOR_DARK_GRAY=8
+export COLOR_LIGHT_BLUE=12
+export COLOR_LIGHT_GREEN=10
+export COLOR_LIGHT_CYAN=14
+export COLOR_LIGHT_RED=9
+export COLOR_LIGHT_PURPLE=13
+export COLOR_YELLOW=11
+export COLOR_WHITE=15
+
 SSH_AGENT_SOURCE=/tmp/ssh-agent-source
 
 function is_on_linux {
@@ -159,9 +177,29 @@ function trouve_KONIX {
 	find ./ -iname "*$file*"
 }
 
-function parse_git_branch {
-    ref=$(git symbolic-ref HEAD 2> /dev/null) || return
-    echo "("${ref#refs/heads/}")"
+function parse_git_branch
+{
+    git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(git:\1)/'
+}
+
+function parse_git_status
+{
+    notclean=`git status --porcelain 2> /dev/null | grep -E "^.(??|M|A|D|R|C|U)" | wc -l`
+
+    if [[ $notclean -gt 0 ]]; then echo -n "*"; fi
+}
+
+# SVN informations
+function parse_svn_revision
+{
+    revTot=`svn info 2>/dev/null | grep Révision | grep -v dernière | sed -e 's/.*: //'`
+    rev=`svn info 2>/dev/null | grep Révision | grep dernière | sed -e 's/.*: //'`
+    if [[ ! -z $rev ]]; then echo -n "(r$rev/r$revTot)"; fi
+}
+
+function parse_svn_status
+{
+    if [[ `svn status 2>/dev/null | wc -l` -gt 0 ]]; then echo -n "*"; fi
 }
 
 on_windows_p () {
@@ -218,23 +256,6 @@ konix_file_to_lines () {
 		fi
 	done
 }
-
-export COLOR_BLACK=0
-export COLOR_BLUE=4
-export COLOR_GREEN=2
-export COLOR_CYAN=6
-export COLOR_RED=1
-export COLOR_PURPLE=5
-export COLOR_BROWN=3
-export COLOR_LIGHT_GRAY=7
-export COLOR_DARK_GRAY=8
-export COLOR_LIGHT_BLUE=12
-export COLOR_LIGHT_GREEN=10
-export COLOR_LIGHT_CYAN=14
-export COLOR_LIGHT_RED=9
-export COLOR_LIGHT_PURPLE=13
-export COLOR_YELLOW=11
-export COLOR_WHITE=15
 
 konix_int_to_color() {
 #####################################################################################################

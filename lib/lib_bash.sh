@@ -344,6 +344,15 @@ konix_assert_last_command () {
 	fi
 }
 
+ccache_disable_toggle () {
+	if [ "$CCACHE_DISABLE" == "" ]
+	then
+		CCACHE_DISABLE=yes
+	else
+		unset CCACHE_DISABLE
+	fi
+}
+
 pinfo () {
 	echo "# $*" >&2
 }

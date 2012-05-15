@@ -456,14 +456,16 @@
 (setq-default calendar-holidays nil)
 
 (setq-default holiday-other-holidays nil)
+
 (setq-default holiday-local-holidays
 			  '(
 				(holiday-fixed 1 1 "Jour de l'an")
-				(holiday-float 4 1 1 "Lundi de Pâques")
+				(holiday-greek-orthodox-easter)
+				(holiday-easter-etc 39 "Ascension")
 				(holiday-fixed 5 1 "Fête du travail")
-				(holiday-fixed 5 8 "Victoire 1945")
+				(holiday-fixed 5 8 "Armistice 1945")
 				(holiday-fixed 7 14 "Fête Nationale")
-				(holiday-fixed 6 15 "Fête Assomption")
+				(holiday-fixed 8 15 "Fête Assomption")
 				(holiday-fixed 11 1 "Toussaint")
 				(holiday-fixed 11 11 "Armistice 1918")
 				(holiday-fixed 12 25 "Noël")

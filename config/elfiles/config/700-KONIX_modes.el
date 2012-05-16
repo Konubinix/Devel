@@ -2393,6 +2393,8 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 (defun konix/cmake-mode-hook ()
   (autopair-mode 1)
   (hs-minor-mode 1)
+  (setq konix/delete-trailing-whitespace t)
+  (setq konix/adjust-new-lines-at-end-of-file t)
   )
 (add-hook 'cmake-mode-hook
 		  'konix/cmake-mode-hook)

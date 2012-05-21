@@ -46,8 +46,8 @@ def getConfigFromEnvFile(envfile, previous_config):
         for key in items.keys():
             value = items[key]
             # first step is to make sure to correctly unquote the values
-            value = re.sub('^"(.*)"$', r"'\1'", value, flags=re.DOTALL)
-            value = re.sub("^'(.*)'$", r"\1", value, flags=re.DOTALL)
+            value = re.sub('^"(.*)"$', r"'\1'", value)
+            value = re.sub("^'(.*)'$", r"\1", value)
 
             env_value = DEFAULT_ENVIRON.get(key)
             if env_value == None:

@@ -554,51 +554,54 @@ cursor stays in the org buffer."
 ;; ####################################################################################################
 ;; ANNOTATE
 ;; ####################################################################################################
-(require 'org-annotate-file)
-(defun konix/org-annotate-file-is-annotated-p (filename)
-  (unless (or
-		   (and (boundp 'already_in_konix/org-annotate-file-is-annotated-p)
-				already_in_konix/org-annotate-file-is-annotated-p
+(require 'org-annotate-file nil t)
+(eval-after-load 'org-annotate-file
+  '(progn
+	 (defun konix/org-annotate-file-is-annotated-p (filename)
+	   (unless (or
+				(and (boundp 'already_in_konix/org-annotate-file-is-annotated-p)
+					 already_in_konix/org-annotate-file-is-annotated-p
+					 )
+				(equal (expand-file-name org-annotate-file-storage-file) (expand-file-name filename))
 				)
-		   (equal (expand-file-name org-annotate-file-storage-file) (expand-file-name filename))
+		 (let* (
+				(already_in_konix/org-annotate-file-is-annotated-p t)
+				(link (org-make-link-string (concat "file:" filename) filename))
+				(buffer_ (find-file-noselect org-annotate-file-storage-file))
+				(result nil)
+				)
+		   (unwind-protect
+			   (with-current-buffer buffer_
+				 (goto-char (point-min))
+				 (widen)
+				 (when org-annotate-file-always-open
+				   (show-all))
+				 (setq result (if (search-forward-regexp
+								   (concat "^* " (regexp-quote link)) nil t)
+								  t
+								nil
+								))
+				 )
+			 (kill-buffer buffer_)
+			 )
+		   result
 		   )
-	(let* (
-		   (already_in_konix/org-annotate-file-is-annotated-p t)
-		   (link (org-make-link-string (concat "file:" filename) filename))
-		   (buffer_ (find-file-noselect org-annotate-file-storage-file))
-		   (result nil)
-		   )
-	  (unwind-protect
-		  (with-current-buffer buffer_
-			(goto-char (point-min))
-			(widen)
-			(when org-annotate-file-always-open
-			  (show-all))
-			(setq result (if (search-forward-regexp
-							  (concat "^* " (regexp-quote link)) nil t)
-							 t
-						   nil
-						   ))
-			)
-		(kill-buffer buffer_)
-		)
-	  result
-	  )
-	)
-  )
+		 )
+	   )
+	 (defun konix/org-notify-if-annotated (&optional buffer-or-file)
+	   (if buffer-or-file
+		   (setq buffer-or-file (get-buffer buffer-or-file))
+		 (setq buffer-or-file (buffer-file-name))
+		 )
+	   (when (konix/org-annotate-file-is-annotated-p buffer-or-file)
+		 (konix/notify (format "File %s has annotation" filename))
+		 )
+	   )
 
-(defun konix/org-notify-if-annotated (&optional buffer-or-file)
-  (if buffer-or-file
-	  (setq buffer-or-file (get-buffer buffer-or-file))
-	(setq buffer-or-file (buffer-file-name))
-	)
-  (when (konix/org-annotate-file-is-annotated-p buffer-or-file)
-	(konix/notify (format "File %s has annotation" filename))
-	)
+	 (add-hook 'find-file-hook
+			   'konix/org-notify-if-annotated)
+	 )
   )
-
-(add-hook 'find-file-hook
-		  'konix/org-notify-if-annotated)
 
 ;; ####################################################################################################
 ;; Sync with google calendar

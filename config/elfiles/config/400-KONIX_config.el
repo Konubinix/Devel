@@ -463,6 +463,7 @@
 				(holiday-fixed 1 1 "Jour de l'an")
 				(holiday-greek-orthodox-easter)
 				(holiday-easter-etc 39 "Ascension")
+				(holiday-easter-etc 50 "Pentecote")
 				(holiday-fixed 5 1 "Fête du travail")
 				(holiday-fixed 5 8 "Armistice 1945")
 				(holiday-fixed 7 14 "Fête Nationale")

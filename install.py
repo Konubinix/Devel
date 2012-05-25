@@ -10,7 +10,10 @@ import subprocess
 import logging
 logging.basicConfig(level=logging.DEBUG)
 import tempfile
+def check_deps():
+    import argparse
 
+check_deps()
 # ####################################################################################################
 # Fill the environ variables
 # ####################################################################################################

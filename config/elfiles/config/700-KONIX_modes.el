@@ -2396,6 +2396,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
   (hs-minor-mode 1)
   (setq konix/delete-trailing-whitespace t)
   (setq konix/adjust-new-lines-at-end-of-file t)
+  (set (make-variable-buffer-local 'comment-start-skip) "^[ \\n\\r]*#+")
   )
 (add-hook 'cmake-mode-hook
 		  'konix/cmake-mode-hook)

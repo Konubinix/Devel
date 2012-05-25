@@ -671,18 +671,18 @@
 						  `(lambda (process string)
 							 (if (string-equal "finished\n" string)
 								 (progn
-		(with-current-buffer ,show_buffer
-		  (diff-mode)
-		  (setq default-directory ,(concat
-									(konix/git/_get-toplevel)
-									"/"
-									))
-		  (when ,when_done_hook
-			(funcall ,when_done_hook)
-			)
-		  )
-		(pop-to-buffer ,show_buffer)
-		)
+								   (with-current-buffer ,show_buffer
+									 (diff-mode)
+									 (setq default-directory ,(concat
+															   (konix/git/_get-toplevel)
+															   "/"
+															   ))
+									 (when ,when_done_hook
+									   (funcall ,when_done_hook)
+									   )
+									 )
+								   (pop-to-buffer ,show_buffer)
+								   )
 							   (display-warning 'show-warning
 												(format
 												 "Show exited abnormaly : '%s'"
@@ -692,7 +692,7 @@
 												)
 							   )
 							 )
-	 )
+						  )
 	)
   )
 
@@ -1320,9 +1320,17 @@ Uses the macro konix/git/status-buffer/next-or-previous
 (defun konix/git/status (&optional buffer_or_name)
   (interactive)
   (let* (
-		 (git_status_buffer_name (or buffer_or_name "*git status*"))
 		 (konix/git/status-process nil)
 		 (current-default-directory default-directory)
+		 (git_top_level (konix/git/_get-toplevel))
+		 (git_status_buffer_name
+		  (or
+		   buffer_or_name
+		   (format "*git status %s*"
+				   git_top_level
+				   )
+		   )
+		  )
 		 )
 	;; first, tries to erase the buffer content
 	(when (buffer-name (get-buffer git_status_buffer_name))

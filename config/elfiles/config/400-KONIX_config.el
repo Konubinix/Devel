@@ -312,8 +312,9 @@
 (setq-default visible-bell t)
 ;; Suppression de la scroll bar sur la gauche
 (put 'scroll-left 'disabled nil)
-;; default auto-fill
+;; default auto-fill columns are 80 and defaults to do nothing
 (setq-default fill-column 80)
+(setq-default auto-fill-function nil)
 ;; For the cursor to move naturally
 (setq-default line-move-visual t)
 ;; hide ifdef

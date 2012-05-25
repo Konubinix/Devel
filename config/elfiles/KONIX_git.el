@@ -1368,8 +1368,10 @@ Uses the macro konix/git/status-buffer/next-or-previous
 		(run-hooks 'konix/git/status-buffer/after-process-hooks)
 		)
 	  )
-	(pop-to-buffer git_status_buffer_name)
-	(delete-other-windows)
+	(if (get-buffer-window git_status_buffer_name)
+		(pop-to-buffer git_status_buffer_name)
+	  (switch-to-buffer git_status_buffer_name)
+	  )
 	)
   )
 

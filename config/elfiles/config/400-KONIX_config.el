@@ -370,7 +370,7 @@
 ;; ************************************************************
 ;; Lorsqu'on saisit un texte alors qu'une zone est sélectionnée, cette
 ;; dernière est écrasée par le texte saisi.
-(delete-selection-mode t)
+;;(delete-selection-mode -1)
 ;; Dictionnaire par défaut en français
 (setq-default ispell-dictionary "francais")
 ;; Le clique du milieu colle à l'emplacement du curseur de texte et

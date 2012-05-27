@@ -1396,7 +1396,7 @@
 ;; nXML mode
 ;; --------------------------------------------------------------------------------
 (setq-default nxml-bind-meta-tab-to-complete-flag t)
-(setq-default nxml-auto-insert-xml-declaration-flag t)
+(setq-default nxml-auto-insert-xml-declaration-flag nil)
 (setq-default nxml-child-indent 2)
 (setq-default nxml-end-tag-indent-scan-distance 400000)
 (setq-default nxml-heading-scan-distance nxml-end-tag-indent-scan-distance)

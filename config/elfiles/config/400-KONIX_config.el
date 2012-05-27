@@ -536,24 +536,6 @@
 (setq-default flyspell-use-meta-tab nil)
 
 ;; ####################################################################################################
-;; run-assoc
-;; ####################################################################################################
-(require 'run-assoc)
-(setq-default associated-program-alist
-			  '(
-				("epdfview" "\\.pdf$")
-				("lowriter" "\\.\\(odt\\|docx?\\)$")
-				("localc" "\\.\\(xlsx\\|csv\\|ods\\)$")
-				("evince" "\\.ps$")
-				("gimp" "\\.\\(png\\|jpg\\)$")
-				("qgis" "\\.shp$")
-				("vlc" "\\.mp3$")
-				("dia" "\\.dia$")
-				((lambda (file)
-				   (browse-url (concat "file:///" (expand-file-name file))))
-				 "\\.html?$"))
-			  )
-;; ####################################################################################################
 ;; diredful
 ;; ####################################################################################################
 (setq-default diredful-init-file (expand-file-name "diredful-conf.el" elfiles))

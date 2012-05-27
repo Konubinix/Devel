@@ -1,12 +1,22 @@
 ;; ################################################################################
 ;; General use function
 ;; ################################################################################
-
 (defvar konix/indirect-mode-name nil
   "Mode to set for indirect buffers.")
 (make-variable-buffer-local 'konix/indirect-mode-name)
 
 (defvar konix/mail_follow (expand-file-name "~/mail_follow") "")
+
+(defun konix/xdg-open (file)
+  "Open the selected file with xdg-open."
+  (interactive "ffile:")
+  (start-process
+   (format "xdg-open %s" file)
+   nil
+   "xdg-open"
+   file
+   )
+  )
 
 (defun konix/open-mail-follow ()
   (interactive)

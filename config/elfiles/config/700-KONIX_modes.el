@@ -780,11 +780,18 @@
 ;; --------------------------------------------------
 (require 'dired-x)
 (setq dired-omit-extensions (remove ".bin" dired-omit-extensions))
+
+(defun konix/dired-xdg-open ()
+  "Open the currectly selected file with xdg-open."
+  (interactive)
+  (konix/xdg-open (dired-get-filename))
+  )
 (defun konix/dired-mode-hook()
   ;; copy and paste in dired
   (auto-revert-mode 1)
   (dired-omit-mode t)
   (turn-on-tempbuf-mode)
+  (local-set-key (kbd "<C-return>") 'konix/dired-xdg-open)
   )
 (add-hook 'dired-mode-hook 'konix/dired-mode-hook)
 

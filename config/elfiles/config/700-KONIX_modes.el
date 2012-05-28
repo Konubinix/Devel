@@ -2310,6 +2310,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; Jabber
 ;; ####################################################################################################
 (setq-default jabber-history-enabled t)
+(setq-default jabber-chat-fill-long-lines nil)
 (defun konix/jabber-notify (from buffer text)
   (unless konix/chat-silent
 	(call-process "konix_display.py" nil nil nil (format "MESSAGE %s : %s" from

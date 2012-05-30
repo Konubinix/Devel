@@ -2399,6 +2399,9 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; ####################################################################################################
 ;; cmake
 ;; ####################################################################################################
+(defun konix/cmake-forward-sexp (&rest args)
+  (re-search-forward "endmacro(")
+  )
 (defun konix/cmake-mode-hook ()
   (autopair-mode 1)
   (hs-minor-mode 1)
@@ -2407,6 +2410,9 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
   (set (make-variable-buffer-local 'comment-start-skip) "^[ \\n\\r]*#+")
   (setq indent-tabs-mode nil)
   (konix/prog/config)
+  (setq hs-block-start-regexp "\\bmacro(")
+  (setq hs-block-end-regexp "\\bendmacro(")
+  (setq hs-forward-sexp-func 'konix/cmake-forward-sexp)
   )
 (add-hook 'cmake-mode-hook
 		  'konix/cmake-mode-hook)

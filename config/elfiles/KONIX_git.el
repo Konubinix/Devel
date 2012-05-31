@@ -1270,15 +1270,18 @@
 	)
   )
 
-(defun konix/git/status-sentinel(process string)
-  (if (string-equal "finished\n" string)
-	  (when (buffer-name (process-buffer process)) ;check the buffer is alive
-		(with-current-buffer (process-buffer process)
-		  (setq konix/git/status-buffer/ended t)
-		  (run-hooks 'konix/git/status-buffer/after-process-hooks)
-		  )
-		)
-	(konix/notify "Git status exited abnormaly")
+(defun konix/git/status-sentinel()
+  (run-hooks 'konix/git/status-buffer/after-process-hooks)
+  )
+
+(defun konix/git/status-sentinel_fail()
+  (konix/notify "Git status exited abnormaly")
+  )
+
+(defun konix/git/status-sentinel_final()
+  (if (get-buffer-window (current-buffer))
+	  (pop-to-buffer (current-buffer))
+	(switch-to-buffer (current-buffer))
 	)
   )
 
@@ -1348,7 +1351,6 @@ Uses the macro konix/git/status-buffer/next-or-previous
 	(setq git_status_buffer_name (get-buffer-create git_status_buffer_name))
 	;; Addition of a trace in the buffer in order to communicate with the sentinel
 	(with-current-buffer git_status_buffer_name
-	  (set (make-local-variable 'konix/git/status-buffer/ended) nil)
 	  (setq default-directory current-default-directory)
 	  )
 	(setq konix/git/status-process (start-process "git status"
@@ -1356,22 +1358,12 @@ Uses the macro konix/git/status-buffer/next-or-previous
 												  "git"
 												  "status"
 												  ))
-	(set-process-sentinel konix/git/status-process 'konix/git/status-sentinel)
-	;; if the process ended before the sentinel was put in place, I have to
-	;; handle that here
-	(with-current-buffer git_status_buffer_name
-	  (when (and
-			 (string-equal (process-status konix/git/status-process) "exit")
-			 (not konix/git/status-buffer/ended)
-			 )
-		;; the sentinel did not have time to setUp and the process ended
-		(run-hooks 'konix/git/status-buffer/after-process-hooks)
-		)
-	  )
-	(if (get-buffer-window git_status_buffer_name)
-		(pop-to-buffer git_status_buffer_name)
-	  (switch-to-buffer git_status_buffer_name)
-	  )
+	(konix/set-process-sentinel-exit-hook
+	 konix/git/status-process
+	 'konix/git/status-sentinel
+	 'konix/git/status-sentinel_fail
+	 'konix/git/status-sentinel_final
+	 )
 	)
   )
 

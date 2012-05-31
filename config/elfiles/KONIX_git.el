@@ -477,20 +477,49 @@
   (konix/git/command "reflog")
   )
 
+(defun konix/git/log/get/commit ()
+  (save-excursion
+	;; to match the commit at current line if the cursor is on a commit line
+	(goto-char (line-end-position))
+	(re-search-backward "^commit \\(.+\\)$")
+	(match-string 1)
+	)
+  )
+
+(defun konix/git/log/show ()
+  (interactive)
+  (let (
+		(commit (konix/git/log/get/commit))
+		)
+	(konix/git/show/commit commit commit)
+	)
+  )
+
 (defun konix/git/log (&optional history_size alog file)
   (interactive "P")
-  (let (
-		(history_cmd
-		 (if history_size (concat "-" (format "%s" history_size))
-		   ""))
-		(log_command (if alog "alog" "log"))
-		(file_cmd (if file (format "-- %s" file) ""))
-		)
+  (let* (
+		 (history_cmd
+		  (if history_size (concat "-" (format "%s" history_size))
+			""))
+		 (log_command (if alog "alog" "log"))
+		 (file_cmd (if file (format "-- %s" file) ""))
+		 (buffer_name (format "*Git Log%s*" (if file (concat " " file) "")))
+		 )
+	(konix/kill-and-new-buffer buffer_name)
 	(konix/git/command
 	 (format "%s %s %s" log_command history_cmd file_cmd)
 	 nil
-	 (format "*Git Log%s*" (if file (concat " " file) ""))
+	 buffer_name
 	 )
+	;; set up the log buffer
+	(with-current-buffer buffer_name
+	  (let (
+			(local_map (make-sparse-keymap))
+			)
+		(define-key local_map (kbd "=") 'konix/git/log/show)
+		(use-local-map local_map)
+		)
+	  )
 	)
   )
 

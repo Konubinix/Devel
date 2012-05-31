@@ -55,6 +55,30 @@
 	)
   )
 
+(defun konix/decorate-buffer (regexp keymap face &optional match-number)
+  """On all strings matching the rexexp, add the keymap and the face"""
+  (font-lock-add-keywords nil
+						  `(
+							(,regexp (if match-number match-number 0) ,face)
+							)
+						  )
+  (save-excursion
+	(goto-char 0)
+	(while (re-search-forward regexp nil t)
+	  (set-text-properties
+	   (match-beginning (if match-number match-number 0))
+	   (match-end (if match-number match-number 0))
+	   `(konix-matched-string
+		 ,(match-string (if match-number match-number 0))
+		 keymap ,keymap
+		 face ,face
+		 custom_elem t
+		 )
+	   )
+	  )
+	)
+  )
+
 (defun konix/xdg-open (file)
   "Open the selected file with xdg-open."
   (interactive "ffile:")

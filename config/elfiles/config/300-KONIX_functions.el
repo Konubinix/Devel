@@ -7,6 +7,54 @@
 
 (defvar konix/mail_follow (expand-file-name "~/mail_follow") "")
 
+(defun konix/process-sentinel-exit (process string)
+  (with-current-buffer (process-buffer process)
+	;;(debug)
+	(if (string-equal "finished\n" string)
+		(progn
+		  (setq process_ended t)
+		  (when end_hook
+			(funcall end_hook)
+			)
+		  )
+	  (when fail_hook
+		(funcall fail_hook)
+		)
+	  )
+	(when final_hook
+	  (funcall final_hook)
+	  )
+	)
+  )
+
+(defun konix/set-process-sentinel-exit-hook (process hook &optional fail_hook final_hook)
+  (let (
+		(buffer_ (process-buffer process))
+		)
+	(with-current-buffer buffer_
+	  (set (make-variable-buffer-local 'process_ended) nil)
+	  (set (make-variable-buffer-local 'end_hook) hook)
+	  (set (make-variable-buffer-local 'fail_hook) fail_hook)
+	  (set (make-variable-buffer-local 'final_hook) final_hook)
+	  (set-process-sentinel process 'konix/process-sentinel-exit)
+	  ;; if the process ended before the sentinel was put in place, I have to
+	  ;; handle that here
+	  (when (and
+			 ;; the process has exited
+			 (string-equal (process-status process) "exit")
+			 ;; and has not launched the sentinel
+			 (not process_ended)
+			 )
+		;; the sentinel did not have time to setUp and the process ended
+		(funcall hook)
+		(when final_hook
+		  (funcall final_hook)
+		  )
+		)
+	  )
+	)
+  )
+
 (defun konix/xdg-open (file)
   "Open the selected file with xdg-open."
   (interactive "ffile:")

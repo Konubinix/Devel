@@ -495,7 +495,7 @@
 	)
   )
 
-(defun konix/git/log (&optional history_size alog file)
+(defun konix/git/log (&optional history_size alog file custom_cmd)
   (interactive "P")
   (let* (
 		 (history_cmd
@@ -507,7 +507,8 @@
 		 )
 	(konix/kill-and-new-buffer buffer_name)
 	(konix/git/command
-	 (format "%s %s %s" log_command history_cmd file_cmd)
+	 (format "%s %s %s %s" log_command history_cmd file_cmd (if custom_cmd
+																custom_cmd ""))
 	 nil
 	 buffer_name
 	 )
@@ -537,6 +538,11 @@
 		)
 	(konix/git/log nil nil file)
 	)
+  )
+
+(defun konix/git/log/pick-axe (string)
+  (interactive "sString:")
+  (konix/git/log nil nil nil (format "-S'%s'" string))
   )
 
 (defun konix/git/cherry-pick ()

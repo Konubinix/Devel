@@ -157,7 +157,18 @@
 		 (delta_line (konix/diff/_compute-delta-line (car diff_info) old_line_number))
 		 (start_diff_line (cdr diff_info))
 		 )
-	(- (+ delta_line (string-to-number start_diff_line)) 2)
+	;; From something like
+	;; @@ -75,7 +75,7 @@
+	;;75  		 (delta_line (konix/diff/_compute-delta-line (car diff_info) old_line_number))
+	;;76  		 (start_diff_line (cdr diff_info))
+	;;77  		 )
+	;;78 -	(- (+ delta_line (string-to-number start_diff_line)) 1)
+	;;79 +	(- (+ delta_line (string-to-number start_diff_line)) 2)
+	;;
+	;; called on the 78th line, delta line is the number of lines from the @@ -75,7
+	;; +75,7 @@ line, its value is then 4. start_diff_line is 75. Then, the
+	;; return line must be 75 + 4 - 1 = 78
+	(- (+ delta_line (string-to-number start_diff_line)) 1)
 	)
   )
 

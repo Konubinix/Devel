@@ -771,7 +771,7 @@
 (define-key konix/git-global-map-branch "r" 'konix/git/branch/rename)
 
 (define-prefix-command 'konix/git-global-map-show)
-(define-key konix/git-global-map (kbd "C-s") 'konix/git-global-map-show)
+(define-key konix/git-global-map (kbd "h") 'konix/git-global-map-show)
 (define-key konix/git-global-map-show "c" 'konix/git/show)
 (define-key konix/git-global-map-show "o" 'konix/git/show/origin-commit-at-pos)
 

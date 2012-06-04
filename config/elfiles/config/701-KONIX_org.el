@@ -81,13 +81,10 @@ cursor stays in the org buffer."
   )
 (setq-default org-agenda-custom-commands
 			  '(
-				("W" "Important stuff"
+				("W" "Important stuff (all)"
 				 (
 				  (todo "WAIT")
 				  (todo nil)
-				  )
-				 (
-				  (org-agenda-files (konix/org-meta-context/return-restricted-agenda-files))
 				  )
 				 )
 				("y" "Yesterday time sheet"

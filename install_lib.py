@@ -98,6 +98,9 @@ def substitute (src, dst):
                         action = shutil.copytree
                 else:
                         action = shutil.copyfile
+        # make sure the parent directory exists
+        if not os.path.isdir(os.path.dirname(dst)):
+                os.makedirs(os.path.dirname(dst))
         print action.__name__,src,"to",dst
         action(src,dst)
 

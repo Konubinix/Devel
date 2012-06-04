@@ -1,0 +1,25 @@
+#	window_state =
+[global_config]
+	dbus=True
+	focus=sloppy
+	window_state=maximise
+[profiles]
+ [[default]]
+	audible_bell=True
+	visible_bell=True
+	urgent_bell=True
+	icon_bell=True
+	background_type=transparent
+	background_darkness=0.8
+	color_scheme=green_on_black
+	emulation=xterm
+	use_system_font=True
+	scroll_on_keystroke=True
+	scroll_on_output=False
+	alternate_screen_scroll=True
+	scrollback_lines=10000
+	scrollback_infinite=False
+	focus_on_close=auto
+	mouse_autohide=True
+	encoding=UTF-8
+	copy_on_selection=True

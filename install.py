@@ -52,8 +52,9 @@ substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "Makefile"),   os.path.join
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "gitk"),       os.path.join(environ["HOME"], ".gitk"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "inputrc"),    os.path.join(environ["HOME"], ".inputrc"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "B.blend"),    os.path.join(environ["HOME"], ".B.blend"))
-substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "screenrc"),    os.path.join(environ["HOME"], ".screenrc"))
+substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "screenrc"),   os.path.join(environ["HOME"], ".screenrc"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "vimrc"),      os.path.join(environ["HOME"], ".vimrc"))
+substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "terminator"), os.path.join(environ["HOME"], ".config/terminator/config"))
 
 if is_on_linux():
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "fluxbox"),   os.path.join(environ["HOME"], ".fluxbox"))

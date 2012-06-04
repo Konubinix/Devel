@@ -1700,7 +1700,6 @@ immediately after the section's start-tag."
 
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
-  (turn-on-tempbuf-mode)
   (auto-fill-mode t)
   (autopair-mode 1)
   (setq show-trailing-whitespace t)

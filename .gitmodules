@@ -28,3 +28,6 @@
 [submodule "config/elfiles/helm"]
 	path = config/elfiles/helm
 	url = https://github.com/emacs-helm/helm.git
+[submodule "config/elfiles/keyfreq"]
+	path = config/elfiles/keyfreq
+	url = https://github.com/jasonblewis/keyfreq.el.git

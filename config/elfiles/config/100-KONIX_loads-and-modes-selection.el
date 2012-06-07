@@ -20,6 +20,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/rebox2")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/helm")))
 (add-to-list 'load-path (expand-file-name (concat devel-dir "/notmuch/emacs")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/keyfreq")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)

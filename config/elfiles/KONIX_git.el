@@ -741,6 +741,7 @@
 		(regexp-quote line_to_search)
 		;;		 )
 		)
+  (message "Showing commit %s" commit)
   (konix/git/show commit
 				  `(lambda ()
 					 (goto-char 0)
@@ -761,17 +762,21 @@
   (interactive)
   (if (eq major-mode 'diff-mode)
 	  (konix/git/diff/show-origin-commit)
-	(konix/git/show/commit
-	 (konix/git/_get-origin-commit
-	  (buffer-file-name)
-	  (konix/line-number-at-pos-widen)
-	  "HEAD"
+	(let (
+		  (origin_commit (konix/git/_get-origin-commit
+						  (buffer-file-name)
+						  (konix/line-number-at-pos-widen)
+						  "HEAD"
+						  ))
+		  )
+	  (konix/git/show/commit
+	   origin_commit
+	   (buffer-substring-no-properties
+		(save-excursion (beginning-of-line) (point))
+		(save-excursion (end-of-line) (point))
+		)
+	   )
 	  )
-	 (buffer-substring-no-properties
-	  (save-excursion (beginning-of-line) (point))
-	  (save-excursion (end-of-line) (point))
-	  )
-	 )
 	)
   )
 

@@ -753,10 +753,10 @@
   (push-tag-mark)
   (condition-case error_value
 	  (semantic-analyze-proto-impl-toggle)
-	  (error
-	   (pop-tag-mark)
-	   (error "%s" error_value)
-	   )
+	(error
+	 (pop-tag-mark)
+	 (error "%s" error_value)
+	 )
 	)
   )
 
@@ -1840,13 +1840,13 @@ immediately after the section's start-tag."
 		(when toggle_tag
 		  (konix/notmuch-add-tag toggle_tag)
 		  )
-	   )
+		)
 	(progn
-	 (konix/notmuch-add-tag tag)
-	 (when toggle_tag
-	   (konix/notmuch-remove-tag toggle_tag)
-	   )
-	 )
+	  (konix/notmuch-add-tag tag)
+	  (when toggle_tag
+		(konix/notmuch-remove-tag toggle_tag)
+		)
+	  )
 	)
   )
 (defun konix/notmuch-toggle-deleted-tag ()
@@ -1859,7 +1859,13 @@ immediately after the section's start-tag."
   )
 (defun konix/notmuch-toggle-unread-tag (&optional no_wontread)
   (interactive "P")
-  (konix/notmuch-toggle-tag "unread" (if no_wontread nil "wontread"))
+  (konix/notmuch-toggle-tag
+   "unread"
+   (if (or no_wontread
+		   (eq major-mode 'notmuch-show-mode))
+	   nil
+	 "wontread")
+   )
   )
 (defun konix/notmuch-toggle-inbox-tag ()
   (interactive)
@@ -2235,7 +2241,7 @@ Additional support for inhibiting one activation (quick hack)"
 	  (progn
 		(konix/erc-tray-change-state-aux arg)
 		(setq konix/chat-old-notif arg)
-	   )
+		)
 	  )
 	)
   )

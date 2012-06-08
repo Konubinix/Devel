@@ -14,7 +14,9 @@ MDP_DIR = os.path.join(KONIX_PERSO_DIR, "mdp_nd")
 MDP_FILES = os.listdir(MDP_DIR)
 MDP_FILES.sort()
 
-def ask_for_mdp_file(mdp_files):
+def ask_for_mdp_file(mdp_files, filters=[]):
+    for filte in filters:
+        mdp_files = [fil for fil in mdp_files if filte in fil]
     if len(mdp_files) == 1:
         return mdp_files[0]
     elif len(mdp_files) == 0:
@@ -34,7 +36,7 @@ if len(MDP_FILES) == 1:
     print "There is only one mdp file : "+MDP_FILES[0]+", it will be used"
     mdp_file_name = MDP_FILES[0]
 else:
-    mdp_file_name = ask_for_mdp_file(MDP_FILES)
+    mdp_file_name = ask_for_mdp_file(MDP_FILES, sys.argv[1:])
 
 if mdp_file_name is None:
     print "No mdp file found"

@@ -8,11 +8,6 @@
 ;; Default font, simple, nice!!
 (set-default-font "Monospace 10")
 
-;; use the cua selection moden but set the cua-set-rectangle-mark on C-x r T
-;; instead of C-return
-(setq-default cua-rectangle-mark-key (kbd "C-x r T"))
-(cua-selection-mode 1)
-
 (defcustom konix/explorer "pcmanfm"
   "The program to launch when wanting to explore the file system"
 )
@@ -305,7 +300,12 @@
 (column-number-mode t)
 (line-number-mode t)
 ;; Mise en surbrillance de la zone sélectionnée
-(transient-mark-mode 1)
+;; (transient-mark-mode 1)
+;; use the cua selection moden but set the cua-set-rectangle-mark on C-x r T
+;; instead of C-return. transient-mark-mode must not be activated before cua
+(setq-default cua-rectangle-mark-key (kbd "C-x r T"))
+(cua-selection-mode 1)
+
 ;; on change le nom de la fenetre par le nom du fichier edité
 (setq frame-title-format '("konix_emacs: %b (%f)"))
 ;;pour que ca ne fasse pas bip !

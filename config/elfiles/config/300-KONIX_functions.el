@@ -136,7 +136,7 @@
 		)
 	(save-excursion
 	  (goto-line start)
-	  (while (re-search-forward "^\\+.+$" end_point t)
+	  (while (re-search-forward "^\\+.*$" end_point t)
 		(setq delta_line (- delta_line 1))
 		)
 	  )

@@ -31,3 +31,6 @@
 [submodule "config/elfiles/keyfreq"]
 	path = config/elfiles/keyfreq
 	url = https://github.com/jasonblewis/keyfreq.el.git
+[submodule "config/elfiles/jabber"]
+	path = config/elfiles/jabber
+	url = git://emacs-jabber.git.sourceforge.net/gitroot/emacs-jabber/emacs-jabber

@@ -12,11 +12,23 @@ tee "${HOME}/konix_view_html.msg" | {
 
 	cat "$@" > "$dir"/msg
 
-	if munpack -C "$dir" -t < "$dir"/msg 2>&1 | tee "${OUT_FILE}" | grep -q 'Did not find'
+	# Adjust the content-id stuffs. If there is an attachment with something
+	# like that
+	# Content-Type: TYPE; name="FILE"
+	# ...
+	# Content-ID: <A>
+	#
+	# CONTENT
+	#
+	# And somewhere in the mail something like cid:A, I must replace it by the
+	# associated FILE name
+	cat "$dir"/msg | _konix_mail_content_id_adjust.py  > "$dir"/msg2
+
+	if munpack -C "$dir" -t < "$dir"/msg2 2>&1 | tee "${OUT_FILE}" | grep -q 'Did not find'
 	then
 	    # failed to unpack the mail, try to do it manually
-		sed -n '/[Hh][Tt][Mm][Ll]/,$p' "$dir"/msg > $dir/part1.html
-		rm "$dir"/msg
+		sed -n '/[Hh][Tt][Mm][Ll]/,$p' "$dir"/msg2 > $dir/part1.html
+		rm "$dir"/msg2
 	else
 		echo "Successfully munpacked msg" >> "${OUT_FILE}"
 		# rename the partN file to get partN.content_type

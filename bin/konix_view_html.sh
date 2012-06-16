@@ -19,18 +19,25 @@ tee "${HOME}/konix_view_html.msg" | {
 		rm "$dir"/msg
 	else
 		echo "Successfully munpacked msg" >> "${OUT_FILE}"
+		# rename the partN file to get partN.content_type
+		sed -n '
+/part.\+ (text\// {
+   s/\(part.\+\) (text\/\(.\+\))/\1 \2/
+   p
+}
+' < ${OUT_FILE} | while read line
+		do
+			set $line
+			mv "${dir}/$1" "${dir}/$1.$2"
+		done
 	fi
 	if ! ls "$dir" |grep -q part
 	then
 		echo "nothing found munpacked" >> "${OUT_FILE}"
 	fi
-	for i in "$dir"/part*; do
-		if grep -q -i -e '<html>' -e 'text/html' "$i"; then
-			x-www-browser "$i" &
-			sleep 3
-			exit 0
-		else
-			echo "No html part in $i" >> "$OUT_FILE"
-		fi
+	for i in "$dir"/part*.html; do
+		x-www-browser "$i" &
+		sleep 3
+		exit 0
 	done
 }

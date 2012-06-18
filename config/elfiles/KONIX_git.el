@@ -460,6 +460,11 @@
   (konix/git/command-to-string (concat "branch " cmd))
   )
 
+(defun konix/git/branch/add (branch_name)
+  (interactive "sBranch name:")
+  (konix/git/command-to-string (concat "branch " branch_name))
+  )
+
 (defun konix/git/branch/delete (branch)
   (interactive
    (konix/git/completing-read-refs "git branch -D " nil t)

@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# TODO, handle the case where several package have the same file, like in
-# gnuplot-x11, gnuplot-nox: /usr/bin/gnuplot
-
 ORPHANS="orphans"
 PROBLEMS="probs"
 SEEN_FILES="seen_files"
@@ -10,21 +7,30 @@ SEEN_PACKAGES="seen_packages"
 > "$ORPHANS"
 > "$SEEN_PACKAGES"
 > "$SEEN_FILES"
-APT_FILE_REGEXP="^\(.\+, \)\?\([^,]\+\): \(/.\+\)$"
+APT_FILE_REGEXP="^\(.\+\): \(/.\+\)$"
 IFS=$'\n'
 
-package () {
-	RES="$(echo "$*" | sed "s-${APT_FILE_REGEXP}-\2-")"
+packages () {
+	RES="$(echo "$*" | sed "s-${APT_FILE_REGEXP}-\1-"|sed "s/, /\n/")"
 }
 
 file () {
-	RES="$(echo "$*" | sed "s-${APT_FILE_REGEXP}-\3-")"
+	RES="$(echo "$*" | sed "s-${APT_FILE_REGEXP}-\2-")"
+}
+
+encode () {
+	echo "$*" | base64
+}
+
+decode () {
+	echo "$*" | base64 -d
 }
 
 #apt-file update
 find "$1" -type f | while read file
 do
-	if grep -q "^${file}$" "$SEEN_FILES"
+	ENCODED_FILE=$(encode "${file}")
+	if grep -q "^${ENCODED_FILE}$" "$SEEN_FILES"
 	then
 		# already dealt with this file
 		continue
@@ -46,17 +52,22 @@ do
 		INFO="$(echo "$INFO"|tail -1)"
 		echo "Using only the info $INFO">&2
 	fi
-	package "$INFO"
-	PACKAGE="$RES"
-	if grep -q -e "^${PACKAGE}$" "$SEEN_PACKAGES"
-	then
-		echo "package $PACKAGE already seen, this is a bug">&2
-		exit 1
-	fi
-	# the package has already been dealt with
-	echo "$PACKAGE" >> "$SEEN_PACKAGES"
-	file "$INFO"
-	FILE="$RES"
-	# add the files of the package to the seen files
-	dpkg -L "${PACKAGE}" >> "$SEEN_FILES"
+	packages "$INFO"
+	for PACKAGE in $RES
+	do
+		ENCODED_PACKAGE="$(encode "$PACKAGE")"
+		if grep -q -e "^${ENCODED_PACKAGE}$" "$SEEN_PACKAGES"
+		then
+			echo "package $PACKAGE (${ENCODED_PACKAGE}) already seen, this is a bug">&2
+			exit 1
+		fi
+     	# the package has already been dealt with
+		echo "$ENCODED_PACKAGE" >> "$SEEN_PACKAGES"
+    	# add the files of the package to the seen files
+		PACKAGE_FILES="$(dpkg -L "${PACKAGE}")"
+		for package_file in ${PACKAGE_FILES}
+		do
+			encode "${package_file}" >> "$SEEN_FILES"
+		done
+	done
 done

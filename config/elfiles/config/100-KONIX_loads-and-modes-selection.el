@@ -155,7 +155,7 @@
 ;; .dot -> graphviz-dot-mode
 (add-to-list 'auto-mode-alist (cons "\\.dot$" 'graphviz-dot-mode))
 ;; .vb -> visual-basic-mode
-(add-to-list 'auto-mode-alist (cons "\\.vb$" 'visual-basic-mode))
+(add-to-list 'auto-mode-alist (cons "\\.vbs?$" 'visual-basic-mode))
 ;; mutt files in mail mode
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 (add-to-list 'auto-mode-alist '("/Mail/" . message-mode))

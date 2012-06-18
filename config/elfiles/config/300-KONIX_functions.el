@@ -7,6 +7,11 @@
 
 (defvar konix/mail_follow (expand-file-name "~/mail_follow") "")
 
+(defun konix/change-directory (directory)
+  (interactive "DDirectory:")
+  (setq default-directory directory)
+  )
+
 (defun konix/process-sentinel-exit (process string)
   (with-current-buffer (process-buffer process)
 	;;(debug)

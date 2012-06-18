@@ -2301,6 +2301,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 		(unless (or (eq 'erc-mode (buffer-local-value 'major-mode (car blist)))
 					(minibufferp (car blist))
 					(string-match "^ " (buffer-name (car blist))))
+		  (bury-buffer)
 		  (switch-to-buffer (car blist))
 		  (setq blist nil))
 		(setq blist (cdr blist)))

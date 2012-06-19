@@ -179,7 +179,12 @@ function trouve_KONIX {
 
 function parse_git_branch
 {
-    git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(git:\1)/'
+    git branch --no-color 2> /dev/null | sed -n -e '
+/^*/ {
+s/* \(.*\)/(git:\1)/
+p
+}
+'
 }
 
 function parse_git_status

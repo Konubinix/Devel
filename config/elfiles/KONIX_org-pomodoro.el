@@ -139,6 +139,7 @@
 	)
   (konix/org-pomodoro-set-bookmark)
   (when (y-or-n-p "Go in the entry (to clock it in etc...) ?")
+	(beginning-of-line)
 	(org-open-at-point)
 	)
   (konix/org-pomodoro-tray-daemon-put "i")

@@ -100,7 +100,7 @@ cursor stays in the org buffer."
 				("c" "Weekly schedule" agenda ""
 				 (
 				  (org-agenda-start-day 'org-today)
-				  (org-agenda-span 7)
+				  (org-agenda-span 14)
 				  (org-agenda-repeating-timestamp-show-all t)
 				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
 																	   'scheduled)

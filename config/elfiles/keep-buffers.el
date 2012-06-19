@@ -120,16 +120,20 @@ If the CDR is nil, then the buffer is only buried."
 ;;;###autoload
 (defun keep-buffers-query ()
   "The query function that disable deletion of buffers we protect."
-  (let ((crit (dolist (crit keep-buffers-protected-alist)
-                (when (string-match (car crit) (buffer-name))
-                  (return crit)))))
-    (if crit
-        (progn
-          (when (cdr crit)
-            (erase-buffer))
-          (bury-buffer)
-          nil)
-      t)))
+  (if current-prefix-arg
+	  ;; kill the buffer if the prefix arg is given
+	  t
+	(let ((crit (dolist (crit keep-buffers-protected-alist)
+				  (when (string-match (car crit) (buffer-name))
+					(return crit)))))
+	  (if crit
+		  (progn
+			(when (cdr crit)
+			  (erase-buffer))
+			(bury-buffer)
+			nil)
+		t))
+	))
 
 
 (provide 'keep-buffers)

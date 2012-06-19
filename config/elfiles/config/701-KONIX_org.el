@@ -81,15 +81,9 @@ cursor stays in the org buffer."
   )
 (setq-default org-agenda-custom-commands
 			  '(
-				("W" "Important stuff (all)"
-				 (
-				  (todo "WAIT")
-				  (todo nil)
-				  )
-				 )
 				("y" "Yesterday time sheet"
 				 (
-				  (agenda)
+				  (agenda nil)
 				  )
 				 (
 				  (org-agenda-start-day 'konix/org-yesterday)
@@ -123,7 +117,7 @@ cursor stays in the org buffer."
 				  (todo)
 				  )
 				 )
-				("w" "Agenda and wait (org-directory)"
+				("W" "Agenda and wait (org-directory)"
 				 (
 				  (todo "WAIT")
 				  (agenda nil)
@@ -132,6 +126,13 @@ cursor stays in the org buffer."
 				 (
 				  (org-agenda-files (list org-directory))
 				  (org-agenda-overriding-header "Things to do (org-directory) :")
+				  )
+				 )
+				("w" "Agenda and wait (all)"
+				 (
+				  (todo "WAIT")
+				  (agenda nil)
+				  (todo nil)
 				  )
 				 )
 				("r" todo "TO_READ" nil)

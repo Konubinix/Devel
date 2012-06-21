@@ -5,7 +5,7 @@
 (defun konix/org-load-hook()
   ;; better dimmed org agenda face
   (set-face-attribute 'org-agenda-dimmed-todo-face nil
-					  :foreground "orange3"
+					  :foreground "OrangeRed4"
 					  )
   ;; With remember
   (org-remember-insinuate)

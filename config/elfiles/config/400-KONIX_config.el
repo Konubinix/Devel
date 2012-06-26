@@ -552,3 +552,10 @@
 (require 'keyfreq)
 (keyfreq-mode 1)
 (keyfreq-autosave-mode 1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; mic paren, a substitute for the normal paren matching but better. It ;;
+;; matches \( \) for instance                                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'mic-paren)
+(paren-activate)

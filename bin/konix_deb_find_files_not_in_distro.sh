@@ -58,7 +58,7 @@ do
 		ENCODED_PACKAGE="$(encode "$PACKAGE")"
 		if grep -q -e "^${ENCODED_PACKAGE}$" "$SEEN_PACKAGES"
 		then
-			echo "package $PACKAGE (${ENCODED_PACKAGE}) already seen, this is a bug">&2
+			echo "package $PACKAGE (${ENCODED_PACKAGE}) already seen, this is a bug">>&2
 			exit 1
 		fi
      	# the package has already been dealt with

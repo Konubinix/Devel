@@ -4,9 +4,34 @@ ORPHANS="orphans"
 PROBLEMS="probs"
 SEEN_FILES="seen_files"
 SEEN_PACKAGES="seen_packages"
-> "$ORPHANS"
-> "$SEEN_PACKAGES"
-> "$SEEN_FILES"
+
+usage () {
+	cat<<EOF
+$0 [-h|-c]
+-h show this help and exits
+-c continue: do not erase the results files and use them
+EOF
+}
+CONTINUE=0
+while getopts "hc" opt; do
+	case $opt in
+		h)
+			usage
+			exit 0
+			;;
+		c)
+			CONTINUE=1
+			;;
+	esac
+done
+
+if [ "$CONTINUE" == "0" ]
+then
+	> "$ORPHANS"
+	> "$SEEN_PACKAGES"
+	> "$SEEN_FILES"
+fi
+
 APT_FILE_REGEXP="^\(.\+\): \(/.\+\)$"
 IFS=$'\n'
 

@@ -77,6 +77,7 @@ do
 	then
 		echo "$file ORPHAN !!"
 		echo "$file" >> "$ORPHANS"
+		encode "$file" >> "$SEEN_FILES"
 		continue
 	fi
 	echo "${INFO}" >&2

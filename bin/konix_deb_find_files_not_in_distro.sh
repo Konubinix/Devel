@@ -7,13 +7,15 @@ SEEN_PACKAGES="seen_packages"
 
 usage () {
 	cat<<EOF
-$0 [-h|-c]
+$0 [-h|-c] -d <directory>
 -h show this help and exits
 -c continue: do not erase the results files and use them
+-d where to look for files
 EOF
 }
 CONTINUE=0
-while getopts "hc" opt; do
+DIRECTORY=""
+while getopts "hcd:" opt; do
 	case $opt in
 		h)
 			usage
@@ -22,8 +24,17 @@ while getopts "hc" opt; do
 		c)
 			CONTINUE=1
 			;;
+		d)
+			DIRECTORY="$OPTARG"
+			;;
 	esac
 done
+
+if [ -z "$DIRECTORY" ]
+then
+	usage
+	exit 1
+fi
 
 if [ "$CONTINUE" == "0" ]
 then
@@ -52,7 +63,7 @@ decode () {
 }
 
 #apt-file update
-find "$1" -type f | while read file
+find "$DIRECTORY" -type f | while read file
 do
 	ENCODED_FILE=$(encode "${file}")
 	if grep -q "^${ENCODED_FILE}$" "$SEEN_FILES"

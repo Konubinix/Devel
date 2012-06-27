@@ -84,7 +84,7 @@ do
 	if ! echo "${_nb_lines}"|grep -q "^1$"
 	then
 		echo "$INFO, got with dpkg -S $file,\
- contains more than one line, this may be a bug"|tee "$PROBLEMS">&2
+ contains more than one line, this may be a bug"|tee -a "$PROBLEMS">&2
 		INFO="$(echo "$INFO"|tail -1)"
 		echo "Using only the info $INFO">&2
 	fi
@@ -94,7 +94,7 @@ do
 		ENCODED_PACKAGE="$(encode "$PACKAGE")"
 		if grep -q -e "^${ENCODED_PACKAGE}$" "$SEEN_PACKAGES"
 		then
-			echo "package $PACKAGE (${ENCODED_PACKAGE}) already seen, this is a bug">>&2
+			echo "package $PACKAGE (${ENCODED_PACKAGE}) already seen, this is a bug">&2
 			exit 1
 		fi
      	# the package has already been dealt with

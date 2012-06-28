@@ -2407,15 +2407,19 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; ####################################################################################################
 ;; cmake
 ;; ####################################################################################################
+(defvar konix/cmake-beginning-of-defun "\\bmacro(\\|\\bfunction(" "")
+(defvar konix/cmake-end-of-defun "\\bend\\(macro\\|function\\)([^)]*)" "")
+
 (defun konix/cmake-forward-sexp (&rest args)
-  (re-search-forward "endmacro(")
+  (re-search-forward konix/cmake-end-of-defun)
   )
 (defun konix/cmake-beginning-of-defun ()
-  (re-search-backward "\\bmacro(")
+  (re-search-backward konix/cmake-beginning-of-defun)
   )
 (defun konix/cmake-end-of-defun ()
-  (re-search-forward "\\bendmacro([^)]*)")
+  (re-search-forward konix/cmake-end-of-defun)
   )
+
 (defun konix/cmake-mode-hook ()
   (autopair-mode 1)
   (hs-minor-mode 1)
@@ -2425,8 +2429,8 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
   (setq konix/adjust-new-lines-at-end-of-file t)
   (set (make-variable-buffer-local 'comment-start-skip) "^[ \\n\\r]*#+")
   (setq indent-tabs-mode nil)
-  (setq hs-block-start-regexp "\\bmacro(")
-  (setq hs-block-end-regexp "\\bendmacro(")
+  (setq hs-block-start-regexp konix/cmake-beginning-of-defun)
+  (setq hs-block-end-regexp konix/cmake-end-of-defun)
   (setq hs-forward-sexp-func 'konix/cmake-forward-sexp)
   (set (make-variable-buffer-local 'beginning-of-defun-function)
 	   'konix/cmake-beginning-of-defun)

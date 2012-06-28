@@ -558,4 +558,5 @@
 ;; matches \( \) for instance                                           ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'mic-paren)
+(setq-default paren-bind-modified-sexp-functions nil)
 (paren-activate)

@@ -2059,7 +2059,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 ;; ******************************************************************************************
 ;; Org mode with icicle (took from http://www.emacswiki.org/emacs/Icicles_-_Key_Binding_Discussion)
 ;; ******************************************************************************************
-(defun konix/icicles/unbind-icicle-occur ()
+(defun konix/icicles/unbind-icicle-commands ()
   (setq my-icicle-top-level-key-bindings
 		(mapcar (lambda (lst)
 				  (unless
@@ -2077,7 +2077,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 
 (defun konix/icicle-mode-hook ()
   (when icicle-mode
-	(konix/icicles/unbind-icicle-occur)
+	(konix/icicles/unbind-icicle-commands)
 	)
   )
 

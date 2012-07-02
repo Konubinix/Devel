@@ -43,7 +43,7 @@ then
 	> "$SEEN_FILES"
 fi
 
-APT_FILE_REGEXP="^\(.\+\): \(/.\+\)$"
+APT_FILE_REGEXP="^\([^:]\+\).*: \(/.\+\)$"
 IFS=$'\n'
 
 packages () {

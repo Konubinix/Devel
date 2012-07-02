@@ -102,6 +102,11 @@ do
 		echo "$ENCODED_PACKAGE" >> "$SEEN_PACKAGES"
     	# add the files of the package to the seen files
 		PACKAGE_FILES="$(dpkg -L "${PACKAGE}")"
+		if [ "$?" != "0" ]
+		then
+			echo "dpkg -L ${PACKAGE} failed, this is a bug">&2
+			exit 1
+		fi
 		for package_file in ${PACKAGE_FILES}
 		do
 			encode "${package_file}" >> "$SEEN_FILES"

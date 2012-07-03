@@ -524,9 +524,13 @@ cursor stays in the org buffer."
   )
 (add-hook 'org-mode-hook 'konix/org-mode-hook)
 
+(defun konix/org-agenda-to-appt-filter (entry)
+  (not (string-match "no_appt" entry))
+  )
+
 (defun konix/org-agenda-mode-hook()
   (hl-line-mode t)
-  (org-agenda-to-appt)
+  (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
   (appt-check)
   )
 (add-hook 'org-agenda-mode-hook 'konix/org-agenda-mode-hook)

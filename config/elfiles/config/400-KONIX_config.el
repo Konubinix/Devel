@@ -560,3 +560,12 @@
 (require 'mic-paren)
 (setq-default paren-bind-modified-sexp-functions nil)
 (paren-activate)
+
+(when (string-match
+	   "linux"
+	   (getenv "KONIX_PLATFORM")
+	   )
+  (setq explicit-shell-file-name "bash")
+  (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
+  (setq comint-process-echoes t)
+  )

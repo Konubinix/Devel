@@ -664,11 +664,22 @@
 (defun konix/shell-mode-hook ()
   (compilation-shell-minor-mode)
   (auto-complete-mode t)
-  (setq ac-sources '(
-					 ac-source-yasnippet
-					 ac-source-files-in-current-dir
-					 ac-source-filename
-					 ))
+  (if (string-match
+	   "linux"
+	   (getenv "KONIX_PLATFORM")
+	   )
+	  (setq ac-sources '(
+						 ac-source-shell
+						 ;; ac-source-yasnippet
+						 ;; ac-source-files-in-current-dir
+						 ;; ac-source-filename
+						 ))
+	(setq ac-sources '(
+					   ac-source-yasnippet
+					   ac-source-files-in-current-dir
+					   ac-source-filename
+					   ))
+	)
   (local-set-key (kbd "<S-return>") 'newline)
   (ansi-color-for-comint-mode-on)
   (font-lock-add-keywords nil konix/shell-font-lock-keywords)
@@ -676,13 +687,6 @@
   (ansi-color-for-comint-mode-on)
   (setq show-trailing-whitespace nil)
   (autopair-mode t)
-  (setq ac-sources
-		'(
-		  ac-source-konix/shell
-		  ac-source-files-in-current-dir
-		  ac-source-filename
-		  )
-		)
   (cond
    ((string-match-p "shell" (buffer-name))
 	(set (make-variable-buffer-local 'dirtrack-list)

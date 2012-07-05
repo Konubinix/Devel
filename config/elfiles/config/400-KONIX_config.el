@@ -10,7 +10,7 @@
 
 (defcustom konix/explorer "pcmanfm"
   "The program to launch when wanting to explore the file system"
-)
+  )
 
 (setq-default default-justification 'left)
 ;; ####################################################################################################
@@ -29,13 +29,13 @@
 ;; ******************************************************************************************
 (eval-after-load "bs"
   '(progn
-	(konix/push-or-replace-in-alist 'bs-configurations "same-mode-files"
-								  nil 'konix/buffer-same-mode-p
-								  ".*" nil
-								  'bs-sort-buffer-interns-are-last
-								  )
-   )
-)
+	 (konix/push-or-replace-in-alist 'bs-configurations "same-mode-files"
+									 nil 'konix/buffer-same-mode-p
+									 ".*" nil
+									 'bs-sort-buffer-interns-are-last
+									 )
+	 )
+  )
 ;; ******************************************************************************************
 ;; kill ring
 ;; ******************************************************************************************
@@ -317,6 +317,7 @@
 (setq-default auto-fill-function nil)
 ;; For the cursor to move naturally
 (setq-default line-move-visual t)
+(setq-default visual-line-fringe-indicators '(nil right-curly-arrow))
 ;; hide ifdef
 (setq-default hide-ifdef-initially t)
 (setq-default hide-ifdef-shadow t)

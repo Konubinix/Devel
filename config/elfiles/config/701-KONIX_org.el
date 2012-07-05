@@ -15,7 +15,7 @@
   (add-hook 'before-save-hook 'org-update-all-dblocks)
   ;; Pour les appointments
   (require 'appt)
-  (org-agenda-to-appt)
+  (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
   (appt-activate 1)
 
   ;; set hook to remember clock when exiting
@@ -25,7 +25,7 @@
 	"Pressing `r' on the agenda will also add appointments."
 	(progn
 	  (setq appt-time-msg-list nil)
-	  (org-agenda-to-appt)
+	  (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
 	  (appt-check)
 	  )
 	)

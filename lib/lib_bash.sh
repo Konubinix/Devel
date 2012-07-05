@@ -325,18 +325,22 @@ konix_string_to_color_index () {
 	RES=$FUNCT_RES
 }
 
-pushd ( ) {
-    local dirname="$*"
-    DIR_STACK="$dirname;${DIR_STACK:-$PWD;}"
-    cd "${dirname:?\"missing directory name.\"}"
-    echo "$DIR_STACK"
-}
+help pushd > /dev/null 2>&1
+if [ "$?" != "0" ]
+then
+    pushd ( ) {
+        local dirname="$*"
+        DIR_STACK="$dirname;${DIR_STACK:-$PWD;}"
+        cd "${dirname:?\"missing directory name.\"}"
+        echo "$DIR_STACK"
+    }
 
-popd ( ) {
-    DIR_STACK="${DIR_STACK#*;}"
-    cd "${DIR_STACK%%;*}"
-    echo "$PWD"
-}
+    popd ( ) {
+        DIR_STACK="${DIR_STACK#*;}"
+        cd "${DIR_STACK%%;*}"
+        echo "$PWD"
+    }
+fi
 
 konix_assert_last_command () {
 	local LAST_RES=$?

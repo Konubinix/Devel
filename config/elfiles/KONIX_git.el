@@ -961,7 +961,7 @@
 (defun konix/git/svn/dcommit ()
   "Lance git svn dcommit."
   (interactive)
-  (konix/git/command "svn dcommit")
+  (konix/git/command "svn dcommit" nil "*GIT Async svn dcommit*")
   )
 
 (defun konix/git/svn/rebase ()

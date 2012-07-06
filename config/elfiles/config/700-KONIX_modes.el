@@ -2411,8 +2411,8 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; ####################################################################################################
 ;; cmake
 ;; ####################################################################################################
-(defvar konix/cmake-beginning-of-defun "\\bmacro(\\|\\bfunction(" "")
-(defvar konix/cmake-end-of-defun "\\bend\\(macro\\|function\\)([^)]*)" "")
+(defvar konix/cmake-beginning-of-defun "\\b\\(macro\\|function\\|if\\|else\\)(" "")
+(defvar konix/cmake-end-of-defun "\\bend\\(macro\\|function\\|if\\)([^)]*)" "")
 
 (defun konix/cmake-forward-sexp (&rest args)
   (re-search-forward konix/cmake-end-of-defun)

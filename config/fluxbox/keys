@@ -166,6 +166,9 @@ Mod4 shift g	:MoveTo * 0 Bottom
 # Rearrange windows
 Mod4 shift KP_0  : ArrangeWindows # 0
 
+# transparency
+Mod4 t :Exec transset -t -a
+
 # ************************************************************
 # Fluxbox specific shortcut (Mod4 Mod1)
 # ************************************************************

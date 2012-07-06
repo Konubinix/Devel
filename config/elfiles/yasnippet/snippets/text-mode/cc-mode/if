@@ -1,6 +1,6 @@
 #name : if (...) { ... }
 # --
-$>if (${500:condition})
+$>if(${500:condition})
 $>{
 $>${525:then;}
 $>}${750:

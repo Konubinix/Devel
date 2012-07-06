@@ -34,8 +34,8 @@ OnTitlebar Mouse2 :MacroCmd {Raise} {Focus} {StartTabbing}
 OnWindow Control Shift Mod1 Mod4 Mouse1 : kill
 
 # Focus
-OnWindow Mod4 Mouse4 :MacroCmd {RaiseLayer} {Exec konix_display.py 'upper'} {Focus}
-OnWindow Mod4 Mouse5 :MacroCmd {Exec konix_display.py 'lower' }{LowerLayer} {unFocus}
+# OnWindow Mod4 Mouse4 :MacroCmd {RaiseLayer} {Exec konix_display.py 'upper'} {Focus}
+# OnWindow Mod4 Mouse5 :MacroCmd {Exec konix_display.py 'lower' }{LowerLayer} {unFocus}
 
 # Stick
 OnWindow Control Mod4 Mouse2 :MacroCmd {Exec konix_display.py 'stick' } { Stick }
@@ -48,8 +48,8 @@ OnTitlebar Mouse4 :PrevWindow (workspace=[current]) !! FBCV13 !!
 OnTitlebar Mouse5 :NextWindow (workspace=[current]) !! FBCV13 !!
 
 # Window changes
-Mod4 Mouse4 :NextWindow {static} (workspace=[current])  !! FBCV13 !!
-Mod4 Mouse5 :PrevWindow {static} (workspace=[current])  !! FBCV13 !!
+# OnWindow Mod4 Mouse4 :NextWindow {static} (workspace=[current])  !! FBCV13 !!
+# OnWindow Mod4 Mouse5 :PrevWindow {static} (workspace=[current])  !! FBCV13 !!
 
 # scroll on the desktop to change workspaces
 OnDesktop Mouse4 :PrevWorkspace
@@ -167,7 +167,12 @@ Mod4 shift g	:MoveTo * 0 Bottom
 Mod4 shift KP_0  : ArrangeWindows # 0
 
 # transparency
+Mod4 c :ToggleCmd {Exec killall xcompmgr ; konix_display_unique.py "Killed xcompmgr"} {Exec xcompmgr -c ; konix_display_unique.py "Launched xcompmgr" }
 Mod4 t :Exec transset -t -a
+Mod4 Up :SetAlpha +20
+Mod4 Down :SetAlpha -20
+OnWindow Mod4 Mouse4 :SetAlpha +20
+OnWindow Mod4 Mouse5 :SetAlpha -20
 
 # ************************************************************
 # Fluxbox specific shortcut (Mod4 Mod1)

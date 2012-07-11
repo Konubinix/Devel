@@ -282,7 +282,6 @@ cursor stays in the org buffer."
 (setq-default org-tag-persistent-alist nil)
 (setq org-tag-alist '(("project" . ?p) ))
 (setq org-timer-timer-is-countdown nil)
-
 (setq-default org-todo-keywords
 			  '(
 				(sequence "WAIT(w@/!)" "TODO(t!)" "|" "DONE(d!)" "NOT_DONE(u@)")
@@ -296,6 +295,66 @@ cursor stays in the org buffer."
 				(sequence "CALL(k!)" "|" "CALLED(@)")
 				)
 			  )
+(setq-default org-agenda-cmp-user-defined 'konix/org-agenda-sort-deadlines)
+(setq-default org-agenda-sorting-strategy
+			  (
+				;; Strategy for Weekly/Daily agenda
+				(agenda habit-down time-up user-defined-up priority-down
+						category-keep)
+				;; Strategy for TODO lists
+				(todo priority-down category-keep)
+				;; Strategy for Tags matches
+				(tags priority-down category-keep)
+				;; Strategy for search matches
+				(search category-keep)
+				)
+			  )
+(defun konix/org-agenda-sort-deadlines (a b)
+  (let*(
+		(deadline_regexp_past "In +\\(-[0-9]+\\) d\\.:")
+		(deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
+		(deadline_regexp_now "Deadline:")
+		(a_now (string-match-p deadline_regexp_now a))
+		(a_past (and
+				 (string-match deadline_regexp_past a)
+				 (string-to-int
+				  (match-string 1 a)
+				  )
+				 )
+				)
+		(a_fut (and
+				(string-match deadline_regexp_future a)
+				(string-to-int
+				 (match-string 1 a)
+				 )
+				)
+			   )
+		(b_now (string-match-p deadline_regexp_now b))
+		(b_past (and
+				 (string-match deadline_regexp_past b)
+				 (string-to-int
+				  (match-string 1 b)
+				  )
+				 )
+				)
+		(b_fut (and
+				(string-match deadline_regexp_future b)
+				(string-to-int
+				 (match-string 1 b)
+				 )
+				)
+			   )
+ 		(a_value (or a_past (and a_now 0) a_fut 99))
+ 		(b_value (or b_past (and b_now 0) b_fut 99))
+		)
+	(if (> a_value b_value)
+		(progn
+		  +1
+		  )
+	  -1
+	  )
+	)
+  )
 
 (defun konix/org-today-time-stamp (&optional with-hm active)
   (interactive)

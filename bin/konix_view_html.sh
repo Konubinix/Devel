@@ -47,7 +47,7 @@ tee "${HOME}/konix_view_html.msg" | {
 	then
 		echo "nothing found munpacked" >> "${OUT_FILE}"
 	fi
-	for i in "$dir"/part*.html; do
+	for i in "$dir"/part*.[Hh][Tt][Mm][Ll]; do
 		x-www-browser "$i" &
 		sleep 3
 		exit 0

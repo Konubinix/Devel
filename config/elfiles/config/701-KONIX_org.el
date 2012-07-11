@@ -297,7 +297,7 @@ cursor stays in the org buffer."
 			  )
 (setq-default org-agenda-cmp-user-defined 'konix/org-agenda-sort-deadlines)
 (setq-default org-agenda-sorting-strategy
-			  (
+			  '(
 				;; Strategy for Weekly/Daily agenda
 				(agenda habit-down time-up user-defined-up priority-down
 						category-keep)

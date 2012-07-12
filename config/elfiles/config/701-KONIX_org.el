@@ -295,7 +295,7 @@ cursor stays in the org buffer."
 				(sequence "CALL(k!)" "|" "CALLED(@)")
 				)
 			  )
-(setq-default org-agenda-cmp-user-defined 'konix/org-agenda-sort-deadlines)
+(setq-default org-agenda-cmp-user-defined 'konix/org-cmp-deadlines-past-and-due-first)
 (setq-default org-agenda-sorting-strategy
 			  '(
 				;; Strategy for Weekly/Daily agenda
@@ -309,10 +309,10 @@ cursor stays in the org buffer."
 				(search category-keep)
 				)
 			  )
-(defun konix/org-agenda-sort-deadlines (a b)
+(defun konix/org-cmp-deadlines-past-and-due-first (a b)
   (let*(
 		(deadline_regexp_past "In +\\(-[0-9]+\\) d\\.:")
-		(deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
+;;		(deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
 		(deadline_regexp_now "Deadline:")
 		(a_now (string-match-p deadline_regexp_now a))
 		(a_past (and
@@ -322,13 +322,13 @@ cursor stays in the org buffer."
 				  )
 				 )
 				)
-		(a_fut (and
-				(string-match deadline_regexp_future a)
-				(string-to-int
-				 (match-string 1 a)
-				 )
-				)
-			   )
+		;; (a_fut (and
+		;; 		(string-match deadline_regexp_future a)
+		;; 		(string-to-int
+		;; 		 (match-string 1 a)
+		;; 		 )
+		;; 		)
+		;; 	   )
 		(b_now (string-match-p deadline_regexp_now b))
 		(b_past (and
 				 (string-match deadline_regexp_past b)
@@ -337,15 +337,17 @@ cursor stays in the org buffer."
 				  )
 				 )
 				)
-		(b_fut (and
-				(string-match deadline_regexp_future b)
-				(string-to-int
-				 (match-string 1 b)
-				 )
-				)
-			   )
- 		(a_value (or a_past (and a_now 0) a_fut 99))
- 		(b_value (or b_past (and b_now 0) b_fut 99))
+		;; (b_fut (and
+		;; 		(string-match deadline_regexp_future b)
+		;; 		(string-to-int
+		;; 		 (match-string 1 b)
+		;; 		 )
+		;; 		)
+		;; 	   )
+ 		(a_value (or a_past (and a_now 0) ;; a_fut
+					 99))
+ 		(b_value (or b_past (and b_now 0) ;; b_fut
+					 99))
 		)
 	(if (> a_value b_value)
 		(progn

@@ -45,7 +45,8 @@ while len(PARTS_TO_PARSE) != 0:
     if type(PAYLOAD) == list:
         PARTS_TO_PARSE = PARTS_TO_PARSE + PAYLOAD
 print "#!/bin/bash"
+print "cat",
 for REPLACE_STUFF in REPLACE_STUFFS:
     FROM=REPLACE_STUFF[0]
     TO=REPLACE_STUFF[1]
-    print "sed s/%s/%s/g" % (FROM, TO)
+    print " | sed s/%s/%s/g" % (FROM, TO),

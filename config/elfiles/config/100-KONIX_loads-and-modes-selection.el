@@ -23,6 +23,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/keyfreq")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/jabber")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/readline-complete")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/elnode")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)

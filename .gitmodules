@@ -40,3 +40,6 @@
 [submodule "config/elfiles/elnode"]
 	path = config/elfiles/elnode
 	url = https://github.com/nicferrier/elnode.git
+[submodule "config/elfiles/langtool"]
+	path = config/elfiles/langtool
+	url = https://github.com/mhayashi1120/Emacs-langtool.git

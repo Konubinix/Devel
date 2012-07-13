@@ -24,6 +24,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/jabber")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/readline-complete")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/elnode")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/langtool")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)

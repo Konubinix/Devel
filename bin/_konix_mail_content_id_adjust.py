@@ -28,7 +28,7 @@ while len(PARTS_TO_PARSE) != 0:
         NAME = re.search('name="([^"]+)"', getValueIgnoreCase('Content-Type',
                                                               PART), re.I)
         CID = re.search('^<(.+)>$', getValueIgnoreCase('Content-ID', PART), re.I)
-        TYPE = re.search('^[^/]+/([^ ]+)', getValueIgnoreCase('Content-Type',
+        TYPE = re.search('^[^/]+/([^ ;\n\r]+)', getValueIgnoreCase('Content-Type',
                                                                            PART),
                          re.I)
         if NAME:

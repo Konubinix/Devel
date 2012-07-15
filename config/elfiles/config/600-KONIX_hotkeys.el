@@ -12,6 +12,8 @@
 ;; ################################################################################
 ;; global hotkeys
 ;; ################################################################################
+;; ioccur
+(define-key global-map (kbd "M-s o") 'ioccur)
 ;; yank pop to more recent kill
 (define-key global-map (kbd "M-Y") 'konix/yank-pop-more-recent)
 (define-key global-map (kbd "C-M-y") 'konix/kill-ring-insert)

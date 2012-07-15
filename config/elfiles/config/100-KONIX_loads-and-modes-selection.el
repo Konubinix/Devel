@@ -25,6 +25,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/readline-complete")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/elnode")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/langtool")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/ioccur")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)
@@ -108,6 +109,8 @@
 ;; mediawiki
 (autoload 'mediawiki-simple-outline-demote "mediawiki" nil t)
 (autoload 'mediawiki-simple-outline-promote "mediawiki" nil t)
+;; ioccur
+(autoload 'ioccur "ioccur" nil t)
 
 ;; ************************************************************
 ;; Automodes

@@ -312,7 +312,7 @@ cursor stays in the org buffer."
 (defun konix/org-cmp-deadlines-past-and-due-first (a b)
   (let*(
 		(deadline_regexp_past "In +\\(-[0-9]+\\) d\\.:")
-;;		(deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
+		;;		(deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
 		(deadline_regexp_now "Deadline:")
 		(a_now (string-match-p deadline_regexp_now a))
 		(a_past (and
@@ -348,13 +348,20 @@ cursor stays in the org buffer."
 					 99))
  		(b_value (or b_past (and b_now 0) ;; b_fut
 					 99))
+		(greater (> a_value b_value))
+		(equal (= a_value b_value))
 		)
-	(if (> a_value b_value)
-		(progn
-		  +1
-		  )
+	(cond
+	 (greater
+	  +1
+	  )
+	 (equal
+	  nil
+	  )
+	 (t
 	  -1
 	  )
+	 )
 	)
   )
 

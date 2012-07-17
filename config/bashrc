@@ -62,4 +62,4 @@ GIT_COLOR="$RES"
 konix_int_to_color -1 -1
 DEFAULT_COLOR="$RES"
 #set +x
-export PS1="\$?\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\[\033[01;36;40m\]|path=\w|\[\033[00m\]${GIT_COLOR}\$(parse_git_branch)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\n\$ "
+export PS1="\$?\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\[\033[01;36;40m\]|path=\w|\[\033[00m\]${GIT_COLOR}\$(parse_git_branch)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\${KONIX_PROMPT_POST}\n\$ "

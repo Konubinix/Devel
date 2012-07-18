@@ -46,3 +46,6 @@
 [submodule "config/elfiles/ioccur"]
 	path = config/elfiles/ioccur
 	url = https://github.com/thierryvolpiatto/ioccur.git
+[submodule "config/elfiles/auto-complete"]
+	path = config/elfiles/auto-complete
+	url = https://github.com/m2ym/auto-complete.git

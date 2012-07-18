@@ -12,6 +12,30 @@
   (setq default-directory directory)
   )
 
+(defun konix/filename-is-root-p (filename)
+  (string-match "^/$" filename)
+  )
+
+(defun konix/find-file-in-parent (filename from_where)
+  (let (
+		(tested_dir from_where)
+		)
+	(while (and
+ 			(not (file-exists-p (expand-file-name filename tested_dir)))
+			(not (konix/filename-is-root-p tested_dir))
+			)
+	  (setq tested_dir (expand-file-name "../" tested_dir))
+	  )
+	(if (or
+		 (not (konix/filename-is-root-p tested_dir))
+		 (file-exists-p (expand-file-name filename tested_dir))
+		 )
+		(expand-file-name filename tested_dir)
+	  nil
+	  )
+	)
+  )
+
 (defun konix/process-sentinel-exit (process string)
   (with-current-buffer (process-buffer process)
 	;;(debug)

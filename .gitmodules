@@ -52,3 +52,6 @@
 [submodule "config/elfiles/popup"]
 	path = config/elfiles/popup
 	url = https://github.com/m2ym/popup-el.git
+[submodule "config/elfiles/elim"]
+	path = config/elfiles/elim
+	url = git://git.sv.gnu.org/elim.git

@@ -228,38 +228,38 @@
 ;; **********************************************************************
 (defvar konix/c/ac-project-files-directories '())
 (defun konix/c/ac-project-files-candidates ()
-  (ignore-errors
-	(let
-		(
-		 (konix/c/ac-project-files-directories
-		  (or konix/c/ac-project-files-directories
-			  (remove-if
-			   (lambda (elem)
-				 (equalp nil elem)
-				 )
-			   (mapcar
-				(lambda (dir_name)
-				  (konix/find-file-in-parents dir_name)
-				  )
-				'("Lib" "Extensions" ".")
-				)
+  (let
+	  (
+	   (konix/c/ac-project-files-directories
+		(or konix/c/ac-project-files-directories
+			(remove-if
+			 (lambda (elem)
+			   (equalp nil elem)
 			   )
+			 (mapcar
+			  (lambda (dir_name)
+				(konix/find-file-in-parents dir_name)
+				)
+			  '("Lib" "Extensions" ".")
 			  )
-		  )
-		 (prefix_dir (file-name-directory ac-prefix))
-		 (prefix_file_name (file-name-nondirectory ac-prefix))
-		 (completions '())
-		 )
-	  (mapcar
-	   (lambda (dir)
+			 )
+			)
+		)
+	   (prefix_dir (or (file-name-directory ac-prefix) ""))
+	   (prefix_file_name (file-name-nondirectory ac-prefix))
+	   (completions_ '())
+	   )
+	(mapcar
+	 (lambda (dir)
+	   (when (file-directory-p (expand-file-name prefix_dir dir))
 		 (let*(
-			   (dir_start (concat dir "/" prefix_dir))
+			   (dir_start (expand-file-name prefix_dir dir))
 			   (completions_no_dir (file-name-all-completions prefix_file_name
 															  dir_start))
 			   )
-		   (setq completions
+		   (setq completions_
 				 (append
-				  completions
+				  completions_
 				  (mapcar
 				   (lambda (file)
 					 (concat prefix_dir file)
@@ -270,17 +270,23 @@
 				 )
 		   )
 		 )
-	   konix/c/ac-project-files-directories
 	   )
-	  completions
-	  )
+	 konix/c/ac-project-files-directories
+	 )
+	completions_
+	)
+  )
+
+(defun konix/c/ac-prefix-in-include ()
+  (if (looking-back "#include +[\"<]\\(.+\\)")
+	  (match-beginning 1)
 	)
   )
 
 (ac-define-source konix/c/project-files
   '(
 	(candidates . konix/c/ac-project-files-candidates)
-    (prefix . file)
+    (prefix . konix/c/ac-prefix-in-include)
     (requires . 0)
     (action . ac-start)
     (limit . nil)

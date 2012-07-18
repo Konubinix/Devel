@@ -112,6 +112,8 @@
 (autoload 'mediawiki-simple-outline-promote "mediawiki" nil t)
 ;; ioccur
 (autoload 'ioccur "ioccur" nil t)
+;; elnode
+(autoload 'elnode-start "elnode" nil t)
 
 ;; ************************************************************
 ;; Automodes

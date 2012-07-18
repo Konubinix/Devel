@@ -34,8 +34,8 @@ OnTitlebar Mouse2 :MacroCmd {Raise} {Focus} {StartTabbing}
 OnWindow Control Shift Mod1 Mod4 Mouse1 : kill
 
 # Focus
-# OnWindow Mod4 Mouse4 :MacroCmd {RaiseLayer} {Exec konix_display.py 'upper'} {Focus}
-# OnWindow Mod4 Mouse5 :MacroCmd {Exec konix_display.py 'lower' }{LowerLayer} {unFocus}
+OnWindow shift Mod4 Mouse4 :MacroCmd {RaiseLayer} {Exec konix_display.py 'upper'} {Focus}
+OnWindow shift Mod4 Mouse5 :MacroCmd {Exec konix_display.py 'lower' }{LowerLayer} {unFocus}
 
 # Stick
 OnWindow Control Mod4 Mouse2 :MacroCmd {Exec konix_display.py 'stick' } { Stick }

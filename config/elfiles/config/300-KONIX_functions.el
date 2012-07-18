@@ -16,7 +16,7 @@
   (string-match "^/$" filename)
   )
 
-(defun konix/find-file-in-parent (filename from_where)
+(defun konix/find-file-in-parents (filename from_where)
   (let (
 		(tested_dir from_where)
 		)

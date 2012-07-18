@@ -28,6 +28,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/ioccur")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/auto-complete")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/popup")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/elim/elisp")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)
@@ -111,6 +112,8 @@
 ;; mediawiki
 (autoload 'mediawiki-simple-outline-demote "mediawiki" nil t)
 (autoload 'mediawiki-simple-outline-promote "mediawiki" nil t)
+;; jabber
+(autoload 'jabber-roster "jabber" nil t)
 ;; ioccur
 (autoload 'ioccur "ioccur" nil t)
 ;; elnode

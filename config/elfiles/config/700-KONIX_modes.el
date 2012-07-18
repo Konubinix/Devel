@@ -597,7 +597,7 @@
 
 (defcustom konix/shell-font-lock-keywords '() "")
 (setq-default explicit-shell-file-name (locate-file "bash" exec-path exec-suffixes))
-(setq-default konix/shell/bash-dirtrack-list '("^[^|\r\n]+|path=\\([^|]+\\)|.+[0-9]+:[0-9]+:[0-9]+ - [0-9]+/[0-9]+/[0-9]+$" 1 nil))
+(setq-default konix/shell/bash-dirtrack-list '("^[^|\r\n]+|path=\\([^|]+\\)|" 1 nil))
 (add-to-list 'ac-modes 'shell-mode)
 
 (defun konix/shell/is-cmd ()

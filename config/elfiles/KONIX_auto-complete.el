@@ -223,6 +223,70 @@
 	)
   )
 
+;; **********************************************************************
+;; c-mode
+;; **********************************************************************
+(defvar konix/c/ac-project-files-directories '())
+(defun konix/c/ac-project-files-candidates ()
+  (ignore-errors
+	(let
+		(
+		 (konix/c/ac-project-files-directories
+		  (or konix/c/ac-project-files-directories
+			  (remove-if
+			   (lambda (elem)
+				 (equalp nil elem)
+				 )
+			   (mapcar
+				(lambda (dir_name)
+				  (konix/find-file-in-parents dir_name)
+				  )
+				'("Lib" "Extensions" ".")
+				)
+			   )
+			  )
+		  )
+		 (prefix_dir (file-name-directory ac-prefix))
+		 (prefix_file_name (file-name-nondirectory ac-prefix))
+		 (completions '())
+		 )
+	  (mapcar
+	   (lambda (dir)
+		 (let*(
+			   (dir_start (concat dir "/" prefix_dir))
+			   (completions_no_dir (file-name-all-completions prefix_file_name
+															  dir_start))
+			   )
+		   (setq completions
+				 (append
+				  completions
+				  (mapcar
+				   (lambda (file)
+					 (concat prefix_dir file)
+					 )
+				   completions_no_dir
+				   )
+				  )
+				 )
+		   )
+		 )
+	   konix/c/ac-project-files-directories
+	   )
+	  completions
+	  )
+	)
+  )
+
+(ac-define-source konix/c/project-files
+  '(
+	(candidates . konix/c/ac-project-files-candidates)
+    (prefix . file)
+    (requires . 0)
+    (action . ac-start)
+    (limit . nil)
+	)
+  )
+
 ;; ####################################################################################################
 ;; rng
 ;; ####################################################################################################

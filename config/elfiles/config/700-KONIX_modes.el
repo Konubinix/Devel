@@ -62,6 +62,8 @@
    nil
    konix/c-mode-font-lock-keywords
    )
+  (setq ac-sources (append '(ac-source-konix/c/project-files)
+						   konix/prog/ac-sources))
   )
 (add-hook 'c-mode-common-hook 'konix/c-mode-common-hook)
 

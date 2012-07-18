@@ -27,6 +27,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/langtool")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/ioccur")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/auto-complete")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/popup")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)

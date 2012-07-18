@@ -49,3 +49,6 @@
 [submodule "config/elfiles/auto-complete"]
 	path = config/elfiles/auto-complete
 	url = https://github.com/m2ym/auto-complete.git
+[submodule "config/elfiles/popup"]
+	path = config/elfiles/popup
+	url = https://github.com/m2ym/popup-el.git

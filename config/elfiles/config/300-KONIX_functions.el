@@ -16,7 +16,10 @@
   (string-match "^/$" filename)
   )
 
-(defun konix/find-file-in-parents (filename from_where)
+(defun konix/find-file-in-parents (filename &optional from_where)
+  (unless from_where
+	(setq from_where default-directory)
+	)
   (let (
 		(tested_dir from_where)
 		)

@@ -2032,6 +2032,8 @@ inspired from `notmuch-show-archive-thread-internal'"
 ;; ####################################################################################################
 (defun konix/server-visit-hook ()
   (maxframe/maximize-frame)
+  ;; Use popwin to have temporary buffer less intrusives ;;
+  (setq-default display-buffer-function 'popwin:display-buffer)
   )
 (add-hook 'server-visit-hook 'konix/server-visit-hook)
 

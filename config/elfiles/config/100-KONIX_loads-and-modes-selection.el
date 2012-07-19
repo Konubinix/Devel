@@ -29,6 +29,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/auto-complete")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/popup")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/elim/elisp")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/popwin")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)
@@ -118,6 +119,8 @@
 (autoload 'ioccur "ioccur" nil t)
 ;; elnode
 (autoload 'elnode-start "elnode" nil t)
+;; popwin
+(autoload 'popwin:display-buffer "popwin" nil t)
 
 ;; ************************************************************
 ;; Automodes

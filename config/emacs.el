@@ -57,6 +57,7 @@
   )
 
 (konix/load-config-files (expand-file-name "config" elfiles))
+(konix/load-config-files (expand-file-name "config" (expand-file-name "elfiles" (getenv "KONIX_PERSO_DIR"))))
 (konix/load-config-files (expand-file-name "config" "~/.elfiles")) ;; custom-config
 
 ;; ####################################################################################################

@@ -2324,7 +2324,14 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; Jabber
 ;; ####################################################################################################
 (setq-default jabber-history-enabled t)
+(setq-default jabber-history-muc-enabled t)
+(setq-default jabber-history-filename
+			  (expand-file-name
+			   "jabber_global_message_log" (getenv "KONIX_PERSO_DIR")
+			   )
+			  )
 (setq-default jabber-chat-fill-long-lines nil)
+(setq-default jabber-show-offline-contacts nil)
 (defun konix/jabber-notify (from buffer text)
   (unless konix/chat-silent
 	(call-process "konix_display.py" nil nil nil (format "MESSAGE %s : %s" from
@@ -2393,6 +2400,8 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 (eval-after-load "jabber"
   '(progn
 	 (define-key jabber-global-keymap (kbd "j") 'jabber-muc-autojoin)
+	 (define-key jabber-global-keymap (kbd "c") 'jabber-connect)
+	 (define-key jabber-global-keymap (kbd "d") 'jabber-disconnect)
 	 (global-set-key (kbd "<escape>") 'konix/jabber-activity-switch-to)
 	 (jabber-activity-mode 1)
 	 )

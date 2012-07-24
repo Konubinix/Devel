@@ -58,3 +58,6 @@
 [submodule "config/elfiles/popwin"]
 	path = config/elfiles/popwin
 	url = https://github.com/m2ym/popwin-el.git
+[submodule "config/elfiles/icicles"]
+	path = config/elfiles/icicles
+	url = https://github.com/emacsmirror/icicles.git

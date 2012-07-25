@@ -1917,11 +1917,17 @@ if too many version exists."
   "Close window of BUF if displayed or bury if it is solo window."
   (interactive)
   (setq buf (or buf (current-buffer)))
-  (condition-case nil
-      (let ((win (get-buffer-window buf)))
-	(and win (window-live-p win)
-	     (delete-window win)))
-    (error (bury-buffer buf))))
+  (let (
+		(win (get-buffer-window buf))
+		)
+	(if	(and win (window-live-p win) (> (length (window-list)) 1))
+		(delete-window win)
+	  (progn
+		(bury-buffer)
+		)
+	  )
+	)
+  )
 
 (defun trac-wiki-convert-to-readable-time-string (str)
   "Parse STR as ISO format time and return encoded time value."

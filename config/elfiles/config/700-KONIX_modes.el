@@ -2401,7 +2401,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
   '(progn
 	 (define-key jabber-global-keymap (kbd "j") 'jabber-muc-autojoin)
 	 (define-key jabber-global-keymap (kbd "c") 'jabber-connect)
-	 (define-key jabber-global-keymap (kbd "d") 'jabber-disconnect)
+	 (define-key jabber-global-keymap (kbd "d") 'jabber-disconnect-one)
 	 (global-set-key (kbd "<escape>") 'konix/jabber-activity-switch-to)
 	 (jabber-activity-mode 1)
 	 )

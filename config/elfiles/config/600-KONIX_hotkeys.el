@@ -18,6 +18,9 @@
 (define-key global-map (kbd "M-Y") 'konix/yank-pop-more-recent)
 (define-key global-map (kbd "C-M-y") 'konix/kill-ring-insert)
 
+;; multi occur
+(global-set-key (kbd "M-s M-o") 'multi-occur-in-matching-buffers)
+
 ;; rebox
 (global-set-key (kbd "C-M-q") 'rebox-dwim)
 (global-set-key (kbd "C-M-S-q") 'rebox-cycle)

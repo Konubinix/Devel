@@ -55,9 +55,6 @@
 [submodule "config/elfiles/elim"]
 	path = config/elfiles/elim
 	url = git://git.sv.gnu.org/elim.git
-[submodule "config/elfiles/popwin"]
-	path = config/elfiles/popwin
-	url = https://github.com/m2ym/popwin-el.git
 [submodule "config/elfiles/icicles"]
 	path = config/elfiles/icicles
 	url = https://github.com/emacsmirror/icicles.git

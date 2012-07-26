@@ -37,7 +37,7 @@
 (setq-default ac-expand-on-auto-complete nil)
 (ac-set-trigger-key "TAB")
 (setq-default ac-dwim-enable t)
-(setq-default ac-comphist-file (concat elfiles "/comphist.dat"))
+(setq-default ac-comphist-file (concat perso-dir "/comphist.dat"))
 (setq-default global-auto-complete-mode t)
 (setq-default ac-candidate-max 1000)
 

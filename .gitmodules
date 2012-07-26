@@ -61,3 +61,12 @@
 [submodule "config/elfiles/icicles"]
 	path = config/elfiles/icicles
 	url = https://github.com/emacsmirror/icicles.git
+[submodule "config/elfiles/dbgr"]
+	path = config/elfiles/dbgr
+	url = https://github.com/rocky/emacs-dbgr.git
+[submodule "config/elfiles/load-relative"]
+	path = config/elfiles/load-relative
+	url = https://github.com/emacsmirror/load-relative.git
+[submodule "config/elfiles/loc-changes"]
+	path = config/elfiles/loc-changes
+	url = https://github.com/monsanto/emacs-loc-changes.git

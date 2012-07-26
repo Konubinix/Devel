@@ -30,6 +30,9 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/popup")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/elim/elisp")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/popwin")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/dbgr")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/load-relative")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/loc-changes")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)

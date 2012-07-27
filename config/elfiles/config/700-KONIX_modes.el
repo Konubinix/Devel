@@ -930,10 +930,10 @@
 (eval-after-load "ecb"
   '(progn
 	 (ecb-layout-define
-	  "PERSO"
-	  left nil
-	  (konix/ecb-set-windows)
-	  )
+		 "PERSO"
+		 left nil
+		 (konix/ecb-set-windows)
+		 )
 	 (setq-default ecb-analyse-buffer-sync-delay 40)
 	 (setq-default ecb-layout-name "PERSO")
 	 (setq-default ecb-options-version "2.40")
@@ -2324,9 +2324,15 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; ####################################################################################################
 (setq-default jabber-history-enabled t)
 (setq-default jabber-history-muc-enabled t)
-(setq-default jabber-history-filename
+(setq-default jabber-use-global-history nil)
+(setq-default jabber-history-dir (expand-file-name "jabber_history" perso-dir))
+(setq-default jabber-global-history-filename
 			  (expand-file-name
-			   "jabber_global_message_log" (getenv "KONIX_PERSO_DIR")
+			   "jabber_global_message_log"
+			   (expand-file-name
+				"jabber_history"
+				perso-dir
+				)
 			   )
 			  )
 (setq-default jabber-chat-fill-long-lines nil)

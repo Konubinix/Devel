@@ -234,7 +234,19 @@
 		 (and (bufferp output_buffer) (buffer-name output_buffer))
 		 "*GIT Async Shell Command*"))
   (or no_kill_output_buffer (ignore-errors (kill-buffer output_buffer)))
-  (shell-command (concat (konix/git/adjust-command command cdup) "&") output_buffer)
+  ;; recreate the buffer if it does not exist
+  (get-buffer-create output_buffer)
+  (let (
+		(top-level (konix/git/_get-toplevel))
+		)
+	(shell-command (concat (konix/git/adjust-command command cdup) "&")
+				   output_buffer)
+	(when cdup
+	  (with-current-buffer output_buffer
+		(setq default-directory top-level)
+		)
+	  )
+	)
   )
 
 (defun konix/git/command-to-string (command &optional cdup)

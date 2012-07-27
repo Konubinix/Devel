@@ -406,6 +406,7 @@
 							 (if message (concat " -m \""message"\"") "")
 							 (if file (concat "  \""file"\"") "")
 							 )
+					 (null file)
 					 )
   )
 

@@ -284,7 +284,7 @@ cursor stays in the org buffer."
 (setq org-timer-timer-is-countdown nil)
 (setq-default org-todo-keywords
 			  '(
-				(sequence "WAIT(w@/!)" "TODO(t!)" "|" "DONE(d!)" "NOT_DONE(u@)")
+				(sequence "WAIT(w@/!)" "TODO(t!)" "NEXT(n!)" "|" "DONE(d!)" "NOT_DONE(u@)")
 				(sequence "MEETING(m!)" "REPORT(o!)" "|" "MET(M!)" "CANCELED(c@)")
 				(sequence
 				 "SPECIFY(S!)" "CREATE_VALIDATOR(v!)" "PROGRAM(P!)" "VALIDATE(V@/!)" "|" "END(E!)" "ABORTED(A@)")

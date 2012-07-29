@@ -150,6 +150,8 @@ cursor stays in the org buffer."
 (setq-default org-agenda-log-mode-items '(closed clock state))
 (setq-default org-agenda-skip-archived-trees t)
 (setq-default org-agenda-skip-scheduled-if-deadline-is-shown t)
+(setq-default org-agenda-skip-scheduled-if-done t)
+(setq-default org-agenda-skip-deadline-if-done t)
 (setq-default org-agenda-span 'day)
 (setq-default org-agenda-start-with-clockreport-mode nil)
 (setq-default org-agenda-start-with-log-mode nil)

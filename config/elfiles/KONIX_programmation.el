@@ -81,6 +81,11 @@ They can be relative or absolute
   :group 'konix/prog
   )
 
+(defface konix/prog/tabs
+  '((((class color)) (:background "gray98")))
+  ""
+  )
+
 (setq konix/prog/ac-sources
       '(
 		;; ac-source-gtags
@@ -137,6 +142,10 @@ They can be relative or absolute
   (interactive)
   ;; in a prog buffer, showing trailing whitespaces may be relevant
   (setq show-trailing-whitespace t)
+  ;; making tabs show up is also relevant
+  (font-lock-add-keywords
+   nil
+   '(("\t" 0 'konix/prog/tabs prepend)))
   (hs-minor-mode t)
   ;; highlight parentheses in prog
   (highlight-parentheses-mode 1)

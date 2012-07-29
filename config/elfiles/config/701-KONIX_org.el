@@ -282,6 +282,7 @@ cursor stays in the org buffer."
 (setq-default org-icalendar-store-UID t)
 (setq-default org-timer-default-timer 25)
 (setq-default org-tag-persistent-alist nil)
+(setq-default org-reverse-note-order t)
 (setq org-tag-alist '(("project" . ?p) ))
 (setq org-timer-timer-is-countdown nil)
 (setq-default org-todo-keywords

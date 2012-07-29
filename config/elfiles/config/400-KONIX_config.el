@@ -323,6 +323,8 @@
 (setq-default hide-ifdef-shadow t)
 ;; Hide region
 (require 'hide-region)
+;; I do not want to draw block cursor as wide as the glyph under it
+(setq-default x-stretch-cursor nil)
 
 ;; ************************************************************
 ;; Buffers

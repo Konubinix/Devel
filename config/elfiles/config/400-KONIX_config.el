@@ -12,6 +12,10 @@
   "The program to launch when wanting to explore the file system"
   )
 
+;; passwords are valid 10 minutes
+(setq-default password-cache t)
+(setq-default password-cache-expiry 600)
+
 (setq-default default-justification 'left)
 ;; ####################################################################################################
 ;; abbrev

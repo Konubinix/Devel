@@ -2335,6 +2335,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 				)
 			   )
 			  )
+(setq-default jabber-auto-reconnect t)
 (setq-default jabber-chat-fill-long-lines nil)
 (setq-default jabber-show-offline-contacts nil)
 (defun konix/jabber-notify (from buffer text)

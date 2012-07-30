@@ -7,6 +7,31 @@
 
 (defvar konix/mail_follow (expand-file-name "~/mail_follow") "")
 
+(defvar konix/frame-configuration-list '() "")
+
+(defun konix/frame-configuration-push ()
+  (interactive)
+  (push (list (current-frame-configuration) (point-marker))
+		konix/frame-configuration-list
+		)
+  (message "Pushed frame configuration into the stack")
+  )
+
+(defun konix/frame-configuration-pop (delete)
+  (interactive "P")
+  (let (
+		(val (pop konix/frame-configuration-list))
+		)
+	(if val
+		(progn
+		  (set-frame-configuration (car val) (not delete))
+		  (goto-char (cadr val))
+		  (message "Poped frame configuration from the stack"))
+	  (error "Cannot pop frame configuration because the stack is empty")
+	  )
+	)
+  )
+
 (defun konix/change-directory (directory)
   (interactive "DDirectory:")
   (setq default-directory directory)
@@ -24,7 +49,7 @@
 		(tested_dir from_where)
 		)
 	(while (and
- 			(not (file-exists-p (expand-file-name filename tested_dir)))
+			(not (file-exists-p (expand-file-name filename tested_dir)))
 			(not (konix/filename-is-root-p tested_dir))
 			)
 	  (setq tested_dir (expand-file-name "../" tested_dir))

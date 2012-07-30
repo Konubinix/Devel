@@ -260,6 +260,15 @@
 
 (define-key 'konix/occur/map "s" 'konix/occur-symbol-at-point)
 
+;; **********************************************************************
+;; frame configuration manipulation
+;; **********************************************************************
+(define-prefix-command 'konix/frame-configuration/map)
+(define-key 'konix/global-fast-key-map (kbd "f") 'konix/frame-configuration/map)
+
+(define-key 'konix/frame-configuration/map "p" 'konix/frame-configuration-push)
+(define-key 'konix/frame-configuration/map "*" 'konix/frame-configuration-pop)
+
 ;; ************************************************************
 ;; semantic
 ;; ************************************************************

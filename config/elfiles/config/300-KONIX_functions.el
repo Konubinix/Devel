@@ -32,6 +32,21 @@
 	)
   )
 
+(defun konix/frame-configuration-top (delete)
+  (interactive "P")
+  (let (
+		(val (car konix/frame-configuration-list))
+		)
+	(if val
+		(progn
+		  (set-frame-configuration (car val) (not delete))
+		  (goto-char (cadr val))
+		  (message "Got frame configuration from the head of the stack"))
+	  (error "Cannot get the head frame configuration because the stack is empty")
+	  )
+	)
+  )
+
 (defun konix/change-directory (directory)
   (interactive "DDirectory:")
   (setq default-directory directory)

@@ -268,6 +268,7 @@
 
 (define-key 'konix/frame-configuration/map "p" 'konix/frame-configuration-push)
 (define-key 'konix/frame-configuration/map "*" 'konix/frame-configuration-pop)
+(define-key 'konix/frame-configuration/map "h" 'konix/frame-configuration-top)
 
 ;; ************************************************************
 ;; semantic

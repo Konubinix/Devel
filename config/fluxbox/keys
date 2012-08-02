@@ -163,6 +163,11 @@ Mod4 shift h    :MoveTo 0 * Right
 Mod4 shift t	:MoveTo * 0 Top
 Mod4 shift g	:MoveTo * 0 Bottom
 
+Mod4 Mod1 shift Left  :MoveTo 0 * Left
+Mod4 Mod1 shift Right :MoveTo 0 * Right
+Mod4 Mod1 shift Up    :MoveTo * 0 Top
+Mod4 Mod1 shift Down  :MoveTo * 0 Bottom
+
 # Rearrange windows
 Mod4 shift KP_0  : ArrangeWindows # 0
 

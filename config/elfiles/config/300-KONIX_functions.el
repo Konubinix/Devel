@@ -47,6 +47,15 @@
 	)
   )
 
+(defun konix/browse-url-uzbl (url &optional new-window)
+  (interactive (browse-url-interactive-arg "URL: "))
+  (start-process (concat "konix_uzbl " url)
+		 nil
+		 "konix_uzbl"
+		 url
+		 )
+  )
+
 (defun konix/change-directory (directory)
   (interactive "DDirectory:")
   (setq default-directory directory)

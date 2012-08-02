@@ -9,6 +9,10 @@
 (global-unset-key (kbd "<f3>"))
 (global-unset-key (kbd "<f4>"))
 
+;; custom prefix key
+(define-prefix-command 'konix/global-custom-key-map)
+(global-set-key (kbd "<f11>") 'konix/global-custom-key-map)
+
 ;; ################################################################################
 ;; global hotkeys
 ;; ################################################################################

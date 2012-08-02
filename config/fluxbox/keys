@@ -282,14 +282,14 @@ Mod4 k c :MacroCmd { Exec setxkbmap -option ctrl:swapcaps } { Exec konix_display
 Mod4 k shift c :MacroCmd { Exec setxkbmap -option } { Exec konix_display.py "Cancel xkb options" }
 
 # ####################################################################################################
-# Macro (Mod4 x k)
+# Macro (Mod4 x k) 67 is the keycode of F1
 # ###################################################################################################
-Mod4 x k s :MacroCmd { Exec pkill cnee } { ExecCommand konix_display_n_launch.sh cnee --record --keyboard --mouse --stop-key F1 --out-file ~/.xmacro }
-Mod4 x k k :MacroCmd { Exec pkill cnee } { ExecCommand konix_display_n_launch.sh cnee --replay --keyboard --mouse --stop-key F1 --speed-percent 50 --file ~/.xmacro }
-Mod4 x k n :MacroCmd { Exec python konix_xmacro.py -n && konix_display.py $(readlink ~/.xmacro) }
-Mod4 x k p :MacroCmd { Exec python konix_xmacro.py -p && konix_display.py $(readlink ~/.xmacro) }
-Mod4 x k v :MacroCmd { Exec python konix_xmacro.py -s && konix_display.py $(readlink ~/.xmacro) }
-Mod4 x k a :MacroCmd { Exec python konix_xmacro.py -a && konix_display.py $(readlink ~/.xmacro) }
+Mod4 x k s :ExecCommand konix_display_n_launch.sh xmacrorec2 -k 67 > $HOME/.xmacro && konix_display.py "Macro added in $HOME/.xmacro"
+Mod4 x k k :ExecCommand konix_display_n_launch.sh xmacroplay :0 < $HOME/.xmacro
+Mod4 x k n :MacroCmd { Exec python konix_xmacro.py -n && konix_display.py $(readlink $HOME/.xmacro) }
+Mod4 x k p :MacroCmd { Exec python konix_xmacro.py -p && konix_display.py $(readlink $HOME/.xmacro) }
+Mod4 x k v :MacroCmd { Exec python konix_xmacro.py -s && konix_display.py $(readlink $HOME/.xmacro) }
+Mod4 x k a :MacroCmd { Exec python konix_xmacro.py -a && konix_display.py $(readlink $HOME/.xmacro) }
 # ####################################################################################################
 # Sound specific (Mod4 m ...)
 # ####################################################################################################

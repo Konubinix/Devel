@@ -196,7 +196,7 @@ Mod4 d : ShowDesktop
 # Lock the screen
 Mod4 l : Exec xlock
 Control Mod4 d : ShowDesktop
-Print : MacroCmd { Exec konix_display.py 'impression ecran' } { ExecCommand $(konix_find_true_exec.sh import) ~/Desktop/Capture.png }
+Print : MacroCmd { Exec konix_display.py 'impression ecran' } { ExecCommand $(konix_find_true_exec.sh import) $HOME/Desktop/Capture.png }
 
 # Open a dialog to run programs
 Mod4 F2 :Exec gnome-run
@@ -249,10 +249,10 @@ Control Mod4 Mod1 e :Exec $(konix_find_true_exec.sh emacs)
 # ************************************************************
 # Open specific folders (Mod4 o ...)
 # ************************************************************
-Mod4 o e : ExecCommand konix_display_n_launch.sh pcmanfm ~
-Mod4 o i : ExecCommand konix_display_n_launch.sh pcmanfm ~/data/Images
-Mod4 o m : ExecCommand konix_display_n_launch.sh pcmanfm ~/data/Musiques
-Mod4 o v : ExecCommand konix_display_n_launch.sh pcmanfm ~/data/Videos
+Mod4 o e : ExecCommand konix_display_n_launch.sh pcmanfm $HOME
+Mod4 o i : ExecCommand konix_display_n_launch.sh pcmanfm $HOME/data/Images
+Mod4 o m : ExecCommand konix_display_n_launch.sh pcmanfm $HOME/data/Musiques
+Mod4 o v : ExecCommand konix_display_n_launch.sh pcmanfm $HOME/data/Videos
 
 # ************************************************************
 # Special window keys
@@ -273,10 +273,10 @@ XF86AudioRaiseVolume	:Exec konix_display_unique.py "Master Volume : $(amixer set
 # ************************************************************
 # Change layout
 Mod4 k a :MacroCmd { Exec setxkbmap fr bepo } { Exec konix_display.py "Switch to BEPO" }
-Mod4 k h :Exec eog ~/Prog/devel/doc/bepo.png
+Mod4 k h :Exec eog $HOME/Prog/devel/doc/bepo.png
 # Same thing in BEPO
 Mod4 s b :MacroCmd { Exec setxkbmap fr } { Exec konix_display.py "Switch to AZERTY" }
-Mod4 s c :Exec eog ~/Prog/devel/doc/bepo.png
+Mod4 s c :Exec eog $HOME/Prog/devel/doc/bepo.png
 
 Mod4 k c :MacroCmd { Exec setxkbmap -option ctrl:swapcaps } { Exec konix_display.py "switch CTRL CAPS" }
 Mod4 k shift c :MacroCmd { Exec setxkbmap -option } { Exec konix_display.py "Cancel xkb options" }

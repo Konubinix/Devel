@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Categories=Application;Network;X-Red-Hat-Base;
+Name=Uzbl
+Comment=Browse the web
+Exec=konix_uzbl
+Icon=/usr/lib/firefox/icons/mozicon50.xpm
+StartupNotify=true
+Terminal=false
+Type=Application

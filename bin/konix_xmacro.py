@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
+
 import os
 import re
 import getopt
@@ -101,5 +103,3 @@ if __name__ == "__main__":
             sys.exit()
         else:
             assert False, "unhandled option"
-
-

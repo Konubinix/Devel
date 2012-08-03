@@ -116,3 +116,7 @@
   [Maximized]	{yes}
   [Jump]	{yes}
 [end]
+[group]
+ [app] (name=uzbl-core)
+ [Layer]	{8}
+[end]

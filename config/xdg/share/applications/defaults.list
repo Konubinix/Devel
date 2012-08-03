@@ -1,2 +1,3 @@
 [Default Applications]
-text/html=uzbl.desktop
+text/html=uzbl.desktop;
+application/pdf=evince.desktop;epdfview.desktop;

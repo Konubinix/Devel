@@ -50,7 +50,7 @@ tee "${HOME}/konix_view_html.msg" | {
 	for i in "$dir"/part*.[Hh][Tt][Mm][Ll]; do
         i_new="$i.new.html"
         cat "$i" | bash "$dir"/sed > "${i_new}"
-		xdg-open "${i_new}" &
+		mimeopen "${i_new}" &
 		sleep 3
 		exit 0
 	done

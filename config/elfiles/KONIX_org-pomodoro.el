@@ -3,7 +3,8 @@
 ;; ####################################################################################################
 (defvar konix/org-pomodoro-set-count 0)
 (defvar konix/org-pomodoro-file-name "pomodoro.org")
-(defvar konix/org-pomodoro-bookmark "pomodoro")
+(defvar konix/org-pomodoro-bookmark '(nil . nil) "a cons representing the place where the
+last pomodoro was called in (file_name . point_in_file)")
 (defvar konix/org-pomodoro-report-heading-name "Report")
 (defvar konix/org-pomodoro-current-pomodoro-report-entry-id "pomodoro_report")
 (defvar konix/org-pomodoro-break-clocks-out nil)
@@ -150,8 +151,7 @@
   (interactive)
   (org-mark-ring-push)
   (let (
-		(current_pomodoro_file (ignore-errors (expand-file-name (bookmark-get-filename
-  																 konix/org-pomodoro-bookmark))))
+		(current_pomodoro_file (ignore-errors (expand-file-name (car konix/org-pomodoro-bookmark))))
   		(new_pomodoro_file (expand-file-name konix/org-pomodoro-file-name org-directory))
   		)
   	(cond
@@ -175,17 +175,29 @@
 		(when (not (file-exists-p new_pomodoro_file))
 		  (write-region (point-min) (point-min) new_pomodoro_file)
 		  )
-		(bookmark-set-filename konix/org-pomodoro-bookmark new_pomodoro_file)
+		(setcar konix/org-pomodoro-bookmark new_pomodoro_file)
+		(with-current-buffer (find-file-noselect new_pomodoro_file)
+		  (setcdr konix/org-pomodoro-bookmark (point-max-marker))
+		  )
 		)
 	  )
 	 )
   	)
-  (bookmark-jump konix/org-pomodoro-bookmark 'pop-to-buffer)
+  ;; make sure the file is loaded in a buffer
+  (find-file-noselect (car konix/org-pomodoro-bookmark))
+  (pop-to-buffer (marker-buffer (cdr konix/org-pomodoro-bookmark)))
+  (goto-char (marker-position (cdr konix/org-pomodoro-bookmark)))
   )
 
 (defun konix/org-pomodoro-set-bookmark ()
   (interactive)
-  (bookmark-set konix/org-pomodoro-bookmark)
+  (setq konix/org-pomodoro-bookmark
+		`(
+		  ,(buffer-file-name)
+		  .
+		  ,(point-marker)
+		  )
+		)
   (message "Setting pomodoro current location to HERE")
   )
 

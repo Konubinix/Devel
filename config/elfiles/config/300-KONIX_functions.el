@@ -160,13 +160,13 @@
 	)
   )
 
-(defun konix/xdg-open (file)
-  "Open the selected file with xdg-open."
+(defun konix/mimeopen (file)
+  "Open the selected file with mimeopen."
   (interactive "ffile:")
   (start-process
-   (format "xdg-open %s" file)
+   (format "mimeopen %s" file)
    nil
-   "xdg-open"
+   "mimeopen"
    file
    )
   )

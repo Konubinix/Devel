@@ -8,6 +8,7 @@ set prefix      = @(echo $PREFIX)@
 set data_home   = @(echo $XDG_DATA_HOME)@
 set cache_home  = @(echo $XDG_CACHE_HOME)@
 set config_home = @(echo $XDG_CONFIG_HOME)@
+set perso_dir   = @(echo $KONIX_PERSO_DIR)@
 
 # Interface paths.
 set fifo_dir   = /tmp
@@ -35,7 +36,7 @@ set set_mode        = set mode =
 set set_status      = set status_message =
 
 # Spawn path shortcuts. In spawn the first dir+path match is used in "dir1:dir2:dir3:executable"
-set scripts_dir      = @data_home/uzbl:@prefix/share/uzbl/examples/data:scripts
+set scripts_dir      = @perso_dir/uzbl:@data/share/uzbl/examples/data_home/uzbl:@prefix/share/uzbl/examples/data:scripts
 
 # === Hardcoded handlers =====================================================
 
@@ -69,10 +70,12 @@ set download_handler    = sync_spawn @scripts_dir/download.sh
 # Load commit handlers
 @on_event   LOAD_COMMIT    @set_status <span foreground="green">recv</span>
 
-  # add some javascript to the page for other 'js' and 'script' commands to access later.
+# add some javascript to the page for other 'js' and 'script' commands to access later.
 @on_event   LOAD_COMMIT    js uzbl = {};
 @on_event   LOAD_COMMIT    script @scripts_dir/formfiller.js
 @on_event   LOAD_COMMIT    script @scripts_dir/follow.js
+@on_event   LOAD_COMMIT    script @scripts_dir/jquery-1.7.2.min.js
+@on_event   LOAD_COMMIT    script @scripts_dir/my_scripts.js
 
 # Userscripts/per-site-settings. See the script and the example configuration for details
 #@on_event   LOAD_COMMIT    spawn @scripts_dir/per-site-settings.py @data_home/uzbl/per-site-settings
@@ -106,6 +109,7 @@ set keycmd_style      = weight="light" foreground="red"
 set prompt_style      = foreground="grey"
 set cursor_style      = underline="single"
 set completion_style  = foreground="green"
+
 set hint_style        = weight="bold"
 
 set mode_section      = <span background="khaki" foreground="black">[\@[\@mode_indicator]\@]</span>
@@ -265,6 +269,12 @@ set ebind     = @mode_bind global,-insert
 @cbind  T   = toggle zoom_type
 @cbind  1   = set zoom_level = 1.0
 @cbind  2   = set zoom_level = 2.0
+
+@cbind <Shift><Ctrl><Right> = js my_next();
+@cbind <Shift><Ctrl><Left> = js my_previous();
+@cbind <Shift><Ctrl><Up> = js my_up();
+@cbind <Shift><Ctrl>T = js my_toc();
+@cbind <Shift><Ctrl>H = js my_home();
 
 # Appearance binds
 @cbind  t   = toggle show_status

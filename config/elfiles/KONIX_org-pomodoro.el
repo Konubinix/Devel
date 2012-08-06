@@ -143,7 +143,7 @@ last pomodoro was called in (file_name . point_in_file)")
 	(beginning-of-line)
 	(org-open-at-point)
 	)
-  (konix/org-pomodoro-tray-daemon-put "i")
+  (konix/org-pomodoro-tray-daemon-put "c")
   (org-timer-set-timer '(16))
   )
 

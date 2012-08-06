@@ -18,7 +18,8 @@ def main():
                           200,
                      {"i" : os.path.join(icons_dir, "pomodorow_idle.png"),
                       "r" : os.path.join(icons_dir, "pomodorow_rings.png"),
-                      "b" : os.path.join(icons_dir, "pomodorow_end_break.png")
+                      "b" : os.path.join(icons_dir, "pomodorow_end_break.png"),
+                      "c" : os.path.join(icons_dir, "pomodorow_clock_in.png")
                       },
                      "i"
                      )

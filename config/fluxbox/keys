@@ -284,8 +284,9 @@ Mod4 k shift c :MacroCmd { Exec setxkbmap -option } { Exec konix_display.py "Can
 # ####################################################################################################
 # Macro (Mod4 x k) 67 is the keycode of F1
 # ###################################################################################################
-Mod4 x k s :ExecCommand konix_display_n_launch.sh xmacrorec2 -k 67 > $HOME/.xmacro && konix_display.py "Macro added in $HOME/.xmacro"
-Mod4 x k k :ExecCommand konix_display_n_launch.sh xmacroplay :0 < $HOME/.xmacro
+Mod4 x k s :ExecCommand konix_display_n_launch.sh konix_xmacrorec.sh
+Mod4 x k k :ExecCommand konix_display_n_launch.sh konix_xmacroplay.sh
+Mod4 x k t :ExecCommand konix_xmacro_toggle_quick_mode.sh
 Mod4 x k n :MacroCmd { Exec python konix_xmacro.py -n && konix_display.py $(readlink $HOME/.xmacro) }
 Mod4 x k p :MacroCmd { Exec python konix_xmacro.py -p && konix_display.py $(readlink $HOME/.xmacro) }
 Mod4 x k v :MacroCmd { Exec python konix_xmacro.py -s && konix_display.py $(readlink $HOME/.xmacro) }

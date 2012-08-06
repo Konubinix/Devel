@@ -2391,6 +2391,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 (defun konix/jabber-chat-mode-hook ()
   (flyspell-mode 1)
   (autopair-mode 1)
+  (visual-line-mode 1)
   )
 
 (add-hook 'jabber-chat-mode-hook

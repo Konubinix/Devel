@@ -167,6 +167,7 @@
    (format "mimeopen %s" file)
    nil
    "mimeopen"
+   "-n"
    file
    )
   )

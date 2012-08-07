@@ -15,7 +15,7 @@ fluxbox &
 
 fbpid=$!
 
-volwheel &
+volti &
 
 numlockx
 konix_notify_daemon > ~/.notify_daemon_log 2>&1 &

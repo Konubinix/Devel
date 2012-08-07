@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: ifndef
+# --
+$>#ifndef ${700:__`(replace-regexp-in-string "\\\\." "_" (file-name-nondirectory(buffer-file-name)))`}
+$>#define $700
+
+$>$0
+
+$>#endif // $700

@@ -122,6 +122,8 @@
 (autoload 'ioccur "ioccur" nil t)
 ;; elnode
 (autoload 'elnode-start "elnode" nil t)
+;; globalff
+(autoload 'globalff "globalff" nil t)
 
 ;; ************************************************************
 ;; Automodes

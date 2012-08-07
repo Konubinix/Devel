@@ -225,8 +225,8 @@
 
 ;; ************************************************************
 
-;; find recent file
-(define-key 'konix/global-key-map (kbd "C-f") 'icicle-recent-file)
+;; find global file
+(define-key 'konix/global-key-map (kbd "C-f") 'globalff)
 ;; delete file
 (define-key 'konix/global-key-map (kbd "C-x C-f") 'konix/delete-file-or-directory)
 ;; proced

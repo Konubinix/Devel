@@ -663,7 +663,39 @@
 	)
   )
 
+(defun konix/shell-complete-rlc ()
+  (interactive)
+  (let* (
+		 (completion (rlc-candidates))
+		 (word-before
+		  (if
+			  (looking-back "[ \t\n]+\\(.+\\)")
+			  (match-string-no-properties 1)
+			(error "Cannot match the word before point")
+			)
+		  )
+		 (beginning-of-word-before (match-beginning 1))
+		 (completion (completing-read "Completion: " (all-completions word-before completion)))
+		 )
+	(if completion
+		(progn
+		  (delete-region beginning-of-word-before (point))
+		  (insert completion)
+		  nil
+		  )
+	  nil
+	  )
+	)
+  )
+
+(defun konix/shell-complete-rlc-no-error (&rest args)
+  (interactive)
+  (and (ignore-errors (konix/shell-complete-rlc))
+	   t)
+  )
+
 (defun konix/shell-mode-hook ()
+  (require 'readline-complete)
   (compilation-shell-minor-mode)
   (auto-complete-mode t)
   (if (string-match
@@ -705,6 +737,11 @@
 	(dirtrack-mode -1)
 	)
    )
+  (set (make-variable-buffer-local 'hippie-expand-try-functions-list)
+	   '(konix/shell-complete-rlc-no-error
+		 konix/comint-dynamic-complete-no-error)
+	   )
+  (local-set-key (kbd "C-j") 'hippie-expand)
   )
 (add-hook 'shell-mode-hook
 		  'konix/shell-mode-hook
@@ -930,10 +967,10 @@
 (eval-after-load "ecb"
   '(progn
 	 (ecb-layout-define
-		 "PERSO"
-		 left nil
-		 (konix/ecb-set-windows)
-		 )
+	  "PERSO"
+	  left nil
+	  (konix/ecb-set-windows)
+	  )
 	 (setq-default ecb-analyse-buffer-sync-delay 40)
 	 (setq-default ecb-layout-name "PERSO")
 	 (setq-default ecb-options-version "2.40")
@@ -1246,6 +1283,11 @@
 	  (comint-dynamic-complete)
 	  )
 	)
+  )
+(defun konix/comint-dynamic-complete-no-error (&rest args)
+  (interactive)
+  (and (ignore-errors (konix/comint-dynamic-complete))
+	   t)
   )
 (defun konix/comint-mode-hook()
   (local-set-key (kbd "C-w") 'comint-kill-region)
@@ -2497,3 +2539,16 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
   )
 (add-hook 'Man-mode-hook
 		  'konix/Man-mode-hook)
+
+;; ######################################################################
+;; readline-complete
+;; ######################################################################
+(eval-after-load "readline-complete"
+  `(ac-define-source shell
+     '(
+	   (candidates . rlc-candidates)
+       (prefix . ac-rlc-prefix-shell-dispatcher)
+       (requires . 4)
+	   )
+	 )
+  )

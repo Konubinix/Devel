@@ -226,7 +226,7 @@
 ;; ************************************************************
 
 ;; find global file
-(define-key 'konix/global-key-map (kbd "C-f") 'globalff)
+(define-key 'konix/global-key-map (kbd "C-f") 'icicle-locate)
 ;; delete file
 (define-key 'konix/global-key-map (kbd "C-x C-f") 'konix/delete-file-or-directory)
 ;; proced

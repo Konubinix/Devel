@@ -681,7 +681,7 @@
 		(progn
 		  (delete-region beginning-of-word-before (point))
 		  (insert completion)
-		  nil
+		  t
 		  )
 	  nil
 	  )

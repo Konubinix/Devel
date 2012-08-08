@@ -117,10 +117,13 @@
   [Jump]	{yes}
 [end]
 [group]
- [app] (name=uzbl-core)
- [Layer]	{8}
+ [app] (title=.*Uzbl browser.*)
+  [Layer]	{8}
 [end]
 [app] (name=terminator)
   [Workspace]	{0}
   [Jump]	{yes}
+[end]
+[app] (title=Uzbl WebInspector)
+  [Layer]	{7}
 [end]

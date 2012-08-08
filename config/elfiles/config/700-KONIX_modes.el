@@ -2380,6 +2380,35 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 (setq-default jabber-auto-reconnect t)
 (setq-default jabber-chat-fill-long-lines nil)
 (setq-default jabber-show-offline-contacts nil)
+
+(defun konix/jabber-bot-psy (text buffer)
+  (save-window-excursion
+   (unless (get-buffer "*doctor*")
+	 (doctor)
+	 )
+   )
+  (let (
+		position
+		answer
+		)
+	(with-current-buffer "*doctor*"
+	  (goto-char (point-max))
+	  (insert (format "\n\n%s\n\n" text))
+	  (setq position (point))
+	  (call-interactively 'doctor-ret-or-read)
+	  (setq answer
+			(replace-regexp-in-string "[ \n]*\\(.+\\)[ \n]*" "\\1"
+									  (buffer-substring-no-properties position (point-max)))
+			)
+	  )
+	(with-current-buffer buffer
+	  (goto-char (point-max))
+	  (insert answer)
+	  (jabber-chat-buffer-send)
+	  )
+	)
+  )
+
 (defun konix/jabber-notify (from buffer text)
   (unless konix/chat-silent
 	(call-process "konix_display.py" nil nil nil (format "MESSAGE %s : %s" from

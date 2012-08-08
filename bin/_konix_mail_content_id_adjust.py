@@ -49,4 +49,4 @@ print "cat",
 for REPLACE_STUFF in REPLACE_STUFFS:
     FROM=REPLACE_STUFF[0]
     TO=REPLACE_STUFF[1]
-    print " | sed s/%s/%s/g" % (FROM, TO),
+    print " | sed 's/%s/%s/g'" % (FROM, TO),

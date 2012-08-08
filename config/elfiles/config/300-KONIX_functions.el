@@ -47,6 +47,17 @@
 	)
   )
 
+(defun konix/multi-eshell-term ()
+  (interactive)
+  (let (
+		(multi-eshell-shell-function '(term explicit-shell-file-name))
+		)
+	(call-interactively
+	 'multi-eshell
+	 )
+	)
+  )
+
 (defun konix/browse-url-uzbl (url &optional new-window)
   (interactive (browse-url-interactive-arg "URL: "))
   (start-process (concat "konix_uzbl " url)

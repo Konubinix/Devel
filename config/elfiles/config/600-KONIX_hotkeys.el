@@ -256,6 +256,7 @@
 (define-key 'konix/global-fast-key-map (kbd "C-s") 'sort-lines)
 ;; SHELL
 (define-key 'konix/global-fast-key-map "e" 'multi-eshell)
+(define-key 'konix/global-fast-key-map "E" 'konix/multi-eshell-term)
 ;; ******************************************************************************************
 ;; Occur
 ;; ******************************************************************************************

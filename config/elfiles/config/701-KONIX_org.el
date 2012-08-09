@@ -113,7 +113,6 @@ cursor stays in the org buffer."
 				 )
  				("c" "Weekly schedule" agenda ""
 				 (
-				  (org-agenda-start-day 'org-today)
 				  (org-agenda-span 21)
 				  (org-agenda-repeating-timestamp-show-all t)
 				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
@@ -128,6 +127,26 @@ cursor stays in the org buffer."
 				 (
 				  (org-agenda-start-with-log-mode t)
 				  (org-agenda-show-log 'clockcheck)
+				  )
+				 )
+				("e" "Agenda weekly view (all)"
+				 (
+				  (agenda nil)
+				  )
+				 (
+				  (org-agenda-skip-function
+				   '(org-agenda-skip-entry-if 'nottodo '("*")))
+				  (org-agenda-span 7)
+				  )
+				 )
+				("E" "Agenda weekly view (org-directory)"
+				 (
+				  (agenda nil)
+				  )
+				 (
+				  (org-agenda-skip-function
+				   '(org-agenda-skip-entry-if 'nottodo '("*")))
+				  (org-agenda-span 7)
 				  )
 				 )
 				("a" "Agenda and co (all)"
@@ -345,7 +364,8 @@ cursor stays in the org buffer."
 ;; be done right now because it waits for other tasks to complete
 ;; NEXT; a TODO task that may be done right now, no more dependency
 ;; WAIT: a task waiting for an external event (phone call, meeting) to be
-;; continued
+;; continued. the time when the event occurs is not know. If it was, the task
+;; would be set in state TODO and scheduled just after the event
 ;; DELEGATED: Someone will do this task but I am still responsible for it
 (setq-default org-todo-keywords
 			  '(

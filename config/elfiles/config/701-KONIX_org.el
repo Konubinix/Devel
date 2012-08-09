@@ -135,7 +135,7 @@ cursor stays in the org buffer."
 				  )
 				 (
 				  (org-agenda-skip-function
-				   '(org-agenda-skip-entry-if 'nottodo '("*")))
+				   '(konix/org-agenda-skip-if-tag "no_weekly"))
 				  (org-agenda-span 7)
 				  )
 				 )
@@ -145,7 +145,8 @@ cursor stays in the org buffer."
 				  )
 				 (
 				  (org-agenda-skip-function
-				   '(org-agenda-skip-entry-if 'nottodo '("*")))
+				   '(konix/org-agenda-skip-if-tag "no_weekly"))
+				  (org-agenda-files (list org-directory))
 				  (org-agenda-span 7)
 				  )
 				 )
@@ -350,6 +351,7 @@ cursor stays in the org buffer."
 (setq-default org-tag-persistent-alist
 			  '(
 				("project" . ?p)
+				("no_weekly" . ?n)
 				("@home" . ?h)
 				("@computer" . ?c)
 				("@work" . ?w)

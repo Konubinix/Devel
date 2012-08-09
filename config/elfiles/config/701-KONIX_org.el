@@ -153,14 +153,16 @@ cursor stays in the org buffer."
 				("a" "Agenda and co (all)"
 				 (
 				  (agenda nil)
+				  (stuck nil)
 				  (todo "NEXT")
-				  (todo "WAIT|DELEGATED")
+ 				  (todo "WAIT|DELEGATED")
 				  (todo nil)
 				  )
 				 )
 				("A" "Important stuff to do (all)"
 				 (
 				  (agenda nil)
+				  (stuck nil)
 				  (todo "NEXT")
 				  (todo "WAIT|DELEGATED")
 				  (todo nil)
@@ -174,6 +176,7 @@ cursor stays in the org buffer."
 				("W" "Important stuff to do (org-directory)"
 				 (
 				  (agenda nil)
+				  (stuck nil)
 				  (todo "NEXT")
 				  (todo "WAIT|DELEGATED")
 				  (todo nil)
@@ -188,6 +191,7 @@ cursor stays in the org buffer."
 				("w" "Agenda and co (org-directory)"
 				 (
 				  (agenda nil)
+				  (stuck nil)
 				  (todo "NEXT")
 				  (todo "WAIT|DELEGATED")
 				  (todo)

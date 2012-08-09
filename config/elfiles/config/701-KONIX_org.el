@@ -84,6 +84,21 @@ cursor stays in the org buffer."
   (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFG]\\]")
   )
 
+(defun konix/org-agenda-skip-if-tag (tag)
+  (let (beg end)
+    (org-back-to-heading t)
+    (setq beg (point)
+		  end (progn (outline-next-heading) (1- (point))))
+    (goto-char beg)
+	(if (member tag
+				(org-get-tags)
+				)
+		end
+	  nil
+	  )
+	)
+  )
+
 (setq-default org-agenda-custom-commands
 			  '(
 				("y" "Yesterday time sheet"

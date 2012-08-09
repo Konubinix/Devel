@@ -742,6 +742,7 @@
 		 konix/comint-dynamic-complete-no-error)
 	   )
   (local-set-key (kbd "C-j") 'hippie-expand)
+  (local-set-key (kbd "<tab>") 'hippie-expand)
   )
 (add-hook 'shell-mode-hook
 		  'konix/shell-mode-hook

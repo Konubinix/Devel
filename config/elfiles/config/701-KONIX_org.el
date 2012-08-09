@@ -363,7 +363,7 @@ cursor stays in the org buffer."
 				)
 			  )
 (setq-default org-tags-exclude-from-inheritance '("project"))
-(setq-default org-fast-tag-selection-single-key nil)
+(setq-default org-fast-tag-selection-single-key t)
 (setq-default org-reverse-note-order t)
 (setq org-tag-alist nil)
 (setq org-timer-timer-is-countdown nil)

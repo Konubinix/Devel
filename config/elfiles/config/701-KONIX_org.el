@@ -91,10 +91,10 @@ cursor stays in the org buffer."
 				  (org-agenda-files (list org-directory))
 				  )
 				 )
-				("c" "Weekly schedule" agenda ""
+ 				("c" "Weekly schedule" agenda ""
 				 (
 				  (org-agenda-start-day 'org-today)
-				  (org-agenda-span 14)
+				  (org-agenda-span 21)
 				  (org-agenda-repeating-timestamp-show-all t)
 				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
 																	   'scheduled)

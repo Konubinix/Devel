@@ -285,9 +285,13 @@ cursor stays in the org buffer."
 (setq-default org-reverse-note-order t)
 (setq org-tag-alist '(("project" . ?p) ))
 (setq org-timer-timer-is-countdown nil)
+;; TODO: a task that does not wait for external event. I is possible it may not
+;; be done right now because it waits for other tasks to complete
+;; NEXT; a TODO task that may be done right now, no more dependency
+;; WAIT: a task waiting for an external event (phone call, meeting) to be continued
 (setq-default org-todo-keywords
 			  '(
-				(sequence "WAIT(w@/!)" "NEXT(n!)" "TODO(t!)" "|" "DONE(d!)" "NOT_DONE(u@)")
+				(sequence "WAIT(w@/!)" "NEXT(n!)" "TODO(t!)" "|" "DONE(d!)" "NOT_DONE(u@/!)")
 				(sequence "MEETING(m!)" "REPORT(o!)" "|" "MET(M!)" "CANCELED(c@)")
 				(sequence
 				 "SPECIFY(S!)" "CREATE_VALIDATOR(v!)" "PROGRAM(P!)" "VALIDATE(V@/!)" "|" "END(E!)" "ABORTED(A@)")

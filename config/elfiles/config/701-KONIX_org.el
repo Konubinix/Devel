@@ -430,6 +430,11 @@ cursor stays in the org buffer."
   (find-file (expand-file-name "todo.org" org-directory))
   )
 
+(defun konix/org-goto-org-directory ()
+  (interactive)
+  (find-file (expand-file-name org-directory))
+  )
+
 (defun konix/org-goto-notes ()
   (interactive)
   (find-file (expand-file-name "notes.org" org-directory))

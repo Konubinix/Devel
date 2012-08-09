@@ -176,6 +176,7 @@ cursor stays in the org buffer."
 (setq-default org-agenda-skip-scheduled-if-done t)
 (setq-default org-agenda-skip-deadline-if-done t)
 (setq-default org-agenda-span 'day)
+(setq-default org-agenda-start-on-weekday nil)
 (setq-default org-agenda-start-with-clockreport-mode nil)
 (setq-default org-agenda-start-with-log-mode nil)
 (setq-default org-agenda-todo-ignore-deadlines t)

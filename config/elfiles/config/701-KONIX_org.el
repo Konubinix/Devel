@@ -99,8 +99,18 @@ cursor stays in the org buffer."
 	)
   )
 
+(setq-default konix/org-agenda-entries
+ '(
+  (agenda nil)
+  (stuck nil)
+  (todo "NEXT")
+  (todo "WAIT|DELEGATED")
+  (todo nil)
+  )
+ )
+
 (setq-default org-agenda-custom-commands
-			  '(
+			  `(
 				("y" "Yesterday time sheet"
 				 (
 				  (agenda nil)
@@ -151,22 +161,10 @@ cursor stays in the org buffer."
 				  )
 				 )
 				("a" "Agenda and co (all)"
-				 (
-				  (agenda nil)
-				  (stuck nil)
-				  (todo "NEXT")
- 				  (todo "WAIT|DELEGATED")
-				  (todo nil)
-				  )
+				 ,konix/org-agenda-entries
 				 )
 				("A" "Important stuff to do (all)"
-				 (
-				  (agenda nil)
-				  (stuck nil)
-				  (todo "NEXT")
-				  (todo "WAIT|DELEGATED")
-				  (todo nil)
-				  )
+				 ,konix/org-agenda-entries
 				 (
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
 				  (org-agenda-overriding-header
@@ -174,13 +172,7 @@ cursor stays in the org buffer."
 				  )
 				 )
 				("W" "Important stuff to do (org-directory)"
-				 (
-				  (agenda nil)
-				  (stuck nil)
-				  (todo "NEXT")
-				  (todo "WAIT|DELEGATED")
-				  (todo nil)
-				  )
+				 ,konix/org-agenda-entries
 				 (
 				  (org-agenda-files (list org-directory))
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
@@ -189,13 +181,7 @@ cursor stays in the org buffer."
 				  )
 				 )
 				("w" "Agenda and co (org-directory)"
-				 (
-				  (agenda nil)
-				  (stuck nil)
-				  (todo "NEXT")
-				  (todo "WAIT|DELEGATED")
-				  (todo)
-				  )
+				 ,konix/org-agenda-entries
 				 (
 				  (org-agenda-files (list org-directory))
 				  (org-agenda-overriding-header "Things to do (org-directory) :")

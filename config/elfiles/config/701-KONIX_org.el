@@ -347,6 +347,7 @@ cursor stays in the org buffer."
 				)
 			  )
 (setq-default org-icalendar-store-UID t)
+(setq-default org-stuck-projects '("+project/-DONE" ("NEXT") ("") ""))
 (setq-default org-timer-default-timer 25)
 (setq-default org-tag-persistent-alist
 			  '(

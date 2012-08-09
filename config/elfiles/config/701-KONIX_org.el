@@ -306,6 +306,7 @@ cursor stays in the org buffer."
 				("@home" . ?h)
 				("@computer" . ?c)
 				("@work" . ?w)
+				("@phone" . ?o)
 				)
 			  )
 (setq-default org-fast-tag-selection-single-key nil)

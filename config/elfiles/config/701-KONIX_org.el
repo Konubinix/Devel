@@ -79,6 +79,11 @@ cursor stays in the org buffer."
 	  )
 	)
   )
+
+(defun konix/org-agenda-skip-non-important-item ()
+  (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFG]\\]")
+  )
+
 (setq-default org-agenda-custom-commands
 			  '(
 				("y" "Yesterday time sheet"
@@ -115,6 +120,31 @@ cursor stays in the org buffer."
 				  (agenda nil)
 				  (todo "WAIT|DELEGATED")
 				  (todo nil)
+				  )
+				 )
+				("A" "Important stuff to do (all)"
+				 (
+				  (agenda nil)
+				  (todo "WAIT|DELEGATED")
+				  (todo nil)
+				  )
+				 (
+				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
+				  (org-agenda-overriding-header
+				   "TODO today (don't forget to take a look at all tasks)")
+				  )
+				 )
+				("W" "Important stuff to do (org-directory)"
+				 (
+				  (agenda nil)
+				  (todo "WAIT|DELEGATED")
+				  (todo nil)
+				  )
+				 (
+				  (org-agenda-files (list org-directory))
+				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
+				  (org-agenda-overriding-header
+				   "TODO today org-directory (don't forget to take a look at all tasks)")
 				  )
 				 )
 				("w" "Agenda and co (org-directory)"

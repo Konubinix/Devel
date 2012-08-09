@@ -112,15 +112,15 @@ cursor stays in the org buffer."
 				 )
 				("A" "Agenda and wait (all agenda files)"
 				 (
-				  (todo "WAIT")
 				  (agenda nil)
+				  (todo "WAIT|DELEGATED")
 				  (todo)
 				  )
 				 )
-				("W" "Agenda and wait (org-directory)"
+				("W" "Agenda and co (org-directory)"
 				 (
-				  (todo "WAIT")
 				  (agenda nil)
+				  (todo "WAIT|DELEGATED")
 				  (todo)
 				  )
 				 (
@@ -128,17 +128,13 @@ cursor stays in the org buffer."
 				  (org-agenda-overriding-header "Things to do (org-directory) :")
 				  )
 				 )
-				("w" "Agenda and wait (all)"
+				("w" "Agenda and co (all)"
 				 (
-				  (todo "WAIT")
 				  (agenda nil)
+				  (todo "WAIT|DELEGATED")
 				  (todo nil)
 				  )
 				 )
-				("r" todo "TO_READ" nil)
-				("b" tags "blocked" nil)
-				("d" tags "DOC" nil)
-				("c" tags "TO_CHECK" nil)
 				)
 			  )
 (setq-default org-agenda-diary-file (concat org-directory "/diary.org"))

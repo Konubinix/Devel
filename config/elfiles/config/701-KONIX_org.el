@@ -281,9 +281,17 @@ cursor stays in the org buffer."
 			  )
 (setq-default org-icalendar-store-UID t)
 (setq-default org-timer-default-timer 25)
-(setq-default org-tag-persistent-alist nil)
+(setq-default org-tag-persistent-alist
+			  '(
+				("project" . ?p)
+				("@home" . ?h)
+				("@computer" . ?c)
+				("@work" . ?w)
+				)
+			  )
+(setq-default org-fast-tag-selection-single-key nil)
 (setq-default org-reverse-note-order t)
-(setq org-tag-alist '(("project" . ?p) ))
+(setq org-tag-alist nil)
 (setq org-timer-timer-is-countdown nil)
 ;; TODO: a task that does not wait for external event. I is possible it may not
 ;; be done right now because it waits for other tasks to complete

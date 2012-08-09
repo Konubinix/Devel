@@ -264,7 +264,7 @@ cursor stays in the org buffer."
 				 :kill-buffer
 				 )
 				("u" "Todo Item URGENT" entry (file+headline (expand-file-name "todo.org" org-directory) "A traiter")
-				 "* TODO [#A] %?
+				 "* TODO [#G] %?
   SCHEDULED: %t
   :LOGBOOK:
   - Captured       %U
@@ -273,7 +273,7 @@ cursor stays in the org buffer."
 				 :kill-buffer
 				 )
 				("p" "Todo Item POMODORO" entry (file (expand-file-name "pomodoro.org" org-directory))
-				 "* TODO [#A] %?
+				 "* TODO [#G] %?
   SCHEDULED: %t
   :LOGBOOK:
   - Captured       %U

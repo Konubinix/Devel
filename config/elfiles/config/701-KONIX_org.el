@@ -290,6 +290,14 @@ cursor stays in the org buffer."
    %:initial"
 				 :kill-buffer
 				 )
+				("b" "Bookmark" entry (file (expand-file-name "bookmarks.org" org-directory))
+				 "* %?
+  :LOGBOOK:
+  - Captured       %U
+  :END:
+"
+				 :kill-buffer
+				 )
 				("T" "Bookmark TO-READ (use with org-protocol)" entry (file (expand-file-name "bookmarks.org" org-directory))
 				 "* TO-READ %:description
    %:link

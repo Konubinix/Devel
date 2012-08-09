@@ -130,8 +130,8 @@
 ;; calendar
 (define-key 'konix/global-slow-key-map (kbd "c") 'calendar)
 ;; org agenda
-(define-key 'konix/global-slow-key-map (kbd "A") 'konix/org-agenda)
-(define-key 'konix/global-slow-key-map (kbd "a") 'org-agenda)
+(define-key 'konix/global-slow-key-map (kbd "a") 'konix/org-agenda)
+(define-key 'konix/global-slow-key-map (kbd "A") 'org-agenda)
 ;; ffap
 (define-key 'konix/global-slow-key-map (kbd "C-f") 'ffap)
 ;; Prog toggle c/h files

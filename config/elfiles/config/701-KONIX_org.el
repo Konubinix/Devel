@@ -160,12 +160,12 @@ cursor stays in the org buffer."
 				  (org-agenda-span 7)
 				  )
 				 )
-				("g" "GO !"
+				("a" "Agenda"
 				 (
 				  (agenda nil)
 				  )
 				 )
-				("G" "GO do important stuff !"
+				("A" "Agenda do important stuff !"
 				 (
 				  (agenda nil)
 				  )
@@ -173,10 +173,10 @@ cursor stays in the org buffer."
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
 				  )
 				 )
-				("a" "Agenda and co (all)"
+				("g" "Agenda and co (all)"
 				 ,konix/org-agenda-entries
 				 )
-				("A" "Important stuff to do (all)"
+				("G" "Important stuff to do (all)"
 				 ,konix/org-agenda-entries
 				 (
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)

@@ -110,14 +110,14 @@ cursor stays in the org buffer."
 				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )
-				("A" "Agenda and wait (all agenda files)"
+				("a" "Agenda and co (all)"
 				 (
 				  (agenda nil)
 				  (todo "WAIT|DELEGATED")
-				  (todo)
+				  (todo nil)
 				  )
 				 )
-				("W" "Agenda and co (org-directory)"
+				("w" "Agenda and co (org-directory)"
 				 (
 				  (agenda nil)
 				  (todo "WAIT|DELEGATED")
@@ -126,13 +126,6 @@ cursor stays in the org buffer."
 				 (
 				  (org-agenda-files (list org-directory))
 				  (org-agenda-overriding-header "Things to do (org-directory) :")
-				  )
-				 )
-				("w" "Agenda and co (all)"
-				 (
-				  (agenda nil)
-				  (todo "WAIT|DELEGATED")
-				  (todo nil)
 				  )
 				 )
 				)

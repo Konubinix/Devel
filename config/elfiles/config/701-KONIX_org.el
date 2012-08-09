@@ -376,7 +376,7 @@ cursor stays in the org buffer."
 ;; DELEGATED: Someone will do this task but I am still responsible for it
 (setq-default org-todo-keywords
 			  '(
-				(sequence "WAIT(w@/!)" "NEXT(n!)" "TODO(t!)" "DELEGATED(D@/!)" "|" "DONE(d!)" "NOT_DONE(u@/!)")
+				(sequence "DELEGATED(D@/!)" "WAIT(w@/!)" "TODO(t!)" "NEXT(n!)" "|" "DONE(d!)" "NOT_DONE(u@/!)")
 				(sequence "MEETING(m!)" "REPORT(o!)" "|" "MET(M!)" "CANCELED(c@)")
 				(sequence
 				 "SPECIFY(S!)" "CREATE_VALIDATOR(v!)" "PROGRAM(P!)" "VALIDATE(V@/!)" "|" "END(E!)" "ABORTED(A@)")

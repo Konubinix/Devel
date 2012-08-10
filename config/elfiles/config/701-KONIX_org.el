@@ -397,6 +397,16 @@ cursor stays in the org buffer."
 				(sequence "CALL(k!)" "|" "CALLED(@)")
 				)
 			  )
+(setq-default org-todo-keyword-faces
+			  '(
+				("TODO" :foreground "red" :weight bold)
+				("NEXT" :foreground "blue" :weight bold)
+				("DONE" :foreground "forest green" :weight bold)
+				("WAIT" :foreground "orange" :weight bold)
+				("DELEGATED" :foreground "magenta" :weight bold)
+				("NOT_DONE" :foreground "forest green" :weight bold)
+				)
+			  )
 (setq-default org-agenda-cmp-user-defined 'konix/org-cmp-deadlines-past-and-due-first)
 (setq-default org-agenda-sorting-strategy
 			  '(

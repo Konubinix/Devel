@@ -100,14 +100,22 @@ cursor stays in the org buffer."
   )
 
 (setq-default konix/org-agenda-entries
- '(
-  (agenda nil)
-  (stuck nil)
-  (todo "NEXT")
-  (todo "WAIT|DELEGATED")
-  (todo nil)
-  )
- )
+			  '(
+				(agenda nil)
+				(stuck nil)
+				(todo "NEXT"
+					  (
+					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tag "phantom"))
+					   )
+					  )
+				(todo "WAIT|DELEGATED")
+				(todo nil
+					  (
+					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tag "project"))
+					   )
+					  )
+				)
+			  )
 
 (setq-default org-agenda-custom-commands
 			  `(

@@ -310,7 +310,7 @@ cursor stays in the org buffer."
   :LOGBOOK:
   - Captured       %U
   :END:
- [[%F]]
+  %a
 "
 				 :kill-buffer
 				 )

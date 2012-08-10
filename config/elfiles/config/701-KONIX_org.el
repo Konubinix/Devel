@@ -363,7 +363,8 @@ cursor stays in the org buffer."
 (setq-default org-tag-persistent-alist
 			  '(
 				("project" . ?p)
-				("no_weekly" . ?n)
+ 				("no_weekly" . ?n)
+ 				("phantom" . ?m)
 				("@home" . ?h)
 				("@computer" . ?c)
 				("@work" . ?w)

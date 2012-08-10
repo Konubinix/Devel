@@ -53,7 +53,7 @@ set download_handler    = sync_spawn @scripts_dir/download.sh
 
 #   What to do when a website wants to open a new window:
 # Open link in new window
-@on_event   NEW_WINDOW     sh 'konix_uzbl ${1:+-u "$1"}' %r
+@on_event   NEW_WINDOW     sh 'uzbl ${1:+-u "$1"}' %r
 # Open in current window (also see the REQ_NEW_WINDOW event handler below)
 #@on_event   NEW_WINDOW     uri %s
 # Open in new tab. Other options are NEW_TAB_NEXT, NEW_BG_TAB and NEW_BG_TAB_NEXT.
@@ -84,6 +84,8 @@ set download_handler    = sync_spawn @scripts_dir/download.sh
 @on_event   LOAD_COMMIT    script @scripts_dir/navigate.js
 @on_event   LOAD_COMMIT    spawn @scripts_dir/change_style.sh
 @on_event   LOAD_COMMIT    script @scripts_dir/lib.js
+@on_event   LOAD_COMMIT    script @scripts_dir/highlight_anchor.js
+
 
 # Userscripts/per-site-settings. See the script and the example configuration for details
 #@on_event   LOAD_COMMIT    spawn @scripts_dir/per-site-settings.py @data_home/uzbl/per-site-settings
@@ -248,6 +250,8 @@ set ebind     = @mode_bind global,-insert
 # Page movement binds
 @cbind <Up>          = scroll vertical -20
 @cbind <Down>        = scroll vertical 20
+@cbind <Left>        = scroll horizontal -20
+@cbind <Right>       = scroll horizontal 20
 @cbind  j            = scroll vertical 20
 @cbind  k            = scroll vertical -20
 @cbind  h            = scroll horizontal -20
@@ -399,7 +403,20 @@ set follow_hint_keys = 0123456789
 @cbind  FL*  = spawn @scripts_dir/follow.sh \@< uzbl.follow("\@follow_hint_keys", "%s", 'returnuri') >\@ clipboard
 @cbind  fi   = spawn @scripts_dir/go_input.sh
 
+@cbind  fs  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('returnuri') >\@ set
+@cbind  fS  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('click') >\@
+@cbind  Fs  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('newwindow') >\@
+@cbind  FS  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('returnuri') >\@ clipboard
+
+@cbind  ft*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'returnuri') >\@ set
+@cbind  fT*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'click') >\@
+@cbind  Ft*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'newwindow') >\@
+@cbind  FT*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'returnuri') >\@ clipboard
+
 @cbind  '*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'click') >\@
+
+#highlight anchors
+@cbind  <Ctrl>h  = js highlight_anchor_toggle();
 
 # Form filler binds
 # This script allows you to configure (per domain) values to fill in form

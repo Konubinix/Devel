@@ -1,3 +1,4 @@
 [MIME Cache]
 text/html=uzbl.desktop;
 application/pdf=evince.desktop;epdfview.desktop;
+image/png=feh.desktop;

@@ -407,6 +407,18 @@ cursor stays in the org buffer."
 				("NOT_DONE" :foreground "forest green" :weight bold)
 				)
 			  )
+(setq-default org-todo-state-tags-triggers
+			  '(
+				("NOT_DONE" ("NOT_DONE" . t))
+				("WAIT" ("WAIT" . t))
+				("DELEGATED" ("WAIT" . t))
+				(done ("WAIT"))
+				("TODO" ("WAIT") ("NOT_DONE"))
+				("NEXT" ("WAIT") ("NOT_DONE"))
+				("DONE" ("WAIT") ("NOT_DONE"))
+				)
+			  )
+
 (setq-default org-agenda-cmp-user-defined 'konix/org-cmp-deadlines-past-and-due-first)
 (setq-default org-agenda-sorting-strategy
 			  '(

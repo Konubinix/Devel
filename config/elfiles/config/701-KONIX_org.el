@@ -406,6 +406,13 @@ cursor stays in the org buffer."
    %:initial"
 				 :kill-buffer
 				 )
+				("j" "Interruption" entry (file+headline (expand-file-name "diary.org" org-directory) "Interruptions")
+				 "* %?
+   %U
+"
+				 :clock-in t
+				 :clock-resume t
+				 )
 				)
 			  )
 (setq-default org-icalendar-store-UID t)

@@ -169,6 +169,14 @@ set ssl_verify = 1
 # Example SSL error handler:
 @on_event   LOAD_ERROR    js var patt=new RegExp('SSL handshake failed'); if (patt.test('%3')) {alert ('%3');}
 
+###################
+## Global config ##
+###################
+# use the cache by default
+set enable_pagecache = 1
+# default to zoom images with text
+set zoom_type = 1
+
 # === Key binding configuration ==============================================
 # --- Internal modmapping and ignoring ---------------------------------------
 
@@ -280,6 +288,9 @@ set ebind     = @mode_bind global,-insert
 @cbind  S   = stop
 @cbind  r   = reload
 @cbind  R   = reload_ign_cache
+
+# toggle current encoding
+@cbind  e   = toggle current_encoding iso-8859-1 utf-8
 
 # link navigation
 @cbind <Ctrl><Up>          = js navigate.prev();

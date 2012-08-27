@@ -11,6 +11,8 @@
   (org-remember-insinuate)
   ;; For dependencies
   (require 'org-depend)
+  ;; for checklists fun
+  (require 'org-checklist)
 
   (add-hook 'before-save-hook 'org-update-all-dblocks)
   ;; Pour les appointments

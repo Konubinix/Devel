@@ -278,6 +278,7 @@ cursor stays in the org buffer."
 (setq-default org-agenda-todo-ignore-deadlines t)
 (setq-default org-agenda-todo-ignore-scheduled t)
 (setq-default org-agenda-todo-list-sublevels t)
+(setq-default org-agenda-window-setup 'current-window)
 (setq-default org-archive-location "%s_archive::")
 (setq-default org-clock-in-resume t)
 (setq-default org-clock-out-remove-zero-time-clocks t)

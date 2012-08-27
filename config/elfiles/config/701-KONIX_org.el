@@ -113,15 +113,25 @@ cursor stays in the org buffer."
   (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")
   )
 
-(defun konix/org-agenda-skip-if-tag (tag)
-  (let (beg end)
+(defun konix/org-agenda-skip-if-tags (request_tags)
+  (let (beg end skip tags current_tag)
     (org-back-to-heading t)
     (setq beg (point)
 		  end (progn (outline-next-heading) (1- (point))))
     (goto-char beg)
-	(if (member tag
-				(org-get-tags)
-				)
+	(setq tags (org-get-tags))
+	(while (and
+			(not skip)
+			request_tags
+			)
+	  (setq current_tag (pop request_tags))
+	  (when (member current_tag
+					tags
+					)
+		(setq skip t)
+		)
+	  )
+	(if skip
 		end
 	  nil
 	  )
@@ -131,16 +141,27 @@ cursor stays in the org buffer."
 (setq-default konix/org-agenda-entries
 			  '(
 				(agenda nil)
-				(stuck nil)
+				(stuck nil
+					   (
+						(org-agenda-overriding-header "Stuck projects")
+						)
+					   )
 				(todo "NEXT"
 					  (
-					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tag "phantom"))
+					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tags '("phantom")))
+					   (org-agenda-overriding-header "NEXT items to be scheduled")
 					   )
 					  )
-				(todo "WAIT|DELEGATED")
+				(todo "WAIT|DELEGATED"
+					  (
+					   (org-agenda-overriding-header "WAITING items")
+					   )
+					  )
 				(todo nil
 					  (
-					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tag "project"))
+					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tags
+												   '("project" "phantom")))
+					   (org-agenda-overriding-header "Todos that need to be organized")
 					   )
 					  )
 				)
@@ -182,7 +203,7 @@ cursor stays in the org buffer."
 				  )
 				 (
 				  (org-agenda-skip-function
-				   '(konix/org-agenda-skip-if-tag "no_weekly"))
+				   '(konix/org-agenda-skip-if-tags '("no_weekly")))
 				  (org-agenda-span 7)
 				  )
 				 )
@@ -192,7 +213,7 @@ cursor stays in the org buffer."
 				  )
 				 (
 				  (org-agenda-skip-function
-				   '(konix/org-agenda-skip-if-tag "no_weekly"))
+				   '(konix/org-agenda-skip-if-tags '("no_weekly")))
 				  (org-agenda-files (list org-directory))
 				  (org-agenda-span 7)
 				  )

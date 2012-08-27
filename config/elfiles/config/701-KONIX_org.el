@@ -58,6 +58,33 @@ cursor stays in the org buffer."
   )
 (add-hook 'org-load-hook 'konix/org-load-hook)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; insert inactive timestamp when creating entries ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun konix/insert-inactive-timestamp ()
+  (interactive)
+  (org-insert-time-stamp nil t t nil nil nil))
+
+(defun konix/insert-heading-inactive-timestamp ()
+  (save-excursion
+    (org-return)
+    (org-cycle)
+	(insert ":LOGBOOK:")
+    (org-return)
+    (org-cycle)
+	(insert ":END:")
+	(beginning-of-line)
+    (org-return)
+	(previous-line)
+    (org-cycle)
+	(insert "- Captured       ")
+    (konix/insert-inactive-timestamp)
+	)
+  )
+
+(add-hook 'org-insert-heading-hook 'konix/insert-heading-inactive-timestamp
+		  'append)
+
 ;; ####################################################################################################
 ;; CONFIG
 ;; ####################################################################################################

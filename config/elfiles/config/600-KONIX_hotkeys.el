@@ -813,3 +813,8 @@
 (require 'key-chord)
 (key-chord-mode 1)
 (key-chord-define-global ",;" 'info)
+
+;; ######################################################################
+;; minibuffer hotkeys
+;; ######################################################################
+(define-key minibuffer-local-map (kbd "C-M-e") 'miniedit)

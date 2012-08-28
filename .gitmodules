@@ -73,3 +73,6 @@
 [submodule "kip"]
 	path = kip
 	url = https://github.com/Konubinix/kip.git
+[submodule "config/elfiles/miniedit"]
+	path = config/elfiles/miniedit
+	url = https://github.com/emacsmirror/miniedit.git

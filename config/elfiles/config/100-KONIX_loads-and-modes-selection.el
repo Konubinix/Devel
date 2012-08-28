@@ -33,6 +33,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/load-relative")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/loc-changes")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/popwin")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/miniedit")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)
@@ -122,6 +123,8 @@
 (autoload 'ioccur "ioccur" nil t)
 ;; elnode
 (autoload 'elnode-start "elnode" nil t)
+;; miniedit
+(autoload 'miniedit "miniedit" nil t)
 
 ;; ************************************************************
 ;; Automodes

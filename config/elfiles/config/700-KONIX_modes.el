@@ -694,6 +694,12 @@
 	   t)
   )
 
+(defun konix/bash-completion-dynamic-complete-no-error (&rest args)
+  (interactive)
+  (and (ignore-errors (bash-completion-dynamic-complete))
+	   t)
+  )
+
 (defun konix/shell-mode-hook ()
   (require 'readline-complete)
   (compilation-shell-minor-mode)
@@ -738,8 +744,11 @@
 	)
    )
   (set (make-variable-buffer-local 'hippie-expand-try-functions-list)
-	   '(konix/shell-complete-rlc-no-error
-		 konix/comint-dynamic-complete-no-error)
+	   '(
+		 konix/shell-complete-rlc-no-error
+		 konix/comint-dynamic-complete-no-error
+		 konix/bash-completion-dynamic-complete-no-error
+		 )
 	   )
   (local-set-key (kbd "C-j") 'hippie-expand)
   (local-set-key (kbd "<tab>") 'hippie-expand)
@@ -2580,5 +2589,14 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
        (prefix . ac-rlc-prefix-shell-dispatcher)
        (requires . 4)
 	   )
+	 )
+  )
+
+;; ######################################################################
+;; bash-completion
+;; ######################################################################
+(eval-after-load "bash-completion"
+  '(progn
+	 (bash-completion-setup)
 	 )
   )

@@ -34,6 +34,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/loc-changes")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/popwin")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/miniedit")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/bash-completion")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)
@@ -125,6 +126,8 @@
 (autoload 'elnode-start "elnode" nil t)
 ;; miniedit
 (autoload 'miniedit "miniedit" nil t)
+;; bash-completion
+(autoload 'bash-completion-dynamic-complete "bash-completion" nil t)
 
 ;; ************************************************************
 ;; Automodes

@@ -76,3 +76,6 @@
 [submodule "config/elfiles/miniedit"]
 	path = config/elfiles/miniedit
 	url = https://github.com/emacsmirror/miniedit.git
+[submodule "config/elfiles/bash-completion"]
+	path = config/elfiles/bash-completion
+	url = https://github.com/szermatt/emacs-bash-completion.git

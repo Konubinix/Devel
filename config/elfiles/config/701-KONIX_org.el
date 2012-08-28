@@ -148,7 +148,8 @@ cursor stays in the org buffer."
 					   )
 				(todo "NEXT"
 					  (
-					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tags '("phantom")))
+					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tags
+												   '("phantom" "maybe")))
 					   (org-agenda-overriding-header "NEXT items to be scheduled")
 					   )
 					  )
@@ -160,10 +161,15 @@ cursor stays in the org buffer."
 				(todo nil
 					  (
 					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tags
-												   '("project" "phantom")))
+												   '("project" "phantom" "maybe")))
 					   (org-agenda-overriding-header "Todos that need to be organized")
 					   )
 					  )
+				(tags-todo "maybe"
+						   (
+							(org-agenda-overriding-header "Maybe list")
+							)
+						   )
 				)
 			  )
 
@@ -422,7 +428,8 @@ cursor stays in the org buffer."
 			  '(
 				("project" . ?p)
  				("no_weekly" . ?n)
- 				("phantom" . ?m)
+  				("phantom" . ?m)
+  				("maybe" . ?y)
 				("@home" . ?h)
 				("@computer" . ?c)
 				("@work" . ?w)

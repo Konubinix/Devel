@@ -520,7 +520,7 @@
 		  (if history_size (concat "-" (format "%s" history_size))
 			""))
 		 (log_command (if alog "alog" "log"))
-		 (file_cmd (if file (format "-- %s" file) ""))
+		 (file_cmd (if file (format "--follow -- %s" file) ""))
 		 (buffer_name (format "*Git Log%s*" (if file (concat " " file) "")))
 		 )
 	(konix/kill-and-new-buffer buffer_name)

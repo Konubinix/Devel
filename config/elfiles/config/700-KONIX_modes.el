@@ -1147,7 +1147,7 @@
   (local-set-key (kbd "<f3>") 'konix/outline-show-children-or-entry)
   (local-set-key (kbd "<f2> <f1>") 'hide-body)
   (local-set-key (kbd "<f2> <f3>") 'show-all)
-  (local-set-key (kbd "TAB") 'outline-toggle-children)
+  (local-set-key (kbd "TAB") 'org-cycle)
   )
 (add-hook 'outline-mode-hook 'konix/outline-mode-hook)
 

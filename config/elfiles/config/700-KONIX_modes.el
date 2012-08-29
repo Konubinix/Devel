@@ -675,7 +675,11 @@
 			)
 		  )
 		 (beginning-of-word-before (match-beginning 1))
-		 (completion (completing-read "Completion: " (all-completions word-before completion)))
+		 (completion (and
+					  completion
+					  (completing-read "Completion: " (all-completions word-before completion))
+					  )
+					 )
 		 )
 	(if completion
 		(progn

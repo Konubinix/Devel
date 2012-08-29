@@ -706,6 +706,7 @@
 
 (defun konix/shell-mode-hook ()
   (require 'readline-complete)
+  (require 'bash-completion)
   (compilation-shell-minor-mode)
   (auto-complete-mode t)
   (if (string-match

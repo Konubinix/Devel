@@ -344,7 +344,7 @@ set ebind     = @mode_bind global,-insert
 # Set function shortcut
 @cbind  s<var:>_<value:>_  = set %1 = %2
 # Exit binding
-@cbind  zz                 = exit
+@cbind  zz                 = chain 'spawn @scripts_dir/exit.sh' 'exit'
 # Dump config to stdout
 @cbind  !dump              = sh 'echo dump_config > "$UZBL_FIFO"'
 # Reload all variables in the config

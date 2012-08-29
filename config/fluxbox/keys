@@ -245,6 +245,7 @@ Control Mod4 Shift e :ExecCommand konix_one_window.sh /usr/bin/emacs
 Control Mod4 Mod1 t :Exec gnome-terminal --tab
 Control Mod4 Mod1 i :Exec $(konix_find_true_exec.sh x-www-browser)
 Control Mod4 Mod1 e :Exec $(konix_find_true_exec.sh emacs)
+Control Mod4 Shift u :Exec $(konix_find_true_exec.sh konix_uzbl_pop_exited_page.sh)
 
 # ************************************************************
 # Open specific folders (Mod4 o ...)

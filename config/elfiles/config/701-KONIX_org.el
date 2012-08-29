@@ -188,6 +188,13 @@ cursor stays in the org buffer."
 				  (org-agenda-files (list org-directory))
 				  )
 				 )
+				("p" "Projects"
+				 (
+				  (tags-todo "project")
+				  )
+				 (
+				  )
+				 )
  				("c" "Weekly schedule" agenda ""
 				 (
 				  (org-agenda-span 21)

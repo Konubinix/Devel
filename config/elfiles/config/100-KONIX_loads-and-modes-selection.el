@@ -128,6 +128,8 @@
 (autoload 'miniedit "miniedit" nil t)
 ;; bash-completion
 (autoload 'bash-completion-dynamic-complete "bash-completion" nil t)
+;; org search goto
+(autoload 'osg "org-search-goto" nil t)
 
 ;; ************************************************************
 ;; Automodes

@@ -148,8 +148,11 @@ cursor stays in the org buffer."
 					   )
 				(todo "NEXT"
 					  (
-					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tags
-												   '("phantom" "maybe")))
+					   (org-agenda-skip-function
+						'(konix/org-agenda-skip-if-tags
+						  '("phantom" "maybe" "project")
+						  )
+						)
 					   (org-agenda-overriding-header "NEXT items to be scheduled")
 					   )
 					  )

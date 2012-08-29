@@ -334,6 +334,7 @@ set ebind     = @mode_bind global,-insert
 @cbind  dwiki<Wikipedia:>_   = uri https://en.wikipedia.org/wiki/\@<encodeURIComponent(%r)>\@
 @cbind  dfrwiki<WikipediaFR:>_   = uri https://fr.wikipedia.org/wiki/\@<encodeURIComponent(%r)>\@
 @cbind  dpa                  = js add_to_pocket();
+@cbind E = spawn @scripts_dir/external_editor.sh
 
 # Handy binds
 # Set function shortcut

@@ -138,6 +138,48 @@ cursor stays in the org buffer."
 	)
   )
 
+(defun konix/org-is-task-of-project-p ()
+  "Find out if entry at point is a task of a project.
+
+For all the parents of the entry, check if it has the project tag. If it does,
+return t, else return nil."
+  (save-excursion
+	(let (
+		  (res nil)
+		  (parent (org-up-heading-safe))
+		  )
+	  (while (and
+			  (not res)
+			  parent
+			  )
+		(if (member "project" (org-get-tags-at))
+			(setq res t)
+		  (setq parent (org-up-heading-safe))
+		  )
+		)
+	  res
+	  )
+	)
+  )
+
+(defun konix/org-agenda-skip-if-task-of-project ()
+  "Skips the entry if it is inside a project.
+
+Projects are considered stuck if they don't possess NEXT items
+and NEXT items not scheduled are asked to be scheduled. This way, TODO items
+inside projects that are not scheduled may not be forgotten and thus don't need
+to be organized.
+"
+  (let (
+		(end (save-excursion (outline-next-heading) (1- (point))))
+		)
+	(if (konix/org-is-task-of-project-p)
+		end
+	  nil
+	  )
+	)
+  )
+
 (setq-default konix/org-agenda-entries
 			  '(
 				(agenda nil)
@@ -163,8 +205,14 @@ cursor stays in the org buffer."
 					  )
 				(todo nil
 					  (
-					   (org-agenda-skip-function '(konix/org-agenda-skip-if-tags
-												   '("project" "phantom" "maybe")))
+					   (org-agenda-skip-function
+						'(or
+						  (konix/org-agenda-skip-if-tags
+						   '("project" "phantom" "maybe")
+						   )
+						  (konix/org-agenda-skip-if-task-of-project)
+						  )
+						)
 					   (org-agenda-overriding-header "Todos that need to be organized")
 					   )
 					  )

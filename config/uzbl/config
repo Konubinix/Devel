@@ -521,6 +521,7 @@ sync_spawn_exec @scripts_dir/load_cookies.sh @data_home/uzbl/session-cookies.txt
 #set uri = uzbl.org/doesitwork/@COMMIT
 
 # === Get the custom machine config ================================================
+include @(echo $KONIX_PERSO_DIR/config/uzbl/config)@
 include @(echo $HOME/.uzbl)@
 
 # vim: set fdm=syntax:

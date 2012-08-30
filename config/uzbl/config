@@ -10,6 +10,7 @@ set cache_home  = @(echo $XDG_CACHE_HOME)@
 set config_home = @(echo $XDG_CONFIG_HOME)@
 set perso_dir   = @(echo $KONIX_PERSO_DIR)@
 set devel_dir   = @(echo $KONIX_DEVEL_DIR)@
+set share_dir   = @(echo $KONIX_SHARE_DIR)@
 
 # Interface paths.
 set fifo_dir   = /tmp
@@ -37,7 +38,7 @@ set set_mode        = set mode =
 set set_status      = set status_message =
 
 # Spawn path shortcuts. In spawn the first dir+path match is used in "dir1:dir2:dir3:executable"
-set scripts_dir      = @devel_dir/uzbl:@perso_dir/uzbl:@data/share/uzbl/examples/data_home/uzbl:@prefix/share/uzbl/examples/data:scripts
+set scripts_dir      = @share_dir/uzbl:@perso_dir/uzbl:@data/share/uzbl/examples/data_home/uzbl:@prefix/share/uzbl/examples/data:scripts
 
 # === Hardcoded handlers =====================================================
 

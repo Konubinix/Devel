@@ -494,6 +494,7 @@ to be organized.
 			  '(
 				("project" . ?p)
  				("no_weekly" . ?n)
+ 				("no_appt" . ?a)
   				("phantom" . ?m)
   				("maybe" . ?y)
 				("@home" . ?h)

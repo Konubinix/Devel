@@ -155,7 +155,11 @@ last pomodoro was called in (file_name . point_in_file)")
   		(new_pomodoro_file (expand-file-name konix/org-pomodoro-file-name org-directory))
   		)
   	(cond
-	 ((not current_pomodoro_file)
+	 ((or
+	   (not current_pomodoro_file)
+	   (not (marker-position (cdr konix/org-pomodoro-bookmark)))
+	   (not (marker-buffer (cdr konix/org-pomodoro-bookmark)))
+	   )
 	  (with-current-buffer (find-file-noselect new_pomodoro_file)
 		(konix/org-pomodoro-set-bookmark)
 		)

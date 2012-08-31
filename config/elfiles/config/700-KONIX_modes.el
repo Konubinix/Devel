@@ -704,6 +704,46 @@
 	   t)
   )
 
+(defvar konix/bash-completion-history '() "")
+
+(defun konix/bash-completion (&rest args)
+  (interactive)
+  (when bash-completion-enabled
+    (when (not (window-minibuffer-p))
+      (message "Bash completion..."))
+    (let* ( (start (comint-line-beginning-position))
+			(pos (point))
+			(tokens (bash-completion-tokenize start pos))
+			(open-quote (bash-completion-tokenize-open-quote tokens))
+			(parsed (bash-completion-process-tokens tokens pos))
+			(line (cdr (assq 'line parsed)))
+			(point (cdr (assq 'point parsed)))
+			(cword (cdr (assq 'cword parsed)))
+			(words (cdr (assq 'words parsed)))
+			(stub (nth cword words))
+			(completions (bash-completion-comm line point words cword open-quote))
+			;; Override configuration for comint-dynamic-simple-complete.
+			;; Bash adds a space suffix automatically.
+			(comint-completion-addsuffix nil) )
+      (if completions
+		  (progn
+		   (comint-dynamic-simple-complete
+			stub
+			(list
+			 (completing-read "Complete: " completions nil nil stub
+							  'konix/bash-completion-history)
+			 )
+			)
+		   t
+		   )
+		;; no standard completion
+		;; try default (file) completion after a wordbreak
+		(bash-completion-dynamic-try-wordbreak-complete stub open-quote)
+		)
+	  )
+	)
+  )
+
 (defun konix/shell-mode-hook ()
   (require 'readline-complete)
   (require 'bash-completion)
@@ -750,9 +790,9 @@
    )
   (set (make-variable-buffer-local 'hippie-expand-try-functions-list)
 	   '(
+		 konix/bash-completion
 		 konix/shell-complete-rlc-no-error
 		 konix/comint-dynamic-complete-no-error
-		 konix/bash-completion-dynamic-complete-no-error
 		 )
 	   )
   (local-set-key (kbd "C-j") 'hippie-expand)

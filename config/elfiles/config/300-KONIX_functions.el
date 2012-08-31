@@ -174,6 +174,7 @@
 (defun konix/mimeopen (file)
   "Open the selected file with mimeopen."
   (interactive "ffile:")
+  (message "Opening %s" file)
   (start-process
    (format "mimeopen %s" file)
    nil

@@ -518,7 +518,7 @@ to be organized.
 (setq-default org-todo-keywords
 			  '(
 				(sequence "TODO(t!)" "NEXT(n!)" "|" "DONE(d!)")
-				(sequence "DELEGATED(D@/!)" "WAIT(w@/!)" "|" "NOT_DONE(u@/!)")
+				(sequence "DELEGATED(l@/!)" "WAIT(w@/!)" "|" "NOT_DONE(u@/!)")
 				(sequence "MEETING(m!)" "REPORT(o!)" "|" "MET(M!)" "CANCELED(c@)")
 				(sequence
 				 "SPECIFY(S!)" "CREATE_VALIDATOR(v!)" "PROGRAM(P!)" "VALIDATE(V@/!)" "|" "END(E!)" "ABORTED(A@)")

@@ -210,7 +210,7 @@ to be organized.
 					   (org-agenda-overriding-header "WAITING items")
 					   )
 					  )
-				(todo nil
+				(tags-todo "//-NEXT"
 					  (
 					   (org-agenda-skip-function
 						'(or

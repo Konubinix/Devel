@@ -431,6 +431,7 @@ set follow_hint_keys = 0123456789
 @cbind  FT*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'returnuri') >\@ clipboard
 
 @cbind  '*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'click') >\@
+@cbind  " = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('returnuri') >\@ set
 
 #highlight anchors
 @cbind  <Ctrl>h  = js highlight_anchor_toggle();

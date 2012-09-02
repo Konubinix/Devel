@@ -218,6 +218,7 @@ to be organized.
 						  (konix/org-agenda-skip-if-tags
 						   '("project" "phantom" "maybe")
 						   )
+						  (org-agenda-skip-entry-if 'scheduled)
 						  (konix/org-agenda-skip-if-task-of-project)
 						  )
 						)
@@ -405,6 +406,9 @@ to be organized.
 				(org-agenda-files . (:maxlevel . 5))
 				)
 			  )
+;; TODO: (setq-default org-refile-use-outline-path 'file) when icicles will be
+;; replaced by something else
+(setq-default org-refile-use-outline-path nil)
 (setq-default org-src-fontify-natively t)
 (setq-default org-src-tab-acts-natively t)
 (setq-default org-export-preserve-breaks t)

@@ -497,7 +497,7 @@ to be organized.
 				(:newline)
  				("no_weekly" . ?n)
  				("no_appt" . ?a)
-  				("phantom" . ?m)
+  				("organization" . ?r)
 				(:startgroup)
 				("@computer" . ?c)
 				("@phone" . ?o)

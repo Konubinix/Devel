@@ -493,10 +493,11 @@ to be organized.
 (setq-default org-tag-persistent-alist
 			  '(
 				("project" . ?p)
+  				("maybe" . ?y)
+				(:newline)
  				("no_weekly" . ?n)
  				("no_appt" . ?a)
   				("phantom" . ?m)
-  				("maybe" . ?y)
 				(:startgroup)
 				("@computer" . ?c)
 				("@phone" . ?o)

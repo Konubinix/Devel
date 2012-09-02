@@ -33,8 +33,8 @@ tee "${HOME}/konix_view_html.msg" | {
 		echo "Successfully munpacked msg" >> "${OUT_FILE}"
 		# rename the partN file to get partN.content_type
 		sed -n '
-/part.\+ (text\// {
-   s/\(part.\+\) (text\/\(.\+\))/\1 \2/
+/part.\+ ([tT][eE][xX][tT]\// {
+   s/\(part.\+\) ([tT][eE][xX][tT]\/\(.\+\))/\1 \2/
    p
 }
 ' < ${OUT_FILE} | while read line

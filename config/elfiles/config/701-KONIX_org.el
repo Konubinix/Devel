@@ -359,7 +359,7 @@ to be organized.
 (setq-default org-clock-persist-file (expand-file-name "org-clock-save.el" user-emacs-directory))
 (setq-default org-clock-persist-query-save t)
 (setq-default org-clock-report-include-clocking-task t)
-(setq-default org-columns-default-format "%25ITEM %TODO %3PRIORITY %TAGS %10Effort(Effort){:} %10CLOCKSUM")
+(setq-default org-columns-default-format "%CATEGORY %90ITEM %1PRIORITY %10Effort{:} %10CLOCKSUM")
 (setq-default org-cycle-separator-lines -1)
 (setq-default org-default-notes-file (concat org-directory "/notes.org"))
 (setq-default org-default-priority ?V)

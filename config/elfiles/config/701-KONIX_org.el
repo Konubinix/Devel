@@ -8,6 +8,9 @@
   (set-face-attribute 'org-agenda-dimmed-todo-face nil
 					  :foreground "OrangeRed4"
 					  )
+  (set-face-attribute 'org-agenda-date nil
+					  :inherit 'org-agenda-structure
+					  :box '(:line-width 2 :color "black" :style released-button))
   ;; With remember
   (org-remember-insinuate)
   ;; For dependencies

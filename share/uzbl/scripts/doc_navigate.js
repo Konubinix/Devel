@@ -1,9 +1,9 @@
 doc_next = function() {
-    $("a:contains(Next)")[0].click();
+    $("a:contains(Next), a:contains(next), a:contains(Suivant), a:text(>)")[0].click();
 }
 
 doc_previous = function() {
-    $("a:contains(Prev)")[0].click();
+    $("a:contains(Prev), a:contains(previous), a:contains(Précédent)")[0].click();
 }
 
 doc_toc = function() {

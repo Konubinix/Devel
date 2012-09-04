@@ -124,13 +124,13 @@ cursor stays in the org buffer."
   (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")
   )
 
-(defun konix/org-agenda-skip-if-tags (request_tags)
+(defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip)
   (let (beg end skip tags current_tag)
     (org-back-to-heading t)
     (setq beg (point)
 		  end (progn (outline-next-heading) (1- (point))))
     (goto-char beg)
-	(setq tags (org-get-tags))
+	(setq tags (org-get-tags-at))
 	(while (and
 			(not skip)
 			request_tags
@@ -141,6 +141,9 @@ cursor stays in the org buffer."
 					)
 		(setq skip t)
 		)
+	  )
+	(when invert_skip
+	  (setq skip (not skip))
 	  )
 	(if skip
 		end

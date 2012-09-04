@@ -279,7 +279,7 @@ Mod4 k h :Exec eog $HOME/Prog/devel/doc/bepo.png
 Mod4 s b :MacroCmd { Exec setxkbmap fr } { Exec konix_display.py "Switch to AZERTY" }
 Mod4 s c :Exec eog $HOME/Prog/devel/doc/bepo.png
 
-Mod4 k c :MacroCmd { Exec setxkbmap -option ctrl:swapcaps } { Exec konix_display.py "switch CTRL CAPS" }
+Mod4 k c :ToggleCmd { Exec setxkbmap -option ctrl:swapcaps && konix_display.py "switch CTRL CAPS" } { Exec setxkbmap -option && konix_display.py "reset CTRL CAPS" }
 Mod4 k shift c :MacroCmd { Exec setxkbmap -option } { Exec konix_display.py "Cancel xkb options" }
 
 # ####################################################################################################

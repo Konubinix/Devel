@@ -73,24 +73,24 @@ cursor stays in the org buffer."
   (let (
 		(logbook_pos nil)
 		)
-   (save-excursion
-	 (org-return)
-	 (org-cycle)
-	 (setq logbook_pos (point))
-	 (insert ":LOGBOOK:")
-	 (org-return)
-	 (org-cycle)
-	 (insert ":END:")
-	 (beginning-of-line)
-	 (org-return)
-	 (previous-line)
-	 (org-cycle)
-	 (insert "- Captured       ")
-	 (konix/insert-inactive-timestamp)
-	 (goto-char logbook_pos)
-	 (org-cycle)
-	 )
-   )
+	(save-excursion
+	  (org-return)
+	  (org-cycle)
+	  (setq logbook_pos (point))
+	  (insert ":LOGBOOK:")
+	  (org-return)
+	  (org-cycle)
+	  (insert ":END:")
+	  (beginning-of-line)
+	  (org-return)
+	  (previous-line)
+	  (org-cycle)
+	  (insert "- Captured       ")
+	  (konix/insert-inactive-timestamp)
+	  (goto-char logbook_pos)
+	  (org-cycle)
+	  )
+	)
   )
 
 (add-hook 'org-insert-heading-hook 'konix/insert-heading-inactive-timestamp
@@ -533,7 +533,13 @@ to be organized.
 "
 				 :kill-buffer
 				 )
-				("n" "Note" entry (file (expand-file-name "notes.org" org-directory)) "* %?"
+				("n" "Note" entry (file (expand-file-name "notes.org"
+														  org-directory))
+				 "* %?
+  :LOGBOOK:
+  - Captured       %U
+  :END:
+"
 				 :kill-buffer
 				 )
 				("B" "Bookmark (use with org-protocol)" entry (file (expand-file-name "bookmarks.org" org-directory))

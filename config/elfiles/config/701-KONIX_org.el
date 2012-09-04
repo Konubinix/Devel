@@ -196,7 +196,23 @@ to be organized.
 
 (setq-default konix/org-agenda-entries
 			  '(
-				(agenda nil)
+				(agenda nil
+						(
+						 (org-agenda-overriding-header "Agenda without projects")
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags '("project"))
+						  )
+						 )
+						)
+				(agenda nil
+						(
+						 (org-agenda-overriding-header "Agenda for projects")
+						 (org-agenda-use-time-grid nil)
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags '("project") t)
+						  )
+						 )
+						)
 				(stuck nil
 					   (
 						(org-agenda-overriding-header "Stuck projects")
@@ -218,19 +234,19 @@ to be organized.
 					   )
 					  )
 				(tags-todo "//-NEXT"
-					  (
-					   (org-agenda-skip-function
-						'(or
-						  (konix/org-agenda-skip-if-tags
-						   '("project" "phantom" "maybe")
+						   (
+							(org-agenda-skip-function
+							 '(or
+							   (konix/org-agenda-skip-if-tags
+								'("project" "phantom" "maybe")
+								)
+							   (org-agenda-skip-entry-if 'scheduled)
+							   (konix/org-agenda-skip-if-task-of-project)
+							   )
+							 )
+							(org-agenda-overriding-header "Todos that need to be organized")
+							)
 						   )
-						  (org-agenda-skip-entry-if 'scheduled)
-						  (konix/org-agenda-skip-if-task-of-project)
-						  )
-						)
-					   (org-agenda-overriding-header "Todos that need to be organized")
-					   )
-					  )
 				(tags-todo "maybe"
 						   (
 							(org-agenda-overriding-header "Maybe list")
@@ -278,7 +294,23 @@ to be organized.
 				 )
 				("e" "Agenda weekly view (all)"
 				 (
-				  (agenda nil)
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header "Agenda without projects")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags '("project"))
+							)
+						   )
+						  )
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header "Agenda for projects")
+						   (org-agenda-use-time-grid nil)
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags '("project") t)
+							)
+						   )
+						  )
 				  )
 				 (
 				  (org-agenda-skip-function
@@ -288,7 +320,23 @@ to be organized.
 				 )
 				("E" "Agenda weekly view (org-directory)"
 				 (
-				  (agenda nil)
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header "Agenda without projects")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags '("project"))
+							)
+						   )
+						  )
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header "Agenda for projects")
+						   (org-agenda-use-time-grid nil)
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags '("project") t)
+							)
+						   )
+						  )
 				  )
 				 (
 				  (org-agenda-skip-function
@@ -299,7 +347,14 @@ to be organized.
 				 )
 				("a" "Agenda"
 				 (
-				  (agenda nil)
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header "Agenda without projects")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags '("project"))
+							)
+						   )
+						  )
 				  )
 				 )
 				("A" "Agenda do important stuff !"
@@ -307,7 +362,14 @@ to be organized.
 				  (agenda nil)
 				  )
 				 (
-				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
+				  (org-agenda-overriding-header
+				   "Agenda without projects (only important stuff)")
+				  (org-agenda-skip-function
+				   '(or
+					 (konix/org-agenda-skip-non-important-item)
+					 (konix/org-agenda-skip-if-tags '("project"))
+					 )
+				   )
 				  )
 				 )
 				("g" "Agenda and co (all)"

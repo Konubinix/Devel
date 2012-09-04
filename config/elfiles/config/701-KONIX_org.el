@@ -213,6 +213,12 @@ to be organized.
 						  )
 						 )
 						)
+				(tags-todo "+project/NEXT"
+						   (
+							(org-agenda-overriding-header
+							 "Projects that should not have NEXT keyword")
+							)
+						   )
 				(stuck nil
 					   (
 						(org-agenda-overriding-header "Stuck projects")

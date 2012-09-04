@@ -630,6 +630,8 @@ to be organized.
 			  )
 
 (setq-default org-agenda-cmp-user-defined 'konix/org-cmp-deadlines-past-and-due-first)
+(setq-default org-agenda-compact-blocks nil)
+(setq-default org-agenda-columns-add-appointments-to-effort-sum t)
 (setq-default org-agenda-sorting-strategy
 			  '(
 				;; Strategy for Weekly/Daily agenda

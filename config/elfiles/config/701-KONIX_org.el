@@ -60,7 +60,11 @@ cursor stays in the org buffer."
   ;; (ad-activate 'org-open-at-mouse)
 
   )
-(add-hook 'org-load-hook 'konix/org-load-hook)
+(eval-after-load "org"
+  '(progn
+	 (konix/org-load-hook)
+	 )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; insert inactive timestamp when creating entries ;;

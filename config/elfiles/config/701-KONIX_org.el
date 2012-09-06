@@ -496,7 +496,7 @@ to be organized.
 (setq-default org-export-with-drawers '("LOGBOOK"))
 (setq-default org-capture-templates
 			  '(
-				("t" "Todo Item" entry (file+headline (expand-file-name "todo.org" org-directory) "A traiter") "* TODO %?
+				("t" "Todo Item" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile") "* TODO %?
   :LOGBOOK:
   - Captured       %U
   :END:
@@ -510,7 +510,7 @@ to be organized.
 "
 				 :kill-buffer
 				 )
-				("f" "Todo Item for file" entry (file+headline (expand-file-name "todo.org" org-directory) "A traiter")
+				("f" "Todo Item for file" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* TODO %?
   :LOGBOOK:
   - Captured       %U
@@ -519,7 +519,7 @@ to be organized.
 "
 				 :kill-buffer
 				 )
-				("u" "Todo Item URGENT" entry (file+headline (expand-file-name "todo.org" org-directory) "A traiter")
+				("u" "Todo Item URGENT" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* TODO [#G] %?
   SCHEDULED: %t
   :LOGBOOK:

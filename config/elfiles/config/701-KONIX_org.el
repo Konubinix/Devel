@@ -308,7 +308,7 @@ to be organized.
 						  (
 						   (org-agenda-overriding-header "Agenda without projects")
 						   (org-agenda-skip-function
-							'(konix/org-agenda-skip-if-tags '("project"))
+							'(konix/org-agenda-skip-if-tags '("project" "no_weekly"))
 							)
 						   )
 						  )

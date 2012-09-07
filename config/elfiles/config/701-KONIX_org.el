@@ -277,11 +277,22 @@ to be organized.
 				  (org-agenda-files (list org-directory))
 				  )
 				 )
-				("p" "Projects"
+				("p" "Projects (without subprojects)"
 				 (
 				  (tags-todo "project")
 				  )
 				 (
+				  (org-agenda-skip-function
+				   'konix/org-agenda-skip-if-task-of-project)
+				  (org-agenda-overriding-header "Projects (without subprojects)")
+				  )
+				 )
+				("P" "All Projects"
+				 (
+				  (tags-todo "project")
+				  )
+				 (
+				  (org-agenda-overriding-header "All Projects")
 				  )
 				 )
  				("c" "Weekly schedule" agenda ""

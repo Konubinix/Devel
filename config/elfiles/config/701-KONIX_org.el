@@ -243,7 +243,7 @@ to be organized.
 					   (org-agenda-overriding-header "WAITING items")
 					   )
 					  )
-				(tags-todo "//-NEXT"
+				(tags-todo "//-NEXT-WAIT"
 						   (
 							(org-agenda-skip-function
 							 '(or
@@ -279,23 +279,44 @@ to be organized.
 				 )
 				("p" "Projects (without subprojects)"
 				 (
-				  (tags-todo "project")
+				  (tags-todo "+project-maybe"
+							 (
+							  (org-agenda-overriding-header
+							   "Projects (without subprojects nor maybe)")
+							  )
+							 )
+				  (tags-todo "+project+maybe"
+							 (
+							  (org-agenda-overriding-header
+							   "Maybe Projects (without subprojects)")
+							  )
+							 )
 				  )
 				 (
 				  (org-agenda-skip-function
 				   'konix/org-agenda-skip-if-task-of-project)
-				  (org-agenda-overriding-header "Projects (without subprojects)")
 				  )
 				 )
 				("P" "All Projects"
 				 (
-				  (tags-todo "project")
+				  (tags-todo "+project-maybe"
+							 (
+							  (org-agenda-overriding-header
+							   "Projects (without maybe)")
+							  )
+							 )
+				  (tags-todo "+project+maybe"
+							 (
+							  (org-agenda-overriding-header
+							   "Maybe Projects")
+							  )
+							 )
 				  )
 				 (
 				  (org-agenda-overriding-header "All Projects")
 				  )
 				 )
- 				("c" "Weekly schedule" agenda ""
+				("c" "Weekly schedule" agenda ""
 				 (
 				  (org-agenda-span 21)
 				  (org-agenda-repeating-timestamp-show-all t)

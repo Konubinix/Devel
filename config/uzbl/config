@@ -46,8 +46,7 @@ set scripts_dir      = @share_dir/uzbl:@perso_dir/share/uzbl:@data/share/uzbl/ex
 # support events that can wait for a response from a script.
 set scheme_handler      = sync_spawn @scripts_dir/scheme.py
 #set request_handler     = sync_spawn @scripts_dir/request.py
-#set authentication_handler = sync_spawn @scripts_dir/auth.py
-set authentication_handler = sync_spawn /home/slo/bin/konix_keys.sh
+set authentication_handler = sync_spawn @scripts_dir/auth.py
 set download_handler    = sync_spawn @scripts_dir/download.sh
 
 # === Dynamic event handlers =================================================

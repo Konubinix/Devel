@@ -198,7 +198,38 @@ to be organized.
 	)
   )
 
-(setq-default konix/org-agenda-entries
+(setq-default konix/org-agenda-view
+			  '(
+  				(agenda nil
+						(
+						 (org-agenda-overriding-header "Agenda without projects")
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags
+							'("project"))
+						  )
+						 )
+						)
+				(agenda nil
+						(
+						 (org-agenda-overriding-header
+						  "Agenda for projects")
+						 (org-agenda-use-time-grid nil)
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags
+							'("project")
+							t)
+						  )
+						 )
+						)
+				(todo "WAIT|DELEGATED"
+					  (
+					   (org-agenda-overriding-header "WAITING items")
+					   )
+					  )
+				)
+			  )
+
+(setq-default konix/org-agenda-weekly-view
 			  '(
 				(agenda nil
 						(
@@ -302,6 +333,15 @@ to be organized.
 				)
 			  )
 
+;; y, yesterday's view: what did I do yesterday, useful for daily reports
+;; p, projects without subprojects: make sure I don't have too much projects at
+;;    the same time
+;; P, idem, with all projects
+;; c, Weekly schedule: to check my calendar
+;; a, agenda view: keep an eye at what I have to do today
+;; A, idem, with only the important stuff
+;; w, full view, used to make weekly reviews
+;; W, idem, with only the important stuff
 (setq-default org-agenda-custom-commands
 			  `(
 				("y" "Yesterday time sheet"
@@ -371,111 +411,24 @@ to be organized.
 				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )
-				("e" "Agenda weekly view (all)"
-				 (
-				  (agenda nil
-						  (
-						   (org-agenda-overriding-header "Agenda without projects")
-						   (org-agenda-skip-function
-							'(konix/org-agenda-skip-if-tags '("project" "no_weekly"))
-							)
-						   )
-						  )
-				  (agenda nil
-						  (
-						   (org-agenda-overriding-header "Agenda for projects")
-						   (org-agenda-use-time-grid nil)
-						   (org-agenda-skip-function
-							'(konix/org-agenda-skip-if-tags '("project") t)
-							)
-						   )
-						  )
-				  )
-				 (
-				  (org-agenda-skip-function
-				   '(konix/org-agenda-skip-if-tags '("no_weekly")))
- 				  (org-agenda-span 7)
-				  )
+				("a" "Agenda view"
+				 ,konix/org-agenda-view
 				 )
-				("E" "Agenda weekly view (org-directory)"
-				 (
-				  (agenda nil
-						  (
-						   (org-agenda-overriding-header "Agenda without projects")
-						   (org-agenda-skip-function
-							'(konix/org-agenda-skip-if-tags '("project"))
-							)
-						   )
-						  )
-				  (agenda nil
-						  (
-						   (org-agenda-overriding-header "Agenda for projects")
-						   (org-agenda-use-time-grid nil)
-						   (org-agenda-skip-function
-							'(konix/org-agenda-skip-if-tags '("project") t)
-							)
-						   )
-						  )
-				  )
-				 (
-				  (org-agenda-skip-function
-				   '(konix/org-agenda-skip-if-tags '("no_weekly")))
-				  (org-agenda-files (list org-directory))
-				  (org-agenda-span 7)
-				  )
-				 )
-				("a" "Agenda"
-				 (
-				  (agenda nil
-						  (
-						   (org-agenda-overriding-header "Agenda without projects")
-						   (org-agenda-skip-function
-							'(konix/org-agenda-skip-if-tags '("project"))
-							)
-						   )
-						  )
-				  )
-				 )
-				("A" "Agenda do important stuff !"
-				 (
-				  (agenda nil)
-				  )
-				 (
-				  (org-agenda-overriding-header
-				   "Agenda without projects (only important stuff)")
-				  (org-agenda-skip-function
-				   '(or
-					 (konix/org-agenda-skip-non-important-item)
-					 (konix/org-agenda-skip-if-tags '("project"))
-					 )
-				   )
-				  )
-				 )
-				("g" "Agenda and co (all)"
-				 ,konix/org-agenda-entries
-				 )
-				("G" "Important stuff to do (all)"
-				 ,konix/org-agenda-entries
+				("A" "Agenda view (Important stuff to do)"
+				 ,konix/org-agenda-view
 				 (
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
-				  (org-agenda-overriding-header
-				   "TODO today (don't forget to take a look at all tasks)")
 				  )
 				 )
-				("W" "Important stuff to do (org-directory)"
-				 ,konix/org-agenda-entries
+				("W" "Weekly review (important stuff)"
+				 ,konix/org-agenda-weekly-view
 				 (
-				  (org-agenda-files (list org-directory))
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
-				  (org-agenda-overriding-header
-				   "TODO today org-directory (don't forget to take a look at all tasks)")
 				  )
 				 )
-				("w" "Agenda and co (org-directory)"
-				 ,konix/org-agenda-entries
+				("w" "Weekly review"
+				 ,konix/org-agenda-weekly-view
 				 (
-				  (org-agenda-files (list org-directory))
-				  (org-agenda-overriding-header "Things to do (org-directory) :")
 				  )
 				 )
 				)
@@ -509,7 +462,6 @@ to be organized.
 (setq-default org-columns-default-format "%CATEGORY %90ITEM %1PRIORITY %10Effort{:} %10CLOCKSUM")
 (setq-default org-cycle-separator-lines -1)
 (setq-default org-default-notes-file (concat org-directory "/notes.org"))
-(setq-default org-default-priority ?V)
 (setq-default org-empty-line-terminates-plain-lists t)
 (setq-default org-enforce-todo-checkbox-dependencies t)
 (setq-default org-enforce-todo-dependencies t)
@@ -523,7 +475,6 @@ to be organized.
 (setq-default org-hide-block-startup t)
 (setq-default org-hide-leading-stars t)
 (setq-default org-hierarchical-todo-statistics nil)
-(setq-default org-highest-priority ?A)
 (setq-default org-insert-labeled-timestamps-at-point nil)
 (setq org-infojs-options '((path . "http://orgmode.org/org-info.js")
 						   (view . "info")
@@ -546,6 +497,18 @@ to be organized.
 (setq-default org-log-reschedule 'note)
 (setq-default org-log-repeat 'time)
 (setq-default org-log-states-order-reversed t)
+;; priority system, GPX
+;; A-I : important stuff to do, default to G, they have to be done from the
+;; scheduled day and MUST not be re scheduled
+;; J-R : wanted stuff to do, default to P, they should be done from the
+;; scheduled day and may be re scheduled. I want them to be done though.
+;; S-Z : wanted stuff to do, default to X, they may be done from the scheduled
+;; day and may be re scheduled. They can be put in free time. They are bonus
+;; tasks
+;; default priority is S, better priority than bonus tasks but not enough to be
+;; considered as wanted task
+(setq-default org-highest-priority ?A)
+(setq-default org-default-priority ?S)
 (setq-default org-lowest-priority ?Z)
 (setq-default org-provide-todo-statistics 'all-headlines)
 (setq-default org-refile-targets

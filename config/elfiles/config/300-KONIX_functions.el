@@ -47,6 +47,24 @@
 	)
   )
 
+(defun konix/unload-feature (feature_prefix)
+  (interactive "sFeature prefix: ")
+  (mapc
+   (lambda (feature_name)
+	 (unload-feature (intern feature_name))
+	 )
+   (all-completions
+	feature_prefix
+	(mapcar
+	 (lambda (elem)
+	   (symbol-name elem)
+	   )
+	 features
+	 )
+	)
+   )
+  )
+
 (defun konix/multi-eshell-term ()
   (interactive)
   (let (

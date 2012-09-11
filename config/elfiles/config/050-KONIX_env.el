@@ -44,8 +44,8 @@
 ;; use the KONIX_EMACSLOADPATH env variable to extends load-path
 (setq load-path
 	  (append
-	   load-path
 	   (split-string (getenv "KONIX_EMACSLOADPATH") path-separator)
+	   load-path
 	   )
 	  )
 ;; get the gpg environment variable from the GPG_INFO_FILE_NAME file

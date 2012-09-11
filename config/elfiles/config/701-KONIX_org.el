@@ -204,16 +204,20 @@ to be organized.
 						(
 						 (org-agenda-overriding-header "Agenda without projects")
 						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags '("project"))
+						  '(konix/org-agenda-skip-if-tags
+							'("project"))
 						  )
 						 )
 						)
 				(agenda nil
 						(
-						 (org-agenda-overriding-header "Agenda for projects")
+						 (org-agenda-overriding-header
+						  "Agenda for projects")
 						 (org-agenda-use-time-grid nil)
 						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags '("project") t)
+						  '(konix/org-agenda-skip-if-tags
+							'("project")
+							t)
 						  )
 						 )
 						)
@@ -262,6 +266,39 @@ to be organized.
 							(org-agenda-overriding-header "Maybe list")
 							)
 						   )
+				(agenda nil
+						(
+						 (org-agenda-overriding-header
+						  "Agenda without projects (month overview)")
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags
+							'("project"
+							  "no_weekly"
+							  "phantom"
+							  ))
+						  )
+						 (org-agenda-span 30)
+						 )
+						)
+				(agenda nil
+						(
+						 (org-agenda-overriding-header
+						  "Agenda for projects (month overview)")
+						 (org-agenda-use-time-grid nil)
+						 (org-agenda-skip-function
+						  '(or
+							(konix/org-agenda-skip-if-tags
+							 '("project")
+							 t)
+							(konix/org-agenda-skip-if-tags
+							 '("phantom"
+							   "no_weekly")
+							 )
+							)
+						  )
+						 (org-agenda-span 30)
+						 )
+						)
 				)
 			  )
 

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+[ -z "$PS1" ] && return
 source "$KONIX_CONFIG_DIR/shrc"
 
 # don't put duplicate lines in the history. See bash(1) for more

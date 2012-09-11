@@ -355,7 +355,7 @@ to be organized.
 				 )
 				("c" "Weekly schedule" agenda ""
 				 (
-				  (org-agenda-span 21)
+				  (org-agenda-span 30)
 				  (org-agenda-repeating-timestamp-show-all t)
 				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
 																	   'scheduled)
@@ -394,7 +394,7 @@ to be organized.
 				 (
 				  (org-agenda-skip-function
 				   '(konix/org-agenda-skip-if-tags '("no_weekly")))
-				  (org-agenda-span 7)
+ 				  (org-agenda-span 7)
 				  )
 				 )
 				("E" "Agenda weekly view (org-directory)"

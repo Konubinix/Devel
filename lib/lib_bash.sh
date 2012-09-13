@@ -114,6 +114,11 @@ function ssh_agent_start_maybe_KONIX {
 }
 
 gpg_agent_start_KONIX () {
+    if ! which gpg-agent > /dev/null
+    then
+        echo "gpg-agent not available, it cannot be launched"
+        return 1
+    fi
 	if [ -f "$GPG_INFO_FILE_NAME" ] \
 		&& pgrep -u "$LOGNAME" gpg-agent > /dev/null 2>&1
 	then

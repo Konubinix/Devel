@@ -1144,3 +1144,27 @@ to be organized.
 	(message "Generated wiki %s from org directory %s" konix_wiki_dir org-directory)
 	)
   )
+
+(defun konix/org-publish-send-server ()
+  (interactive)
+  (async-shell-command "konix_public_send.sh")
+  )
+
+(eval-after-load "org-publish"
+  '(progn
+	 (konix/push-or-replace-in-alist
+	  'org-publish-project-alist
+	  "public"
+	  :base-directory (expand-file-name "wiki/public" perso-dir)
+	  :author konix/org-wiki-author
+	  :base-extension "org"
+	  :publishing-directory "~/public_html"
+	  :auto-index t
+	  :index-filename "index.html"
+	  :auto-sitemap t
+	  :sitemap-filename "index.html"
+	  :sitemap-title "My notes"
+	  :completion-function 'konix/org-publish-send-server
+	  )
+	 )
+  )

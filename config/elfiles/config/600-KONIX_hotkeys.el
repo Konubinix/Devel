@@ -21,6 +21,7 @@
 ;; yank pop to more recent kill
 (define-key global-map (kbd "M-Y") 'konix/yank-pop-more-recent)
 (define-key global-map (kbd "C-M-y") 'konix/kill-ring-insert)
+(define-key global-map (kbd "C-S-Y") 'konix/kill-ring-to-clipboard)
 
 ;; multi occur
 (global-set-key (kbd "M-s M-o") 'multi-occur-in-matching-buffers)

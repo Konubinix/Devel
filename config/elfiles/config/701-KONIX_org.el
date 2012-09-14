@@ -713,7 +713,7 @@ to be organized.
 "
 				 :kill-buffer
 				 )
-				("B" "Bookmark (use with org-protocol)" entry (file (expand-file-name "bookmarks.org" org-directory))
+				("B" "Bookmark (use with org-protocol)" entry (file+headline (expand-file-name "bookmark.org" org-directory) "Refile")
 				 "* %:description
   :LOGBOOK:
   - Captured       %U

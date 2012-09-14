@@ -356,6 +356,9 @@ set ebind     = @mode_bind global,-insert
 @cbind  <Ctrl><Mod1>t  = sh 'xterm -e "socat unix-connect:\"$UZBL_SOCKET\" -"'
 #@cbind  <Ctrl><Mod1>t  = sh 'urxvt -e socat unix-connect:"$UZBL_SOCKET" -'
 
+# org protocol
+@cbind  <Ctrl>o  = spawn "@scripts_dir/org-capture.sh" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
+
 # show the inspector
 @cbind  <Ctrl>i  = show_inspector
 

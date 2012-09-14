@@ -228,8 +228,45 @@ to be organized.
 					  )
 				)
 			  )
+(setq-default konix/org-agenda-month-view
+			  '(
+				(agenda nil
+						(
+						 (org-agenda-overriding-header
+						  "Agenda without projects (month overview)")
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags
+							'("project"
+							  "no_weekly"
+							  "phantom"
+							  ))
+						  )
+						 (org-agenda-span 30)
+						 )
+						)
+				(agenda nil
+						(
+						 (org-agenda-overriding-header
+						  "Agenda for projects (month overview)")
+						 (org-agenda-use-time-grid nil)
+						 (org-agenda-skip-function
+						  '(or
+							(konix/org-agenda-skip-if-tags
+							 '("project")
+							 t)
+							(konix/org-agenda-skip-if-tags
+							 '("phantom"
+							   "no_weekly")
+							 )
+							)
+						  )
+						 (org-agenda-span 30)
+						 )
+						)
+				)
+			  )
 
-(setq-default konix/org-agenda-weekly-view
+(setq-default konix/org-agenda-full-view
 			  '(
 				(agenda nil
 						(
@@ -340,8 +377,12 @@ to be organized.
 ;; c, Weekly schedule: to check my calendar
 ;; a, agenda view: keep an eye at what I have to do today
 ;; A, idem, with only the important stuff
-;; w, full view, used to make weekly reviews
-;; W, idem, with only the important stuff
+;; f, full view, used to make full reviews
+;; F, idem, with only the important stuff
+;; m, Month view, used to make monthly reviews
+;; M, Month, with only the important stuff
+;; w, Week view, used to make weekly reviews
+;; W, Week, with only the important stuff
 (setq-default org-agenda-custom-commands
 			  `(
 				("y" "Yesterday time sheet"
@@ -420,14 +461,107 @@ to be organized.
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
 				  )
 				 )
-				("W" "Weekly review (important stuff)"
-				 ,konix/org-agenda-weekly-view
+				("F" "Full review (important stuff)"
+				 ,konix/org-agenda-full-view
 				 (
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
 				  )
 				 )
-				("w" "Weekly review"
-				 ,konix/org-agenda-weekly-view
+				("f" "Full review"
+				 ,konix/org-agenda-full-view
+				 (
+				  )
+				 )
+				("M" "Month view (important stuff)"
+				 ,konix/org-agenda-month-view
+				 (
+				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
+				  )
+				 )
+				("m" "Month review"
+				 ,konix/org-agenda-month-view
+				 (
+				  )
+				 )
+				("W" "Weekly view (important stuff)"
+				 (
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Agenda without projects (week overview)")
+						   (org-agenda-skip-function
+							'(or
+							  (konix/org-agenda-skip-if-tags
+							   '("project"
+								 "no_weekly"
+								 "phantom"
+								 ))
+							  (konix/org-agenda-skip-non-important-item)
+							  )
+							)
+						   (org-agenda-span 7)
+						   )
+						  )
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Agenda for projects (week overview)")
+						   (org-agenda-use-time-grid nil)
+						   (org-agenda-skip-function
+							'(or
+							  (konix/org-agenda-skip-if-tags
+							   '("project")
+							   t)
+							  (konix/org-agenda-skip-if-tags
+							   '("phantom"
+								 "no_weekly")
+							   )
+							  (konix/org-agenda-skip-non-important-item)
+							  )
+							)
+						   (org-agenda-span 7)
+						   )
+						  )
+				  )
+				 (
+				  )
+				 )
+				("w" "Week review"
+				 (
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Agenda without projects (week overview)")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("project"
+								"no_weekly"
+								"phantom"
+								))
+							)
+						   (org-agenda-span 7)
+						   )
+						  )
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Agenda for projects (week overview)")
+						   (org-agenda-use-time-grid nil)
+						   (org-agenda-skip-function
+							'(or
+							  (konix/org-agenda-skip-if-tags
+							   '("project")
+							   t)
+							  (konix/org-agenda-skip-if-tags
+							   '("phantom"
+								 "no_weekly")
+							   )
+							  )
+							)
+						   (org-agenda-span 7)
+						   )
+						  )
+				  )
 				 (
 				  )
 				 )

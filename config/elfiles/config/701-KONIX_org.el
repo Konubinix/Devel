@@ -342,11 +342,6 @@ to be organized.
 							 (org-agenda-overriding-header "Todos that need to be organized")
 							 )
 							)
-				 (tags "refile"
-					   (
-						(org-agenda-overriding-header "Entries to be refiled")
-						)
-					   )
 				 (tags-todo "maybe"
 							(
 							 (org-agenda-overriding-header "Maybe list")

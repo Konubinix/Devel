@@ -266,30 +266,8 @@ to be organized.
 						)
 				)
 			  )
-
-(setq-default konix/org-agenda-full-view
+(setq-default konix/org-agenda-stuck-view
 			  '(
-				(agenda nil
-						(
-						 (org-agenda-overriding-header "Agenda without projects")
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project"))
-						  )
-						 )
-						)
-				(agenda nil
-						(
-						 (org-agenda-overriding-header
-						  "Agenda for projects")
-						 (org-agenda-use-time-grid nil)
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project")
-							t)
-						  )
-						 )
-						)
 				(tags-todo "+project/NEXT"
 						   (
 							(org-agenda-overriding-header
@@ -301,14 +279,9 @@ to be organized.
 						(org-agenda-overriding-header "Stuck projects")
 						)
 					   )
-				(todo "NEXT"
+				(tags "refile"
 					  (
-					   (org-agenda-skip-function
-						'(konix/org-agenda-skip-if-tags
-						  '("phantom" "maybe" "project")
-						  )
-						)
-					   (org-agenda-overriding-header "NEXT items to be scheduled")
+					   (org-agenda-overriding-header "Entries to be refiled")
 					   )
 					  )
 				(todo "WAIT|DELEGATED"
@@ -316,64 +289,104 @@ to be organized.
 					   (org-agenda-overriding-header "WAITING items")
 					   )
 					  )
-				(tags-todo "//-NEXT-WAIT"
-						   (
-							(org-agenda-skip-function
-							 '(or
-							   (konix/org-agenda-skip-if-tags
-								'("project" "phantom" "maybe")
-								)
-							   (org-agenda-skip-entry-if 'scheduled)
-							   (konix/org-agenda-skip-if-task-of-project)
-							   )
-							 )
-							(org-agenda-overriding-header "Todos that need to be organized")
-							)
+				)
+			  )
+(setq-default konix/org-agenda-full-view
+			  (append
+			   '(
+				 (agenda nil
+						 (
+						  (org-agenda-overriding-header "Agenda without projects")
+						  (org-agenda-skip-function
+						   '(konix/org-agenda-skip-if-tags
+							 '("project"))
 						   )
-				(tags "refile"
-					  (
-					   (org-agenda-overriding-header "Entries to be refiled")
-					   )
-					  )
-				(tags-todo "maybe"
-						   (
-							(org-agenda-overriding-header "Maybe list")
-							)
-						   )
-				(agenda nil
-						(
-						 (org-agenda-overriding-header
-						  "Agenda without projects (month overview)")
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project"
-							  "no_weekly"
-							  "phantom"
-							  ))
 						  )
-						 (org-agenda-span 30)
 						 )
-						)
-				(agenda nil
-						(
-						 (org-agenda-overriding-header
-						  "Agenda for projects (month overview)")
-						 (org-agenda-use-time-grid nil)
-						 (org-agenda-skip-function
-						  '(or
-							(konix/org-agenda-skip-if-tags
+				 (agenda nil
+						 (
+						  (org-agenda-overriding-header
+						   "Agenda for projects")
+						  (org-agenda-use-time-grid nil)
+						  (org-agenda-skip-function
+						   '(konix/org-agenda-skip-if-tags
 							 '("project")
 							 t)
-							(konix/org-agenda-skip-if-tags
-							 '("phantom"
-							   "no_weekly")
+						   )
+						  )
+						 )
+				 )
+			   konix/org-agenda-stuck-view
+			   '(
+				 (todo "NEXT"
+					   (
+						(org-agenda-skip-function
+						 '(konix/org-agenda-skip-if-tags
+						   '("phantom" "maybe" "project")
+						   )
+						 )
+						(org-agenda-overriding-header "NEXT items to be scheduled")
+						)
+					   )
+				 (tags-todo "//-NEXT-WAIT"
+							(
+							 (org-agenda-skip-function
+							  '(or
+								(konix/org-agenda-skip-if-tags
+								 '("project" "phantom" "maybe")
+								 )
+								(org-agenda-skip-entry-if 'scheduled)
+								(konix/org-agenda-skip-if-task-of-project)
+								)
+							  )
+							 (org-agenda-overriding-header "Todos that need to be organized")
 							 )
 							)
-						  )
-						 (org-agenda-span 30)
-						 )
+				 (tags "refile"
+					   (
+						(org-agenda-overriding-header "Entries to be refiled")
 						)
-				)
+					   )
+				 (tags-todo "maybe"
+							(
+							 (org-agenda-overriding-header "Maybe list")
+							 )
+							)
+				 (agenda nil
+						 (
+						  (org-agenda-overriding-header
+						   "Agenda without projects (month overview)")
+						  (org-agenda-skip-function
+						   '(konix/org-agenda-skip-if-tags
+							 '("project"
+							   "no_weekly"
+							   "phantom"
+							   ))
+						   )
+						  (org-agenda-span 30)
+						  )
+						 )
+				 (agenda nil
+						 (
+						  (org-agenda-overriding-header
+						   "Agenda for projects (month overview)")
+						  (org-agenda-use-time-grid nil)
+						  (org-agenda-skip-function
+						   '(or
+							 (konix/org-agenda-skip-if-tags
+							  '("project")
+							  t)
+							 (konix/org-agenda-skip-if-tags
+							  '("phantom"
+								"no_weekly")
+							  )
+							 )
+						   )
+						  (org-agenda-span 30)
+						  )
+						 )
+				 )
+			   )
 			  )
 
 ;; y, yesterday's view: what did I do yesterday, useful for daily reports
@@ -381,6 +394,8 @@ to be organized.
 ;;    the same time
 ;; P, idem, with all projects
 ;; c, Weekly schedule: to check my calendar
+;; s, stuck things: keep an eye at what is going wrong
+;; S, same thing for important entries
 ;; a, agenda view: keep an eye at what I have to do today
 ;; A, idem, with only the important stuff
 ;; f, full view, used to make full reviews
@@ -456,6 +471,15 @@ to be organized.
 				 (
 				  (org-agenda-start-with-log-mode t)
 				  (org-agenda-show-log 'clockcheck)
+				  )
+				 )
+				("s" "Stuck view"
+				 ,konix/org-agenda-stuck-view
+				 )
+				("S" "Stuck view (Important stuff to do)"
+				 ,konix/org-agenda-stuck-view
+				 (
+				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
 				  )
 				 )
 				("a" "Agenda view"

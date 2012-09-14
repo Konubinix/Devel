@@ -330,6 +330,11 @@ to be organized.
 							(org-agenda-overriding-header "Todos that need to be organized")
 							)
 						   )
+				(tags "refile"
+					  (
+					   (org-agenda-overriding-header "Entries to be refiled")
+					   )
+					  )
 				(tags-todo "maybe"
 						   (
 							(org-agenda-overriding-header "Maybe list")
@@ -753,6 +758,7 @@ to be organized.
 			  '(
 				("project" . ?p)
   				("maybe" . ?y)
+  				("refile" . ?f)
 				(:newline)
  				("no_weekly" . ?n)
  				("no_appt" . ?a)

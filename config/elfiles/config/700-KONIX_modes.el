@@ -2438,10 +2438,10 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 
 (defun konix/jabber-bot-psy (text buffer)
   (save-window-excursion
-   (unless (get-buffer "*doctor*")
-	 (doctor)
-	 )
-   )
+	(unless (get-buffer "*doctor*")
+	  (doctor)
+	  )
+	)
   (let (
 		position
 		answer
@@ -2536,7 +2536,6 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 	 (define-key jabber-global-keymap (kbd "c") 'jabber-connect)
 	 (define-key jabber-global-keymap (kbd "d") 'jabber-disconnect-one)
 	 (define-key jabber-roster-mode-map (kbd "V") 'jabber-vcard-get)
-	 (global-set-key (kbd "<escape>") 'konix/jabber-activity-switch-to)
 	 (jabber-activity-mode 1)
 	 )
   )

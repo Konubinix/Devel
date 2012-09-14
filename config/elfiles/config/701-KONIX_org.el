@@ -199,36 +199,46 @@ to be organized.
 	)
   )
 
-(setq-default konix/org-agenda-view
-			  '(
-  				(agenda nil
-						(
-						 (org-agenda-overriding-header "Agenda without projects")
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project"))
-						  )
-						 )
-						)
-				(agenda nil
-						(
-						 (org-agenda-overriding-header
-						  "Agenda for projects")
-						 (org-agenda-use-time-grid nil)
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project")
-							t)
-						  )
-						 )
-						)
-				(todo "WAIT|DELEGATED"
-					  (
-					   (org-agenda-overriding-header "WAITING items")
-					   )
-					  )
+(defun konix/org-agenda-view-generate-list (&optional important)
+  `(
+	(agenda nil
+			(
+			 (org-agenda-overriding-header "Agenda without projects")
+			 (org-agenda-skip-function
+			  '(or
+				(konix/org-agenda-skip-if-tags
+				 '("project"))
+				(and ,important
+					 (konix/org-agenda-skip-non-important-item)
+					 )
 				)
 			  )
+			 )
+			)
+	(agenda nil
+			(
+			 (org-agenda-overriding-header
+			  "Agenda for projects")
+			 (org-agenda-use-time-grid nil)
+			 (org-agenda-skip-function
+			  '(or
+				(konix/org-agenda-skip-if-tags
+				 '("project")
+				 t)
+				(and ,important
+					 (konix/org-agenda-skip-non-important-item)
+					 )
+				)
+			  )
+			 )
+			)
+	(todo "WAIT|DELEGATED"
+		  (
+		   (org-agenda-overriding-header "WAITING items")
+		   )
+		  )
+	)
+  )
 (setq-default konix/org-agenda-month-view
 			  '(
 				(agenda nil
@@ -478,13 +488,10 @@ to be organized.
 				  )
 				 )
 				("a" "Agenda view"
-				 ,konix/org-agenda-view
+				 ,(konix/org-agenda-view-generate-list)
 				 )
 				("A" "Agenda view (Important stuff to do)"
-				 ,konix/org-agenda-view
-				 (
-				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
-				  )
+				 ,(konix/org-agenda-view-generate-list t)
 				 )
 				("F" "Full review (important stuff)"
 				 ,konix/org-agenda-full-view

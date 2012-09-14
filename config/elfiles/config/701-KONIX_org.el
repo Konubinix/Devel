@@ -1,5 +1,6 @@
 (require 'KONIX_org-meta-context)
 (require 'org-notmuch)
+(require 'org-protocol)
 ;; ####################################################################################################
 ;; Init hook
 ;; ####################################################################################################
@@ -714,6 +715,9 @@ to be organized.
 				 )
 				("B" "Bookmark (use with org-protocol)" entry (file (expand-file-name "bookmarks.org" org-directory))
 				 "* %:description
+  :LOGBOOK:
+  - Captured       %U
+  :END:
    %:link
    %:initial"
 				 :kill-buffer

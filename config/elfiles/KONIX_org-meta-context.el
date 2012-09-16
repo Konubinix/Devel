@@ -1,10 +1,52 @@
 ;; The meta context library allows the user to easily change the value of
 ;; `org-directory' cycling into the `konix/org-meta-contexts' list
 
+(require 'find-lisp)
+
 (defcustom konix/org-meta-contexts '()
   "The list of contexts
 The first element of the list is the default context
 ")
+
+(defun konix/org-meta-context/ignore-data-dir-internal (dir parent)
+  (and
+   (not (string= "data" dir))
+   (not (string= "." dir))
+   (not (string= ".." dir))
+   )
+  )
+
+(defun konix/org-meta-context/ignore-data-file-internal (file dir)
+  (and
+   (not (string= "data" file))
+   (find-lisp-file-predicate-is-directory file dir)
+   )
+  )
+
+(defun konix/org-meta-context/agenda-files-for-contexts (contexts)
+  "find all directories, except for data/, in all contexts in the
+contexts list"
+  (let (
+		(files '())
+		)
+	(mapc
+	 (lambda (context)
+	   (setq files
+			 (append files
+					 (list context)
+					 (find-lisp-find-files-internal
+					  context
+					  'konix/org-meta-context/ignore-data-file-internal
+					  'konix/org-meta-context/ignore-data-dir-internal
+					  )
+					 )
+			 )
+	   )
+	 contexts
+	 )
+	(remove-duplicates files :test 'string=)
+	)
+  )
 
 (defun konix/org-meta-context/initialize ()
   (interactive)
@@ -16,7 +58,11 @@ The first element of the list is the default context
 						  )
 				  )
 	)
-  (setq org-agenda-files konix/org-meta-contexts)
+  (setq org-agenda-files
+		(konix/org-meta-context/agenda-files-for-contexts
+		 konix/org-meta-contexts
+		 )
+		)
   (konix/org-meta-context/switch-to-context (first konix/org-meta-contexts) t)
   (when (and (getenv "KONIX_PERSO_DIR")
 			 (not (boundp 'konix/org-meta-contexts))
@@ -44,7 +90,10 @@ The first element of the list is the default context
 		org-agenda-diary-file (expand-file-name "diary.org" name)
 		)
   (when konix/org-meta-context/restricted
-	(setq org-agenda-files (list org-directory))
+	(setq org-agenda-files (konix/org-meta-context/agenda-files-for-contexts
+							(list org-directory)
+							)
+		  )
 	)
   (message "Initialized %s context" name)
   )
@@ -93,12 +142,17 @@ The first element of the list is the default context
   (interactive)
   (if konix/org-meta-context/restricted
 	  (progn
-		(setq org-agenda-files konix/org-meta-contexts
+		(setq org-agenda-files
+			  (konix/org-meta-context/agenda-files-for-contexts
+			   konix/org-meta-contexts)
 			  konix/org-meta-context/restricted nil
 			  )
 		)
 	(progn
-	  (setq org-agenda-files (list org-directory)
+	  (setq org-agenda-files
+			(konix/org-meta-context/agenda-files-for-contexts
+			 (list org-directory)
+			 )
 			konix/org-meta-context/restricted t
 			)
 	  )

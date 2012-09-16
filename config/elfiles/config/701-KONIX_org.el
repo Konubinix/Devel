@@ -299,6 +299,30 @@ to be organized.
 					   (org-agenda-overriding-header "WAITING items")
 					   )
 					  )
+				(todo "NEXT"
+					  (
+					   (org-agenda-skip-function
+						'(konix/org-agenda-skip-if-tags
+						  '("phantom" "maybe" "project")
+						  )
+						)
+					   (org-agenda-overriding-header "NEXT items to be scheduled")
+					   )
+					  )
+				(tags-todo "//-NEXT-WAIT"
+						   (
+							(org-agenda-skip-function
+							 '(or
+							   (konix/org-agenda-skip-if-tags
+								'("project" "phantom" "maybe")
+								)
+							   (org-agenda-skip-entry-if 'scheduled)
+							   (konix/org-agenda-skip-if-task-of-project)
+							   )
+							 )
+							(org-agenda-overriding-header "Todos that need to be organized")
+							)
+						   )
 				)
 			  )
 (setq-default konix/org-agenda-full-view
@@ -328,30 +352,6 @@ to be organized.
 				 )
 			   konix/org-agenda-stuck-view
 			   '(
-				 (todo "NEXT"
-					   (
-						(org-agenda-skip-function
-						 '(konix/org-agenda-skip-if-tags
-						   '("phantom" "maybe" "project")
-						   )
-						 )
-						(org-agenda-overriding-header "NEXT items to be scheduled")
-						)
-					   )
-				 (tags-todo "//-NEXT-WAIT"
-							(
-							 (org-agenda-skip-function
-							  '(or
-								(konix/org-agenda-skip-if-tags
-								 '("project" "phantom" "maybe")
-								 )
-								(org-agenda-skip-entry-if 'scheduled)
-								(konix/org-agenda-skip-if-task-of-project)
-								)
-							  )
-							 (org-agenda-overriding-header "Todos that need to be organized")
-							 )
-							)
 				 (tags-todo "maybe"
 							(
 							 (org-agenda-overriding-header "Maybe list")

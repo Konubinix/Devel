@@ -744,7 +744,7 @@ to be organized.
 "
 				 :kill-buffer
 				 )
-				("B" "Bookmark (use with org-protocol)" entry (file+headline (expand-file-name "bookmark.org" org-directory) "Refile")
+				("B" "Bookmark (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* %:description
   :LOGBOOK:
   - Captured       %U
@@ -753,7 +753,7 @@ to be organized.
    %:initial"
 				 :kill-buffer
 				 )
-				("R" "Bookmark to read (use with org-protocol)" entry (file+headline (expand-file-name "bookmark.org" org-directory) "Refile")
+				("R" "Bookmark to read (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* TODO Read %:description
   :LOGBOOK:
   - Captured       %U

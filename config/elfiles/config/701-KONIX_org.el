@@ -240,8 +240,8 @@ to be organized.
 	)
   )
 
-(defun konix/org-agenda-skip-refile-heading ()
-  (if (string= "Refile"
+(defun konix/org-agenda-skip-if-heading (heading)
+  (if (string= heading!
 			   (org-get-heading t t)
 			   )
 	  (save-excursion (outline-next-heading) (1- (point)))
@@ -302,7 +302,8 @@ to be organized.
 				(tags "refile"
 					  (
 					   (org-agenda-overriding-header "Entries to be refiled")
-					   (org-agenda-skip-function 'konix/org-agenda-skip-refile-heading)
+					   (org-agenda-skip-function
+						'(konix/org-agenda-skip-if-heading "Refile"))
 					   )
 					  )
 				(todo "WAIT|DELEGATED"
@@ -405,7 +406,8 @@ to be organized.
 			   )
 			  )
 
-;; y, yesterday's view: what did I do yesterday, useful for daily reports
+;; Y, yesterday's view: what did I do yesterday, useful for daily reports
+;; y, maybe list
 ;; p, projects without subprojects: make sure I don't have too much projects at
 ;;    the same time
 ;; P, idem, with all projects
@@ -422,7 +424,7 @@ to be organized.
 ;; W, Week, with only the important stuff
 (setq-default org-agenda-custom-commands
 			  `(
-				("y" "Yesterday time sheet"
+				("Y" "Yesterday time sheet"
 				 (
 				  (agenda nil)
 				  )
@@ -430,6 +432,13 @@ to be organized.
 				  (org-agenda-start-day 'konix/org-yesterday)
 				  (org-agenda-show-log 'clockcheck)
 				  (org-agenda-files (list org-directory))
+				  )
+				 )
+				("y" "Maybe list"
+				 (
+				  (tags-todo "maybe")
+				  )
+				 (
 				  )
 				 )
 				("p" "Projects (without subprojects)"

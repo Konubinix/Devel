@@ -727,15 +727,15 @@
 			(comint-completion-addsuffix nil) )
       (if completions
 		  (progn
-		   (comint-dynamic-simple-complete
-			stub
-			(list
-			 (completing-read "Complete: " completions nil nil stub
-							  'konix/bash-completion-history)
+			(comint-dynamic-simple-complete
+			 stub
+			 (list
+			  (completing-read "Complete: " completions nil nil stub
+							   'konix/bash-completion-history)
+			  )
 			 )
+			t
 			)
-		   t
-		   )
 		;; no standard completion
 		;; try default (file) completion after a wordbreak
 		(bash-completion-dynamic-try-wordbreak-complete stub open-quote)
@@ -2558,11 +2558,47 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; cmake
 ;; ####################################################################################################
 (defvar konix/cmake-beginning-of-defun "\\b\\(macro\\|function\\|if\\|else\\)(" "")
-(defvar konix/cmake-end-of-defun "\\bend\\(macro\\|function\\|if\\)([^)]*)" "")
+(defvar konix/cmake-end-of-defun "\\b\\(end\\(macro\\|function\\|if\\)\\|else([^)]*)\\)" "")
 
 (defun konix/cmake-forward-sexp (&rest args)
-  (re-search-forward konix/cmake-end-of-defun)
+  ;; the closing sexp is an end of defun with no beginning of defun behind
+  ;; (point) and it
+  (let (
+		(last_beginning (point))
+		(last_end (point))
+		(last_end_beginning nil)
+		(found nil)
+		)
+	;; move just after the beginning if on it
+	(when (looking-at konix/cmake-beginning-of-defun)
+	  (setq last_beginning (match-end 1))
+	  (goto-char last_beginning)
+	  )
+	(while (and
+			(not found)
+			(re-search-forward konix/cmake-end-of-defun)
+			)
+	  (setq last_end (match-end 1))
+	  (setq last_end_beginning (match-beginning 1))
+	  ;; check if the found end of defun is good.
+
+	  ;; for it to be good, there must not be any beginning of defun between the
+	  ;; last beginning of defun and current point. If there is, put the
+	  ;; last_beginning to the place of found beginning and continue
+	  ;; searching another end of defun
+	  (goto-char last_beginning)
+	  (if (re-search-forward konix/cmake-beginning-of-defun last_end_beginning t)
+		  (progn
+		   (setq last_beginning (match-end 1))
+		   (goto-char last_end)
+		   )
+		(setq found t)
+		)
+	  )
+	(goto-char last_end_beginning)
+	)
   )
+
 (defun konix/cmake-beginning-of-defun ()
   (re-search-backward konix/cmake-beginning-of-defun)
   )

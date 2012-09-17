@@ -1,0 +1,18 @@
+When getting the org-agenda-list, in the start-day parameter is a function, call it.
+
+This provides a way for the user to indicate what day the agenda should show.
+It is useful to get a time log of yesterday for instance.
+Index: devel/config/elfiles/org/lisp/org-agenda.el
+===================================================================
+--- devel.orig/config/elfiles/org/lisp/org-agenda.el	2012-09-17 12:42:41.985082375 +0200
++++ devel/config/elfiles/org/lisp/org-agenda.el	2012-09-17 12:42:51.073082662 +0200
+@@ -3586,6 +3586,9 @@
+   (if (and (integerp arg) (> arg 0))
+       (setq span arg arg nil))
+   (setq start-day (or start-day org-agenda-start-day))
++  (when (functionp start-day)
++    (setq start-day (funcall start-day))
++    )
+   (if org-agenda-overriding-arguments
+       (setq arg (car org-agenda-overriding-arguments)
+ 	    start-day (nth 1 org-agenda-overriding-arguments)

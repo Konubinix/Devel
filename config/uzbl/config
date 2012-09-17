@@ -384,7 +384,7 @@ set ebind     = @mode_bind global,-insert
 @cbind  zS  = event REQ_NEW_WINDOW \@(echo "$UZBL_URI" | sed -e 's/^http:/https:/')\@
 
 # Yanking & pasting binds
-@cbind  yu  = sh 'printf "$UZBL_URI" | xclip'
+@cbind  yu  = sh 'echo "\@uri" | xclip'
 @cbind  yU  = sh 'printf "$1" | xclip' '\@SELECTED_URI'
 @cbind  yy  = sh 'printf "$UZBL_TITLE" | xclip'
 

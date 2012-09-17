@@ -85,6 +85,7 @@ set download_handler    = sync_spawn @scripts_dir/download.sh
 @on_event   LOAD_COMMIT    spawn @scripts_dir/change_style.sh
 @on_event   LOAD_COMMIT    script @scripts_dir/lib.js
 @on_event   LOAD_COMMIT    script @scripts_dir/highlight_anchor.js
+@on_event   LOAD_COMMIT    spawn @scripts_dir/per_site_user_agent.sh
 @on_event   LOAD_COMMIT    script @scripts_dir/adblock.js
 
 

@@ -83,7 +83,7 @@
 	(process-send-string process current_kill)
 	(process-send-eof process)
 	;; no need to kill the process, when receiving eof, it should end itself
-	(message "Sent %s to the clipboard" current_kill)
+	(message "Sent '%s' to the clipboard" current_kill)
 	)
   )
 

@@ -152,11 +152,20 @@ after"
               (setq multi-eshell-index (+ multi-eshell-index 1))
               )
           (progn
-            (interactive)
+			;; the `multi-eshell-shell-function' is expected to switch to the
+			;; shell buffer if it finds one, or create a new buffer with its
+			;; name if it does not exist. For instance, `shell' will switch to
+			;; *shell* or create a shell into *shell*. We have to move the
+			;; default shell buffer to some *tempshell* one so that the
+			;; multi-eshell-shell-function will create a new *shell* buffer with
+			;; a new shell in it. Then, we can move the *shell* buffer to
+			;; *shell*<2> (or <3>, or <4>...) because it is the second shell (or
+			;; the third, or the fourth...) and put back *tempshell* -> *shell*
+			(with-current-buffer (get-buffer multi-eshell-name)
+			  (rename-buffer tempname)
+			  )
             (multi-eshell-function)
-            (rename-buffer tempname)
-            (multi-eshell-function)
-            (rename-buffer new-buff-name )
+            (rename-buffer new-buff-name)
             (switch-to-buffer tempname)
             (rename-buffer multi-eshell-name)
         (switch-to-buffer new-buff-name)

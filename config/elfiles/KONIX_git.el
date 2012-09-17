@@ -1248,7 +1248,7 @@
 						  (define-key map "C" 'konix/git/status-buffer/checkout-file)
 						  map
 						  )
-						"^#	modified:   \\(.+?\\)\\( (\\(.+tracked.+\\|new commits\\))\\)?$"
+						"^#	modified:   \\(.+?\\)\\( (\\(.+tracked.+\\|new commits\\|modified content\\))\\)?$"
 						compilation-info-face)
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))

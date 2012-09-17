@@ -239,6 +239,16 @@ to be organized.
 		  )
 	)
   )
+
+(defun konix/org-agenda-skip-refile-heading ()
+  (if (string= "Refile"
+			   (org-get-heading t t)
+			   )
+	  (save-excursion (outline-next-heading) (1- (point)))
+	nil
+	)
+  )
+
 (setq-default konix/org-agenda-month-view
 			  '(
 				(agenda nil
@@ -292,6 +302,7 @@ to be organized.
 				(tags "refile"
 					  (
 					   (org-agenda-overriding-header "Entries to be refiled")
+					   (org-agenda-skip-function 'konix/org-agenda-skip-refile-heading)
 					   )
 					  )
 				(todo "WAIT|DELEGATED"

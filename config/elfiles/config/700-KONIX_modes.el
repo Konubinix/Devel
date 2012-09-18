@@ -2557,8 +2557,8 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; ####################################################################################################
 ;; cmake
 ;; ####################################################################################################
-(defvar konix/cmake-beginning-of-defun "\\b\\(macro\\|function\\|if\\|else\\)(" "")
-(defvar konix/cmake-end-of-defun "\\b\\(end\\(macro\\|function\\|if\\)\\|else([^)]*)\\)" "")
+(defvar konix/cmake-beginning-of-defun "\\b\\(foreach\\|macro\\|function\\|if\\|else\\)(" "")
+(defvar konix/cmake-end-of-defun "\\b\\(end\\(foreach\\|macro\\|function\\|if\\)\\|else([^)]*)\\)" "")
 
 (defun konix/cmake-forward-sexp (&rest args)
   ;; the closing sexp is an end of defun with no beginning of defun behind

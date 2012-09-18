@@ -1361,3 +1361,31 @@ to be organized.
 	  )
 	 )
   )
+
+;; ######################################################################
+;; Make pause and interrup appear clearly in the agenda
+;; ######################################################################
+(defun konix/org-agenda-highlight-pauses ()
+  (save-excursion
+	(goto-char (point-min))
+	(let (
+		  (over nil)
+		  )
+	  (while (re-search-forward "^.+\\(PAUSE\\|INTERRUP\\):.+$" nil t)
+		(setq over
+			  (make-overlay (match-beginning 0) (match-end 0))
+			  )
+		(overlay-put over 'face 'font-lock-warning-face)
+		)
+	  )
+	)
+  )
+
+(defadvice org-agenda (after highlight_pauses ())
+  (konix/org-agenda-highlight-pauses)
+  )
+(defadvice org-agenda-redo (after highlight_pauses ())
+  (konix/org-agenda-highlight-pauses)
+  )
+(ad-activate 'org-agenda)
+(ad-activate 'org-agenda-redo)

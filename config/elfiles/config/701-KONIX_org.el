@@ -152,7 +152,11 @@ cursor stays in the org buffer."
   )
 
 (defun konix/org-agenda-skip-non-important-item ()
-  (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")
+  ;; an non todo entry is always important
+  (if (org-entry-is-todo-p)
+	  (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")
+	nil
+   )
   )
 
 (defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip)

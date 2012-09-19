@@ -125,6 +125,32 @@ cursor stays in the org buffer."
 	)
   )
 
+(defun konix/org-entry-at-point-has-timestamp-no-schedule-nor-deadline-p ()
+  (let (
+		(end_of_appt_search (org-entry-end-position))
+		)
+	(save-excursion
+	  (org-back-to-heading)
+	  (if (and
+		   (re-search-forward org-ts-regexp end_of_appt_search t)
+		   (progn
+			 (goto-char (match-beginning 0))
+			 (and
+			  (not (looking-back
+					(format "\\(%s\\|%s\\) *"
+							org-scheduled-regexp
+							org-deadline-regexp)))
+			  )
+			 )
+		   )
+		  ;; found an appt
+		  t
+		nil
+		)
+	  )
+	)
+  )
+
 (defun konix/org-agenda-skip-non-important-item ()
   (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")
   )

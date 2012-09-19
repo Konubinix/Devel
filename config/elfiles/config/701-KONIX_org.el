@@ -161,10 +161,10 @@ cursor stays in the org buffer."
 
 (defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip)
   (let (beg end skip tags current_tag)
-    (org-back-to-heading t)
-    (setq beg (point)
+	(org-back-to-heading t)
+	(setq beg (point)
 		  end (progn (outline-next-heading) (1- (point))))
-    (goto-char beg)
+	(goto-char beg)
 	(setq tags (org-get-tags-at))
 	(while (and
 			(not skip)
@@ -836,12 +836,12 @@ to be organized.
 (setq-default org-tag-persistent-alist
 			  '(
 				("project" . ?p)
-  				("maybe" . ?y)
-  				("refile" . ?f)
+				("maybe" . ?y)
+				("refile" . ?f)
 				(:newline)
- 				("no_weekly" . ?n)
- 				("no_appt" . ?a)
-  				("organization" . ?r)
+				("no_weekly" . ?n)
+				("no_appt" . ?a)
+				("organization" . ?r)
 				(:startgroup)
 				("@computer" . ?c)
 				("@phone" . ?o)
@@ -930,12 +930,12 @@ to be organized.
 				 )
 				)
 		;; (a_fut (and
-		;; 		(string-match deadline_regexp_future a)
-		;; 		(string-to-int
-		;; 		 (match-string 1 a)
-		;; 		 )
-		;; 		)
-		;; 	   )
+		;;		(string-match deadline_regexp_future a)
+		;;		(string-to-int
+		;;		 (match-string 1 a)
+		;;		 )
+		;;		)
+		;;	   )
 		(b_now (string-match-p deadline_regexp_now b))
 		(b_past (and
 				 (string-match deadline_regexp_past b)
@@ -945,15 +945,15 @@ to be organized.
 				 )
 				)
 		;; (b_fut (and
-		;; 		(string-match deadline_regexp_future b)
-		;; 		(string-to-int
-		;; 		 (match-string 1 b)
-		;; 		 )
-		;; 		)
-		;; 	   )
- 		(a_value (or a_past (and a_now 0) ;; a_fut
+		;;		(string-match deadline_regexp_future b)
+		;;		(string-to-int
+		;;		 (match-string 1 b)
+		;;		 )
+		;;		)
+		;;	   )
+		(a_value (or a_past (and a_now 0) ;; a_fut
 					 99))
- 		(b_value (or b_past (and b_now 0) ;; b_fut
+		(b_value (or b_past (and b_now 0) ;; b_fut
 					 99))
 		(greater (> a_value b_value))
 		(equal (= a_value b_value))
@@ -1030,7 +1030,7 @@ to be organized.
 (defun konix/org-table-toggle-cross ()
   (interactive)
   (let* (
-		 (content_  (save-excursion
+		 (content_ (save-excursion
 					  (skip-chars-backward "^|\n")
 					  (backward-char 1)
 					  (search-forward-regexp "|\\([^|]+\\)|")
@@ -1303,25 +1303,25 @@ to be organized.
   (setq org-tstr-regexp (concat org-tst-regexp "--?-?" org-tst-regexp))
   (save-excursion
 										; get categories
-    (setq mycategory (org-get-category))
+	(setq mycategory (org-get-category))
 										; get start and end of tree
-    (org-back-to-heading t)
-    (setq mystart    (point))
-    (org-end-of-subtree)
-    (setq myend      (point))
-    (goto-char mystart)
+	(org-back-to-heading t)
+	(setq mystart	 (point))
+	(org-end-of-subtree)
+	(setq myend		 (point))
+	(goto-char mystart)
 										; search for timerange
-    (setq myresult (re-search-forward org-tstr-regexp myend t))
+	(setq myresult (re-search-forward org-tstr-regexp myend t))
 										; search for categories to exclude
-    (setq mycatp (member mycategory org-export-exclude-category))
+	(setq mycatp (member mycategory org-export-exclude-category))
 										; return t if ok, nil when not ok
-    (if (and myresult (not mycatp)) t nil)))
+	(if (and myresult (not mycatp)) t nil)))
 
 ;;; activate filter and call export function
 (defun org-mycal-export ()
   (interactive)
   (let ((org-icalendar-verify-function 'org-mycal-export-limit))
-    (org-export-icalendar-combine-agenda-files)))
+	(org-export-icalendar-combine-agenda-files)))
 
 ;; ####################################################################################################
 ;; Generate wiki from org-directory files

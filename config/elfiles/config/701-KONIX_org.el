@@ -1370,7 +1370,8 @@ to be organized.
 
 (defun konix/org-publish-send-server ()
   (interactive)
-  (async-shell-command "konix_public_send.sh")
+  (shell-command "konix_public_send.sh")
+  (message "Sent to public server")
   )
 
 (eval-after-load "org-publish"

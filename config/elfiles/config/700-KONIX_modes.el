@@ -2558,50 +2558,57 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; cmake
 ;; ####################################################################################################
 (defvar konix/cmake-beginning-of-defun "\\b\\(foreach\\|macro\\|function\\|if\\|else\\)(" "")
-(defvar konix/cmake-end-of-defun "\\b\\(end\\(foreach\\|macro\\|function\\|if\\)\\|else\\)(" "")
+(defvar konix/cmake-end-of-defun "\\b\\(end\\(foreach\\|macro\\|function\\|if\\)\\|else\\)([^)]*)" "")
 
 (defun konix/cmake-forward-sexp (&rest args)
   ;; the closing sexp is an end of defun with no beginning of defun behind
   ;; (point) and it
-  (let (
-		(last_beginning (point))
-		(last_end (point))
-		(last_end_beginning nil)
-		(found nil)
-		)
-	;; move just after the beginning if on it
-	(when (looking-at konix/cmake-beginning-of-defun)
-	  (setq last_beginning (match-end 0))
-	  (goto-char last_beginning)
-	  )
-	(while (and
-			(not found)
-			(re-search-forward konix/cmake-end-of-defun)
-			)
-	  (setq last_end (match-end 0))
-	  (setq last_end_beginning (match-beginning 1))
-	  ;; check if the found end of defun is good.
+  (setq args
+   (or (and args (car args)) 1)
+   )
+  (if (< args 0)
+	  (konix/cmake-backward-sexp (- 0 args))
+   (let (
+		 (last_beginning (point))
+		 (last_end (point))
+		 (last_end_beginning nil)
+		 (found nil)
+		 )
+	 ;; move just after the beginning if on it
+	 (when (looking-at konix/cmake-beginning-of-defun)
+	   (setq last_beginning (match-end 0))
+	   (goto-char last_beginning)
+	   )
+	 (while (and
+			 (not found)
+			 (re-search-forward konix/cmake-end-of-defun)
+			 )
+	   (setq last_end (match-end 0))
+	   (setq last_end_beginning (match-beginning 1))
+	   ;; check if the found end of defun is good.
 
-	  ;; for it to be good, there must not be any beginning of defun between the
-	  ;; last beginning of defun and current point. If there is, put the
-	  ;; last_beginning to the place of found beginning and continue
-	  ;; searching another end of defun
-	  (goto-char last_beginning)
-	  (if (re-search-forward konix/cmake-beginning-of-defun last_end_beginning t)
-		  (progn
-			(setq last_beginning (match-end 1))
-			(goto-char last_end)
-			)
-		(setq found t)
-		)
-	  )
-	(goto-char last_end)
-	)
+	   ;; for it to be good, there must not be any beginning of defun between the
+	   ;; last beginning of defun and current point. If there is, put the
+	   ;; last_beginning to the place of found beginning and continue
+	   ;; searching another end of defun
+	   (goto-char last_beginning)
+	   (if (re-search-forward konix/cmake-beginning-of-defun last_end_beginning t)
+		   (progn
+			 (setq last_beginning (match-end 1))
+			 (goto-char last_end)
+			 )
+		 (setq found t)
+		 )
+	   )
+	 (goto-char last_end)
+	 )
+   )
   )
 
 (defun konix/cmake-backward-sexp (&rest args)
   ;; the beginning sexp is an beginning of defun with no end of defun behind
   ;; (point) and it
+  (interactive "^p")
   (let (
 		(last_beginning (point))
 		(last_end (point))
@@ -2665,6 +2672,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 	   'konix/cmake-beginning-of-defun)
   (set (make-variable-buffer-local 'end-of-defun-function)
 	   'konix/cmake-end-of-defun)
+  (set (make-variable-buffer-local 'forward-sexp-function) 'konix/cmake-forward-sexp)
   )
 (add-hook 'cmake-mode-hook
 		  'konix/cmake-mode-hook)

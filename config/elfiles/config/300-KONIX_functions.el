@@ -794,10 +794,19 @@ current buffer still has clients"
 
 (defun konix/find (name)
   (interactive "sName : ")
-  (find-dired
-   default-directory
-   (concat find-name-arg" \"*"name"*\"")
-   )
+  (let (
+		(find-name-arg
+		 (if current-prefix-arg
+			 (read-string "find arg: " find-name-arg nil find-name-arg)
+		   find-name-arg
+		   )
+		 )
+		)
+	(find-dired
+	 default-directory
+	 (concat find-name-arg" \"*"name"*\"")
+	 )
+	)
   )
 
 (defun konix/yank-pop-more-recent ()

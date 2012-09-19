@@ -2558,7 +2558,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; cmake
 ;; ####################################################################################################
 (defvar konix/cmake-beginning-of-defun "\\b\\(foreach\\|macro\\|function\\|if\\|else\\)(" "")
-(defvar konix/cmake-end-of-defun "\\b\\(end\\(foreach\\|macro\\|function\\|if\\)\\|else([^)]*)\\)" "")
+(defvar konix/cmake-end-of-defun "\\b\\(end\\(foreach\\|macro\\|function\\|if\\)\\|else\\)(" "")
 
 (defun konix/cmake-forward-sexp (&rest args)
   ;; the closing sexp is an end of defun with no beginning of defun behind
@@ -2571,14 +2571,14 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 		)
 	;; move just after the beginning if on it
 	(when (looking-at konix/cmake-beginning-of-defun)
-	  (setq last_beginning (match-end 1))
+	  (setq last_beginning (match-end 0))
 	  (goto-char last_beginning)
 	  )
 	(while (and
 			(not found)
 			(re-search-forward konix/cmake-end-of-defun)
 			)
-	  (setq last_end (match-end 1))
+	  (setq last_end (match-end 0))
 	  (setq last_end_beginning (match-beginning 1))
 	  ;; check if the found end of defun is good.
 
@@ -2595,15 +2595,58 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 		(setq found t)
 		)
 	  )
-	(goto-char last_end_beginning)
+	(goto-char last_end)
+	)
+  )
+
+(defun konix/cmake-backward-sexp (&rest args)
+  ;; the beginning sexp is an beginning of defun with no end of defun behind
+  ;; (point) and it
+  (let (
+		(last_beginning (point))
+		(last_end (point))
+		(last_beg_ending nil)
+		(found nil)
+		)
+	;; move just before the beginning if after it
+	(if (looking-back konix/cmake-end-of-defun)
+		(progn
+		  (setq last_end (match-beginning 1))
+		  (goto-char last_end)
+		  )
+	  (progn
+		(while (and
+				(not found)
+				(re-search-backward konix/cmake-beginning-of-defun)
+				)
+		  (setq last_beginning (match-beginning 1))
+		  (setq last_beg_ending (match-end 1))
+		  ;; check if the found beg of defun is good.
+
+		  ;; for it to be good, there must not be any end of defun between the
+		  ;; last end of defun and current point. If there is, put the
+		  ;; last_end to the place of found end and continue
+		  ;; searching another beg of defun
+		  (goto-char last_end)
+		  (if (re-search-backward konix/cmake-end-of-defun last_beg_ending t)
+			  (progn
+				(setq last_end (match-beginning 1))
+				(goto-char last_beginning)
+				)
+			(setq found t)
+			)
+		  )
+		(goto-char last_beginning)
+		)
+	  )
 	)
   )
 
 (defun konix/cmake-beginning-of-defun ()
-  (re-search-backward konix/cmake-beginning-of-defun)
+  (konix/cmake-backward-sexp)
   )
 (defun konix/cmake-end-of-defun ()
-  (re-search-forward konix/cmake-end-of-defun)
+  (konix/cmake-forward-sexp)
   )
 
 (defun konix/cmake-mode-hook ()

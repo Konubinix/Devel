@@ -483,8 +483,8 @@
   (let (
 		(appt_elem (second (first appt-time-msg-list)))
 		)
-	(unless (y-or-n-p (format "Recall this appt : '%s' ?"
-							  appt_elem))
+	(unless (y-or-n-p-with-timeout (format "Recall this appt : '%s' ?"
+										   appt_elem) 30 t)
 	  (pop appt-time-msg-list)
 	  (appt-check)
 	  )
@@ -2589,9 +2589,9 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 	  (goto-char last_beginning)
 	  (if (re-search-forward konix/cmake-beginning-of-defun last_end_beginning t)
 		  (progn
-		   (setq last_beginning (match-end 1))
-		   (goto-char last_end)
-		   )
+			(setq last_beginning (match-end 1))
+			(goto-char last_end)
+			)
 		(setq found t)
 		)
 	  )

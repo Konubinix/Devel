@@ -271,7 +271,7 @@ to be organized.
   )
 
 (defun konix/org-agenda-skip-if-heading (heading)
-  (if (string= heading!
+  (if (string= heading
 			   (org-get-heading t t)
 			   )
 	  (save-excursion (outline-next-heading) (1- (point)))

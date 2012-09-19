@@ -400,6 +400,22 @@ make the line non empty"
    )
   )
 
+(defun konix/may-not-be-killed-p (buffer)
+  (let* (
+		 (buffer_name (buffer-name buffer))
+		 (resul nil)
+		 )
+	(mapc
+	 (lambda (crit)
+	   (when (string-match (car crit) buffer_name)
+		 (setq resul t))
+	   )
+	 keep-buffers-protected-alist
+	 )
+	resul
+	)
+  )
+
 (defun konix/server-buffer-still-has-client-p ()
   "Function extracted from `server-kill-buffer-query-function' to know of the
 current buffer still has clients"

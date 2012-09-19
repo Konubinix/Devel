@@ -38,6 +38,11 @@
 									 ".*" nil
 									 'bs-sort-buffer-interns-are-last
 									 )
+	 (konix/push-or-replace-in-alist 'bs-configurations "may-be-killed"
+									 nil nil nil
+									 'konix/may-not-be-killed-p
+									 'bs-sort-buffer-interns-are-last
+									 )
 	 )
   )
 ;; ******************************************************************************************

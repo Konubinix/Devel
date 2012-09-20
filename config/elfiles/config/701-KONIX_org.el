@@ -812,8 +812,16 @@ to be organized.
    %:initial"
 				 :kill-buffer
 				 )
-				("b" "Bookmark" entry (file (expand-file-name "bookmarks.org" org-directory))
+				("b" "Bookmark" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* %?
+  :LOGBOOK:
+  - Captured       %U
+  :END:
+"
+				 :kill-buffer
+				 )
+				("r" "Bookmark To Read" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
+				 "* TODO Read %?
   :LOGBOOK:
   - Captured       %U
   :END:

@@ -156,7 +156,7 @@ cursor stays in the org buffer."
   (if (org-entry-is-todo-p)
 	  (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")
 	nil
-   )
+	)
   )
 
 (defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip)
@@ -1031,12 +1031,12 @@ to be organized.
   (interactive)
   (let* (
 		 (content_ (save-excursion
-					  (skip-chars-backward "^|\n")
-					  (backward-char 1)
-					  (search-forward-regexp "|\\([^|]+\\)|")
-					  (match-string-no-properties 1)
-					  )
-					)
+					 (skip-chars-backward "^|\n")
+					 (backward-char 1)
+					 (search-forward-regexp "|\\([^|]+\\)|")
+					 (match-string-no-properties 1)
+					 )
+				   )
 		 (beg_ (match-beginning 1))
 		 (end_ (match-end 1))
 		 )
@@ -1111,6 +1111,22 @@ to be organized.
 	(when id_blocker
 	  (org-mark-ring-push)
 	  (org-id-goto (replace-regexp-in-string "^id:" ""id_blocker))
+	  )
+	)
+  )
+
+(defun konix/org-depend-warn-if-blocked-task ()
+  (let (
+		(id_blocker (org-entry-get (point) "BLOCKER"))
+		)
+	(when id_blocker
+	  ;; find whether the dependency is done
+	  (save-window-excursion
+		(org-id-goto id_blocker)
+		(unless (org-entry-is-done-p)
+		  (konix/notify "Entry has a not done dependency")
+		  )
+		)
 	  )
 	)
   )
@@ -1214,6 +1230,13 @@ to be organized.
   (appt-check)
   )
 (add-hook 'org-agenda-mode-hook 'konix/org-agenda-mode-hook)
+
+(defun konix/org-clock-in-hook ()
+  (konix/org-depend-warn-if-blocked-task)
+  )
+(add-hook 'org-clock-in-hook
+		  'konix/org-clock-in-hook)
+
 
 (defun konix/org-store-link-at-point ()
   (interactive)

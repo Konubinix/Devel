@@ -57,12 +57,19 @@ def install_emacs():
     if not os.path.exists(environ["KONIX_EMACS_CUSTOM_FILE"]):
         shutil.copyfile("./config/emacs-custom.el", environ ["KONIX_EMACS_CUSTOM_FILE"])
 
-    replace_file_content(os.path.join(environ["HOME"], ".emacs"),"""(load-file "%(HOME)s/.emacs_var")
+    replace_file_content(os.path.join(environ["HOME"], ".emacs"),"""(setq emacs_com_file (getenv "EMACS_START_COM"))
+(load-file "%(HOME)s/.emacs_var")
 (load-file "%(KONIX_CONFIG_DIR)s/emacs.el")
 ;; On finit par loader les customs
 (if custom-file
 	(load custom-file)
   (display-warning 'No-custom "No custom file found")
+  )
+(when emacs_com_file
+  (with-temp-buffer
+	(insert "ended\n")
+	(write-file emacs_com_file)
+	)
   )
 """ % environ)
 

@@ -1,0 +1,19 @@
+#! /bin/bash
+
+DAEMON_NAME="$1"
+if [ "$DAEMON_NAME" == "" ]
+then
+    DAEMON_NAME="default_daemon"
+fi
+
+export EMACS_START_COM="$(mktemp -u -t start_emacs_com.XXXX)"
+rm "$EMACS_START_COM"
+
+emacs --daemon="${DAEMON_NAME}"
+read ended < "$EMACS_START_COM"
+if [ "$?" == "0" ] && [ "$ended" == "ended" ]
+then
+    exit 0
+else
+    exit 1
+fi

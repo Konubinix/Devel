@@ -490,7 +490,8 @@
 ;; TERM
 ;; ************************************************************
 (setq-default term-default-bg-color "black")
-(setq-default term-default-fg-color "grey")
+(setq-default term-default-fg-color "white")
+(setq-default term-buffer-maximum-size 0)
 
 ;; ************************************************************
 ;; TAGS

@@ -886,10 +886,25 @@ to be organized.
 				(sequence "CALL(k!)" "|" "CALLED(@)")
 				)
 			  )
+(defface konix/org-next-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit org-todo :foreground "deep sky blue")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit org-todo :foreground "RoyalBlue4")
+	 )
+	)
+  ""
+  )
 (setq-default org-todo-keyword-faces
 			  '(
 				("TODO" :foreground "red" :weight bold)
-				("NEXT" :foreground "blue" :weight bold)
+				("NEXT" konix/org-next-face)
 				("DONE" :foreground "forest green" :weight bold)
 				("WAIT" :foreground "orange" :weight bold)
 				("DELEGATED" :foreground "magenta" :weight bold)

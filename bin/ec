@@ -4,16 +4,6 @@ findEmacsWindow () {
 	wmctrl -l -x|grep -q '.Emacs'
 }
 
-findEmacsclientProcess () {
-	if on_windows_p
-	then
-		# no notion of emacs daemon on windows
-		return 1
-	else
-		ps -A -o comm|grep -q '^emacsclient$'
-	fi
-}
-
 findEmacsProcess () {
 	if on_windows_p
 	then
@@ -40,21 +30,6 @@ noNeedToCreateANewFrame ( ) {
 	fi
 }
 
-startEmacsProcess ( ) {
-	if on_windows_p
-	then
-		emacs.exe
-	else
-		emacs --daemon
-	fi
-}
-if findEmacsProcess
-then
-	echo "Already an emacs daemon" 1>&2
-else
-	startEmacsProcess
-fi
-
 printf "Starting an emacsclient " 1>&2
 if noNeedToCreateANewFrame
 then
@@ -64,8 +39,8 @@ then
 		# Need at least an argument when launching without -c
 		set "."
 	fi
-	emacsclient "$@"
+	emacsclient -a "" "$@"
 else
 	printf "within a new frame\n" >&2
-	emacsclient -c "$@"
+	emacsclient -a "" -c "$@"
 fi

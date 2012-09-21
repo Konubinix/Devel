@@ -49,15 +49,15 @@
 
 (defun konix/time-string-to-hours (timestring)
   (if (string-match "\\([0-9]+\\):\\([0-9]+\\)" timestring)
-   (let* (
-		 (hours (string-to-int (match-string-no-properties 1 timestring)))
-		 (minutes (string-to-int (match-string-no-properties 2 timestring)))
-		 (minutes_hour_fraction (/ minutes 60.0))
-		 (new_hour (+ hours minutes_hour_fraction))
-		 )
-	 new_hour
-	 )
-   )
+	  (let* (
+			 (hours (string-to-int (match-string-no-properties 1 timestring)))
+			 (minutes (string-to-int (match-string-no-properties 2 timestring)))
+			 (minutes_hour_fraction (/ minutes 60.0))
+			 (new_hour (+ hours minutes_hour_fraction))
+			 )
+		new_hour
+		)
+	)
   )
 
 (defun konix/unload-feature (feature_prefix)
@@ -805,6 +805,8 @@ current buffer still has clients"
   (mapc 'yas/load-directory (reverse yas/root-directory))
   )
 
+(defconst find-name-arg "-iname"
+  "Default argument given to find for the find-dired method")
 (defun konix/find (name)
   (interactive "sName : ")
   (let (

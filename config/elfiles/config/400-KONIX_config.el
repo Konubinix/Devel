@@ -465,7 +465,7 @@
   (setq-default calendar-month-abbrev-array calendar-month-abbrev-array-french)
   )
 
-(konix/calendar-to-french)
+;;(konix/calendar-to-french)
 
 ;; ************************************************************
 ;; Grep
@@ -633,4 +633,20 @@
   (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
   (setq comint-process-echoes t)
   (setq browse-url-browser-function 'konix/browse-url-uzbl)
+  )
+
+(defface region
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "blue")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "khaki")
+	 )
+	)
+  ""
   )

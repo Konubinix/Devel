@@ -2883,3 +2883,24 @@ FExport diary data into iCalendar file: ")
   (save-some-buffers)
   (kill-emacs)
   )
+
+(defun konix/term ()
+  (interactive)
+  (if (buffer-live-p (get-buffer "*terminal*"))
+	  (pop-to-buffer "*terminal*")
+	(let (
+		  (frame (make-frame))
+		  )
+	  (select-frame frame)
+	  (modify-frame-parameters
+	   frame
+	   `(
+		 (background-color . ,term-default-bg-color)
+		 (foreground-color . ,term-default-fg-color))
+	   )
+	  (term explicit-shell-file-name)
+	  (set-window-dedicated-p (selected-window) t)
+	  (setq window-size-fixed t)
+	  )
+	)
+  )

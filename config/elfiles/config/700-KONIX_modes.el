@@ -1865,11 +1865,89 @@ immediately after the section's start-tag."
 				)
 			  )
 (setq notmuch-address-command "notmuch_addresses.py")
+
+(defface konix/notmuch-search-unread
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit default :foreground "green")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit default :foreground "dark green")
+	 )
+	)
+  ""
+  )
 (setq notmuch-search-line-faces '(
 								  ("deleted" . '(:foreground "red"))
-								  ("unread" . '(:foreground "dark green"))
+								  ("unread" . konix/notmuch-search-unread
+								   )
 								  )
 	  )
+(defface notmuch-search-count
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit default :foreground "green")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit default)
+	 )
+	)
+  ""
+  )
+(defface notmuch-search-date
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit default :foreground "cyan")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit default :foreground "blue")
+	 )
+	)
+  ""
+  )
+(defface notmuch-search-matching-authors
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit default :foreground "white")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit default :foreground "blue")
+	 )
+	)
+  ""
+  )
+(defface notmuch-search-subject
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit default :foreground "light green")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit default :foreground "sienna")
+	 )
+	)
+  ""
+  )
+
 (defun konix/notmuch-search-tag-change (tag_change)
   (notmuch-search-tag-region
    (save-excursion (beginning-of-line) (point))

@@ -82,7 +82,18 @@ They can be relative or absolute
   )
 
 (defface konix/prog/tabs
-  '((((class color)) (:background "gray98")))
+  '(
+	(
+	 ((class color)
+	  (background light))
+	 (:background "gray98")
+	 )
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "gray30")
+	 )
+	)
   ""
   )
 

@@ -141,8 +141,14 @@
 (define-key 'konix/global-slow-key-map (kbd "t") 'konix/prog/toggle-source-header)
 ;; yank current buffer name
 (define-key 'konix/global-slow-key-map (kbd "M-b") 'konix/yank-current-buffer-name)
+;; **********************************************************************
 ;; bbdb
-(define-key 'konix/global-slow-key-map (kbd "b") 'bbdb)
+;; **********************************************************************
+(define-prefix-command 'konix/bbdb/map)
+(define-key 'konix/global-slow-key-map (kbd "b") 'konix/bbdb/map)
+
+(define-key 'konix/bbdb/map (kbd "s") 'bbdb)
+(define-key 'konix/bbdb/map (kbd "c") 'bbdb-create)
 
 ;; ******************************************************************************************
 ;; Delete lines

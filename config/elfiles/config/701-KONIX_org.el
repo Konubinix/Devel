@@ -19,7 +19,6 @@
   ;; for checklists fun
   (require 'org-checklist)
 
-  (add-hook 'before-save-hook 'org-update-all-dblocks)
   ;; Pour les appointments
   (require 'appt)
   (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)

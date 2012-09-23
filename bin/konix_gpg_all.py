@@ -10,8 +10,6 @@ import socket                   # for hostname
 import which
 import logging
 LOGGER = logging.getLogger(__name__)
-#logging.basicConfig(level=logging.DEBUG)
-#LOGGER.setLevel(logging.DEBUG)
 
 # ####################################################################################################
 # Parsing arguments
@@ -19,14 +17,23 @@ LOGGER = logging.getLogger(__name__)
 import argparse
 parser = argparse.ArgumentParser(description="""Encrypt of decrypt recursively
 current directory but this script.""")
-parser.add_argument('-d','--decrypt', nargs='?', const="a", help="""Use decrypt (by default,
-encryption is done)""")
+parser.add_argument('-d','--decrypt', nargs='?', const="a",
+                    help="""Use decrypt (by default, encryption is done)""")
+parser.add_argument('-v','--verbose', action='store_true',
+                    help="""Verbose mode""")
 
 args = parser.parse_args()
 
 # ####################################################################################################
 # Real script
 # ####################################################################################################
+# **********************************************************************
+# Hanlde verbosity
+# **********************************************************************
+if args.verbose:
+    logging.basicConfig(level=logging.DEBUG)
+    LOGGER.setLevel(logging.DEBUG)
+
 # **********************************************************************
 # Need gpg to use it...
 # **********************************************************************

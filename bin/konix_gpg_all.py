@@ -9,8 +9,9 @@ import subprocess
 import socket                   # for hostname
 import which
 import logging
-#logging.setLevel(logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
+#logging.basicConfig(level=logging.DEBUG)
+#LOGGER.setLevel(logging.DEBUG)
 
 # ####################################################################################################
 # Parsing arguments
@@ -26,6 +27,9 @@ args = parser.parse_args()
 # ####################################################################################################
 # Real script
 # ####################################################################################################
+# **********************************************************************
+# Need gpg to use it...
+# **********************************************************************
 gpg_path=None
 for gpg_exe_name in ["gpg", "gpg2"]:
     try:
@@ -36,34 +40,22 @@ for gpg_exe_name in ["gpg", "gpg2"]:
 if not gpg_path:
     LOGGER.error("No gpg found, cannot go further")
     exit(2)
-try:
-    gpg_agent_path=which.which("gpg-agent")
-except:
-    LOGGER.error("No gpg-agent found, you'll to write your password for each action")
-    gpg_agent_path = None
-
-gpg_env_file = os.path.expanduser("~/.gnupg/gpg-agent-info-%s" % socket.gethostname())
-def load_gpg_env_file():
-    with open(gpg_env_file,"r") as f:
+# **********************************************************************
+# Try to start a gpg agent file or use an already launched one
+# **********************************************************************
+def load_gpg_agent_info_file(gpg_agent_info_file):
+    with open(gpg_agent_info_file,"r") as f:
         gpg_agent_info = f.readline().partition("=")
         os.environ[gpg_agent_info[0]] = gpg_agent_info[2]
-        LOGGER.debug(os.environ[gpg_agent_info[0]])
+        LOGGER.debug("Loading gpg-agent info: " + os.environ[gpg_agent_info[0]])
 
-def new_gpg_agent(gpg_env_file):
-    retcode = subprocess.call([gpg_agent_path,"--daemon","--write-env-file",gpg_env_file])
-    if retcode != 0:
-        LOGGER.error("Error when trying to run gpg-agent in daemon mode")
-        return False
-    else:
-        return True
+gpg_start_process = subprocess.Popen(["konix_gpg_agent_start.sh"], stdout=subprocess.PIPE)
+rc = gpg_start_process.wait()
+if rc == 0:
+    gpg_agent_info_file = gpg_start_process.stdout.readlines()[0].replace("\n","")
+    load_gpg_agent_info_file(gpg_agent_info_file)
 
 DEFAULT_RECIPIENT=konix_gpg.get_default_key()
-
-if os.path.exists(gpg_env_file):
-    load_gpg_env_file()
-if gpg_agent_path:
-    if not new_gpg_agent(gpg_env_file):
-        LOGGER.error("gpg-agent initialization failed")
 
 dir_walker = os.walk(".")
 def remove_hidden_files(walk_res):

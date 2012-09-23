@@ -1432,7 +1432,7 @@ to be organized.
 	  :index-filename "index.html"
 	  :auto-sitemap t
 	  :sitemap-filename "index.html"
-	  :sitemap-title "My notes"
+	  :sitemap-title "Index"
 	  :completion-function 'konix/org-publish-send-server
 	  )
 	 )

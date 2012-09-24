@@ -1340,6 +1340,15 @@ to be organized.
 (require 'org-annotate-file nil t)
 (eval-after-load 'org-annotate-file
   '(progn
+	 (defun konix/org-notify-if-annotated (&optional buffer-or-file)
+	   (if buffer-or-file
+		   (setq buffer-or-file (get-buffer buffer-or-file))
+		 (setq buffer-or-file (buffer-file-name))
+		 )
+	   (when (konix/org-annotate-file-is-annotated-p buffer-or-file)
+		 (konix/notify (format "File %s has annotation" filename))
+		 )
+	   )
 	 (defun konix/org-annotate-file-is-annotated-p (filename)
 	   (unless (or
 				(and (boundp 'already_in_konix/org-annotate-file-is-annotated-p)
@@ -1347,6 +1356,7 @@ to be organized.
 					 )
 				(equal (expand-file-name org-annotate-file-storage-file) (expand-file-name filename))
 				)
+		 (setq filename (abbreviate-file-name filename))
 		 (let* (
 				(already_in_konix/org-annotate-file-is-annotated-p t)
 				(link (org-make-link-string (concat "file:" filename) filename))
@@ -1371,16 +1381,6 @@ to be organized.
 		   )
 		 )
 	   )
-	 (defun konix/org-notify-if-annotated (&optional buffer-or-file)
-	   (if buffer-or-file
-		   (setq buffer-or-file (get-buffer buffer-or-file))
-		 (setq buffer-or-file (buffer-file-name))
-		 )
-	   (when (konix/org-annotate-file-is-annotated-p buffer-or-file)
-		 (konix/notify (format "File %s has annotation" filename))
-		 )
-	   )
-
 	 (add-hook 'find-file-hook
 			   'konix/org-notify-if-annotated)
 	 )

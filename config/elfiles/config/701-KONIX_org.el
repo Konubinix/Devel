@@ -1156,10 +1156,41 @@ to be organized.
 	)
   )
 
+(defun konix/org-depend-first-blocker-and-tag-blocked ()
+  (let (
+		(id_blockers (org-entry-get (point) "BLOCKER"))
+		(tested_blocker nil)
+		(first_blocker nil)
+		(last_buffer (current-buffer))
+		(last_point (point))
+		)
+	(when id_blockers
+	  (setq id_blockers (split-string id_blockers " "))
+	  )
+	(while (and id_blockers (not first_blocker))
+	  (setq tested_blocker (pop id_blockers))
+	  (save-excursion
+		(save-window-excursion
+		  (org-id-goto tested_blocker)
+		  (unless (org-entry-is-done-p)
+			(setq first_blocker tested_blocker)
+			)
+		  )
+		)
+	  )
+ 	;; (switch-to-buffer last_buffer)
+	;; (goto-char last_point)
+	(when first_blocker
+	  (org-toggle-tag "blocked" 'on)
+	  )
+	first_blocker
+	)
+  )
+
 (defun konix/org-depend-goto-blocker ()
   (interactive)
   (let (
-		(id_blocker (org-entry-get (point) "BLOCKER"))
+		(id_blocker (konix/org-depend-first-blocker-and-tag-blocked))
 		)
 	(when id_blocker
 	  (org-mark-ring-push)
@@ -1170,16 +1201,10 @@ to be organized.
 
 (defun konix/org-depend-warn-if-blocked-task ()
   (let (
-		(id_blocker (org-entry-get (point) "BLOCKER"))
+		(id_blocker (konix/org-depend-first-blocker-and-tag-blocked))
 		)
 	(when id_blocker
-	  ;; find whether the dependency is done
-	  (save-window-excursion
-		(org-id-goto id_blocker)
-		(unless (org-entry-is-done-p)
-		  (konix/notify "Entry has a not done dependency")
-		  )
-		)
+	  (konix/notify (format "Entry has a not done dependency %s" id_blocker))
 	  )
 	)
   )

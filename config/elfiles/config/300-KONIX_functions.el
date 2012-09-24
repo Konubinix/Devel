@@ -2898,7 +2898,9 @@ FExport diary data into iCalendar file: ")
 	   frame
 	   `(
 		 (background-color . ,term-default-bg-color)
-		 (foreground-color . ,term-default-fg-color))
+		 (foreground-color . ,term-default-fg-color)
+		 (background-mode . dark)
+		 )
 	   )
 	  (term explicit-shell-file-name)
 	  (set-window-dedicated-p (selected-window) t)

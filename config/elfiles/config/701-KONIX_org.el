@@ -646,6 +646,36 @@ to be organized.
 				 (
 				  )
 				 )
+				("ae" "Errand view"
+				 (
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Errand agenda")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("@errand")
+							  t
+							  )
+							)
+						   )
+						  )
+				  (todo nil
+						(
+						 (org-agenda-overriding-header
+						  "Errand tasks")
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags
+							'("@errand")
+							t
+							)
+						  )
+						 )
+						)
+				  )
+				 nil
+				 ("~/errand_tasks.html")
+				 )
 				)
 			  )
 (setq-default org-agenda-diary-file (concat org-directory "/diary.org"))
@@ -855,6 +885,7 @@ to be organized.
 				(:endgroup)
 				(:startgroup)
 				("@home" . ?h)
+				("@errand" . ?e)
 				("@work" . ?w)
 				(:endgroup)
 				)

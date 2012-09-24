@@ -453,7 +453,7 @@ to be organized.
 ;; W, Week, with only the important stuff
 (setq-default org-agenda-custom-commands
 			  `(
-				("Y" "Yesterday time sheet"
+				("aY" "Yesterday time sheet"
 				 (
 				  (agenda nil)
 				  )
@@ -463,14 +463,14 @@ to be organized.
 				  (org-agenda-files (list org-directory))
 				  )
 				 )
-				("y" "Maybe list"
+				("ay" "Maybe list"
 				 (
 				  (tags-todo "maybe")
 				  )
 				 (
 				  )
 				 )
-				("p" "Projects (without subprojects)"
+				("ap" "Projects (without subprojects)"
 				 (
 				  (tags-todo "+project-maybe"
 							 (
@@ -490,7 +490,7 @@ to be organized.
 				   'konix/org-agenda-skip-if-task-of-project)
 				  )
 				 )
-				("P" "All Projects"
+				("aP" "All Projects"
 				 (
 				  (tags-todo "+project-maybe"
 							 (
@@ -509,7 +509,7 @@ to be organized.
 				  (org-agenda-overriding-header "All Projects")
 				  )
 				 )
-				("c" "Weekly schedule" agenda ""
+				("ac" "Weekly schedule" agenda ""
 				 (
 				  (org-agenda-span 30)
 				  (org-agenda-repeating-timestamp-show-all t)
@@ -518,7 +518,7 @@ to be organized.
 											)
 				  )
 				 )
-				("l" "log today"
+				("al" "log today"
 				 (
 				  (agenda nil)
 				  )
@@ -527,44 +527,44 @@ to be organized.
 				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )
-				("s" "Stuck view"
+				("as" "Stuck view"
 				 ,konix/org-agenda-stuck-view
 				 )
-				("S" "Stuck view (Important stuff to do)"
+				("aS" "Stuck view (Important stuff to do)"
 				 ,konix/org-agenda-stuck-view
 				 (
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
 				  )
 				 )
-				("a" "Agenda view"
+				("aa" "Agenda view"
 				 ,(konix/org-agenda-view-generate-list)
 				 )
-				("A" "Agenda view (Important stuff to do)"
+				("aA" "Agenda view (Important stuff to do)"
 				 ,(konix/org-agenda-view-generate-list t)
 				 )
-				("F" "Full review (important stuff)"
+				("aF" "Full review (important stuff)"
 				 ,konix/org-agenda-full-view
 				 (
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
 				  )
 				 )
-				("f" "Full review"
+				("af" "Full review"
 				 ,konix/org-agenda-full-view
 				 (
 				  )
 				 )
-				("M" "Month view (important stuff)"
+				("aM" "Month view (important stuff)"
 				 ,konix/org-agenda-month-view
 				 (
 				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
 				  )
 				 )
-				("m" "Month review"
+				("am" "Month review"
 				 ,konix/org-agenda-month-view
 				 (
 				  )
 				 )
-				("W" "Weekly view (important stuff)"
+				("aW" "Weekly view (important stuff)"
 				 (
 				  (agenda nil
 						  (
@@ -607,7 +607,7 @@ to be organized.
 				 (
 				  )
 				 )
-				("w" "Week review"
+				("aw" "Week review"
 				 (
 				  (agenda nil
 						  (

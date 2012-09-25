@@ -2706,23 +2706,23 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 		)
 	  (while (and
 			  (not found)
-			  (re-search-forward konix/cmake-end-of-defun)
+			  (konix/hs-re-search-forward-ignore-comment konix/cmake-end-of-defun)
 			  )
-		(setq last_end (match-end 0))
-		(setq last_end_beginning (match-beginning 1))
-		;; check if the found end of defun is good.
+		  (setq last_end (match-end 0))
+		  (setq last_end_beginning (match-beginning 1))
+		  ;; check if the found end of defun is good.
 
-		;; for it to be good, there must not be any beginning of defun between the
-		;; last beginning of defun and current point. If there is, put the
-		;; last_beginning to the place of found beginning and continue
-		;; searching another end of defun
-		(goto-char last_beginning)
-		(if (re-search-forward konix/cmake-beginning-of-defun last_end_beginning t)
-			(progn
-			  (setq last_beginning (match-end 1))
-			  (goto-char last_end)
-			  )
-		  (setq found t)
+		  ;; for it to be good, there must not be any beginning of defun between the
+		  ;; last beginning of defun and current point. If there is, put the
+		  ;; last_beginning to the place of found beginning and continue
+		  ;; searching another end of defun
+		  (goto-char last_beginning)
+		(if (konix/hs-re-search-forward-ignore-comment konix/cmake-beginning-of-defun last_end_beginning t)
+			  (progn
+				(setq last_beginning (match-end 1))
+				(goto-char last_end)
+				)
+			(setq found t)
 		  )
 		)
 	  (goto-char last_end)
@@ -2749,7 +2749,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 	  (progn
 		(while (and
 				(not found)
-				(re-search-backward konix/cmake-beginning-of-defun)
+				(konix/hs-re-search-backward-ignore-comment konix/cmake-beginning-of-defun)
 				)
 		  (setq last_beginning (match-beginning 1))
 		  (setq last_beg_ending (match-end 1))
@@ -2760,7 +2760,7 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 		  ;; last_end to the place of found end and continue
 		  ;; searching another beg of defun
 		  (goto-char last_end)
-		  (if (re-search-backward konix/cmake-end-of-defun last_beg_ending t)
+		  (if (konix/hs-re-search-backward-ignore-comment konix/cmake-end-of-defun last_beg_ending t)
 			  (progn
 				(setq last_end (match-beginning 1))
 				(goto-char last_beginning)

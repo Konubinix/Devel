@@ -1491,6 +1491,14 @@ to be organized.
 	  :sitemap-title "Index"
 	  :completion-function 'konix/org-publish-send-server
 	  )
+	 (konix/push-or-replace-in-alist
+	  'org-publish-project-alist
+	  "public_data"
+	  :base-directory (expand-file-name "wiki/public/data" perso-dir)
+	  :base-extension ".*"
+	  :publishing-directory "~/public_html/data"
+	  :completion-function 'konix/org-publish-send-server
+	  )
 	 )
   )
 

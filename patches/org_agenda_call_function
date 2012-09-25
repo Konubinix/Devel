@@ -4,9 +4,9 @@ This provides a way for the user to indicate what day the agenda should show.
 It is useful to get a time log of yesterday for instance.
 Index: devel/config/elfiles/org/lisp/org-agenda.el
 ===================================================================
---- devel.orig/config/elfiles/org/lisp/org-agenda.el	2012-09-17 12:42:41.985082375 +0200
-+++ devel/config/elfiles/org/lisp/org-agenda.el	2012-09-17 12:42:51.073082662 +0200
-@@ -3586,6 +3586,9 @@
+--- devel.orig/config/elfiles/org/lisp/org-agenda.el	2012-09-25 09:53:09.130707236 +0200
++++ devel/config/elfiles/org/lisp/org-agenda.el	2012-09-25 09:53:12.214707334 +0200
+@@ -3543,6 +3543,9 @@
    (if (and (integerp arg) (> arg 0))
        (setq span arg arg nil))
    (setq start-day (or start-day org-agenda-start-day))

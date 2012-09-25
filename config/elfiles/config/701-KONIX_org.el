@@ -1507,7 +1507,7 @@ to be organized.
 ;; ######################################################################
 (defvar konix/org-agenda-text-properties
   '(
-	("^.+\\(PAUSE\\|INTERRUP\\):.+$" 0 (face 'font-lock-warning-face))
+	("^.+\\(PAUSE\\|INTERRUP\\):.+$" 0 (face font-lock-warning-face))
 	)
   "")
 (defun konix/org-agenda-set-text-properties ()

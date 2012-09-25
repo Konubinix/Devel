@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 from email.parser import FeedParser
+from email.header import decode_header
 import sys
 import re
 import os
@@ -35,6 +36,12 @@ while len(PARTS_TO_PARSE) != 0:
             NAME = NAME.group(1)
         else:
             NAME = CID.group(1)+ '.' + TYPE.group(1)
+        NAME = decode_header(NAME)
+        NAME = NAME[0]
+        if NAME[1] is not None:
+            NAME = NAME[0].decode(NAME[1])
+        else:
+            NAME = NAME[0]
         # write the attachment into the temp dir
         f = open(os.path.join(CID_DIR, NAME), "wb")
         f.write(PART.get_payload(None, True))

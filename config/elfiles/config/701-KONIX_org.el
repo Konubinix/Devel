@@ -1497,27 +1497,38 @@ to be organized.
 ;; ######################################################################
 ;; Make pause and interrup appear clearly in the agenda
 ;; ######################################################################
-(defun konix/org-agenda-highlight-pauses ()
-  (save-excursion
-	(goto-char (point-min))
-	(let (
-		  (over nil)
-		  )
-	  (while (re-search-forward "^.+\\(PAUSE\\|INTERRUP\\):.+$" nil t)
-		(setq over
-			  (make-overlay (match-beginning 0) (match-end 0))
-			  )
-		(overlay-put over 'face 'font-lock-warning-face)
-		)
-	  )
+(defvar konix/org-agenda-text-properties
+  '(
+	("^.+\\(PAUSE\\|INTERRUP\\):.+$" 0 (face 'font-lock-warning-face))
 	)
+  "")
+(defun konix/org-agenda-set-text-properties ()
+  (setq buffer-read-only nil)
+  (save-excursion
+	(mapc
+	 (lambda (property)
+	   (goto-char (point-min))
+	   (let (
+			 (regexp (first property))
+ 			 (match (second property))
+ 			 (prop (third property))
+			 )
+		 (while (re-search-forward regexp nil t)
+		   (set-text-properties (match-beginning match) (match-end match) prop)
+		   )
+		 )
+	   )
+	 konix/org-agenda-text-properties
+	 )
+	)
+  (setq buffer-read-only t)
   )
 
-(defadvice org-agenda (after highlight_pauses ())
-  (konix/org-agenda-highlight-pauses)
+(defadvice org-agenda (after konix/set-text-properties ())
+  (konix/org-agenda-set-text-properties)
   )
-(defadvice org-agenda-redo (after highlight_pauses ())
-  (konix/org-agenda-highlight-pauses)
+(defadvice org-agenda-redo (after konix/set-text-properties ())
+  (konix/org-agenda-set-text-properties)
   )
 (ad-activate 'org-agenda)
 (ad-activate 'org-agenda-redo)

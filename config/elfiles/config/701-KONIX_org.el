@@ -1387,6 +1387,16 @@ to be organized.
 	 )
   )
 
+(defun konix/org-capture-interruption (&optional goto)
+  (interactive "P")
+  (cond
+   ((equal goto '(4)) (org-capture-goto-target "j"))
+   (t
+	(org-capture nil "j")
+	)
+   )
+  )
+
 ;; ####################################################################################################
 ;; Sync with google calendar
 ;; ####################################################################################################

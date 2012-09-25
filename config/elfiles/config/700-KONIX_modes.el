@@ -1154,6 +1154,44 @@
   (narrow-to-region beg end)
   )
 
+(defun konix/safe-hs-inside-comment-p ()
+  (save-match-data
+	(hs-inside-comment-p)
+	)
+  )
+
+(defun konix/hs-re-search-forward-ignore-comment (regexp &optional bound noerror count)
+  (let (
+		(found nil)
+		)
+	(while (and
+			(not found)
+			(re-search-forward regexp bound noerror count)
+			)
+	  (when (not (konix/safe-hs-inside-comment-p))
+		(setq found t)
+		)
+	  )
+	found
+   )
+  )
+
+(defun konix/hs-re-search-backward-ignore-comment (regexp &optional bound noerror count)
+  (let (
+		(found nil)
+		)
+	(while (and
+			(not found)
+			(re-search-backward regexp bound noerror count)
+			)
+	  (when (not (konix/safe-hs-inside-comment-p))
+		(setq found t)
+		)
+	  )
+	found
+   )
+  )
+
 (defun konix/hs-minor-mode-hook()
   (local-set-key (kbd "<f2> <f1>") 'hs-hide-all)
   (local-set-key (kbd "<f2> <f3>") 'hs-show-all)

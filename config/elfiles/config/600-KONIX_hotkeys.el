@@ -26,6 +26,9 @@
 ;; multi occur
 (global-set-key (kbd "M-s M-o") 'multi-occur-in-matching-buffers)
 
+;; handle interruption quickly
+(global-set-key (kbd "C-M-S-J") 'konix/org-capture-interruption)
+
 ;; rebox
 (global-set-key (kbd "C-M-q") 'rebox-dwim)
 (global-set-key (kbd "C-M-S-q") 'rebox-cycle)

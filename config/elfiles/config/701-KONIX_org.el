@@ -1551,5 +1551,3 @@ to be organized.
   )
 (ad-activate 'org-agenda)
 (ad-activate 'org-agenda-redo)
-(ad-deactivate 'org-agenda)
-(ad-deactivate 'org-agenda-redo)

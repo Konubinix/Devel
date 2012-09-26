@@ -1416,8 +1416,9 @@ Uses the macro konix/git/status-buffer/next-or-previous
 	  )
 	(setq konix/git/status-process (start-process "git status"
 												  git_status_buffer_name
-												  "git"
-												  "status"
+												  "sh"
+												  "-c"
+												  "git status && git stash list"
 												  ))
 	(konix/set-process-sentinel-exit-hook
 	 konix/git/status-process

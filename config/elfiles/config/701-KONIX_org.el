@@ -151,6 +151,49 @@ cursor stays in the org buffer."
 	)
   )
 
+(defun konix/org-ts-is-today-p (timestamp)
+  (let (
+		(decoded_ts (org-parse-time-string timestamp))
+		(decoded_today (decode-time (org-current-time)))
+		)
+	(and
+	 (equal (fourth decoded_today) (fourth decoded_ts))
+	 (equal (fifth decoded_today) (fifth decoded_ts))
+	 (equal (sixth decoded_today) (sixth decoded_ts))
+	 )
+	)
+  )
+
+(defun konix/org-ts-is-precise-p (timestamp)
+  (save-match-data
+	(string-match org-ts-regexp0 timestamp)
+	(not (not
+		  (and
+		   ;; minutes
+		   (match-string 8 timestamp)
+		   ;; hour
+		   (match-string 7 timestamp)
+		   )
+		  )
+		 )
+	)
+  )
+
+(defun konix/org-get-active-timestamp ()
+  (let (
+		timestamp
+		)
+	(if (save-excursion
+		  (org-back-to-heading)
+		  (re-search-forward org-ts-regexp (org-entry-end-position)
+							 t)
+		  )
+		(match-string 0)
+	  nil
+	  )
+	)
+  )
+
 (defun konix/org-agenda-skip-non-important-item ()
   ;; an non todo entry is always important
   (if (org-entry-is-todo-p)

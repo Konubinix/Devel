@@ -17,6 +17,7 @@ then
 	echo "Using current gpg-agent conf from $GPG_INFO_FILE_NAME" >&2
 else
 	echo "Starting a new gpg-agent" >&2
+	rm -f "$GPG_INFO_FILE_NAME"
 	GPG_AGENT_STARTING_CMD='gpg-agent --daemon --enable-ssh-support --write-env-file "$GPG_INFO_FILE_NAME" >/dev/null'
 	if ! is_on_linux
 	then

@@ -195,11 +195,29 @@ cursor stays in the org buffer."
   )
 
 (defun konix/org-agenda-skip-non-important-item ()
-  ;; an non todo entry is always important
-  (if (org-entry-is-todo-p)
-	  (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")
+  (cond
+   ((or
+	 ;; an non todo entry is always important
+	 (not (org-entry-is-todo-p))
+	 ;; a task scheduled for today with a precise timestamp (with hour and
+	 ;; minute) is always important
+	 (let (
+		   (act_ts (konix/org-get-active-timestamp))
+		   )
+	   (and
+		act_ts
+		(konix/org-ts-is-today-p act_ts)
+		(konix/org-ts-is-precise-p act_ts)
+		)
+	   )
+	 )
 	nil
 	)
+   (t
+	;; for other entries, the priority defines the importance
+	(org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")
+	)
+   )
   )
 
 (defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip)

@@ -213,6 +213,13 @@ cursor stays in the org buffer."
 	 )
 	nil
 	)
+   ((and
+	 (save-excursion (re-search-forward org-deadline-time-regexp (org-entry-end-position) t))
+	 (org-deadline-close (match-string 0))
+	 )
+	;; keep deadlines
+	nil
+	)
    (t
 	;; for other entries, the priority defines the importance
 	(org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")

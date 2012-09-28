@@ -450,7 +450,7 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 	;; 4 pomodorow without pauses. It assumes that the long pause will be taken
 	;; with `konix/org-pomodoro-long-break'
 	(when (>= konix/org-pomodoro-set-count 4)
-	  (setq _long " LONG")
+	  (setq _long #(" LONG" 0 5 (face font-lock-warning-face)))
 	  )
 	(setq konix/org-pomodoro-in-pomodoro nil)
 	(konix/org-pomodoro-report-finish-pomodoro)

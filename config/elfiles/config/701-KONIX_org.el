@@ -763,6 +763,7 @@ to be organized.
 (setq-default org-agenda-start-with-clockreport-mode nil)
 (setq-default org-agenda-start-with-log-mode nil)
 (setq-default org-agenda-todo-ignore-deadlines t)
+(setq-default org-agenda-include-deadlines t)
 (setq-default org-agenda-todo-ignore-scheduled t)
 (setq-default org-agenda-todo-list-sublevels t)
 (setq-default org-agenda-window-setup 'current-window)

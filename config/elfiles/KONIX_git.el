@@ -574,16 +574,18 @@
   (shell-command (concat "git stash save '"msg"'"))
   )
 
-(defun konix/git/stash/pop ()
+(defun konix/git/stash/pop (&optional stash_number)
   "git stash pop."
   (interactive)
-  (konix/git/command "stash pop")
+  (setq stash_number (or stash_number 0))
+  (konix/git/command (format "stash pop stash@{%s}" stash_number))
   )
 
-(defun konix/git/stash/drop ()
+(defun konix/git/stash/drop (&optional stash_number)
   "git stash pop."
   (interactive)
-  (konix/git/command "stash drop")
+  (setq stash_number (or stash_number 0))
+  (konix/git/command (format "stash drop stash@{%s}" stash_number))
   )
 
 (defun konix/git/stash/apply ()
@@ -602,10 +604,10 @@
   (konix/compile "git stash list")
   )
 
-(defun konix/git/stash/show (&optional number)
+(defun konix/git/stash/show (&optional stash_number)
   (interactive "sNumber : ")
-  (setq number (or number 0))
-  (konix/compile (format "git stash show -u stash@{%s}" number))
+  (setq stash_number (or stash_number 0))
+  (konix/compile (format "git stash show -u stash@{%s}" stash_number))
   )
 
 (defun konix/git/remote/list ()
@@ -1128,6 +1130,21 @@
 	)
   )
 
+(defun konix/git/status-buffer/stash/drop ()
+  (interactive)
+  (konix/git/stash/drop (get-text-property (point) 'konix/git/status/filename))
+  )
+
+(defun konix/git/status-buffer/stash/pop ()
+  (interactive)
+  (konix/git/stash/pop (get-text-property (point) 'konix/git/status/filename))
+  )
+
+(defun konix/git/status-buffer/stash/show ()
+  (interactive)
+  (konix/git/stash/show (get-text-property (point) 'konix/git/status/filename))
+  )
+
 (defun konix/git/status-decorate-buffer ()
   (defun decorate_file_type (keymap regexp face)
 	(goto-char 0)
@@ -1279,6 +1296,17 @@
 						)
 	(widen)
 	)
+  ;; handle the stash list
+  (decorate_file_type (let (
+							(map (make-sparse-keymap))
+							)
+						(define-key map "d" 'konix/git/status-buffer/stash/drop)
+						(define-key map "s" 'konix/git/status-buffer/stash/show)
+						(define-key map "p" 'konix/git/status-buffer/stash/pop)
+						map
+						)
+					  "^stash@{\\([0-9]+\\)}: .+$"
+					  compilation-info-face)
   (goto-char 0)
   )
 

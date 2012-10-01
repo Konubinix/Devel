@@ -1588,6 +1588,9 @@ to be organized.
 (defvar konix/org-agenda-text-properties
   '(
 	("^.+\\(PAUSE\\|INTERRUP\\):.+$" 0 (face font-lock-warning-face))
+	("^.+\\(now\\).+$" 1 (face org-checkbox-statistics-done))
+	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\)\\).+$" 1 (face bold))
+	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 (face italic))
 	)
   "")
 (defun konix/org-agenda-set-text-properties ()

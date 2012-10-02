@@ -433,6 +433,7 @@ make the line non empty"
 		 (protected nil)
 		 (has_client (konix/buffer-has-client-p buffer))
 		 (result nil)
+		 (clocked_in_buffer (equal (marker-buffer org-clock-marker) buffer))
 		 )
 	(mapc
 	 (lambda (crit)
@@ -444,7 +445,7 @@ make the line non empty"
 	;; a buffer may not be killed if it is protected or is associated to a
 	;; server
 	(setq result
-	 (or protected has_client)
+	 (or protected has_client clocked_in_buffer)
 	 )
 	(when konix/may-not-be-killed-p-debug
 	  (message "%s protected = %s" buffer result)

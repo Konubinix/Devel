@@ -47,6 +47,19 @@
 	)
   )
 
+(defun konix/buffer-has-client-p (&optional buffer)
+  (setq buffer (or buffer (current-buffer)))
+  (with-current-buffer buffer
+   (not
+	(let ((res t))
+	  (dolist (proc server-buffer-clients res)
+		(when (and (memq proc server-clients)
+				   (eq (process-status proc) 'open))
+		  (setq res nil))))
+	)
+   )
+  )
+
 (defun konix/time-string-to-hours (timestring)
   (if (string-match "\\([0-9]+\\):\\([0-9]+\\)" timestring)
 	  (let* (

@@ -426,19 +426,30 @@ make the line non empty"
    )
   )
 
+(defvar konix/may-not-be-killed-p-debug nil "")
 (defun konix/may-not-be-killed-p (buffer)
   (let* (
 		 (buffer_name (buffer-name buffer))
-		 (resul nil)
+		 (protected nil)
+		 (has_client (konix/buffer-has-client-p buffer))
+		 (result nil)
 		 )
 	(mapc
 	 (lambda (crit)
 	   (when (string-match (car crit) buffer_name)
-		 (setq resul t))
+		 (setq protected t))
 	   )
 	 keep-buffers-protected-alist
 	 )
-	resul
+	;; a buffer may not be killed if it is protected or is associated to a
+	;; server
+	(setq result
+	 (or protected has_client)
+	 )
+	(when konix/may-not-be-killed-p-debug
+	  (message "%s protected = %s" buffer result)
+	  )
+	result
 	)
   )
 

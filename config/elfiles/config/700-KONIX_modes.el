@@ -2264,14 +2264,8 @@ inspired from `notmuch-show-archive-thread-internal'"
 ;; Configuration of mail sending
 (setq message-send-mail-function 'message-send-mail-with-sendmail)
 (setq-default message-sendmail-envelope-from 'header)
-(setq-default sendmail-program "msmtp")
-(setq-default message-sendmail-extra-arguments
-			  (list "-C"
-					(expand-file-name "msmtprc"
-									  (getenv "KONIX_PERSO_DIR")
-									  )
-					)
-			  )
+(setq-default sendmail-program "konix_msmtp.sh")
+(setq-default message-sendmail-extra-arguments nil)
 (setq-default mm-text-html-renderer 'w3m
 			  gnus-inhibit-images t)
 (defun konix/message-mode-hook ()

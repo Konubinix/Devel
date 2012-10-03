@@ -49,3 +49,5 @@
         cmd = python \"$(which konix_emacs_merge.py)\" \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
 [diff "gpg"]
 	textconv = gpg -d
+[sendemail]
+	chainreplyto = yes

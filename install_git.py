@@ -4,6 +4,7 @@
 import os
 import sys
 import shutil
+import subprocess
 
 from install_lib import *
 
@@ -37,6 +38,9 @@ def install_git():
     GITCONFIG_FILE.write(GITCONFIG_DEFAULT_FILE.read())
     GITCONFIG_DEFAULT_FILE.close()
     GITCONFIG_FILE.close()
+    # set some env variables into the git config file
+    KONIX_MSMTP=os.path.join(environ["KONIX_BIN_DIR"], "konix_msmtp.sh")
+    subprocess.Popen(["git", "config", "--global", "sendemail.smtpserver", KONIX_MSMTP])
 
     print "Successful installed git config"
 if __name__ == '__main__':

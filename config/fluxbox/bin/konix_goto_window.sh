@@ -42,8 +42,9 @@ findwindow $BASENAME $WMCTRL $GREP;
 
 if [ $FOUND -eq 0 ]
 then
-    $FALLBACK # $ARGS do not give the args till I find a way to get shift and $*
-			  # or $@ working
+    # $ARGS do not give the args till I find a way to get shift and $*
+    # or $@ working
+    konix_launch_app.sh "$FALLBACK"
     sleep 2;
     findwindow $BASENAME $WMCTRL $GREP;
     if [ $FOUND -eq 0 ]

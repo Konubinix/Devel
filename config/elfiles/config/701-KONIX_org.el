@@ -1623,3 +1623,23 @@ to be organized.
   )
 (ad-activate 'org-agenda)
 (ad-activate 'org-agenda-redo)
+
+;; ######################################################################
+;; Notmuch
+;; ######################################################################
+(setq org-email-link-description-format "Email %d %c: %.30s")
+(defun org-notmuch-store-link ()
+  "Store a link to a notmuch search or message."
+  (when (eq major-mode 'notmuch-show-mode)
+    (let* ((message-id (notmuch-show-get-prop :id))
+	   (subject (notmuch-show-get-subject))
+	   (date (notmuch-show-get-date))
+	   (to (notmuch-show-get-to))
+	   (from (notmuch-show-get-from))
+	   desc link)
+      (org-store-link-props :type "notmuch" :from from :to to
+       			    :subject subject :message-id message-id :date date)
+      (setq desc (org-email-link-description))
+      (setq link (org-make-link "notmuch:"  "id:" message-id))
+      (org-add-link-props :link link :description desc)
+      link)))

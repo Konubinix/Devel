@@ -37,7 +37,7 @@ _WHICH="`which which 2>/dev/null`" || { exit 1; } # Required! ;-)
 #
 WGET_OPTS="--user-agent Firefox"
 TMP_DIRECTORY="/tmp"
-DEFAULT_DOWNLOAD_DIRECTORY="${HOME}"
+DEFAULT_DOWNLOAD_DIRECTORY="${XDG_DOWNLOAD_DIR:-$HOME}"
 
 
 #

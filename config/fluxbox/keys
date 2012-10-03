@@ -223,7 +223,8 @@ Control Mod4 Delete :ExecCommand konix_ask_poweroff.sh
 # GOTO SHORTCUTS (Control Mod4)
 # ////////////////////////////////////////
 Control Mod4 t :ExecCommand $(konix_goto_true_exec.sh terminator)
-Control Mod4 i :ExecCommand $(konix_goto_true_exec.sh x-www-browser)
+Control Mod4 w :ExecCommand $(konix_goto_true_exec.sh x-www-browser)
+Control Mod4 i :ExecCommand $(konix_goto_true_exec.sh iceweasel)
 Control Mod4 u :ExecCommand $(konix_goto_window.sh \.uzbl uzbl)
 Control Mod4 p :ExecCommand $(konix_goto_true_exec.sh pidgin)
 Control Mod4 v :ExecCommand $(konix_goto_true_exec.sh vlc)
@@ -235,7 +236,8 @@ Control Mod4 h :ExecCommand $(konix_goto_true_exec.sh icedove)
 # BRING WINDOW SHORTCUTS (Control Mod4 Shift)
 # ////////////////////////////////////////
 Control Mod4 Shift t :ExecCommand konix_one_window.sh /usr/bin/gnome-terminal
-Control Mod4 Shift i :ExecCommand konix_one_window.sh $(konix_find_true_exec.sh x-www-browser)
+Control Mod4 Shift w :ExecCommand konix_one_window.sh $(konix_find_true_exec.sh x-www-browser)
+Control Mod4 Shift i :ExecCommand konix_one_window.sh $(konix_find_true_exec.sh iceweasel)
 Control Mod4 Shift p :ExecCommand konix_one_window.sh /usr/bin/pidgin
 Control Mod4 Shift v :ExecCommand konix_one_window.sh /usr/bin/vlc
 Control Mod4 Shift e :ExecCommand konix_one_window.sh /usr/bin/emacs
@@ -244,7 +246,7 @@ Control Mod4 Shift e :ExecCommand konix_one_window.sh /usr/bin/emacs
 # MULTIPLE INSTANCE SHORTCUTS (Control Mod4 Mod1)
 # ////////////////////////////////////////
 Control Mod4 Mod1 t :Exec gnome-terminal --tab
-Control Mod4 Mod1 i :Exec $(konix_find_true_exec.sh x-www-browser)
+Control Mod4 Mod1 w :Exec $(konix_find_true_exec.sh x-www-browser)
 Control Mod4 Mod1 e :Exec $(konix_find_true_exec.sh emacs)
 Control Mod4 Shift u :Exec $(konix_find_true_exec.sh konix_uzbl_pop_exited_page.sh)
 

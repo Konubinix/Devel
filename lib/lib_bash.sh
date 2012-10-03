@@ -114,7 +114,7 @@ function ssh_agent_start_maybe_KONIX {
 }
 
 gpg_agent_start_KONIX () {
-	GPG_INFO_FILE_NAME="$(konix_gpg_agent_start.sh)"
+    konix_gpg_agent_start.sh
 	if [ "$?" == "0" ]
 	then
 		. "${GPG_INFO_FILE_NAME}"

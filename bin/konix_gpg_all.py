@@ -59,8 +59,11 @@ def load_gpg_agent_info_file(gpg_agent_info_file):
 gpg_start_process = subprocess.Popen(["konix_gpg_agent_start.sh"], stdout=subprocess.PIPE)
 rc = gpg_start_process.wait()
 if rc == 0:
-    gpg_agent_info_file = gpg_start_process.stdout.readlines()[0].replace("\n","")
-    load_gpg_agent_info_file(gpg_agent_info_file)
+    gpg_agent_info_file = os.environ.get("GPG_INFO_FILE_NAME", None)
+    if gpg_agent_info_file:
+        load_gpg_agent_info_file(gpg_agent_info_file)
+    else:
+        LOGGER.warning("GPG_INFO_FILE_NAME not set, cannot use it")
 
 DEFAULT_RECIPIENT=konix_gpg.get_default_key()
 

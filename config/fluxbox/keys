@@ -208,6 +208,7 @@ Mod4 Mod1 Up :Exec konix_display_unique.py "Master Volume : $(amixer set Master,
 # Reconfigure
 control Mod4 f : MacroCmd {Reconfigure} {Exec konix_display.py 'reconfigure done'}
 control shift Mod4 f : MacroCmd {Exec $(konix_find_true_exec.sh fluxbox-generate_menu) -is -su -t gnome-terminal -m Menu} {Exec konix_display.py 'regenerate menu'}
+control Mod4 Mod1 f : CommandDialog
 
 # poweroff and reboot
 Mod4 p s : Exec /sbin/poweroff

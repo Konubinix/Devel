@@ -578,7 +578,16 @@ to be organized.
 				  (org-agenda-overriding-header "All Projects")
 				  )
 				 )
-				("ac" "Weekly schedule" agenda ""
+				("ac" "Monthly schedule" agenda ""
+				 (
+				  (org-agenda-span 30)
+				  (org-agenda-repeating-timestamp-show-all t)
+				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
+																	   'scheduled)
+											)
+				  )
+				 )
+				("aC" "Monthly schedule with calfw" konix/cfw:open-org-calendar ""
 				 (
 				  (org-agenda-span 30)
 				  (org-agenda-repeating-timestamp-show-all t)
@@ -1632,14 +1641,32 @@ to be organized.
   "Store a link to a notmuch search or message."
   (when (eq major-mode 'notmuch-show-mode)
     (let* ((message-id (notmuch-show-get-prop :id))
-	   (subject (notmuch-show-get-subject))
-	   (date (notmuch-show-get-date))
-	   (to (notmuch-show-get-to))
-	   (from (notmuch-show-get-from))
-	   desc link)
+		   (subject (notmuch-show-get-subject))
+		   (date (notmuch-show-get-date))
+		   (to (notmuch-show-get-to))
+		   (from (notmuch-show-get-from))
+		   desc link)
       (org-store-link-props :type "notmuch" :from from :to to
-       			    :subject subject :message-id message-id :date date)
+							:subject subject :message-id message-id :date date)
       (setq desc (org-email-link-description))
       (setq link (org-make-link "notmuch:"  "id:" message-id))
       (org-add-link-props :link link :description desc)
       link)))
+
+;; ######################################################################
+;; Calfw integration
+;; ######################################################################
+(require 'calfw-org nil t)
+(defun konix/cfw:open-org-calendar (&rest args)
+  (interactive)
+  (let (
+		;; do not duplicate deadlines
+		(org-deadline-warning-days 0)
+		)
+   (cfw:open-org-calendar)
+   )
+  ;; set the org variables to remember
+  (set (make-variable-buffer-local 'org-agenda-skip-function)
+	   org-agenda-skip-function)
+  (set (make-variable-buffer-local 'org-deadline-warning-days) org-deadline-warning-days)
+  )

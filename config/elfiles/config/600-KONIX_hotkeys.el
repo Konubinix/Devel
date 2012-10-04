@@ -305,6 +305,7 @@
 (define-key 'konix/semantic-key-map "a" 'semantic-speedbar-analysis)
 (define-key 'konix/semantic-key-map "t" 'konix/semantic-analyze-proto-impl-toggle)
 (define-key 'konix/semantic-key-map "l" 'konix/semantic-add-lex-c-preprocessor-symbol-map)
+(define-key 'konix/semantic-key-map "D" 'semantic-analyze-debug-assist)
 (define-key 'konix/semantic-key-map (kbd "TAB") 'semantic-complete-analyze-inline)
 (define-key 'konix/semantic-key-map (kbd "V") 'konix/prog/semantic-toggle-verbose)
 (define-key 'konix/semantic-key-map (kbd "A") 'konix/global-semantic-ac-sources)

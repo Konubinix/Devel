@@ -47,7 +47,11 @@ set scripts_dir      = @share_dir/uzbl:@perso_dir/share/uzbl:@data/share/uzbl/ex
 set scheme_handler      = sync_spawn @scripts_dir/scheme.py
 #set request_handler     = sync_spawn @scripts_dir/request.py
 set authentication_handler = sync_spawn @scripts_dir/auth.py
-set download_handler    = sync_spawn @scripts_dir/download.sh
+
+# Download stuff
+set dm_dm_start      = @(which dm-dm.sh)@ -s
+set download_handler = spawn @dm_dm_start
+@cbind !downloads    = sh 'dm-dm.sh -g'
 
 # === Dynamic event handlers =================================================
 

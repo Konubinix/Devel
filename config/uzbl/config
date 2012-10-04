@@ -411,8 +411,8 @@ set ebind     = @mode_bind global,-insert
 @cbind  M  = spawn @scripts_dir/insert_bookmark.sh
 
 # Bookmark/history loading
-@cbind  U  = spawn @scripts_dir/load_url_from_history.sh
-@cbind  u  = spawn @scripts_dir/load_url_from_bookmarks.sh
+@cbind  U  = spawn @scripts_dir/konix_load_url_from_history.sh
+@cbind  u  = spawn @scripts_dir/konix_load_url_from_bookmarks.sh
 
 # Temporary bookmarks
 @cbind  <Ctrl>d  = spawn @scripts_dir/insert_temp.sh

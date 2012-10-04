@@ -1898,10 +1898,12 @@ immediately after the section's start-tag."
 			  '(
 				("inbox" . "tag:inbox AND -tag:deleted")
 				("flagged" . "tag:flagged")
+				("drafs" . "tag:draft and not tag:deleted")
 				("unread" . "tag:unread AND NOT tag:rss AND NOT tag:inbox AND NOT tag:flagged")
 				("unread rss" . "tag:rss AND tag:unread")
 				)
 			  )
+
 (setq notmuch-address-command "notmuch_addresses.py")
 
 (defface konix/notmuch-search-unread

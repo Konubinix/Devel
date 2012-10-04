@@ -22,6 +22,7 @@ konix_notify_daemon > ~/.notify_daemon_log 2>&1 &
 
 sleep 4
 {
+    fbpager -w &
     killall conky
     wicd-gtk -t &
     conky -d -c ~/.conky.d/conky1 > ~/conky.log 2> ~/conky.err

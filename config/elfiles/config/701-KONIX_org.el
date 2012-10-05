@@ -529,7 +529,6 @@ to be organized.
 				 (
 				  (org-agenda-start-day 'konix/org-yesterday)
 				  (org-agenda-show-log 'clockcheck)
-				  (org-agenda-files (list org-directory))
 				  )
 				 )
 				("ay" "Maybe list"

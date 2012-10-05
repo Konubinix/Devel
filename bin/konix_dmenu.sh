@@ -1,19 +1,24 @@
 #!/bin/bash
+
 # This script only calls dmenu and allow successive filtering (like M-* in
 # icicles). An entry validated with RET is chosen. An entry validated with S-RET
 # (that does not match exactly an input) is used to launch a new dmenu with the
-# inputs filtered with that entry
+# inputs filtered with that entry. If the user exits dmenu with ESC, the program
+# stops. If the user validates the empty string with S-RET, the filter is
+# aborted.
 
 # ######################################################################
 # Init variables
 # ######################################################################
 TEMP_DIR=`mktemp -d`
 INPUT="$TEMP_DIR/input"
+FIRST_INPUT="$TEMP_DIR/first_input"
 TMP="$TEMP_DIR/tmp"
 # command to launch DMENU
 DMENU='cat "$INPUT" | dmenu "$@"'
 
 cat > "$INPUT"
+cp "$INPUT" "$FIRST_INPUT"
 # ######################################################################
 # Cleaning config
 # ######################################################################
@@ -32,6 +37,13 @@ match_output ( ) {
     grep -qr "^$output\$" "$INPUT"
 }
 
+assert_succeeded ( ) {
+    if [ "$?" != "0" ]
+    then
+        exit 1
+    fi
+}
+
 # ######################################################################
 # Code :
 #
@@ -41,20 +53,26 @@ match_output ( ) {
 # a new dmenu instance with only that entries.
 # ######################################################################
 OUTPUT="`eval $DMENU`"
+assert_succeeded
 while ! match_output "$OUTPUT"
 do
-    # this should be a substring of input, filter with it
-    grep "$OUTPUT" "$INPUT" > "$TMP"
+    # put in tmp what will be the next input
+    if [ "$OUTPUT" == "" ]
+    then
+        cp "$FIRST_INPUT" "$TMP"
+    else
+        # this should be a substring of input, filter with it
+        grep "$OUTPUT" "$INPUT" > "$TMP"
+    fi
+    # make the tmp file the new input
     mv "$TMP" "$INPUT"
+    # if the resulting input is empty, return the last output
     if [ `cat "$INPUT" | wc -l` == "0" ]
     then
         return "$OUTPUT"
     fi
 
     OUTPUT="`eval $DMENU`"
-    if [ "$?" != "0" ]
-    then
-        exit 1
-    fi
+    assert_succeeded
 done
 echo "$OUTPUT"

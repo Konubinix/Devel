@@ -92,11 +92,12 @@ Handles wget downloads
 
 Options:
   -s,--start <URL>          start downloading the passed URL
-  -p,--pause <WGET_PID>     pause (or resume) a download
+  -p,--pause <WGET_PID>     pause a download
+  -r,--resume <WGET_PID>    resume a download
   -c,--cancel <WGET_PID>    cancel a download
   -l,--list                 list downloads
   -h,--help                 display these information
-
+  -g,--gui                  launch the dmenu based gui
 EOF
 }
 

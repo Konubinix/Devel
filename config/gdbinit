@@ -1,2 +1,9 @@
 set breakpoint pending on
 set print pretty
+define bp_save
+       save breakpoints ~/.gdb_bps
+end
+
+define bp_rest
+       source ~/.gdb_bps
+end

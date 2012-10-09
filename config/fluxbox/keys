@@ -172,8 +172,8 @@ Mod4 Mod1 shift Down  :MoveTo * 0 Bottom
 Mod4 shift KP_0  : ArrangeWindows # 0
 
 # transparency
-Mod4 c :ToggleCmd {Exec killall xcompmgr & konix_display_unique.py "Killed xcompmgr"} {Exec xcompmgr -n & konix_display_unique.py "Launched xcompmgr" }
-Mod4 t :Exec transset -t -a
+Mod4 x c :ToggleCmd {Exec killall xcompmgr & konix_display_unique.py "Killed xcompmgr"} {Exec xcompmgr -n & konix_display_unique.py "Launched xcompmgr" }
+Mod4 x t :Exec transset -t -a
 Mod4 Up :SetAlpha +20
 Mod4 Down :SetAlpha -20
 OnWindow Mod4 Mouse4 :SetAlpha +20

@@ -140,6 +140,8 @@
 (define-key 'konix/global-slow-key-map (kbd "A") 'konix/org-agenda)
 ;; ffap
 (define-key 'konix/global-slow-key-map (kbd "C-f") 'ffap)
+;; seeks
+(define-key 'konix/global-slow-key-map (kbd "M-f") 'konix/seeks)
 ;; Prog toggle c/h files
 (define-key 'konix/global-slow-key-map (kbd "t") 'konix/prog/toggle-source-header)
 ;; yank current buffer name

@@ -47,6 +47,26 @@
 	)
   )
 
+(defvar konix/seeks-url "http://www.seeks.fr/search?q=%s&expansion=1&action=expand" "")
+(defvar konix/seeks-history '() "")
+(defun konix/seeks (request)
+  (interactive
+   (list
+	(let (
+		  (default (if (region-active-p)
+					   (buffer-substring-no-properties
+						(region-beginning)
+						(region-end))
+					 (thing-at-point 'word)
+					 ))
+		  )
+	  (read-string "Seeks: " default 'konix/seeks-history default)
+	  )
+	)
+   )
+  (browse-url (format konix/seeks-url request))
+  )
+
 (defun konix/buffer-has-client-p (&optional buffer)
   (setq buffer (or buffer (current-buffer)))
   (with-current-buffer buffer

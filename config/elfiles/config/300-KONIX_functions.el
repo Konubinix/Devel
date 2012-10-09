@@ -465,8 +465,15 @@ make the line non empty"
 	;; a buffer may not be killed if it is protected or is associated to a
 	;; server
 	(setq result
-	 (or protected has_client clocked_in_buffer)
-	 )
+		  (or protected has_client clocked_in_buffer
+			  ;; calc trail must be killed by the calculator kill because else
+			  ;; calculator will fail to be killed
+			  (string=
+			   (buffer-name buffer)
+			   "*Calc Trail*"
+			   )
+			  )
+		  )
 	(when konix/may-not-be-killed-p-debug
 	  (message "%s protected = %s" buffer result)
 	  )

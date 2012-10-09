@@ -365,6 +365,8 @@
 (setq-default case-replace nil)			;Don't want queryReplace or expand
 										;dabbrev to put everything in lower or
 										;upper case
+;; Non-nil means `query-replace' uses the last search string.
+(setq-default query-replace-interactive nil)
 ;; C-u C-Space C-space ...
 (setq-default set-mark-command-repeat-pop t)
 

@@ -70,7 +70,7 @@
 		;; minbif control buffers
 		("^&[a-zA-Z]+$")
 		;; irc buffers
-		("^#[a-zA-Z]+$")
+		("^#[a-zA-Z-]+$")
 		;; irc control buffers
 		("^.+:[0-9]+$")
 		)

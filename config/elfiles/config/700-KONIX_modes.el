@@ -2422,8 +2422,15 @@ Prefix argument ARG makes the entry nonmarking."
 ;; tracking channels
 ;; ******************************************************************************************
 (setq erc-track-visibility 'visible)
-(setq-default erc-track-exclude-types '("JOIN" "KICK" "NICK" "PART" "QUIT"
-										"MODE" "333" "353"))
+;; http://www.irchelp.org/irchelp/rfc/rfc2812.txt
+(setq-default erc-track-exclude-types '("JOIN" "NICK" "PART" "MODE"
+										;; "QUIT"
+										"324" ;; RPL_CHANNELMODEIS
+									    ;; "332" RPL_TOPIC
+										;; "353" RPL_NAMREPLY
+										;; "477" ERR_NOCHANMODES
+										))
+
 (setq-default erc-track-exclude-server-buffer t)
 (setq-default erc-track-showcount t)
 

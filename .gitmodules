@@ -79,3 +79,6 @@
 [submodule "config/elfiles/bash-completion"]
 	path = config/elfiles/bash-completion
 	url = https://github.com/szermatt/emacs-bash-completion.git
+[submodule "config/elfiles/codesearch"]
+	path = config/elfiles/codesearch
+	url = https://github.com/abingham/codesearch.el.git

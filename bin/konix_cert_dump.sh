@@ -2,12 +2,11 @@
 
 konix_cert_show.sh "$@" 2>/dev/null| \
     sed -n -e '/BEGIN CERTIFICATE/,/END CERTIFICATE/p' \
-    -e '/^ - subject / {
-s/^ - /# /
+    -e '/^ - subject / { # for gnutls output
+s/^.\+, issuer /# /
+p
+}' \
+    -e '/i:/ { # for openssl output
+s/^.\+\(i\):/# \1/
 p
 }'
-#     sed -n -e '/BEGIN CERTIFICATE/,/END CERTIFICATE/p' \
-#     -e '/i:/ {
-# s/^.\+\(i\):/# \1/
-# p
-# }'

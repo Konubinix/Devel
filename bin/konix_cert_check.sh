@@ -2,7 +2,7 @@
 
 TIMEOUT="${3:-10}"
 
-TESTS="konix_cert_show_openssl.sh konix_cert_show_gnutls.sh"
+TESTS="konix_cert_check_openssl.sh konix_cert_check_gnutls.sh"
 
 for t in $TESTS
 do

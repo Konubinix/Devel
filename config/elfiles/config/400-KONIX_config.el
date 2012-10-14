@@ -612,13 +612,6 @@
 (setq-default framemove-hook-into-windmove t)
 (require 'framemove)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; keyfreq: useful to know more about my habits ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'keyfreq)
-(keyfreq-mode 1)
-(keyfreq-autosave-mode 1)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; mic paren, a substitute for the normal paren matching but better. It ;;
 ;; matches \( \) for instance                                           ;;

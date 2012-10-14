@@ -1422,7 +1422,7 @@
 (eval-after-load "icicles"
   '(progn
 	 (require 'icicles-iswitchb)
-	 (iswitchb-default-keybindings)
+	 (global-set-key (kbd "C-x b") 'iswitchb-buffer)
 	 )
   )
 

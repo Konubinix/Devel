@@ -6,7 +6,10 @@
 ;; it is then put into the mode file or into a dedicated file
 ;; ####################################################################################################
 ;; Default font, simple, nice!!
-(set-default-font "Monospace 10")
+(if (equalp emacs-major-version 24)
+	(set-default-font "Monospace 8")
+  (set-default-font "Monospace 10")
+ )
 
 (defcustom konix/explorer "pcmanfm"
   "The program to launch when wanting to explore the file system"

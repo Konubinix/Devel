@@ -35,6 +35,7 @@
 (add-to-list 'load-path (expand-file-name (concat elfiles "/miniedit")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/bash-completion")))
 (add-to-list 'load-path (expand-file-name (concat elfiles "/codesearch")))
+(add-to-list 'load-path (expand-file-name (concat elfiles "/autopair")))
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)

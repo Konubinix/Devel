@@ -84,6 +84,7 @@
 (global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
 (global-set-key (kbd "S-C-<down>") 'shrink-window)
 (global-set-key (kbd "S-C-<up>") 'enlarge-window)
+
 ;; Auto complete
 (global-set-key (kbd "C-j") 'hippie-expand)
 (global-set-key (kbd "C-S-j") 'ac-stop)
@@ -257,6 +258,22 @@
 (define-key 'konix/global-fast-key-map (kbd "m") 'man)
 ;;to move easily between windows with M-Arrows
 (windmove-default-keybindings 'meta)
+
+;; for terminal mode
+(define-key 'konix/global-fast-key-map (kbd "j") 'shrink-window-horizontally)
+(define-key 'konix/global-fast-key-map (kbd "l") 'enlarge-window-horizontally)
+(define-key 'konix/global-fast-key-map (kbd "k") 'shrink-window)
+(define-key 'konix/global-fast-key-map (kbd "i") 'enlarge-window)
+(define-key 'konix/global-fast-key-map (kbd "C-k") 'bury-buffer)
+(define-key 'konix/global-fast-key-map (kbd "C-c") 'calc)
+(define-key 'konix/global-fast-key-map (kbd "<") 'beginning-of-buffer)
+(define-key 'konix/global-fast-key-map (kbd ">") 'end-of-buffer)
+(define-key 'konix/global-fast-key-map (kbd "C-f") 'ffap)
+
+;; SHELL
+(define-key 'konix/global-fast-key-map (kbd "<next>") 'multi-eshell-switch-to-next-live-shell)
+(define-key 'konix/global-fast-key-map (kbd "<prior>") 'multi-eshell-switch)
+
 ;; In case the previous keywords are already taken by the mode (like in org-mode)
 (define-key 'konix/global-fast-key-map (kbd "<left>") 'windmove-left)
 (define-key 'konix/global-fast-key-map (kbd "<up>") 'windmove-up)

@@ -800,6 +800,21 @@
 	)
   )
 
+(defmacro konix/diff/finished-hook (diff_buffer top_level)
+  `(progn
+	 (with-current-buffer ,diff_buffer
+	   (diff-mode)
+	   (setq default-directory ,top_level)
+	   )
+	 (let (
+		   (previous_window (selected-window))
+		   )
+	   (pop-to-buffer ,diff_buffer)
+	   (select-window previous_window)
+	   )
+	 )
+  )
+
 (defun konix/git/diff (&optional file cached)
   "Launch a simple diff and view it in some buffer."
   (interactive)
@@ -846,31 +861,26 @@
 						 t
 						 )
 	  )
-	(set-process-sentinel (get-buffer-process diff_buffer)
-						  `(lambda (process string)
-							 (if (string-equal "finished\n" string)
-								 (progn
-								   (with-current-buffer ,diff_buffer
-									 (diff-mode)
-									 (setq default-directory ,top_level)
-									 )
-								   (let (
-										 (previous_window (selected-window))
-										 )
-									 (pop-to-buffer ,diff_buffer)
-									 (select-window previous_window)
-									 )
+	(if (get-buffer-process diff_buffer)
+		(set-process-sentinel (get-buffer-process diff_buffer)
+							  `(lambda (process string)
+								 (if (string-equal "finished\n" string)
+									 (progn
+									   (konix/diff/finished-hook ,diff_buffer
+																 ,top_level)
+									   )
+								   (display-warning 'diff-warning
+													(format
+													 "Diff exited abnormaly : '%s'"
+													 (substring-no-properties string
+																			  0 -1)
+													 )
+													)
 								   )
-							   (display-warning 'diff-warning
-												(format
-												 "Diff exited abnormaly : '%s'"
-												 (substring-no-properties string
-																		  0 -1)
-												 )
-												)
-							   )
-							 )
-						  )
+								 )
+							  )
+	  (konix/diff/finished-hook diff_buffer top_level)
+	  )
 	)
   )
 

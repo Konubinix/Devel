@@ -499,7 +499,7 @@
   (save-excursion
 	;; to match the commit at current line if the cursor is on a commit line
 	(goto-char (line-end-position))
-	(re-search-backward "^commit \\(.+\\)$")
+	(re-search-backward "commit \\([a-h0-9]+\\)")
 	(match-string 1)
 	)
   )

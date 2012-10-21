@@ -22,7 +22,7 @@ tee "${HOME}/konix_view_html.msg" | {
 	#
 	# And somewhere in the mail something like cid:A, I must replace it by the
 	# associated FILE name
-	cat "$dir"/msg | _konix_mail_content_id_adjust.py "$dir" > "$dir"/sed
+	cat "$dir"/msg | _konix_mail_content_id_adjust.py "$dir" > "$dir"/sed 2> "$dir"/sed_err
 
 	if munpack -C "$dir" -t < "$dir"/msg 2>&1 | tee "${OUT_FILE}" | grep -q 'Did not find'
 	then

@@ -525,7 +525,7 @@ set ssl_verify = 1
 # Command to toggle ssl_verify value:
 @cbind !ssl = chain 'toggle ssl_verify' 'reload'
 # Example SSL error handler:
-@on_event   LOAD_ERROR    js var patt=new RegExp('SSL handshake failed'); if (patt.test('%3')) {alert ('%3');}
+@on_event   LOAD_ERROR    js var patt=new RegExp('SSL handshake failed'); if (patt.test('%3')) {alert ('%1\\\\n%3');}
 
 # === Post-load misc commands ================================================
 sync_spawn_exec @scripts_dir/load_cookies.sh

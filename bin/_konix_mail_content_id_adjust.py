@@ -42,6 +42,7 @@ while len(PARTS_TO_PARSE) != 0:
             NAME = NAME[0].decode(NAME[1])
         else:
             NAME = NAME[0]
+        NAME = NAME.replace("/", "_")
         # write the attachment into the temp dir
         f = open(os.path.join(CID_DIR, NAME), "wb")
         f.write(PART.get_payload(None, True))
@@ -56,4 +57,4 @@ print "cat",
 for REPLACE_STUFF in REPLACE_STUFFS:
     FROM=REPLACE_STUFF[0]
     TO=REPLACE_STUFF[1]
-    print " | sed 's/%s/%s/g'" % (FROM.encode("utf-8"), TO.encode("utf-8")),
+    print " | sed 's|%s|%s|g'" % (FROM.encode("utf-8"), TO.encode("utf-8")),

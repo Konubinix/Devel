@@ -910,6 +910,15 @@ to be organized.
    %:initial"
 				 :kill-buffer
 				 )
+				("I" "Bookmark in current clock (use with org-protocol)" entry
+				 (clock) "* TODO Read %:description
+  :LOGBOOK:
+  - Captured       %U
+  :END:
+   %:link
+   %:initial"
+				 :kill-buffer
+				 )
 				("R" "Bookmark to read (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* TODO Read %:description
   :LOGBOOK:

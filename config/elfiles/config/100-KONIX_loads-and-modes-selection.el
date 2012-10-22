@@ -86,7 +86,7 @@
 (autoload 'konix/org-meta-context/goto-root "KONIX_org-meta-context")
 (autoload 'konix/org-meta-context/return-restricted-agenda-files "KONIX_org-meta-context")
 (autoload 'konix/org-meta-context/toggle-restrict "KONIX_org-meta-context")
-(autoload 'konix/org-pomodoro-goto "KONIX_org-pomodoro")
+(autoload 'konix/org-pomodoro-start "KONIX_org-pomodoro2")
 (autoload 'org-timer-cancel-timer "org-timer")
 (autoload 'notmuch "notmuch")
 (autoload 'appt-check "appt")

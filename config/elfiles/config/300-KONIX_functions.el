@@ -671,7 +671,10 @@ current buffer still has clients"
   (interactive)
   (let*(
 		(buffer_name (buffer-file-name))
-		(file_under_cursor (thing-at-point 'filename))
+		(file_under_cursor (or
+							(thing-at-point 'filename)
+							""
+							))
 		(directory_ default-directory)
 		(proposition (if (file-exists-p file_under_cursor)
 						 (list

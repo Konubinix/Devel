@@ -244,6 +244,14 @@
   (require 'ediff)
   (require 'hi-lock))
 
+(defface trac-wiki-strike-through
+  `((((class color))
+     ,(if (featurep 'xemacs)
+	  '(:strikethru t)
+	'(:strike-through t)))
+    (t (:underline t)))
+  "Face used for displaying strike-through text."
+  :group 'trac-wiki-face)
 
 (defvar trac-projects
   '(("emacs-trac-wiki"			; annonymous (read-only)
@@ -404,6 +412,8 @@ user may need or want to edit them.")
 	     ((string= b "''") 'italic)
 	     ((string= b "'''") 'bold)
 	     ((string= b "''''") 'bold-italic))))))
+    ("~~[^\n]*~~" ; strike
+     (0 'trac-wiki-strike-through))
     ("\\[\\[\\([^]()]+\\)[^]\n]*\\]\\]"	; macro
      ;; font-lock-preprocessor-face is not defined in emacs 21
      (0 (trac-wiki-link-face

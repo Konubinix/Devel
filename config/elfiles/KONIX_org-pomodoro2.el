@@ -9,6 +9,7 @@
   20)
 (defvar konix/org-pomodoro-break-clocks-out nil)
 (defvar konix/org-pomodoro-in-pomodoro nil)
+(defvar konix/org-pomodoro-global-mode t)
 (defcustom konix/org-pomodoro-tray-daemon-controller
   "/tmp/pomodorow_tray_daemon_control" "")
 
@@ -191,6 +192,12 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 	)
   )
 
+(defun konix/org-pomodoro-global-mode ()
+  (interactive)
+  (setq konix/org-pomodoro-global-mode (not konix/org-pomodoro-global-mode))
+  (message "org-pomodoro-global-mode set to %s" konix/org-pomodoro-global-mode)
+  )
+
 ;; ####################################################################################################
 ;; HOOKS
 ;; ####################################################################################################
@@ -222,7 +229,10 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
   )
 
 (defun konix/org-clock-in-pomodoro-hook ()
-  (if (not konix/org-pomodoro-in-pomodoro)
+  (if (and
+	   konix/org-pomodoro-global-mode
+	   (not konix/org-pomodoro-in-pomodoro)
+	   )
 	  (when (y-or-n-p "You have no pomodoro running, start one?")
 		(konix/org-pomodoro-start)
 		)

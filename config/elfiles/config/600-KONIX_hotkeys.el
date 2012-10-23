@@ -504,17 +504,17 @@
 ;; Header
 (global-set-key (kbd "<f8>") 'konix/header)
 (global-set-key (kbd "<C-f8>")
-		(lambda()
-		  (interactive)
-		  (konix/header konix/header-marker-2)
-		  )
-		)
+				(lambda()
+				  (interactive)
+				  (konix/header konix/header-marker-2)
+				  )
+				)
 (global-set-key (kbd "<S-f8>")
-		(lambda()
-		  (interactive)
-		  (konix/header konix/header-marker-3)
-		  )
-		)
+				(lambda()
+				  (interactive)
+				  (konix/header konix/header-marker-3)
+				  )
+				)
 (define-key 'konix/global-fast-key-map (kbd "<f8>") 'konix/header-wrap)
 (define-key 'konix/global-fast-key-map (kbd "<C-f8>")
   (lambda()
@@ -597,6 +597,7 @@
 (define-key 'konix/org-pomodoro-map "t" 'konix/org-pomodoro-insert-table)
 (define-key 'konix/org-pomodoro-map "T" 'konix/org-pomodoro-insert-week-planning-table)
 (define-key 'konix/org-pomodoro-map "C" 'konix/org-pomodoro-convert-time-before-point-into-pomodoro)
+(define-key 'konix/org-pomodoro-map "m" 'konix/org-pomodoro-global-mode)
 
 (eval-after-load "org-agenda"
   '(progn
@@ -612,13 +613,13 @@
   '(progn
      (define-key global-map (kbd "C-c s") cscope-list-entry-keymap)
      (define-key cscope-list-entry-keymap "b" '(lambda()(interactive)
-						 (when (string-match "^\*" (buffer-name(current-buffer)))
-						   (rename-buffer
-						    (generate-new-buffer-name
-						     "cscope_result")
-						    )
-						   )
-						 )
+												 (when (string-match "^\*" (buffer-name(current-buffer)))
+												   (rename-buffer
+													(generate-new-buffer-name
+													 "cscope_result")
+													)
+												   )
+												 )
        )
      )
   )
@@ -645,8 +646,8 @@
 ;; ####################################################################################################
 (setq speedbar-mode-hook
       (lambda ()
-	(local-set-key "-" 'speedbar-contract-line)
-	)
+		(local-set-key "-" 'speedbar-contract-line)
+		)
       )
 
 ;; ####################################################################################################
@@ -665,7 +666,7 @@
   (local-set-key (kbd "<C-right>") 'forward-word)
   )
 (add-hook 'wikipedia-mode-hook
-	  'konix/wikipedia-mode-set-keywords-hook)
+		  'konix/wikipedia-mode-set-keywords-hook)
 
 ;; ####################################################################################################
 ;; outline

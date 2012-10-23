@@ -138,7 +138,7 @@
 		  (while (not decision)
 			(setq decision
 				  (read-event (format "%s%s
-what to do ? (Start pomodoro, Pause, Long pause)" warning prompt))
+what to do ? (Start pomodoro, Pause, Long pause, Quit)" warning prompt))
 				  )
 			(case decision
 			  (?s
@@ -149,6 +149,14 @@ what to do ? (Start pomodoro, Pause, Long pause)" warning prompt))
 			   )
 			  (?l
 			   (konix/org-pomodoro-long-break)
+			   )
+			  (?q
+			   (when (and
+					  (org-clocking-p)
+					  (y-or-n-p "Clock out current clock ?")
+					  )
+				 (org-clock-out)
+				 )
 			   )
 			  (t
 			   (setq warning "You must enter s, p or l
@@ -238,7 +246,7 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 
 (defun konix/org-timer-done-break-pomodoro-hook ()
   (konix/org-pomodoro-tray-daemon-put "b")
-  (if (y-or-n-p "Break done, go back to work ?")
+  (if (y-or-n-p "Break done, start another pomodoro ?")
 	  (konix/org-pomodoro-start)
 	(message "You should start a pomodorro when you are ready")
 	)

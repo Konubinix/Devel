@@ -1602,9 +1602,25 @@ to be organized.
 ;; ######################################################################
 ;; Make pause and interrup appear clearly in the agenda
 ;; ######################################################################
+(defface konix/org-agenda-pause-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "green")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "green")
+	 )
+	)
+  ""
+  )
 (defvar konix/org-agenda-text-properties
   '(
-	("^.+\\(PAUSE\\|INTERRUP\\):.+$" 0 (face font-lock-warning-face))
+	("^.+INTERRUP:.+$" 0 (face font-lock-warning-face))
+	("^.+PAUSE:.+$" 0 (face konix/org-agenda-pause-face))
 	("^.+\\(now\\).+$" 1 (face org-checkbox-statistics-done))
 	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\)\\).+$" 1 (face bold))
 	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 (face italic))

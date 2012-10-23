@@ -61,15 +61,31 @@
 	  )
 	)
   (konix/org-pomodoro-tray-daemon-put "c")
-  (save-window-excursion
-	(save-excursion
-	  (if (org-clocking-p)
-		  (konix/org-clock-goto)
-		(or (major-mode 'org-mode)
-			(error "You must start a pomodoro in a org buffer")
-			)
+  (let (
+		(org-clock-in-fct nil)
 		)
-	  (org-timer-set-timer '(16))
+	(save-window-excursion
+	  (save-excursion
+		(if (org-clocking-p)
+			(konix/org-clock-goto)
+		  (or (and
+			   (equal major-mode 'org-mode)
+			   (setq org-clock-in-fct 'org-clock-in)
+			   )
+			  (and
+			   (equal major-mode 'org-agenda-mode)
+			   (setq org-clock-in-fct 'org-agenda-clock-in)
+			   )
+			  (error "You must start a pomodoro in a org buffer")
+			  )
+		  )
+		(org-timer-set-timer '(16))
+		(when (and (not (org-clocking-p))
+				   (y-or-n-p "Clock in ?")
+				   )
+		  (funcall org-clock-in-fct)
+		  )
+		)
 	  )
 	)
   (message "Starting a pomodoro of %s minutes (%s)" org-timer-default-timer konix/org-pomodoro-set-count)

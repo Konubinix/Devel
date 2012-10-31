@@ -2429,6 +2429,7 @@ Prefix argument ARG makes the entry nonmarking."
 (setq-default erc-track-exclude-types '("JOIN" "NICK" "PART" "MODE"
 										"QUIT"
 										"324" ;; RPL_CHANNELMODEIS
+										"329" ;; #emacsfr was created on Tuesday 2009/01/27 06:27:09 AM
 									    ;; "332" RPL_TOPIC
 										;; "353" RPL_NAMREPLY
 										;; "477" ERR_NOCHANMODES

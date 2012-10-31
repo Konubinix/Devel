@@ -492,7 +492,7 @@
 (define-key 'konix/global-fast-key-map (kbd "a") 'konix/helm/map)
 
 (define-key 'konix/helm/map (kbd "a") 'helm-mini)
-(define-key 'konix/helm/map (kbd "f") 'helm-find-files)
+(define-key 'konix/helm/map (kbd "f") 'helm-recentf)
 
 ;; ####################################################################################################
 ;; F1-F12 keys

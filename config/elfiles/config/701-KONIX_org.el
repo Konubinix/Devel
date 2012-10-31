@@ -783,6 +783,8 @@ to be organized.
 (setq-default org-clock-persist-query-save t)
 (setq-default org-clock-report-include-clocking-task t)
 (setq-default org-columns-default-format "%CATEGORY %90ITEM %1PRIORITY %10Effort{:} %10CLOCKSUM")
+(setq-default org-agenda-overriding-columns-format "%CATEGORY %90ITEM
+ %1PRIORITY %2POMODORO{+} %2DONE_POMODORO(dp){+} %10Effort{:} %10CLOCKSUM")
 (setq-default org-cycle-separator-lines -1)
 (setq-default org-default-notes-file (concat org-directory "/notes.org"))
 (setq-default org-empty-line-terminates-plain-lists t)
@@ -794,7 +796,11 @@ to be organized.
 (setq-default org-export-mark-todo-in-toc t)
 (setq-default org-export-with-tags t)
 (setq-default org-global-properties
-			  '(("Effort_ALL". "0:30 1:00 2:00 3:00 4:00 5:00 6:00 7:00 8:00")))
+			  '(
+				("Effort_ALL". "0:30 1:00 2:00 3:00 4:00 5:00 6:00 7:00 8:00")
+				("POMODORO_ALL". "0 1 2 3 4 5 6 7 8 9")
+				("DONE_POMODORO_ALL". "0 1 2 3 4 5 6 7 8 9")
+				))
 (setq-default org-hide-block-startup t)
 (setq-default org-hide-leading-stars t)
 (setq-default org-hierarchical-todo-statistics nil)

@@ -151,6 +151,9 @@ If the file exists, it is automatically deleted
 	 (3 . 6)
 	 (5 . 7)
 	 (8 . 9))
+	(docbook
+	 "No rule to make target"
+	 )
 	)
   ""
   )

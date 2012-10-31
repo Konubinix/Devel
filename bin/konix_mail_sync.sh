@@ -12,8 +12,6 @@ echo "?" > "$MAIL_TRAY_DAEMON_CTRL"
 echo "b" > "$MAIL_TRAY_DAEMON_CTRL"
 # make notmuch db consistent (earlier removed mail files etc)
 notmuch new --verbose
-# sync maildir flags up with notmuch
-notmuchsync -d -s --all --sync-deleted-tag
 
 #sync with imap server
 offlineimap -c "$KONIX_OFFLINEIMAPRC"

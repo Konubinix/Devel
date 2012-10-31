@@ -137,6 +137,8 @@
 (define-key 'konix/global-slow-key-map (kbd "C-s") 'grin)
 ;; insert the date
 (define-key 'konix/global-slow-key-map (kbd "C-t") 'konix/insert-iso-time-string)
+;; insert the number of seconds since the epoch to the past month
+(define-key 'konix/global-slow-key-map (kbd "C-M") 'konix/insert-past-month-string)
 ;; insert the number of second since the 00:00 1/1/1970
 (define-key 'konix/global-slow-key-map (kbd "C-d") 'konix/insert-seconds-since-1970)
 ;; Lance l'explorer

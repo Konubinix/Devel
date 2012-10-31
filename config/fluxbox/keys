@@ -253,10 +253,10 @@ Control Mod4 Shift u :Exec $(konix_find_true_exec.sh konix_uzbl_pop_exited_page.
 # ************************************************************
 # Open specific folders (Mod4 o ...)
 # ************************************************************
-Mod4 o e : ExecCommand konix_display_n_launch.sh pcmanfm $HOME
-Mod4 o i : ExecCommand konix_display_n_launch.sh pcmanfm $HOME/data/Images
-Mod4 o m : ExecCommand konix_display_n_launch.sh pcmanfm $HOME/data/Musiques
-Mod4 o v : ExecCommand konix_display_n_launch.sh pcmanfm $HOME/data/Videos
+Mod4 o e : ExecCommand konix_display_n_launch.sh sh -c "pcmanfm $HOME"
+Mod4 o i : ExecCommand konix_display_n_launch.sh sh -c "pcmanfm $HOME/data/Images"
+Mod4 o m : ExecCommand konix_display_n_launch.sh sh -c "pcmanfm $HOME/data/Musiques"
+Mod4 o v : ExecCommand konix_display_n_launch.sh sh -c "pcmanfm $HOME/data/Videos"
 
 # ************************************************************
 # Special window keys

@@ -30,6 +30,7 @@ import_env
         # Install bashrc
         # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".bashrc"), """#!/bin/bash
+[ -z "$PS1" ] && return
 source "${HOME}/.shrc_var"
 source "${KONIX_CONFIG_DIR}/bashrc"
 source "${KONIX_SH_CUSTOM_FILE}"
@@ -39,6 +40,7 @@ source "${KONIX_SH_CUSTOM_FILE}"
         # SHRC
         # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".shrc"), """#!/bin/sh
+[ -z "$PS1" ] && return
 source "${HOME}/.shrc_var"
 source "${KONIX_CONFIG_DIR}/shrc"
 source "${KONIX_SH_CUSTOM_FILE}"
@@ -47,6 +49,7 @@ source "${KONIX_SH_CUSTOM_FILE}"
         # ZSHRC
         # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".zshrc"), """#!/bin/zsh
+[ -z "$PS1" ] && return
 source "${HOME}/.shrc_var"
 source "${KONIX_CONFIG_DIR}/zshrc"
 source "${KONIX_SH_CUSTOM_FILE}"

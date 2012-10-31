@@ -144,6 +144,7 @@
 
 ;; Dired in human readable format
 (setq-default dired-listing-switches "-alh")
+(setq-default history-length 300)
 ;; Sometimes, display-warning may fail because this is not set
 (setq-default warning-suppress-types '())
 

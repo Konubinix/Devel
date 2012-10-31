@@ -79,7 +79,7 @@ If the file exists, it is automatically deleted
 "
   )
 
-(defcustom konix/compilation-font-lock-keyworkonix
+(defcustom konix/compilation-font-lock-keywords
   '()
   ""
   :type 'konix/font-lock-keyworkonix-widget

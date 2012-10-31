@@ -93,6 +93,26 @@
 	)
   )
 
+(defun konix/get-past-time-string (past_time_seconds)
+  (let*(
+		(past_time (seconds-to-time past_time_seconds))
+		(today (current-time))
+		(past_time (time-subtract today past_time))
+		)
+	(format-time-string "%s" past_time)
+	)
+  )
+
+(defun konix/get-past-month-string (&optional number_of_months)
+  (setq number_of_months (or number_of_months 1))
+  (konix/get-past-time-string (* 3600 24 30 number_of_months))
+  )
+
+(defun konix/insert-past-month-string (&optional number_of_months)
+  (interactive "P")
+  (insert (konix/get-past-month-string number_of_months))
+  )
+
 (defun konix/unload-feature (feature_prefix)
   (interactive "sFeature prefix: ")
   (mapc
@@ -478,6 +498,15 @@ make the line non empty"
 	  (message "%s protected = %s" buffer result)
 	  )
 	result
+	)
+  )
+
+(defun konix/not-trac-p (buffer)
+  (with-current-buffer buffer
+	(if (equal major-mode 'trac-wiki-mode)
+		nil
+	  t
+	  )
 	)
   )
 

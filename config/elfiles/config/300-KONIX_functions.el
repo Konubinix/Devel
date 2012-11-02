@@ -653,11 +653,11 @@ current buffer still has clients"
 
 (defun konix/make-directories (directory-list)
   (mapc
-   '(lambda(elt)
-	  (if (not (file-exists-p elt))
-		  (make-directory elt t)
-		)
-	  )
+   #'(lambda(elt)
+	   (if (not (file-exists-p elt))
+		   (make-directory elt t)
+		 )
+	   )
    directory-list
    )
   )
@@ -915,9 +915,9 @@ current buffer still has clients"
 
 (defun keys (assoc)
   (mapcar
-   '(lambda (e)
-	  (car e)
-	  )
+   #'(lambda (e)
+	   (car e)
+	   )
    assoc
    )
   )
@@ -2089,7 +2089,7 @@ INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
 
 (defun konix/gnuplot/file-dat-command (filedat)
   "Return the file dat command string"
-  (mapconcat '(lambda(x)x)
+  (mapconcat #'(lambda(x)x)
 			 (list
 			  "plot"
 			  (concat "'"filedat"'")
@@ -2106,9 +2106,9 @@ INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
   (konix/gnuplot
    (concat "-e \
 \"\
-"(konix/gnuplot/file-dat-command filedat)"\
-;pause -1;\
-\""))
+		   "(konix/gnuplot/file-dat-command filedat)"\
+										;pause -1;\
+		   \""))
   )
 
 (defun konix/gnuplot/file-dat-to-png (fichier)
@@ -2118,13 +2118,13 @@ INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
 	(setq pdf (concat fichier_sans_ext ".png"))
 	(konix/gnuplot (concat "-e \
 \"\
-set terminal push;\
-set terminal png;\
-set output '"pdf"';\
-"(konix/gnuplot/file-dat-command fichier)";
-set output;\
-set terminal pop;\
-\""))
+						   set terminal push;\
+						   set terminal png;\
+						   set output '"pdf"';\
+						   "(konix/gnuplot/file-dat-command fichier)";
+						   set output;\
+						   set terminal pop;\
+						   \""))
 	(message "%s créé" pdf)
 	)
   )
@@ -2134,15 +2134,15 @@ set terminal pop;\
   (interactive "DFolder : ")
   (let (list-files)
 	(setq list-files (split-string (shell-command-to-string (concat "ls "folder)) "\n"))
-	(mapc '(lambda (elem)
-			 (if (equal "dat" (car (cdr (konix/split-ext elem))))
-				 (progn
-				   (message (format "%s" elem))
-				   (konix/gnuplot/file-dat-to-png (expand-file-name elem folder))
-				   )
-			   ""
-			   )
-			 )
+	(mapc #'(lambda (elem)
+			  (if (equal "dat" (car (cdr (konix/split-ext elem))))
+				  (progn
+					(message (format "%s" elem))
+					(konix/gnuplot/file-dat-to-png (expand-file-name elem folder))
+					)
+				""
+				)
+			  )
 		  list-files
 		  )
 	)
@@ -2732,29 +2732,29 @@ The behavior I want is :
     (ediff-maybe-checkout buf-to-patch)
 
     (ediff-with-current-buffer patch-diagnostics
-							   (insert-buffer-substring patch-buf)
-							   (message "Applying patch ... ")
-							   ;; fix environment for gnu patch, so it won't make numbered extensions
-							   (setq backup-style (getenv "VERSION_CONTROL"))
-							   (setenv "VERSION_CONTROL" nil)
-							   (setq patch-return-code
-									 (call-process-region
-									  (point-min) (point-max)
-									  shell-file-name
-									  t   ; delete region (which contains the patch
-									  t   ; insert output (patch diagnostics) in current buffer
-									  nil ; don't redisplay
-									  shell-command-switch   ; usually -c
-									  (format "%s %s %s -o '%s' %s"
-											  ediff-patch-program
-											  ediff-patch-options
-											  ediff-backup-specs
-											  konix/ediff-patch-new-filename
-											  (expand-file-name true-source-filename))
-									  ))
+	  (insert-buffer-substring patch-buf)
+	  (message "Applying patch ... ")
+	  ;; fix environment for gnu patch, so it won't make numbered extensions
+	  (setq backup-style (getenv "VERSION_CONTROL"))
+	  (setenv "VERSION_CONTROL" nil)
+	  (setq patch-return-code
+			(call-process-region
+			 (point-min) (point-max)
+			 shell-file-name
+			 t   ; delete region (which contains the patch
+			 t   ; insert output (patch diagnostics) in current buffer
+			 nil ; don't redisplay
+			 shell-command-switch   ; usually -c
+			 (format "%s %s %s -o '%s' %s"
+					 ediff-patch-program
+					 ediff-patch-options
+					 ediff-backup-specs
+					 konix/ediff-patch-new-filename
+					 (expand-file-name true-source-filename))
+			 ))
 
-							   ;; restore environment for gnu patch
-							   (setenv "VERSION_CONTROL" backup-style))
+	  ;; restore environment for gnu patch
+	  (setenv "VERSION_CONTROL" backup-style))
 
     (message "Applying patch ... done")
     (message "")
@@ -2768,7 +2768,7 @@ The behavior I want is :
 		(progn
 		  (with-output-to-temp-buffer ediff-msg-buffer
 			(ediff-with-current-buffer standard-output
-									   (fundamental-mode))
+			  (fundamental-mode))
 			(princ (format
 					"Patch program has failed due to a bad patch file,
 it couldn't apply all hunks, OR
@@ -2845,8 +2845,8 @@ you can still examine the changes via M-x ediff-files"
 		   buf-to-patch target-buf nil
 		   startup-hooks 'epatch))
     (ediff-with-current-buffer ctl-buf
-							   (setq ediff-patchbufer patch-buf
-									 ediff-patch-diagnostics patch-diagnostics))
+	  (setq ediff-patchbufer patch-buf
+			ediff-patch-diagnostics patch-diagnostics))
 
     (bury-buffer patch-diagnostics)
     (message "Type `P', if you need to see patch diagnostics")

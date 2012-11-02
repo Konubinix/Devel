@@ -1543,6 +1543,12 @@
 (setq-default nxml-heading-scan-distance nxml-end-tag-indent-scan-distance)
 (add-to-list 'safe-local-variable-values
 			 '(nxml-section-element-name-regexp . t))
+(eval-after-load "rng-loc"
+	'(progn
+	   (add-to-list 'rng-schema-locating-files (expand-file-name "xml/schemas.xml"
+																 perso-dir))
+	   )
+  )
 (defun konix/hs-nxml-forward-sexp-func (dummy)
   (save-match-data
 	(unless (looking-at "<\\([a-zA-Z0-9_-]+\\)[ >]")

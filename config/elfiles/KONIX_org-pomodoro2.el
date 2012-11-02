@@ -162,16 +162,16 @@
 		  (while (not decision)
 			(setq decision
 				  (read-event (format "%s%s
-what to do ? (Start pomodoro, Pause, Long pause, Quit)" warning prompt))
+what to do ? (Start pomodoro (s), Break (b), Long break (B), Quit (q))" warning prompt))
 				  )
 			(case decision
 			  (?s
 			   (konix/org-pomodoro-start)
 			   )
-			  (?p
+			  (?b
 			   (konix/org-pomodoro-break)
 			   )
-			  (?l
+			  (?B
 			   (konix/org-pomodoro-long-break)
 			   )
 			  (?q
@@ -183,7 +183,7 @@ what to do ? (Start pomodoro, Pause, Long pause, Quit)" warning prompt))
 				 )
 			   )
 			  (t
-			   (setq warning "You must enter s, p or l
+			   (setq warning "You must enter s, b, B or q
 ")
 			   (setq decision nil)
 			   )

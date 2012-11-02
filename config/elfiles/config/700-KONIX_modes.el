@@ -2698,6 +2698,13 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; ####################################################################################################
 ;; Trac wiki
 ;; ####################################################################################################
+(defun konix/trac-wiki-kill-query-function ()
+  (or (not
+	   (buffer-modified-p)
+	   )
+	  (y-or-n-p "Modifications for this buffer will be lost. Kill it?")
+	  )
+  )
 (defun konix/trac-wiki-mode-hook ()
   (konix/outline-mode-hook)
   (autopair-mode 1)
@@ -2707,6 +2714,8 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
   (local-set-key (kbd "C-<right>") 'forward-word)
   (local-set-key (kbd "M-<left>") 'mediawiki-simple-outline-promote)
   (local-set-key (kbd "M-<right>") 'mediawiki-simple-outline-demote)
+  (make-local-variable 'kill-buffer-query-functions)
+  (add-to-list 'kill-buffer-query-functions 'konix/trac-wiki-kill-query-function)
   )
 (add-hook 'trac-wiki-mode-hook 'konix/trac-wiki-mode-hook)
 ;; ####################################################################################################

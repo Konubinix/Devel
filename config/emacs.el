@@ -68,6 +68,15 @@
 ;; rest of your .emacs goes here
 
 (message "My emacs configuration loaded in %ds"
-		 (destructuring-bind (hi lo ms) (current-time)
-		   (- (+ hi lo) (+ (first *emacs-load-start*) (second *emacs-load-start*)))))
+		 (let*(
+			   (current_time (current-time))
+			   (hi (first current_time))
+			   (lo (second current_time))
+			   )
+		   (- (+ hi lo) (+ (first *emacs-load-start*) (second
+													   *emacs-load-start*)
+						   )
+			  )
+		   )
+		 )
 ;;(find-file "~/.emacs")

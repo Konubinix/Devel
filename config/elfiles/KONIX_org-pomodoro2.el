@@ -32,7 +32,31 @@
   (when (< konix/org-pomodoro-set-count 0)
 	(setq konix/org-pomodoro-set-count 0)
 	)
+  (konix/org-pomodoro-current-clock-property-increase)
   (message "Set the pomodoro count to %s" konix/org-pomodoro-set-count)
+  )
+
+(defun konix/org-pomodoro-current-clock-property-increase (&optional increment)
+  (interactive)
+  (unless increment
+   (setq increment 1)
+   )
+  (save-window-excursion
+	(save-excursion
+	  (konix/org-clock-goto)
+	  (let* (
+			 (done_pomodoro
+			  (or
+			   (org-entry-get (point) "DONE_POMODORO")
+			   "0"
+			   )
+			  )
+			 (new_value (+ increment (string-to-int done_pomodoro)))
+			 )
+		(org-set-property "DONE_POMODORO" (int-to-string new_value))
+		)
+	  )
+	)
   )
 
 (defun konix/org-pomodoro-decrease (&optional decrement)

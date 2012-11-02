@@ -60,7 +60,6 @@ cursor stays in the org buffer."
 
   ;; (set 'org-open-at-mouse 'org-open-at-point)
   ;; (ad-activate 'org-open-at-mouse)
-
   )
 (eval-after-load "org"
   '(progn
@@ -962,7 +961,7 @@ to be organized.
 			  )
 (setq-default org-icalendar-store-UID t)
 (setq-default org-todo-repeat-to-state "NEXT")
-(setq-default org-stuck-projects '("+project-maybe/-WAIT-DONE" ("NEXT") ("") ""))
+(setq-default org-stuck-projects '("+project-maybe/-WAIT-DONE-NOT_DONE" ("NEXT") ("") ""))
 (setq-default org-timer-default-timer 25)
 (setq-default org-tag-persistent-alist
 			  '(

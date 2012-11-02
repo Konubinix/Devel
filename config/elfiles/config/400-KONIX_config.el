@@ -9,7 +9,7 @@
 (if (equalp emacs-major-version 24)
 	(set-default-font "Monospace 8")
   (set-default-font "Monospace 10")
- )
+  )
 
 (defcustom konix/explorer "pcmanfm"
   "The program to launch when wanting to explore the file system"
@@ -106,6 +106,8 @@
 ;; ******************************************************************************************
 ;; Mail config
 ;; ******************************************************************************************
+(setq-default konix/mail-signature-directory (expand-file-name "signatures/" perso-dir))
+(setq-default mail-signature-base (expand-file-name "sig" konix/mail-signature-directory))
 ;; SMTP
 ;; (setq-default message-send-mail-function 'smtpmail-send-it
 ;; 			  smtpmail-default-smtp-server "smtp.gmail.com"

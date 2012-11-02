@@ -45,10 +45,10 @@
 	url = https://github.com/thierryvolpiatto/ioccur.git
 [submodule "config/elfiles/auto-complete"]
 	path = config/elfiles/auto-complete
-	url = https://github.com/m2ym/auto-complete.git
+	url = https://github.com/auto-complete/auto-complete.git
 [submodule "config/elfiles/popup"]
 	path = config/elfiles/popup
-	url = https://github.com/m2ym/popup-el.git
+	url = https://github.com/auto-complete/popup-el.git
 [submodule "config/elfiles/elim"]
 	path = config/elfiles/elim
 	url = git://git.sv.gnu.org/elim.git

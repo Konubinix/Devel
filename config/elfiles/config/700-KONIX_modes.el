@@ -2218,20 +2218,6 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 (defalias 'notmuch-show-mark-read 'konix/notmuch-show-mark-read)
 	 )
   )
-
-;; ####################################################################################################
-;; Message mode
-;; ####################################################################################################
-(defun konix/message-mode-hook ()
-  (konix/flyspell-mode 1)
-  )
-(eval-after-load "message"
-  '(progn
-	 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
-	 )
-  )
-(add-hook 'message-mode-hook
-		  'konix/message-mode-hook)
 ;; ####################################################################################################
 ;; ELK
 ;; ####################################################################################################
@@ -2273,6 +2259,13 @@ inspired from `notmuch-show-archive-thread-internal'"
 (setq-default message-sendmail-extra-arguments nil)
 (setq-default mm-text-html-renderer 'w3m
 			  gnus-inhibit-images t)
+(eval-after-load "message"
+  '(progn
+	 (add-hook 'message-setup-hook 'gnus-alias-determine-identity)
+	 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
+	 (define-key message-mode-map (kbd "C-c i") 'gnus-alias-select-identity)
+	 )
+  )
 (defun konix/message-mode-hook ()
   (auto-fill-mode -1)
   (visual-line-mode 1)

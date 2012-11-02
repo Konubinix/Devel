@@ -116,6 +116,7 @@
 (autoload 'rebox-cycle "rebox2" nil t)
 ;; helm
 (autoload 'helm-mini "helm-config" nil t)
+(autoload 'helm-recentf "helm" nil t)
 ;; mediawiki
 (autoload 'mediawiki-simple-outline-demote "mediawiki" nil t)
 (autoload 'mediawiki-simple-outline-promote "mediawiki" nil t)

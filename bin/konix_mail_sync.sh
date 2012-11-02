@@ -7,6 +7,7 @@ then
 else
 	touch "$LOCK_FILE"
 fi
+trap "echo > /tmp/konix_mail_tray_stamp ; rm '$LOCK_FILE'" 0
 MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
 echo "?" > "$MAIL_TRAY_DAEMON_CTRL"
 echo "b" > "$MAIL_TRAY_DAEMON_CTRL"
@@ -36,5 +37,3 @@ konix_mail_tray_daemon_update.sh -d
 echo "B" > "$MAIL_TRAY_DAEMON_CTRL"
 
 echo "" > /tmp/konix_mail_tray_stamp
-
-rm "$LOCK_FILE"

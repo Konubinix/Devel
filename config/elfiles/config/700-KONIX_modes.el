@@ -2266,9 +2266,8 @@ inspired from `notmuch-show-archive-thread-internal'"
   "Variable to indicate if it is the first time a client visits the daemon"
   )
 (defun konix/server-visit-hook ()
-  (when (equal emacs-major-version 24)
-	(set-default-font "Monospace 8")
-	)
+  (require 'maxframe)
+  (set-default-font konix/default-font)
   (maxframe/maximize-frame)
   (when konix/first-visit
 	(pop-to-buffer "*Messages*")

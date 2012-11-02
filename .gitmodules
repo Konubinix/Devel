@@ -82,3 +82,6 @@
 [submodule "config/elfiles/autopair"]
 	path = config/elfiles/autopair
 	url = https://github.com/capitaomorte/autopair.git
+[submodule "config/elfiles/yasnippet"]
+	path = config/elfiles/yasnippet
+	url = https://github.com/capitaomorte/yasnippet.git

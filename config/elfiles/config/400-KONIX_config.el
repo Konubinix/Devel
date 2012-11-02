@@ -244,9 +244,10 @@
 ;; TODO : Do that only when it is needed because it is time consuming
 ;; ************************************************************
 (require 'yasnippet)
-(yas/initialize)
+(yas-global-mode 1)
 (setq yas/root-directory
 	  (list (expand-file-name "~/.elfiles/yasnippet/snippets")
+			(expand-file-name "snippets" elfiles)
 			(expand-file-name "yasnippet/snippets" elfiles)
 			)
 	  )

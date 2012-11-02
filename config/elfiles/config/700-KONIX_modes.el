@@ -1173,7 +1173,7 @@
 		)
 	  )
 	found
-   )
+	)
   )
 
 (defun konix/hs-re-search-backward-ignore-comment (regexp &optional bound noerror count)
@@ -1189,7 +1189,7 @@
 		)
 	  )
 	found
-   )
+	)
   )
 
 (defun konix/hs-minor-mode-hook()
@@ -2267,7 +2267,6 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 )
   )
 (defun konix/message-mode-hook ()
-  (auto-fill-mode -1)
   (visual-line-mode 1)
   (flyspell-mode 1)
   )
@@ -2423,7 +2422,7 @@ Prefix argument ARG makes the entry nonmarking."
 										"QUIT"
 										"324" ;; RPL_CHANNELMODEIS
 										"329" ;; #emacsfr was created on Tuesday 2009/01/27 06:27:09 AM
-									    ;; "332" RPL_TOPIC
+										;; "332" RPL_TOPIC
 										;; "353" RPL_NAMREPLY
 										;; "477" ERR_NOCHANMODES
 										))
@@ -2708,21 +2707,21 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 			  (not found)
 			  (konix/hs-re-search-forward-ignore-comment konix/cmake-end-of-defun)
 			  )
-		  (setq last_end (match-end 0))
-		  (setq last_end_beginning (match-beginning 1))
-		  ;; check if the found end of defun is good.
+		(setq last_end (match-end 0))
+		(setq last_end_beginning (match-beginning 1))
+		;; check if the found end of defun is good.
 
-		  ;; for it to be good, there must not be any beginning of defun between the
-		  ;; last beginning of defun and current point. If there is, put the
-		  ;; last_beginning to the place of found beginning and continue
-		  ;; searching another end of defun
-		  (goto-char last_beginning)
+		;; for it to be good, there must not be any beginning of defun between the
+		;; last beginning of defun and current point. If there is, put the
+		;; last_beginning to the place of found beginning and continue
+		;; searching another end of defun
+		(goto-char last_beginning)
 		(if (konix/hs-re-search-forward-ignore-comment konix/cmake-beginning-of-defun last_end_beginning t)
-			  (progn
-				(setq last_beginning (match-end 1))
-				(goto-char last_end)
-				)
-			(setq found t)
+			(progn
+			  (setq last_beginning (match-end 1))
+			  (goto-char last_end)
+			  )
+		  (setq found t)
 		  )
 		)
 	  (goto-char last_end)
@@ -2840,10 +2839,10 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 ;; ######################################################################
 (eval-after-load "readline-complete"
   `(ac-define-source shell
-     '(
+	 '(
 	   (candidates . rlc-candidates)
-       (prefix . ac-rlc-prefix-shell-dispatcher)
-       (requires . 4)
+	   (prefix . ac-rlc-prefix-shell-dispatcher)
+	   (requires . 4)
 	   )
 	 )
   )

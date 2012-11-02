@@ -131,6 +131,8 @@
 (autoload 'bash-completion-dynamic-complete "bash-completion" nil t)
 ;; org search goto
 (autoload 'osg "org-search-goto" nil t)
+;; gnus alias
+(autoload 'gnus-alias-determine-identity "gnus-alias" "" t)
 
 ;; ************************************************************
 ;; Automodes

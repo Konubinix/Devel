@@ -1921,10 +1921,25 @@ immediately after the section's start-tag."
 	)
   ""
   )
+(defface konix/notmuch-search-replied
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "aquamarine")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "aquamarine")
+	 )
+	)
+  ""
+  )
 (setq notmuch-search-line-faces '(
 								  ("deleted" . '(:foreground "red"))
-								  ("unread" . konix/notmuch-search-unread
-								   )
+								  ("unread" . konix/notmuch-search-unread)
+								  ("replied" . konix/notmuch-search-replied)
 								  )
 	  )
 (defface notmuch-search-count
@@ -2236,8 +2251,8 @@ inspired from `notmuch-show-archive-thread-internal'"
   )
 (defun konix/server-visit-hook ()
   (when (equal emacs-major-version 24)
-   (set-default-font "Monospace 8")
-   )
+	(set-default-font "Monospace 8")
+	)
   (maxframe/maximize-frame)
   (when konix/first-visit
 	(pop-to-buffer "*Messages*")

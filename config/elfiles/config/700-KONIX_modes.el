@@ -1936,7 +1936,23 @@ immediately after the section's start-tag."
 	)
   ""
   )
+(defface konix/notmuch-search-temp
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "gainsboro")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "gainsboro")
+	 )
+	)
+  ""
+  )
 (setq notmuch-search-line-faces '(
+								  ("temp" . konix/notmuch-search-temp)
 								  ("deleted" . '(:foreground "red"))
 								  ("unread" . konix/notmuch-search-unread)
 								  ("replied" . konix/notmuch-search-replied)

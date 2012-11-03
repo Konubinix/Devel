@@ -1957,8 +1957,24 @@ immediately after the section's start-tag."
 	)
   ""
   )
+(defface konix/notmuch-search-perso
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "peach puff")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "peach puff")
+	 )
+	)
+  ""
+  )
 (setq notmuch-search-line-faces '(
 								  ("temp" . konix/notmuch-search-temp)
+								  ("perso" . konix/notmuch-search-perso)
 								  ("deleted" . '(:foreground "red"))
 								  ("unread" . konix/notmuch-search-unread)
 								  ("replied" . konix/notmuch-search-replied)

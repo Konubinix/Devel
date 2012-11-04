@@ -1354,6 +1354,16 @@ to be organized.
   (- (org-today) 1)
   )
 
+(defun konix/org-is-errand-p ()
+  (save-excursion
+	(org-back-to-heading)
+	(member
+	 "@errand"
+	 (org-get-tags)
+	 )
+	)
+  )
+
 ;; un parent est DONE quand à 100%
 (setq org-after-todo-statistics-hook 'konix/org-summary-todo)
 (defcustom konix/org-mode-font-lock-keywords

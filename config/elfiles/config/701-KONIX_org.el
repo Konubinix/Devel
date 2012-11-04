@@ -1550,7 +1550,7 @@ to be organized.
   (interactive)
   (require 'org-icalendar)
   (let (
-		(setq org-icalendar-verify-function
+		(org-icalendar-verify-function
 			  'konix/org-is-errand-p)
 		)
 	(org-export-icalendar-combine-agenda-files)

@@ -1357,11 +1357,18 @@ to be organized.
 (defun konix/org-is-errand-p ()
   (save-excursion
 	(org-back-to-heading)
-	(member
-	 "@errand"
-	 (org-get-tags)
+	;;(show-all)
+	(show-branches)
+	(not
+	 (not
+	  (member
+	   "@errand"
+	   (org-get-tags-at (point))
+	   )
+	  )
 	 )
 	)
+
   )
 
 ;; un parent est DONE quand à 100%
@@ -1541,15 +1548,14 @@ to be organized.
 
 (defun konix/org-export-errands-as-ical ()
   (interactive)
+  (require 'org-icalendar)
   (let (
-		(org-icalendar-verify-function
-		 'konix/org-is-errand-p
-		 )
+		(setq org-icalendar-verify-function
+			  'konix/org-is-errand-p)
 		)
 	(org-export-icalendar-combine-agenda-files)
 	)
   )
-
 ;; ####################################################################################################
 ;; Generate wiki from org-directory files
 ;; ####################################################################################################
@@ -1716,8 +1722,8 @@ to be organized.
 		;; do not duplicate deadlines
 		(org-deadline-warning-days 0)
 		)
-   (cfw:open-org-calendar)
-   )
+	(cfw:open-org-calendar)
+	)
   ;; set the org variables to remember
   (set (make-variable-buffer-local 'org-agenda-skip-function)
 	   org-agenda-skip-function)

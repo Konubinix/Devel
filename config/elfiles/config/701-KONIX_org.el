@@ -960,6 +960,8 @@ to be organized.
 				)
 			  )
 (setq-default org-icalendar-store-UID t)
+(setq-default org-icalendar-include-todo t)
+(setq-default org-combined-agenda-icalendar-file (expand-file-name "org.ics" perso-dir))
 (setq-default org-todo-repeat-to-state "NEXT")
 (setq-default org-stuck-projects '("+project-maybe/-WAIT-DONE-NOT_DONE" ("NEXT") ("") ""))
 (setq-default org-timer-default-timer 25)

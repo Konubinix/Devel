@@ -1539,6 +1539,17 @@ to be organized.
   (let ((org-icalendar-verify-function 'org-mycal-export-limit))
 	(org-export-icalendar-combine-agenda-files)))
 
+(defun konix/org-export-errands-as-ical ()
+  (interactive)
+  (let (
+		(org-icalendar-verify-function
+		 'konix/org-is-errand-p
+		 )
+		)
+	(org-export-icalendar-combine-agenda-files)
+	)
+  )
+
 ;; ####################################################################################################
 ;; Generate wiki from org-directory files
 ;; ####################################################################################################

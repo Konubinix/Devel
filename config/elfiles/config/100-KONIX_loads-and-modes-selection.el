@@ -134,6 +134,8 @@
 (autoload 'osg "org-search-goto" nil t)
 ;; gnus alias
 (autoload 'gnus-alias-determine-identity "gnus-alias" "" t)
+;; cmake mode
+(autoload 'cmake-mode "cmake-mode" "" t)
 
 ;; ************************************************************
 ;; Automodes
@@ -197,6 +199,8 @@
 ;; txx and ixx are c++ files
 (add-to-list 'auto-mode-alist (cons "\\.ixx$" 'c++-mode))
 (add-to-list 'auto-mode-alist (cons "\\.txx$" 'c++-mode))
+;; cmake files in cmake mode
+(add-to-list 'auto-mode-alist (cons "\\.cmake$" 'cmake-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

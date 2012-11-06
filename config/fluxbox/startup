@@ -30,7 +30,7 @@ sleep 4
 	# start de emacs_tray_daemon if possible
 	emacs_tray_daemon.py &
 	konix_mail_tray_daemon.py &
-    fbsetbg -l
+    konix_setbg.sh
 } &
 
 if [ -n "$KONIX_X_INIT" ]

@@ -39,8 +39,8 @@
 (defun konix/org-pomodoro-current-clock-property-increase (&optional increment)
   (interactive)
   (unless increment
-   (setq increment 1)
-   )
+	(setq increment 1)
+	)
   (save-window-excursion
 	(save-excursion
 	  (konix/org-clock-goto)
@@ -286,6 +286,16 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
   (if (and
 	   konix/org-pomodoro-global-mode
 	   (not konix/org-pomodoro-in-pomodoro)
+	   ;; don't ask for running a new pomodorro if the current task is an interruption
+	   (not (member "interruption"
+					(save-window-excursion
+					  (save-excursion
+						(org-clock-goto)
+						(org-get-tags-at (point))
+						)
+					  )
+					)
+			)
 	   )
 	  (when (y-or-n-p "You have no pomodoro running, start one?")
 		(konix/org-pomodoro-start)

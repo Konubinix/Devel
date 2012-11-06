@@ -2311,6 +2311,8 @@ inspired from `notmuch-show-archive-thread-internal'"
 (setq-default message-sendmail-extra-arguments nil)
 (setq-default mm-text-html-renderer 'w3m
 			  gnus-inhibit-images t)
+;; let notmuch decide which identity is the default
+(setq-default gnus-alias-default-identity nil)
 (eval-after-load "message"
   '(progn
 	 (add-hook 'message-setup-hook 'gnus-alias-determine-identity)

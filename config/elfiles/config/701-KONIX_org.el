@@ -19,6 +19,9 @@
   (set-face-attribute 'org-agenda-date nil
 					  :inherit 'org-agenda-structure
 					  :box '(:line-width 2 :color "black" :style released-button))
+  (setq-default org-agenda-files (list
+								  (expand-file-name "wiki" perso-dir)
+								  ))
   ;; With remember
   (org-remember-insinuate)
   ;; For dependencies

@@ -1,3 +1,8 @@
+;; ######################################################################
+;; Settings that should be done before loading org
+;; ######################################################################
+(setq-default org-empty-line-terminates-plain-lists t)
+
 (require 'KONIX_org-meta-context)
 (require 'org-notmuch)
 (require 'org-protocol)
@@ -787,7 +792,6 @@ to be organized.
  %1PRIORITY %2POMODORO{+} %2DONE_POMODORO(dp){+} %10Effort{:} %10CLOCKSUM")
 (setq-default org-cycle-separator-lines -1)
 (setq-default org-default-notes-file (concat org-directory "/notes.org"))
-(setq-default org-empty-line-terminates-plain-lists t)
 (setq-default org-enforce-todo-checkbox-dependencies t)
 (setq-default org-enforce-todo-dependencies t)
 (setq-default org-export-exclude-tags '("noexport" "PERSO"))

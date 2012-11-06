@@ -245,15 +245,15 @@
 ;; ************************************************************
 (require 'yasnippet)
 (yas-global-mode 1)
-(setq yas/root-directory
+(setq yas-snippet-dirs
 	  (list (expand-file-name "~/.elfiles/yasnippet/snippets")
 			(expand-file-name "snippets" elfiles)
 			(expand-file-name "yasnippet/snippets" elfiles)
 			)
 	  )
-(mapc '(lambda(elt) (if (not (file-exists-p elt)) (make-directory elt t))) yas/root-directory)
-(mapc 'yas/load-directory yas/root-directory)
-(setq-default yas/fallback-behavior 'call-other-command)
+(mapc '(lambda(elt) (if (not (file-exists-p elt)) (make-directory elt t))) yas-snippet-dirs)
+(mapc 'yas-load-directory yas-snippet-dirs)
+(setq-default yas-fallback-behavior 'call-other-command)
 
 ;; ************************************************************
 ;; Autopair (parenthèsage automatique et bien pensé)

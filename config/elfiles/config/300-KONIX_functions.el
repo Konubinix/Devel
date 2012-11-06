@@ -871,22 +871,22 @@ current buffer still has clients"
 (defun konix/yas-expand (prefix)
   (let* (
 		 (templates (mapcan #'(lambda (table)
-								(yas/fetch table prefix))
-							(yas/get-snippet-tables)))
+								(yas--fetch table prefix))
+							(yas--get-snippet-tables)))
 		 (template (or (and (rest templates) ;; more than one
-							(yas/prompt-for-template (mapcar #'cdr templates)))
+							(yas--prompt-for-template (mapcar #'cdr templates)))
 					   (cdar templates))))
 	(when template
-	  (yas/expand-snippet (yas/template-content template)
+	  (yas-expand-snippet (yas--template-content template)
 						  (point)
 						  (point)
-						  (yas/template-expand-env template))))
+						  (yas--template-expand-env template))))
 
   )
 
 (defun konix/yas/update-directory ()
-  (konix/make-directories yas/root-directory)
-  (mapc 'yas/load-directory (reverse yas/root-directory))
+  (konix/make-directories yas-snippet-dirs)
+  (mapc 'yas-load-directory (reverse yas-snippet-dirs))
   )
 
 (defconst find-name-arg "-iname"

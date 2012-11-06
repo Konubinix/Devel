@@ -1271,6 +1271,10 @@
 ;; Ediff
 ;; --------------------------------------------------
 (setq-default ediff-ignore-similar-regions t)
+(set-face-attribute 'ediff-current-diff-B
+					nil
+					:background "yellow"
+					)
 ;; replace the ediff-patch-file-internal function with the one that does not
 ;; edit the orignal file by default
 (eval-after-load "ediff-ptch"

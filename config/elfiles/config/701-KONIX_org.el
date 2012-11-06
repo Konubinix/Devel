@@ -1715,7 +1715,7 @@ to be organized.
       (org-store-link-props :type "notmuch" :from from :to to
 							:subject subject :message-id message-id :date date)
       (setq desc (org-email-link-description))
-      (setq link (org-make-link "notmuch:"  "id:" message-id))
+      (setq link (concat "notmuch:"  "id:" message-id))
       (org-add-link-props :link link :description desc)
       link)))
 

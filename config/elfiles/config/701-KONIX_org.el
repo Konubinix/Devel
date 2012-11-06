@@ -69,11 +69,6 @@ cursor stays in the org buffer."
   ;; (set 'org-open-at-mouse 'org-open-at-point)
   ;; (ad-activate 'org-open-at-mouse)
   )
-(eval-after-load "org"
-  '(progn
-	 (konix/org-load-hook)
-	 )
-  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; insert inactive timestamp when creating entries ;;
@@ -1735,4 +1730,13 @@ to be organized.
   (set (make-variable-buffer-local 'org-agenda-skip-function)
 	   org-agenda-skip-function)
   (set (make-variable-buffer-local 'org-deadline-warning-days) org-deadline-warning-days)
+  )
+
+;; ######################################################################
+;; Evaluation to be done after loading org
+;; ######################################################################
+(eval-after-load "org"
+  '(progn
+	 (konix/org-load-hook)
+	 )
   )

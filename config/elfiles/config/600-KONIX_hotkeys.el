@@ -847,6 +847,7 @@
 (define-key konix/git-global-map (kbd "h") 'konix/git-global-map-show)
 (define-key konix/git-global-map-show "c" 'konix/git/show)
 (define-key konix/git-global-map-show "o" 'konix/git/show/origin-commit-at-pos)
+(define-key konix/git-global-map-show "h" 'konix/git/show/head)
 
 (define-prefix-command 'konix/git-global-map-checkout)
 (define-key konix/git-global-map-branch "c" 'konix/git-global-map-checkout)

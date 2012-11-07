@@ -21,7 +21,10 @@
 ;; ####################################################################################################
 ;; abbrev
 ;; ####################################################################################################
-(setq-default abbrev-file-name (expand-file-name "abbrev" (getenv "KONIX_CONFIG_DIR")))
+(setq-default abbrev-file-name (expand-file-name "abbrev"
+												 (expand-file-name "elfiles" (getenv "KONIX_PERSO_DIR"))
+												 )
+			  )
 
 ;; ******************************************************************************************
 ;; bbdb custom

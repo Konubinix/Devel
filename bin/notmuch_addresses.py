@@ -110,7 +110,8 @@ class NotmuchAddressMatcher(object):
         """
         """
         config = ConfigParser.ConfigParser()
-        config.read(os.path.expanduser("~/.notmuch-config"))
+        config.read(os.path.expanduser(
+            os.environ.get("NOTMUCH_CONFIG","~/.notmuch-config")))
         self.db_path = config.get("database", "path")
         self.email = config.get("user", "primary_email")
         try:

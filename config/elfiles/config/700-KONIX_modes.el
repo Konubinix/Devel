@@ -1495,7 +1495,12 @@
 	 (define-key diff-mode-map (kbd "<f2> <f1>") 'hide-body)
 	 (define-key diff-mode-map (kbd "<f2> <f3>") 'show-all)
 	 (define-key diff-mode-map (kbd "<f1>") 'konix/outline-zoom-out)
-	 (define-key diff-mode-map (kbd "<f3>") 'konix/outline-show-children-or-entry)
+	 (define-key diff-mode-map (kbd "<f3>")
+	   'konix/outline-show-children-or-entry)
+	 (set-face-attribute 'diff-changed
+						 nil
+						 :background "light pink"
+						 )
 	 )
   )
 
@@ -1552,10 +1557,10 @@
 (add-to-list 'safe-local-variable-values
 			 '(nxml-section-element-name-regexp . t))
 (eval-after-load "rng-loc"
-	'(progn
-	   (add-to-list 'rng-schema-locating-files (expand-file-name "xml/schemas.xml"
-																 perso-dir))
-	   )
+  '(progn
+	 (add-to-list 'rng-schema-locating-files (expand-file-name "xml/schemas.xml"
+															   perso-dir))
+	 )
   )
 (defun konix/hs-nxml-forward-sexp-func (dummy)
   (save-match-data

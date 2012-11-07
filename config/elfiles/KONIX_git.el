@@ -778,6 +778,11 @@
 				  )
   )
 
+(defun konix/git/show/head ()
+  (interactive)
+  (konix/git/show "HEAD")
+  )
+
 (defun konix/git/show/origin-commit-at-pos ()
   (interactive)
   (if (eq major-mode 'diff-mode)

@@ -531,6 +531,8 @@ to be organized.
 				  )
 				 (
 				  (org-agenda-start-day 'konix/org-yesterday)
+				  (org-agenda-start-with-clockreport-mode t)
+				  (org-agenda-start-with-log-mode t)
 				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )
@@ -604,6 +606,7 @@ to be organized.
 				  )
 				 (
 				  (org-agenda-start-with-log-mode t)
+				  (org-agenda-start-with-clockreport-mode t)
 				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )

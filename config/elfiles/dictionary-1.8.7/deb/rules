@@ -6,7 +6,7 @@ package=dictionary
 
 build:
 	$(checkdir)
-
+	
 	touch build
 
 clean:
@@ -33,8 +33,8 @@ binary-arch: checkroot build
 	chmod 755 debian/tmp/usr/lib/emacsen-common/packages/install/dictionary
 	cp debian/remove.debian debian/tmp/usr/lib/emacsen-common/packages/remove/dictionary
 	chmod 755 debian/tmp/usr/lib/emacsen-common/packages/remove/dictionary
-
-	debstd README
+	
+	debstd README 
 	dpkg-gencontrol -isp
 	chown -R root.root debian/tmp
 	chmod -R go=rX debian/tmp

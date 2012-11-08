@@ -21,3 +21,4 @@
 (unless (boundp 'running-xemacs)
   (autoload 'global-dictionary-tooltip-mode "dictionary"
     "Enable/disable dictionary-tooltip-mode for all buffers" t))
+

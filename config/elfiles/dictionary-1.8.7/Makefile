@@ -45,7 +45,7 @@ debian:
 	@echo "to me only, not to the Debian Bugtracking System."
 
 .PHONY: package
-package: $(XEMACS-PACKAGE)
+package: $(XEMACS-PACKAGE) 
 
 $(XEMACS-PACKAGE): $(COMPILED)
 	@case $(EMACS) in emacs*) printf "\aNote, packages work with XEmacs 21 only, hope you know what you are doing\n\n";; esac

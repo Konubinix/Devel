@@ -103,7 +103,7 @@ nil: argument is no connection object
 	      (delete-process process))
 	  (if buffer
 	      (kill-buffer buffer))
-
+	  
 	  (connection-set-process connection nil)
 	  (connection-set-buffer connection nil)))))
 
@@ -130,7 +130,7 @@ nil: argument is no connection object
     (save-excursion
       (set-buffer (connection-buffer connection))
       (goto-char (connection-read-point connection))
-      ;; Wait until there is enough data
+      ;; Wait until there is enough data 
       (while (not (search-forward-regexp delimiter nil t))
 	(accept-process-output (connection-process connection) 3)
 	(goto-char (connection-read-point connection)))

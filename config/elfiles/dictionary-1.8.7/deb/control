@@ -8,7 +8,7 @@ Standards-Version: 3.2.1
 Package: dictionary
 Architecture: all
 Depends: emacsen
-Description: dictionary client for emacs
+Description: dictionary client for emacs 
  This dictionary client provides access to a dictionary server
  (as defined in RFC 2229) from within Emacs or XEmacs.
  .

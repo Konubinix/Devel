@@ -247,8 +247,8 @@
 (defface trac-wiki-strike-through
   `((((class color))
      ,(if (featurep 'xemacs)
-	  '(:strikethru t)
-	'(:strike-through t)))
+		  '(:strikethru t)
+		'(:strike-through t)))
     (t (:underline t)))
   "Face used for displaying strike-through text."
   :group 'trac-wiki-face)
@@ -393,64 +393,84 @@ user may need or want to edit them.")
   "\\<\\([A-Z][a-z]+\\(?:[A-Z][a-z]*[a-z/]\\)+\\)"
   "Regular expression for camel case.")
 
+(defun trac-wiki-quote-face-default ()
+  (let (
+		(fg
+		 (concat "#" (substring (md5 (match-string 1)) 0 12))
+		 )
+		)
+	`(:foreground ,fg :slant italic)
+	)
+  )
+
+(defvar trac-wiki-quote-face-function 'trac-wiki-quote-face-default "")
+
+(defun trac-wiki-quote-face ()
+  (if trac-wiki-quote-face-function
+	  (funcall trac-wiki-quote-face-function)
+	(trac-wiki-quote-face-default)
+	)
+  )
+
 ;; for trac-wiki mode, simple
 (defvar trac-wiki-font-lock-keywords
   `(("^\\(\\(=+\\) \\(.*\\) \\(=+\\)\\)\\(.*\\)" ; section heading
      (1 (if (string= (match-string 2) (match-string 4))
-	    'bold
-	  ;; Warn if starting/ending '='  count is not ballanced.
-	  'font-lock-warning-face))
+			'bold
+		  ;; Warn if starting/ending '='  count is not ballanced.
+		  'font-lock-warning-face))
      (5 'shadow))
     ("^=.*" . font-lock-warning-face)	   ; invalid section heading
     ("`[^`\n]*`" . 'shadow)		   ; inline quote
     ("\\(''+\\)[^'\n]*\\(''+\\)"	   ; bold and italic
      (0 (let ((b (match-string 1))
-	      (e (match-string 2)))
-	  (if (not (string= b e))
-	      font-lock-warning-face
-	    (cond
-	     ((string= b "''") 'italic)
-	     ((string= b "'''") 'bold)
-	     ((string= b "''''") 'bold-italic))))))
+			  (e (match-string 2)))
+		  (if (not (string= b e))
+			  font-lock-warning-face
+			(cond
+			 ((string= b "''") 'italic)
+			 ((string= b "'''") 'bold)
+			 ((string= b "''''") 'bold-italic))))))
     ("~~[^\n]*~~" ; strike
      (0 'trac-wiki-strike-through))
     ("\\[\\[\\([^]()]+\\)[^]\n]*\\]\\]"	; macro
      ;; font-lock-preprocessor-face is not defined in emacs 21
      (0 (trac-wiki-link-face
-	 (if (trac-wiki-macro-exist-p (match-string 1))
-	     font-lock-type-face
-	   font-lock-warning-face))))
+		 (if (trac-wiki-macro-exist-p (match-string 1))
+			 font-lock-type-face
+		   font-lock-warning-face))))
     ("{[0-9]+}"	;  {1}
      (0 (trac-wiki-link-face font-lock-type-face)))
     ("\\[\\(\\w+:\\)?\\([^] #\n]*\\)[^]\n]*\\]" ; bracket trac link
      (0 (let ((whole (match-string 0))
-	      (scheme (match-string 1))
-	      (name (match-string 2)))
-	  (trac-wiki-link-face
-	   (cond
-	    ((save-match-data	 ; [1], [1/trunk], [../file], [/trunk]
-	       (string-match "^\\[[1-9./]" whole))
-	     font-lock-function-name-face)
-	    ((or (string= scheme "wiki:")
-		 (null scheme))
-	     (if (trac-wiki-page-exist-p name)
-		 font-lock-function-name-face
-	       font-lock-warning-face))
-	    (t
-	     font-lock-function-name-face))))))
+			  (scheme (match-string 1))
+			  (name (match-string 2)))
+		  (trac-wiki-link-face
+		   (cond
+			((save-match-data	 ; [1], [1/trunk], [../file], [/trunk]
+			   (string-match "^\\[[1-9./]" whole))
+			 font-lock-function-name-face)
+			((or (string= scheme "wiki:")
+				 (null scheme))
+			 (if (trac-wiki-page-exist-p name)
+				 font-lock-function-name-face
+			   font-lock-warning-face))
+			(t
+			 font-lock-function-name-face))))))
     (,(format "\\(?:%s\\):\\(?:\"[^\"\n]*\"\\|[^ \t\n]\\)+" ; types
-	      (regexp-opt trac-wiki-link-type-keywords))
+			  (regexp-opt trac-wiki-link-type-keywords))
      (0 (trac-wiki-link-face font-lock-function-name-face)))
     ("\\w+://[^ \t\n]+" . font-lock-function-name-face)	  ; raw url
     ("\\(?:#\\|\\br\\)[0-9]+\\(?::[0-9a-z]+\\)?\\b" ; r123 or #123
      (0 (trac-wiki-link-face font-lock-function-name-face)))
     (,(concat trac-wiki-camel-case-regexp ; camel case
-	      "\\(?:#\\(?:\\w\\|[-:.]\\)+\\)?\\>")	       ; fragments
+			  "\\(?:#\\(?:\\w\\|[-:.]\\)+\\)?\\>")	       ; fragments
      (0 (trac-wiki-link-face
-	 (if (trac-wiki-page-exist-p (match-string 1))
-	     font-lock-function-name-face
-	   font-lock-warning-face))))
+		 (if (trac-wiki-page-exist-p (match-string 1))
+			 font-lock-function-name-face
+		   font-lock-warning-face))))
     ("||" . 'shadow)			; table delimiter
+    ("^\\s-*\\(>+\\).+" . (0 (trac-wiki-quote-face) append))			; table delimiter
     )
   "For `trac-wiki-mode'.")
 

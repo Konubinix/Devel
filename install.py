@@ -38,6 +38,7 @@ substitute(os.path.join(environ["KONIX_PWD"],"init_bin"), os.path.join(environ["
 # Install shell and emacs
 # ####################################################################################################
 from install_emacs import install_emacs
+from install_vim import install_vim
 from install_shell import install_shell
 from install_git import install_git
 from install_bin import install_bin
@@ -47,6 +48,7 @@ install_emacs()
 install_git()
 install_bin()
 install_gdbinit()
+install_vim()
 
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "Makefile"),   os.path.join(environ["HOME"], "Makefile"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "gitk"),       os.path.join(environ["HOME"], ".gitk"))

@@ -573,31 +573,31 @@ If editing page is newly created, return buffer creation time."
   (defmacro with-local-quit (&rest body)
     (declare (debug t) (indent 0))
     `(condition-case nil
-	 (let ((inhibit-quit nil))
-	   ,@body)
+		 (let ((inhibit-quit nil))
+		   ,@body)
        (quit (setq quit-flag t)
-	     (eval '(ignore nil)))))
+			 (eval '(ignore nil)))))
 
   ;; adapt to new multi-byte handling.
   (defadvice encode-coding-string (around trac-wiki (str enc))
     "Adapt to allow emacs 22 style multi-byte operation."
     (setq ad-return-value
-	  (with-temp-buffer
-	    (insert str)
-	    (encode-coding-region
-	     (point-min) (point-max) enc)
-	    (buffer-string))))
+		  (with-temp-buffer
+			(insert str)
+			(encode-coding-region
+			 (point-min) (point-max) enc)
+			(buffer-string))))
 
   ;; Making callback argument.
   (defadvice url-retrieve (before trac-wiki
-				  (url &optional callback args) activate)
+								  (url &optional callback args) activate)
     "Bug workaround advice for Emacs 21 and w3-url-e21(2005.10.23-5).
 Url package (debian testing, stable) for Emacs 21.4 has a bug.
 It seems the function `url-retrieve-synchronously' does not pass
 callback argument but `url-http-handle-authentication' expects url is
 in 1st element of callback argument. This advice fakes for this."
     (if (null args)
-	(setq args (list url))))
+		(setq args (list url))))
 
   ;;; these 2 advices are for asking on every 401 auth reply.
   (defadvice url-http-handle-authentication (before trac-wiki (proxy) activate)
@@ -606,15 +606,15 @@ This behaviour is required  for old url libraries as workaround because
 it re-use bad auth data on retrying although authentication is failed."
     (when (< 0 trac-wiki-auth-retry-count) ; internal global variable
       (setq url-http-real-basic-auth-storage nil
-	    url-http-real-digest-auth-storage nil))
+			url-http-real-digest-auth-storage nil))
     (setq trac-wiki-auth-retry-count (1+ trac-wiki-auth-retry-count)))
 
   )
 
 
 (when (and (< emacs-major-version 22)
-	   (boundp 'url-basic-auth-storage)
-	   (not (boundp 'url-http-real-basic-auth-storage)))
+		   (boundp 'url-basic-auth-storage)
+		   (not (boundp 'url-http-real-basic-auth-storage)))
   ;; This is for Emacs 21 and old url library (on debian sarge stable)
   ;; Old url library does not remember authentication data
   ;; due to local binding in url-http-handle-authentication<f>.
@@ -629,19 +629,19 @@ it re-use bad auth data on retrying although authentication is failed."
     "Trap to grab authentication data."
     ;; remember auth info into our own storage
     (let ((url-basic-auth-storage trac-rpc-basic-auth-storage)
-	  (url-digest-auth-storage trac-rpc-digest-auth-storage))
+		  (url-digest-auth-storage trac-rpc-digest-auth-storage))
       ad-do-it
       (setq trac-rpc-basic-auth-storage url-basic-auth-storage
-	    trac-rpc-digest-auth-storage url-digest-auth-storage))))
+			trac-rpc-digest-auth-storage url-digest-auth-storage))))
 
 (if (not (fboundp 'buffer-local-value))
     (defun buffer-local-value (sym buf)
       (if (not (buffer-live-p buf))
-	  nil
-	(with-current-buffer buf
-	  (if (boundp sym)
-	      (symbol-value sym)
-	    nil)))))
+		  nil
+		(with-current-buffer buf
+		  (if (boundp sym)
+			  (symbol-value sym)
+			nil)))))
 
 (defun trac-wiki-url-retrieve-synchronously (url)
   "Fetch the content from URL.
@@ -654,30 +654,30 @@ Without this, `url-retrieve-synchronously' returns wrong buffer
 on getting response \"403: auth required\"."
   (url-do-setup)
   (lexical-let ((retrieval-done nil)
-		(asynch-buffer nil))
+				(asynch-buffer nil))
     (setq asynch-buffer
-	  (url-retrieve url (lambda (&rest ignored)
-			      (url-debug 'retrieval "Synchronous fetching done (%S)" (current-buffer))
-			      (setq retrieval-done t
-				    asynch-buffer (current-buffer)))))
+		  (url-retrieve url (lambda (&rest ignored)
+							  (url-debug 'retrieval "Synchronous fetching done (%S)" (current-buffer))
+							  (setq retrieval-done t
+									asynch-buffer (current-buffer)))))
     (if (null asynch-buffer)
         ;; We do not need to do anything, it was a mailto or something
         ;; similar that takes processing completely outside of the URL
         ;; package.
         nil
       (let ((proc (get-buffer-process asynch-buffer)))
-	;; If the access method was synchronous, `retrieval-done' should
-	;; hopefully already be set to t.  If it is nil, and `proc' is also
-	;; nil, it implies that the async process is not running in
-	;; asynch-buffer.  This happens e.g. for FTP files.  In such a case
-	;; url-file.el should probably set something like a `url-process'
-	;; buffer-local variable so we can find the exact process that we
-	;; should be waiting for.  In the mean time, we'll just wait for any
-	;; process output.
-	(while (not retrieval-done)
-	  (url-debug 'retrieval
-		     "Spinning in url-retrieve-synchronously: %S (%S)"
-		     retrieval-done asynch-buffer)
+		;; If the access method was synchronous, `retrieval-done' should
+		;; hopefully already be set to t.  If it is nil, and `proc' is also
+		;; nil, it implies that the async process is not running in
+		;; asynch-buffer.  This happens e.g. for FTP files.  In such a case
+		;; url-file.el should probably set something like a `url-process'
+		;; buffer-local variable so we can find the exact process that we
+		;; should be waiting for.  In the mean time, we'll just wait for any
+		;; process output.
+		(while (not retrieval-done)
+		  (url-debug 'retrieval
+					 "Spinning in url-retrieve-synchronously: %S (%S)"
+					 retrieval-done asynch-buffer)
           (if (buffer-local-value 'url-redirect-buffer asynch-buffer)
               (setq proc (get-buffer-process
                           (setq asynch-buffer
@@ -685,8 +685,8 @@ on getting response \"403: auth required\"."
                                                     asynch-buffer))))
             (if (and proc (memq (process-status proc)
                                 ;;'(closed exit signal failed))
-				;; MODIFIED! do not accept 'closed nor 'exit
-				'(signal failed))
+								;; MODIFIED! do not accept 'closed nor 'exit
+								'(signal failed))
                      ;; Make sure another process hasn't been started.
                      (eq proc (or (get-buffer-process asynch-buffer) proc)))
                 ;; FIXME: It's not clear whether url-retrieve's callback is
@@ -695,9 +695,9 @@ on getting response \"403: auth required\"."
                 ;; clear that it's a bug, but even then we need to decide how
                 ;; url-http can then warn us that the download has completed.
                 ;; In the mean time, we use this here workaround.
-		;; XXX: The callback must always be called.  Any
-		;; exception is a bug that should be fixed, not worked
-		;; around.
+				;; XXX: The callback must always be called.  Any
+				;; exception is a bug that should be fixed, not worked
+				;; around.
                 (setq retrieval-done t))
             ;; We used to use `sit-for' here, but in some cases it wouldn't
             ;; work because apparently pending keyboard input would always
@@ -705,32 +705,32 @@ on getting response \"403: auth required\"."
             ;; `sleep-for' was tried but it lead to other forms of
             ;; hanging.  --Stef
             (unless (or (with-local-quit
-			  (accept-process-output proc))
-			(null proc))
+						  (accept-process-output proc))
+						(null proc))
               ;; accept-process-output returned nil, maybe because the process
               ;; exited (and may have been replaced with another).  If we got
-	      ;; a quit, just stop.
-	      (sit-for 0.01)		; give a chance to callback
-	      (when quit-flag
-		(delete-process proc))
+			  ;; a quit, just stop.
+			  (sit-for 0.01)		; give a chance to callback
+			  (when quit-flag
+				(delete-process proc))
               (setq proc (and (not quit-flag)
-			      (get-buffer-process asynch-buffer)))))))
+							  (get-buffer-process asynch-buffer)))))))
       ;; wait a little to avoid bug in e21 not to re-use closing  session.
       (if (< emacs-major-version 22)
-	  (sleep-for 0.05))		; not to re-use closing session
+		  (sleep-for 0.05))		; not to re-use closing session
       ;; fix-up lacked tail. On old emacs (emacs 21), sometime some bytes
       ;; of response are lacked. like "</methodRespons"
       ;; So fix it.
       (with-current-buffer asynch-buffer
-	(save-excursion
-	  (goto-char (point-max))
-	  (beginning-of-line)
-	  (when (looking-at "</method")
-	    (delete-region (point) (save-excursion
-				     (end-of-line) (point)))
-	    (insert "</methodResponse>\n")
-	    (message "*** Fixed http response ***")
-	    (sit-for 0.5))))
+		(save-excursion
+		  (goto-char (point-max))
+		  (beginning-of-line)
+		  (when (looking-at "</method")
+			(delete-region (point) (save-excursion
+									 (end-of-line) (point)))
+			(insert "</methodResponse>\n")
+			(message "*** Fixed http response ***")
+			(sit-for 0.5))))
       asynch-buffer)))
 
 
@@ -743,23 +743,23 @@ And aslo providing workaround of buf for storing auth info in old bad
 url library behaviour."
   ;; to avoid endless auth retry wihtout asking in old url library.
   (let ((orig-basic-auth-storage (copy-sequence
-				  url-http-real-basic-auth-storage)))
+								  url-http-real-basic-auth-storage)))
     (unwind-protect
-	(setq trac-wiki-auth-retry-count 0
-	      ad-return-value (trac-wiki-url-retrieve-synchronously url))
+		(setq trac-wiki-auth-retry-count 0
+			  ad-return-value (trac-wiki-url-retrieve-synchronously url))
       ;; restore original if fail
       ;; merge with original if success
       (if (and ad-return-value
-	       (with-current-buffer ad-return-value
-		 (save-excursion
-		   (goto-char 1)
-		   (looking-at "HTTP/[0-9.]+ 2[0-9]+"))))
-	  ;; success, merge backuped storage into real storage
-	  (trac-wiki-merge-storage url-http-real-basic-auth-storage
-				   orig-basic-auth-storage)
-	;; failed, restore original
-	(setq url-http-real-basic-auth-storage
-	      orig-basic-auth-storage))
+			   (with-current-buffer ad-return-value
+				 (save-excursion
+				   (goto-char 1)
+				   (looking-at "HTTP/[0-9.]+ 2[0-9]+"))))
+		  ;; success, merge backuped storage into real storage
+		  (trac-wiki-merge-storage url-http-real-basic-auth-storage
+								   orig-basic-auth-storage)
+		;; failed, restore original
+		(setq url-http-real-basic-auth-storage
+			  orig-basic-auth-storage))
       ;; clean up on ether successed or fail.
       (trac-wiki-cleanup-auth-storage url-http-real-basic-auth-storage))))
 
@@ -788,9 +788,9 @@ Note that if buffer does not has end-point information, return
 also non-nil because we cannot get cache data.  In other word,
 \"I don't know\" is non-nil."
   (let ((items (and trac-rpc-endpoint
-		    (cdr (assoc trac-rpc-endpoint cache)))))
+					(cdr (assoc trac-rpc-endpoint cache)))))
     (or (null items)
-	(member item items))))
+		(member item items))))
 
 ;; cache macro
 (defmacro trac-wiki-with-cache (cache-name ep no-cache &rest body)
@@ -802,12 +802,12 @@ If NO-CACHE is nil, return data in cache if exist without executing
 BODY.  If NO-CACHE is non-nil, always run BODY and update cache with its
 result data."
   `(let* ((entry (assoc ,ep (symbol-value ,cache-name)))
-	  (data (if (and (not ,no-cache) entry)
-		    (cdr entry)
-		  ,@body)))
+		  (data (if (and (not ,no-cache) entry)
+					(cdr entry)
+				  ,@body)))
      (if (null entry)
-	 (set ,cache-name (cons (cons ,ep data)
-				(symbol-value ,cache-name)))
+		 (set ,cache-name (cons (cons ,ep data)
+								(symbol-value ,cache-name)))
        (setcdr entry data))
      data))
 (put 'trac-wiki-with-cache 'lisp-indent-function 3)
@@ -818,22 +818,22 @@ result data."
   (interactive)
   (prog1
       (trac-wiki-with-cache
-	  'trac-wiki-page-name-cache
-	  trac-rpc-endpoint 'update
-	(trac-rpc-get-all-pages))
+		  'trac-wiki-page-name-cache
+		  trac-rpc-endpoint 'update
+		(trac-rpc-get-all-pages))
     (if (interactive-p)
-	(message "Page name cache is updated."))))
+		(message "Page name cache is updated."))))
 
 (defun trac-wiki-update-macro-name-cache ()
   "Update cache of wiki macro names."
   (interactive)
   (prog1
       (trac-wiki-with-cache
-	  'trac-wiki-macro-name-cache
-	  trac-rpc-endpoint 'update
-	(trac-wiki-collect-macro-names))
+		  'trac-wiki-macro-name-cache
+		  trac-rpc-endpoint 'update
+		(trac-wiki-collect-macro-names))
     (if (interactive-p)
-	(message "Macro name cache is updated."))))
+		(message "Macro name cache is updated."))))
 
 
 ;; mode
@@ -860,17 +860,17 @@ retrying.  Use `trac-rpc-call-async' instead."
     (ad-activate 'encode-coding-string))
   (unwind-protect
       (let* ((url-http-attempt-keepalives trac-wiki-use-keepalive)
-	     (ep trac-rpc-endpoint)
-	     (xml-rpc-base64-encode-unicode nil)
-	     (xml-rpc-base64-decode-unicode nil)
-	     (result (with-temp-buffer
-		       (apply 'xml-rpc-method-call
-			      ep method args))))
-	(if (and (numberp result) (= result 0))
-	    nil
-	  (if (stringp result)
-	      (apply `concat (split-string result "\r"))
-	    result)))
+			 (ep trac-rpc-endpoint)
+			 (xml-rpc-base64-encode-unicode nil)
+			 (xml-rpc-base64-decode-unicode nil)
+			 (result (with-temp-buffer
+					   (apply 'xml-rpc-method-call
+							  ep method args))))
+		(if (and (numberp result) (= result 0))
+			nil
+		  (if (stringp result)
+			  (apply `concat (split-string result "\r"))
+			result)))
     (when (< emacs-major-version 22)
       (ad-deactivate 'encode-coding-string))))
 
@@ -915,12 +915,12 @@ COMMENT can be nil."
 (defun trac-rpc-get-page-version (&optional page)
   "Get latest version of PAGE in remote."
   (if (or (null trac-wiki-page-info)
-	  (null trac-rpc-endpoint))
+		  (null trac-rpc-endpoint))
       (error "Page information is not exist!"))
   (let ((info (trac-rpc-get-page-info
-	       (or page (trac-wiki-page-name)))))
+			   (or page (trac-wiki-page-name)))))
     (if (null info)
-	0				; no page, return version 0
+		0				; no page, return version 0
       (cdr-safe (assoc "version" info)))))
 
 
@@ -930,26 +930,26 @@ COMMENT can be nil."
   "Enter page name with competion.
 If DEFAULT is specified, use it as initial input on completion."
   (let ((cached (and (not trac-wiki-update-page-name-cache-on-visit)
-		     (cdr (assoc trac-rpc-endpoint
-				 trac-wiki-page-name-cache))))
-	(all (trac-wiki-with-cache
-		 'trac-wiki-page-name-cache
-		 trac-rpc-endpoint trac-wiki-update-page-name-cache-on-visit
-	       (trac-rpc-get-all-pages)))
-	(re (concat "^\\(?:"
-		    (if trac-wiki-hide-system-pages
-			(concat (regexp-opt trac-wiki-system-pages) "\\|"))
-		    (mapconcat 'identity trac-wiki-hidden-pages "\\|")
-		    "\\)\\(?:\\.[a-z]\\{2\\}\\)?$")) ; lang suffix
-	pages page)
+					 (cdr (assoc trac-rpc-endpoint
+								 trac-wiki-page-name-cache))))
+		(all (trac-wiki-with-cache
+				 'trac-wiki-page-name-cache
+				 trac-rpc-endpoint trac-wiki-update-page-name-cache-on-visit
+			   (trac-rpc-get-all-pages)))
+		(re (concat "^\\(?:"
+					(if trac-wiki-hide-system-pages
+						(concat (regexp-opt trac-wiki-system-pages) "\\|"))
+					(mapconcat 'identity trac-wiki-hidden-pages "\\|")
+					"\\)\\(?:\\.[a-z]\\{2\\}\\)?$")) ; lang suffix
+		pages page)
     (dolist (page all)
       (unless (string-match re page)
-	(add-to-list 'pages page)))
+		(add-to-list 'pages page)))
     (while (null page)
       (setq page (completing-read (if cached "Page name (cached): "
-				    "Page name: ")
-				  (mapcar 'list pages)
-				  nil nil default 'trac-wiki-page-history)))
+									"Page name: ")
+								  (mapcar 'list pages)
+								  nil nil default 'trac-wiki-page-history)))
     page))
 
 (defun trac-wiki-save ()
@@ -961,19 +961,19 @@ If DEFAULT is specified, use it as initial input on completion."
    ((y-or-n-p "You are editing remote page.  Save to file? ")
     ;; add header information and write to file
     (let ((content (buffer-string))
-	  (filename))
+		  (filename))
       (with-temp-buffer
-	(insert content)
-	(setq filename (read-file-name "Enter filename to save: "))
-	;; save to file with confirming overwriting.
-	(write-region (point-min) (point-max) filename nil nil nil t))
+		(insert content)
+		(setq filename (read-file-name "Enter filename to save: "))
+		;; save to file with confirming overwriting.
+		(write-region (point-min) (point-max) filename nil nil nil t))
       ;; ask to visit onto saved file.
       (if (and filename (y-or-n-p "Visit to saved file? "))
-	  (find-file-other-window filename)
-	(message "saved."))))
+		  (find-file-other-window filename)
+		(message "saved."))))
    (t
     (message "Canceled. (You may want to commit current page by %s)"
-	     (substitute-command-keys "\\[trac-wiki-commit]")))))
+			 (substitute-command-keys "\\[trac-wiki-commit]")))))
 
 (defun trac-wiki-ask-project ()
   "Prompts to enter project name and return its information data.
@@ -982,71 +982,71 @@ enter without project name, ask enter project informations
 interectively and remember temporary project information data
 named as \"dir@host\".  It will be kept until re-start Emacs."
   (let* ((project (and (or trac-projects
-			   trac-wiki-project-history)
-		       (completing-read "Select project (or empty to define): "
-					trac-projects
-					nil t nil
-					'trac-wiki-project-history)))
-	 (pinfo (and project
-		     (cdr (assoc project trac-projects)))))
+						   trac-wiki-project-history)
+					   (completing-read "Select project (or empty to define): "
+										trac-projects
+										nil t nil
+										'trac-wiki-project-history)))
+		 (pinfo (and project
+					 (cdr (assoc project trac-projects)))))
     (or pinfo
-	;; make project data interactively.
-	(let* ((rawurl (read-string "Site URL: "
-				 trac-rpc-endpoint
-				 'trac-wiki-url-history))
-	       (url (url-generic-parse-url
-		     (trac-wiki-strip-url-trailer
-		      rawurl '("xmlrpc" "login" "wiki"))))
-	       (login  (or (elt url 1)
-			   (string-match "/login\\(?:/\\|$\\)" rawurl)
-			   (y-or-n-p "Login? ")))
-	       (host (elt url 3))
-	       (name (file-name-nondirectory
-		      (directory-file-name (elt url 5))))
-	       (project-name (format "%s@%s" name host))
-	       info)
-	  ;; build project info property list
-	  (prog1
-	      ;; make return value
-	      (setq info (list :name project-name
-			       :endpoint (format "%s://%s:%s%s%s/xmlrpc"
-						 (elt url 0)
-						 (elt url 3)
-						 (elt url 4)
-						 (directory-file-name (elt url 5))
-						 (if (string= login "")
-						     ""
-						   "/login"))
-			       :login (and (stringp login)
-					   (not (string= login ""))
-					   login)))
-	    ;; remember it
-	    (if (not (assoc project-name trac-projects))
-		(add-to-list 'trac-projects (cons project-name info))
-	      ;; already exist, overwrite
-	      (setcdr (assoc project-name trac-projects) info)))))))
+		;; make project data interactively.
+		(let* ((rawurl (read-string "Site URL: "
+									trac-rpc-endpoint
+									'trac-wiki-url-history))
+			   (url (url-generic-parse-url
+					 (trac-wiki-strip-url-trailer
+					  rawurl '("xmlrpc" "login" "wiki"))))
+			   (login  (or (elt url 1)
+						   (string-match "/login\\(?:/\\|$\\)" rawurl)
+						   (y-or-n-p "Login? ")))
+			   (host (elt url 3))
+			   (name (file-name-nondirectory
+					  (directory-file-name (elt url 5))))
+			   (project-name (format "%s@%s" name host))
+			   info)
+		  ;; build project info property list
+		  (prog1
+			  ;; make return value
+			  (setq info (list :name project-name
+							   :endpoint (format "%s://%s:%s%s%s/xmlrpc"
+												 (elt url 0)
+												 (elt url 3)
+												 (elt url 4)
+												 (directory-file-name (elt url 5))
+												 (if (string= login "")
+													 ""
+												   "/login"))
+							   :login (and (stringp login)
+										   (not (string= login ""))
+										   login)))
+			;; remember it
+			(if (not (assoc project-name trac-projects))
+				(add-to-list 'trac-projects (cons project-name info))
+			  ;; already exist, overwrite
+			  (setcdr (assoc project-name trac-projects) info)))))))
 
 (defmacro trac-wiki-protected (&rest body)
   "Run BODY or report readable message from response code on error."
   `(condition-case e
        (progn
-	 ,@body)
+		 ,@body)
      (error
       (if (and (listp e) (listp (cdr e)) (stringp (cadr e)))
-	  (let ((emsg (cadr e)))
-	    (cond
-	     ((string-match ": 404$" emsg)
-	      (message "ERROR: The site seems not support XML-RPC."))
-	     ((string-match ": 401$" emsg)
-	      (message "ERROR: Authentication failed."))
-	     ((string-match "privilege is required" emsg)
-	      (message "ERROR: You are not privileged for this operation."))
-	     ((string-match ": 403$" emsg)
-	      ;; if XML_RPC privilege is not set, you'll get 403
-	      (message "ERROR: forbidden, you may not have XML_RPC privilege for this operation."))
-	     (t
-	      (message "ERROR: %s" emsg))))
-	(message "Error: %s" e)))))
+		  (let ((emsg (cadr e)))
+			(cond
+			 ((string-match ": 404$" emsg)
+			  (message "ERROR: The site seems not support XML-RPC."))
+			 ((string-match ": 401$" emsg)
+			  (message "ERROR: Authentication failed."))
+			 ((string-match "privilege is required" emsg)
+			  (message "ERROR: You are not privileged for this operation."))
+			 ((string-match ": 403$" emsg)
+			  ;; if XML_RPC privilege is not set, you'll get 403
+			  (message "ERROR: forbidden, you may not have XML_RPC privilege for this operation."))
+			 (t
+			  (message "ERROR: %s" emsg))))
+		(message "Error: %s" e)))))
 
 
 (defun trac-wiki ()
@@ -1063,14 +1063,14 @@ If with prefix argument ASK-PROJECT, force asking project instead
 of current buffer's one."
   (interactive "P")
   (let ((pinfo (or (and (not ask-project) trac-wiki-project-info)
-		   (trac-wiki-ask-project)))
-	(page (and (eq major-mode 'trac-wiki-mode) ; only in trac-wiki buffer
-		   (not ask-project)
-		   (trac-wiki-pick-wiki-name-at-point))))
+				   (trac-wiki-ask-project)))
+		(page (and (eq major-mode 'trac-wiki-mode) ; only in trac-wiki buffer
+				   (not ask-project)
+				   (trac-wiki-pick-wiki-name-at-point))))
     (let ((ep (plist-get pinfo :endpoint)))
       (if (not (and (stringp ep)
-		    (string-match "\\`https?://[^ ]+/\\(?:.*/\\)?xmlrpc" ep)))
-	  (error "Invalid endpoint: %s" ep)))
+					(string-match "\\`https?://[^ ]+/\\(?:.*/\\)?xmlrpc" ep)))
+		  (error "Invalid endpoint: %s" ep)))
     (trac-wiki-protected
      (trac-wiki-visit pinfo page))))
 
@@ -1086,17 +1086,17 @@ is specified, use it as initial input.  If FORCE is non-nil,
 visit to PAGE without interaction."
   ;; case of project argument is project name
   (if (and (stringp project)
-	   (assoc project trac-projects))
+		   (assoc project trac-projects))
       (setq project (cdr (assoc project trac-projects))))
   ;; case of project argument is endpoint
   (if (and (stringp project)
-	   (string-match "^https?://" project)) ; assume endpoint url
+		   (string-match "^https?://" project)) ; assume endpoint url
       (dolist (proj trac-projects)
-	(when (and (stringp project)
-		   (string= project (plist-get (cdr proj) :endpoint)))
-	  (setq project (cdr proj)))))
+		(when (and (stringp project)
+				   (string= project (plist-get (cdr proj) :endpoint)))
+		  (setq project (cdr proj)))))
   (if (or (null project)
-	  (not (listp project)))
+		  (not (listp project)))
       (error "Invalid project info"))
   (let ((ep (plist-get project :endpoint)))
     ;; this is workaround for bug of url-generic-parse-url<f>
@@ -1105,53 +1105,53 @@ visit to PAGE without interaction."
     ;; clean up wasted buffer named as " *http://xxx.xxx .....*"
     (dolist (buf (buffer-list))
       (if (and (string-match "^ \\*http" (buffer-name buf))
-	       (let ((proc (get-buffer-process buf)))
-		 (or (null proc)
-		     (not (member (process-status proc) '(open run connect))))))
-	  (kill-buffer buf)))
+			   (let ((proc (get-buffer-process buf)))
+				 (or (null proc)
+					 (not (member (process-status proc) '(open run connect))))))
+		  (kill-buffer buf)))
     ;; main
     (if (not force)
-	(let ((trac-rpc-endpoint ep))
-	  (setq page (trac-wiki-read-page-name page))
-	  (if (or (null page) (string= page ""))
-	      (error "Page name should be specified"))))
+		(let ((trac-rpc-endpoint ep))
+		  (setq page (trac-wiki-read-page-name page))
+		  (if (or (null page) (string= page ""))
+			  (error "Page name should be specified"))))
     ;; If not page is not already visited, retrieve and edit.
     ;; Else ask re-use already visited buffer.
     ;; If re-used, check version is up-to-date and merge if need.
 
     (if (catch 'found
-	  (dolist (buf (buffer-list))
-	    (set-buffer buf)
-	    (if (and (eq major-mode 'trac-wiki-mode)
-		     (string= trac-rpc-endpoint ep)
-		     (string= (trac-wiki-page-name) page))
-		(throw 'found
-		       (and (y-or-n-p "The page is already visited.  Use it? ")
-			    (switch-to-buffer (current-buffer)))))))
-	;; re-use already exising buffer
-	(let ((rver (trac-rpc-get-page-version page)) ; remote version
-	      (ver (trac-wiki-page-version))	      ; local version
-	      (modified (trac-wiki-modified-p)))
-	  (if (eq ver rver)
-	      (message "This page is version %d (%s)."
-		       rver (if modified
-				"up-to-date and modified"
-			      "up-to-date"))
-	    ;; not up-to-date
-	    (cond
-	     ((and (not modified)
-		   (y-or-n-p
-		    (format "This page has new version %d.  Update to it? "
-			    rver)))
-	      (trac-wiki-fetch-page page)) ; get latest
-	     ((and modified
-		   (y-or-n-p
-		    (format "This page has new version %d.  Merge with it? "
-			    rver)))
-	      (trac-wiki-merge))
-	     (t
-	      (message "Continue editing current veresion %s (latest version is %s)."
-		       ver rver)))))
+		  (dolist (buf (buffer-list))
+			(set-buffer buf)
+			(if (and (eq major-mode 'trac-wiki-mode)
+					 (string= trac-rpc-endpoint ep)
+					 (string= (trac-wiki-page-name) page))
+				(throw 'found
+					   (and (y-or-n-p "The page is already visited.  Use it? ")
+							(switch-to-buffer (current-buffer)))))))
+		;; re-use already exising buffer
+		(let ((rver (trac-rpc-get-page-version page)) ; remote version
+			  (ver (trac-wiki-page-version))	      ; local version
+			  (modified (trac-wiki-modified-p)))
+		  (if (eq ver rver)
+			  (message "This page is version %d (%s)."
+					   rver (if modified
+								"up-to-date and modified"
+							  "up-to-date"))
+			;; not up-to-date
+			(cond
+			 ((and (not modified)
+				   (y-or-n-p
+					(format "This page has new version %d.  Update to it? "
+							rver)))
+			  (trac-wiki-fetch-page page)) ; get latest
+			 ((and modified
+				   (y-or-n-p
+					(format "This page has new version %d.  Merge with it? "
+							rver)))
+			  (trac-wiki-merge))
+			 (t
+			  (message "Continue editing current veresion %s (latest version is %s)."
+					   ver rver)))))
       ;; newly visit page
       (switch-to-buffer (generate-new-buffer (format "%s" page)))
       (erase-buffer)
@@ -1166,22 +1166,22 @@ If VERSION is nil, most recent version will be fetched."
   (erase-buffer)
   (let ((info (trac-rpc-get-page-info page version)))
     (if (null info)
-	(progn
-	  ;; make dummy information
-	  (setq trac-wiki-page-info `(("version" . 0)
-				      ("name" . ,page)
-				      ("lastModified" .
-				       ,(format-time-string "%Y%m%dT%T"))
-				      ("hash" . ,(md5 ""))))
-	  (message "new page"))
+		(progn
+		  ;; make dummy information
+		  (setq trac-wiki-page-info `(("version" . 0)
+									  ("name" . ,page)
+									  ("lastModified" .
+									   ,(format-time-string "%Y%m%dT%T"))
+									  ("hash" . ,(md5 ""))))
+		  (message "new page"))
       (insert (trac-rpc-get-page page))
       (goto-char (point-min))
       (trac-wiki-update-page-info page info))
     (set-buffer-modified-p nil)
     (let ((ver (trac-wiki-page-version)))
       (if (= ver 0)
-	  (message "New page.")
-	(message "Page is retrieved (version = %s)" ver)))))
+		  (message "New page.")
+		(message "Page is retrieved (version = %s)" ver)))))
 
 (defun trac-wiki-update-page-info (page &optional info)
   "Update information of PAGE as INFO.
@@ -1191,7 +1191,7 @@ This information is page specific data holded as buffer local variable."
   (when (eq info 0)
     ;; case of new page (no page information exists).
     (setq info `(("name" . ,page)
-		 ("version" . 0))))
+				 ("version" . 0))))
   (add-to-list 'info `("hash" . ,(md5 (buffer-string) nil nil 'utf-8)))
   (setq trac-wiki-page-info info))
 
@@ -1203,46 +1203,46 @@ If local content is not changed, confirm doing."
   (interactive)
   (if (null trac-rpc-endpoint)
       (error "This buffer is not managed as trac wiki mode")
-  (cond
-   ((not (buffer-modified-p))
-    (message "Nothing changed."))
-   ((and (string= (trac-wiki-page-hash)
-		  (md5 (buffer-string) nil nil 'utf-8))
-	 (not (y-or-n-p "Buffer seems to be same.  Commit it? ")))
-    (message "canceled."))
-   ((/= (trac-rpc-get-page-version)
-	(trac-wiki-page-version))
-    (if (y-or-n-p (format "Remote page is updated (version: local=%s, remote=%s).  Merge with it? "
-			  (trac-wiki-page-version)
-			  (trac-rpc-get-page-version)))
-	(trac-wiki-merge)
-      (message "commit canceled.")))
-   (t
-    ;; do it
-    (let ((comment (read-string "Comment: " nil 'trac-wiki-comment-history))
-	  (page (trac-wiki-page-name)))
-      (trac-rpc-put-page page (buffer-string) comment)
-      ;; update new info
-      (trac-wiki-update-page-info page)
-      (set-buffer-modified-p nil)
-      (let* ((entry (assoc trac-rpc-endpoint trac-wiki-page-name-cache))
-	     (names (cdr entry)))
-	(when (not (member page names))
-	  ;; add this page into cache
-	  (if (null entry)
-	      (setq trac-wiki-page-name-cache
-		    (list trac-rpc-endpoint page))
-	    (setcdr entry (cons page names)))
-	  ;; re-fontify all the pages which has same endpoint
-	  (save-excursion
-	    (let ((ep trac-rpc-endpoint))
-	      (dolist (buf (buffer-list))
-		(set-buffer buf)
-		(if (and (eq major-mode 'trac-wiki-mode)
-			 (eq trac-rpc-endpoint ep)
-			 font-lock-mode)
-		    (font-lock-fontify-buffer)))))))
-      (message "Committed as version %s" (trac-wiki-page-version)))))))
+	(cond
+	 ((not (buffer-modified-p))
+	  (message "Nothing changed."))
+	 ((and (string= (trac-wiki-page-hash)
+					(md5 (buffer-string) nil nil 'utf-8))
+		   (not (y-or-n-p "Buffer seems to be same.  Commit it? ")))
+	  (message "canceled."))
+	 ((/= (trac-rpc-get-page-version)
+		  (trac-wiki-page-version))
+	  (if (y-or-n-p (format "Remote page is updated (version: local=%s, remote=%s).  Merge with it? "
+							(trac-wiki-page-version)
+							(trac-rpc-get-page-version)))
+		  (trac-wiki-merge)
+		(message "commit canceled.")))
+	 (t
+	  ;; do it
+	  (let ((comment (read-string "Comment: " nil 'trac-wiki-comment-history))
+			(page (trac-wiki-page-name)))
+		(trac-rpc-put-page page (buffer-string) comment)
+		;; update new info
+		(trac-wiki-update-page-info page)
+		(set-buffer-modified-p nil)
+		(let* ((entry (assoc trac-rpc-endpoint trac-wiki-page-name-cache))
+			   (names (cdr entry)))
+		  (when (not (member page names))
+			;; add this page into cache
+			(if (null entry)
+				(setq trac-wiki-page-name-cache
+					  (list trac-rpc-endpoint page))
+			  (setcdr entry (cons page names)))
+			;; re-fontify all the pages which has same endpoint
+			(save-excursion
+			  (let ((ep trac-rpc-endpoint))
+				(dolist (buf (buffer-list))
+				  (set-buffer buf)
+				  (if (and (eq major-mode 'trac-wiki-mode)
+						   (eq trac-rpc-endpoint ep)
+						   font-lock-mode)
+					  (font-lock-fontify-buffer)))))))
+		(message "Committed as version %s" (trac-wiki-page-version)))))))
 
 (defun trac-wiki-modified-p ()
   "Return non-nil if buffer content is modified.
@@ -1250,8 +1250,8 @@ Jadgement of 'modified' is done by `buffer-modified-p' flag
 and comparation of MD5 hash with current and original content.
 Note that return nil if MD5 is equal althogh `buffer-modified-p' is non-nil."
   (let ((modified (and (buffer-modified-p)
-		       (not (string= (trac-wiki-page-hash)
-				     (md5 (buffer-string) nil nil 'utf-8))))))
+					   (not (string= (trac-wiki-page-hash)
+									 (md5 (buffer-string) nil nil 'utf-8))))))
     modified))
 
 (defun trac-wiki-revert ()
@@ -1265,20 +1265,20 @@ Note that return nil if MD5 is equal althogh `buffer-modified-p' is non-nil."
 		  )
       (trac-wiki-diff nil)
       (if (not (y-or-n-p "Really revert these changes? "))
-	  (message "canceled.")
-	(erase-buffer)
-	(let ((page (trac-wiki-page-name))
-	      (ver (trac-wiki-page-version)))
-	  (insert (trac-rpc-get-page page ver))
-	  (set-buffer-modified-p nil)
-	  (goto-char 1)
-	  (message "Reverted to original (version=%s)" ver)))
+		  (message "canceled.")
+		(erase-buffer)
+		(let ((page (trac-wiki-page-name))
+			  (ver (trac-wiki-page-version)))
+		  (insert (trac-rpc-get-page page ver))
+		  (set-buffer-modified-p nil)
+		  (goto-char 1)
+		  (message "Reverted to original (version=%s)" ver)))
       (set-window-configuration config)
 	  (goto-line line_position)
       ;; erase diff buffer
       (let ((win (get-buffer-window trac-wiki-diff-buffer-name)))
-	(if win
-	    (delete-window win))))))
+		(if win
+			(delete-window win))))))
 
 
 (defun trac-wiki-diff (arg)
@@ -1293,57 +1293,57 @@ If with prefix ARG, invoke `ediff' instead of `diff'."
     ;; clean up diff output window
     (let ((win (get-buffer-window trac-wiki-diff-buffer-name)))
       (if win
-	  (delete-window win)))
+		  (delete-window win)))
     ;; check and confirm unmodified guess.
     (if (not (trac-wiki-modified-p))
-	(message "Nothing changed.")
+		(message "Nothing changed.")
       (let* ((page (trac-wiki-page-name))
-	     (version (trac-wiki-page-version)))
-	(if (= 0 version)
-	    (message "No need to diff. This is initial version.")
-	  (let ((orig (trac-rpc-get-page page version)))
-	    (if (null orig)
-		(error "Error on fetching page: %s, version %s" page version))
-	    (trac-wiki-diff-internal (buffer-substring-no-properties
-				      (point-min) (point-max)) orig)))))))
+			 (version (trac-wiki-page-version)))
+		(if (= 0 version)
+			(message "No need to diff. This is initial version.")
+		  (let ((orig (trac-rpc-get-page page version)))
+			(if (null orig)
+				(error "Error on fetching page: %s, version %s" page version))
+			(trac-wiki-diff-internal (buffer-substring-no-properties
+									  (point-min) (point-max)) orig)))))))
 
 (defun trac-wiki-diff-internal (str1 str2)
   "Show diff of two content STR1 and STR2 in popup buffer."
   (let* ((trac-rpc-endpoint trac-rpc-endpoint)
-	 (page (trac-wiki-page-name))
-	 (tmpa (make-temp-file "wiki"))
-	 (tmpb (make-temp-file "wiki")))
+		 (page (trac-wiki-page-name))
+		 (tmpa (make-temp-file "wiki"))
+		 (tmpb (make-temp-file "wiki")))
     (unwind-protect
-	(progn
-	  (require 'diff)
-	  (let ((coding-system-for-write 'utf-8)
-		(coding-system-for-read 'utf-8))
-	    (with-temp-file tmpa
-	      (insert str2))
-	    (with-temp-file tmpb
-	      (insert str1))
-	    (condition-case nil
-		(diff tmpa tmpb "-u" 'no-async) ; for emacs 22.50 or later
-	      (error
-	       ;; for emacs 21 or before
-	       (diff tmpa tmpb))))
-	  (with-current-buffer (get-buffer trac-wiki-diff-buffer-name)
-	    ;; wait for process completion, required for Emacs 21
-	    (let ((proc (get-buffer-process (current-buffer))))
-	      (while (and proc
-			  (member (process-status proc)
-				  '(run open connect)))
-		(accept-process-output proc)))
-	    (local-set-key "q" 'trac-wiki-delete-window-or-bury-buffer)
-	    (let ((win (get-buffer-window (current-buffer))))
-	      (if (not (re-search-forward "^Diff finished (no differences)."
-					  nil t))
-		  (progn
-		    (setq buffer-read-only t)
-		    (shrink-window-if-larger-than-buffer win)
-		    (message "done."))	; clear last message
-		(delete-window win)
-		(message "No difference.")))))
+		(progn
+		  (require 'diff)
+		  (let ((coding-system-for-write 'utf-8)
+				(coding-system-for-read 'utf-8))
+			(with-temp-file tmpa
+			  (insert str2))
+			(with-temp-file tmpb
+			  (insert str1))
+			(condition-case nil
+				(diff tmpa tmpb "-u" 'no-async) ; for emacs 22.50 or later
+			  (error
+			   ;; for emacs 21 or before
+			   (diff tmpa tmpb))))
+		  (with-current-buffer (get-buffer trac-wiki-diff-buffer-name)
+			;; wait for process completion, required for Emacs 21
+			(let ((proc (get-buffer-process (current-buffer))))
+			  (while (and proc
+						  (member (process-status proc)
+								  '(run open connect)))
+				(accept-process-output proc)))
+			(local-set-key "q" 'trac-wiki-delete-window-or-bury-buffer)
+			(let ((win (get-buffer-window (current-buffer))))
+			  (if (not (re-search-forward "^Diff finished (no differences)."
+										  nil t))
+				  (progn
+					(setq buffer-read-only t)
+					(shrink-window-if-larger-than-buffer win)
+					(message "done."))	; clear last message
+				(delete-window win)
+				(message "No difference.")))))
       (delete-file tmpa)
       (delete-file tmpb))))
 
@@ -1351,21 +1351,21 @@ If with prefix ARG, invoke `ediff' instead of `diff'."
   "Invoke `ediff' with original content."
   (interactive)
   (let* ((mode major-mode)
-	 (page (trac-wiki-page-name))
-	 (version (trac-wiki-page-version)))
+		 (page (trac-wiki-page-name))
+		 (version (trac-wiki-page-version)))
     (if (= version 0)
-	(message "No need to ediff. This is initial version.")
+		(message "No need to ediff. This is initial version.")
       (let ((content (trac-rpc-get-page page version))
-	    (buf (generate-new-buffer (format "*%s BASE*" page))))
-	(when (null buf)
-	  (kill-buffer buf)
-	  (error "Error on fetching page: %s, version %s" page version))
-	(with-current-buffer buf
-	  (erase-buffer)
-	  (insert content)
-	  (funcall mode)
-	  (set-buffer-modified-p nil))
-	(ediff-buffers (current-buffer) buf)))))
+			(buf (generate-new-buffer (format "*%s BASE*" page))))
+		(when (null buf)
+		  (kill-buffer buf)
+		  (error "Error on fetching page: %s, version %s" page version))
+		(with-current-buffer buf
+		  (erase-buffer)
+		  (insert content)
+		  (funcall mode)
+		  (set-buffer-modified-p nil))
+		(ediff-buffers (current-buffer) buf)))))
 
 
 (defvar trac-wiki-merge-windows nil)
@@ -1382,105 +1382,105 @@ If version number is same but md5 is differ, remote page is deleted then
 revised.  This case also need merging."
   (interactive)
   (let* ((page (trac-wiki-page-name))
-	 (page-info (trac-rpc-get-page-info page)) ; of recent one
-	 (rver (cdr (assoc "version" page-info)))  ; remote version
-	 (rcontent (trac-rpc-get-page page))	   ; remote content
-	 (rmd5 (md5 rcontent nil nil 'utf-8))	   ; remote md5
-	 (lver (trac-wiki-page-version))	   ; local version
-	 (lmd5 (trac-wiki-page-hash))		   ; local md5
-	 (bcontent (if (< rver lver)		   ; base content
-		       rcontent
-		     (trac-rpc-get-page page lver)))
-	 (bmd5 (md5 bcontent nil nil 'utf-8))
-	 msg)
+		 (page-info (trac-rpc-get-page-info page)) ; of recent one
+		 (rver (cdr (assoc "version" page-info)))  ; remote version
+		 (rcontent (trac-rpc-get-page page))	   ; remote content
+		 (rmd5 (md5 rcontent nil nil 'utf-8))	   ; remote md5
+		 (lver (trac-wiki-page-version))	   ; local version
+		 (lmd5 (trac-wiki-page-hash))		   ; local md5
+		 (bcontent (if (< rver lver)		   ; base content
+					   rcontent
+					 (trac-rpc-get-page page lver)))
+		 (bmd5 (md5 bcontent nil nil 'utf-8))
+		 msg)
     (if (and (= lver rver)
-	     (string= lmd5 rmd5))
-	;; up-to-date
-	(message "This page is up-to-date. No need to merge.")
+			 (string= lmd5 rmd5))
+		;; up-to-date
+		(message "This page is up-to-date. No need to merge.")
       ;; something different
       (cond
        ((< rver lver)			; base version is not exist
-	(setq msg "Remote page is deleted."))
+		(setq msg "Remote page is deleted."))
        ((and (< lver rver)
-	     (string= lmd5 bmd5))
-	(setq msg "Remote page is updated.")) ; usual update
+			 (string= lmd5 bmd5))
+		(setq msg "Remote page is updated.")) ; usual update
        (t
-	(setq msg "Remote page might be deleted and updated.")))
+		(setq msg "Remote page might be deleted and updated.")))
 
       (if (not (save-window-excursion
-		 (delete-other-windows)
-		 (let ((act (if (trac-wiki-modified-p)
-				"Merge with"
-			      "Update to")))
-		   (with-temp-buffer
-		     (insert "        Ver.  MD5\n"
-			     (format "local:  %4d  %s\n" lver lmd5)
-			     (format "remote: %4d  %s\n" rver rmd5))
-		     (pop-to-buffer (current-buffer))
-		     (shrink-window-if-larger-than-buffer)
-		     (y-or-n-p (format "%s %s latest version? " msg act))))))
-	  (message "Canceld.")
-	(if (not (trac-wiki-modified-p))
-	    ;; simply replace current content and update page info
-	    (let ((pt (point)))
-	      (erase-buffer)
-	      (insert rcontent)
-	      (trac-wiki-update-page-info page page-info)
-	      (set-buffer-modified-p nil)
-	      (message "Page is updated to version %d" rver))
-	  (let* ((mode major-mode)
-		 (config (current-window-configuration))
-		 (cur (current-buffer))
-		 (mine-buf (generate-new-buffer (format "*%s MINE*" page)))
-		 (their-buf (generate-new-buffer (format "*%s OTHER*" page)))
-		 (base-buf (generate-new-buffer (format "*%s BASE*" page))))
-	    (require 'ediff)
-	    (with-current-buffer mine-buf
-	      (insert-buffer-substring cur)
-	      (funcall mode))
-	    (with-current-buffer their-buf
-	      (insert rcontent)
-	      (funcall mode))
-	    (with-current-buffer base-buf
-	      (insert bcontent)
-	      (funcall mode))
-	    ;; start merging
-	    (set-buffer
-	     (ediff-merge-buffers-with-ancestor mine-buf their-buf base-buf))
-	    ;; prepare for sentinel action
-	    (set (make-local-variable 'trac-wiki-merge-windows) config)
-	    (set (make-local-variable 'trac-wiki-merge-buffer) cur)
-	    (set (make-local-variable 'trac-wiki-merge-page-info)
-		 (append page-info `("hash" ,(md5 (buffer-string)
-						  nil nil 'utf-8))))
-	    (set (make-local-variable 'ediff-quit-hook) 'trac-wiki-merge-sentinel)
-	    (message "Please merge with recent version.")))))))
+				 (delete-other-windows)
+				 (let ((act (if (trac-wiki-modified-p)
+								"Merge with"
+							  "Update to")))
+				   (with-temp-buffer
+					 (insert "        Ver.  MD5\n"
+							 (format "local:  %4d  %s\n" lver lmd5)
+							 (format "remote: %4d  %s\n" rver rmd5))
+					 (pop-to-buffer (current-buffer))
+					 (shrink-window-if-larger-than-buffer)
+					 (y-or-n-p (format "%s %s latest version? " msg act))))))
+		  (message "Canceld.")
+		(if (not (trac-wiki-modified-p))
+			;; simply replace current content and update page info
+			(let ((pt (point)))
+			  (erase-buffer)
+			  (insert rcontent)
+			  (trac-wiki-update-page-info page page-info)
+			  (set-buffer-modified-p nil)
+			  (message "Page is updated to version %d" rver))
+		  (let* ((mode major-mode)
+				 (config (current-window-configuration))
+				 (cur (current-buffer))
+				 (mine-buf (generate-new-buffer (format "*%s MINE*" page)))
+				 (their-buf (generate-new-buffer (format "*%s OTHER*" page)))
+				 (base-buf (generate-new-buffer (format "*%s BASE*" page))))
+			(require 'ediff)
+			(with-current-buffer mine-buf
+			  (insert-buffer-substring cur)
+			  (funcall mode))
+			(with-current-buffer their-buf
+			  (insert rcontent)
+			  (funcall mode))
+			(with-current-buffer base-buf
+			  (insert bcontent)
+			  (funcall mode))
+			;; start merging
+			(set-buffer
+			 (ediff-merge-buffers-with-ancestor mine-buf their-buf base-buf))
+			;; prepare for sentinel action
+			(set (make-local-variable 'trac-wiki-merge-windows) config)
+			(set (make-local-variable 'trac-wiki-merge-buffer) cur)
+			(set (make-local-variable 'trac-wiki-merge-page-info)
+				 (append page-info `("hash" ,(md5 (buffer-string)
+												  nil nil 'utf-8))))
+			(set (make-local-variable 'ediff-quit-hook) 'trac-wiki-merge-sentinel)
+			(message "Please merge with recent version.")))))))
 
 
 (defun trac-wiki-merge-sentinel ()
   "Called by `ediff-quit-hook' for cleanup and aplying merge result."
   (let ((buffers (list ediff-buffer-A ediff-buffer-B ediff-buffer-C
-		       ediff-ancestor-buffer))
-	(merged ediff-buffer-C)
-	(windows trac-wiki-merge-windows)
-	(page-info trac-wiki-merge-page-info)
-	(buf trac-wiki-merge-buffer))
+					   ediff-ancestor-buffer))
+		(merged ediff-buffer-C)
+		(windows trac-wiki-merge-windows)
+		(page-info trac-wiki-merge-page-info)
+		(buf trac-wiki-merge-buffer))
     (ediff-cleanup-mess)
     (with-current-buffer buf
       (if (not (y-or-n-p "Accept merge result? "))
-	  (message "Discarded merge result and stay on version %s."
-		   (trac-wiki-page-version))
-	(let ((buffer-read-only nil))
-	  (erase-buffer)
-	  (insert-buffer-substring merged)
-	  (setq trac-wiki-page-info page-info)
-	  (goto-char 1))
-	(message "Merged with version %s and now on it."
-		 (trac-wiki-page-version))))
+		  (message "Discarded merge result and stay on version %s."
+				   (trac-wiki-page-version))
+		(let ((buffer-read-only nil))
+		  (erase-buffer)
+		  (insert-buffer-substring merged)
+		  (setq trac-wiki-page-info page-info)
+		  (goto-char 1))
+		(message "Merged with version %s and now on it."
+				 (trac-wiki-page-version))))
     ;; kill all the buffuers
     (dolist (buf buffers)
       (if (bufferp buf)
-	  (kill-buffer buf)))
+		  (kill-buffer buf)))
     (set-window-configuration windows)))
 
 
@@ -1489,7 +1489,7 @@ revised.  This case also need merging."
 TRAILERS is list of string to be removed."
   (let ((re (concat "\\(?:/\\(?:" (regexp-opt trailers) "\\)\\)+$")))
     (if (string-match re url)
-	(substring url 0 (match-beginning 0))
+		(substring url 0 (match-beginning 0))
       url)))
 
 (defun trac-wiki-preview (arg)
@@ -1500,58 +1500,59 @@ With prefix ARG, execute browser using `browse-url' to preview
 html.  It supports styles sheet."
   (interactive "P")
   (let ((html (trac-rpc-wiki-to-html (buffer-string)))
-	(buf (get-buffer-create (if arg " *html-preview-tmp*" "*preview*")))
-	(name (trac-wiki-page-name))
-	;; this depen on trac url structure
-	(base-url (trac-wiki-strip-url-trailer trac-rpc-endpoint
-					       '("xmlrpc" "login" "wiki"))))
+		(buf (get-buffer-create (if arg " *html-preview-tmp*" "*preview*")))
+		(name (trac-wiki-page-name))
+		;; this depen on trac url structure
+		(base-url (trac-wiki-strip-url-trailer trac-rpc-endpoint
+											   '("xmlrpc" "login" "wiki"))))
     (save-excursion
       (set-buffer buf)
       (setq buffer-read-only t)
       (let ((buffer-read-only nil)
-	    (css (mapconcat
-		  (lambda (x)
-		    (format "<link rel='stylesheet' href='%s%s%s' type='text/css' />"
-			    base-url "/chrome/common/css/" x))
-		  '("trac.css" "wiki.css" "site_common.css")
-		  "\n")))
-	(erase-buffer)
-	;; add some supplements as valid html content
-	(insert (format "<html><head><title>%s (preview)</title>" name)
-		"\n"
-		css
-		"\n</head><body>\n"
-		"<div id='content' class='wiki'><div class='wikipage'>"
-		html
-		"</div></div></body>")
-	;; replace links
-	(goto-char (point-min))
-	(while (re-search-forward "\\(?:href\\|src\\)=\"/" nil t)
-	  (backward-char 1)
-	  (insert base-url))
-	(if arg
-	    (progn
-	      (require 'browse-url)
-	      (let ((coding-system-for-write 'utf-8))
-		(browse-url-of-buffer)
-		(message "Previewing with external browser.")))
-	  (require 'w3m)
-	  (w3m-region (point-min) (point-max))
-	  (goto-char (point-min))
-	  (pop-to-buffer buf)
-	  ;; define 'q' key to close preview buffer
-	  (local-set-key "q" 'trac-wiki-delete-window-or-bury-buffer)
-	  (message "Hit 'q' to quit preview window"))))))
+			(css (mapconcat
+				  (lambda (x)
+					(format "<link rel='stylesheet' href='%s%s%s' type='text/css' />"
+							base-url "/chrome/common/css/" x))
+				  '("trac.css" "wiki.css" "site_common.css")
+				  "\n")))
+		(erase-buffer)
+		;; add some supplements as valid html content
+		(insert (format "<html><head><title>%s (preview)</title>" name)
+				"\n"
+				css
+				"\n</head><body>\n"
+				"<div id='content' class='wiki'><div class='wikipage'>"
+				html
+				"</div></div></body>")
+		;; replace links
+		(goto-char (point-min))
+		(while (re-search-forward "\\(?:href\\|src\\)=\"/" nil t)
+		  (backward-char 1)
+		  (insert base-url))
+		(if arg
+			(progn
+			  (require 'browse-url)
+			  (let ((coding-system-for-write 'utf-8))
+				(browse-url-of-buffer)
+				(message "Previewing with external browser.")))
+		  (require 'w3m)
+		  (w3m-region (point-min) (point-max))
+		  (w3m-minor-mode 1)
+		  (goto-char (point-min))
+		  (pop-to-buffer buf)
+		  ;; define 'q' key to close preview buffer
+		  (local-set-key "q" 'trac-wiki-delete-window-or-bury-buffer)
+		  (message "Hit 'q' to quit preview window"))))))
 
 (defun trac-wiki-view-page ()
   "View current page on remote trac site with external browser.
 The page is viewed by `browse-url' function, not emacs-w3m."
   (interactive)
   (let* ((base (trac-wiki-strip-url-trailer trac-rpc-endpoint
-					   '("xmlrpc" "login" "wiki")))
-	 (url (format "%s/wiki/%s"
-		      (directory-file-name base)
-		      (trac-wiki-page-name))))
+											'("xmlrpc" "login" "wiki")))
+		 (url (format "%s/wiki/%s"
+					  (directory-file-name base)
+					  (trac-wiki-page-name))))
     (let ((default-directory temporary-file-directory))
       (browse-url url))
     (message "View page in browser: %s" url)))
@@ -1560,34 +1561,34 @@ The page is viewed by `browse-url' function, not emacs-w3m."
   "Show url and version information of current page."
   (interactive)
   (let* ((version (trac-wiki-page-version))
-	 (author (or (trac-wiki-page-author) "you"))
-	 (date (or (trac-wiki-page-modified-time) "now"))
-	 (state (if (and (< 0 version)
-			 (not (string= (trac-wiki-page-hash)
-				       (md5 (buffer-string) nil nil 'utf-8))))
-		    " (localy modified)"
-		  ""))
-	 (page (cdr (assoc "name" trac-wiki-page-info)))
-	 (lines `(("End Point" . trac-rpc-endpoint)
-		  ("Page Name" . ,(concat page state))
-		  ("Base Version" . (if (< 0 version)
-					,(format "%s (made by %s at %s)"
-						 version author date)
-				      "(newly creating now)"))))
-	 (wid 0))
+		 (author (or (trac-wiki-page-author) "you"))
+		 (date (or (trac-wiki-page-modified-time) "now"))
+		 (state (if (and (< 0 version)
+						 (not (string= (trac-wiki-page-hash)
+									   (md5 (buffer-string) nil nil 'utf-8))))
+					" (localy modified)"
+				  ""))
+		 (page (cdr (assoc "name" trac-wiki-page-info)))
+		 (lines `(("End Point" . trac-rpc-endpoint)
+				  ("Page Name" . ,(concat page state))
+				  ("Base Version" . (if (< 0 version)
+										,(format "%s (made by %s at %s)"
+												 version author date)
+									  "(newly creating now)"))))
+		 (wid 0))
     ;; align key strings with right justification.
     (dolist (elem lines)
       (if elem
-	  (setq wid (max wid (string-width (car elem))))))
+		  (setq wid (max wid (string-width (car elem))))))
     ;; print message in echo erea (for emacs 22 )
     (message
      (mapconcat (lambda (elem)
-		  (if elem
-		      (concat (make-string (- wid (string-width (car elem))) ? )
-			      (car elem)
-			      ": "
-			      (eval (cdr elem)))))
-		lines "\n"))
+				  (if elem
+					  (concat (make-string (- wid (string-width (car elem))) ? )
+							  (car elem)
+							  ": "
+							  (eval (cdr elem)))))
+				lines "\n"))
     ))
 
 (defun trac-wiki-html2text-string (str)
@@ -1607,37 +1608,37 @@ In Emacs 22, this function simply use `completing-read-multiple'.
 In Emacs 21, this function provides own selection loop because
 `completing-read-multiple' has bit strange behaviour."
   (let ((more t)
-	(alist (mapcar 'list filters))
-	(prompt "Select filters: ")
-	items result)
+		(alist (mapcar 'list filters))
+		(prompt "Select filters: ")
+		items result)
     (if (not (< emacs-major-version 22))
-	(completing-read-multiple prompt
-				  alist nil t
-				  (mapconcat 'identity
-					     trac-wiki-search-default-filters
-					     ",")
-				  'trac-wiki-search-filter-hist
-				  "wiki")
+		(completing-read-multiple prompt
+								  alist nil t
+								  (mapconcat 'identity
+											 trac-wiki-search-default-filters
+											 ",")
+								  'trac-wiki-search-filter-hist
+								  "wiki")
       ;; completing-read-multiple of emacs 21 has strange behaviour.
       ;; so make alternative.
       (while more
-	(setq more nil
-	      result nil)
-	(dolist (item (completing-read-multiple
-		       prompt
-		       alist nil nil
-		       (mapconcat 'identity
-				  trac-wiki-search-default-filters
-				  ",")
-		       'trac-wiki-search-filter-hist
-		       "wiki"))
-	  (let ((all (all-completions item alist)))
-	    (if (null all)
-		(setq more t)
-	      (dolist (cand all)
-		(if (not (member cand result))
-		    (setq result (cons cand result)))))))
-	(setq prompt "[again] Select filters: "))
+		(setq more nil
+			  result nil)
+		(dolist (item (completing-read-multiple
+					   prompt
+					   alist nil nil
+					   (mapconcat 'identity
+								  trac-wiki-search-default-filters
+								  ",")
+					   'trac-wiki-search-filter-hist
+					   "wiki"))
+		  (let ((all (all-completions item alist)))
+			(if (null all)
+				(setq more t)
+			  (dolist (cand all)
+				(if (not (member cand result))
+					(setq result (cons cand result)))))))
+		(setq prompt "[again] Select filters: "))
       (or result '("wiki")))))
 
 (defun trac-wiki-search (query &optional filters)
@@ -1648,76 +1649,76 @@ FILTERS is interactively selected if not specified."
    (list
     ;; enter query string
     (let ((str (read-string "Query string: " nil
-			    'trac-wiki-search-keyword-hist)))
+							'trac-wiki-search-keyword-hist)))
       (if (or (null str) (string= str ""))
-	  (error "Query string must be specified"))
+		  (error "Query string must be specified"))
       str)
     ;; select filters
     (let ((filters (trac-wiki-with-cache
-		       'trac-wiki-search-filter-cache
-		       trac-rpc-endpoint nil
-		     (mapcar 'car
-			     (trac-rpc-call 'search.getSearchFilters)))))
+					   'trac-wiki-search-filter-cache
+					   trac-rpc-endpoint nil
+					 (mapcar 'car
+							 (trac-rpc-call 'search.getSearchFilters)))))
       (trac-wiki-input-search-filters filters))))
   ;; args are prepared,
   ;; try search request
   (let ((result (trac-rpc-call 'search.performSearch query filters))
-	(ep trac-rpc-endpoint)
-	(buf (get-buffer-create "*search result*")))
+		(ep trac-rpc-endpoint)
+		(buf (get-buffer-create "*search result*")))
     ;; close last result first
     (if (get-buffer-window buf)
-	(delete-window (get-buffer-window buf)))
+		(delete-window (get-buffer-window buf)))
     (if (null result)
-	(message "No match.")
+		(message "No match.")
       (with-current-buffer buf
-	(let ((buffer-read-only nil))
-	  (erase-buffer)
-	  (require 'hi-lock)
-	  (if hi-lock-mode
-	      (hi-lock-mode 0))
-	  (dolist (elem result)
-	    (setq elem (mapcar
-			(lambda (x) (replace-regexp-in-string
-				     "[ \t\r\n]+" " " x))
-			elem))
-	    ;; elem := (href title date author excerpt)
-	    (require 'url-util)
-	    (let ((url (nth 0 elem))
-		  (title (nth 1 elem))
-		  (date (nth 2 elem))
-		  (author (nth 3 elem))
-		  (excerpt (nth 4 elem)))
-	      (if (string-match "<[a-z]+.*>" title)
-		  (setq title (trac-wiki-html2text-string title)))
-	      (insert title "\n"	; title
-		      "  "
-		      (decode-coding-string
-		       (url-unhex-string (string-as-unibyte url))
-		       'utf-8)
-		      "\n"		; href
-		      excerpt "\n"
-		      (format "By %s -- %s\n"
-			      author
-			      (format-time-string
-			       "%Y-%m-%d %H:%M:%S"
-			       (seconds-to-time (string-to-number date))))
-		      "\n"))))
-	(goto-char (point-min))
-	;; setup font-lock
-	(set (make-local-variable 'font-lock-defaults)
-	     '(trac-wiki-search-result-font-lock-keywords t t))
-	(if font-lock-mode
-	    (font-lock-default-fontify-buffer)) ; immediately
-	;; highlight search keywords
-	(let ((colors '(hi-yellow hi-blue hi-green hi-pink)))
-	  (dolist (q (split-string (downcase query)))
-	    (highlight-regexp q (or (car-safe colors)
-				    'highlight))
-	    (setq colors (cdr-safe colors))))
-	(setq trac-rpc-endpoint ep)
-	;; local keys
-	(use-local-map trac-wiki-search-result-mode-map)
-	(setq buffer-read-only t))
+		(let ((buffer-read-only nil))
+		  (erase-buffer)
+		  (require 'hi-lock)
+		  (if hi-lock-mode
+			  (hi-lock-mode 0))
+		  (dolist (elem result)
+			(setq elem (mapcar
+						(lambda (x) (replace-regexp-in-string
+									 "[ \t\r\n]+" " " x))
+						elem))
+			;; elem := (href title date author excerpt)
+			(require 'url-util)
+			(let ((url (nth 0 elem))
+				  (title (nth 1 elem))
+				  (date (nth 2 elem))
+				  (author (nth 3 elem))
+				  (excerpt (nth 4 elem)))
+			  (if (string-match "<[a-z]+.*>" title)
+				  (setq title (trac-wiki-html2text-string title)))
+			  (insert title "\n"	; title
+					  "  "
+					  (decode-coding-string
+					   (url-unhex-string (string-as-unibyte url))
+					   'utf-8)
+					  "\n"		; href
+					  excerpt "\n"
+					  (format "By %s -- %s\n"
+							  author
+							  (format-time-string
+							   "%Y-%m-%d %H:%M:%S"
+							   (seconds-to-time (string-to-number date))))
+					  "\n"))))
+		(goto-char (point-min))
+		;; setup font-lock
+		(set (make-local-variable 'font-lock-defaults)
+			 '(trac-wiki-search-result-font-lock-keywords t t))
+		(if font-lock-mode
+			(font-lock-default-fontify-buffer)) ; immediately
+		;; highlight search keywords
+		(let ((colors '(hi-yellow hi-blue hi-green hi-pink)))
+		  (dolist (q (split-string (downcase query)))
+			(highlight-regexp q (or (car-safe colors)
+									'highlight))
+			(setq colors (cdr-safe colors))))
+		(setq trac-rpc-endpoint ep)
+		;; local keys
+		(use-local-map trac-wiki-search-result-mode-map)
+		(setq buffer-read-only t))
       (pop-to-buffer buf))))
 
 (defconst trac-wiki-search-result-top-regexp
@@ -1745,7 +1746,7 @@ FILTERS is interactively selected if not specified."
   (save-excursion
     (end-of-line)
     (if (re-search-backward trac-wiki-search-result-top-regexp nil t)
-	(match-string-no-properties 1))))
+		(match-string-no-properties 1))))
 
 (defun trac-wiki-search-result-edit ()
   "Edit page of entry at point."
@@ -1769,56 +1770,56 @@ NOTE: Wiki macro names are retrieved from HTML content of
 WikiMacros page on remote site."
   (interactive "P")
   (let ((ep (or trac-rpc-endpoint
-		(error "XML-RPC endpoint is not known")))
-	kind candidates part)
+				(error "XML-RPC endpoint is not known")))
+		kind candidates part)
     (cond
      ;; macro completion
      ((trac-wiki-looking-back "\\[\\[\\(\\w*\\)")
       (setq kind "macro"
-	    part (match-string 1)
-	    candidates (append (list "BR")
-			       (trac-wiki-with-cache
-				   'trac-wiki-macro-name-cache
-				   ep no-cache
-				 (trac-wiki-collect-macro-names)))))
+			part (match-string 1)
+			candidates (append (list "BR")
+							   (trac-wiki-with-cache
+								   'trac-wiki-macro-name-cache
+								   ep no-cache
+								 (trac-wiki-collect-macro-names)))))
      ((trac-wiki-looking-back "\\[wiki:\\(\\(?:\\w\\|[/.]\\)*\\)")
       ;; wiki link
       (setq kind "page name"
-	    part (match-string 1)
-	    candidates (trac-wiki-with-cache
-			   'trac-wiki-page-name-cache
-			   ep no-cache
-			 (trac-rpc-get-all-pages))))
+			part (match-string 1)
+			candidates (trac-wiki-with-cache
+						   'trac-wiki-page-name-cache
+						   ep no-cache
+						 (trac-rpc-get-all-pages))))
      ((trac-wiki-looking-back "\\(^\\|\\W\\)\\([A-Z]\\(\\w\\|[/.]\\)*\\)")
       ;; camel case wiki name
       (setq kind "wiki name"
-	    part (match-string 2)
-	    candidates (trac-wiki-with-cache
-			   'trac-wiki-page-name-cache
-			   ep no-cache
-			 (trac-rpc-get-all-pages)))))
+			part (match-string 2)
+			candidates (trac-wiki-with-cache
+						   'trac-wiki-page-name-cache
+						   ep no-cache
+						 (trac-rpc-get-all-pages)))))
 
     (when (and kind candidates part)
       (let* ((pos (point))
-	     (beg (- pos (length part))))
-	;; try completion
-	(let ((cmpl (try-completion part (mapcar 'list candidates))))
-	  (cond
-	   ((null cmpl)
-	    (message "no matching %s" kind))
-	   ((eq cmpl t)
-	    (message "Sole completion"))
-	   (t
-	    (let ((repl (if (string= cmpl part)
-			    (completing-read (format "[%s] " kind)
-					     (mapcar 'list candidates)
-					     nil t part)
-			  cmpl)))
-	      (kill-region beg pos)
-	      (insert repl)
-	      (if (eq t (try-completion repl (mapcar 'list candidates)))
-		  (message "Sole completion")
-		(message "Complete, but not uniq"))))))))))
+			 (beg (- pos (length part))))
+		;; try completion
+		(let ((cmpl (try-completion part (mapcar 'list candidates))))
+		  (cond
+		   ((null cmpl)
+			(message "no matching %s" kind))
+		   ((eq cmpl t)
+			(message "Sole completion"))
+		   (t
+			(let ((repl (if (string= cmpl part)
+							(completing-read (format "[%s] " kind)
+											 (mapcar 'list candidates)
+											 nil t part)
+						  cmpl)))
+			  (kill-region beg pos)
+			  (insert repl)
+			  (if (eq t (try-completion repl (mapcar 'list candidates)))
+				  (message "Sole completion")
+				(message "Complete, but not uniq"))))))))))
 
 (defun trac-wiki-history (arg)
   "Show history of visiting page in popup'ed buffer.
@@ -1828,47 +1829,47 @@ If with prefix ARG, all the history is displayed but it might slow
 if too many version exists."
   (interactive "P")
   (let* ((page-info trac-wiki-page-info)
-	 (page (trac-wiki-page-name))
-	 (current (trac-wiki-page-version))
-	 (ver (trac-rpc-get-page-version))
-	 (buf (get-buffer-create (format " *page history*")))
-	 (ep trac-rpc-endpoint)
-	 (keyhelp (substitute-command-keys "\\[trac-wiki-history]"))
-	 (rest (if arg trac-wiki-max-history
-		 trac-wiki-history-count))
-	 info)
+		 (page (trac-wiki-page-name))
+		 (current (trac-wiki-page-version))
+		 (ver (trac-rpc-get-page-version))
+		 (buf (get-buffer-create (format " *page history*")))
+		 (ep trac-rpc-endpoint)
+		 (keyhelp (substitute-command-keys "\\[trac-wiki-history]"))
+		 (rest (if arg trac-wiki-max-history
+				 trac-wiki-history-count))
+		 info)
     (save-excursion
       (set-buffer buf)
       (setq buffer-read-only nil)
       (erase-buffer)
       (message "fetching version info...")
       (let ((trac-rpc-endpoint ep)
-	    info)
-	(insert "--- History of " page " ---")
-	(while (and (< 0 rest) (< 0 ver))
-	  (setq info (condition-case nil
-			 (trac-rpc-get-page-info page ver)
-		       (error nil)))
-	  (when (and info (listp info))
-	    (setq rest (1- rest))
-	    (insert (format "\nversion:  %s" (cdr (assoc "version" info))))
-	    (insert "\nmodified: "
-		    (trac-wiki-convert-to-readable-time-string
-		     (cdr (assoc "lastModified" info))))
-	    (insert "\nauthor:   " (cdr (assoc "author" info)))
-	    (if (assoc "comment" info)
-		(insert "\ncomment:  " (or (cdr-safe (assoc "comment" info))
-					   "")))
-	    (insert "\n"))
-	  (setq ver (1- ver))))
+			info)
+		(insert "--- History of " page " ---")
+		(while (and (< 0 rest) (< 0 ver))
+		  (setq info (condition-case nil
+						 (trac-rpc-get-page-info page ver)
+					   (error nil)))
+		  (when (and info (listp info))
+			(setq rest (1- rest))
+			(insert (format "\nversion:  %s" (cdr (assoc "version" info))))
+			(insert "\nmodified: "
+					(trac-wiki-convert-to-readable-time-string
+					 (cdr (assoc "lastModified" info))))
+			(insert "\nauthor:   " (cdr (assoc "author" info)))
+			(if (assoc "comment" info)
+				(insert "\ncomment:  " (or (cdr-safe (assoc "comment" info))
+										   "")))
+			(insert "\n"))
+		  (setq ver (1- ver))))
       (message "fetching version info...done")
       (if (and (null arg) (< 1 ver))
-	  (insert "\n... to show more versions, use C-u " keyhelp "\n"))
+		  (insert "\n... to show more versions, use C-u " keyhelp "\n"))
       (setq buffer-read-only t)
       (re-search-backward (format "version: +%s" current) nil t)
       (trac-wiki-history-mode)
       (setq trac-rpc-endpoint ep
-	    trac-wiki-page-info page-info)
+			trac-wiki-page-info page-info)
       (pop-to-buffer buf)
       (shrink-window-if-larger-than-buffer))))
 
@@ -1905,7 +1906,7 @@ if too many version exists."
     (while (looking-at "\\w+:")
       (forward-line -1))
     (if (not (re-search-backward "version: +" nil t))
-	(message "No more newer version.")
+		(message "No more newer version.")
       (goto-char (match-end 0)))))
 
 (defun trac-wiki-history-diff ()
@@ -1915,21 +1916,21 @@ if too many version exists."
     (save-excursion
       (end-of-line)
       (if (not (re-search-backward "version: +\\([0-9]+\\)" nil t))
-	  (message "No version")
-	(setq ver1 (string-to-number (match-string 1)))
-	(end-of-line)
-	(if (not (re-search-forward "version: +\\([0-9]+\\)" nil t))
-	    (message "This is initial version.")
-	  (setq ver2 (string-to-number (match-string 1))))))
+		  (message "No version")
+		(setq ver1 (string-to-number (match-string 1)))
+		(end-of-line)
+		(if (not (re-search-forward "version: +\\([0-9]+\\)" nil t))
+			(message "This is initial version.")
+		  (setq ver2 (string-to-number (match-string 1))))))
     (when (and ver1 ver2)
       (let* ((page (trac-wiki-page-name))
-	     (str1 (trac-rpc-get-page page ver1))
-	     (str2 (trac-rpc-get-page page ver2)))
-	(if (null str1)
-	    (error "Cannot fetch version %s" ver1))
-	(if (null str2)
-	    (error "Cannot fetch version %s" ver2))
-	(trac-wiki-diff-internal str1 str2)))))
+			 (str1 (trac-rpc-get-page page ver1))
+			 (str2 (trac-rpc-get-page page ver2)))
+		(if (null str1)
+			(error "Cannot fetch version %s" ver1))
+		(if (null str2)
+			(error "Cannot fetch version %s" ver2))
+		(trac-wiki-diff-internal str1 str2)))))
 
 ;; utilities
 ;; FIXME: alter
@@ -1940,8 +1941,8 @@ if too many version exists."
     "Easy implementation of `looking-back' of Emacs 22."
     (let ((pos (point)))
       (and (save-excursion
-	     (re-search-backward regex nil t))
-	   (eq (match-end 0) pos)))))
+			 (re-search-backward regex nil t))
+		   (eq (match-end 0) pos)))))
 
 (defun trac-wiki-delete-window-or-bury-buffer (&optional buf)
   "Close window of BUF if displayed or bury if it is solo window."
@@ -1968,14 +1969,14 @@ if too many version exists."
 (defun trac-wiki-collect-macro-names ()
   "Collect available macro names from WikiMacro page."
   (let ((html (trac-rpc-get-page-html "WikiMacros"))
-	names)
+		names)
     (with-temp-buffer
       (insert html)
       (goto-char (point-min))
       (while (re-search-forward "<code>\\[\\[\\(\\w+\\)\\]\\]</code>" nil t)
-	(let ((name (match-string 1)))
-	  (if (not (member name names))
-	      (setq names (cons name names))))))
+		(let ((name (match-string 1)))
+		  (if (not (member name names))
+			  (setq names (cons name names))))))
     (sort names 'string<)))		; return sorted names
 
 (defun trac-wiki-pick-wiki-name-at-point ()
@@ -1986,32 +1987,32 @@ Return page name string or nil if not found."
   (save-excursion
     (save-restriction
       (let ((pt (point))
-	    (beg (line-beginning-position))
-	    (end (line-end-position)))
-	;; find
-	(cond
-	 ((and (save-excursion
-		 (re-search-backward "wiki:\\([^] \t\n]+\\)" beg t))
-	       (<= (match-beginning 0) pt)
-	       (<= pt (match-end 0)))
-	  (goto-char (match-beginning 0))
-	  (looking-at "wiki:\\([^] \t\n]+\\)")
-	  (match-string-no-properties 1))
-	 ((save-excursion
-	    (and (re-search-backward "\\([^]]\\|^\\)\\[" beg t)
-		 (goto-char (match-end 0))
-		 (looking-at "\\(?:wiki:\\)?\\([^./][^] \t:\n]*\\)[^]\n]*\\]")
-		 (<= (match-beginning 0) pt)
-		 (<= pt (match-end 0))))
-	  (match-string-no-properties 1))
-	 ((save-excursion
-	    ;; FIXME: not enough in fragment part
-	    (and (skip-chars-backward "A-Za-z/")
-		 (looking-at trac-wiki-camel-case-regexp)
-		 (<= (match-beginning 0) pt)
-		 (<= pt (match-end 0))))
-	  (match-string-no-properties 1))
-	 (t nil))))))
+			(beg (line-beginning-position))
+			(end (line-end-position)))
+		;; find
+		(cond
+		 ((and (save-excursion
+				 (re-search-backward "wiki:\\([^] \t\n]+\\)" beg t))
+			   (<= (match-beginning 0) pt)
+			   (<= pt (match-end 0)))
+		  (goto-char (match-beginning 0))
+		  (looking-at "wiki:\\([^] \t\n]+\\)")
+		  (match-string-no-properties 1))
+		 ((save-excursion
+			(and (re-search-backward "\\([^]]\\|^\\)\\[" beg t)
+				 (goto-char (match-end 0))
+				 (looking-at "\\(?:wiki:\\)?\\([^./][^] \t:\n]*\\)[^]\n]*\\]")
+				 (<= (match-beginning 0) pt)
+				 (<= pt (match-end 0))))
+		  (match-string-no-properties 1))
+		 ((save-excursion
+			;; FIXME: not enough in fragment part
+			(and (skip-chars-backward "A-Za-z/")
+				 (looking-at trac-wiki-camel-case-regexp)
+				 (<= (match-beginning 0) pt)
+				 (<= pt (match-end 0))))
+		  (match-string-no-properties 1))
+		 (t nil))))))
 
 
 ;; Utility functions to define project.
@@ -2029,21 +2030,21 @@ If nil, without login.  If project NAME is already defined,
 simply replace with new definition."
   (interactive
    (list (let ((name (read-string "Project name: ")))
-	   (if (and (assoc name trac-projects)
-		    (not (y-or-n-p (format "'%s' is already defined.  Replace it? " name))))
-	       (error "Canceled"))
-	   name)
-	 (read-string "Project url: " "http://")
-	 (y-or-n-p "Login? ")))
+		   (if (and (assoc name trac-projects)
+					(not (y-or-n-p (format "'%s' is already defined.  Replace it? " name))))
+			   (error "Canceled"))
+		   name)
+		 (read-string "Project url: " "http://")
+		 (y-or-n-p "Login? ")))
   (setq trac-projects (let ((pair (assoc name trac-projects)))
-			(if pair
-			    (delq pair trac-projects)
-			  trac-projects)))
+						(if pair
+							(delq pair trac-projects)
+						  trac-projects)))
   (if (string-match "/$" url)
       (setq url (substring url 0 (match-beginning 0)))) ; remove
   (let ((plist (list :endpoint (concat url (if login "/login") "/xmlrpc"))))
     (if login
-	(plist-put plist :login login)) ; might t or username
+		(plist-put plist :login login)) ; might t or username
     (add-to-list 'trac-projects (cons name plist)))
   (if (interactive-p)
       (message "Project '%s' is defined." name)))
@@ -2057,15 +2058,15 @@ is made to access via login module.  This function uses command
 `trac-wiki-define-project'."
   (let (plist)
     (if (not (string-match "/$" parent))
-	(setq parent (concat parent "/")))
+		(setq parent (concat parent "/")))
     (dolist (proj projects)
       (let ((name (or (and (consp proj) (stringp (car proj)) (car proj))
-		      (and (stringp proj) proj)
-		      (error "Invalid entry of PROJECTS: %s" proj)))
-	    (subdir (or (and (consp proj) (stringp (cdr proj)) (cdr proj))
-			(and (stringp proj) proj)
-			(error "Invalid entry of PROJECTS: %s" proj))))
-	(trac-wiki-define-project name (concat parent subdir) login)))))
+					  (and (stringp proj) proj)
+					  (error "Invalid entry of PROJECTS: %s" proj)))
+			(subdir (or (and (consp proj) (stringp (cdr proj)) (cdr proj))
+						(and (stringp proj) proj)
+						(error "Invalid entry of PROJECTS: %s" proj))))
+		(trac-wiki-define-project name (concat parent subdir) login)))))
 
 ;;; utility functions
 
@@ -2098,10 +2099,10 @@ For exmple:
     (setq entry (cdr entry))
     (while entry
       (let ((e entry))
-	(while (cdr e)
-	  (if (string= (caadr e) (caar entry))
-	      (setcdr e (cddr e))
-	    (setq e (cdr e)))))
+		(while (cdr e)
+		  (if (string= (caadr e) (caar entry))
+			  (setcdr e (cddr e))
+			(setq e (cdr e)))))
       (setq entry (cdr entry))))
   storage)
 
@@ -2129,14 +2130,14 @@ For exmple:
       src
     (dolist (s src)
       (let ((d (assoc (car s) dst)))	; find site entry
-	(if (null d)
-	    ;; not exist, simply append it
-	    (nconc dst (list s))
-	  ;; exist append auth item
-	  (dolist (a (cdr s))
-	    (if (null (assoc (car a) (cdr d)))
-		;; not found, append
-		(nconc d (list a)))))))
+		(if (null d)
+			;; not exist, simply append it
+			(nconc dst (list s))
+		  ;; exist append auth item
+		  (dolist (a (cdr s))
+			(if (null (assoc (car a) (cdr d)))
+				;; not found, append
+				(nconc d (list a)))))))
     dst))
 
 (provide 'trac-wiki)

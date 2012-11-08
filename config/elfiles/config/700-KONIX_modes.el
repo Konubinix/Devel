@@ -1246,6 +1246,8 @@
 (eval-after-load "help-mode"
   '(progn
 	 (define-key help-map "b" 'konix/describe-bindings)
+	 (define-key help-map "T" 'describe-text-properties)
+	 (define-key help-map (kbd "M-c") 'describe-char)
 	 )
   )
 
@@ -2167,8 +2169,8 @@ immediately after the section's start-tag."
   (notmuch-show-pipe-message nil "konix_view_html.sh")
   )
 (defun konix/notmuch-message-completion-toggle ()
-  (require 'notmuch)
   (interactive)
+  (require 'notmuch)
   (let (
 		(need_to_remove (not (not (member notmuch-address-message-alist-member message-completion-alist))))
 		)

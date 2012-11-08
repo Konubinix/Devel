@@ -47,6 +47,11 @@
 									 'konix/may-not-be-killed-p
 									 'bs-sort-buffer-interns-are-last
 									 )
+	 (konix/push-or-replace-in-alist 'bs-configurations "erc-buffer"
+									 nil nil nil
+									 'konix/not-erc-buffer-p
+									 'bs-sort-buffer-interns-are-last
+									 )
 	 (konix/push-or-replace-in-alist 'bs-configurations "trac-pages"
 									 nil nil nil
 									 'konix/not-trac-p

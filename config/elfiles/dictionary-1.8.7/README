@@ -41,11 +41,11 @@
    points to the definitions of these words. The hyper-link with the
    green background will be activated when pressing the middle mouse
    button.
-
+   
    This buffer shows the result of looking for matching words to
    possible. You can now select one of the found entries or ignore the
    search by pressing any mouse button outside the menu.
-
+   
    This screenshot shows the tool-tips supported in GNU Emacs 21.
    Whenever the mouse cursor stands still for a certain time (about one
    second) the word at cursor is looked up in the configured dictionary.

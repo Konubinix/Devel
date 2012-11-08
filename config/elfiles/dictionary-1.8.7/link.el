@@ -91,7 +91,7 @@ link.  Upon clicking the `function' is called with `data' as argument."
 	    pos
 	  (next-single-property-change pos 'link))
       nil)))
-
+      
 
 (defun link-prev-link ()
   "Return the position of the previous link or nil if there is none"

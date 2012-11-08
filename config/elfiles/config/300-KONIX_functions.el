@@ -1007,7 +1007,7 @@ NO : Ne pas truncater
   (delete-window)
   )
 
-(defun konix/yank-current-buffer-name (full_path)
+(defun konix/yank-current-buffer-file-name (full_path)
   (interactive "P")
   (let (
 		(buffer_file_name (buffer-file-name))
@@ -1017,6 +1017,18 @@ NO : Ne pas truncater
 		  (insert (file-name-nondirectory buffer_file_name))
 		(insert buffer_file_name)
 		)
+	  (copy-region-as-kill (point-min) (point-max))
+	  )
+	)
+  )
+
+(defun konix/yank-current-buffer-name ()
+  (interactive)
+  (let (
+		(buffer_name (buffer-name))
+		)
+	(with-temp-buffer
+	  (insert buffer_name)
 	  (copy-region-as-kill (point-min) (point-max))
 	  )
 	)

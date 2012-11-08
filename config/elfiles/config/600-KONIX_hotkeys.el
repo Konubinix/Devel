@@ -159,6 +159,7 @@
 (define-key 'konix/global-slow-key-map (kbd "t") 'konix/prog/toggle-source-header)
 ;; yank current buffer name
 (define-key 'konix/global-slow-key-map (kbd "M-b") 'konix/yank-current-buffer-name)
+(define-key 'konix/global-slow-key-map (kbd "M-B") 'konix/yank-current-buffer-file-name)
 ;; **********************************************************************
 ;; bbdb
 ;; **********************************************************************

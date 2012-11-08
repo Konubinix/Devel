@@ -82,3 +82,6 @@
 [submodule "config/elfiles/yasnippet"]
 	path = config/elfiles/yasnippet
 	url = https://github.com/capitaomorte/yasnippet.git
+[submodule "config/elfiles/bbdb"]
+	path = config/elfiles/bbdb
+	url = git://git.savannah.nongnu.org/bbdb.git

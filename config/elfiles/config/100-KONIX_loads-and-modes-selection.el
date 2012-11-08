@@ -5,37 +5,63 @@
 ;; ************************************************************
 ;; Libraries path
 ;; ************************************************************
-(add-to-list 'load-path (expand-file-name (concat elfiles "/ecb")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/w3m")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/csharp")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/yasnippet")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/git")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/magit")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/org/lisp")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/org/contrib/lisp")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/icicles")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/full-ack")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/dictionary")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cc-mode")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/rebox2")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/helm")))
-(add-to-list 'load-path (expand-file-name (concat devel-dir "/notmuch/emacs")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/jabber")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/readline-complete")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/elnode")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/langtool")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/ioccur")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/auto-complete")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/popup")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/elim/elisp")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/dbgr")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/load-relative")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/loc-changes")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/popwin")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/miniedit")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/bash-completion")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/codesearch")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/autopair")))
+(progn
+  (setq konix/personal-load-path
+		(list
+		 (expand-file-name "bbdb/lisp" elfiles)
+		 (expand-file-name "ecb" elfiles)
+		 (expand-file-name "w3m" elfiles)
+		 (expand-file-name "csharp" elfiles)
+		 (expand-file-name "yasnippet" elfiles)
+		 (expand-file-name "git" elfiles)
+		 (expand-file-name "org/lisp" elfiles)
+		 (expand-file-name "org/contrib/lisp" elfiles)
+		 (expand-file-name "dictionary-1.8.7" elfiles)
+		 (expand-file-name "icicles" elfiles)
+		 (expand-file-name "full-ack" elfiles)
+		 (expand-file-name "cc-mode" elfiles)
+		 (expand-file-name "rebox2" elfiles)
+		 (expand-file-name "helm" elfiles)
+		 (expand-file-name "notmuch/emacs" devel-dir)
+		 (expand-file-name "readline-complete" elfiles)
+		 (expand-file-name "elnode" elfiles)
+		 (expand-file-name "langtool" elfiles)
+		 (expand-file-name "ioccur" elfiles)
+		 (expand-file-name "auto-complete" elfiles)
+		 (expand-file-name "popup" elfiles)
+		 (expand-file-name "elim/elisp" elfiles)
+		 (expand-file-name "dbgr" elfiles)
+		 (expand-file-name "load-relative" elfiles)
+		 (expand-file-name "loc-changes" elfiles)
+		 (expand-file-name "popwin" elfiles)
+		 (expand-file-name "miniedit" elfiles)
+		 (expand-file-name "bash-completion" elfiles)
+		 (expand-file-name "codesearch" elfiles)
+		 (expand-file-name "autopair" elfiles)
+		 )
+		)
+  ;; add my personal load path to the load-path
+  (mapc '(lambda (dir) (add-to-list 'load-path dir)) konix/personal-load-path)
+  )
+;; ;; add the official site-lisp at the end of the load-path
+;; (let (
+;; 	  (site-lisp "/usr/share/emacs/site-lisp")
+;; 	  )
+;;   (add-to-list 'load-path (expand-file-name site-lisp) t)
+;;   (mapc
+;;    (lambda (file)
+;; 	 (when (and
+;; 			(not (string-equal "." file))
+;; 			(not (string-equal ".." file))
+;; 			(file-directory-p (expand-file-name file site-lisp))
+;; 			)
+;; 	   (add-to-list 'load-path (expand-file-name file site-lisp) t)
+;; 	   )
+;; 	 )
+;;    (directory-files site-lisp)
+;;    )
+;;   (add-to-list 'load-path (expand-file-name site-lisp) t)
+;;   )
 
 ;; ************************************************************
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)
@@ -46,10 +72,12 @@
 (defun konix/update-loaddefs ()
   (interactive)
   (mapc
-   'update-file-autoloads
-   load-path
+   'update-directory-autoloads
+   konix/personal-load-path
    )
   )
+;; (konix/update-loaddefs)
+(load-file generated-autoload-file)
 
 (autoload 'php-mode "php-mode" "Major mode for editing php code." t)
 (autoload 'maxima-mode "maxima" "Mode maxima" t)
@@ -120,8 +148,6 @@
 ;; mediawiki
 (autoload 'mediawiki-simple-outline-demote "mediawiki" nil t)
 (autoload 'mediawiki-simple-outline-promote "mediawiki" nil t)
-;; jabber
-(autoload 'jabber-roster "jabber" nil t)
 ;; ioccur
 (autoload 'ioccur "ioccur" nil t)
 ;; elnode
@@ -208,7 +234,7 @@
 ;; COMMIT_MSG -> diff-mode
 (setq magic-mode-alist '(
 						 ((lambda ()
-								  (string-equal (buffer-name) "COMMIT_EDITMSG")
-								  ) . diff-mode)
+							(string-equal (buffer-name) "COMMIT_EDITMSG")
+							) . diff-mode)
 						 )
 	  )

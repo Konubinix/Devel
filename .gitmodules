@@ -12,7 +12,7 @@
 	url = https://github.com/emacs-pkg-mirrors/cedet.git
 [submodule "config/elfiles/w3m"]
 	path = config/elfiles/w3m
-	url = https://github.com/id774-2/emacs-w3m.git
+	url = https://github.com/emacsmirror/w3m.git
 [submodule "notmuch"]
 	path = notmuch
 	url = git://notmuchmail.org/git/notmuch

@@ -392,7 +392,10 @@
   (interactive "r")
   (let ((buffer-name (generate-new-buffer-name "*indirect*"))
 		(mode
-		 (if (not konix/indirect-mode-name)
+		 (if (or
+			  (not konix/indirect-mode-name)
+			  current-prefix-arg
+			  )
 			 (setq konix/indirect-mode-name
 				   (intern
 					(completing-read

@@ -504,6 +504,11 @@ make the line non empty"
 	)
   )
 
+(defun konix/gnus-alias-determine-identity ()
+  (interactive)
+  (gnus-alias-determine-identity)
+  )
+
 (defun konix/not-trac-p (buffer)
   (with-current-buffer buffer
 	(if (equal major-mode 'trac-wiki-mode)

@@ -504,6 +504,14 @@ make the line non empty"
 	)
   )
 
+(defun konix/not-erc-buffer-p (buffer)
+  (with-current-buffer buffer
+	(not
+	 (eq major-mode 'erc-mode)
+	 )
+	)
+  )
+
 (defun konix/gnus-alias-determine-identity ()
   (interactive)
   (gnus-alias-determine-identity)

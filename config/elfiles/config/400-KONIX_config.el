@@ -693,3 +693,8 @@
   (setq-default x-select-enable-primary t)
   (setq-default mouse-drag-copy-region t)
   )
+
+;; ######################################################################
+;; Package
+;; ######################################################################
+(setq-default package-user-dir (expand-file-name "elfiles/elpa" perso-dir))

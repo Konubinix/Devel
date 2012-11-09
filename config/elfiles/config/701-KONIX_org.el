@@ -1743,3 +1743,5 @@ to be organized.
 	 (konix/org-load-hook)
 	 )
   )
+
+(defalias 'string>= 'org-string>=)

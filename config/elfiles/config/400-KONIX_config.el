@@ -693,3 +693,13 @@
 ;; Package
 ;; ######################################################################
 (setq-default package-user-dir (expand-file-name "elfiles/elpa" perso-dir))
+
+;; ######################################################################
+;; Recentf
+;; ######################################################################
+(setq-default recentf-save-file
+	      (expand-file-name 
+	       "recentf"
+	       (expand-file-name
+		(getenv "HOSTNAME")
+		perso-dir)))

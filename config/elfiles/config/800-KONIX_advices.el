@@ -130,3 +130,11 @@
 	)
   )
 (ad-activate 'konix/git/command-with-completion)
+
+;; **********************************************************************
+;; Org
+;; **********************************************************************
+(defadvice org-open-at-point (before push-ring ())
+  (org-mark-ring-push)
+  )
+(ad-activate 'org-open-at-point)

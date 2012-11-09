@@ -470,7 +470,7 @@ user may need or want to edit them.")
 			 font-lock-function-name-face
 		   font-lock-warning-face))))
     ("||" . 'shadow)			; table delimiter
-    ("^\\s-*\\(>+\\).+" . (0 (trac-wiki-quote-face) append))			; table delimiter
+    ("^\\(\\s-*>+\\).+" . (0 (trac-wiki-quote-face) append))			; table delimiter
     )
   "For `trac-wiki-mode'.")
 

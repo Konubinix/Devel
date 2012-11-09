@@ -67,7 +67,11 @@
 ;; Autoloads (TODO, automatise that with update-directory-autoloads)
 ;; ************************************************************
 ;; Loaddef file
-;; (setq-default generated-autoload-file (expand-file-name "loaddefs.el" user-emacs-directory))
+(setq-default generated-autoload-file
+			  (expand-file-name
+			   (format "%s/loaddefs.el" (getenv "HOSTNAME"))
+			   perso-dir))
+
 ;; (load-file generated-autoload-file)
 (defun konix/update-loaddefs ()
   (interactive)

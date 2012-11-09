@@ -382,6 +382,7 @@ set ebind     = @mode_bind global,-insert
 @cbind  yu  = sh 'echo -n "\@uri" | xclip'
 @cbind  yU  = sh 'printf "$1" | xclip' '\@SELECTED_URI'
 @cbind  yy  = sh 'printf "$UZBL_TITLE" | xclip'
+@cbind  yt  = sh 'konix_emacs_open.sh "\@uri" "$(xclip -o)"'
 
 # Clone current window
 @cbind  c   = event REQ_NEW_WINDOW \@uri

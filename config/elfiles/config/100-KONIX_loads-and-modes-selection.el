@@ -81,7 +81,9 @@
    )
   )
 ;; (konix/update-loaddefs)
-(load-file generated-autoload-file)
+(when (file-exists-p generated-autoload-file)
+  (load-file generated-autoload-file)
+  )
 
 (autoload 'php-mode "php-mode" "Major mode for editing php code." t)
 (autoload 'maxima-mode "maxima" "Mode maxima" t)

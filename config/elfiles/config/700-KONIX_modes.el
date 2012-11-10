@@ -2304,9 +2304,14 @@ inspired from `notmuch-show-archive-thread-internal'"
   )
 (defun konix/server-visit-hook ()
   (when konix/first-visit
-	(pop-to-buffer "*Messages*")
-	(when (buffer-live-p (get-buffer "*Warnings*"))
-	  (pop-to-buffer "*Warnings*")
+	(let (
+		  (current_buffer (current-buffer))
+		  )
+	  (pop-to-buffer "*Messages*")
+	  (when (buffer-live-p (get-buffer "*Warnings*"))
+		(pop-to-buffer "*Warnings*")
+		)
+	  (pop-to-buffer current_buffer)
 	  )
 	)
   (setq-default konix/first-visit nil)

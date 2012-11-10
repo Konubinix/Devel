@@ -8,6 +8,14 @@
 ;; Default font, simple, nice!!
 (setq-default konix/default-font "Monospace 10")
 (set-default-font konix/default-font)
+(setq-default default-frame-alist
+			  `(
+				(font . ,konix/default-font)
+				(fullscreen . maximized)
+				(vertical-scroll-bars)
+				)
+			  )
+(setq-default initial-frame-alist default-frame-alist)
 
 (defcustom konix/explorer "pcmanfm"
   "The program to launch when wanting to explore the file system"
@@ -698,8 +706,8 @@
 ;; Recentf
 ;; ######################################################################
 (setq-default recentf-save-file
-	      (expand-file-name 
-	       "recentf"
-	       (expand-file-name
-		(getenv "HOSTNAME")
-		perso-dir)))
+			  (expand-file-name
+			   "recentf"
+			   (expand-file-name
+				(getenv "HOSTNAME")
+				perso-dir)))

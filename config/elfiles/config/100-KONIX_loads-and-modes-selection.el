@@ -168,6 +168,8 @@
 (autoload 'gnus-alias-determine-identity "gnus-alias" "" t)
 ;; cmake mode
 (autoload 'cmake-mode "cmake-mode" "" t)
+;; bbdb mode
+(autoload 'bbdb-create "bbdb-com" "" t)
 
 ;; ************************************************************
 ;; Automodes

@@ -1328,8 +1328,9 @@
   (decorate_file_type (let (
 							(map (make-sparse-keymap))
 							)
-						(define-key map "d" 'konix/git/status-buffer/stash/drop)
+						(define-key map "D" 'konix/git/status-buffer/stash/drop)
 						(define-key map "s" 'konix/git/status-buffer/stash/show)
+						(define-key map "d" 'konix/git/status-buffer/stash/show)
 						(define-key map "p" 'konix/git/status-buffer/stash/pop)
 						map
 						)

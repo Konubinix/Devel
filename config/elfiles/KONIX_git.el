@@ -815,6 +815,7 @@
 		   (previous_window (selected-window))
 		   )
 	   (pop-to-buffer ,diff_buffer)
+	   (goto-char (point-min))
 	   (select-window previous_window)
 	   )
 	 )

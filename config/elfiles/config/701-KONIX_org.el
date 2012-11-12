@@ -353,6 +353,10 @@ to be organized.
 	)
   )
 
+(defun konix/show-todos-review (&optional todo-only)
+  (org-tags-view todo-only (org-get-heading t t))
+  )
+
 (defun konix/org-agenda-skip-if-heading (heading)
   (if (string= heading
 			   (org-get-heading t t)

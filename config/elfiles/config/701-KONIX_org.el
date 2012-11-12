@@ -1094,7 +1094,7 @@ to be organized.
 (setq-default org-agenda-sorting-strategy
 			  '(
 				;; Strategy for Weekly/Daily agenda
-				(agenda habit-down time-up user-defined-up priority-down
+				(agenda time-up user-defined-up habit-up priority-down
 						category-keep)
 				;; Strategy for TODO lists
 				(todo priority-down category-keep)
@@ -1595,7 +1595,7 @@ to be organized.
   (require 'org-icalendar)
   (let (
 		(org-icalendar-verify-function
-			  'konix/org-is-errand-p)
+		 'konix/org-is-errand-p)
 		)
 	(org-export-icalendar-combine-agenda-files)
 	)

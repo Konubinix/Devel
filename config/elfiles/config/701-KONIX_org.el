@@ -2,6 +2,18 @@
 ;; Settings that should be done before loading org
 ;; ######################################################################
 (setq-default org-empty-line-terminates-plain-lists t)
+(setq-default org-modules
+			  '(
+				org-bbdb
+				org-bibtex
+				org-info
+				org-jsinfo
+				org-irc
+				org-habit
+				org-w3m
+				org-wl
+				)
+			  )
 
 (require 'KONIX_org-meta-context)
 (require 'org-notmuch)

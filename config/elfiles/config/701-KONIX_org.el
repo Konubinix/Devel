@@ -538,6 +538,7 @@ to be organized.
 ;; m, Month view, used to make monthly reviews
 ;; M, Month, with only the important stuff
 ;; w, Week view, used to make weekly reviews
+;; L, Last week view with spent time and clock report, used to review projects
 ;; W, Week, with only the important stuff
 (setq-default org-agenda-custom-commands
 			  `(
@@ -743,6 +744,23 @@ to be organized.
 						  )
 				  )
 				 (
+				  )
+				 )
+				("aL" "Last week review"
+				 (
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Review for last week")
+						   (org-agenda-span 7)
+						   )
+						  )
+				  )
+				 (
+				  (org-agenda-start-day 'konix/org-last-week)
+				  (org-agenda-start-with-clockreport-mode t)
+				  (org-agenda-start-with-log-mode t)
+				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )
 				("ae" "Errand view"
@@ -1374,6 +1392,10 @@ to be organized.
 
 (defun konix/org-yesterday ()
   (- (org-today) 1)
+  )
+
+(defun konix/org-last-week ()
+  (- (org-today) 7)
   )
 
 (defun konix/org-is-errand-p ()

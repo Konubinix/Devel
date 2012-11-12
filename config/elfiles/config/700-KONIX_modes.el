@@ -1912,7 +1912,15 @@ immediately after the section's start-tag."
 ;; Not much of a config
 ;; ####################################################################################################
 ;; Sign messages by default.
-(add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime)
+(defun konix/message-setup-hook ()
+  (mml-secure-message-sign-pgpmime)
+  (save-excursion
+	(goto-char (point-max))
+	(newline)
+	)
+  )
+
+(add-hook 'message-setup-hook 'konix/message-setup-hook)
 ;; for notmuch to sort mails like I want
 (setq-default notmuch-search-oldest-first nil)
 (setq-default notmuch-saved-searches

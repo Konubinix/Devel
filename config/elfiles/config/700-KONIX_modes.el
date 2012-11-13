@@ -1918,6 +1918,7 @@ immediately after the section's start-tag."
 	(goto-char (point-max))
 	(newline)
 	)
+  (gnus-alias-determine-identity)
   )
 
 (add-hook 'message-setup-hook 'konix/message-setup-hook)
@@ -2340,7 +2341,6 @@ inspired from `notmuch-show-archive-thread-internal'"
 (setq-default gnus-alias-default-identity nil)
 (eval-after-load "message"
   '(progn
-	 (add-hook 'message-setup-hook 'gnus-alias-determine-identity)
 	 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
 	 (define-key message-mode-map (kbd "C-c I") 'gnus-alias-select-identity)
 	 (define-key message-mode-map (kbd "C-c i") 'konix/gnus-alias-determine-identity)

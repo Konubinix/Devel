@@ -50,5 +50,5 @@ set tabstop=4
 
 set wildmenu
 
-highlight BadTabAndSpace ctermbg=gray guibg=gray
+highlight BadTabAndSpace ctermbg=black guibg=gray
 match BadTabAndSpace /\t\| \+$/

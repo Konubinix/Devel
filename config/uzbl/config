@@ -377,6 +377,7 @@ set ebind     = @mode_bind global,-insert
 # SSL-ify bindings
 @cbind  zs  = uri \@(echo "$UZBL_URI" | sed -e 's/^http:/https:/')\@
 @cbind  zS  = event REQ_NEW_WINDOW \@(echo "$UZBL_URI" | sed -e 's/^http:/https:/')\@
+@cbind  zw  = uri \@(echo "http://www.mywot.com/en/scorecard/$UZBL_URI")\@
 
 # Yanking & pasting binds
 @cbind  yu  = sh 'echo -n "\@uri" | xclip'

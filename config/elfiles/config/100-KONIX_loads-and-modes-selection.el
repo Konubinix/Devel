@@ -170,6 +170,8 @@
 (autoload 'cmake-mode "cmake-mode" "" t)
 ;; bbdb mode
 (autoload 'bbdb-create "bbdb-com" "" t)
+;; bbdb mode
+(autoload 'bbdb-complete-mail "bbdb-com" "" t)
 
 ;; ************************************************************
 ;; Automodes

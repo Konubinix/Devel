@@ -44,8 +44,9 @@ done
 IFS=$OLD_IFS
 # unset bash bmajor bminor
 
-# by default autorise the core dump, till 15Mio
-ulimit -c 15360
+# by default autorise the core dump, till 200Mio
+ulimit -c 209715200
+
 
 # ************************************************************
 # Variables

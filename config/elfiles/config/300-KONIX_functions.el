@@ -133,23 +133,11 @@
 
 (defun konix/kill-ring-to-clipboard ()
   (interactive)
-  (let* (
-		 ;; need to comunicate via pipe instead of pty
-		 (process-connection-type nil)
-		 (process (start-process
-				   "xclip"
-				   nil
-				   "xclip"
-				   "-in"
-				   "-selection"
-				   "clipboard")
-				  )
-		 (current_kill (current-kill 0))
-		 )
-	(process-send-string process current_kill)
-	(process-send-eof process)
-	;; no need to kill the process, when receiving eof, it should end itself
-	(message "Sent '%s' to the clipboard" current_kill)
+  (with-temp-buffer
+	(yank)
+	(message "Send '%s' to the clipboard" (buffer-substring-no-properties
+										 (point-min) (point-max)))
+	(clipboard-kill-region (point-min) (point-max))
 	)
   )
 

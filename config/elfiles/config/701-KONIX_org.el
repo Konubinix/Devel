@@ -1696,13 +1696,44 @@ to be organized.
 	)
   ""
   )
+(defface konix/org-agenda-urgent-items-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "light coral" :weight bold)
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "light coral" :weight bold)
+	 )
+	)
+  ""
+  )
+(defface konix/org-agenda-non-urgent-items-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "khaki" :slant italic)
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "khaki" :slant italic)
+	 )
+	)
+  ""
+  )
+
 (defvar konix/org-agenda-text-properties
   '(
 	("^.+INTERRUP:.+$" 0 (face font-lock-warning-face))
 	("^.+PAUSE:.+$" 0 (face konix/org-agenda-pause-face))
 	("^.+\\(now\\).+$" 1 (face org-checkbox-statistics-done))
-	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\)\\).+$" 1 (face bold))
-	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 (face italic))
+	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\)\\).+$" 1 (face konix/org-agenda-urgent-items-face))
+	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 (face konix/org-agenda-non-urgent-items-face))
 	)
   "")
 (defun konix/org-agenda-set-text-properties ()

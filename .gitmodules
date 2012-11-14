@@ -85,3 +85,6 @@
 [submodule "config/elfiles/bbdb"]
 	path = config/elfiles/bbdb
 	url = git://git.savannah.nongnu.org/bbdb.git
+[submodule "lib/offlineimap"]
+	path = lib/offlineimap
+	url = git@github.com:Konubinix/offlineimap.git

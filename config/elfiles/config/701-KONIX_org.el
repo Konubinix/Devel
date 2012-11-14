@@ -877,7 +877,7 @@ to be organized.
 ;; default priority is S, better priority than bonus tasks but not enough to be
 ;; considered as wanted task
 (setq-default org-highest-priority ?A)
-(setq-default org-default-priority ?S)
+(setq-default org-default-priority ?P)
 (setq-default org-lowest-priority ?Z)
 (setq-default org-provide-todo-statistics 'all-headlines)
 (setq-default org-refile-targets

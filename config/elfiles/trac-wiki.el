@@ -431,7 +431,7 @@ user may need or want to edit them.")
 			 ((string= b "''") 'italic)
 			 ((string= b "'''") 'bold)
 			 ((string= b "''''") 'bold-italic))))))
-    ("~~[^\n]*~~" ; strike
+    ("~~[^~\n]*~~" ; strike
      (0 'trac-wiki-strike-through))
     ("\\[\\[\\([^]()]+\\)[^]\n]*\\]\\]"	; macro
      ;; font-lock-preprocessor-face is not defined in emacs 21

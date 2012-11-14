@@ -118,6 +118,7 @@
 [end]
 [group]
  [app] (title=.*Uzbl browser.*)
+  [Maximized]	{yes}
   [Layer]	{8}
 [end]
 [app] (name=terminator)

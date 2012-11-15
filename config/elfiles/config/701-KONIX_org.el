@@ -12,6 +12,7 @@
 				org-habit
 				org-w3m
 				org-wl
+				org-babel
 				)
 			  )
 

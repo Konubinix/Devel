@@ -8,6 +8,7 @@
 (progn
   (setq konix/personal-load-path
 		(list
+		 (expand-file-name "jinja2-mode" elfiles)
 		 (expand-file-name "bbdb/lisp" elfiles)
 		 (expand-file-name "ecb" elfiles)
 		 (expand-file-name "w3m" elfiles)
@@ -85,6 +86,7 @@
   (load-file generated-autoload-file)
   )
 
+(autoload 'jinja2-mode "jinja2-mode" "" t)
 (autoload 'php-mode "php-mode" "Major mode for editing php code." t)
 (autoload 'maxima-mode "maxima" "Mode maxima" t)
 (autoload 'lua-mode "lua-mode")
@@ -239,6 +241,8 @@
 (add-to-list 'auto-mode-alist (cons "\\.cmake$" 'cmake-mode))
 ;; cmake files in cmake mode
 (add-to-list 'auto-mode-alist (cons "CMakeLists.txt$" 'cmake-mode))
+;; tpl files in jinja2 mode
+(add-to-list 'auto-mode-alist (cons "\\.tpl$" 'jinja2-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

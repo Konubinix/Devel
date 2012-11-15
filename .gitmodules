@@ -88,3 +88,7 @@
 [submodule "lib/offlineimap"]
 	path = lib/offlineimap
 	url = git@github.com:Konubinix/offlineimap.git
+[submodule "config/elfiles/jinja2-mode"]
+	path = config/elfiles/jinja2-mode
+	url = https://github.com/paradoxxxzero/jinja2-mode.git
+

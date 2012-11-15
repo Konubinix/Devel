@@ -91,4 +91,6 @@
 [submodule "config/elfiles/jinja2-mode"]
 	path = config/elfiles/jinja2-mode
 	url = https://github.com/paradoxxxzero/jinja2-mode.git
-
+[submodule "config/elfiles/graphviz-dot-mode"]
+	path = config/elfiles/graphviz-dot-mode
+	url = https://github.com/ppareit/graphviz-dot-mode.git

@@ -8,6 +8,7 @@
 (progn
   (setq konix/personal-load-path
 		(list
+		 (expand-file-name "graphviz-dot-mode" elfiles)
 		 (expand-file-name "jinja2-mode" elfiles)
 		 (expand-file-name "bbdb/lisp" elfiles)
 		 (expand-file-name "ecb" elfiles)

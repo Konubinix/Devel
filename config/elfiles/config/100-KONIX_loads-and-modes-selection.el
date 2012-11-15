@@ -237,6 +237,8 @@
 (add-to-list 'auto-mode-alist (cons "\\.txx$" 'c++-mode))
 ;; cmake files in cmake mode
 (add-to-list 'auto-mode-alist (cons "\\.cmake$" 'cmake-mode))
+;; cmake files in cmake mode
+(add-to-list 'auto-mode-alist (cons "CMakeLists.txt$" 'cmake-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

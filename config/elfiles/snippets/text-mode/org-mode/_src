@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: _src
+# key: _src
+# --
+$>#+BEGIN_SRC ${100:language}
+$>$0
+$>#+END_SRC

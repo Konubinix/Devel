@@ -80,7 +80,7 @@ session.doubleClickInterval:	250
 session.cacheLife:	5l
 session.autoRaiseDelay:	250
 session.forcePseudoTransparency:	true
-session.styleFile:	~/.fluxbox/styles/perso
+session.styleFile:	~/.fluxbox/styles/perso/theme.cfg
 session.configVersion:	13
 session.tabsAttachArea:	Window
 session.cacheMax:	2000l

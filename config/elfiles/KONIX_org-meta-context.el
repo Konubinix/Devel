@@ -137,25 +137,33 @@ contexts list"
   (message "Current context is %s" org-directory)
   )
 
-(setq konix/org-meta-context/restricted nil)
-(defun konix/org-meta-context/toggle-restrict ()
+(setq konix/org-meta-context/restricted -1)
+(defun konix/org-meta-context/toggle-restrict (&optional on)
   (interactive)
-  (if konix/org-meta-context/restricted
-	  (progn
-		(setq org-agenda-files
-			  (konix/org-meta-context/agenda-files-for-contexts
-			   konix/org-meta-contexts)
-			  konix/org-meta-context/restricted nil
-			  )
+  (setq konix/org-meta-context/restricted
+		(or
+		 (and
+		  ;; explicitly set it
+		  on
+		  ;; to 1 or -1
+		  (equalp 1 (* on on))
+		  ;; use it
+		  on
+		  )
+		 ;; fallback to toggling the value
+		 (- 0 konix/org-meta-context/restricted)
+		 )
 		)
-	(progn
+  (if (equalp konix/org-meta-context/restricted 1)
 	  (setq org-agenda-files
 			(konix/org-meta-context/agenda-files-for-contexts
 			 (list org-directory)
 			 )
-			konix/org-meta-context/restricted t
 			)
-	  )
+	(setq org-agenda-files
+		  (konix/org-meta-context/agenda-files-for-contexts
+		   konix/org-meta-contexts)
+		  )
 	)
   (message "Restriction is %s" konix/org-meta-context/restricted)
   )

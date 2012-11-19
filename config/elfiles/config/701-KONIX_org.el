@@ -761,6 +761,7 @@ to be organized.
 				  (org-agenda-start-day 'konix/org-last-week)
 				  (org-agenda-start-with-clockreport-mode t)
 				  (org-agenda-start-with-log-mode t)
+				  (org-agenda-archives-mode t)
 				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )

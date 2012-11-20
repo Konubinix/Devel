@@ -2387,6 +2387,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 	 (define-key message-mode-map (kbd "C-c i") 'konix/gnus-alias-determine-identity)
 	 )
   )
+
 (defun konix/message-mode-hook ()
   (visual-line-mode 1)
   (flyspell-mode 1)
@@ -2394,6 +2395,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)
 
+(defalias 'bbdb-complete-name 'bbdb-complete-mail)
 ;; ####################################################################################################
 ;; ICICLES
 ;; ####################################################################################################

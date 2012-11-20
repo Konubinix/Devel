@@ -351,6 +351,7 @@
   (global-set-key (kbd "<f12>t") 'gud-tbreak)
   (global-set-key (kbd "<f12>w") 'gud-watch)
   (global-set-key (kbd "<f12>u") 'gud-until)
+  (global-set-key (kbd "<f12>T") 'gud-tooltip-mode)
   (global-set-key (kbd "<f12>*") 'gud-tooltip-dereference)
   (gud-def gud-checkpoint "checkpoint" "\C-C" "GDB Checkpoint.")
   (gud-def gud-restart "restart %p" "\C-C" "GDB Restart.")

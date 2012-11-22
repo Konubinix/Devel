@@ -512,8 +512,6 @@
 	)
   )
 
-(global-set-key (kbd "M-s M-o") 'multi-occur)
-
 (defun konix/occur-mode-hook()
   (define-key occur-mode-map "O"
 	'konix/occur-mode-goto-occurrence-other-window-and-come-back)

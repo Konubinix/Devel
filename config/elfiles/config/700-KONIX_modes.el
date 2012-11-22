@@ -352,6 +352,7 @@
   (global-set-key (kbd "<f12>t") 'gud-tbreak)
   (global-set-key (kbd "<f12>w") 'gud-watch)
   (global-set-key (kbd "<f12>u") 'gud-until)
+  (global-set-key (kbd "<f12>U") 'konix/gud-cont-to-temp-bp)
   (global-set-key (kbd "<f12>T") 'gud-tooltip-mode)
   (global-set-key (kbd "<f12>*") 'gud-tooltip-dereference)
   (gud-def gud-checkpoint "checkpoint" "\C-C" "GDB Checkpoint.")
@@ -372,6 +373,12 @@
   (setq konix/gud-last-call-arg arg)
   )
 (ad-activate 'gud-call)
+
+(defun konix/gud-cont-to-temp-bp ()
+  (interactive)
+  (gud-tbreak 1)
+  (gud-cont 1)
+  )
 
 (defun konix/gud-recall ()
   "Recall the last gud command with the same argument."

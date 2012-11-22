@@ -2401,7 +2401,6 @@ inspired from `notmuch-show-archive-thread-internal'"
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)
 
-(defalias 'bbdb-complete-name 'bbdb-complete-mail)
 ;; ####################################################################################################
 ;; ICICLES
 ;; ####################################################################################################
@@ -2427,6 +2426,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 (defun konix/icicle-mode-hook ()
   (when icicle-mode
 	(konix/icicles/unbind-icicle-commands)
+	(defalias 'bbdb-complete-name 'bbdb-complete-mail)
 	)
   )
 

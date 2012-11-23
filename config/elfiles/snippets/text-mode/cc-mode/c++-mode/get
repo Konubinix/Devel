@@ -1,3 +1,0 @@
-#name : get
-# --
-${1:type} get${2:$(capitalize text)}()const{ return m_${2:member};}

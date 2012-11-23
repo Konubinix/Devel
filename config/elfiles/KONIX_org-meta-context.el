@@ -89,7 +89,7 @@ contexts list"
   (setq org-directory name
 		org-agenda-diary-file (expand-file-name "diary.org" name)
 		)
-  (when konix/org-meta-context/restricted
+  (when (equalp konix/org-meta-context/restricted 1)
 	(setq org-agenda-files (konix/org-meta-context/agenda-files-for-contexts
 							(list org-directory)
 							)

@@ -1,0 +1,22 @@
+Index: devel/notmuch/emacs/notmuch.el
+===================================================================
+--- devel.orig/notmuch/emacs/notmuch.el	2012-11-23 18:16:10.716084834 +0100
++++ devel/notmuch/emacs/notmuch.el	2012-11-23 18:16:51.172086113 +0100
+@@ -566,7 +566,16 @@
+ 
+ (defun notmuch-search-tag-region (beg end &optional tag-changes)
+   "Change tags for threads in the given region."
+-  (let ((search-string (notmuch-search-find-thread-id-region-search beg end)))
++  (let (
++	(search-string (format "%s AND %s"
++			       ;; get the current threads
++			       (notmuch-search-find-thread-id-region-search
++				beg end)
++			       ;; and filter with the query not to tag
++			       ;; all the messages
++			       notmuch-search-query-string
++			))
++	)
+     (setq tag-changes (funcall 'notmuch-tag search-string tag-changes))
+     (notmuch-search-foreach-result beg end
+       (lambda (pos)

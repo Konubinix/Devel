@@ -34,20 +34,6 @@
 	 (setq boxquote-top-corner    "╭")
 	 (setq boxquote-side          "│ ")
 	 (setq boxquote-bottom-corner "╰")
-
-	 ;;,--------
-	 ;;| Hotkeys
-	 ;;`--------
-	 (define-prefix-command 'konix/global-boxquote-key-map)
-	 (define-key 'konix/global-fast-key-map "b" 'konix/global-boxquote-key-map)
-
-	 (define-key 'konix/global-boxquote-key-map "b" 'boxquote-region)
-	 (define-key 'konix/global-boxquote-key-map "B" 'boxquote-boxquote)
-	 (define-key 'konix/global-boxquote-key-map "u" 'boxquote-unbox)
-	 (define-key 'konix/global-boxquote-key-map "p" 'boxquote-paragraph)
-	 (define-key 'konix/global-boxquote-key-map "t" 'boxquote-title)
-	 (define-key 'konix/global-boxquote-key-map "k" 'boxquote-kill)
-	 (define-key 'konix/global-boxquote-key-map "n" 'boxquote-narrow-to-boxquote)
 	 )
   )
 
@@ -82,6 +68,19 @@
 ;;`---------------
 (autoload 'boxquote-region "boxquote" nil t)
 (autoload 'boxquote-quoted-p "boxquote" nil t)
+;;,--------
+;;| Hotkeys
+;;`--------
+(define-prefix-command 'konix/global-boxquote-key-map)
+(define-key 'konix/global-fast-key-map "b" 'konix/global-boxquote-key-map)
+
+(define-key 'konix/global-boxquote-key-map "b" 'boxquote-region)
+(define-key 'konix/global-boxquote-key-map "B" 'boxquote-boxquote)
+(define-key 'konix/global-boxquote-key-map "u" 'boxquote-unbox)
+(define-key 'konix/global-boxquote-key-map "p" 'boxquote-paragraph)
+(define-key 'konix/global-boxquote-key-map "t" 'boxquote-title)
+(define-key 'konix/global-boxquote-key-map "k" 'boxquote-kill)
+(define-key 'konix/global-boxquote-key-map "n" 'boxquote-narrow-to-boxquote)
 
 (provide '700-boxquote)
 ;;; 700-boxquote.el ends here

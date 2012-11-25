@@ -435,6 +435,18 @@ to be organized.
 					   (org-agenda-skip-function
 						'(konix/org-agenda-skip-if-tags
 						  '("phantom" "maybe" "project")
+						  t
+						  )
+						)
+					   (org-agenda-overriding-header
+						"NEXT items should not have phantom, maybe or project tag")
+					   )
+					  )
+				(todo "NEXT"
+					  (
+					   (org-agenda-skip-function
+						'(konix/org-agenda-skip-if-tags
+						  '("phantom" "maybe" "project")
 						  )
 						)
 					   (org-agenda-overriding-header "NEXT items to be scheduled")

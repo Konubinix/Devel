@@ -4,6 +4,7 @@
 (setq-default org-empty-line-terminates-plain-lists t)
 (setq-default org-modules
 			  '(
+				org-id
 				org-bbdb
 				org-bibtex
 				org-info

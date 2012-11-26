@@ -10,6 +10,10 @@ doc_toc = function() {
     $("a:contains(ToC)")[0].click();
 }
 
+doc_current = function() {
+    $("a:contains(Current)")[0].click();
+}
+
 doc_home = function() {
     $("a:contains(Home)")[0].click();
 }

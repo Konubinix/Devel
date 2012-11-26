@@ -302,6 +302,7 @@ set ebind     = @mode_bind global,-insert
 @cbind <Shift><Ctrl><Up> = js doc_up();
 @cbind <Shift><Ctrl>T = js doc_toc();
 @cbind <Shift><Ctrl>H = js doc_home();
+@cbind <Shift><Ctrl>C = js doc_current();
 
 # Zoom binds
 @cbind  +   = zoom_in

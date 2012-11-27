@@ -575,6 +575,13 @@ to be organized.
 				 (
 				  )
 				 )
+				("an" "Next action list"
+				 (
+				  (tags-todo "//NEXT")
+				  )
+				 (
+				  )
+				 )
 				("ap" "Projects (without subprojects)"
 				 (
 				  (tags-todo "+project-maybe"

@@ -7,6 +7,8 @@ DMENU_OPTIONS="xmms vertical resize"
 . "$UZBL_UTIL_DIR/uzbl-dir.sh"
 
 DMENU=`echo "$DMENU"|sed 's/^dmenu/konix_dmenu.sh/'`
+# use the one given as parameter
+UZBL_HISTORY_FILE="${1:-$UZBL_HISTORY_FILE}"
 
 [ -r "$UZBL_HISTORY_FILE" ] || exit 1
 

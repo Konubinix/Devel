@@ -532,7 +532,7 @@ set ssl_verify = 1
 
 # === Post-load misc commands ================================================
 sync_spawn_exec @scripts_dir/load_cookies.sh
-sync_spawn_exec @scripts_dir/load_cookies.sh @data_home/uzbl/session-cookies.txt
+sync_spawn_exec @scripts_dir/load_cookies.sh @(echo $UZBL_SESSION_COOKIES_FILE)@
 
 # Set the "home" page.
 #set uri = uzbl.org/doesitwork/@COMMIT

@@ -136,7 +136,7 @@
   (with-temp-buffer
 	(yank)
 	(message "Send '%s' to the clipboard" (buffer-substring-no-properties
-										 (point-min) (point-max)))
+										   (point-min) (point-max)))
 	(clipboard-kill-region (point-min) (point-max))
 	)
   )
@@ -2987,9 +2987,53 @@ FExport diary data into iCalendar file: ")
     found-error))
 (defalias 'icalendar-export-region 'konix/icalendar-export-region)
 
-(defun konix/kill-emacs ()
+(defvar konix/really-kill-buffer-ignore-name
+  '(
+	" *Minibuf-0*"
+	"*Messages*"
+	)
+  )
+
+(defvar konix/really-kill-buffer-ignore-mode
+  '(
+	dired-mode
+	)
+  )
+
+(defun konix/really-kill-buffer (&optional buffer)
   (interactive)
+  (setq buffer (or buffer (current-buffer)))
+  (let (
+		;; all buffers should die
+		(keep-buffers-protected-alist nil)
+		)
+	(message "Killing %s" buffer)
+	(or
+	 ;; it does not matter if this buffer is not killed
+	 (member (buffer-name buffer) konix/really-kill-buffer-ignore-name)
+	 ;; it does not matter if a buffer of this mode is not killed
+	 (member (with-current-buffer buffer
+			   major-mode
+			   )
+			 konix/really-kill-buffer-ignore-mode)
+	 (kill-buffer buffer)
+	 ;; not managed to kill this buffer, aborting
+	 (error "Aborting to avoid loosing changes in %s" buffer)
+	 )
+	)
+  )
+
+(defun konix/really-kill-emacs ()
+  (interactive)
+  ;; make sure everything is saved
   (save-some-buffers)
+  ;; kill all the buffers. If change would be lost by the killing of the buffer,
+  ;; it should have warned us
+  (mapc
+   'konix/really-kill-buffer
+   (buffer-list)
+   )
+  ;; no that all the buffer are killed, I can safely kill emacs
   (kill-emacs)
   )
 

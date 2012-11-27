@@ -1,9 +1,17 @@
 doc_next = function() {
-    $("a:contains(Thread Next),a:contains(Next),a:contains(next),a:contains(Suivant),a:text(>),a[title='Next Page']")[0].click();
+    var next_elem = $("a:contains(Thread Next),a:contains(Next),a:contains(next),a:contains(Suivant),a:text(>),a[title='Next Page'],li:contains('Next message: ') a")
+    if(next_elem)
+    {
+	next_elem[0].click();
+    }
 }
 
 doc_previous = function() {
-    $("a:contains(Thread Previous), a:contains(Prev), a:contains(previous), a:contains(Précédent),a[title='Previous Page']")[0].click();
+    var prev_elem = $("a:contains(Thread Previous), a:contains(Prev), a:contains(previous), a:contains(Précédent),a[title='Previous Page'],li:contains('Previous message: ') a");
+    if(prev_elem)
+    {
+	prev_elem[0].click();
+    }
 }
 
 doc_toc = function() {

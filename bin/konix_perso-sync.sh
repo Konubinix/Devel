@@ -48,7 +48,7 @@ trap "fusermount -u '$TMP_PERSO_DECRYPT' && rm -rvf '$TMP_PERSO_DECRYPT'" 0
 # special case for the first sync : create the distant repo if it is empty
 if [ ! -e "${TMP_PERSO_DECRYPT}/hooks" ]
 then
-	git clone . "${TMP_PERSO_DECRYPT}"
+	git clone --bare . "${TMP_PERSO_DECRYPT}"
 else
 	git pull "$TMP_PERSO_DECRYPT"
 fi

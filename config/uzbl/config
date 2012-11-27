@@ -405,6 +405,7 @@ set ebind     = @mode_bind global,-insert
 
 # Bookmark/history loading
 @cbind  U  = spawn @scripts_dir/konix_load_url_from_history.sh
+@cbind  <Ctrl>u  = spawn @scripts_dir/konix_load_url_from_history.sh @(echo $UZBL_UNDOLIST_FILE)@
 @cbind  u  = spawn @scripts_dir/konix_load_url_from_bookmarks.sh
 
 # Temporary bookmarks

@@ -94,7 +94,7 @@
 		;; irc buffers
 		("^#[a-zA-Z-]+$")
 		;; irc control buffers
-		("^.+:[0-9]+$")
+		("^[^/]+:[0-9]+$")
 		)
 	  )
 

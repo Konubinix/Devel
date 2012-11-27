@@ -74,7 +74,7 @@
 ;; Recentrage horizontal
 (global-set-key (kbd "C-S-L") 'konix/horizontal-recenter)
 ;; Kill emacs
-(global-set-key (kbd "C-x M-k") 'konix/kill-emacs)
+(global-set-key (kbd "C-x M-k") 'konix/really-kill-emacs)
 ;; speedbar
 (global-set-key (kbd "<pause>") 'speedbar)
 ;; speedbar

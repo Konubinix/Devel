@@ -2994,3 +2994,37 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 	 (bash-completion-setup)
 	 )
   )
+
+;; ######################################################################
+;; Find file customization
+;; ######################################################################
+(defun konix/find-file-hook ()
+  (if (and
+	   (string-match "^\\(.+\\):\\([0-9]+\\)$" buffer-file-name)
+	   (not
+		(file-exists-p buffer-file-name)
+		)
+	   )
+	  ;; the given file does not exist and is of the form file_name:number, I
+	  ;; most likely wants to open file_name at line number
+	  (progn
+		(let (
+			  (old_buffer (current-buffer))
+			  (file_name (match-string-no-properties 1 buffer-file-name))
+			  (line (match-string-no-properties 2 buffer-file-name))
+			  )
+		  (if (file-exists-p file_name)
+			  (progn
+				(find-file file_name)
+				(goto-line (string-to-int line))
+				(kill-buffer old_buffer)
+				nil
+				)
+			  nil
+			  )
+		  )
+		)
+	nil
+	)
+  )
+(add-to-list 'find-file-hook 'konix/find-file-hook)

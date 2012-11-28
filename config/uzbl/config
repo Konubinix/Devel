@@ -337,7 +337,7 @@ set ebind     = @mode_bind global,-insert
 @cbind  dwiki<Wikipedia:>_   = uri https://en.wikipedia.org/wiki/\@<encodeURIComponent(%r)>\@
 @cbind  dfrwiki<WikipediaFR:>_   = uri https://fr.wikipedia.org/wiki/\@<encodeURIComponent(%r)>\@
 @cbind  dpa                  = js add_to_pocket();
-@cbind E = spawn @scripts_dir/external_editor.sh
+@cbind E = chain 'js var konix_edited_elem = document.activeElement;var konix_edited_elem_old_background_color = $(konix_edited_elem).css("background-color");$(konix_edited_elem).css("background-color", "lightBlue");' 'spawn @scripts_dir/external_editor.sh \@<document.activeElement.type>\@ \@<Base64.encode(document.activeElement.value)>\@'
 
 # Handy binds
 # Set function shortcut

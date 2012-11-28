@@ -24,24 +24,20 @@
 
 ;;; Code:
 
-(eval-after-load "boxquote"
-  '(progn
-	 ;;,-------
-	 ;;| Config
-	 ;;`-------
-	 (setq boxquote-title-format "┤ %s │")
-	 (setq boxquote-top-and-tail "────")
-	 (setq boxquote-top-corner    "╭")
-	 (setq boxquote-side          "│ ")
-	 (setq boxquote-bottom-corner "╰")
-	 )
-  )
+;;,-------
+;;| Config
+;;`-------
+(setq boxquote-title-format "┤ %s │")
+(setq boxquote-top-and-tail "────")
+(setq boxquote-top-corner    "╭")
+(setq boxquote-side          "│ ")
+(setq boxquote-bottom-corner "╰")
 
 ;;,-----------------------------
 ;;| Customization with other modes
 ;;`-----------------------------
 (defun konix/boxquote/auto-fill-function ()
-  (message "truc %s" current-prefix-arg)
+  "Do not mess up when filling inside a boxquote"
   (if (and
 	   (boxquote-quoted-p)
 	   (<= (current-fill-column) (current-column))
@@ -57,7 +53,6 @@
 
 (eval-after-load "message"
   '(progn
-
 	 (add-hook 'message-mode-hook
 			   'konix/boxquote/message-mode-hook)
 	 )
@@ -68,6 +63,7 @@
 ;;`---------------
 (autoload 'boxquote-region "boxquote" nil t)
 (autoload 'boxquote-quoted-p "boxquote" nil t)
+
 ;;,--------
 ;;| Hotkeys
 ;;`--------

@@ -493,7 +493,7 @@
 ;; repeat last command
 (global-set-key (kbd "<f4>") 'repeat)
 ;; Macro
-(global-set-key (kbd "<f6>") 'kmacro-end-or-call-macro)
+(global-set-key (kbd "C-<f4>") 'kmacro-end-or-call-macro)
 ;; Magit
 (global-set-key (kbd "<f9>") 'konix/magit-status)
 ;; Header

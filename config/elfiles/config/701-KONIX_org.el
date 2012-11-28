@@ -1029,7 +1029,10 @@ to be organized.
 (setq-default org-icalendar-include-todo t)
 (setq-default org-combined-agenda-icalendar-file (expand-file-name "org.ics" perso-dir))
 (setq-default org-todo-repeat-to-state "NEXT")
-(setq-default org-stuck-projects '("+project-maybe/-WAIT-DONE-NOT_DONE" ("NEXT") ("") ""))
+;; If a project contains WAITing event, it is not stuck because something is
+;; already going on. We won't loose track of the waiting item because it lies in
+;; the "WAITING items" section
+(setq-default org-stuck-projects '("+project-maybe/-WAIT-DELEGATED-DONE-NOT_DONE" ("NEXT" "WAIT") ("") ""))
 (setq-default org-timer-default-timer 25)
 (setq-default org-tag-persistent-alist
 			  '(

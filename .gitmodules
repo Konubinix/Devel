@@ -94,3 +94,6 @@
 [submodule "config/elfiles/graphviz-dot-mode"]
 	path = config/elfiles/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
+[submodule "share/uzbl/scripts/js-base64"]
+	path = share/uzbl/scripts/js-base64
+	url = https://github.com/dankogai/js-base64.git

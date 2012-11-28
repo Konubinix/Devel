@@ -17,8 +17,8 @@
 	civ = commit -v
 	sm = submodule
 	alog = log --graph --decorate=full --all
-#	fetch = fetch --upload-pack="git upload-pack"
-
+ 	ri = rebase --interactive --autosquash
+	# fetch = fetch --upload-pack="git upload-pack"
 [remote "origin"]
 #	uploadpack = git upload-pack
 #	receivepack = git receive-pack

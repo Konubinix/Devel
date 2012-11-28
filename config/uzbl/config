@@ -89,6 +89,7 @@ set download_handler = spawn @dm_dm_start
 @on_event   LOAD_COMMIT    spawn @scripts_dir/change_style.sh
 @on_event   LOAD_COMMIT    script @scripts_dir/lib.js
 @on_event   LOAD_COMMIT    script @scripts_dir/highlight_anchor.js
+@on_event   LOAD_COMMIT    script @scripts_dir/js-base64/base64.js
 @on_event   LOAD_COMMIT    spawn @scripts_dir/per_site_user_agent.sh
 @on_event   LOAD_COMMIT    spawn @scripts_dir/adblock.py
 @on_event   LOAD_PROGRESS  js uzblAdBlock();

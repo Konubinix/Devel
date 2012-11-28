@@ -1523,6 +1523,7 @@ to be organized.
 ;; ANNOTATE
 ;; ####################################################################################################
 (require 'org-annotate-file nil t)
+(setq-default org-annotate-file-storage-file (expand-file-name "elfiles/org-annotates.org" perso-dir))
 (eval-after-load 'org-annotate-file
   '(progn
 	 (defun konix/org-notify-if-annotated (&optional buffer-or-file)

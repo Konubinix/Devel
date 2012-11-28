@@ -16,6 +16,26 @@
 ;; ################################################################################
 ;; Load config files
 ;; ################################################################################
+(defun konix/load-config-files_after-loads (directory)
+  ;; for each file in after-loads with the pattern .*KONIX_AL_\(.+\).el directory, make sure it will be loaded after
+  ;; the file with the exact name \1 will be loaded
+  (mapc
+   '(lambda(elt)
+	  (string-match "KONIX_AL-\\(.+\\).el" elt)
+	  (eval-after-load (match-string-no-properties 1 elt)
+		`(progn
+		   (message "Loading %s triggered by %s" ,elt ,(match-string-no-properties 1 elt))
+		   (load-file ,elt)
+		   )
+		)
+	  )
+   (sort
+	(file-expand-wildcards (concat directory "/after-loads/*KONIX_AL-*.el"))
+	'string<
+	)
+   )
+  )
+
 (defun konix/load-config-files (directory)
   (mapc
    ;; Load every .el file in my config
@@ -43,6 +63,7 @@
 	'string<
 	)
    )
+  (konix/load-config-files_after-loads directory)
   )
 
 ;; on windows, disable vc because it is too long

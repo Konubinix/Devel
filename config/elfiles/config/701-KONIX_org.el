@@ -369,6 +369,15 @@ to be organized.
 	)
   )
 
+(defun konix/org-agenda-pomodoro ()
+  (interactive)
+  (let (
+		(org-agenda-view-columns-initially t)
+		)
+	(org-agenda nil "aA")
+	)
+  )
+
 (setq-default konix/org-agenda-month-view
 			  '(
 				(agenda nil

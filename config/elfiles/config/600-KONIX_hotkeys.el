@@ -594,6 +594,7 @@
 (define-key 'konix/org-pomodoro-map "T" 'konix/org-pomodoro-insert-week-planning-table)
 (define-key 'konix/org-pomodoro-map "C" 'konix/org-pomodoro-convert-time-before-point-into-pomodoro)
 (define-key 'konix/org-pomodoro-map "m" 'konix/org-pomodoro-global-mode)
+(define-key 'konix/org-pomodoro-map "v" 'konix/org-agenda-pomodoro)
 
 (eval-after-load "org-agenda"
   '(progn

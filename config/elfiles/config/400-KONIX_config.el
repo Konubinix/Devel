@@ -716,3 +716,31 @@
 ;; ps custo
 ;; ######################################################################
 (setq-default ps-font-size '(7 . 6))
+
+;; ######################################################################
+;; backup
+;; ######################################################################
+;; Make a backup of the file once everything else has been done
+(add-hook 'before-save-hook 'konix/force-backup-of-buffer t)
+
+;; ####################################################################################################
+;; Maximize frame when visiting a file from emacs client
+;; ####################################################################################################
+(defvar konix/first-visit t
+  "Variable to indicate if it is the first time a client visits the daemon"
+  )
+(defun konix/server-visit-hook ()
+  (when konix/first-visit
+	(let (
+		  (current_buffer (current-buffer))
+		  )
+	  (pop-to-buffer "*Messages*")
+	  (when (buffer-live-p (get-buffer "*Warnings*"))
+		(pop-to-buffer "*Warnings*")
+		)
+	  (pop-to-buffer current_buffer)
+	  )
+	)
+  (setq-default konix/first-visit nil)
+  )
+(add-hook 'server-visit-hook 'konix/server-visit-hook)

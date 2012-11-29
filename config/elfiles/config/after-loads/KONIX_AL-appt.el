@@ -1,8 +1,8 @@
-;;; 700-KONIX_appt-mode.el ---
+;;; KONIX_AL-appt.el ---
 
-;; Copyright (C) 2012  sam
+;; Copyright (C) 2012  slo
 
-;; Author: sam <sam@konubinix>
+;; Author: slo <slo@konixwork.incubateur.ens-lyon.fr>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,6 @@
 ;;
 
 ;;; Code:
-
 (setq-default appt-display-duration 10)
 (setq-default appt-message-warning-time 35)
 (setq-default appt-time-msg-list nil)
@@ -64,5 +63,5 @@
 (setq-default appt-disp-window-function 'konix/appt-disp-window)
 (setq-default appt-delete-window-function 'konix/appt-delete-window)
 
-(provide '700-KONIX_appt-mode)
-;;; 700-KONIX_appt-mode.el ends here
+(provide 'KONIX_AL-appt)
+;;; KONIX_AL-appt.el ends here

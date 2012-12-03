@@ -185,4 +185,4 @@ if __name__ == '__main__':
         matcher = NotmuchAddressMatcher(name)
         matcher.generate_matches()
 
-        for elem in matcher.matches: print (elem)
+        for elem in matcher.matches: print (elem.encode("utf-8"))

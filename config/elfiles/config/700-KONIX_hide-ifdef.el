@@ -1,8 +1,8 @@
 ;;; 700-KONIX_hide-ifdef-mode.el ---
 
-;; Copyright (C) 2012  sam
+;; Copyright (C) 2012  konubinix
 
-;; Author: sam <sam@konubinix>
+;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify

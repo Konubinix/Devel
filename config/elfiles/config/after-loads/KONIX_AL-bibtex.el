@@ -1,8 +1,8 @@
-;;; 700-KONIX_bitlbee.el ---
+;;; KONIX_AL-bibtex.el ---
 
-;; Copyright (C) 2012  slo
+;; Copyright (C) 2012  konubinix
 
-;; Author: slo <slo@konixwork.incubateur.ens-lyon.fr>
+;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,17 +24,10 @@
 
 ;;; Code:
 
-(defcustom konix/bitlbee-password "" "")
+(defun konix/bibtex-mode-hook()
+  (konix/prog/config)
+  )
+(add-hook 'bibtex-mode-hook 'konix/bibtex-mode-hook)
 
-(add-hook 'erc-join-hook 'konix/bitlbee-identify)
-(defun konix/bitlbee-identify ()
-  "If we're on the bitlbee server, send the identify command to the
- &bitlbee channel."
-  (when (and (string= "localhost" erc-session-server)
-			 (string= "&bitlbee" (buffer-name)))
-	(erc-message "PRIVMSG" (format "%s identify %s"
-								   (erc-default-target)
-								   konix/bitlbee-password))))
-
-(provide '700-KONIX_bitlbee)
-;;; 700-KONIX_bitlbee.el ends here
+(provide 'KONIX_AL-bibtex)
+;;; KONIX_AL-bibtex.el ends here

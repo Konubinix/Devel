@@ -1,8 +1,8 @@
-;;; 700-KONIX_bs-show.el ---
+;;; KONIX_AL-boxquote.el ---
 
-;; Copyright (C) 2012  slo
+;; Copyright (C) 2012  konubinix
 
-;; Author: slo <slo@konixwork.incubateur.ens-lyon.fr>
+;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,10 +24,15 @@
 
 ;;; Code:
 
-(defun konix/bs-mode-hook()
-  (hl-line-mode t)
-  )
-(add-hook 'bs-mode-hook 'konix/bs-mode-hook)
+;;,-------
+;;| Config
+;;`-------
+(setq boxquote-title-format "┤ %s │")
+(setq boxquote-top-and-tail "────")
+(setq boxquote-top-corner    "╭")
+(setq boxquote-side          "│ ")
+(setq boxquote-bottom-corner "╰")
 
-(provide '700-KONIX_bs-show)
-;;; 700-KONIX_bs-show.el ends here
+
+(provide 'KONIX_AL-boxquote)
+;;; KONIX_AL-boxquote.el ends here

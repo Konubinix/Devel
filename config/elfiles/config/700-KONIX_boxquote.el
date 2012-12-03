@@ -1,8 +1,8 @@
 ;;; 700-boxquote.el --- boxquote customization
 
-;; Copyright (C) 2012  slo
+;; Copyright (C) 2012  konubinix
 
-;; Author: slo <slo@konixwork.incubateur.ens-lyon.fr>
+;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,18 +24,31 @@
 
 ;;; Code:
 
-;;,-------
-;;| Config
-;;`-------
-(setq boxquote-title-format "┤ %s │")
-(setq boxquote-top-and-tail "────")
-(setq boxquote-top-corner    "╭")
-(setq boxquote-side          "│ ")
-(setq boxquote-bottom-corner "╰")
+;;,---------------
+;;| Autoload stuff
+;;`---------------
+(autoload 'boxquote-region "boxquote" nil t)
+(autoload 'boxquote-quoted-p "boxquote" nil t)
+(autoload 'konix/boxquote/auto-fill-function "boxquote" nil t)
 
-;;,-----------------------------
-;;| Customization with other modes
-;;`-----------------------------
+;;,--------
+;;| Hotkeys
+;;`--------
+(define-prefix-command 'konix/global-boxquote-key-map)
+(define-key 'konix/global-fast-key-map "b" 'konix/global-boxquote-key-map)
+
+(define-key 'konix/global-boxquote-key-map "b" 'boxquote-region)
+(define-key 'konix/global-boxquote-key-map "B" 'boxquote-boxquote)
+(define-key 'konix/global-boxquote-key-map "u" 'boxquote-unbox)
+(define-key 'konix/global-boxquote-key-map "p" 'boxquote-paragraph)
+(define-key 'konix/global-boxquote-key-map "t" 'boxquote-title)
+(define-key 'konix/global-boxquote-key-map "k" 'boxquote-kill)
+(define-key 'konix/global-boxquote-key-map "n" 'boxquote-narrow-to-boxquote)
+
+;;,----------------------------------------------------------------------------
+;;| Customization with other modes. Those may not be put in the after load part
+;;| because they may trigger the loading of boxquote
+;;`----------------------------------------------------------------------------
 (defun konix/boxquote/auto-fill-function ()
   "Do not mess up when filling inside a boxquote"
   (if (and
@@ -57,26 +70,6 @@
 			   'konix/boxquote/message-mode-hook)
 	 )
   )
-
-;;,---------------
-;;| Autoload stuff
-;;`---------------
-(autoload 'boxquote-region "boxquote" nil t)
-(autoload 'boxquote-quoted-p "boxquote" nil t)
-
-;;,--------
-;;| Hotkeys
-;;`--------
-(define-prefix-command 'konix/global-boxquote-key-map)
-(define-key 'konix/global-fast-key-map "b" 'konix/global-boxquote-key-map)
-
-(define-key 'konix/global-boxquote-key-map "b" 'boxquote-region)
-(define-key 'konix/global-boxquote-key-map "B" 'boxquote-boxquote)
-(define-key 'konix/global-boxquote-key-map "u" 'boxquote-unbox)
-(define-key 'konix/global-boxquote-key-map "p" 'boxquote-paragraph)
-(define-key 'konix/global-boxquote-key-map "t" 'boxquote-title)
-(define-key 'konix/global-boxquote-key-map "k" 'boxquote-kill)
-(define-key 'konix/global-boxquote-key-map "n" 'boxquote-narrow-to-boxquote)
 
 (provide '700-boxquote)
 ;;; 700-boxquote.el ends here

@@ -1,8 +1,8 @@
-;;; 700-KONIX_bash-completion.el ---
+;;; 700-KONIX_c-mode.el ---
 
-;; Copyright (C) 2012  slo
+;; Copyright (C) 2012  konubinix
 
-;; Author: slo <slo@konixwork.incubateur.ens-lyon.fr>
+;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,11 +24,6 @@
 
 ;;; Code:
 
-(eval-after-load "bash-completion"
-  '(progn
-	 (bash-completion-setup)
-	 )
-  )
 
-(provide '700-KONIX_bash-completion)
-;;; 700-KONIX_bash-completion.el ends here
+(provide '700-KONIX_c-mode)
+;;; 700-KONIX_c-mode.el ends here

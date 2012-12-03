@@ -1,8 +1,8 @@
 ;;; KONIX_AL-appt.el ---
 
-;; Copyright (C) 2012  slo
+;; Copyright (C) 2012  konubinix
 
-;; Author: slo <slo@konixwork.incubateur.ens-lyon.fr>
+;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify

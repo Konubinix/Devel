@@ -1,8 +1,8 @@
-;;; 700-KONIX_c-mode.el ---
+;;; KONIX_AL-cc-vars.el ---
 
-;; Copyright (C) 2012  sam
+;; Copyright (C) 2012  konubinix
 
-;; Author: sam <sam@konubinix>
+;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,7 @@
 ;; Mode commun programmation
 ;; --------------------------------------------------
 ;; C, C++ etc
+;; my prefered coding style
 (setq-default c-offsets-alist
 			  '(
 				(substatement . +)
@@ -36,7 +37,10 @@
 				(defun-open . +)
 				)
 			  )
-(defcustom konix/c-tab-width 4 "")
+;; I prefer using 4 spaces tabs
+(setq-default tab-width 4)
+
+;; some custom faces and font lock settings
 (defface konix/c-mode-font-lock-allocate '((t (:inherit font-lock-keyword-face
 														:weight bold))) "")
 (defface konix/c-mode-font-lock-deallocate '((t (:inherit font-lock-keyword-face
@@ -61,10 +65,8 @@
 		  )
   )
 (defun konix/c-mode-common-hook ()
-  (setq tab-width konix/c-tab-width)
   (hide-ifdef-mode t)
   (konix/prog/config)
-  (local-set-key (kbd "C-c C-v") 'compile)
   (local-set-key (kbd "M-RET") 'c-context-line-break)
   (font-lock-add-keywords
    nil
@@ -74,10 +76,11 @@
    nil
    konix/c-mode-font-lock-keywords
    )
+  (require 'KONIX_auto-complete)
   (setq ac-sources (append '(ac-source-konix/c/project-files)
 						   konix/prog/ac-sources))
   )
 (add-hook 'c-mode-common-hook 'konix/c-mode-common-hook)
 
-(provide '700-KONIX_c-mode)
-;;; 700-KONIX_c-mode.el ends here
+(provide 'KONIX_AL-cc-vars)
+;;; KONIX_AL-cc-vars.el ends here

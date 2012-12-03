@@ -49,6 +49,9 @@
   (setq konix/adjust-new-lines-at-end-of-file nil
 		konix/delete-trailing-whitespace nil
 		)
+  (local-set-key (kbd "M-/") 'dabbrev-expand)
+  (local-set-key (kbd "C-z") 'diff-undo)
+  (auto-fill-mode 1)
   )
 (add-hook 'diff-mode-hook 'konix/diff-mode-hook)
 

@@ -641,9 +641,13 @@ current buffer still has clients"
 
 (defun konix/flyspell-mode (&optional arg)
   (interactive)
+  (setq arg (if arg 1 (if flyspell-mode -1 1)))
   (if (and konix/on-windows-p (not current-prefix-arg))
 	  (message "Flyspell mode deactivated on windows...")
-	(flyspell-mode arg)
+	(progn
+	 (flyspell-mode arg)
+	 (message "Flyspell mode is now %s" arg)
+	 )
 	)
   )
 

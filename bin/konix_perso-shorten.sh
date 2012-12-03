@@ -8,6 +8,7 @@ git-freeze.sh
 
 end(){
     git co master
+    exit "${1:-1}"
 }
 
 # keep only the last 100 commits
@@ -17,4 +18,4 @@ git reset --soft bottom || end
 git commit -m "squashed from bottom to latest_commit"
 FIRST_COMMIT=`git what-commit.sh`
 git rebase latest_commit master --onto "$FIRST_COMMIT"
-end
+end 0

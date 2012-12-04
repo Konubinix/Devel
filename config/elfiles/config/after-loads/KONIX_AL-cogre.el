@@ -1,4 +1,4 @@
-;;; 700-KONIX_java-mode.el ---
+;;; KONIX_AL-cogre.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -23,15 +23,11 @@
 ;;
 
 ;;; Code:
-;; --------------------------------------------------------------------------------
-;; java mode
-;; --------------------------------------------------------------------------------
-(defun konix/java-mode-hook ()
-  (konix/prog/config)
-  (c-toggle-electric-state nil)
-  )
-(add-hook 'java-mode-hook
-		  'konix/java-mode-hook)
 
-(provide '700-KONIX_java-mode)
-;;; 700-KONIX_java-mode.el ends here
+(defun konix/cogre-mode-hook()
+  (setq show-trailing-whitespace nil)
+  )
+(add-hook 'cogre-mode-hook 'konix/cogre-mode-hook)
+
+(provide 'KONIX_AL-cogre)
+;;; KONIX_AL-cogre.el ends here

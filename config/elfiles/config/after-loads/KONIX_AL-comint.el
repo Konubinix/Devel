@@ -1,4 +1,4 @@
-;;; 700-KONIX_comint.el ---
+;;; KONIX_AL-comint.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -134,11 +134,7 @@
   )
 (add-hook 'comint-mode-hook 'konix/comint-mode-hook)
 
-(eval-after-load "comint"
-  '(progn
-	 (add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
-	 )
-  )
+(add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
 
 (provide '700-KONIX_comint)
-;;; 700-KONIX_comint.el ends here
+;;; KONIX_AL-comint.el ends here

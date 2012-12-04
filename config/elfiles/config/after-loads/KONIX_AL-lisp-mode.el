@@ -1,4 +1,4 @@
-;;; 700-KONIX_lisp-mode.el ---
+;;; 700-KONIX_emacs-lisp-mode.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -49,6 +49,17 @@
   )
 (add-hook 'lisp-mode-hook
 		  'konix/lisp-mode-hook)
+;; ######################################################################
+;; Emacs lisp mode
+;; ######################################################################
 
-(provide '700-KONIX_lisp-mode)
-;;; 700-KONIX_lisp-mode.el ends here
+(defun konix/emacs-lisp-mode-hook()
+  (run-hooks 'lisp-mode-hook)
+  (local-set-key (kbd"C-j") 'hippie-expand)
+  (local-set-key (kbd "C-x e") 'eval-print-last-sexp)
+  )
+
+(add-hook 'emacs-lisp-mode-hook 'konix/emacs-lisp-mode-hook)
+
+(provide '700-KONIX_emacs-lisp-mode)
+;;; 700-KONIX_emacs-lisp-mode.el ends here

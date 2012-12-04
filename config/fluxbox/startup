@@ -31,6 +31,7 @@ sleep 4
 	emacs_tray_daemon.py &
 	konix_mail_tray_daemon.py &
     konix_setbg.sh
+	konix_seeks.sh
 } &
 
 if [ -n "$KONIX_X_INIT" ]

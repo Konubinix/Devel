@@ -17,6 +17,7 @@ set fifo_dir   = /tmp
 set socket_dir = /tmp
 
 set shell_cmd       = sh -c
+set proxy_url = @(echo $http_proxy)@
 
 # === General config aliases =================================================
 

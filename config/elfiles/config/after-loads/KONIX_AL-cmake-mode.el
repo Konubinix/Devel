@@ -1,4 +1,4 @@
-;;; 400-KONIX_cmake.el ---
+;;; KONIX_AL-cmake.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -144,5 +144,5 @@
 (add-hook 'cmake-mode-hook
 		  'konix/cmake-mode-hook)
 
-(provide '400-KONIX_cmake)
-;;; 400-KONIX_cmake.el ends here
+(provide 'KONIX_AL-cmake)
+;;; KONIX_AL-cmake.el ends here

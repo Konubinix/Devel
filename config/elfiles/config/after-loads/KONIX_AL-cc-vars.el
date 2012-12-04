@@ -82,5 +82,44 @@
   )
 (add-hook 'c-mode-common-hook 'konix/c-mode-common-hook)
 
+;; ######################################################################
+;; C++
+;; ######################################################################
+(defun konix/c++-find-tag-default ()
+  (cond
+   ((and
+	 (not current-prefix-arg)
+	 (boundp 'konix/semantic-mode)
+	 konix/semantic-mode
+	 (ignore-errors(konix/semantic-get-canonical-name-current-point))
+	 )
+	(konix/semantic-get-canonical-name-current-point)
+	)
+   (t
+	(konix/etags/find-tag-default)
+	)
+   )
+  )
+(defun konix/c++-mode-hook ()
+  #'(lambda ()
+	  (push '(?< . ?>)
+			(getf autopair-extra-pairs :code))
+	  )
+  (set (make-local-variable 'find-tag-default-function)
+	   'konix/c++-find-tag-default)
+  (local-set-key (kbd "C-M-q") 'rebox-dwim)
+  )
+(add-hook 'c++-mode-hook 'konix/c++-mode-hook)
+
+;; --------------------------------------------------------------------------------
+;; java mode
+;; --------------------------------------------------------------------------------
+(defun konix/java-mode-hook ()
+  (konix/prog/config)
+  (c-toggle-electric-state nil)
+  )
+(add-hook 'java-mode-hook
+		  'konix/java-mode-hook)
+
 (provide 'KONIX_AL-cc-vars)
 ;;; KONIX_AL-cc-vars.el ends here

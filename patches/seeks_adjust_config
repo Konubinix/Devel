@@ -1,0 +1,250 @@
+Index: devel/seeks/src/config
+===================================================================
+--- devel.orig/seeks/src/config	2012-12-04 23:26:45.000000000 +0100
++++ devel/seeks/src/config	2012-12-04 23:29:53.000000000 +0100
+@@ -221,7 +221,7 @@
+ #      The logfile is where all logging and error messages are
+ #      written. The level of detail and number of messages are set with
+ #      the debug option (see below).  The logfile can be useful for
+-#      tracking down a problem with Seeks' proxy and it can help 
++#      tracking down a problem with Seeks' proxy and it can help
+ #      you to monitor what your browser is doing.
+ #
+ #      Depending on the debug options below, the logfile may be a
+@@ -259,12 +259,12 @@
+ #
+ # Notes:
+ #
+-#      It makes sense to setup this value after Seeks has been installed 
++#      It makes sense to setup this value after Seeks has been installed
+ #      through a package or the configure/make install scripts.
+-#      
++#
+ #      The repository is then recursively scanned at startup, and Seeks will
+ #      try to load _all_ dynamic libraries within this directory.
+-#      Therefore it is strongly recommended to NOT specify a system-wide 
++#      Therefore it is strongly recommended to NOT specify a system-wide
+ #      repository such as '/usr/lib' etc...
+ #
+ #      Use --plugin-repository your_repository to override the value at startup.
+@@ -279,17 +279,17 @@
+ #	The dynamically loaded plugins that are activated.
+ #
+ # Type of value:
+-#      	
++#
+ #	Plugin name.
+ #
+ # Default value:
+-# 	  
++#
+ # 	Unset. All loaded plugins are activated.
+ #
+ # Notes:
+ #
+ #       Plugins are started in listed order.
+-#	
++#
+ #	Every plugin can define a number of plugin elements,
+ #	such as URI interceptors and/or filters. Activating/
+ #	deactivating a plugin means activating/deactivating
+@@ -310,7 +310,7 @@
+ activated-plugin query-capture
+ activated-plugin cf
+ activated-plugin udb-service
+-#activated-plugin httpserv
++activated-plugin httpserv
+ #activated-plugin xsl-serializer
+ activated-plugin readable
+ #
+@@ -337,7 +337,7 @@
+ #
+ #      The specified repository should contain data for Seeks and the
+ #      installed plugins.
+-# 
++#
+ #      Use --data-repository your_repository to override the value at startup.
+ #
+ # datadir /usr/local/share/seeks
+@@ -377,7 +377,7 @@
+ #
+ # Default value:
+ #
+-#      Unset. This means the db is located in $HOME/.seeks/seeks_user.db 
++#      Unset. This means the db is located in $HOME/.seeks/seeks_user.db
+ #      as default location.
+ #
+ # user-db-file /path/to/file.db
+@@ -419,7 +419,7 @@
+ #
+ #  0 or 1
+ #
+-# Default value: 
++# Default value:
+ #
+ #    1
+ #
+@@ -441,7 +441,7 @@
+ #
+ #  0 or 1
+ #
+-# Default value: 
++# Default value:
+ #
+ #    1
+ #
+@@ -458,7 +458,7 @@
+ #
+ #  0 or 1
+ #
+-# Default value: 
++# Default value:
+ #
+ #    0
+ #
+@@ -475,7 +475,7 @@
+ #
+ #  int64
+ #
+-# Default value: 
++# Default value:
+ #
+ #    -1 (automatic)
+ #
+@@ -929,7 +929,7 @@
+ #      anywhere, with the exception that 192.168.45.73 may not access
+ #      the IP address behind www.dirty-stuff.example.com:
+ #
+-#        permit-access  192.168.45.64/26 
++#        permit-access  192.168.45.64/26
+ #        deny-access   192.168.45.73  www.dirty-stuff.example.com
+ #
+ #      Allow access from the IPv4 network 192.0.2.0/24 even if listening
+@@ -1043,7 +1043,7 @@
+ #      Everything goes to an example parent proxy, except SSL on port
+ #      443 (which it doesn't handle):
+ #
+-#        forward   /      parent-proxy.example.org:8080 
++#        forward   /      parent-proxy.example.org:8080
+ #        forward   :443   .
+ #
+ #
+@@ -1124,7 +1124,7 @@
+ #      ISP's proxy by way of example.com's corporate SOCKS 4A gateway
+ #      to the Internet.
+ #
+-#        forward-socks4a   /       socks-gw.example.com:1080    www-cache.isp.example.net:8080 
++#        forward-socks4a   /       socks-gw.example.com:1080    www-cache.isp.example.net:8080
+ #        forward           .example.com        .
+ #
+ #
+@@ -1144,8 +1144,8 @@
+ #      if you need to access local servers you therefore might want
+ #      to make some exceptions:
+ #
+-#        forward         192.168.*.*/     .  
+-#        forward         10.*.*.*/        .  
++#        forward         192.168.*.*/     .
++#        forward         10.*.*.*/        .
+ #        forward         127.*.*.*/       .
+ #
+ #
+@@ -1602,7 +1602,7 @@
+ #  =====================================
+ #
+ #  Specifies:
+-# 
++#
+ #   CORS is a W3C specification for controlling Cross Origin AJAX Requests.
+ #   If enabled, seeks can tell to the browser the list of domain that are
+ #   allowed to request the node through the API.
+@@ -1654,4 +1654,3 @@
+ #
+ ct-connect-timeout 1
+ ct-transfer-timeout 3
+-
+Index: devel/seeks/src/plugins/websearch/websearch-config
+===================================================================
+--- devel.orig/seeks/src/plugins/websearch/websearch-config	2012-12-04 23:28:42.000000000 +0100
++++ devel/seeks/src/plugins/websearch/websearch-config	2012-12-04 23:29:53.000000000 +0100
+@@ -9,29 +9,29 @@
+ 
+ # one or more enabled search engines
+ # google, yahoo, bing, exalead, yauba, blekko
+-# entries are of the form search-engine <engine> <url> <name> <default | nodefault>
++# entries are of the form search-engine <engine> <url> <name> <default | default>
+ # 'default' indicates that the engine and url are default engines when
+ # no engine is specified to the API.
+ search-engine seeks s.s seeks default
+ search-engine google http://www.google.com/search?q=%query&start=%start&num=%num&hl=%lang&ie=%encoding&oe=%encoding google default
+-search-engine bing http://www.bing.com/search?q=%query&first=%start&mkt=%lang bing nodefault
+-search-engine bing_api http://api.bing.net/xml.aspx?AppId=yourbingkeyhere&Query=%query&Sources=Web&Web.Count=%num&Web.Offset=0&Market=%lang&Web.Options=DisableHostCollapsing+DisableQueryAlterations bing_api nodefault
+-search-engine yahoo http://search.yahoo.com/search?n=10&ei=UTF-8&va_vt=any&vo_vt=any&ve_vt=any&vp_vt=any&vd=all&vst=0&vf=all&vm=p&fl=1&vl=lang_%lang&p=%query&vs= yahoo nodefault
+-search-engine blekko http://blekko.com/ws/%query/rss?ps=100 blekko nodefault
+-search-engine exalead http://www.exalead.com/search/web/results/?q=%query+language=%lang&elements_per_page=%num&start_index=%start exalead nodefault
++search-engine bing http://www.bing.com/search?q=%query&first=%start&mkt=%lang bing default
++search-engine bing_api http://api.bing.net/xml.aspx?AppId=yourbingkeyhere&Query=%query&Sources=Web&Web.Count=%num&Web.Offset=0&Market=%lang&Web.Options=DisableHostCollapsing+DisableQueryAlterations bing_api default
++search-engine yahoo http://search.yahoo.com/search?n=10&ei=UTF-8&va_vt=any&vo_vt=any&ve_vt=any&vp_vt=any&vd=all&vst=0&vf=all&vm=p&fl=1&vl=lang_%lang&p=%query&vs= yahoo default
++search-engine blekko http://blekko.com/ws/%query/rss?ps=100 blekko default
++search-engine exalead http://www.exalead.com/search/web/results/?q=%query+language=%lang&elements_per_page=%num&start_index=%start exalead default
+ #search-engine delicious http://www.delicious.com/search?p=%query&page=%start delicious default
+-search-engine youtube http://gdata.youtube.com/feeds/base/videos?q=%query&client=ytapi-youtube-search&alt=rss&v=2&start-index=%start&max-results=%num youtube nodefault
+-search-engine dailymotion http://www.dailymotion.com/rss/relevance/search/%query/%start dailymotion nodefault
+-search-engine twitter http://search.twitter.com/search.atom?q=%query&page=%start&rpp=%num twitter nodefault http://identi.ca/api/search.atom?q=%query&page=%start&rpp=%num identica nodefault
+-search-engine yauba http://%lang.yauba.com/?q=%query&target=websites&pg=%start&ss=n&con=y yauba nodefault
+-search-engine dokuwiki http://doc.ubuntu-fr.org/?do=search&id=%query doc_ubuntu nodefault
+-search-engine mediawiki http://www.mediawiki.org/w/index.php?title=Special%3ASearch&fulltext=Search&search=%query&button= doc_mwiki nodefault http://%lang.wikipedia.org/w/index.php?title=Special%3ASearch&search=%query wikipedia nodefault
+-search-engine wordpress http://www.seeks-project.info/site/?s=%query site_seeks nodefault
+-search-engine redmine http://redmine.seeks-project.info/search/index/seeks?q=%query&scope=all&all_words=1&issues=1&documents=1&changesets=1&messages=1&submit=Submit redmine_seeks nodefault
+-search-engine opensearch_rss http://plone.org/search_rss?SearchableText=%query plosone nodefault
+-search-engine opensearch_atom atom_feed_here no_name nodefault
+-search-engine dotclear http://dotclear.org/blog/?q=%query dotclear nodefault
+-#search-engine dummy http://dummy.du no_name nodefault
++search-engine youtube http://gdata.youtube.com/feeds/base/videos?q=%query&client=ytapi-youtube-search&alt=rss&v=2&start-index=%start&max-results=%num youtube default
++search-engine dailymotion http://www.dailymotion.com/rss/relevance/search/%query/%start dailymotion default
++search-engine twitter http://search.twitter.com/search.atom?q=%query&page=%start&rpp=%num twitter default http://identi.ca/api/search.atom?q=%query&page=%start&rpp=%num identica default
++search-engine yauba http://%lang.yauba.com/?q=%query&target=websites&pg=%start&ss=n&con=y yauba default
++search-engine dokuwiki http://doc.ubuntu-fr.org/?do=search&id=%query doc_ubuntu default
++search-engine mediawiki http://www.mediawiki.org/w/index.php?title=Special%3ASearch&fulltext=Search&search=%query&button= doc_mwiki default http://%lang.wikipedia.org/w/index.php?title=Special%3ASearch&search=%query wikipedia default
++search-engine wordpress http://www.seeks-project.info/site/?s=%query site_seeks default
++search-engine redmine http://redmine.seeks-project.info/search/index/seeks?q=%query&scope=all&all_words=1&issues=1&documents=1&changesets=1&messages=1&submit=Submit redmine_seeks default
++search-engine opensearch_rss http://plone.org/search_rss?SearchableText=%query plosone default
++search-engine opensearch_atom atom_feed_here no_name default
++search-engine dotclear http://dotclear.org/blog/?q=%query dotclear default
++#search-engine dummy http://dummy.du no_name default
+ 
+ # minimum number of seconds search results are kept in
+ # the system cache, for reuse, update, etc...
+@@ -52,7 +52,7 @@
+ # default ranking system.
+ # However, the advanced system has more features, such as better
+ # aggregation of websearch snippets from multiple search engines,
+-# preemptive caching of webpages pointed to by websearch results and automated 
++# preemptive caching of webpages pointed to by websearch results and automated
+ # similarity analysis and clustering of the websearch results.
+ # default: 0
+ enable-content-analysis 0
+@@ -68,12 +68,12 @@
+ # Connection timeout when connecting to a search engine.
+ # In seconds.
+ # default: 3
+-se-connect-timeout 3
++se-connect-timeout 10
+ 
+ # Transfer timeout when connecting to a search engine.
+ # In seconds.
+ # default: 5
+-se-transfer-timeout 5
++se-transfer-timeout 10
+ 
+ # Connection timeout when fetching content for analysis & caching.
+ # In seconds.
+@@ -114,7 +114,7 @@
+ # default:
+ #result-message Beware, you are using a remote Seeks node
+ 
+-# Enables the dynamic ui (JSON-based). Do not use this UI if 
++# Enables the dynamic ui (JSON-based). Do not use this UI if
+ # your browser is console-based and / or does not support javascript.
+ # default: 0
+ dynamic-ui 0

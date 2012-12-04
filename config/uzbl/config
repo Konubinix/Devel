@@ -293,6 +293,9 @@ set ebind     = @mode_bind global,-insert
 # toggle current encoding
 @cbind  e   = toggle current_encoding iso-8859-1 utf-8
 
+# toggle use of a proxy
+@cbind <Shift><Ctrl>P   = toggle proxy_url "" \@(echo $http_proxy)\@
+
 # link navigation
 @cbind <Ctrl><Up>          = js navigate.prev();
 @cbind <Ctrl><Down>        = js navigate.next();

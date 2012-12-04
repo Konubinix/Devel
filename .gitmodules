@@ -97,3 +97,6 @@
 [submodule "share/uzbl/scripts/js-base64"]
 	path = share/uzbl/scripts/js-base64
 	url = https://github.com/dankogai/js-base64.git
+[submodule "seeks"]
+	path = seeks
+	url = git://seeks.git.sourceforge.net/gitroot/seeks/seeks

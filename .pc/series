@@ -3,3 +3,4 @@ improve_doc_org-empty-line-terminates-plain-lists
 org_fix_org_plain_text
 notmuch_search_tag_not_all
 org_plain_link_after_point
+seeks_adjust_config

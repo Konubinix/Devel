@@ -920,7 +920,7 @@ to be organized.
 				(org-agenda-files . (:maxlevel . 5))
 				)
 			  )
-(setq-default org-refile-use-outline-path t)
+(setq-default org-refile-use-outline-path 'full-file-path)
 (setq-default org-outline-path-complete-in-steps nil)
 ;; TODO: (setq-default org-refile-use-outline-path 'file) when icicles will be
 ;; replaced by something else

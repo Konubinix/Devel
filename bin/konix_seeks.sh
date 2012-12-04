@@ -1,3 +1,4 @@
 #!/bin/bash
 
-seeks >> $HOME/seeks.log 2>&1 &
+cd ${KONIX_DEVEL_DIR}/seeks/src
+./seeks >> $HOME/seeks.log 2>&1 &

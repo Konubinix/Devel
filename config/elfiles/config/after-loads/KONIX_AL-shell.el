@@ -55,6 +55,7 @@
 	completions
     )
   )
+
 (defun konix/shell/delete-async-shell-buffer ()
   (let (
 		(async_shell_buffer (get-buffer "*Async Shell Command*"))
@@ -69,24 +70,6 @@
 				 )
 			   )
 	  (kill-buffer async_shell_buffer)
-	  )
-	)
-  )
-
-(defun konix/shell/rename-async-shell-buffer ()
-  (let (
-		(async_shell_buffer (get-buffer "*Async Shell Command*"))
-		)
-	(when (and async_shell_buffer
-			   (save-window-excursion
-				 (switch-to-buffer async_shell_buffer)
-				 (y-or-n-p
-				  (format "%s buffer already exists, rename it ?"
-						  async_shell_buffer)
-				  )
-				 (rename-uniquely)
-				 )
-			   )
 	  )
 	)
   )

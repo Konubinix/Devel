@@ -922,9 +922,6 @@ to be organized.
 			  )
 (setq-default org-refile-use-outline-path 'full-file-path)
 (setq-default org-outline-path-complete-in-steps nil)
-;; TODO: (setq-default org-refile-use-outline-path 'file) when icicles will be
-;; replaced by something else
-(setq-default org-refile-use-outline-path nil)
 (setq-default org-src-fontify-natively t)
 (setq-default org-src-tab-acts-natively t)
 (setq-default org-export-preserve-breaks t)

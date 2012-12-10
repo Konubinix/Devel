@@ -2994,6 +2994,7 @@ FExport diary data into iCalendar file: ")
 (defvar konix/really-kill-buffer-ignore-name
   '(
 	" *Minibuf-0*"
+	" *Minibuf-1*"
 	"*Messages*"
 	)
   )

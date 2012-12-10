@@ -24,14 +24,12 @@
 
 ;;; Code:
 
-(eval-after-load "readline-complete"
-  `(ac-define-source shell
-	 '(
-	   (candidates . rlc-candidates)
-	   (prefix . ac-rlc-prefix-shell-dispatcher)
-	   (requires . 4)
-	   )
-	 )
+(ac-define-source shell
+  '(
+	(candidates . rlc-candidates)
+	(prefix . ac-rlc-prefix-shell-dispatcher)
+	(requires . 4)
+	)
   )
 
 (provide '700-KONIX_readline-complete)

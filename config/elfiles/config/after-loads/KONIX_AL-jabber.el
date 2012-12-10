@@ -135,15 +135,11 @@
 			  'konix/jabber-muc-alert
 			  )
 
-(eval-after-load "jabber"
-  '(progn
-	 (define-key jabber-global-keymap (kbd "j") 'jabber-muc-autojoin)
-	 (define-key jabber-global-keymap (kbd "c") 'jabber-connect)
-	 (define-key jabber-global-keymap (kbd "d") 'jabber-disconnect-one)
-	 (define-key jabber-roster-mode-map (kbd "V") 'jabber-vcard-get)
-	 (jabber-activity-mode 1)
-	 )
-  )
+(define-key jabber-global-keymap (kbd "j") 'jabber-muc-autojoin)
+(define-key jabber-global-keymap (kbd "c") 'jabber-connect)
+(define-key jabber-global-keymap (kbd "d") 'jabber-disconnect-one)
+(define-key jabber-roster-mode-map (kbd "V") 'jabber-vcard-get)
+(jabber-activity-mode 1)
 
 (provide '400-KONIX_jabber)
 ;;; 400-KONIX_jabber.el ends here

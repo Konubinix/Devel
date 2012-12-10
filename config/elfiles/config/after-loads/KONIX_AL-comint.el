@@ -38,6 +38,7 @@
 	(comint-kill-region beg end)
 	)
   )
+
 (defun konix/comint-hide-or-delete-before-last-output ()
   (interactive)
   (save-excursion
@@ -110,11 +111,13 @@
 	  )
 	)
   )
+
 (defun konix/comint-dynamic-complete-no-error (&rest args)
   (interactive)
   (and (ignore-errors (konix/comint-dynamic-complete))
 	   t)
   )
+
 (defun konix/comint-mode-hook()
   (local-set-key (kbd "C-w") 'comint-kill-region)
   (local-set-key (kbd "C-c C-w") 'konix/comint-kill-last-output)

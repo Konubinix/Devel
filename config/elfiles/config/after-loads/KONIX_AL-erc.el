@@ -41,8 +41,8 @@
 (defvar konix/chat-old-notif 0 "")
 
 (defun konix/erc-mode-hook ()
-  (local-set-key (kbd "<C-up>") 'erc-previous-command)
-  (local-set-key (kbd "<C-down>") 'erc-next-command)
+  (local-set-key (kbd "<M-up>") 'erc-previous-command)
+  (local-set-key (kbd "<M-down>") 'erc-next-command)
   )
 (add-hook 'erc-mode-hook
 		  'konix/erc-mode-hook)

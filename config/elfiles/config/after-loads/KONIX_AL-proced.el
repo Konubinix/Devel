@@ -25,11 +25,7 @@
 ;;; Code:
 
 (setq-default proced-tree-flag t)
-(eval-after-load "proced"
-  '(progn
-	 (define-key proced-mode-map (kbd "q") 'delete-window)
-	 )
-  )
+(define-key proced-mode-map (kbd "q") 'delete-window)
 
 (provide '700-KONIX_proced)
 ;;; 700-KONIX_proced.el ends here

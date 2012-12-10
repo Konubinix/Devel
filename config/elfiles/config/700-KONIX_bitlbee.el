@@ -1,4 +1,4 @@
-;;; 700-KONIX_kmacro-mode.el ---
+;;; 700-KONIX_bitlbee.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'KONIX_macros)
+(defcustom konix/bitlbee-password "" "")
 
-(provide '700-KONIX_kmacro-mode)
-;;; 700-KONIX_kmacro-mode.el ends here
+(provide '700-KONIX_bitlbee)
+;;; 700-KONIX_bitlbee.el ends here

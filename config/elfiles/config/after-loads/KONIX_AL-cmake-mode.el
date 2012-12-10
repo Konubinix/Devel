@@ -119,6 +119,7 @@
 (defun konix/cmake-beginning-of-defun ()
   (konix/cmake-backward-sexp)
   )
+
 (defun konix/cmake-end-of-defun ()
   (konix/cmake-forward-sexp)
   )

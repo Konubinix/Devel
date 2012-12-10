@@ -50,11 +50,7 @@
 	)
   )
 
-(eval-after-load "icicles"
-  '(progn
-	 (add-hook 'icicle-mode-hook 'konix/icicle-mode-hook)
-	 )
-  )
+(add-hook 'icicle-mode-hook 'konix/icicle-mode-hook)
 
 (provide '400-KONIX_icicles)
 ;;; 400-KONIX_icicles.el ends here

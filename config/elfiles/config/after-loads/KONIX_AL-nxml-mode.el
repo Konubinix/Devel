@@ -128,7 +128,14 @@
 		  (found nil)
 		  )
 	 (while (and my_elem (not found))
-	   (when (string-equal (cdr my_elem) "screen")
+	   (when (and
+			  (string-equal (cdr my_elem) "screen")
+			  (not (save-excursion
+					 (beginning-of-line)
+					 (looking-at " *</screen")
+					 )
+				   )
+			  )
 		 (setq found t)
 		 )
 	   (setq my_elem (pop rng-open-elements_tmp))
@@ -247,10 +254,12 @@
   (skip-chars-forward " \t\n\r")
   )
 
-(defun konix/nxml-forward-element ()
-  (interactive)
+(defun konix/nxml-forward-element (&optional not_to_next)
+  (interactive "P")
   (nxml-forward-element)
-  (skip-chars-forward " \t\n\r")
+  (when (not not_to_next)
+	(skip-chars-forward " \t\n\r")
+	)
   )
 
 (defun konix/nxml-heading-start-position_get-attribute (&optional bound)
@@ -366,20 +375,16 @@ immediately after the section's start-tag."
 (add-hook 'nxml-mode-hook
 		  'konix/nxml-mode-hook)
 
-(eval-after-load "nxml-mode"
-  '(progn
-	 (set-face-attribute 'nxml-text nil
-						 :weight 'bold
-						 )
-	 (set-face-attribute 'nxml-cdata-section-content nil
-						 :inherit nil)
-	 (set-face-foreground 'nxml-element-local-name
-						  "dodger blue"
-						  )
-	 (define-key nxml-outline-showing-tag-map (kbd "<C-tab>") 'nxml-hide-subheadings)
-	 (define-key nxml-outline-hiding-tag-map (kbd "<C-tab>") 'nxml-show-direct-subheadings)
-	 )
-  )
+(set-face-attribute 'nxml-text nil
+					:weight 'bold
+					)
+(set-face-attribute 'nxml-cdata-section-content nil
+					:inherit nil)
+(set-face-foreground 'nxml-element-local-name
+					 "dodger blue"
+					 )
+(define-key nxml-outline-showing-tag-map (kbd "<C-tab>") 'nxml-hide-subheadings)
+(define-key nxml-outline-hiding-tag-map (kbd "<C-tab>") 'nxml-show-direct-subheadings)
 
 (provide '700-KONIX_nxml)
 ;;; 700-KONIX_nxml.el ends here

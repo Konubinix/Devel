@@ -25,7 +25,9 @@
 ;;; Code:
 
 (require 'dired-x)
-(setq dired-omit-extensions (remove ".bin" dired-omit-extensions))
+(require 'wuxch-dired-copy-paste)
+(require 'dired-sort)
+(require 'diredful)
 
 (defun konix/dired-mimeopen ()
   "Open the currectly selected file with mimeopen."
@@ -127,37 +129,30 @@
 	)
   )
 
-(eval-after-load "dired"
-  '(progn
-	 (require 'wuxch-dired-copy-paste)
-	 (require 'dired-sort)
-	 (require 'diredful)
-	 (dired-visit-history-enable)
-	 ;; with "a", replace existing buffer
-	 (put 'dired-find-alternate-file 'disabled nil)
-	 (defvar dired-sort-map (make-sparse-keymap))
+(dired-visit-history-enable)
 
-	 (define-key dired-mode-map "s" dired-sort-map)
+;; with "a", replace existing buffer
+(put 'dired-find-alternate-file 'disabled nil)
 
-	 (define-key dired-sort-map "s" 'dired-sort-size)
-	 (define-key dired-sort-map "x" 'dired-sort-extension)
-	 (define-key dired-sort-map "t" 'dired-sort-time)
-	 (define-key dired-sort-map "c" 'dired-sort-ctime)
-	 (define-key dired-sort-map "u" 'dired-sort-utime)
-	 (define-key dired-sort-map "n" 'dired-sort-name)
-	 (define-key dired-sort-map "r" 'dired-sort-toggle-reverse)
+(defvar dired-sort-map (make-sparse-keymap))
+(define-key dired-mode-map "s" dired-sort-map)
+(define-key dired-sort-map "s" 'dired-sort-size)
+(define-key dired-sort-map "x" 'dired-sort-extension)
+(define-key dired-sort-map "t" 'dired-sort-time)
+(define-key dired-sort-map "c" 'dired-sort-ctime)
+(define-key dired-sort-map "u" 'dired-sort-utime)
+(define-key dired-sort-map "n" 'dired-sort-name)
+(define-key dired-sort-map "r" 'dired-sort-toggle-reverse)
 
-	 ;; Hotkeys
-	 (define-key dired-mode-map "o" 'konix/dired-find-file-other-windows)
-	 ;; epa-dired maps
-	 (define-prefix-command 'konix/dired/epa-dired-map)
-	 (define-key dired-mode-map "c" 'konix/dired/epa-dired-map)
-	 (define-key konix/dired/epa-dired-map "e" 'epa-dired-do-encrypt)
-	 (define-key konix/dired/epa-dired-map "d" 'epa-dired-do-decrypt)
-	 (define-key konix/dired/epa-dired-map "s" 'epa-dired-do-sign)
-	 (define-key konix/dired/epa-dired-map "v" 'epa-dired-do-verify)
-	 )
-  )
+;; Hotkeys
+(define-key dired-mode-map "o" 'konix/dired-find-file-other-windows)
+;; epa-dired maps
+(define-prefix-command 'konix/dired/epa-dired-map)
+(define-key dired-mode-map "c" 'konix/dired/epa-dired-map)
+(define-key konix/dired/epa-dired-map "e" 'epa-dired-do-encrypt)
+(define-key konix/dired/epa-dired-map "d" 'epa-dired-do-decrypt)
+(define-key konix/dired/epa-dired-map "s" 'epa-dired-do-sign)
+(define-key konix/dired/epa-dired-map "v" 'epa-dired-do-verify)
 
 (provide '700-KONIX_dired-mode)
 ;;; 700-KONIX_dired-mode.el ends here

@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'notmuch-address)
+
 (defun konix/message-setup-hook ()
   (mml-secure-message-sign-pgpmime)
   (save-excursion
@@ -388,26 +390,21 @@ inspired from `notmuch-show-archive-thread-internal'"
   (konix/notmuch-remove-tag "unread")
   )
 
-(eval-after-load "notmuch"
-  '(progn
-	 (require 'notmuch-address)
-	 (konix/notmuch-define-key-search-show "d" 'konix/notmuch-toggle-deleted-tag)
-	 (konix/notmuch-define-key-search-show (kbd "<deletechar>") 'konix/notmuch-toggle-deleted-tag)
-	 (konix/notmuch-define-key-search-show "S" 'konix/notmuch-toggle-spam-tag)
-	 (konix/notmuch-define-key-search-show "i" 'konix/notmuch-toggle-inbox-tag)
-	 (konix/notmuch-define-key-search-show (kbd "C-f") 'konix/notmuch-toggle-flagged-tag)
-	 (konix/notmuch-define-key-search-show "u" 'konix/notmuch-toggle-unread-tag)
-	 (konix/notmuch-define-key-search-show (kbd "a") 'konix/notmuch-read-and-archive)
-	 (define-key notmuch-search-mode-map (kbd "F") 'konix/notmuch-search-unflag-remove-read-and-next)
-	 (define-key notmuch-show-mode-map (kbd "M") 'konix/notmuch-show-open-in-external-browser)
-	 (define-key notmuch-show-mode-map (kbd "F") 'konix/notmuch-show-unflag-and-next)
-	 (define-key notmuch-show-mode-map (kbd "U") 'konix/notmuch-show-read-delete-and-next)
-	 (define-key notmuch-show-mode-map (kbd "<C-return>") 'w3m-view-url-with-external-browser)
-	 (define-key notmuch-hello-mode-map (kbd "N") 'konix/notmuch-search-no-tag)
-	 ;; redefine notmuch-show-mark-read so that it removes also the wontread tag
-	 (defalias 'notmuch-show-mark-read 'konix/notmuch-show-mark-read)
-	 )
-  )
+(konix/notmuch-define-key-search-show "d" 'konix/notmuch-toggle-deleted-tag)
+(konix/notmuch-define-key-search-show (kbd "<deletechar>") 'konix/notmuch-toggle-deleted-tag)
+(konix/notmuch-define-key-search-show "S" 'konix/notmuch-toggle-spam-tag)
+(konix/notmuch-define-key-search-show "i" 'konix/notmuch-toggle-inbox-tag)
+(konix/notmuch-define-key-search-show (kbd "C-f") 'konix/notmuch-toggle-flagged-tag)
+(konix/notmuch-define-key-search-show "u" 'konix/notmuch-toggle-unread-tag)
+(konix/notmuch-define-key-search-show (kbd "a") 'konix/notmuch-read-and-archive)
+(define-key notmuch-search-mode-map (kbd "F") 'konix/notmuch-search-unflag-remove-read-and-next)
+(define-key notmuch-show-mode-map (kbd "M") 'konix/notmuch-show-open-in-external-browser)
+(define-key notmuch-show-mode-map (kbd "F") 'konix/notmuch-show-unflag-and-next)
+(define-key notmuch-show-mode-map (kbd "U") 'konix/notmuch-show-read-delete-and-next)
+(define-key notmuch-show-mode-map (kbd "<C-return>") 'w3m-view-url-with-external-browser)
+(define-key notmuch-hello-mode-map (kbd "N") 'konix/notmuch-search-no-tag)
+;; redefine notmuch-show-mark-read so that it removes also the wontread tag
+(defalias 'notmuch-show-mark-read 'konix/notmuch-show-mark-read)
 
 (provide '700-KONIX_notmuch)
 ;;; 700-KONIX_notmuch.el ends here

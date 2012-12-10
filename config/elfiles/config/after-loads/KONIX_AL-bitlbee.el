@@ -24,8 +24,6 @@
 
 ;;; Code:
 
-(defcustom konix/bitlbee-password "" "")
-
 (add-hook 'erc-join-hook 'konix/bitlbee-identify)
 (defun konix/bitlbee-identify ()
   "If we're on the bitlbee server, send the identify command to the

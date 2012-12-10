@@ -35,6 +35,7 @@
 				  nil
 				  konix/hs-nxml-forward-sexp-func)
 	  )
+
 (eval-after-load "hideshow"
   '(progn
 	 (konix/push-or-replace-assoc-in-alist

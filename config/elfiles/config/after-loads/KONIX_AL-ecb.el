@@ -24,21 +24,17 @@
 
 ;;; Code:
 
-(eval-after-load "ecb"
-  '(progn
-	 (ecb-layout-define
-	  "PERSO"
-	  left nil
-	  (konix/ecb-set-windows)
-	  )
-	 (setq-default ecb-analyse-buffer-sync-delay 40)
-	 (setq-default ecb-layout-name "PERSO")
-	 (setq-default ecb-options-version "2.40")
-	 (setq-default ecb-tip-of-the-day nil)
-	 (setq-default ecb-auto-update-methods-after-save nil)
-	 (setq-default ecb-basic-buffer-sync-delay 10)
-	 )
-  )
+(ecb-layout-define
+ "PERSO"
+ left nil
+ (konix/ecb-set-windows)
+ )
+(setq-default ecb-analyse-buffer-sync-delay 40)
+(setq-default ecb-layout-name "PERSO")
+(setq-default ecb-options-version "2.40")
+(setq-default ecb-tip-of-the-day nil)
+(setq-default ecb-auto-update-methods-after-save nil)
+(setq-default ecb-basic-buffer-sync-delay 10)
 
 (provide '700-KONIX_ecb-mode)
 ;;; 700-KONIX_ecb-mode.el ends here

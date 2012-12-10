@@ -33,13 +33,10 @@
 			  gnus-inhibit-images t)
 ;; let notmuch decide which identity is the default
 (setq-default gnus-alias-default-identity nil)
-(eval-after-load "message"
-  '(progn
-	 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
-	 (define-key message-mode-map (kbd "C-c I") 'gnus-alias-select-identity)
-	 (define-key message-mode-map (kbd "C-c i") 'konix/gnus-alias-determine-identity)
-	 )
-  )
+
+(define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
+(define-key message-mode-map (kbd "C-c I") 'gnus-alias-select-identity)
+(define-key message-mode-map (kbd "C-c i") 'konix/gnus-alias-determine-identity)
 
 (defun konix/message-mode-hook ()
   (visual-line-mode 1)

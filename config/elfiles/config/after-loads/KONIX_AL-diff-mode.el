@@ -24,26 +24,24 @@
 
 ;;; Code:
 
+(require 'outline)
 (setq-default diff-default-read-only nil)
 (setq-default diff-outline-regexp
 			  "\\([*+-][*+-][*+-] [^0-9]\\|@@ ...\\|\\*\\*\\* [0-9].\\|--- [0-9]..\\)")
-(eval-after-load "diff-mode"
-  '(progn
-	 (require 'outline)
-	 (define-key diff-mode-map (kbd "<tab>") 'outline-toggle-children)
-	 (define-key diff-mode-map (kbd "<backtab>") 'hide-body)
-	 (define-key diff-mode-map (kbd "<C-tab>") 'hide-sublevels)
-	 (define-key diff-mode-map (kbd "<f2> <f1>") 'hide-body)
-	 (define-key diff-mode-map (kbd "<f2> <f3>") 'show-all)
-	 (define-key diff-mode-map (kbd "<f1>") 'konix/outline-zoom-out)
-	 (define-key diff-mode-map (kbd "<f3>")
-	   'konix/outline-show-children-or-entry)
-	 (set-face-attribute 'diff-changed
-						 nil
-						 :background "light pink"
-						 )
-	 )
-  )
+
+(define-key diff-mode-map (kbd "<tab>") 'outline-toggle-children)
+(define-key diff-mode-map (kbd "<backtab>") 'hide-body)
+(define-key diff-mode-map (kbd "<C-tab>") 'hide-sublevels)
+(define-key diff-mode-map (kbd "<f2> <f1>") 'hide-body)
+(define-key diff-mode-map (kbd "<f2> <f3>") 'show-all)
+(define-key diff-mode-map (kbd "<f1>") 'konix/outline-zoom-out)
+(define-key diff-mode-map (kbd "<f3>")
+  'konix/outline-show-children-or-entry)
+
+(set-face-attribute 'diff-changed
+					nil
+					:background "light pink"
+					)
 
 (defun konix/diff-mode-hook()
   (setq konix/adjust-new-lines-at-end-of-file nil

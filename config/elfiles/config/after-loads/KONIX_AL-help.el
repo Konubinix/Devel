@@ -24,8 +24,10 @@
 
 ;;; Code:
 
+
+
 (defun konix/help-mode-hook()
-  (local-set-key "q" 'konix/quit-and-delete-window)
+  (local-set-key "q" 'quit-window)
   (local-set-key (kbd "C-f") 'find-function-at-point)
   )
 (add-hook 'help-mode-hook 'konix/help-mode-hook)

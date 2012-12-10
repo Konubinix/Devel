@@ -926,8 +926,14 @@
 (defun konix/git/diff/_get-commit ()
   (save-excursion
 	(goto-char 0)
-	(re-search-forward "^commit \\(.+\\)$")
-	(match-string-no-properties 1)
+	(if (re-search-forward "^commit \\(.+\\)$" nil t)
+		(match-string-no-properties 1)
+	  (progn
+		(message "Could not find a commit for this diff,
+fallbacking to HEAD")
+		"HEAD"
+		)
+	 )
 	)
   )
 

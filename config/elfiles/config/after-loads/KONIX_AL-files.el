@@ -41,9 +41,16 @@
 			  )
 		  (if (file-exists-p file_name)
 			  (progn
+				(message "Opening %s" file_name)
 				(find-file file_name)
 				(goto-line (string-to-int line))
-				(kill-buffer old_buffer)
+				(let (
+					  ;; make sure the buffer is killed even if the
+					  ;; keep-buffers-protected-alist says otherwise
+					  (keep-buffers-protected-alist nil)
+					  )
+				 (kill-buffer old_buffer)
+				 )
 				nil
 				)
 			  nil

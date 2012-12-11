@@ -1,0 +1,36 @@
+#!/bin/sh
+# $Id$
+# elvis: localhost		-- Search the web using localhost:8080
+. surfraw || exit 1
+
+w3_config_hook () {
+    def   SURFRAW_localhost_results "$SURFRAW_results"
+    def   SURFRAW_localhost_search search
+}
+
+w3_usage_hook () {
+    cat <<EOF
+Usage: $w3_argv0 [options] [search words]...
+Description:
+  Surfraw search the web using localhost:8080
+EOF
+    w3_global_usage
+}
+
+w3_config
+w3_parse_args "$@"
+# w3_args now contains a list of arguments
+
+url="http://localhost:8080/search"
+
+if test -z "$w3_args" ; then
+    echo "ERROR"
+    exit 1
+else
+    search="$SURFRAW_localhost_search"
+
+    escaped_args=`w3_url_of_arg $w3_args`
+    url="${url}?q=${escaped_args}&num=${SURFRAW_localhost_results}"
+fi
+
+w3_browse_url "$url"

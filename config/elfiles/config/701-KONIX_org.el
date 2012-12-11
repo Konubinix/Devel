@@ -584,9 +584,9 @@ to be organized.
 				 (
 				  )
 				 )
-				("an" "Next action list"
+				("an" "Next action list (without habits)"
 				 (
-				  (tags-todo "//NEXT")
+				  (tags-todo "STYLE<>\"habit\"-habit//NEXT")
 				  )
 				 (
 				  )

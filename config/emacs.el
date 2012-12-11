@@ -25,6 +25,9 @@
 	  (eval-after-load (match-string-no-properties 1 elt)
 		`(progn
 		   (message "Loading %s triggered by %s" ,elt ,(match-string-no-properties 1 elt))
+		   (when (getenv "KONIX_EMACS_DEBUG_AFTER_LOAD")
+			 (backtrace)
+			 )
 		   (load-file ,elt)
 		   )
 		)

@@ -142,6 +142,8 @@
 	   )
 	 found
 	 )
+   ;; try a list of user defined functions
+   (run-hook-with-args-until-success 'konix/nxml-indent-line-functions)
    ;; else, perform the default nxml indentation function
    (nxml-indent-line)
    )

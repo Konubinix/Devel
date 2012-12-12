@@ -880,6 +880,7 @@ to be organized.
 				("POMODORO_ALL". "1 2 3 4 5 6 7 8 9 0")
 				("DONE_POMODORO_ALL". "0 1 2 3 4 5 6 7 8 9 0")
 				))
+(setq-default org-habit-graph-column 100)
 (setq-default org-hide-block-startup t)
 (setq-default org-hide-leading-stars t)
 (setq-default org-hierarchical-todo-statistics nil)

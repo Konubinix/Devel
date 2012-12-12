@@ -239,8 +239,8 @@ DIRECTORY : Folder from which the research is made
    ((file-directory-p directory)
     (let* (
 		   (res nil)
-		   (parent (expand-file-name (concat directory "../")))
 		   (me (expand-file-name directory))
+		   (parent (directory-file-name (file-name-directory me)))
 		   (locate_makefile_level (locate-file "Makefile"
 											   (mapcar
 												(lambda (dir)

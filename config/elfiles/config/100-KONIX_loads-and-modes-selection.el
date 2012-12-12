@@ -175,6 +175,8 @@
 (autoload 'bbdb-create "bbdb-com" "" t)
 ;; bbdb mode
 (autoload 'bbdb-complete-mail "bbdb-com" "" t)
+;; etags stack
+(autoload 'etags-stack-show "etags-stack" "" t)
 
 ;; ************************************************************
 ;; Automodes

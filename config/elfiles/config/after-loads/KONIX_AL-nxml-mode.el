@@ -37,38 +37,11 @@
 															   perso-dir))
 	 )
   )
-(defun konix/hs-nxml-forward-sexp-func (dummy)
-  (save-match-data
-	(unless (looking-at "<\\([a-zA-Z0-9_-]+\\)[ >]")
-	  (error "Not in correct beginning of tag")
-	  )
-	(let (
-		  (beg_block_match (format "<%s[ >]" (match-string-no-properties 1)))
-		  (end_block_match (format "</%s[ >]" (match-string-no-properties 1)))
-		  (beg_encounter 1)
-		  )
-	  ;; go after the current block start
-	  (re-search-forward beg_block_match)
-	  (while (and
-			  (not (equal beg_encounter 0))
-			  (re-search-forward (format "%s\\|%s" beg_block_match
-										 end_block_match))
-			  )
-		;; if the block was a beg, increase the counter
-		(when (looking-back beg_block_match)
-		  (setq beg_encounter (1+ beg_encounter))
-		  )
-		;; if on a end, decrease it
-		(when (looking-back end_block_match)
-		  (setq beg_encounter (- beg_encounter 1))
-		  )
-		;; if on the good end, beg_encounter should be 0
-		)
-	  ;; on the corresponding end_block, go to the top of it
-	  (re-search-backward end_block_match)
-	  )
-	)
+
+(defun konix/hs-nxml-forward-sexp-func (&rest args)
+  (nxml-forward-element)
   )
+
 (setq konix/hs-xml-mode-info
 	  '(nxml-mode "<[^/\\?!][^>]*[^/]>"
 				  "</[^>]>"

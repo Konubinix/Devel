@@ -12,10 +12,10 @@
   "find the top level dir for quilt from fn"
   (let* ((d (file-name-directory fn)))
     (if (or (not fn) (equal fn "/"))
-	nil
-      (if (file-accessible-directory-p (concat d "/.pc"))
-	  d
-	(quilt-find-dir (directory-file-name d))))))
+		nil
+      (if (file-accessible-directory-p (concat d "/patches"))
+		  d
+		(quilt-find-dir (directory-file-name d))))))
 
 (defun quilt-dir (&optional fn)
   (quilt-find-dir (if fn fn buffer-file-name)))

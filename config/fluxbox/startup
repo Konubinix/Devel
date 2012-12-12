@@ -5,6 +5,9 @@ cd "${HOME}"
 # load the default env
 source "${HOME}/.shrc_var"
 
+# use menu as a compose key
+setxkbmap -option compose:menu
+
 # For flash to be fully functionnal
 export GDK_NATIVE_WINDOWS=1
 export PATH="$(dirname "$0")/bin:$(dirname "$0")/devel_bin:$PATH"

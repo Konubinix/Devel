@@ -1,0 +1,4 @@
+# Get the default compose sequence
+include "%L"
+
+<Multi_key> <less> <greater>   : "↔" U2194 # left-right arrow

@@ -35,9 +35,9 @@
   "check if the current buffer is quilt controlled"
   (if (not fn)
       nil
-    (let* ((pd (file-name-nondirectory 
-		(directory-file-name (file-name-directory fn)))))
-      (and 
+    (let* ((pd (file-name-nondirectory
+				(directory-file-name (file-name-directory fn)))))
+      (and
        (not (string-match "\\(~$\\|\\.rej$\\)" fn))
        (not (equal pd "patches"))
        (not (equal pd ".pc"))
@@ -69,45 +69,62 @@
 (defun quilt-top-patch ()
   (let* ((top (quilt-cmd-to-string "top")))
     (if (equal top "")
-	nil
-	(substring top 0 -1))))
+		nil
+	  (substring top 0 -1))))
 
 (defun quilt-complete-list (p l)
   (defun to-alist (list n)
     (if list
-	(cons (cons (car list) n)
-	      (to-alist (cdr list) (+ 1 n)))
+		(cons (cons (car list) n)
+			  (to-alist (cdr list) (+ 1 n)))
       nil))
   (completing-read p (to-alist l 0) nil t))
 
+(defvar quilt-editable-always-editable-root `(,(expand-file-name
+											   (let (
+													 (home (getenv "HOME"))
+													 )
+												  (unless (string-match-p "/$"
+																		  home)
+													(setq home (concat home "/"))
+													)
+												 )
+											   ))
+  "*List of directories being quilt roots but whose files are still editable.
+It may be used to manage patches in a directory without handling all files.
+The directories must contain the last /
+" )
 (defun quilt-editable (f)
   (let* ((qd (quilt-dir))
-	 (fn (quilt-drop-dir f)))
+		 (fn (quilt-drop-dir f)))
     (defun editable (file dirs)
       (if (car dirs)
-	  (if (file-exists-p (concat qd ".pc/" (car dirs) "/" file))
-	      't
-	    (editable file (cdr dirs)))
-	nil))
-    (editable fn (if quilt-edit-top-only
-		     (list (quilt-top-patch))
-		     (cdr (cdr (directory-files (concat qd ".pc/"))))))))
+		  (if (file-exists-p (concat qd ".pc/" (car dirs) "/" file))
+			  't
+			(editable file (cdr dirs)))
+		nil))
+    (or
+	 (member qd quilt-editable-always-editable-root)
+	 (editable fn (if quilt-edit-top-only
+					  (list (quilt-top-patch))
+					(cdr (cdr (directory-files (concat qd ".pc/"))))))
+	 )))
 
 (defun quilt-short-patchname ()
   (let* ((p (quilt-top-patch)))
     (if (not p)
-	"none"
+		"none"
       (let* ((p2 (file-name-sans-extension p)))
-	   (if (< (length p2) 10)
-	       p2
-	     (concat (substring p2 0 8) ".."))))))
+		(if (< (length p2) 10)
+			p2
+		  (concat (substring p2 0 8) ".."))))))
 
 (defun quilt-update-modeline ()
   (interactive)
   (defvar quilt-mode-line nil)
   (make-variable-buffer-local 'quilt-mode-line)
-  (setq quilt-mode-line 
-	(concat " Q:" (quilt-short-patchname)))
+  (setq quilt-mode-line
+		(concat " Q:" (quilt-short-patchname)))
   (force-mode-line-update))
 
 (defun quilt-revert ()
@@ -115,13 +132,13 @@
     (save-excursion
       (set-buffer buf)
       (if (quilt-owned-p buffer-file-name)
-	  (quilt-update-modeline))
+		  (quilt-update-modeline))
       (if (and (quilt-owned-p buffer-file-name)
-	       (not (buffer-modified-p)))
-	  (revert-buffer 't 't))))
+			   (not (buffer-modified-p)))
+		  (revert-buffer 't 't))))
   (defun revert-list (buffers)
     (if (not (cdr buffers))
-	nil
+		nil
       (revert (car buffers))
       (revert-list (cdr buffers))))
   (revert-list (buffer-list)))
@@ -166,10 +183,10 @@
   "Go to a specified patch"
   (interactive)
   (let* ((arg (quilt-complete-list "Goto patch: " (quilt-patch-list))))
-       (quilt-save)
-       (if (file-exists-p (concat (quilt-dir) ".pc/" arg))
-	   (quilt-cmd (concat "pop -q " arg) "*quilt*")
-	 (quilt-cmd (concat "push -q " arg) "*quilt*")))
+	(quilt-save)
+	(if (file-exists-p (concat (quilt-dir) ".pc/" arg))
+		(quilt-cmd (concat "pop -q " arg) "*quilt*")
+	  (quilt-cmd (concat "push -q " arg) "*quilt*")))
   (quilt-revert))
 
 (defun quilt-top ()
@@ -181,7 +198,7 @@
   "Find a file in the topmost patch"
   (interactive)
   (find-file (concat (quilt-dir)
-		     (quilt-complete-list "File: " (quilt-file-list)))))
+					 (quilt-complete-list "File: " (quilt-file-list)))))
 
 (defun quilt-files ()
   "Display files in topmost patch"
@@ -244,7 +261,7 @@
   (interactive)
   (let* ((f (quilt-drop-dir buffer-file-name)))
     (if (y-or-n-p (format "Really drop %s? " f))
-	(quilt-cmd (concat "remove " f))))
+		(quilt-cmd (concat "remove " f))))
   (quilt-revert))
 
 (defun quilt-edit-series ()
@@ -284,17 +301,17 @@
 \\{quilt-mode-map}
 "
   (interactive "p")
-  (setq quilt-mode 
-	(if (null arg) 
-	    (not quilt-mode) 
-	  (> (prefix-numeric-value arg) 0)))
+  (setq quilt-mode
+		(if (null arg)
+			(not quilt-mode)
+		  (> (prefix-numeric-value arg) 0)))
   (if quilt-mode
       (let* ((f buffer-file-name))
-	(if (quilt-owned-p f)
-	    (if (not (quilt-editable f))
-		(toggle-read-only 1)
-	      (toggle-read-only 0)))
-	(quilt-update-modeline))))
+		(if (quilt-owned-p f)
+			(if (not (quilt-editable f))
+				(toggle-read-only 1)
+			  (toggle-read-only 0)))
+		(quilt-update-modeline))))
 
 (defun quilt-hook ()
   "Enable quilt mode for quilt-controlled files."
@@ -305,8 +322,8 @@
 
 (or (assq 'quilt-mode minor-mode-alist)
     (setq minor-mode-alist
-	  (cons '(quilt-mode quilt-mode-line) minor-mode-alist)))  
+		  (cons '(quilt-mode quilt-mode-line) minor-mode-alist)))
 
 (or (assq 'quilt-mode-map minor-mode-map-alist)
     (setq minor-mode-map-alist
-	  (cons (cons 'quilt-mode quilt-mode-map) minor-mode-map-alist)))
+		  (cons (cons 'quilt-mode quilt-mode-map) minor-mode-map-alist)))

@@ -744,3 +744,8 @@
   (setq-default konix/first-visit nil)
   )
 (add-hook 'server-visit-hook 'konix/server-visit-hook)
+
+;; **********************************************************************
+;; Use quilt
+;; **********************************************************************
+(require 'quilt)

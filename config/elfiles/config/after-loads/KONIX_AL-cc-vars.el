@@ -65,7 +65,9 @@
 		  )
   )
 (defun konix/c-mode-common-hook ()
-  (hide-ifdef-mode t)
+  (ignore-errors
+   (hide-ifdef-mode t)
+   )
   (konix/prog/config)
   (local-set-key (kbd "M-RET") 'c-context-line-break)
   (font-lock-add-keywords

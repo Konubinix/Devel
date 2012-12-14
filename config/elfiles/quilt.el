@@ -327,3 +327,5 @@ The directories must contain the last /
 (or (assq 'quilt-mode-map minor-mode-map-alist)
     (setq minor-mode-map-alist
 		  (cons (cons 'quilt-mode quilt-mode-map) minor-mode-map-alist)))
+
+(provide 'quilt)

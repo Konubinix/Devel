@@ -645,9 +645,9 @@ current buffer still has clients"
   (if (and konix/on-windows-p (not current-prefix-arg))
 	  (message "Flyspell mode deactivated on windows...")
 	(progn
-	 (flyspell-mode arg)
-	 (message "Flyspell mode is now %s" arg)
-	 )
+	  (flyspell-mode arg)
+	  (message "Flyspell mode is now %s" arg)
+	  )
 	)
   )
 
@@ -1812,6 +1812,25 @@ TAGS_FILE_NAMETHE"
 		 )
 		)
   (message "New head : %s" (car tags-table-list))
+  )
+
+(defun konix/tags/query-replace-at-point ()
+  (interactive)
+  (let* (
+		 (symbol-at-point (thing-at-point 'symbol))
+		 (from_default (if symbol-at-point
+						   (format "\\b%s\\b" symbol-at-point)
+						 ""
+						 )
+					   )
+		 (from (read-string "From: "
+							from_default
+							query-replace-from-history-variable
+							from_default
+							))
+		 )
+	(tags-query-replace from (query-replace-read-to from "replace" t))
+	)
   )
 
 ;; semantic uses it

@@ -442,6 +442,7 @@
 (define-key 'konix/tags/map (kbd "r") 'tags-reset-tags-tables)
 (define-key 'konix/tags/map (kbd "e") 'konix/tags/echo-tags-table-list)
 (define-key 'konix/tags/map (kbd "M-%") 'tags-query-replace)
+(define-key 'konix/tags/map (kbd "%") 'konix/tags/query-replace-at-point)
 (define-key 'konix/tags/map (kbd "a") 'tags-apropos)
 (define-key 'konix/tags/map (kbd "U") 'konix/tags/update-current-head)
 (define-key 'konix/tags/map (kbd "u") 'konix/tags/update-tags-visit)

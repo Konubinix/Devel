@@ -1,6 +1,6 @@
 #!/bin/bash
 
-UNDO="$XDG_DATA_HOME/uzbl/undolist"
+UNDO="${UZBL_UNDOLIST_FILE:-${XDG_DATA_HOME:-~/.local/share}/uzbl/undolist}"
 if [ -e $UNDO ]; then
     LINECOUNT=`cat $UNDO | wc -l`
     if [ $LINECOUNT -ge 100 ]; then

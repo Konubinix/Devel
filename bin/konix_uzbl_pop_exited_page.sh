@@ -1,6 +1,6 @@
 #!/bin/bash
 
-UNDO="$XDG_DATA_HOME/uzbl/undolist"
+UNDO="${UZBL_UNDOLIST_FILE:-${XDG_DATA_HOME:-~/.local/share}/uzbl/undolist}"
 UZBL=uzbl-browser
 if [ -e $UNDO ]; then
     URL=`tail -n 1 $UNDO`

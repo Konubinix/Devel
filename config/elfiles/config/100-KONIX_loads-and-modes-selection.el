@@ -177,6 +177,9 @@
 (autoload 'bbdb-complete-mail "bbdb-com" "" t)
 ;; etags stack
 (autoload 'etags-stack-show "etags-stack" "" t)
+;; tags
+(autoload 'konix/tags/create "KONIX_tags" "" t)
+(autoload 'konix/tags/visit-tags-file "KONIX_tags" "" t)
 
 ;; ************************************************************
 ;; Automodes

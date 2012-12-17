@@ -357,7 +357,7 @@ They can be relative or absolute
 			(stop_searching nil)
 			)
 		(while (not stop_searching)
-		  (setq found_relative (search-forward word_at_point nil t))
+		  (setq found_relative (re-search-forward (format "\\b%s\\b" word_at_point) nil t))
 		  ;; Stop if not in a command or not found a relative
 		  (setq stop_searching (not (and found_relative (hs-inside-comment-p))))
 		  )

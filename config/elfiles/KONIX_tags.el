@@ -251,6 +251,24 @@ TAGS_FILE_NAMETHE"
 	)
   )
 
+(defun konix/tags/search (regexp &optional file-list-form)
+  "Wrapper of `tags-search', initializing the regexp with symbol at point
+surrounded by \\b characters."
+  (interactive
+   (let* (
+		  (symbol-at-point (thing-at-point 'symbol))
+		  (initial-input (if symbol-at-point
+							 (format "\\b%s\\b" symbol-at-point)
+						   ""
+						   ))
+		  )
+	 (list
+	  (read-string "Tags search (regexp): " initial-input))
+	 )
+   )
+  (tags-search regexp file-list-form)
+  )
+
 ;; semantic uses it
 (defalias 'push-tag-mark 'konix/push-tags-mark)
 

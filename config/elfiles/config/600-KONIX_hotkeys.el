@@ -428,7 +428,7 @@
 (define-prefix-command 'konix/tags/map)
 (define-key 'konix/global-fast-key-map (kbd "t") 'konix/tags/map)
 
-(define-key 'konix/tags/map (kbd "s") 'tags-search)
+(define-key 'konix/tags/map (kbd "s") 'konix/tags/search)
 (define-key 'konix/tags/map (kbd "p") 'pop-tag-mark)
 (define-key 'konix/tags/map (kbd "w") 'konix/tags/restore-window-configuration)
 (define-key 'konix/tags/map (kbd "i") 'konix/tags/add-include-current-head)

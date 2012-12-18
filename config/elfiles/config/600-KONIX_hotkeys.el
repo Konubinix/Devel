@@ -177,6 +177,8 @@
 
 ;; Goto emacs config
 (define-key 'konix/global-key-map "h" 'konix/hack-on-emacs)
+;; Update the env
+(define-key 'konix/global-key-map (kbd "M-e") 'konix/load-default-env-file)
 ;;Indentation
 (define-key 'konix/global-key-map (kbd "i") 'konix/indent-region-or-buffer)
 ;; goto

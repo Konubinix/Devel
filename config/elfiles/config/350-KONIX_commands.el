@@ -56,6 +56,12 @@
 	(narrow-to-region start end)
 	(shrink-window-if-larger-than-buffer)))
 
+(defun konix/load-default-env-file ()
+  (interactive)
+  (konix/load-env-file)
+  (message "Environment loaded")
+  )
+
 ;; frame configuration handling
 (defvar konix/frame-configuration-list '() "")
 

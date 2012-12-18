@@ -269,9 +269,6 @@ surrounded by \\b characters."
   (tags-search regexp file-list-form)
   )
 
-;; semantic uses it
-(defalias 'push-tag-mark 'konix/push-tags-mark)
-
 (defun konix/tags/find-tags-file (&optional starting_directory)
   "recursively searches each parent directory for a file named 'TAGS' and returns the
 path to that file or nil if a tags file is not found. Returns nil if it finds nothing.

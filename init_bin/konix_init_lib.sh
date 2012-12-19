@@ -26,7 +26,12 @@ import_env () {
     do
         if [ -n "$line" ]
         then
-            eval "export $line"
+            if echo "$line" |egrep -q "=''\$"
+            then
+                eval "unset $(echo "$line"|cut -f1 -d"=")"
+            else
+                eval "export $line"
+            fi
         fi
     done < "${TEMP_FILE}"
     rm "${TEMP_FILE}"

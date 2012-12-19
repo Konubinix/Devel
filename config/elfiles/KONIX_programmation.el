@@ -101,9 +101,9 @@ They can be relative or absolute
       '(
 		;; ac-source-gtags
 		;; ac-source-imenu
-		ac-source-abbrev
+		;; ac-source-abbrev
 		ac-source-yasnippet
-		ac-source-files-in-current-dir
+		;; ac-source-files-in-current-dir
 		ac-source-dictionary
 		ac-source-words-in-same-mode-buffers
 		;; ac-source-words-in-all-buffer

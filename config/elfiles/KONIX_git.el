@@ -588,10 +588,11 @@
   (konix/git/command (format "stash drop stash@{%s}" stash_number))
   )
 
-(defun konix/git/stash/apply ()
+(defun konix/git/stash/apply (&optional stash_number)
   "git stash apply."
   (interactive)
-  (konix/git/command "stash apply")
+  (setq stash_number (or stash_number 0))
+  (konix/git/command (format "stash apply stash@{%s}" stash_number))
   )
 
 (defun konix/git/stash/clear ()
@@ -1157,6 +1158,11 @@ fallbacking to HEAD")
   (konix/git/stash/drop (get-text-property (point) 'konix/git/status/filename))
   )
 
+(defun konix/git/status-buffer/stash/apply ()
+  (interactive)
+  (konix/git/stash/apply (get-text-property (point) 'konix/git/status/filename))
+  )
+
 (defun konix/git/status-buffer/stash/pop ()
   (interactive)
   (konix/git/stash/pop (get-text-property (point) 'konix/git/status/filename))
@@ -1335,6 +1341,7 @@ fallbacking to HEAD")
 							(map (make-sparse-keymap))
 							)
 						(define-key map "D" 'konix/git/status-buffer/stash/drop)
+						(define-key map "a" 'konix/git/status-buffer/stash/apply)
 						(define-key map "s" 'konix/git/status-buffer/stash/show)
 						(define-key map "d" 'konix/git/status-buffer/stash/show)
 						(define-key map "p" 'konix/git/status-buffer/stash/pop)

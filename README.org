@@ -1,0 +1,147 @@
+
+* Introductory note
+  :LOGBOOK:
+  - Captured       [2012-12-18 Tue 18:15]
+  :END:
+  *DO NOT LAUNCH* the install scripts! They may get rid of your current configuration.
+* Files hierarchy
+  :LOGBOOK:
+  - Captured       [2012-12-17 lun. 19:23]
+  :END:
+** bin
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 16:34]
+   :END:
+   some useful scripts
+** bin_win32
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 16:35]
+   :END:
+   some useful scripts, dedicated to some deficient computers using win32
+** config
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 16:35]
+   :END:
+   The configuration of the packages I use, respecting the xdg standard. This means that the environment variable XDG_CONFIG_HOME may point to this directory and the application following the xdg standard should retrieve their configuration there.
+** etc
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:01]
+   :END:
+   Some of my global configuration. They are not automatically copied during the install phase because it does not require admin privileges.
+** init_bin
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:03]
+   :END:
+   The entry point of the [[id:d75e73af-0741-4fef-ab5b-373036bb08ca][environment variables handling]] mechanism.
+** install*
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:05]
+   :END:
+   Scripts to install my configuration on a computer, see [[id:01315c95-f800-420e-90bc-91a4a8b5a091][Configuration installation]] for more info.
+** lib
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:06]
+   :END:
+   Some useful functions that I might want in some languages. PYTHONPATH should point to this directory to have access to the libraries and in shell, one can use them with.
+   #+BEGIN_SRC sh
+     source "${KONIX_LIB_DIR}/lib_bash.sh"
+   #+END_SRC
+   This assumes the environment variable KONIX_LIB_DIR points to this directory.
+** patches and .pc
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:09]
+   :END:
+   Patches to some projects I casually contribute to, quilt powered.
+** prog
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:11]
+   :END:
+   Some snippets of code that might prove useful one day, I admit I never look at them...
+** share
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:12]
+   :END:
+   The content of the share directory as specified by xdg. XDG_DATA_HOME could point to this folder.
+** tuning
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:13]
+   :END:
+   Some useful files for tuning my desktop, like Gnome Delta icons theme.
+* TODO Configuration installation
+  :LOGBOOK:
+  - Captured       [2012-12-18 Tue 18:05]
+  :END:
+  :PROPERTIES:
+  :ID:       01315c95-f800-420e-90bc-91a4a8b5a091
+  :END:
+  The scripts install_* are made to install my configuration files in the home of the current user. They are not designed to keep the previously installed one then be warned that when launched, they will erase your ~/.emacs, ~./.bashrc... before installing mine. This is certainly not what you want.
+
+  They are designed to leave all the configuration files into the cloned folder so that any modification made to one of those files may be easily commited. If do not use symlinks to do so because the configuration should be as easy to deploy on any platform. Is it then restricted by the windows lack of symbolic linking.
+
+  In order to reach the configuration files, correct environment variables are set up and minimal configuration files are written into the home directory. The scripts in init_bin are used to do so.
+** How does it work?
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:24]
+   :END:
+   For a component to have access to its configuration, one need several things:
+   - an entry point : something into ~/.someconfigurationfile.rc
+   - a way to get to the true configuration : some environment variables
+   - a way to extract the path to the true configuration : the init_bin folder
+
+   The installation phase does the following:
+   - Create the ~/.env.conf file. Briefly, this file stores the needed information to reach the Devel directory in order to get access to the configuration files. Take a look at the [[id:d75e73af-0741-4fef-ab5b-373036bb08ca][environment variable mechanism]] for more info about the content of this file. What should be kept in mind is that it indicates that the environment variable KONIX_DEVEL_DIR should contain the path to the Devel directory.
+   - Copy the init_bin folder into the HOME directory. This folder stores the needed scripts to extract the environment variables from the ~/.env.conf file and insert them into the environment of the running process. It is composed of a simple python script parsing the file and some wrapper in each language using that information to initialise the environment variables.
+   - Launches the install_* scripts that write some minimal code into the canonical configuration file location that:
+     - gets the needed information in .env.conf file using the helpers in init_bin
+     - load the associated configuration file into the KONIX_DEVEL_DIR folder
+
+   What happens during the initialisation phase depends on the running component. Let's see the example with bash:
+   - bash loads the default ~/.bashrc file.
+   - in this file, the ~/init_bin/konix_init_lib.sh library is sourced, giving access to the import_env shell function.
+   - import_env is called, importing (among others) the KONIX_DEVEL_DIR environment variable
+   - the $KONIX_DEVEL_DIR/config/bashrc file is loaded
+
+   During the initialisation phase, the component must also set the KONIX_PLATFORM environment variable before it loads the other environment variables. Take a look at [[id:d75e73af-0741-4fef-ab5b-373036bb08ca][environment variables handling]] for more info about the why of this setting. Briefly, the variable should by the value of what os.sys.platform would return on such platform (linux2, win32, cygwin...).
+
+   This assumes that the component's configuration file is able to include another file or to get the needed information from that file. That is not always the case. Special handling has been done when it was not possible. Take a look for instance at the git installation script.
+
+   The content of the default configuration files is generated and should be as small as possible since they are only meant to reach the true configuration files.
+
+   Now, lets see in detail how each component is installed.
+** install_bin.py
+   :LOGBOOK:
+   - Captured       [2012-12-18 Tue 18:23]
+   :END:
+   Does nothing for the time being, but it could!
+** TODO install_emacs.py
+   :LOGBOOK:
+   - State "TODO"       [2012-12-19 Wed 18:27]
+   - Captured       [2012-12-18 Tue 18:24]
+   :END:
+** install_shell.py
+   :LOGBOOK:
+   - Captured       [2012-12-19 Wed 12:32]
+   :END:
+   As described before, the shell installation script inserts a default template into the ~/.bashrc, ~/.shrc and ~/.zshrc files. Each one is composed of:
+   - a line testing whether the shell is launched interactively. In this case, the rest of the configuration is loaded. In the other case, nothing is loaded. This prevent some custom behaviour to be triggered while the calling script might assume the default behaviour to happen
+   - a line testing whether the computer is doing much work. If so, the remaining of the configuration is not loaded. This may be useful in case you try to have access to your computer while it is performing too much and even loading configuration file is taking too long. With that trick, you still get access to the machine.
+   - load the ~/.shrc_var script. This script performs the code to import the environment variables
+   - load the associated configuration file inside the ${KONIX_CONFIG_DIR} directory. It is shrc for sh, bashrc for bash and zshrc for zsh.
+   - load the content of the ${KONIX_SH_CUSTOM_FILE}, it might be useful when wanting to customise the loading of the shell
+* TODO Environment variables handling
+  :LOGBOOK:
+  - State "TODO"       [2012-12-18 Tue 18:05]
+  - Captured       [2012-12-18 Tue 18:04]
+  :END:
+  :PROPERTIES:
+  :ID:       d75e73af-0741-4fef-ab5b-373036bb08ca
+  :END:
+  Talk about
+  - KONIX_PLATFORM
+* Magic stuff                                                       :ARCHIVE:
+  :LOGBOOK:
+  - Captured       [2012-12-17 lun. 19:25]
+  :END:
+# Local Variables:
+# ispell-dictionary: "british"
+# End:

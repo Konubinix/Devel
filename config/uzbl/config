@@ -382,11 +382,10 @@ set ebind     = @mode_bind global,-insert
 # New window binds
 @cbind  gw  = event REQ_NEW_WINDOW
 
-# SSL-ify bindings
-@cbind  zs  = uri \@(echo "$UZBL_URI" | sed -e 's/^http:/https:/')\@
-@cbind  zS  = event REQ_NEW_WINDOW \@(echo "$UZBL_URI" | sed -e 's/^http:/https:/')\@
+# Open new page from here
 @cbind  zw  = uri \@(echo "http://www.mywot.com/en/scorecard/$UZBL_URI")\@
 @cbind  zf  = spawn \@(which firefox)\@ "\@uri"
+@cbind  zss  = sh 'echo "uri http://localhost:8080/search?q=$(xclip -o)&expansion=1&action=expand" > "$UZBL_FIFO"'
 
 # Yanking & pasting binds
 @cbind  yu  = sh 'echo -n "\@uri" | xclip'

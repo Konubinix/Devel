@@ -6,43 +6,6 @@ from install_lib import *
 def install_emacs():
     environ = get_environ()
     replace_file_content(os.path.join(environ["HOME"] , ".emacs_var"), """;; -*- mode:emacs-lisp -*-
-;; the only hacky thing, set the KONIX_PLATFORM like python will like it
-(setenv "KONIX_PLATFORM" (cond
-  ((or
-     (eq system-type 'windows-nt)
-     (eq system-type 'ms-dos)
-   )
-   "win32"
-   )
-  ((eq system-type 'cygwin)
-   "cygwin"
-   )
-  ((or
-     (eq system-type 'gnu)
-     (eq system-type 'gnu/kfreebsd)
-     (eq system-type 'gnu/linux)
-   )
-   "linux2"
-   )
-  ((eq system-type 'darwin)
-   "darwin"
-   )
-  )
- )
-(setenv "PATH"
-(concat
-;; compute the python path
-(file-name-directory
-  (with-temp-buffer
-    (insert-file-contents-literally (expand-file-name (format "~/.env_%s.conf" (getenv "KONIX_PLATFORM"))))
-    (re-search-forward "^PYTHON_BIN=['\\\"]?\\\\(.+\\\\)['\\\"]?$")
-    (match-string 1)
-  )
-)
- path-separator
-(getenv "PATH")
-)
-)
 (load-file (expand-file-name "~/init_bin/konix_import_env.el"))
 (defvar python-bin (getenv "PYTHON_BIN"))
 (konix/load-env-file)

@@ -276,7 +276,11 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 
 (defun konix/org-timer-done-break-pomodoro-hook ()
   (konix/org-pomodoro-tray-daemon-put "b")
-  (if (y-or-n-p (format-time-string "<%Y-%m-%d %a %H:%M:%S> : Break done, start another pomodoro ?"))
+  (if (y-or-n-p-with-timeout
+	   (format-time-string
+		"<%Y-%m-%d %a %H:%M:%S> : Break done, start another pomodoro ?")
+	   60
+	   nil)
 	  (konix/org-pomodoro-start)
 	(message "You should start a pomodorro when you are ready")
 	)

@@ -250,6 +250,8 @@
 (add-to-list 'auto-mode-alist (cons "CMakeLists.txt$" 'cmake-mode))
 ;; tpl files in jinja2 mode
 (add-to-list 'auto-mode-alist (cons "\\.tpl$" 'jinja2-mode))
+;; compilation log use the compilog suffix
+(add-to-list 'auto-mode-alist (cons "\\.compilog$" 'compilation-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

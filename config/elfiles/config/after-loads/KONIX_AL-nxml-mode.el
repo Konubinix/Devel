@@ -326,6 +326,7 @@ immediately after the section's start-tag."
   (ac-flyspell-workaround)
   (local-set-key (kbd "<C-return>") 'konix/nxml-newline-dwim)
   (local-set-key (kbd "C-c C-d") 'konix/nxml/indirect-buffer-cdata)
+  (setq hs-c-start-regexp "\<\!\-\-")
   (setq ac-sources
 		'(
 		  ac-source-konix/rng

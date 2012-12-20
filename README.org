@@ -207,7 +207,7 @@
    - Captured       [2012-12-19 mer. 22:53]
    :END:
    copies KONIX_CONFIG_DIR/vimrc into the ~/.vimrc file. Now that I know better how vim works and I know the source command exists, I may change this behaviour to ake it more like the one of emacs or shell.
-* TODO Environment variables handling
+* Environment variables handling
   :LOGBOOK:
   - State "TODO"       [2012-12-18 Tue 18:05]
   - Captured       [2012-12-18 Tue 18:04]
@@ -236,11 +236,105 @@
    - KONIX_EMACS_CUSTOM_FILE
    - KONIX_SRC_DIR : path to some sources, not used anymore
    - PYTHON_BIN : the path to the python executable that is to be called to get the environment values
-** TODO The need for PYTHON_PATH
+** How it works
    :LOGBOOK:
-   - State "TODO"       [2012-12-19 mer. 23:00]
-   - Captured       [2012-12-19 mer. 23:00]
+   - Captured       [2012-12-20 Thu 16:48]
    :END:
+   The core of the environment manager is the python script konix_get_env.py. it reads the content of the env.conf files and prints on stdout the list of environment variables with the format.
+
+   NAME='VALUE'
+
+   Its constraints are:
+   - it should work on any platform, this caused the python language choice
+   - The installation for one platform should not impact the installation for another. This means that if your HOME folder in shared between cygwin and mac for instance, installing the environments for one should not impact on the installation for another. Besides,
+     running on each platform should work correctly and load the default values as well as those specific for each platform.
+
+   The script updates the values of the environment variables at the time it is called. For instance, if the variable FOO has the value BAR and if the env.conf file indicates to add :JO to FOO, then the script output will contain
+
+   FOO='BAR:JO'
+
+   It is the responsibility of each wrapper to call it and parse the result.
+** The content of the env.conf files
+   :LOGBOOK:
+   - Captured       [2012-12-20 Thu 17:39]
+   :END:
+   The env.conf files, written in ini style, are composed of three sections:
+   - [Replace]: the value of the environment variables replace the existing value, FOO=':JO:'
+   - [Prefix]: the value of the variable is put before the existing value, FOO=':JOBAR'
+   - [Suffix]: the value of the variable is put after the existing value, FOO='BAR:JO'
+
+   Note: prefer using KONIX_PATH_SEPARATOR instead of : to have something platform independent.
+
+   Each section may be repeated as many times as wanted and they are interpreted in order. For instance, the content
+   #+BEGIN_EXAMPLE
+   [Prefix]
+   FOO=BA
+   [Suffix]
+   FOO=FU
+   #+END_EXAMPLE
+   Will result in FOO getting the value BABARFU.
+** The env.conf files organisation
+   :LOGBOOK:
+   - Captured       [2012-12-20 Thu 17:41]
+   :END:
+   The script reads the following files in order
+   - possibly a backup env file, see the [[id:008f277c-fb05-407d-864a-be8fcf55733b][avoiding loops]] section for more information
+   - KONIX_CONFIG_DIR/env.conf
+   - ~/env.conf
+   - KONIX_CONFIG_DIR/env_[PLATFORM].conf
+   - ~/env_[PLATFORM].conf
+   The content of the environment variables is updated between each call, meaning that when interpreting the second env.conf file, the content of the variables once passing the first file is taken into account. For instance, if in KONIX_CONFIG_DIR/env.conf, there is
+   #+BEGIN_EXAMPLE
+   [Prefix]
+   FOO=BAR
+   #+END_EXAMPLE
+   and in ~/env.conf
+   #+BEGIN_EXAMPLE
+   [Suffix]
+   FOO=FU
+   #+END_EXAMPLE
+   The result will be FOO=BARBAFU.
+** Avoiding loops
+   :LOGBOOK:
+   - Captured       [2012-12-20 Thu 17:43]
+   :END:
+   :PROPERTIES:
+   :ID:       008f277c-fb05-407d-864a-be8fcf55733b
+   :END:
+   When recursively calling components, for instance if bash loads emacs that loads bash that loads... The associated wrappers may be called several times: once for each call.
+   This may cause environment variables to grow a lot. With the example of FOO given earlier and bash calling emacs calling bash, you get:
+   - in bash: FOO BARBAFU
+   - in emacs: FOO BARBARBAFUFU
+   - in the second bash: FOO BARBARBARBAFUFUFU
+
+   To avoid this (unwanted behavior), the content of the environment before interpreting the env.conf files the first time the konix_get_env.py script is called is recorder in HOME/.env_backup/env_RANDOM.conf and the new environment variable KONIX_ENV_BACKUP_FILE is set
+   to the path to that file. When the script is called, it checks whether this variable exists and the given file exist also. If so, the values of this file is inserted before the first env.conf file in the list. This causes all the modified environment variable changed
+   during the parsing of the env.conf files to be set to a default value instead of the defaut environment value.
+
+   That means that if you change an environment variable in one of the layer without going through the environment manager process, its value would be forgotten when spawning a child. For instance, if in bash you do:
+   Export FOO YOUPI
+   And then you call emacs, the emacs process will have
+   FOO BARBAFU instead of BARYOUPIFU. There is not any work to adjust this behaviour yet.
+** The need for PYTHON_BIN
+   :LOGBOOK:
+   - Captured       [2012-12-20 Thu 17:43]
+   :END:
+   Imagine you are on window, with python and cygwin installed. You then run the cygwin bash and then launch the install script. By default, calling python will call the one of windows and then all the paths are written c:/... Now imagine you just installed cygwin
+   python. Then when running another bash. The new call to python will find the one of cygwin expecting paths like /cygwin/c/... then the whole installed files won't be correctly read.
+
+   More generally, if you install another version of python on your system (in addition to the one used to install),there might be an conflict between this new version and the content of the written env files.
+
+   The wrappers should then make sure it is the python whose path is in PYTHON_BIN that should be called. This is the hacky thing of the system: the wrappers need to know the value of the PYTHON_BIN that should be given by the environment manager script in order to launch
+   the environment manager. I don't know any cleaner way to do this for the time being.
+
+   The wrappers should also know the current platform to know what .env[PLATFORM].conf file to parse.
+   Indeed, imagine your HOME folder is shared between several platforms, then the default environment variables won,t be the same. Guess for instance that KONIX_PATH_SEPARATOR would be : on unix and ; on windows.
+   The wrapper should use some heuristic to know what to put into the KONIX_PLATFORM environment variable so that the konix_get_env.py script will know what to launch. Keep in mind that the value is initialised during the installation phase with the sys.platform value.
+** New platform
+   :LOGBOOK:
+   - Captured       [2012-12-20 Thu 17:49]
+   :END:
+   If you want to add support for a new platform, just copy the KONIX_CONFIG_DIR/env_[PLATFORM].conf and ~/env_[PLATFORM].conf file generated during a previous installation and give the platform the name you want. Then make sure the wrappers will set the KONIX_PLATFORM variable to the good value
 * Magic stuff                                                       :ARCHIVE:
   :LOGBOOK:
   - Captured       [2012-12-17 lun. 19:25]

@@ -1,76 +1,34 @@
 
 * Introductory note
-  :LOGBOOK:
-  - Captured       [2012-12-18 Tue 18:15]
-  :END:
   *DO NOT LAUNCH* the install scripts! They may get rid of your current configuration.
 * Files hierarchy
-  :LOGBOOK:
-  - Captured       [2012-12-17 lun. 19:23]
-  :END:
 ** bin
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 16:34]
-   :END:
    some useful scripts
 ** bin_win32
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 16:35]
-   :END:
    some useful scripts, dedicated to some deficient computers using win32
 ** config
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 16:35]
-   :END:
    The configuration of the packages I use, respecting the xdg standard. This means that the environment variable XDG_CONFIG_HOME may point to this directory and the application following the xdg standard should retrieve their configuration there.
 ** etc
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:01]
-   :END:
    Some of my global configuration. They are not automatically copied during the install phase because it does not require admin privileges.
 ** init_bin
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:03]
-   :END:
    The entry point of the [[id:d75e73af-0741-4fef-ab5b-373036bb08ca][environment variables handling]] mechanism.
 ** install*
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:05]
-   :END:
    Scripts to install my configuration on a computer, see [[id:01315c95-f800-420e-90bc-91a4a8b5a091][Configuration installation]] for more info.
 ** lib
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:06]
-   :END:
    Some useful functions that I might want in some languages. PYTHONPATH should point to this directory to have access to the libraries and in shell, one can use them with.
    #+BEGIN_SRC sh
      source "${KONIX_LIB_DIR}/lib_bash.sh"
    #+END_SRC
    This assumes the environment variable KONIX_LIB_DIR points to this directory.
 ** patches and .pc
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:09]
-   :END:
    Patches to some projects I casually contribute to, quilt powered.
 ** prog
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:11]
-   :END:
    Some snippets of code that might prove useful one day, I admit I never look at them...
 ** share
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:12]
-   :END:
    The content of the share directory as specified by xdg. XDG_DATA_HOME could point to this folder.
 ** tuning
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:13]
-   :END:
    Some useful files for tuning my desktop, like Gnome Delta icons theme.
 * Configuration installation
-  :LOGBOOK:
-  - Captured       [2012-12-18 Tue 18:05]
-  :END:
   :PROPERTIES:
   :ID:       01315c95-f800-420e-90bc-91a4a8b5a091
   :END:
@@ -80,9 +38,6 @@
 
   In order to reach the configuration files, correct environment variables are set up and minimal configuration files are written into the home directory. The scripts in init_bin are used to do so.
 ** How does it work?
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:24]
-   :END:
    For a component to have access to its configuration, one need several things:
    - an entry point : something into ~/.someconfigurationfile.rc
    - a way to get to the true configuration : some environment variables
@@ -109,15 +64,8 @@
 
    Now, lets see in detail how each component is installed.
 ** install_bin.py
-   :LOGBOOK:
-   - Captured       [2012-12-18 Tue 18:23]
-   :END:
    Does nothing for the time being, but it could!
 ** install_emacs.py
-   :LOGBOOK:
-   - State "TODO"       [2012-12-19 Wed 18:27]
-   - Captured       [2012-12-18 Tue 18:24]
-   :END:
    It writes the file ~/.emacs_var that does:
    - load the ~/init_bin/konix_import_env.el file. This file make sure to provide the needed function to import the environment variables
    - call the function import the environment
@@ -134,9 +82,6 @@
    - loads the emacs.el file in the KONIX_CONFIG_DIR folder
    - loads the custom file if it exists
 ** install_shell.py
-   :LOGBOOK:
-   - Captured       [2012-12-19 Wed 12:32]
-   :END:
    As described before, the shell installation script inserts a default template into the ~/.bashrc, ~/.shrc and ~/.zshrc files. Each one is composed of:
    - a line testing whether the shell is launched interactively. In this case, the rest of the configuration is loaded. In the other case, nothing is loaded. This prevent some custom behaviour to be triggered while the calling script might assume the default behaviour to happen
    - a line testing whether the computer is doing much work. If so, the remaining of the configuration is not loaded. This may be useful in case you try to have access to your computer while it is performing too much and even loading configuration file is taking too long. With that trick, you still get access to the machine.
@@ -144,28 +89,16 @@
    - load the associated configuration file inside the ${KONIX_CONFIG_DIR} directory. It is shrc for sh, bashrc for bash and zshrc for zsh.
    - load the content of the ${KONIX_SH_CUSTOM_FILE}, it might be useful when wanting to customise the loading of the shell
 ** install_gdbinit.py
-   :LOGBOOK:
-   - Captured       [2012-12-19 mer. 22:27]
-   :END:
    It writes the ~/.gdbinit file that:
    - sources the gdbinit file in KONIX_CONFIG_DIR
    - sources the stl-views.gdb file in KONIX_CONFIG_DIR, this file may be useful to debug stl objects in debugging sessions. It has been made obsolete in gdb 7 by the possibility to add python printers but that is another story
 ** install_git.py
-   :LOGBOOK:
-   - Captured       [2012-12-19 mer. 22:30]
-   :END:
    Because git does not provide any way to source another file, this file is directly copied in the home. This means that the KONIX_CONFIG_DIR/gitconfig file should be changed by hand and then install_git.py re launched each time a change is to be done in the configuration. This is really a pain, and I hope I will find a solution to make it easier in the future. Luckily, I barely change this file. The script copies the KONIX_CONFIG_DIR/gitconfig file in ~/.gitconfig, making sure to conserve the previous values of user name and email. It also adds the konix_msmtp.sh script as sendemail.smtpserver default value because it use it.
 
    This install script should be re done in the future.
 ** install_lib.py
-   :LOGBOOK:
-   - Captured       [2012-12-19 mer. 22:35]
-   :END:
    This script does not install anything, it should be imported by all other script in order to get access to useful information like the environment values before installing anything. It also provides some helpers like a function that replaces a file only if the user confirmed he did not mind.
 ** install.py
-   :LOGBOOK:
-   - Captured       [2012-12-19 mer. 22:37]
-   :END:
    This is the main installation script, it calls all other install scripts and also:
    - install the ~/.env_[PLATFORM].conf file with the default content of the environment variables. This is the file used by the wrappers when wanting to reach the configuration folder
    - install the ~/init_bin folder with the wrappers in it.
@@ -193,32 +126,16 @@
      - make sure to add via gconf the configuration of some applications
      - make sure the files inside the binary folder are executable
 ** install_quilt.py
-   :LOGBOOK:
-   - Captured       [2012-12-19 mer. 22:49]
-   :END:
    makes sure the folders ~/patches and ~/.pc are symlinks to the ones in devel. There are useful to store random patches about project I may not contribute to directly. For instance, I keep some patch made in emacs that wait to be send upstream. I only have to quilt pop and quilt push to get them back after a pulling of upstream sources and keeping them centralised facilitates synchronisation between computers.
 ** install_seeks.sh
-   :LOGBOOK:
-   - Captured       [2012-12-19 mer. 22:52]
-   :END:
    It is not an install script but some reminder about how to compile it
 ** install_vim.py
-   :LOGBOOK:
-   - Captured       [2012-12-19 mer. 22:53]
-   :END:
    copies KONIX_CONFIG_DIR/vimrc into the ~/.vimrc file. Now that I know better how vim works and I know the source command exists, I may change this behaviour to ake it more like the one of emacs or shell.
 * Environment variables handling
-  :LOGBOOK:
-  - State "TODO"       [2012-12-18 Tue 18:05]
-  - Captured       [2012-12-18 Tue 18:04]
-  :END:
   :PROPERTIES:
   :ID:       d75e73af-0741-4fef-ab5b-373036bb08ca
   :END:
 ** Default ones
-   :LOGBOOK:
-   - Captured       [2012-12-19 mer. 22:55]
-   :END:
    Those are the default environment variable provided for all the components.
    - KONIX_LIB_DIR
    - KONIX_CONFIG_DIR
@@ -237,9 +154,6 @@
    - KONIX_SRC_DIR : path to some sources, not used anymore
    - PYTHON_BIN : the path to the python executable that is to be called to get the environment values
 ** How it works
-   :LOGBOOK:
-   - Captured       [2012-12-20 Thu 16:48]
-   :END:
    The core of the environment manager is the python script konix_get_env.py. it reads the content of the env.conf files and prints on stdout the list of environment variables with the format.
 
    NAME='VALUE'
@@ -255,9 +169,6 @@
 
    It is the responsibility of each wrapper to call it and parse the result.
 ** The content of the env.conf files
-   :LOGBOOK:
-   - Captured       [2012-12-20 Thu 17:39]
-   :END:
    The env.conf files, written in ini style, are composed of three sections:
    - [Replace]: the value of the environment variables replace the existing value, FOO=':JO:'
    - [Prefix]: the value of the variable is put before the existing value, FOO=':JOBAR'
@@ -274,9 +185,6 @@
    #+END_EXAMPLE
    Will result in FOO getting the value BABARFU.
 ** The env.conf files organisation
-   :LOGBOOK:
-   - Captured       [2012-12-20 Thu 17:41]
-   :END:
    The script reads the following files in order
    - possibly a backup env file, see the [[id:008f277c-fb05-407d-864a-be8fcf55733b][avoiding loops]] section for more information
    - KONIX_CONFIG_DIR/env.conf
@@ -295,9 +203,6 @@
    #+END_EXAMPLE
    The result will be FOO=BARBAFU.
 ** Avoiding loops
-   :LOGBOOK:
-   - Captured       [2012-12-20 Thu 17:43]
-   :END:
    :PROPERTIES:
    :ID:       008f277c-fb05-407d-864a-be8fcf55733b
    :END:
@@ -316,9 +221,6 @@
    And then you call emacs, the emacs process will have
    FOO BARBAFU instead of BARYOUPIFU. There is not any work to adjust this behaviour yet.
 ** The need for PYTHON_BIN
-   :LOGBOOK:
-   - Captured       [2012-12-20 Thu 17:43]
-   :END:
    Imagine you are on window, with python and cygwin installed. You then run the cygwin bash and then launch the install script. By default, calling python will call the one of windows and then all the paths are written c:/... Now imagine you just installed cygwin
    python. Then when running another bash. The new call to python will find the one of cygwin expecting paths like /cygwin/c/... then the whole installed files won't be correctly read.
 
@@ -331,9 +233,6 @@
    Indeed, imagine your HOME folder is shared between several platforms, then the default environment variables won,t be the same. Guess for instance that KONIX_PATH_SEPARATOR would be : on unix and ; on windows.
    The wrapper should use some heuristic to know what to put into the KONIX_PLATFORM environment variable so that the konix_get_env.py script will know what to launch. Keep in mind that the value is initialised during the installation phase with the sys.platform value.
 ** New platform
-   :LOGBOOK:
-   - Captured       [2012-12-20 Thu 17:49]
-   :END:
    If you want to add support for a new platform, just copy the KONIX_CONFIG_DIR/env_[PLATFORM].conf and ~/env_[PLATFORM].conf file generated during a previous installation and give the platform the name you want. Then make sure the wrappers will set the KONIX_PLATFORM variable to the good value
 * Magic stuff                                                       :ARCHIVE:
   :LOGBOOK:

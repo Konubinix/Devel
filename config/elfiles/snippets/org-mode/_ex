@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: _ex
+# key: _ex
+# --
+$>#+BEGIN_EXAMPLE
+$>$0
+$>#+END_EXAMPLE

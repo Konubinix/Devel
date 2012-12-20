@@ -174,5 +174,20 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
 
 (add-hook 'erc-track-list-changed-hook 'konix/erc-track-list-changed-hook)
 
+(defun konix/erc-disconnected-hook (nick ip reason)
+  (unless konix/chat-silent
+	(call-process "konix_display.py"
+				  nil
+				  nil
+				  nil
+				  (format "Disconnected !\n%s" reason))
+	)
+  (with-temp-buffer
+	(insert "D")
+	(write-file "/tmp/emacs_tray_daemon_control")
+	)
+  )
+(add-hook 'erc-disconnected-hook 'konix/erc-disconnected-hook)
+
 (provide '400-KONIX_erc)
 ;;; 400-KONIX_erc.el ends here

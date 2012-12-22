@@ -21,7 +21,49 @@ The first element of the list is the default context
   (and
    (not (string= "data" file))
    (find-lisp-file-predicate-is-directory file dir)
+   (let (
+		 (org_file_regexp
+		  (format "%s/*.org"
+				  (expand-file-name dir)
+				  ))
+		 )
+	 (file-expand-wildcards
+	  org_file_regexp
+	  )
+	 )
    )
+  )
+
+(defun konix/org-meta-context/find-org-directories_internal (root)
+  "Find directorier under root that possess org files."
+  (find-lisp-find-files-internal
+   root
+   'konix/org-meta-context/ignore-data-file-internal
+   'konix/org-meta-context/ignore-data-dir-internal
+   )
+  )
+
+(defun konix/org-meta-context/find-org-directories_find (root)
+  "Same as konix/org-meta-context/find-org-directories_internal, but using find."
+  (cdr
+   (reverse
+	(split-string
+	 (shell-command-to-string
+	  (format
+	   "konix_find_org_directories.sh '%s'"
+	   root
+	   )
+	  )
+	 "
+"
+	 )
+	)
+   )
+  )
+
+(defvar konix/org-meta-context/find-org-directories
+  'konix/org-meta-context/find-org-directories_find
+  "Function used to find the directory with org files into them"
   )
 
 (defun konix/org-meta-context/agenda-files-for-contexts (contexts)
@@ -35,11 +77,7 @@ contexts list"
 	   (setq files
 			 (append files
 					 (list context)
-					 (find-lisp-find-files-internal
-					  context
-					  'konix/org-meta-context/ignore-data-file-internal
-					  'konix/org-meta-context/ignore-data-dir-internal
-					  )
+					 (funcall konix/org-meta-context/find-org-directories context)
 					 )
 			 )
 	   )

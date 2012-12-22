@@ -335,7 +335,7 @@ set ebind     = @mode_bind global,-insert
 @cbind  ddg<DuckDuckGo:>_    = uri http://duckduckgo.com/?q=%s
 @cbind  dsf<SeeksFR:>_    = uri http://www.seeks.fr/search?q=%s&expansion=1&action=expand
 @cbind  dsl<SeeksLocal:>_    = uri http://s.s/search?lang=en&q=%s&expansion=1&action=expand&engines=&content_analysis=off&ui=stat
-@cbind  dss<SeeksHttp:>_    = uri http://localhost:8080/search?q=%s&expansion=1&action=expand
+@cbind  dss<SeeksHttp:>_    = uri http://localhost:8250/search?q=%s&expansion=1&action=expand
 @cbind  \\awiki<Archwiki:>_  = uri http://wiki.archlinux.org/index.php/Special:Search?search=\@<encodeURIComponent(%r)>\@&go=Go
 @cbind  \\wiki<Wikipedia:>_  = uri http://en.wikipedia.org/w/index.php?title=Special:Search&search=\@<encodeURIComponent(%r)>\@&go=Go
 @cbind  denfr<ENFR:>_         = uri http://www.wordreference.com/enfr/\@<encodeURIComponent(%r)>\@

@@ -12,7 +12,6 @@ The first element of the list is the default context
 (defun konix/org-meta-context/ignore-data-dir-internal (dir parent)
   (and
    (not (string= "data" dir))
-   (not (string= "." dir))
    (not (string= ".." dir))
    )
   )
@@ -76,7 +75,6 @@ contexts list"
 	 (lambda (context)
 	   (setq files
 			 (append files
-					 (list context)
 					 (funcall konix/org-meta-context/find-org-directories context)
 					 )
 			 )

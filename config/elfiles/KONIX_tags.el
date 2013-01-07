@@ -117,6 +117,19 @@ TAGS_FILE_NAMETHE"
 	)
   )
 
+(defun konix/tags/apropos (string)
+  "Run `tags-apropos' in the `tags-file-name' buffer."
+  (interactive
+   (konix/tags/read-string-from-point "Tag apropos (regexp): ")
+   )
+  (assert (get-file-buffer (first tags-table-list))
+		  nil
+		  "You must visit a tags before running this function")
+  (with-current-buffer (get-file-buffer (first tags-table-list))
+	(tags-apropos string)
+	)
+  )
+
 (defun konix/tags/update-tags-visit ()
   (interactive)
   (let (
@@ -129,6 +142,21 @@ TAGS_FILE_NAMETHE"
 		  tags_table
 		  )
 	)
+  )
+
+(defun konix/tags/reset ()
+  (interactive)
+  (mapc
+   (lambda (buffer)
+	 (when (string-match-p "^TAGS" (buffer-name buffer))
+	   (with-current-buffer buffer
+		(revert-buffer)
+		)
+	   )
+	 )
+   (buffer-list)
+   )
+  (tags-reset-tags-tables)
   )
 
 (defun konix/tags/update-current-head (&optional recursive)

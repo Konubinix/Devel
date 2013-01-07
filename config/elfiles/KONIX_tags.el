@@ -100,15 +100,20 @@ TAGS_FILE_NAMETHE"
   (or tags-table-list (error "At least one tags file must be in use"))
   )
 
-(defun konix/tags/create (&optional tags_dir output_buffer)
+(defun konix/tags/create (&optional tags_dir output_buffer recursive)
   (interactive)
   (let (
 		(default-directory default-directory)
+		(command (if recursive
+					 "konix_etags_recursive_updates.sh"
+				   "konix_etags_create.sh -v"
+				   )
+				 )
 		)
 	(when (and tags_dir (file-exists-p tags_dir))
 	  (setq default-directory tags_dir)
 	  )
-	(async-shell-command "konix_etags_create.sh -v" output_buffer)
+	(async-shell-command command output_buffer)
 	)
   )
 

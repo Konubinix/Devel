@@ -215,10 +215,10 @@ cygpath2dos () {
 }
 
 konix_var_points_to_file_or_null_p () {
-# ####################################################################################################
-# This function checks if the file whose name is stored in variable whose name
-# is in $1 exists, if not so, it replace the content of the variable by ""
-# ####################################################################################################
+    # ####################################################################################################
+    # This function checks if the file whose name is stored in variable whose name
+    # is in $1 exists, if not so, it replace the content of the variable by ""
+    # ####################################################################################################
 	local TAGDIR_VAR="$1"
 	eval local TAGDIR_FILE="\$$TAGDIR_VAR"
 	if [ ! -f "$TAGDIR_FILE" ]
@@ -229,15 +229,18 @@ konix_var_points_to_file_or_null_p () {
 }
 
 konix_file_to_lines () {
-# ####################################################################################################
-# Param 1 : file
-# Param 2 : sep
-#
-# Reads the content of the file, split its lines and put in the RES global
-# variable something of the form "line1"$SEP"line2"$SEP...
-# ####################################################################################################
+    # ####################################################################################################
+    # Param 1 : file
+    # Param 2 : sep
+    # Param 3 : comment
+    #
+    # Reads the content of the file, split its lines and put in the RES global
+    # variable something of the form "line1"$SEP"line2"$SEP... lines beginning with
+    # comment will be avoided
+    # ####################################################################################################
 	local FILE="$1"
 	local SEP="$2"
+    local comment="$3"
 	source konix_assert_var.sh "$FILE"
 	source konix_assert_var.sh "$SEP"
 	source konix_assert.sh "-f '$FILE'"
@@ -245,6 +248,10 @@ konix_file_to_lines () {
 	IFS=$'\n'
 	for LINE in $(<$FILE)
 	do
+        if [ -n "$comment" ] && [ "${LINE#${comment}}" != "${LINE}" ]
+        then
+            continue
+        fi
 		if [ -z "$RES" ]
 		then
 			RES="\"$LINE\""
@@ -255,20 +262,20 @@ konix_file_to_lines () {
 }
 
 konix_int_to_color() {
-#####################################################################################################
-# cf http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
-#
-# |-----------+-------+-----+-------+-----------+------+---------+------+-------|
-# | Intensity | 0     | 1   | 2     | 3         | 4    | 5       | 6    | 7     |
-# |-----------+-------+-----+-------+-----------+------+---------+------+-------|
-# | Normal    | Black | Red | Green | Yellow[7] | Blue | Magenta | Cyan | White |
-# | Bright    | Black | Red | Green | Yellow    | Blue | Magenta | Cyan | White |
-# |-----------+-------+-----+-------+-----------+------+---------+------+-------|
-# Bright = +8
-# Foreground accepts 16 values (light and dark)
-# Background accepts 8 values (only dark)
-# Negative values mean default
-######################################################################################################
+    #####################################################################################################
+    # cf http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+    #
+    # |-----------+-------+-----+-------+-----------+------+---------+------+-------|
+    # | Intensity | 0     | 1   | 2     | 3         | 4    | 5       | 6    | 7     |
+    # |-----------+-------+-----+-------+-----------+------+---------+------+-------|
+    # | Normal    | Black | Red | Green | Yellow[7] | Blue | Magenta | Cyan | White |
+    # | Bright    | Black | Red | Green | Yellow    | Blue | Magenta | Cyan | White |
+    # |-----------+-------+-----+-------+-----------+------+---------+------+-------|
+    # Bright = +8
+    # Foreground accepts 16 values (light and dark)
+    # Background accepts 8 values (only dark)
+    # Negative values mean default
+    ######################################################################################################
 	local FG_VALUE="$1"
 	local BG_VALUE="$2"
 	if [ ! $FG_VALUE -lt 16 ]

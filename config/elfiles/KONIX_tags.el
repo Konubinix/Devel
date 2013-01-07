@@ -131,8 +131,8 @@ TAGS_FILE_NAMETHE"
 	)
   )
 
-(defun konix/tags/update-current-head ()
-  (interactive)
+(defun konix/tags/update-current-head (&optional recursive)
+  (interactive "P")
   (konix/tags/_assert-current-head)
   (let (
 		(default-directory (file-name-directory (first tags-table-list)))
@@ -157,7 +157,7 @@ TAGS_FILE_NAMETHE"
 		)
 	(ignore-errors (kill-buffer tags_update_buffer_name))
 	(setq tags_update_buffer (get-buffer-create tags_update_buffer_name))
-	(konix/tags/create nil tags_update_buffer)
+	(konix/tags/create nil tags_update_buffer recursive)
 	(set-process-sentinel (get-buffer-process tags_update_buffer) tags_created_hook)
 	)
   )

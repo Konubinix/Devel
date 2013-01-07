@@ -1706,6 +1706,16 @@ to be organized.
       link)))
 
 ;; ######################################################################
+;; Message
+;; ######################################################################
+(defun konix/org/message-mode-hook ()
+  (orgtbl-mode)
+  (orgstruct-mode)
+  )
+(add-hook 'message-mode-hook
+		  'konix/org/message-mode-hook)
+
+;; ######################################################################
 ;; Calfw integration
 ;; ######################################################################
 (require 'calfw-org nil t)

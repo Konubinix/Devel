@@ -1,18 +1,38 @@
-Index: devel/config/elfiles/org/lisp/org.el
+ Make org-open-at-point behave the same with plain links and with bracket links.
+
+        * lisp/org.el (org-open-at-point): make org-open-at-point handle a plain link
+          even if the cursor is before it
+
+    TINYCHANGEIndex: devel/config/elfiles/org/lisp/org.el
 ===================================================================
---- devel.orig/config/elfiles/org/lisp/org.el	2012-11-26 09:17:52.551256244 +0100
-+++ devel/config/elfiles/org/lisp/org.el	2012-11-26 15:41:24.459983553 +0100
-@@ -9757,17 +9757,33 @@
- 			 ;; string "http://orgmode.org][Org]]Mode" is
- 			 ;; recognized as a plain link while it should
- 			 ;; not be
--			 (progn
--			   ;; go to the begining of the match, If we
--			   ;; were in the special case, we should now
--			   ;; be in a org-bracket-link-regexp
--			   (goto-char (car match))
--			   (not
--			    (org-in-regexp org-bracket-link-regexp)
+--- devel.orig/config/elfiles/org/lisp/org.el	2013-01-07 18:02:32.912442626 +0100
++++ devel/config/elfiles/org/lisp/org.el	2013-01-07 18:06:22.004449867 +0100
+@@ -9717,15 +9717,50 @@
+ 			(or (next-single-property-change pos 'org-linked-text)
+ 			    (point-max))))
+ 	    (throw 'match t))
+-
+ 	  (save-excursion
+-	    (let ((plinkpos (org-in-regexp org-plain-link-re)))
+-	      (when (or (org-in-regexp org-angle-link-re)
+-			(and plinkpos (goto-char (car plinkpos))
+-			     (save-match-data (not (looking-back "\\[\\[")))))
+-		(setq type (match-string 1)
+-		      path (org-link-unescape (match-string 2)))
+-		(throw 'match t))))
++	    (when (or (org-in-regexp org-angle-link-re)
++		      (let (
++			    (match (org-in-regexp org-plain-link-re))
++			    )
++			(and
++			 ;; link at point is a plain link
++			 match
++			 ;; check that it is not of the form
++			 ;; [[http://orgmode.org][Org]]Mode. in that
++			 ;; case, if the cursor is on "Mode", then the
++			 ;; string "http://orgmode.org][Org]]Mode" is
++			 ;; recognized as a plain link while it should
++			 ;; not be
 +			 (save-excursion
 +			  (progn
 +			    ;; go to the begining of the match, If we
@@ -22,11 +42,9 @@ Index: devel/config/elfiles/org/lisp/org.el
 +			    (not
 +			     (org-in-regexp org-bracket-link-regexp)
 +			     )
- 			    )
--			   )
++			    )
 +			  )
- 			 )
--			))
++			 )
 +			)
 +		      (let (
 +			    (line_ending (save-excursion (end-of-line)
@@ -42,6 +60,9 @@ Index: devel/config/elfiles/org/lisp/org.el
 +			 )
 +			)
 +		      )
- 	      (setq type (match-string 1)
- 		    path (org-link-unescape (match-string 2)))
- 	      (throw 'match t)))
++	      (setq type (match-string 1)
++		    path (org-link-unescape (match-string 2)))
++	      (throw 'match t)))
+ 	  (save-excursion
+ 	    (when (org-in-regexp (org-re "\\(:[[:alnum:]_@#%:]+\\):[ \t]*$"))
+ 	      (setq type "tags"

@@ -8,7 +8,7 @@
 --langmap=c++:.c++.cc.cp.cpp.cxx.h.h++.hh.hp.hpp.hxx.C.H.txx.ixx(*.hxx.in)
 --regex-c++=/^.+public[ \t]+([^ \t]+).*$/\1 PARENT/
 --langdef=cmake
---langmap=cmake:.cmake
+--langmap=cmake:.cmake(CMakeLists.txt)
 --regex-cmake=/[Mm][Aa][Cc][Rr][Oo][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 MACRO_CMAKE/
 --regex-cmake=/[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 FCT_CMAKE/
 --regex-cmake=/[sS][eE][tT][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 SET_CMAKE/

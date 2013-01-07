@@ -456,13 +456,13 @@
 (define-key 'konix/tags/map (kbd "h") 'etags-stack-show)
 
 ;; ************************************************************
-;; Icicle
+;; Imenu
 ;; ************************************************************
-(define-prefix-command 'konix/icicles/map)
-(define-key 'konix/global-fast-key-map (kbd "i") 'konix/icicles/map)
-
-(define-key 'konix/icicles/map (kbd "s") 'icicle-search)
-(define-key 'konix/icicles/map (kbd "d") 'icicle-delete-file)
+(define-prefix-command 'konix/imenu/map)
+(define-key 'konix/global-fast-key-map (kbd "i") 'konix/imenu/map)
+(define-key 'konix/imenu/map (kbd "t") 'imenu-tree)
+(define-key 'konix/imenu/map (kbd "g") 'konix/imenu-tree-goto)
+(define-key 'konix/imenu/map (kbd "s") 'konix/imenu-tree-show)
 
 ;; ************************************************************
 ;; Uniquify

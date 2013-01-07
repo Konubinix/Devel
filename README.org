@@ -176,7 +176,7 @@
 
    Note: prefer using KONIX_PATH_SEPARATOR instead of : to have something platform independent.
 
-   Each section may be repeated as many times as wanted and they are interpreted in order. For instance, the content
+   Each section may be repeated as many times as wanted, they may be written in any order and they are interpreted in order. For instance, the content
    #+BEGIN_EXAMPLE
    [Prefix]
    FOO=BA

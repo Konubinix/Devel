@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'erc-imenu)
+
 (setq-default erc-log-insert-log-on-open t)
 (setq-default erc-log-mode t)
 (setq-default erc-log-write-after-insert t)

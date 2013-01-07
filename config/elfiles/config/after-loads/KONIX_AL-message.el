@@ -41,6 +41,7 @@
 (defun konix/message-mode-hook ()
   (visual-line-mode 1)
   (flyspell-mode 1)
+  (autopair-mode 1)
   )
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)

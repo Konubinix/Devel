@@ -181,6 +181,8 @@
 (autoload 'konix/tags/create "KONIX_tags" "" t)
 (autoload 'konix/tags/visit-tags-file "KONIX_tags" "" t)
 (autoload 'konix/push-tags-mark "KONIX_tags" "" t)
+;; imenu
+(autoload 'imenu-tree "imenu-tree" "" t)
 
 ;; ************************************************************
 ;; Automodes

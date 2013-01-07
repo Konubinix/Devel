@@ -27,6 +27,7 @@
 (setq-default semantic-idle-scheduler-idle-time 10)
 (setq-default semantic-idle-work-update-headers-flag t)
 (setq-default semantic-lex-c-preprocessor-symbol-file '("~/macros.h"))
+(setq-default semantic-imenu-summary-function 'semantic-format-tag-uml-concise-prototype)
 
 (defun konix/semantic-analyze-proto-impl-toggle()
   (interactive)

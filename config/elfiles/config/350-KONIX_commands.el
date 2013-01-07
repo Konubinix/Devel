@@ -1394,18 +1394,16 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 	)
   )
 
-(defun konix/www/search-in-google (string)
-  "Search the string at point in google. If prefix arg is given, use w3m, else
-don't change the value of the default browser"
+(defun konix/www/web-search (string)
   (interactive
    (list
-	(konix/_get-string "Google search")
+	(konix/_get-string "Web search")
 	)
    )
-  (konix/www/browse-url (format "http://www.google.com/search?q=%s"
-								(replace-regexp-in-string " " "+" string)
-								)
-						)
+  (async-shell-command (format "konix_websearch.sh '%s'"
+							   (replace-regexp-in-string " " "+" string)
+							   )
+					   )
   )
 
 (defun konix/www/brows-url-of-file-at-point (file)

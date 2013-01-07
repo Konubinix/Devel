@@ -478,7 +478,7 @@
 
 (define-key 'konix/www/map (kbd "s") 'w3m) ;session
 (define-key 'konix/www/map (kbd "b") 'w3m-buffer)
-(define-key 'konix/www/map (kbd "g") 'konix/www/search-in-google)
+(define-key 'konix/www/map (kbd "g") 'konix/www/web-search)
 (define-key 'konix/www/map (kbd "f") 'konix/www/brows-url-of-file-at-point)
 (define-key 'konix/www/map (kbd "l") 'konix/www/browse-link-at-point)
 

@@ -77,7 +77,7 @@ then
 fi
 if [ -n "$TAGINCLUDES_FILE" ]
 then
-	konix_file_to_lines "$TAGINCLUDES_FILE" " --etags-include="
+	konix_file_to_lines "$TAGINCLUDES_FILE" " --etags-include=" "#"
 	RES="${RES//\\//}"
 	TAGINCLUDES_CMD="--etags-include=$RES"
 fi

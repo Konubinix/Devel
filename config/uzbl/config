@@ -384,6 +384,7 @@ set ebind     = @mode_bind global,-insert
 
 # Open new page from here
 @cbind  zw  = uri \@(echo "http://www.mywot.com/en/scorecard/$UZBL_URI")\@
+@cbind  zb  = uri \@(echo "http://wayback.archive.org/web/*/$UZBL_URI")\@
 @cbind  zf  = spawn \@(which firefox)\@ "\@uri"
 @cbind  zss  = sh 'echo "uri http://localhost:8080/search?q=$(xclip -o)&expansion=1&action=expand" > "$UZBL_FIFO"'
 

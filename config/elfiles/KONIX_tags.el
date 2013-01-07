@@ -256,20 +256,24 @@ TAGS_FILE_NAMETHE"
 	)
   )
 
+(defun konix/tags/read-string-from-point (prompt)
+  (let* (
+		 (symbol-at-point (thing-at-point 'symbol))
+		 (initial-input (if symbol-at-point
+							(format "\\b%s\\b" symbol-at-point)
+						  ""
+						  ))
+		 )
+	(list
+	 (read-string prompt initial-input))
+	)
+  )
+
 (defun konix/tags/search (regexp &optional file-list-form)
   "Wrapper of `tags-search', initializing the regexp with symbol at point
 surrounded by \\b characters."
   (interactive
-   (let* (
-		  (symbol-at-point (thing-at-point 'symbol))
-		  (initial-input (if symbol-at-point
-							 (format "\\b%s\\b" symbol-at-point)
-						   ""
-						   ))
-		  )
-	 (list
-	  (read-string "Tags search (regexp): " initial-input))
-	 )
+   (konix/tags/read-string-from-point "Tags search (regexp): ")
    )
   (tags-search regexp file-list-form)
   )

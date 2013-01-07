@@ -265,6 +265,9 @@
 ;;to move easily between windows with M-Arrows
 (windmove-default-keybindings 'meta)
 
+;; speedbar
+(define-key 'konix/global-fast-key-map (kbd "p") 'speedbar)
+
 ;; for terminal mode
 (define-key 'konix/global-fast-key-map (kbd "j") 'shrink-window-horizontally)
 (define-key 'konix/global-fast-key-map (kbd "l") 'enlarge-window-horizontally)

@@ -1049,6 +1049,8 @@ to be organized.
 ;; the "WAITING items" section
 (setq-default org-stuck-projects '("+project-maybe/-WAIT-DELEGATED-DONE-NOT_DONE" ("NEXT" "WAIT") ("") ""))
 (setq-default org-timer-default-timer 25)
+(setq-default org-time-clocksum-format
+			  '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t))
 (setq-default org-tag-persistent-alist
 			  '(
 				("project" . ?p)

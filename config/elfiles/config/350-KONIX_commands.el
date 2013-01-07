@@ -148,9 +148,9 @@
 	)
   )
 
-(defun konix/browse-url-uzbl (url &optional new-window)
+(defun konix/browse-url-browser (url &optional new-window)
   (interactive (browse-url-interactive-arg "URL: "))
-  (start-process (concat "uzbl " url)
+  (start-process (format "%s '%s'" (getenv "BROWSER") url)
 				 nil
 				 "uzbl"
 				 url

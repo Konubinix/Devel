@@ -362,5 +362,18 @@ immediately after the section's start-tag."
 (define-key nxml-outline-showing-tag-map (kbd "<C-tab>") 'nxml-hide-subheadings)
 (define-key nxml-outline-hiding-tag-map (kbd "<C-tab>") 'nxml-show-direct-subheadings)
 
+(setq-default nxml-section-element-name-regexp
+			  (concat
+			   nxml-section-element-name-regexp
+			   "\\|glossentry"
+			   )
+			  )
+(setq-default nxml-heading-element-name-regexp
+			  (concat
+			   nxml-heading-element-name-regexp
+			   "\\|glossterm"
+			   )
+			  )
+
 (provide '700-KONIX_nxml)
 ;;; 700-KONIX_nxml.el ends here

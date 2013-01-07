@@ -3,6 +3,12 @@
 source _konix_etags_variables.sh
 
 TAGS_INCLUDES_FILE="./$TAGS_INCLUDES_FILE_NAME"
+PWD=`pwd`
+cat<<EOF
+# #################################################
+# Recursively update $PWD
+# #################################################
+EOF
 
 if [ -f "$TAGS_INCLUDES_FILE" ]
 then
@@ -10,14 +16,9 @@ then
 	for INCLUDE_FILE in $(<$TAGS_INCLUDES_FILE)
 	do
 		INCLUDE_DIR="$(dirname "$INCLUDE_FILE")"
-		cat<<EOF
-# #################################################
-# Recursively update the include dir $INCLUDE_DIR
-# #################################################
-EOF
 		(
 			cd "$INCLUDE_DIR"
-			konix_etags_includes_updates.sh
+			"$0"
 		)
 	done
 fi

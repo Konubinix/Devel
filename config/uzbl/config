@@ -389,7 +389,7 @@ set ebind     = @mode_bind global,-insert
 @cbind  zss  = sh 'konix_websearch.sh "$(xclip -o)"'
 
 # Yanking & pasting binds
-@cbind  yu  = sh 'echo -n "\@uri" | xclip'
+@cbind  yu  = sh 'echo -n "$UZBL_URI" | xclip'
 @cbind  yU  = sh 'printf "$1" | xclip' '\@SELECTED_URI'
 @cbind  yy  = sh 'printf "$UZBL_TITLE" | xclip'
 @cbind  yt  = sh 'konix_emacs_open.sh "\@uri" "$(xclip -o)"'

@@ -1,16 +1,16 @@
 doc_next = function() {
-    var next_elem = $("a:contains(Thread Next),a:contains(Next),a:contains(next),a:contains(Suivant),a:text(>),a[title='Next Page'],li:contains('Next message: ') a")
+    var next_elem = $("a:contains(Thread Next),a:contains(Next),a:contains(next),a:contains(Suivant),a:text(>),a[title='Next Page'],a[rel='next'],li:contains('Next message: ') a");
     if(next_elem)
     {
-	next_elem[0].click();
+		next_elem[0].click();
     }
 }
 
 doc_previous = function() {
-    var prev_elem = $("a:contains(Thread Previous), a:contains(Prev), a:contains(previous), a:contains(Précédent),a[title='Previous Page'],li:contains('Previous message: ') a");
+    var prev_elem = $("a:contains(Thread Previous), a:contains(Prev), a:contains(previous), a:contains(Précédent),a[title='Previous Page'],a[rel='previous'],li:contains('Previous message: ') a");
     if(prev_elem)
     {
-	prev_elem[0].click();
+		prev_elem[0].click();
     }
 }
 
@@ -27,12 +27,20 @@ doc_home = function() {
 }
 
 doc_up = function() {
-    if(document.URL.match(/\/$/))
-    {
-	window.location.href = document.URL + "..";
-    }
-    else
-    {
-	window.location.href = document.URL + "/..";
-    }
+    var up_elem = $("a[rel='up']");
+    if(up_elem)
+	{
+		up_elem[0].click();
+	}
+	else
+	{
+		if(document.URL.match(/\/$/))
+		{
+			window.location.href = document.URL + "..";
+		}
+		else
+		{
+			window.location.href = document.URL + "/..";
+		}
+	}
 }

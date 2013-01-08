@@ -1,0 +1,83 @@
+Addition of tests highlighting the expected behavior of org-open-at-point in several circumstancesIndex: devel/config/elfiles/org/testing/examples/open-at-point.org
+===================================================================
+Index: devel/config/elfiles/org/testing/examples/open-at-point.org
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ devel/config/elfiles/org/testing/examples/open-at-point.org	2013-01-07 18:12:46.500462019 +0100
+@@ -0,0 +1,8 @@
++
++* Header 1
++  :PROPERTIES:
++  :ID:       header1_with_great_id
++  :END:
++* Header 2
++  [[id:header1_with_great_id][Header 1]]
++  id:header1_with_great_id
+Index: devel/config/elfiles/org/testing/lisp/test-org-open-at-point.el
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ devel/config/elfiles/org/testing/lisp/test-org-open-at-point.el	2013-01-07 18:12:46.504462019 +0100
+@@ -0,0 +1,63 @@
++;;; test-org-open-at-point.el
++
++;; Copyright (c) Samuel Loury
++;; Authors: Samuel Loury
++
++;; Released under the GNU General Public License version 3
++;; see: http://www.gnu.org/licenses/gpl-3.0.html
++
++;;;; Comments:
++
++;; Test for the org-open-at-point function
++
++;;; Code:
++
++
++;;; Bracket links
++
++(save-excursion
++  (set-buffer (get-buffer-create "test-org-open-at-point.el"))
++  (setq ly-here
++        (file-name-directory
++         (or load-file-name (buffer-file-name)))))
++
++(defun test-org-open-at-point/goto-fixture ()
++  (find-file-other-window
++   (concat ly-here "../examples/open-at-point.org"))
++  (set-buffer "open-at-point.org"))
++
++(ert-deftest test-org-open-at-point/bracket-link-inside ()
++  "Test `org-open-at-point' from inside a bracket link."
++  (test-org-open-at-point/goto-fixture)
++  ;; go inside the bracket link
++  (goto-char 113)
++  (org-open-at-point)
++  ;; should now be in front of the header
++  (should (equal (point) 2)))
++
++(ert-deftest test-org-open-at-point/plain-link-inside ()
++  "Test `org-open-at-point' from inside a plain link."
++  (test-org-open-at-point/goto-fixture)
++  ;; go inside the plain link
++  (goto-char 126)
++  (org-open-at-point)
++  ;; should now be in front of the header
++  (should (equal (point) 2)))
++
++(ert-deftest test-org-open-at-point/bracket-link-before ()
++  "Test `org-open-at-point' from before a bracket link but in the same line."
++  (test-org-open-at-point/goto-fixture)
++  ;; go before the bracket link
++  (goto-char 83)
++  (org-open-at-point)
++  ;; should now be in front of the header
++  (should (equal (point) 2)))
++
++(ert-deftest test-org-open-at-point/plain-link-before ()
++  "Test `org-open-at-point' from before a plain link but in the same line."
++  (test-org-open-at-point/goto-fixture)
++  ;; go before the plain link
++  (goto-char 124)
++  (org-open-at-point)
++  ;; should now be in front of the header
++  (should (equal (point) 2)))

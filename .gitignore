@@ -8,4 +8,5 @@
 *#
 gnome-run
 devel_bin
-.pc
+.pc/*
+!.pc/series

@@ -1,0 +1,2 @@
+# bash-completion file for ecw
+complete -c command type ecw

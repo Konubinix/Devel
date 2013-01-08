@@ -18,7 +18,7 @@ if __name__ == "__main__":
                      EMACS_TRAY_PERIOD,
                      {"i" : os.path.join(icons_dir, "emacs_icon_blue.png"),
                       "n" : os.path.join(icons_dir, "emacs_icon_yellow.png"),
-                      "N" : os.path.join(icons_dir, "emacs_icon_red.png")
+                      "N" : os.path.join(icons_dir, "emacs_icon_red.png"),
                       "D" : os.path.join(icons_dir, "emacs_icon_black.png")
                       },
                      "i"

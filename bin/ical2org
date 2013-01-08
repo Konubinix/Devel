@@ -90,12 +90,9 @@ BEGIN {
     indescription = 0;
     lasttimestamp=-1;
 
-    print "# -*- auto-revert-mode:t -*-"
-    print "#+TITLE:     Main Google calendar entries"
-    print "#+AUTHOR:    Eric S Fraga"
-    print "#+EMAIL:     e.fraga@ucl.ac.uk"
+    print "#+TITLE:     Entries got from icals"
     print "#+DESCRIPTION: converted using the ical2org awk script"
-    print "#+CATEGORY: google"
+    print "#+CATEGORY: ICAL"
     print "#+STARTUP: hidestars"
     print "#+STARTUP: overview"
     print " "

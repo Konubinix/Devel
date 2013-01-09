@@ -4,3 +4,4 @@ org_agenda_call_function
 org_tests_plain_link
 org_plain_link_after_point
 notmuch_vcalendar_insert_unfold.patch
+org-git-link_add-line-pos.patch

@@ -20,6 +20,10 @@ trap "rm -rvf '$TMP_PERSO_DECRYPT'" 0
 
 # init
 pushd "$KONIX_PERSO_DIR"
+# dump my crontab
+mkdir -p "`hostname`/"
+crontab -l > "`hostname`/crontab"
+
 # crypt what need to be
 for tobecrypted in *nd
 do

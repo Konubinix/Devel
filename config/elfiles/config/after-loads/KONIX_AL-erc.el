@@ -191,5 +191,16 @@ GOT FROM : my-track-switch-buffer in https://github.com/antoine-levitt/perso/blo
   )
 (add-hook 'erc-disconnected-hook 'konix/erc-disconnected-hook)
 
+;; ######################################################################
+;; Advices
+;; ######################################################################
+(defadvice erc (after update_tray ())
+  (with-temp-buffer
+	(insert "i")
+	(write-file "/tmp/emacs_tray_daemon_control")
+	)
+  )
+(ad-activate 'erc)
+
 (provide '400-KONIX_erc)
 ;;; 400-KONIX_erc.el ends here

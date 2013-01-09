@@ -69,7 +69,8 @@ do
     # if the resulting input is empty, return the last output
     if [ `cat "$INPUT" | wc -l` == "0" ]
     then
-        return "$OUTPUT"
+        echo "$OUTPUT"
+        exit 0
     fi
 
     OUTPUT="`eval $DMENU`"

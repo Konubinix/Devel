@@ -1056,8 +1056,15 @@ to be organized.
 (setq-default org-stuck-projects '("+project-maybe/-WAIT-DELEGATED-DONE-NOT_DONE" ("NEXT" "WAIT") ("") ""))
 (setq-default org-timer-default-timer 25)
 (setq-default org-time-clocksum-format "%d:%02d")
-(setq-default org-tag-persistent-alist
+(setq-default konix/org-tag-contexts
 			  '(
+				("@home" . ?h)
+				("@errand" . ?e)
+				("@work" . ?w)
+				)
+			  )
+(setq-default org-tag-persistent-alist
+			  `(
 				("project" . ?p)
 				("maybe" . ?y)
 				("refile" . ?f)
@@ -1070,12 +1077,12 @@ to be organized.
 				("@phone" . ?o)
 				(:endgroup)
 				(:startgroup)
-				("@home" . ?h)
-				("@errand" . ?e)
-				("@work" . ?w)
+				,@konix/org-tag-contexts
 				(:endgroup)
 				)
 			  )
+(setq-default konix/org-current-context nil)
+
 (setq-default org-tags-exclude-from-inheritance '("project"))
 (setq-default org-fast-tag-selection-single-key t)
 (setq-default org-reverse-note-order t)
@@ -1210,6 +1217,34 @@ to be organized.
 	  )
 	 )
 	)
+  )
+
+(defun konix/org-set-context-filter-according-to-context ()
+  (interactive)
+  (setq-default org-agenda-tag-filter-preset
+				(remove-if-not
+				 ;; remove if nil
+				 'identity
+				 (mapcar
+				  (lambda (context)
+					(unless (equal (car context) konix/org-current-context)
+					  (format "-%s" (car context))
+					  )
+					)
+				  konix/org-tag-contexts
+				  )
+				 )
+				)
+  )
+
+(defun konix/org-change-context (context)
+  (interactive
+   (list
+	(completing-read "Context : " konix/org-tag-contexts)
+	)
+   )
+  (setq-default konix/org-current-context context)
+  (konix/org-set-context-filter-according-to-context)
   )
 
 (defun konix/org-today-time-stamp (&optional with-hm active)

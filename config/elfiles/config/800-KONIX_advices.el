@@ -99,7 +99,7 @@
 (ad-activate 'shell-command)
 
 (defadvice dired-do-async-shell-command (before kill_async_shell_buffer ())
-  (konix/shell/delete-async-shell-buffer)
+  (konix/shell/rename-async-shell-buffer)
   )
 (ad-activate 'dired-do-async-shell-command)
 ;; ******************************************************************************************

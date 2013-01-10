@@ -482,6 +482,12 @@ to be organized.
 							(org-agenda-overriding-header "Todos that need to be organized")
 							)
 						   )
+				(tags-todo "-{@.+}//+NEXT"
+						   (
+							(org-agenda-overriding-header
+							 "Next items without context assigned")
+							)
+						   )
 				)
 			  )
 (setq-default konix/org-agenda-full-view

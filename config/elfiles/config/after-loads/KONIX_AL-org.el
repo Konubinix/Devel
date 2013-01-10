@@ -1222,28 +1222,41 @@ to be organized.
 (defun konix/org-set-context-filter-according-to-context ()
   (interactive)
   (setq-default org-agenda-tag-filter-preset
-				(remove-if-not
-				 ;; remove if nil
-				 'identity
-				 (mapcar
-				  (lambda (context)
-					(unless (equal (car context) konix/org-current-context)
-					  (format "-%s" (car context))
+				;; if konix/org-current-context is nil, no filter should be done
+				(and konix/org-current-context
+					 (remove-if-not
+					  ;; remove if nil
+					  'identity
+					  (mapcar
+					   (lambda (context)
+						 (unless (equal (car context) konix/org-current-context)
+						   (format "-%s" (car context))
+						   )
+						 )
+					   konix/org-tag-contexts
+					   )
 					  )
-					)
-				  konix/org-tag-contexts
-				  )
-				 )
+					 )
 				)
   )
 
 (defun konix/org-change-context (context)
   (interactive
    (list
-	(completing-read "Context : " konix/org-tag-contexts)
+	(completing-read "Context : "
+					 (append konix/org-tag-contexts
+							 (list nil)
+							 )
+					 )
 	)
    )
-  (setq-default konix/org-current-context context)
+  (setq-default konix/org-current-context
+				(if (equal context "nil")
+					;; special case, context is nil means that there should be no filter
+					nil
+				  context
+				  )
+				)
   (konix/org-set-context-filter-according-to-context)
   )
 

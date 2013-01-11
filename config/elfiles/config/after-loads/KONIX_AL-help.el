@@ -37,6 +37,7 @@
 	 (define-key help-map "b" 'konix/describe-bindings)
 	 (define-key help-map "T" 'describe-text-properties)
 	 (define-key help-map (kbd "M-c") 'describe-char)
+	 (define-key help-map (kbd "A") 'apropos-value)
 	 )
   )
 

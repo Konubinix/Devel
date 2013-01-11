@@ -869,7 +869,7 @@ to be organized.
 (setq-default org-columns-default-format "%CATEGORY %90ITEM %1PRIORITY
 %10Effort{:} %10CLOCKSUM %10CLOCKSUM_T")
 (setq-default org-agenda-overriding-columns-format "%CATEGORY %90ITEM
- %1PRIORITY %2POMODORO{+} %2DONE_POMODORO(dp){+} %10Effort{:} %10CLOCKSUM_T
+ %1PRIORITY %2DONE_POMODORO(dp){+} %2POMODORO{+} %10Effort{:} %10CLOCKSUM_T
 %10CLOCKSUM")
 (setq-default org-cycle-separator-lines -1)
 (setq-default org-default-notes-file (concat org-directory "/notes.org"))

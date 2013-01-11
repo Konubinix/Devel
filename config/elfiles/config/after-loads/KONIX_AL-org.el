@@ -1498,6 +1498,14 @@ to be organized.
 
   )
 
+(defun konix/org-list-sort-not-done-first ()
+  (interactive)
+  (if (looking-at "^ +- \\[ \\]")
+	  0
+	1
+	)
+  )
+
 ;; un parent est DONE quand à 100%
 (setq org-after-todo-statistics-hook 'konix/org-summary-todo)
 (defcustom konix/org-mode-font-lock-keywords

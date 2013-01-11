@@ -180,9 +180,16 @@ BEGIN {
 # the summary will be the org heading
 
 /^SUMMARY/ {
-    $1 = "";
-    summary = gensub("\r", "", "g", $0);
-    insummary = 1;
+	if(! insummary == 1)
+	{
+		$1 = "";
+		if($0 !~ /^ $/)
+		{
+			summary = gensub("\r", "", "g", $0);
+			summary = gensub("^ +", "", "g", summary);
+			insummary = 1
+		}
+	};
 }
 
 # the unique ID will be stored as a property of the entry

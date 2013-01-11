@@ -1061,10 +1061,15 @@ to be organized.
 				("@home" . ?h)
 				("@errand" . ?e)
 				("@work" . ?w)
+				(:newline)
+				("@computer" . ?c)
+				("@phone" . ?o)
+				(:newline)
 				)
 			  )
 (setq-default org-tag-persistent-alist
 			  `(
+				,@konix/org-tag-contexts
 				("project" . ?p)
 				("maybe" . ?y)
 				("refile" . ?f)
@@ -1072,13 +1077,6 @@ to be organized.
 				("no_weekly" . ?n)
 				("no_appt" . ?a)
 				("organization" . ?r)
-				(:startgroup)
-				("@computer" . ?c)
-				("@phone" . ?o)
-				(:endgroup)
-				(:startgroup)
-				,@konix/org-tag-contexts
-				(:endgroup)
 				)
 			  )
 (setq-default konix/org-current-context nil)

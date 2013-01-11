@@ -26,4 +26,6 @@ while getopts "hs:d:" opt; do
     esac
 done
 shift $((OPTIND-1))
+# remove duplicates
+konix_remove_duplicate.sh
 cat "$SRC"/* | ical2org > "$DST"

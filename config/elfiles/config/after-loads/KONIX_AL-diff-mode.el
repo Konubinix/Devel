@@ -50,6 +50,12 @@
   (local-set-key (kbd "M-/") 'dabbrev-expand)
   (local-set-key (kbd "C-z") 'diff-undo)
   (auto-fill-mode 1)
+  (font-lock-add-keywords
+   nil
+   '(
+	 ("^[-+]\\{3\\} /dev/null$" . compilation-error-face)
+	 )
+   )
   )
 (add-hook 'diff-mode-hook 'konix/diff-mode-hook)
 

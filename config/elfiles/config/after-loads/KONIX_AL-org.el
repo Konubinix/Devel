@@ -1079,8 +1079,6 @@ to be organized.
 				("organization" . ?r)
 				)
 			  )
-(setq-default konix/org-current-context nil)
-
 (setq-default org-tags-exclude-from-inheritance '("project"))
 (setq-default org-fast-tag-selection-single-key t)
 (setq-default org-reverse-note-order t)
@@ -1161,6 +1159,7 @@ to be organized.
 				(search category-keep)
 				)
 			  )
+(defvar konix/org-agenda-tag-filter-preset '() "")
 (defun konix/org-cmp-deadlines-past-and-due-first (a b)
   (let*(
 		(deadline_regexp_past "In +\\(-[0-9]+\\) d\\.:")
@@ -1217,45 +1216,31 @@ to be organized.
 	)
   )
 
-(defun konix/org-set-context-filter-according-to-context ()
+(defun konix/org/toggle-org-agenda-tag-filter-preset (&optional force)
   (interactive)
   (setq-default org-agenda-tag-filter-preset
-				;; if konix/org-current-context is nil, no filter should be done
-				(and konix/org-current-context
-					 (remove-if-not
-					  ;; remove if nil
-					  'identity
-					  (mapcar
-					   (lambda (context)
-						 (unless (equal (car context) konix/org-current-context)
-						   (format "-%s" (car context))
-						   )
-						 )
-					   konix/org-tag-contexts
-					   )
-					  )
-					 )
+				(cond
+				 (force
+				  (if (equal force 1)
+					  konix/org-agenda-tag-filter-preset
+					nil
+					)
+				  )
+				 (org-agenda-tag-filter-preset
+				  nil
+				  )
+				 (t
+				  konix/org-agenda-tag-filter-preset
+				  )
+				 )
 				)
+  (message "org-agenda-tag-filter-preset set to %s" org-agenda-tag-filter-preset)
   )
 
-(defun konix/org-change-context (context)
-  (interactive
-   (list
-	(completing-read "Context : "
-					 (append konix/org-tag-contexts
-							 (list nil)
-							 )
-					 )
-	)
-   )
-  (setq-default konix/org-current-context
-				(if (equal context "nil")
-					;; special case, context is nil means that there should be no filter
-					nil
-				  context
-				  )
-				)
-  (konix/org-set-context-filter-according-to-context)
+(defun konix/org/record-org-agenda-tag-filter-preset ()
+  (interactive)
+  (assert nil "TODO")
+  (message "org-agenda-tag-filter-preset (%s) recorded" org-agenda-tag-filter-preset)
   )
 
 (defun konix/org-today-time-stamp (&optional with-hm active)

@@ -429,11 +429,6 @@ to be organized.
 							 "Projects that should not have NEXT keyword")
 							)
 						   )
-				(stuck nil
-					   (
-						(org-agenda-overriding-header "Stuck projects")
-						)
-					   )
 				(tags "refile"
 					  (
 					   (org-agenda-overriding-header "Entries to be refiled")
@@ -441,6 +436,11 @@ to be organized.
 						'(konix/org-agenda-skip-if-heading "Refile"))
 					   )
 					  )
+				(stuck nil
+					   (
+						(org-agenda-overriding-header "Stuck projects")
+						)
+					   )
 				(todo "WAIT|DELEGATED"
 					  (
 					   (org-agenda-overriding-header "WAITING items")

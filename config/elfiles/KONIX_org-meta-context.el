@@ -205,9 +205,4 @@ contexts list"
   (message "Restriction is %s" konix/org-meta-context/restricted)
   )
 
-;; ####################################################################################################
-;; INIT
-;; ####################################################################################################
-(ignore-errors (konix/org-meta-context/initialize))
-
 (provide 'KONIX_org-meta-context)

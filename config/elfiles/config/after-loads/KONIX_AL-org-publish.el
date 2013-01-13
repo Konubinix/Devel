@@ -1,4 +1,4 @@
-;;; KONIX_AL-org.el-publish.el ---
+;;; KONIX_AL-org-publish.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -85,6 +85,8 @@
  :sitemap-filename "index.html"
  :sitemap-title "Index"
  :completion-function 'konix/org-publish-send-server
+ :exclude-tags '("draft" "noexport" "phantom")
+ :exclude "draft_"
  )
 (konix/push-or-replace-in-alist
  'org-publish-project-alist
@@ -95,5 +97,5 @@
  :completion-function 'konix/org-publish-send-server
  )
 
-(provide 'KONIX_AL-org.el-publish)
-;;; KONIX_AL-org.el-publish.el ends here
+(provide 'KONIX_AL-org-publish)
+;;; KONIX_AL-org-publish.el ends here

@@ -25,6 +25,7 @@
 		 (expand-file-name "rebox2" elfiles)
 		 (expand-file-name "helm" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)
+		 (expand-file-name "notmuch/contrib/notmuch-pick" devel-dir)
 		 (expand-file-name "readline-complete" elfiles)
 		 (expand-file-name "elnode" elfiles)
 		 (expand-file-name "langtool" elfiles)

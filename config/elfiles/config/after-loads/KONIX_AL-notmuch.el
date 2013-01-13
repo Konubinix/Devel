@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'notmuch-address)
+(require 'notmuch-pick)
 
 (defun konix/message-setup-hook ()
   (mml-secure-message-sign-pgpmime)

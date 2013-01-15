@@ -621,6 +621,8 @@ to be organized.
 				 (
 				  (org-agenda-skip-function
 				   'konix/org-agenda-skip-if-task-of-project)
+				  ;; projects should not be filtered by default
+				  (org-agenda-tag-filter-preset nil)
 				  )
 				 )
 				("aP" "All Projects"
@@ -640,6 +642,8 @@ to be organized.
 				  )
 				 (
 				  (org-agenda-overriding-header "All Projects")
+				  ;; projects should not be filtered by default
+				  (org-agenda-tag-filter-preset nil)
 				  )
 				 )
 				("ac" "Monthly schedule" agenda ""

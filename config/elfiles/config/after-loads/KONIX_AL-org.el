@@ -1075,6 +1075,9 @@ to be organized.
 (setq-default org-tag-persistent-alist
 			  `(
 				,@konix/org-tag-contexts
+				;; a commitment is something I am contractually (morally or
+				;; legally) engaged with
+				("commitment" . ?i)
 				("project" . ?p)
 				("maybe" . ?y)
 				("refile" . ?f)

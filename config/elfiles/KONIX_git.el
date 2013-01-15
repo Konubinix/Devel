@@ -560,7 +560,7 @@
 
 (defun konix/git/log/pick-axe (string)
   (interactive "sString:")
-  (konix/git/log nil nil nil (format "-S'%s'" string))
+  (konix/git/log nil nil nil (format "--pickaxe-regex -S'%s'" string))
   )
 
 (defun konix/git/cherry-pick ()

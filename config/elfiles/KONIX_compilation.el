@@ -446,7 +446,7 @@ PARAM : a string with parameters given to make
 (defun konix/compile (command &optional full_window _mode)
   (interactive
    (list
-	(read-string "Command : " konix/compile-command 'konix/compile-command-history)
+	(read-shell-command "Command : " konix/compile-command 'konix/compile-command-history)
 	)
    )
   (add-to-list 'konix/compile-command-history konix/compile-command)

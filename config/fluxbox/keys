@@ -110,6 +110,9 @@ Mod4 Left  : PrevWorkspace # LEFT
 Mod4 Insert : AddWorkspace
 Mod4 Delete   : RemoveLastWorkspace
 
+# special case of the logging of interuption that is non handling windows
+Mod4 j : Exec ec --eval '(konix/org-capture-interruption)'
+
 # ************************************************************
 # Manipulating window (Mod4 Shift)
 # ************************************************************

@@ -28,6 +28,7 @@
 (setq message-send-mail-function 'message-send-mail-with-sendmail)
 (setq-default message-sendmail-envelope-from 'header)
 (setq-default sendmail-program "konix_msmtp.sh")
+(setq-default message-forward-before-signature t)
 (setq-default message-sendmail-extra-arguments nil)
 (setq-default mm-text-html-renderer 'w3m
 			  gnus-inhibit-images t)
@@ -45,6 +46,26 @@
   )
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)
+
+(defadvice message-forward-make-body-mml (before go_after_mml_stuff ())
+  "with a new message like
+<#secure method=pgpmime mode=sign>
+
+--
+Signature
+
+If I want the content of a forwarded message to be put before the signature, I
+can set the message-forward-before-signature variable. Nonetheless, this would
+put the message content before the secure tag, making it not used. This advice
+make sure to insert any mml content after the secure tag
+"
+  (while (looking-at "<#")
+	(search-forward ">")
+	(next-line)
+	(beginning-of-line)
+	)
+  )
+(ad-activate 'message-forward-make-body-mml)
 
 (provide '400-KONIX_message)
 ;;; 400-KONIX_message.el ends here

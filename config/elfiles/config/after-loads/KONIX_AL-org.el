@@ -427,6 +427,7 @@ to be organized.
 						   (
 							(org-agenda-overriding-header
 							 "Projects that should not have NEXT keyword")
+							(org-agenda-tag-filter-preset nil)
 							)
 						   )
 				(tags "refile"
@@ -434,16 +435,19 @@ to be organized.
 					   (org-agenda-overriding-header "Entries to be refiled")
 					   (org-agenda-skip-function
 						'(konix/org-agenda-skip-if-heading "Refile"))
+					   (org-agenda-tag-filter-preset nil)
 					   )
 					  )
 				(stuck nil
 					   (
 						(org-agenda-overriding-header "Stuck projects")
+						(org-agenda-tag-filter-preset nil)
 						)
 					   )
 				(todo "WAIT|DELEGATED"
 					  (
 					   (org-agenda-overriding-header "WAITING items")
+					   (org-agenda-tag-filter-preset nil)
 					   )
 					  )
 				(todo "NEXT"
@@ -454,6 +458,7 @@ to be organized.
 						  t
 						  )
 						)
+					   (org-agenda-tag-filter-preset nil)
 					   (org-agenda-overriding-header
 						"NEXT items should not have phantom, maybe or project tag")
 					   )
@@ -465,6 +470,7 @@ to be organized.
 						  '("phantom" "maybe" "project")
 						  )
 						)
+					   (org-agenda-tag-filter-preset nil)
 					   (org-agenda-overriding-header "NEXT items to be scheduled")
 					   )
 					  )
@@ -479,6 +485,7 @@ to be organized.
 							   (konix/org-agenda-skip-if-task-of-project)
 							   )
 							 )
+							(org-agenda-tag-filter-preset nil)
 							(org-agenda-overriding-header "Todos that need to be organized")
 							)
 						   )
@@ -486,6 +493,7 @@ to be organized.
 						   (
 							(org-agenda-overriding-header
 							 "Next items without context assigned")
+							(org-agenda-tag-filter-preset nil)
 							)
 						   )
 				)

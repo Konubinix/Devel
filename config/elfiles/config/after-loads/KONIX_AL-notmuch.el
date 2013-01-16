@@ -50,6 +50,7 @@
 				)
 			  )
 (setq-default mailcap-download-directory (format "%s/" (getenv "KONIX_DOWNLOAD_DIR")))
+(setq-default notmuch-crypto-process-mime t)
 
 (setq notmuch-address-command "notmuch_addresses.py")
 

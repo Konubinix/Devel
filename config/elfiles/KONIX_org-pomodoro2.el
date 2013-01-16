@@ -322,6 +322,20 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 (add-hook 'org-timer-cancel-hook
 		  'konix/org-timer-cancel-pomodoro-hook)
 
+(defun konix/konix/org-capture-interruption-pre-hook ()
+  (konix/org-pomodoro-tray-daemon-put "j")
+  )
+(add-hook 'konix/org-capture-interruption-pre-hook
+		  'konix/konix/org-capture-interruption-pre-hook)
+
+(defun konix/org-pomodoro/org-capture-prepare-finalize-hook ()
+  "If in interruption, go back to the state before interrupted"
+  (konix/org-pomodoro-tray-daemon-put konix/org-pomodoro-tray-daemon-prev-state)
+  )
+(add-hook '
+ org-capture-prepare-finalize-hook
+		  'konix/org-pomodoro/org-capture-prepare-finalize-hook)
+
 ;; when a timer is done, launch the hook
 (defalias 'konix/org-timer-done-hook 'konix/org-timer-done-pomodoro-hook)
 (add-hook 'org-timer-done-hook

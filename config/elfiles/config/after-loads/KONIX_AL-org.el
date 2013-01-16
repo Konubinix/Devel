@@ -1589,8 +1589,10 @@ to be organized.
 	)
   )
 
+(defvar konix/org-capture-interruption-pre-hook '() "")
 (defun konix/org-capture-interruption (&optional goto)
   (interactive "P")
+  (run-hooks 'konix/org-capture-interruption-pre-hook)
   (cond
    ((equal goto '(4)) (org-capture-goto-target "j"))
    (t

@@ -1066,7 +1066,8 @@ to be organized.
 ;; If a project contains WAITing event, it is not stuck because something is
 ;; already going on. We won't loose track of the waiting item because it lies in
 ;; the "WAITING items" section
-(setq-default org-stuck-projects '("+project-maybe/-WAIT-DELEGATED-DONE-NOT_DONE" ("NEXT" "WAIT") ("") ""))
+(setq-default org-stuck-projects
+			  '("+project-maybe/-WAIT-DELEGATED-DONE-NOT_DONE" ("NEXT" "WAIT" "DELEGATED") ("") ""))
 (setq-default org-timer-default-timer 25)
 (setq-default org-time-clocksum-format "%d:%02d")
 (setq-default konix/org-tag-contexts

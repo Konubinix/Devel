@@ -1729,7 +1729,11 @@ to be organized.
  			 (prop (third property))
 			 )
 		 (while (re-search-forward regexp nil t)
-		   (add-text-properties (match-beginning match) (match-end match) prop)
+		   (let (
+				 (ov (make-overlay (match-beginning match) (match-end match)))
+				 )
+			 (overlay-put ov 'face prop)
+			 )
 		   )
 		 )
 	   )

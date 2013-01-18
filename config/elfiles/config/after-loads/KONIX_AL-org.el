@@ -971,7 +971,7 @@ to be organized.
 "
 				 :kill-buffer
 				 )
-				("f" "Todo Item for file" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("l" "Todo Item for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* TODO %?
   :LOGBOOK:
   - Captured       %U

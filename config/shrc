@@ -31,15 +31,6 @@ if [ -f "$KONIX_PERSO_DIR/perso" ]; then
 	source "$KONIX_PERSO_DIR/perso"
 fi
 
-# ######################################################################
-# Make makej use make bash completion
-# ######################################################################
-if [ -e "/usr/share/bash-completion/completions/make" ]
-then
-	source "/usr/share/bash-completion/completions/make"
-fi
-complete -F _make makej
-
 # ################################################################################
 # Aliases
 # ################################################################################
@@ -52,6 +43,17 @@ fi
 # Importation de mes fonctions persos
 # ################################################################################
 source "${KONIX_LIB_DIR}/lib_bash.sh"
+
+# ######################################################################
+# Bash completion custom
+# ######################################################################
+# load the bash completion script
+source_if_possible "/usr/share/bash-completion/bash_completion"
+# makej alias
+source_if_possible "/usr/share/bash-completion/completions/make"
+complete -F _make makej
+# get the aptitude completion from sjoubert repository
+source_if_possible "$KONIX_DEVEL_DIR/sjoubert_dot_rc/.config/bash/completions/aptitude"
 
 # Log sur l'agent SSH
 if is_on_linux

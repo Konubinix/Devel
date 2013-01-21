@@ -365,7 +365,7 @@ immediately after the section's start-tag."
 (setq-default nxml-section-element-name-regexp
 			  (concat
 			   nxml-section-element-name-regexp
-			   "\\|glossentry"
+			   "\\|glossentry\\|table"
 			   )
 			  )
 (setq-default nxml-heading-element-name-regexp

@@ -819,7 +819,7 @@ to be organized.
 				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )
-				("ae" "Errand view"
+ 				("ae" "Errand view"
 				 (
 				  (agenda nil
 						  (
@@ -848,6 +848,8 @@ to be organized.
 				  )
 				 nil
 				 ("~/errand_tasks.html")
+				 )
+ 				("ad" tags "//+DONE|//+CANCELED|//+NOT_DONE"
 				 )
 				)
 			  )

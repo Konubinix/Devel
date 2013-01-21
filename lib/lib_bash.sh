@@ -380,3 +380,16 @@ p () {
 b () {
 	popd && ls
 }
+
+source_if_possible () {
+    local file="$1"
+    if [ -r "$file" ]
+    then
+	    source "$file"
+        echo $file
+        return 0
+    else
+        echo "Cannot load $file"
+        return 1
+    fi
+}

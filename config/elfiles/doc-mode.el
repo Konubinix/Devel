@@ -134,8 +134,8 @@ For using single-line comments, see `doc-mode-allow-single-line-comments'"
                  (const :tag "On" t)))
 
 (defcustom doc-mode-template-keywords
-  '("deprecated" "param" "return" "author" "exception" "throws" "version"
-    "since" "see" "sa" "todo")
+  '("brief" "deprecated" "param" "return" "author" "exception" "throws"
+  "version" "since" "see" "sa" "todo")
   "*Keywords that should be listed in this order.
 All other keywords will be considered regular text."
   :group 'doc-mode
@@ -445,53 +445,63 @@ undetermined content should be created with `doc-mode-new-keyword'."
 (defun doc-mode-insert-doc (keywords &optional pos)
   "Insert a documentation at POS.
 LINES is a list of keywords."
-  (save-excursion
-    (if pos
-        (goto-char pos)
-      (setq pos (point)))
-    (let ((indent (current-column)))
+  (let (
+		(end (save-excursion
+			   (next-line)
+			   (point-marker)
+			   ))
+		)
+	(save-excursion
+	  (if pos
+		  (goto-char pos)
+		(setq pos (point)))
+	  (let (
+			(indent (current-column))
+			)
 
-      (if (and (not (cdr keywords)) doc-mode-allow-single-line-comments)
-          (progn (insert doc-mode-template-single-line-start)
-                 (doc-mode-insert (car keywords))
-                 (insert doc-mode-template-single-line-end "\n"))
-        (insert doc-mode-template-start "\n")
+		(if (and (not (cdr keywords)) doc-mode-allow-single-line-comments)
+			(progn (insert doc-mode-template-single-line-start)
+				   (doc-mode-insert (car keywords))
+				   (insert doc-mode-template-single-line-end "\n"))
+		  (insert doc-mode-template-start "\n")
 
-        ;; first line
-        (when (or (stringp (car keywords))
-                  (eq 'prompt (caar keywords)))
-          (doc-mode-insert-line (pop keywords) indent))
+		  ;; first line
+		  (when (or (stringp (car keywords))
+					(eq 'prompt (caar keywords)))
+			(doc-mode-insert-line `("brief"
+									,(pop keywords)
+									) indent))
 
-        (when (and doc-mode-template-empty-line-after-summary
-                   (or (null doc-mode-template-empty-line-before-keywords)
-                       (stringp (cadr keywords))))
-          (doc-mode-insert-line "" indent))
+		  (when (and doc-mode-template-empty-line-after-summary
+					 (or (null doc-mode-template-empty-line-before-keywords)
+						 (stringp (cadr keywords))))
+			(doc-mode-insert-line "" indent))
 
-        ;; paragraphs
-        (if (cdr keywords)
-            (while (stringp (car keywords))
-              (doc-mode-insert-line (pop keywords) indent)
-              (when (stringp (car keywords))
-                (doc-mode-insert-line "" indent)))
-          (while (stringp (car keywords))
-            (doc-mode-insert-line (pop keywords) indent)))
+		  ;; paragraphs
+		  (if (cdr keywords)
+			  (while (stringp (car keywords))
+				(doc-mode-insert-line (pop keywords) indent)
+				(when (stringp (car keywords))
+				  (doc-mode-insert-line "" indent)))
+			(while (stringp (car keywords))
+			  (doc-mode-insert-line (pop keywords) indent)))
 
-        (when doc-mode-template-empty-line-before-keywords
-          (doc-mode-insert-line "" indent))
+		  (when doc-mode-template-empty-line-before-keywords
+			(doc-mode-insert-line "" indent))
 
-        ;; keywords
-        (while keywords
-          (doc-mode-insert-keyword (pop keywords) indent))
-        (indent-to-column indent)
-        (insert doc-mode-template-end "\n"))
+		  ;; keywords
+		  (while keywords
+			(doc-mode-insert-keyword (pop keywords) indent))
+		  (indent-to-column indent)
+		  (insert doc-mode-template-end "\n"))
 
-      ;; re-indent original line
-      (if (< (current-column) indent)
-          (indent-to-column indent)
-        (move-to-column indent t))))
-
-    (and doc-mode-jump-to-template doc-mode-templates
-         (ignore-errors (doc-mode-next-template pos (point)))))
+		;; re-indent original line
+		(if (< (current-column) indent)
+			(indent-to-column indent)
+		  (move-to-column indent t))))
+	(and doc-mode-jump-to-template doc-mode-templates
+		 (ignore-errors (doc-mode-next-template pos (marker-position end)))))
+  )
 
 (defun doc-mode-remove-doc (point)
   "Remove the documentation before POINT."
@@ -736,8 +746,12 @@ Returns (length LIST) if no occurrence was found."
           (push (doc-mode-new-keyword "return") keywords))
       ;; remove
       (setq keywords (doc-mode-filter-keyword "return" keywords)))
-    (unless (stringp (car keywords))
+    (unless (or
+			 (stringp (car keywords))
+			 (string-equal (caar keywords) "brief")
+			 )
       (push `(prompt ,(format "Description for %s." (semantic-tag-name tag)))
+
             keywords))
     (doc-mode-sort-keywords (nconc (doc-mode-update-parameters old-params
                                                                new-params)

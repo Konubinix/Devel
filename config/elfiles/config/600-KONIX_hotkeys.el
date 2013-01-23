@@ -326,6 +326,7 @@
 (define-key 'konix/semantic-key-map "m" 'konix/semantic-mode)
 (define-key 'konix/semantic-key-map "r" 'senator-force-refresh)
 (define-key 'konix/semantic-key-map "s" 'semantic-ia-show-summary)
+(define-key 'konix/semantic-key-map "n" 'senator-next-tag)
 (define-key 'konix/semantic-key-map "j" 'semantic-ia-fast-jump)
 (define-key 'konix/semantic-key-map (kbd "C-j") 'senator-jump)
 (define-key 'konix/semantic-key-map "d" 'semantic-ia-show-doc)

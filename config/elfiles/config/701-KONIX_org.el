@@ -15,5 +15,6 @@
 				org-wl
 				org-babel
 				org-depend
+				org-checklist
 				)
 			  )

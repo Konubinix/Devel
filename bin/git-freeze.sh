@@ -12,7 +12,7 @@ do
 	git rm -f "$FILE"
 done
 print "# Adding untracked files"
-git ls-files -o | while read FILE
+git ls-files -o --exclude-standard | while read FILE
 do
 	if [ -s "$FILE" ]
 	then

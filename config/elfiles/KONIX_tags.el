@@ -235,7 +235,7 @@ TAGS_FILE_NAMETHE"
 	   (konix/compile-command-wrap "%s")
 	   (default-directory (file-name-directory(first tags-table-list)))
 	   )
-	(konix/compile (format "konix_etags_find_references.sh -t \"%s\" %s"
+	(konix/compile (format "konix_etags_find_references.sh -r -i -t \"%s\" %s"
 						   (mapconcat
 							'identity
 							tags

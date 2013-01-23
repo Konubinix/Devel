@@ -749,3 +749,22 @@
 ;; Use quilt
 ;; **********************************************************************
 (require 'quilt)
+
+;; ######################################################################
+;; Custom display table
+;; ######################################################################
+(setq-default konix/display-table (make-display-table))
+;; ZERO WIDTH characters made visible
+;; ZERO WIDTH JOINER
+(aset konix/display-table ?​ [? ])
+;; ZERO WIDTH NO-BREAK SPACE
+(aset konix/display-table ?‍ [? ])
+;; ZERO WIDTH NON-JOINER
+(aset konix/display-table ?﻿ [? ])
+;; ZERO WIDTH SPACE
+(aset konix/display-table ?‌ [? ])
+(setq-default buffer-display-table konix/display-table)
+
+;; Local Variables:
+;; coding: utf-8-unix
+;; End:

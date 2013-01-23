@@ -53,13 +53,18 @@ uzbl.formfiller = {
                 var selects = allFrames[j].document.getElementsByTagName("select");
                 for( var k = 0; k < selects.length; ++k ) {
                     var select = selects[k];
-                    if ( ! select.name ) {
+					var name = select.name;
+                    if ( ! name ) {
+						name = "id." + select.id;
+					}
+					if ( name == "id." ) {
+						// cannot find a name for the select
                         continue
                     }
 					var option = $(select).find("option:selected")[0];
 					var option_value = option.value;
                     rv += '%'
-						+ escape(select.name)
+						+ escape(name)
 						+ '(select):'
 						+ option_value
 						+ "\n";
@@ -97,8 +102,20 @@ uzbl.formfiller = {
                 }
 				else if ( ftype == 'select' ) {
 					fvalue = unescape(fvalue);
-					var select =
-						allFrames[j].document.getElementsByName(fname)[0];
+					var select;
+					if ( fname.match(/^id./) )
+					{
+						// use the id
+						var fid = fname.match(/^id.(.+)$/)[1];
+						select =
+							allFrames[j].document.getElementById(fid);
+					}
+					else
+					{
+						// fallback to the name
+						select =
+							allFrames[j].document.getElementsByName(fname)[0];
+					}
 					// remove the current selected option
 					$(select).find("option:selected").removeAttr("selected");
 					// find the option with the associated value and set it to

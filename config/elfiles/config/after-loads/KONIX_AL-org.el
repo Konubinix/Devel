@@ -1008,7 +1008,7 @@ to be organized.
 				 :kill-buffer
 				 )
 				("u" "Todo Item URGENT" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
-				 "* TODO [#G] %?
+				 "* NEXT [#G] %?
   SCHEDULED: %t
   :LOGBOOK:
   - Captured       %U

@@ -133,6 +133,12 @@ For using single-line comments, see `doc-mode-allow-single-line-comments'"
   :type '(choice (const :tag "Off" nil)
                  (const :tag "On" t)))
 
+(defcustom doc-mode-template-empty-line-after-paragraph t
+  "*Whether to put an empty line after each paragraph."
+  :group 'doc-mode
+  :type '(choice (const :tag "Off" nil)
+                 (const :tag "On" t)))
+
 (defcustom doc-mode-template-keywords
   '("copydoc" "brief" "deprecated" "remark" "note" "param" "pre" "post" "return" "author"
   "exception" "throw" "throws" "version" "since" "see" "sa" "bug" "todo" "note")
@@ -481,7 +487,10 @@ LINES is a list of keywords."
 		  (if (cdr keywords)
 			  (while (stringp (car keywords))
 				(doc-mode-insert-line (pop keywords) indent)
-				(when (stringp (car keywords))
+				(when (or
+					   (stringp (car keywords))
+					   doc-mode-template-empty-line-after-paragraph
+					   )
 				  (doc-mode-insert-line "" indent)))
 			(while (stringp (car keywords))
 			  (doc-mode-insert-line (pop keywords) indent)))

@@ -849,12 +849,32 @@ to be organized.
 				 nil
 				 ("~/errand_tasks.html")
 				 )
+ 				("ao" "Phone tasks"
+				 (
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Phone agenda")
+						   (org-agenda-tag-filter-preset '("+@phone"))
+						   )
+						  )
+				  (todo nil
+						(
+						 (org-agenda-overriding-header
+						  "Phone tasks")
+						 (org-agenda-tag-filter-preset '("+@phone"))
+						 )
+						)
+				  )
+				 nil
+				 ("~/errand_tasks.html")
+				 )
  				("ad" "Done tasks that might be put in archives"
 				 (
 				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
-						 "Done projects")
+						  "Done projects")
 						 (org-agenda-skip-function
 						  '(konix/org-agenda-skip-if-tags
 							'("project")
@@ -866,7 +886,7 @@ to be organized.
 				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
-						 "Done tasks (no project)")
+						  "Done tasks (no project)")
 						 (org-agenda-skip-function
 						  '(konix/org-agenda-skip-if-tags
 							'("project")

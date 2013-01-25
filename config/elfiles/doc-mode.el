@@ -695,13 +695,28 @@ argument value) or (keyword argument)."
   (let* ((paragraphs (doc-mode-clean-doc beg end))
          (doc "")
          (pos 0)
-         match results)
+         match results
+		 (regexp (doc-mode-keywords-regexp '("brief")))
+		 (separation nil)
+		 )
+	(with-temp-buffer
+	  (insert paragraphs)
+	  (goto-char (point-min))
+	  (skip-chars-forward " \t\n")
+	  (kill-region (point-min) (point))
+	  (setq separation
+			(if (re-search-forward regexp nil t)
+				(match-beginning 0)
+			  (point-max)
+			  )
+			)
+	  (setq doc
+			(buffer-substring-no-properties separation (point-max))
+			paragraphs
+			(buffer-substring-no-properties (point-min) separation)
+			)
+	  )
 
-    (when (string-match
-           "[ \t\n]*\\(\\(.\\|\n\\)*?\\)\\([@\\]\\<\\(.\\|\n\\)*\\'\\)"
-           paragraphs)
-      (setq doc (match-string-no-properties 3 paragraphs)
-            paragraphs (match-string-no-properties 1 paragraphs)))
 
     ;; first line summary
     (when (string-match "\\`[ \t\n]*\\(.+\\.\\)\\([ \n]+\\|\\'\\)" paragraphs)

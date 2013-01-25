@@ -825,24 +825,14 @@ to be organized.
 						  (
 						   (org-agenda-overriding-header
 							"Errand agenda")
-						   (org-agenda-skip-function
-							'(konix/org-agenda-skip-if-tags
-							  '("@errand")
-							  t
-							  )
-							)
+						   (org-agenda-tag-filter-preset '("+@errand"))
 						   )
 						  )
 				  (todo nil
 						(
 						 (org-agenda-overriding-header
 						  "Errand tasks")
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("@errand")
-							t
-							)
-						  )
+						 (org-agenda-tag-filter-preset '("+@errand"))
 						 )
 						)
 				  )
@@ -875,23 +865,14 @@ to be organized.
 						(
 						 (org-agenda-overriding-header
 						  "Done projects")
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project")
-							t
-							)
-						  )
+						 (org-agenda-tag-filter-preset '("+project"))
 						 )
 						)
 				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
 						  "Done tasks (no project)")
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project")
-							)
-						  )
+						 (org-agenda-tag-filter-preset '("+project"))
 						 )
 						)
 				  )

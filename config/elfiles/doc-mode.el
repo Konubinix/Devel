@@ -141,7 +141,7 @@ For using single-line comments, see `doc-mode-allow-single-line-comments'"
 
 (defcustom doc-mode-template-keywords
   '("copydoc" "brief" "deprecated" "remark" "note" "param" "pre" "post" "return" "author"
-  "exception" "throw" "throws" "version" "since" "see" "sa" "bug" "todo" "note")
+	"exception" "throw" "throws" "version" "since" "see" "sa" "bug" "todo" "note")
   "*Keywords that should be listed in this order.
 All other keywords will be considered regular text."
   :group 'doc-mode
@@ -200,38 +200,38 @@ undetermined content should be created with `doc-mode-new-keyword'."
 (defconst doc-mode-font-lock-keywords
   (eval-when-compile
     `((,(concat "[\\@]"
-         (regexp-opt
-          '("addindex" "addtogroup" "anchor" "arg" "author" "brief" "callgraph"
-            "callergraph" "category" "code" "cond" "copydoc" "date" "defgroup"
-            "deprecated" "details" "dir" "dontinclude" "dot" "dotfile" "e"
-            "else" "elseif" "em" "endcode" "endcond" "enddot" "endhtmlonly"
-            "endif" "endlatexonly" "endlink" "endmanonly" "endmsc" "endverbatim"
-            "endxmlonly" "example" "f$" "f[" "f]" "file" "fn" "hideinitializer"
-            "htmlinclude" "htmlonly" "if" "ifnot" "image" "include"
-            "includelineno" "ingroup" "internal" "invariant" "latexonly" "li"
-            "line" "link" "mainpage" "manonly" "msc" "name" "nosubgrouping"
-            "note" "overload" "package" "page" "par" "paragraph"  "post" "pre"
-            "private" "privatesection" "property" "protected" "protectedsection"
-            "public" "publicsection" "ref" "remarks" "return" "retval" "sa"
-            "section" "see" "serial" "serialData" "serialField"
-            "showinitializer" "since" "skip" "skipline" "subpage" "subsection"
-            "subsubsection" "test" "typedef" "until" "defvar" "verbatim"
-            "verbinclude" "version" "weakgroup" "xmlonly" "xrefitem" "$" "@"
-            "\\" "&" "~" "<" ">" "#" "%") t)
-         "\\>")
+				(regexp-opt
+				 '("addindex" "addtogroup" "anchor" "arg" "author" "brief" "callgraph"
+				   "callergraph" "category" "code" "cond" "copydoc" "date" "defgroup"
+				   "deprecated" "details" "dir" "dontinclude" "dot" "dotfile" "e"
+				   "else" "elseif" "em" "endcode" "endcond" "enddot" "endhtmlonly"
+				   "endif" "endlatexonly" "endlink" "endmanonly" "endmsc" "endverbatim"
+				   "endxmlonly" "example" "f$" "f[" "f]" "file" "fn" "hideinitializer"
+				   "htmlinclude" "htmlonly" "if" "ifnot" "image" "include"
+				   "includelineno" "ingroup" "internal" "invariant" "latexonly" "li"
+				   "line" "link" "mainpage" "manonly" "msc" "name" "nosubgrouping"
+				   "note" "overload" "package" "page" "par" "paragraph"  "post" "pre"
+				   "private" "privatesection" "property" "protected" "protectedsection"
+				   "public" "publicsection" "ref" "remarks" "return" "retval" "sa"
+				   "section" "see" "serial" "serialData" "serialField"
+				   "showinitializer" "since" "skip" "skipline" "subpage" "subsection"
+				   "subsubsection" "test" "typedef" "until" "defvar" "verbatim"
+				   "verbinclude" "version" "weakgroup" "xmlonly" "xrefitem" "$" "@"
+				   "\\" "&" "~" "<" ">" "#" "%") t)
+				"\\>")
        (0 font-lock-keyword-face prepend))
       ;; don't highlight \n, it's too common in code
       ("@n" (0 font-lock-keyword-face prepend))
       (,(concat "\\([@\\]"
-         (regexp-opt '("class" "struct" "union" "exception" "enum" "throw"
-                       "throws") t)
-         "\\)\\>\\(?:[ \t]+\\(\\sw+\\)\\)?")
+				(regexp-opt '("class" "struct" "union" "exception" "enum" "throw"
+							  "throws") t)
+				"\\)\\>\\(?:[ \t]+\\(\\sw+\\)\\)?")
        (1 font-lock-keyword-face prepend)
        (3 font-lock-type-face prepend))
       (,(concat "\\([@\\]"
-         (regexp-opt '("param" "param[in]" "param[out]" "param[in+out]" "a"
-                       "namespace" "relates" "relatesalso" "def") t)
-         "\\)\\>\\(?:[ \t]+\\(\\sw+\\)\\)?")
+				(regexp-opt '("param" "param[in]" "param[out]" "param[in+out]" "a"
+							  "namespace" "relates" "relatesalso" "def") t)
+				"\\)\\>\\(?:[ \t]+\\(\\sw+\\)\\)?")
        (1 font-lock-keyword-face prepend)
        (3 font-lock-variable-name-face prepend))
       (,(concat "\\([@\\]retval\\)\\>\\(?:[ \t]+\\(\\sw+\\)\\)?")
@@ -241,8 +241,8 @@ undetermined content should be created with `doc-mode-new-keyword'."
                 "\\>")
        (0 font-lock-warning-face prepend))
       (,(concat "{@"
-         (regexp-opt '("docRoot" "inheritDoc" "link" "linkplain" "value") t)
-         "}")
+				(regexp-opt '("docRoot" "inheritDoc" "link" "linkplain" "value") t)
+				"}")
        (0 font-lock-keyword-face prepend))
       ("\\([@\\]b\\)[ \t\n]+\\([^ \t\n]+\\)"
        (1 font-lock-keyword-face prepend)
@@ -601,7 +601,7 @@ returned.  Otherwise a cons of the doc's beginning and end is given."
 (defun doc-mode-find-summary (beg end)
   (save-excursion
     (goto-char beg)
-    (if (or (re-search-forward "^[@\\]brief \\([^\t ][^\n]*\n\\)" end t)
+    (if (or (re-search-forward "^[@\\]\\(brief\\|copydoc\\) \\(?1:[^\t ][^\n]*\n\\)" end t)
             (re-search-forward "\\<\\(.*\\)\\(\\*+/\\|\n\\)" end t))
         (cons (match-beginning 1) (match-end 1))
       (cons beg beg))))
@@ -696,7 +696,7 @@ argument value) or (keyword argument)."
          (doc "")
          (pos 0)
          match results
-		 (regexp (doc-mode-keywords-regexp '("brief")))
+		 (regexp (doc-mode-keywords-regexp '("brief" "copydoc")))
 		 (separation nil)
 		 )
 	(with-temp-buffer
@@ -786,13 +786,13 @@ Returns (length LIST) if no occurrence was found."
 (defun doc-mode-keyword< (a b tag)
   (if (equal (car a) "param")
       (let* ((args (mapcar 'semantic-tag-name
-                          (semantic-tag-get-attribute tag :arguments)))
+						   (semantic-tag-get-attribute tag :arguments)))
              (a-param (cadr a))
              (b-param (cadr b))
              (a-pos (doc-mode-position a-param args))
              (b-pos (doc-mode-position b-param args)))
         (if (= a-pos b-pos)
-             (string< a-param b-param)
+			(string< a-param b-param)
           (< a-pos b-pos)))
     (string< (cadr a) (cadr b))))
 

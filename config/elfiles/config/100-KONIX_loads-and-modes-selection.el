@@ -132,6 +132,8 @@
 (autoload 'macro-math-eval-and-round-region "macro-math" t nil)
 (autoload 'macro-math-eval-region "macro-math" t nil)
 (autoload 'highlight-symbol-at-point "highlight-symbol" t nil)
+(autoload 'highlight-symbol-next "highlight-symbol" t nil)
+(autoload 'highlight-symbol-prev "highlight-symbol" t nil)
 ;; full ack autoloads
 (autoload 'ack-same "full-ack" nil t)
 (autoload 'ack "full-ack" nil t)

@@ -629,6 +629,65 @@ returned.  Otherwise a cons of the doc's beginning and end is given."
         (pop lines))
       (mapconcat 'identity lines "\n"))))
 
+(defun doc-mode-keywords-regexp (&optional exclude)
+  (format "[@\\]\\(%s\\)\\>"
+		  (mapconcat
+		   'identity
+		   (remove-if
+			(lambda (elem)
+			  (member elem exclude)
+			  )
+			doc-mode-template-keywords
+			)
+		   "\\|"
+		   )
+		  )
+  )
+
+(defun doc-mode-split-keywords (doc)
+  ;;(split-string doc "[@\\]\\<")
+  (let (
+		(regexp ;; regexp matching the beginning of a keyword
+		 (doc-mode-keywords-regexp)
+		 )
+		(result '(""))
+		)
+	(with-temp-buffer
+	  (insert doc)
+	  (goto-char (point-min))
+	  (while (re-search-forward regexp nil t)
+		(let (
+			  (keyword (match-string 1))
+			  (value "")
+			  )
+		  (kill-region (match-beginning 0) (match-end 0))
+		  ;; go to next keyword or end of line
+		  (if (re-search-forward regexp nil t)
+			  ;; on next keyword, get the content of previous keyword
+			  (goto-char (match-beginning 0))
+			;; on last keyword, go to the end of the buffer
+			(goto-char (point-max))
+			)
+		  (setq value (buffer-substring-no-properties (point-min) (point)))
+		  (add-to-list 'result
+					   (format "%s%s"
+							   keyword
+							   value
+							   )
+					   t
+					   )
+		  ;; remove the content
+		  (kill-region (point-min) (point))
+		  )
+		)
+	  ;; make sure nothing is left behind
+	  (assert (equal (point-min) (point-max)))
+	  )
+	result
+	)
+
+  )
+
 (defun doc-mode-extract-keywords (beg end)
   "Extract documentation keywords between BEG and END.
 Returns a alist of keywords, where each element is the list (keyword
@@ -655,7 +714,7 @@ argument value) or (keyword argument)."
       (push (replace-regexp-in-string "[\n\r]" " " paragraph) results))
 
     ;; keywords
-    (dolist (keyword (cdr (split-string doc "[@\\]\\<")))
+    (dolist (keyword (cdr (doc-mode-split-keywords doc)))
       (setq match (split-string keyword))
       (push (if (equal (car match) "param")
                 (list (car match) (cadr match)

@@ -25,6 +25,10 @@
 ;;; Code:
 
 (define-key konix/global-fast-key-map (kbd "d") doc-mode-prefix-map)
+(setq-default doc-mode-template-empty-line-after-summary t
+			  doc-mode-template-empty-line-before-keywords nil
+			  doc-mode-template-empty-line-after-paragraph t
+			  )
 
 (provide 'KONIX_AL-doc-mode)
 ;;; KONIX_AL-doc-mode.el ends here

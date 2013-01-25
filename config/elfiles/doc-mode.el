@@ -487,9 +487,11 @@ LINES is a list of keywords."
 									(pop keywords)
 									) indent))
 
-		  (when (and doc-mode-template-empty-line-after-summary
-					 (or (null doc-mode-template-empty-line-before-keywords)
-						 (stringp (cadr keywords))))
+		  (when (and
+				 doc-mode-template-empty-line-after-summary
+				 ;; it is only necessary if there is something after
+				 keywords
+				 )
 			(doc-mode-insert-line "" indent))
 
 		  ;; paragraphs

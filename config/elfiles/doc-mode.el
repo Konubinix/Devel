@@ -178,6 +178,12 @@ If this is nil, `comment-fill-column' is used."
   :type '(choice (const :tag "Default" nil)
                  (integer :tag "Fill Column")))
 
+(defcustom doc-mode-first-line-is-brief nil
+  "*Whether the first line is expected to have brief before its content."
+  :group 'doc-mode
+  :type '(choice (const :tag "Off" nil)
+                 (const :tag "On" t)))
+
 (defcustom doc-mode-keywords-from-tag-func 'doc-mode-keywords-from-tag
   "*Function used to generate keywords for a tag.
 This must be a function that takes two arguments.  The first argument is the
@@ -474,8 +480,11 @@ LINES is a list of keywords."
 		  ;; first line
 		  (when (or (stringp (car keywords))
 					(eq 'prompt (caar keywords)))
-			(doc-mode-insert-line `("brief"
-									,(pop keywords)
+			(doc-mode-insert-line (if doc-mode-first-line-is-brief
+									  `("brief"
+										,(pop keywords)
+										)
+									(pop keywords)
 									) indent))
 
 		  (when (and doc-mode-template-empty-line-after-summary

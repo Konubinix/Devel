@@ -7,6 +7,7 @@
 ;; ####################################################################################################
 ;; Default font, simple, nice!!
 (setq-default konix/default-font "Monospace 10")
+
 (set-default-font konix/default-font)
 (setq-default default-frame-alist
 			  `(
@@ -226,6 +227,13 @@
 			 '(konix/delete-trailing-whitespace . nil))
 (add-to-list 'safe-local-variable-values
 			 '(auto-revert-mode . t))
+(add-to-list 'safe-local-variable-values
+			 '(ispell-dictionary . "francais"))
+(add-to-list 'safe-local-variable-values
+			 '(ispell-dictionary . "british"))
+(add-to-list 'safe-local-variable-values
+			 '(ispell-dictionary . "americain"))
+
 (add-hook 'before-save-hook 'konix/delete-trailing-whitespace)
 (add-hook 'before-save-hook 'konix/adjust-new-lines-at-end-of-file)
 (add-hook 'before-save-hook 'konix/check-paren-warn)

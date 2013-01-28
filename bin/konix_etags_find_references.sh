@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -x
+# set -x
 TAGS_FILES=TAGS
 
 usage () {
@@ -27,7 +27,7 @@ while getopts "hrit:" opt; do
         i)
             CASE="I"
             ;;
-    esac
+            esac
 done
 shift $((OPTIND-1))
 # ####################################################################################################
@@ -61,7 +61,18 @@ $new_tags"
 fi
 
 IFS=$'\n'
-sed -n -e "
+PWD=`pwd`
+for tag_file in $ALL_TAGS_FILES
+do
+    # adjust the path relatively to pwd
+    tag_dir=`dirname "$tag_file"`
+    relpath=`konix_relative_path.sh "$PWD" "$tag_dir"`
+    if [ -n "$relpath" ]
+    then
+        relpath="$relpath/"
+    fi
+
+    sed -n -e "
 # record the file name
 /^$/ {
    n
@@ -71,7 +82,8 @@ sed -n -e "
 /^.\+$REF.\+$/$CASE {
    /[]/ ! d
    G
-   s/^\(.*\)\(.\+\)\(.\+\),\(.\+\)\n\(.\+\)$/\5:\3:\1 (\2, \4)/
+   s|^\(.*\)\(.\+\)\(.\+\),\(.\+\)\n\(.\+\)$|$relpath\5:\3:\1 (\2, \4)|
    p
 }
-" $ALL_TAGS_FILES
+" "$tag_file"
+done

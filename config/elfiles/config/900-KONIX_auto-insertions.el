@@ -56,11 +56,6 @@ Add a yasnippet template with key %s"
 							  (auto-insert-use-yasnippet-template "py")
 							  )
 						   )
-	 (redefine-auto-insert "\.org"
-						   '(lambda()
-							  (auto-insert-use-yasnippet-template "org")
-							  )
-						   )
 	 )
   )
 

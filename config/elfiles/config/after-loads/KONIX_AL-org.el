@@ -859,20 +859,28 @@ to be organized.
 				 nil
 				 ("~/errand_tasks.html")
 				 )
- 				("ad" "Done tasks that might be put in archives"
+ 				("ad" "Done projects that might be put in archives"
 				 (
 				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
 						  "Done projects")
-						 (org-agenda-tag-filter-preset '("+project"))
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags
+							'("project")
+							t)
+						  )
 						 )
 						)
 				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
 						  "Done tasks (no project)")
-						 (org-agenda-tag-filter-preset '("+project"))
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags
+							'("project")
+							)
+						  )
 						 )
 						)
 				  )

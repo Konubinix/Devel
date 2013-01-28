@@ -171,7 +171,7 @@ contexts list"
 
 (defun konix/org-meta-context/echo-current-context ()
   (interactive)
-  (message "Current context is %s" org-directory)
+  (message "Current context is %s, restricted is %s" org-directory konix/org-meta-context/restricted)
   )
 
 (setq konix/org-meta-context/restricted -1)

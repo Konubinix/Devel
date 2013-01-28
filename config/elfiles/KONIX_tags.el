@@ -225,7 +225,7 @@ TAGS_FILE_NAMETHE"
 
 (defun konix/tags/find-references (elem &optional tags)
   (interactive
-   (list (konix/_get-string "Elem : "))
+   (list (konix/_get-string "Elem"))
    )
   (unless tags
 	(setq tags tags-table-list)
@@ -235,7 +235,35 @@ TAGS_FILE_NAMETHE"
 	   (konix/compile-command-wrap "%s")
 	   (default-directory (file-name-directory(first tags-table-list)))
 	   )
-	(konix/compile (format "konix_etags_find_references.sh -r -i -t \"%s\" %s"
+	(push-tag-mark)
+	(konix/compile (format "konix_etags_find_references.sh -r -i -t \"%s\" \"%s\""
+						   (mapconcat
+							'identity
+							tags
+							","
+							)
+						   elem
+						   )
+				   nil
+				   'grep-mode
+				   )
+	)
+  )
+
+(defun konix/tags/grep (elem &optional tags)
+  (interactive
+   (list (konix/_get-string "Elem"))
+   )
+  (unless tags
+	(setq tags tags-table-list)
+	)
+
+  (let(
+	   (konix/compile-command-wrap "%s")
+	   (default-directory (file-name-directory(first tags-table-list)))
+	   )
+	(push-tag-mark)
+	(konix/compile (format "konix_etags_grep.sh -r -i -t \"%s\" \"%s\""
 						   (mapconcat
 							'identity
 							tags

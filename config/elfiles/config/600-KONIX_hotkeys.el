@@ -441,6 +441,7 @@
 (define-key 'konix/tags/map (kbd "I") 'konix/tags/init)
 (define-key 'konix/tags/map (kbd "d") 'konix/tags/add-tags-dirs-current-head)
 (define-key 'konix/tags/map (kbd "R") 'konix/tags/find-references)
+(define-key 'konix/tags/map (kbd "G") 'konix/tags/grep)
 (define-key 'konix/tags/map (kbd "n") 'konix/tags/next-head)
 (define-key 'konix/tags/map (kbd "g") 'konix/tags/goto-dir)
 (define-key 'konix/tags/map (kbd "c") 'konix/tags/create)

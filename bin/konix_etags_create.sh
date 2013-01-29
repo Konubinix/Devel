@@ -79,7 +79,10 @@ if [ -n "$TAGINCLUDES_FILE" ]
 then
 	konix_file_to_lines "$TAGINCLUDES_FILE" " --etags-include=" "#"
 	RES="${RES//\\//}"
-	TAGINCLUDES_CMD="--etags-include=$RES"
+    if [ -n "$RES" ]
+    then
+	    TAGINCLUDES_CMD="--etags-include=$RES"
+    fi
 fi
 
 eval ctags $VERBOSE_CMD \
@@ -91,7 +94,7 @@ eval ctags $VERBOSE_CMD \
 	$TAGINCLUDES_CMD
 echo updating tags with kinds
 konix_etags_add_kinds.sh 'TAGS'
-if [ $? == 0 ]
+if [ "$?" == "0" ]
 then
 	echo kinds added
 else

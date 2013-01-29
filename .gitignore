@@ -10,3 +10,4 @@ gnome-run
 devel_bin
 .pc/*
 !.pc/series
+exaile

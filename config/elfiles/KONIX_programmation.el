@@ -86,7 +86,7 @@ They can be relative or absolute
 	(
 	 ((class color)
 	  (background light))
-	 (:background "gray98")
+	 (:background "gray95")
 	 )
 	(
 	 ((class color)

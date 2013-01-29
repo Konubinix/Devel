@@ -1559,6 +1559,17 @@ to be organized.
 	)
   )
 
+(defun konix/org-adjust-effort ()
+  "Set the value of the effort of the entry at point to the value
+of the clocksum."
+  (interactive)
+  (org-entry-put
+   (point)
+   "Effort"
+   (org-entry-get (point) "CLOCKSUM")
+   )
+  )
+
 ;; un parent est DONE quand à 100%
 (setq org-after-todo-statistics-hook 'konix/org-summary-todo)
 (defcustom konix/org-mode-font-lock-keywords

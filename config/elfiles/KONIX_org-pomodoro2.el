@@ -195,6 +195,49 @@ what to do ? (Start pomodoro (s), Break (b), Long break (B), Quit (q))" warning 
 	)
   )
 
+(setq konix/org-pomodoro-break-done-decide_already_in nil)
+(defun konix/org-pomodoro-break-done-decide (prompt)
+  (interactive)
+  (unless konix/org-pomodoro-break-done-decide_already_in
+	(setq konix/org-pomodoro-break-done-decide_already_in t)
+	(unwind-protect
+		(let (
+			  (warning "")
+			  decision
+			  )
+		  (while (not decision)
+			(setq decision
+				  (read-event (format "%s%s
+what to do ? (Show agenda (a),  New pomodoro (n), Quit (q))" warning prompt))
+				  )
+			(case decision
+			  (?n
+			   (konix/org-pomodoro-start)
+			   )
+			  (?a
+			   (org-agenda nil "aA")
+			   )
+			  (?q
+			   (when (and
+					  (org-clocking-p)
+					  (y-or-n-p "Clock out current clock ?")
+					  )
+				 (org-clock-out)
+				 )
+			   )
+			  (t
+			   (setq warning "You must enter a, n or q
+")
+			   (setq decision nil)
+			   )
+			  )
+			)
+		  )
+	  (setq konix/org-pomodoro-break-done-decide_already_in nil)
+	  )
+	)
+  )
+
 (defun konix/org-pomodoro-convert-time-into-pomodoro (time_string)
   "Convert a time string in format 'HH:MM' into a number of equivalent pomodoro
 of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
@@ -280,14 +323,7 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 
 (defun konix/org-timer-done-break-pomodoro-hook ()
   (konix/org-pomodoro-tray-daemon-put "b")
-  (if (y-or-n-p-with-timeout
-	   (format-time-string
-		"<%Y-%m-%d %a %H:%M:%S> : Break done, start another pomodoro ?")
-	   30
-	   nil)
-	  (konix/org-pomodoro-start)
-	(message "You should start a pomodorro when you are ready")
-	)
+  (konix/org-pomodoro-break-done-decide "Break done")
   )
 
 (defun konix/org-clock-in-pomodoro-hook ()

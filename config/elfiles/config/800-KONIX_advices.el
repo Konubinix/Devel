@@ -138,3 +138,13 @@
   (org-mark-ring-push)
   )
 (ad-activate 'org-open-at-point)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Auto insert does nothing if the file already exists ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defadvice auto-insert (around do_nothing_already_existing_file ())
+  (unless (file-exists-p (buffer-file-name))
+	ad-do-it
+	)
+  )
+(ad-activate 'auto-insert)

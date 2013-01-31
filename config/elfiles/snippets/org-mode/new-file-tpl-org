@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: new-file-tpl-org
 # --
-* Refile
+* Refile :refile:
 * Diary
-* Someday/Maybe
+* Someday/Maybe :maybe:

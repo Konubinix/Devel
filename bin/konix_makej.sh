@@ -1,4 +1,4 @@
 #!/bin/bash
 
-NB_CPU="$(konix_nb_cpu.py)"
-make -j$((1+NB_CPU)) "$@"
+USED_JOBS="${JOBS:-$(($(nproc) + 1))}"
+make -j$USED_JOBS "$@"

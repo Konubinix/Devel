@@ -41,6 +41,7 @@
 		 (expand-file-name "bash-completion" elfiles)
 		 (expand-file-name "codesearch" elfiles)
 		 (expand-file-name "autopair" elfiles)
+		 (expand-file-name "ace-jump-mode" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -186,6 +187,8 @@
 (autoload 'konix/push-tags-mark "KONIX_tags" "" t)
 ;; imenu
 (autoload 'imenu-tree "imenu-tree" "" t)
+;; ace-jump
+(autoload 'ace-jump-mode "ace-jump-mode" "" t)
 
 ;; ************************************************************
 ;; Automodes

@@ -140,9 +140,9 @@ For using single-line comments, see `doc-mode-allow-single-line-comments'"
                  (const :tag "On" t)))
 
 (defcustom doc-mode-template-keywords
-  '("copydoc" "brief" "deprecated" "remark" "note" "param" "tparam" "pre" "post"
-  "return" "author" "exception" "throw" "throws" "version" "since" "see" "sa"
-  "bug" "todo" "note")
+  '("copydoc" "brief" "deprecated" "remark" "note" "warning" "param" "tparam" "pre" "post"
+	"return" "author" "exception" "throw" "throws" "version" "since" "see" "sa"
+	"bug" "todo" "note")
   "*Keywords that should be listed in this order.
 All other keywords will be considered regular text."
   :group 'doc-mode

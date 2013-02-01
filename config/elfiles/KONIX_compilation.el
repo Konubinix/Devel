@@ -319,8 +319,11 @@ PARAM : a string with parameters given to make
 					konix/compile/nb-cpu
 					)
 				   (konix/compile/nb-cpu
-					(1+
-					 (string-to-number (shell-command-to-string "konix_nb_cpu.py"))
+					(or
+					 (getenv "JOBS")
+					 (1+
+					  (string-to-number (shell-command-to-string "nproc"))
+					  )
 					 )
 					)
 				   (t

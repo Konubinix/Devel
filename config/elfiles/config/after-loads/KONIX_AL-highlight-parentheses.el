@@ -26,7 +26,7 @@
 
 (setq-default
  hl-paren-background-colors
- '("salmon" "light pink" "orange1" "SpringGreen1")
+ '("lawn green" "orange1" "light pink" "SpringGreen1")
  )
 
 (setq-default

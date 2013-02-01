@@ -1052,8 +1052,26 @@ to be organized.
    %:initial"
 				 :kill-buffer
 				 )
-				("I" "Bookmark in current clock (use with org-protocol)" entry
-				 (clock) "* TODO Read %:description
+				("C" "Bookmark in current clock (use with org-protocol)" entry
+				 (clock) "* %:description
+  :LOGBOOK:
+  - Captured       %U
+  :END:
+   %:link
+   %:initial"
+				 :kill-buffer
+				 )
+				("D" "Bookmark TODO (use with org-protocol)" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				 "* TODO Read %:description
+  :LOGBOOK:
+  - Captured       %U
+  :END:
+   %:link
+   %:initial"
+				 :kill-buffer
+				 )
+				("E" "Bookmark TODO in current clock (use with org-protocol)" entry (clock)
+				 "* TODO Read %:description
   :LOGBOOK:
   - Captured       %U
   :END:

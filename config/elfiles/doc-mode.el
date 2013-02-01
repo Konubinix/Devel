@@ -845,9 +845,24 @@ Returns (length LIST) if no occurrence was found."
 			 (stringp (car keywords))
 			 (string-equal (caar keywords) "brief")
 			 )
-      (push `(prompt ,(format "Description for %s." (semantic-tag-name tag)))
+      (push
+	   `(prompt
+		 ,(format "%s %s."
+				  (cond
+				   ((semantic-tag-function-destructor-p tag)
+					"Destructor of"
+					)
+				   ((semantic-tag-function-constructor-p tag)
+					"Destructor of"
+					)
+				   (t
+					"Description for"
+					)
+					)
+				  (semantic-tag-name tag)
+				  ))
 
-            keywords))
+	   keywords))
     (doc-mode-sort-keywords (nconc (doc-mode-update-parameters old-params
                                                                new-params)
                                    (doc-mode-filter-keyword "param" keywords))

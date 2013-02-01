@@ -11,6 +11,7 @@
 # no match, the user agent is not changed.
 
 . "$UZBL_UTIL_DIR/uzbl-dir.sh"
+UZBL_URI="$1"
 
 USER_AGENT_FILE="${UZBL_PER_SITE_USERAGENT_FILE:-${UZBL_DATA_DIR}/useragents.txt}"
 NEW_USER_AGENT=""

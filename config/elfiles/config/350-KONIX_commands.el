@@ -864,11 +864,23 @@ Will prompt you shell name when you type `C-u' before this command."
 	(save-match-data
 	  (save-excursion
 		(goto-char (point-max))
-		(when (looking-back "[ \t\n\r]+" nil t)
+		(when (not
+			   (or
+				;; only one line, do not attempt to insert another one
+				(<
+				 (line-number-at-pos)
+				 1
+				 )
+				;; only one new line at end of file, it is ok, then do nothing
+				(looking-back "[^\n\r\t ]\n\r?" nil t)
+				)
+			   )
+		  ;; delete all trailing spaces
+		  (looking-back "[ \t\n\r]+" nil t)
 		  (delete-region (match-beginning 0) (match-end 0))
-		  )
-		(insert "
+		  (insert "
 ")
+		  )
 		)
 	  )
 	)

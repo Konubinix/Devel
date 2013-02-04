@@ -1569,6 +1569,11 @@ to be organized.
 
   )
 
+(defun konix/org-sparse-next-actions ()
+  (interactive)
+  (org-occur (concat "^" org-outline-regexp " *\\(NEXT\\)\\>"))
+  )
+
 (defun konix/org-list-sort-not-done-first ()
   (interactive)
   (if (looking-at "^ +- \\[ \\]")

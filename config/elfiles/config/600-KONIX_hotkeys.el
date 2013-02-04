@@ -574,6 +574,7 @@
 (define-key 'konix/org-global-map "D" 'konix/org-goto-org-directory)
 (define-key 'konix/org-global-map "i" 'org-id-copy)
 (define-key 'konix/org-global-map "/" 'org-sparse-tree)
+(define-key 'konix/org-global-map "-" 'konix/org-sparse-next-actions)
 (define-key 'konix/org-global-map (kbd "C-l") 'org-toggle-link-display)
 (define-key 'konix/org-global-map (kbd "M-o") 'osg)
 

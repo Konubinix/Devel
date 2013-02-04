@@ -876,8 +876,9 @@ Will prompt you shell name when you type `C-u' before this command."
 				)
 			   )
 		  ;; delete all trailing spaces
-		  (looking-back "[ \t\n\r]+" nil t)
-		  (delete-region (match-beginning 0) (match-end 0))
+		  (when (looking-back "[ \t\n\r]+" nil t)
+			(delete-region (match-beginning 0) (match-end 0))
+		   )
 		  (insert "
 ")
 		  )

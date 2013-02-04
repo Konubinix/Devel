@@ -128,6 +128,9 @@ cursor stays in the org buffer."
 ;; ####################################################################################################
 ;; CONFIG
 ;; ####################################################################################################
+(defcustom konix/org-worday-number-hours 8
+  ""
+  )
 (setq-default org-directory (concat perso-dir "/wiki"))
 (setq-default org-agenda-clockreport-parameter-plist `(:link t :maxlevel 5 :emphasize t :link t :timestamp t))
 (defun konix/org-skip-other-meta-context ()

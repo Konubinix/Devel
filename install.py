@@ -65,7 +65,6 @@ if is_on_linux():
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "fluxbox"),   os.path.join(environ["HOME"], ".fluxbox"))
 
         substitute(os.path.join(environ["KONIX_DEVEL_DIR"],  "bin"),       os.path.join(environ["HOME"], ".fluxbox/devel_bin"))
-        substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "conky"),     os.path.join(environ["HOME"], ".conky.d"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "ideskrc"),   os.path.join(environ["HOME"], ".ideskrc"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "idesktop"),  os.path.join(environ["HOME"], ".idesktop"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "Xdefaults"), os.path.join(environ["HOME"], ".Xdefaults"))

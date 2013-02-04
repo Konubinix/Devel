@@ -28,7 +28,7 @@ sleep 4
     fbpager -w &
     killall conky
     wicd-gtk -t &
-    conky -d -c ~/.conky.d/conky1 > ~/conky.log 2> ~/conky.err
+    conky -d -c "$KONIX_CONKYRC" > ~/conky.log 2> ~/conky.err
 	pcmanfm -d --no-desktop & # nice and simple desktop manager
 	# start de emacs_tray_daemon if possible
 	emacs_tray_daemon.py &

@@ -599,7 +599,19 @@ to be organized.
 				 )
 				("ay" "Maybe list"
 				 (
-				  (tags-todo "maybe")
+				  (tags-todo "+maybe-project"
+							 (
+							  (org-agenda-overriding-header
+							   "Maybe tasks (without projects)")
+							  (org-tags-exclude-from-inheritance nil)
+							  )
+							 )
+				  (tags-todo "+project+maybe"
+							 (
+							  (org-agenda-overriding-header
+							   "Maybe Projects")
+							  )
+							 )
 				  )
 				 (
 				  )

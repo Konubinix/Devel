@@ -51,12 +51,12 @@ Add a yasnippet template with key %s"
 							  )
 						   )
 
-	 (redefine-auto-insert "\.py"
+	 (redefine-auto-insert "\\.py\\'"
 						   '(lambda()
 							  (auto-insert-use-yasnippet-template "py")
 							  )
 						   )
-	 (redefine-auto-insert "\.org"
+	 (redefine-auto-insert "\\.org\\'"
 						   '(lambda()
 							  (auto-insert-use-yasnippet-template "org")
 							  )

@@ -499,6 +499,7 @@ menu_add Quit uzbl = exit
 
 # Link context menu
 menu_link_add Print Link = print \@SELECTED_URI
+menu_link_add Copy Link = sh 'echo -n \@SELECTED_URI | xclip'
 
 # === Mode configuration =====================================================
 

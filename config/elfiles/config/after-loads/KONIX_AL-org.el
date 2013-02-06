@@ -328,20 +328,6 @@ to be organized.
   `(
 	(agenda nil
 			(
-			 (org-agenda-overriding-header "Agenda without projects")
-			 (org-agenda-skip-function
-			  '(or
-				(konix/org-agenda-skip-if-tags
-				 '("project"))
-				(and ,important
-					 (konix/org-agenda-skip-non-important-item)
-					 )
-				)
-			  )
-			 )
-			)
-	(agenda nil
-			(
 			 (org-agenda-overriding-header
 			  "Agenda for projects")
 			 (org-agenda-use-time-grid nil)
@@ -362,6 +348,20 @@ to be organized.
 		   (org-agenda-overriding-header "WAITING items")
 		   )
 		  )
+	(agenda nil
+			(
+			 (org-agenda-overriding-header "Agenda without projects")
+			 (org-agenda-skip-function
+			  '(or
+				(konix/org-agenda-skip-if-tags
+				 '("project"))
+				(and ,important
+					 (konix/org-agenda-skip-non-important-item)
+					 )
+				)
+			  )
+			 )
+			)
 	)
   )
 

@@ -13,6 +13,11 @@ do
     then
         echo "$t timed out" >&2
     else
+        if [ "$RES" != "0" ]
+        then
+            echo "man verify for an explanation of the return code"
+            echo "konix_cert_show.sh might give more info"
+        fi
         exit "$RES"
     fi
 done

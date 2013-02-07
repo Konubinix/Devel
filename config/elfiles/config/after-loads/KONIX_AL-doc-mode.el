@@ -25,6 +25,7 @@
 ;;; Code:
 
 (define-key konix/global-fast-key-map (kbd "d") doc-mode-prefix-map)
+(define-key doc-mode-prefix-map (kbd "p") 'doc-mode-previous-template)
 (setq-default doc-mode-template-empty-line-after-summary t
 			  doc-mode-template-empty-line-before-keywords nil
 			  doc-mode-template-empty-line-after-paragraph t

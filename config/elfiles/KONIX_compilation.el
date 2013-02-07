@@ -311,6 +311,19 @@ PARAM : a string with parameters given to make
 "
   (interactive "sParam : \nfMakefile :")
   (konix/compile/find-makefile makefile)
+  ;; go to the buffer of compilation and set its default directory
+  (let (window)
+	(setq window (get-buffer-window "*compilation*"))
+	(if window
+		(select-window window)
+	  (progn
+		(setq window (split-window))
+		(select-window window)
+		(switch-to-buffer "*compilation*")
+		)
+	  )
+	(setq default-directory (file-name-directory konix/compile/makefile-proj))
+	)
   (let (
 		(command (format
 				  "make -j%s -C '%s' %s"
@@ -336,19 +349,9 @@ PARAM : a string with parameters given to make
 				 )
         (buf_name (buffer-name))
         )
-    (let (window)
-      (setq window (get-buffer-window "*compilation*"))
-      (if window
-          (select-window window)
-        (progn
-          (setq window (split-window))
-          (select-window window)
-          (switch-to-buffer "*compilation*")
-          )
-        )
-      )
     (message "Make en cours...")
     (compile command)
+	;; redo the setq default-directory because compile erases it
 	(setq default-directory (file-name-directory konix/compile/makefile-proj))
     (highlight-regexp "error" 'compilation-error)
     (highlight-regexp "warning" 'compilation-warning)

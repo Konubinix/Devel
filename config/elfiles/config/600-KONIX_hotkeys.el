@@ -652,6 +652,7 @@
 (define-key 'konix/compile/map (kbd "<f7>") 'konix/compile/make-run)
 (define-key 'konix/compile/map (kbd "t") 'konix/compile/make-test)
 (define-key 'konix/compile/map (kbd "c") 'konix/compile)
+(define-key 'konix/compile/map (kbd "D") 'konix/compile/make-goto-dir)
 
 ;; ####################################################################################################
 ;; Semantic

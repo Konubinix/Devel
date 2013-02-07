@@ -360,6 +360,18 @@ PARAM : a string with parameters given to make
     )
   )
 
+(defun konix/compile/make-goto-dir ()
+  (interactive)
+  (let (
+		(makefile (konix/compile/find-makefile))
+		)
+	(if makefile
+		(find-file (file-name-directory makefile))
+	  (user-error "Makefile not found in folder hierarchy")
+	  )
+	)
+  )
+
 (defun konix/compile/make-fast ()
   (interactive)
   (konix/compile/make)

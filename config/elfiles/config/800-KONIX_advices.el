@@ -73,6 +73,32 @@
   (push-mark)
   )
 (ad-activate 'c-end-of-defun)
+
+(defadvice query-replace-read-from (around add_thing_at_point_to_history ())
+  (let (
+		(word (thing-at-point 'symbol))
+		)
+	(when (and word current-prefix-arg)
+	  ;; lets go to the beginning of the line so that the replace command will
+	  ;; match the thing at point
+	  (beginning-of-line)
+	  (add-to-list 'query-replace-history (substring-no-properties word))
+	  )
+	ad-do-it
+	(when (and word current-prefix-arg)
+	  ;; remove the second element of the history
+	  (setq query-replace-history
+			(append
+			 (list (car query-replace-history))
+			 (cddr query-replace-history)
+			 )
+			)
+	  )
+	)
+  )
+(ad-activate 'query-replace-read-from)
+
+
 ;; ******************************************************************************************
 ;; TAGS
 ;; ******************************************************************************************

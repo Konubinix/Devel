@@ -77,6 +77,7 @@ set download_handler = spawn @dm_dm_start
 
 # Load commit handlers
 @on_event   LOAD_COMMIT    @set_status <span foreground="green">recv</span>
+@on_event   LOAD_COMMIT    chain 'set title_format_short = \@TITLE' 'set title_format_long = \@keycmd_prompt \@raw_modcmd \@raw_keycmd \@TITLE - Uzbl browser <\@NAME> \@SELECTED_URI'
 
 # add some javascript to the page for other 'js' and 'script' commands to access later.
 @on_event   LOAD_COMMIT    js uzbl = {};

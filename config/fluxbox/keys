@@ -236,6 +236,13 @@ Control Mod4 m :ExecCommand $(konix_goto_true_exec.sh exaile)
 Control Mod4 h :ExecCommand $(konix_goto_true_exec.sh icedove)
 
 # ////////////////////////////////////////
+# web related shorcut (Mod4 w)
+# ////////////////////////////////////////
+Mod4 w b :ExecCommand $(konix_do_cron_job.sh konix_web_bookmark.sh)
+Mod4 w h :ExecCommand $(konix_do_cron_job.sh konix_web_history.sh)
+Mod4 w s :ExecCommand $(konix_do_cron_job.sh konix_web_search.sh)
+
+# ////////////////////////////////////////
 # BRING WINDOW SHORTCUTS (Control Mod4 Shift)
 # ////////////////////////////////////////
 Control Mod4 Shift t :ExecCommand konix_one_window.sh /usr/bin/gnome-terminal

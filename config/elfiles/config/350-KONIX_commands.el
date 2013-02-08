@@ -1413,7 +1413,7 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 	(konix/_get-string "Web search")
 	)
    )
-  (async-shell-command (format "konix_websearch.sh '%s'"
+  (async-shell-command (format "konix_web_search.sh '%s'"
 							   (replace-regexp-in-string " " "+" string)
 							   )
 					   )

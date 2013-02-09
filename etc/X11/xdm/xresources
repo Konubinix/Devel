@@ -1,0 +1,50 @@
+! position
+xlogin.geometry: 400x300+180+10
+
+! colors
+xlogin*background:  white
+xlogin*foreground:  darkgray
+xlogin*greetColor:  darkgray
+xlogin*promptColor: darkgray
+xlogin*failColor:   red
+
+! prompts
+Xlogin*titleMessage:     Xlogin
+xlogin*greeting:         Welcome to CLIENTHOST! Authentication required
+xlogin*namePrompt:       Username:\040
+xlogin*passwdPrompt:     Password:\040
+xlogin*fail:             -- Permission Denied --
+
+! fonts
+!xlogin*font:       -microsoft-comic sans ms-medium-r-normal--16-*-100-100-p-*-iso8859-15
+!xlogin*greetFont:  -microsoft-comic sans ms-medium-r-normal--16-*-100-100-p-*-iso8859-15
+!xlogin*promptFont: -microsoft-comic sans ms-medium-r-normal--16-*-100-100-p-*-iso8859-15
+!xlogin*failFont:   -microsoft-comic sans ms-medium-r-normal--16-*-100-100-p-*-iso8859-15
+!
+!xlogin*greetFace:       Comic Sans MS-16
+!xlogin*face:            Comic Sans MS-16
+!xlogin*promptFace:      Comic Sans MS-16
+!xlogin*failFace:        Comic Sans MS-16
+
+! shape
+xlogin*borderWidth:      0
+xlogin*frameWidth:       0
+xlogin*innerFramesWidth: 0
+
+! xmessage resources
+! ==================
+
+Xmessage*geometry:              400x30+10-50
+Xmessage*background:            white
+Xmessage*foreground:            darkgrey
+!Xmessage*Font:                  -microsoft-comic sans ms-medium-r-normal--16-*-100-100-p-*-iso8859-15
+Xmessage*borderWidth:           0
+
+Xmessage*message.scrollVertical:        Never
+Xmessage*message.scrollHorizontal:      Never
+
+Xmessage*Text*background:       white
+Xmessage*Text*foreground:       darkgrey
+Xmessage*Text.borderColor:      white
+Xmessage*Text.borderWidth:      0
+!Xmessage*Text*font:             -microsoft-comic sans ms-medium-r-normal--16-*-100-100-p-*-iso8859-15

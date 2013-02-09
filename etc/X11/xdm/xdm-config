@@ -1,0 +1,3 @@
+DisplayManager._0.setup:        /etc/X11/xdm/xsetup.sh
+DisplayManager._0.startup:      /etc/X11/xdm/cleanup.sh
+DisplayManager*resources:       /etc/X11/xdm/xresources

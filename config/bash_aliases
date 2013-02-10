@@ -41,4 +41,4 @@ alias sasg='sudo aptitude safe-upgrade'
 alias safg='sudo aptitude full-upgrade'
 alias sar='sudo aptitude remove'
 alias sap='sudo aptitude purge'
-
+alias mo=mimeopen

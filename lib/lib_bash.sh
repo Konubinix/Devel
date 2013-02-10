@@ -393,3 +393,11 @@ source_if_possible () {
         return 1
     fi
 }
+
+logless () {
+	ccze -A < $1 | less -R;
+}
+
+logtail () {
+	tail -f $1 | ccze -A;
+}

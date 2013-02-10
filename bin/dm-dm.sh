@@ -328,7 +328,7 @@ dm_gui()
         LINES="`dm_list | ${_SED} -n '$='`"
 
         # No lines, no downloads so a GUI is useless
-        test "x${LINES}" = "x" && { return 0; }
+        test "x${LINES}" = "x" && { konix_display.py "Nothing to download"; return 0; }
 
         # Pick a download
         PROMPT="Select a download:"

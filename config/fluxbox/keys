@@ -241,6 +241,7 @@ Control Mod4 h :ExecCommand $(konix_goto_true_exec.sh icedove)
 Mod4 w b :ExecCommand $(konix_do_cron_job.sh konix_web_bookmark.sh)
 Mod4 w h :ExecCommand $(konix_do_cron_job.sh konix_web_history.sh)
 Mod4 w s :ExecCommand $(konix_do_cron_job.sh konix_web_search.sh)
+Mod4 w d :ExecCommand $(konix_do_cron_job.sh uget-gtk || dm-dm.sh -g)
 
 # ////////////////////////////////////////
 # BRING WINDOW SHORTCUTS (Control Mod4 Shift)

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+complete -F _sar sap

@@ -202,7 +202,7 @@ Control Mod4 d : ShowDesktop
 Print : MacroCmd { Exec konix_display.py 'impression ecran' } { ExecCommand $(konix_find_true_exec.sh import) $HOME/Desktop/Capture.png }
 
 # Open a dialog to run programs
-Mod4 F2 :Exec dmenu_run
+Mod4 F2 :Exec konix_dmenu_run.sh
 
 # volume settings
 Mod4 Mod1 Down :Exec konix_display_unique.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"

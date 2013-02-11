@@ -238,9 +238,11 @@ Control Mod4 h :ExecCommand $(konix_goto_true_exec.sh icedove)
 # ////////////////////////////////////////
 # web related shorcut (Mod4 w)
 # ////////////////////////////////////////
-Mod4 w b :ExecCommand $(konix_do_cron_job.sh konix_web_bookmark.sh)
-Mod4 w h :ExecCommand $(konix_do_cron_job.sh konix_web_history.sh)
-Mod4 w s :ExecCommand $(konix_do_cron_job.sh konix_web_search.sh)
+Mod4 w u :ExecCommand $(konix_do_cron_job.sh konix_web_bookmark.sh)
+Mod4 w U :ExecCommand $(konix_do_cron_job.sh konix_web_history.sh)
+Mod4 w Control u :ExecCommand $(konix_do_cron_job.sh konix_web_history_undo.sh)
+Mod4 w s s :ExecCommand $(konix_do_cron_job.sh konix_web_search.sh)
+Mod4 w s d :ExecCommand $(konix_do_cron_job.sh konix_web_search.sh -d)
 Mod4 w d :ExecCommand $(konix_do_cron_job.sh uget-gtk || dm-dm.sh -g)
 
 # ////////////////////////////////////////

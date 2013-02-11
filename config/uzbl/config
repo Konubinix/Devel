@@ -333,18 +333,8 @@ set ebind     = @mode_bind global,-insert
 @cbind  <Ctrl>p = hardcopy
 
 # Web searching binds
-@cbind  dgg<Google:>_         = uri http://www.google.com/search?q=\@<encodeURIComponent(%r)>\@
-@cbind  dgi<GoogleImage:>_    = uri https://encrypted.google.com/search?tbm=isch&tbs=imgo:1&q=\@<encodeURIComponent(%r)>\@
-@cbind  ddg<DuckDuckGo:>_    = uri http://duckduckgo.com/?q=%s
-@cbind  dsf<SeeksFR:>_    = uri http://www.seeks.fr/search?q=%s&expansion=1&action=expand
-@cbind  dsl<SeeksLocal:>_    = uri http://s.s/search?lang=en&q=%s&expansion=1&action=expand&engines=&content_analysis=off&ui=stat
-@cbind  dss<SeeksHttp:>_    = uri http://localhost:8250/search?q=%s&expansion=1&action=expand
-@cbind  \\awiki<Archwiki:>_  = uri http://wiki.archlinux.org/index.php/Special:Search?search=\@<encodeURIComponent(%r)>\@&go=Go
-@cbind  \\wiki<Wikipedia:>_  = uri http://en.wikipedia.org/w/index.php?title=Special:Search&search=\@<encodeURIComponent(%r)>\@&go=Go
-@cbind  denfr<ENFR:>_         = uri http://www.wordreference.com/enfr/\@<encodeURIComponent(%r)>\@
-@cbind  dfren<FREN:>_         = uri http://www.wordreference.com/fren/\@<encodeURIComponent(%r)>\@
-@cbind  dwiki<Wikipedia:>_   = uri https://en.wikipedia.org/wiki/\@<encodeURIComponent(%r)>\@
-@cbind  dfrwiki<WikipediaFR:>_   = uri https://fr.wikipedia.org/wiki/\@<encodeURIComponent(%r)>\@
+@cbind  dss = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh'
+@cbind  dsd = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh -d'
 @cbind  dpa                  = js add_to_pocket();
 @cbind E = chain 'js var konix_edited_elem = document.activeElement;var konix_edited_elem_old_background_color = $(konix_edited_elem).css("background-color");$(konix_edited_elem).css("background-color", "lightBlue");' 'spawn @scripts_dir/external_editor.sh \@<document.activeElement.type>\@ \@<Base64.encode(document.activeElement.value)>\@'
 
@@ -419,9 +409,9 @@ set ebind     = @mode_bind global,-insert
 @cbind  M  = spawn @scripts_dir/insert_bookmark.sh
 
 # Bookmark/history loading
-@cbind  U  = spawn @scripts_dir/konix_load_url_from_history.sh
-@cbind  <Ctrl>u  = spawn @scripts_dir/konix_load_url_from_history.sh @(echo "${UZBL_UNDOLIST_FILE:-${XDG_DATA_HOME:-~/.local/share}/uzbl/undolist}")@
-@cbind  u  = spawn @scripts_dir/konix_load_url_from_bookmarks.sh
+@cbind  U  = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_history.sh'
+@cbind  <Ctrl>u  = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_history_undo.sh'
+@cbind  u  = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_bookmark.sh'
 
 # Temporary bookmarks
 @cbind  <Ctrl>d  = spawn @scripts_dir/insert_temp.sh

@@ -246,6 +246,11 @@ Mod4 w s d :ExecCommand $(konix_do_cron_job.sh konix_web_search.sh -d)
 Mod4 w d :ExecCommand $(konix_do_cron_job.sh uget-gtk || dm-dm.sh -g)
 
 # ////////////////////////////////////////
+# xset related shorcut (Mod4 s)
+# ////////////////////////////////////////
+Mod4 s f :ToggleCmd {Exec xset r rate 200 100 && konix_display_unique.py "Fast keyboard" } {Exec xset r rate && konix_display_unique.py "Reset keyboard speed"}
+
+# ////////////////////////////////////////
 # BRING WINDOW SHORTCUTS (Control Mod4 Shift)
 # ////////////////////////////////////////
 Control Mod4 Shift t :ExecCommand konix_one_window.sh /usr/bin/gnome-terminal

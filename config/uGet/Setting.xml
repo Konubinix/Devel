@@ -42,7 +42,7 @@
   </Window>
   <UserInterface>
     <CloseConfirmation value='0'/>
-    <CloseAction value='2'/>
+    <CloseAction value='1'/>
     <DeleteConfirmation value='1'/>
     <ShowTrayIcon value='1'/>
     <StartInTray value='0'/>

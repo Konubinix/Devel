@@ -189,6 +189,8 @@
 (autoload 'imenu-tree "imenu-tree" "" t)
 ;; ace-jump
 (autoload 'ace-jump-mode "ace-jump-mode" "" t)
+;; undo tree
+(autoload 'undo-tree-mode "undo-tree" "" t)
 
 ;; ************************************************************
 ;; Automodes

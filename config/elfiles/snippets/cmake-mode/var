@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: $
+# key: $
+# binding: direct-keybinding
+# --
+\$\{${100:variable}\}$0

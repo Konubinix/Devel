@@ -387,6 +387,11 @@ PARAM : a string with parameters given to make
   (konix/compile/make "test")
   )
 
+(defun konix/compile/make-clean ()
+  (interactive)
+  (konix/compile/make "clean")
+  )
+
 (defun konix/compile/make-shell (makefile &optional param)
   "Start make in a shell."
   (interactive "fMakefile : ")

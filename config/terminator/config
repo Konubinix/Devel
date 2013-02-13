@@ -7,12 +7,13 @@
 [keybindings]
 [profiles]
   [[default]]
-    palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
+    foreground_color = "#51bfb6"
     visible_bell = True
     background_darkness = 0.8
     urgent_bell = True
     background_type = transparent
-    foreground_color = "#51bfb6"
+    cursor_color = "#ffffff"
+    cursor_blink = False
     scroll_on_output = False
     color_scheme = green_on_black
     copy_on_selection = True

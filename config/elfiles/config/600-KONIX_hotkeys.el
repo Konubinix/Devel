@@ -485,11 +485,15 @@
 (define-prefix-command 'konix/www/map)
 (define-key 'konix/global-fast-key-map (kbd "w") 'konix/www/map)
 
-(define-key 'konix/www/map (kbd "s") 'w3m) ;session
+(define-key 'konix/www/map (kbd "w") 'w3m)
 (define-key 'konix/www/map (kbd "b") 'w3m-buffer)
-(define-key 'konix/www/map (kbd "g") 'konix/www/web-search)
 (define-key 'konix/www/map (kbd "f") 'konix/www/brows-url-of-file-at-point)
 (define-key 'konix/www/map (kbd "l") 'konix/www/browse-link-at-point)
+
+(define-prefix-command 'konix/www-search/map)
+(define-key 'konix/www/map (kbd "s") 'konix/www-search/map)
+(define-key 'konix/www-search/map (kbd "s") 'konix/www/web-search)
+(define-key 'konix/www-search/map (kbd "d") 'konix/www/web-search-default)
 
 ;; ******************************************************************************************
 ;; helm

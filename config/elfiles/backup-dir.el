@@ -28,7 +28,7 @@
 ;;; Commentary:
 ;;;
 ;;; Allows backup files to be optionally stored in some directories, based on
-;;; the value of the alist, `bkup-backup-directory-info'.  This variable is a
+;;; the value of the alist, `backup-dir/bkup-backup-directory-info'.  This variable is a
 ;;; list of lists of the form (FILE-REGEXP BACKUP-DIR OPTIONS ...).  If the
 ;;; filename to be backed up matches FILE-REGEXP, or FILE-REGEXP is t, then
 ;;; BACKUP-DIR is used as the path for its backups.  Directories may begin
@@ -57,7 +57,7 @@
 ;;; These lines from my .emacs load this file and set the values I like:
 ;;;
 ;;; (require 'backup-dir)
-;;; (setq bkup-backup-directory-info
+;;; (setq backup-dir/bkup-backup-directory-info
 ;;;       '(("/home/greg/.*" "/~/.backups/" ok-create full-path prepend-name)
 ;;;         ("^/[^/:]+:"     ".backups/") ; handle EFS files specially: don't
 ;;;         ("^/[^/:]+:"     "./")        ; search-upward... its very slow
@@ -150,7 +150,7 @@
 ;;;
 ;;; April 23, 1993     Version 1.1
 ;;;  * Reworked to allow different behavior for different files based on the
-;;;    alist `bkup-backup-directory-info'.
+;;;    alist `backup-dir/bkup-backup-directory-info'.
 ;;;
 ;;; Fall 1992          Version 1.0
 ;;;  * Name change
@@ -178,7 +178,7 @@
 ;;; New variables affecting backup file behavior
 ;;; This is the only user-customizable variable for this package.
 ;;;
-(defcustom bkup-backup-directory-info nil
+(defcustom backup-dir/bkup-backup-directory-info nil
   "*Alist of (FILE-REGEXP BACKUP-DIR OPTIONS ...))
 If the filename to be backed up matches FILE-REGEXP, or FILE-REGEXP is t,
 then BACKUP-DIR is used as the path for its backups.
@@ -280,7 +280,7 @@ A new string is produced and returned."
 and backup file name base for FILE."
   (let ((file (expand-file-name file)))
     (let ((dir     (file-name-directory file))
-          (alist   bkup-backup-directory-info)
+          (alist   backup-dir/bkup-backup-directory-info)
           (bk-dir  nil)
           (bk-base nil))
       (if (listp alist)

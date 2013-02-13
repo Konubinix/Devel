@@ -17,7 +17,6 @@
     color_scheme = green_on_black
     copy_on_selection = True
     scrollback_lines = 10000
-    audible_bell = True
 [layouts]
   [[default]]
     [[[child1]]]

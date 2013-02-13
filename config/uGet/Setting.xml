@@ -48,7 +48,7 @@
     <StartInTray value='0'/>
     <StartInOfflineMode value='0'/>
     <StartNotification value='1'/>
-    <SoundNotification value='1'/>
+    <SoundNotification value='0'/>
   </UserInterface>
   <Clipboard>
     <pattern value='ZIP|BIN|GZ|7Z|Z|TAR|TGZ|BZ2|A[0-9]?|LZH|MP3|RPM|DEB|EXE|RAR|R[0-9][0-9]'/>

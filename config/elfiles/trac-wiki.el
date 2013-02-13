@@ -383,11 +383,55 @@ user may need or want to edit them.")
     "milestone" "attachment" "source")
   "Trac link type keywords to be used in font-lock.")
 
+(defun trac-wiki-set-properties-link-buffer ()
+  (interactive)
+  (save-excursion
+	(goto-char 0)
+	(while (re-search-forward "\\(\\[[^\] ]+ \\)[^]]+\\(\\]\\)" nil t)
+	  (let (
+			(start_start (match-beginning 1))
+			(start_end (match-end 1))
+			(end_start (match-beginning 2))
+			(end_end (match-end 2))
+			)
+		(add-text-properties
+		 start_start
+		 start_end
+		 '(
+		   invisible trac-wiki-link
+					 )
+		 )
+		(add-text-properties
+		 end_start
+		 end_end
+		 '(
+		   invisible trac-wiki-link
+					 )
+		 )
+		)
+	  )
+	)
+  )
+
+(defvar trac-wiki-show-links nil "")
+(defun trac-wiki-toggle-show-links ()
+  (interactive)
+  (if trac-wiki-show-links
+	  (remove-from-invisibility-spec '(trac-wiki-link))
+	(progn
+	 (add-to-invisibility-spec '(trac-wiki-link))
+	 (trac-wiki-set-properties-link-buffer)
+	 )
+	)
+  (setq trac-wiki-show-links (not trac-wiki-show-links))
+  (message "The show link property is now %s" trac-wiki-show-links)
+  )
+
 (defun trac-wiki-link-face (face)
   "Return FACE if not escaped by '!', or return 'normal."
   (if (eq (char-before (match-beginning 0)) ?!)
-      'shadow
-    face))
+	  'shadow
+	face))
 
 (defconst trac-wiki-camel-case-regexp
   "\\<\\([A-Z][a-z]+\\(?:[A-Z][a-z]*[a-z/]\\)+\\)"
@@ -415,15 +459,15 @@ user may need or want to edit them.")
 ;; for trac-wiki mode, simple
 (defvar trac-wiki-font-lock-keywords
   `(("^\\(\\(=+\\) \\(.*\\) \\(=+\\)\\)\\(.*\\)" ; section heading
-     (1 (if (string= (match-string 2) (match-string 4))
+	 (1 (if (string= (match-string 2) (match-string 4))
 			'bold
 		  ;; Warn if starting/ending '='  count is not ballanced.
 		  'font-lock-warning-face))
-     (5 'shadow))
-    ("^=.*" . font-lock-warning-face)	   ; invalid section heading
-    ("`[^`\n]*`" . 'shadow)		   ; inline quote
-    ("\\(''+\\)[^'\n]*\\(''+\\)"	   ; bold and italic
-     (0 (let ((b (match-string 1))
+	 (5 'shadow))
+	("^=.*" . font-lock-warning-face)	   ; invalid section heading
+	("`[^`\n]*`" . 'shadow)		   ; inline quote
+	("\\(''+\\)[^'\n]*\\(''+\\)"	   ; bold and italic
+	 (0 (let ((b (match-string 1))
 			  (e (match-string 2)))
 		  (if (not (string= b e))
 			  font-lock-warning-face
@@ -431,18 +475,18 @@ user may need or want to edit them.")
 			 ((string= b "''") 'italic)
 			 ((string= b "'''") 'bold)
 			 ((string= b "''''") 'bold-italic))))))
-    ("~~[^~\n]*~~" ; strike
-     (0 'trac-wiki-strike-through))
-    ("\\[\\[\\([^]()]+\\)[^]\n]*\\]\\]"	; macro
-     ;; font-lock-preprocessor-face is not defined in emacs 21
-     (0 (trac-wiki-link-face
+	("~~[^~\n]*~~" ; strike
+	 (0 'trac-wiki-strike-through))
+	("\\[\\[\\([^]()]+\\)[^]\n]*\\]\\]"	; macro
+	 ;; font-lock-preprocessor-face is not defined in emacs 21
+	 (0 (trac-wiki-link-face
 		 (if (trac-wiki-macro-exist-p (match-string 1))
 			 font-lock-type-face
 		   font-lock-warning-face))))
-    ("{[0-9]+}"	;  {1}
-     (0 (trac-wiki-link-face font-lock-type-face)))
-    ("\\[\\(\\w+:\\)?\\([^] #\n]*\\)[^]\n]*\\]" ; bracket trac link
-     (0 (let ((whole (match-string 0))
+	("{[0-9]+}"	;  {1}
+	 (0 (trac-wiki-link-face font-lock-type-face)))
+	("\\[\\(\\w+:\\)?\\([^] #\n]*\\)[^]\n]*\\]" ; bracket trac link
+	 (0 (let ((whole (match-string 0))
 			  (scheme (match-string 1))
 			  (name (match-string 2)))
 		  (trac-wiki-link-face
@@ -457,7 +501,7 @@ user may need or want to edit them.")
 			   font-lock-warning-face))
 			(t
 			 font-lock-function-name-face))))))
-    (,(format "\\(?:%s\\):\\(?:\"[^\"\n]*\"\\|[^ \t\n]\\)+" ; types
+	(,(format "\\(?:%s\\):\\(?:\"[^\"\n]*\"\\|[^ \t\n]\\)+" ; types
 			  (regexp-opt trac-wiki-link-type-keywords))
      (0 (trac-wiki-link-face font-lock-function-name-face)))
     ("\\w+://[^ \t\n]+" . font-lock-function-name-face)	  ; raw url
@@ -509,6 +553,7 @@ user may need or want to edit them.")
 (define-key trac-wiki-mode-map "\C-c\C-m" 'trac-wiki-merge)
 (define-key trac-wiki-mode-map "\C-c\C-p" 'trac-wiki-preview)
 (define-key trac-wiki-mode-map "\C-c\C-l" 'trac-wiki-history)
+(define-key trac-wiki-mode-map "\C-cl" 'trac-wiki-toggle-show-links)
 (define-key trac-wiki-mode-map "\C-c\C-o" 'trac-wiki-edit)
 (define-key trac-wiki-mode-map "\C-c\C-s" 'trac-wiki-search)
 (define-key trac-wiki-mode-map "\C-c\C-v" 'trac-wiki-view-page)
@@ -652,86 +697,86 @@ is occured.  The code is copied from `url.el' of Emacs 22 and
 modified not to quit by closing (or exiting) of first process.
 Without this, `url-retrieve-synchronously' returns wrong buffer
 on getting response \"403: auth required\"."
-  (url-do-setup)
-  (lexical-let ((retrieval-done nil)
-				(asynch-buffer nil))
-    (setq asynch-buffer
-		  (url-retrieve url (lambda (&rest ignored)
-							  (url-debug 'retrieval "Synchronous fetching done (%S)" (current-buffer))
-							  (setq retrieval-done t
-									asynch-buffer (current-buffer)))))
-    (if (null asynch-buffer)
-        ;; We do not need to do anything, it was a mailto or something
-        ;; similar that takes processing completely outside of the URL
-        ;; package.
-        nil
-      (let ((proc (get-buffer-process asynch-buffer)))
-		;; If the access method was synchronous, `retrieval-done' should
-		;; hopefully already be set to t.  If it is nil, and `proc' is also
-		;; nil, it implies that the async process is not running in
-		;; asynch-buffer.  This happens e.g. for FTP files.  In such a case
-		;; url-file.el should probably set something like a `url-process'
-		;; buffer-local variable so we can find the exact process that we
-		;; should be waiting for.  In the mean time, we'll just wait for any
-		;; process output.
-		(while (not retrieval-done)
-		  (url-debug 'retrieval
-					 "Spinning in url-retrieve-synchronously: %S (%S)"
-					 retrieval-done asynch-buffer)
-          (if (buffer-local-value 'url-redirect-buffer asynch-buffer)
-              (setq proc (get-buffer-process
-                          (setq asynch-buffer
-                                (buffer-local-value 'url-redirect-buffer
-                                                    asynch-buffer))))
-            (if (and proc (memq (process-status proc)
-                                ;;'(closed exit signal failed))
-								;; MODIFIED! do not accept 'closed nor 'exit
-								'(signal failed))
-                     ;; Make sure another process hasn't been started.
-                     (eq proc (or (get-buffer-process asynch-buffer) proc)))
-                ;; FIXME: It's not clear whether url-retrieve's callback is
-                ;; guaranteed to be called or not.  It seems that url-http
-                ;; decides sometimes consciously not to call it, so it's not
-                ;; clear that it's a bug, but even then we need to decide how
-                ;; url-http can then warn us that the download has completed.
-                ;; In the mean time, we use this here workaround.
-				;; XXX: The callback must always be called.  Any
-				;; exception is a bug that should be fixed, not worked
-				;; around.
-                (setq retrieval-done t))
-            ;; We used to use `sit-for' here, but in some cases it wouldn't
-            ;; work because apparently pending keyboard input would always
-            ;; interrupt it before it got a chance to handle process input.
-            ;; `sleep-for' was tried but it lead to other forms of
-            ;; hanging.  --Stef
-            (unless (or (with-local-quit
-						  (accept-process-output proc))
-						(null proc))
-              ;; accept-process-output returned nil, maybe because the process
-              ;; exited (and may have been replaced with another).  If we got
-			  ;; a quit, just stop.
-			  (sit-for 0.01)		; give a chance to callback
-			  (when quit-flag
-				(delete-process proc))
-              (setq proc (and (not quit-flag)
-							  (get-buffer-process asynch-buffer)))))))
-      ;; wait a little to avoid bug in e21 not to re-use closing  session.
-      (if (< emacs-major-version 22)
-		  (sleep-for 0.05))		; not to re-use closing session
-      ;; fix-up lacked tail. On old emacs (emacs 21), sometime some bytes
-      ;; of response are lacked. like "</methodRespons"
-      ;; So fix it.
-      (with-current-buffer asynch-buffer
-		(save-excursion
-		  (goto-char (point-max))
-		  (beginning-of-line)
-		  (when (looking-at "</method")
-			(delete-region (point) (save-excursion
-									 (end-of-line) (point)))
-			(insert "</methodResponse>\n")
-			(message "*** Fixed http response ***")
-			(sit-for 0.5))))
-      asynch-buffer)))
+(url-do-setup)
+(lexical-let ((retrieval-done nil)
+			  (asynch-buffer nil))
+  (setq asynch-buffer
+		(url-retrieve url (lambda (&rest ignored)
+							(url-debug 'retrieval "Synchronous fetching done (%S)" (current-buffer))
+							(setq retrieval-done t
+								  asynch-buffer (current-buffer)))))
+  (if (null asynch-buffer)
+	  ;; We do not need to do anything, it was a mailto or something
+	  ;; similar that takes processing completely outside of the URL
+	  ;; package.
+	  nil
+	(let ((proc (get-buffer-process asynch-buffer)))
+	  ;; If the access method was synchronous, `retrieval-done' should
+	  ;; hopefully already be set to t.  If it is nil, and `proc' is also
+	  ;; nil, it implies that the async process is not running in
+	  ;; asynch-buffer.  This happens e.g. for FTP files.  In such a case
+	  ;; url-file.el should probably set something like a `url-process'
+	  ;; buffer-local variable so we can find the exact process that we
+	  ;; should be waiting for.  In the mean time, we'll just wait for any
+	  ;; process output.
+	  (while (not retrieval-done)
+		(url-debug 'retrieval
+				   "Spinning in url-retrieve-synchronously: %S (%S)"
+				   retrieval-done asynch-buffer)
+		(if (buffer-local-value 'url-redirect-buffer asynch-buffer)
+			(setq proc (get-buffer-process
+						(setq asynch-buffer
+							  (buffer-local-value 'url-redirect-buffer
+												  asynch-buffer))))
+		  (if (and proc (memq (process-status proc)
+							  ;;'(closed exit signal failed))
+							  ;; MODIFIED! do not accept 'closed nor 'exit
+							  '(signal failed))
+				   ;; Make sure another process hasn't been started.
+				   (eq proc (or (get-buffer-process asynch-buffer) proc)))
+			  ;; FIXME: It's not clear whether url-retrieve's callback is
+			  ;; guaranteed to be called or not.  It seems that url-http
+			  ;; decides sometimes consciously not to call it, so it's not
+			  ;; clear that it's a bug, but even then we need to decide how
+			  ;; url-http can then warn us that the download has completed.
+			  ;; In the mean time, we use this here workaround.
+			  ;; XXX: The callback must always be called.  Any
+			  ;; exception is a bug that should be fixed, not worked
+			  ;; around.
+			  (setq retrieval-done t))
+		  ;; We used to use `sit-for' here, but in some cases it wouldn't
+		  ;; work because apparently pending keyboard input would always
+		  ;; interrupt it before it got a chance to handle process input.
+		  ;; `sleep-for' was tried but it lead to other forms of
+		  ;; hanging.  --Stef
+		  (unless (or (with-local-quit
+						(accept-process-output proc))
+					  (null proc))
+			;; accept-process-output returned nil, maybe because the process
+			;; exited (and may have been replaced with another).  If we got
+			;; a quit, just stop.
+			(sit-for 0.01)		; give a chance to callback
+			(when quit-flag
+			  (delete-process proc))
+			(setq proc (and (not quit-flag)
+							(get-buffer-process asynch-buffer)))))))
+	;; wait a little to avoid bug in e21 not to re-use closing  session.
+	(if (< emacs-major-version 22)
+		(sleep-for 0.05))		; not to re-use closing session
+	;; fix-up lacked tail. On old emacs (emacs 21), sometime some bytes
+	;; of response are lacked. like "</methodRespons"
+	;; So fix it.
+	(with-current-buffer asynch-buffer
+	  (save-excursion
+		(goto-char (point-max))
+		(beginning-of-line)
+		(when (looking-at "</method")
+		  (delete-region (point) (save-excursion
+								   (end-of-line) (point)))
+		  (insert "</methodResponse>\n")
+		  (message "*** Fixed http response ***")
+		  (sit-for 0.5))))
+	asynch-buffer)))
 
 
 (defvar trac-wiki-auth-retry-count 0
@@ -770,16 +815,16 @@ url library behaviour."
 Note that if buffer does not has end-point information, return
 also non-nil because we cannot get cache data.  In other word,
 \"I don't know\" is non-nil."
-  (or (null trac-rpc-endpoint)
-      (trac-wiki-cache-item-exist-p page trac-wiki-page-name-cache)))
+ (or (null trac-rpc-endpoint)
+	 (trac-wiki-cache-item-exist-p page trac-wiki-page-name-cache)))
 
 (defun trac-wiki-macro-exist-p (macro)
   "Return non-nil if MACRO exists in macro name cache or no cache.
 Note that if buffer does not has end-point information, return
 also non-nil because we cannot get cache data.  In other word,
 \"I don't know\" is non-nil."
-  (or (null trac-rpc-endpoint)
-      (trac-wiki-cache-item-exist-p macro trac-wiki-macro-name-cache)))
+ (or (null trac-rpc-endpoint)
+	 (trac-wiki-cache-item-exist-p macro trac-wiki-macro-name-cache)))
 
 
 (defun trac-wiki-cache-item-exist-p (item cache)
@@ -787,10 +832,10 @@ also non-nil because we cannot get cache data.  In other word,
 Note that if buffer does not has end-point information, return
 also non-nil because we cannot get cache data.  In other word,
 \"I don't know\" is non-nil."
-  (let ((items (and trac-rpc-endpoint
-					(cdr (assoc trac-rpc-endpoint cache)))))
-    (or (null items)
-		(member item items))))
+ (let ((items (and trac-rpc-endpoint
+				   (cdr (assoc trac-rpc-endpoint cache)))))
+   (or (null items)
+	   (member item items))))
 
 ;; cache macro
 (defmacro trac-wiki-with-cache (cache-name ep no-cache &rest body)
@@ -838,6 +883,7 @@ result data."
 
 ;; mode
 
+
 (define-derived-mode trac-wiki-mode text-mode "TracWiki"
   "Trac Wiki authorizing mode with XML-RPC access."
   (set (make-local-variable 'font-lock-defaults)
@@ -846,8 +892,11 @@ result data."
   (if font-lock-mode
       (font-lock-fontify-buffer))
   (set (make-local-variable 'outline-regexp) "^=+ ")
-  (outline-minor-mode 1))
-
+  (outline-minor-mode 1)
+  (trac-wiki-set-properties-link-buffer)
+  (add-to-invisibility-spec '(trac-wiki-link))
+  (setq trac-wiki-show-links t)
+  )
 
 ;; XML-RPC functions
 
@@ -981,50 +1030,50 @@ Returns project info which is property list of some data.  If hit
 enter without project name, ask enter project informations
 interectively and remember temporary project information data
 named as \"dir@host\".  It will be kept until re-start Emacs."
-  (let* ((project (and (or trac-projects
-						   trac-wiki-project-history)
-					   (completing-read "Select project (or empty to define): "
-										trac-projects
-										nil t nil
-										'trac-wiki-project-history)))
-		 (pinfo (and project
-					 (cdr (assoc project trac-projects)))))
-    (or pinfo
-		;; make project data interactively.
-		(let* ((rawurl (read-string "Site URL: "
-									trac-rpc-endpoint
-									'trac-wiki-url-history))
-			   (url (url-generic-parse-url
-					 (trac-wiki-strip-url-trailer
-					  rawurl '("xmlrpc" "login" "wiki"))))
-			   (login  (or (elt url 1)
-						   (string-match "/login\\(?:/\\|$\\)" rawurl)
-						   (y-or-n-p "Login? ")))
-			   (host (elt url 3))
-			   (name (file-name-nondirectory
-					  (directory-file-name (elt url 5))))
-			   (project-name (format "%s@%s" name host))
-			   info)
-		  ;; build project info property list
-		  (prog1
-			  ;; make return value
-			  (setq info (list :name project-name
-							   :endpoint (format "%s://%s:%s%s%s/xmlrpc"
-												 (elt url 0)
-												 (elt url 3)
-												 (elt url 4)
-												 (directory-file-name (elt url 5))
-												 (if (string= login "")
-													 ""
-												   "/login"))
-							   :login (and (stringp login)
-										   (not (string= login ""))
-										   login)))
-			;; remember it
-			(if (not (assoc project-name trac-projects))
-				(add-to-list 'trac-projects (cons project-name info))
-			  ;; already exist, overwrite
-			  (setcdr (assoc project-name trac-projects) info)))))))
+(let* ((project (and (or trac-projects
+						 trac-wiki-project-history)
+					 (completing-read "Select project (or empty to define): "
+									  trac-projects
+									  nil t nil
+									  'trac-wiki-project-history)))
+	   (pinfo (and project
+				   (cdr (assoc project trac-projects)))))
+  (or pinfo
+	  ;; make project data interactively.
+	  (let* ((rawurl (read-string "Site URL: "
+								  trac-rpc-endpoint
+								  'trac-wiki-url-history))
+			 (url (url-generic-parse-url
+				   (trac-wiki-strip-url-trailer
+					rawurl '("xmlrpc" "login" "wiki"))))
+			 (login  (or (elt url 1)
+						 (string-match "/login\\(?:/\\|$\\)" rawurl)
+						 (y-or-n-p "Login? ")))
+			 (host (elt url 3))
+			 (name (file-name-nondirectory
+					(directory-file-name (elt url 5))))
+			 (project-name (format "%s@%s" name host))
+			 info)
+		;; build project info property list
+		(prog1
+			;; make return value
+			(setq info (list :name project-name
+							 :endpoint (format "%s://%s:%s%s%s/xmlrpc"
+											   (elt url 0)
+											   (elt url 3)
+											   (elt url 4)
+											   (directory-file-name (elt url 5))
+											   (if (string= login "")
+												   ""
+												 "/login"))
+							 :login (and (stringp login)
+										 (not (string= login ""))
+										 login)))
+		  ;; remember it
+		  (if (not (assoc project-name trac-projects))
+			  (add-to-list 'trac-projects (cons project-name info))
+			;; already exist, overwrite
+			(setcdr (assoc project-name trac-projects) info)))))))
 
 (defmacro trac-wiki-protected (&rest body)
   "Run BODY or report readable message from response code on error."
@@ -2095,16 +2144,16 @@ For exmple:
 		   (\"r5\" . \"C\"))))
 
 "
-  (dolist (entry storage)
-    (setq entry (cdr entry))
-    (while entry
-      (let ((e entry))
-		(while (cdr e)
-		  (if (string= (caadr e) (caar entry))
-			  (setcdr e (cddr e))
-			(setq e (cdr e)))))
-      (setq entry (cdr entry))))
-  storage)
+		   (dolist (entry storage)
+			 (setq entry (cdr entry))
+			 (while entry
+			   (let ((e entry))
+				 (while (cdr e)
+				   (if (string= (caadr e) (caar entry))
+					   (setcdr e (cddr e))
+					 (setq e (cdr e)))))
+			   (setq entry (cdr entry))))
+		   storage)
 
 (defun trac-wiki-merge-storage (dst src)
   "Merge auth data of SRC into DST destructively.
@@ -2126,19 +2175,19 @@ For exmple:
               (\"b\" . \"BBB\")   ; added
               (\"c\" . \"CCC\"))) ; added
 "
-  (if (null dst)
-      src
-    (dolist (s src)
-      (let ((d (assoc (car s) dst)))	; find site entry
-		(if (null d)
-			;; not exist, simply append it
-			(nconc dst (list s))
-		  ;; exist append auth item
-		  (dolist (a (cdr s))
-			(if (null (assoc (car a) (cdr d)))
-				;; not found, append
-				(nconc d (list a)))))))
-    dst))
+			  (if (null dst)
+				  src
+				(dolist (s src)
+				  (let ((d (assoc (car s) dst)))	; find site entry
+					(if (null d)
+						;; not exist, simply append it
+						(nconc dst (list s))
+					  ;; exist append auth item
+					  (dolist (a (cdr s))
+						(if (null (assoc (car a) (cdr d)))
+							;; not found, append
+							(nconc d (list a)))))))
+				dst))
 
 (provide 'trac-wiki)
 

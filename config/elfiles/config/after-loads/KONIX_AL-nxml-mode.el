@@ -347,6 +347,9 @@ immediately after the section's start-tag."
   (local-set-key (kbd "C-M-n") 'konix/nxml-forward-element)
   (local-set-key (kbd "C-c C-c") 'konix/nxml-show-context)
   (auto-complete-mode 1)
+  (setq header-line-format '(:eval (format "Schema : %s"
+									(or rng-current-schema-file-name "Vacuous")
+									)))
   )
 (add-hook 'nxml-mode-hook
 		  'konix/nxml-mode-hook)

@@ -49,7 +49,9 @@
 				("unread rss" . "tag:rss AND tag:unread")
 				)
 			  )
-(setq-default mailcap-download-directory (format "%s/" (getenv "KONIX_DOWNLOAD_DIR")))
+(setq-default mailcap-download-directory
+			  (format "%s/" (getenv "KONIX_DOWNLOAD_DIR")))
+(setq-default mm-default-directory mailcap-download-directory)
 (setq-default notmuch-crypto-process-mime t)
 
 (setq notmuch-address-command "notmuch_addresses.py")

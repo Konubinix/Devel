@@ -890,7 +890,21 @@ to be organized.
 				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
-						  "Done tasks (no project)")
+						  "Done tasks into a project")
+						 (org-tags-exclude-from-inheritance nil)
+						 (org-agenda-skip-function
+						  '(konix/org-agenda-skip-if-tags
+							'("project")
+							t
+							)
+						  )
+						 )
+						)
+				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
+						(
+						 (org-agenda-overriding-header
+						  "Done tasks not into a project")
+						 (org-tags-exclude-from-inheritance nil)
 						 (org-agenda-skip-function
 						  '(konix/org-agenda-skip-if-tags
 							'("project")

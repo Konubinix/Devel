@@ -183,7 +183,17 @@
 
 (defun konix/kill-ring-insert ()
   (interactive)
-  (insert (completing-read "Yank : " kill-ring))
+  (let (
+		(to_insert (completing-read "Yank : " kill-ring))
+		)
+	(when (and to_insert
+			   (region-active-p)
+			   )
+	  ;; the currently highlighted section is to be replaced by the yank
+	  (delete-region (region-beginning) (region-end))
+	  )
+	(insert to_insert)
+	)
   )
 
 (defun konix/insert-seconds-since-1970 ()
@@ -878,7 +888,7 @@ Will prompt you shell name when you type `C-u' before this command."
 		  ;; delete all trailing spaces
 		  (when (looking-back "[ \t\n\r]+" nil t)
 			(delete-region (match-beginning 0) (match-end 0))
-		   )
+			)
 		  (insert "
 ")
 		  )

@@ -1054,6 +1054,16 @@ to be organized.
 "
 				 :kill-buffer
 				 )
+				("U" "Todo Item URGENT for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				 "* NEXT [#G] %?
+  SCHEDULED: %t
+  :LOGBOOK:
+  - Captured       %U
+  :END:
+  %a
+"
+				 :kill-buffer
+				 )
 				("p" "Todo Item POMODORO" entry (file (expand-file-name "pomodoro.org" org-directory))
 				 "* TODO [#G] %?
   SCHEDULED: %t

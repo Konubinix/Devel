@@ -293,11 +293,31 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
   (message "org-pomodoro-global-mode set to %s" konix/org-pomodoro-global-mode)
   )
 
+(defun konix/org-pomodoro/get-clock-tags ()
+  (save-window-excursion
+	(save-excursion
+	  (org-clock-goto)
+	  (org-get-tags-at (point))
+	  )
+	)
+  )
+
 ;; ####################################################################################################
 ;; HOOKS
 ;; ####################################################################################################
 (defun konix/org-timer-done-pomodoro-hook ()
-  (ignore-errors (konix/org-pomodoro-increase))
+  ;; increase the pomodoro if not in an interruption, a pause or a diary meeting
+  (let (
+		(tags (konix/org-pomodoro/get-clock-tags))
+		)
+   (when (and
+		  (not (member "diary" tags))
+ 		  (not (member "REPAS" tags))
+ 		  (not (member "interruption" tags))
+ 		  )
+	 (ignore-errors (konix/org-pomodoro-increase))
+	 )
+   )
   (let (
 		(_long "")
 		)
@@ -370,7 +390,7 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
   )
 (add-hook '
  org-capture-prepare-finalize-hook
-		  'konix/org-pomodoro/org-capture-prepare-finalize-hook)
+ 'konix/org-pomodoro/org-capture-prepare-finalize-hook)
 
 ;; when a timer is done, launch the hook
 (defalias 'konix/org-timer-done-hook 'konix/org-timer-done-pomodoro-hook)

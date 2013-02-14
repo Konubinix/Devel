@@ -153,7 +153,7 @@
 ;; Backup
 ;; ******************************************************************************************
 (require 'backup-dir)
-(setq-default bkup-backup-directory-info
+(setq-default backup-dir/bkup-backup-directory-info
 			  '(
 				(".*" "~/.emacs.d/backup/" ok-create full-path)
 				)

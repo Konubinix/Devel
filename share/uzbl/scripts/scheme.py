@@ -23,8 +23,8 @@ if __name__ == '__main__':
     elif u.scheme == 'git':
         detach_open(['git', 'clone', '--', uri], cwd=os.path.expanduser('~/src'))
     elif u.scheme == 'editor':
-        open_in_emacs = subprocess.call(
-            ['zenity', '--question', '--text', "Open this url in emacs ? "+uri]
+        dwim = subprocess.call(
+            ['zenity', '--question', '--text', "Do what I mean ? "+uri]
         )
-        if open_in_emacs == 0:
-            detach_open(['konix_emacs_open.sh', uri],)
+        if dwim == 0:
+            detach_open(['konix_uri_dwim.py', uri],)

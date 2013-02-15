@@ -387,7 +387,7 @@ set ebind     = @mode_bind global,-insert
 @cbind  yu  = sh 'echo -n "$UZBL_URI" | xclip'
 @cbind  yU  = sh 'printf "$1" | xclip' '\@SELECTED_URI'
 @cbind  yy  = sh 'printf "$UZBL_TITLE" | xclip'
-@cbind  yt  = sh 'konix_emacs_open.sh "\@uri" "$(xclip -o)"'
+@cbind  yt  = sh 'konix_uri_dwim.py "\@uri" "$(xclip -o)"'
 @cbind  yv  = sh "quvi '\@uri' --exec 'vlc %u'"
 @cbind  yd  = sh "konix_flash_dl.sh '\@uri'"
 
@@ -492,7 +492,7 @@ menu_add Quit uzbl = exit
 # Link context menu
 menu_link_add Print Link = print \@SELECTED_URI
 menu_link_add Copy Link = sh 'echo -n \@SELECTED_URI | xclip'
-menu_link_add Emacs open = sh 'konix_emacs_open.sh "\@SELECTED_URI"'
+menu_link_add Do what I mean ? = sh 'konix_uri_dwim.py "\@SELECTED_URI"'
 
 # === Mode configuration =====================================================
 

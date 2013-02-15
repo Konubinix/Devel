@@ -28,7 +28,9 @@
   (or (not
 	   (buffer-modified-p)
 	   )
-	  (y-or-n-p "Modifications for this buffer will be lost. Kill it?")
+	  (y-or-n-p
+	   (format "Modifications for the buffer %s will be lost. Kill it?" (buffer-name))
+	   )
 	  )
   )
 (defun konix/trac-wiki-escape-camel-case-links ()

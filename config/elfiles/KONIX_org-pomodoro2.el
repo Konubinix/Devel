@@ -312,7 +312,7 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 		)
    (when (and
 		  (not (member "diary" tags))
- 		  (not (member "REPAS" tags))
+ 		  (not (member "lunch" tags))
  		  (not (member "interruption" tags))
  		  )
 	 (ignore-errors (konix/org-pomodoro-increase))

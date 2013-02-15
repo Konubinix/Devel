@@ -13,6 +13,7 @@ export PYTHON_PATH="$(cd "${HOME}/init_bin" && ./konix_dirname.py "$PYTHON_BIN")
 # Function needed to import my custom env
 # ####################################################################################################
 import_env () {
+    OLD_PWD="${PWD}"
     ENV_CUSTOM_FILE="$1"
     TEMP_FILE=$(mktemp -t "temp_file_for_import_env.XXXX")
     rm -f "${TEMP_FILE}"
@@ -34,5 +35,7 @@ import_env () {
             fi
         fi
     done < "${TEMP_FILE}"
+    # restore the old pwd
+    PWD="${OLD_PWD}"
     rm "${TEMP_FILE}"
 }

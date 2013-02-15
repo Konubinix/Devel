@@ -132,7 +132,17 @@ cursor stays in the org buffer."
   ""
   )
 (setq-default org-directory (concat perso-dir "/wiki"))
-(setq-default org-agenda-clockreport-parameter-plist `(:link t :maxlevel 5 :emphasize t :link t :timestamp t))
+(setq-default org-agenda-clockreport-parameter-plist
+			  '(:fileskip0
+				:stepskip0
+				:link t
+				:maxlevel 5
+				:emphasize t
+				:link t
+				:timestamp t
+				:tags "-lunch"
+				)
+			  )
 (defun konix/org-skip-other-meta-context ()
   "Skip trees that are not in current meta context"
   (if (or

@@ -42,3 +42,5 @@ alias safg='sudo aptitude full-upgrade'
 alias sar='sudo aptitude remove'
 alias sap='sudo aptitude purge'
 alias mo=mimeopen
+alias as="aptitude search"
+alias ao="aptitude show"

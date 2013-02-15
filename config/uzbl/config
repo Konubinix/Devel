@@ -47,7 +47,7 @@ set scripts_dir      = @share_dir/uzbl:@perso_dir/share/uzbl:@data/share/uzbl/ex
 # support events that can wait for a response from a script.
 set scheme_handler      = sync_spawn @scripts_dir/scheme.py
 #set request_handler     = sync_spawn @scripts_dir/request.py
-set authentication_handler = sync_spawn @scripts_dir/auth.py
+set authentication_handler = sync_spawn @scripts_dir/konix_auth.py
 
 # Download stuff
 set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" || dm-dm.sh -s "$1"'

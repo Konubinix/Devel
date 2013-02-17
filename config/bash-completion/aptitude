@@ -2,4 +2,4 @@
 
 complete -F _sar sap
 
-complete -F _sai ao
+complete -F _sai apo

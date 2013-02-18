@@ -35,6 +35,7 @@ alias tetris="beep -f 330 -l 150 -n -f 1 -l 40 -n -f 494 -l 159 -n -f 1 -l 40 -n
 # aptitude
 alias sa='sudo aptitude'
 alias aps='aptitude search'
+alias apo="aptitude show"
 alias sai='sudo aptitude install'
 alias sau='sudo aptitude update'
 alias sasg='sudo aptitude safe-upgrade'
@@ -42,5 +43,3 @@ alias safg='sudo aptitude full-upgrade'
 alias sar='sudo aptitude remove'
 alias sap='sudo aptitude purge'
 alias mo=mimeopen
-alias aps="aptitude search"
-alias apo="aptitude show"

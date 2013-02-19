@@ -1,7 +1,7 @@
 #!/bin/bash
 
 UNDO="${UZBL_UNDOLIST_FILE:-${XDG_DATA_HOME:-~/.local/share}/uzbl/undolist}"
-UZBL=uzbl-browser
+UZBL="exec uzbl-browser"
 if [ -e $UNDO ]; then
     URL=`tail -n 1 $UNDO`
     LINECOUNT=`cat $UNDO | wc -l`

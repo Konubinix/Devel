@@ -578,6 +578,7 @@ NO : Ne pas truncater
 	(with-temp-buffer
 	  (insert buffer_name)
 	  (copy-region-as-kill (point-min) (point-max))
+	  (message "Copied '%s'" buffer_name)
 	  )
 	)
   )

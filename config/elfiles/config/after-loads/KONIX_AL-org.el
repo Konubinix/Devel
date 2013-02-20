@@ -292,6 +292,42 @@ cursor stays in the org buffer."
 	)
   )
 
+(defun konix/org-agenda-skip-if-done-last-week ()
+  (org-back-to-heading t)
+  (save-excursion
+	(save-restriction
+	  (org-narrow-to-element)
+	  (let* (
+			 (beg (point))
+			 (end (progn (outline-next-heading) (1- (point))))
+			 ts
+			 done_time
+			 (week (seconds-to-time (* 3600 24 7)))
+			 (last_week
+			  (time-subtract
+			   (current-time)
+			   week
+			   )
+			  )
+			 )
+		(goto-char beg)
+		(if (re-search-forward (org-re-timestamp 'inactive) end t)
+			(progn
+			  (setq ts (match-string-no-properties 1))
+			  (setq done_time (date-to-time ts))
+			  (if (time-less-p done_time last_week)
+				  nil
+				end
+				)
+			  )
+		  ;; could not find the closed time stamp. do not skip it
+		  nil
+		  )
+		)
+	  )
+	)
+  )
+
 (defun konix/org-is-task-of-project-p ()
   "Find out if entry at point is a task of a project.
 
@@ -891,9 +927,12 @@ to be organized.
 						 (org-agenda-overriding-header
 						  "Done projects")
 						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project")
-							t)
+						  '(or
+							(konix/org-agenda-skip-if-tags
+							 '("project")
+							 t)
+							(konix/org-agenda-skip-if-done-last-week)
+							)
 						  )
 						 )
 						)
@@ -903,9 +942,12 @@ to be organized.
 						  "Done tasks into a project")
 						 (org-tags-exclude-from-inheritance nil)
 						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project")
-							t
+						  '(or
+							(konix/org-agenda-skip-if-tags
+							 '("project")
+							 t
+							 )
+							(konix/org-agenda-skip-if-done-last-week)
 							)
 						  )
 						 )
@@ -916,8 +958,11 @@ to be organized.
 						  "Done tasks not into a project")
 						 (org-tags-exclude-from-inheritance nil)
 						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("project")
+						  '(or
+							(konix/org-agenda-skip-if-tags
+							 '("project")
+							 )
+							(konix/org-agenda-skip-if-done-last-week)
 							)
 						  )
 						 )

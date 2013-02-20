@@ -40,9 +40,6 @@ OnWindow shift Mod4 Mouse5 :MacroCmd {Exec konix_display.py 'lower' }{LowerLayer
 # Stick
 OnWindow Control Mod4 Mouse2 :MacroCmd {Exec konix_display.py 'stick' } { Stick }
 
-# double click on the titlebar to Max/Min
-OnTitlebar Double Mouse1 :Maximize
-
 # Shade
 OnTitlebar Mouse4 :PrevWindow (workspace=[current]) !! FBCV13 !!
 OnTitlebar Mouse5 :NextWindow (workspace=[current]) !! FBCV13 !!

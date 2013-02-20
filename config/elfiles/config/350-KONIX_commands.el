@@ -1628,6 +1628,7 @@ FExport diary data into iCalendar file: ")
 	" *Minibuf-0*"
 	" *Minibuf-1*"
 	"*Messages*"
+	" *Echo Area 0*"
 	)
   )
 

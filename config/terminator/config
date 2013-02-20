@@ -7,12 +7,11 @@
 [keybindings]
 [profiles]
   [[default]]
-    foreground_color = "#51bfb6"
     visible_bell = True
     background_darkness = 0.8
     urgent_bell = True
     background_type = transparent
-    cursor_color = "#ffffff"
+    cursor_color = ""
     cursor_blink = False
     scroll_on_output = False
     color_scheme = green_on_black

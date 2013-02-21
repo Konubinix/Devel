@@ -378,5 +378,11 @@ immediately after the section's start-tag."
 			   )
 			  )
 
+;; advices
+(defadvice nxml-backward-up-element (before push_mark ())
+  (push-mark)
+  )
+(ad-activate 'nxml-backward-up-element)
+
 (provide '700-KONIX_nxml)
 ;;; 700-KONIX_nxml.el ends here

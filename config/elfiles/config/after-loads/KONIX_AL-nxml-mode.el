@@ -29,6 +29,13 @@
 (setq-default nxml-child-indent 2)
 (setq-default nxml-end-tag-indent-scan-distance 400000)
 (setq-default nxml-heading-scan-distance nxml-end-tag-indent-scan-distance)
+;; ######################################################################
+;; Special fontification for keywords
+;; ######################################################################
+(defvar konix/nxml-qname-keywords
+  '()
+  "qnames to be highlighted differently")
+
 (add-to-list 'safe-local-variable-values
 			 '(nxml-section-element-name-regexp . t))
 (eval-after-load "rng-loc"
@@ -319,6 +326,23 @@ immediately after the section's start-tag."
 
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
+  (when konix/nxml-qname-keywords
+	(font-lock-add-keywords
+	 nil
+	 `(
+	   (
+		,(format "</?\\([^>:]+?:\\)?\\(%s\\)[ >]"
+				 (mapconcat
+				  'identity
+				  konix/nxml-qname-keywords
+				  "\\|")
+				 )
+		.
+		(2 font-lock-function-name-face)
+		)
+	   )
+	 )
+	)
   (auto-fill-mode t)
   (autopair-mode 1)
   (setq show-trailing-whitespace t)
@@ -348,8 +372,8 @@ immediately after the section's start-tag."
   (local-set-key (kbd "C-c C-c") 'konix/nxml-show-context)
   (auto-complete-mode 1)
   (setq header-line-format '(:eval (format "Schema : %s"
-									(or rng-current-schema-file-name "Vacuous")
-									)))
+										   (or rng-current-schema-file-name "Vacuous")
+										   )))
   )
 (add-hook 'nxml-mode-hook
 		  'konix/nxml-mode-hook)

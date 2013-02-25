@@ -11,6 +11,7 @@ if [ -e $UNDO ]; then
         $UZBL -u "$URL" &
         rm $UNDO
     else
+        konix_display.py "Popping url $URL"
         $UZBL -u "$URL" &
         sed -i '$d' $UNDO
     fi

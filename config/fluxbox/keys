@@ -245,7 +245,7 @@ Mod4 w d :MacroCmd {ExecCommand konix_display.py "Executing download manager"} {
 # ////////////////////////////////////////
 # xset related shorcut (Mod4 s)
 # ////////////////////////////////////////
-Mod4 s f :ToggleCmd {Exec xset r rate 200 100 && konix_display_unique.py "Fast keyboard" } {Exec xset r rate && konix_display_unique.py "Reset keyboard speed"}
+Mod4 s f :ToggleCmd {Exec xset r rate 170 150 && konix_display_unique.py "Fast keyboard" } {Exec xset r rate && konix_display_unique.py "Reset keyboard speed"}
 
 # ////////////////////////////////////////
 # BRING WINDOW SHORTCUTS (Control Mod4 Shift)

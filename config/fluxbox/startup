@@ -10,7 +10,7 @@ setxkbmap -option compose:menu
 # make the keyboard more responsive
 # arg1= delay (in ms) before the first repetition
 # arg2= number of repetitions per second
-xset r rate 200 100
+xset r rate 170 150
 
 # For flash to be fully functionnal
 export GDK_NATIVE_WINDOWS=1

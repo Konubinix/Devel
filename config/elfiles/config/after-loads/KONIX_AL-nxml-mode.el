@@ -348,6 +348,7 @@ immediately after the section's start-tag."
   (setq show-trailing-whitespace t)
   (setq indent-line-function 'konix/nxml-indent-line)
   (ac-flyspell-workaround)
+  (flyspell-prog-mode)
   (local-set-key (kbd "<C-return>") 'konix/nxml-newline-dwim)
   (local-set-key (kbd "C-c C-d") 'konix/nxml/indirect-buffer-cdata)
   (setq hs-c-start-regexp "\<\!\-\-")
@@ -402,6 +403,12 @@ immediately after the section's start-tag."
 			   )
 			  )
 
+(eval-after-load "flyspell"
+  '(progn
+	 ;; make flyspell work well with nxml
+	 (add-to-list 'flyspell-prog-text-faces 'nxml-text-face)
+	 )
+  )
 ;; advices
 (defadvice nxml-backward-up-element (before push_mark ())
   (push-mark)

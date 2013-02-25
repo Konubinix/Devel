@@ -640,7 +640,7 @@ to be organized.
 				  (agenda nil)
 				  )
 				 (
-				  (org-agenda-start-day (konix/org-yesterday))
+				  (org-agenda-start-day "-1")
 				  (org-agenda-start-with-clockreport-mode t)
 				  (org-agenda-start-with-log-mode t)
 				  (org-agenda-show-log 'clockcheck)
@@ -873,7 +873,7 @@ to be organized.
 						  )
 				  )
 				 (
-				  (org-agenda-start-day (konix/org-last-week))
+				  (org-agenda-start-day "-7")
 				  (org-agenda-start-with-clockreport-mode t)
 				  (org-agenda-start-with-log-mode t)
 				  (org-agenda-archives-mode t)
@@ -1636,14 +1636,6 @@ to be organized.
 		)
 	(message "No timer currently run")
 	)
-  )
-
-(defun konix/org-yesterday ()
-  (- (org-today) 1)
-  )
-
-(defun konix/org-last-week ()
-  (- (org-today) 7)
   )
 
 (defun konix/org-is-errand-p ()

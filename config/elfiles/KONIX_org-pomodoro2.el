@@ -276,9 +276,12 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 
 (defvar konix/org-pomodoro-tray-daemon-state "i" "")
 (defvar konix/org-pomodoro-tray-daemon-prev-state nil "")
-(defun konix/org-pomodoro-tray-daemon-put (command)
-  (setq konix/org-pomodoro-tray-daemon-prev-state konix/org-pomodoro-tray-daemon-state
-		konix/org-pomodoro-tray-daemon-state command)
+(defun konix/org-pomodoro-tray-daemon-put (command &optional record_prev_state)
+  (when record_prev_state
+	(setq konix/org-pomodoro-tray-daemon-prev-state
+		  konix/org-pomodoro-tray-daemon-state)
+	)
+  (setq konix/org-pomodoro-tray-daemon-state command)
   (when (file-exists-p konix/org-pomodoro-tray-daemon-controller)
 	(with-temp-buffer
 	  (insert command)
@@ -379,7 +382,7 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 		  'konix/org-timer-cancel-pomodoro-hook)
 
 (defun konix/konix/org-capture-interruption-pre-hook ()
-  (konix/org-pomodoro-tray-daemon-put "j")
+  (konix/org-pomodoro-tray-daemon-put "j" t)
   )
 (add-hook 'konix/org-capture-interruption-pre-hook
 		  'konix/konix/org-capture-interruption-pre-hook)

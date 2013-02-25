@@ -313,14 +313,14 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
   (let (
 		(tags (konix/org-pomodoro/get-clock-tags))
 		)
-   (when (and
-		  (not (member "diary" tags))
- 		  (not (member "lunch" tags))
- 		  (not (member "interruption" tags))
- 		  )
-	 (ignore-errors (konix/org-pomodoro-increase))
-	 )
-   )
+	(when (and
+		   (not (member "diary" tags))
+		   (not (member "lunch" tags))
+		   (not (member "interruption" tags))
+		   )
+	  (ignore-errors (konix/org-pomodoro-increase))
+	  )
+	)
   (let (
 		(_long "")
 		)
@@ -389,11 +389,19 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 
 (defun konix/org-pomodoro/org-capture-prepare-finalize-hook ()
   "If in interruption, go back to the state before interrupted"
-  (konix/org-pomodoro-tray-daemon-put konix/org-pomodoro-tray-daemon-prev-state)
+  (when (member "interruption"
+				(save-window-excursion
+				  (save-excursion
+					(org-clock-goto)
+					(org-get-tags-at (point))
+					)
+				  )
+				)
+	(konix/org-pomodoro-tray-daemon-put konix/org-pomodoro-tray-daemon-prev-state)
+	)
   )
-(add-hook '
- org-capture-prepare-finalize-hook
- 'konix/org-pomodoro/org-capture-prepare-finalize-hook)
+(add-hook 'org-capture-prepare-finalize-hook
+		  'konix/org-pomodoro/org-capture-prepare-finalize-hook)
 
 ;; when a timer is done, launch the hook
 (defalias 'konix/org-timer-done-hook 'konix/org-timer-done-pomodoro-hook)

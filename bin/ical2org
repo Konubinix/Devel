@@ -198,6 +198,10 @@ BEGIN {
     id = gensub("\r", "", "g", $2);
 }
 
+/^VERSION/ {
+    version = gensub("\r", "", "g", $2);
+}
+
 /^LOCATION/ {
     location = gensub("\r", "", "g", $2);
 }
@@ -221,6 +225,8 @@ BEGIN {
     print "  :ID:       " id
     if(length(location))
         print "  :LOCATION: " location
+    if(length(version))
+        print "  :VERSION: " version
     if(length(status))
         print "  :STATUS: " status
     print "  :END:"

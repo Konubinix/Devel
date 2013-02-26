@@ -926,6 +926,7 @@ to be organized.
 						(
 						 (org-agenda-overriding-header
 						  "Done projects")
+						 (org-agenda-tag-filter-preset nil)
 						 (org-agenda-skip-function
 						  '(or
 							(konix/org-agenda-skip-if-tags
@@ -941,6 +942,7 @@ to be organized.
 						 (org-agenda-overriding-header
 						  "Done tasks into a project")
 						 (org-tags-exclude-from-inheritance nil)
+						 (org-agenda-tag-filter-preset nil)
 						 (org-agenda-skip-function
 						  '(or
 							(konix/org-agenda-skip-if-tags
@@ -957,6 +959,7 @@ to be organized.
 						 (org-agenda-overriding-header
 						  "Done tasks not into a project")
 						 (org-tags-exclude-from-inheritance nil)
+						 (org-agenda-tag-filter-preset nil)
 						 (org-agenda-skip-function
 						  '(or
 							(konix/org-agenda-skip-if-tags

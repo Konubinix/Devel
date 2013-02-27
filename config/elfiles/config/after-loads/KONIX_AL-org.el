@@ -920,12 +920,12 @@ to be organized.
 				 nil
 				 ("~/errand_tasks.html")
 				 )
- 				("ad" "Done projects that might be put in archives"
+ 				("ad" "Done projects that might be put in _archives files"
 				 (
 				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
-						  "Done projects")
+						  "Done projects (full archive)")
 						 (org-agenda-tag-filter-preset nil)
 						 (org-agenda-skip-function
 						  '(or
@@ -933,6 +933,7 @@ to be organized.
 							 '("project")
 							 t)
 							(konix/org-agenda-skip-if-done-last-week)
+							(konix/org-agenda-skip-if-task-of-project)
 							)
 						  )
 						 )
@@ -940,7 +941,7 @@ to be organized.
 				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
-						  "Done tasks into a project")
+						  "Done tasks into a project or done subproject (soft archive)")
 						 (org-tags-exclude-from-inheritance nil)
 						 (org-agenda-tag-filter-preset nil)
 						 (org-agenda-skip-function
@@ -957,7 +958,7 @@ to be organized.
 				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
-						  "Done tasks not into a project")
+						  "Done tasks not into a project (full archive)")
 						 (org-tags-exclude-from-inheritance nil)
 						 (org-agenda-tag-filter-preset nil)
 						 (org-agenda-skip-function

@@ -1872,7 +1872,7 @@ of the clocksum."
   '(
 	("^.+INTERRUP:.+$" 0 (face font-lock-warning-face))
 	("^.+PAUSE:.+$" 0 (face konix/org-agenda-pause-face))
-	("^.+\\(now\\).+$" 1 (face org-checkbox-statistics-done))
+	("^.+\\(\\bnow\\b\\).+$" 1 (face org-checkbox-statistics-done))
 	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\)\\).+$" 1 (face konix/org-agenda-urgent-items-face))
 	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 (face konix/org-agenda-non-urgent-items-face))
 	)

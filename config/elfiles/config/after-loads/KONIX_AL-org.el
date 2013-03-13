@@ -535,7 +535,8 @@ to be organized.
 							   )
 							 )
 							(org-agenda-tag-filter-preset nil)
-							(org-agenda-overriding-header "Todos that need to be organized")
+							(org-agenda-overriding-header
+							 "Todos that need to be organized (add project, refile to project or set to NEXT)")
 							)
 						   )
 				(tags-todo "-{@.+}//+NEXT"

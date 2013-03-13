@@ -383,7 +383,7 @@ user may need or want to edit them.")
     "milestone" "attachment" "source")
   "Trac link type keywords to be used in font-lock.")
 
-(defvar trac-wiki-link-regexp-type-1 "\\[\\([^[ ]+\\) \\([^]]+\\)\\]" "")
+(defvar trac-wiki-link-regexp-type-1 "\\[\\([^[ \n]+\\) \\([^]\n]+\\)\\]" "")
 (defvar trac-wiki-link-regexp-type-2 "\\[\\[\\([^|\n\r]+\\)|\\([^]]+\\)\\]\\]" "")
 (defun trac-wiki-set-properties-link-buffer ()
   (interactive)

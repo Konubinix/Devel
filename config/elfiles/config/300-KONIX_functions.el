@@ -899,6 +899,18 @@ you can still examine the changes via M-x ediff-files"
     (bury-buffer patch-diagnostics)
     (message "Type `P', if you need to see patch diagnostics")
     ctl-buf))
+
+(defun konix/elnode-show-my-buffer (httpcon)
+  "(elnode-start 'konix/elnode-show-my-buffer :port 9000 :host \"*\")
+   (elnode-stop 9000)"
+  (elnode-http-start httpcon 200 '("Content-Type: text/html"))
+  (with-current-buffer (with-current-buffer (car (buffer-list))
+						 (htmlfontify-buffer)
+						 )
+	;; go after the xml declaration
+	(elnode-http-return httpcon (buffer-substring 40 (point-max)))
+	)
+  )
 ;; ####################################################################################################
 ;; the current netrc-parse implementation sucks
 ;; ####################################################################################################

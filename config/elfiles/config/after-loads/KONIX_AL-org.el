@@ -1341,7 +1341,6 @@ to be organized.
 				(search category-keep)
 				)
 			  )
-(defvar konix/org-agenda-tag-filter-preset '() "")
 (defun konix/org-cmp-deadlines-past-and-due-first (a b)
   (let*(
 		(deadline_regexp_past "In +\\(-[0-9]+\\) d\\.:")
@@ -1398,26 +1397,39 @@ to be organized.
 	)
   )
 
-(defun konix/org/toggle-org-agenda-tag-filter-preset (&optional force)
+(defvar konix/org-agenda-tag-filter-contexts-default '() "")
+(defvar konix/org-agenda-tag-filter-contexts '() "")
+(defun konix/org-toggle-org-agenda-tag-filter-context (&optional force)
   (interactive)
-  (setq-default org-agenda-tag-filter-preset
+  (setq-default konix/org-agenda-tag-filter-contexts
 				(cond
 				 (force
 				  (if (equal force 1)
-					  konix/org-agenda-tag-filter-preset
+					  konix/org-agenda-tag-filter-contexts-default
 					nil
 					)
 				  )
-				 (org-agenda-tag-filter-preset
+				 (konix/org-agenda-tag-filter-contexts
 				  nil
 				  )
 				 (t
-				  konix/org-agenda-tag-filter-preset
+				  konix/org-agenda-tag-filter-contexts-default
 				  )
 				 )
 				)
-  (message "org-agenda-tag-filter-preset set to %s" org-agenda-tag-filter-preset)
+  (message "konix/org-agenda-tag-filter-contexts set to %s" konix/org-agenda-tag-filter-contexts)
   )
+(defun konix/org-agenda-auto-exclude-function-context (tag)
+  (if (and
+	   konix/org-agenda-tag-filter-contexts
+	   (string-match-p "^@" tag)
+	   (not (member tag konix/org-agenda-tag-filter-contexts))
+	   )
+	  (format "-%s" tag)
+	nil
+	)
+  )
+(setq org-agenda-auto-exclude-function 'konix/org-agenda-auto-exclude-function-context)
 
 (defun konix/org/record-org-agenda-tag-filter-preset ()
   (interactive)
@@ -1916,8 +1928,25 @@ of the clocksum."
   (setq buffer-read-only t)
   )
 
+(defun konix/org-apply-org-agenda-auto-exclude-function ()
+  (org-agenda-filter-show-all-tag)
+  (when org-agenda-auto-exclude-function
+	(setq org-agenda-tag-filter '())
+	(dolist (tag (org-agenda-get-represented-tags))
+	  (let ((modifier (funcall org-agenda-auto-exclude-function tag)))
+	    (if modifier
+			(push modifier org-agenda-tag-filter))))
+	(if (not (null org-agenda-tag-filter))
+	    (org-agenda-filter-apply org-agenda-tag-filter 'tag)))
+  (setq maybe-refresh t)
+  )
+
+;; ######################################################################
+;; advices
+;; ######################################################################
 (defadvice org-agenda (after konix/set-text-properties ())
   (konix/org-agenda-set-text-properties)
+  (konix/org-apply-org-agenda-auto-exclude-function)
   )
 (defadvice org-agenda-redo (after konix/set-text-properties ())
   (konix/org-agenda-set-text-properties)

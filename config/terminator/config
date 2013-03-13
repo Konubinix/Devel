@@ -1,9 +1,8 @@
 [global_config]
   dbus = True
   window_state = maximise
-  title_inactive_bg_color = "#0021fb"
   title_transmit_bg_color = "#2a3bff"
-  focus = mouse
+  title_inactive_bg_color = "#0021fb"
 [keybindings]
 [profiles]
   [[default]]

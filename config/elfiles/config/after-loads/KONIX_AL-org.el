@@ -433,6 +433,18 @@ to be organized.
 	)
   )
 
+(defun konix/org-yesterworkday ()
+  (-
+   (org-today)
+   (if (string= "1"
+				(format-time-string "%u" (current-time))
+				)
+	   3
+	 1
+	 )
+   )
+  )
+
 (setq-default konix/org-agenda-month-view
 			  '(
 				(agenda nil
@@ -617,7 +629,7 @@ to be organized.
 			   )
 			  )
 
-;; Y, yesterday's view: what did I do yesterday, useful for daily reports
+;; Y, yesterworkday's view: what did I do yesterworkday, useful for daily reports
 ;; y, maybe list
 ;; p, projects without subprojects: make sure I don't have too much projects at
 ;;    the same time
@@ -636,12 +648,12 @@ to be organized.
 ;; W, Week, with only the important stuff
 (setq-default org-agenda-custom-commands
 			  `(
-				("aY" "Yesterday time sheet"
+				("aY" "Yesterworkday time sheet"
 				 (
 				  (agenda nil)
 				  )
 				 (
-				  (org-agenda-start-day "-1")
+				  (org-agenda-start-day (konix/org-yesterworkday))
 				  (org-agenda-start-with-clockreport-mode t)
 				  (org-agenda-start-with-log-mode t)
 				  (org-agenda-show-log 'clockcheck)

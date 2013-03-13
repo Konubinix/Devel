@@ -49,6 +49,7 @@
   (make-local-variable 'kill-buffer-query-functions)
   (add-to-list 'kill-buffer-query-functions 'konix/trac-wiki-kill-query-function)
   (setq indent-tabs-mode nil)
+  (abbrev-mode 1)
   )
 (add-hook 'trac-wiki-mode-hook 'konix/trac-wiki-mode-hook)
 

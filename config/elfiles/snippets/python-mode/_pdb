@@ -3,3 +3,4 @@
 # --
 $>import ${100:i}pdb
 $>$100pdb.set_trace()
+$>$0

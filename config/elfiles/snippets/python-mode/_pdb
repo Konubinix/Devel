@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
 # name: _pdb
 # --
-$>import pdb
-$>pdb.set_trace()
+$>import ${100:i}pdb
+$>$100pdb.set_trace()

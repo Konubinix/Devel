@@ -290,7 +290,9 @@ set ebind     = @mode_bind global,-insert
 
 # Navigation binds
 @cbind  b   = back
+@cbind  <Mod1><Left>   = back
 @cbind  m   = forward
+@cbind  <Mod1><Right>   = forward
 @cbind  S   = stop
 @cbind  r   = reload
 @cbind  R   = reload_ign_cache

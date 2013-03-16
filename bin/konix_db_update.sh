@@ -12,6 +12,7 @@ do
 	then
 		mkdir -p "$KONIX_DB_MEDIA_DBS"
 	fi
+	echo "Updating db for $disk in $KONIX_DB_MEDIA_DBS/${disk_name}.db"
 	updatedb -l 0 -U "$disk" -o "$KONIX_DB_MEDIA_DBS/${disk_name}.db"
 done
 echo "Done"

@@ -629,6 +629,19 @@ to be organized.
 			   )
 			  )
 
+(defvar konix/org-agenda-inhibit-context-filtering nil "")
+(defun konix/org-agenda-inhibit-context-filtering ()
+  (with-current-buffer
+	  (get-buffer-create org-agenda-buffer-name)
+	(set (make-local-variable
+		  'konix/org-agenda-tag-filter-contexts)
+		 nil)
+	(set (make-local-variable
+		  'konix/org-agenda-inhibit-context-filtering)
+		 t)
+	)
+  )
+
 ;; Y, yesterworkday's view: what did I do yesterworkday, useful for daily reports
 ;; y, maybe list
 ;; p, projects without subprojects: make sure I don't have too much projects at
@@ -758,11 +771,16 @@ to be organized.
 				 )
 				("as" "Stuck view"
 				 ,konix/org-agenda-stuck-view
+				 (
+				  (dummy (konix/org-agenda-inhibit-context-filtering))
+				  )
 				 )
 				("aS" "Stuck view (Important stuff to do)"
 				 ,konix/org-agenda-stuck-view
 				 (
-				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
+				  (org-agenda-skip-function
+				   'konix/org-agenda-skip-non-important-item)
+				  (dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
 				 )
 				("aa" "Agenda view"
@@ -910,7 +928,9 @@ to be organized.
 						 )
 						)
 				  )
-				 nil
+				 (
+				  (dummy (konix/org-agenda-inhibit-context-filtering))
+				  )
 				 ("~/errand_tasks.html")
 				 )
  				("ao" "Phone tasks"
@@ -930,7 +950,9 @@ to be organized.
 						 )
 						)
 				  )
-				 nil
+				 (
+				  (dummy (konix/org-agenda-inhibit-context-filtering))
+				  )
 				 ("~/errand_tasks.html")
 				 )
  				("ad" "Done projects that might be put in _archives files"
@@ -984,6 +1006,9 @@ to be organized.
 						  )
 						 )
 						)
+				  )
+				 (
+				  (dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
 				 )
 				)

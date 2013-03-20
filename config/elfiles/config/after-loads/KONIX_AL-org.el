@@ -1941,15 +1941,62 @@ of the clocksum."
   (setq maybe-refresh t)
   )
 
+(defun konix/org-agenda-filter-context_1 (tags)
+  ;; Deactivate `org-agenda-entry-text-mode' when filtering
+  (if org-agenda-entry-text-mode (org-agenda-entry-text-mode))
+  (let (tags
+		cat
+		(konix/org-entry-predicate (append '(or)
+										   (mapcar
+											(lambda (elem)
+											  `(member ,elem tags)
+											  )
+											tags
+											)
+										   ))
+		)
+	(save-excursion
+	  (goto-char (point-min))
+	  (while (not (eobp))
+		(if (org-get-at-bol 'org-marker)
+			(progn
+			  (setq tags (org-get-at-bol 'tags) ; used in eval
+					cat (get-text-property (point) 'org-category))
+			  (if (not (eval konix/org-entry-predicate))
+				  (org-agenda-filter-hide-line 'tag))
+			  (beginning-of-line 2))
+		  (beginning-of-line 2))))
+	)
+  (if (get-char-property (point) 'invisible)
+	  (ignore-errors (org-agenda-previous-line))
+	)
+  )
+
+(defun konix/org-agenda-filter-context ()
+  (cond
+   (konix/org-agenda-inhibit-context-filtering
+	(setq header-line-format "Context filtering inhibited")
+	)
+   (konix/org-agenda-tag-filter-contexts
+	(konix/org-agenda-filter-context_1 konix/org-agenda-tag-filter-contexts)
+	(setq header-line-format `("Context filtered with " ,konix/org-agenda-tag-filter-contexts))
+	)
+   ((not konix/org-agenda-tag-filter-contexts)
+	(setq header-line-format "No context filter")
+	)
+   )
+  )
+
 ;; ######################################################################
 ;; advices
 ;; ######################################################################
 (defadvice org-agenda (after konix/set-text-properties ())
   (konix/org-agenda-set-text-properties)
-  (konix/org-apply-org-agenda-auto-exclude-function)
+  (konix/org-agenda-filter-context)
   )
 (defadvice org-agenda-redo (after konix/set-text-properties ())
   (konix/org-agenda-set-text-properties)
+  (konix/org-agenda-filter-context)
   )
 (ad-activate 'org-agenda)
 (ad-activate 'org-agenda-redo)

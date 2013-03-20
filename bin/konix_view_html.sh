@@ -33,8 +33,8 @@ tee "${HOME}/konix_view_html.msg" | {
 		echo "Successfully munpacked msg" >> "${OUT_FILE}"
 		# rename the partN file to get partN.content_type
 		sed -n '
-/part.\+ ([tT][eE][xX][tT]\// {
-   s/\(part.\+\) ([tT][eE][xX][tT]\/\(.\+\))/\1 \2/
+/.\+ ([tT][eE][xX][tT]\// {
+   s/^\(.\+\) ([tT][eE][xX][tT]\/\(.\+\))/\1 \2/
    p
 }
 ' < ${OUT_FILE} | while read line
@@ -47,11 +47,11 @@ tee "${HOME}/konix_view_html.msg" | {
 	then
 		echo "nothing found munpacked" >> "${OUT_FILE}"
 	fi
-	for i in "$dir"/part*.[Hh][Tt][Mm][Ll]; do
+	for i in "$dir"/*.[Hh][Tt][Mm][Ll]; do
         i_new="$i.new.html"
         cat "$i" | bash "$dir"/sed > "${i_new}"
 		mimeopen -n "${i_new}" &
-		sleep 3
-		exit 0
 	done
+	sleep 3
+	exit 0
 }

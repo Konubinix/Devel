@@ -313,7 +313,7 @@ PARAM : a string with parameters given to make
   (konix/compile/find-makefile makefile)
   ;; go to the buffer of compilation and set its default directory
   (let (window)
-	(setq window (get-buffer-window "*compilation*"))
+	(setq window (get-buffer-window "*compilation*" t))
 	(if window
 		(select-window window)
 	  (progn

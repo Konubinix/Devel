@@ -1,7 +1,3 @@
 #!/bin/bash
 
-if [ -z "$*" ]
-then
-	set "."
-fi
 exec ec "$@"

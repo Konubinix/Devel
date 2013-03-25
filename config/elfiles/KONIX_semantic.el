@@ -312,13 +312,28 @@
 
 (defun konix/semantic-add-lex-c-preprocessor-symbol-map ()
   (interactive)
-  (unless (thing-at-point 'sexp)
-	(error "Nothing at point...")
-	)
-  (semantic-c-add-preprocessor-symbol (substring-no-properties (thing-at-point 'sexp)) nil)
-  (customize-save-variable 'semantic-lex-c-preprocessor-symbol-map
-						   semantic-lex-c-preprocessor-symbol-map
-						   )
+  (let (
+		(value
+		 (cond
+		  ((region-active-p)
+		   (buffer-substring-no-properties
+			(region-beginning)
+			(region-end)
+			)
+		   )
+		  ((thing-at-point 'sexp)
+		   (thing-at-point 'sexp)
+		   )
+		  (t
+		   (error "Nothing to add...")
+		   )
+		  )
+		 )
+		)
+	(semantic-c-add-preprocessor-symbol value nil)
+	(customize-save-variable 'semantic-lex-c-preprocessor-symbol-map
+							 semantic-lex-c-preprocessor-symbol-map
+							 ))
   )
 
 (defun konix/semantic-get-canonical-name-current-point ()

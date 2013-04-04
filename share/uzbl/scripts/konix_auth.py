@@ -6,6 +6,7 @@ import os
 import netrc
 import sys
 import auth                     # local import
+import gtk
 
 if __name__ == "__main__":
     # $1 authentication zone unique identifier (may be used as 'key')

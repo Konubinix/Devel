@@ -1,11 +1,20 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 import sys
-import logging
 import konix_notify
-logging.basicConfig(level=logging.DEBUG)
+import argparse
 
-if len(sys.argv) <= 1:
-    exit(1)
-message = ' '.join(sys.argv[1:])
-konix_notify.main(message)
+parser = argparse.ArgumentParser(
+    description="Display a message using the notification daemon.",
+)
+
+parser.add_argument('-d', '--duration', default=3000, type=int,
+                    help="The duration of the notification in ms, defaults to 3000")
+
+parser.add_argument('message', type=str, nargs="*",
+                    help="The message")
+
+args = parser.parse_args()
+
+message = ' '.join(args.message)
+konix_notify.main(message, duration=args.duration)

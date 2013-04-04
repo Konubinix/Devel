@@ -32,29 +32,32 @@
   (when (< konix/org-pomodoro-set-count 0)
 	(setq konix/org-pomodoro-set-count 0)
 	)
-  (konix/org-pomodoro-current-clock-property-increase)
+  (konix/org-pomodoro-current-increase)
   (message "Set the pomodoro count to %s" konix/org-pomodoro-set-count)
   )
 
-(defun konix/org-pomodoro-current-clock-property-increase (&optional increment)
+(defun konix/org-pomodoro-current-increase (&optional increment)
   (interactive)
   (unless increment
 	(setq increment 1)
 	)
-  (save-window-excursion
-	(save-excursion
-	  (konix/org-clock-goto)
-	  (let* (
-			 (done_pomodoro
-			  (or
-			   (org-entry-get (point) "DONE_POMODORO")
-			   "0"
-			   )
-			  )
-			 (new_value (+ increment (string-to-int done_pomodoro)))
+  ;; go to the entry that was recorder when the pomodoro started, code
+  ;; inspired from the one of org-clock-goto
+  (with-current-buffer (marker-buffer konix/org-pomodoro-start_entry)
+	(if (or (< konix/org-pomodoro-start_entry (point-min))
+			(> konix/org-pomodoro-start_entry (point-max)))
+		(widen))
+	(goto-char konix/org-pomodoro-start_entry)
+	(let* (
+		   (done_pomodoro
+			(or
+			 (org-entry-get (point) "DONE_POMODORO")
+			 "0"
 			 )
-		(org-set-property "DONE_POMODORO" (int-to-string new_value))
-		)
+			)
+		   (new_value (+ increment (string-to-int done_pomodoro)))
+		   )
+	  (org-set-property "DONE_POMODORO" (int-to-string new_value))
 	  )
 	)
   )

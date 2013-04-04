@@ -10,4 +10,4 @@ function yesterworkday()
     fi
 }
 
-git log --since="$(yesterworkday)" "$@"
+git log -w --since="$(yesterworkday)" "$@"

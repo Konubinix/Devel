@@ -6,7 +6,8 @@ source konix_assert_var.sh "$KONIX_SITE_LOGIN"
 source konix_assert_var.sh "$KONIX_SITE_MDP"
 source konix_assert_var.sh "$KONIX_SITE_SERVER"
 
-emacsclient -e "(save-excursion (konix/org-wiki-generate))"
+emacsclient -e "(progn (require 'ox-publish) (save-excursion (konix/org-wiki-generate)))"
+source konix_assert.sh "$?" == "0"
 # the org file is by default in ~/org.ics
 (
 	cd "${KONIX_WIKI_DIR}"

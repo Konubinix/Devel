@@ -395,6 +395,27 @@ inspired from `notmuch-show-archive-thread-internal'"
   (konix/notmuch-remove-tag "unread")
   )
 
+(defun konix/notmuch-show-reply-sender ()
+  (interactive)
+  (let (
+		(mm-inline-text-html-with-w3m-keymap nil)
+		)
+	(notmuch-show-reply-sender)
+	)
+  )
+
+(defun konix/notmuch-show-reply ()
+  (interactive)
+  (let (
+		(mm-inline-text-html-with-w3m-keymap nil)
+		)
+	(notmuch-show-reply)
+	)
+  )
+
+(konix/notmuch-define-key-search-show "r" 'konix/notmuch-show-reply-sender)
+(konix/notmuch-define-key-search-show "R" 'konix/notmuch-show-reply)
+(konix/notmuch-define-key-search-show "d" 'konix/notmuch-toggle-deleted-tag)
 (konix/notmuch-define-key-search-show "d" 'konix/notmuch-toggle-deleted-tag)
 (konix/notmuch-define-key-search-show (kbd "<deletechar>") 'konix/notmuch-toggle-deleted-tag)
 (konix/notmuch-define-key-search-show "S" 'konix/notmuch-toggle-spam-tag)

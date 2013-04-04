@@ -562,7 +562,8 @@
 (setq-default holiday-local-holidays
 			  '(
 				(holiday-fixed 1 1 "Jour de l'an")
-				(holiday-greek-orthodox-easter)
+				(holiday-easter-etc -14 "Passion Sunday")
+				(holiday-easter-etc 0 "Easter Sunday")
 				(holiday-easter-etc 39 "Ascension")
 				(holiday-fixed 5 1 "Fête du travail")
 				(holiday-fixed 5 8 "Armistice 1945")

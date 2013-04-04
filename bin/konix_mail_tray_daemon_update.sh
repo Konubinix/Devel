@@ -25,7 +25,7 @@ if [ "$DO_DISPLAY" == "1" ] \
 then
 	# less than 10 new mails display all of them
     IFS=$'\n'
-    for mail in $(notmuch search tag:flagged and tag:unread)
+    for mail in $(notmuch search tag:flagged and tag:unread and tag:new)
     do
         # display only the summary part
         konix_display.py -d 10000 "${mail:23}"

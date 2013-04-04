@@ -318,35 +318,57 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
   ;; increase the pomodoro if not in an interruption, a pause or a diary meeting
   (let (
 		(tags (konix/org-pomodoro/get-clock-tags))
+		(take_pomodoro_into_account nil)
+		(reason "hum...")
+		(ask_for_new_pomodoro nil)
 		)
-	(when (and
-		   (not (member "diary" tags))
-		   (not (member "lunch" tags))
-		   (not (member "interruption" tags))
-		   )
-	  (ignore-errors (konix/org-pomodoro-increase))
-	  )
-	)
-  (let (
-		(_long "")
+	(cond
+	 ((or
+	   (member "interruption" tags)
+	   (member "lunch" tags)
+	   (member "diary" tags)
+	   )
+	  ;; do not ask for a new pomodoro, but may be increase the pomodoro number
+	  (setq ask_for_new_pomodoro nil)
+	  (if (<= (org-clock-get-clocked-time) 5)
+		  (setq take_pomodoro_into_account t)
+		(setq reason "a too long interruption.")
 		)
-	;; Ask the pomodorow user to take a long break when there has been more than
-	;; 4 pomodorow without pauses. It assumes that the long pause will be taken
-	;; with `konix/org-pomodoro-long-break'
-	(when (>= konix/org-pomodoro-set-count 4)
-	  (setq _long '#(" LONG" 0 5 (face font-lock-warning-face)))
 	  )
-	(setq konix/org-pomodoro-in-pomodoro nil)
-	(konix/org-pomodoro-tray-daemon-put "r")
-	;; beep
-	(let (
-		  (visible-bell nil)
+	 (t
+	  ;; take the pomodoro into account and ask for a new one
+	  (setq take_pomodoro_into_account t)
+	  (setq ask_for_new_pomodoro t)
+	  )
+	 )
+	(if take_pomodoro_into_account
+		(ignore-errors (konix/org-pomodoro-increase))
+	  ;; else
+	  (message "This pomodoro won't be taken into account because of %s" reason)
+	  )
+	(if ask_for_new_pomodoro
+		(let (
+			  (_long "")
+			  )
+		  ;; Ask the pomodorow user to take a long break when there has been more than
+		  ;; 4 pomodorow without pauses. It assumes that the long pause will be taken
+		  ;; with `konix/org-pomodoro-long-break'
+		  (when (>= konix/org-pomodoro-set-count 4)
+			(setq _long '#(" LONG" 0 5 (face font-lock-warning-face)))
+			)
+		  (setq konix/org-pomodoro-in-pomodoro nil)
+		  (konix/org-pomodoro-tray-daemon-put "r")
+		  ;; beep
+		  (let (
+				(visible-bell nil)
+				)
+			(beep t)
+			)
+		  (konix/org-pomodoro-decide-start-or-break
+		   (format "Ended a pomodoro, you may take a%s break (%s)" _long
+				   konix/org-pomodoro-set-count))
 		  )
-	  (beep t)
 	  )
-	(konix/org-pomodoro-decide-start-or-break
-	 (format "Ended a pomodoro, you may take a%s break (%s)" _long
-			 konix/org-pomodoro-set-count))
 	)
   )
 

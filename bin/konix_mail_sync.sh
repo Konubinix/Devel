@@ -31,9 +31,10 @@ notmuch new || exit 1
 
 # this is useless since 0.5 -> notmuchsync -d -r --all --sync-deleted-tag
 konix_mail_init_tags.sh || exit 1
-konix_mail_unnew.sh || exit 1
 
 konix_mail_tray_daemon_update.sh -d || exit 1
+
+konix_mail_unnew.sh || exit 1
 
 echo "B" > "$MAIL_TRAY_DAEMON_CTRL"
 echo "" > /tmp/konix_mail_tray_stamp

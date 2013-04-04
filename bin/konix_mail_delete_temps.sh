@@ -1,6 +1,8 @@
 #!/bin/bash
 
 NUMBER_OF_MONTH="${KONIX_TEMP_MAIL_KEEP_MONTHS:-3}"
+SAFE=$1
+
 # Get old threads. an old thread is a thread with all its messages older than
 # KONIX_TEMP_MAIL_KEEP_MONTHS months. Get only those among the mails that may be
 # deleted, that means only the temp mails with not any mail flagged and all
@@ -17,7 +19,7 @@ eval_notmuch_on_threads () {
     NOTMUCH_COMMAND="$*"
     LINE_NUMBER=0
     ARGS=""
-#    set -x
+    #    set -x
     while read line
     do
         if [ "$ARGS" == "" ]
@@ -42,9 +44,11 @@ eval_notmuch_on_threads () {
 
 TIMESTAMP="$(konix_last_month_since_epoch.sh $NUMBER_OF_MONTH)"
 notmuch search \
+    --sort=oldest-first \
     tag:temp \
     and not tag:unread \
     and not tag:flagged \
+    and not tag:deleted \
     and ..$TIMESTAMP \
     | sed -n '/\[\([0-9]\+\)\/\1\]/ { # show only threads matching [A/A] and not [A/B] with A != B
 # display only the thread id part
@@ -52,12 +56,35 @@ s/^\(thread:[^ ]\+\).\+/\1/
 p
 }
 '>"${TMP_FILE}"
-cat "${TMP_FILE}"|eval_notmuch_on_threads notmuch search --
 
-echo "Those mails will be put to be deleted, confirm?"
-read y
-if [ "$y" == "y" ]
+safe_delete () {
+    while [ "$(wc -l "${TMP_FILE}" |cut -f 1 -d' ')" != "0" ]
+    do
+        sed -n "1,50 p" "${TMP_FILE}" |eval_notmuch_on_threads notmuch search --
+        echo "Those mails will be put to be deleted, confirm?"
+        read y
+        if [ "$y" == "y" ]
+        then
+            head -50 "${TMP_FILE}"|eval_notmuch_on_threads notmuch tag +deleted --
+        fi
+        sed -i -n '51,$ p' "${TMP_FILE}"
+    done
+}
+
+all_delete () {
+    cat "${TMP_FILE}"|eval_notmuch_on_threads notmuch search --
+    echo "Those mails will be put to be deleted, confirm?"
+    read y
+    if [ "$y" == "y" ]
+    then
+        cat "${TMP_FILE}"|eval_notmuch_on_threads notmuch tag +deleted --
+    fi
+}
+
+
+if [ "$SAFE" == "" ]
 then
-    set -x
-    cat "${TMP_FILE}"|eval_notmuch_on_threads notmuch tag +deleted --
+    all_delete
+else
+    safe_delete
 fi

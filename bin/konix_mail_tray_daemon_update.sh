@@ -24,7 +24,7 @@ if [ "$DO_DISPLAY" == "1" ] \
 	-o "$FLAGGED_ELEMENTS" != "0" ]
 then
 	# new mails, display some message
-	konix_display.py "Mail info :
+	konix_display.py -d 10000 "Mail info :
 $INBOX_ELEMENTS in the inbox ($UNREAD_N_INBOX_ELEMENTS unread)
 $UNREAD_ELEMENTS not read
 $FLAGGED_ELEMENTS flagged (with $FLAGGED_UNREAD_ELEMENTS unread)"

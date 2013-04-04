@@ -4,7 +4,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
-def by_konubinix_notificator(message,unique=False):
+def by_konubinix_notificator(message,unique=False, duration=3000):
     import dbus
     session = dbus.SessionBus()
     if unique:
@@ -15,7 +15,8 @@ def by_konubinix_notificator(message,unique=False):
     notification = session.get_object('konubinix.notificator',
                                       path)
     LOGGER.info("Displaying message "+message)
-    notification.Notify(message)
+    notification.Notify(message, duration)
+    LOGGER.info("Message displayed")
 
 def by_pynotify(message):
     import pynotify
@@ -30,12 +31,16 @@ def by_pyosd(message):
     p = pyosd.osd("-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-1", colour="green", pos=pyosd.POS_BOT,offset=40, align=pyosd.ALIGN_CENTER)
     p.display(message)
 
-def main(message,unique=False):
+def main(message,unique=False, duration=3000):
     message = message.replace("<", "-")
+
     try:
-        by_konubinix_notificator(message,unique)
+        LOGGER.info("Trying with the notificator")
+        by_konubinix_notificator(message,unique, duration)
     except:
         try:
+            LOGGER.error("Fallbacking to pynotify")
             by_pynotify(message)
         except:
+            LOGGER.error("Fallbacking to pyosd")
             by_pyosd(message)

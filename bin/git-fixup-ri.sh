@@ -16,7 +16,7 @@ then
         STASHED=1
     fi
     echo "Performing the rebase">&2
-    git rebase -i "$@"
+    git rebase --autosquash -i "$TREEISH"~ "$@"
     if [ "$STASHED" == "1" ]
     then
         echo "Popping the previously stashed changes">&2

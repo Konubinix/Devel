@@ -36,6 +36,7 @@
 		(org-export-html-xml-declaration '(("html" . "")))
 		;; save auto-insert-mode because It have to disable it
 		(auto-insert-mode_before auto-insert-mode)
+		(org-export-html-special-string-regexps nil)
 		)
 	(unless konix_wiki_dir
 	  (error "KONIX_WIKI_DIR env variable not set")
@@ -45,7 +46,7 @@
 	 (list
 	  "wiki"
 	  :base-directory org-directory
-	  :publishing-function 'org-publish-org-to-html
+	  :publishing-function 'org-html-publish-to-html
 	  :index-title "Some info I want to share"
 	  :index-filename "index.html"
 	  :auto-index t
@@ -78,6 +79,7 @@
  :base-directory (expand-file-name "wiki/public" perso-dir)
  :author konix/org-wiki-author
  :base-extension "org"
+ :publishing-function 'org-html-publish-to-html
  :publishing-directory "~/public_html"
  :auto-index t
  :index-filename "index.html"

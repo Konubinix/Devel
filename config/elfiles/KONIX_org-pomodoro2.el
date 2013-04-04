@@ -72,6 +72,7 @@
   (message "Now at the pomorodo n°%s" konix/org-pomodoro-set-count)
   )
 
+(defvar konix/org-pomodoro-start_entry nil)
 (defun konix/org-pomodoro-start ()
   (interactive)
   (setq-default org-timer-default-timer konix/org-pomodoro-default-timer)
@@ -112,6 +113,8 @@
 		)
 	  )
 	)
+  ;; remember the clocked-in entry where the pomodoro started
+  (setq konix/org-pomodoro-start_entry org-clock-marker)
   (message "Starting a pomodoro of %s minutes (%s)" org-timer-default-timer konix/org-pomodoro-set-count)
   )
 

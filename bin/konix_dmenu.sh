@@ -34,7 +34,7 @@ trap "clean" 0
 # else 0
 match_output ( ) {
     output="$1"
-    grep -qr "^$output\$" "$INPUT"
+    grep -qir "^$output\$" "$INPUT"
 }
 
 assert_succeeded ( ) {
@@ -62,7 +62,7 @@ do
         cp "$FIRST_INPUT" "$TMP"
     else
         # this should be a substring of input, filter with it
-        grep "$OUTPUT" "$INPUT" > "$TMP"
+        grep -i "$OUTPUT" "$INPUT" > "$TMP"
     fi
     # make the tmp file the new input
     mv "$TMP" "$INPUT"

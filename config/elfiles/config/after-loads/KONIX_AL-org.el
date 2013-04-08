@@ -487,13 +487,13 @@ to be organized.
 				(tags-todo "+project/NEXT"
 						   (
 							(org-agenda-overriding-header
-							 "Projects that should not have NEXT keyword")
+							 "Remove the NEXT keyword from projects")
 							(org-agenda-tag-filter-preset nil)
 							)
 						   )
 				(tags "refile"
 					  (
-					   (org-agenda-overriding-header "Entries to be refiled")
+					   (org-agenda-overriding-header "Refile those entries")
 					   (org-agenda-skip-function
 						'(konix/org-agenda-skip-if-heading "Refile"))
 					   (org-agenda-tag-filter-preset nil)
@@ -501,13 +501,15 @@ to be organized.
 					  )
 				(stuck nil
 					   (
-						(org-agenda-overriding-header "Stuck projects")
+						(org-agenda-overriding-header
+						 "Make sure those projects have at least one NEXT entry")
 						(org-agenda-tag-filter-preset nil)
 						)
 					   )
 				(todo "WAIT|DELEGATED"
 					  (
-					   (org-agenda-overriding-header "WAITING items")
+					   (org-agenda-overriding-header
+						"Ask for information about those WAITING items and schedule them")
 					   (org-agenda-tag-filter-preset nil)
 					   )
 					  )
@@ -515,13 +517,13 @@ to be organized.
 					  (
 					   (org-agenda-skip-function
 						'(konix/org-agenda-skip-if-tags
-						  '("phantom" "maybe" "project")
+						  '("phantom" "maybe")
 						  t
 						  )
 						)
 					   (org-agenda-tag-filter-preset nil)
 					   (org-agenda-overriding-header
-						"NEXT items should not have phantom, maybe or project tag")
+						"phantom, maybe and maybe items should not be NEXT actions")
 					   )
 					  )
 				(todo "NEXT"
@@ -532,7 +534,7 @@ to be organized.
 						  )
 						)
 					   (org-agenda-tag-filter-preset nil)
-					   (org-agenda-overriding-header "NEXT items to be scheduled")
+					   (org-agenda-overriding-header "NEXT items should be scheduled")
 					   )
 					  )
 				(tags-todo "//-NEXT-WAIT"
@@ -548,13 +550,13 @@ to be organized.
 							 )
 							(org-agenda-tag-filter-preset nil)
 							(org-agenda-overriding-header
-							 "Todos that need to be organized (add project, refile to project or set to NEXT)")
+							 "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
 							)
 						   )
 				(tags-todo "-{@.+}//+NEXT"
 						   (
 							(org-agenda-overriding-header
-							 "Next items without context assigned")
+							 "Assign a context to all NEXT items")
 							(org-agenda-tag-filter-preset nil)
 							)
 						   )

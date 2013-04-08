@@ -28,6 +28,8 @@
 (setq message-send-mail-function 'message-send-mail-with-sendmail)
 (setq-default message-sendmail-envelope-from 'header)
 (setq-default sendmail-program "konix_msmtp.sh")
+;; -f is not compatible with --read-envelope-from from msmtp
+(setq-default message-sendmail-f-is-evil t)
 (setq-default message-forward-before-signature t)
 (setq-default message-sendmail-extra-arguments nil)
 (setq-default mm-text-html-renderer 'w3m

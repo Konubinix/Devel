@@ -116,7 +116,23 @@
 	)
   ""
   )
+(defface konix/notmuch-search-sent
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit default :foreground "royal blue")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit default :foreground "royal blue")
+	 )
+	)
+  ""
+  )
 (setq notmuch-search-line-faces '(
+								  ("sent" . konix/notmuch-search-sent)
 								  ("temp" . konix/notmuch-search-temp)
 								  ("perso" . konix/notmuch-search-perso)
 								  ("deleted" . '(:foreground "red"))

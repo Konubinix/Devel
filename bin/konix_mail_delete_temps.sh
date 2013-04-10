@@ -65,6 +65,7 @@ safe_delete () {
         read y
         if [ "$y" == "y" ]
         then
+            echo "Flagging them as deleted"
             head -50 "${TMP_FILE}"|eval_notmuch_on_threads notmuch tag +deleted --
         fi
         sed -i -n '51,$ p' "${TMP_FILE}"

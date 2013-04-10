@@ -60,7 +60,7 @@ p
 safe_delete () {
     while [ "$(wc -l "${TMP_FILE}" |cut -f 1 -d' ')" != "0" ]
     do
-        sed -n "1,50 p" "${TMP_FILE}" |eval_notmuch_on_threads notmuch search --
+        sed -n "1,50 p" "${TMP_FILE}" |eval_notmuch_on_threads notmuch search --|tac
         echo "Those mails will be put to be deleted, confirm?"
         read y
         if [ "$y" == "y" ]

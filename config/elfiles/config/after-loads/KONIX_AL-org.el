@@ -631,7 +631,7 @@ to be organized.
 			   )
 			  )
 
-(defvar konix/org-agenda-inhibit-context-filtering nil "")
+(defvar konix/org-agenda-inhibit-context-filtering t "")
 (defun konix/org-agenda-inhibit-context-filtering ()
   (with-current-buffer
 	  (get-buffer-create org-agenda-buffer-name)

@@ -66,6 +66,11 @@
 									 'konix/not-trac-p
 									 'bs-sort-buffer-interns-are-last
 									 )
+	 (konix/push-or-replace-in-alist 'bs-configurations "clients"
+									 nil nil nil
+									 'konix/not-client-p
+									 'bs-sort-buffer-interns-are-last
+									 )
 	 )
   )
 ;; ******************************************************************************************

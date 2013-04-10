@@ -311,6 +311,14 @@ make the line non empty"
 	)
   )
 
+(defun konix/not-client-p (buffer)
+  (with-current-buffer buffer
+   (not
+	server-buffer-clients
+	)
+   )
+  )
+
 (defun konix/server-buffer-still-has-client-p ()
   "Function extracted from `server-kill-buffer-query-function' to know of the
 current buffer still has clients"

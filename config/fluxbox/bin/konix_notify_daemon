@@ -33,7 +33,7 @@ class UniqueNotification(Notification):
 						 in_signature='si', out_signature='')
 	def Notify(self, message, show_time):
                 logging.info("Notifying unique message "+message)
-		notification.set_timeout(show_time);
+		self.notification.set_timeout(show_time);
 		self.notification.update("Message", message)
 		self.notification.show()
 

@@ -109,3 +109,6 @@
 [submodule "merge-ics"]
 	path = merge-ics
 	url = git@github.com:Konubinix/merge-ics.git
+[submodule "config/elfiles/calfw"]
+	path = config/elfiles/calfw
+	url = https://github.com/kiwanami/emacs-calfw.git

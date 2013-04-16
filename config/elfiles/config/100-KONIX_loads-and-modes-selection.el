@@ -42,6 +42,7 @@
 		 (expand-file-name "codesearch" elfiles)
 		 (expand-file-name "autopair" elfiles)
 		 (expand-file-name "ace-jump-mode" elfiles)
+		 (expand-file-name "calfw" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -192,6 +193,8 @@
 (autoload 'ace-jump-mode "ace-jump-mode" "" t)
 ;; undo tree
 (autoload 'undo-tree-mode "undo-tree" "" t)
+;; calfw
+(autoload 'cfw:open-org-calendar "calfw-org" "" t)
 
 ;; ************************************************************
 ;; Automodes

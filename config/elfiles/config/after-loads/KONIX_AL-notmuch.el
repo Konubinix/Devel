@@ -132,12 +132,12 @@
   ""
   )
 (setq notmuch-search-line-faces '(
-								  ("sent" . konix/notmuch-search-sent)
 								  ("temp" . konix/notmuch-search-temp)
 								  ("perso" . konix/notmuch-search-perso)
 								  ("deleted" . '(:foreground "red"))
 								  ("unread" . konix/notmuch-search-unread)
 								  ("replied" . konix/notmuch-search-replied)
+ 								  ("sent" . konix/notmuch-search-sent)
 								  )
 	  )
 (defface notmuch-search-count

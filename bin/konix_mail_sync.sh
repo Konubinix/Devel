@@ -7,18 +7,19 @@ then
 else
 	touch "$LOCK_FILE"
 fi
-trap "echo > /tmp/konix_mail_tray_stamp ; rm '$LOCK_FILE'" 0
+LOG_FILE="$(mktemp)"
 MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
 echo "?" > "$MAIL_TRAY_DAEMON_CTRL"
 echo "b" > "$MAIL_TRAY_DAEMON_CTRL"
+trap "echo > /tmp/konix_mail_tray_stamp; echo B > '$MAIL_TRAY_DAEMON_CTRL' ; rm '$LOCK_FILE'; rm '$LOG_FILE'" 0
+
 # make notmuch db consistent (earlier removed mail files etc)
 notmuch new --verbose || exit 1
 
 #sync with imap server
-offlineimap -c "$KONIX_OFFLINEIMAPRC" || exit 1
+offlineimap -c "$KONIX_OFFLINEIMAPRC" 2>&1 | tee "$LOG_FILE" || exit 1
 #get messages from pop server
 # getmail
-
 #finally reflect externally changed maildir flags in notmuch tags
 notmuch new || exit 1
 
@@ -36,5 +37,9 @@ konix_mail_tray_daemon_update.sh -d || exit 1
 
 konix_mail_unnew.sh || exit 1
 
-echo "B" > "$MAIL_TRAY_DAEMON_CTRL"
-echo "" > /tmp/konix_mail_tray_stamp
+if grep -q ERROR "$LOG_FILE"
+then
+    echo "Errors in offlineimap call" >&2
+    cat "$LOG_FILE" >&2
+    exit 1
+fi

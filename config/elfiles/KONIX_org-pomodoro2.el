@@ -117,7 +117,7 @@
 	  )
 	)
   ;; remember the clocked-in entry where the pomodoro started
-  (setq konix/org-pomodoro-start_entry org-clock-marker)
+  (setq konix/org-pomodoro-start_entry (copy-marker org-clock-marker))
   (message "Starting a pomodoro of %s minutes (%s)" org-timer-default-timer konix/org-pomodoro-set-count)
   )
 

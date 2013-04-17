@@ -87,7 +87,7 @@
 	url = git://git.savannah.nongnu.org/bbdb.git
 [submodule "lib/offlineimap"]
 	path = lib/offlineimap
-	url = git@github.com:Konubinix/offlineimap.git
+	url = https://github.com/Konubinix/offlineimap.git
 [submodule "config/elfiles/jinja2-mode"]
 	path = config/elfiles/jinja2-mode
 	url = https://github.com/paradoxxxzero/jinja2-mode.git
@@ -102,13 +102,13 @@
 	url = git://seeks.git.sourceforge.net/gitroot/seeks/seeks
 [submodule "sjoubert_dot_rc"]
 	path = sjoubert_dot_rc
-	url = git@github.com:Konubinix/dotrcfiles.git
+	url = https://github.com/Konubinix/dotrcfiles.git
 [submodule "config/elfiles/ace-jump-mode"]
 	path = config/elfiles/ace-jump-mode
 	url = https://github.com/winterTTr/ace-jump-mode.git
 [submodule "merge-ics"]
 	path = merge-ics
-	url = git@github.com:Konubinix/merge-ics.git
+	url = https://github.com/Konubinix/merge-ics.git
 [submodule "config/elfiles/calfw"]
 	path = config/elfiles/calfw
 	url = https://github.com/kiwanami/emacs-calfw.git

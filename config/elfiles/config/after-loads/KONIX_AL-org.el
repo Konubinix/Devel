@@ -692,6 +692,7 @@ to be organized.
 				  (org-agenda-start-with-clockreport-mode t)
 				  (org-agenda-start-with-log-mode t)
 				  (org-agenda-show-log 'clockcheck)
+				  (dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
 				 )
 				("ay" "Maybe list"
@@ -770,6 +771,9 @@ to be organized.
 				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
 																	   'scheduled)
 											)
+				  (
+				   (dummy (konix/org-agenda-inhibit-context-filtering))
+				   )
 				  )
 				 )
 				("aC" "Monthly schedule with calfw" konix/cfw:open-org-calendar ""
@@ -779,6 +783,9 @@ to be organized.
 				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
 																	   'scheduled)
 											)
+				  (
+				   (dummy (konix/org-agenda-inhibit-context-filtering))
+				   )
 				  )
 				 )
 				("al" "log today"
@@ -789,6 +796,9 @@ to be organized.
 				  (org-agenda-start-with-log-mode t)
 				  (org-agenda-start-with-clockreport-mode t)
 				  (org-agenda-show-log 'clockcheck)
+				  (
+				   (dummy (konix/org-agenda-inhibit-context-filtering))
+				   )
 				  )
 				 )
 				("as" "Stuck view"

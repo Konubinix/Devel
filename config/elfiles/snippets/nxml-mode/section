@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: section
+# --
+$><section>
+$><title>${100:Title}</title>
+$><para>
+$>$0
+$></para>
+$></section>

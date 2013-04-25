@@ -425,7 +425,15 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 					)
 				  )
 				)
-	(konix/org-pomodoro-tray-daemon-put konix/org-pomodoro-tray-daemon-prev-state)
+	(konix/org-pomodoro-tray-daemon-put
+	 konix/org-pomodoro-tray-daemon-prev-state)
+	;; if more than 5 minutes in interruption, recommend to start a new pomodoro
+	(when (> (org-clock-get-clocked-time) 5)
+	  (message
+	   "The interruption lasted more than 5 minutes (%s), you should start a new pomodoro"
+	   (org-clock-get-clocked-time)
+	   )
+	  )
 	)
   )
 (add-hook 'org-capture-prepare-finalize-hook

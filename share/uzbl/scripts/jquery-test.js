@@ -3,7 +3,7 @@ var jquery_test = function()
 	var res = "jquery_test\n";
 	try
 	{
-		var jQuery = jQuery;
+		var j = jQuery;
 		res += "OUI\n";
 	}
 	catch(e)

@@ -653,7 +653,8 @@ to be organized.
 			   )
 			  )
 
-(defvar konix/org-agenda-inhibit-context-filtering t "")
+;; useful setting to filter tasks when having to select something to do
+(defvar konix/org-agenda-inhibit-context-filtering nil "")
 (defun konix/org-agenda-inhibit-context-filtering ()
   (with-current-buffer
 	  (get-buffer-create org-agenda-buffer-name)

@@ -1952,11 +1952,11 @@ of the clocksum."
 
 (defvar konix/org-agenda-text-properties
   '(
-	("^.+INTERRUP:.+$" 0 (face font-lock-warning-face))
-	("^.+PAUSE:.+$" 0 (face konix/org-agenda-pause-face))
-	("^.+\\(\\bnow\\b\\).+$" 1 (face org-checkbox-statistics-done))
-	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\)\\).+$" 1 (face konix/org-agenda-urgent-items-face))
-	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 (face konix/org-agenda-non-urgent-items-face))
+	("^.+INTERRUP:.+$" 0 font-lock-warning-face)
+	("^.+PAUSE:.+$" 0 konix/org-agenda-pause-face)
+	("^.+\\(\\bnow\\b\\).+$" 1 org-checkbox-statistics-done)
+	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
+	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
 	)
   "")
 (defun konix/org-agenda-set-text-properties ()

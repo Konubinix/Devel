@@ -18,7 +18,18 @@
 		(quilt-find-dir (directory-file-name d))))))
 
 (defun quilt-dir (&optional fn)
-  (quilt-find-dir (if fn fn buffer-file-name)))
+  (quilt-find-dir (cond
+				   (fn
+					fn
+					)
+					(buffer-file-name
+					 buffer-file-name
+					 )
+					(default-directory
+					  default-directory
+					  )
+
+				   )))
 
 (defun quilt-drop-dir (fn)
   (let* ((d (quilt-find-dir fn)))

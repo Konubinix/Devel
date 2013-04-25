@@ -6,7 +6,7 @@
 --fields=+ialStmnsz
 --file-scope=yes
 --langmap=c++:.c++.cc.cp.cpp.cxx.h.h++.hh.hp.hpp.hxx.C.H.txx.ixx(*.hxx.in)
---regex-c++=/^.+public[ \t]+([^ \t,]+).*$/\1 PARENT/
+--regex-c++=/^.+public[ \t]+([^ \t,<]+).*$/\1 PARENT/
 --langdef=cmake
 --langmap=cmake:.cmake(CMakeLists.txt)
 --regex-cmake=/\b[Mm][Aa][Cc][Rr][Oo][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 MACRO_CMAKE/

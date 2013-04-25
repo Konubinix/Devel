@@ -659,9 +659,6 @@ to be organized.
   (with-current-buffer
 	  (get-buffer-create org-agenda-buffer-name)
 	(set (make-local-variable
-		  'konix/org-agenda-tag-filter-contexts)
-		 nil)
-	(set (make-local-variable
 		  'konix/org-agenda-inhibit-context-filtering)
 		 t)
 	)

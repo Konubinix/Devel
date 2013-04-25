@@ -150,8 +150,8 @@ TAGS_FILE_NAMETHE"
    (lambda (buffer)
 	 (when (string-match-p "^TAGS" (buffer-name buffer))
 	   (with-current-buffer buffer
-		(revert-buffer)
-		)
+		 (revert-buffer)
+		 )
 	   )
 	 )
    (buffer-list)
@@ -315,11 +315,27 @@ TAGS_FILE_NAMETHE"
 (defun konix/tags/read-string-from-point (prompt)
   (let* (
 		 (symbol-at-point (thing-at-point 'symbol))
-		 (initial-input (if symbol-at-point
-							(format "\\b%s\\b" symbol-at-point)
+		 (initial-input (cond
+						 ((region-active-p)
+						  (buffer-substring-no-properties
+						   (region-beginning)
+						   (region-end)
+						   )
+						  )
+						 (symbol-at-point
+						  symbol-at-point
+						  )
+						 (t
 						  ""
-						  ))
+						  )
+						 )
+						)
 		 )
+	(when initial-input
+	  (setq initial-input
+			(format "\\b%s\\b" initial-input)
+			)
+	  )
 	(list
 	 (read-string prompt initial-input))
 	)

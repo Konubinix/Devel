@@ -153,6 +153,14 @@ If the file exists, it is automatically deleted
 	 (8 . 9))
 	(docbook
 	 "No rule to make target"
+	 nil
+	 nil
+	 nil
+	 nil
+	 nil
+	 (
+	  (0 compilation-error-face)
+	  )
 	 )
 	)
   ""

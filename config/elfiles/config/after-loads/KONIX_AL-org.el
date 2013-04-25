@@ -262,21 +262,7 @@ with a precise timestamp)."
 
 (defun konix/org-agenda-skip-non-important-item ()
   (cond
-   ((or
-	 ;; an non todo entry is always important
-	 (not (org-entry-is-todo-p))
-	 ;; a task scheduled for today with a precise timestamp (with hour and
-	 ;; minute) is always important
-	 (let (
-		   (act_ts (konix/org-get-active-timestamp))
-		   )
-	   (and
-		act_ts
-		(konix/org-ts-is-today-p act_ts)
-		(konix/org-ts-is-precise-p act_ts)
-		)
-	   )
-	 )
+   ((konix/org-appt-p)
 	nil
 	)
    ((and

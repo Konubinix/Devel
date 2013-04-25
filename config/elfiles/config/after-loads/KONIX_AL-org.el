@@ -231,6 +231,35 @@ cursor stays in the org buffer."
 	)
   )
 
+(defun konix/org-appt-p ()
+  "Returns t if the entry at point is an appointment (not a todo or scheduled
+with a precise timestamp)."
+  (or
+   ;; an non todo entry is always important
+   (not (org-entry-is-todo-p))
+   ;; a task scheduled for today with a precise timestamp (with hour and
+   ;; minute) is always important
+   (let (
+		 (act_ts (konix/org-get-active-timestamp))
+		 )
+	 (and
+	  act_ts
+	  (konix/org-ts-is-today-p act_ts)
+	  (konix/org-ts-is-precise-p act_ts)
+	  )
+	 )
+   )
+  )
+
+(defun konix/org-agenda-appt-p ()
+  (save-window-excursion
+	(save-excursion
+	  (org-agenda-goto)
+	  (konix/org-appt-p)
+	  )
+	)
+  )
+
 (defun konix/org-agenda-skip-non-important-item ()
   (cond
    ((or

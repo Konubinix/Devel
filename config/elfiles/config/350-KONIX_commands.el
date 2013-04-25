@@ -184,7 +184,10 @@
 (defun konix/kill-ring-insert ()
   (interactive)
   (let (
-		(to_insert (completing-read "Yank : " kill-ring))
+		(to_insert (completing-read "Yank : "
+									(delete-duplicates kill-ring :test #'equal)
+									)
+				   )
 		)
 	(when (and to_insert
 			   (region-active-p)

@@ -1998,6 +1998,7 @@ of the clocksum."
   (setq maybe-refresh t)
   )
 
+(defvar konix/org-agenda-filter-context-show-appt t "")
 (defun konix/org-agenda-filter-context_1 (tags)
   ;; Deactivate `org-agenda-entry-text-mode' when filtering
   (if org-agenda-entry-text-mode (org-agenda-entry-text-mode))
@@ -2019,7 +2020,15 @@ of the clocksum."
 			(progn
 			  (setq tags (org-get-at-bol 'tags) ; used in eval
 					cat (get-text-property (point) 'org-category))
-			  (if (not (eval konix/org-entry-predicate))
+			  (if (and
+				   (not (eval konix/org-entry-predicate))
+				   ;; do not hide appointment if the associated setting is set
+				   (or (not konix/org-agenda-filter-context-show-appt)
+					   (not
+						(konix/org-agenda-appt-p)
+						)
+					   )
+				   )
 				  (org-agenda-filter-hide-line 'tag))
 			  (beginning-of-line 2))
 		  (beginning-of-line 2))))
@@ -2036,7 +2045,13 @@ of the clocksum."
 	)
    (konix/org-agenda-tag-filter-contexts
 	(konix/org-agenda-filter-context_1 konix/org-agenda-tag-filter-contexts)
-	(setq header-line-format `("Context filtered with " ,konix/org-agenda-tag-filter-contexts))
+	(setq header-line-format
+		  `("Context filtered with "
+			,konix/org-agenda-tag-filter-contexts
+			", appt display = " ,(if konix/org-agenda-filter-context-show-appt
+									 "on" "off")
+			)
+		  )
 	)
    ((not konix/org-agenda-tag-filter-contexts)
 	(setq header-line-format "No context filter")

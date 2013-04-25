@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: para
+# key: para
+# --
+$><para>
+$>$0
+$></para>

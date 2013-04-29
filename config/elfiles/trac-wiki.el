@@ -472,6 +472,23 @@ user may need or want to edit them.")
 	)
   )
 
+(defvar trac-wiki-link-face 'trac-wiki-link-face)
+(defface trac-wiki-link-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit font-lock-function-name-face :background "light salmon")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit font-lock-function-name-face :background "light salmon")
+	 )
+	)
+  ""
+  )
+
 ;; for trac-wiki mode, simple
 (defvar trac-wiki-font-lock-keywords
   `(("^\\(\\(=+\\) \\(.*\\) \\(=+\\)\\)\\(.*\\)" ; section heading
@@ -513,25 +530,25 @@ user may need or want to edit them.")
 		   (cond
 			((save-match-data	 ; [1], [1/trunk], [../file], [/trunk]
 			   (string-match "^\\[[1-9./]" whole))
-			 font-lock-function-name-face)
+			 trac-wiki-link-face)
 			((or (string= scheme "wiki:")
 				 (null scheme))
 			 (if (trac-wiki-page-exist-p name)
-				 font-lock-function-name-face
+				 trac-wiki-link-face
 			   font-lock-warning-face))
 			(t
-			 font-lock-function-name-face))))))
+			 trac-wiki-link-face))))))
 	(,(format "\\(?:%s\\):\\(?:\"[^\"\n]*\"\\|[^ \t\n]\\)+" ; types
 			  (regexp-opt trac-wiki-link-type-keywords))
-     (0 (trac-wiki-link-face font-lock-function-name-face)))
-    ("\\w+://[^ \t\n]+" . font-lock-function-name-face)	  ; raw url
+     (0 (trac-wiki-link-face trac-wiki-link-face)))
+    ("\\w+://[^ \t\n]+" . trac-wiki-link-face)	  ; raw url
     ("\\(?:#\\|\\br\\)[0-9]+\\(?::[0-9a-z]+\\)?\\b" ; r123 or #123
-     (0 (trac-wiki-link-face font-lock-function-name-face)))
+     (0 (trac-wiki-link-face trac-wiki-link-face)))
     (,(concat trac-wiki-camel-case-regexp ; camel case
 			  "\\(?:#\\(?:\\w\\|[-:.]\\)+\\)?\\>")	       ; fragments
      (0 (trac-wiki-link-face
 		 (if (trac-wiki-page-exist-p (match-string 1))
-			 font-lock-function-name-face
+			 trac-wiki-link-face
 		   font-lock-warning-face))))
     ("||" . 'shadow)			; table delimiter
     ("^\\(\\s-*>+\\).+" . (0 (trac-wiki-quote-face) append))			; table delimiter
@@ -550,7 +567,7 @@ user may need or want to edit them.")
   '(("^\\([^ \n]+\\):.*"
      (1 'bold))
     ("^  \\(http://.*\\)"
-     (1 font-lock-function-name-face))
+     (1 trac-wiki-link-face))
     ("^\\(By \\w+ -- [-: 0-9]+\\)\n\n"
      (1 font-lock-type-face)))
   "For search result buffer.")

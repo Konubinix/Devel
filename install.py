@@ -62,6 +62,12 @@ substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "vimrc"),      os.path.join
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "terminator"), os.path.join(environ["HOME"], ".config/terminator/config"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "procmailrc"), os.path.join(environ["HOME"], ".procmailrc"))
 
+if confirm(prompt="Fetch submodules?"):
+    print "Initializing the submodules"
+    subprocess.call(["git", "submodule", "init"])
+    print "Updating the submodules"
+    subprocess.call(["git", "submodule", "update"])
+
 if is_on_linux():
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "fluxbox"),   os.path.join(environ["HOME"], ".fluxbox"))
 

@@ -46,7 +46,7 @@
 	 (list
 	  "wiki"
 	  :base-directory org-directory
-	  :publishing-function 'org-html-publish-to-html
+	  :publishing-function 'org-publish-org-to-html
 	  :index-title "Some info I want to share"
 	  :index-filename "index.html"
 	  :auto-index t
@@ -79,7 +79,7 @@
  :base-directory (expand-file-name "wiki/public" perso-dir)
  :author konix/org-wiki-author
  :base-extension "org"
- :publishing-function 'org-html-publish-to-html
+ :publishing-function 'org-publish-org-to-html
  :publishing-directory "~/public_html"
  :auto-index t
  :index-filename "index.html"

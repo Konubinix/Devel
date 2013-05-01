@@ -171,7 +171,7 @@ set useragent         = Uzbl (Webkit @{WEBKIT_MAJOR}.@{WEBKIT_MINOR}) (@(+uname 
 #request WHITELIST_COOKIE domain 'uzbl.org$' expires '^$'
 
 # Drop google analytics tracking cookies (applied after whitelists if any)
-#request BLACKLIST_COOKIE name '^__utm.$'
+request BLACKLIST_COOKIE name '^__utm.$'
 
 ###################
 ## Global config ##

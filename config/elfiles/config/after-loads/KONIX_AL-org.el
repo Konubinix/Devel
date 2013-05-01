@@ -201,6 +201,25 @@ cursor stays in the org buffer."
 	)
   )
 
+(defun konix/org-ts-is-today-or-past-p (timestamp)
+  (let (
+		(decoded_ts (org-parse-time-string timestamp))
+		(decoded_today (decode-time (org-current-time)))
+		)
+	(or
+	 (> (sixth decoded_today) (sixth decoded_ts))
+	 (and
+	  (equal (sixth decoded_today) (sixth decoded_ts))
+	  (> (fifth decoded_today) (fifth decoded_ts))
+	  )
+	 (and
+	  (equal (fifth decoded_today) (fifth decoded_ts))
+	  (> (fourth decoded_today) (fourth decoded_ts))
+	  )
+	 )
+	)
+  )
+
 (defun konix/org-ts-is-precise-p (timestamp)
   (save-match-data
 	(string-match org-ts-regexp0 timestamp)
@@ -244,7 +263,9 @@ with a precise timestamp)."
 		 )
 	 (and
 	  act_ts
-	  (konix/org-ts-is-today-p act_ts)
+	  ;; tasks for today or past today but still scheduled are important if
+	  ;; there possess a precise timestamp
+	  (konix/org-ts-is-today-or-past-p act_ts)
 	  (konix/org-ts-is-precise-p act_ts)
 	  )
 	 )

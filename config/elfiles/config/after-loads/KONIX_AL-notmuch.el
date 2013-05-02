@@ -131,8 +131,24 @@
 	)
   ""
   )
+(defface konix/notmuch-search-answer
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit default :slant italic)
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit default :slant italic)
+	 )
+	)
+  ""
+  )
 (setq notmuch-search-line-faces '(
 								  ("temp" . konix/notmuch-search-temp)
+								  ("answer" . konix/notmuch-search-answer)
 								  ("perso" . konix/notmuch-search-perso)
 								  ("deleted" . '(:foreground "red"))
 								  ("unread" . konix/notmuch-search-unread)

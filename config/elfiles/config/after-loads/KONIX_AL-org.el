@@ -1002,7 +1002,6 @@ to be organized.
 				 (
 				  (dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
-				 ("~/errand_tasks.html")
 				 )
  				("ad" "Done projects that might be put in _archives files"
 				 (

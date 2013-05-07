@@ -41,6 +41,7 @@
 (setq-default notmuch-search-oldest-first nil)
 (setq-default notmuch-saved-searches
 			  '(
+				("unread inbox" . "tag:inbox AND not tag:deleted AND tag:unread")
 				("inbox" . "tag:inbox AND -tag:deleted")
 				("flagged" . "tag:flagged")
 				("draft" . "tag:draft and not tag:deleted")

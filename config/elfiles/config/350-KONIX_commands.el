@@ -384,9 +384,11 @@
   (interactive)
   (let*(
 		(buffer_name (buffer-file-name))
-		(file_under_cursor (or
-							(thing-at-point 'filename)
-							""
+		(file_under_cursor (substring-no-properties
+							(or
+							 (thing-at-point 'filename)
+							 ""
+							 )
 							))
 		(directory_ default-directory)
 		(proposition (if (file-exists-p file_under_cursor)

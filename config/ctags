@@ -12,3 +12,4 @@
 --regex-cmake=/\b[Mm][Aa][Cc][Rr][Oo][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 MACRO_CMAKE/
 --regex-cmake=/\b[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 FCT_CMAKE/
 --regex-cmake=/\b[sS][eE][tT][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 SET_CMAKE/
+--regex-cmake=/\b[Gg][Ee][Tt]_[Ff][Ii][Ll][Ee][Nn][Aa][Mm][Ee]_[Cc][Oo][Mm][Pp][Oo][Nn][Ee][Nn][Tt][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 GET_FILENAME_COMPONENT/

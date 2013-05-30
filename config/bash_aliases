@@ -43,3 +43,5 @@ alias safg='sudo aptitude full-upgrade'
 alias sar='sudo aptitude remove'
 alias sap='sudo aptitude purge'
 alias mo=mimeopen
+alias kc=konix_cc.sh
+alias kxx=konix_cxx.sh

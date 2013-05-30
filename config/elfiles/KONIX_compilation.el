@@ -585,6 +585,7 @@ PARAM : a string with parameters given to make
 	 compil_list
 	 )
 	)
+  (message "Done killing compilation buffers")
   )
 
 ;; ####################################################################################################

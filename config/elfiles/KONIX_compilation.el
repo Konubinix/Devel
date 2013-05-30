@@ -151,8 +151,19 @@ If the file exists, it is automatically deleted
 	 (3 . 6)
 	 (5 . 7)
 	 (8 . 9))
-	(docbook
+	(docbook_rule_target
 	 "No rule to make target"
+	 nil
+	 nil
+	 nil
+	 nil
+	 nil
+	 (
+	  (0 compilation-error-face)
+	  )
+	 )
+	(docbook_ID_reference
+	 "Page [0-9]+: Unresolved ID reference"
 	 nil
 	 nil
 	 nil

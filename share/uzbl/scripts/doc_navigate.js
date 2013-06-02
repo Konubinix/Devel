@@ -7,7 +7,7 @@ doc_next = function() {
 }
 
 doc_previous = function() {
-    var prev_elem = $("a:contains(Thread Previous), a:contains(Prev), a:contains(previous), a:contains(Précédent),a[title='Previous Page'],a[rel='previous'],li:contains('Previous message: ') a");
+    var prev_elem = $("a:contains(Thread Previous), a:contains(Prev), a:contains(prev), a:contains(previous), a:contains(Précédent),a[title='Previous Page'],a[rel='previous'],li:contains('Previous message: ') a");
     if(prev_elem)
     {
 		prev_elem[0].click();

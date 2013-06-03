@@ -129,6 +129,11 @@
 	)
   )
 
+(defun konix/dired-sort-directory-first ()
+  "Dired sort by create time."
+  (interactive)
+  (dired-sort-other (concat dired-listing-switches " --group-directories-first")))
+
 (dired-visit-history-enable)
 
 ;; with "a", replace existing buffer
@@ -143,6 +148,7 @@
 (define-key dired-sort-map "u" 'dired-sort-utime)
 (define-key dired-sort-map "n" 'dired-sort-name)
 (define-key dired-sort-map "r" 'dired-sort-toggle-reverse)
+(define-key dired-sort-map "d" 'konix/dired-sort-directory-first)
 
 ;; Hotkeys
 (define-key dired-mode-map "o" 'konix/dired-find-file-other-windows)

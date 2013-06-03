@@ -551,7 +551,7 @@ user may need or want to edit them.")
 			 trac-wiki-link-face
 		   font-lock-warning-face))))
     ("||" . 'shadow)			; table delimiter
-    ("^\\(\\s-*>+\\).+" . (0 (trac-wiki-quote-face) append))			; table delimiter
+    ("^\\([\s->]*>\\).+" . (0 (trac-wiki-quote-face) append))
     )
   "For `trac-wiki-mode'.")
 

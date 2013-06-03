@@ -1499,6 +1499,7 @@ Uses the macro konix/git/status-buffer/next-or-previous
 	 'konix/git/status-sentinel_final
 	 )
 	)
+  (message "Git status command launched")
   )
 
 (defun konix/git/tag ()

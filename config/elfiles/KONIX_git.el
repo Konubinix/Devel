@@ -506,7 +506,7 @@
 
 (defun konix/git/log/show ()
   (interactive)
-  (let (
+(let (
 		(commit (konix/git/log/get/commit))
 		)
 	(konix/git/show/commit commit commit)
@@ -525,8 +525,10 @@
 		 )
 	(konix/kill-and-new-buffer buffer_name)
 	(konix/git/command
-	 (format "%s %s %s %s" log_command history_cmd file_cmd (if custom_cmd
-																custom_cmd ""))
+	 (format "%s --name-status %s %s %s"
+			 log_command history_cmd file_cmd
+			 (if custom_cmd
+				 custom_cmd ""))
 	 nil
 	 buffer_name
 	 )
@@ -934,7 +936,7 @@
 fallbacking to HEAD")
 		"HEAD"
 		)
-	 )
+	  )
 	)
   )
 

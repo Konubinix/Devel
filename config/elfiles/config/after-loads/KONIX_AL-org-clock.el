@@ -24,26 +24,29 @@
 
 ;;; Code:
 
-(setq-default org-clocktable-defaults  (list
-										:maxlevel 2
-										:lang org-export-default-language
-										:scope 'file
-										:block nil
-										:tstart nil
-										:tend nil
-										:step nil
-										:stepskip0 nil
-										:fileskip0 nil
-										:tags nil
-										:emphasize nil
-										:link nil
-										:narrow '120!
-										:indent t
-										:formula nil
-										:timestamp nil
-										:level nil
-										:tcolumns nil
-										:formatter nil)
+(setq-default org-clocktable-defaults
+			  (list
+			   :maxlevel 2
+			   :lang (or (org-bound-and-true-p org-export-default-language) "en")
+			   :scope 'file
+			   :block nil
+			   :wstart 1
+			   :mstart 1
+			   :tstart nil
+			   :tend nil
+			   :step nil
+			   :stepskip0 nil
+			   :fileskip0 nil
+			   :tags nil
+			   :emphasize nil
+			   :link nil
+			   :narrow '120!
+			   :indent t
+			   :formula nil
+			   :timestamp nil
+			   :level nil
+			   :tcolumns nil
+			   :formatter nil)
 			  )
 
 (provide 'KONIX_AL-org-clock)

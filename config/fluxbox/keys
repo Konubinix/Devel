@@ -196,7 +196,8 @@ Mod4 d : ShowDesktop
 # Lock the screen
 Mod4 l : Exec xlock
 Control Mod4 d : ShowDesktop
-Print : MacroCmd { Exec konix_display.py 'impression ecran' } { ExecCommand $(konix_find_true_exec.sh import) $HOME/Desktop/Capture.png }
+Print : MacroCmd { Exec konix_display.py 'Printing screen' } { ExecCommand $(konix_find_true_exec.sh import) $HOME/Desktop/CaptureScreen.png }
+control Print : MacroCmd { Exec scrot -u $HOME/Desktop/CaptureWindow.png } { Exec konix_display.py 'Printed focused window' }
 
 # Open a dialog to run programs
 Mod4 F2 :Exec konix_dmenu_run.sh

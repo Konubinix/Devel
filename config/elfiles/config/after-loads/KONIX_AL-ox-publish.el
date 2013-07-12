@@ -1,4 +1,4 @@
-;;; KONIX_AL-org-publish.el ---
+;;; KONIX_AL-ox-publish.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -79,14 +79,13 @@
  :base-directory (expand-file-name "wiki/public" perso-dir)
  :author konix/org-wiki-author
  :base-extension "org"
- :publishing-function 'org-publish-org-to-html
+ :publishing-function 'org-html-publish-to-html
  :publishing-directory "~/public_html"
  :auto-index t
  :index-filename "index.html"
  :auto-sitemap t
  :sitemap-filename "index.html"
  :sitemap-title "Index"
- :completion-function 'konix/org-publish-send-server
  :exclude-tags '("draft" "noexport" "phantom")
  :exclude "draft_"
  )

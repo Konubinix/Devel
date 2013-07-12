@@ -194,7 +194,7 @@ Mod4 F5 :Maximize
 Mod4 F11 :Fullscreen
 Mod4 d : ShowDesktop
 # Lock the screen
-Mod4 l : Exec xlock
+Mod4 l : Exec i3lock
 Control Mod4 d : ShowDesktop
 Print : MacroCmd { Exec konix_display.py 'Printing screen' } { ExecCommand $(konix_find_true_exec.sh import) $HOME/Desktop/CaptureScreen.png }
 control Print : MacroCmd { Exec scrot -u $HOME/Desktop/CaptureWindow.png } { Exec konix_display.py 'Printed focused window' }

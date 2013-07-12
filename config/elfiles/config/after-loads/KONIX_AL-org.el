@@ -43,8 +43,6 @@
   (setq-default org-agenda-files (list
 								  (expand-file-name "wiki" perso-dir)
 								  ))
-  ;; With remember
-  (org-remember-insinuate)
   ;; For dependencies
   (require 'org-depend)
   ;; for checklists fun

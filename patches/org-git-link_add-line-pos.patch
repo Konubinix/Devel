@@ -1,46 +1,49 @@
+Provide a way for git-link to be given the line in the file where the link
+should point
 Index: devel/config/elfiles/org/contrib/lisp/org-git-link.el
 ===================================================================
---- devel.orig/config/elfiles/org/contrib/lisp/org-git-link.el	2013-01-04 14:19:25.699827295 +0100
-+++ devel/config/elfiles/org/contrib/lisp/org-git-link.el	2013-01-09 15:17:41.178772078 +0100
-@@ -96,10 +96,14 @@
+--- devel.orig/config/elfiles/org/contrib/lisp/org-git-link.el	2013-07-08 15:44:17.572065222 +0200
++++ devel/config/elfiles/org/contrib/lisp/org-git-link.el	2013-07-15 17:52:44.198871288 +0200
+@@ -98,10 +98,12 @@
    (let* ((strlist (org-git-split-string str))
           (filepath (first strlist))
           (commit (second strlist))
-+	 (line (third strlist))
++         (line (third strlist))
           (dirlist (org-git-find-gitdir (file-truename filepath)))
           (gitdir (first dirlist))
           (relpath (second dirlist)))
 -    (org-git-open-file-internal gitdir (concat commit ":" relpath))))
 +    (org-git-open-file-internal gitdir (concat commit ":" relpath))
-+    (when line
-+     (goto-line (string-to-int line))
-+     )))
++    (when line (goto-line (string-to-int line)))))
  
  
  ;; Utility functions (file names etc)
-@@ -140,14 +144,17 @@
+@@ -141,16 +143,19 @@
+ ;; splitting the link string
+ 
  ;; Both link open functions are called with a string of
- ;; consisting of two parts separated by a double colon (::).
+-;; consisting of two parts separated by a double colon (::).
++;; consisting of three parts separated by a double colon (::).
  (defun org-git-split-string (str)
 -  "Given a string of the form \"str1::str2\", return a list of
 -  two substrings \'(\"str1\" \"str2\"). If the double colon is mising, take str2 to be the empty string."
 +  "Given a string of the form \"str1::str2::str3\", return a list of
 +  three substrings \'(\"str1\" \"str2\" \"str3\"). If there are less
-+than two colons, str2 and/or str3 may be set to \"\"."
++than two double colons, str2 and/or str3 may be set the empty string."
    (let ((strlist (split-string str "::")))
      (cond ((= 1 (length strlist))
 -           (list (car strlist) ""))
 +           (list (car strlist) "" ""))
            ((= 2 (length strlist))
 +           (append strlist (list "")))
-+	  ((= 3 (length strlist))
++          ((= 3 (length strlist))
             strlist)
 -          (t (error "org-git-split-string: only one :: allowed: %s" str)))))
 +          (t (error "org-git-split-string: only one or two :: allowed: %s" str)))))
  
  ;; finding the file name part of a commit
  (defun org-git-link-filename (str)
-@@ -165,22 +172,25 @@
+@@ -168,22 +173,24 @@
    (concat branch "@{" timestring "}"))
  
  
@@ -52,8 +55,7 @@ Index: devel/config/elfiles/org/contrib/lisp/org-git-link.el
           (branchname (org-git-get-current-branch gitdir))
           (timestring (format-time-string "%Y-%m-%d" (current-time))))
 -    (concat "git:" file "::" (org-git-create-searchstring branchname timestring))))
-+    (concat "git:" file
-+	    "::" (org-git-create-searchstring branchname timestring)
++    (concat "git:" file "::" (org-git-create-searchstring branchname timestring)
 +	    (if line (format "::%s" line) ""))))
  
  (defun org-git-store-link ()

@@ -212,7 +212,7 @@ cursor stays in the org buffer."
 	  )
 	 (and
 	  (equal (fifth decoded_today) (fifth decoded_ts))
-	  (> (fourth decoded_today) (fourth decoded_ts))
+	  (>= (fourth decoded_today) (fourth decoded_ts))
 	  )
 	 )
 	)

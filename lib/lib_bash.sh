@@ -352,6 +352,10 @@ konix_assert_last_command () {
 	fi
 }
 
+konix_assert_var () {
+    source konix_assert_var.sh "$@"
+}
+
 ccache_disable_toggle () {
 	if [ "$CCACHE_DISABLE" == "" ]
 	then

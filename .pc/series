@@ -1,6 +1,4 @@
 seeks_adjust_config
 notmuch_search_tag_not_all
-org_tests_plain_link
-org_plain_link_after_point
 org-git-link_add-line-pos.patch
 org_show_notes_in_agenda.patch

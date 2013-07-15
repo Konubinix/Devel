@@ -322,3 +322,9 @@ Mod4 m p :ExecCommand exaile -p && konix_display.py "Previous music"
 XF86AudioPrev :ExecCommand exaile -p && konix_display.py "Previous music"
 Mod4 m q :ExecCommand pkill exaile && konix_display.py "Kill exaile"
 Mod4 m l :ExecCommand exaile && konix_display.py "Launch exaile"
+
+# ####################################################################################################
+# Assword (Mod4 a ...)
+# ####################################################################################################
+Mod4 a g :ExecCommand assword gui
+Mod4 a y :ExecCommand assword_yank.sh gui

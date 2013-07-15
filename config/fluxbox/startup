@@ -26,6 +26,8 @@ volti &
 
 numlockx
 konix_notify_daemon > ~/.notify_daemon_log 2>&1 &
+# the real notification daemon
+dunst&
 
 sleep 4
 {

@@ -37,8 +37,8 @@ else
 	GPG_AGENT_STARTING_CMD='gpg-agent
  --daemon
  --enable-ssh-support
- --default-cache-ttl 600
- --default-cache-ttl-ssh 600
+ --default-cache-ttl ${KONIX_GPG_CACHE_TTL}
+ --default-cache-ttl-ssh ${KONIX_GPG_CACHE_TTL_SSH}
  --write-env-file "$GPG_INFO_FILE_NAME" >/dev/null'
 	if ! is_on_linux
 	then

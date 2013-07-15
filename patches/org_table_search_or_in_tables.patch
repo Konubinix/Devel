@@ -1,0 +1,30 @@
+Crash case. stuff3|stuff4 is matched instead of the beginning of the table while
+updating the table in stuff2
+* stuff1
+    :PROPERTIES:
+    :ID:       some_id
+    :END:
+    #+BEGIN: clocktable :tags "stuff3|stuff4"
+    |---+---|
+    |   |   |
+    |---+---|
+    #+END:
+* stuff2
+    |---+---|
+    | # |   |
+    |---+---|
+    #+TBLFM: @1$2=remote(some_id,@1$1)
+
+Index: devel/config/elfiles/org/lisp/org-table.el
+===================================================================
+--- devel.orig/config/elfiles/org/lisp/org-table.el	2013-07-08 15:46:40.284525470 +0200
++++ devel/config/elfiles/org/lisp/org-table.el	2013-07-08 15:47:29.940698329 +0200
+@@ -4954,7 +4954,7 @@
+ 		(widen)
+ 		(goto-char loc)
+ 		(forward-char 1)
+-		(unless (and (re-search-forward "^\\(\\*+ \\)\\|[ \t]*|" nil t)
++		(unless (and (re-search-forward "^\\(\\*+ \\)\\|^[ \t]*|" nil t)
+ 			     (not (match-beginning 1)))
+ 		  (user-error "Cannot find a table at NAME or ID %s" name-or-id))
+ 		(setq tbeg (point-at-bol))

@@ -506,7 +506,7 @@
 
 (defun konix/git/log/show ()
   (interactive)
-(let (
+  (let (
 		(commit (konix/git/log/get/commit))
 		)
 	(konix/git/show/commit commit commit)
@@ -1211,6 +1211,19 @@ fallbacking to HEAD")
 		  )
 	  nil
 	  )
+	)
+  (goto-char 0)
+  (when (re-search-forward "^# On branch \\(.+\\)$" nil t)
+	(set-text-properties
+	 (match-beginning 1)
+	 (match-end 1)
+	 (list
+	  'face
+	  `(:foreground
+		,(concat "#" (substring (md5 (match-string-no-properties 1)) 0 6))
+		)
+	  )
+	 )
 	)
   (goto-char 0)
   (when (narrow_to_block "# Unmerged paths:")

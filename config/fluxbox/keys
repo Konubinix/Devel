@@ -326,5 +326,5 @@ Mod4 m l :ExecCommand exaile && konix_display.py "Launch exaile"
 # ####################################################################################################
 # Assword (Mod4 a ...)
 # ####################################################################################################
-Mod4 a g :ExecCommand assword gui
-Mod4 a y :ExecCommand assword_yank.sh gui
+Mod4 a g :ExecCommand konix_do_with_gpg_agent.sh assword gui
+Mod4 a y :ExecCommand konix_do_with_gpg_agent.sh assword_yank.sh gui

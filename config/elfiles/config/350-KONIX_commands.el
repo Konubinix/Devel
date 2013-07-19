@@ -1423,16 +1423,21 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 	)
   )
 
-(defun konix/www/web-search (string)
+(defun konix/www/web-search (string &optional default)
   (interactive
    (list
 	(konix/_get-string "Web search")
 	)
    )
-  (async-shell-command (format "konix_web_search.sh '%s'"
-							   (replace-regexp-in-string " " "+" string)
-							   )
-					   )
+
+  (let (
+		(command (format "konix_web_search.sh %s '%s'"
+						 (if default "-d" "")
+						 (replace-regexp-in-string " " "+" string)
+						 ))
+		)
+   (start-process "konix web search" nil "bash" "-c" command)
+   )
   )
 
 (defun konix/www/web-search-default (string)
@@ -1441,10 +1446,7 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 	(konix/_get-string "Web search")
 	)
    )
-  (async-shell-command (format "konix_web_search.sh -d '%s'"
-							   (replace-regexp-in-string " " "+" string)
-							   )
-					   )
+  (konix/www/web-search string t)
   )
 
 (defun konix/www/brows-url-of-file-at-point (file)

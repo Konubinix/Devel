@@ -6,6 +6,7 @@
 [keybindings]
 [profiles]
   [[default]]
+    background_image = None
     visible_bell = True
     background_darkness = 0.8
     urgent_bell = True

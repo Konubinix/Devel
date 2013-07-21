@@ -70,5 +70,6 @@ for line in mdp_file.readlines():
         p = subprocess.Popen(["konix_copy_to_clipboard", "Password"],stdin=subprocess.PIPE)
         p.stdin.write(mdp)
         p.stdin.close()
+        p.wait()
         break
 mdp_file.close()

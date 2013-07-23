@@ -11,7 +11,6 @@
 		 (expand-file-name "graphviz-dot-mode" elfiles)
 		 (expand-file-name "jinja2-mode" elfiles)
 		 (expand-file-name "bbdb/lisp" elfiles)
-		 (expand-file-name "ecb" elfiles)
 		 (expand-file-name "w3m" elfiles)
 		 (expand-file-name "csharp" elfiles)
 		 (expand-file-name "yasnippet" elfiles)

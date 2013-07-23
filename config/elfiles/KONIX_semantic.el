@@ -23,18 +23,6 @@
 ;;
 
 ;;; Code:
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/semantic")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/semantic/bovine")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/semantic/symref")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/ede")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/common")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/semantic/wisent")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/semantic/ctags")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/eieio")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/cedet/srecode")))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/ede")))
-
 (require 'inversion)
 (require 'speedbar)
 

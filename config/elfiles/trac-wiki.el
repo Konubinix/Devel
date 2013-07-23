@@ -497,6 +497,7 @@ user may need or want to edit them.")
 		  ;; Warn if starting/ending '='  count is not ballanced.
 		  'font-lock-warning-face))
 	 (5 'shadow))
+    ("^\\([ \t>]*>\\).+" . (0 (trac-wiki-quote-face) append))
 	("^=.*" . font-lock-warning-face)	   ; invalid section heading
 	("`[^`\n]*`" . 'shadow)		   ; inline quote
 	("\\(''+\\)[^'\n]*\\(''+\\)"	   ; bold and italic
@@ -551,7 +552,6 @@ user may need or want to edit them.")
 			 trac-wiki-link-face
 		   font-lock-warning-face))))
     ("||" . 'shadow)			; table delimiter
-    ("^\\([\s->]*>\\).+" . (0 (trac-wiki-quote-face) append))
     )
   "For `trac-wiki-mode'.")
 

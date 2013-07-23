@@ -38,7 +38,7 @@
   [Close]	{yes}
 [end]
 [app] (name=) (class=)
-  [Position]	(UPPERLEFT)	{0 0}
+  [Position]	(UPPERLEFT)	{0% 0%}
   [Layer]	{2}
   [Close]	{yes}
 [end]

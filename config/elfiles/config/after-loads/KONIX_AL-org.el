@@ -587,10 +587,10 @@ to be organized.
 							 "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
 							)
 						   )
-				(tags-todo "-{@.+}//+NEXT"
+				(tags-todo "-{@.+}//+NEXT|+WAIT"
 						   (
 							(org-agenda-overriding-header
-							 "Assign a context to all NEXT items")
+							 "Assign a context to all NEXT and WAITING items")
 							(org-agenda-tag-filter-preset nil)
 							)
 						   )

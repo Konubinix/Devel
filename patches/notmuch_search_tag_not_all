@@ -1,4 +1,7 @@
-Index: devel/notmuch/emacs/notmuch.el
+When changing the tag of selected threads, only tag those matching the query.
+
+The previous implementation tags all the messages of the thread while the user
+probably wants to tag only those matched by the query.Index: devel/notmuch/emacs/notmuch.el
 ===================================================================
 --- devel.orig/notmuch/emacs/notmuch.el	2012-11-23 18:16:10.716084834 +0100
 +++ devel/notmuch/emacs/notmuch.el	2012-11-23 18:16:51.172086113 +0100

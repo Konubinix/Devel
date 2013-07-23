@@ -61,9 +61,6 @@
 [submodule "config/elfiles/popwin"]
 	path = config/elfiles/popwin
 	url = https://github.com/m2ym/popwin-el.git
-[submodule "kip"]
-	path = kip
-	url = https://github.com/Konubinix/kip.git
 [submodule "config/elfiles/miniedit"]
 	path = config/elfiles/miniedit
 	url = https://github.com/emacsmirror/miniedit.git

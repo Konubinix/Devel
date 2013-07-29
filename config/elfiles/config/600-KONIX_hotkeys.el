@@ -558,6 +558,7 @@
 (define-key 'konix/org-global-map (kbd "M-e") 'konix/org-adjust-effort)
 (define-key 'konix/org-global-map "j" 'konix/org-jump-to)
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
+(define-key 'konix/org-global-map "b" 'konix/org-goto-bookmarks)
 (define-key 'konix/org-global-map "O" 'org-clock-out)
 (define-key 'konix/org-global-map "I" 'org-clock-in-last)
 (define-key 'konix/org-global-map "c" 'org-capture)

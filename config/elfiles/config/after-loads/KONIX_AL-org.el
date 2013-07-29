@@ -1538,6 +1538,11 @@ to be organized.
   (find-file (expand-file-name "notes.org" org-directory))
   )
 
+(defun konix/org-goto-bookmarks ()
+  (interactive)
+  (find-file (expand-file-name "bookmarks.org" org-directory))
+  )
+
 (defun konix/org-add-note ()
   (interactive)
   (save-window-excursion

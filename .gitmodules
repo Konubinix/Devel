@@ -112,3 +112,6 @@
 [submodule "emacs"]
 	path = emacs
 	url = git://git.savannah.gnu.org/emacs.git
+[submodule "config/elfiles/cedet"]
+	path = config/elfiles/cedet
+	url = bzr://cedet.bzr.sourceforge.net/bzrroot/cedet/code/trunk

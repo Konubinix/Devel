@@ -442,6 +442,17 @@ to be organized.
 			  )
 			 )
 			)
+	(todo "NEXT"
+		  (
+		   (org-agenda-skip-function
+			'(konix/org-agenda-skip-if-tags
+			  '("phantom" "maybe" "project")
+			  )
+			)
+		   (org-agenda-tag-filter-preset nil)
+		   (org-agenda-overriding-header "Unscheduled NEXT Items")
+		   )
+		  )
 	)
   )
 
@@ -558,17 +569,6 @@ to be organized.
 					   (org-agenda-tag-filter-preset nil)
 					   (org-agenda-overriding-header
 						"phantom, maybe and maybe items should not be NEXT actions")
-					   )
-					  )
-				(todo "NEXT"
-					  (
-					   (org-agenda-skip-function
-						'(konix/org-agenda-skip-if-tags
-						  '("phantom" "maybe" "project")
-						  )
-						)
-					   (org-agenda-tag-filter-preset nil)
-					   (org-agenda-overriding-header "NEXT items should be scheduled")
 					   )
 					  )
 				(tags-todo "//-NEXT-WAIT"

@@ -42,6 +42,7 @@
 		 (expand-file-name "autopair" elfiles)
 		 (expand-file-name "ace-jump-mode" elfiles)
 		 (expand-file-name "calfw" elfiles)
+		 (expand-file-name "git-annex" elfiles)
 		 (expand-file-name "highlight-indentation" elfiles)
 		 )
 		)

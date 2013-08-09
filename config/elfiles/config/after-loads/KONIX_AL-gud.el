@@ -42,7 +42,8 @@
   (global-set-key (kbd "<f12>j") 'gud-jump)
   (global-set-key (kbd "<f12>l") 'gud-refresh)
   (global-set-key (kbd "<f12>t") 'gud-tbreak)
-  (global-set-key (kbd "<f12>w") 'gud-watch)
+  (global-set-key (kbd "<f12>w") 'konix/gud-where)
+  (global-set-key (kbd "<f12>W") 'gud-watch)
   (global-set-key (kbd "<f12>u") 'gud-until)
   (global-set-key (kbd "<f12>U") 'konix/gud-cont-to-temp-bp)
   (global-set-key (kbd "<f12>T") 'gud-tooltip-mode)
@@ -70,6 +71,11 @@
   (interactive)
   (gud-tbreak 1)
   (gud-cont 1)
+  )
+
+(defun konix/gud-where ()
+  (interactive)
+  (gud-call "where")
   )
 
 (defun konix/gud-recall ()

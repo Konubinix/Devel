@@ -26,7 +26,7 @@
 
 (defun konix/find-file-hook ()
   (if (and
-	   (string-match "^\\(.+\\):\\([0-9]+\\)$" buffer-file-name)
+	   (string-match "^\\(.+\\):\\([0-9]+\\):?$" buffer-file-name)
 	   (not
 		(file-exists-p buffer-file-name)
 		)

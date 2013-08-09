@@ -280,13 +280,13 @@ konix_int_to_color() {
 	local BG_VALUE="$2"
 	if [ ! $FG_VALUE -lt 16 ]
 	then
-		echo "Bad foreground value">&2
+		echo "Bad foreground value $FG_VALUE">&2
 		caller
 		return 1
 	fi
 	if [ ! $BG_VALUE -lt 8 ]
 	then
-		echo "Bad background value">&2
+		echo "Bad background value $BG_VALUE">&2
 		caller
 		return 1
 	fi

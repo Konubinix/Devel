@@ -42,6 +42,7 @@
   (global-set-key (kbd "<f12>j") 'gud-jump)
   (global-set-key (kbd "<f12>l") 'gud-refresh)
   (global-set-key (kbd "<f12>t") 'gud-tbreak)
+  (global-set-key (kbd "<f12>g") 'konix/gud-goto)
   (global-set-key (kbd "<f12>w") 'konix/gud-where)
   (global-set-key (kbd "<f12>W") 'gud-watch)
   (global-set-key (kbd "<f12>u") 'gud-until)
@@ -66,6 +67,11 @@
   (setq konix/gud-last-call-arg arg)
   )
 (ad-activate 'gud-call)
+
+(defun konix/gud-goto ()
+  (interactive)
+  (pop-to-buffer gud-comint-buffer)
+  )
 
 (defun konix/gud-cont-to-temp-bp ()
   (interactive)

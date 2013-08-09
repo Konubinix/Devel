@@ -17,6 +17,7 @@ ${350:PeopleName}\\\\
 ${375:PeopleAddress}\\\\
 ${382:PeoplePostalCode}\\\\
 }}
+${391:\lieu{${395:Somewhere}}}
 \conc{${400:object}}
 \opening{${500:Madame, Monsieur,}}
 

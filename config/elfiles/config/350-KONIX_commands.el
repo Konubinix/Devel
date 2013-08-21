@@ -1454,7 +1454,7 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
   (konix/www/web-search string t)
   )
 
-(defun konix/www/brows-url-of-file-at-point (file)
+(defun konix/www/browse-url-of-file-at-point (file)
   (interactive
    (list
 	(konix/_get-file-name "browse at point" t)

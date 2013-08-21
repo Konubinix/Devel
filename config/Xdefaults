@@ -236,6 +236,11 @@ xterm*jumpScroll:         true
 xterm*multiScroll:        true
 xterm*toolBar:            false
 
+URxvt.keysym.Home:   \033[7~
+URxvt.keysym.End:    \033[8~
+URxvt.keysym.C-Home: \033[7^
+URxvt.keysym.C-End:  \033[8^
+
 ! ************************************************************
 ! xpdf
 ! ************************************************************

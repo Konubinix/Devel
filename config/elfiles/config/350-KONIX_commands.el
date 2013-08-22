@@ -153,7 +153,7 @@
   (interactive (browse-url-interactive-arg "URL: "))
   (start-process (format "%s '%s'" (getenv "BROWSER") url)
 				 nil
-				 "uzbl"
+				 (getenv "BROWSER")
 				 url
 				 )
   )

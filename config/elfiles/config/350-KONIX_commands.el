@@ -59,7 +59,8 @@
 (defun konix/load-default-env-file ()
   (interactive)
   (konix/load-env-file)
-  (message "Environment loaded")
+  (konix/initialize-env)
+  (message "Environment loaded and initialized")
   )
 
 ;; frame configuration handling

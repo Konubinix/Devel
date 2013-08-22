@@ -27,7 +27,7 @@ doc_home = function() {
 }
 
 doc_up = function() {
-    var up_elem = $("a[rel='up'], a:contains(Home)");
+    var up_elem = $("a[rel='up'], a:contains(Up)");
     if(up_elem)
 	{
 		up_elem[0].click();

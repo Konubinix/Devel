@@ -44,12 +44,14 @@ from install_git import install_git
 from install_bin import install_bin
 from install_gdbinit import install_gdbinit
 from install_quilt import install_quilt
+from install_mr import install_mr
 install_shell()
 install_emacs()
 install_git()
 install_bin()
 install_gdbinit()
 install_vim()
+install_mr()
 if is_on_linux():
     install_quilt()
 

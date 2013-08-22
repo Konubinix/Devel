@@ -169,23 +169,6 @@ function trouve_KONIX {
 	find ./ -iname "*$file*"
 }
 
-function parse_git_branch
-{
-    git branch --no-color 2> /dev/null | sed -n -e '
-/^*/ {
-s/* \(.*\)/(git:\1)/
-p
-}
-'
-}
-
-function parse_git_status
-{
-    notclean=`git status --porcelain 2> /dev/null | grep -E "^.(??|M|A|D|R|C|U)" | wc -l`
-
-    if [[ $notclean -gt 0 ]]; then echo -n "*"; fi
-}
-
 # SVN informations
 function parse_svn_revision
 {

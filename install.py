@@ -74,7 +74,8 @@ if is_on_linux():
         substitute(os.path.join(environ["KONIX_DEVEL_DIR"],  "bin"),       os.path.join(environ["HOME"], ".fluxbox/devel_bin"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "ideskrc"),   os.path.join(environ["HOME"], ".ideskrc"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "idesktop"),  os.path.join(environ["HOME"], ".idesktop"))
-        substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "Xdefaults"), os.path.join(environ["HOME"], ".Xdefaults"))
+        substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "Xdefaults"),
+                   os.path.join(environ["HOME"], ".Xdefaults-" + environ["HOSTNAME"]))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "xinitrc"),   os.path.join(environ["HOME"], ".xinitrc"))
         substitute(os.path.join(environ["HOME"],       ".xinitrc"),  os.path.join(environ["HOME"], ".xsession"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "gtkrc-2.0"), os.path.join(environ["HOME"], ".gtkrc-2.0"))

@@ -3,10 +3,6 @@
 [ -z "$PS1" ] && return
 source "$KONIX_CONFIG_DIR/shrc"
 
-# don't put duplicate lines in the history. See bash(1) for more
-# options
-export HISTCONTROL=ignoredups
-
 # make less more friendly for non-text input files
 LESSPIPE="$(which lesspipe)"
 [ -e "$LESSFILE" -a -x "$LESSFILE" ] && eval "$(lesspipe)"

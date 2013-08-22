@@ -1,0 +1,2 @@
+[DEFAULT]
+include = [ -e ${KONIX_PERSO_DIR}/config/mrconfig ] && cat ${KONIX_PERSO_DIR}/config/mrconfig ; [ -e ${KONIX_PERSO_DIR}/$(hostname)/mrconfig ] && cat ${KONIX_PERSO_DIR}/$(hostname)/mrconfig

@@ -96,7 +96,7 @@
 	url = git://seeks.git.sourceforge.net/gitroot/seeks/seeks
 [submodule "sjoubert_dot_rc"]
 	path = sjoubert_dot_rc
-	url = https://github.com/Konubinix/dotrcfiles.git
+	url = https://github.com/sjoubert/dotrcfiles.git
 [submodule "config/elfiles/ace-jump-mode"]
 	path = config/elfiles/ace-jump-mode
 	url = https://github.com/winterTTr/ace-jump-mode.git

@@ -50,14 +50,14 @@ trap "fusermount -u '$TMP_PERSO_DECRYPT' && rm -rvf '$TMP_PERSO_DECRYPT'" 0
 
 # sync
 # special case for the first sync : create the distant repo if it is empty
-if [ ! -e "${TMP_PERSO_DECRYPT}/hooks" ]
+if [ ! -e "${TMP_PERSO_DECRYPT}/perso/hooks" ]
 then
-	git clone --bare . "${TMP_PERSO_DECRYPT}"
+	git clone --bare . "${TMP_PERSO_DECRYPT}/perso"
 else
-	git pull "$TMP_PERSO_DECRYPT"
+	git pull "${TMP_PERSO_DECRYPT}/perso"
 fi
 konix_assert_last_command "Failed to pull from the temp dir"
-git push "$TMP_PERSO_DECRYPT"
+git push "${TMP_PERSO_DECRYPT}/perso"
 konix_assert_last_command "Failed to push to the temp dir"
 
 # clean

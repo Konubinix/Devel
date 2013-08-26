@@ -1019,9 +1019,9 @@ to be organized.
 				  (dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
 				 )
- 				("ad" "Done projects that might be put in _archives files"
+				("ad" "Done projects that might be put in _archives files"
 				 (
-				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
+				  (tags "//+DONE|+CANCELED|+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
 						  "Done projects (full archive)")
@@ -1037,7 +1037,7 @@ to be organized.
 						  )
 						 )
 						)
-				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
+				  (tags "//+DONE|+CANCELED|+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
 						  "Done tasks into a project or done subproject (soft archive)")
@@ -1054,7 +1054,7 @@ to be organized.
 						  )
 						 )
 						)
-				  (tags "//+DONE|//+CANCELED|//+NOT_DONE"
+				  (tags "//+DONE|+CANCELED|+NOT_DONE"
 						(
 						 (org-agenda-overriding-header
 						  "Done tasks not into a project (full archive)")

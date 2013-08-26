@@ -787,9 +787,14 @@ to be organized.
 				 (
 				  (org-agenda-span 30)
 				  (org-agenda-repeating-timestamp-show-all t)
-				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
+				  (org-agenda-skip-function
+				   '(or
+					 (konix/org-agenda-skip-if-tags
+					  '("no_monthly"))
+					 (org-agenda-skip-entry-if 'deadline
 																	   'scheduled)
-											)
+					 )
+				   )
 				  (dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
 				 )
@@ -850,12 +855,25 @@ to be organized.
 				("aM" "Month view (important stuff)"
 				 ,konix/org-agenda-month-view
 				 (
-				  (org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
+				  (org-agenda-skip-function
+				   '(or
+					 (konix/org-agenda-skip-if-tags
+					  '("no_monthly"))
+					 (konix/org-agenda-skip-non-important-item)
+					 )
+				   )
 				  )
 				 )
 				("am" "Month review"
 				 ,konix/org-agenda-month-view
 				 (
+				  (org-agenda-skip-function
+				   '(or
+					 (konix/org-agenda-skip-if-tags
+					  '("no_monthly"))
+					 (konix/org-agenda-skip-non-important-item)
+					 )
+				   )
 				  )
 				 )
 				("aW" "Weekly view (important stuff)"
@@ -958,7 +976,7 @@ to be organized.
 				  (org-agenda-show-log 'clockcheck)
 				  )
 				 )
- 				("ae" "Errand view"
+				("ae" "Errand view"
 				 (
 				  (agenda nil
 						  (
@@ -980,7 +998,7 @@ to be organized.
 				  )
 				 ("~/errand_tasks.html")
 				 )
- 				("ao" "Phone tasks"
+				("ao" "Phone tasks"
 				 (
 				  (agenda nil
 						  (
@@ -1666,7 +1684,7 @@ to be organized.
 		  )
 		)
 	  )
- 	;; (switch-to-buffer last_buffer)
+	;; (switch-to-buffer last_buffer)
 	;; (goto-char last_point)
 	(when first_blocker
 	  (org-toggle-tag "blocked" 'on)
@@ -1986,8 +2004,8 @@ of the clocksum."
 	   (goto-char (point-min))
 	   (let (
 			 (regexp (first property))
- 			 (match (second property))
- 			 (prop (third property))
+			 (match (second property))
+			 (prop (third property))
 			 )
 		 (while (re-search-forward regexp nil t)
 		   (let (
@@ -2010,10 +2028,10 @@ of the clocksum."
 	(setq org-agenda-tag-filter '())
 	(dolist (tag (org-agenda-get-represented-tags))
 	  (let ((modifier (funcall org-agenda-auto-exclude-function tag)))
-	    (if modifier
+		(if modifier
 			(push modifier org-agenda-tag-filter))))
 	(if (not (null org-agenda-tag-filter))
-	    (org-agenda-filter-apply org-agenda-tag-filter 'tag)))
+		(org-agenda-filter-apply org-agenda-tag-filter 'tag)))
   (setq maybe-refresh t)
   )
 
@@ -2099,18 +2117,18 @@ of the clocksum."
 (defun org-notmuch-store-link ()
   "Store a link to a notmuch search or message."
   (when (eq major-mode 'notmuch-show-mode)
-    (let* ((message-id (notmuch-show-get-prop :id))
+	(let* ((message-id (notmuch-show-get-prop :id))
 		   (subject (notmuch-show-get-subject))
 		   (date (notmuch-show-get-date))
 		   (to (notmuch-show-get-to))
 		   (from (notmuch-show-get-from))
 		   desc link)
-      (org-store-link-props :type "notmuch" :from from :to to
+	  (org-store-link-props :type "notmuch" :from from :to to
 							:subject subject :message-id message-id :date date)
-      (setq desc (org-email-link-description))
-      (setq link (concat "notmuch:"  "id:" message-id))
-      (org-add-link-props :link link :description desc)
-      link)))
+	  (setq desc (org-email-link-description))
+	  (setq link (concat "notmuch:"  "id:" message-id))
+	  (org-add-link-props :link link :description desc)
+	  link)))
 
 ;; ######################################################################
 ;; Message

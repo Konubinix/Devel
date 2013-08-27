@@ -57,7 +57,7 @@
 	url = https://github.com/emacsmirror/load-relative.git
 [submodule "config/elfiles/loc-changes"]
 	path = config/elfiles/loc-changes
-	url = https://github.com/monsanto/emacs-loc-changes.git
+	url = https://github.com/rocky/emacs-loc-changes.git
 [submodule "config/elfiles/popwin"]
 	path = config/elfiles/popwin
 	url = https://github.com/m2ym/popwin-el.git

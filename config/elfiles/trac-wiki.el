@@ -539,7 +539,7 @@ user may need or want to edit them.")
 			   font-lock-warning-face))
 			(t
 			 trac-wiki-link-face))))))
-	(,(format "\\(?:%s\\):\\(?:\"[^\"\n]*\"\\|[^ \t\n]\\)+" ; types
+	(,(format "\\b\\(?:%s\\):\\(?:\"[^\"\n]*\"\\|[^ \t\n]\\)+" ; types
 			  (regexp-opt trac-wiki-link-type-keywords))
      (0 (trac-wiki-link-face trac-wiki-link-face)))
     ("\\w+://[^ \t\n]+" . trac-wiki-link-face)	  ; raw url

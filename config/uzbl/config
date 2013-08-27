@@ -82,8 +82,6 @@ set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" ||
 @on_event   LOAD_COMMIT    js uzbl = {};
 @on_event   LOAD_COMMIT    script @scripts_dir/formfiller.js
 @on_event   LOAD_COMMIT    script @scripts_dir/follow.js
-@on_event   LOAD_COMMIT    script @scripts_dir/jquery-test.js
-@on_event   LOAD_COMMIT    spawn @scripts_dir/jquery-if-not-already.sh
 @on_event   LOAD_COMMIT    script @scripts_dir/doc_navigate.js
 @on_event   LOAD_COMMIT    script @scripts_dir/pocket.js
 @on_event   LOAD_COMMIT    script @scripts_dir/revealAnchors.js

@@ -121,3 +121,6 @@
 [submodule "config/elfiles/highlight-indentation"]
 	path = config/elfiles/highlight-indentation
 	url = https://github.com/antonj/Highlight-Indentation-for-Emacs.git
+[submodule "git-fs"]
+	path = git-fs
+	url = https://github.com/g2p/git-fs.git

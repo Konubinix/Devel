@@ -40,7 +40,8 @@ print "Attempt to run custom commands for URI %s" % UZBL_URI
 for section in config.sections():
     items = dict(config.items(section))
     regexp = items["uri_re"]
-    script_name = items["script"]
+    script_name_tpl = string.Template(items["script"])
+    script_name = script_name_tpl.safe_substitute(os.environ)
     continu = items.get("continue", None)
 
     if re.search(regexp, UZBL_URI):

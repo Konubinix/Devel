@@ -23,13 +23,16 @@ ENV_BACKUP_FILE_TEMPLATE=os.path.join(os.path.expanduser("~"),"env_backups",".en
 DEFAULT_ENVIRON = os.environ
 
 def mergeItemsOfSection(items):
+    # this method assumes that the items are unique
     new_items = {}
+    items_keys = []
     for key,value in items:
         if new_items.get(key) == None:
             new_items[key] = value
         else:
             new_items[key] = "".join((new_items[key],value,))
-    return new_items
+        items_keys.append(key)
+    return (new_items, items_keys,)
 
 def getConfigFromEnvFile(envfile, previous_config):
     if not os.path.exists(envfile):
@@ -42,8 +45,8 @@ def getConfigFromEnvFile(envfile, previous_config):
     new_config = previous_config
     for section in config.sections():
         assert(section in ("prefix","replace","suffix",))
-        items = mergeItemsOfSection(config.items(section))
-        for key in items.keys():
+        (items, items_keys,) = mergeItemsOfSection(config.items(section))
+        for key in items_keys:
             value = items[key]
             # first step is to make sure to correctly unquote the values
             value = re.sub('^"(.*)"$', r"'\1'", value)
@@ -58,6 +61,8 @@ def getConfigFromEnvFile(envfile, previous_config):
             substitute_config.update(DEFAULT_CONFIG)
             substitute_config.update(DEFAULT_ENVIRON)
             substitute_config.update(previous_config)
+            substitute_config.update(new_config)
+
             value_template = string.Template(value)
             value = value_template.safe_substitute(substitute_config)
 

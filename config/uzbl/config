@@ -82,7 +82,6 @@ set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" ||
 @on_event   LOAD_COMMIT    js uzbl = {};
 @on_event   LOAD_COMMIT    script @scripts_dir/formfiller.js
 @on_event   LOAD_COMMIT    script @scripts_dir/follow.js
-@on_event   LOAD_COMMIT    script @scripts_dir/doc_navigate.js
 @on_event   LOAD_COMMIT    script @scripts_dir/pocket.js
 @on_event   LOAD_COMMIT    script @scripts_dir/revealAnchors.js
 @on_event   LOAD_COMMIT    script @scripts_dir/navigate.js
@@ -308,13 +307,6 @@ set ebind     = @mode_bind global,-insert
 @cbind <Ctrl><Down>        = js navigate.next();
 @cbind <Ctrl><Page_Up>     = js navigate.init();
 @cbind <Ctrl><Return>      = js navigate.click();
-
-@cbind <Shift><Ctrl><Right> = js doc_next();
-@cbind <Shift><Ctrl><Left> = js doc_previous();
-@cbind <Shift><Ctrl><Up> = js doc_up();
-@cbind <Shift><Ctrl>T = js doc_toc();
-@cbind <Shift><Ctrl>H = js doc_home();
-@cbind <Shift><Ctrl>C = js doc_current();
 
 # Zoom binds
 @cbind  +   = zoom_in

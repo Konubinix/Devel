@@ -1,4 +1,26 @@
-export COLOR_RESET=-1
+if [ -x "/usr/bin/tput" ] && [ "`tput colors`" -ge "8" ]
+then
+    export COLOR_RESET=`tput sgr0`
+    export COLOR_BOLD=`tput bold`
+    export COLOR_UL=`tput smul`
+
+    export COLOR_FG_BLACK=`tput setaf 0`
+    export COLOR_FG_RED=`tput setaf 1`
+    export COLOR_FG_GREEN=`tput setaf 2`
+    export COLOR_FG_YELLOW=`tput setaf 3`
+    export COLOR_FG_BLUE=`tput setaf 4`
+    export COLOR_FG_MAGENTA=`tput setaf 5`
+    export COLOR_FG_CYAN=`tput setaf 6`
+    export COLOR_FG_WHITE=`tput setaf 7`
+    export COLOR_BG_BLACK=`tput setab 0`
+    export COLOR_BG_RED=`tput setab 1`
+    export COLOR_BG_GREEN=`tput setab 2`
+    export COLOR_BG_YELLOW=`tput setab 3`
+    export COLOR_BG_BLUE=`tput setab 4`
+    export COLOR_BG_MAGENTA=`tput setab 5`
+    export COLOR_BG_CYAN=`tput setab 6`
+    export COLOR_BG_WHITE=`tput setab 7`
+fi
 export COLOR_BLACK=0
 export COLOR_BLUE=4
 export COLOR_GREEN=2

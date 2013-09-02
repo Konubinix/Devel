@@ -799,7 +799,7 @@ to be organized.
 					 (konix/org-agenda-skip-if-tags
 					  '("no_monthly"))
 					 (org-agenda-skip-entry-if 'deadline
-																	   'scheduled)
+											   'scheduled)
 					 )
 				   )
 				  (dummy (konix/org-agenda-inhibit-context-filtering))
@@ -1112,10 +1112,10 @@ to be organized.
 (setq-default org-clock-persist-query-save t)
 (setq-default org-clock-report-include-clocking-task t)
 (setq-default org-columns-default-format "%CATEGORY %90ITEM %1PRIORITY
-%10Effort{:} %10CLOCKSUM %10CLOCKSUM_T")
+%10Effort{:} %10CLOCKSUM %10CLOCKSUM_T %ORDERED %allocate %BLOCKER")
 (setq-default org-agenda-overriding-columns-format "%CATEGORY %90ITEM
  %1PRIORITY %2DONE_POMODORO(dp){+} %2POMODORO{+} %10Effort{:} %10CLOCKSUM_T
-%10CLOCKSUM")
+%10CLOCKSUM %ORDERED %allocate %BLOCKER")
 (setq-default org-cycle-separator-lines -1)
 (setq-default org-default-notes-file (concat org-directory "/notes.org"))
 (setq-default org-enforce-todo-checkbox-dependencies t)

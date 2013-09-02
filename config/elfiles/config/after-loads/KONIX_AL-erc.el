@@ -30,6 +30,7 @@
 (setq-default erc-log-mode t)
 (setq-default erc-log-write-after-insert t)
 (setq-default erc-log-write-after-send t)
+(setq-default erc-fill-column 800)
 (setq-default erc-modules '(autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands notify readonly ring smiley sound stamp spelling track))
 (setq-default erc-user-mode 'ignore)
 (defcustom konix/chat-silent nil ""

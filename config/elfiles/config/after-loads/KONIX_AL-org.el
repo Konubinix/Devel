@@ -740,6 +740,13 @@ to be organized.
 				 (
 				  )
 				 )
+				("aT" "Todo list (without projects)"
+				 (
+				  (tags-todo "-project//NEXT|TODO")
+				  )
+				 (
+				  )
+				 )
 				("ap" "Projects (without subprojects)"
 				 (
 				  (tags-todo "+project-maybe"

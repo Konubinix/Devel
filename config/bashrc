@@ -73,5 +73,13 @@ konix_git_prompt_maybe ( ) {
         git_prompt
     fi
 }
+
+konix_prompt_pre ( ) {
+echo -n
+}
+konix_prompt_post ( ) {
+echo -n
+}
+
 #set +x
-export PS1="\$(rc=\$? && [ \$rc -ne 0 ] && printf '\[$BAD_PROMPT_COLOR\]' || printf '\[$GOOD_PROMPT_COLOR\]' ; printf '%03d$DEFAULT_COLOR' \$rc ;)\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\[\033[01;36;40m\]|path=\w|\[\033[00m\]${GIT_COLOR}\$(konix_git_prompt_maybe)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\${KONIX_PROMPT_POST}\n\$ "
+export PS1="\$(rc=\$? ; konix_prompt_pre; [ \$rc -ne 0 ] && printf '\[$BAD_PROMPT_COLOR\]' || printf '\[$GOOD_PROMPT_COLOR\]' ; printf '%03d$DEFAULT_COLOR' \$rc ;)\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\[\033[01;36;40m\]|path=\w|\[\033[00m\]${GIT_COLOR}\$(konix_git_prompt_maybe)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\$(konix_prompt_post)\n\$ "

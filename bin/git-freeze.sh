@@ -4,7 +4,7 @@ print () {
 	echo "$*" >&2
 }
 print "# Adding tracked files"
-git add -u -v
+git add -u -v :/
 print "# Removing deleted files"
 git-rm-deleted-files.sh
 print "# Adding untracked files"

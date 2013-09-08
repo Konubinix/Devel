@@ -377,6 +377,7 @@ inspired from `notmuch-show-archive-thread-internal'"
   )
 (defun konix/notmuch-archive ()
   (interactive)
+  (konix/notmuch-remove-unread)
   (cond
    ((eq major-mode 'notmuch-search-mode)
 	(notmuch-search-archive-thread)
@@ -390,7 +391,6 @@ inspired from `notmuch-show-archive-thread-internal'"
 		   )
 	)
    )
-  (konix/notmuch-remove-unread)
   )
 
 (defun konix/notmuch-search-no-tag ()

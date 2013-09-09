@@ -64,6 +64,19 @@
 				(sexp :tag "Face") )
 		  )
   )
+
+(defun konix/c-mode-make-executable-if-binfmt ()
+  (when (save-excursion
+		  (save-restriction
+			(widen)
+			(goto-char 0)
+			(looking-at "/\\*BINFMT")
+			)
+		  )
+	(konix/make-executable)
+	)
+  )
+
 (defun konix/c-mode-common-hook ()
   (ignore-errors
 	(hide-ifdef-mode t)
@@ -78,19 +91,12 @@
    nil
    konix/c-mode-font-lock-keywords
    )
+  (add-hook 'after-save-hook 'konix/c-mode-make-executable-if-binfmt t t)
   (require 'KONIX_auto-complete)
   (setq ac-sources (append '(ac-source-konix/c/project-files)
 						   konix/prog/ac-sources))
   ;; if the file is meant to be compiled with binfmtc, then make it executable
-  (when (save-excursion
-		  (save-restriction
-			(widen)
-			(goto-char 0)
-			(looking-at "/\\*BINFMT")
-			)
-		  )
-	(add-hook 'after-save-hook 'konix/make-executable t t)
-	)
+
   )
 (add-hook 'c-mode-common-hook 'konix/c-mode-common-hook)
 

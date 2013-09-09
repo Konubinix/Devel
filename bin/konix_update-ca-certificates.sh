@@ -37,7 +37,8 @@ do
     shift
 done
 
-CERTSCONF="$KONIX_PERSO_DIR/ca-certificates.conf"
+CERTSCONF="/etc/ca-certificates.conf"
+CERTSCONF_CUSTOM="$KONIX_PERSO_DIR/ca-certificates.conf"
 CERTSDIR=/usr/share/ca-certificates
 LOCALCERTSDIR="$KONIX_PERSO_DIR/ca-certificates"
 CERTBUNDLE=ca-certificates.crt
@@ -106,6 +107,11 @@ sed -n -e '/^$/d' -e 's/^!//p' $CERTSCONF | while read crt
 do
     remove "$CERTSDIR/$crt"
 done
+sed -n -e '/^$/d' -e 's/^!//p' "${CERTSCONF_CUSTOM}" | while read crt
+do
+    remove "$CERTSDIR/$crt"
+done
+
 
 sed -e '/^$/d' -e '/^#/d' -e '/^!/d' $CERTSCONF | while read crt
 do
@@ -116,6 +122,16 @@ do
     fi
     add "$CERTSDIR/$crt"
 done
+sed -e '/^$/d' -e '/^#/d' -e '/^!/d' "${CERTSCONF_CUSTOM}" | while read crt
+do
+    if ! test -f "$CERTSDIR/$crt"
+    then
+        echo "W: $CERTSDIR/$crt not found, but listed in ${CERTSCONF_CUSTOM}." >&2
+        continue
+    fi
+    add "$CERTSDIR/$crt"
+done
+
 
 # Now process certificate authorities installed by the local system
 # administrator.
@@ -162,6 +178,10 @@ then
 else
     echo "$HOOKSDIR is not an existing directory"
 fi
+echo "ADDED:"
+cat "${ADDED}"
+echo "REMOVED:"
+cat "${REMOVED}"
 
 echo "done."
 

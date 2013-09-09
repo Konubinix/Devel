@@ -348,6 +348,15 @@ then
     }
 fi
 
+konix_die ( ) {
+    caller
+    if [ -n "$*" ]
+    then
+        echo "$*"
+    fi
+    exit 1
+}
+
 konix_assert_last_command () {
 	local LAST_RES=$?
 	local MSG="$*"

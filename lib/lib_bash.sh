@@ -1,4 +1,6 @@
-if [ -x "/usr/bin/tput" ] && [ "`tput colors`" -ge "8" ]
+if [ -n "$TERM" ] \
+    && [ -x "/usr/bin/tput" ] \
+    && [ "`tput colors`" -ge "8" ]
 then
     export COLOR_RESET=`tput sgr0`
     export COLOR_BOLD=`tput bold`

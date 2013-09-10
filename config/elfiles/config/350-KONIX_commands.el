@@ -1082,7 +1082,14 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 (defun konix/gitk ()
   "Lance gitk --all."
   (interactive)
-  (start-process "gitk" nil "gitk" "--all")
+  (let (
+		(append (if current-prefix-arg
+					""
+				  "--all"
+				  ))
+		)
+	(start-process "gitk" nil "gitk" append)
+	)
   (message "git k launched")
   )
 
@@ -1442,8 +1449,8 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 						 (replace-regexp-in-string " " "+" string)
 						 ))
 		)
-   (start-process "konix web search" nil "bash" "-c" command)
-   )
+	(start-process "konix web search" nil "bash" "-c" command)
+	)
   )
 
 (defun konix/www/web-search-default (string)

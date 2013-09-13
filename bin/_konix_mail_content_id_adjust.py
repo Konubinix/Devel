@@ -24,7 +24,7 @@ def getValueIgnoreCase(key, dico):
 
 while len(PARTS_TO_PARSE) != 0:
     PART = PARTS_TO_PARSE.pop(0)
-    if getValueIgnoreCase("content-id", PART):
+    if getValueIgnoreCase("content-id", PART) and PART.get_payload(None, True):
         assert getValueIgnoreCase('Content-Type', PART)
         NAME = re.search('name="([^"]+)"', getValueIgnoreCase('Content-Type',
                                                               PART), re.I)

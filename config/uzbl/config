@@ -47,7 +47,6 @@ set scripts_dir      = @share_dir/uzbl:@data_home/uzbl:@devel_dir/uzbl/examples/
 # support events that can wait for a response from a script.
 set scheme_handler      = sync_spawn @scripts_dir/scheme.py
 #set request_handler     = sync_spawn @scripts_dir/request.py
-set authentication_handler = sync_spawn @scripts_dir/konix_auth.py
 
 # Download stuff
 set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" || dm-dm.sh -s "$1"'
@@ -110,6 +109,9 @@ set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" ||
 
 # Switch to command mode if anything else is clicked
 @on_event   ROOT_ACTIVE    @set_mode command
+
+# authentication handler
+@on_event   AUTHENTICATE   spawn @scripts_dir/konix_auth.py "%1" "%2" "%3"
 
 # Example CONFIG_CHANGED event handler
 #@on_event  CONFIG_CHANGED print Config changed: %1 = %2

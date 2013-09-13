@@ -83,13 +83,10 @@ set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" ||
 @on_event   LOAD_COMMIT    script @scripts_dir/follow.js
 @on_event   LOAD_COMMIT    script @scripts_dir/pocket.js
 @on_event   LOAD_COMMIT    script @scripts_dir/revealAnchors.js
-@on_event   LOAD_COMMIT    script @scripts_dir/navigate.js
 @on_event   LOAD_COMMIT    spawn @scripts_dir/change_style.sh
 @on_event   LOAD_COMMIT    script @scripts_dir/lib.js
 @on_event   LOAD_COMMIT    script @scripts_dir/highlight_anchor.js
 @on_event   LOAD_COMMIT    script @scripts_dir/js-base64/base64.js
-@on_event   LOAD_COMMIT    spawn @scripts_dir/adblock.py
-@on_event   LOAD_PROGRESS  js uzblAdBlock();
 
 @on_event   REQUEST_STARTING sync_spawn @scripts_dir/per_site_user_agent.sh "\@uri"
 
@@ -303,12 +300,6 @@ set ebind     = @mode_bind global,-insert
 
 # toggle use of a proxy
 @cbind <Shift><Ctrl>P   = toggle proxy_url "" \@(echo $http_proxy)\@
-
-# link navigation
-@cbind <Ctrl><Up>          = js navigate.prev();
-@cbind <Ctrl><Down>        = js navigate.next();
-@cbind <Ctrl><Page_Up>     = js navigate.init();
-@cbind <Ctrl><Return>      = js navigate.click();
 
 # Zoom binds
 @cbind  +   = zoom_in

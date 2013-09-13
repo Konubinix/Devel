@@ -2,9 +2,9 @@ Provide a way to add my custom notes in the agenda view when in log modeIndex: d
 ===================================================================
 Index: devel/config/elfiles/org/lisp/org-agenda.el
 ===================================================================
---- devel.orig/config/elfiles/org/lisp/org-agenda.el	2013-01-15 10:54:46.429978670 +0100
-+++ devel/config/elfiles/org/lisp/org-agenda.el	2013-01-16 09:27:44.105204498 +0100
-@@ -5737,6 +5737,22 @@
+--- devel.orig/config/elfiles/org/lisp/org-agenda.el	2013-09-13 08:19:22.923631382 +0200
++++ devel/config/elfiles/org/lisp/org-agenda.el	2013-09-13 08:19:22.919631365 +0200
+@@ -5772,6 +5772,22 @@
  	 (parts
  	  (delq nil
  		(list

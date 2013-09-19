@@ -654,9 +654,4 @@ will be inserted.  Otherwise this function asks for the keyword to use
   (setq mode-name "TaskJuggler")
   (run-hooks 'taskjuggler-mode-hook))
 
-(add-to-list 'auto-mode-alist '("\\.tjp\\'" . taskjuggler-mode))
-(add-to-list 'auto-mode-alist '("\\.tji\\'" . taskjuggler-mode))
-(add-to-list 'auto-mode-alist '("\\.tjsp\\'" . taskjuggler-mode))
-
-
 (provide 'taskjuggler-mode)

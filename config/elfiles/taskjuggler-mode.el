@@ -234,6 +234,12 @@ Used when completing resources.")
   :group 'taskjuggler
   )
 
+(defcustom taskjuggler-man-cmd
+  "tj3man"
+  "The command to call to launch taskjuggler manual"
+  :group 'taskjuggler
+  )
+
 ;; Internals, Parser, etc
 (defun taskjuggler-indent-line ()
   "Indent current line as taskjuggler code.
@@ -593,6 +599,16 @@ will be inserted.  Otherwise this function asks for the keyword to use
   (let ((cmd (taskjuggler-build-compile-command (current-buffer))))
     (compile cmd)))
 
+(defun taskjuggler-launch-html-man ()
+  (interactive)
+  (message "Launching the taskjuggler manual")
+  (start-process "tjman"
+				 nil
+				 taskjuggler-man-cmd
+				 "--html"
+				 )
+  )
+
 (defun taskjuggler-check-syntax ()
   (interactive)
   (let ((cmd (taskjuggler-build-compile-command (current-buffer) "-s")))
@@ -608,6 +624,7 @@ will be inserted.  Otherwise this function asks for the keyword to use
   (define-key taskjuggler-mode-map [(control c) (control d)] 'taskjuggler-insert-dependency)
   (define-key taskjuggler-mode-map [(control c) (control c)] 'taskjuggler-compile)
   (define-key taskjuggler-mode-map [(control c) (control s)] 'taskjuggler-check-syntax)
+  (define-key taskjuggler-mode-map [(control c) (h)] 'taskjuggler-launch-html-man)
   (define-key taskjuggler-mode-map [(control c) (r)]         'taskjuggler-rescan-buffer)
   (define-key taskjuggler-mode-map [(control c) (control r)] 'taskjuggler-insert-resource)
   (define-key taskjuggler-mode-map [(control c) (i) (t)] 'taskjuggler-insert-task)

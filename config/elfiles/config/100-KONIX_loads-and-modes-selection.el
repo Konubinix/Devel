@@ -196,6 +196,8 @@
 (autoload 'undo-tree-mode "undo-tree" "" t)
 ;; calfw
 (autoload 'cfw:open-org-calendar "calfw-org" "" t)
+;; taskjuggler
+(autoload 'taskjuggler-mode "taskjuggler-mode" "" t)
 
 ;; ************************************************************
 ;; Automodes
@@ -267,6 +269,8 @@
 (add-to-list 'auto-mode-alist (cons "\\.tpl$" 'jinja2-mode))
 ;; compilation log use the compilog suffix
 (add-to-list 'auto-mode-alist (cons "\\.compilog$" 'compilation-mode))
+;; taskjuggler files
+(add-to-list 'auto-mode-alist (cons "\\.tj.$" 'taskjuggler-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

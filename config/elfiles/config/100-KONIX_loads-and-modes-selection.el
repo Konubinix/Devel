@@ -270,7 +270,7 @@
 ;; compilation log use the compilog suffix
 (add-to-list 'auto-mode-alist (cons "\\.compilog$" 'compilation-mode))
 ;; taskjuggler files
-(add-to-list 'auto-mode-alist (cons "\\.tj.$" 'taskjuggler-mode))
+(add-to-list 'auto-mode-alist (cons "\\.tj..?$" 'taskjuggler-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

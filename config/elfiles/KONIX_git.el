@@ -1503,7 +1503,7 @@ Uses the macro konix/git/status-buffer/next-or-previous
 												  git_status_buffer_name
 												  "sh"
 												  "-c"
-												  "git status && git stash list"
+												  "LC_ALL=C git status && git stash list"
 												  ))
 	(konix/set-process-sentinel-exit-hook
 	 konix/git/status-process

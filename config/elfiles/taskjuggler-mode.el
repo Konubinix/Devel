@@ -218,8 +218,6 @@ Used for font-lock.")
   "Keywords after which a resource may follow.
 Used when completing resources.")
 
-
-
 (defvar taskjuggler-font-lock-keywords
   (list
    (cons (regexp-opt taskjuggler-properties 'words) font-lock-function-name-face)
@@ -230,6 +228,11 @@ Used when completing resources.")
    '("\\('\\w*'\\)" . font-lock-variable-name-face))
   "Default highlighting expressions for TASKJUG mode")
 
+(defcustom taskjuggler-cmd
+  "tj3"
+  "The command to call to launch taskjuggler"
+  :group 'taskjuggler
+  )
 
 ;; Internals, Parser, etc
 (defun taskjuggler-indent-line ()
@@ -577,7 +580,8 @@ will be inserted.  Otherwise this function asks for the keyword to use
 
 ;; Compile
 (defun taskjuggler-build-compile-command (buffer &optional args)
-  (concat "taskjuggler "
+  (concat taskjuggler-cmd
+		  " "
           (cond
            ((listp args) (mapconcat 'identity args " "))
            ((stringp args) args))

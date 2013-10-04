@@ -124,3 +124,6 @@
 [submodule "git-fs"]
 	path = git-fs
 	url = https://github.com/g2p/git-fs.git
+[submodule "hobeika_cfg"]
+	path = hobeika_cfg
+	url = https://github.com/hobeika/cfg

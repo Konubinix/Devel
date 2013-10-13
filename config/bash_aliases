@@ -47,3 +47,7 @@ alias mo=mimeopen
 alias kc=konix_cc.sh
 alias kxx=konix_cxx.sh
 alias ga=git-annex
+alias gaw="git-annex whereis"
+alias gag="git-annex get"
+alias gad="git-annex drop"
+alias gac="git-annex copy"

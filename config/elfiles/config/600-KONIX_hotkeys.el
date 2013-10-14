@@ -774,7 +774,11 @@
 
 (define-prefix-command 'konix/git-global-map-cherry)
 (define-key konix/git-global-map "C" 'konix/git-global-map-cherry)
-(define-key konix/git-global-map-cherry "p" 'konix/git/cherry-pick)
+(define-prefix-command 'konix/git-global-map-cherry-pick)
+(define-key konix/git-global-map-cherry "p" 'konix/git-global-map-cherry-pick)
+(define-key konix/git-global-map-cherry-pick "p" 'konix/git/cherry-pick)
+(define-key konix/git-global-map-cherry-pick "a" 'konix/git/cherry-pick-abort)
+(define-key konix/git-global-map-cherry-pick "c" 'konix/git/cherry-pick-continue)
 
 (define-prefix-command 'konix/git-global-map-bisect)
 (define-key konix/git-global-map "B" 'konix/git-global-map-bisect)

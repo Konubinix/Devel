@@ -570,6 +570,16 @@
   (konix/git/command-with-completion "cherry-pick ")
   )
 
+(defun konix/git/cherry-pick-continue ()
+  (interactive)
+  (konix/git/command-with-completion "cherry-pick --continue")
+  )
+
+(defun konix/git/cherry-pick-abort ()
+  (interactive)
+  (konix/git/command-with-completion "cherry-pick --abort")
+  )
+
 (defun konix/git/stash/save (msg)
   "Lance git stash."
   (interactive "sMessage : ")

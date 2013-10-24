@@ -46,7 +46,11 @@ ulimit -c 209715200
 # ######################################################################
 # For a nice git prompt
 # ######################################################################
-source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/git"
+if [ -e "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/git" ]
+then
+    source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/git"
+    KONIX_GIT_PROMPT_SOURCED=1
+fi
 
 # ************************************************************
 # Variables
@@ -68,7 +72,8 @@ BAD_PROMPT_COLOR="$RES"
 konix_int_to_color $((COLOR_GREEN+8)) -1
 GOOD_PROMPT_COLOR="$RES"
 konix_git_prompt_maybe ( ) {
-    if [ "$KONIX_GIT_PROMPT" ]
+    if [ -n "$KONIX_GIT_PROMPT_SOURCED" \
+        -a -n "$KONIX_GIT_PROMPT" ]
     then
         git_prompt
     fi

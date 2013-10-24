@@ -4,7 +4,7 @@ print () {
 	echo "$*" >&2
 }
 
-git ls-files -o --exclude-standard | while read FILE
+git ls-files -o --exclude-standard :/ | while read FILE
 do
 	if [ -s "$FILE" ]
 	then

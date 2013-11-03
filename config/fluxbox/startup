@@ -29,6 +29,9 @@ konix_notify_daemon > ~/.notify_daemon_log 2>&1 &
 # the real notification daemon
 dunst&
 
+# automount usb drives
+udisks-glue
+
 sleep 4
 {
     fbpager -w &

@@ -421,3 +421,8 @@ logless () {
 logtail () {
 	tail -f $1 | ccze -A;
 }
+
+private_nav () {
+	export KONIX_BASH_PRIVATE_NAV=1
+	bash -i
+}

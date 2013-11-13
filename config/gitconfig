@@ -18,6 +18,7 @@
 	sm = submodule
 	alog = log --graph --decorate=full --all --full-history -m
  	ri = rebase --interactive --autosquash
+ 	sm = submodule
 	# fetch = fetch --upload-pack="git upload-pack"
 [remote "origin"]
 #	uploadpack = git upload-pack

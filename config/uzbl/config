@@ -238,6 +238,9 @@ set ebind     = @mode_bind global,-insert
 @ebind <Mod1>p                 = request HISTORY_PREV
 @ebind <Mod1>n                 = request HISTORY_NEXT
 
+# load jquery on demand
+@bind   <Ctrl>j  = chain 'sync_sh "konix_display.py Loading_jquery"' 'script @scripts_dir/jquery-1.7.2.min.js' 'sync_sh "konix_display.py jquery_Loaded"'
+
 # Keycmd injection/append examples.
 #@ebind  <Ctrl>su = event INJECT_KEYCMD \@uri
 #@ebind  <Ctrl>st = event INJECT_KEYCMD \@title

@@ -16,7 +16,7 @@
 	diffc = diff --cached
 	civ = commit -v
 	sm = submodule
-	alog = log --graph --decorate=full --all --full-history
+	alog = log --graph --decorate=full --all --full-history -m
  	ri = rebase --interactive --autosquash
 	# fetch = fetch --upload-pack="git upload-pack"
 [remote "origin"]

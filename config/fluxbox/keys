@@ -229,7 +229,7 @@ Control Mod4 i :ExecCommand $(konix_goto_true_exec.sh iceweasel)
 Control Mod4 u :ExecCommand $(konix_goto_window.sh \.uzbl konix_uzbl.sh)
 Control Mod4 p :ExecCommand $(konix_goto_true_exec.sh pidgin)
 Control Mod4 v :ExecCommand $(konix_goto_true_exec.sh vlc)
-Control Mod4 e :ExecCommand $(konix_goto_window.sh emacs konix_emacs)
+Control Mod4 e :ExecCommand $(konix_goto_window.sh konix_emacs)
 Control Mod4 m :ExecCommand $(konix_goto_true_exec.sh exaile)
 Control Mod4 h :ExecCommand $(konix_goto_true_exec.sh icedove)
 

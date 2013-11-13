@@ -127,3 +127,6 @@
 [submodule "hobeika_cfg"]
 	path = hobeika_cfg
 	url = https://github.com/hobeika/cfg
+[submodule "smartcd"]
+	path = smartcd
+	url = https://github.com/cxreg/smartcd.git

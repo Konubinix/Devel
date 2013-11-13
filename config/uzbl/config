@@ -97,7 +97,6 @@ set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" ||
 @on_event   LOAD_FINISH    @set_status <span foreground="gold">done</span>
 @on_event   LOAD_FINISH    spawn @scripts_dir/history.sh
 @on_event   LOAD_FINISH    chain 'set title_format_short =\@PID - [LOADED] \@TITLE' 'set title_format_long =\@PID - [LOADED] \@title_format_long'
-@on_event   LOAD_FINISH    script @scripts_dir/my_scripts.js
 @on_event   LOAD_FINISH    spawn @scripts_dir/per_site_commands.sh
 
 # Switch to insert mode if a (editable) html form is clicked

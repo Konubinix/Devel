@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os, subprocess, sys, urlparse
+import konix_notify
 
 def detach_open(cmd):
     # Thanks to the vast knowledge of Laurence Withers (lwithers) and this message:
@@ -28,3 +29,12 @@ if __name__ == '__main__':
         )
         if dwim == 0:
             detach_open(['konix_uri_dwim.py', uri],)
+    elif u.scheme == 'smb':
+        smb_mount = os.environ.get("KONIX_SMB_MOUNT", None)
+        if not smb_mount:
+            konix_notify.main("KONIX_SMB_MOUNT not set")
+            print "USED"
+        else:
+            real_path = os.path.join(smb_mount, u.netloc, u.path[1:])
+            konix_notify.main("Opening %s with mimeopen" % real_path)
+            detach_open(['mimeopen', "-n", real_path])

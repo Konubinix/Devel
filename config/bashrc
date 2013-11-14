@@ -1,6 +1,8 @@
 #!/bin/bash
 
 [ -z "$PS1" ] && return
+echo "Initializing interactive bash configuration"
+echo "Sourcing shrc configuration"
 source "$KONIX_CONFIG_DIR/shrc"
 
 # make less more friendly for non-text input files
@@ -23,16 +25,19 @@ esac
 # Bash Comp
 # ************************************************************
 if [ -f /etc/bash_completion ]; then
+    echo "Loading bash completion from etc"
     . /etc/bash_completion
 fi
 
 if [ -f /etc/profile.d/bash-completion.sh ]; then
+    echo "Loading bash completion from etc/profile.d"
     . /etc/profile.d/bash-completion.sh
 fi
 
 # source custom bash completions
 OLD_IFS=$IFS
 IFS=$'\n'
+echo "Loading personal bash completions"
 for bashcomp_file in $KONIX_CONFIG_DIR/bash-completion/*
 do
 	source "$bashcomp_file"
@@ -48,6 +53,7 @@ ulimit -c 209715200
 # ######################################################################
 if [ -e "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/git" ]
 then
+    echo "Loading sjoubert git config"
     source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/git"
     KONIX_GIT_PROMPT_SOURCED=1
 fi

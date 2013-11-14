@@ -62,10 +62,10 @@ then
 fi
 
 # Source the smartcd package if available
-if [ -d "$HOME/.smartcd" ]
+if [ -e "$HOME/.smartcd_config" ]
 then
         echo "Loading smartcd"
-        source "${KONIX_DEVEL_DIR}/smartcd/lib/core/smartcd"
+        source "$HOME/.smartcd_config"
 fi
 
 # ************************************************************

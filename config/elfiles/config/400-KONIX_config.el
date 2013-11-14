@@ -737,7 +737,7 @@
 ;; backup
 ;; ######################################################################
 ;; Make a backup of the file once everything else has been done
-(add-hook 'before-save-hook 'konix/force-backup-of-buffer t)
+(add-hook 'before-save-hook 'konix/force-backup-of-buffer-if-not-git t)
 
 ;; ####################################################################################################
 ;; Maximize frame when visiting a file from emacs client

@@ -130,3 +130,6 @@
 [submodule "smartcd"]
 	path = smartcd
 	url = https://github.com/cxreg/smartcd.git
+[submodule "git-wip"]
+	path = git-wip
+	url = https://github.com/bartman/git-wip.git

@@ -48,6 +48,9 @@ IFS=$OLD_IFS
 # by default autorise the core dump, till 200Mio
 ulimit -c 209715200
 
+# use the autocd feature to gain precious miliseconds
+shopt -s autocd
+
 # ######################################################################
 # For a nice git prompt
 # ######################################################################

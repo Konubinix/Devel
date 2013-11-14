@@ -509,7 +509,7 @@
   (let (
 		(commit (konix/git/log/get/commit))
 		)
-	(konix/git/show/commit commit commit)
+	(konix/git/show/commit commit nil commit)
 	)
   )
 
@@ -721,7 +721,7 @@
 	)
   )
 
-(defun konix/git/show (commit &optional when_done_hook)
+(defun konix/git/show (commit &optional file when_done_hook)
   "Launch a simple diff and view it in some buffer."
   (interactive
    (list
@@ -730,12 +730,18 @@
    )
   (let (
 		(show_buffer (format "*GIT Show Buffer %s*" commit))
+		(command
+		 (format "show \"%s\"" commit)
+		 )
 		)
+	(when file
+	  (setq command (concat command " -- '" file "'"))
+	  )
 	(when (get-buffer show_buffer)
 	  (kill-buffer show_buffer)
 	  )
 	(save-window-excursion
-	  (konix/git/command (format "show \"%s\"" commit) nil show_buffer t)
+	  (konix/git/command command nil show_buffer t)
 	  )
 	(push-tag-mark)
 	(set-process-sentinel (get-buffer-process show_buffer)
@@ -767,7 +773,7 @@
 	)
   )
 
-(defun konix/git/show/commit (commit line_to_search)
+(defun konix/git/show/commit (commit file line_to_search)
   ;; strip the beginning and end blanks out of the line to search
   (setq line_to_search
 		;;		(konix/strip-blank-line-regexp
@@ -776,6 +782,7 @@
 		)
   (message "Showing commit %s" commit)
   (konix/git/show commit
+				  file
 				  `(lambda ()
 					 (goto-char 0)
 					 (or
@@ -798,6 +805,9 @@
 
 (defun konix/git/show/origin-commit-at-pos ()
   (interactive)
+  (when current-prefix-arg
+	(message "Limiting to selected file")
+	)
   (if (eq major-mode 'diff-mode)
 	  (konix/git/diff/show-origin-commit)
 	(let (
@@ -809,6 +819,7 @@
 		  )
 	  (konix/git/show/commit
 	   origin_commit
+	   (and current-prefix-arg (buffer-file-name))
 	   (buffer-substring-no-properties
 		(save-excursion (beginning-of-line) (point))
 		(save-excursion (end-of-line) (point))
@@ -952,6 +963,9 @@ fallbacking to HEAD")
 
 (defun konix/git/diff/show-origin-commit ()
   (interactive)
+  (when current-prefix-arg
+	(message "Limiting to selected file")
+	)
   (let* (
 		 (line_start (save-excursion (beginning-of-line) (forward-char) (point)))
 		 (line_end (save-excursion (end-of-line) (point)))
@@ -960,7 +974,15 @@ fallbacking to HEAD")
 		 (line (konix/diff/_get-old-line))
 		 (commit (konix/git/diff/_get-commit))
 		 )
-	(konix/git/show/commit (konix/git/_get-origin-commit file line (format "%s~1" commit)) line_to_search)
+	(konix/git/show/commit
+	 (konix/git/_get-origin-commit
+	  file
+	  line
+	  (format "%s~1" commit)
+	  )
+	 (and current-prefix-arg
+		  file)
+	 line_to_search)
 	)
   )
 

@@ -364,11 +364,13 @@ current buffer still has clients"
    )
   )
 
-(defun konix/force-backup-of-buffer ()
+(defun konix/force-backup-of-buffer-if-not-git ()
   (let (
 		(buffer-backed-up nil)
 		)
-	(backup-buffer)
+	(unless (string= (vc-backend (buffer-file-name)) "Git")
+	 (backup-buffer)
+	 )
 	)
   )
 

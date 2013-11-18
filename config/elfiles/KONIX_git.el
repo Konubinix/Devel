@@ -1042,6 +1042,12 @@ fallbacking to HEAD")
   (konix/git/command "svn rebase")
   )
 
+(defun konix/git/svn/up ()
+  "Run git svnup.sh."
+  (interactive)
+  (konix/git/command "svnup.sh")
+  )
+
 (defun konix/git/svn/list ()
   '("rebase" "dcommit" "fetch")
   )

@@ -1805,11 +1805,16 @@ to be organized.
   "Set the value of the effort of the entry at point to the value
 of the clocksum."
   (interactive)
-  (org-entry-put
-   (point)
-   "Effort"
-   (org-entry-get (point) "CLOCKSUM")
-   )
+  (let (
+		(new_effort (org-entry-get (point) "CLOCKSUM"))
+		)
+	(org-entry-put
+	 (point)
+	 "Effort"
+	 new_effort
+	 )
+	(message "Effort set to %s" new_effort)
+	)
   )
 
 ;; un parent est DONE quand à 100%

@@ -731,6 +731,7 @@ to be organized.
 							 )
 				  )
 				 (
+				  (dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
 				 )
 				("an" "Next action list (without habits)"

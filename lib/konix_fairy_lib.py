@@ -5,7 +5,7 @@ import re
 import sys
 
 def get_files(MATCH, ALL):
-        result = []
+        result = set()
         for match in MATCH:
                 # take extensions into account
                 match = match+"(\.[^\.]+)?$"
@@ -15,9 +15,9 @@ def get_files(MATCH, ALL):
                                         sys.stderr.write(directory+" does not exist or is not a directory\n")
                                 continue
                         files = os.listdir(directory)
-                        found_files = [os.path.join(directory,fil) for fil in files if re.match(match, fil)]
+                        found_files = set([os.path.join(directory,fil) for fil in files if re.match(match, fil)])
                         if found_files:
-                                result += found_files
+                                result.update(found_files)
                                 if not ALL:
                                         break
         return result

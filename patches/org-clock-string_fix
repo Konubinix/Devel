@@ -3,8 +3,8 @@ Made use of org-clock-string when needed.
 Avoided the hard coding of "CLOCK:"
 Index: devel/config/elfiles/org/lisp/org-clock.el
 ===================================================================
---- devel.orig/config/elfiles/org/lisp/org-clock.el	2013-09-08 19:05:33.000000000 +0200
-+++ devel/config/elfiles/org/lisp/org-clock.el	2013-09-08 19:25:39.000000000 +0200
+--- devel.orig/config/elfiles/org/lisp/org-clock.el	2013-11-18 09:38:17.356321996 +0100
++++ devel/config/elfiles/org/lisp/org-clock.el	2013-11-18 09:38:17.344322047 +0100
 @@ -779,7 +779,7 @@
      (with-current-buffer buf
        (save-excursion
@@ -16,9 +16,9 @@ Index: devel/config/elfiles/org/lisp/org-clock.el
      clocks))
 Index: devel/config/elfiles/org/lisp/org.el
 ===================================================================
---- devel.orig/config/elfiles/org/lisp/org.el	2013-09-08 19:05:33.000000000 +0200
-+++ devel/config/elfiles/org/lisp/org.el	2013-09-08 19:25:39.000000000 +0200
-@@ -8498,7 +8498,8 @@
+--- devel.orig/config/elfiles/org/lisp/org.el	2013-11-18 09:38:17.356321996 +0100
++++ devel/config/elfiles/org/lisp/org.el	2013-11-18 09:38:17.352322013 +0100
+@@ -8559,7 +8559,8 @@
  			    (org-entry-delete nil "ID")
  			  (org-id-get-create t)))
  	    (unless (= n 0)
@@ -28,7 +28,7 @@ Index: devel/config/elfiles/org/lisp/org.el
  		(kill-whole-line))
  	      (goto-char (point-min))
  	      (while (re-search-forward drawer-re nil t)
-@@ -15575,8 +15576,13 @@
+@@ -15649,8 +15650,13 @@
      (setq hiddenp (outline-invisible-p))
      (end-of-line 1)
      (and (equal (char-after) ?\n) (forward-char 1))
@@ -44,7 +44,7 @@ Index: devel/config/elfiles/org/lisp/org.el
  	  ;; just skip this line
  	  (beginning-of-line 2)
  	;; Drawer start, find the end
-@@ -17275,7 +17281,9 @@
+@@ -17343,7 +17349,9 @@
    "Is the cursor on the clock log line?"
    (save-excursion
      (move-beginning-of-line 1)

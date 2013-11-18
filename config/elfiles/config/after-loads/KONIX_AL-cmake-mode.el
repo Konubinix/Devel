@@ -48,7 +48,8 @@
 		)
 	  (while (and
 			  (not found)
-			  (konix/hs-re-search-forward-ignore-comment konix/cmake-end-of-defun)
+			  (konix/hs-re-search-forward-ignore-comment
+			   konix/cmake-end-of-defun nil t)
 			  )
 		(setq last_end (match-end 0))
 		(setq last_end_beginning (match-beginning 1))

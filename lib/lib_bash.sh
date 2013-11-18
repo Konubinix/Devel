@@ -426,3 +426,7 @@ private_nav () {
 	export KONIX_BASH_PRIVATE_NAV=1
 	bash -i
 }
+
+import_env_autostash () {
+    import_env "" autostash
+}

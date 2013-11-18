@@ -256,6 +256,37 @@
 	)
   )
 
+(defun konix/nxml-goto-next-error ()
+  "Go to the next validation error in the buffer."
+  (interactive)
+  (let (
+		(prop_pos (point))
+		(old_prop_pos (point))
+		(max (point-max))
+		)
+	(while (and
+			(not
+			 (equal
+			  (setq prop_pos
+					(next-single-char-property-change
+					 old_prop_pos
+					 'category))
+			  max
+			  )
+			 )
+			(not (equal
+				  (get-char-property old_prop_pos 'category)
+				  'rng-error
+				  ))
+			)
+	  (setq old_prop_pos prop_pos)
+	)
+	(unless (equal old_prop_pos max)
+	  (goto-char old_prop_pos)
+	  )
+   )
+  )
+
 (defun nxml-heading-start-position ()
   "Return the position of the start of the content of a heading element.
 Adjust the position to be after initial leading whitespace.

@@ -15,6 +15,7 @@ export PYTHON_PATH="$(cd "${HOME}/init_bin" && ./konix_dirname.py "$PYTHON_BIN")
 import_env () {
     OLD_PWD="${PWD}"
     ENV_CUSTOM_FILE="$1"
+    EXPORT_KEYWORD="${2:-export}"
     TEMP_FILE=$(mktemp -t "temp_file_for_import_env.XXXX")
     rm -f "${TEMP_FILE}"
     "$PYTHON_BIN" "${HOME}/init_bin/konix_get_env.py" "$ENV_CUSTOM_FILE" 2>/dev/null| "$PYTHON_BIN" "${HOME}/init_bin/konix_quote_env_variables.py" > "${TEMP_FILE}"
@@ -31,7 +32,7 @@ import_env () {
             then
                 eval "unset $(echo "$line"|cut -f1 -d"=")"
             else
-                eval "export $line"
+                eval "${EXPORT_KEYWORD} $line"
             fi
         fi
     done < "${TEMP_FILE}"

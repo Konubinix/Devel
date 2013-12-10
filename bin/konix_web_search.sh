@@ -34,7 +34,7 @@ then
         exit 1
     fi
 fi
-URI=`konix_web_search_engine_find_uri.sh "$ENGINE"`
+
 if [ -z "$1" ]
 then
 	RES=`zenity --entry --text "Search what in $ENGINE ?"`
@@ -46,4 +46,15 @@ then
     fi
 
 fi
-"$BROWSER" "${URI//%s/$*}"
+
+URI=`konix_web_search_engine_find_uri.sh "$ENGINE"`
+URI="${URI//%s/$*}"
+# if the scheme indicates so, the URI must be evaled
+if echo "$URI" | grep -q -e "^eval://"
+then
+    URI="${URI/eval:/}"
+    URI="$(eval "echo "`echo "$URI"`"")"
+fi
+# percent encode the URI
+URI="${URI//%20}"
+"$BROWSER" "${URI}"

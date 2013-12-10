@@ -76,6 +76,80 @@
   (message "Now at the pomorodo n°%s" konix/org-pomodoro-set-count)
   )
 
+(defun konix/org-pomodoro-number-of-seconds-till-next-pause (&optional long)
+  (+
+   (if long
+	   (*
+		;; number of sprint works before the long pause
+		(max
+		 (-
+		  konix/org-pomodoro-sprint-steps
+		  1
+		  konix/org-pomodoro-set-count
+		  )
+		 ;; if I already have more than 4 pomodoros, the next one may well be a
+		 ;; long pause
+		 0
+		 )
+		;; time in minute of the sum sprint + short break
+		(+
+		 konix/org-pomodoro-default-timer
+		 konix/org-pomodoro-default-timer-break
+		 )
+		;; convert to seconds
+		60
+		)
+	 ;; next short pause will be enough
+	 0
+	 )
+   (org-timer-seconds)
+   )
+  )
+
+(defun konix/org-pomodoro-next-available-time (&optional long)
+  (seconds-to-time
+   (+
+	(konix/org-pomodoro-number-of-seconds-till-next-pause long)
+	(string-to-number
+	 (format-time-string
+	  "%s"
+	  )
+	 )
+	)
+   )
+  )
+
+(defun konix/org-pomodoro-next-available-timestamp (&optional long)
+  (format-time-string
+   (cdr org-time-stamp-formats)
+   (konix/org-pomodoro-next-available-time long)
+   )
+  )
+
+(defun konix/org-pomodoro-next-available-time-echo (long)
+  (interactive "P")
+  (require 'erc)
+  (message
+   "Available for %s minutes in %s"
+   (if long
+	   konix/org-pomodoro-default-timer-long-break
+	 konix/org-pomodoro-default-timer-break
+	 )
+   (erc-seconds-to-string
+	(car
+	 (cl-truncate
+	  (konix/org-pomodoro-number-of-seconds-till-next-pause long)
+	  )
+	 )
+	)
+   )
+  )
+
+(defun konix/org-pomodoro-next-available-long-time-echo ()
+  (interactive)
+  (konix/org-pomodoro-next-available-time-echo t)
+  )
+
 (defvar konix/org-pomodoro-start_entry nil)
 (defun konix/org-pomodoro-start ()
   (interactive)

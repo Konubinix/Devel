@@ -377,7 +377,10 @@ current buffer still has clients"
 	)
   )
 
-(defun konix/_get-string (&optional prompt collection)
+(defun konix/_get-string (&optional prompt collection type_of_thing)
+  (unless type_of_thing
+	(setq type_of_thing 'sexp)
+	)
   (completing-read (concat "Get "(when prompt prompt)": ")
 				   collection
 				   nil
@@ -391,7 +394,7 @@ current buffer still has clients"
 							 )
 							(t
 							 (let (
-								   (_sexp (thing-at-point 'sexp))
+								   (_sexp (thing-at-point type_of_thing))
 								   )
 							   (if _sexp
 								   (replace-regexp-in-string "[<>]" ""

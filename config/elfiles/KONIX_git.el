@@ -124,6 +124,8 @@
 
 (defvar konix/git/diff/ignore-all-space t)
 
+(defvar konix/git/precommit-hook nil)
+
 ;; ####################################################################################################
 ;; Functions
 ;; ####################################################################################################
@@ -401,6 +403,21 @@
 (defun konix/git/commit (&optional amend message file)
   "Lance un git commit."
   (interactive)
+  (when konix/git/precommit-hook
+	(mapc
+	 (lambda (hook)
+	  (apply
+	   hook
+	   (list
+		amend
+		message
+		file
+		)
+	   )
+	  )
+	 konix/git/precommit-hook
+	 )
+	)
   (konix/git/command (concat "commit -v"
 							 (if amend " --amend" "")
 							 (if message (concat " -m \""message"\"") "")

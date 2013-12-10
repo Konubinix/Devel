@@ -1439,7 +1439,7 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 (defun konix/www/web-search (string &optional default)
   (interactive
    (list
-	(konix/_get-string "Web search")
+	(konix/_get-string "Web search" nil 'word)
 	)
    )
 

@@ -816,6 +816,7 @@
 (define-key konix/git-global-map "S" 'konix/git-global-map-stash)
 (define-key konix/git-global-map-stash "p" 'konix/git/stash/pop)
 (define-key konix/git-global-map-stash "s" 'konix/git/stash/save)
+(define-key konix/git-global-map-stash "k" 'konix/git/stash/save/keep_index)
 (define-key konix/git-global-map-stash "S" 'konix/git/stash/show)
 (define-key konix/git-global-map-stash "a" 'konix/git/stash/apply)
 (define-key konix/git-global-map-stash "c" 'konix/git/stash/clear)

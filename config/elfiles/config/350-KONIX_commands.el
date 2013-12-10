@@ -1436,6 +1436,11 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
   (find-file (getenv "UZBL_BOOKMARKS_FILE"))
   )
 
+(defun konix/www/goto-history ()
+  (interactive)
+  (find-file (getenv "UZBL_HISTORY_FILE"))
+  )
+
 (defun konix/www/web-search (string &optional default)
   (interactive
    (list

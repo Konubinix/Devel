@@ -488,6 +488,7 @@
 (define-key 'konix/www/map (kbd "w") 'w3m)
 (define-key 'konix/www/map (kbd "B") 'w3m-buffer)
 (define-key 'konix/www/map (kbd "b") 'konix/www/goto-bookmarks)
+(define-key 'konix/www/map (kbd "h") 'konix/www/goto-history)
 (define-key 'konix/www/map (kbd "f") 'konix/www/browse-url-of-file-at-point)
 (define-key 'konix/www/map (kbd "l") 'konix/www/browse-link-at-point)
 

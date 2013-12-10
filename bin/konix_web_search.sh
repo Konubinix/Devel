@@ -1,5 +1,14 @@
 #!/bin/bash
 
+usage () {
+    cat<<EOF
+$0 [-h] [-e engine] [-d]
+-d: default engine
+-e: choose the engine
+-h: show this
+EOF
+}
+
 ENGINE=""
 while getopts "he:d" opt; do
     case $opt in

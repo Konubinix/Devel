@@ -12,3 +12,5 @@ do
 done
 # clean the old rss
 #feed2imap-cleaner -f "$KONIX_PERSO_DIR/feed2imaprc"
+# init the tags for the new mails
+konix_mail_init_tags.sh

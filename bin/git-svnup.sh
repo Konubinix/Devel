@@ -1,3 +1,3 @@
 #!/bin/bash
 
-git svn fetch && git svn rebase
+git svn fetch && git svn rebase -l

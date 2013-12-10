@@ -10,6 +10,7 @@
 (defvar konix/org-pomodoro-break-clocks-out nil)
 (defvar konix/org-pomodoro-in-pomodoro nil)
 (defvar konix/org-pomodoro-global-mode t)
+(defvar konix/org-pomodoro-sprint-steps 4)
 (defcustom konix/org-pomodoro-tray-daemon-controller
   "/tmp/pomodorow_tray_daemon_control" "")
 
@@ -246,7 +247,7 @@ what to do ? (Show agenda (a),  New pomodoro (n), Quit (q))" warning prompt))
 
 (defun konix/org-pomodoro-convert-time-into-pomodoro (time_string)
   "Convert a time string in format 'HH:MM' into a number of equivalent pomodoro
-of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
+of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sprint-steps` and a 5 minutes
   pause between them."
   (unless (string-match "\\([0-9]+\\):\\([0-9]+\\)" time_string)
 	(error "Time must be of format HH:MM")
@@ -258,7 +259,7 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 		 (nb_half_hour (/ total_mm 30))
 		 (nb_sets (/ nb_half_hour 5))
 		 (nb_left_pomodoros (mod nb_half_hour 5))
-		 (nb_pomodoro (+ (* 4 nb_sets) nb_left_pomodoros))
+		 (nb_pomodoro (+ (* konix/org-pomodoro-sprint-steps nb_sets) nb_left_pomodoros))
 		 )
 	nb_pomodoro
 	)
@@ -351,9 +352,9 @@ of 25 minutes with a 25 minutes pause between each set of 4 and a 5 minutes
 			  (_long "")
 			  )
 		  ;; Ask the pomodorow user to take a long break when there has been more than
-		  ;; 4 pomodorow without pauses. It assumes that the long pause will be taken
+		  ;; `konix/org-pomodoro-sprint-steps` pomodorow without pauses. It assumes that the long pause will be taken
 		  ;; with `konix/org-pomodoro-long-break'
-		  (when (>= konix/org-pomodoro-set-count 4)
+		  (when (>= konix/org-pomodoro-set-count konix/org-pomodoro-sprint-steps)
 			(setq _long '#(" LONG" 0 5 (face font-lock-warning-face)))
 			)
 		  (setq konix/org-pomodoro-in-pomodoro nil)

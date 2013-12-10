@@ -597,10 +597,23 @@
   (konix/git/command-with-completion "cherry-pick --abort")
   )
 
-(defun konix/git/stash/save (msg)
+(defun konix/git/stash/save (msg &optional args)
   "Lance git stash."
-  (interactive "sMessage : ")
-  (shell-command (concat "git stash save '"msg"'"))
+  (interactive "sStash save message: ")
+  (unless args
+	(setq args "")
+	)
+  (shell-command (format
+				  "git stash save %s '%s'"
+				  args
+				  msg
+				  ))
+  )
+
+(defun konix/git/stash/save/keep_index (msg)
+  "Lance git stash."
+  (interactive "sStash save message (keep-index): ")
+  (konix/git/stash/save msg "--keep-index")
   )
 
 (defun konix/git/stash/pop (&optional stash_number)

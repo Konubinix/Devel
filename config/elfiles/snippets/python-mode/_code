@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: _code
+# --
+$>import readline, rlcompleter
+$>readline.parse_and_bind("tab: complete")
+$>import code
+$>code.interact(local=locals())
+$>$0

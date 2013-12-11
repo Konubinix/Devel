@@ -369,7 +369,8 @@ konix_assert_last_command () {
 }
 
 konix_assert_var () {
-    source konix_assert_var.sh "$@"
+    local VAR_VALUE="$(eval "echo \${$(echo $1)}")"
+    source konix_assert_var.sh "${VAR_VALUE}"
 }
 
 ccache_disable_toggle () {

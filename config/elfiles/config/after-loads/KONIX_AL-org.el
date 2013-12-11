@@ -32,6 +32,12 @@
 ;; ####################################################################################################
 ;; Init hook
 ;; ####################################################################################################
+(defun konix/org-agenda-appt-reload ()
+  (interactive)
+  (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
+  (appt-check)
+  )
+
 (defun konix/org-load-hook()
   (setq-default org-clock-string
 				(format "CLOCK-%s-%s:"
@@ -66,8 +72,7 @@
 	"Pressing `r' on the agenda will also add appointments."
 	(progn
 	  (setq appt-time-msg-list nil)
-	  (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
-	  (appt-check)
+	  (konix/org-agenda-appt-reload)
 	  )
 	)
   (ad-activate 'org-agenda-redo)

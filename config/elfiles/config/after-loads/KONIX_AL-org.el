@@ -290,6 +290,22 @@ with a precise timestamp)."
 	)
   )
 
+(defun konix/org-agenda-no-context-p ()
+  (let (
+		(no_c t)
+		)
+	(mapc
+	 (lambda (tag)
+	   (when (string-match-p "^@" tag)
+		 (setq no_c nil)
+		 )
+	   )
+	 (org-get-at-bol 'tags)
+	 )
+	no_c
+   )
+  )
+
 (defun konix/org-agenda-skip-non-important-item ()
   (cond
    ((konix/org-appt-p)

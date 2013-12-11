@@ -1902,6 +1902,12 @@ of the clocksum."
 		  'konix/org-clock-in-hook)
 
 
+(defun konix/org-capture-prepare-finalize-hook ()
+  (konix/org-agenda-appt-reload)
+  )
+(add-hook 'org-capture-prepare-finalize-hook
+		  'konix/org-capture-prepare-finalize-hook)
+
 (defun konix/org-store-link-at-point ()
   (interactive)
   (save-excursion

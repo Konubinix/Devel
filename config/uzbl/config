@@ -298,7 +298,7 @@ set ebind     = @mode_bind global,-insert
 @cbind  R   = reload_ign_cache
 
 # toggle current encoding
-@cbind  e   = toggle current_encoding iso-8859-1 utf-8
+@cbind  e   = toggle custom_encoding iso-8859-1 utf-8
 
 # toggle use of a proxy
 @cbind <Shift><Ctrl>P   = toggle proxy_url "" \@(echo $http_proxy)\@

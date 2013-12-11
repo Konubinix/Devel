@@ -137,3 +137,6 @@
 [app] (title=Uzbl WebInspector)
   [Layer]	{7}
 [end]
+[app] (class=Assword)
+  [Layer]	{7}
+[end]

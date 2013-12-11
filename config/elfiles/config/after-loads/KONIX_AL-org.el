@@ -320,7 +320,7 @@ with a precise timestamp)."
 	)
    (t
 	;; for other entries, the priority defines the importance
-	(org-agenda-skip-entry-if 'notregexp "\\=.*\\[#[ABCDEFGHIJ]\\]")
+	(org-agenda-skip-entry-if 'regexp "\\=.*\\[#[K-Z]\\]")
 	)
    )
   )

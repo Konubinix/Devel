@@ -1261,9 +1261,18 @@ to be organized.
 "
 				 :kill-buffer
 				 )
-				("p" "Todo Item POMODORO" entry (file (expand-file-name "pomodoro.org" org-directory))
-				 "* TODO [#G] %?
-  SCHEDULED: %t
+				("p" "Todo pomodoro next short pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				 "* NEXT [#G] %?
+  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp)
+  :LOGBOOK:
+  - Captured       %U
+  :END:
+"
+				 :kill-buffer
+				 )
+				("P" "Todo pomodoro next long pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				 "* NEXT [#G] %?
+  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t)
   :LOGBOOK:
   - Captured       %U
   :END:

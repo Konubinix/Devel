@@ -18,9 +18,3 @@
 				org-checklist
 				)
 			  )
-(setq-default org-clock-string
-			  (format "CLOCK-%s-%s:"
-					  (getenv "USER")
-					  (getenv "HOSTNAME")
-					  )
-			  )

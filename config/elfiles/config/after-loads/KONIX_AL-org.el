@@ -2101,6 +2101,7 @@ of the clocksum."
   )
 
 (defvar konix/org-agenda-filter-context-show-appt t "")
+(defvar konix/org-agenda-filter-context-show-empty-context t "")
 (defun konix/org-agenda-filter-context_1 (tags)
   ;; Deactivate `org-agenda-entry-text-mode' when filtering
   (if org-agenda-entry-text-mode (org-agenda-entry-text-mode))
@@ -2130,6 +2131,12 @@ of the clocksum."
 						(konix/org-agenda-appt-p)
 						)
 					   )
+				   ;; show empty context entries if the associated setting is set
+				   (or (not konix/org-agenda-filter-context-show-empty-context)
+					   (not
+						(konix/org-agenda-no-context-p)
+						)
+					   )
 				   )
 				  (org-agenda-filter-hide-line 'tag))
 			  (beginning-of-line 2))
@@ -2151,6 +2158,8 @@ of the clocksum."
 		  `("Context filtered with "
 			,konix/org-agenda-tag-filter-contexts
 			", appt display = " ,(if konix/org-agenda-filter-context-show-appt
+									 "on" "off")
+			", no context display = " ,(if konix/org-agenda-filter-context-show-empty-context
 									 "on" "off")
 			)
 		  )

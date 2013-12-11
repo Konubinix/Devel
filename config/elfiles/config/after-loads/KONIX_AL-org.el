@@ -2036,9 +2036,25 @@ of the clocksum."
   ""
   )
 
+(defface konix/org-agenda-interruption-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "orange")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "orange")
+	 )
+	)
+  ""
+  )
+
 (defvar konix/org-agenda-text-properties
   '(
-	("^.+INTERRUP:.+$" 0 font-lock-warning-face)
+	("^.+:interruption:.+$" 0 konix/org-agenda-interruption-face)
 	("^.+PAUSE:.+$" 0 konix/org-agenda-pause-face)
 	("^.+\\(\\bnow\\b\\).+$" 1 org-checkbox-statistics-done)
 	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)

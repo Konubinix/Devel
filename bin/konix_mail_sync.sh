@@ -1,17 +1,10 @@
 #!/bin/bash
-LOCK_FILE="/var/lock/$(basename "$0").lock"
-if [ -f "$LOCK_FILE" ]
-then
-	echo "Already a $0 running"
-	exit 1
-else
-	touch "$LOCK_FILE"
-fi
+
 LOG_FILE="$(mktemp)"
 MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
 echo "?" > "$MAIL_TRAY_DAEMON_CTRL"
 echo "b" > "$MAIL_TRAY_DAEMON_CTRL"
-trap "echo > /tmp/konix_mail_tray_stamp; echo B > '$MAIL_TRAY_DAEMON_CTRL' ; rm '$LOCK_FILE'; rm '$LOG_FILE'" 0
+trap "echo > /tmp/konix_mail_tray_stamp; echo B > '$MAIL_TRAY_DAEMON_CTRL' ; rm '$LOG_FILE'" 0
 
 # make notmuch db consistent (earlier removed mail files etc)
 notmuch new --verbose || exit 1

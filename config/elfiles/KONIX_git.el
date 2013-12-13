@@ -530,22 +530,31 @@
 	)
   )
 
-(defun konix/git/log (&optional history_size alog file custom_cmd)
+(defun konix/git/log (&optional history_size alog file custom_cmd custom_log_cmd)
   (interactive "P")
   (let* (
 		 (history_cmd
 		  (if history_size (concat "-" (format "%s" history_size))
 			""))
-		 (log_command (if alog "alog" "log"))
+		 (log_command (cond
+					   (custom_log_cmd
+						custom_log_cmd
+						)
+					   (alog
+						"alog")
+					   (t
+						"log")
+					   )
+					  )
 		 (file_cmd (if file (format "--follow -- %s" file) ""))
 		 (buffer_name (format "*Git Log%s*" (if file (concat " " file) "")))
 		 )
 	(konix/kill-and-new-buffer buffer_name)
 	(konix/git/command
-	 (format "%s --name-status %s %s %s"
+	 (format "%s %s %s %s"
 			 log_command history_cmd file_cmd
 			 (if custom_cmd
-				 custom_cmd ""))
+				 custom_cmd "--name-status"))
 	 nil
 	 buffer_name
 	 )
@@ -579,7 +588,7 @@
 
 (defun konix/git/log/pick-axe (string)
   (interactive "sString:")
-  (konix/git/log nil nil nil (format "--pickaxe-regex -i -S'%s'" string))
+  (konix/git/log nil nil nil (format "--name-status --pickaxe-regex -i -S'%s'" string))
   )
 
 (defun konix/git/cherry-pick ()
@@ -1612,6 +1621,21 @@ Uses the macro konix/git/status-buffer/next-or-previous
   "git diff-index --name-only."
   (interactive)
   (konix/git/command "--name-only HEAD")
+  )
+
+(defun konix/git/standup/log/incremental ()
+  (interactive)
+  (konix/git/log nil nil nil "-i" "standup.sh")
+  )
+
+(defun konix/git/standup/log/incremental/validate ()
+  (interactive)
+  (konix/git/log nil nil nil "-v -q" "standup.sh")
+  )
+
+(defun konix/git/standup/log/incremental/reset ()
+  (interactive)
+  (konix/git/log nil nil nil "-R -q" "standup.sh")
   )
 
 (provide 'KONIX_git)

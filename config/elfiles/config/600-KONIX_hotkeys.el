@@ -777,6 +777,12 @@
 (define-key konix/git-global-map-log "b" 'konix/git/blame/file)
 (define-key konix/git-global-map-log "a" 'konix/git/alog)
 
+(define-prefix-command 'konix/git-global-map-log-standup)
+(define-key konix/git-global-map-log "s" 'konix/git-global-map-log-standup)
+(define-key konix/git-global-map-log-standup "i" 'konix/git/standup/log/incremental)
+(define-key konix/git-global-map-log-standup "v" 'konix/git/standup/log/incremental/validate)
+(define-key konix/git-global-map-log-standup "R" 'konix/git/standup/log/incremental/reset)
+
 (define-prefix-command 'konix/git-global-map-cherry)
 (define-key konix/git-global-map "C" 'konix/git-global-map-cherry)
 (define-prefix-command 'konix/git-global-map-cherry-pick)

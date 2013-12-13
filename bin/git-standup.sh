@@ -19,17 +19,18 @@ h: show this
 m: from last month
 d: from DATE
 i: incremental
+s: displays the status of the incremental
+v: validate increment, record the last seen date for next incremental
 r: record given date (current date if set to .) for further incremental
-    standup (implicit if -i)
-l: see commits from last increment (implicit if -i)
+    standup
 R: reset incremental
 q: do nothing and quit, usefull to only reset incremental
+k: lauch gitk instead of git log
+y: from yesterworkday
 
 What does incremental mean?
 Gets the current date from the git config, then shows the log from that date
 then, if quitted normally, record the current date into the git config.
-
-Default, show from yesterday or friday if today is monday
 EOF
 }
 
@@ -42,24 +43,45 @@ get_date () {
     [ -n "${DATE}" ] || DATE="$(date_config)"
     [ -n "${DATE}" ] || DATE="1970/01/01"
     konix_assert_var DATE
-    echo "Commits will be retrieved since $DATE"
+    echo "Last known reviewed date is '${DATE}'"
+}
+
+now () {
+    date "+%Y/%m/%d %H:%M:%S"
+}
+
+record_now () {
+    NOW="$(now)"
+    git config konix.standup.now "$NOW"
+    echo "Recorded now to be $NOW (use validate to commit that date)"
+}
+
+get_recorded_now () {
+    NOW="$(git config konix.standup.now)"
+    echo "Last known NOW is $NOW"
+}
+
+rm_recorded_now () {
+    git config --unset-all konix.standup.now
+    echo "Remove the stored value of NOW"
 }
 
 set_date () {
     CURRENT_DATE="$1"
-    [ "${CURRENT_DATE}" == "." ] && CURRENT_DATE="$(date "+%Y/%m/%d %H:%M:%S")"
-    [ -n "${CURRENT_DATE}" ] || CURRENT_DATE="$(date "+%Y/%m/%d %H:%M:%S")"
-    echo "Recording ${CURRENT_DATE} in the current git config"
+    [ "${CURRENT_DATE}" == "." ] && CURRENT_DATE="$(now)"
+    [ -n "${CURRENT_DATE}" ] || CURRENT_DATE="$(now)"
+    echo "Recording '${CURRENT_DATE}' in the current git config last date"
     date_config "${CURRENT_DATE}"
 }
 
-rm_date () {
+reset () {
     echo "Removing incremental date"
     git config --remove-section konix.standup
 }
 
-DATE="$(yesterworkday)"
-while getopts "hd:miRqr:l" opt; do
+DATE=""
+COMMAND="git log"
+while getopts "kshyvd:miRqr:l" opt; do
     case $opt in
         h)
             usage
@@ -68,17 +90,31 @@ while getopts "hd:miRqr:l" opt; do
         d)
             DATE="$OPTARG"
             ;;
+        k)
+            COMMAND="gitk"
+            ;;
         m)
             DATE="1 month ago"
             ;;
         i)
             get_date
-            set_date "."
+            record_now
+            ;;
+        v)
+            get_recorded_now
+            konix_assert_var NOW
+            set_date "$NOW"
+            rm_recorded_now
             ;;
         R)
-            rm_date
+            reset
             ;;
-        l)
+        s)
+            get_recorded_now
+            if [ -n "${NOW}" ]
+            then
+                echo "Think about validating ($0 -v -q)"
+            fi
             get_date
             ;;
         r)
@@ -88,7 +124,17 @@ while getopts "hd:miRqr:l" opt; do
             echo "Bye"
             exit 0
             ;;
+        y)
+            DATE="$(yesterworkday)"
+            ;;
     esac
 done
 shift $((OPTIND-1))
-git log -w --since="${DATE}" "$@"
+if [ -z "${DATE}" ]
+then
+    echo "No date set, use -i, -m or -y"
+    usage
+    exit 2
+fi
+
+$COMMAND -w --since="${DATE}" "$@"

@@ -552,9 +552,11 @@
 	(konix/kill-and-new-buffer buffer_name)
 	(konix/git/command
 	 (format "%s %s %s %s"
-			 log_command history_cmd file_cmd
+			 log_command history_cmd
 			 (if custom_cmd
-				 custom_cmd "--name-status"))
+				 custom_cmd "--name-status")
+			 file_cmd
+			 )
 	 nil
 	 buffer_name
 	 )

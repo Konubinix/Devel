@@ -306,6 +306,13 @@ with a precise timestamp)."
    )
   )
 
+(defun konix/org-agenda-skip-non-appt-item ()
+  (if (konix/org-appt-p)
+	  nil
+	(org-end-of-subtree t)
+  )
+)
+
 (defun konix/org-agenda-skip-non-important-item ()
   (cond
    ((konix/org-appt-p)
@@ -1105,6 +1112,29 @@ to be organized.
 						  )
 						 )
 						)
+				  )
+				 (
+				  (dummy (konix/org-agenda-inhibit-context-filtering))
+				  )
+				 )
+				("at" "Appointments week"
+				 (
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Appointments for the next week")
+						   (org-agenda-skip-function
+							'(or
+							  (konix/org-agenda-skip-if-tags
+							  '("project"
+								"no_weekly"
+								"phantom"
+								))
+							  (konix/org-agenda-skip-non-appt-item))
+							)
+						   (org-agenda-span 7)
+						   )
+						  )
 				  )
 				 (
 				  (dummy (konix/org-agenda-inhibit-context-filtering))

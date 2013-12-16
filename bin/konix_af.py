@@ -110,7 +110,7 @@ else:
     soup = BeautifulSoup(res.read())
 
     # print all the results
-    results = soup.findAll("td")
+    results = [unicode(result) for result in soup.findAll("td")]
 
     results_cache[request] = results
     if not args.no_cache:
@@ -126,4 +126,4 @@ else:
     for result in results:
         print "############################"
 
-        print html2text.html2text(unicode(result))
+        print html2text.html2text(result)

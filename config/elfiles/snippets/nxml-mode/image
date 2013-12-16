@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: image
+# --
+$><mediaobject>
+$><imageobject>
+$><imagedata fileref="${100:ImageName}.svg" format="SVG"
+$>width="70%" scalefit="1" contentdepth="100%" align="center"/>
+$></imageobject>
+$><imageobject>
+$><imagedata fileref="$100.png" format="PNG"
+$>width="70%" scalefit="1" contentdepth="100%" align="center"/>
+$></imageobject>
+$><textobject>
+$><phrase>${200:Description}</phrase>
+$></textobject>
+$></mediaobject>

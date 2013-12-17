@@ -137,4 +137,4 @@ then
     exit 2
 fi
 
-$COMMAND -w --since="${DATE}" "$@"
+$COMMAND --name-status -w --since="${DATE}" "$@"

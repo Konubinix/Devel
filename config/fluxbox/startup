@@ -38,7 +38,6 @@ sleep 4
     killall conky
     wicd-gtk -t &
     conky -d -c "$KONIX_CONKYRC" > ~/conky.log 2> ~/conky.err
-	pcmanfm -d --no-desktop & # nice and simple desktop manager
 	# start de emacs_tray_daemon if possible
 	emacs_tray_daemon.py &
 	konix_mail_tray_daemon.py &

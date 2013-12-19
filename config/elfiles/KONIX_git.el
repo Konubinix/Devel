@@ -1277,10 +1277,10 @@ fallbacking to HEAD")
 	)
   (defun narrow_to_block (start_block_string)
 	(goto-char 0)
-	(if (search-forward start_block_string nil t)
+	(if (re-search-forward start_block_string nil t)
 		(let (
 			  (narrow_end (or
-						   (save-excursion (re-search-forward "^# [^ ]" nil t))
+						   (save-excursion (re-search-forward "^\\(?:# \\)?[^ \t\n\r]" nil t))
 						   (point-max)
 						   )
 						  )
@@ -1292,7 +1292,7 @@ fallbacking to HEAD")
 	  )
 	)
   (goto-char 0)
-  (when (re-search-forward "^# On branch \\(.+\\)$" nil t)
+  (when (re-search-forward "^\\(?:# \\)?On branch \\(.+\\)$" nil t)
 	(set-text-properties
 	 (match-beginning 1)
 	 (match-end 1)
@@ -1305,7 +1305,7 @@ fallbacking to HEAD")
 	 )
 	)
   (goto-char 0)
-  (when (narrow_to_block "# Unmerged paths:")
+  (when (narrow_to_block "\\(?:# \\)?Unmerged paths:")
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
 							  )
@@ -1316,7 +1316,7 @@ fallbacking to HEAD")
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
 						  )
-						"^#	both modified:      \\(.+\\)$"
+						"^\\(?:# \\)?	both modified:      \\(.+\\)$"
 						compilation-info-face)
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
@@ -1327,7 +1327,7 @@ fallbacking to HEAD")
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
 						  )
-						"^#	both added:         \\(.+\\)$"
+						"^\\(?:# \\)?	both added:         \\(.+\\)$"
 						compilation-info-face)
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
@@ -1338,11 +1338,11 @@ fallbacking to HEAD")
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
 						  )
-						"^#	added by us:        \\(.+\\)$"
+						"^\\(?:# \\)?	added by us:        \\(.+\\)$"
 						compilation-info-face)
 	(widen)
  	)
-  (when (narrow_to_block "# Changes to be committed:")
+  (when (narrow_to_block "\\(?:# \\)?Changes to be committed:")
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
 							  )
@@ -1352,7 +1352,7 @@ fallbacking to HEAD")
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
 						  )
-						"^#	modified:   \\(.+\\)$"
+						"^\\(?:# \\)?	modified:   \\(.+\\)$"
 						compilation-info-face)
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
@@ -1363,7 +1363,7 @@ fallbacking to HEAD")
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
 						  )
-						"^#	new file:   \\(.+\\)$"
+						"^\\(?:# \\)?	new file:   \\(.+\\)$"
 						compilation-info-face)
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
@@ -1374,7 +1374,7 @@ fallbacking to HEAD")
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
 						  )
-						"^#	renamed:    .+ -> \\(.+\\)$"
+						"^\\(?:# \\)?	renamed:    .+ -> \\(.+\\)$"
 						compilation-info-face)
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
@@ -1382,11 +1382,11 @@ fallbacking to HEAD")
 						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
 						  map
 						  )
-						"^#	deleted:    \\(.+\\)$"
+						"^\\(?:# \\)?	deleted:    \\(.+\\)$"
 						compilation-error-face)
 	(widen)
  	)
-  (when (narrow_to_block "# Changes not staged for commit:")
+  (when (narrow_to_block "\\(?:# \\)?Changes not staged for commit:")
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
 							  )
@@ -1399,7 +1399,7 @@ fallbacking to HEAD")
 						  (define-key map "C" 'konix/git/status-buffer/checkout-file)
 						  map
 						  )
-						"^#	modified:   \\(.+?\\)\\( (.*\\(tracked\\|new commits\\|modified content\\).*)\\)?$"
+						"^\\(?:# \\)?	modified:   \\(.+?\\)\\( (.*\\(tracked\\|new commits\\|modified content\\).*)\\)?$"
 						compilation-info-face)
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
@@ -1410,11 +1410,11 @@ fallbacking to HEAD")
 						  (define-key map "r" 'konix/git/status-buffer/rm-file)
 						  map
 						  )
-						"^#	deleted:    \\(.+\\)$"
+						"^\\(?:# \\)?	deleted:    \\(.+\\)$"
 						compilation-error-face)
 	(widen)
 	)
-  (when (narrow_to_block "# Untracked files:")
+  (when (narrow_to_block "\\(?:# \\)?Untracked files:")
 	;; untracked decoration
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
@@ -1425,7 +1425,7 @@ fallbacking to HEAD")
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
 						  )
-						"^#	\\(.+\\)$"
+						"^\\(?:# \\)?	\\(.+\\)$"
 						compilation-warning-face
 						)
 	(widen)

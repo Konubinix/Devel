@@ -136,3 +136,6 @@
 [submodule "config/elfiles/dynsite"]
 	path = config/elfiles/dynsite
 	url = https://github.com/iani/dynsite.git
+[submodule "lazygal"]
+	path = lazygal
+	url = https://github.com/Konubinix/lazygal.git

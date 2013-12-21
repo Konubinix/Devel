@@ -174,7 +174,7 @@
   (interactive "ffile:")
   (message "Opening %s" file)
   (start-process
-   (format "mimeopen %s" file)
+   (format "mimeopen '%s'" file)
    nil
    "mimeopen"
    "-n"

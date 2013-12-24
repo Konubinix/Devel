@@ -383,6 +383,7 @@ set ebind     = @mode_bind global,-insert
 @cbind  yt  = sh 'konix_uri_dwim.py "\@uri" "$(xclip -o)"'
 @cbind  yv  = sh "quvi '\@uri' --exec 'vlc %u'"
 @cbind  yd  = sh "konix_flash_dl.sh '\@uri'"
+@cbind  yas  = sh "konix_ril_save_url.sh '\@uri' && konix_display.py 'Saved \@uri'"
 
 # Clone current window
 @cbind  c   = event REQ_NEW_WINDOW \@uri

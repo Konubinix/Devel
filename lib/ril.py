@@ -31,7 +31,7 @@ def html_unescape(data):
     return entity_re.sub(replace_entities, data)
 
 SCRAP=os.environ.get("KONIX_SCRAP_DIR")
-RIL=os.environ.get("KONIX_RIL_PATH")
+RIL=os.environ.get("KONIX_RIL_DIR")
 DOWNLOAD_NORMAL_MODE=1
 DOWNLOAD_LIGHT_MODE=0
 DOWNLOAD_MIRROR_MODE=2

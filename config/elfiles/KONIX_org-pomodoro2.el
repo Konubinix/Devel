@@ -73,7 +73,13 @@
 
 (defun konix/org-pomodoro-echo ()
   (interactive)
-  (message "Now at the pomorodo n°%s" konix/org-pomodoro-set-count)
+  (message "Already done %s pomorodo and %s"
+		   konix/org-pomodoro-set-count
+		   (if konix/org-pomodoro-in-pomodoro
+			   "working on another"
+			 "in pause"
+			 )
+		   )
   )
 
 (defun konix/org-pomodoro-number-of-seconds-till-next-pause (&optional long)

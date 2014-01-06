@@ -230,7 +230,8 @@ Control Mod4 u :ExecCommand $(konix_goto_window.sh \.uzbl konix_uzbl.sh)
 Control Mod4 p :ExecCommand $(konix_goto_true_exec.sh pidgin)
 Control Mod4 v :ExecCommand $(konix_goto_true_exec.sh vlc)
 Control Mod4 e :ExecCommand $(konix_goto_window.sh konix_emacs)
-Control Mod4 m :ExecCommand $(konix_goto_true_exec.sh exaile)
+Control Mod4 m :ExecCommand $(konix_goto_true_exec.sh gmpc)
+Control Mod4 g :ExecCommand $(konix_goto_true_exec.sh gmpc)
 Control Mod4 h :ExecCommand $(konix_goto_true_exec.sh icedove)
 
 # ////////////////////////////////////////
@@ -314,14 +315,15 @@ Mod4 x k a :MacroCmd { Exec python konix_xmacro.py -a && konix_display.py $(read
 # ####################################################################################################
 # Sound specific (Mod4 m ...)
 # ####################################################################################################
-Mod4 m t :ExecCommand exaile -t && konix_display.py "Pause/resume"
-XF86AudioPlay :ExecCommand exaile -t && konix_display.py "Pause/resume"
-Mod4 m n :ExecCommand exaile -n && konix_display.py "Next music"
-XF86AudioNext :ExecCommand exaile -n && konix_display.py "Next music"
-Mod4 m p :ExecCommand exaile -p && konix_display.py "Previous music"
-XF86AudioPrev :ExecCommand exaile -p && konix_display.py "Previous music"
-Mod4 m q :ExecCommand pkill exaile && konix_display.py "Kill exaile"
-Mod4 m l :ExecCommand exaile && konix_display.py "Launch exaile"
+Mod4 m t :ExecCommand mpc toggle && konix_display.py "Pause/resume"
+XF86AudioPlay :ExecCommand mpc toggle && konix_display.py "Pause/resume"
+Mod4 m n :ExecCommand mpc next && konix_display.py "Next music"
+XF86AudioNext :ExecCommand mpc next && konix_display.py "Next music"
+Mod4 m p :ExecCommand mpc prev && konix_display.py "Previous music"
+XF86AudioPrev :ExecCommand mpc prev && konix_display.py "Previous music"
+Mod4 m q :ExecCommand mpd --kill && konix_display.py "Kill mpd"
+Mod4 m l :ExecCommand mpd && konix_display.py "Launched mpd"
+Mod4 m g :ExecCommand gmpc && konix_display.py "Launched gmpc"
 
 # ####################################################################################################
 # Assword (Mod4 a ...)

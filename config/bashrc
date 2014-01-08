@@ -45,8 +45,8 @@ done
 IFS=$OLD_IFS
 # unset bash bmajor bminor
 
-# by default autorise the core dump, till 200Mio
-ulimit -c 209715200
+# do not generate a core dump by default to avoid dissemineting core dumps everywhere
+# ulimit -c 209715200
 
 # use the autocd feature to gain precious miliseconds
 shopt -s autocd

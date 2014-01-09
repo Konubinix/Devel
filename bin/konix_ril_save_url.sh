@@ -6,11 +6,11 @@ die () {
 }
 
 URL="$1"
-[ -z "$KONIX_RIL_PATH" ] && die "KONIX_RIL_PATH must be set"
+[ -z "$KONIX_RIL_DIR" ] && die "KONIX_RIL_DIR must be set"
 [ -z "$URL" ] && die "The url must be given as parameter"
-if ! [ -d "$KONIX_RIL_PATH" ]
+if ! [ -d "$KONIX_RIL_DIR" ]
 then
-    mkdir -p "$KONIX_RIL_PATH"
+    mkdir -p "$KONIX_RIL_DIR"
 fi
 
-echo "$URL" > "$(mktemp --tmpdir="$KONIX_RIL_PATH" --suffix=.txt)"
+echo "$URL" > "$(mktemp --tmpdir="$KONIX_RIL_DIR" --suffix=.txt)"

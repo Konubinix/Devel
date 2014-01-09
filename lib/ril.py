@@ -96,7 +96,7 @@ class RILItem(object):
                 )
         self.wget_log_file_path = os.path.join(
                 self.dir,
-                "wget.log"
+                "wget.log.txt"
                 )
         self.title_file_path = os.path.join(
                 self.dir,

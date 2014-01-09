@@ -425,7 +425,9 @@ class RILItems(object):
 
     @property
     def items_priority_stamp_sorted(self):
-        return self.items_sorted(key=lambda x:(x.priority + str(x.stamp)))
+        items = self.items_sorted(key=lambda x:x.stamp, reverse=True)
+        items.sort(key=lambda x:x.priority)
+        return items
 
 def get_rilitems():
     rilitems = RILItems()

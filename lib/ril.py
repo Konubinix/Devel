@@ -211,15 +211,15 @@ class RILItem(object):
         if self._index:
             pass
         elif os.path.exists(self.index_file_path):
-            self._index = open(self.index_file_path, "r").read()
+            self._index = open(self.index_file_path, "r").read().decode("utf-8")
         elif os.path.exists(self.wget_log_file_path):
-            for line in open(self.wget_log_file_path, "r").read().splitlines():
+            for line in open(self.wget_log_file_path, "r").readlines():
                 match = re.match("^Saving to: ‘(.+)’$", line)
                 if match:
                     self._index = match.group(1)
                     break
             if self._index:
-                open(self.index_file_path, "w").write(self._index)
+                open(self.index_file_path, "w").write(self._index.encode("utf-8"))
         return self._index
 
     @property
@@ -378,7 +378,7 @@ class RILItem(object):
 
     def open(self):
         assert self.dled
-        os.system("mimeopen '%s'" % self.index_abs_path)
+        os.system("mimeopen '%s'" % self.index_abs_path.encode("utf-8"))
 
 class RILItems(object):
     def __init__(self, items=None):

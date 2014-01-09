@@ -297,6 +297,8 @@ class RILItem(object):
                 }
         command += mode_to_attributes[mode]
         command += [self.url]
+        if os.path.exists(self.wget_log_file_path):
+            os.unlink(self.wget_log_file_path)
         output = open(self.wget_log_file_path, "w")
         output.write("Command: " + " ".join(command) + "\n\n")
         output.flush()
@@ -307,6 +309,8 @@ class RILItem(object):
         p.wait()
         output.write("\nreturncode: "+ str(p.returncode))
         output.close()
+        if os.path.exists(self.dl_mode_file_path):
+            os.unlink(self.dl_mode_file_path)
         open(self.dl_mode_file_path, "w").write(str(mode))
         self.in_dl = False
         assert self.in_dl == False

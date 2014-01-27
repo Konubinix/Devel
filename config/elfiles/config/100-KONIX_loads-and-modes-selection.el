@@ -200,6 +200,8 @@
 (autoload 'cfw:open-org-calendar "calfw-org" "" t)
 ;; taskjuggler
 (autoload 'taskjuggler-mode "taskjuggler-mode" "" t)
+;; org mime
+(autoload 'org-mime-htmlize "org-mime" "" t)
 
 ;; ************************************************************
 ;; Automodes

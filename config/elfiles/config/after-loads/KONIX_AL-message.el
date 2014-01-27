@@ -40,6 +40,7 @@
 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
 (define-key message-mode-map (kbd "C-c I") 'gnus-alias-select-identity)
 (define-key message-mode-map (kbd "C-c i") 'konix/gnus-alias-determine-identity)
+(define-key message-mode-map (kbd "C-c o m") 'org-mime-htmlize)
 
 (defun konix/message-mode-hook ()
   (visual-line-mode 1)

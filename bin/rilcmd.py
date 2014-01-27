@@ -161,7 +161,7 @@ class RilCmd(cmd.Cmd):
             number += 1
 
     def get_items(self, number=None, read=None, in_dl=None):
-        items = ril.rilitems_stamp_sorted()
+        items = ril.rilitems_priority_stamp_sorted()
         if read is not None:
             items = [item for item in items if item.read == read]
         if in_dl is not None:
@@ -169,7 +169,7 @@ class RilCmd(cmd.Cmd):
         if number is not None:
             items = items[:number]
         return items
- 
+
     def get_item_printed(self, number):
         assert self.printed_items
         return self.printed_items[number]
@@ -179,7 +179,7 @@ class RilCmd(cmd.Cmd):
         items = [item for item in self.get_items() if item.hash.startswith(hash)]
         assert len(items) == 1
         return items[0]
- 
+
     def get_item(self, req):
         if req.startswith("."):
             return self.get_item_hash(req[1:])

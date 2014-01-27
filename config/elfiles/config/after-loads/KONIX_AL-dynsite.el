@@ -28,6 +28,11 @@
   '()
   )
 
+(defun konix/dynsite-reset-sites ()
+  (interactive)
+  (setq-default org-sites '())
+  )
+
 (defun konix/dynsite-install-sites ()
   (interactive)
   (mapc

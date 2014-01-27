@@ -32,7 +32,7 @@ thumbsize = 128
 screenshot_delay = 2
 
 [actions]
-num_actions = 4
+num_actions = 5
 names[0] = Open in GIMP
 commands[0] = gimp %F &
 shortcuts[0] = <Control>e
@@ -49,6 +49,10 @@ names[3] = Move to Favorites
 commands[3] = mkdir -p ~/mirage-favs; mv %F ~/mirage-favs; [NEXT]
 shortcuts[3] = <Control><Alt>f
 batch[3] = False
+names[4] = reorient
+commands[4] = konix_image_reorient.sh %F
+shortcuts[4] = <Alt>s
+batch[4] = False
 
 [recent]
 num_recent = 0

@@ -4,10 +4,5 @@
 export LC_ALL=C
 for package in `aptitude -O installsize search ~i | tac | cut -c 5- | cut -d ' ' -f 1`
 do
-    aptitude show "${package}" | sed -n "
-/^Uncompressed Size:/ {
-  s/^Uncompressed Size: \+\(.\+\)\$/\1\t\t${package}/ p
-}
-"
-
+    echo -e "`aptitude reinstall -sy ${package} | grep archive | sed -e "s@.*/\(.*\)B of archives.*@\1@"` \t${package}"
 done

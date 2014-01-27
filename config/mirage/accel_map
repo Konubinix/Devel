@@ -21,6 +21,7 @@
 ; (gtk_accel_path "<Actions>/Actions/Toolbar" "")
 ; (gtk_accel_path "<Actions>/Actions/HelpMenu" "")
 ; (gtk_accel_path "<Actions>/Actions/Previous Image" "Left")
+; (gtk_accel_path "<Actions>/CustomActions/reorient" "<Alt>s")
 ; (gtk_accel_path "<Actions>/Actions/GoMenu" "")
 ; (gtk_accel_path "<Actions>/Actions/Save" "<Primary>s")
 ; (gtk_accel_path "<Actions>/CustomActions/Open in GIMP" "<Primary>e")

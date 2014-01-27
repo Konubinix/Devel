@@ -1380,7 +1380,7 @@ to be organized.
 				 :kill-buffer
 				 )
 				("j" "Interruption" entry (file+headline (expand-file-name "diary.org" org-directory) "Interruptions")
-				 "* %?
+				 "* Interruption %?
    %U
 "
 				 :clock-in t

@@ -1021,22 +1021,50 @@ to be organized.
 				("ae" "Errand view"
 				 (
 				  (agenda nil
-						  (
-						   (org-agenda-overriding-header
-							"Errand agenda")
-						   (org-agenda-tag-filter-preset '("+@errand"))
-						   )
-						  )
-				  (todo nil
+				  		  (
+				  		   (org-agenda-overriding-header
+				  			"Errand agenda")
+				  		   )
+				  		  )
+				  (tags-todo "@errand"
 						(
 						 (org-agenda-overriding-header
 						  "Errand tasks")
-						 (org-agenda-tag-filter-preset '("+@errand"))
+						 )
+						)
+				  (tags-todo "@home"
+						(
+						 (org-agenda-overriding-header
+						  "Home tasks")
+						 )
+						)
+				  (tags-todo "@phone"
+						(
+						 (org-agenda-overriding-header
+						  "Phone tasks")
+						 )
+						)
+				  (tags-todo "@car"
+						(
+						 (org-agenda-overriding-header
+						  "Car tasks")
+						 )
+						)
+				  (tags-todo "@internet"
+						(
+						 (org-agenda-overriding-header
+						  "Internet tasks")
+						 )
+						)
+				  (tags-todo "@computer"
+						(
+						 (org-agenda-overriding-header
+						  "Computer tasks")
 						 )
 						)
 				  )
 				 (
-				  (dummy (konix/org-agenda-inhibit-context-filtering))
+				  ;(dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
 				 ("~/errand_tasks.html")
 				 )

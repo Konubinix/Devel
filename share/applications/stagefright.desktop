@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Categories=Application;Network;X-Red-Hat-Base;
+Name=Stagefright
+Comment=Play some music on android
+Exec=stagefright -a -o %f
+StartupNotify=true
+Terminal=false
+Type=Application

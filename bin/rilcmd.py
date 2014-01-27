@@ -69,7 +69,7 @@ class RilCmd(cmd.Cmd):
         item = self.get_item(line)
         print item
         print """Url   : %s""" % item.url
-        print """Index : %s""" % item.index
+        print """Index : %s""" % item.index.encode("utf-8")
 
     def do_open(self, line):
         item = self.get_item(line)
@@ -110,7 +110,7 @@ class RilCmd(cmd.Cmd):
         print "OK      : " + str(ok)
         print "KO      : " + str(ko)
         print "IGNORED : " + str(ig)
-        
+
     def do_clean(self, line):
         item = self.get_item(line)
         item.clean()

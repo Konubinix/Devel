@@ -137,4 +137,4 @@ then
     exit 2
 fi
 
-$COMMAND --name-status -w --since="${DATE}" "$@"
+$COMMAND --name-status -w --since="${DATE}" $GIT_STANDUP_EXTRAS "$@"

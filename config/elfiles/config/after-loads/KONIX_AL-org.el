@@ -2091,11 +2091,29 @@ of the clocksum."
   ""
   )
 
+(defface org-agenda-current-time
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "orange")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:inherit 'org-time-grid
+				  :inverse-video t
+				  )
+	 )
+	)
+  ""
+  )
+
 (defvar konix/org-agenda-text-properties
   '(
 	("^.+:interruption:.+$" 0 konix/org-agenda-interruption-face)
 	("^.+PAUSE:.+$" 0 konix/org-agenda-pause-face)
-	("^.+\\(\\bnow\\b\\).+$" 1 org-checkbox-statistics-done)
+	;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)
 	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
 	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
 	)

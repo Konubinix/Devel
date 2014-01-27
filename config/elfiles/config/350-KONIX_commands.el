@@ -30,6 +30,12 @@
 
 (make-variable-buffer-local 'konix/indirect-mode-name)
 
+(defun konix/bury-buffer-and-delete-window ()
+  (interactive)
+  (bury-buffer)
+  (delete-windows-on)
+  )
+
 (defun konix/indirect-region (start end)
   "Edit the current region in another buffer.
     If the buffer-local variable `konix/indirect-mode-name' is not set, prompt

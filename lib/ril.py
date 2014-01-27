@@ -216,7 +216,7 @@ class RILItem(object):
             for line in open(self.wget_log_file_path, "r").readlines():
                 match = re.match("^Saving to: ‘(.+)’$", line)
                 if match:
-                    self._index = match.group(1)
+                    self._index = match.group(1).decode('utf-8')
                     break
             if self._index:
                 open(self.index_file_path, "w").write(self._index.encode("utf-8"))
@@ -382,7 +382,7 @@ class RILItem(object):
 
     def open(self):
         assert self.dled
-        os.system("mimeopen '%s'" % self.index_abs_path.encode("utf-8"))
+        os.system('mimeopen "%s"' % self.index_abs_path.encode("utf-8").replace('"', '\\"'))
 
 class RILItems(object):
     def __init__(self, items=None):

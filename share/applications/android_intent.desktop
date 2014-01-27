@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Categories=Application;Network;X-Red-Hat-Base;
+Name=IntentOpen
+Comment=Open the file with the default intent in android
+Exec=konix_android_intent_open.sh %f
+StartupNotify=true
+Terminal=false
+Type=Application

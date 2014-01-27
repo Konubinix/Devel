@@ -136,7 +136,7 @@ class RilCmd(cmd.Cmd):
         print "Dling %s in mode %s" % (
                     item,
                     ril.DOWNLOAD_MODE_NAMES[int(dl_mode)],
-                    ) 
+                    )
         res = item.download(int(dl_mode))
         print ril.DOWNLOAD_RC_TO_MSG.get(res, "Unknown error")
         return res
@@ -147,7 +147,11 @@ class RilCmd(cmd.Cmd):
             return
         else:
             print "Opening %s" % item
-        os.system("mimeopen '%s'" % item.index_abs_path)
+        os.system("%s '%s'" % (
+            os.environ["BROWSER"],
+            item.index_abs_path.encode("utf-8"),
+            )
+            )
 
     def print_items(self, items):
         self.printed_items = items

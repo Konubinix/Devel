@@ -530,6 +530,55 @@
 	)
   )
 
+(defun konix/git/log/commit-kill ()
+  (interactive)
+  (let (
+		(beg (if (looking-at "^commit \\([a-h0-9]+\\)")
+				 (prog1
+					 (point)
+				   (right-char)
+				   )
+			   (save-excursion
+				 (re-search-backward "^commit \\([a-h0-9]+\\)")
+				 (match-beginning 0)
+				 )
+			   )
+			 )
+		(end (save-excursion
+			   (or
+				(and
+				 (re-search-forward "^commit \\([a-h0-9]+\\)" nil t)
+				 (match-beginning 0)
+				 )
+				(point-max)
+				)
+			   )
+			 )
+		)
+	(kill-region beg end)
+	)
+  )
+
+(defun konix/git/log/commit-prev ()
+  (interactive)
+  (re-search-backward "^commit \\([a-h0-9]+\\)")
+  )
+
+(defun konix/git/log/commit-kill-n-prev ()
+  (interactive)
+  (konix/git/log/commit-kill)
+  (konix/git/log/commit-prev)
+  )
+
+(defun konix/git/log/commit-next ()
+  (interactive)
+  (when (looking-at "^commit \\([a-h0-9]+\\)"
+					(right-char)
+					)
+	)
+  (re-search-forward "^commit \\([a-h0-9]+\\)")
+  )
+
 (defun konix/git/log (&optional history_size alog file custom_cmd custom_log_cmd)
   (interactive "P")
   (let* (
@@ -566,6 +615,10 @@
 			(local_map (make-sparse-keymap))
 			)
 		(define-key local_map (kbd "=") 'konix/git/log/show)
+		(define-key local_map (kbd "C-k") 'konix/git/log/commit-kill)
+		(define-key local_map (kbd "M-n") 'konix/git/log/commit-next)
+		(define-key local_map (kbd "M-p") 'konix/git/log/commit-prev)
+		(define-key local_map (kbd "M-P") 'konix/git/log/commit-kill-n-prev)
 		(use-local-map local_map)
 		)
 	  )

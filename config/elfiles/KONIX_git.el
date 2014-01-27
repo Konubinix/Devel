@@ -406,15 +406,15 @@
   (when konix/git/precommit-hook
 	(mapc
 	 (lambda (hook)
-	  (apply
-	   hook
-	   (list
-		amend
-		message
-		file
+	   (apply
+		hook
+		(list
+		 amend
+		 message
+		 file
+		 )
 		)
 	   )
-	  )
 	 konix/git/precommit-hook
 	 )
 	)
@@ -816,54 +816,92 @@
   )
 
 (defun konix/git/show (commit &optional file when_done_hook)
-  "Launch a simple diff and view it in some buffer."
+  "Launch a simple diff and view it in some buffer. Give prefix argument to
+force recomputation"
   (interactive
    (list
 	(konix/_get-string "git show object")
 	)
    )
-  (let (
-		(show_buffer (format "*GIT Show Buffer %s*" commit))
-		(command
-		 (format "show \"%s\"" commit)
+  (let* (
+		 (show_buffer (format "*GIT Show Buffer %s*" commit))
+		 (command
+		  (format "show \"%s\"" commit)
+		  )
+		 (display_buffer_hook
+		  `(progn
+			 (push-tag-mark)
+			 (with-current-buffer ,show_buffer
+			   (diff-mode)
+			   (let (
+					 ;; copy the local keymap to avoid altering the diff-mode
+					 ;; keymap
+					 (keymap (copy-keymap (current-local-map)))
+					 )
+				 (define-key keymap
+				   "q"
+				   'konix/bury-buffer-and-delete-window
+				   )
+				 (define-key keymap
+				   "k"
+				   'kill-buffer-and-window
+				   )
+				 (define-key keymap
+				   (kbd "C-k")
+				   'kill-this-buffer
+				   )
+				 ;; use this local map instead of the diff-mode one to get
+				 ;; access to the additional keys
+				 (use-local-map keymap)
+				 )
+			   (setq default-directory ,(concat
+										 (konix/git/_get-toplevel)
+										 "/"
+										 ))
+			   (when ,when_done_hook
+				 (funcall ,when_done_hook)
+				 )
+			   )
+			 (pop-to-buffer ,show_buffer)
+			 )
+		  )
 		 )
-		)
-	(when file
-	  (setq command (concat command " -- '" file "'"))
-	  )
-	(when (get-buffer show_buffer)
-	  (kill-buffer show_buffer)
-	  )
-	(save-window-excursion
-	  (konix/git/command command nil show_buffer t)
-	  )
-	(push-tag-mark)
-	(set-process-sentinel (get-buffer-process show_buffer)
-						  `(lambda (process string)
-							 (if (string-equal "finished\n" string)
-								 (progn
-								   (with-current-buffer ,show_buffer
-									 (diff-mode)
-									 (setq default-directory ,(concat
-															   (konix/git/_get-toplevel)
-															   "/"
-															   ))
-									 (when ,when_done_hook
-									   (funcall ,when_done_hook)
-									   )
-									 )
-								   (pop-to-buffer ,show_buffer)
+	(if (and
+		 (get-buffer show_buffer)
+		 (not current-prefix-arg)
+		 )
+		(if (get-buffer-window show_buffer)
+			;; do not mess with windows layout
+			(select-window (get-buffer-window show_buffer))
+		  (pop-to-buffer show_buffer)
+		  )
+	  ;; else recompute
+	  (progn
+		(when (get-buffer show_buffer)
+		  (kill-buffer show_buffer)
+		  )
+		(when file
+		  (setq command (concat command " -- '" file "'"))
+		  )
+		(save-window-excursion
+		  (konix/git/command command nil show_buffer t)
+		  )
+		(set-process-sentinel (get-buffer-process show_buffer)
+							  `(lambda (process string)
+								 (if (string-equal "finished\n" string)
+									 ,display_buffer_hook
+								   (display-warning 'show-warning
+													(format
+													 "Show exited abnormaly : '%s'"
+													 (substring-no-properties string
+																			  0 -1)
+													 )
+													)
 								   )
-							   (display-warning 'show-warning
-												(format
-												 "Show exited abnormaly : '%s'"
-												 (substring-no-properties string
-																		  0 -1)
-												 )
-												)
-							   )
-							 )
-						  )
+								 )
+							  )
+		)
+	  )
 	)
   )
 

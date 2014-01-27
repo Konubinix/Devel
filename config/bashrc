@@ -42,6 +42,12 @@ for bashcomp_file in $KONIX_CONFIG_DIR/bash-completion/*
 do
 	source "$bashcomp_file"
 done
+# special case for notmuch completion
+if [ -f "$KONIX_DEVEL_DIR/notmuch/completion/notmuch-completion.bash" ]
+then
+    source "$KONIX_DEVEL_DIR/notmuch/completion/notmuch-completion.bash"
+fi
+
 IFS=$OLD_IFS
 # unset bash bmajor bminor
 

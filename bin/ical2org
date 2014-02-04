@@ -36,32 +36,32 @@
 # section)
 
 function datetimestamp(input)
-{
-    # convert the iCal Date+Time entry to a format that mktime can understand
+	{
+		# convert the iCal Date+Time entry to a format that mktime can understand
 
-    # datespec in UTC, i.e. ending with Z
-    UTC = "no"
-    UTC = gensub("([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])T([0-9][0-9])([0-9][0-9])([0-9][0-9])Z.*[\r]*", "yes", "g", input);
+		# datespec in UTC, i.e. ending with Z
+		UTC = "no"
+		UTC = gensub("([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])T([0-9][0-9])([0-9][0-9])([0-9][0-9])Z.*[\r]*", "yes", "g", input);
 
-    # parse date and time
-    datespec  = gensub("([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])T([0-9][0-9])([0-9][0-9])([0-9][0-9]).*[\r]*", "\\1 \\2 \\3 \\4 \\5 \\6", "g", input);
+		# parse date and time
+		datespec  = gensub("([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])T([0-9][0-9])([0-9][0-9])([0-9][0-9]).*[\r]*", "\\1 \\2 \\3 \\4 \\5 \\6", "g", input);
 
-    # print "date spec : " datespec; convert this date+time into
-    # seconds from the beginning of time and include adjustment for
-    # time zone, as determined in the BEGIN section below.  For time
-    # zone adjustment, I have not tested edge effects, specifically
-    # what happens when UTC time is a different day to local time and
-    # especially when an event with a duration crosses midnight in UTC
-    # time.  It should work but...
-    if(UTC == "yes")
-        timestamp = mktime(datespec) + UTC_offset ;
-    else
-        timestamp = mktime(datespec);
+		# print "date spec : " datespec; convert this date+time into
+		# seconds from the beginning of time and include adjustment for
+		# time zone, as determined in the BEGIN section below.  For time
+		# zone adjustment, I have not tested edge effects, specifically
+		# what happens when UTC time is a different day to local time and
+		# especially when an event with a duration crosses midnight in UTC
+		# time.  It should work but...
+		if(UTC == "yes")
+			timestamp = mktime(datespec) + UTC_offset ;
+		else
+			timestamp = mktime(datespec);
 
-    # print "adjusted    : " timestamp
-    # print "Time stamp  : " strftime("%Y-%m-%d %H:%M", timestamp);
-    return timestamp;
-}
+		# print "adjusted    : " timestamp
+		# print "Time stamp  : " strftime("%Y-%m-%d %H:%M", timestamp);
+		return timestamp;
+	}
 
 BEGIN {
     ### config section
@@ -218,25 +218,30 @@ BEGIN {
     #output event
     if(max_age<0 || ( lasttimestamp>0 && systime()<lasttimestamp+max_age*24*60*60 ) )
     {
-    # translate \n sequences to actual newlines and unprotect commas (,)
-    print "* " gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))
-    print "  <" date ">"
-    print "  :PROPERTIES:"
-    print "  :ID:       " id
-    if(length(location))
-        print "  :LOCATION: " location
-    if(length(version))
-        print "  :VERSION: " version
-    if(length(status))
-        print "  :STATUS: " status
-    print "  :END:"
-    # for the entry, convert all embedded "\n" strings to actual newlines
-    print ""
-    # translate \n sequences to actual newlines and unprotect commas (,)
-    if(length(entry)>1)
-    print gensub("\\\\,", ",", "g", gensub("\\\\n", "\n", "g", entry));
-    print "** COMMENT original iCal entry"
-    print gensub("\r", "", "g", icalentry)
+		# translate \n sequences to actual newlines and unprotect commas (,)
+		print "* " gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))
+		print "  <" date ">"
+		print "  :PROPERTIES:"
+		print "  :ID:       " id
+		if(length(location))
+			print "  :LOCATION: " location
+		if(length(version))
+			print "  :VERSION: " version
+		if(length(status))
+			print "  :STATUS: " status
+		print "  :END:"
+		# for the entry, convert all embedded "\n" strings to actual newlines
+		print ""
+		# translate \n sequences to actual newlines and unprotect commas (,)
+		if(length(entry)>1) {
+			entry = gensub("\\\\,", ",", "g", gensub("\\\\n", "\n", "g", entry))
+			entry = gensub("*", ",*", "g", entry)
+			print entry;
+		}
+
+		print "** COMMENT original iCal entry"
+		icalentry = gensub("\r", "", "g", icalentry)
+		print icalentry
     }
     summary = ""
     date = ""

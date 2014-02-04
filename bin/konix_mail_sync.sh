@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "############"
+date
+echo "############"
 LOG_FILE="$(mktemp)"
 MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
 echo "?" > "$MAIL_TRAY_DAEMON_CTRL"

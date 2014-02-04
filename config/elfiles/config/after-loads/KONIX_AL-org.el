@@ -1537,7 +1537,7 @@ to be organized.
 			  )
 (defun konix/org-cmp-deadlines-past-and-due-first (a b)
   (let*(
-		(deadline_regexp_past "In +\\(-[0-9]+\\) d\\.:")
+		(deadline_regexp_past "\\([0-9]+\\) d\\. ago:")
 		;;		(deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
 		(deadline_regexp_now "Deadline:")
 		(a_now (string-match-p deadline_regexp_now a))

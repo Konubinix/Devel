@@ -44,6 +44,18 @@ def getConfigFromEnvFile(envfile, previous_config):
     config.read(envfile)
     new_config = previous_config
     for section in config.sections():
+        if section == "include":
+            items = config.items(section)
+            for item in items:
+                include_name, file_to_include=item
+                file_to_include = os.path.expanduser(file_to_include)
+                logging.debug("Attempting to include env from %s (%s)" %
+                              (file_to_include, include_name,))
+                assert os.path.exists(file_to_include)
+                # update the existing config with the one included
+                new_config = getConfigFromEnvFile(file_to_include, new_config)
+            continue
+
         assert(section in ("prefix","replace","suffix",))
         (items, items_keys,) = mergeItemsOfSection(config.items(section))
         for key in items_keys:

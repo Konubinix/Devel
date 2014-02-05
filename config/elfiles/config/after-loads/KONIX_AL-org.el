@@ -2137,6 +2137,38 @@ of the clocksum."
   ""
   )
 
+(defface konix/org-agenda-discret-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:foreground "grey50")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:foreground "grey90")
+	 )
+	)
+  ""
+  )
+
+(defface konix/org-agenda-less-discret-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:foreground "grey50")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:foreground "grey70")
+	 )
+	)
+  ""
+  )
+
 (defvar konix/org-agenda-text-properties
   '(
 	("^.+:interruption:.+$" 0 konix/org-agenda-interruption-face)
@@ -2144,7 +2176,7 @@ of the clocksum."
 	;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)
 	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
 	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
-	)
+ 	)
   "")
 (defun konix/org-agenda-set-text-properties ()
   (setq buffer-read-only nil)

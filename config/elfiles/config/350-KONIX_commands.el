@@ -36,6 +36,21 @@
   (delete-windows-on)
   )
 
+(defun konix/md5-region (start end)
+  (interactive "r")
+  (let (
+		(region-content
+		 (buffer-substring-no-properties
+		  start
+		  end
+		  ))
+		)
+	(delete-region start end)
+	(insert
+	 (md5 region-content))
+	)
+  )
+
 (defun konix/indirect-region (start end)
   "Edit the current region in another buffer.
     If the buffer-local variable `konix/indirect-mode-name' is not set, prompt

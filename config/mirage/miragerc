@@ -32,7 +32,7 @@ thumbsize = 128
 screenshot_delay = 2
 
 [actions]
-num_actions = 5
+num_actions = 6
 names[0] = Open in GIMP
 commands[0] = gimp %F &
 shortcuts[0] = <Control>e
@@ -53,6 +53,10 @@ names[4] = reorient
 commands[4] = konix_image_reorient.sh %F
 shortcuts[4] = <Alt>s
 batch[4] = False
+names[5] = Open with inkscape
+commands[5] = inkscape %F &
+shortcuts[5] = <Primary>i
+batch[5] = False
 
 [recent]
 num_recent = 0

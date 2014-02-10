@@ -46,7 +46,7 @@ set scripts_dir      = @data_home/uzbl:@share_dir/uzbl:@devel_dir/uzbl/examples/
 # These handlers can't be moved to the new event system yet as we don't
 # support events that can wait for a response from a script.
 set scheme_handler      = sync_spawn @scripts_dir/scheme.py
-#set request_handler     = sync_spawn @scripts_dir/request.py
+set request_handler     = sync_spawn @scripts_dir/request.sh
 
 # Download stuff
 set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" || dm-dm.sh -s "$1"'

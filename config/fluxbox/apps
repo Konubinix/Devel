@@ -9,6 +9,9 @@
 [app] (name=thunar) (class=Thunar)
   [Workspace]	{2}
 [end]
+[app] (class=Gmpc)
+  [Workspace]	{5}
+[end]
 [app] (class=Zenity)
   [Layer]	{6}
 [end]

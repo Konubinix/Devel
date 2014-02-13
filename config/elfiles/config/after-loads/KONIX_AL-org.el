@@ -1006,12 +1006,13 @@ to be organized.
 						  (
 						   (org-agenda-overriding-header
 							"Review for last week")
-						   (org-agenda-span 7)
+						   (org-agenda-span 'week)
 						   )
 						  )
 				  )
 				 (
 				  (org-agenda-start-day "-7")
+				  (org-agenda-start-on-weekday 1)
 				  (org-agenda-start-with-clockreport-mode t)
 				  (org-agenda-start-with-log-mode t)
 				  (org-agenda-archives-mode t)

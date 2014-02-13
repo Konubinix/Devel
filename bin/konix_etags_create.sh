@@ -1,4 +1,9 @@
 #!/bin/bash
+die () {
+    echo $*
+    exit 1
+}
+
 usage () {
 	cat<<EOF
 $0 [-h] [-d TAGDIR_FILE] [-i TAGINCLUDE_FILE] [-o TAGFILE]
@@ -86,12 +91,13 @@ then
 fi
 
 eval ctags $VERBOSE_CMD \
-	--options="'$KONIX_CONFIG_DIR/ctags'" \
+	--options="'$KONIX_DEFAULT_CTAGS_CONFIG'" \
+	$( [ -f "${KONIX_CUSTOM_CTAGS_CONFIG}" ] && echo "--options='$KONIX_CUSTOM_CTAGS_CONFIG'" ; ) \
 	-e \
 	"$APPEND_CMD" \
 	-f "'$TAGS_FILE'" \
 	$TAGDIRS_CMD \
-	$TAGINCLUDES_CMD
+	$TAGINCLUDES_CMD || die "Failed to generate tags"
 echo updating tags with kinds
 konix_etags_add_kinds.sh 'TAGS'
 if [ "$?" == "0" ]

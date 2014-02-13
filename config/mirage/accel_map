@@ -62,6 +62,7 @@
 ; (gtk_accel_path "<Actions>/Actions/About" "")
 ; (gtk_accel_path "<Actions>/Actions/ActionSubMenu" "")
 ; (gtk_accel_path "<Actions>/Actions/Previous2" "Left")
+; (gtk_accel_path "<Actions>/CustomActions/Open with inkscape" "<Primary>i")
 ; (gtk_accel_path "<Actions>/Actions/Rename Image" "F2")
 ; (gtk_accel_path "<Actions>/Actions/Random Image" "r")
 ; (gtk_accel_path "<Actions>/Actions/Take Screenshot" "")

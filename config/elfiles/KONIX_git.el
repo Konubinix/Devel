@@ -826,7 +826,12 @@ force recomputation"
   (let* (
 		 (show_buffer (format "*GIT Show Buffer %s*" commit))
 		 (command
-		  (format "show \"%s\"" commit)
+		  (format "show %s \"%s\""
+				  (if konix/git/diff/ignore-all-space
+					  " -w"
+					""
+					)
+				  commit)
 		  )
 		 (display_buffer_hook
 		  `(progn

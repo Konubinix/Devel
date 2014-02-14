@@ -238,7 +238,9 @@ class RILItem(object):
 
     @staticmethod
     def from_url_path(url_path):
-        return RILItem(open(url_path, "r").read().decode("utf-8"), os.stat(url_path).st_atime)
+        content = open(url_path, "r").read().decode("utf-8")
+        assert content != ""
+        return RILItem(content, os.stat(url_path).st_atime)
 
     @staticmethod
     def from_directory(dir):

@@ -303,15 +303,15 @@ with a precise timestamp)."
 	 (org-get-at-bol 'tags)
 	 )
 	no_c
-   )
+	)
   )
 
 (defun konix/org-agenda-skip-non-appt-item ()
   (if (konix/org-appt-p)
 	  nil
 	(org-end-of-subtree t)
+	)
   )
-)
 
 (defun konix/org-agenda-skip-non-important-item ()
   (cond
@@ -1028,44 +1028,44 @@ to be organized.
 				  		   )
 				  		  )
 				  (tags-todo "@errand"
-						(
-						 (org-agenda-overriding-header
-						  "Errand tasks")
-						 )
-						)
+							 (
+							  (org-agenda-overriding-header
+							   "Errand tasks")
+							  )
+							 )
 				  (tags-todo "@home"
-						(
-						 (org-agenda-overriding-header
-						  "Home tasks")
-						 )
-						)
+							 (
+							  (org-agenda-overriding-header
+							   "Home tasks")
+							  )
+							 )
 				  (tags-todo "@phone"
-						(
-						 (org-agenda-overriding-header
-						  "Phone tasks")
-						 )
-						)
+							 (
+							  (org-agenda-overriding-header
+							   "Phone tasks")
+							  )
+							 )
 				  (tags-todo "@car"
-						(
-						 (org-agenda-overriding-header
-						  "Car tasks")
-						 )
-						)
+							 (
+							  (org-agenda-overriding-header
+							   "Car tasks")
+							  )
+							 )
 				  (tags-todo "@internet"
-						(
-						 (org-agenda-overriding-header
-						  "Internet tasks")
-						 )
-						)
+							 (
+							  (org-agenda-overriding-header
+							   "Internet tasks")
+							  )
+							 )
 				  (tags-todo "@computer"
-						(
-						 (org-agenda-overriding-header
-						  "Computer tasks")
-						 )
-						)
+							 (
+							  (org-agenda-overriding-header
+							   "Computer tasks")
+							  )
+							 )
 				  )
 				 (
-				  ;(dummy (konix/org-agenda-inhibit-context-filtering))
+										;(dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
 				 ("~/errand_tasks.html")
 				 )
@@ -1155,10 +1155,10 @@ to be organized.
 						   (org-agenda-skip-function
 							'(or
 							  (konix/org-agenda-skip-if-tags
-							  '("project"
-								"no_weekly"
-								"phantom"
-								))
+							   '("project"
+								 "no_weekly"
+								 "phantom"
+								 ))
 							  (konix/org-agenda-skip-non-appt-item))
 							)
 						   (org-agenda-span 7)
@@ -1167,6 +1167,20 @@ to be organized.
 				  )
 				 (
 				  (dummy (konix/org-agenda-inhibit-context-filtering))
+				  )
+				 )
+				("aD" "Done today"
+				 (
+				  (todo ""
+						(
+						 (org-agenda-overriding-header
+						  "What was done today")
+						 (org-agenda-skip-function
+						  '(org-agenda-skip-entry-if 'notregexp
+													 (format-time-string "CLOSED: \\[%Y-%m-%d"))
+						  )
+						 )
+						)
 				  )
 				 )
 				)
@@ -2131,8 +2145,8 @@ of the clocksum."
 	 ((class color)
 	  (background light))
 	 (:inherit 'org-time-grid
-				  :inverse-video t
-				  )
+			   :inverse-video t
+			   )
 	 )
 	)
   ""
@@ -2278,7 +2292,7 @@ of the clocksum."
 			", appt display = " ,(if konix/org-agenda-filter-context-show-appt
 									 "on" "off")
 			", no context display = " ,(if konix/org-agenda-filter-context-show-empty-context
-									 "on" "off")
+										   "on" "off")
 			)
 		  )
 	)

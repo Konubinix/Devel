@@ -32,6 +32,12 @@
 ;; ####################################################################################################
 ;; Init hook
 ;; ####################################################################################################
+(defadvice org-attach-commit (around prevent ())
+  "prevent org-attach-commit from doing anything."
+  (message "Org attach commit by passed")
+  )
+(ad-activate 'org-attach-commit)
+
 (defun konix/org-agenda-appt-reload ()
   (interactive)
   (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)

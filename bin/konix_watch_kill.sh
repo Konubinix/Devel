@@ -2,4 +2,4 @@
 
 source "${KONIX_LIB_DIR}/watch_lib.sh"
 
-watch "$@"
+watch_kill

@@ -2,4 +2,5 @@
 
 source "${KONIX_LIB_DIR}/watch_lib.sh"
 
-watch "$@"
+watch_ls
+echo "$WATCH_LISTING"

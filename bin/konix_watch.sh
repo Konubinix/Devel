@@ -16,5 +16,9 @@ cat <<EOF|tee -a "${OUTPUT_FILE}" >> "${ERROR_FILE}"
 `date`: Launched '$*'
 ########################################
 EOF
-"$@" >> "${OUTPUT_FILE}" 2>> "${ERROR_FILE}"
-zenity --info --text "Command line '$*' ended"
+"$@" >> "${OUTPUT_FILE}" 2>> "${ERROR_FILE}" &
+cat <<EOF|tee -a "${OUTPUT_FILE}" >> "${ERROR_FILE}"
+PID=$!
+EOF
+wait %1
+zenity --info --text "Command line '${*//&/&amp;}' ended"

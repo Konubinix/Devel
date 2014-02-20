@@ -139,3 +139,6 @@
 [submodule "lazygal"]
 	path = lazygal
 	url = https://github.com/Konubinix/lazygal.git
+[submodule "lib/log.sh"]
+	path = lib/log.sh
+	url = https://github.com/livibetter/log.sh.git

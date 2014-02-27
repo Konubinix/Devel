@@ -126,6 +126,10 @@
 
 (defvar konix/git/precommit-hook nil)
 
+(defvar konix/git/commit/message-initial-input-function
+  nil
+  "Function to pre fill the message to be commited")
+
 ;; ####################################################################################################
 ;; Functions
 ;; ####################################################################################################
@@ -143,6 +147,20 @@
 		)
 	  )
 	)
+  )
+
+(defun konix/git/_read-message (&optional prompt)
+  (unless prompt
+	(setq prompt "Message: ")
+	)
+  (read-string prompt
+			   (when konix/git/commit/message-initial-input-function
+				 `(
+				   ,(apply konix/git/commit/message-initial-input-function nil)
+				   . 0
+				   )
+				 )
+			   )
   )
 
 (defun konix/git/adjust-command (cmd cdup)
@@ -429,7 +447,11 @@
 
 (defun konix/git/commit/message (message)
   "Lance un git commit -m ."
-  (interactive "sMessage : ")
+  (interactive
+   (list
+	(konix/git/_read-message)
+	)
+   )
   (konix/git/commit nil message)
   )
 
@@ -449,7 +471,7 @@
   (interactive
    (list
 	(konix/git/_get-file-name "commit file" t)
-	(read-string "Message : ")
+	(konix/git/_read-message)
 	(y-or-n-p-with-timeout "Amend ? " 5 nil)
 	)
    )
@@ -1317,7 +1339,7 @@ fallbacking to HEAD")
   (let (
 		(file-name (get-text-property (point) 'konix/git/status/filename))
 		)
-	(konix/git/commit/file file-name (read-string "Commit message : ") nil)
+	(konix/git/commit/file file-name (konix/git/_read-message "File commit: ") nil)
 	)
   )
 

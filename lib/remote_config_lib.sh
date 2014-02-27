@@ -145,3 +145,11 @@ remoterc_compute_contexts ( ) {
     fi
     remoterc_log "I am in contexts ${contexts}"
 }
+
+remoterc_quiet () {
+    # to be used in script using the stdout, make sure stdout is clear
+    if [ -z "${KONIX_REMOTE_QUIET}" ]
+    then
+        export KONIX_REMOTE_QUIET=err
+    fi
+}

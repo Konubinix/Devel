@@ -5,6 +5,6 @@ HOST="$1"
 PORT="$2"
 USER="$3"
 
-export KONIX_REMOTE_QUIET=err
+remoterc_quiet
 remoterc_setup_or_quit "${HOST}"
 nc "${remote_url}" "${remote_ssh_port}"

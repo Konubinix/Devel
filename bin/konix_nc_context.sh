@@ -2,7 +2,7 @@
 
 source "${KONIX_LIB_DIR}/remote_config_lib.sh"
 
-export KONIX_REMOTE_QUIET=1
+remoterc_quiet
 HOST="${1}"
 PORT="${2}"
 shift 2

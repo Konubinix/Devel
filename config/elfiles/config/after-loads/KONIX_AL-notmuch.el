@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'notmuch-address)
-(require 'notmuch-pick)
+(require 'notmuch-tree)
 
 (defun konix/message-setup-hook ()
   (mml-secure-message-sign-pgpmime)
@@ -54,7 +54,7 @@
 			  (format "%s/" (getenv "KONIX_DOWNLOAD_DIR")))
 (setq-default mm-default-directory mailcap-download-directory)
 (setq-default notmuch-crypto-process-mime t)
-
+(setq-default notmuch-archive-tags '("-inbox" "-unread"))
 (setq notmuch-address-command "notmuch_addresses.py")
 
 (defface konix/notmuch-search-unread
@@ -219,10 +219,10 @@
   )
 
 (defun konix/notmuch-search-tag-change (tag_change)
-  (notmuch-search-tag-region
+  (notmuch-search-tag
+   tag_change
    (save-excursion (beginning-of-line) (point))
    (save-excursion (end-of-line) (point))
-   tag_change
    )
   )
 (defun konix/notmuch-remove-tag (tag)
@@ -242,12 +242,6 @@
 			 )
 	  )
 	 )
-	)
-  )
-(defun konix/notmuch-remove-unread ()
-  (when (member "unread" (konix/notmuch-get-tags))
-	(konix/notmuch-add-tag "wontread")
-	(konix/notmuch-remove-tag "unread")
 	)
   )
 (defun konix/notmuch-add-tag (tag)
@@ -377,7 +371,6 @@ inspired from `notmuch-show-archive-thread-internal'"
   )
 (defun konix/notmuch-archive ()
   (interactive)
-  (konix/notmuch-remove-unread)
   (cond
    ((eq major-mode 'notmuch-search-mode)
 	(notmuch-search-archive-thread)
@@ -406,9 +399,12 @@ inspired from `notmuch-show-archive-thread-internal'"
   )
 (defun konix/notmuch-search-unflag-remove-read-and-next ()
   (interactive)
-  (konix/notmuch-remove-tag "flagged")
-  (konix/notmuch-remove-unread)
-  (next-line)
+  (let (
+		(notmuch-archive-tags '("-unread" "-flagged"))
+		)
+	(notmuch-search-archive-thread)
+	)
+  (notmuch-search-next-thread)
   )
 
 (defun konix/notmuch-hello-refresh-hook ()

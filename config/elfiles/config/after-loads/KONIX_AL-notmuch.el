@@ -218,7 +218,7 @@
   ""
   )
 
-(defun konix/notmuch-search-tag-change (tag_change)
+(defun konix/notmuch-search-tag-change (&rest tag_change)
   (notmuch-search-tag
    tag_change
    (save-excursion (beginning-of-line) (point))
@@ -246,7 +246,9 @@
   )
 (defun konix/notmuch-add-tag (tag)
   (let (
-		(tag_change (format "+%s" tag))
+		(tag_change (list
+					 (format "+%s" tag)
+					 ))
 		)
 	(cond
 	 ((eq major-mode 'notmuch-search-mode)

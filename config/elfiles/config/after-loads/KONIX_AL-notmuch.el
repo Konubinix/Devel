@@ -404,7 +404,6 @@ inspired from `notmuch-show-archive-thread-internal'"
 		)
 	(notmuch-search-archive-thread)
 	)
-  (notmuch-search-next-thread)
   )
 
 (defun konix/notmuch-hello-refresh-hook ()

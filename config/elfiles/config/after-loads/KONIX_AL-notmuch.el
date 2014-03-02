@@ -246,9 +246,7 @@
   )
 (defun konix/notmuch-add-tag (tag)
   (let (
-		(tag_change (list
-					 (format "+%s" tag)
-					 ))
+		(tag_change (format "+%s" tag))
 		)
 	(cond
 	 ((eq major-mode 'notmuch-search-mode)

@@ -7,4 +7,4 @@ HOST="${1}"
 PORT="${2}"
 shift 2
 remoterc_setup_or_quit "${HOST}"
-nc -w5 -v "${remote_url}" "${PORT}" "$@"
+remoterc_nc "${remote_url}" "${PORT}" "$@"

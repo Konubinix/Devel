@@ -153,3 +153,12 @@ remoterc_quiet () {
         export KONIX_REMOTE_QUIET=err
     fi
 }
+
+remoterc_nc () {
+	if [ "$KONIX_REMOTE_QUIET" != "" ] \
+		|| [ "$KONIX_REMOTE_QUIET" == "err" ]
+	then
+		VERBOSE_CMD=-v
+	fi
+	nc -w3 $VERBOSE_CMD "$@"
+}

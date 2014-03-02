@@ -7,4 +7,4 @@ USER="$3"
 
 remoterc_quiet
 remoterc_setup_or_quit "${HOST}"
-nc -v -w3 "${remote_url}" "${remote_ssh_port}"
+remoterc_nc "${remote_url}" "${remote_ssh_port}"

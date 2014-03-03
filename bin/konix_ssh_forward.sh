@@ -1,4 +1,6 @@
 #!/bin/bash
+source "${KONIX_LIB_DIR}/remote_config_lib.sh"
+
 set -x
 HOST="${1}"
 DISTANT_LOCAL_PORT="${2}"

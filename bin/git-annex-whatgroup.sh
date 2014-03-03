@@ -20,6 +20,7 @@ uuid_compute () {
 
 remote_name="$1"
 uuid="$(uuid_compute "${remote_name}")"
+[ -n "${uuid}" ] || { echo "Could not find uuid for ${1}" ; exit 1 ; }
 # make sure to take the latest recorded group in case they are several
 # values. Use the timestamp to do so
 git show git-annex:group.log | \

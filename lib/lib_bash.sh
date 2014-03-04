@@ -407,7 +407,6 @@ source_if_possible () {
     if [ -r "$file" ]
     then
 	    source "$file"
-        echo $file
         return 0
     else
         echo "Cannot load $file"

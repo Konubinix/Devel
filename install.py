@@ -81,6 +81,7 @@ if is_on_linux():
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "xinitrc"),   os.path.join(environ["HOME"], ".xinitrc"))
         substitute(os.path.join(environ["HOME"],       ".xinitrc"),  os.path.join(environ["HOME"], ".xsession"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "gtkrc-2.0"), os.path.join(environ["HOME"], ".gtkrc-2.0"))
+        substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "rdesktop"), os.path.join(environ["HOME"], ".rdesktop"))
 
         # ####################################################################################################
         # Gnome conf

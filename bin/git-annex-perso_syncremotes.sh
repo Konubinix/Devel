@@ -125,12 +125,20 @@ then
 			    fi
                 gaps_log "Getting data from $remote_name (only what is not here)"
                 git annex get "${KONIX_GIT_ANNEX_PERSO_SYNC_FAST_ARG}" --auto --from "$remote_name" --not --in here
-                gaps_log "Sending data to $remote_name (only what is not there)"
-                git annex copy "${KONIX_GIT_ANNEX_PERSO_SYNC_FAST_ARG}" --to "$remote_name" --auto --not --in "$remote_name"
-                gaps_log "Dropping data from $remote_name (only what is already there)"
-		        git annex drop "${KONIX_GIT_ANNEX_PERSO_SYNC_FAST_ARG}" --auto --from "$remote_name" --in "$remote_name"
-                gaps_log "Re syncing $remote_name with me to take into account the changes"
-                git annex sync "$remote_name"
+                readonly_value="$(git config remote.${remote}.annex-readonly)"
+                if [ "${readonly_value}" == "true" ]
+                then
+                    gaps_log "No attempt to copy to ${remote} or drop from it"
+                    gaps_log "Since it is readonly"
+                else
+                    gaps_log "Sending data to $remote_name (only what is not there)"
+                    git annex copy "${KONIX_GIT_ANNEX_PERSO_SYNC_FAST_ARG}" --to "$remote_name" --auto --not --in "$remote_name"
+                    gaps_log "Dropping data from $remote_name (only what is already there)"
+		            git annex drop "${KONIX_GIT_ANNEX_PERSO_SYNC_FAST_ARG}" --auto --from "$remote_name" --in "$remote_name"
+                    gaps_log "Re syncing $remote_name with me to take into account the changes"
+                    # extra sync with the remote, useful only if I can push to it
+                    git annex sync "$remote_name"
+                fi
                 gaps_launch_posthook "${sync_posthook}" "${url}" "sync post hook"
             fi
             popd

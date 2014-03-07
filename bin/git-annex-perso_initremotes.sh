@@ -76,6 +76,12 @@ to url $url ?"
         # reinit the trap.
         trap "" 0
         git annex describe "${remote}" "${remote}"
+        # set the readonly information
+        if [ -f "${readonly}" ]
+        then
+            gaps_log "Setting the readonly flag"
+            git config remote."${remote}".annex-readonly true
+        fi
         git annex sync "$remote_name"
         gaps_show_date_maybe
         if [ -f "${posthook}" ]

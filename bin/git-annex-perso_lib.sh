@@ -231,6 +231,7 @@ gaps_extract_remote_info_from_dir ( ) {
     local remote_path="$1"
     url="$(cat ${remote_path}/url)"
     url="$(eval echo $(echo $url))"
+	readonly="${remote_path}/readonly"
     availhook="${remote_path}/availhook"
     prehook="${remote_path}/prehook"
     posthook="${remote_path}/posthook"
@@ -280,10 +281,10 @@ gaps_remotes_fix ( ) {
                 fi
             fi
 
-            # sanity check that the url is the same in the config only if the
-            # remote is not here
             if ! gaps_remote_here_p "${remote}"
             then
+                # sanity check that the url is the same in the config only if the
+                # remote is not here
                 recorded_url="$(git config remote.${remote}.url)"
                 if [ "${recorded_url}" != "${url}" ]
                 then
@@ -302,6 +303,39 @@ gaps_remotes_fix ( ) {
 						    fi
                             gaps_log "Aboooort"
                             continue
+                        fi
+                    fi
+                fi
+
+                # sanity check that the readonly is the same
+                recorded_readonly="$(git config remote.${remote}.annex-readonly)"
+                # nothing is the same as false
+                if [ -z "${recorded_readonly}" ]
+                then
+                    recorded_readonly=false
+                fi
+                if [ -f "${readonly}" ]
+                then
+                    readonly_value=true
+                else
+                    readonly_value=false
+                fi
+                if [ "${recorded_readonly}" != "${readonly_value}" ]
+                then
+                    gaps_warn "readonly mismatch"
+                    gaps_log "git config: ${recorded_readonly}"
+                    gaps_log "gitannexremotes: ${readonly_value}"
+                    if gaps_ask_for_confirmation "Record ${readonly_value} in git config?"
+                    then
+                        git config "remote.${remote}.annex-readonly" "${readonly_value}"
+                    else
+                        if [ "${recorded_readonly}" == "true" ]
+                        then
+					        gaps_ask_for_confirmation "Remove readonly from .gitannexremotes?" \
+                                && rm "${readonly}"
+                        else
+					        gaps_ask_for_confirmation "Add readonly into .gitannexremotes?" \
+                                && touch "${readonly}"
                         fi
                     fi
                 fi

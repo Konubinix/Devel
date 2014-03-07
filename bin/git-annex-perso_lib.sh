@@ -257,6 +257,10 @@ gaps_remotes_fix ( ) {
         for remote in ${remotes}
         do
 	        gaps_log_info "Checking remote $remote"
+            if gaps_remote_here_p "${remote}"
+            then
+                gaps_log_info "Remote $remote is here"
+            fi
             if ! gaps_extract_remote_info "${contexts}" "${remote}"
             then
                 gaps_warn "Could not find info for remote ${remote} in contexts ${contexts}"

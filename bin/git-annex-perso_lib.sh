@@ -263,6 +263,19 @@ gaps_extract_context_independent_remote_info ( ) {
 	dead="${remote_path}/dead"
 }
 
+gaps_remote_considered_available_p () {
+    local remote="$1"
+    local res="$(git config "remote.${remote}.konix-annex-available")"
+    local git_command_res=$?
+    if [ "${git_command_res}" == "0" ]
+    then
+        [ "${res}" == "true" ]
+        return "$?"
+    else
+        return 0
+    fi
+}
+
 gaps_remotes_fix ( ) {
     local REMOTES="${1}"
     gaps_log_info "Checking inconsistency in remotes"
@@ -300,6 +313,46 @@ gaps_remotes_fix ( ) {
                     continue
                 fi
             fi
+
+            # now, the remote must be initialized or be here
+            if ! gaps_remote_here_p "${remote}"
+            then
+                # it is a distant remote, check that it is available
+                gaps_launch_availhook \
+                    "${availhook}" \
+                    "${url}" \
+                    "availhook of ${remote}"
+                avail_res="$?"
+                gaps_remote_considered_available_p "${remote}"
+                local considered_available="$?"
+                # changing the state according to what I know now
+                if [ "${avail_res}" != "0" ] && [ "${considered_available}" == "0" ]
+                then
+                    gaps_error "${remote} is not available"
+                    gaps_error "stopping syncing with it and ignoring it"
+                    git config "remote.${remote}.annex-ignore" true
+                    git config "remote.${remote}.annex-sync" false
+                    git config "remote.${remote}.konix-annex-available" false
+                elif [ "${avail_res}" == "0" ] && [ "${considered_available}" != "0" ]
+                then
+                    gaps_log_info "${remote} is now available, stop ignoring it"
+                    git config "remote.${remote}.annex-ignore" false
+                    git config "remote.${remote}.annex-sync" true
+                    git config "remote.${remote}.konix-annex-available" true
+                elif [ "${avail_res}" != "0" ] && [ "${considered_available}" != "0" ]
+                then
+                    gaps_warn "remote ${remote} still is ignored since still not available"
+                fi
+
+                # do I have to go on (check the new state of availability) ?
+                if ! gaps_remote_considered_available_p "${remote}"
+                then
+                    gaps_log "continuing to next remote"
+                    continue
+                fi
+            fi
+
+            gaps_log_info "The remote ${remote} is correctly initialized and available"
 
             if ! gaps_remote_here_p "${remote}"
             then

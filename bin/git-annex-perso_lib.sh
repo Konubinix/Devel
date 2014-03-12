@@ -10,6 +10,8 @@ GITANNEXSYNC_REMOTES=".gitannexremotes"
 GITANNEXSYNC_CONFIG=".gitannexconfig"
 GITANNEXSYNC_CONTEXTS=".gitannexcontexts"
 GITANNEXSYNC_INIT="git-annex-perso_init.sh"
+GITANNEXSYNC_WARN_FILE="${HOME}/.gaps_warn_log"
+GITANNEXSYNC_ERROR_FILE="${HOME}/.gaps_error_log"
 
 gaps_log ( ) {
     echo "## $*"
@@ -70,7 +72,14 @@ ${remotes}"
 }
 
 gaps_error ( ) {
-    gaps_log "${COLOR_FG_RED}ERROR: $*${COLOR_RESET}" >&2
+    gaps_log "${COLOR_FG_RED}ERROR: $*${COLOR_RESET}" >&2| {
+        if [ -n "${GITANNEXSYNC_ERROR_FILE}" ]
+        then
+            tee "${GITANNEXSYNC_ERROR_FILE}"
+        else
+            cat
+        fi
+    } >&2
 }
 
 gaps_error_n_quit ( ) {
@@ -79,7 +88,14 @@ gaps_error_n_quit ( ) {
 }
 
 gaps_warn ( ) {
-    gaps_log "${COLOR_FG_YELLOW}WARNING: $*${COLOR_RESET}" >&2
+    gaps_log "${COLOR_FG_YELLOW}WARNING: $*${COLOR_RESET}" | {
+        if [ -n "${GITANNEXSYNC_WARN_FILE}" ]
+        then
+            tee "${GITANNEXSYNC_WARN_FILE}"
+        else
+            cat
+        fi
+    } >&2
 }
 
 gaps_error_and_continue ( ) {

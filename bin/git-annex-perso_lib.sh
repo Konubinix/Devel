@@ -478,7 +478,7 @@ gaps_extract_remote_info ( ) {
     gaps_log "Extracting info from ${remote_path}"
     if [ -f "${remote_path}/url" ]
     then
-        gaps_warn "No context information detected in $remote_path"
+        gaps_log "No context information detected in $remote_path"
         gaps_extract_remote_info_from_dir "${remote_path}"
         res=0
     else

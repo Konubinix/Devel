@@ -49,7 +49,11 @@ gaps_log "Path limited to ${LIMIT_PATH}"
 gaps_log "Syncing limited by remote ${REMOTE}"
 
 pushd "${TOP_LEVEL}"
-RES=1
+fail=0
+inc_fail_and_continue () {
+    fail=$((fail + 1))
+    continue
+}
 gaps_remotes_fix "${REMOTE}"
 if [ -d "${GITANNEXSYNC_REMOTES}" ]
 then
@@ -61,7 +65,7 @@ then
         if ! gaps_extract_remote_info "${contexts}" "${remote}"
         then
             gaps_warn "Could not find info for remote ${remote} in contexts ${contexts}"
-            continue
+            inc_fail_and_continue
         fi
         if ! gaps_remote_initialized_p "${remote}"
         then
@@ -86,8 +90,11 @@ then
         trap gaps_posthook_launch_maybe 0
 
         gaps_log "Git annex syncing with ${remote_name}"
-        git annex sync "${remote_name}" || \
-			gaps_error_n_quit "Failed git annexing with ${remote}"
+        git annex sync "${remote_name}" || {
+            gaps_error "Failed git annex syncing with ${remote}" ;
+            trap "" 0
+            inc_fail_and_continue
+        }
         NEW_MASTER_SHA=`git log -1 master --pretty=format:"%H"`
         NEW_GIT_ANNEX_SHA=`git log -1 git-annex --pretty=format:"%H"`
         NEW_REMOTE_MASTER_SHA=`git log -1 ${remote_name}/synced/master --pretty=format:"%H"`
@@ -131,6 +138,12 @@ then
                     gaps_log "No attempt to copy to ${remote} or drop from it"
                     gaps_log "Since it is readonly"
                 else
+                    # gaps_log "Attempt to get what may be wanted by $remote_name (only what is not already here and not there)"
+                    # git annex get "${KONIX_GIT_ANNEX_PERSO_SYNC_FAST_ARG}" \
+                    #     --auto \
+                    #     --want-get "$remote_name" \
+                    #     --and --not --in here \
+                    #     --and --not --in "$remote_name"
                     gaps_log "Sending data to $remote_name (only what is not there)"
                     git annex copy "${KONIX_GIT_ANNEX_PERSO_SYNC_FAST_ARG}" --to "$remote_name" --auto --not --in "$remote_name"
                     gaps_log "Dropping data from $remote_name (only what is already there)"
@@ -146,10 +159,9 @@ then
         # launch the post hook and reinit the trap
         gaps_posthook_launch_maybe
         trap "" 0
-        RES=0
     done
 else
 	gaps_log "No remote to sync with"
 fi
 popd
-exit "${RES}"
+exit "${fail}"

@@ -498,7 +498,7 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 
 (defun konix/org-pomodoro/org-capture-prepare-finalize-hook ()
   "If in interruption, go back to the state before interrupted"
-  (when (member "interruption"
+  (when (member "INTERRUPTION"
 				(save-window-excursion
 				  (save-excursion
 					(org-clock-goto)

@@ -117,31 +117,40 @@ cursor stays in the org buffer."
   (interactive)
   (org-insert-time-stamp nil t t nil nil nil))
 
-(defun konix/insert-heading-inactive-timestamp ()
-  (let (
-		(logbook_pos nil)
+(defvar konix/insert-heading-inactive-timestamp-file-name-regex
+  (expand-file-name perso-dir)
+  "Regex matched against the file name in which to insert the inactive time stamp")
+
+(defun konix/insert-heading-inactive-timestamp-maybe ()
+  (when (string-match-p
+		 konix/insert-heading-inactive-timestamp-file-name-regex
+		 (buffer-file-name)
+		 )
+	(let (
+		  (logbook_pos nil)
+		  )
+	  (save-excursion
+		(org-return)
+		(org-cycle)
+		(setq logbook_pos (point))
+		(insert ":LOGBOOK:")
+		(org-return)
+		(org-cycle)
+		(insert ":END:")
+		(beginning-of-line)
+		(org-return)
+		(previous-line)
+		(org-cycle)
+		(insert "- Captured       ")
+		(konix/insert-inactive-timestamp)
+		(goto-char logbook_pos)
+		(org-cycle)
 		)
-	(save-excursion
-	  (org-return)
-	  (org-cycle)
-	  (setq logbook_pos (point))
-	  (insert ":LOGBOOK:")
-	  (org-return)
-	  (org-cycle)
-	  (insert ":END:")
-	  (beginning-of-line)
-	  (org-return)
-	  (previous-line)
-	  (org-cycle)
-	  (insert "- Captured       ")
-	  (konix/insert-inactive-timestamp)
-	  (goto-char logbook_pos)
-	  (org-cycle)
 	  )
 	)
   )
 
-(add-hook 'org-insert-heading-hook 'konix/insert-heading-inactive-timestamp
+(add-hook 'org-insert-heading-hook 'konix/insert-heading-inactive-timestamp-maybe
 		  'append)
 
 ;; ####################################################################################################

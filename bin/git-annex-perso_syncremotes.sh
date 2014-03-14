@@ -59,9 +59,14 @@ if [ -d "${GITANNEXSYNC_REMOTES}" ]
 then
     gaps_compute_contexts
     gaps_compute_remotes "${REMOTE}"
-	for remote in ${remotes}
+    for remote in ${remotes}
     do
-		gaps_log_info "Syncing with $remote"
+        if gaps_remote_here_p "${remote}"
+        then
+            gaps_log_info "Not syncing with ${remote} since it is here"
+            continue
+        fi
+        gaps_log_info "Syncing with $remote"
         if ! gaps_extract_remote_info "${contexts}" "${remote}"
         then
             gaps_warn "Could not find info for remote ${remote} in contexts ${contexts}"

@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: getopts
+# key: getopts
+# --
+$>while getopts "${100:h${150:i}}" opt; do
+$>case $opt in
+${200:$>h\)
+$>usage
+$>exit 0
+$>;;
+}${300:$>$150\)
+$>${350:STUFF="$OPTARG"}
+$>;;
+}$>esac
+$>done
+$>${400:shift \$((OPTIND-1))}

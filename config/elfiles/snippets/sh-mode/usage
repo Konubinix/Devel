@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: usage
+# key: usage
+# --
+$>usage () {
+$>    cat<<EOF
+$>\$0 ${100:arguments}
+$>
+$>${200:Description}
+$>EOF
+$>}

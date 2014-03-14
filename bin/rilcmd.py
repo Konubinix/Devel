@@ -86,6 +86,10 @@ class RilCmd(cmd.Cmd, object):
         item = self.get_item(line)
         self.open(item)
 
+    def do_explorer(self, line):
+        item = self.get_item(line)
+        os.system("mimeopen '%s'" % item.dir)
+
     def do_open_last_unread(self, line):
         self.open(self.get_items(1, False)[0])
 

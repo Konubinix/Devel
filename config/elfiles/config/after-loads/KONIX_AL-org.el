@@ -29,6 +29,14 @@
 (require 'org-protocol)
 (require 'org-man)
 (require 'org-clock)
+;; ######################################################################
+;; My variables
+;; ######################################################################
+(defvar konix/org-capture-interruption-handled-threshold
+  3
+  "Time before which an interruption is considered handled"
+  )
+
 ;; ####################################################################################################
 ;; Init hook
 ;; ####################################################################################################
@@ -1354,19 +1362,25 @@ to be organized.
 				 :kill-buffer
 				 )
 				("p" "Todo pomodoro next short pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
-				 "* NEXT [#G] %?
+				 "* NEXT [#G] %? :INTERRUPTION:
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp)
   :LOGBOOK:
   - Captured       %U
+  :END:
+  :PROPERTIES:
+  :INTERRUPTION_HANDLED: t
   :END:
 "
 				 :kill-buffer
 				 )
 				("P" "Todo pomodoro next long pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
-				 "* NEXT [#G] %?
+				 "* NEXT [#G] %? :INTERRUPTION:
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t)
   :LOGBOOK:
   - Captured       %U
+  :END:
+  :PROPERTIES:
+  :INTERRUPTION_HANDLED: t
   :END:
 "
 				 :kill-buffer
@@ -1442,7 +1456,7 @@ to be organized.
 				 :kill-buffer
 				 )
 				("j" "Interruption" entry (file+headline (expand-file-name "diary.org" org-directory) "Interruptions")
-				 "* Interruption %?
+				 "* Interruption %? :INTERRUPTION:
    %U
 "
 				 :clock-in t
@@ -2002,9 +2016,27 @@ of the clocksum."
 (add-hook 'org-clock-in-hook
 		  'konix/org-clock-in-hook)
 
-
 (defun konix/org-capture-prepare-finalize-hook ()
   (konix/org-agenda-appt-reload)
+  ;; if the capture is an interruption that lasted less than
+  ;; konix/org-capture-interruption-handled-threshold minutes, it is considered
+  ;; handled
+  (when (and
+		 (member "INTERRUPTION"
+				 (save-window-excursion
+				   (save-excursion
+					 (org-clock-goto)
+					 (org-get-tags-at (point))
+					 )
+				   )
+				 )
+		 (<=
+		  (org-clock-get-clocked-time)
+		  konix/org-capture-interruption-handled-threshold
+		  )
+		 )
+	(org-set-property "INTERRUPTION_HANDLED" "t")
+	)
   )
 (add-hook 'org-capture-prepare-finalize-hook
 		  'konix/org-capture-prepare-finalize-hook)

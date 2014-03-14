@@ -14,7 +14,18 @@ def str2int(string):
     else:
         return int(string)
 
-class RilCmd(cmd.Cmd):
+class RilCmd(cmd.Cmd, object):
+    def __init__(self, *args, **kwargs):
+        super(RilCmd, self).__init__(*args, **kwargs)
+        self.__count = 0
+
+    def do_count(self, line):
+        if line == "":
+            print self.__count
+        else:
+            self.__count = int(line)
+            print "Set count to %s" % self.__count
+
     def do_EOF(self, line):
         print "Bye"
         sys.exit(0)
@@ -159,6 +170,9 @@ class RilCmd(cmd.Cmd):
         for item in items:
             print number, item
             number += 1
+            if self.__count != 0 and number >= self.__count:
+                print "-- Stopped (set count to display more)"
+                return
 
     def get_items(self, number=None, read=None, in_dl=None):
         items = ril.rilitems_priority_stamp_sorted()
@@ -189,3 +203,7 @@ class RilCmd(cmd.Cmd):
 if __name__ == "__main__":
     c = RilCmd()
     c.cmdloop()
+
+# Local Variables:
+# python-indent: 4
+# End:

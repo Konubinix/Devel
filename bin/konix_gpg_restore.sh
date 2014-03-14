@@ -1,7 +1,12 @@
 #!/bin/bash
 
+set -eu
 echo "Restoring the public keys"
-gpg --import < "$KONIX_PERSO_DIR/gnupg/pubring.gpg"
+cat "${KONIX_PERSO_DIR}/gnupg_nd/pubring.gpg" \
+    | gpg --armor --decrypt \
+    | gpg --import
 echo "Restoring the ownertrust"
-gpg --import-ownertrust < "$KONIX_PERSO_DIR/gnupg/trustdb.txt"
+cat "${KONIX_PERSO_DIR}/gnupg_nd/trustdb.txt.gpg" \
+    | gpg --armor --decrypt \
+    | gpg --import-ownertrust
 echo "Done"

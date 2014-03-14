@@ -49,11 +49,11 @@ EOF
 cat <<EOF > sync_posthook
 #! /bin/bash
 
-git-annex-perso_remoteprehook_ssh.sh $PORT_CMD -u$URL -l$LOCATION
+git-annex-perso_remoteposthook_ssh.sh $PORT_CMD -u$URL -l$LOCATION
 EOF
 
 cat <<EOF > availhook
 #! /bin/bash
 
-ssh $URL exit 0
+git-annex-perso_remoteavailhook_ssh.sh $PORT_CMD -u$URL -l$LOCATION
 EOF

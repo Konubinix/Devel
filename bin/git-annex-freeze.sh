@@ -24,9 +24,8 @@ GITANNEXFREEZE_PRE_HOOK=".gitannexfreeze_prehook"
 pushd `git rev-parse --show-toplevel`
 log "First merge the annex in case someone else pushed the sync branch here"
 git annex merge || die "Could not merge"
-set -x
-echo gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}" "$(pwd)"
-echo gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}_${HOSTNAME}" "$(pwd)"
+gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}" "$(pwd)"
+gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}_${HOSTNAME}" "$(pwd)"
 log "Annex add new files"
 git annex add || die "Could not annex add"
 if [ "$(git config annex.direct)" == "true" ]

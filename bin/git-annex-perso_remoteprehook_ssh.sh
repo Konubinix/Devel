@@ -28,5 +28,5 @@ konix_assert_var URL
 konix_assert_var LOCATION
 cat <<EOF|ssh $PORT "$URL"
 cd "$LOCATION"
-$(cat "$(which git-annex-freeze.sh)")
+\${HOME}/Prog/devel/bin/konix_do_cron_job.sh git-annex-freeze.sh
 EOF

@@ -4,7 +4,6 @@ source "${KONIX_LIB_DIR}/lib_bash.sh"
 
 GITANNEX_BIG_FILE=".gitannexbig"
 GITANNEXSYNC_PRE_HOOK=".gitannexsync_prehook"
-GITANNEXFREEZE_PRE_HOOK=".gitannexfreeze_prehook"
 GITANNEXSYNC_POST_HOOK=".gitannexsync_posthook"
 GITANNEXSYNC_REMOTES=".gitannexremotes"
 GITANNEXSYNC_CONFIG=".gitannexconfig"

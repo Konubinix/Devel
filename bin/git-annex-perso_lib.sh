@@ -9,8 +9,8 @@ GITANNEXSYNC_REMOTES=".gitannexremotes"
 GITANNEXSYNC_CONFIG=".gitannexconfig"
 GITANNEXSYNC_CONTEXTS=".gitannexcontexts"
 GITANNEXSYNC_INIT="git-annex-perso_init.sh"
-GITANNEXSYNC_WARN_FILE="${HOME}/.gaps_warn_log"
-GITANNEXSYNC_ERROR_FILE="${HOME}/.gaps_error_log"
+GITANNEXSYNC_WARN_FILE="${HOME}/log/gaps_warn_log"
+GITANNEXSYNC_ERROR_FILE="${HOME}/log/gaps_error_log"
 
 gaps_log ( ) {
     echo "## $*"
@@ -74,7 +74,7 @@ gaps_error ( ) {
     gaps_log "${COLOR_FG_RED}ERROR: $*${COLOR_RESET}" >&2| {
         if [ -n "${GITANNEXSYNC_ERROR_FILE}" ]
         then
-            tee "${GITANNEXSYNC_ERROR_FILE}"
+            tee -a "${GITANNEXSYNC_ERROR_FILE}"
         else
             cat
         fi
@@ -90,7 +90,7 @@ gaps_warn ( ) {
     gaps_log "${COLOR_FG_YELLOW}WARNING: $*${COLOR_RESET}" | {
         if [ -n "${GITANNEXSYNC_WARN_FILE}" ]
         then
-            tee "${GITANNEXSYNC_WARN_FILE}"
+            tee -a "${GITANNEXSYNC_WARN_FILE}"
         else
             cat
         fi

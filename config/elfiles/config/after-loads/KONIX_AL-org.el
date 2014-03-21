@@ -1052,49 +1052,141 @@ to be organized.
 				  		  (
 				  		   (org-agenda-overriding-header
 				  			"Errand agenda")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("@errand")
+							  t)
+							)
 				  		   )
 				  		  )
 				  (tags-todo "@errand"
 							 (
 							  (org-agenda-overriding-header
 							   "Errand tasks")
+							  (org-agenda-skip-function
+							   '(org-agenda-skip-entry-if
+								 'scheduled
+								 'deadline
+								 'regexp "\n]+>")
+							   )
 							  )
 							 )
+				  (agenda nil
+				  		  (
+				  		   (org-agenda-overriding-header
+				  			"home agenda")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("@home")
+							  t)
+							)
+				  		   )
+				  		  )
 				  (tags-todo "@home"
 							 (
 							  (org-agenda-overriding-header
-							   "Home tasks")
+							   "home tasks")
+							  (org-agenda-skip-function
+							   '(org-agenda-skip-entry-if
+								 'scheduled
+								 'deadline
+								 'regexp "\n]+>")
+							   )
 							  )
 							 )
+				  (agenda nil
+				  		  (
+				  		   (org-agenda-overriding-header
+				  			"phone agenda")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("@phone")
+							  t)
+							)
+				  		   )
+				  		  )
 				  (tags-todo "@phone"
 							 (
 							  (org-agenda-overriding-header
-							   "Phone tasks")
+							   "phone tasks")
+							  (org-agenda-skip-function
+							   '(org-agenda-skip-entry-if
+								 'scheduled
+								 'deadline
+								 'regexp "\n]+>")
+							   )
 							  )
 							 )
+				  (agenda nil
+				  		  (
+				  		   (org-agenda-overriding-header
+				  			"car agenda")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("@car")
+							  t)
+							)
+				  		   )
+				  		  )
 				  (tags-todo "@car"
 							 (
 							  (org-agenda-overriding-header
-							   "Car tasks")
+							   "car tasks")
+							  (org-agenda-skip-function
+							   '(org-agenda-skip-entry-if
+								 'scheduled
+								 'deadline
+								 'regexp "\n]+>")
+							   )
 							  )
 							 )
+				  (agenda nil
+				  		  (
+				  		   (org-agenda-overriding-header
+				  			"internet agenda")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("@internet")
+							  t)
+							)
+				  		   )
+				  		  )
 				  (tags-todo "@internet"
 							 (
 							  (org-agenda-overriding-header
-							   "Internet tasks")
+							   "internet tasks")
+							  (org-agenda-skip-function
+							   '(org-agenda-skip-entry-if
+								 'scheduled
+								 'deadline
+								 'regexp "\n]+>")
+							   )
 							  )
 							 )
+				  (agenda nil
+				  		  (
+				  		   (org-agenda-overriding-header
+				  			"computer agenda")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("@computer")
+							  t)
+							)
+				  		   )
+				  		  )
 				  (tags-todo "@computer"
 							 (
 							  (org-agenda-overriding-header
-							   "Computer tasks")
+							   "computer tasks")
+							  (org-agenda-skip-function
+							   '(org-agenda-skip-entry-if
+								 'scheduled
+								 'deadline
+								 'regexp "\n]+>")
+							   )
 							  )
 							 )
 				  )
-				 (
-										;(dummy (konix/org-agenda-inhibit-context-filtering))
-				  )
-				 ("~/errand_tasks.html")
 				 )
 				("ao" "Phone tasks"
 				 (

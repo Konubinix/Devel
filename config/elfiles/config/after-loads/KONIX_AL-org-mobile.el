@@ -27,14 +27,13 @@
 (setq-default org-mobile-directory
 			  (expand-file-name
 			   "org-mobile"
-			   perso-dir
+			   gits-dir
 			   )
 			  )
 
 (setq-default org-mobile-inbox-for-pull
 			  (expand-file-name
-			   "from-mobile.org"
-			   org-directory
+			   "~/from-mobileorg.org"
 			   )
 			  )
 

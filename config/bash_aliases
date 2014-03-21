@@ -2,7 +2,7 @@
 if ls --color > /dev/null 2>&1
 then
     # some version of ls do not support color
-    alias ls='ls --color'
+    alias ls='ls --color=auto'
 fi
 alias ll='ls -l'
 alias la='ls -Al'

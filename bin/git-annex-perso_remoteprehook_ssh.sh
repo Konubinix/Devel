@@ -26,7 +26,7 @@ while getopts "u:p:l:" opt; do
 done
 konix_assert_var URL
 konix_assert_var LOCATION
-cat <<EOF|ssh $PORT "$URL"
+cat <<EOF|ssh -t $PORT "$URL"
 cd "$LOCATION"
 \${HOME}/Prog/devel/bin/konix_do_cron_job.sh git-annex-freeze.sh
 EOF

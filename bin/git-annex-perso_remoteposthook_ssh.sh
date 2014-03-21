@@ -27,4 +27,9 @@ while getopts "u:p:l:" opt; do
 done
 konix_assert_var URL
 konix_assert_var LOCATION
-ssh $PORT $URL "cd $LOCATION && git annex merge && git rebase synced/master"
+cat <<EOF | ssh -t $PORT $URL
+cd $LOCATION
+git annex merge
+git rebase synced/master
+\${HOME}/Prog/devel/bin/konix_do_cron_job.sh git-annex-freeze.sh
+EOF

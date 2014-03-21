@@ -158,11 +158,11 @@ then
                     git annex sync "$remote_name"
                 fi
             fi
-            # Sync posthook must be done even if no data transfer has been made
-            # since file may only have been moved around
-            gaps_launch_posthook "${sync_posthook}" "${url}" "sync post hook"
             popd
         fi
+        # Sync posthook must be done even if no data transfer has been made
+        # since file may only have been moved around
+        gaps_launch_posthook "${sync_posthook}" "${url}" "sync post hook"
         # launch the post hook and reinit the trap
         gaps_posthook_launch_maybe
         trap "" 0

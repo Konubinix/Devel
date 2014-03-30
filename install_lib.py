@@ -32,9 +32,10 @@ def get_environ():
         environ["KONIX_PWD"] = KONIX_PWD
         environ["KONIX_CONFIG_DIR"] = KONIX_PWD+"/"+"config"
         environ["KONIX_TUNING_DIR"] = KONIX_PWD+"/"+"tuning"
-        environ["KONIX_PERSO_DIR"] = KONIX_PWD+"/"+".."+"/"+"perso"
-        environ["PATH_SEPARATOR"] = os.pathsep
         environ["HOME"] = os.path.expanduser("~").replace("\\","/")
+        environ["KONIX_PERSO_DIRS"] = os.path.join(environ["HOME"], "perso")
+        environ["KONIX_PERSO_DIR"] = os.path.join(environ["KONIX_PERSO_DIRS"], "perso")
+        environ["PATH_SEPARATOR"] = os.pathsep
         environ["HOSTNAME"] = os.environ["HOSTNAME"]
         environ["KONIX_SH_CUSTOM_FILE"] = environ["HOME"]+"/"+".shrc_custo"
         environ["KONIX_EMACS_CUSTOM_FILE"] = environ["HOME"]+"/"+".emacs_custo"

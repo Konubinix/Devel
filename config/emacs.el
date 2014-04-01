@@ -8,10 +8,24 @@
 ;; ####################################################################################################
 ;; Needed library paths
 ;; ####################################################################################################
-(add-to-list 'load-path (expand-file-name elfiles))
-(add-to-list 'load-path (expand-file-name (concat elfiles "/config")))
-(add-to-list 'load-path (expand-file-name "~/.elfiles/config")) ;; for custom files
-(add-to-list 'load-path (expand-file-name "~/.elfiles")) ;; for custom files
+(setq-default
+ perso-elfiles (expand-file-name "elfiles" perso-dir)
+ perso-host-elfiles (expand-file-name "elfiles"
+									  (expand-file-name
+									   (getenv
+										"HOSTNAME") perso-dir
+										)
+									  )
+ home-elfiles (expand-file-name "~/.elfiles")
+ )
+(defun konix/setup-elfiles (elfiles)
+  (add-to-list 'load-path (expand-file-name "config" elfiles))
+  (add-to-list 'load-path (expand-file-name elfiles))
+  )
+(konix/setup-elfiles elfiles)
+(konix/setup-elfiles perso-elfiles)
+(konix/setup-elfiles perso-host-elfiles)
+(konix/setup-elfiles home-elfiles)
 
 ;; ################################################################################
 ;; Load config files
@@ -81,8 +95,9 @@
   )
 
 (konix/load-config-files (expand-file-name "config" elfiles))
-(konix/load-config-files (expand-file-name "config" (expand-file-name "elfiles" (getenv "KONIX_PERSO_DIR"))))
-(konix/load-config-files (expand-file-name "config" "~/.elfiles")) ;; custom-config
+(konix/load-config-files (expand-file-name "config" perso-elfiles))
+(konix/load-config-files (expand-file-name "config" perso-host-elfiles))
+(konix/load-config-files (expand-file-name "config" home-elfiles))
 
 ;; ####################################################################################################
 ;; Starts the serveur

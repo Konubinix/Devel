@@ -12,9 +12,12 @@
  perso-elfiles (expand-file-name "elfiles" perso-dir)
  perso-host-elfiles (expand-file-name "elfiles"
 									  (expand-file-name
-									   (getenv
-										"HOSTNAME") perso-dir
+									   "config"
+									   (expand-file-name
+										(getenv "HOSTNAME")
+										perso-dir
 										)
+									   )
 									  )
  home-elfiles (expand-file-name "~/.elfiles")
  )

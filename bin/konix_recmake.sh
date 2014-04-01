@@ -4,6 +4,7 @@ set -eu
 
 TMP="`mktemp`"
 mv CMakeCache.txt "${TMP}"
-trap "mv '${TMP}' ." 0
+trap "mv '${TMP}' CMakeCache.txt" 0
 
 rm -rf *
+cmake "$@"

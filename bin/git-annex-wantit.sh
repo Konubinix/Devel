@@ -19,6 +19,11 @@ then
 fi
 
 wanted="$(git annex wanted "${REMOTE}")"
-new_wanted="include=${relative_path} or ( ${wanted} )"
+if [ -n "${wanted}" ] && [ "${wanted}" != "standard" ]
+then
+    new_wanted="include=${relative_path} or ( ${wanted} )"
+else
+    new_wanted="include=${relative_path}"
+fi
 echo "New wanted = ${new_wanted}"
 git annex wanted "${REMOTE}" "${new_wanted}"

@@ -1331,9 +1331,9 @@ to be organized.
 (setq-default org-clock-persist-file (expand-file-name "org-clock-save.el" user-emacs-directory))
 (setq-default org-clock-persist-query-save t)
 (setq-default org-clock-report-include-clocking-task t)
-(setq-default org-columns-default-format "%CATEGORY %90ITEM %1PRIORITY
+(setq-default org-columns-default-format "%CATEGORY %TODO %90ITEM %1PRIORITY
 %10Effort{:} %10CLOCKSUM %10CLOCKSUM_T %ORDERED %allocate %BLOCKER")
-(setq-default org-agenda-overriding-columns-format "%CATEGORY %90ITEM
+(setq-default org-agenda-overriding-columns-format "%CATEGORY %TODO %90ITEM
  %1PRIORITY %2DONE_POMODORO(dp){+} %2POMODORO{+} %10Effort{:} %10CLOCKSUM_T
 %10CLOCKSUM %ORDERED %allocate %BLOCKER")
 (setq-default org-cycle-separator-lines -1)

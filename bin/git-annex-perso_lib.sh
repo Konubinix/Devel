@@ -11,6 +11,7 @@ GITANNEXSYNC_CONTEXTS=".gitannexcontexts"
 GITANNEXSYNC_INIT="git-annex-perso_init.sh"
 GITANNEXSYNC_WARN_FILE="${HOME}/log/gaps_warn_log"
 GITANNEXSYNC_ERROR_FILE="${HOME}/log/gaps_error_log"
+GITANNEXPERSO_REMOTECLEAN=""
 
 gaps_log ( ) {
     echo "## $*"
@@ -36,6 +37,13 @@ gaps_compute_remotes_internal ( ) {
             if git config remote.${remote}.url > /dev/null
             then
                 gaps_error "The git remote ${remote} is not known by git-annex-perso-sync"
+                if [ -n "${GITANNEXPERSO_REMOTECLEAN}" ] \
+                    && gaps_ask_for_confirmation "Remove it?"
+                then
+                    git remote remove ${remote} && \
+                        gaps_log_info "Correctly removed ${remote}" || \
+                        gaps_log_error "Failed to remove ${remote}"
+                fi
             else
                 gaps_log_info "${remote} has no url. It must be a special remote"
             fi

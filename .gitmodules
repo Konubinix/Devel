@@ -112,9 +112,6 @@
 [submodule "config/elfiles/cedet"]
 	path = config/elfiles/cedet
 	url = bzr://cedet.bzr.sourceforge.net/bzrroot/cedet/code/trunk
-[submodule "config/elfiles/git-annex"]
-	path = config/elfiles/git-annex
-	url = https://github.com/Konubinix/git-annex-el.git
 [submodule "config/elfiles/highlight-indentation"]
 	path = config/elfiles/highlight-indentation
 	url = https://github.com/antonj/Highlight-Indentation-for-Emacs.git

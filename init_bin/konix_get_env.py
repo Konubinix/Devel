@@ -47,11 +47,14 @@ def getConfigFromEnvFile(envfile, previous_config):
         if section == "include":
             items = config.items(section)
             for item in items:
-                include_name, file_to_include=item
+                condition, file_to_include=item
                 file_to_include = os.path.expanduser(file_to_include)
                 logging.debug("Attempting to include env from %s (%s)" %
-                              (file_to_include, include_name,))
-                assert os.path.exists(file_to_include)
+                              (file_to_include, condition,))
+                if condition == "assert_exists":
+                  assert os.path.exists(file_to_include)
+                elif not os.path.exists(file_to_include):
+                  logging.critical("File %s not found" % file_to_include)
                 # update the existing config with the one included
                 new_config = getConfigFromEnvFile(file_to_include, new_config)
             continue

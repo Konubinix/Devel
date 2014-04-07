@@ -34,6 +34,26 @@ def mergeItemsOfSection(items):
         items_keys.append(key)
     return (new_items, items_keys,)
 
+def parse_value(key, value, previous_config, new_config):
+    # first step is to make sure to correctly unquote the values
+    value = re.sub('^"(.*)"$', r"'\1'", value)
+    value = re.sub("^'(.*)'$", r"\1", value)
+
+    env_value = DEFAULT_ENVIRON.get(key)
+    if env_value == None:
+        env_value = ""
+
+    value = value.replace('\n','')
+    substitute_config = {}
+    substitute_config.update(DEFAULT_CONFIG)
+    substitute_config.update(DEFAULT_ENVIRON)
+    substitute_config.update(previous_config)
+    substitute_config.update(new_config)
+
+    value_template = string.Template(value)
+    value = value_template.safe_substitute(substitute_config)
+    return value, env_value
+
 def getConfigFromEnvFile(envfile, previous_config):
     if not os.path.exists(envfile):
         print >>sys.stderr,"Config file",envfile,"does not exist"
@@ -63,23 +83,7 @@ def getConfigFromEnvFile(envfile, previous_config):
         (items, items_keys,) = mergeItemsOfSection(config.items(section))
         for key in items_keys:
             value = items[key]
-            # first step is to make sure to correctly unquote the values
-            value = re.sub('^"(.*)"$', r"'\1'", value)
-            value = re.sub("^'(.*)'$", r"\1", value)
-
-            env_value = DEFAULT_ENVIRON.get(key)
-            if env_value == None:
-                env_value = ""
-
-            value = value.replace('\n','')
-            substitute_config = {}
-            substitute_config.update(DEFAULT_CONFIG)
-            substitute_config.update(DEFAULT_ENVIRON)
-            substitute_config.update(previous_config)
-            substitute_config.update(new_config)
-
-            value_template = string.Template(value)
-            value = value_template.safe_substitute(substitute_config)
+            value, env_value = parse_value(key, value, previous_config, new_config)
 
             #env_value = env_value.replace("\\","\\\\")
             #value = value.replace('\\','\\\\')

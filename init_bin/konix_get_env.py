@@ -68,7 +68,12 @@ def getConfigFromEnvFile(envfile, previous_config):
             items = config.items(section)
             for item in items:
                 condition, file_to_include=item
-                file_to_include = os.path.expanduser(file_to_include)
+                file_to_include, _ = parse_value(
+                  condition,
+                  file_to_include,
+                  previous_config,
+                  new_config,
+                )
                 logging.debug("Attempting to include env from %s (%s)" %
                               (file_to_include, condition,))
                 if condition == "assert_exists":

@@ -106,14 +106,14 @@
 
 
 !!! help topics label for Xaw
-*help_label.font: -*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*
+*help_label.font: -bitstream-charter-medium-r-normal--12-120-75-75-p-68-iso8859-1
 
 !!!------------------------------------------------------------------------------
 !!!-------------------------------- Motif tooltips ------------------------------
 !!!------------------------------------------------------------------------------
 !!! background color and font:
 *tipShell.background: cornsilk
-*tipShell.fontSet: -*-helvetica-medium-r-*-*-12-*-*-*-*-*-*
+*tipShell.fontSet: -bitstream-charter-medium-r-normal--12-120-75-75-p-68-iso8859-1
 
 !!! time the mouse needs to stay on a button until tooltips pop up,
 !!! in milliseconds; set to a negative value to disable:
@@ -134,12 +134,10 @@
 !!! TOPIC_LABEL: Label for topics list in help window
 !!! TOPIC_HEADING: Heading for help text in help window
 !!!
+!! http://en.wikipedia.org/wiki/X_logical_font_description
 *fontList: \
--*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*=NORMAL,\
--*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*=UNMARKED,\
--*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*=MARKED,\
--*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*=TOPIC_LABEL,\
--*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*=TOPIC_HEADING
+-bitstream-charter-medium-r-normal--12-120-75-75-p-68-iso8859-1
+
 
 
 !!! Color used for page border, image bounding boxes and the ruler in `Ruler mode.

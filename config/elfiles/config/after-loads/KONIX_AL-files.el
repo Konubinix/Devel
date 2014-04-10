@@ -37,6 +37,7 @@
 	  (setq-default insert-directory-program konix/insert-directory-program)
 	(setq-default insert-directory-program konix/old-insert-directory-program)
 	)
+  (message "insert-directory-program is now %s" insert-directory-program)
   )
 (konix/gatls-dired-toggle t)
 

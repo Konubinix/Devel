@@ -115,6 +115,8 @@
 
 ;; open recent file
 (define-key 'konix/global-slow-key-map (kbd "f") 'recentf-open-files)
+;; toggle gatls_dired
+(define-key 'konix/global-slow-key-map (kbd "C-l") 'konix/gatls-dired-toggle)
 ;; toggle undo-tree mode
 (define-key 'konix/global-slow-key-map (kbd "C-u") 'undo-tree-mode)
 ;; calc

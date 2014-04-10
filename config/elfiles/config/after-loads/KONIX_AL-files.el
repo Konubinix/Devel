@@ -24,6 +24,22 @@
 
 ;;; Code:
 
+(setq-default konix/old-insert-directory-program insert-directory-program)
+(setq-default konix/insert-directory-program "gatls_dired.py")
+
+(defun konix/gatls-dired-toggle (&optional force)
+  (interactive)
+  (if (or
+	   (string-equal insert-directory-program
+					 konix/old-insert-directory-program)
+	   force
+	   )
+	  (setq-default insert-directory-program konix/insert-directory-program)
+	(setq-default insert-directory-program konix/old-insert-directory-program)
+	)
+  )
+(konix/gatls-dired-toggle t)
+
 (defun konix/find-file-hook ()
   (if (and
 	   (string-match "^\\(.+\\):\\([0-9]+\\):?$" buffer-file-name)
@@ -49,12 +65,12 @@
 					  ;; keep-buffers-protected-alist says otherwise
 					  (keep-buffers-protected-alist nil)
 					  )
-				 (kill-buffer old_buffer)
-				 )
+				  (kill-buffer old_buffer)
+				  )
 				nil
 				)
-			  nil
-			  )
+			nil
+			)
 		  )
 		)
 	nil

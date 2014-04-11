@@ -62,14 +62,15 @@ else:
     logger.debug("Switching to %s" % new_dir)
     os.chdir(new_dir)
     files = [os.path.relpath(f) for f in files]
-    command = ["git", "annex", "find", "--not", "-(",] + \
+    command = ["git", "annex", "find",] + \
               shlex.split(filter) + \
-              ["-)", '--'] + files
+              ['--'] + files
     logger.debug(" ".join(command))
     p = subprocess.Popen(command,
           stdout=subprocess.PIPE)
     p.wait()
-    ignored_files = [f[:-1] for f in p.stdout.readlines()]
+    files_to_keep = [f[:-1] for f in p.stdout.readlines()]
+    ignored_files = list(set(files).difference(set(files_to_keep)))
     for ignored_file in ignored_files:
         ignored_command.append("-I")
         ignored_command.append(ignored_file)

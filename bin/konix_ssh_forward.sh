@@ -1,5 +1,8 @@
 #!/bin/bash
 source "${KONIX_LIB_DIR}/remote_config_lib.sh"
+# try to re connect to the gpg-agent (transporting the ssh-agent) in case it
+# changed
+gpg_agent_start_KONIX
 
 set -x
 HOST="${1}"

@@ -39,7 +39,6 @@
 	)
   (message "insert-directory-program is now %s" insert-directory-program)
   )
-(konix/gatls-dired-toggle t)
 
 (defun konix/find-file-hook ()
   (if (and

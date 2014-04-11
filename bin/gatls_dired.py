@@ -71,6 +71,22 @@ else:
     p.wait()
     files_to_keep = [f[:-1] for f in p.stdout.readlines()]
     ignored_files = list(set(files).difference(set(files_to_keep)))
+    # does the same with directories if asked to
+    if os.environ.get("KONIX_GIT_ANNEX_DIRED_SCAN_DIRECTORY", None):
+      directories = [os.path.relpath(d) for d in directories]
+      command = ["git", "annex", "find",] + \
+                shlex.split(filter) + \
+                ['--'] + directories
+      logger.debug(" ".join(command))
+      p = subprocess.Popen(command,
+            stdout=subprocess.PIPE)
+      p.wait()
+      files_to_keep = [f[:-1] for f in p.stdout.readlines()]
+      # find root dir
+      directories_to_keep = [d.split(os.path.sep)[0] for d in files_to_keep]
+      directories_to_keep = list(set(directories_to_keep))
+      ignored_files = ignored_files + list(set(directories).difference(set(directories_to_keep)))
+
     for ignored_file in ignored_files:
         ignored_command.append("-I")
         ignored_command.append(ignored_file)

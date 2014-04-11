@@ -2375,6 +2375,26 @@ of the clocksum."
   (setq maybe-refresh t)
   )
 
+(defun konix/org-agenda-reset-apply-filter (filters)
+  (interactive "sFilters: ")
+  (setq raw_filters filters)
+  (setq filters '())
+  (while (not
+		  (string-equal raw_filters "")
+		  )
+	(if (string-match "^\\([+-]?[^+-]+\\)\\(.*\\)$" raw_filters)
+		(add-to-list 'filters (match-string 1 raw_filters))
+	  (add-to-list 'filters raw_filters)
+	  )
+	(setq raw_filters (match-string 2 raw_filters))
+	)
+
+  (with-current-buffer org-agenda-buffer
+	(org-agenda-filter-show-all-tag)
+	(org-agenda-filter-apply filters 'tag)
+	)
+  )
+
 (defvar konix/org-agenda-filter-context-show-appt t "")
 (defvar konix/org-agenda-filter-context-show-empty-context t "")
 (defun konix/org-agenda-filter-context_1 (tags)

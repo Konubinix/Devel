@@ -9,6 +9,7 @@ import logging
 logging.basicConfig()
 logger = logging.getLogger("unseen")
 #logger.setLevel(logging.DEBUG)
+logger.debug(" ".join(sys.argv))
 
 if subprocess.call(shlex.split("git rev-parse --is-inside-git-dir"),
                 stdout=open("/dev/null", "w"),
@@ -25,10 +26,13 @@ else:
       found = True
       break
     index = index + 1
-  assert found, "Must have -- in the command line"
-  logger.debug(" ".join(sys.argv))
-  ls_args = sys.argv[1:index]
-  input_directories = sys.argv[index+1:]
+  if found:
+    ls_args = sys.argv[1:index]
+    input_directories = sys.argv[index+1:]
+  else:
+    logger.info("-- not found, default to .")
+    ls_args = sys.argv[1:]
+    input_directories = [".",]
   assert len(input_directories) == 1, "Only support one input directory for the time being"
   logger.debug("Args: " + " ".join(ls_args))
   logger.debug("Input: " + " ".join(input_directories))

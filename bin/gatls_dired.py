@@ -9,6 +9,7 @@ import logging
 logging.basicConfig()
 logger = logging.getLogger(os.path.basename(sys.argv[0]))
 logger.setLevel(logging.INFO)
+#logger.setLevel(logging.DEBUG)
 logger.debug(" ".join(sys.argv))
 
 p = subprocess.Popen(shlex.split("git rev-parse --git-dir"),
@@ -49,6 +50,7 @@ else:
   directories = []
   files = []
   for directory in input_directories:
+      directory = os.path.realpath(directory)
       files = files + [
           os.path.join(directory, f)
           for f in os.listdir(directory)]
@@ -56,7 +58,9 @@ else:
   files = list(set(files).difference(set(directories)))
   ignored_command = []
   if len(files) != 0:
-    os.chdir(input_directories[0])
+    new_dir = os.path.realpath(input_directories[0])
+    logger.debug("Switching to %s" % new_dir)
+    os.chdir(new_dir)
     files = [os.path.relpath(f) for f in files]
     command = ["git", "annex", "find", "--not", "-(",] + \
               shlex.split(filter) + \

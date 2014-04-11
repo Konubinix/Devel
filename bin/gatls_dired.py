@@ -11,11 +11,18 @@ logger = logging.getLogger("unseen")
 #logger.setLevel(logging.DEBUG)
 logger.debug(" ".join(sys.argv))
 
-if subprocess.call(shlex.split("git rev-parse --is-inside-git-dir"),
-                stdout=open("/dev/null", "w"),
+p = subprocess.Popen(shlex.split("git rev-parse --git-dir"),
+                stdout=subprocess.PIPE,
                 stderr=open("/dev/null", "w"),
-              ) != 0 or \
-                   not os.environ.get("KONIX_GIT_ANNEX_DIRED_METADATA", None):
+              )
+p.wait()
+in_git_annex = False
+if p.returncode == 0:
+  git_dir = p.stdout.read()[:-1]
+  in_git_annex = os.path.isdir(os.path.join(git_dir, "annex"))
+
+if not ( in_git_annex and
+         not os.environ.get("KONIX_GIT_ANNEX_DIRED_METADATA", None) ):
   subprocess.call(["ls"] + sys.argv[1:])
 else:
   # look for the -- in the arguments

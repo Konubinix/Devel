@@ -7,7 +7,7 @@ import shlex
 import sys
 import logging
 logging.basicConfig()
-logger = logging.getLogger("unseen")
+logger = logging.getLogger(os.path.basename(sys.argv[0]))
 logger.setLevel(logging.INFO)
 logger.debug(" ".join(sys.argv))
 

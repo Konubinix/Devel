@@ -8,7 +8,7 @@ import sys
 import logging
 logging.basicConfig()
 logger = logging.getLogger("unseen")
-#logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 logger.debug(" ".join(sys.argv))
 
 p = subprocess.Popen(shlex.split("git rev-parse --git-dir"),
@@ -16,15 +16,18 @@ p = subprocess.Popen(shlex.split("git rev-parse --git-dir"),
                 stderr=open("/dev/null", "w"),
               )
 p.wait()
+
 in_git_annex = False
 if p.returncode == 0:
   git_dir = p.stdout.read()[:-1]
   in_git_annex = os.path.isdir(os.path.join(git_dir, "annex"))
 
 if not ( in_git_annex and
-         not os.environ.get("KONIX_GIT_ANNEX_DIRED_METADATA", None) ):
+         os.environ.get("KONIX_GIT_ANNEX_DIRED_METADATA", None) ):
   subprocess.call(["ls"] + sys.argv[1:])
 else:
+  filter = os.environ["KONIX_GIT_ANNEX_DIRED_METADATA"]
+  logger.info("git annex filter: %s" % filter)
   # look for the -- in the arguments
   index = 0
   found = False
@@ -56,7 +59,7 @@ else:
     os.chdir(input_directories[0])
     files = [os.path.relpath(f) for f in files]
     command = ["git", "annex", "find", "--not", "-(",] + \
-              shlex.split(os.environ["KONIX_GIT_ANNEX_DIRED_METADATA"]) + \
+              shlex.split(filter) + \
               ["-)", '--'] + files
     logger.debug(" ".join(command))
     p = subprocess.Popen(command,

@@ -2115,13 +2115,8 @@ of the clocksum."
   ;; handled
   (when (and
 		 (member "INTERRUPTION"
-				 (save-window-excursion
-				   (save-excursion
-					 (org-clock-goto)
 					 (org-get-tags-at (point))
 					 )
-				   )
-				 )
 		 (<=
 		  (org-clock-get-clocked-time)
 		  konix/org-capture-interruption-handled-threshold

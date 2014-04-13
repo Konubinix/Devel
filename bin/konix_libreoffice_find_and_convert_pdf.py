@@ -10,9 +10,9 @@ import shlex
 matches = []
 for root, dirnames, filenames in os.walk('.'):
   dirnames = [d for d in dirnames if not re.match("^\..+$", d)]
-  for filename in fnmatch.filter(filenames, '*.doc?') + \
-      fnmatch.filter(filenames, '*.ppt?') + \
-      fnmatch.filter(filenames, '*.xls?'):
+  for filename in fnmatch.filter(filenames, '*.doc*') + \
+      fnmatch.filter(filenames, '*.ppt*') + \
+      fnmatch.filter(filenames, '*.xls*'):
       matches.append(os.path.join(root, filename))
 def guess_pdf(doc):
   return re.sub("(doc|ppt|xls).?$", "pdf", doc)

@@ -25,5 +25,12 @@ then
 else
     new_wanted="include=${relative_path}"
 fi
+echo "Old wanted = ${wanted}"
 echo "New wanted = ${new_wanted}"
-git annex wanted "${REMOTE}" "${new_wanted}"
+echo "Ok with that?"
+read res
+if [ "$res" == "y" ]
+then
+        git annex wanted "${REMOTE}" "${new_wanted}" \
+                && echo "done"
+fi

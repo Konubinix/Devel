@@ -19,7 +19,7 @@ then
 fi
 
 wanted="$(git annex wanted "${REMOTE}")"
-if [ -n "${wanted}" ] && [ "${wanted}" != "standard" ]
+if [ -n "${wanted}" ] && ( echo "$wanted" | grep -q 'include=' || [ "${wanted}" != "standard" ] )
 then
     new_wanted="include=${relative_path} or ( ${wanted} )"
 else

@@ -1753,6 +1753,23 @@ to be organized.
 				)
   (message "konix/org-agenda-tag-filter-contexts set to %s" konix/org-agenda-tag-filter-contexts)
   )
+(defun konix/org-agenda-tag-filter-context-initialize-from-context ()
+  (setq-default
+   konix/org-agenda-tag-filter-contexts-default
+   (mapcar
+	(lambda (elem)
+	  (concat "@" elem)
+	  )
+	(split-string
+	 (replace-regexp-in-string "\n" ""
+							   (shell-command-to-string "konix_contexts.sh")
+							   )
+	 " "
+	 )
+	)
+   )
+  )
+(konix/org-agenda-tag-filter-context-initialize-from-context)
 (defun konix/org-agenda-auto-exclude-function-context (tag)
   (if (and
 	   konix/org-agenda-tag-filter-contexts
@@ -2115,8 +2132,8 @@ of the clocksum."
   ;; handled
   (when (and
 		 (member "INTERRUPTION"
-					 (org-get-tags-at (point))
-					 )
+				 (org-get-tags-at (point))
+				 )
 		 (<=
 		  (org-clock-get-clocked-time)
 		  konix/org-capture-interruption-handled-threshold

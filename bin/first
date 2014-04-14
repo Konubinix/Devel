@@ -1,0 +1,4 @@
+#!/bin/bash
+
+POS="${1:-1}"
+ls -1|konix_choose.sh "$POS"

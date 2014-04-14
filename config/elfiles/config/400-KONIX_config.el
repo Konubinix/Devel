@@ -261,8 +261,9 @@
 ;; ************************************************************
 ;; Usage of winner to undo windows configurations
 ;; ************************************************************
-(require 'winner)
-(winner-mode t)
+(when (require 'winner nil t)
+  (winner-mode t)
+ )
 
 ;; ************************************************************
 ;; Sticky windows allow dedicated windows
@@ -344,11 +345,17 @@
 			  scroll-up-aggressively 10)
 (setq-default scroll-step 5)
 ;;Virer la toolbar (que j'utilise jamais)
-(tool-bar-mode -1)
+(when (boundp 'tool-bar-mode)
+  (tool-bar-mode -1)
+ )
 ;;Virer la scrollbar (que j'utilise jamais)
-(scroll-bar-mode -1)
+(when (boundp 'scroll-bar-mode)
+ (scroll-bar-mode -1)
+ )
 ;; virer le menu-bar
-(menu-bar-mode -1)
+(when  (boundp 'menu-bar-mode)
+ (menu-bar-mode -1)
+ )
 ;; when truncating window, truncate words and not characters
 (setq-default word-wrap t)
 (setq-default truncate-lines t)
@@ -740,7 +747,9 @@
 ;; Make a backup of the file once everything else has been done
 (add-hook 'before-save-hook 'konix/force-backup-of-buffer-if-not-git t)
 ;; make backup of git tracked files thanks to git-wip
-(load-library "git-wip")
+(when (locate-library "git-wip")
+  (load-library "git-wip")
+ )
 
 ;; ####################################################################################################
 ;; Maximize frame when visiting a file from emacs client

@@ -136,3 +136,6 @@
 [submodule "lib/log.sh"]
 	path = lib/log.sh
 	url = https://github.com/livibetter/log.sh.git
+[submodule "config/elfiles/org-ehtml"]
+	path = config/elfiles/org-ehtml
+	url = https://github.com/eschulte/org-ehtml

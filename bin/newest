@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -eu
+POS="${1:-1}"
+ls -t1|konix_choose.sh "${POS}"

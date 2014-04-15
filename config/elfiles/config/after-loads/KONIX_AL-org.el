@@ -1769,7 +1769,7 @@ to be organized.
 	)
    )
   )
-(konix/org-agenda-tag-filter-context-initialize-from-context)
+
 (defun konix/org-agenda-auto-exclude-function-context (tag)
   (if (and
 	   konix/org-agenda-tag-filter-contexts
@@ -2483,6 +2483,9 @@ of the clocksum."
 (defadvice org-agenda (after konix/set-text-properties ())
   (konix/org-agenda-set-text-properties)
   (konix/org-agenda-filter-context)
+  )
+(defadvice org-agenda (before konix/recompute-contexts ())
+  (konix/org-agenda-tag-filter-context-initialize-from-context)
   )
 (defadvice org-agenda-redo (after konix/set-text-properties ())
   (konix/org-agenda-set-text-properties)

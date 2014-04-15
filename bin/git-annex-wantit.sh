@@ -17,6 +17,7 @@ if [ -n "${DIRECTORY}" ]
 then
     relative_path="${relative_path%%/}/*"
 fi
+relative_path="${relative_path/ /?}"
 
 wanted="$(git annex wanted "${REMOTE}")"
 if [ -n "${wanted}" ] && ( echo "$wanted" | grep -q 'include=' || [ "${wanted}" != "standard" ] )

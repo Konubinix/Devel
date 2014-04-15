@@ -386,6 +386,9 @@ class RILItem(object):
         assert self.dled
         os.system('mimeopen "%s"' % self.index_abs_path.encode("utf-8").replace('"', '\\"'))
 
+    def open_url(self):
+        os.system('"%s" "%s"' % (os.environ["BROWSER"], self.url))
+
 class RILItems(object):
     def __init__(self, items=None):
         if items == None:

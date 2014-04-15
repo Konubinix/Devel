@@ -86,6 +86,10 @@ class RilCmd(cmd.Cmd, object):
         item = self.get_item(line)
         self.open(item)
 
+    def do_open_url(self, line):
+        item = self.get_item(line)
+        item.open_url()
+
     def do_explorer(self, line):
         item = self.get_item(line)
         os.system("mimeopen '%s'" % item.dir)

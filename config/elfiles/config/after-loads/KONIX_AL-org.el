@@ -126,7 +126,7 @@ cursor stays in the org buffer."
   (org-insert-time-stamp nil t t nil nil nil))
 
 (defvar konix/insert-heading-inactive-timestamp-file-name-regex
-  (expand-file-name perso-dir)
+  (expand-file-name perso-dirs)
   "Regex matched against the file name in which to insert the inactive time stamp")
 
 (defun konix/insert-heading-inactive-timestamp-maybe ()

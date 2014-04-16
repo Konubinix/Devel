@@ -71,3 +71,4 @@ alias gaweb="git-annex sync"
 alias gam="git-annex move"
 alias kfairy="konix_fairy.py"
 alias ms="mr -s"
+alias le=less

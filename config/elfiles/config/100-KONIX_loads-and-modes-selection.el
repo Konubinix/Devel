@@ -45,7 +45,7 @@
 		 (expand-file-name "highlight-indentation" elfiles)
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "dynsite" elfiles)
-		 (expand-file-name "org-ehtml" elfiles)
+		 (expand-file-name "org-ehtml/src" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

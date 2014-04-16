@@ -1731,31 +1731,28 @@ to be organized.
 	)
   )
 
-(defvar konix/org-agenda-tag-filter-contexts-default '() "")
 (defvar konix/org-agenda-tag-filter-contexts '() "")
+(defvar konix/org-agenda-tag-filter-context-p t "")
 (defun konix/org-toggle-org-agenda-tag-filter-context (&optional force)
   (interactive)
-  (setq-default konix/org-agenda-tag-filter-contexts
+  (setq-default konix/org-agenda-tag-filter-context-p
 				(cond
 				 (force
 				  (if (equal force 1)
-					  konix/org-agenda-tag-filter-contexts-default
+					  t
 					nil
 					)
 				  )
-				 (konix/org-agenda-tag-filter-contexts
-				  nil
-				  )
 				 (t
-				  konix/org-agenda-tag-filter-contexts-default
+				  (not konix/org-agenda-tag-filter-context-p)
 				  )
 				 )
 				)
-  (message "konix/org-agenda-tag-filter-contexts set to %s" konix/org-agenda-tag-filter-contexts)
+  (message "konix/org-agenda-tag-filter-context-p set to %s" konix/org-agenda-tag-filter-context-p)
   )
 (defun konix/org-agenda-tag-filter-context-initialize-from-context ()
   (setq-default
-   konix/org-agenda-tag-filter-contexts-default
+   konix/org-agenda-tag-filter-contexts
    (mapcar
 	(lambda (elem)
 	  (concat "@" elem)
@@ -2485,7 +2482,9 @@ of the clocksum."
   (konix/org-agenda-filter-context)
   )
 (defadvice org-agenda (before konix/recompute-contexts ())
-  (konix/org-agenda-tag-filter-context-initialize-from-context)
+  (when konix/org-agenda-tag-filter-context-p
+   (konix/org-agenda-tag-filter-context-initialize-from-context)
+   )
   )
 (defadvice org-agenda-redo (after konix/set-text-properties ())
   (konix/org-agenda-set-text-properties)

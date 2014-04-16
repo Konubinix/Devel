@@ -49,6 +49,7 @@ else:
   logger.debug("Input: " + " ".join(input_directories))
   directories = []
   files = []
+  ignored_files = []
   for directory in input_directories:
       directory = os.path.realpath(directory)
       files = files + [
@@ -57,10 +58,10 @@ else:
   directories = [d for d in files if os.path.isdir(d)]
   files = list(set(files).difference(set(directories)))
   ignored_command = []
+  new_dir = os.path.realpath(input_directories[0])
+  os.chdir(new_dir)
   if len(files) != 0:
-    new_dir = os.path.realpath(input_directories[0])
     logger.debug("Switching to %s" % new_dir)
-    os.chdir(new_dir)
     files = [os.path.relpath(f) for f in files]
     command = ["git", "annex", "find",] + \
               shlex.split(filter) + \
@@ -71,7 +72,8 @@ else:
     p.wait()
     files_to_keep = [f[:-1] for f in p.stdout.readlines()]
     ignored_files = list(set(files).difference(set(files_to_keep)))
-    # does the same with directories if asked to
+  # does the same with directories if asked to
+  if len(directories) != 0:
     if os.environ.get("KONIX_GIT_ANNEX_DIRED_SCAN_DIRECTORY", None):
       directories = [os.path.relpath(d) for d in directories]
       command = ["git", "annex", "find",] + \
@@ -87,9 +89,9 @@ else:
       directories_to_keep = list(set(directories_to_keep))
       ignored_files = ignored_files + list(set(directories).difference(set(directories_to_keep)))
 
-    for ignored_file in ignored_files:
-        ignored_command.append("-I")
-        ignored_command.append(ignored_file)
+  for ignored_file in ignored_files:
+      ignored_command.append("-I")
+      ignored_command.append(ignored_file)
   ls_command = ["ls",] + ls_args + ignored_command + ["--",] + input_directories
   logger.debug(" ".join(ls_command))
   subprocess.call(ls_command)

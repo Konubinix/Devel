@@ -1732,6 +1732,7 @@ to be organized.
   )
 
 (defvar konix/org-agenda-tag-filter-contexts '() "")
+(defvar konix/org-agenda-tag-filter-contexts-forced nil "")
 (defvar konix/org-agenda-tag-filter-context-p t "")
 (defun konix/org-toggle-org-agenda-tag-filter-context (&optional force)
   (interactive)
@@ -2482,8 +2483,18 @@ of the clocksum."
   (konix/org-agenda-filter-context)
   )
 (defadvice org-agenda (before konix/recompute-contexts ())
-  (when konix/org-agenda-tag-filter-context-p
-   (konix/org-agenda-tag-filter-context-initialize-from-context)
+  (cond
+   (konix/org-agenda-tag-filter-contexts-forced
+	(setq konix/org-agenda-tag-filter-contexts
+		  konix/org-agenda-tag-filter-contexts-forced
+		  )
+	)
+   (konix/org-agenda-tag-filter-context-p
+	(konix/org-agenda-tag-filter-context-initialize-from-context)
+	)
+   (t
+	(setq konix/org-agenda-tag-filter-contexts nil)
+	)
    )
   )
 (defadvice org-agenda-redo (after konix/set-text-properties ())

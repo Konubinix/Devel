@@ -30,6 +30,15 @@
 
 (make-variable-buffer-local 'konix/indirect-mode-name)
 
+(defun konix/org-ehtml-start ()
+  (interactive)
+  (require 'org-ehtml)
+  (setq org-ehtml-docroot org-directory)
+  (setq org-ehtml-everything-editable t)
+  (setq org-ehtml-allow-agenda t)
+  (ws-start org-ehtml-handler 8888)
+  )
+
 (defun konix/bury-buffer-and-delete-window ()
   (interactive)
   (bury-buffer)

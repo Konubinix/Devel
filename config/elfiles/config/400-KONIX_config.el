@@ -345,15 +345,15 @@
 			  scroll-up-aggressively 10)
 (setq-default scroll-step 5)
 ;;Virer la toolbar (que j'utilise jamais)
-(when (boundp 'tool-bar-mode)
+(when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1)
  )
 ;;Virer la scrollbar (que j'utilise jamais)
-(when (boundp 'scroll-bar-mode)
+(when (fboundp 'scroll-bar-mode)
  (scroll-bar-mode -1)
  )
 ;; virer le menu-bar
-(when  (boundp 'menu-bar-mode)
+(when  (fboundp 'menu-bar-mode)
  (menu-bar-mode -1)
  )
 ;; when truncating window, truncate words and not characters

@@ -31,5 +31,6 @@ cat <<EOF | ssh -t $PORT $URL
 cd $LOCATION
 git annex merge
 git rebase synced/master
-\${HOME}/Prog/devel/bin/konix_do_cron_job.sh git-annex-freeze.sh
+git reset --hard HEAD
+git rebase synced/master
 EOF

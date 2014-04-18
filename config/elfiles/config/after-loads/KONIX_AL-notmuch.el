@@ -26,6 +26,23 @@
 
 (require 'notmuch-address)
 (require 'notmuch-tree)
+(require 'thingatpt)
+
+(defun konix/notmuch/record-url-to-ril-unflag-and-next (url)
+  (interactive
+   (list
+	(thing-at-point 'url)
+	)
+   )
+  (async-shell-command
+   (format
+	"konix_ril_save_url.sh '%s' && konix_display.py 'Saved %s'"
+	url
+	url
+	)
+   )
+  (konix/notmuch-show-unflag-and-next)
+)
 
 (defun konix/message-setup-hook ()
   (mml-secure-message-sign-pgpmime)

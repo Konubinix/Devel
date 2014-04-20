@@ -9,12 +9,12 @@ $0 -p PORT -h HOST [-w WAITING_TIME]
 Starts a local proxy on port PORT tunnelling traffic through ssh connection with
 HOST
 
-It checks every WAITING_TIME seconds (defaults to 300 = 5 minutes) and attemps
-to restart the connection if it appears broken.
+Once a connection is broken, the program will wait for WAITING_TIME seconds
+(defaults to 10) before trying again.
 EOF
 }
 
-WAITING_TIME="300"
+WAITING_TIME="10"
 while getopts "w:p:H:h" opt; do
 	case $opt in
 		h)
@@ -35,17 +35,16 @@ done
 shift $((OPTIND-1))
 
 echo "HOST=$HOST, PORT=$PORT, WAITING_TIME=$WAITING_TIME"
+if netstat -tupln 2> /dev/null |grep -q "${PORT}"
+then
+	echo "There is already something listening on port ${PORT}"
+fi
+
 while true
 do
 	echo "###########"
 	date
-	if netstat -tupln 2> /dev/null |grep ssh|grep -q "${PORT}"
-	then
-		echo "SSH connection appears to still be alive"
-	else
-		echo "SSH connection appears down, restating it"
-		ssh -fnNT -D "${PORT}" "${HOST}"
-	fi
+	ssh -nNT -D "${PORT}" "${HOST}"
 	echo "Waiting for ${WAITING_TIME}"
 	sleep "${WAITING_TIME}"
 done

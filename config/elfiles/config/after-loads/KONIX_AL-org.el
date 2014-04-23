@@ -29,6 +29,7 @@
 (require 'org-protocol)
 (require 'org-man)
 (require 'org-clock)
+(require 'org-expiry)
 ;; ######################################################################
 ;; My variables
 ;; ######################################################################
@@ -124,42 +125,6 @@ cursor stays in the org buffer."
 (defun konix/insert-inactive-timestamp ()
   (interactive)
   (org-insert-time-stamp nil t t nil nil nil))
-
-(defvar konix/insert-heading-inactive-timestamp-file-name-regex
-  (expand-file-name perso-dirs)
-  "Regex matched against the file name in which to insert the inactive time stamp")
-
-(defun konix/insert-heading-inactive-timestamp-maybe ()
-  (when (string-match-p
-		 konix/insert-heading-inactive-timestamp-file-name-regex
-		 (buffer-file-name)
-		 )
-	(let (
-		  (logbook_pos nil)
-		  )
-	  (save-excursion
-		(org-return)
-		(org-cycle)
-		(setq logbook_pos (point))
-		(insert ":LOGBOOK:")
-		(org-return)
-		(org-cycle)
-		(insert ":END:")
-		(beginning-of-line)
-		(org-return)
-		(previous-line)
-		(org-cycle)
-		(insert "- Captured       ")
-		(konix/insert-inactive-timestamp)
-		(goto-char logbook_pos)
-		(org-cycle)
-		)
-	  )
-	)
-  )
-
-(add-hook 'org-insert-heading-hook 'konix/insert-heading-inactive-timestamp-maybe
-		  'append)
 
 ;; ####################################################################################################
 ;; CONFIG
@@ -1412,23 +1377,23 @@ to be organized.
 (setq-default org-capture-templates
 			  '(
 				("t" "Todo Item" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile") "* TODO %?
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
 "
 				 :kill-buffer
 				 )
 				("i" "Todo Item in current clock" entry (clock) "* TODO %?
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
 "
 				 :kill-buffer
 				 )
 				("l" "Todo Item for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* TODO %?
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
   %a
 "
@@ -1437,8 +1402,8 @@ to be organized.
 				("u" "Todo Item URGENT" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %?
   SCHEDULED: %t
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
 "
 				 :kill-buffer
@@ -1446,8 +1411,8 @@ to be organized.
 				("U" "Todo Item URGENT for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %?
   SCHEDULED: %t
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
   %a
 "
@@ -1456,8 +1421,8 @@ to be organized.
 				("p" "Todo pomodoro next short pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %? :INTERRUPTION:
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp)
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
   :PROPERTIES:
   :INTERRUPTION_HANDLED: t
@@ -1468,8 +1433,8 @@ to be organized.
 				("P" "Todo pomodoro next long pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %? :INTERRUPTION:
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t)
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
   :PROPERTIES:
   :INTERRUPTION_HANDLED: t
@@ -1480,16 +1445,16 @@ to be organized.
 				("n" "Note" entry (file (expand-file-name "notes.org"
 														  org-directory))
 				 "* %?
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
 "
 				 :kill-buffer
 				 )
 				("B" "Bookmark (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* %:description
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
    %:link
    %:initial"
@@ -1497,8 +1462,8 @@ to be organized.
 				 )
 				("C" "Bookmark in current clock (use with org-protocol)" entry
 				 (clock) "* %:description
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
    %:link
    %:initial"
@@ -1506,8 +1471,8 @@ to be organized.
 				 )
 				("D" "Bookmark TODO (use with org-protocol)" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* TODO Read %:description
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
    %:link
    %:initial"
@@ -1515,8 +1480,8 @@ to be organized.
 				 )
 				("E" "Bookmark TODO in current clock (use with org-protocol)" entry (clock)
 				 "* TODO Read %:description
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
    %:link
    %:initial"
@@ -1524,8 +1489,8 @@ to be organized.
 				 )
 				("R" "Bookmark to read (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* TODO Read %:description
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
    %:link
    %:initial"
@@ -1533,16 +1498,16 @@ to be organized.
 				 )
 				("b" "Bookmark" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* %?
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
 "
 				 :kill-buffer
 				 )
 				("r" "Bookmark To Read" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* TODO Read %?
-  :LOGBOOK:
-  - Captured       %U
+  :PROPERTIES:
+  :CREATED:  %T
   :END:
 "
 				 :kill-buffer
@@ -2503,6 +2468,21 @@ of the clocksum."
   )
 (ad-activate 'org-agenda)
 (ad-activate 'org-agenda-redo)
+
+(defvar konix/org-expiry-insert-created-file-name-regex
+  (expand-file-name perso-dirs)
+  "Regex matched against the file name in which to auto insert created stamp")
+
+(defadvice org-expiry-insert-created (around insert-if-personal-entry ())
+  (when (string-match-p
+		 konix/org-expiry-insert-created-file-name-regex
+		 (buffer-file-name)
+		 )
+	ad-do-it
+	)
+  )
+(ad-activate 'org-expiry-insert-created)
+(org-expiry-insinuate)
 
 ;; ######################################################################
 ;; Notmuch

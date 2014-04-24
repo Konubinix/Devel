@@ -2472,6 +2472,7 @@ of the clocksum."
 (defvar konix/org-expiry-insert-created-file-name-regex
   (expand-file-name perso-dirs)
   "Regex matched against the file name in which to auto insert created stamp")
+(setq-default org-expiry-inactive-timestamps t)
 
 (defadvice org-expiry-insert-created (around insert-if-personal-entry ())
   (when (string-match-p

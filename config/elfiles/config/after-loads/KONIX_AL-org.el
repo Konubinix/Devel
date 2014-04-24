@@ -2477,7 +2477,10 @@ of the clocksum."
 (defadvice org-expiry-insert-created (around insert-if-personal-entry ())
   (when (string-match-p
 		 konix/org-expiry-insert-created-file-name-regex
-		 (buffer-file-name)
+		 (or
+		  (buffer-file-name)
+		  ""
+		  )
 		 )
 	ad-do-it
 	)

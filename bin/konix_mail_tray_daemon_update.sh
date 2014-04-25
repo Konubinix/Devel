@@ -35,11 +35,11 @@ main () {
 	    esac
     done
 
-    INBOX_ELEMENTS="$(notmuch search tag:inbox | wc -l)"
-    UNREAD_N_INBOX_ELEMENTS="$(notmuch search tag:unread and tag:inbox| wc -l)"
-    UNREAD_ELEMENTS="$(notmuch search tag:unread | wc -l)"
-    FLAGGED_ELEMENTS="$(notmuch search tag:flagged | wc -l)"
-    FLAGGED_UNREAD_ELEMENTS="$(notmuch search tag:flagged and tag:unread | wc -l)"
+    INBOX_ELEMENTS="$(notmuch search tag:inbox AND not tag:hide | wc -l)"
+    UNREAD_N_INBOX_ELEMENTS="$(notmuch search tag:unread and tag:inbox AND not tag:hide| wc -l)"
+    UNREAD_ELEMENTS="$(notmuch search tag:unread AND not tag:hide | wc -l)"
+    FLAGGED_ELEMENTS="$(notmuch search tag:flagged AND not tag:hide | wc -l)"
+    FLAGGED_UNREAD_ELEMENTS="$(notmuch search tag:flagged and tag:unread AND not tag:hide | wc -l)"
     MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
     NEW_UNREAD_MAILS_COUNT="$(notmuch search tag:new and tag:unread | wc -l)"
 

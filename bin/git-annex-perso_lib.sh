@@ -283,6 +283,14 @@ gaps_remote_considered_available_p () {
     fi
 }
 
+gaps_remote_disable () {
+    local remote="$1"
+    gaps_error "stopping syncing with remote ${remote} it and ignoring it"
+    git config "remote.${remote}.annex-ignore" true
+    git config "remote.${remote}.annex-sync" false
+    git config "remote.${remote}.konix-annex-available" false
+}
+
 gaps_remotes_fix ( ) {
     local REMOTES="${1}"
     gaps_log_info "Checking inconsistency in remotes"
@@ -300,6 +308,10 @@ gaps_remotes_fix ( ) {
             if ! gaps_extract_remote_info "${contexts}" "${remote}"
             then
                 gaps_warn "Could not find info for remote ${remote} in contexts ${contexts}"
+                if gaps_remote_considered_available_p "${remote}"
+                then
+                    gaps_remote_disable "${remote}"
+                fi
                 continue
             fi
             if ! gaps_remote_initialized_or_here_p "${remote}"
@@ -336,10 +348,7 @@ gaps_remotes_fix ( ) {
                 if [ "${avail_res}" != "0" ] && [ "${considered_available}" == "0" ]
                 then
                     gaps_error "${remote} is not available"
-                    gaps_error "stopping syncing with it and ignoring it"
-                    git config "remote.${remote}.annex-ignore" true
-                    git config "remote.${remote}.annex-sync" false
-                    git config "remote.${remote}.konix-annex-available" false
+                    gaps_remote_disable "${remote}"
                 elif [ "${avail_res}" == "0" ] && [ "${considered_available}" != "0" ]
                 then
                     gaps_log_info "${remote} is now available, stop ignoring it"

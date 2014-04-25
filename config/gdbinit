@@ -7,3 +7,13 @@ end
 define bp_rest
        source ~/.gdb_bps
 end
+python
+import sys
+import os
+
+sys.path.insert(0, os.environ["KONIX_GDB_PRETTY_PRINTERS"])
+import prettyprinters
+prettyprinters.register()
+
+end
+set print pretty 1

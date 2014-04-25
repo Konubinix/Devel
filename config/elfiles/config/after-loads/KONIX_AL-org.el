@@ -1379,15 +1379,13 @@ to be organized.
 				("t" "Todo Item" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile") "* TODO %?
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-"
+  :END:"
 				 :kill-buffer
 				 )
 				("i" "Todo Item in current clock" entry (clock) "* TODO %?
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-"
+  :END:"
 				 :kill-buffer
 				 )
 				("l" "Todo Item for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
@@ -1395,8 +1393,7 @@ to be organized.
   :PROPERTIES:
   :CREATED:  %U
   :END:
-  %a
-"
+  %a"
 				 :kill-buffer
 				 )
 				("u" "Todo Item URGENT" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
@@ -1404,8 +1401,7 @@ to be organized.
   SCHEDULED: %t
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-"
+  :END:"
 				 :kill-buffer
 				 )
 				("U" "Todo Item URGENT for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
@@ -1414,8 +1410,7 @@ to be organized.
   :PROPERTIES:
   :CREATED:  %U
   :END:
-  %a
-"
+  %a"
 				 :kill-buffer
 				 )
 				("p" "Todo pomodoro next short pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
@@ -1426,8 +1421,7 @@ to be organized.
   :END:
   :PROPERTIES:
   :INTERRUPTION_HANDLED: t
-  :END:
-"
+  :END:"
 				 :kill-buffer
 				 )
 				("P" "Todo pomodoro next long pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
@@ -1438,8 +1432,7 @@ to be organized.
   :END:
   :PROPERTIES:
   :INTERRUPTION_HANDLED: t
-  :END:
-"
+  :END:"
 				 :kill-buffer
 				 )
 				("n" "Note" entry (file (expand-file-name "notes.org"
@@ -1447,8 +1440,7 @@ to be organized.
 				 "* %?
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-"
+  :END:"
 				 :kill-buffer
 				 )
 				("B" "Bookmark (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
@@ -1500,22 +1492,19 @@ to be organized.
 				 "* %?
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-"
+  :END:"
 				 :kill-buffer
 				 )
 				("r" "Bookmark To Read" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* TODO Read %?
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-"
+  :END:"
 				 :kill-buffer
 				 )
 				("j" "Interruption" entry (file+headline (expand-file-name "diary.org" org-directory) "Interruptions")
 				 "* Interruption %? :INTERRUPTION:
-   %U
-"
+   %U"
 				 :clock-in t
 				 :clock-resume t
 				 )

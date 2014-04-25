@@ -1378,14 +1378,14 @@ to be organized.
 			  '(
 				("t" "Todo Item" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile") "* TODO %?
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
 "
 				 :kill-buffer
 				 )
 				("i" "Todo Item in current clock" entry (clock) "* TODO %?
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
 "
 				 :kill-buffer
@@ -1393,7 +1393,7 @@ to be organized.
 				("l" "Todo Item for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* TODO %?
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
   %a
 "
@@ -1403,7 +1403,7 @@ to be organized.
 				 "* NEXT [#G] %?
   SCHEDULED: %t
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
 "
 				 :kill-buffer
@@ -1412,7 +1412,7 @@ to be organized.
 				 "* NEXT [#G] %?
   SCHEDULED: %t
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
   %a
 "
@@ -1422,7 +1422,7 @@ to be organized.
 				 "* NEXT [#G] %? :INTERRUPTION:
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp)
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
   :PROPERTIES:
   :INTERRUPTION_HANDLED: t
@@ -1434,7 +1434,7 @@ to be organized.
 				 "* NEXT [#G] %? :INTERRUPTION:
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t)
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
   :PROPERTIES:
   :INTERRUPTION_HANDLED: t
@@ -1446,7 +1446,7 @@ to be organized.
 														  org-directory))
 				 "* %?
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
 "
 				 :kill-buffer
@@ -1454,7 +1454,7 @@ to be organized.
 				("B" "Bookmark (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* %:description
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
    %:link
    %:initial"
@@ -1463,7 +1463,7 @@ to be organized.
 				("C" "Bookmark in current clock (use with org-protocol)" entry
 				 (clock) "* %:description
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
    %:link
    %:initial"
@@ -1472,7 +1472,7 @@ to be organized.
 				("D" "Bookmark TODO (use with org-protocol)" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* TODO Read %:description
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
    %:link
    %:initial"
@@ -1481,7 +1481,7 @@ to be organized.
 				("E" "Bookmark TODO in current clock (use with org-protocol)" entry (clock)
 				 "* TODO Read %:description
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
    %:link
    %:initial"
@@ -1490,7 +1490,7 @@ to be organized.
 				("R" "Bookmark to read (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* TODO Read %:description
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
    %:link
    %:initial"
@@ -1499,7 +1499,7 @@ to be organized.
 				("b" "Bookmark" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* %?
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
 "
 				 :kill-buffer
@@ -1507,7 +1507,7 @@ to be organized.
 				("r" "Bookmark To Read" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* TODO Read %?
   :PROPERTIES:
-  :CREATED:  %T
+  :CREATED:  %U
   :END:
 "
 				 :kill-buffer
@@ -2468,25 +2468,6 @@ of the clocksum."
   )
 (ad-activate 'org-agenda)
 (ad-activate 'org-agenda-redo)
-
-(defvar konix/org-expiry-insert-created-file-name-regex
-  (expand-file-name perso-dirs)
-  "Regex matched against the file name in which to auto insert created stamp")
-(setq-default org-expiry-inactive-timestamps t)
-
-(defadvice org-expiry-insert-created (around insert-if-personal-entry ())
-  (when (string-match-p
-		 konix/org-expiry-insert-created-file-name-regex
-		 (or
-		  (buffer-file-name)
-		  ""
-		  )
-		 )
-	ad-do-it
-	)
-  )
-(ad-activate 'org-expiry-insert-created)
-(org-expiry-insinuate)
 
 ;; ######################################################################
 ;; Notmuch

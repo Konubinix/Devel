@@ -1561,6 +1561,10 @@ fallbacking to HEAD")
 						)
 					  "^stash@{\\([0-9]+\\)}: .+$"
 					  compilation-info-face)
+  ;; WIP on... kinda stuff are generally useless information
+  (decorate_file_type nil
+					  "^stash.+\\(WIP on .+\\)$"
+					  'shadow)
   (goto-char 0)
   )
 

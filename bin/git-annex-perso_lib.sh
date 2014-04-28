@@ -30,6 +30,7 @@ gaps_compute_remotes_internal ( ) {
     local remotes="$(/bin/ls -1 ${GITANNEXSYNC_REMOTES})"
     all_remotes=""
     local git_remotes="$(git remote)"
+    # check that git remotes are ok
     for remote in ${git_remotes}
     do
         if echo ${remotes}|grep -v -q ${remote}

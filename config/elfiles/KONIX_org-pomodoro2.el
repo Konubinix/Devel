@@ -501,8 +501,11 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
   (when (member "INTERRUPTION"
 				(org-get-tags-at (point))
 				)
+	(if konix/org-pomodoro-tray-daemon-prev-state
 	(konix/org-pomodoro-tray-daemon-put
 	 konix/org-pomodoro-tray-daemon-prev-state)
+	(warn "Could not find previous pomodoro state")
+	)
 	;; if more than 5 minutes in interruption, recommend to start a new pomodoro
 	(when (> (org-clock-get-clocked-time) 5)
 	  (message

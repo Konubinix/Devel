@@ -67,14 +67,18 @@ then
             continue
         fi
         gaps_log_info "Syncing with $remote"
+        if ! gaps_remote_initialized_p "${remote}"
+        then
+            gaps_warn_and_continue "Remote $remote_name not initialized, cannot do anything with it"
+        fi
+        if ! gaps_remote_considered_available_p "${remote}"
+        then
+            gaps_warn_and_continue "Remote $remote_name not considered available. Cannot do anything with it"
+        fi
         if ! gaps_extract_remote_info "${contexts}" "${remote}"
         then
             gaps_warn "Could not find info for remote ${remote} in contexts ${contexts}"
             inc_fail_and_continue
-        fi
-        if ! gaps_remote_initialized_p "${remote}"
-        then
-            gaps_warn_and_continue "Remote $remote_name not initialized, cannot do anything with it"
         fi
 
         gaps_log "Syncing $remote_name with me"

@@ -294,7 +294,7 @@ gaps_remote_disable () {
 
 gaps_remotes_fix ( ) {
     local REMOTES="${1}"
-    gaps_log_info "Checking inconsistency in remotes"
+    gaps_log_info "## Checking for inconsistencies in remotes"
     if [ -d "${GITANNEXSYNC_REMOTES}" ]
     then
         gaps_compute_contexts

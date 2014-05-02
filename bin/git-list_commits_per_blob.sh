@@ -5,7 +5,7 @@ blob="${1}"
 
 git rev-list --all |
 while read commit; do
-    if git ls-tree -r $commit | grep -q $blob; then
+    if git ls-tree -t -r $commit | grep -q $blob; then
         echo $commit
     fi
 done

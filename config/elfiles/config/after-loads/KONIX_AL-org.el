@@ -1612,7 +1612,6 @@ to be organized.
 				)
 			  )
 
-(setq-default org-agenda-cmp-user-defined 'konix/org-cmp-deadlines-past-and-due-first)
 (setq-default org-agenda-compact-blocks nil)
 (setq-default org-agenda-columns-add-appointments-to-effort-sum t)
 (add-to-list 'org-effort-durations '("p" . 30))
@@ -1684,6 +1683,55 @@ to be organized.
 	 )
 	)
   )
+
+(defun konix/org-energy-compare (a b)
+  (let* (
+		 (ma (or (get-text-property 0 'org-marker a)
+				 (get-text-property 0 'org-hd-marker a)))
+		 (mb (or (get-text-property 0 'org-marker b)
+				 (get-text-property 0 'org-hd-marker b)))
+		 (energy_a (org-entry-get ma "Energy"))
+		 (energy_b (org-entry-get mb "Energy"))
+		 )
+	(cond
+	 ((and
+	   (not energy_a)
+	   (not energy_b)
+	   )
+	  nil
+	  )
+	 ((and
+	   energy_a
+	   (not energy_b)
+	   )
+	  1
+	  )
+	 ((and
+	   (not energy_a)
+	   energy_b
+	   )
+	  -1
+	  )
+	 ((> energy_a energy_b)
+	  1
+	  )
+	 ((< energy_a energy_b)
+	  -1
+	  )
+	 (t
+	  nil
+	  )
+	 )
+	)
+  )
+
+(defun konix/org-agenda-cmp-user-defined (a b)
+  (or
+   ;;(konix/org-energy-compare a b)
+   (konix/org-cmp-deadlines-past-and-due-first a b)
+   )
+  )
+(setq-default org-agenda-cmp-user-defined 'konix/org-agenda-cmp-user-defined)
 
 (defvar konix/org-agenda-tag-filter-contexts '() "")
 (defvar konix/org-agenda-tag-filter-contexts-forced nil "")
@@ -2298,7 +2346,7 @@ of the clocksum."
 	;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)
 	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
 	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
- 	)
+	)
   "")
 (defun konix/org-agenda-set-text-properties ()
   (setq buffer-read-only nil)

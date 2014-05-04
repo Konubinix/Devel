@@ -253,8 +253,13 @@ gaps_remote_initialized_or_here_p ( ) {
 
 gaps_extract_remote_info_from_dir ( ) {
     local remote_path="$1"
-    url="$(cat ${remote_path}/url)"
-    url="$(eval echo $(echo $url))"
+	if [ -f "${remote_path}/url" ]
+	then
+		url="$(cat ${remote_path}/url)"
+		url="$(eval echo $(echo $url))"
+	fi
+	type="$(cat ${remote_path}/type)"
+	type="$(eval echo $(echo $type))"
 	readonly="${remote_path}/readonly"
     availhook="${remote_path}/availhook"
     prehook="${remote_path}/prehook"
@@ -376,7 +381,7 @@ gaps_remotes_fix ( ) {
                 # sanity check that the url is the same in the config only if the
                 # remote is not here
                 recorded_url="$(git config remote.${remote}.url)"
-                if [ "${recorded_url}" != "${url}" ]
+                if [ "${type}" == "ssh" ] && [ "${recorded_url}" != "${url}" ]
                 then
                     gaps_warn "URL mismatch"
                     gaps_log "git config: ${recorded_url}"
@@ -493,7 +498,7 @@ gaps_extract_remote_info ( ) {
     remote_name="$2"
     remote_path="${GITANNEXSYNC_REMOTES}/${remote_name}"
     gaps_log "Extracting info from ${remote_path}"
-    if [ -f "${remote_path}/url" ]
+    if [ -f "${remote_path}/type" ]
     then
         gaps_log "No context information detected in $remote_path"
         gaps_extract_remote_info_from_dir "${remote_path}"

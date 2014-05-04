@@ -257,6 +257,8 @@ gaps_extract_remote_info_from_dir ( ) {
 	then
 		url="$(cat ${remote_path}/url)"
 		url="$(eval echo $(echo $url))"
+	else
+		url=""
 	fi
 	type="$(cat ${remote_path}/type)"
 	type="$(eval echo $(echo $type))"

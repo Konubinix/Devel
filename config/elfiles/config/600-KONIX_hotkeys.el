@@ -462,6 +462,7 @@
 (define-key 'konix/tags/map (kbd ".") 'find-tag)
 (define-key 'konix/tags/map (kbd "l") 'tags-loop-continue)
 (define-key 'konix/tags/map (kbd "h") 'etags-stack-show)
+(define-key 'konix/tags/map (kbd "f") 'konix/tags/find-file)
 
 ;; ************************************************************
 ;; Imenu

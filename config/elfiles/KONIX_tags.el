@@ -25,6 +25,8 @@
 ;;; Code:
 
 ;; TAGS
+(require 'thingatpt)
+
 (defun konix/tags/init (tags_file_name)
   "If TAGS_FILE_NAME does not exist, create an empty one. Then visit
 TAGS_FILE_NAMETHE"
@@ -415,5 +417,38 @@ INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
 	)
   )
 
+(defun konix/tags/find-file (&optional filename)
+  (interactive
+   (list
+	(or
+	 (thing-at-point 'filename)
+	 (read-string "Filename: ")
+	 )
+	)
+   )
+  (unless filename
+	(error "Could not find a filename to search for")
+	)
+  (push-tag-mark)
+  (let* (
+		 (found-files
+		  (split-string
+		   (shell-command-to-string
+			(format "konix_etags_find_file.sh -t '%s' -f '%s'"
+					(mapconcat 'identity tags-table-computed-list ":")
+					filename
+					)
+			)
+		   "\n"
+		   ))
+		 (found-file (car found-files))
+		 )
+	;; take only the first match
+	(if (not (string-equal found-file ""))
+		(find-file found-file)
+	  (message "Could not find '%s'" filename)
+	  )
+	)
+  )
 (provide 'KONIX_tags)
 ;;; KONIX_tags.el ends here

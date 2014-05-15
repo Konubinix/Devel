@@ -318,24 +318,24 @@ Mod4 x k a :MacroCmd { Exec python konix_xmacro.py -a && konix_display.py $(read
 # ####################################################################################################
 # Sound specific (Mod4 m ...)
 # ####################################################################################################
-Mod4 m t :ExecCommand mpc toggle && konix_display.py "Pause/resume"
-XF86AudioPlay :ExecCommand mpc toggle && konix_display.py "Pause/resume"
-Mod4 m n :ExecCommand mpc next && konix_display.py "Next music"
-Mod4 m Right :ExecCommand mpc seek +00:00:05 && konix_display.py "Forward 5 seconds"
-XF86AudioNext :ExecCommand mpc next && konix_display.py "Next music"
-Mod4 m p :ExecCommand mpc prev && konix_display.py "Previous music"
-Mod4 m Left :ExecCommand mpc seek -00:00:05 && konix_display.py "Backward 5 seconds"
-XF86AudioPrev :ExecCommand mpc prev && konix_display.py "Previous music"
+Mod4 m t :ExecCommand konix_do_cron_job.sh mpc toggle && konix_display.py "Pause/resume"
+XF86AudioPlay :ExecCommand konix_do_cron_job.sh mpc toggle && konix_display.py "Pause/resume"
+Mod4 m n :ExecCommand konix_do_cron_job.sh mpc next && konix_display.py "Next music"
+Mod4 m Right :ExecCommand konix_do_cron_job.sh mpc seek +00:00:05 && konix_display.py "Forward 5 seconds"
+XF86AudioNext :ExecCommand konix_do_cron_job.sh mpc next && konix_display.py "Next music"
+Mod4 m p :ExecCommand konix_do_cron_job.sh mpc prev && konix_display.py "Previous music"
+Mod4 m Left :ExecCommand konix_do_cron_job.sh mpc seek -00:00:05 && konix_display.py "Backward 5 seconds"
+XF86AudioPrev :ExecCommand konix_do_cron_job.sh mpc prev && konix_display.py "Previous music"
 Mod4 m q :ExecCommand mpd --kill && konix_display.py "Kill mpd"
 Mod4 m l :ExecCommand konix_display.py "Launching mpd" && mpd && konix_display.py "Launched mpd" || konix_display.py "Failed to launch mpd"
 Mod4 m g :ExecCommand gmpc && konix_display.py "Launched gmpc"
 Mod4 m u :ExecCommand konix_display.py "Updating mpd" && mpc --wait update && konix_display.py "Updated mpd" || konix_display.py "Failed to update mpd"
-Mod4 m Down :ExecCommand mpc volume -5 && konix_display_unique.py "MPD : $(mpc volume)"
-Mod4 m Up :ExecCommand mpc volume +5 && konix_display_unique.py "MPD : $(mpc volume)"
+Mod4 m Down :ExecCommand konix_do_cron_job.sh mpc volume -5 && konix_display_unique.py "MPD : $(mpc volume)"
+Mod4 m Up :ExecCommand konix_do_cron_job.sh mpc volume +5 && konix_display_unique.py "MPD : $(mpc volume)"
 
 # command the mpc with the same kind of bindings than the volume
-Mod4 Mod1 Left :ExecCommand mpc seek -00:00:05 && konix_display.py "Backward 5 seconds"
-Mod4 Mod1 Right :ExecCommand mpc seek +00:00:05 && konix_display.py "Forward 5 seconds"
+Mod4 Mod1 Left :ExecCommand konix_do_cron_job.sh mpc seek -00:00:05 && konix_display.py "Backward 5 seconds"
+Mod4 Mod1 Right :ExecCommand konix_do_cron_job.sh mpc seek +00:00:05 && konix_display.py "Forward 5 seconds"
 
 # ####################################################################################################
 # Assword (Mod4 a ...)

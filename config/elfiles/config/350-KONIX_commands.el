@@ -39,6 +39,13 @@
   (ws-start org-ehtml-handler 8888)
   )
 
+(defun konix/ps-print-toggle-landscape ()
+  (interactive)
+  (require 'ps-print)
+  (setq ps-landscape-mode (not ps-landscape-mode))
+  (message "Landscape mode set to %s" ps-landscape-mode)
+  )
+
 (defun konix/bury-buffer-and-delete-window ()
   (interactive)
   (bury-buffer)

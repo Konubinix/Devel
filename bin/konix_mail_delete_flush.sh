@@ -1,8 +1,14 @@
 #!/bin/bash
 
-echo "The deleted mails are"
-notmuch search tag:deleted
-echo "Delete them ?"
+source "${KONIX_LIB_DIR}/lib_bash.sh"
+
+echo "${COLOR_FG_CYAN}##### The mails to re check are:${COLOR_RESET}"
+notmuch search tag:deleted and tag:draft and not '--text follows this line--'
+echo "${COLOR_FG_CYAN}##### The mails to delete almost without risk are:${COLOR_RESET}"
+notmuch search tag:deleted and tag:draft and '--text follows this line--'
+echo "${COLOR_FG_CYAN}##### Other mails to delete (pay attention to those) are:${COLOR_RESET}"
+notmuch search tag:deleted and not tag:draft
+echo "${COLOR_FG_CYAN}Delete them ?${COLOR_RESET}"
 read y
 if [ "$y" == "y" ]
 then

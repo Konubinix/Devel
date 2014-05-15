@@ -72,3 +72,4 @@ alias gam="git-annex move"
 alias kfairy="konix_fairy.py"
 alias ms="mr -s"
 alias le=less
+alias ns="netstat -tupln"

@@ -1003,7 +1003,7 @@ to be organized.
 						  )
 				  )
 				 (
-				  (org-agenda-start-day "-7")
+				  (org-agenda-start-day "-7d")
 				  (org-agenda-start-on-weekday 1)
 				  (org-agenda-start-with-clockreport-mode t)
 				  (org-agenda-start-with-log-mode t)

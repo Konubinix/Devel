@@ -291,7 +291,23 @@ class RILItem(object):
         elif self.in_dl:
             return 16
         self.in_dl = True
-        command = ["wget", "--unlink", "--convert-links", "--force-directories", "--adjust-extension", "--no-iri", "--restrict-file-names=windows",]
+        command = ["wget",
+                   "--unlink",
+                   "--convert-links",
+                   "--force-directories",
+                   "--adjust-extension",
+                   "--no-iri",
+                   "--restrict-file-names=windows",
+                 ]
+        cookie_file = os.environ.get("UZBL_COOKIES_FILE",
+                                     None)
+        session_cookie_file = os.environ.get("UZBL_COOKIES_FILE",
+                                     None)
+        if cookie_file and os.path.exists(cookie_file):
+          command += ["--load-cookies", cookie_file,]
+        if session_cookie_file and os.path.exists(session_cookie_file):
+          command += ["--load-cookies", session_cookie_file,]
+
         mode_to_attributes = {
                 DOWNLOAD_LIGHT_MODE : [],
                 DOWNLOAD_NORMAL_MODE : ["--page-requisites"],

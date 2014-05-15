@@ -76,43 +76,66 @@
   (message "Already done %s pomorodo and %s"
 		   konix/org-pomodoro-set-count
 		   (if konix/org-pomodoro-in-pomodoro
-			   "working on another"
+			   (format
+				"working on another and available in %ss (%smin) minutes or for long in %ss (%ssmin)"
+				(konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
+				(/
+				 (konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
+				 60
+				 )
+				(konix/org-pomodoro-number-of-seconds-till-next-pause t t)
+				(/
+				 (konix/org-pomodoro-number-of-seconds-till-next-pause t t)
+				 60
+				 )
+				)
 			 "in pause"
 			 )
 		   )
   )
 
-(defun konix/org-pomodoro-number-of-seconds-till-next-pause (&optional long)
-  (+
-   (if long
-	   (*
-		;; number of sprint works before the long pause
-		(max
-		 (-
-		  konix/org-pomodoro-sprint-steps
-		  1
-		  konix/org-pomodoro-set-count
-		  )
-		 ;; if I already have more than 4 pomodoros, the next one may well be a
-		 ;; long pause
-		 0
-		 )
-		;; time in minute of the sum sprint + short break
-		(+
-		 konix/org-pomodoro-default-timer
-		 konix/org-pomodoro-default-timer-break
-		 )
-		;; convert to seconds
-		60
+(defun konix/org-pomodoro-number-of-seconds-till-next-pause (&optional long floor)
+  (let (
+		(seconds (+
+				  (if long
+					  (*
+					   ;; number of sprint works before the long pause
+					   (max
+						(-
+						 konix/org-pomodoro-sprint-steps
+						 1
+						 konix/org-pomodoro-set-count
+						 )
+						;; if I already have more than 4 pomodoros, the next one may well be a
+						;; long pause
+						0
+						)
+					   ;; time in minute of the sum sprint + short break
+					   (+
+						konix/org-pomodoro-default-timer
+						konix/org-pomodoro-default-timer-break
+						)
+					   ;; convert to seconds
+					   60
+					   )
+					;; next short pause will be enough
+					0
+					)
+				  (org-timer-seconds)
+				  )
+				 )
 		)
-	 ;; next short pause will be enough
-	 0
-	 )
-   (org-timer-seconds)
-   )
+	(if floor
+		(floor seconds)
+	  seconds
+	  )
+	)
   )
 
-(defun konix/org-pomodoro-next-available-time (&optional long)
+(defun konix/org-pomodoro-next-available-time (&optional long add)
+  (unless add
+	(setq add 0)
+	)
   (seconds-to-time
    (+
 	(konix/org-pomodoro-number-of-seconds-till-next-pause long)
@@ -121,14 +144,15 @@
 	  "%s"
 	  )
 	 )
+	add
 	)
    )
   )
 
-(defun konix/org-pomodoro-next-available-timestamp (&optional long)
+(defun konix/org-pomodoro-next-available-timestamp (&optional long add)
   (format-time-string
    (cdr org-time-stamp-formats)
-   (konix/org-pomodoro-next-available-time long)
+   (konix/org-pomodoro-next-available-time long add)
    )
   )
 

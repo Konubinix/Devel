@@ -1415,7 +1415,7 @@ to be organized.
 				 )
 				("p" "Todo pomodoro next short pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %? :INTERRUPTION:
-  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp)
+  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp nil 2)
   :PROPERTIES:
   :CREATED:  %U
   :END:
@@ -1426,7 +1426,7 @@ to be organized.
 				 )
 				("P" "Todo pomodoro next long pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %? :INTERRUPTION:
-  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t)
+  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t 2)
   :PROPERTIES:
   :CREATED:  %U
   :END:

@@ -421,7 +421,10 @@ INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
   (interactive
    (list
 	(or
-	 (thing-at-point 'filename)
+	 (and
+	  (not current-prefix-arg)
+	  (thing-at-point 'filename)
+	  )
 	 (read-string "Filename: ")
 	 )
 	)

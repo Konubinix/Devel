@@ -36,6 +36,10 @@ then
     URL_PORT="${URL_PORT}:${PORT}"
 fi
 
+cat <<EOF > type
+ssh
+EOF
+
 cat <<EOF > url
 ssh://${URL_PORT}$LOCATION
 EOF

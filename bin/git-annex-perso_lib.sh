@@ -260,8 +260,14 @@ gaps_extract_remote_info_from_dir ( ) {
 	else
 		url=""
 	fi
-	type="$(cat ${remote_path}/type)"
-	type="$(eval echo $(echo $type))"
+	if [ -f "${remote_path}/type" ]
+	then
+		type="$(cat ${remote_path}/type)"
+		type="$(eval echo $(echo $type))"
+	else
+		gaps_warn "Missing type file for ${remote}, assuming ssh"
+		type="ssh"
+	fi
 	readonly="${remote_path}/readonly"
     availhook="${remote_path}/availhook"
     prehook="${remote_path}/prehook"

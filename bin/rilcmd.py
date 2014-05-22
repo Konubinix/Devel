@@ -31,8 +31,14 @@ class RilCmd(cmd.Cmd, object):
         sys.exit(0)
 
     def do_search_x(self, line):
+        """Show only items for which the expression is True. x is an Item. See
+        help_rilitem for more information about what is available."""
         items = self.get_items()
         self.filter_x(items, line)
+
+    def do_help_rilitem(self, line):
+        """Show the help about rilitem."""
+        help(ril.RILItem)
 
     def do_filter_x(self, line):
         items = self.printed_items

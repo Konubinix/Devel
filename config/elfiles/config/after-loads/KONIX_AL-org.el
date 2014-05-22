@@ -1549,7 +1549,7 @@ to be organized.
 				("organization" . ?r)
 				)
 			  )
-(setq-default org-tags-exclude-from-inheritance '("project"))
+(setq-default org-tags-exclude-from-inheritance '("project" "draft"))
 (setq-default org-fast-tag-selection-single-key t)
 (setq-default org-reverse-note-order t)
 (setq org-tag-alist nil)

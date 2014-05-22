@@ -39,7 +39,7 @@ set set_mode        = set mode =
 set set_status      = set status_message =
 
 # Spawn path shortcuts. In spawn the first dir+path match is used in "dir1:dir2:dir3:executable"
-set scripts_dir      = @data_home/uzbl:@share_dir/uzbl:@devel_dir/uzbl/examples/data/:scripts
+set scripts_dir      = @data_home/uzbl:@share_dir/uzbl:@devel_dir/uzbl/examples/data:scripts
 
 # === Hardcoded handlers =====================================================
 
@@ -78,9 +78,9 @@ set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" ||
 @on_event   LOAD_COMMIT    chain 'set title_format_short =\@PID - \@TITLE' 'set title_format_long =\@PID - \@keycmd_prompt \@raw_modcmd \@raw_keycmd \@TITLE - Uzbl browser <\@NAME> \@SELECTED_URI'
 
 # add some javascript to the page for other 'js' and 'script' commands to access later.
-@on_event   LOAD_COMMIT    js uzbl = {};
-@on_event   LOAD_COMMIT    script @scripts_dir/formfiller.js
+@on_event   LOAD_COMMIT    js uzbl = uzbl || {};
 @on_event   LOAD_COMMIT    script @scripts_dir/follow.js
+@on_event   LOAD_COMMIT    script @scripts_dir/formfiller.js
 @on_event   LOAD_COMMIT    script @scripts_dir/pocket.js
 @on_event   LOAD_COMMIT    script @scripts_dir/revealAnchors.js
 @on_event   LOAD_COMMIT    spawn @scripts_dir/change_style.sh

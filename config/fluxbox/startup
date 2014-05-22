@@ -5,8 +5,8 @@ cd "${HOME}"
 # load the default env
 source "${HOME}/.shrc_var"
 
-# use menu as a compose key
-setxkbmap -option compose:menu
+# use menu as a compose key (actually, I seldom use the menu key...)
+#setxkbmap -option compose:menu
 # make the keyboard more responsive
 # arg1= delay (in ms) before the first repetition
 # arg2= number of repetitions per second

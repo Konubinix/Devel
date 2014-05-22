@@ -2,8 +2,8 @@
 
 tmp_log=`mktemp`
 cd "${KONIX_PERSO_DIRS}"
-mkdir -p "data/gaps_logs/"
-LOG="data/gaps_logs/gaps_log-$(hostname)_$(date "+%y%m%d_%H%M%S").txt"
+mkdir -p "${KONIX_PERSO_DIR}/data/gaps_logs/"
+LOG="${KONIX_PERSO_DIR}/data/gaps_logs/gaps_log-$(hostname)_$(date "+%y%m%d_%H%M%S").txt"
 echo "# ######################################################################
 # Fixing Remotes
 # ######################################################################"

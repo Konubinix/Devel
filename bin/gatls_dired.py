@@ -74,7 +74,8 @@ else:
     ignored_files = list(set(files).difference(set(files_to_keep)))
   # does the same with directories if asked to
   if len(directories) != 0:
-    if os.environ.get("KONIX_GIT_ANNEX_DIRED_SCAN_DIRECTORY", None):
+    scandir = os.environ.get("KONIX_GIT_ANNEX_DIRED_SCAN_DIRECTORY", None)
+    if scandir and os.path.exists(scandir):
       directories = [os.path.relpath(d) for d in directories]
       command = ["git", "annex", "find",] + \
                 shlex.split(filter) + \

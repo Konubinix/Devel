@@ -51,3 +51,5 @@
 	textconv = gpg -d
 [sendemail]
 	chainreplyto = yes
+[svn]
+    rmdir = true

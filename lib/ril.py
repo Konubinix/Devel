@@ -296,6 +296,7 @@ class RILItem(object):
                    "--convert-links",
                    "--force-directories",
                    "--adjust-extension",
+                   "--span-hosts",
                    "--no-iri",
                    "--restrict-file-names=windows",
                  ]

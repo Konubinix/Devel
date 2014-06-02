@@ -151,6 +151,13 @@ class RilCmd(cmd.Cmd, object):
             item.clean()
             print "Cleaned %s" % item
 
+    def do_clean_printed_items(self, line):
+        assert self.printed_items
+        items = self.printed_items
+        for item in items:
+            item.clean()
+            print "Cleaned %s" % item
+
     def do_reset(self, line):
         self.printed_items = None
         print "Reseted printed items"

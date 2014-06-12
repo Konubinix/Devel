@@ -174,7 +174,7 @@ def main():
             # ####################################################################################################
             # Hardcoded ones
             # ####################################################################################################
-            config["HOSTNAME"] = socket.gethostname()
+            config["HOSTNAME"] = config.get("HOSTNAME", socket.gethostname())
             (stamp, backup_file) = createBackupFileOrUseIt(os.environ.get("KONIX_ENV_STAMP", None))
             config["KONIX_ENV_STAMP"] = stamp
             logging.debug("Parsing the env")

@@ -202,6 +202,8 @@
 (autoload 'taskjuggler-mode "taskjuggler-mode" "" t)
 ;; org mime
 (autoload 'org-mime-htmlize "org-mime" "" t)
+;; org timer
+(autoload 'org-timer-seconds "org-timer" "" t)
 
 ;; ************************************************************
 ;; Automodes

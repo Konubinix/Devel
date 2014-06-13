@@ -130,7 +130,9 @@
 [end]
 [group]
  [app] (title=.*Uzbl browser.*)
+  [FocusNewWindow]	{no}
   [Maximized]	{yes}
+  [Jump]	{yes}
   [Layer]	{8}
 [end]
 [app] (name=terminator)

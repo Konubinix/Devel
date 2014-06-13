@@ -77,17 +77,21 @@
 		   konix/org-pomodoro-set-count
 		   (if konix/org-pomodoro-in-pomodoro
 			   (format
-				"working on another and available in %ss (%smin) minutes or for long in %ss (%ssmin)"
+				"working on another and
+shortly available in %ss seconds (%s min) %s or for
+long              in %ss seconds (%s min) %s"
 				(konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
 				(/
 				 (konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
 				 60
 				 )
+				(konix/org-pomodoro-next-available-timestamp)
 				(konix/org-pomodoro-number-of-seconds-till-next-pause t t)
 				(/
 				 (konix/org-pomodoro-number-of-seconds-till-next-pause t t)
 				 60
 				 )
+				(konix/org-pomodoro-next-available-timestamp t)
 				)
 			 "in pause"
 			 )

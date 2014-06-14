@@ -24,7 +24,6 @@
 [end]
 [app] (name=Navigator) (class=Iceweasel) (role=browser)
   [Workspace]	{1}
-  [Jump]	{yes}
 [end]
 [app] (name=rt) (class=Rt)
   [Dimensions]	{633 445}

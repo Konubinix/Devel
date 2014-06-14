@@ -25,6 +25,21 @@ then
         then
             gaps_warn_and_continue "Aborting initialization because $remote_name is already a remote"
         fi
+		if [ "$type" == "rsync" ]
+		then
+			if ! gaps_ask_for_confirmation "Initing remote $remote_name of type $type ?"
+			then
+				inc_failure_and_continue
+			fi
+			git annex enableremote "$remote"
+			continue
+		fi
+		if [ "$type" != "ssh" ]
+		then
+			gaps_error "I don't know how to initialize the remote $remote of type $type"
+			inc_failure_and_continue
+		fi
+		# remote in ssh mode
 		if ! gaps_ask_for_confirmation "Initing remote $remote_name
 to url $url ?"
 		then
@@ -71,6 +86,7 @@ to url $url ?"
             trap "" 0
             inc_failure_and_continue
         fi
+
         gaps_setup_context_independent_remote_info
 
         # reinit the trap.

@@ -66,9 +66,6 @@
   [FocusNewWindow]	{no}
   [Layer]	{6}
 [end]
-[app] (name=Qt-subapplication) (class=VirtualBox)
-  [Workspace]	{3}
-[end]
 [app] (name=evince) (class=Evince)
   [Workspace]	{6}
   [Maximized]	{yes}

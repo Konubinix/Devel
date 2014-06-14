@@ -24,13 +24,22 @@
 
 ;;; Code:
 
-(setq-default ispell-extra-args
-			  (split-string
-			   (getenv "KONIX_ASPELL_EXTRA_FLAGS")
-			   " "
-			   t
-			   )
-			  )
+
+(let (
+      (flags
+       (getenv "KONIX_ASPELL_EXTRA_FLAGS")
+       )
+      )
+  (when flags
+    (setq-default ispell-extra-args
+		  (split-string
+		   flags
+		   " "
+		   t
+		   )
+		  )
+    )
+  )
 
 (provide 'KONIX_AL-ispell)
 ;;; KONIX_AL-ispell.el ends here

@@ -26,15 +26,23 @@ log "First merge the annex in case someone else pushed the sync branch here"
 git annex merge || die "Could not merge"
 gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}" "$(pwd)"
 gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}_${HOSTNAME}" "$(pwd)"
-log "Annex add new files"
-git annex add || die "Could not annex add"
 if [ "$(git config annex.direct)" == "true" ]
 then
-    echo "direct mode, so do not git freeze"
-    echo "Removing from the index files that were deleted in the working tree"
-    git diff --name-only --diff-filter=D -z | xargs -0 git rm --cached || die "Could not remove deleted files"
-else
-	echo "Syncing working copy to index"
+    log "In direct mode, I have to make git sync before git annex"
+    git diff --name-only --diff-filter=M -z | xargs --no-run-if-empty -0 git add -v
+    log "Add files ignored by git annex"
+    OLDIFS="${IFS}"
+    IFS=$'\n'
+    git status --porcelain | grep '^??'|sed 's/^?? //'|xargs --no-run-if-empty git add -v
+    IFS="${OLDIFS}"
+    log "Remove from the index files that were deleted in the working tree"
+    git diff --name-only --diff-filter=D -z | xargs --no-run-if-empty -0 git rm --cached || die "Could not remove deleted files"
+fi
+log "Annex add new files"
+git annex add || die "Could not annex add"
+if ! [ "$(git config annex.direct)" == "true" ]
+then
+	log "In indirect mode, syncing the working copy to index after git annex"
 	git add -A :/ || die "Could not add -A files"
 fi
 # taken from https://github.com/svend/home-bin/blob/master/git-autocommit

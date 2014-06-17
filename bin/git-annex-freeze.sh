@@ -30,11 +30,6 @@ if [ "$(git config annex.direct)" == "true" ]
 then
     log "In direct mode, I have to make git sync before git annex"
     git diff --name-only --diff-filter=M -z | xargs --no-run-if-empty -0 git add -v
-    log "Add files ignored by git annex"
-    OLDIFS="${IFS}"
-    IFS=$'\n'
-    git status --porcelain | grep '^??'|sed 's/^?? //'|xargs --no-run-if-empty git add -v
-    IFS="${OLDIFS}"
     log "Remove from the index files that were deleted in the working tree"
     git diff --name-only --diff-filter=D -z | xargs --no-run-if-empty -0 git rm --cached || die "Could not remove deleted files"
 fi
@@ -44,6 +39,9 @@ if ! [ "$(git config annex.direct)" == "true" ]
 then
 	log "In indirect mode, syncing the working copy to index after git annex"
 	git add -A :/ || die "Could not add -A files"
+else
+    log "Add files ignored by git annex"
+    git ls-files --others --exclude-standard|xargs -0 --no-run-if-empty git add -v
 fi
 # taken from https://github.com/svend/home-bin/blob/master/git-autocommit
 hostname=`hostname`

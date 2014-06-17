@@ -26,11 +26,11 @@
 
 (require 'erc-imenu)
 
-(setq-default erc-log-insert-log-on-open t)
-(setq-default erc-log-mode t)
-(setq-default erc-join-buffer 'bury)
+(setq-default erc-log-insert-log-on-open nil)
+(setq-default erc-log-mode nil)
 (setq-default erc-log-write-after-insert t)
 (setq-default erc-log-write-after-send t)
+(setq-default erc-join-buffer 'bury)
 (setq-default erc-fill-column 800)
 (setq-default erc-echo-timestamps t)
 (setq-default erc-hide-timestamps t)

@@ -9,7 +9,7 @@ trap "rm '${LIST_PACKAGES}'" 0
 echo "Computing the list of packages"
 aptitude search '~i ?not(~M) ?not(?user-tag(.))' > "${LIST_PACKAGES}"
 NUMBER="$(wc -l "${LIST_PACKAGES}"|cut -f1 -d' ')"
-LAST_RES="del"
+LAST_RES="d"
 while read -u 10 line
 do
     NAME="$(echo "$line" | sed -r 's/^[^ ]+ +([^ ]+).+$/\1/')"
@@ -22,7 +22,7 @@ do
         RES="${LAST_RES}"
     fi
     LAST_RES="${RES}"
-    if [ "${RES}" == "del" ]
+    if [ "${RES}" == "d" ]
     then
         echo "Removing packages ${NAME}"
         sudo aptitude purge "${NAME}"

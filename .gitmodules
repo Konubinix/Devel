@@ -139,3 +139,6 @@
 [submodule "config/elfiles/org-ehtml"]
 	path = config/elfiles/org-ehtml
 	url = https://github.com/eschulte/org-ehtml
+[submodule "config/elfiles/znc"]
+	path = config/elfiles/znc
+	url = https://github.com/sshirokov/ZNC.el.git

@@ -46,6 +46,7 @@
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "dynsite" elfiles)
 		 (expand-file-name "org-ehtml/src" elfiles)
+		 (expand-file-name "znc" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -204,6 +205,9 @@
 (autoload 'org-mime-htmlize "org-mime" "" t)
 ;; org timer
 (autoload 'org-timer-seconds "org-timer" "" t)
+;; znc + erc
+(autoload 'znc-erc "znc" "" t)
+(autoload 'znc-all "znc" "" t)
 
 ;; ************************************************************
 ;; Automodes

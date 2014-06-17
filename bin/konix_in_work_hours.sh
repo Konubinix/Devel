@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 WEEK_NUMBER="$(date +%u)"
 HOUR="$(date +%H)"

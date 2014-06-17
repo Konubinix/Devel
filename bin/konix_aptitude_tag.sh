@@ -26,6 +26,10 @@ do
     then
         echo "Removing packages ${NAME}"
         sudo aptitude purge "${NAME}"
+    elif [ "${RES}" == "a" ]
+    then
+        echo "Marking ${NAME} as automatically installed"
+        sudo aptitude markauto "${NAME}"
     else
         TAG="${DATE_READABLE} (${DATE}):${RES}"
         echo "Applying to ${NAME} the user tag '${TAG}'"

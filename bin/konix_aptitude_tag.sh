@@ -21,11 +21,11 @@ flush_commands () {
 		if [ "${command}" == "d" ]
 		then
 			echo "Removing packages ${name}"
-			sudo aptitude purge "${name}"
+			sudo aptitude purge -y "${name}"
 		elif [ "${command}" == "a" ]
 		then
 			echo "Marking ${name} as automatically installed"
-			sudo aptitude markauto "${name}"
+			sudo aptitude markauto -y "${name}"
 		else
 			TAG="${DATE_READABLE} (${DATE}):${command}"
 			echo "Applying to ${name} the user tag '${TAG}'"

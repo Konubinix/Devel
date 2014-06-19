@@ -48,6 +48,9 @@ do
 	if [ "${RES}" == "f" ]
 	then
 		flush_commands
+	elif [ "${RES}" == "q" ]
+	then
+		break
 	else
 		if [ "${RES}" == "" ]
 		then

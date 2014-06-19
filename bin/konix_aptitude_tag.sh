@@ -13,6 +13,7 @@ LAST_RES="d"
 while read -u 10 line
 do
     NAME="$(echo "$line" | sed -r 's/^[^ ]+ +([^ ]+).+$/\1/')"
+	clear
     echo "--------------- ${NUMBER} left"
 	NUMBER=$((NUMBER-1))
     aptitude show "${NAME}"

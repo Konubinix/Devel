@@ -36,6 +36,7 @@
 (setq-default erc-hide-timestamps t)
 (setq-default erc-modules '(autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands notify readonly ring smiley sound stamp spelling track))
 (setq-default erc-user-mode 'ignore)
+(setq-default erc-header-line-format "%n on %t (%m,%l)")
 (defcustom konix/chat-silent nil ""
   :type 'boolean
   )

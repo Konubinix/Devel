@@ -30,7 +30,4 @@ konix_assert_var LOCATION
 cat <<EOF | ssh -t $PORT $URL
 cd $LOCATION
 git annex merge
-git rebase synced/master
-git reset --hard HEAD
-git rebase synced/master
 EOF

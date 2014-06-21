@@ -54,7 +54,7 @@ if [ -z "$GIT_COMMITTER_EMAIL" ]; then
     export GIT_COMMITTER_EMAIL=`whoami`"@$hostname"
 fi
 # all except the type change in direct mode
-if [ -n "$(git diff --name-only --diff-filter=ACDMRUXB)" ]
+if [ -n "$(git diff --cached --name-only --diff-filter=ACDMRUXB)" ]
 then
     echo "Perform the commit"
     git commit -m "Freezing of repo by $LOGNAME at $HOSTNAME" || die "Could not commit"

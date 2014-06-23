@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source "${KONIX_LIB_DIR}/lib_bash.sh"
-
 set -eu
 #set -x
 LAST_OFX="$(ls *ofx* | tail -1)"
@@ -16,3 +15,5 @@ DATE="$(date '+%Y-%m-%d %H:%M:%S' -d@"${DATE_STR}")"
 NOW_STR="$(date '+%s')"
 
 boobank -q history "${ACCOUNT}@${BANK}" "${DATE}" -f ofx > "${ACCOUNT}_${BANK}_${NOW_STR}.ofx"
+echo "Calling the post hook"
+konix_boobank_ofx_new_post_hook.sh "${ACCOUNT}_${BANK}_${NOW_STR}.ofx"

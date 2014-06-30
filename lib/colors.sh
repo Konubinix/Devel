@@ -41,3 +41,9 @@ export COLOR_LIGHT_RED=9
 export COLOR_LIGHT_PURPLE=13
 export COLOR_YELLOW=11
 export COLOR_WHITE=15
+
+in_color () {
+    local color="${1}"
+    shift
+    echo "${color}$*${COLOR_RESET}"
+}

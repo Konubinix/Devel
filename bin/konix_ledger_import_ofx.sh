@@ -5,7 +5,7 @@ OFX_FILE_PATH="$(readlink -f "${1}")"
 OFX_FILE_NAME="$(basename "${OFX_FILE_PATH}")"
 FID=1
 DATE="$(date)"
-ACCOUNT="$(echo "${OFX_FILE_NAME}"|sed -r "s/^([^_]+)_([^_]+)_.+$/\2:\1/")"
+ACCOUNT="Assets:Bank:$(echo "${OFX_FILE_NAME}"|sed -r "s/^([^_]+)_([^_]+)_.+$/\2:\1/")"
 
 # ledger does not like brackets
 sed -i 's/[()]/_/g' "${OFX_FILE_PATH}"

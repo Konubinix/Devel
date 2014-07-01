@@ -39,6 +39,35 @@
   (ws-start org-ehtml-handler 8888)
   )
 
+(defun konix/async-shellbuffer/get-all()
+  (remove-if
+   'null
+   (mapcar
+	(lambda (buf_)
+	  (when (string-match "Async Shell Command" (buffer-name buf_))
+		buf_
+		)
+	  )
+	(buffer-list)
+	)
+   )
+  )
+
+(defun konix/async-shellbuffer/show-all ()
+  (interactive)
+  (konix/buffer/show-all (konix/async-shellbuffer/get-all))
+  )
+
+(defun konix/async-shellbuffer/kill-all ()
+  (interactive)
+  (mapc
+   (lambda (buf)
+	 (kill-buffer buf)
+	 )
+   (konix/async-shellbuffer/get-all)
+   )
+  )
+
 (defun konix/ps-print-toggle-landscape ()
   (interactive)
   (require 'ps-print)

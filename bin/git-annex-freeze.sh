@@ -21,7 +21,7 @@ gaps_launch_freeze_pre_hook ( ) {
 }
 GITANNEXFREEZE_PRE_HOOK=".gitannexfreeze_prehook"
 
-pushd `git rev-parse --show-toplevel`
+pushd `git -c core.bare=false rev-parse --show-toplevel`
 log "First merge the annex in case someone else pushed the sync branch here"
 git annex merge || die "Could not merge"
 gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}" "$(pwd)"
@@ -29,9 +29,9 @@ gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}_${HOSTNAME}" "$(pwd)"
 if [ "$(git config annex.direct)" == "true" ]
 then
     log "In direct mode, I have to make git sync before git annex"
-    git diff --name-only --diff-filter=M -z | xargs --no-run-if-empty -0 git add -v
+    git -c core.bare=false diff --name-only --diff-filter=M -z | xargs --no-run-if-empty -0 git -c core.bare=false add -v
     log "Remove from the index files that were deleted in the working tree"
-    git diff --name-only --diff-filter=D -z | xargs --no-run-if-empty -0 git rm --cached || die "Could not remove deleted files"
+    git -c core.bare=false diff --name-only --diff-filter=D -z | xargs --no-run-if-empty -0 git -c core.bare=false rm --cached || die "Could not remove deleted files"
 fi
 log "Annex add new files"
 git annex add || die "Could not annex add"
@@ -41,7 +41,7 @@ then
 	git add -A :/ || die "Could not add -A files"
 else
     log "Add files ignored by git annex"
-    git ls-files --others --exclude-standard|xargs -0 --no-run-if-empty git add -v
+    git -c core.bare=false ls-files --others --exclude-standard|xargs -0 --no-run-if-empty git add -v
 fi
 # taken from https://github.com/svend/home-bin/blob/master/git-autocommit
 hostname=`hostname`

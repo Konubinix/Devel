@@ -1,3 +1,4 @@
 #!/bin/bash
 
-echo -n "$UZBL_URI" | konix_edit_stdin.sh
+URI="${1:-${UZBL_URI}}"
+echo -n "$URI" | konix_edit_stdin.sh

@@ -29,5 +29,10 @@ konix_assert_var URL
 konix_assert_var LOCATION
 cat <<EOF | ssh -t $PORT $URL
 cd $LOCATION
-git annex merge
+if [ "$(git config annex.direct)" == "true" ]
+then
+  git annex sync
+else
+  git annex merge
+fi
 EOF

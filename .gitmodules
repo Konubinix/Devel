@@ -10,9 +10,6 @@
 [submodule "config/elfiles/w3m"]
 	path = config/elfiles/w3m
 	url = https://github.com/emacsmirror/w3m.git
-[submodule "notmuch"]
-	path = notmuch
-	url = git://notmuchmail.org/git/notmuch
 [submodule "bash_optparse"]
 	path = bash_optparse
 	url = https://github.com/carlobaldassi/bash_optparse.git

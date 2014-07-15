@@ -282,6 +282,23 @@ with a precise timestamp)."
 	)
   )
 
+(defmacro konix/org-with-point-on-heading (body)
+  `(save-window-excursion
+	(case major-mode
+	  ('org-agenda-mode
+	   (org-agenda-switch-to)
+	   )
+	  ('org-mode
+	   t
+	   )
+	  (t
+	   (org-clock-goto)
+	   )
+	  )
+	(eval ,body)
+	)
+)
+
 (defun konix/org-agenda-no-context-p ()
   (let (
 		(no_c t)

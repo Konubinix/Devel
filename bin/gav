@@ -1,0 +1,7 @@
+#! /bin/bash
+
+if git annex view "$@"
+then
+    echo "$@" > .gitannexview
+    echo "Saved the view"
+fi

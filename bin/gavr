@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if test -e .gitannexview
+then
+    echo "Poping the view"
+    git annex vpop
+    echo "ReApplying $(cat .gitannexview)"
+    git annex view $(cat .gitannexview)
+else
+    echo "No view recorded"
+fi

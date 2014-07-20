@@ -37,7 +37,7 @@ fi
 
 if [ -z "$1" ]
 then
-	RES=`zenity --entry --text "Search what in $ENGINE ?"`
+	RES=`konix_gtk_entry.py --text "Search what in $ENGINE ?"`
     if [ -n "$RES" ]
     then
         set $RES

@@ -189,6 +189,63 @@ cursor stays in the org buffer."
 	)
   )
 
+(defun konix/org-copy-as-gcalcli-command (&optional beg end)
+  (cond
+   ((and (region-active-p)
+		 (not beg)
+		 )
+	(setq beg (region-beginning)
+		  end (region-end)
+		  )
+	)
+   ((not beg)
+	(setq beg (point)
+		  end (point))
+	)
+   )
+  (let* (
+		 (date (eval
+				`(format "%s/%s/%s"
+						 ,@(get-text-property beg 'date)
+						 )))
+		 (duration (konix/org-agenda-sum-duration
+					beg
+					end
+					))
+		 (time (let (
+					 (time-stamps (get-text-property beg 'time))
+					 )
+				 (if (string-match "^\\([^-.]+\\)[-.].+$" time-stamps)
+					 (match-string-no-properties 1 time-stamps)
+				   time-stamps
+				   )
+				 )
+			   )
+		 (entry (konix/org-with-point-on-heading
+				 (org-get-heading t t)
+				 ))
+		 (command (format
+				   "gcalcli --desc='' --where '' --title '%s' --when '%s %s' --duration '%s' add"
+				   (subst-char-in-string ?' ?_ entry)
+				   date
+				   time
+				   duration
+				   ))
+		 )
+	(with-temp-buffer
+	  (insert command)
+	  (copy-region-as-kill (point-min) (point-max))
+	  (message "Copied %s" command)
+	  )
+	)
+  )
+
+(defun konix/org-agenda-copy-at-point-as-gcalcli-command ()
+  (interactive)
+  (konix/org-copy-as-gcalcli-command)
+  (konix/kill-ring-to-clipboard)
+  )
+
 (defun konix/org-ts-is-today-p (timestamp)
   (let (
 		(decoded_ts (org-parse-time-string timestamp))

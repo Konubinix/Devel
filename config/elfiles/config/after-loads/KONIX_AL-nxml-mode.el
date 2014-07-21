@@ -78,7 +78,7 @@
 		)
 	(save-excursion
 	  (nxml-move-outside-backwards)
-	  (setq beg (+ 10 (point)))			;moves just after <![CDATA[
+	  (setq beg (+ 9 (point)))			;moves just after <![CDATA[
 	  (xmltok-forward)
 	  (setq end (-
 				 (point)

@@ -284,20 +284,107 @@ with a precise timestamp)."
 
 (defmacro konix/org-with-point-on-heading (body)
   `(save-window-excursion
-	(case major-mode
-	  ('org-agenda-mode
-	   (org-agenda-switch-to)
+	 (case major-mode
+	   ('org-agenda-mode
+		(org-agenda-switch-to)
+		)
+	   ('org-mode
+		t
+		)
+	   (t
+		(org-clock-goto)
+		)
 	   )
-	  ('org-mode
-	   t
-	   )
-	  (t
-	   (org-clock-goto)
-	   )
+	 (eval ,body)
+	 )
+  )
+
+(defun konix/org-guess-category-at-point_internal ()
+  (let (
+		(archive_cat (org-entry-get-with-inheritance "ARCHIVE_CATEGORY"))
+		(cat (org-entry-get-with-inheritance "CATEGORY"))
+		)
+	(cond
+	 (cat
+	  cat
 	  )
-	(eval ,body)
+	 (archive_cat
+	  archive_cat
+	  )
+	 (t
+	  (org-get-category)
+	  )
+	 )
 	)
-)
+  )
+
+(defun konix/org-guess-category-at-point ()
+  (konix/org-with-point-on-heading
+   (konix/org-guess-category-at-point_internal)
+   )
+  )
+
+(defun konix/org-agenda-region-same-category ()
+  "Return the beg and end of the region around pount in the
+  agenda of events of the same category"
+  (let (
+		(here (point))
+		beg
+		(upper_beg (point))
+		end
+		(lower_end (point))
+		(category (konix/org-guess-category-at-point))
+		)
+	(save-excursion
+	  (while (not beg)
+		(previous-line)
+		(cond
+		 ((equal
+		   (line-number-at-pos (point))
+		   1
+		   )
+		  (setq beg upper_beg)
+		  )
+		 ((org-get-at-bol 'org-marker)
+		  (if (not (equal
+					category
+					(konix/org-guess-category-at-point)
+					)
+				   )
+			  (setq beg upper_beg)
+			(setq upper_beg (point))
+			)
+		  )
+		 )
+		)
+	  )
+
+	(save-excursion
+	  (while (not end)
+		(next-line)
+		(cond
+		 ((equal
+		   (line-number-at-pos (point))
+		   (line-number-at-pos (point-max))
+		   )
+		  (setq end lower_end)
+		  )
+		 ((org-get-at-bol 'org-marker)
+		  (if (not (equal
+					category
+					(konix/org-guess-category-at-point)
+					)
+				   )
+			  (setq end lower_end)
+			(setq lower_end (point))
+			)
+		  )
+		 )
+		)
+	  )
+	(list beg end)
+	)
+  )
 
 (defun konix/org-agenda-no-context-p ()
   (let (

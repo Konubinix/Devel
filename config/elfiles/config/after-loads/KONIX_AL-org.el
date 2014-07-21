@@ -533,6 +533,83 @@ to be organized.
    )
   )
 
+(defun konix/org-agenda-sum-duration (beg end)
+  (let (
+		(line_beg (line-number-at-pos beg))
+		(line_end (line-number-at-pos end))
+		(result 0)
+		)
+	(save-excursion
+	  (goto-char beg)
+	  (while (<= (line-number-at-pos (point))
+				 line_end
+				 )
+		(setq result (+
+					  result
+					  (or
+					   (get-text-property (point) 'duration)
+					   0
+					   )
+					  ))
+		(next-line)
+		)
+	  )
+	result
+	)
+  )
+
+(defun konix/org-agenda-echo-sum-duration-in-region ()
+  (interactive)
+  (unless (region-active-p)
+	(user-error "The region must be active")
+	)
+  (message "Duration: %s"
+		   (konix/org-agenda-sum-duration
+			(region-beginning)
+			(region-end)
+			)
+		   )
+  )
+
+(defun konix/org-agenda-goto-char-biggest-duration-in-region (&optional beg end)
+  (when (region-active-p)
+	(setq beg (region-beginning)
+		  end (region-end)
+		  )
+	)
+  (unless beg
+	(user-error "The region must be active")
+	)
+  (let* (
+		 (line_beg (line-number-at-pos beg))
+		 (line_end (line-number-at-pos end))
+		 (biggest_duration_point beg)
+		 (biggest_duration 0)
+		 point_duration
+		 )
+	(goto-char beg)
+	(while (<= (line-number-at-pos (point))
+			   line_end
+			   )
+	  (setq point_duration
+			(or (get-text-property (point) 'duration) 0)
+			)
+	  (when (>
+			 point_duration
+			 biggest_duration
+			 )
+		(setq biggest_duration point_duration)
+		(setq biggest_duration_point (point))
+		(setq point_duration
+			  (or (get-text-property (point) 'duration) 0)
+			  )
+		)
+	  (next-line)
+	  )
+	(goto-char biggest_duration_point)
+	)
+  )
+
 (setq-default konix/org-agenda-month-view
 			  '(
 				(agenda nil

@@ -159,13 +159,14 @@ gaps_launch_script ( ) {
 }
 
 gaps_launch_config ( ) {
+    # I don't want to run into disk left space troubles again
+    git config annex.diskreserve 200M
     if [ -f "${GITANNEXSYNC_CONFIG}" ]
     then
         gaps_log "Launching the config script"
         gaps_launch_script "${GITANNEXSYNC_CONFIG}"
         gaps_assert "[ $? -eq 0 ]" "Failed to launch the config script ${GITANNEXSYNC_CONFIG}"
     fi
-
 }
 
 gaps_launch_availhook ( ) {

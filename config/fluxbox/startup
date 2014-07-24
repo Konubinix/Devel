@@ -22,25 +22,12 @@ fluxbox &
 
 fbpid=$!
 
-volti &
-
 numlockx
-konix_notify_daemon > ~/.notify_daemon_log 2>&1 &
-# the real notification daemon
-dunst&
 
-# automount usb drives
-udisks-glue
+supervisord -c "${KONIX_CONFIG_DIR}/supervisord.conf"
 
 sleep 4
 {
-    fbpager -w &
-    killall conky
-    wicd-gtk -t &
-    conky -d -c "$KONIX_CONKYRC" > ~/conky.log 2> ~/conky.err
-	# start de emacs_tray_daemon if possible
-	emacs_tray_daemon.py &
-	konix_mail_tray_daemon.py &
     konix_setbg.sh
 	konix_seeks.sh
 } &

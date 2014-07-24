@@ -5,7 +5,7 @@
 # # Check http://conky.sf.net for an up-to-date-list.
 
 # # set to yes if you want Conky to be forked in the background
-# background yes
+background no
 
 # # X font when Xft is disabled, you can pick one with program xfontsel
 # #font 5x7
@@ -103,7 +103,7 @@ own_window_transparent yes
 
 default_color white
 
-background yes
+background no
 
 double_buffer yes
 draw_outline yes

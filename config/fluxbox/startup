@@ -32,9 +32,4 @@ sleep 4
 	konix_seeks.sh
 } &
 
-if [ -n "$KONIX_X_INIT" ]
-then
-	eval "$KONIX_X_INIT"
-fi
-
 wait $fbpid

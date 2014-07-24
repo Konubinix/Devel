@@ -139,3 +139,6 @@
 [submodule "config/elfiles/znc"]
 	path = config/elfiles/znc
 	url = https://github.com/sshirokov/ZNC.el.git
+[submodule "supervisord"]
+	path = supervisord
+	url = https://github.com/Supervisor/supervisor.git

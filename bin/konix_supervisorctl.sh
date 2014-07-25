@@ -1,3 +1,3 @@
 #!/bin/bash
 
-supervisorctl  -c "${KONIX_CONFIG_DIR}/supervisord.conf"
+supervisorctl  -c "${KONIX_SUPERVISORDCONF}"

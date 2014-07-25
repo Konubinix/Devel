@@ -24,7 +24,7 @@ fbpid=$!
 
 numlockx
 
-supervisord -c "${KONIX_CONFIG_DIR}/supervisord.conf"
+supervisord -c "${KONIX_CONFIG_DIR}/supervisord_pc.conf"
 
 sleep 4
 {

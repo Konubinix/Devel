@@ -47,6 +47,7 @@
 		 (expand-file-name "dynsite" elfiles)
 		 (expand-file-name "org-ehtml/src" elfiles)
 		 (expand-file-name "znc" elfiles)
+		 (expand-file-name "circe/lisp" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -208,6 +209,9 @@
 ;; znc + erc
 (autoload 'znc-erc "znc" "" t)
 (autoload 'znc-all "znc" "" t)
+;; circe
+(autoload 'circe "circe" "" t)
+(autoload 'circe-server-buffers "circe" "" t)
 
 ;; ************************************************************
 ;; Automodes

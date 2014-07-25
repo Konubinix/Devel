@@ -144,4 +144,4 @@
 	url = https://github.com/Supervisor/supervisor.git
 [submodule "config/elfiles/circe"]
 	path = config/elfiles/circe
-	url = git://github.com/jorgenschaefer/circe.git
+	url = https://github.com/Konubinix/circe.git

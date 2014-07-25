@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "############"
+date
+echo "############"
 # do a rss -> imap work
 feed2imap -v -f "$KONIX_PERSO_DIR/feed2imaprc" | while read line
 do

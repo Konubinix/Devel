@@ -1,3 +1,3 @@
 #!/bin/bash
 
-supervisorctl  -c "${KONIX_SUPERVISORDCONF}"
+supervisorctl -c "${KONIX_SUPERVISORDCONF}" "$@"

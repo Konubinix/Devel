@@ -32,6 +32,8 @@ def html_unescape(data):
 
 SCRAP=os.environ.get("KONIX_SCRAP_DIR")
 RIL=os.environ.get("KONIX_RIL_DIR")
+USERAGENT = os.environ.get("KONIX_RIL_USERAGENT", "")
+
 DOWNLOAD_NORMAL_MODE=1
 DOWNLOAD_LIGHT_MODE=0
 DOWNLOAD_MIRROR_MODE=2
@@ -297,6 +299,7 @@ class RILItem(object):
                    "--force-directories",
                    "--adjust-extension",
                    "--span-hosts",
+                   "--user-agent=%s" % USERAGENT,
                    "--no-iri",
                    "--restrict-file-names=windows",
                  ]

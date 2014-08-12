@@ -1,7 +1,0 @@
-#!/bin/bash
-
-complete -F _sar sap
-
-complete -F _availablePackages apo
-
-complete -F _availablePackages apve

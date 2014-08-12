@@ -1,0 +1,7 @@
+if test -e "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/aptitude"
+then
+    source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/aptitude"
+	complete -F _availablePackages apve
+else
+    echo "Could not load aptitude completion from sjoubertrc"
+fi

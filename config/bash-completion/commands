@@ -1,4 +1,0 @@
-#!/bin/bash
-
-complete -c command type xvfb-run
-complete -c command type source

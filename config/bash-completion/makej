@@ -1,0 +1,4 @@
+# load the make completion
+_completion_loader make
+
+complete -F _make makej

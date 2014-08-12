@@ -1,9 +1,0 @@
-#!/bin/bash
-
-if test -e /usr/share/bash-completion/completions/ssh
-then
-    source /usr/share/bash-completion/completions/ssh
-    complete -F _ssh konix_sshfs_it.sh
-else
-    echo "no ssh bash completion found" >&2
-fi

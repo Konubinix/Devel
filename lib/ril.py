@@ -148,7 +148,7 @@ class RILItem(object):
         elif os.path.exists(self.priority_file_path):
             self._priority = open(self.priority_file_path, "r").read()
         else:
-            self._priority = 'B'
+            self._priority = 'A'
         return self._priority
 
     @priority.setter

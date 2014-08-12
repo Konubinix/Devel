@@ -1,5 +1,0 @@
-#!/bin/bash
-
-complete -v konix_dump_env.py
-complete -v stash
-complete -v unstash

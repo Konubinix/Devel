@@ -1,4 +1,4 @@
 #!/bin/bash
 
-source /usr/share/bash-completion/completions/sudo
+_completion_loader sudo
 complete -F _sudo sudo_which.sh

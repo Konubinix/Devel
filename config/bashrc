@@ -38,10 +38,8 @@ fi
 OLD_IFS=$IFS
 IFS=$'\n'
 echo "Loading personal bash completions"
-for bashcomp_file in $KONIX_CONFIG_DIR/bash-completion/*
-do
-	source "$bashcomp_file"
-done
+source "$KONIX_CONFIG_DIR/bash_completion"
+
 # special case for notmuch completion
 if [ -f "$KONIX_DEVEL_DIR/notmuch/completion/notmuch-completion.bash" ]
 then

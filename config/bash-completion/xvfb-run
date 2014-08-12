@@ -1,0 +1,1 @@
+complete -c command type xvfb-run

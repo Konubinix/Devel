@@ -142,6 +142,10 @@ class RILItem(object):
         return open(self.wget_log_file_path, "r").read()
 
     @property
+    def priority_explicit(self):
+        return os.path.exists(self.priority_file_path)
+
+    @property
     def priority(self):
         if self._priority:
             pass

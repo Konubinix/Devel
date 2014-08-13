@@ -4,6 +4,7 @@ _konix_completion_loader()
 {
     # use the system wide completion
     _completion_loader "$@"
+    local res="$?"
 
     # override with my local one if possible
     local compfile=./bash-completion
@@ -12,5 +13,8 @@ _konix_completion_loader()
 
     # Avoid trying to source dirs; https://bugzilla.redhat.com/903540
     [[ -f "$compfile" ]] && . "$compfile" &>/dev/null && return 124
+
+    # Propagate the result of the system completion
+    return "${res}"
 } &&
 complete -D -F _konix_completion_loader

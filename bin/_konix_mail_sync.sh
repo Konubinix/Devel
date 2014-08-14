@@ -29,6 +29,20 @@ notmuch new || exit 1
 # this is useless since 0.5 -> notmuchsync -d -r --all --sync-deleted-tag
 konix_mail_init_tags.sh || exit 1
 
+# perform general tag manipulation
+# mute mails new that are in a muted thread
+MUTED_THREADS="$(notmuch search --output=threads tag:muted|cut -f 1 -d $' ')"
+if [ "${MUTED_THREADS}" != "" ]
+then
+    notmuch tag -unread -inbox -- tag:new and ${MUTED_THREADS}
+fi
+# make new mail in loud thread automatically show up
+LOUD_THREADS="$(notmuch search --output=threads tag:loud|cut -f 1 -d $' ')"
+if [ "${LOUD_THREADS}" != "" ]
+then
+    notmuch tag +flagged +unread +inbox -- tag:new and ${LOUD_THREADS}
+fi
+
 konix_mail_tray_daemon_update.sh -d || exit 1
 
 konix_mail_unnew.sh || exit 1

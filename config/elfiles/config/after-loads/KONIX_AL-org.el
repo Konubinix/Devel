@@ -582,7 +582,7 @@ inside projects that are not scheduled may not be forgotten and thus don't need
 to be organized.
 "
   (let (
-		(end (save-excursion (outline-next-heading) (1- (point))))
+		(end (save-excursion (org-end-of-subtree t)))
 		)
 	(if (konix/org-is-task-of-project-p)
 		end

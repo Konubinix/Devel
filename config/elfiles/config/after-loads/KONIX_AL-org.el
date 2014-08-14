@@ -613,8 +613,22 @@ to be organized.
 	)
   )
 
+(defun konix/org-skip-if-subtree-has-waiting-items ()
+  (let (
+		(end (save-excursion (org-end-of-subtree t)))
+		)
+    (save-excursion
+	  (org-back-to-heading)
+	  (if (re-search-forward "^\\*+ \\(WAIT\\|DELEGATED\\)" end t)
+		  end
+		nil
+	   )
+	  )
+	)
+  )
+
 (defun konix/org-agenda-keep-if-is-unactive-project ()
-  "Skip if not a project or the project is active"
+  "Skip if not a project or the project is active or the project contains"
   (let (
 		(end (save-excursion (org-end-of-subtree t)))
 		)
@@ -912,7 +926,10 @@ to be organized.
 						"Keep an eye on those projects (they may well be stuck)")
 					   (org-agenda-tag-filter-preset nil)
 					   (org-agenda-skip-function
-						'(konix/org-agenda-keep-if-is-unactive-project))
+						'(or
+						  (konix/org-agenda-keep-if-is-unactive-project)
+						  (konix/org-skip-if-subtree-has-waiting-items)
+						  ))
 					   )
 					  )
 				)

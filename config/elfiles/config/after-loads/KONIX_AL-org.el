@@ -591,6 +591,47 @@ to be organized.
 	)
   )
 
+(defun konix/org-subtree-has-active-schedule ()
+  "Indocate whether the entry has scheduled and active times in its subtree."
+  (let (
+        (res nil)
+		(end (save-excursion (org-end-of-subtree t)))
+		)
+    (save-excursion
+	  (org-back-to-heading)
+	  (while (and
+			  (re-search-forward
+			   org-scheduled-regexp end t) ;; go to the next schedule item
+			  (not
+			   (setq res (org-entry-is-todo-p)) ;; remember if one has been found
+			   ) ;; stop if one has been found
+			  )
+		;; Nothing to do in the body. Everything is in the condition.
+		)
+	  )
+	res
+	)
+  )
+
+(defun konix/org-agenda-keep-if-is-unactive-project ()
+  "Skip if not a project or the project is active"
+  (let (
+		(end (save-excursion (org-end-of-subtree t)))
+		)
+	(if (or
+		 ;; not a project
+		 (not
+		  (member "project" (org-get-tags))
+		  )
+		 ;; is an active project
+		 (konix/org-subtree-has-active-schedule)
+		 )
+		end
+	  nil
+	  )
+	)
+  )
+
 (defun konix/org-agenda-view-generate-list (&optional important)
   `(
 	(agenda nil
@@ -865,6 +906,15 @@ to be organized.
 							(org-agenda-tag-filter-preset nil)
 							)
 						   )
+				(tags-todo "+project"
+					  (
+					   (org-agenda-overriding-header
+						"Keep an eye on those projects (they may well be stuck)")
+					   (org-agenda-tag-filter-preset nil)
+					   (org-agenda-skip-function
+						'(konix/org-agenda-keep-if-is-unactive-project))
+					   )
+					  )
 				)
 			  )
 (setq-default konix/org-agenda-full-view

@@ -1764,6 +1764,7 @@ to be organized.
 				("@home" . ?h)
 				("@errand" . ?e)
 				("@work" . ?w)
+				("@workhours" . ?W)
 				("@car" . ?C)
 				(:newline)
 				("@computer" . ?c)

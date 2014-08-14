@@ -145,3 +145,6 @@
 [submodule "config/elfiles/circe"]
 	path = config/elfiles/circe
 	url = https://github.com/Konubinix/circe.git
+[submodule "ledger-autosync"]
+	path = ledger-autosync
+	url = hg::https://bitbucket.org/egh/ledger-autosync

@@ -2645,10 +2645,27 @@ of the clocksum."
   ""
   )
 
+(defface konix/org-agenda-future-deadline-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:foreground "hot pink")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:foreground "hot pink")
+	 )
+	)
+  ""
+  )
+
 (defvar konix/org-agenda-text-properties
   '(
 	("^.+:INTERRUPTION:.*$" 0 konix/org-agenda-interruption-face)
 	("^.*:perso:.*$" 0 konix/org-agenda-perso-face)
+	("^.+In +.+ d\..*$" 0 konix/org-agenda-future-deadline-face)
 	;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)
 	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
 	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)

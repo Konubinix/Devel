@@ -42,7 +42,7 @@
 	)
    )
   (konix/notmuch-show-unflag-and-next)
-)
+  )
 
 (defun konix/message-setup-hook ()
   (mml-secure-message-sign-pgpmime)
@@ -56,16 +56,14 @@
 (add-hook 'message-setup-hook 'konix/message-setup-hook)
 ;; for notmuch to sort mails like I want
 (setq-default notmuch-search-oldest-first nil)
+(require 'ini)
 (setq-default notmuch-saved-searches
-			  '(
-				("unread inbox" . "tag:inbox AND not tag:deleted AND tag:unread AND not tag:hide")
-				("inbox" . "tag:inbox AND -tag:deleted AND not tag:hide")
-				("flagged" . "tag:flagged AND not tag:hide")
-				("draft" . "tag:draft and not tag:deleted")
-				("unread" . "tag:unread AND NOT tag:rss AND NOT tag:ml AND NOT tag:inbox AND NOT tag:flagged")
-				("unread ml" . "tag:ml AND tag:unread")
-				("unread rss" . "tag:rss AND tag:unread")
-				)
+			  (ini-decode
+			   (with-temp-buffer
+				 (insert-file-contents (getenv "KONIX_NOTMUCH_SAVED_SEARCHES"))
+				 (buffer-substring-no-properties (point-min) (point-max))
+				 )
+			   )
 			  )
 (setq-default mailcap-download-directory
 			  (format "%s/" (getenv "KONIX_DOWNLOAD_DIR")))

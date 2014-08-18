@@ -148,3 +148,6 @@
 [submodule "ledger-autosync"]
 	path = ledger-autosync
 	url = hg::https://bitbucket.org/egh/ledger-autosync
+[submodule "config/elfiles/ini"]
+	path = config/elfiles/ini
+	url = https://github.com/daniel-ness/ini.el.git

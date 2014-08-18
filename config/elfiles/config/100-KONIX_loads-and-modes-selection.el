@@ -48,6 +48,7 @@
 		 (expand-file-name "org-ehtml/src" elfiles)
 		 (expand-file-name "znc" elfiles)
 		 (expand-file-name "circe/lisp" elfiles)
+		 (expand-file-name "ini" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

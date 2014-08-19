@@ -58,11 +58,13 @@
 (setq-default notmuch-search-oldest-first nil)
 (require 'ini)
 (setq-default notmuch-saved-searches
-			  (ini-decode
-			   (with-temp-buffer
-				 (insert-file-contents (getenv "KONIX_NOTMUCH_SAVED_SEARCHES"))
-				 (buffer-substring-no-properties (point-min) (point-max))
-				 )
+			  (reverse
+			   (ini-decode
+				(with-temp-buffer
+				  (insert-file-contents (getenv "KONIX_NOTMUCH_SAVED_SEARCHES"))
+				  (buffer-substring-no-properties (point-min) (point-max))
+				  )
+				)
 			   )
 			  )
 (setq-default mailcap-download-directory

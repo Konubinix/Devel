@@ -622,7 +622,7 @@ to be organized.
 	  (if (re-search-forward "^\\*+ \\(WAIT\\|DELEGATED\\)" end t)
 		  end
 		nil
-	   )
+		)
 	  )
 	)
   )
@@ -921,17 +921,17 @@ to be organized.
 							)
 						   )
 				(tags-todo "+project"
-					  (
-					   (org-agenda-overriding-header
-						"Keep an eye on those projects (they may well be stuck)")
-					   (org-agenda-tag-filter-preset nil)
-					   (org-agenda-skip-function
-						'(or
-						  (konix/org-agenda-keep-if-is-unactive-project)
-						  (konix/org-skip-if-subtree-has-waiting-items)
-						  ))
-					   )
-					  )
+						   (
+							(org-agenda-overriding-header
+							 "Keep an eye on those projects (they may well be stuck)")
+							(org-agenda-tag-filter-preset nil)
+							(org-agenda-skip-function
+							 '(or
+							   (konix/org-agenda-keep-if-is-unactive-project)
+							   (konix/org-skip-if-subtree-has-waiting-items)
+							   ))
+							)
+						   )
 				)
 			  )
 (setq-default konix/org-agenda-full-view
@@ -2062,31 +2062,21 @@ to be organized.
 (defun konix/org-agenda-tag-filter-context-initialize-from-context ()
   (setq-default
    konix/org-agenda-tag-filter-contexts
-   (mapcar
-	(lambda (elem)
-	  (concat "@" elem)
+   (list
+	(mapcar
+	 (lambda (elem)
+	   (concat "@" elem)
+	   )
+	 (split-string
+	  (replace-regexp-in-string "\n" ""
+								(shell-command-to-string "konix_contexts.sh")
+								)
+	  " "
 	  )
-	(split-string
-	 (replace-regexp-in-string "\n" ""
-							   (shell-command-to-string "konix_contexts.sh")
-							   )
-	 " "
 	 )
 	)
    )
   )
-
-(defun konix/org-agenda-auto-exclude-function-context (tag)
-  (if (and
-	   konix/org-agenda-tag-filter-contexts
-	   (string-match-p "^@" tag)
-	   (not (member tag konix/org-agenda-tag-filter-contexts))
-	   )
-	  (format "-%s" tag)
-	nil
-	)
-  )
-(setq org-agenda-auto-exclude-function 'konix/org-agenda-auto-exclude-function-context)
 
 (defun konix/org/record-org-agenda-tag-filter-preset ()
   (interactive)
@@ -2737,14 +2727,24 @@ of the clocksum."
   (if org-agenda-entry-text-mode (org-agenda-entry-text-mode))
   (let (tags
 		cat
-		(konix/org-entry-predicate (append '(or)
-										   (mapcar
-											(lambda (elem)
-											  `(member ,elem tags)
-											  )
-											tags
-											)
-										   ))
+		(konix/org-entry-predicate
+		 (append
+		  '(and)
+		  (mapcar
+		   (lambda (disjunction)
+		   (append
+			'(or)
+			(mapcar
+			 (lambda (elem)
+			   `(member ,elem tags)
+			   )
+			 disjunction
+			 )
+			)
+		   )
+		   tags
+		   )
+		  ))
 		)
 	(save-excursion
 	  (goto-char (point-min))
@@ -2786,7 +2786,12 @@ of the clocksum."
 	(konix/org-agenda-filter-context_1 konix/org-agenda-tag-filter-contexts)
 	(setq header-line-format
 		  `("Context filtered with "
-			,konix/org-agenda-tag-filter-contexts
+			,(mapconcat
+			  (lambda (disjunction)
+				(mapconcat 'identity disjunction " or ")
+				)
+			  konix/org-agenda-tag-filter-contexts
+			  " and ")
 			", appt display = " ,(if konix/org-agenda-filter-context-show-appt
 									 "on" "off")
 			", no context display = " ,(if konix/org-agenda-filter-context-show-empty-context

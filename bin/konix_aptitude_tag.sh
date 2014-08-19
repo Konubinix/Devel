@@ -9,6 +9,20 @@ LIST_COMMANDS="$(mktemp)"
 # echo "LIST_PACKAGES=${LIST_PACKAGES}"
 trap "rm '${LIST_COMMANDS}' '${LIST_PACKAGES}'" 0
 
+FAST=""
+while getopts "hf" opt; do
+    case $opt in
+        h)
+            usage
+            exit 0
+            ;;
+        f)
+            FAST="1"
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
 echo "Computing the list of packages"
 aptitude search '~i ?not(~M) ?not(?user-tag(.))' > "${LIST_PACKAGES}"
 NUMBER="$(wc -l "${LIST_PACKAGES}"|cut -f1 -d' ')"
@@ -43,7 +57,12 @@ do
 	clear
     echo "--------------- ${NUMBER} left"
 	NUMBER=$((NUMBER-1))
-    aptitude show "${NAME}"
+    if [ -n "${FAST}" ]
+    then
+        echo "${NAME}"
+    else
+        aptitude show "${NAME}"
+    fi
     read -p "> Why is $NAME still here (${LAST_RES}) ? " RES
 	if [ "${RES}" == "f" ]
 	then

@@ -2653,7 +2653,7 @@ of the clocksum."
 
 (defvar konix/org-agenda-text-properties
   '(
-	("^.+:INTERRUPTION:.*$" 0 konix/org-agenda-interruption-face)
+	("([0-9]+:[0-9]+) .+:INTERRUPTION:.*$" 0 konix/org-agenda-interruption-face)
 	("^.*:perso:.*$" 0 konix/org-agenda-perso-face)
 	("^.+In +.+ d\..*$" 0 konix/org-agenda-future-deadline-face)
 	;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)

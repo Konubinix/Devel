@@ -1,46 +1,39 @@
 # declare colors to allow scripts with -u to work correctly
-set_if_not_already() {
-    local var_name="$1"
-    if [ -z "$(eval "echo \${${var_name}}")" ]
-    then
-        eval "export ${var_name}="
-    fi
-}
-set_if_not_already COLOR_RESET
-set_if_not_already COLOR_BOLD
-set_if_not_already COLOR_UL
-set_if_not_already COLOR_FG_BLACK
-set_if_not_already COLOR_FG_RED
-set_if_not_already COLOR_FG_GREEN
-set_if_not_already COLOR_FG_YELLOW
-set_if_not_already COLOR_FG_BLUE
-set_if_not_already COLOR_FG_MAGENTA
-set_if_not_already COLOR_FG_CYAN
-set_if_not_already COLOR_FG_WHITE
-set_if_not_already COLOR_BG_BLACK
-set_if_not_already COLOR_BG_RED
-set_if_not_already COLOR_BG_GREEN
-set_if_not_already COLOR_BG_YELLOW
-set_if_not_already COLOR_BG_BLUE
-set_if_not_already COLOR_BG_MAGENTA
-set_if_not_already COLOR_BG_CYAN
-set_if_not_already COLOR_BG_WHITE
-set_if_not_already COLOR_BLACK
-set_if_not_already COLOR_BLUE
-set_if_not_already COLOR_GREEN
-set_if_not_already COLOR_CYAN
-set_if_not_already COLOR_RED
-set_if_not_already COLOR_PURPLE
-set_if_not_already COLOR_BROWN
-set_if_not_already COLOR_LIGHT_GRAY
-set_if_not_already COLOR_DARK_GRAY
-set_if_not_already COLOR_LIGHT_BLUE
-set_if_not_already COLOR_LIGHT_GREEN
-set_if_not_already COLOR_LIGHT_CYAN
-set_if_not_already COLOR_LIGHT_RED
-set_if_not_already COLOR_LIGHT_PURPLE
-set_if_not_already COLOR_YELLOW
-set_if_not_already COLOR_WHITE
+export COLOR_RESET=""
+export COLOR_BOLD=""
+export COLOR_UL=""
+export COLOR_FG_BLACK=""
+export COLOR_FG_RED=""
+export COLOR_FG_GREEN=""
+export COLOR_FG_YELLOW=""
+export COLOR_FG_BLUE=""
+export COLOR_FG_MAGENTA=""
+export COLOR_FG_CYAN=""
+export COLOR_FG_WHITE=""
+export COLOR_BG_BLACK=""
+export COLOR_BG_RED=""
+export COLOR_BG_GREEN=""
+export COLOR_BG_YELLOW=""
+export COLOR_BG_BLUE=""
+export COLOR_BG_MAGENTA=""
+export COLOR_BG_CYAN=""
+export COLOR_BG_WHITE=""
+export COLOR_BLACK=""
+export COLOR_BLUE=""
+export COLOR_GREEN=""
+export COLOR_CYAN=""
+export COLOR_RED=""
+export COLOR_PURPLE=""
+export COLOR_BROWN=""
+export COLOR_LIGHT_GRAY=""
+export COLOR_DARK_GRAY=""
+export COLOR_LIGHT_BLUE=""
+export COLOR_LIGHT_GREEN=""
+export COLOR_LIGHT_CYAN=""
+export COLOR_LIGHT_RED=""
+export COLOR_LIGHT_PURPLE=""
+export COLOR_YELLOW=""
+export COLOR_WHITE=""
 
 SSH_AGENT_SOURCE=/tmp/ssh-agent-source
 

@@ -24,6 +24,26 @@ then
     export COLOR_BG_MAGENTA=`tput setab 5`
     export COLOR_BG_CYAN=`tput setab 6`
     export COLOR_BG_WHITE=`tput setab 7`
+else
+    export COLOR_RESET=""
+    export COLOR_BOLD=""
+    export COLOR_UL=""
+    export COLOR_FG_BLACK=""
+    export COLOR_FG_RED=""
+    export COLOR_FG_GREEN=""
+    export COLOR_FG_YELLOW=""
+    export COLOR_FG_BLUE=""
+    export COLOR_FG_MAGENTA=""
+    export COLOR_FG_CYAN=""
+    export COLOR_FG_WHITE=""
+    export COLOR_BG_BLACK=""
+    export COLOR_BG_RED=""
+    export COLOR_BG_GREEN=""
+    export COLOR_BG_YELLOW=""
+    export COLOR_BG_BLUE=""
+    export COLOR_BG_MAGENTA=""
+    export COLOR_BG_CYAN=""
+    export COLOR_BG_WHITE=""
 fi
 export COLOR_BLACK=0
 export COLOR_BLUE=4

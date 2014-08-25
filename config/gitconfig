@@ -19,10 +19,6 @@
 	alog = log --graph --decorate=full --all --full-history -m
  	ri = rebase --interactive --autosquash
 	# fetch = fetch --upload-pack="git upload-pack"
-[remote "origin"]
-#	uploadpack = git upload-pack
-#	receivepack = git receive-pack
-	gitsvn = git svn
 [diff]
   	tool = meld #konix_emacs_diff
 	renamelimit = 888

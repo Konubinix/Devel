@@ -2,6 +2,7 @@
 ;; `org-directory' cycling into the `konix/org-meta-contexts' list
 
 (require 'find-lisp)
+(require 'cl)
 (require 'org)
 
 (defcustom konix/org-meta-contexts '()

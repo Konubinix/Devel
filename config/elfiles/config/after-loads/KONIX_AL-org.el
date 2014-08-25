@@ -1486,6 +1486,7 @@ to be organized.
 						 (org-agenda-overriding-header
 						  "Done projects (full archive)")
 						 (org-agenda-tag-filter-preset nil)
+						 (org-agenda-archives-mode 'tree)
 						 (org-agenda-skip-function
 						  '(or
 							(konix/org-agenda-skip-if-tags
@@ -1520,6 +1521,7 @@ to be organized.
 						  "Done tasks not into a project (full archive)")
 						 (org-tags-exclude-from-inheritance nil)
 						 (org-agenda-tag-filter-preset nil)
+						 (org-agenda-archives-mode 'tree)
 						 (org-agenda-skip-function
 						  '(or
 							(konix/org-agenda-skip-if-tags

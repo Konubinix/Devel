@@ -1,6 +1,18 @@
 ;; The meta context library allows the user to easily change the value of
 ;; `org-directory' cycling into the `konix/org-meta-contexts' list
 
+;; how to use:
+;; (load-file "../KONIX_org-meta-context.el")
+;; (setq konix/org-meta-contexts '("org_directory1" "org_directory2"))
+;; (defalias 'konix/notify 'warn)
+;; (setq konix/org-meta-context/find-org-directories 'konix/org-meta-context/find-org-directories_internal)
+;; (konix/org-meta-context/initialize)
+
+;; To change the context
+;; (konix/org-meta-context/next-context)
+;; To toggle the restriction to one context
+;; (konix/org-meta-context/toggle-restrict)
+
 (require 'find-lisp)
 (require 'cl)
 (require 'org)

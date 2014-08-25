@@ -31,9 +31,17 @@ HOST="${1}"
 remoterc_quiet
 if [ -n "${ALL}" ]
 then
-    for context in "${KONIX_REMOTE_CONTEXTS_DIR}/${HOST}"/*
+    remoterc_compute_contexts
+    for context_path in "${KONIX_REMOTE_CONTEXTS_DIR}/${HOST}"/*
     do
-        echo "$(basename ${context}): $(cat "${context}/url")"
+        context="$(basename ${context_path})"
+        if echo "${contexts}" | grep -q "\b${context}\b"
+        then
+            echo -n "A:"
+        else
+            echo -n "U:"
+        fi
+        echo "${context}: $(cat "${context_path}/url")"
     done
 else
     remoterc_setup_or_quit "${HOST}"

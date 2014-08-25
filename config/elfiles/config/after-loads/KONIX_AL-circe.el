@@ -56,32 +56,6 @@
   ""
   )
 
-(defun konix/circe-list-connected-network ()
-  (mapcar
-   (lambda (buffer)
-	 (with-current-buffer
-		 buffer
-	   circe-server-network)
-	 )
-   (circe-server-buffers)
-   )
-  )
-
-(defun konix/circe-jump-network (network)
-  (interactive
-   (list
-	(completing-read "Network: " (konix/circe-list-connected-network))
-	)
-   )
-  (catch 'return
-    (dolist (buffer (circe-server-buffers))
-	  (when (with-current-buffer buffer (string= network circe-server-network))
-		(pop-to-buffer buffer)
-		(throw 'return t)
-		)
-	  )
-	)
-  )
 
 (provide 'KONIX_AL-circe)
 ;;; KONIX_AL-circe.el ends here

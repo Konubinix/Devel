@@ -56,6 +56,7 @@
   ""
   )
 
+(setq-default circe-server-buffer-name "{network}")
 
 (provide 'KONIX_AL-circe)
 ;;; KONIX_AL-circe.el ends here

@@ -10,7 +10,7 @@ then
         then
             FILE="$(pwd)/${FILE}"
         fi
-        FILE="$(echo ${FILE}|sed 's-^/home-/data/home-')"
+        FILE="$(echo ${FILE}|sed 's-^/home-/data/debian/home-')"
         FILE="file://$FILE"
 fi
 

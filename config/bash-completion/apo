@@ -1,7 +1,10 @@
-if test -e "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/aptitude"
+#!/bin/bash
+
+ME="$(basename($0))"
+if test -e "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/completions/aptitude"
 then
-    source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/aptitude"
-    complete -F _availablePackages apo
+    source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/completions/aptitude"
+    complete -F _availablePackages "$ME"
 else
-    echo "Could not load aptitude completion from sjoubertrc"
+    konix_display.py "Could not load aptitude completion from sjoubertrc"
 fi

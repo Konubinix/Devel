@@ -1,7 +1,9 @@
-if test -e "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/aptitude"
+#!/bin/bash
+
+if test -e "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/completions/aptitude"
 then
-    source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/aptitude"
+    source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/completions/aptitude"
 	complete -F _sar sap
 else
-    echo "Could not load aptitude completion from sjoubertrc"
+    konix_display.py "Could not load aptitude completion from sjoubertrc"
 fi

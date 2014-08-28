@@ -607,7 +607,9 @@ to be organized.
 	  (org-back-to-heading)
 	  (while (and
 			  (re-search-forward
-			   org-scheduled-regexp end t) ;; go to the next schedule item
+			   (format "\\(%s\\|%s\\)"
+					   org-scheduled-regexp
+					   org-deadline-regexp) end t) ;; go to the next schedule item
 			  (not
 			   (setq res (org-entry-is-todo-p)) ;; remember if one has been found
 			   ) ;; stop if one has been found

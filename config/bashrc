@@ -48,9 +48,6 @@ fi
 
 IFS=$OLD_IFS
 
-# get the aptitude completion from sjoubert repository
-source_if_possible "$KONIX_DEVEL_DIR/sjoubert_dot_rc/.config/bash/completions/aptitude"
-
 # unset bash bmajor bminor
 
 # do not generate a core dump by default to avoid dissemineting core dumps everywhere

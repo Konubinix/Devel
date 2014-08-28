@@ -151,3 +151,6 @@
 [submodule "config/elfiles/ini"]
 	path = config/elfiles/ini
 	url = https://github.com/daniel-ness/ini.el.git
+[submodule "config/elfiles/ebib"]
+	path = config/elfiles/ebib
+	url = https://github.com/joostkremers/ebib.git

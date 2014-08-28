@@ -26,6 +26,7 @@ The first element of the list is the default context
   (and
    (not (string= "data" dir))
    (not (string= ".." dir))
+   (not (string= "." dir))
    )
   )
 

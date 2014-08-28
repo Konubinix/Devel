@@ -42,6 +42,7 @@ DOWNLOAD_RC_TO_MSG={
         16:"Already downloading something about this item",
         0:"Everything went well",
         4:"Wget: Network Failure",
+        8:"Server issued an error response.(too many redirection?)",
         }
 DOWNLOAD_MODE_NAMES={
         DOWNLOAD_NORMAL_MODE:"DOWNLOAD_NORMAL_MODE",
@@ -328,10 +329,13 @@ class RILItem(object):
         output = open(self.wget_log_file_path, "w")
         output.write("Command: " + " ".join(command) + "\n\n")
         output.flush()
+        environ = os.environ.copy()
+        environ['LC_ALL'] = 'C'
         p = subprocess.Popen(command,
                 cwd=self.dir,
                 stdout=output,
-                stderr=output)
+                stderr=output,
+                env=environ)
         p.wait()
         output.write("\nreturncode: "+ str(p.returncode))
         output.close()

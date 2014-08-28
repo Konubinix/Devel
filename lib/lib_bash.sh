@@ -425,3 +425,15 @@ private_nav () {
 import_env_autostash () {
     import_env "" autostash
 }
+
+is_sourced () {
+    ! [ "$BASH_SOURCE" == "$0" ]
+}
+
+my_location () {
+    RES="$(dirname "${BASH_SOURCE[0]}")"
+}
+
+my_name () {
+    RES="$(basename "${BASH_SOURCE[0]}")"
+}

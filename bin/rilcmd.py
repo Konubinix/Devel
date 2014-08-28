@@ -86,7 +86,7 @@ class RilCmd(cmd.Cmd, object):
         item = self.get_item(line)
         print item
         print """Url   : %s""" % item.url
-        print """Index : %s""" % item.index.encode("utf-8")
+        print """Index : %s""" % unicode(item.index).encode("utf-8")
 
     def do_open(self, line):
         item = self.get_item(line)

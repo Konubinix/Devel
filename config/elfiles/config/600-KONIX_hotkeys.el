@@ -156,6 +156,11 @@
 (define-key 'konix/global-slow-key-map (kbd "M-b") 'konix/yank-current-buffer-name)
 (define-key 'konix/global-slow-key-map (kbd "M-B") 'konix/yank-current-buffer-file-name)
 ;; **********************************************************************
+;; ebib
+;; **********************************************************************
+(define-key 'konix/global-slow-key-map (kbd "e") 'ebib)
+
+;; **********************************************************************
 ;; bbdb
 ;; **********************************************************************
 (define-prefix-command 'konix/bbdb/map)

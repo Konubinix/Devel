@@ -49,6 +49,7 @@
 		 (expand-file-name "znc" elfiles)
 		 (expand-file-name "circe/lisp" elfiles)
 		 (expand-file-name "ini" elfiles)
+		 (expand-file-name "ebib" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -213,6 +214,8 @@
 ;; circe
 (autoload 'circe "circe" "" t)
 (autoload 'circe-server-buffers "circe" "" t)
+;; ebib
+(autoload 'ebib "ebib" "" t)
 
 ;; ************************************************************
 ;; Automodes

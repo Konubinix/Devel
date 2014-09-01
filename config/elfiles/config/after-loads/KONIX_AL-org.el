@@ -1713,7 +1713,7 @@ to be organized.
 				 )
 				("u" "Todo Item URGENT" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %?
-  SCHEDULED: %t
+  DEADLINE: %t
   :PROPERTIES:
   :CREATED:  %U
   :END:"
@@ -1721,7 +1721,7 @@ to be organized.
 				 )
 				("U" "Todo Item URGENT for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %?
-  SCHEDULED: %t
+  DEADLINE: %t
   :PROPERTIES:
   :CREATED:  %U
   :END:

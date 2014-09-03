@@ -62,6 +62,16 @@
 									 'konix/not-erc-buffer-p
 									 'bs-sort-buffer-interns-are-last
 									 )
+	 (konix/push-or-replace-in-alist 'bs-configurations "circe-buffer"
+									 nil nil nil
+									 'konix/not-circe-buffer-p
+									 'bs-sort-buffer-interns-are-last
+									 )
+	 (konix/push-or-replace-in-alist 'bs-configurations "circe-query-buffer"
+									 nil nil nil
+									 'konix/not-circe-query-buffer-p
+									 'bs-sort-buffer-interns-are-last
+									 )
 	 (konix/push-or-replace-in-alist 'bs-configurations "trac-pages"
 									 nil nil nil
 									 'konix/not-trac-p

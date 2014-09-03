@@ -50,6 +50,8 @@
 		 (expand-file-name "circe/lisp" elfiles)
 		 (expand-file-name "ini" elfiles)
 		 (expand-file-name "ebib" elfiles)
+		 (expand-file-name "deferred" elfiles)
+		 (expand-file-name "ctable" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

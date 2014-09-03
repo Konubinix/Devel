@@ -52,6 +52,7 @@
 		 (expand-file-name "ebib" elfiles)
 		 (expand-file-name "deferred" elfiles)
 		 (expand-file-name "ctable" elfiles)
+		 (expand-file-name "epc" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

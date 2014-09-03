@@ -160,3 +160,6 @@
 [submodule "config/elfiles/ctable"]
 	path = config/elfiles/ctable
 	url = https://github.com/kiwanami/emacs-ctable.git
+[submodule "config/elfiles/epc"]
+	path = config/elfiles/epc
+	url = https://github.com/kiwanami/emacs-epc.git

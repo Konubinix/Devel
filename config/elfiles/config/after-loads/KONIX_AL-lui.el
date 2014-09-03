@@ -25,6 +25,7 @@
 ;;; Code:
 
 (setq-default lui-fill-column 700)
+(setq-default lui-time-stamp-position 'left)
 
 (provide 'KONIX_AL-lui)
 ;;; KONIX_AL-lui.el ends here

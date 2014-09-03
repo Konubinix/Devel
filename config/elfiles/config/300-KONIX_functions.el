@@ -328,6 +328,24 @@ make the line non empty"
 	)
   )
 
+(defun konix/not-circe-buffer-p (buffer)
+  (with-current-buffer buffer
+	(not
+	 (string-match "circe"
+	  (format "%s" major-mode)
+	  )
+	 )
+	)
+  )
+
+(defun konix/not-circe-query-buffer-p (buffer)
+  (with-current-buffer buffer
+	(not
+	 (eq major-mode 'circe-query-mode)
+	 )
+	)
+  )
+
 (defun konix/not-trac-p (buffer)
   (with-current-buffer buffer
 	(if (equal major-mode 'trac-wiki-mode)

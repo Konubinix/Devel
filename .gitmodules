@@ -154,3 +154,9 @@
 [submodule "config/elfiles/ebib"]
 	path = config/elfiles/ebib
 	url = https://github.com/joostkremers/ebib.git
+[submodule "config/elfiles/deferred"]
+	path = config/elfiles/deferred
+	url = https://github.com/kiwanami/emacs-deferred.git
+[submodule "config/elfiles/ctable"]
+	path = config/elfiles/ctable
+	url = https://github.com/kiwanami/emacs-ctable.git

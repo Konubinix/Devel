@@ -2,7 +2,7 @@
 hardstatus lastline
 hardstatus string "%w %{kg}%` %=%{kc} %d/%m/%Y %c:%s"
 # display in the hardstatus the battery status
-backtick 0 15 15 acpi
+backtick 0 15 15 konix_acpi_maybe.sh
 # monitor activity in other windows
 defmonitor on
 # when searching in copy mode, ignore case

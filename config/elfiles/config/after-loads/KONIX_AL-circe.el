@@ -35,12 +35,12 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:foreground "green")
+	 (:foreground "forest green")
 	 )
 	(
 	 ((class color)
 	  (background light))
-	 (:foreground "green")
+	 (:foreground "forest green")
 	 )
 	)
   ""

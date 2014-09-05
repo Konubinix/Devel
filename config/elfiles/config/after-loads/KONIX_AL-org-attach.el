@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(setq-default org-attach-store-link-p 'attached)
 
 (provide 'KONIX_AL-org-attach)
 ;;; KONIX_AL-org-attach.el ends here

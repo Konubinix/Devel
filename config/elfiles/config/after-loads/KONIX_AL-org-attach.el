@@ -23,13 +23,6 @@
 ;;
 
 ;;; Code:
-(defun konix/org-attach-open (file)
-  (find-file
-   (org-attach-expand file)
-   )
-  )
-
-(org-add-link-type "attach" 'konix/org-attach-open)
 
 (provide 'KONIX_AL-org-attach)
 ;;; KONIX_AL-org-attach.el ends here

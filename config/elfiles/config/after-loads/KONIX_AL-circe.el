@@ -24,7 +24,13 @@
 
 ;;; Code:
 
-(defface circe-my-message-face
+(require 'circe-color-nicks)
+(enable-circe-color-nicks)
+
+(require 'circe-highlight-all-nicks)
+(enable-circe-highlight-all-nicks)
+
+(defface konix/circe-my-message-face
   '(
 	(
 	 ((class color)
@@ -40,7 +46,7 @@
   ""
   )
 
-(defface circe-originator-face
+(defface konix/circe-originator-face
   '(
 	(
 	 ((class color)
@@ -57,6 +63,9 @@
   )
 
 (setq-default circe-server-buffer-name "{network}")
+(setq-default circe-format-self-say "(me)<{nick}> {body}")
+(setq-default circe-my-message-face 'konix/circe-my-message-face)
+(setq-default circe-originator-face 'konix/circe-originator-face)
 
 (provide 'KONIX_AL-circe)
 ;;; KONIX_AL-circe.el ends here

@@ -15,3 +15,26 @@ deflog on
 logstamp on
 # do not display the annoying startup message
 startup_message off
+# some usefull key bindings
+# hint, to know the key combination to use, run screen and cat into the screen
+
+# shift + arrow to move focus
+bindkey ^[[1;2C focus right
+bindkey ^[[1;2D focus left
+bindkey ^[[1;2B focus down
+bindkey ^[[1;2A focus up
+
+# ctrl + arrow to switch window
+bindkey ^[[1;5C next
+bindkey ^[[1;5D prev
+
+# meta + ctrl + arrow to enlarge window
+# bindkey ^[[1;7C resize right
+# bindkey ^[[1;7D resize left
+bindkey ^[[1;7B resize -2
+bindkey ^[[1;7A resize +2
+
+# emacs-ish commands (C-x 1 C-x 2 and C-x 3)
+bindkey "^x3" split -v
+bindkey "^x2" split
+bindkey "^x1" only

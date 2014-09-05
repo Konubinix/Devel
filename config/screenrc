@@ -35,6 +35,8 @@ bindkey ^[[1;7B resize -2
 bindkey ^[[1;7A resize +2
 
 # emacs-ish commands (C-x 1 C-x 2 and C-x 3)
-bindkey "^x3" split -v
-bindkey "^x2" split
-bindkey "^x1" only
+bindkey ^x3 split -v
+bindkey ^x2 split
+bindkey ^x1 only
+bindkey ^x0 remove
+bindkey ^x^b windows

@@ -1,5 +1,6 @@
 #! /bin/bash
 
+cd `git -c core.bare=false rev-parse --show-toplevel`
 if git annex view "$@"
 then
     echo "$@" > .gitannexview

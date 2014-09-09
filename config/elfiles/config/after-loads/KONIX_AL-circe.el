@@ -30,8 +30,9 @@
 (require 'circe-highlight-all-nicks)
 (enable-circe-highlight-all-nicks)
 
-(defface konix/circe-my-message-face
-  '(
+(custom-set-faces
+ '(circe-my-message-face
+   (
 	(
 	 ((class color)
 	  (background dark))
@@ -43,11 +44,9 @@
 	 (:foreground "forest green")
 	 )
 	)
-  ""
-  )
-
-(defface konix/circe-originator-face
-  '(
+   )
+ '(circe-originator-face
+   (
 	(
 	 ((class color)
 	  (background dark))
@@ -59,13 +58,11 @@
 	 (:foreground "blue")
 	 )
 	)
-  ""
-  )
+   )
+ )
 
 (setq-default circe-server-buffer-name "{network}")
 (setq-default circe-format-self-say "(me)<{nick}> {body}")
-(setq-default circe-my-message-face 'konix/circe-my-message-face)
-(setq-default circe-originator-face 'konix/circe-originator-face)
 
 (provide 'KONIX_AL-circe)
 ;;; KONIX_AL-circe.el ends here

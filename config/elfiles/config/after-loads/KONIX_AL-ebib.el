@@ -24,7 +24,6 @@
 
 ;;; Code:
 
-(require 'org-ebib)
 (setq-default ebib-preload-bib-files '("bibliography.bib"))
 (setq-default ebib-use-timestamp t)
 (setq-default ebib-hide-hidden-fields nil)

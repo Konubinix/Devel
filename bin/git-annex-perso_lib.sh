@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source "${KONIX_LIB_DIR}/lib_bash.sh"
+source "${KONIX_LIB_DIR}/colors.sh"
 
 GITANNEX_BIG_FILE=".gitannexbig"
 GITANNEXSYNC_PRE_HOOK=".gitannexsync_prehook"

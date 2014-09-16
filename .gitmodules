@@ -163,3 +163,6 @@
 [submodule "config/elfiles/epc"]
 	path = config/elfiles/epc
 	url = https://github.com/kiwanami/emacs-epc.git
+[submodule "dmenu-frecency"]
+	path = dmenu-frecency
+	url = https://github.com/kspi/dmenu-frecency.git

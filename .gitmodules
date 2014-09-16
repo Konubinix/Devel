@@ -166,3 +166,6 @@
 [submodule "dmenu-frecency"]
 	path = dmenu-frecency
 	url = https://github.com/kspi/dmenu-frecency.git
+[submodule "config/elfiles/gnuplot"]
+	path = config/elfiles/gnuplot
+	url = https://github.com/bruceravel/gnuplot-mode.git

@@ -202,7 +202,8 @@ Print : MacroCmd { Exec konix_display.py 'Printing screen' } { ExecCommand $(kon
 control Print : MacroCmd { Exec scrot -u $HOME/Desktop/CaptureWindow.png } { Exec konix_display.py 'Printed focused window' }
 
 # Open a dialog to run programs
-Mod4 F2 :Exec konix_dmenu_run.sh
+Mod4 F2 :Exec ExecCommand $(konix_do_cron_job.sh konix_dmenu_run.sh)
+Mod4 F3 :Exec ExecCommand $(konix_do_cron_job.sh dmenu-frecency)
 
 # volume settings
 Mod4 Mod1 Down :Exec konix_display_unique.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"

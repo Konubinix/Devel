@@ -1,3 +1,3 @@
 #!/bin/bash
 
-osync.sh sync.conf
+osync.sh sync.conf --verbose --stats

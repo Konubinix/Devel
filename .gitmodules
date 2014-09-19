@@ -76,9 +76,6 @@
 [submodule "config/elfiles/bbdb"]
 	path = config/elfiles/bbdb
 	url = git://git.savannah.nongnu.org/bbdb.git
-[submodule "lib/offlineimap"]
-	path = lib/offlineimap
-	url = https://github.com/Konubinix/offlineimap.git
 [submodule "config/elfiles/jinja2-mode"]
 	path = config/elfiles/jinja2-mode
 	url = https://github.com/paradoxxxzero/jinja2-mode.git
@@ -169,3 +166,6 @@
 [submodule "config/elfiles/gnuplot"]
 	path = config/elfiles/gnuplot
 	url = https://github.com/bruceravel/gnuplot-mode.git
+[submodule "offlineimap"]
+	path = offlineimap
+	url = https://github.com/Konubinix/offlineimap.git

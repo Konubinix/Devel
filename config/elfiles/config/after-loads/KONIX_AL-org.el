@@ -1934,7 +1934,7 @@ to be organized.
 (setq-default org-agenda-sorting-strategy
 			  '(
 				;; Strategy for Weekly/Daily agenda
-				(agenda time-up user-defined-up habit-up priority-down
+				(agenda time-up user-defined-down habit-up priority-down
 						category-keep)
 				;; Strategy for TODO lists
 				(todo priority-down category-keep)
@@ -1945,6 +1945,10 @@ to be organized.
 				)
 			  )
 (defun konix/org-cmp-deadlines-past-and-due-first (a b)
+  "a < b
+ <=> a is due before b
+ <=> (konix/org-cmp-deadlines-past-and-due-first a b) == 1
+"
   (let*(
 		(deadline_regexp_past "\\([0-9]+\\) d\\. ago:")
 		;;		(deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
@@ -1980,21 +1984,21 @@ to be organized.
 		;;		)
 		;;	   )
 		(a_value (or a_past (and a_now 0) ;; a_fut
-					 99))
+					 -99))
 		(b_value (or b_past (and b_now 0) ;; b_fut
-					 99))
-		(greater (> a_value b_value))
+					 -99))
+		(lower (< a_value b_value))
 		(equal (= a_value b_value))
 		)
 	(cond
-	 (greater
-	  +1
+	 (lower
+	  -1
 	  )
 	 (equal
 	  nil
 	  )
 	 (t
-	  -1
+	  +1
 	  )
 	 )
 	)

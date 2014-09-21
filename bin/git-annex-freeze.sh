@@ -41,7 +41,7 @@ then
 	git add -A :/ || die "Could not add -A files"
 else
     log "Add files ignored by git annex"
-    git -c core.bare=false ls-files --others --exclude-standard|xargs -0 --no-run-if-empty git -c core.bare=false add -v
+    git -c core.bare=false ls-files --others --exclude-standard -z|xargs -0 --no-run-if-empty git -c core.bare=false add -v
 fi
 # taken from https://github.com/svend/home-bin/blob/master/git-autocommit
 hostname=`hostname`

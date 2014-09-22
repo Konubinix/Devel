@@ -43,7 +43,7 @@ then
     notmuch tag +flagged +unread +inbox +louded -- tag:new and not tag:sent and ${LOUD_THREADS}
 fi
 
-konix_mail_tray_daemon_update.sh -d || exit 1
+konix_mail_tray_daemon_update.py -d || exit 1
 
 konix_mail_unnew.sh || exit 1
 

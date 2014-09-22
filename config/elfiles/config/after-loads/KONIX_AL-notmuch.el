@@ -58,12 +58,26 @@
 (setq-default notmuch-search-oldest-first nil)
 (require 'ini)
 (setq-default notmuch-saved-searches
-			  (reverse
-			   (ini-decode
-				(with-temp-buffer
-				  (insert-file-contents (getenv "KONIX_NOTMUCH_SAVED_SEARCHES"))
-				  (buffer-substring-no-properties (point-min) (point-max))
+			  (remove-if
+			   'null
+			   (mapcar
+				(lambda (entry)
+				  (if (assoc "search" (cdr entry))
+					  (cons
+					   (car entry)
+					   (cdr (assoc "search" (cdr entry)))
+					   )
+					nil
+					)
 				  )
+				(reverse
+				 (ini-decode
+				  (with-temp-buffer
+					(insert-file-contents (getenv "KONIX_NOTMUCH_SAVED_SEARCHES"))
+					(buffer-substring-no-properties (point-min) (point-max))
+					)
+				  )
+				 )
 				)
 			   )
 			  )

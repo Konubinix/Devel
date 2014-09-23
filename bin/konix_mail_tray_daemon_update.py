@@ -23,6 +23,8 @@ def main():
     if "default" in sections:
         default_letter = config.get("default", "icon_letter")
     sections = [section for section in sections if section != "default"]
+    import notmuch
+    db=notmuch.Database()
     for section in config.sections():
         try:
             icon_letter = config.get(section, "icon_letter")
@@ -30,14 +32,8 @@ def main():
             icon_letter = None
         search = config.get(section, "search")
         if icon_letter:
-            p = subprocess.Popen(
-                shlex.split(
-                    "notmuch count %s" % search,
-                ),
-                stdout=subprocess.PIPE
-            )
-            p.wait()
-            res = int(p.stdout.read())
+            q = notmuch.Query(db, search)
+            res = q.count_messages()
             if res != 0:
                 open(
                     "/tmp/mail_tray_daemon_control",

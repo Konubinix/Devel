@@ -1423,6 +1423,21 @@ fallbacking to HEAD")
 	 )
 	)
   (goto-char 0)
+  (while (re-search-forward "new commit" nil t)
+	(let (
+		  (beg (match-beginning 0))
+		  (end (match-end 0))
+		  )
+	 (set-text-properties
+	  beg end
+	  (list
+	   'face
+	   compilation-error-face
+	   )
+	  )
+	 )
+	)
+  (goto-char 0)
   (when (narrow_to_block "\\(?:# \\)?Unmerged paths:")
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))

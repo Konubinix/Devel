@@ -73,7 +73,17 @@
 				(reverse
 				 (ini-decode
 				  (with-temp-buffer
-					(insert-file-contents (getenv "KONIX_NOTMUCH_SAVED_SEARCHES"))
+					(insert-file-contents
+					 (first
+					  (remove-if-not
+					   'file-exists-p
+					   (split-string
+						(getenv "KONIX_NOTMUCH_SAVED_SEARCHES")
+						path-separator
+						)
+					   )
+					  )
+					 )
 					(buffer-substring-no-properties (point-min) (point-max))
 					)
 				  )

@@ -928,18 +928,18 @@ to be organized.
 							(org-agenda-tag-filter-preset nil)
 							)
 						   )
-				(tags-todo "+project"
-						   (
-							(org-agenda-overriding-header
-							 "Keep an eye on those projects (they may well be stuck)")
-							(org-agenda-tag-filter-preset nil)
-							(org-agenda-skip-function
-							 '(or
-							   (konix/org-agenda-keep-if-is-unactive-project)
-							   (konix/org-skip-if-subtree-has-waiting-items)
-							   ))
-							)
-						   )
+				(tags "project"
+					  (
+					   (org-agenda-overriding-header
+						"Keep an eye on those projects (they may well be stuck or done)")
+					   (org-agenda-tag-filter-preset nil)
+					   (org-agenda-skip-function
+						'(or
+						  (konix/org-agenda-keep-if-is-unactive-project)
+						  (konix/org-skip-if-subtree-has-waiting-items)
+						  ))
+					   )
+					  )
 				)
 			  )
 (setq-default konix/org-agenda-full-view
@@ -2746,16 +2746,16 @@ of the clocksum."
 		  '(and)
 		  (mapcar
 		   (lambda (disjunction)
-		   (append
-			'(or)
-			(mapcar
-			 (lambda (elem)
-			   `(member ,elem tags)
+			 (append
+			  '(or)
+			  (mapcar
+			   (lambda (elem)
+				 `(member ,elem tags)
+				 )
+			   disjunction
 			   )
-			 disjunction
+			  )
 			 )
-			)
-		   )
 		   tags
 		   )
 		  ))

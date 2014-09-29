@@ -286,6 +286,16 @@ gaps_extract_context_independent_remote_info ( ) {
 	dead="${remote_path}/dead"
 }
 
+gaps_remote_update_availability () {
+    local remote="$1"
+    if [ "$(git config "remote.${remote}.annex-ignore")" == "true" ]
+    then
+        git config "remote.${remote}.konix-annex-available" false
+    else
+        git config "remote.${remote}.konix-annex-available" true
+    fi
+}
+
 gaps_remote_considered_available_p () {
     local remote="$1"
     local res="$(git config "remote.${remote}.konix-annex-available")"
@@ -317,6 +327,8 @@ gaps_remotes_fix ( ) {
         for remote in ${remotes}
         do
 	        gaps_log_info "Checking remote $remote"
+            # make sure the availability is correctly set up
+            gaps_remote_update_availability "${remote}"
             if gaps_remote_here_p "${remote}"
             then
                 gaps_log_info "Remote $remote is here"

@@ -81,7 +81,7 @@ then
             inc_fail_and_continue
         fi
 
-		if [ "${type}" == "ssh" ] || [ "${type}" == "local" ]
+		if [ "${type}" == "git" ] || [ "${type}" == "ssh" ] || [ "${type}" == "local" ]
 		then
 			gaps_log "Syncing $remote_name with me"
 			OLD_MASTER_SHA=`git log -1 master --pretty=format:"%H"`
@@ -122,7 +122,7 @@ then
             gaps_log "Limiting to path ${LIMIT_PATH}"
             pushd "${LIMIT_PATH}"
             gaps_log "Transferring data"
-            if ( [ "${type}" == "ssh" ] || [ "${type}" == "local" ] ) && [ "${OLD_GIT_ANNEX_SHA}" == "${NEW_GIT_ANNEX_SHA}" \
+            if ( [ "${type}" == "git" ] || [ "${type}" == "ssh" ] || [ "${type}" == "local" ] ) && [ "${OLD_GIT_ANNEX_SHA}" == "${NEW_GIT_ANNEX_SHA}" \
                 -a \
                 "${OLD_MASTER_SHA}" == "${NEW_MASTER_SHA}" \
                 -a \

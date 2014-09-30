@@ -34,7 +34,7 @@ then
 			git annex enableremote "$remote"
 			continue
 		fi
-		if [ "$type" != "ssh" ] && [ "$type" != "local" ]
+		if [ "$type" != "ssh" ] && [ "$type" != "git" ] && [ "$type" != "local" ]
 		then
 			gaps_error "I don't know how to initialize the remote $remote of type $type"
 			inc_failure_and_continue

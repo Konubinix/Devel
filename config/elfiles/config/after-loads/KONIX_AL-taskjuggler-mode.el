@@ -1,4 +1,4 @@
-;;; KONIX_AL-taskjuggler.el ---
+;;; KONIX_AL-taskjuggler-mode ---
 
 ;; Copyright (C) 2014  konubinix
 
@@ -26,9 +26,10 @@
 
 (defun konix/taskjuggler-mode-hook ()
   (autopair-mode)
+  (hs-minor-mode)
   )
 
 (add-hook 'taskjuggler-mode-hook 'konix/taskjuggler-mode-hook)
 
-(provide 'KONIX_AL-taskjuggler)
-;;; KONIX_AL-taskjuggler.el ends here
+(provide 'KONIX_AL-taskjuggler-mode)
+;;; KONIX_AL-taskjuggler-mode ends here

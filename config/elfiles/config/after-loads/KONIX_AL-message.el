@@ -46,6 +46,10 @@
   (visual-line-mode 1)
   (flyspell-mode 1)
   (autopair-mode 1)
+  (orgtbl-mode)
+  (orgstruct-mode)
+  ;; footnote overrides some keybindings made by orgstruct-mode
+  (footnote-mode)
   )
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)

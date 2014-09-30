@@ -397,13 +397,12 @@ gaps_remotes_fix ( ) {
             fi
 
             gaps_log_info "The remote ${remote} is correctly initialized and available"
-
             if ! gaps_remote_here_p "${remote}"
             then
                 # sanity check that the url is the same in the config only if the
                 # remote is not here
                 recorded_url="$(git config remote.${remote}.url)"
-                if ( [ "${type}" == "ssh" ] || [ "${type}" == "ssh" ] ) && [ "${recorded_url}" != "${url}" ]
+                if ( [ "${type}" == "ssh" ] || [ "${type}" == "local" ] || [ "${type}" == "git" ] ) && [ "${recorded_url}" != "${url}" ]
                 then
                     gaps_warn "URL mismatch"
                     gaps_log "git config: ${recorded_url}"

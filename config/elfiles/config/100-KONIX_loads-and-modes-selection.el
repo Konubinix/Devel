@@ -53,6 +53,7 @@
 		 (expand-file-name "deferred" elfiles)
 		 (expand-file-name "ctable" elfiles)
 		 (expand-file-name "epc" elfiles)
+		 (expand-file-name "text-translator" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -219,6 +220,8 @@
 (autoload 'circe-server-buffers "circe" "" t)
 ;; ebib
 (autoload 'ebib "ebib" "" t)
+;; text translator
+(require 'text-translator-load)
 
 ;; ************************************************************
 ;; Automodes

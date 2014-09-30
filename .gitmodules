@@ -172,3 +172,6 @@
 [submodule "syncplay"]
 	path = syncplay
 	url = https://github.com/Uriziel/syncplay.git
+[submodule "config/elfiles/text-translator"]
+	path = config/elfiles/text-translator
+	url = bzr::http://bazaar.launchpad.net/~khiker/+junk/text-translator

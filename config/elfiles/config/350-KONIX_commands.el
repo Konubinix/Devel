@@ -1517,7 +1517,9 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
   (let (
 		(command (format "konix_web_search.sh %s '%s'"
 						 (if default "-d" "")
-						 (replace-regexp-in-string " " "+" string)
+						 (replace-regexp-in-string "'" " "
+												   (replace-regexp-in-string " " "+" string)
+												   )
 						 ))
 		)
 	(start-process "konix web search" nil "bash" "-c" command)

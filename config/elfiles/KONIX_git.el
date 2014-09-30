@@ -1471,7 +1471,7 @@ fallbacking to HEAD")
 						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
 						  map
 						  )
-						"^\\(?:# \\)?	added by us:        \\(.+\\)$"
+						"^	added by us:     \\(.+\\)$"
 						compilation-info-face)
 	(widen)
  	)

@@ -57,4 +57,6 @@ then
 fi
 # percent encode the URI
 URI="${URI//%20}"
+konix_display.py "$BROWSER ${URI}"
+
 "$BROWSER" "${URI}"

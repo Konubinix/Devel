@@ -464,38 +464,41 @@ gaps_remotes_fix ( ) {
                 remote_or_here=here
             fi
 
-            # sanity check that the wanted is the same in the config
-            recorded_wanted="$(git annex wanted "${remote_or_here}")"
-            if [ "${recorded_wanted}" != "${wanted}" ]
+            if ! [ -f "${readonly}" ]
             then
-                gaps_warn "Wanted mismatch"
-                gaps_log "git-annex value: ${recorded_wanted}"
-                gaps_log ".gitannexremote: ${wanted}"
-                if gaps_ask_for_confirmation "Record ${wanted} in git-annex?"
+                # sanity check that the wanted is the same in the config
+                recorded_wanted="$(git annex wanted "${remote_or_here}")"
+                if [ "${recorded_wanted}" != "${wanted}" ]
                 then
-                    git annex wanted "${remote_or_here}" "${wanted}"
-                elif gaps_ask_for_confirmation "Replace .gitannexremote value (${wanted}) by git-annex one (${recorded_wanted})"
-                then
-                    echo "${recorded_wanted}" > "${wanted_file}"
+                    gaps_warn "Wanted mismatch"
+                    gaps_log "git-annex value: ${recorded_wanted}"
+                    gaps_log ".gitannexremote: ${wanted}"
+                    if gaps_ask_for_confirmation "Record ${wanted} in git-annex?"
+                    then
+                        git annex wanted "${remote_or_here}" "${wanted}"
+                    elif gaps_ask_for_confirmation "Replace .gitannexremote value (${wanted}) by git-annex one (${recorded_wanted})"
+                    then
+                        echo "${recorded_wanted}" > "${wanted_file}"
+                    fi
+
                 fi
 
-            fi
-            # sanity check that the group is the same in the config
-            recorded_group="$(git-annex-whatgroup.sh "${remote_or_here}")"
-            res="$?"
-            if [ "$res" == "0" ] && [ "${recorded_group}" != "${group}" ]
-            then
-                gaps_warn "group mismatch"
-                gaps_log "git-annex value: ${recorded_group}"
-                gaps_log ".gitannexremote: ${group}"
-                if gaps_ask_for_confirmation "Record ${group} in git-annex?"
+                # sanity check that the group is the same in the config
+                recorded_group="$(git-annex-whatgroup.sh "${remote_or_here}")"
+                res="$?"
+                if [ "$res" == "0" ] && [ "${recorded_group}" != "${group}" ]
                 then
-                    git annex group "${remote_or_here}" "${group}"
-                elif gaps_ask_for_confirmation "Replace .gitannexremote value (${group}) by git-annex one (${recorded_group})"
-                then
-                    echo "${recorded_group}" > "${group_file}"
+                    gaps_warn "group mismatch"
+                    gaps_log "git-annex value: ${recorded_group}"
+                    gaps_log ".gitannexremote: ${group}"
+                    if gaps_ask_for_confirmation "Record ${group} in git-annex?"
+                    then
+                        git annex group "${remote_or_here}" "${group}"
+                    elif gaps_ask_for_confirmation "Replace .gitannexremote value (${group}) by git-annex one (${recorded_group})"
+                    then
+                        echo "${recorded_group}" > "${group_file}"
+                    fi
                 fi
-
             fi
         done
     fi

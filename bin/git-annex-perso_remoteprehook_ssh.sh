@@ -28,6 +28,6 @@ konix_assert_var URL
 konix_assert_var LOCATION
 cat <<EOF|ssh -t $PORT "$URL"
 cd "$LOCATION"
-\${HOME}/Prog/devel/bin/konix_do_cron_job.sh git-bare-fixup.sh
-\${HOME}/Prog/devel/bin/konix_do_cron_job.sh git-annex-perso_freeze.sh
+\${HOME}/init_bin/konix_do_cron_job.sh git-bare-fixup.sh
+\${HOME}/init_bin/konix_do_cron_job.sh git-annex-perso_freeze.sh
 EOF

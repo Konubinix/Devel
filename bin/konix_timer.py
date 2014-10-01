@@ -1,13 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"gui2py application example using a resource"
-
-__author__ = "Mariano Reingart (reingart@gmail.com)"
-__copyright__ = "Copyright (C) 2013- Mariano Reingart"
-__license__ = "LGPL 3.0"
-
-
+import os
 import gui
 import thread
 import time
@@ -24,6 +18,19 @@ EVT_CURRENT_TIME_ID = wx.NewId()
 
 def bell():
     konix_notify.main("ALARM !")
+    try:
+        import pygame
+        pygame.init()
+        pygame.mixer.music.load(
+            os.path.join(
+                os.environ["KONIX_DEVEL_DIR"],
+                "data",
+                "alarm.ogg"
+            )
+        )
+        pygame.mixer.music.play()
+    except:
+        pass
 
 class CurrentTime(wx.PyEvent):
     def __init__(self, current_time):
@@ -86,6 +93,11 @@ def on_stop_click(evt):
     with a_lock:
         run = False
         time_widget.text = str(initial_time)
+        try:
+            import pygame
+            pygame.mixer.music.stop()
+        except:
+            pass
 
 if __name__ == '__main__':
     window = gui.load()

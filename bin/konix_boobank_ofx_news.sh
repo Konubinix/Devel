@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -eu
 test -e "${LEDGER_FILE}" || {
     echo "Ledger file not found in ${LEDGER_FILE}"
     exit 1

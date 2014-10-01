@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Gui2Py
+Comment=Open the file with gui2py
+Exec=gui2py.sh %f
+StartupNotify=true
+Terminal=false
+Type=Application

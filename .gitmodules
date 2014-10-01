@@ -175,3 +175,6 @@
 [submodule "config/elfiles/text-translator"]
 	path = config/elfiles/text-translator
 	url = bzr::http://bazaar.launchpad.net/~khiker/+junk/text-translator
+[submodule "gui2py"]
+	path = gui2py
+	url = https://github.com/reingart/gui2py.git

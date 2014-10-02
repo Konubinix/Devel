@@ -27,7 +27,7 @@
 (setq-default org-mobile-directory
 			  (expand-file-name
 			   "org-mobile"
-			   gits-dir
+			   perso-dir
 			   )
 			  )
 

@@ -11,7 +11,6 @@ def install_emacs():
 (konix/load-env-file)
 (defvar perso-dir (getenv "KONIX_PERSO_DIR"))
 (defvar perso-dirs (getenv "KONIX_PERSO_DIRS"))
-(defvar gits-dir (getenv "KONIX_GITS_DIR"))
 (defvar config-dir (getenv "KONIX_CONFIG_DIR") "where I put my config files")
 (defvar elfiles (expand-file-name "elfiles" (getenv "KONIX_CONFIG_DIR")) "where I put my emacs files")
 (defvar emacs-config-dir (expand-file-name "config" elfiles) "where I put my emacs custom config files")

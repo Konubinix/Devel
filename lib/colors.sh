@@ -2,6 +2,7 @@
 
 if [ -n "$TERM" ] \
     && [ -x "/usr/bin/tput" ] \
+    && tput colors 2>/dev/null >&2
     && [ "`tput colors`" -ge "8" ]
 then
     export COLOR_RESET=`tput sgr0`

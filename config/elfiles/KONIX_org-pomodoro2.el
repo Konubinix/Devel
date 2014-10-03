@@ -14,6 +14,12 @@
 (defcustom konix/org-pomodoro-tray-daemon-controller
   "/tmp/pomodorow_tray_daemon_control" "")
 
+(defvar konix/org-pomodoro-interruption-warn-time 4
+  "How many minutes of interruption to wait before warning the user")
+
+(defvar konix/org-pomodoro-interruption-timer nil "Variable storing the
+interruption timer, if any")
+
 ;; ####################################################################################################
 ;; FUNCTIONS
 ;; ####################################################################################################
@@ -518,8 +524,19 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 (add-hook 'org-timer-cancel-hook
 		  'konix/org-timer-cancel-pomodoro-hook)
 
+(defun konix/org-pomodoro-interruption-warn ()
+  (konix/notify "You should really GO BACK TO WORK"
+				3 t)
+  )
+
 (defun konix/konix/org-capture-interruption-pre-hook ()
   (konix/org-pomodoro-tray-daemon-put "j" t)
+  (setq konix/org-pomodoro-interruption-timer
+   (run-with-timer (* 60 konix/org-pomodoro-interruption-warn-time)
+				   nil
+				   'konix/org-pomodoro-interruption-warn
+				   )
+   )
   )
 (add-hook 'konix/org-capture-interruption-pre-hook
 		  'konix/konix/org-capture-interruption-pre-hook)
@@ -540,6 +557,11 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 	   "The interruption lasted more than 5 minutes (%s), you should start a new pomodoro"
 	   (org-clock-get-clocked-time)
 	   )
+	  )
+	;; remove the warn timer if not warned yet
+	(when konix/org-pomodoro-interruption-timer
+	  (cancel-timer konix/org-pomodoro-interruption-timer)
+	  (setq konix/org-pomodoro-interruption-timer nil)
 	  )
 	)
   )

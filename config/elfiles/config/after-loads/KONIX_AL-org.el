@@ -1610,6 +1610,7 @@ to be organized.
 (setq-default org-clock-persist (quote clock))
 (setq-default org-clock-persist-file (expand-file-name "org-clock-save.el" user-emacs-directory))
 (setq-default org-clock-persist-query-save t)
+(setq-default org-clock-clocked-in-display 'both)
 (setq-default org-clock-report-include-clocking-task t)
 (setq-default org-columns-default-format "%CATEGORY %TODO %90ITEM %1PRIORITY
 %10Effort{:} %10CLOCKSUM %10CLOCKSUM_T %ORDERED %allocate %BLOCKER")

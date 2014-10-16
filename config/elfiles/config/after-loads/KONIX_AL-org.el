@@ -898,7 +898,7 @@ to be organized.
 						"phantom, maybe and maybe items should not be NEXT actions")
 					   )
 					  )
-				(tags-todo "//-NEXT-WAIT"
+				(tags-todo "//-NEXT-WAIT-DELEGATED"
 						   (
 							(org-agenda-skip-function
 							 '(or

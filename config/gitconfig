@@ -19,6 +19,7 @@
 	alog = log --graph --decorate=full --all --full-history -m
  	ri = rebase --interactive --autosquash
 	# fetch = fetch --upload-pack="git upload-pack"
+	amu = !curl ${1} | git am -
 [diff]
   	tool = meld #konix_emacs_diff
 	renamelimit = 888

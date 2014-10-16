@@ -6,4 +6,4 @@ git reflog expire --expire-unreachable=now --all
 echo "Reconstruct the packs with -A to unpack loose objects"
 git repack -Ad
 echo "Prune loose objects"
-git gc --prune=now
+git gc --aggressive --prune=now

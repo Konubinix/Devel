@@ -894,6 +894,14 @@
 
 (global-set-key (kbd "C-< g") 'konix/git/command-with-completion)
 
+;;;;;;;;;
+;; ZNC ;;
+;;;;;;;;;
+(define-prefix-command 'konix/znc/map)
+(define-key 'konix/global-slow-key-map (kbd "z") 'konix/znc/map)
+
+(define-key 'konix/znc/map (kbd "g") 'konix/znc/goto)
+
 ;;;;;;;;;;;;;;;;
 ;; key chords ;;
 ;;;;;;;;;;;;;;;;

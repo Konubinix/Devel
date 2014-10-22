@@ -27,7 +27,7 @@ set match-hidden-files on
 # through the list.
 set menu-complete-display-prefix on
 # If set to On, readline uses an internal more-like pager to display a screenful of possible completions at a time.
-set page-completions on
+set page-completions off
 # If  set  to  On,  readline  will  display  completions with matches sorted horizontally in alphabetical order, rather than down the
 # screen.
 set print-completions-horizontally on

@@ -1,1 +1,3 @@
-complete -c command type xvfb-run
+#!/bin/bash
+
+complete -c xvfb-run

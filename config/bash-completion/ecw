@@ -1,2 +1,4 @@
-# bash-completion file for ecw
-complete -c command type ecw
+#!/bin/bash
+
+ME="$(basename "${BASH_SOURCE[0]}")"
+complete -c "$ME"

@@ -25,8 +25,8 @@
 ;;; Code:
 
 (defun konix/tracking/kill-emacs-query-function ()
-  (and
-   tracking-buffers
+  (or
+   (not tracking-buffers)
    (y-or-n-p "Still some buffers tracked and not seen, kill anyway")
    )
   )

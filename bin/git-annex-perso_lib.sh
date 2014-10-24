@@ -326,22 +326,15 @@ gaps_remotes_fix ( ) {
         gaps_compute_remotes "${REMOTES}"
         for remote in ${remotes}
         do
+
 	        gaps_log_info "Checking remote $remote"
-            # make sure the availability is correctly set up
-            gaps_remote_update_availability "${remote}"
             if gaps_remote_here_p "${remote}"
             then
                 gaps_log_info "Remote $remote is here"
             fi
-            if ! gaps_extract_remote_info "${contexts}" "${remote}"
-            then
-                gaps_warn "Could not find info for remote ${remote} in contexts ${contexts}"
-                if gaps_remote_considered_available_p "${remote}"
-                then
-                    gaps_remote_disable "${remote}"
-                fi
-                continue
-            fi
+
+            # this must be done prior to updating the availability since the
+            # availability will implicitly create the remote
             if ! gaps_remote_initialized_or_here_p "${remote}"
             then
                 gaps_warn "Remote $remote_name not initialized"
@@ -359,6 +352,18 @@ gaps_remotes_fix ( ) {
                     fi
                     continue
                 fi
+            fi
+
+            # make sure the availability is correctly set up
+            gaps_remote_update_availability "${remote}"
+            if ! gaps_extract_remote_info "${contexts}" "${remote}"
+            then
+                gaps_warn "Could not find info for remote ${remote} in contexts ${contexts}"
+                if gaps_remote_considered_available_p "${remote}"
+                then
+                    gaps_remote_disable "${remote}"
+                fi
+                continue
             fi
 
             # now, the remote must be initialized or be here

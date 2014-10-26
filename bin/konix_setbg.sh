@@ -1,3 +1,3 @@
 #!/bin/bash
 
-fbsetbg -A "${XDG_DATA_HOME}/background.jpg"
+fbsetbg -A -R "${XDG_DATA_HOME}/backgrounds"

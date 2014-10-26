@@ -26,4 +26,4 @@ CMD="$CMD ${OFX_FILE_PATH}"
     echo ""
     ${CMD}
     echo "; end of import"
-} >> "${LEDGER_FILE}"
+} >> "${KONIX_LEDGER_BANK_FILE}"

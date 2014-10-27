@@ -1093,12 +1093,26 @@ to be organized.
 							 (
 							  (org-agenda-overriding-header
 							   "Projects (without subprojects nor maybe)")
+							  (org-agenda-skip-function
+							   '(or
+								 (konix/org-agenda-skip-if-tags
+								  '("phantom"))
+								 (konix/org-agenda-skip-non-important-item)
+								 )
+							   )
 							  )
 							 )
 				  (tags-todo "+project+maybe"
 							 (
 							  (org-agenda-overriding-header
 							   "Maybe Projects (without subprojects)")
+							  (org-agenda-skip-function
+							   '(or
+								 (konix/org-agenda-skip-if-tags
+								  '("phantom"))
+								 (konix/org-agenda-skip-non-important-item)
+								 )
+							   )
 							  )
 							 )
 				  )

@@ -1695,6 +1695,40 @@ to be organized.
 				(org-agenda-files . (:maxlevel . 5))
 				)
 			  )
+(defun konix/org-capture/git-annex-info ()
+  (with-current-buffer orig-buf
+	(let* (
+		   (file_path (cond ((eq major-mode 'dired-mode)
+							 (dired-file-name-at-point)
+							 )
+							(t
+							 (buffer-file-name)
+
+							 )
+
+							))
+		   (file_name (file-name-nondirectory file_path))
+		   (key (shell-command-to-string
+				 (format "git annex find '%s' --format='${key}'"
+						 file_name
+						 ))
+				)
+		   )
+	  (unless key
+		(user-error "Not in an annexed file")
+		)
+	  (cons file_path key)
+	  )
+	)
+  )
+
+(defun konix/org-capture/git-annex ()
+  (let* (
+		 (info (konix/org-capture/git-annex-info))
+		 )
+	(format "[[file:%s][%s]]" (car info) (cdr info))
+	)
+  )
 (setq-default org-refile-use-outline-path 'full-file-path)
 (setq-default org-outline-path-complete-in-steps nil)
 (setq-default org-src-fontify-natively t)
@@ -1724,6 +1758,15 @@ to be organized.
   :CREATED:  %U
   :END:
   %a"
+				 :kill-buffer
+				 )
+				("a" "Todo Item for git annexed stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				 "* TODO %?%(file-name-nondirectory (car (konix/org-capture/git-annex-info)))
+  :PROPERTIES:
+  :CREATED:  %U
+  :ID: %(cdr (konix/org-capture/git-annex-info))
+  :END:
+  %(konix/org-capture/git-annex)"
 				 :kill-buffer
 				 )
 				("u" "Todo Item URGENT" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")

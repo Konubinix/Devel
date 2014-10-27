@@ -303,6 +303,8 @@ class RILItem(object):
                    "--convert-links",
                    "--force-directories",
                    "--adjust-extension",
+                   "--timeout=%s" % os.environ.get("KONIX_RIL_TIMEOUT", "10"),
+                   "--tries=%s" % os.environ.get("KONIX_RIL_TRIES", "3"),
                    "--span-hosts",
                    "--user-agent=%s" % USERAGENT,
                    "--no-iri",

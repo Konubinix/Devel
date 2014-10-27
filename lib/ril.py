@@ -221,7 +221,7 @@ class RILItem(object):
             self._index = open(self.index_file_path, "r").read().decode("utf-8")
         elif os.path.exists(self.wget_log_file_path):
             for line in open(self.wget_log_file_path, "r").readlines():
-                match = re.match("^Saving to: ‘(.+)’$", line)
+                match = re.match("^Saving to: '(.+)'$", line)
                 if match:
                     self._index = match.group(1).decode('utf-8')
                     break

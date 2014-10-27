@@ -305,6 +305,8 @@ class RILItem(object):
                    "--adjust-extension",
                    "--timeout=%s" % os.environ.get("KONIX_RIL_TIMEOUT", "10"),
                    "--tries=%s" % os.environ.get("KONIX_RIL_TRIES", "3"),
+                   "--reject=*robots.txt",
+                   "--no-check-certificate",
                    "--span-hosts",
                    "--user-agent=%s" % USERAGENT,
                    "--no-iri",

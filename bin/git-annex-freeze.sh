@@ -19,7 +19,20 @@ gaps_launch_freeze_pre_hook ( ) {
             || die "Failed to launch the freeze prehook for ${message}"
     fi
 }
+
+gaps_launch_freeze_post_hook ( ) {
+    local hook="${1}"
+    local message="${2}"
+    if [ -f "${hook}" ]
+    then
+        log "Launching the freeze posthook (${hook}) for $message"
+        bash -x "${hook}" \
+            || die "Failed to launch the freeze posthook for ${message}"
+    fi
+}
+
 GITANNEXFREEZE_PRE_HOOK=".gitannexfreeze_prehook"
+GITANNEXFREEZE_POST_HOOK=".gitannexfreeze_posthook"
 
 pushd `git -c core.bare=false rev-parse --show-toplevel`
 log "First merge the annex in case someone else pushed the sync branch here"
@@ -58,6 +71,10 @@ if [ -n "$(git diff --cached --name-only --diff-filter=ACDMRUXB)" ]
 then
     echo "Perform the commit"
     git -c core.bare=false commit -m "Freezing of repo by $LOGNAME at $HOSTNAME" || die "Could not commit"
+
+    gaps_launch_freeze_post_hook "${GITANNEXFREEZE_POST_HOOK}" "$(pwd)"
+    gaps_launch_freeze_post_hook "${GITANNEXFREEZE_POST_HOOK}_${HOSTNAME}" "$(pwd)"
+
 else
     echo "No need to commit"
 fi

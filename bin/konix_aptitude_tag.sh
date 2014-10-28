@@ -19,9 +19,10 @@ DATE="$(date +%s)"
 DATE_READABLE="$(date -d @${DATE})"
 LIST_PACKAGES="$(mktemp)"
 LIST_COMMANDS="$(mktemp)"
+LIST_COMMANDS2="$(mktemp)"
 # echo "LIST_COMMANDS=${LIST_COMMANDS}"
 # echo "LIST_PACKAGES=${LIST_PACKAGES}"
-trap "rm '${LIST_COMMANDS}' '${LIST_PACKAGES}'" 0
+trap "rm '${LIST_COMMANDS}' '${LIST_COMMANDS2}' '${LIST_PACKAGES}'" 0
 
 FAST=""
 USE_EDITOR=""
@@ -47,29 +48,34 @@ NUMBER="$(wc -l "${LIST_PACKAGES}"|cut -f1 -d' ')"
 LAST_RES="d"
 
 flush_command () {
-    local name="${1}"
-    local command="${2}"
-    echo "Applying ${command} to ${name}"
+    set -x
+    local command="${1}"
+    shift
+    echo "Applying ${command} to ${@}"
 	if [ "${command}" == "d" ]
 	then
-		echo "Removing packages ${name}"
-		sudo aptitude purge -y "${name}"
+		echo "Removing packages ${@}"
+		sudo aptitude purge -y ${@}
 	elif [ "${command}" == "a" ]
 	then
-		echo "Marking ${name} as automatically installed"
-		sudo aptitude markauto -y "${name}"
+		echo "Marking ${@} as automatically installed"
+		sudo aptitude markauto -y ${@}
 	else
 		TAG="${DATE_READABLE} (${DATE}):${command}"
-		echo "Applying to ${name} the user tag '${TAG}'"
-		sudo aptitude add-user-tag "${TAG}" "${name}"
+		echo "Applying to ${@} the user tag '${TAG}'"
+		sudo aptitude add-user-tag "${TAG}" ${@}
 	fi
 
 }
 
 flush_commands () {
+    # the LIST_COMMANDS is a list package -> command
+    # I want a list command -> packages
+    # this is what this magical awk command does
+    awk 'NR==1 {  } { A[$2]=A[$2]" "$1 } END { for(X in A) print X,substr(A[X],2) }' "${LIST_COMMANDS}" > "${LIST_COMMANDS2}"
     set +e
     trap sigint_handler SIGINT
-	while read -u 11 name command
+	while read -u 11 command names
 	do
         res="1"
         BAU="1"
@@ -79,11 +85,11 @@ flush_commands () {
             BAU="0"
             (
                 set -e
-                flush_command "${name}" "${command}"
+                flush_command "${command}" ${names}
             )
             res="$?"
         done
-	done 11<"${LIST_COMMANDS}"
+	done 11<"${LIST_COMMANDS2}"
 	echo -n "" > "${LIST_COMMANDS}"
 	read -p "Press Enter to continue"
 }

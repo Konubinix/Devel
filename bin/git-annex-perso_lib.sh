@@ -331,6 +331,7 @@ gaps_remotes_fix ( ) {
             if gaps_remote_here_p "${remote}"
             then
                 gaps_log_info "Remote $remote is here"
+                continue
             fi
 
             # this must be done prior to updating the availability since the

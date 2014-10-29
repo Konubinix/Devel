@@ -48,7 +48,6 @@ NUMBER="$(wc -l "${LIST_PACKAGES}"|cut -f1 -d' ')"
 LAST_RES="d"
 
 flush_command () {
-    set -x
     local command="${1}"
     shift
     echo "Applying ${command} to ${@}"
@@ -65,7 +64,6 @@ flush_command () {
 		echo "Applying to ${@} the user tag '${TAG}'"
 		sudo aptitude add-user-tag "${TAG}" ${@}
 	fi
-
 }
 
 flush_commands () {

@@ -638,7 +638,12 @@ to be organized.
 (defun konix/org-agenda-keep-if-is-unactive-project ()
   "Skip if not a project or the project is active or the project contains"
   (let (
-		(end (save-excursion (org-end-of-subtree t)))
+		(end (save-excursion
+			   ;; I must not avoid a stuck subproject even if the current one is ok
+			   (forward-line)
+			   (point)
+			   )
+			 )
 		)
 	(if (or
 		 ;; not a project

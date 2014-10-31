@@ -934,256 +934,256 @@ to be organized.
 						"Keep an eye on those projects (they may well be stuck or done)")
 					   (org-agenda-tag-filter-preset nil)
 					   (org-agenda-skip-function
-						'(or
-						  (konix/org-agenda-keep-if-is-unactive-project)
-						  (konix/org-skip-if-subtree-has-waiting-items)
-						  ))
+						 '(or
+						   (konix/org-agenda-keep-if-is-unactive-project)
+						   (konix/org-skip-if-subtree-has-waiting-items)
+						   ))
+						)
 					   )
-					  )
-				)
-			  )
-(setq-default konix/org-agenda-full-view
-			  (append
-			   '(
-				 (agenda nil
-						 (
-						  (org-agenda-overriding-header "Agenda without projects")
-						  (org-agenda-skip-function
-						   '(konix/org-agenda-skip-if-tags
-							 '("project"))
-						   )
-						  )
-						 )
-				 (agenda nil
-						 (
-						  (org-agenda-overriding-header
-						   "Agenda for projects")
-						  (org-agenda-use-time-grid nil)
-						  (org-agenda-skip-function
-						   '(konix/org-agenda-skip-if-tags
-							 '("project")
-							 t)
-						   )
-						  )
-						 )
-				 )
-			   konix/org-agenda-stuck-view
-			   '(
-				 (tags-todo "maybe"
-							(
-							 (org-agenda-overriding-header "Maybe list")
-							 )
-							)
-				 (agenda nil
-						 (
-						  (org-agenda-overriding-header
-						   "Agenda without projects (month overview)")
-						  (org-agenda-skip-function
-						   '(konix/org-agenda-skip-if-tags
-							 '("project"
-							   "no_weekly"
-							   "phantom"
-							   ))
-						   )
-						  (org-agenda-span 30)
-						  )
-						 )
-				 (agenda nil
-						 (
-						  (org-agenda-overriding-header
-						   "Agenda for projects (month overview)")
-						  (org-agenda-use-time-grid nil)
-						  (org-agenda-skip-function
-						   '(or
-							 (konix/org-agenda-skip-if-tags
-							  '("project")
-							  t)
-							 (konix/org-agenda-skip-if-tags
-							  '("phantom"
-								"no_weekly")
-							  )
-							 )
-						   )
-						  (org-agenda-span 30)
-						  )
-						 )
 				 )
 			   )
-			  )
-
-;; useful setting to filter tasks when having to select something to do
-(defvar konix/org-agenda-inhibit-context-filtering nil "")
-(defun konix/org-agenda-inhibit-context-filtering ()
-  (with-current-buffer
-	  (get-buffer-create org-agenda-buffer-name)
-	(set (make-local-variable
-		  'konix/org-agenda-inhibit-context-filtering)
-		 t)
-	)
-  )
-
-;; Y, yesterworkday's view: what did I do yesterworkday, useful for daily reports
-;; y, maybe list
-;; p, projects without subprojects: make sure I don't have too much projects at
-;;    the same time
-;; P, idem, with all projects
-;; c, Weekly schedule: to check my calendar
-;; s, stuck things: keep an eye at what is going wrong
-;; S, same thing for important entries
-;; a, agenda view: keep an eye at what I have to do today
-;; A, idem, with only the important stuff
-;; f, full view, used to make full reviews
-;; F, idem, with only the important stuff
-;; m, Month view, used to make monthly reviews
-;; M, Month, with only the important stuff
-;; w, Week view, used to make weekly reviews
-;; L, Last week view with spent time and clock report, used to review projects
-;; W, Week, with only the important stuff
-(setq-default org-agenda-custom-commands
-			  `(
-				("aY" "Yesterworkday time sheet"
-				 (
-				  (agenda nil)
+ (setq-default konix/org-agenda-full-view
+			   (append
+				'(
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header "Agenda without projects")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("project"))
+							)
+						   )
+						  )
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Agenda for projects")
+						   (org-agenda-use-time-grid nil)
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("project")
+							  t)
+							)
+						   )
+						  )
 				  )
-				 (
-				  (org-agenda-start-day (konix/org-yesterworkday))
-				  (org-agenda-start-with-clockreport-mode t)
-				  (org-agenda-start-with-log-mode t)
-				  (org-agenda-show-log 'clockcheck)
-				  (dummy (konix/org-agenda-inhibit-context-filtering))
-				  )
-				 )
-				("ay" "Maybe list"
-				 (
-				  (tags-todo "+maybe-project"
+				konix/org-agenda-stuck-view
+				'(
+				  (tags-todo "maybe"
 							 (
-							  (org-agenda-overriding-header
-							   "Maybe tasks (without projects)")
-							  (org-tags-exclude-from-inheritance nil)
+							  (org-agenda-overriding-header "Maybe list")
 							  )
 							 )
-				  (tags-todo "+project+maybe"
-							 (
-							  (org-agenda-overriding-header
-							   "Maybe Projects")
-							  )
-							 )
-				  )
-				 (
-				  (dummy (konix/org-agenda-inhibit-context-filtering))
-				  )
-				 )
-				("an" "Next action list (without habits)"
-				 (
-				  (tags-todo "STYLE<>\"habit\"-habit//NEXT")
-				  )
-				 (
-				  )
-				 )
-				("aT" "Todo list (without projects)"
-				 (
-				  (tags-todo "-project//NEXT|TODO")
-				  )
-				 (
-				  )
-				 )
-				("ap" "Projects (without subprojects)"
-				 (
-				  (tags-todo "+project-maybe"
-							 (
-							  (org-agenda-overriding-header
-							   "Projects (without subprojects nor maybe)")
-							  (org-agenda-skip-function
-							   '(or
-								 (konix/org-agenda-skip-if-tags
-								  '("phantom"))
-								 (konix/org-agenda-skip-non-important-item)
-								 )
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Agenda without projects (month overview)")
+						   (org-agenda-skip-function
+							'(konix/org-agenda-skip-if-tags
+							  '("project"
+								"no_weekly"
+								"phantom"
+								))
+							)
+						   (org-agenda-span 30)
+						   )
+						  )
+				  (agenda nil
+						  (
+						   (org-agenda-overriding-header
+							"Agenda for projects (month overview)")
+						   (org-agenda-use-time-grid nil)
+						   (org-agenda-skip-function
+							'(or
+							  (konix/org-agenda-skip-if-tags
+							   '("project")
+							   t)
+							  (konix/org-agenda-skip-if-tags
+							   '("phantom"
+								 "no_weekly")
 							   )
 							  )
-							 )
-				  (tags-todo "+project+maybe"
-							 (
-							  (org-agenda-overriding-header
-							   "Maybe Projects (without subprojects)")
-							  (org-agenda-skip-function
-							   '(or
-								 (konix/org-agenda-skip-if-tags
-								  '("phantom"))
-								 (konix/org-agenda-skip-non-important-item)
-								 )
-							   )
-							  )
-							 )
+							)
+						   (org-agenda-span 30)
+						   )
+						  )
 				  )
-				 (
-				  (org-agenda-skip-function
-				   'konix/org-agenda-skip-if-task-of-project)
-				  ;; projects should not be filtered by default
-				  (org-agenda-tag-filter-preset nil)
-				  )
-				 )
-				("aP" "All Projects"
-				 (
-				  (tags-todo "+project-maybe"
-							 (
-							  (org-agenda-overriding-header
-							   "Projects (without maybe)")
-							  )
-							 )
-				  (tags-todo "+project+maybe"
-							 (
-							  (org-agenda-overriding-header
-							   "Maybe Projects")
-							  )
-							 )
-				  )
-				 (
-				  (org-agenda-overriding-header "All Projects")
-				  ;; projects should not be filtered by default
-				  (org-agenda-tag-filter-preset nil)
-				  )
-				 )
-				("ac" "Monthly schedule" agenda ""
-				 (
-				  (org-agenda-span 30)
-				  (org-agenda-repeating-timestamp-show-all t)
-				  (org-agenda-skip-function
-				   '(or
-					 (konix/org-agenda-skip-if-tags
-					  '("no_monthly"))
-					 (org-agenda-skip-entry-if 'deadline
-											   'scheduled)
-					 )
+				)
+			   )
+
+ ;; useful setting to filter tasks when having to select something to do
+ (defvar konix/org-agenda-inhibit-context-filtering nil "")
+ (defun konix/org-agenda-inhibit-context-filtering ()
+   (with-current-buffer
+	   (get-buffer-create org-agenda-buffer-name)
+	 (set (make-local-variable
+		   'konix/org-agenda-inhibit-context-filtering)
+		  t)
+	 )
+   )
+
+ ;; Y, yesterworkday's view: what did I do yesterworkday, useful for daily reports
+ ;; y, maybe list
+ ;; p, projects without subprojects: make sure I don't have too much projects at
+ ;;    the same time
+ ;; P, idem, with all projects
+ ;; c, Weekly schedule: to check my calendar
+ ;; s, stuck things: keep an eye at what is going wrong
+ ;; S, same thing for important entries
+ ;; a, agenda view: keep an eye at what I have to do today
+ ;; A, idem, with only the important stuff
+ ;; f, full view, used to make full reviews
+ ;; F, idem, with only the important stuff
+ ;; m, Month view, used to make monthly reviews
+ ;; M, Month, with only the important stuff
+ ;; w, Week view, used to make weekly reviews
+ ;; L, Last week view with spent time and clock report, used to review projects
+ ;; W, Week, with only the important stuff
+ (setq-default org-agenda-custom-commands
+			   `(
+				 ("aY" "Yesterworkday time sheet"
+				  (
+				   (agenda nil)
 				   )
-				  (dummy (konix/org-agenda-inhibit-context-filtering))
+				  (
+				   (org-agenda-start-day (konix/org-yesterworkday))
+				   (org-agenda-start-with-clockreport-mode t)
+				   (org-agenda-start-with-log-mode t)
+				   (org-agenda-show-log 'clockcheck)
+				   (dummy (konix/org-agenda-inhibit-context-filtering))
+				   )
 				  )
-				 )
-				("aC" "Monthly schedule with calfw" konix/cfw:open-org-calendar ""
-				 (
-				  (org-agenda-span 30)
-				  (org-agenda-repeating-timestamp-show-all t)
-				  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
-																	   'scheduled)
-											)
+				 ("ay" "Maybe list"
+				  (
+				   (tags-todo "+maybe-project"
+							  (
+							   (org-agenda-overriding-header
+								"Maybe tasks (without projects)")
+							   (org-tags-exclude-from-inheritance nil)
+							   )
+							  )
+				   (tags-todo "+project+maybe"
+							  (
+							   (org-agenda-overriding-header
+								"Maybe Projects")
+							   )
+							  )
+				   )
 				  (
 				   (dummy (konix/org-agenda-inhibit-context-filtering))
 				   )
 				  )
-				 )
-				("al" "log today"
-				 (
-				  (agenda nil)
+				 ("an" "Next action list (without habits)"
+				  (
+				   (tags-todo "STYLE<>\"habit\"-habit//NEXT")
+				   )
+				  (
+				   )
 				  )
-				 (
-				  (org-agenda-start-with-log-mode t)
-				  (org-agenda-start-with-clockreport-mode t)
-				  (org-agenda-show-log 'clockcheck)
-				  (dummy (konix/org-agenda-inhibit-context-filtering))
+				 ("aT" "Todo list (without projects)"
+				  (
+				   (tags-todo "-project//NEXT|TODO")
+				   )
+				  (
+				   )
 				  )
-				 )
-				("as" "Stuck view"
-				 ,konix/org-agenda-stuck-view
+				 ("ap" "Projects (without subprojects)"
+				  (
+				   (tags-todo "+project-maybe"
+							  (
+							   (org-agenda-overriding-header
+								"Projects (without subprojects nor maybe)")
+							   (org-agenda-skip-function
+								'(or
+								  (konix/org-agenda-skip-if-tags
+								   '("phantom"))
+								  (konix/org-agenda-skip-non-important-item)
+								  )
+								)
+							   )
+							  )
+				   (tags-todo "+project+maybe"
+							  (
+							   (org-agenda-overriding-header
+								"Maybe Projects (without subprojects)")
+							   (org-agenda-skip-function
+								'(or
+								  (konix/org-agenda-skip-if-tags
+								   '("phantom"))
+								  (konix/org-agenda-skip-non-important-item)
+								  )
+								)
+							   )
+							  )
+				   )
+				  (
+				   (org-agenda-skip-function
+					'konix/org-agenda-skip-if-task-of-project)
+				   ;; projects should not be filtered by default
+				   (org-agenda-tag-filter-preset nil)
+				   )
+				  )
+				 ("aP" "All Projects"
+				  (
+				   (tags-todo "+project-maybe"
+							  (
+							   (org-agenda-overriding-header
+								"Projects (without maybe)")
+							   )
+							  )
+				   (tags-todo "+project+maybe"
+							  (
+							   (org-agenda-overriding-header
+								"Maybe Projects")
+							   )
+							  )
+				   )
+				  (
+				   (org-agenda-overriding-header "All Projects")
+				   ;; projects should not be filtered by default
+				   (org-agenda-tag-filter-preset nil)
+				   )
+				  )
+				 ("ac" "Monthly schedule" agenda ""
+				  (
+				   (org-agenda-span 30)
+				   (org-agenda-repeating-timestamp-show-all t)
+				   (org-agenda-skip-function
+					'(or
+					  (konix/org-agenda-skip-if-tags
+					   '("no_monthly"))
+					  (org-agenda-skip-entry-if 'deadline
+												'scheduled)
+					  )
+					)
+				   (dummy (konix/org-agenda-inhibit-context-filtering))
+				   )
+				  )
+				 ("aC" "Monthly schedule with calfw" konix/cfw:open-org-calendar ""
+				  (
+				   (org-agenda-span 30)
+				   (org-agenda-repeating-timestamp-show-all t)
+				   (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
+																		'scheduled)
+											 )
+				   (
+					(dummy (konix/org-agenda-inhibit-context-filtering))
+					)
+				   )
+				  )
+				 ("al" "log today"
+				  (
+				   (agenda nil)
+				   )
+				  (
+				   (org-agenda-start-with-log-mode t)
+				   (org-agenda-start-with-clockreport-mode t)
+				   (org-agenda-show-log 'clockcheck)
+				   (dummy (konix/org-agenda-inhibit-context-filtering))
+				   )
+				  )
+				 ("as" "Stuck view"
+				  ,konix/org-agenda-stuck-view
 				 (
 				  (dummy (konix/org-agenda-inhibit-context-filtering))
 				  )
@@ -1923,7 +1923,7 @@ to be organized.
 				("organization" . ?r)
 				)
 			  )
-(setq-default org-tags-exclude-from-inheritance '("project" "draft"))
+(setq-default org-tags-exclude-from-inheritance '("project" "draft" "phantom"))
 (setq-default org-fast-tag-selection-single-key t)
 (setq-default org-reverse-note-order t)
 (setq org-tag-alist nil)

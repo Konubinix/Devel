@@ -28,6 +28,8 @@
   (expand-file-name perso-dirs)
   "Regex matched against the file name in which to auto insert created stamp")
 (setq-default org-expiry-inactive-timestamps t)
+(setq-default org-expiry-confirm-flag 'interactive)
+(setq-default org-expiry-wait "+1y")
 
 (defadvice org-expiry-insert-created (around insert-if-personal-entry ())
   (when (string-match-p
@@ -42,6 +44,44 @@
   )
 (ad-activate 'org-expiry-insert-created)
 (org-expiry-insinuate)
+
+(defun konix/org-expiry/update-all ()
+  (interactive)
+  (save-window-excursion
+	(save-excursion
+	  (mapc
+	   (lambda (file)
+		 (find-file file)
+		 (org-map-entries 'org-expiry-insert-created)
+		 )
+	   (org-agenda-files)
+	   )
+	  )
+	)
+  )
+
+(defun konix/org-expiry/process-all ()
+  (interactive)
+  (save-window-excursion
+	(save-excursion
+	  (mapc
+	   (lambda (file)
+		 (find-file file)
+		 (org-expiry-process-entries
+		  (point-min)
+		  (point-max))
+		 )
+	   (org-agenda-files)
+	   )
+	  )
+	)
+  )
+
+(defun konix/org-expiry/handler ()
+  (interactive)
+  (konix/org-add-tag "EXPIRED")
+  )
+(setq-default org-expiry-handler-function 'konix/org-expiry/handler)
 
 (provide 'KONIX_AL-org-expiry)
 ;;; KONIX_AL-org-expiry.el ends here

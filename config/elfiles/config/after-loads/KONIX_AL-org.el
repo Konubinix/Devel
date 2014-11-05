@@ -126,6 +126,19 @@ cursor stays in the org buffer."
   (interactive)
   (org-insert-time-stamp nil t t nil nil nil))
 
+(defun konix/org-add-tag (tag)
+  (interactive "sTag:")
+  (let (
+		(tags (org-get-tags))
+		)
+	(add-to-list 'tags tag)
+	(org-set-tags-to
+	 (format ":%s:"
+	  (mapconcat 'identity tags ":")
+	  ))
+   )
+  )
+
 ;; ####################################################################################################
 ;; CONFIG
 ;; ####################################################################################################

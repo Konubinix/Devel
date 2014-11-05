@@ -1613,6 +1613,24 @@ items"
 						  )
 					)
 				   )
+				  ("aE" "Expiry helper"
+				   (
+					(tags "CREATED=\"\""
+						  (
+						   (org-agenda-overriding-header
+							"Entries with not creation date (konix/org-expiry/update-all)")
+						   (dummy (konix/org-agenda-inhibit-context-filtering))
+						   )
+						  )
+					(tags "EXPIRED"
+						  (
+						   (org-agenda-overriding-header
+							"Expired entries (archive them)")
+						   (dummy (konix/org-agenda-inhibit-context-filtering))
+						   )
+						  )
+					)
+				   )
 				  )
 				)
   )

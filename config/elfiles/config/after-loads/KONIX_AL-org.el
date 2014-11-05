@@ -1809,8 +1809,6 @@ items"
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp nil 2)
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-  :PROPERTIES:
   :INTERRUPTION_HANDLED: t
   :END:"
 				 :kill-buffer
@@ -1820,8 +1818,6 @@ items"
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t 2)
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-  :PROPERTIES:
   :INTERRUPTION_HANDLED: t
   :END:"
 				 :kill-buffer
@@ -1895,6 +1891,9 @@ items"
 				 )
 				("j" "Interruption" entry (file+headline (expand-file-name "diary.org" org-directory) "Interruptions")
 				 "* Interruption %? :INTERRUPTION:
+  :PROPERTIES:
+  :CREATED:  %U
+  :END:
    %U"
 				 :clock-in t
 				 :clock-resume t

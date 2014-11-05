@@ -1917,8 +1917,10 @@ items"
 			  `(
 				,@konix/org-tag-contexts
 				;; waiting status of the task
+				(:startgroup . nil)
 				("WAIT" . ?W)
 				("DELEGATED" . ?L)
+				(:endgroup . nil)
 				;; a commitment is something I am contractually (morally or
 				;; legally) engaged with
 				("commitment" . ?i)

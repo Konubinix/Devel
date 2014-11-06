@@ -1,6 +1,7 @@
 [submodule "config/elfiles/org"]
 	path = config/elfiles/org
-	url = git://repo.or.cz/org-mode.git
+	url = https://github.com/Konubinix/org-mode
+	# url = git://repo.or.cz/org-mode.git
 [submodule "config/elfiles/full-ack"]
 	path = config/elfiles/full-ack
 	url = https://github.com/nschum/full-ack.git

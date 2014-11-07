@@ -15,6 +15,6 @@ DATE="$(date '+%Y-%m-%d %H:%M:%S' -d@"${DATE_STR}")"
 NOW_STR="$(date '+%s')"
 
 echo "Importing the bank account ${ACCOUNT} from date ${DATE}"
-boobank -q history "${ACCOUNT}@${BANK}" "${DATE}" -f ofx > "${ACCOUNT}_${BANK}_${NOW_STR}.ofx"
+boobank -q history -n 0 "${ACCOUNT}@${BANK}" "${DATE}" -f ofx > "${ACCOUNT}_${BANK}_${NOW_STR}.ofx"
 echo "Calling the post hook"
 konix_boobank_ofx_new_post_hook.sh "${ACCOUNT}_${BANK}_${NOW_STR}.ofx"

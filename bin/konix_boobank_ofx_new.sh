@@ -1,5 +1,10 @@
 #!/bin/bash
 
+test -e "${LEDGER_FILE}" || {
+    echo "Ledger file not found in ${LEDGER_FILE}"
+    exit 1
+}
+
 source "${KONIX_LIB_DIR}/lib_bash.sh"
 set -eu
 #set -x

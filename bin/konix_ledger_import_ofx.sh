@@ -2,28 +2,10 @@
 
 set -eu
 OFX_FILE_PATH="$(readlink -f "${1}")"
-OFX_FILE_NAME="$(basename "${OFX_FILE_PATH}")"
-FID=1
-DATE="$(date)"
-ACCOUNT="Assets:Bank:$(konix_ofx_get_info.sh -l "${OFX_FILE_NAME}")"
+OUTPUT_FILE="${OFX_FILE_PATH%%.ofx}.dat"
+KONIX_LEDGER_BANK_DIR="$(dirname "${KONIX_LEDGER_BANK_FILE}")"
+OUTPUT_FILE_NAME="$(basename "${OUTPUT_FILE}")"
 
-# ledger does not like brackets
-sed -i 's/[()]/_/g' "${OFX_FILE_PATH}"
-
-# ledger-autosync does not explicitly encode output
-export PYTHONIOENCODING=utf_8
-
-CMD="ledger-autosync --assertions --fid 1 -a ${ACCOUNT}"
-if ! ledger accounts|grep -q "${ACCOUNT}"
-then
-    CMD="${CMD} --initial"
-fi
-CMD="$CMD ${OFX_FILE_PATH}"
-{
-    echo ""
-    echo "; ${DATE}"
-    echo "; import command: $CMD"
-    echo ""
-    ${CMD}
-    echo "; end of import"
-} >> "${KONIX_LEDGER_BANK_FILE}"
+konix_ofx_to_ledger.sh "${OFX_FILE_PATH}" >> "${OUTPUT_FILE}"
+REL_PATH="$(konix_relative_path.py "${OUTPUT_FILE}" "${KONIX_LEDGER_BANK_DIR}")"
+echo "include ${REL_PATH}" >> "${KONIX_LEDGER_BANK_FILE}"

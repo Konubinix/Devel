@@ -3,7 +3,6 @@
 set -eu
 OFX_FILE_PATH="$(readlink -f "${1}")"
 OFX_FILE_NAME="$(basename "${OFX_FILE_PATH}")"
-BANK_ACCOUNT="$(konix_ofx_get_info.sh -b "${OFX_FILE_NAME}")_$(konix_ofx_get_info.sh -a "${OFX_FILE_NAME}")"
 FID=1
 DATE="$(date)"
 ACCOUNT="Assets:Bank:$(konix_ofx_get_info.sh -l "${OFX_FILE_NAME}")"
@@ -26,5 +25,5 @@ CMD="$CMD ${OFX_FILE_PATH}"
     echo "; import command: $CMD"
     echo ""
     ${CMD}
-    echo "; end of import: $CMD"
-} >> "${KONIX_LEDGER_BANK_DIR}/${BANK_ACCOUNT}.dat"
+    echo "; end of import"
+} >> "${KONIX_LEDGER_BANK_FILE}"

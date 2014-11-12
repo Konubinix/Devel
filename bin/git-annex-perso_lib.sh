@@ -288,6 +288,10 @@ gaps_extract_context_independent_remote_info ( ) {
 
 gaps_remote_update_availability () {
     local remote="$1"
+    if ! gaps_remote_initialized_p "${remote}"
+    then
+        return
+    fi
     if [ "$(git config "remote.${remote}.annex-ignore")" == "true" ]
     then
         git config "remote.${remote}.konix-annex-available" false
@@ -311,6 +315,10 @@ gaps_remote_considered_available_p () {
 
 gaps_remote_disable () {
     local remote="$1"
+    if ! gaps_remote_initialized_p "${remote}"
+    then
+        return
+    fi
     gaps_error "stopping syncing with remote ${remote} it and ignoring it"
     git config "remote.${remote}.annex-ignore" true
     git config "remote.${remote}.annex-sync" false
@@ -334,31 +342,31 @@ gaps_remotes_fix ( ) {
                 continue
             fi
 
-            # this must be done prior to updating the availability since the
-            # availability will implicitly create the remote
-            if ! gaps_remote_initialized_or_here_p "${remote}"
+            if gaps_extract_remote_info "${contexts}" "${remote}"
             then
-                gaps_warn "Remote $remote_name not initialized"
-				gaps_log "Is it available ?"
-				gaps_launch_availhook_or_continue "${availhook}" "${url}" "${remote_name}"
-				gaps_log "It is available! Now, trying to initialize it"
-                if ! git-annex-perso_initremotes.sh "\b${remote}\b"
+                if gaps_remote_initialized_p "${remote}"
                 then
-                    gaps_warn "Could not initialize remote ${remote}"
-                    if gaps_ask_for_confirmation "Consider it dead?"
+                    # only need to make sure the availability is ok
+                    gaps_remote_update_availability "${remote}"
+                else
+                    # only need to initialize it
+                    gaps_warn "Remote $remote_name not initialized"
+				    gaps_log "Is it available ?"
+				    gaps_launch_availhook_or_continue "${availhook}" "${url}" "${remote_name}"
+				    gaps_log "It is available! Now, trying to initialize it"
+                    if ! git-annex-perso_initremotes.sh "\b${remote}\b"
                     then
-                        local remote_path="${GITANNEXSYNC_REMOTES}/${remote}"
-                        gaps_extract_context_independent_remote_info "${remote_path}"
-                        echo 1 > "${dead}"
+                        gaps_warn "Could not initialize remote ${remote}"
+                        if gaps_ask_for_confirmation "Consider it dead?"
+                        then
+                            local remote_path="${GITANNEXSYNC_REMOTES}/${remote}"
+                            gaps_extract_context_independent_remote_info "${remote_path}"
+                            echo 1 > "${dead}"
+                        fi
+                        continue
                     fi
-                    continue
                 fi
-            fi
-
-            # make sure the availability is correctly set up
-            gaps_remote_update_availability "${remote}"
-            if ! gaps_extract_remote_info "${contexts}" "${remote}"
-            then
+            else
                 gaps_warn "Could not find info for remote ${remote} in contexts ${contexts}"
                 if gaps_remote_considered_available_p "${remote}"
                 then
@@ -366,40 +374,37 @@ gaps_remotes_fix ( ) {
                 fi
                 continue
             fi
+            # now, the remote must be initialized and not be here
 
-            # now, the remote must be initialized or be here
-            if ! gaps_remote_here_p "${remote}"
+            # it is a distant remote, check that it is available
+            gaps_launch_availhook \
+                "${availhook}" \
+                "${url}" \
+                "availhook of ${remote}"
+            avail_res="$?"
+            gaps_remote_considered_available_p "${remote}"
+            local considered_available="$?"
+            # changing the state according to what I know now
+            if [ "${avail_res}" != "0" ] && [ "${considered_available}" == "0" ]
             then
-                # it is a distant remote, check that it is available
-                gaps_launch_availhook \
-                    "${availhook}" \
-                    "${url}" \
-                    "availhook of ${remote}"
-                avail_res="$?"
-                gaps_remote_considered_available_p "${remote}"
-                local considered_available="$?"
-                # changing the state according to what I know now
-                if [ "${avail_res}" != "0" ] && [ "${considered_available}" == "0" ]
-                then
-                    gaps_error "${remote} is not available"
-                    gaps_remote_disable "${remote}"
-                elif [ "${avail_res}" == "0" ] && [ "${considered_available}" != "0" ]
-                then
-                    gaps_log_info "${remote} is now available, stop ignoring it"
-                    git config "remote.${remote}.annex-ignore" false
-                    git config "remote.${remote}.annex-sync" true
-                    git config "remote.${remote}.konix-annex-available" true
-                elif [ "${avail_res}" != "0" ] && [ "${considered_available}" != "0" ]
-                then
-                    gaps_warn "remote ${remote} still is ignored since still not available"
-                fi
+                gaps_error "${remote} is not available"
+                gaps_remote_disable "${remote}"
+            elif [ "${avail_res}" == "0" ] && [ "${considered_available}" != "0" ]
+            then
+                gaps_log_info "${remote} is now available, stop ignoring it"
+                git config "remote.${remote}.annex-ignore" false
+                git config "remote.${remote}.annex-sync" true
+                git config "remote.${remote}.konix-annex-available" true
+            elif [ "${avail_res}" != "0" ] && [ "${considered_available}" != "0" ]
+            then
+                gaps_warn "remote ${remote} still is ignored since still not available"
+            fi
 
-                # do I have to go on (check the new state of availability) ?
-                if ! gaps_remote_considered_available_p "${remote}"
-                then
-                    gaps_log "continuing to next remote"
-                    continue
-                fi
+            # do I have to go on (check the new state of availability) ?
+            if ! gaps_remote_considered_available_p "${remote}"
+            then
+                gaps_log "continuing to next remote"
+                continue
             fi
 
             gaps_log_info "The remote ${remote} is correctly initialized and available"

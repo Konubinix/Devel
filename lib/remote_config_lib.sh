@@ -98,6 +98,12 @@ remoterc_extract_remote_info ( ) {
 
 remoterc_setup() {
     local host="$1"
+    if [ $# -gt 1 ]
+    then
+        local forced_context="$2"
+    else
+        local forced_context=""
+    fi
     remoterc_compute_contexts
     local found=1
     # add a dump value for the first shift to be ok
@@ -106,6 +112,12 @@ remoterc_setup() {
     do
         local context="${1}"
         shift
+        if [ "${forced_context}" != "" ] \
+            && [ "${forced_context}" != "${context}" ]
+        then
+            echo "Ignoring context ${context}" >&2
+            continue
+        fi
         remoterc_extract_remote_info "${context}" "${host}" \
             || continue
         remoterc_launch_hook \

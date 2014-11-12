@@ -14,7 +14,8 @@ EOF
 }
 
 ALL=""
-while getopts "ha" opt; do
+CONTEXT=""
+while getopts "hac:" opt; do
     case $opt in
         h)
             usage
@@ -22,6 +23,10 @@ while getopts "ha" opt; do
             ;;
         a)
             ALL="1"
+            ;;
+        c)
+            CONTEXT="${OPTARG}"
+            echo "Filtering with context ${CONTEXT}" >&2
             ;;
     esac
 done
@@ -44,6 +49,6 @@ then
         echo "${context}: $(cat "${context_path}/url")"
     done
 else
-    remoterc_setup_or_quit "${HOST}"
+    remoterc_setup_or_quit "${HOST}" "${CONTEXT}"
     echo -n "${remote_url}"
 fi

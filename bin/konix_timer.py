@@ -7,6 +7,8 @@ import thread
 import time
 import wx
 import konix_notify
+import rpyc
+from rpyc.utils.server import ThreadedServer
 
 a_lock = thread.allocate_lock()
 time_widget = None
@@ -102,6 +104,18 @@ def stop():
 def on_stop_click(evt):
     stop()
 
+class MyService(rpyc.Service):
+    def exposed_start(self):
+        start()
+    def exposed_stop(self):
+        stop()
+
+def start_rpyc_server():
+    server = ThreadedServer(MyService, port = 12345)
+    server.start()
+
 if __name__ == '__main__':
+
+    thread.start_new_thread(start_rpyc_server, ())
     window = gui.load()
     gui.main_loop()

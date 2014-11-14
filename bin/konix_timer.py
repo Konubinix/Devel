@@ -88,7 +88,7 @@ def on_time_keypress(evt):
     if evt.key == 13:
         start()
 
-def on_stop_click(evt):
+def stop():
     global time_widget, run
     with a_lock:
         run = False
@@ -98,6 +98,9 @@ def on_stop_click(evt):
             pygame.mixer.music.stop()
         except:
             pass
+
+def on_stop_click(evt):
+    stop()
 
 if __name__ == '__main__':
     window = gui.load()

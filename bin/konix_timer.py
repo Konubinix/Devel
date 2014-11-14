@@ -192,14 +192,17 @@ def on_time_keypress(evt):
     if evt.key == 13:
         play()
 
-def update_button(evt=None):
+def update_graphics(evt=None):
     pause_button = gui.component.COMPONENTS["bgMin.pause"]
     stop_button = gui.component.COMPONENTS["bgMin.stop"]
     play_button = gui.component.COMPONENTS["bgMin.play"]
+    state_label = gui.component.COMPONENTS["bgMin.state"]
+
     play_button.enabled = True if possible_events_leading_to("playing") else False
     stop_button.enabled = True if possible_events_leading_to("stopped") else False
     pause_button.enabled = True if possible_events_leading_to("paused") else False
-control_post_hooks.append(update_button)
+    state_label.text = fsm.current
+control_post_hooks.append(update_graphics)
 
 def on_play_click(evt):
     play()
@@ -207,7 +210,7 @@ def on_play_click(evt):
 def on_pause_click(evt):
     pause()
 
-def on_stop_click():
+def on_stop_click(evt):
     stop()
 
 ##########
@@ -216,5 +219,5 @@ def on_stop_click():
 if __name__ == '__main__':
     thread.start_new_thread(start_rpyc_server, ())
     window = gui.load()
-    update_button()
+    update_graphics()
     gui.main_loop()

@@ -78,35 +78,25 @@ def timer():
                 # indicate the current time
                 wx.PostEvent(window.app, CurrentTime(current_time))
 
-def onplaying(evt):
-    global time_widget, run, initial_time
-    with a_lock:
-        if run == True:
-            time_widget.text = str(initial_time)
-        else:
-            if evt.src != "paused":
-                initial_time = int(time_widget.text)
-        run = True
-
-def onpaused(evt):
-    global time_widget, run, initial_time
-    with a_lock:
-        run = False
-
-def onstopped(evt):
-    global time_widget, run
-    with a_lock:
-        run = False
-        time_widget.text = str(initial_time)
-        try:
-            import pygame
-            pygame.mixer.music.stop()
-        except:
-            pass
-
 #################
 ## State stuff ##
 #################
+fsm_onplaying_hooks = []
+fsm_onpaused_hooks = []
+fsm_onstopped_hooks = []
+
+def fsm_onplaying(evt):
+    for hook in fsm_onplaying_hooks:
+        hook(evt)
+
+def fsm_onpaused(evt):
+    for hook in fsm_onpaused_hooks:
+        hook(evt)
+
+def fsm_onstopped(evt):
+    for hook in fsm_onstopped_hooks:
+        hook(evt)
+
 fsm_events = [
     {'name': 'play', 'src': 'idle', 'dst': 'playing'},
     {'name': 'play', 'src': 'stopped', 'dst': 'playing'},
@@ -118,9 +108,9 @@ fsm_events = [
 fsm = Fysom({ 'initial': 'idle',
               'events': fsm_events,
               'callbacks': {
-                 'onplaying': onplaying,
-                 'onstopped': onstopped,
-                 'onpaused': onpaused,
+                 'onplaying': fsm_onplaying,
+                 'onstopped': fsm_onstopped,
+                 'onpaused': fsm_onpaused,
               }
           })
 
@@ -212,6 +202,39 @@ def on_pause_click(evt):
 
 def on_stop_click(evt):
     stop()
+
+##,----------------------------------------
+##| plug the gui control into the fsm stuff
+##`----------------------------------------
+def gui_onplaying(evt):
+    global time_widget, run, initial_time
+    with a_lock:
+        if run == True:
+            time_widget.text = str(initial_time)
+        else:
+            if evt.src != "paused":
+                initial_time = int(time_widget.text)
+        run = True
+
+def gui_onpaused(evt):
+    global time_widget, run, initial_time
+    with a_lock:
+        run = False
+
+def gui_onstopped(evt):
+    global time_widget, run
+    with a_lock:
+        run = False
+        time_widget.text = str(initial_time)
+        try:
+            import pygame
+            pygame.mixer.music.stop()
+        except:
+            pass
+
+fsm_onplaying_hooks.append(gui_onplaying)
+fsm_onpaused_hooks.append(gui_onpaused)
+fsm_onstopped_hooks.append(gui_onstopped)
 
 ##########
 ## Main ##

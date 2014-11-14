@@ -7,8 +7,10 @@ import thread
 import time
 import wx
 import konix_notify
+import functools
 import rpyc
 from rpyc.utils.server import ThreadedServer
+from fysom import Fysom
 
 a_lock = thread.allocate_lock()
 time_widget = None
@@ -17,6 +19,19 @@ window = None
 run = False
 
 EVT_CURRENT_TIME_ID = wx.NewId()
+
+#################
+## fsm helpers ##
+#################
+def events_leading_to(dst):
+    return [event["name"] for event in fsm_events
+            if event["dst"] == dst
+        ]
+
+def possible_events_leading_to(dst):
+    return [name for name in events_leading_to(dst)
+            if fsm.can(name)
+        ]
 
 ########################
 ## Notification stuff ##
@@ -63,21 +78,22 @@ def timer():
                 # indicate the current time
                 wx.PostEvent(window.app, CurrentTime(current_time))
 
-def start():
+def onplaying(evt):
     global time_widget, run, initial_time
     with a_lock:
         if run == True:
             time_widget.text = str(initial_time)
         else:
-            initial_time = int(time_widget.text)
+            if evt.src != "paused":
+                initial_time = int(time_widget.text)
         run = True
 
-def pause():
+def onpaused(evt):
     global time_widget, run, initial_time
     with a_lock:
-        run = not run
+        run = False
 
-def stop():
+def onstopped(evt):
     global time_widget, run
     with a_lock:
         run = False
@@ -88,12 +104,60 @@ def stop():
         except:
             pass
 
+#################
+## State stuff ##
+#################
+fsm_events = [
+    {'name': 'play', 'src': 'idle', 'dst': 'playing'},
+    {'name': 'play', 'src': 'stopped', 'dst': 'playing'},
+    {'name': 'pause', 'src': 'playing', 'dst': 'paused'},
+    {'name': 'unpause', 'src': 'paused', 'dst': 'playing'},
+    {'name': 'stop', 'src': 'playing', 'dst': 'stopped'},
+    {'name': 'reset', 'src': 'paused', 'dst': 'stopped'},
+]
+fsm = Fysom({ 'initial': 'idle',
+              'events': fsm_events,
+              'callbacks': {
+                 'onplaying': onplaying,
+                 'onstopped': onstopped,
+                 'onpaused': onpaused,
+              }
+          })
+
+###################
+## control stuff ##
+###################
+control_post_hooks = []
+def control_hook(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        res = func(*args, **kwargs)
+        for post_hook in control_post_hooks:
+            post_hook()
+        return res
+    return wrapper
+
+@control_hook
+def play():
+    event = possible_events_leading_to("playing")[0]
+    fsm.trigger(event)
+
+@control_hook
+def pause():
+    event = possible_events_leading_to("paused")[0]
+    fsm.trigger(event)
+
+@control_hook
+def stop():
+    event = possible_events_leading_to("stopped")[0]
+    fsm.trigger(event)
+
 ##########################
 ## Remote control stuff ##
 ##########################
 class MyService(rpyc.Service):
-    def exposed_start(self):
-        start()
+    def exposed_play(self):
+        play()
     def exposed_stop(self):
         stop()
     def exposed_pause(self):
@@ -126,15 +190,24 @@ def on_time_change(evt):
 
 def on_time_keypress(evt):
     if evt.key == 13:
-        start()
+        play()
 
-def on_start_click(evt):
-    start()
+def update_button(evt=None):
+    pause_button = gui.component.COMPONENTS["bgMin.pause"]
+    stop_button = gui.component.COMPONENTS["bgMin.stop"]
+    play_button = gui.component.COMPONENTS["bgMin.play"]
+    play_button.enabled = True if possible_events_leading_to("playing") else False
+    stop_button.enabled = True if possible_events_leading_to("stopped") else False
+    pause_button.enabled = True if possible_events_leading_to("paused") else False
+control_post_hooks.append(update_button)
+
+def on_play_click(evt):
+    play()
 
 def on_pause_click(evt):
     pause()
 
-def on_stop_click(evt):
+def on_stop_click():
     stop()
 
 ##########
@@ -143,4 +216,5 @@ def on_stop_click(evt):
 if __name__ == '__main__':
     thread.start_new_thread(start_rpyc_server, ())
     window = gui.load()
+    update_button()
     gui.main_loop()

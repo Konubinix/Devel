@@ -72,6 +72,11 @@ def start():
             initial_time = int(time_widget.text)
         run = True
 
+def pause():
+    global time_widget, run, initial_time
+    with a_lock:
+        run = not run
+
 def stop():
     global time_widget, run
     with a_lock:
@@ -91,6 +96,8 @@ class MyService(rpyc.Service):
         start()
     def exposed_stop(self):
         stop()
+    def exposed_pause(self):
+        pause()
 
 def start_rpyc_server():
     server = ThreadedServer(MyService, port = 12345)
@@ -123,6 +130,9 @@ def on_time_keypress(evt):
 
 def on_start_click(evt):
     start()
+
+def on_pause_click(evt):
+    pause()
 
 def on_stop_click(evt):
     stop()

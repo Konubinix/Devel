@@ -9,6 +9,8 @@ import wx
 import konix_notify
 import functools
 import rpyc
+import logging
+logging.basicConfig()
 from rpyc.utils.server import ThreadedServer
 from fysom import Fysom
 
@@ -114,9 +116,9 @@ fsm = Fysom({ 'initial': 'idle',
               }
           })
 
-###################
-## control stuff ##
-###################
+##,--------------
+##| control stuff
+##`--------------
 control_post_hooks = []
 def control_hook(func):
     @functools.wraps(func)
@@ -128,19 +130,21 @@ def control_hook(func):
     return wrapper
 
 @control_hook
+def fsm_go_to(dst):
+    event = possible_events_leading_to(dst)
+    if event != []:
+        return fsm.trigger(event[0])
+    else:
+        logging.error("Cannot go to %s" % dst)
+
 def play():
-    event = possible_events_leading_to("playing")[0]
-    fsm.trigger(event)
+    fsm_go_to("playing")
 
-@control_hook
 def pause():
-    event = possible_events_leading_to("paused")[0]
-    fsm.trigger(event)
+    fsm_go_to("paused")
 
-@control_hook
 def stop():
-    event = possible_events_leading_to("stopped")[0]
-    fsm.trigger(event)
+    fsm_go_to("stopped")
 
 ##########################
 ## Remote control stuff ##

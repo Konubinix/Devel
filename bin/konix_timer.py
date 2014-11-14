@@ -157,11 +157,11 @@ def stop():
 ##########################
 class MyService(rpyc.Service):
     def exposed_play(self):
-        play()
+        wx.CallAfter(play)
     def exposed_stop(self):
-        stop()
+        wx.CallAfter(stop)
     def exposed_pause(self):
-        pause()
+        wx.CallAfter(pause)
 
 def start_rpyc_server():
     server = ThreadedServer(MyService, port = 12345)

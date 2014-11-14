@@ -151,11 +151,11 @@ def stop():
 ##########################
 class MyService(rpyc.Service):
     def exposed_play(self):
-        wx.CallAfter(play)
+        play()
     def exposed_stop(self):
-        wx.CallAfter(stop)
+        stop()
     def exposed_pause(self):
-        wx.CallAfter(pause)
+        pause()
 
 def start_rpyc_server():
     server = ThreadedServer(MyService, port = 12345)
@@ -164,6 +164,13 @@ def start_rpyc_server():
 ###############
 ## Gui stuff ##
 ###############
+def gui_async_call(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        print "calling after"
+        return wx.CallAfter(func, *args, **kwargs)
+    return wrapper
+
 def on_load(evt):
     print "initializing!"
     global time_widget, initial_time, window
@@ -186,6 +193,7 @@ def on_time_keypress(evt):
     if evt.key == 13:
         play()
 
+@gui_async_call
 def update_graphics(evt=None):
     pause_button = gui.component.COMPONENTS["bgMin.pause"]
     stop_button = gui.component.COMPONENTS["bgMin.stop"]
@@ -210,6 +218,7 @@ def on_stop_click(evt):
 ##,----------------------------------------
 ##| plug the gui control into the fsm stuff
 ##`----------------------------------------
+@gui_async_call
 def gui_onplaying(evt):
     global time_widget, run, initial_time
     with a_lock:
@@ -220,11 +229,13 @@ def gui_onplaying(evt):
                 initial_time = int(time_widget.text)
         run = True
 
+@gui_async_call
 def gui_onpaused(evt):
     global time_widget, run, initial_time
     with a_lock:
         run = False
 
+@gui_async_call
 def gui_onstopped(evt):
     global time_widget, run
     with a_lock:
@@ -235,6 +246,7 @@ def gui_onstopped(evt):
             pygame.mixer.music.stop()
         except:
             pass
+
 
 fsm_onplaying_hooks.append(gui_onplaying)
 fsm_onpaused_hooks.append(gui_onpaused)

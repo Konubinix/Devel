@@ -134,6 +134,16 @@
   (interactive)
   (dired-sort-other (concat dired-listing-switches " --group-directories-first")))
 
+(defun konix/dired-sort-random ()
+  "Dired sort by create time."
+  (interactive)
+  (let (
+		(insert-directory-program "ls_dired_random.sh")
+		)
+	(revert-buffer)
+	)
+  )
+
 (dired-visit-history-enable)
 
 ;; with "a", replace existing buffer
@@ -148,6 +158,7 @@
 (define-key dired-sort-map "u" 'dired-sort-utime)
 (define-key dired-sort-map "n" 'dired-sort-name)
 (define-key dired-sort-map "r" 'dired-sort-toggle-reverse)
+(define-key dired-sort-map "R" 'konix/dired-sort-random)
 (define-key dired-sort-map "d" 'konix/dired-sort-directory-first)
 
 ;; Hotkeys

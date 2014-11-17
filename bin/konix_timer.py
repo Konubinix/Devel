@@ -16,9 +16,10 @@ from fysom import Fysom
 
 a_lock = thread.allocate_lock()
 time_widget = None
-initial_time = None
+initial_time = 300
 window = None
 run = False
+current_time = initial_time
 
 EVT_CURRENT_TIME_ID = wx.NewId()
 
@@ -53,26 +54,6 @@ def bell():
         pygame.mixer.music.play()
     except:
         pass
-
-###########################
-## Time management stuff ##
-###########################
-def set_current_time(current_time):
-    global window
-    with a_lock:
-        window["time"].text = str(current_time)
-
-# http://wiki.wxpython.org/LongRunningTasks
-def timer():
-    global time_widget, window
-    while True:
-        time.sleep(1)
-        with a_lock:
-            if run:
-                current_time = int(eval(time_widget.text))
-                current_time -= 1
-                # indicate the current time
-                wx.CallAfter(set_current_time, current_time)
 
 #################
 ## State stuff ##
@@ -140,6 +121,51 @@ def pause():
 def stop():
     fsm_go_to("stopped")
 
+###########################
+## Time management stuff ##
+###########################
+timer_current_time_set_hooks = []
+def set_current_time(current_time_):
+    global current_time
+    current_time = current_time_
+    for hook in timer_current_time_set_hooks:
+        hook(current_time)
+
+# http://wiki.wxpython.org/LongRunningTasks
+def timer():
+    global time_widget, window, current_time
+    while True:
+        time.sleep(1)
+        with a_lock:
+            if run:
+                current_time -= 1
+                set_current_time(current_time)
+
+def timer_onstopped_hook(evt):
+    global current_time, run, initial_time
+    with a_lock:
+        run = False
+        set_current_time(initial_time)
+
+def timer_onplaying_hook(evt):
+    global run, current_time, initial_time
+    with a_lock:
+        if run == True:
+            set_current_time(initial_time)
+        else:
+            if evt.src != "paused":
+                initial_time = current_time
+        run = True
+
+def timer_onpaused_hook(evt):
+    global run
+    with a_lock:
+        run = False
+
+fsm_onplaying_hooks.append(timer_onplaying_hook)
+fsm_onpaused_hooks.append(timer_onpaused_hook)
+fsm_onstopped_hooks.append(timer_onstopped_hook)
+
 ##########################
 ## Remote control stuff ##
 ##########################
@@ -166,16 +192,11 @@ def gui_async_call(func):
 
 def on_load(evt):
     print "initializing!"
-    global time_widget, initial_time, window
+    global time_widget, initial_time
     time_widget = evt.window['time']
-    # make sure the window will receive the current time event
-    window = evt.window
-    initial_time = int(time_widget.text)
-    thread.start_new_thread(timer, ())
-
 
 def on_time_change(evt):
-    global time_widget, run, initial_time
+    global run, current_time
     current_time = int(
         eval(evt.window['time'].text) if evt.window['time'].text != "" else 0
     )
@@ -198,6 +219,7 @@ def update_graphics(evt=None):
     stop_button.enabled = True if possible_events_leading_to("stopped") else False
     pause_button.enabled = True if possible_events_leading_to("paused") else False
     state_label.text = fsm.current
+
 control_post_hooks.append(update_graphics)
 
 def on_play_click(evt):
@@ -213,44 +235,19 @@ def on_stop_click(evt):
 ##| plug the gui control into the fsm stuff
 ##`----------------------------------------
 @gui_async_call
-def gui_onplaying(evt):
-    global time_widget, run, initial_time
+def gui_set_current_time(current_time):
+    global window
     with a_lock:
-        if run == True:
-            time_widget.text = str(initial_time)
-        else:
-            if evt.src != "paused":
-                initial_time = int(eval(time_widget.text))
-        run = True
+        window["time"].text = str(current_time)
 
-@gui_async_call
-def gui_onpaused(evt):
-    global time_widget, run, initial_time
-    with a_lock:
-        run = False
-
-@gui_async_call
-def gui_onstopped(evt):
-    global time_widget, run
-    with a_lock:
-        run = False
-        time_widget.text = str(initial_time)
-        try:
-            import pygame
-            pygame.mixer.music.stop()
-        except:
-            pass
-
-
-fsm_onplaying_hooks.append(gui_onplaying)
-fsm_onpaused_hooks.append(gui_onpaused)
-fsm_onstopped_hooks.append(gui_onstopped)
+timer_current_time_set_hooks.append(gui_set_current_time)
 
 ##########
 ## Main ##
 ##########
 if __name__ == '__main__':
     thread.start_new_thread(start_rpyc_server, ())
+    thread.start_new_thread(timer, ())
     window = gui.load()
     update_graphics()
     gui.main_loop()

@@ -29,6 +29,10 @@ class KonixTimerController(cmd.Cmd, object):
     def do_EOF(self, line):
         return True
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     program = KonixTimerController()
-    program.cmdloop()
+    import sys
+    if len(sys.argv) > 1:
+        program.onecmd(' '.join(sys.argv[1:]))
+    else:
+        program.cmdloop()

@@ -75,7 +75,7 @@ def timer():
         time.sleep(1)
         with a_lock:
             if run:
-                current_time = int(time_widget.text)
+                current_time = int(eval(time_widget.text))
                 current_time -= 1
                 # indicate the current time
                 wx.PostEvent(window.app, CurrentTime(current_time))
@@ -184,7 +184,9 @@ def on_load(evt):
 
 def on_time_change(evt):
     global time_widget, run, initial_time
-    current_time = int(evt.window['time'].text or 0)
+    current_time = int(
+        eval(evt.window['time'].text) if evt.window['time'].text != "" else 0
+    )
     if current_time <= 0 and run:
         run = False
         bell()
@@ -226,7 +228,7 @@ def gui_onplaying(evt):
             time_widget.text = str(initial_time)
         else:
             if evt.src != "paused":
-                initial_time = int(time_widget.text)
+                initial_time = int(eval(time_widget.text))
         run = True
 
 @gui_async_call

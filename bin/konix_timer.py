@@ -57,16 +57,10 @@ def bell():
 ###########################
 ## Time management stuff ##
 ###########################
-class CurrentTime(wx.PyEvent):
-    def __init__(self, current_time):
-        wx.PyEvent.__init__(self)
-        self.SetEventType(EVT_CURRENT_TIME_ID)
-        self.current_time = current_time
-
-def onCurrentTime(evt):
+def set_current_time(current_time):
     global window
     with a_lock:
-        window["time"].text = str(evt.current_time)
+        window["time"].text = str(current_time)
 
 # http://wiki.wxpython.org/LongRunningTasks
 def timer():
@@ -78,7 +72,7 @@ def timer():
                 current_time = int(eval(time_widget.text))
                 current_time -= 1
                 # indicate the current time
-                wx.PostEvent(window.app, CurrentTime(current_time))
+                wx.CallAfter(set_current_time, current_time)
 
 #################
 ## State stuff ##
@@ -167,7 +161,6 @@ def start_rpyc_server():
 def gui_async_call(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        print "calling after"
         return wx.CallAfter(func, *args, **kwargs)
     return wrapper
 
@@ -177,7 +170,6 @@ def on_load(evt):
     time_widget = evt.window['time']
     # make sure the window will receive the current time event
     window = evt.window
-    window.app.Connect(-1, -1, EVT_CURRENT_TIME_ID, onCurrentTime)
     initial_time = int(time_widget.text)
     thread.start_new_thread(timer, ())
 

@@ -55,7 +55,7 @@
   'image': '',
   'left': '647',
   'name': 'bgMin',
-  'title': u'Minimal gui2py resource app',
+  'title': u'Remotely controllable timer',
   'top': '123',
   'type': 'Window',
   'width': '314px'}]

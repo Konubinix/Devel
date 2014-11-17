@@ -22,6 +22,10 @@ class KonixTimerController(cmd.Cmd, object):
     def do_stop(self, line):
         self.conn.root.stop()
 
+    def do_set_current_time(self, line):
+        current_time = int(line)
+        self.conn.root.set_current_time(current_time)
+
     def do_EOF(self, line):
         return True
 

@@ -176,6 +176,8 @@ class MyService(rpyc.Service):
         stop()
     def exposed_pause(self):
         pause()
+    def exposed_set_current_time(self, current_time):
+        set_current_time(current_time)
 
 def start_rpyc_server():
     server = ThreadedServer(MyService, port = 12345)

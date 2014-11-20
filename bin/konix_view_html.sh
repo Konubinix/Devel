@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 dir=`mktemp -d`
 #trap "rm -r $dir" 0
 echo "$dir" > "${HOME}/konix_view_html.dir"

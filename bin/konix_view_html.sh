@@ -3,6 +3,8 @@ dir=`mktemp -d`
 #trap "rm -r $dir" 0
 echo "$dir" > "${HOME}/konix_view_html.dir"
 
+IN_EXPLORER="${1}"
+
 tee "${HOME}/konix_view_html.msg" | {
 	echo $dir > ~/test
 	ERR_FILE="${HOME}/konix_view_html.err"
@@ -50,8 +52,18 @@ tee "${HOME}/konix_view_html.msg" | {
 	for i in "$dir"/*.[Hh][Tt][Mm][Ll]; do
         i_new="$i.new.html"
         cat "$i" | bash "$dir"/sed > "${i_new}"
-		mimeopen -n "${i_new}" &
+        if [ "${IN_EXPLORER}" == "" ]
+        then
+		    mimeopen -n "${i_new}" &
+        fi
 	done
+
 	sleep 3
+
+    if [ "${IN_EXPLORER}" != "" ]
+    then
+        mimeopen -n "${dir}" &
+    fi
+
 	exit 0
 }

@@ -370,6 +370,12 @@
   (interactive)
   (notmuch-show-pipe-message nil "konix_view_html.sh")
   )
+
+(defun konix/notmuch-show-open-in-explorer ()
+  (interactive)
+  (notmuch-show-pipe-message nil "konix_view_html.sh t")
+  )
+
 (defun konix/notmuch-message-completion-toggle ()
   (interactive)
   (require 'notmuch)
@@ -495,7 +501,9 @@ inspired from `notmuch-show-archive-thread-internal'"
 (konix/notmuch-define-key-search-show "H" 'konix/notmuch-unread-and-hide-tag)
 (konix/notmuch-define-key-search-show (kbd "a") 'konix/notmuch-archive)
 (define-key notmuch-search-mode-map (kbd "F") 'konix/notmuch-search-unflag-remove-read-and-next)
-(define-key notmuch-show-mode-map (kbd "M") 'konix/notmuch-show-open-in-external-browser)
+(define-key notmuch-show-mode-map (kbd "M")
+  'konix/notmuch-show-open-in-external-browser)
+(define-key notmuch-show-mode-map (kbd "E") 'konix/notmuch-show-open-in-explorer)
 (define-key notmuch-show-mode-map (kbd "F") 'konix/notmuch-show-unflag-and-next)
 (define-key notmuch-show-mode-map (kbd "U") 'konix/notmuch-show-read-delete-and-next)
 (define-key notmuch-show-mode-map (kbd "<C-return>") 'w3m-view-url-with-external-browser)

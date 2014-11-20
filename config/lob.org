@@ -1,0 +1,4 @@
+#+NAME: pystr
+#+BEGIN_SRC python :var values=2
+  return " ".join(values)
+#+END_SRC

@@ -56,12 +56,6 @@
   )
 
 (defun konix/org-load-hook()
-  (setq-default org-clock-string
-				(format "CLOCK-%s-%s:"
-						(getenv "USER")
-						(getenv "HOSTNAME")
-						)
-				)
   ;; better dimmed org agenda face
   (set-face-attribute 'org-agenda-dimmed-todo-face nil
 					  :foreground "OrangeRed4"

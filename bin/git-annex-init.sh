@@ -1,4 +1,4 @@
 #!/bin/bash -x
 
-git annex init $HOSTNAME
-git config annex.uuid $HOSTNMAE
+git annex init ${HOSTNAME}
+git config annex.uuid ${HOSTNAME}

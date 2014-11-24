@@ -139,8 +139,10 @@ cursor stays in the org buffer."
 ;; CONFIG
 ;; ####################################################################################################
 (setq-default org-file-apps
-			  '((auto-mode . emacs)
+			  '(
+				(".org" . emacs)
 				(".*" . "mimeopen %s")
+				(auto-mode . emacs)
 				)
 			  )
 

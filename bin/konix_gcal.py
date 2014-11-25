@@ -60,14 +60,32 @@ def lazy(expire_key):
         return wrapper
     return real_decorator
 
+PROVIDERS_KEYS = {}
+
 def needs(expire_key):
     def real_decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
+            if not (
+                    self.db.get(expire_key)
+                    and expire_key in PROVIDERS_KEYS
+            ):
+                logging.debug("Calling the provider of the needed key {}".format(expire_key))
+                PROVIDERS_KEYS[expire_key](self)
             if self.db.get(expire_key):
                 return func(self, *args, **kwargs)
             else:
                 logging.error("{} is needed".format(expire_key))
+        return wrapper
+    return real_decorator
+
+def provides(key):
+    def real_decorator(func):
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            return func(self, *args, **kwargs)
+        global PROVIDERS_KEYS
+        PROVIDERS_KEYS[key] = wrapper
         return wrapper
     return real_decorator
 
@@ -101,9 +119,7 @@ class GCall(cmd.Cmd, object):
     def do_clear_user_permission(self, line=None):
         self.db.delete("user_code")
 
-    @lazy("access_token")
-    @needs("device_code")
-    def do_get_access_token(self, line=None):
+    def get_access_token(self):
         req = urllib.request.Request(
             url='https://accounts.google.com/o/oauth2/token',
             data='client_id={}&client_secret={}&code={}&grant_type=http://oauth.net/grant_type/device/1.0'.format(
@@ -122,9 +138,7 @@ class GCall(cmd.Cmd, object):
         # now that I have a token, the device code is no longer expiring
         self.db.persist("device_code")
 
-    @lazy("access_token")
-    @needs("device_code")
-    def do_refresh_token(self, line=None):
+    def get_refresh_token(self):
         req = urllib.request.Request(
             url='https://accounts.google.com/o/oauth2/token',
             data='client_id={}&client_secret={}&refresh_token={}&grant_type=refresh_token'.format(
@@ -140,7 +154,17 @@ class GCall(cmd.Cmd, object):
         self.db.set("token_type", data["token_type"])
         assert self.db.get("token_type") == "Bearer"
 
+    @lazy("access_token")
+    @needs("device_code")
+    @provides("access_token")
+    def do_get_access_token(self, line=None):
+        if self.db.get("refresh_token"):
+            self.get_refresh_token()
+        else:
+            self.get_access_token()
+
     @lazy("device_code")
+    @provides("device_code")
     def do_get_user_permission(self, line=None):
         req = urllib.request.Request(
             url='https://accounts.google.com/o/oauth2/device/code',
@@ -161,6 +185,7 @@ class GCall(cmd.Cmd, object):
         self.db.set("device_code", data["device_code"])
         self.db.expire("device_code", int(data["expires_in"]))
 
+    @needs("access_token")
     def do_list_calendars(self, refresh=None):
         if refresh or not self.calendars:
             req = urllib.request.Request(
@@ -254,6 +279,7 @@ class GCall(cmd.Cmd, object):
             if calendar.id.startswith(text)
         ]
 
+    @needs("access_token")
     def do_list_events(self, line):
         calendar_id = self.db.get("calendar_id")
         if not calendar_id:
@@ -273,6 +299,7 @@ class GCall(cmd.Cmd, object):
         data = json.loads(f.read().decode("utf-8"))
         pprint.pprint(data)
 
+    @needs("access_token")
     def do_add_event(self, line):
         calendar_id = self.db.get("calendar_id")
         if not calendar_id:

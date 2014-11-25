@@ -5,6 +5,8 @@ echo Total size
 du -sh .
 echo Annex size
 du -sh .git/annex/
+echo Working copy
+du -sh --exclude .git .
 echo Git object size
 du -sh .git/objects
 echo Size in git annexed files here

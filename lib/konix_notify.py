@@ -26,6 +26,10 @@ def by_pynotify(message):
     n.set_timeout(3000)
     n.show()
 
+def by_sl4a(message):
+    from konix_android import droid
+    droid.makeToast(message)
+
 def by_pyosd(message):
     import pyosd
     p = pyosd.osd("-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-1", colour="green", pos=pyosd.POS_BOT,offset=40, align=pyosd.ALIGN_CENTER)
@@ -43,4 +47,7 @@ def main(message,unique=False, duration=3000):
             by_pynotify(message)
         except:
             LOGGER.error("Fallbacking to pyosd")
-            by_pyosd(message)
+            try:
+                by_pyosd(message)
+            except:
+                by_sl4a(message)

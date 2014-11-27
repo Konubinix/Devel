@@ -321,6 +321,10 @@ some usage.  By setting this variable nil, page name cache is
 updated only when invoking `trac-wiki' command or do completion
 with prefix explicitly on page editing buffer.")
 
+(defcustom trac-wiki-auto-save-directory "~/wiki_saves"
+  "Directory where to auto save wiki pages. If set to nil,
+  nothing will be saved."  )
+
 ;;; internal variables
 
 (defconst trac-wiki-diff-buffer-name
@@ -933,6 +937,14 @@ result data."
   (trac-wiki-set-properties-link-buffer)
   (add-to-invisibility-spec '(trac-wiki-link))
   (setq trac-wiki-show-links t)
+  (when trac-wiki-auto-save-directory
+	(make-directory trac-wiki-auto-save-directory t)
+	(let (
+		  (default-directory trac-wiki-auto-save-directory)
+		  )
+	  (auto-save-mode t)
+	  )
+	)
   )
 
 ;; XML-RPC functions

@@ -25,7 +25,7 @@
 ;;; Code:
 
 (setq-default python-guess-indent nil)
-(setq-default python-indent 4)
+(setq-default python-indent-offset 4)
 (defun konix/python-mode-hook ()
   (setq tab-width 4)
   (konix/prog/config)

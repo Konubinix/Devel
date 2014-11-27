@@ -859,7 +859,7 @@ NO : Ne pas truncater
 	(set (make-local-variable 'c-basic-offset) size)
 	(set (make-local-variable 'tab-stop-list) list)
 	(when (eq major-mode 'python-mode)
-	  (set (make-local-variable 'python-indent) size)
+	  (set (make-local-variable 'python-indent-offset) size)
 	  )
 	(when (eq major-mode 'sh-mode)
 	  (set (make-local-variable 'sh-basic-offset) size)

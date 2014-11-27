@@ -26,13 +26,45 @@
 
 (defun konix/trac-wiki-kill-query-function ()
   (or (not
-	   (buffer-modified-p)
+	   (and
+		(equal major-mode 'trac-wiki-mode)
+		(buffer-modified-p)
+		)
 	   )
 	  (y-or-n-p
-	   (format "Modifications for the buffer %s will be lost. Kill it?" (buffer-name))
+	   (format "WIKI PAGE %s will be lost. Kill it anyway?" (buffer-name))
 	   )
 	  )
   )
+
+(defun konix/trac-wiki/kill-emacs-query-function ()
+  (let (
+		(buffer
+		 (find-if
+		  (lambda (buffer)
+			(with-current-buffer buffer
+			  (and
+			   (eq major-mode 'trac-wiki-mode)
+			   (buffer-modified-p)
+			   )
+			  )
+			)
+		  (buffer-list)
+		  ))
+		)
+	(if buffer
+		(progn
+		  (pop-to-buffer buffer)
+		  (warn "Decide something about the wiki page '%s'" (buffer-name))
+		  nil
+		  )
+	  t
+	  )
+	)
+  )
+(add-to-list 'kill-emacs-query-functions 'konix/tracking/kill-emacs-query-function)
+
+
 (defun konix/trac-wiki-escape-camel-case-links ()
   (interactive)
   (query-replace-regexp "\\([^!]\\)\\(\\b[A-Z][a-z]+[A-Z]\\)" "\\1!\\2")
@@ -46,12 +78,12 @@
   (local-set-key (kbd "C-<right>") 'forward-word)
   (local-set-key (kbd "M-<left>") 'mediawiki-simple-outline-promote)
   (local-set-key (kbd "M-<right>") 'mediawiki-simple-outline-demote)
-  (make-local-variable 'kill-buffer-query-functions)
-  (add-to-list 'kill-buffer-query-functions 'konix/trac-wiki-kill-query-function)
   (setq indent-tabs-mode nil)
   (abbrev-mode 1)
   )
 (add-hook 'trac-wiki-mode-hook 'konix/trac-wiki-mode-hook)
+(add-to-list 'kill-buffer-query-functions 'konix/trac-wiki-kill-query-function)
+(add-to-list 'kill-emacs-query-functions 'konix/trac-wiki/kill-emacs-query-function)
 
 (provide '400-KONIX_trac-wiki)
 ;;; 400-KONIX_trac-wiki.el ends here

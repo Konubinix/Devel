@@ -47,7 +47,11 @@ Calendar = collections.namedtuple(
     "Calendar",
     calendar_keys
 )
+DISCOVERY_URI = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}/rest'.format(
+                     api="calendar",
+                     apiVersion="v3")
 
+DATETIME_FORMAT = "%m/%d/%Y %H:%M"
 def lazy(expire_key):
     def real_decorator(func):
         @functools.wraps(func)
@@ -105,6 +109,18 @@ class GCall(cmd.Cmd, object):
             self.calendars = eval(calendars_string)
         else:
             self.calendars = []
+
+    def get_api(self):
+        req = urllib.request.Request(
+            url='https://accounts.google.com/o/oauth2/token',
+            data='client_id={}&client_secret={}&code={}&grant_type=http://oauth.net/grant_type/device/1.0'.format(
+                self.client_id,
+                self.client_secret,
+                self.db.get("device_code"),
+            ).encode("utf-8"))
+        f = urllib.request.urlopen(req)
+        assert f.code == 200
+        self.api = json.loads(f.read().decode("utf-8"))
 
     def set_prompt(self):
         self.prompt = PROMPT.format(self.db.get("calendar_id"))
@@ -308,7 +324,7 @@ class GCall(cmd.Cmd, object):
         calendar = self.get_calendar(calendar_id)
         tz = pytz.timezone(calendar.timeZone)
         (title, where, when, duration) = shlex.split(line)
-        start = datetime.datetime.strptime(when, "%m/%d/%Y %H:%M")
+        start = datetime.datetime.strptime(when, DATETIME_FORMAT)
         start = tz.localize(start)
         end = start + datetime.timedelta(0, int(duration) * 60)
         event = {

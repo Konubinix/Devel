@@ -130,9 +130,9 @@ cursor stays in the org buffer."
 	(add-to-list 'tags tag)
 	(org-set-tags-to
 	 (format ":%s:"
-	  (mapconcat 'identity tags ":")
-	  ))
-   )
+			 (mapconcat 'identity tags ":")
+			 ))
+	)
   )
 
 ;; ####################################################################################################
@@ -736,6 +736,26 @@ items"
 	)
   )
 
+(defun konix/org-agenda-skip-if-has-not-next-entry ()
+  (if (save-excursion
+				  (catch 'found-next-entry
+					(when (org-goto-first-child)
+					  (when (string= "NEXT" (org-get-todo-state))
+						(throw 'found-next-entry t)
+						)
+					  (while (org-get-next-sibling)
+						(when (string= "NEXT" (org-get-todo-state))
+						  (throw 'found-next-entry t)
+						  )
+						)
+					  )
+					)
+				  )
+	  (save-excursion (outline-next-heading) (1- (point)))
+	nil
+	)
+  )
+
 (defun konix/org-agenda-pomodoro ()
   (interactive)
   (let (
@@ -884,13 +904,13 @@ items"
 				)
   (setq-default konix/org-agenda-stuck-view
 				'(
-				  (tags-todo "+project/NEXT"
-							 (
-							  (org-agenda-overriding-header
-							   "Remove the NEXT keyword from projects")
-							  (org-agenda-tag-filter-preset nil)
-							  )
-							 )
+				  ;; (tags-todo "+project/NEXT"
+				  ;; 			 (
+				  ;; 			  (org-agenda-overriding-header
+				  ;; 			   "Remove the NEXT keyword from projects")
+				  ;; 			  (org-agenda-tag-filter-preset nil)
+				  ;; 			  )
+				  ;; 			 )
 				  (tags "refile"
 						(
 						 (org-agenda-overriding-header "Refile those entries")
@@ -899,13 +919,16 @@ items"
 						 (org-agenda-tag-filter-preset nil)
 						 )
 						)
-				  (stuck nil
-						 (
-						  (org-agenda-overriding-header
-						   "A project MUST have a NEXT entry")
-						  (org-agenda-tag-filter-preset nil)
-						  )
-						 )
+				  (tags-todo "+project"
+							 (
+							  (org-agenda-overriding-header
+							   "A project MUST have a NEXT entry")
+							  (org-agenda-tag-filter-preset nil)
+							  (org-agenda-skip-function
+							   'konix/org-agenda-skip-if-has-not-next-entry
+							   )
+							  )
+							 )
 				  (todo "NEXT"
 						(
 						 (org-agenda-skip-function

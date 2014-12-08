@@ -904,13 +904,14 @@ items"
 				)
   (setq-default konix/org-agenda-stuck-view
 				'(
-				  ;; (tags-todo "+project/NEXT"
-				  ;; 			 (
-				  ;; 			  (org-agenda-overriding-header
-				  ;; 			   "Remove the NEXT keyword from projects")
-				  ;; 			  (org-agenda-tag-filter-preset nil)
-				  ;; 			  )
-				  ;; 			 )
+				  (tags-todo "ARCHIVE+TODO=\"NEXT\"|ARCHIVE+TODO=\"TODO\""
+				  			 (
+				  			  (org-agenda-overriding-header
+				  			   "Close a TODO before archiving it")
+				  			  (org-agenda-tag-filter-preset nil)
+							  (org-agenda-archives-mode t)
+				  			  )
+				  			 )
 				  (tags "refile"
 						(
 						 (org-agenda-overriding-header "Refile those entries")

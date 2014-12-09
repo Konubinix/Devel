@@ -11,3 +11,4 @@ git -c core.bare=false config annex.genmetadata true
 
 gaps_log "Freezing the repo"
 git-annex-freeze.sh
+git-annex-freeze-views.sh

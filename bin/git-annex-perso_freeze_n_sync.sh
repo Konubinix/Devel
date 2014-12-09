@@ -1,4 +1,4 @@
 #!/bin/bash -x
 
-git-annex-freeze.sh
+git-annex-perso-freeze.sh
 git-annex sync "$@"

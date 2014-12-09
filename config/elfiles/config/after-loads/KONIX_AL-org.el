@@ -962,7 +962,7 @@ items"
 				  (tags-todo "-{@.+}-project//+NEXT"
 							 (
 							  (org-agenda-overriding-header
-							   "Assign a context to all NEXT items")
+							   "Assign a context to all NEXT (not project) items")
 							  (org-agenda-tag-filter-preset nil)
 							  )
 							 )

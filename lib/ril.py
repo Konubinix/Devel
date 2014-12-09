@@ -246,7 +246,7 @@ class RILItem(object):
     @staticmethod
     def from_url_path(url_path):
         content = open(url_path, "r").read().decode("utf-8")
-        assert content != ""
+        assert content != "", "{} is empty".format(url_path)
         return RILItem(content, os.stat(url_path).st_atime)
 
     @staticmethod

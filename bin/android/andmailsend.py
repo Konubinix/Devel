@@ -2,6 +2,7 @@
 
 from konix_android import droid
 import argparse
+import sys
 
 parser = argparse.ArgumentParser(
             description="Send a mail from the command line.",

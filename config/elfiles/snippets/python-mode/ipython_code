@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ipython_code
+# key: ipython_code
+# binding: direct-keybinding
+# --
+$>import IPython
+$>IPython.start_ipython(argv=[], user_ns=locals())

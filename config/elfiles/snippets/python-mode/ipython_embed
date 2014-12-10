@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ipython_embed
+# key: ipython_embed
+# binding: direct-keybinding
+# --
+$>from IPython import embed
+$>embed()

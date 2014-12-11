@@ -279,6 +279,10 @@ class GCall(cmd.Cmd, object):
             ]
         )
 
+    def do_ipython(self, line=None):
+        import IPython
+        IPython.start_ipython(argv=[], user_ns=locals())
+
     def help_find_calendar(self):
         print("{}".format(calendar_keys))
 

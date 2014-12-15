@@ -27,5 +27,15 @@
 ;; make sure the agendas are sticky
 (org-toggle-sticky-agenda t)
 
+(defun konix/org-agenda-refile (orig &optional goto rfloc no-update)
+  (funcall orig goto rfloc t)
+  )
+
+(add-function :around
+			  (symbol-function 'org-agenda-refile)
+			  #'konix/org-agenda-refile
+			  )
+
+
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

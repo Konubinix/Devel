@@ -15,6 +15,7 @@ import datetime
 import time
 import collections
 import pytz
+import parsedatetime
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -51,7 +52,9 @@ DISCOVERY_URI = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}
                      api="calendar",
                      apiVersion="v3")
 
-DATETIME_FORMAT = "%m/%d/%Y %H:%M"
+EVENT_STRFTIME="%Y-%m-%dT%H:%M:%S.000%z"
+EVENT_STRFTIME_ALL_DAY="%Y-%m-%d"
+
 def lazy(expire_key):
     def real_decorator(func):
         @functools.wraps(func)
@@ -321,6 +324,7 @@ class GCall(cmd.Cmd, object):
 
     @needs("access_token")
     def do_add_event(self, line):
+        """title, where, when, duration"""
         calendar_id = self.db.get("calendar_id")
         if not calendar_id:
             print("Use the command select_calendar first")
@@ -328,19 +332,38 @@ class GCall(cmd.Cmd, object):
         calendar = self.get_calendar(calendar_id)
         tz = pytz.timezone(calendar.timeZone)
         (title, where, when, duration) = shlex.split(line)
-        start = datetime.datetime.strptime(when, DATETIME_FORMAT)
-        start = tz.localize(start)
-        end = start + datetime.timedelta(0, int(duration) * 60)
+        cal = parsedatetime.Calendar()
+
+        start, flag = cal.parseDT(when,
+                            sourceTime=datetime.datetime.today(),
+                            tzinfo=tz)
+        time_dict = re.match('^\s*((?P<hours>\d+)\s*h)?\s*((?P<minutes>\d+)\s*m)?\s*((?P<seconds>\d+)\s*s)?\s*$',
+                             duration).groupdict()
+        duration = datetime.timedelta(seconds=int(time_dict['seconds'] or "0"),
+                             minutes=int(time_dict['minutes'] or "0"),
+                             hours=int(time_dict['hours'] or "0"))
+        end = start + duration
+        if flag == 2:
+            start = {
+                "dateTime": start.strftime(EVENT_STRFTIME),
+            }
+            end = {
+                "dateTime": end.strftime(EVENT_STRFTIME),
+            }
+        else:
+            start = {
+                "date": start.strftime(EVENT_STRFTIME_ALL_DAY),
+            }
+            end = {
+                "date": end.strftime(EVENT_STRFTIME_ALL_DAY),
+            }
+
         event = {
             "summary" : title,
             "location" : where,
             "description" : "",
-            "start" : {
-                "dateTime": start.strftime("%Y-%m-%dT%H:%M:%S.000%z"),
-            },
-            "end" : {
-                "dateTime": end.strftime("%Y-%m-%dT%H:%M:%S.000%z"),
-            },
+            "start" : start,
+            "end" : end,
         }
 
         req = urllib.request.Request(

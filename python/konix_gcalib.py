@@ -303,7 +303,7 @@ class GCall(cmd.Cmd, object):
         ]
 
     @needs("access_token")
-    def list_events(self, calendarId=None):
+    def list_events(self, filter_=None):
         calendar_id = self.db.get("calendar_id")
         if not calendar_id:
             return None
@@ -318,11 +318,16 @@ class GCall(cmd.Cmd, object):
         )
         f = urllib.request.urlopen(req)
         assert f.code == 200
-        data = json.loads(f.read().decode("utf-8"))
+        data = json.loads(f.read().decode("utf-8"))["items"]
+        if filter_:
+            data = [d for d in data if "summary" in d and filter_(d)]
+
         return data
 
     @needs("access_token")
     def do_list_events(self, line):
+        if line:
+            line = eval("lambda x:{}".format(line))
         data = self.list_events(line)
         if data == None:
             print("Use the command select_calendar first")

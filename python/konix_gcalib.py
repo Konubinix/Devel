@@ -112,8 +112,8 @@ class GCall(cmd.Cmd, object):
             self.calendars = eval(calendars_string)
         else:
             self.calendars = []
-        self.calendar_filter = "lambda x: '{search_term}' in x['summary']"
-        self.event_filter = "lambda x: 'summary' in x and '{search_term}' in x['summary']"
+        self.calendar_filter = "'{search_term}' in x['summary']"
+        self.event_filter = "'summary' in x and '{search_term}' in x['summary']"
 
     @provides("api")
     def get_api(self):
@@ -212,7 +212,7 @@ class GCall(cmd.Cmd, object):
         )
         f = urllib.request.urlopen(req)
         if search_term:
-            filter_ = eval(self.calendar_filter.format(search_term=search_term))
+            filter_ = eval("lambda x:" + self.calendar_filter.format(search_term=search_term))
 
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
@@ -338,7 +338,7 @@ class GCall(cmd.Cmd, object):
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))["items"]
         if search_term:
-            filter_ = eval(self.event_filter.format(search_term=search_term))
+            filter_ = eval("lambda x: " + self.event_filter.format(search_term=search_term))
             data = [d for d in data if filter_(d)]
 
         return data

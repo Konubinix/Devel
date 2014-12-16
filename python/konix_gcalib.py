@@ -365,6 +365,15 @@ class GCall(cmd.Cmd, object):
             if calendar.id.startswith(text)
         ]
 
+    @needs("calendar_id")
+    def do_describe_calendar(self, line):
+        calendar_id = self.db.get("calendar_id")
+        formatter = eval("lambda x:" + self.calendar_formatter)
+        print(formatter([cal
+               for cal in self.list_calendars()
+               if cal.id == calendar_id
+           ][0]))
+
     @needs("access_token")
     def list_events(self, search_term=None):
         calendar_id = self.db.get("calendar_id")

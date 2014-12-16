@@ -410,9 +410,11 @@ class GCall(cmd.Cmd, object):
     @needs("access_token")
     @needs("all_events")
     @needs("calendar_id")
-    def list_events(self, search_term=None):
+    def list_events(self, search_terms=None):
         events = eval(self.db.get("all_events"))
-        if search_term:
+        search_terms = shlex.split(search_terms)
+
+        for search_term in search_terms:
             filter_ = eval("lambda x: " + self.event_filter.format(search_term=search_term))
             events = [e for e in events if filter_(e)]
 

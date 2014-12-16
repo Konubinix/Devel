@@ -13,34 +13,30 @@ findEmacsProcess () {
 	fi
 }
 
-noNeedToCreateANewFrame ( ) {
-	if konix_on_linux_p
-	then
-		if [ -n "$DISPLAY" ]
-		then
-			findEmacsWindow
-		else
-			return 0
-		fi
-	else
-		if ! findEmacsProcess
-		then
-			source konix_assert.sh
-		fi
-	fi
-}
-
 printf "Starting an emacsclient " 1>&2
-if noNeedToCreateANewFrame
+if on_windows_p
 then
-	printf "with no frame\n" >&2
-	if [ -z "$*" ]
+	if ! findEmacsProcess
+	then
+		source konix_assert.sh
+	fi
+elif konix_on_linux_p
+then
+	if [ -n "$DISPLAY" ]
+    then
+        if ! findEmacsWindow
+        then
+            ARGS="${ARGS} -c"
+        fi
+    else
+            ARGS="${ARGS} -nw"
+    fi
+else
+        source konix_assert.sh
+fi
+	if [ -z "$*" ] && [ -z "${ARGS}" ]
 	then
 		# Need at least an argument when launching without -c
 		set "."
 	fi
-	emacsclient -a "" "$@"
-else
-	printf "within a new frame\n" >&2
-	emacsclient -a "" -c "$@"
-fi
+	emacsclient -a "" ${ARGS} "$@"

@@ -424,19 +424,19 @@ class GCall(cmd.Cmd, object):
                              minutes=int(time_dict['minutes'] or "0"),
                              hours=int(time_dict['hours'] or "0"))
         end = start + duration
-        if flag == 2:
-            start = {
-                "dateTime": start.strftime(EVENT_STRFTIME),
-            }
-            end = {
-                "dateTime": end.strftime(EVENT_STRFTIME),
-            }
-        else:
+        if flag == 0:
             start = {
                 "date": start.strftime(EVENT_STRFTIME_ALL_DAY),
             }
             end = {
                 "date": end.strftime(EVENT_STRFTIME_ALL_DAY),
+            }
+        else:
+            start = {
+                "dateTime": start.strftime(EVENT_STRFTIME),
+            }
+            end = {
+                "dateTime": end.strftime(EVENT_STRFTIME),
             }
         attendees = [{"email": attendee_email} for attendee_email in attendees_emails]
         event = {

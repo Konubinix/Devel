@@ -21,6 +21,8 @@ import konix_collections
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
+pp = pprint.PrettyPrinter(indent=4, width=200)
+
 import readline
 # handle the history
 histfile = os.environ.get("KONIX_GCAL_HISTORY",
@@ -260,7 +262,7 @@ class GCall(cmd.Cmd, object):
     def do_list_calendars(self, search_term=None):
         calendars = self.list_calendars(search_term)
         formatter = eval("lambda x:" + self.calendar_formatter)
-        pprint.pprint([formatter(calendar) for calendar in calendars])
+        pp.pprint([formatter(calendar) for calendar in calendars])
 
     def do__code(self, line=None):
         import readline, rlcompleter
@@ -272,7 +274,7 @@ class GCall(cmd.Cmd, object):
         if not self.calendars:
             print("Run list_calendars first")
             return
-        pprint.pprint(*[calendar for calendar in self.calendars if calendar.id == calendar_id])
+        pp.pprint(*[calendar for calendar in self.calendars if calendar.id == calendar_id])
 
     def complete_show_calendar(self, text, line, begidx, endidx):
         return [
@@ -288,7 +290,7 @@ class GCall(cmd.Cmd, object):
             print("Run list_calendars first")
             return
         keys = shlex.split(keys)
-        pprint.pprint(
+        pp.pprint(
             [
                 {
                     key:calendar.__getattribute__(key)
@@ -336,7 +338,7 @@ class GCall(cmd.Cmd, object):
             print("Run list_calendars first")
             return
         fil = eval("lambda x:" + line)
-        pprint.pprint(
+        pp.pprint(
             [
                 calendar
                 for calendar in self.calendars
@@ -427,7 +429,7 @@ class GCall(cmd.Cmd, object):
             return
         events = self.list_events(search_term)
         formatter = eval("lambda x:" + self.event_formatter)
-        pprint.pprint([formatter(event) for event in events])
+        pp.pprint([formatter(event) for event in events])
 
     @needs("access_token")
     def add_event(self, title, where, when, duration, description="", attendees_emails=None):
@@ -495,7 +497,7 @@ class GCall(cmd.Cmd, object):
         (title, where, when, duration, *description) = shlex.split(line)
         description = description[0] if description else ""
         event = self.add_event(title, where, when, duration, description)
-        pprint.pprint(event)
+        pp.pprint(event)
 
     def do_EOF(self, line):
         return True

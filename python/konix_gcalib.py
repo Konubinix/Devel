@@ -20,6 +20,7 @@ import konix_collections
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
+LOGGER = logging.getLogger(__file__)
 
 pp = pprint.PrettyPrinter(indent=4, width=200)
 
@@ -47,9 +48,9 @@ def lazy(expire_key):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if self.db.get(expire_key):
-                logging.debug("{} up to date".format(expire_key))
+                LOGGER.debug("{} up to date".format(expire_key))
             else:
-                logging.debug("{} out of date (reeval)".format(expire_key))
+                LOGGER.debug("{} out of date (reeval)".format(expire_key))
                 return func(self, *args, **kwargs)
         return wrapper
     return real_decorator
@@ -64,16 +65,16 @@ def needs(expire_key):
                     self.db.get(expire_key)
                     and expire_key in PROVIDERS_KEYS
             ):
-                logging.debug("Calling the provider of the needed key {}".format(expire_key))
+                LOGGER.debug("Calling the provider of the needed key {}".format(expire_key))
                 provider, interactive = PROVIDERS_KEYS[expire_key]
                 if interactive:
-                    logging.error("You must call {}".format(provider))
+                    LOGGER.error("You must call {}".format(provider))
                     return
                 provider(self)
             if self.db.get(expire_key):
                 return func(self, *args, **kwargs)
             else:
-                logging.error("{} is needed".format(expire_key))
+                LOGGER.error("{} is needed".format(expire_key))
         return wrapper
     return real_decorator
 
@@ -109,6 +110,24 @@ class GCall(cmd.Cmd, object):
             self.calendars = eval(calendars_string)
         else:
             self.calendars = []
+        self.updatable_data = [
+            "summary",
+            "start",
+            "end",
+            "status"
+        ]
+
+    def format(self, object_):
+        object_formatters = {
+            "Event": self.event_formatter,
+            "CalendarListEntry": self.calendar_formatter
+        }
+        formatter = object_formatters[object_.__class__.__name__]
+        formatter = eval("lambda x:" + formatter)
+        return formatter(object_)
+
+    def pprint(self, object_):
+        pp.pprint(self.format(object_))
 
     def setup_types(self):
         global Calendar, CalendarListEntry, Event
@@ -161,6 +180,9 @@ class GCall(cmd.Cmd, object):
     def do_clear_user_permission(self, line=None):
         self.db.delete("user_code")
         self.db.delete("device_code")
+
+    def do_clear_list_event(self, line=None):
+        self.db.delete("all_events")
 
     @needs("device_code")
     def get_access_token(self):
@@ -376,6 +398,24 @@ class GCall(cmd.Cmd, object):
                if cal.id == calendar_id
            ][0]))
 
+    @needs("calendar_id")
+    def get_event(self, event_id):
+        calendar_id = self.db.get("calendar_id")
+        req = urllib.request.Request(
+            url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
+                calendar_id,
+                event_id
+            ),
+            headers={"Content-Type": "application/json",
+                     "Authorization": "{} {}".format(
+                self.db.get("token_type"),
+                self.db.get("access_token"))}
+        )
+        f = urllib.request.urlopen(req)
+        assert f.code == 200
+        data = json.loads(f.read().decode("utf-8"))
+        return Event(**data)
+
     @provides("all_events")
     def list_all_events(self):
         calendar_id = self.db.get("calendar_id")
@@ -488,8 +528,66 @@ class GCall(cmd.Cmd, object):
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
-        event = self.make("Event", data)
+        event = Event(**data)
         return event
+
+    @needs("access_token")
+    @needs("calendar_id")
+    def update_event(self, event_id, new_summary):
+        calendar_id = self.db.get("calendar_id")
+        event = self.get_event(event_id)
+        dict_ = dict(event._asdict())
+        dict_ = {
+            k: dict_[k]
+            for k in dict_
+            if k in self.updatable_data
+        }
+        dict_["summary"] = new_summary
+        req = urllib.request.Request(
+            url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
+                calendar_id,
+                event_id
+            ),
+            data=json.dumps(
+                dict_
+            ).encode("utf-8"),
+            headers={"Content-Type": "application/json",
+                     "Authorization": "{} {}".format(
+                         self.db.get("token_type"),
+                         self.db.get("access_token"))},
+            method='PUT'
+        )
+        f = urllib.request.urlopen(req)
+        assert f.code == 200
+        data = json.loads(f.read().decode("utf-8"))
+        event = Event(**data)
+        return event
+
+    def do_update_event(self, line):
+        event_id, new_summary = shlex.split(line)
+        event = self.update_event(event_id, new_summary)
+        self.pprint(event)
+
+    def sed_events(self, search_terms, regexp, replace):
+        events = self.list_events(search_terms)
+        import ipdb
+        ipdb.set_trace()
+        new_events = []
+        for event in events:
+            new_summary = re.sub(regexp, replace, event.summary)
+            if new_summary != event.summary:
+                LOGGER.info("Replacing summary of event {} from '{}' to '{}'".format(
+                    event.id,
+                    event.summary,
+                    new_summary
+                ))
+                new_events.append(self.update_event(event.id, new_summary))
+        return new_events
+
+    def do_sed_events(self, line):
+        search_terms, regexp, replace = shlex.split(line)
+        events = self.sed_events(search_terms, regexp, replace)
+        pp.pprint([self.format(event) for event in events])
 
     @needs("access_token")
     def do_add_event(self, line):

@@ -407,6 +407,7 @@ class GCall(cmd.Cmd, object):
     @needs("access_token")
     def add_event(self, title, where, when, duration, description="", attendees_emails=None):
         calendar_id = self.db.get("calendar_id")
+        attendees_emails = attendees_emails or []
         if not calendar_id:
             print("Use the command select_calendar first")
             return
@@ -460,7 +461,7 @@ class GCall(cmd.Cmd, object):
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
-        event = self.Event(**self.get_defaultdict(self.event_keys, data))
+        event = self.make("Event", data)
         return event
 
     @needs("access_token")

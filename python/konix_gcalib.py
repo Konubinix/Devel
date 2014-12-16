@@ -115,17 +115,13 @@ class GCall(cmd.Cmd, object):
         self.calendar_filter = "lambda x: '{search_term}' in x['summary']"
         self.event_filter = "lambda x: 'summary' in x and '{search_term}' in x['summary']"
 
+    @provides("api")
     def get_api(self):
-        req = urllib.request.Request(
-            url='https://accounts.google.com/o/oauth2/token',
-            data='client_id={}&client_secret={}&code={}&grant_type=http://oauth.net/grant_type/device/1.0'.format(
-                self.client_id,
-                self.client_secret,
-                self.db.get("device_code"),
-            ).encode("utf-8"))
+        req = urllib.request.Request(url=DISCOVERY_URI)
         f = urllib.request.urlopen(req)
         assert f.code == 200
         self.api = json.loads(f.read().decode("utf-8"))
+        self.db.set("api", self.api)
 
     def set_prompt(self):
         self.prompt = PROMPT.format(self.db.get("calendar_id"))

@@ -123,7 +123,7 @@ class GCall(cmd.Cmd, object):
         f = urllib.request.urlopen(req)
         assert f.code == 200
         api = json.loads(f.read().decode("utf-8"))
-        self.db.set("api", self.api)
+        self.db.set("api", api)
 
     def set_prompt(self):
         self.prompt = PROMPT.format(self.db.get("calendar_id"))

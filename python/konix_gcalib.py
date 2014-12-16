@@ -32,22 +32,6 @@ import atexit
 atexit.register(readline.write_history_file, histfile)
 del histfile
 
-calendar_keys = [
-    'accessRole',
-    'backgroundColor',
-    'colorId',
-    'defaultReminders',
-    'etag',
-    'foregroundColor',
-    'id',
-    'kind',
-    'summary',
-    'timeZone',
-]
-Calendar = collections.namedtuple(
-    "Calendar",
-    calendar_keys
-)
 DISCOVERY_URI = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}/rest'.format(
                      api="calendar",
                      apiVersion="v3")
@@ -112,10 +96,32 @@ class GCall(cmd.Cmd, object):
             self.calendars = eval(calendars_string)
         else:
             self.calendars = []
-        self.calendar_filter = "'{search_term}' in x['summary']"
-        self.event_filter = "'summary' in x and '{search_term}' in x['summary']"
+        self.calendar_filter = "'{search_term}' in x.summary"
+        self.event_filter = "'{search_term}' in x.summary"
         self.calendar_formatter = "str([x.id, x.summary])"
-        self.event_formatter = "str([x['id'], x.get('summary', 'No summary...')])"
+        self.event_formatter = "str([x.id, x.summary])"
+        self.get_api()
+
+        self.calendar_keys = self.api["schemas"]["Calendar"]["properties"].keys()
+        self.Calendar = collections.namedtuple(
+            "Calendar",
+            self.calendar_keys
+        )
+        self.calendarListEntry_keys = self.api["schemas"]["CalendarListEntry"]["properties"].keys()
+        self.CalendarListEntry = collections.namedtuple(
+            "Calendar",
+            self.calendarListEntry_keys
+        )
+        self.event_keys = self.api["schemas"]["Event"]["properties"].keys()
+        self.Event = collections.namedtuple(
+            "Event",
+            self.event_keys
+        )
+
+    @property
+    @needs("api")
+    def api(self):
+        return eval(self.db.get("api"))
 
     @provides("api")
     def get_api(self):
@@ -210,6 +216,11 @@ class GCall(cmd.Cmd, object):
         self.db.set("device_code", data["device_code"])
         self.db.expire("device_code", int(data["expires_in"]))
 
+    def get_defaultdict(self, keys, dict_):
+        res = {k: "" for k in keys}
+        res.update(dict_)
+        return res
+
     @needs("access_token")
     def list_calendars(self, search_term):
         req = urllib.request.Request(
@@ -226,7 +237,10 @@ class GCall(cmd.Cmd, object):
         data = json.loads(f.read().decode("utf-8"))
 
         self.calendars = [
-            Calendar(*[item[key] for key in calendar_keys])
+            self.CalendarListEntry(
+                **self.get_defaultdict(
+                    self.calendarListEntry_keys,
+                    item))
             for item in data["items"]
             if not search_term or filter_(item)
         ]
@@ -358,20 +372,27 @@ class GCall(cmd.Cmd, object):
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))["items"]
+        events = [
+            self.Event(
+                **self.get_defaultdict(self.event_keys,
+                                       d)
+            )
+            for d in data
+            ]
         if search_term:
             filter_ = eval("lambda x: " + self.event_filter.format(search_term=search_term))
-            data = [d for d in data if filter_(d)]
+            events = [e for e in events if filter_(e)]
 
-        return data
+        return events
 
     @needs("access_token")
     def do_list_events(self, search_term):
-        data = self.list_events(search_term)
-        if data == None:
+        events = self.list_events(search_term)
+        if not events:
             print("Use the command select_calendar first")
         else:
             formatter = eval("lambda x:" + self.event_formatter)
-            pprint.pprint([formatter(event) for event in data])
+            pprint.pprint([formatter(event) for event in events])
 
     @needs("access_token")
     def add_event(self, title, where, when, duration, description="", attendees_emails=None):
@@ -429,15 +450,16 @@ class GCall(cmd.Cmd, object):
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
-        return data
+        event = self.Event(**self.get_defaultdict(self.event_keys, data))
+        return event
 
     @needs("access_token")
     def do_add_event(self, line):
         """title, where, when, duration, description (optional)"""
         (title, where, when, duration, *description) = shlex.split(line)
         description = description[0] if description else ""
-        data = self.add_event(title, where, when, duration, description)
-        pprint.pprint(data)
+        event = self.add_event(title, where, when, duration, description)
+        pprint.pprint(event)
 
     def do_EOF(self, line):
         return True

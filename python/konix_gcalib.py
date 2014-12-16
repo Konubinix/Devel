@@ -250,9 +250,12 @@ class GCall(cmd.Cmd, object):
         data = json.loads(f.read().decode("utf-8"))
 
         self.calendars = [
-            self.make("CalendarListEntry", item)
-            for item in data["items"]
-            if not search_term or filter_(item)
+            cal
+            for cal in [
+                    self.make("CalendarListEntry", item)
+                    for item in data["items"]
+            ]
+            if not search_term or filter_(cal)
         ]
         self.db.set("calendars", self.calendars)
         return self.calendars

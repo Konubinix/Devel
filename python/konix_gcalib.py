@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import cmd
@@ -92,31 +92,49 @@ class GCall(cmd.Cmd, object):
         assert self.client_secret, "redis-cli set client_secret <yoursecret> (https://console.developers.google.com/project/<yourapp>/apiui/credential)"
         self.set_prompt()
         calendars_string = self.db.get("calendars")
-        if calendars_string:
-            self.calendars = eval(calendars_string)
-        else:
-            self.calendars = []
         self.calendar_filter = "'{search_term}' in x.summary"
         self.event_filter = "'{search_term}' in x.summary"
         self.calendar_formatter = "str([x.id, x.summary])"
         self.event_formatter = "str([x.id, x.summary])"
         self.get_api()
+        self.setup_types()
+        if calendars_string:
+            self.calendars = eval(calendars_string)
+        else:
+            self.calendars = []
 
-        self.calendar_keys = self.api["schemas"]["Calendar"]["properties"].keys()
-        self.Calendar = collections.namedtuple(
-            "Calendar",
-            self.calendar_keys
+    def setup_types(self):
+        global Calendar, CalendarListEntry, Event
+        self.types = {
+            "CalendarListEntry" : {
+                "keys": self.api["schemas"]["CalendarListEntry"]["properties"].keys()
+            },
+            "Event" : {
+                "keys": self.api["schemas"]["Event"]["properties"].keys()
+            }
+        }
+        CalendarListEntry = collections.namedtuple(
+            "CalendarListEntry",
+            self.types["CalendarListEntry"]["keys"]
         )
-        self.calendarListEntry_keys = self.api["schemas"]["CalendarListEntry"]["properties"].keys()
-        self.CalendarListEntry = collections.namedtuple(
-            "Calendar",
-            self.calendarListEntry_keys
-        )
-        self.event_keys = self.api["schemas"]["Event"]["properties"].keys()
-        self.Event = collections.namedtuple(
+        Event = collections.namedtuple(
             "Event",
-            self.event_keys
+            self.types["Event"]["keys"]
         )
+        self.types["CalendarListEntry"]["class"] = CalendarListEntry
+        self.types["Event"]["class"] = Event
+
+    def get_defaultdict(self, keys, dict_):
+        res = {k: "" for k in keys}
+        res.update(dict_)
+        return res
+
+    def make(self, type_, kwargs):
+        return self.types[type_]["class"](
+            **self.get_defaultdict(
+                self.types[type_]["keys"],
+                kwargs
+            ))
 
     @property
     @needs("api")
@@ -216,11 +234,6 @@ class GCall(cmd.Cmd, object):
         self.db.set("device_code", data["device_code"])
         self.db.expire("device_code", int(data["expires_in"]))
 
-    def get_defaultdict(self, keys, dict_):
-        res = {k: "" for k in keys}
-        res.update(dict_)
-        return res
-
     @needs("access_token")
     def list_calendars(self, search_term):
         req = urllib.request.Request(
@@ -237,10 +250,7 @@ class GCall(cmd.Cmd, object):
         data = json.loads(f.read().decode("utf-8"))
 
         self.calendars = [
-            self.CalendarListEntry(
-                **self.get_defaultdict(
-                    self.calendarListEntry_keys,
-                    item))
+            self.make("CalendarListEntry", item)
             for item in data["items"]
             if not search_term or filter_(item)
         ]
@@ -373,10 +383,7 @@ class GCall(cmd.Cmd, object):
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))["items"]
         events = [
-            self.Event(
-                **self.get_defaultdict(self.event_keys,
-                                       d)
-            )
+            self.make("Event", d)
             for d in data
             ]
         if search_term:

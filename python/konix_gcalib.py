@@ -114,6 +114,8 @@ class GCall(cmd.Cmd, object):
             self.calendars = []
         self.calendar_filter = "'{search_term}' in x['summary']"
         self.event_filter = "'summary' in x and '{search_term}' in x['summary']"
+        self.calendar_formatter = "str([x.id, x.summary])"
+        self.event_formatter = "str([x['id'], x.get('summary', 'No summary...')])"
 
     @provides("api")
     def get_api(self):
@@ -228,7 +230,8 @@ class GCall(cmd.Cmd, object):
     @needs("access_token")
     def do_list_calendars(self, search_term):
         calendars = self.list_calendars(search_term)
-        pprint.pprint([calendar.id for calendar in calendars])
+        formatter = eval("lambda x:" + self.calendar_formatter)
+        pprint.pprint([formatter(calendar) for calendar in calendars])
 
     def do__code(self, line=None):
         import readline, rlcompleter
@@ -286,6 +289,18 @@ class GCall(cmd.Cmd, object):
             self.event_filter = line
         else:
             print(self.event_filter)
+
+    def do_calendar_formatter(self, line):
+        if line:
+            self.calendar_formatter = line
+        else:
+            print(self.calendar_formatter)
+
+    def do_event_formatter(self, line):
+        if line:
+            self.event_formatter = line
+        else:
+            print(self.event_formatter)
 
     def do_find_calendar(self, line):
         if not self.calendars:
@@ -349,7 +364,8 @@ class GCall(cmd.Cmd, object):
         if data == None:
             print("Use the command select_calendar first")
         else:
-            pprint.pprint(data)
+            formatter = eval("lambda x:" + self.event_formatter)
+            pprint.pprint([formatter(event) for event in data])
 
     @needs("access_token")
     def add_event(self, title, where, when, duration, description="", attendees_emails=None):

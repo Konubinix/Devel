@@ -134,10 +134,13 @@ class GCall(cmd.Cmd, object):
 
     def do_clear_token(self, line=None):
         self.db.delete("access_token")
+        self.db.delete("refresh_token")
 
     def do_clear_user_permission(self, line=None):
         self.db.delete("user_code")
+        self.db.delete("device_code")
 
+    @needs("device_code")
     def get_access_token(self):
         req = urllib.request.Request(
             url='https://accounts.google.com/o/oauth2/token',

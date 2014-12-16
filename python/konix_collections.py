@@ -12,7 +12,10 @@ def namedtuples_default_values(name, keys, default_values=None):
     res = type(
         name,
         (parent,),
-        {}
+        {
+            "__slots__": (),
+            "_fields": parent._fields,
+        }
     )
     def __new__(cls, **kwarg):
         attrs = {k: default_values.get(k, None) for k in keys}

@@ -122,7 +122,7 @@ class GCall(cmd.Cmd, object):
         req = urllib.request.Request(url=DISCOVERY_URI)
         f = urllib.request.urlopen(req)
         assert f.code == 200
-        self.api = json.loads(f.read().decode("utf-8"))
+        api = json.loads(f.read().decode("utf-8"))
         self.db.set("api", self.api)
 
     def set_prompt(self):
@@ -184,11 +184,14 @@ class GCall(cmd.Cmd, object):
 
     @lazy("device_code")
     @provides("device_code")
+    @needs("api")
     def do_get_user_permission(self, line=None):
+        api = eval(self.db.get("api"))
         req = urllib.request.Request(
             url='https://accounts.google.com/o/oauth2/device/code',
-            data='client_id={}&scope=https://www.googleapis.com/auth/calendar+https://www.googleapis.com/auth/calendar.readonly'.format(
+            data='client_id={}&scope={scopes}'.format(
                 self.client_id,
+                scopes="+".join(api["auth"]["oauth2"]["scopes"].keys())
             ).encode("utf-8"))
         f = urllib.request.urlopen(req)
         assert f.code == 200

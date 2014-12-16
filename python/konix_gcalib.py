@@ -16,6 +16,7 @@ import time
 import collections
 import pytz
 import parsedatetime
+import konix_collections
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -113,28 +114,19 @@ class GCall(cmd.Cmd, object):
                 "keys": self.api["schemas"]["Event"]["properties"].keys()
             }
         }
-        CalendarListEntry = collections.namedtuple(
+        CalendarListEntry = konix_collections.namedtuples_default_values(
             "CalendarListEntry",
-            self.types["CalendarListEntry"]["keys"]
+            self.types["CalendarListEntry"]["keys"],
+            {k: "" for k in self.types["CalendarListEntry"]["keys"]}
         )
-        Event = collections.namedtuple(
+
+        Event = konix_collections.namedtuples_default_values(
             "Event",
-            self.types["Event"]["keys"]
+            self.types["Event"]["keys"],
+            {k: "" for k in self.types["Event"]["keys"]}
         )
         self.types["CalendarListEntry"]["class"] = CalendarListEntry
         self.types["Event"]["class"] = Event
-
-    def get_defaultdict(self, keys, dict_):
-        res = {k: "" for k in keys}
-        res.update(dict_)
-        return res
-
-    def make(self, type_, kwargs):
-        return self.types[type_]["class"](
-            **self.get_defaultdict(
-                self.types[type_]["keys"],
-                kwargs
-            ))
 
     @property
     @needs("api")
@@ -252,7 +244,7 @@ class GCall(cmd.Cmd, object):
         self.calendars = [
             cal
             for cal in [
-                    self.make("CalendarListEntry", item)
+                    CalendarListEntry(**item)
                     for item in data["items"]
             ]
             if not search_term or filter_(cal)
@@ -386,7 +378,7 @@ class GCall(cmd.Cmd, object):
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))["items"]
         events = [
-            self.make("Event", d)
+            Event(**d)
             for d in data
             ]
         if search_term:

@@ -112,6 +112,8 @@ class GCall(cmd.Cmd, object):
             self.calendars = eval(calendars_string)
         else:
             self.calendars = []
+        self.calendar_filter = "lambda x: '{search_term}' in x['summary']"
+        self.event_filter = "lambda x: 'summary' in x and '{search_term}' in x['summary']"
 
     def get_api(self):
         req = urllib.request.Request(
@@ -205,24 +207,32 @@ class GCall(cmd.Cmd, object):
         self.db.expire("device_code", int(data["expires_in"]))
 
     @needs("access_token")
-    def do_list_calendars(self, refresh=None):
-        if refresh or not self.calendars:
-            req = urllib.request.Request(
-                url='https://www.googleapis.com/calendar/v3/users/me/calendarList',
-                headers={"Authorization": "{} {}".format(
-                    self.db.get("token_type"),
-                    self.db.get("access_token"))}
-            )
-            f = urllib.request.urlopen(req)
+    def list_calendars(self, search_term):
+        req = urllib.request.Request(
+            url='https://www.googleapis.com/calendar/v3/users/me/calendarList',
+            headers={"Authorization": "{} {}".format(
+                self.db.get("token_type"),
+                self.db.get("access_token"))}
+        )
+        f = urllib.request.urlopen(req)
+        if search_term:
+            filter_ = eval(self.calendar_filter.format(search_term=search_term))
 
-            assert f.code == 200
-            data = json.loads(f.read().decode("utf-8"))
-            self.calendars = [
-                Calendar(*[item[key] for key in calendar_keys])
-                for item in data["items"]
-            ]
-            self.db.set("calendars", self.calendars)
-        pprint.pprint([calendar.id for calendar in self.calendars])
+        assert f.code == 200
+        data = json.loads(f.read().decode("utf-8"))
+
+        self.calendars = [
+            Calendar(*[item[key] for key in calendar_keys])
+            for item in data["items"]
+            if not search_term or filter_(item)
+        ]
+        self.db.set("calendars", self.calendars)
+        return self.calendars
+
+    @needs("access_token")
+    def do_list_calendars(self, search_term):
+        calendars = self.list_calendars(search_term)
+        pprint.pprint([calendar.id for calendar in calendars])
 
     def do__code(self, line=None):
         import readline, rlcompleter
@@ -269,6 +279,18 @@ class GCall(cmd.Cmd, object):
                 if calendar.id == id_
         ][0]
 
+    def do_calendar_filter(self, line):
+        if line:
+            self.calendar_filter = line
+        else:
+            print(self.calendar_filter)
+
+    def do_event_filter(self, line):
+        if line:
+            self.event_filter = line
+        else:
+            print(self.event_filter)
+
     def do_find_calendar(self, line):
         if not self.calendars:
             print("Run list_calendars first")
@@ -303,7 +325,7 @@ class GCall(cmd.Cmd, object):
         ]
 
     @needs("access_token")
-    def list_events(self, filter_=None):
+    def list_events(self, search_term):
         calendar_id = self.db.get("calendar_id")
         if not calendar_id:
             return None
@@ -319,16 +341,15 @@ class GCall(cmd.Cmd, object):
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))["items"]
-        if filter_:
-            data = [d for d in data if "summary" in d and filter_(d)]
+        if search_term:
+            filter_ = eval(self.event_filter.format(search_term=search_term))
+            data = [d for d in data if filter_(d)]
 
         return data
 
     @needs("access_token")
-    def do_list_events(self, line):
-        if line:
-            line = eval("lambda x:{}".format(line))
-        data = self.list_events(line)
+    def do_list_events(self, search_term):
+        data = self.list_events(search_term)
         if data == None:
             print("Use the command select_calendar first")
         else:

@@ -92,8 +92,8 @@ class GCall(cmd.Cmd, object):
         assert self.client_secret, "redis-cli set client_secret <yoursecret> (https://console.developers.google.com/project/<yourapp>/apiui/credential)"
         self.set_prompt()
         calendars_string = self.db.get("calendars")
-        self.calendar_filter = "'{search_term}' in x.summary"
-        self.event_filter = "'{search_term}' in x.summary"
+        self.calendar_filter = "'{search_term}'.lower() in x.summary.lower()"
+        self.event_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.calendar_formatter = "str([x.id, x.summary])"
         self.event_formatter = "str([x.id, x.summary])"
         self.get_api()

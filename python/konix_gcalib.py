@@ -394,12 +394,12 @@ class GCall(cmd.Cmd, object):
 
     @needs("access_token")
     def do_list_events(self, search_term):
-        events = self.list_events(search_term)
-        if not events:
+        if not self.db.get("calendar_id"):
             print("Use the command select_calendar first")
-        else:
-            formatter = eval("lambda x:" + self.event_formatter)
-            pprint.pprint([formatter(event) for event in events])
+            return
+        events = self.list_events(search_term)
+        formatter = eval("lambda x:" + self.event_formatter)
+        pprint.pprint([formatter(event) for event in events])
 
     @needs("access_token")
     def add_event(self, title, where, when, duration, description="", attendees_emails=None):

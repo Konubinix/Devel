@@ -380,7 +380,7 @@ class GCall(cmd.Cmd, object):
         if not calendar_id:
             return None
         req = urllib.request.Request(
-            url='https://www.googleapis.com/calendar/v3/calendars/{}/events'.format(
+            url='https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=100000'.format(
                 calendar_id
             ),
             headers={"Content-Type": "application/json",

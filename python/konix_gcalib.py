@@ -364,7 +364,7 @@ class GCall(cmd.Cmd, object):
 
     def complete_select_calendar(self, text, line, begidx, endidx):
         return [
-            calendar.summary for calendar in self.calendars
+            calendar.id for calendar in self.calendars
             if calendar.id.startswith(text)
         ]
 

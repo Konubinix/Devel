@@ -452,7 +452,7 @@ class GCall(cmd.Cmd, object):
     @needs("access_token")
     @needs("all_events")
     @needs("calendar_id")
-    def list_events(self, search_terms=None):
+    def list_events(self, search_terms=""):
         events = eval(self.db.get("all_events"))
         search_terms = shlex.split(search_terms)
 
@@ -570,8 +570,6 @@ class GCall(cmd.Cmd, object):
 
     def sed_events(self, search_terms, regexp, replace):
         events = self.list_events(search_terms)
-        import ipdb
-        ipdb.set_trace()
         new_events = []
         for event in events:
             new_summary = re.sub(regexp, replace, event.summary)

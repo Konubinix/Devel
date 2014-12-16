@@ -374,27 +374,44 @@ class GCall(cmd.Cmd, object):
                if cal.id == calendar_id
            ][0]))
 
-    @needs("access_token")
-    def list_events(self, search_term=None):
+    @provides("all_events")
+    def list_all_events(self):
         calendar_id = self.db.get("calendar_id")
         if not calendar_id:
             return None
-        req = urllib.request.Request(
-            url='https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=100000'.format(
+        def get_events(page_token=None):
+            url='https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=2500'.format(
                 calendar_id
-            ),
-            headers={"Content-Type": "application/json",
-                     "Authorization": "{} {}".format(
-                self.db.get("token_type"),
-                self.db.get("access_token"))}
-        )
-        f = urllib.request.urlopen(req)
-        assert f.code == 200
-        data = json.loads(f.read().decode("utf-8"))["items"]
+            )
+            if page_token:
+                url += "&pageToken={}".format(page_token)
+            req = urllib.request.Request(
+                url=url,
+                headers={"Content-Type": "application/json",
+                         "Authorization": "{} {}".format(
+                             self.db.get("token_type"),
+                             self.db.get("access_token"))}
+            )
+            f = urllib.request.urlopen(req)
+            assert f.code == 200
+            data = json.loads(f.read().decode("utf-8"))
+            return data
+        data = get_events()
+        items = data["items"]
+        while data.get("nextPageToken", None):
+            data = get_events(page_token=data.get("nextPageToken", None))
+            items += data["items"]
         events = [
-            Event(**d)
-            for d in data
+            Event(**i)
+            for i in items
             ]
+        self.db.set("all_events", events)
+
+    @needs("access_token")
+    @needs("all_events")
+    @needs("calendar_id")
+    def list_events(self, search_term=None):
+        events = eval(self.db.get("all_events"))
         if search_term:
             filter_ = eval("lambda x: " + self.event_filter.format(search_term=search_term))
             events = [e for e in events if filter_(e)]

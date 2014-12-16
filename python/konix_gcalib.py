@@ -227,7 +227,7 @@ class GCall(cmd.Cmd, object):
         self.db.expire("device_code", int(data["expires_in"]))
 
     @needs("access_token")
-    def list_calendars(self, search_term):
+    def list_calendars(self, search_term=None):
         req = urllib.request.Request(
             url='https://www.googleapis.com/calendar/v3/users/me/calendarList',
             headers={"Authorization": "{} {}".format(
@@ -253,7 +253,7 @@ class GCall(cmd.Cmd, object):
         return self.calendars
 
     @needs("access_token")
-    def do_list_calendars(self, search_term):
+    def do_list_calendars(self, search_term=None):
         calendars = self.list_calendars(search_term)
         formatter = eval("lambda x:" + self.calendar_formatter)
         pprint.pprint([formatter(calendar) for calendar in calendars])
@@ -361,7 +361,7 @@ class GCall(cmd.Cmd, object):
         ]
 
     @needs("access_token")
-    def list_events(self, search_term):
+    def list_events(self, search_term=None):
         calendar_id = self.db.get("calendar_id")
         if not calendar_id:
             return None
@@ -388,7 +388,7 @@ class GCall(cmd.Cmd, object):
         return events
 
     @needs("access_token")
-    def do_list_events(self, search_term):
+    def do_list_events(self, search_term=None):
         if not self.db.get("calendar_id"):
             print("Use the command select_calendar first")
             return

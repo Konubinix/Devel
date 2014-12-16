@@ -63,7 +63,11 @@ def needs(expire_key):
                     and expire_key in PROVIDERS_KEYS
             ):
                 logging.debug("Calling the provider of the needed key {}".format(expire_key))
-                PROVIDERS_KEYS[expire_key](self)
+                provider, interactive = PROVIDERS_KEYS[expire_key]
+                if interactive:
+                    logging.error("You must call {}".format(provider))
+                    return
+                provider(self)
             if self.db.get(expire_key):
                 return func(self, *args, **kwargs)
             else:
@@ -71,13 +75,13 @@ def needs(expire_key):
         return wrapper
     return real_decorator
 
-def provides(key):
+def provides(key, interactive=False):
     def real_decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             return func(self, *args, **kwargs)
         global PROVIDERS_KEYS
-        PROVIDERS_KEYS[key] = wrapper
+        PROVIDERS_KEYS[key] = (wrapper, interactive,)
         return wrapper
     return real_decorator
 
@@ -347,6 +351,7 @@ class GCall(cmd.Cmd, object):
     def help_find_calendar(self):
         print("{}".format(calendar_keys))
 
+    @provides("calendar_id", True)
     def do_select_calendar(self, calendar_id):
         if calendar_id:
             self.db.set("calendar_id", calendar_id)

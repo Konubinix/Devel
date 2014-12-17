@@ -88,7 +88,7 @@ def provides(key, interactive=False):
         return wrapper
     return real_decorator
 
-PROMPT="GCal({})> "
+PROMPT="GCal({calendar_id}, {extra_query})\n> "
 
 class GCall(cmd.Cmd, object):
     def __init__(self):
@@ -167,7 +167,10 @@ class GCall(cmd.Cmd, object):
         self.db.set("api", api)
 
     def set_prompt(self):
-        self.prompt = PROMPT.format(self.db.get("calendar_id"))
+        self.prompt = PROMPT.format(
+            calendar_id=self.db.get("calendar_id"),
+            extra_query=self.db.get("event_list_extra_query")
+        )
 
     def do_init(self, line=None):
         self.do_get_user_permission()
@@ -343,6 +346,22 @@ class GCall(cmd.Cmd, object):
         else:
             print(self.event_filter)
 
+    def do_event_list_extra_query(self, line):
+        """Try: &timeMin=2014-11-30T00:00:00Z&timeMax=2014-12-30T00:00:00Z"""
+        if line:
+            self.db.set("event_list_extra_query", line)
+            print("Clearing the list of events")
+            self.do_clear_list_event()
+        else:
+            print(self.db.get("event_list_extra_query"))
+        self.set_prompt()
+
+    def do_del_event_list_extra_query(self, line):
+        self.db.delete("event_list_extra_query")
+        print("Clearing the list of events")
+        self.do_clear_list_event()
+        self.set_prompt()
+
     def do_calendar_formatter(self, line):
         if line:
             self.calendar_formatter = line
@@ -427,6 +446,8 @@ class GCall(cmd.Cmd, object):
             )
             if page_token:
                 url += "&pageToken={}".format(page_token)
+            if self.db.get("event_list_extra_query"):
+                url += self.db.get("event_list_extra_query")
             req = urllib.request.Request(
                 url=url,
                 headers={"Content-Type": "application/json",

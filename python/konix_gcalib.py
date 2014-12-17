@@ -587,7 +587,7 @@ class GCall(cmd.Cmd, object):
     def do_update_event(self, line):
         event_id, new_summary = shlex.split(line)
         event = self.update_event(event_id, new_summary)
-        self.pprint(event)
+        print(event)
 
     def sed_events(self, search_terms, regexp, replace):
         events = self.list_events(search_terms)
@@ -614,7 +614,7 @@ class GCall(cmd.Cmd, object):
         (title, where, when, duration, *description) = shlex.split(line)
         description = description[0] if description else ""
         event = self.add_event(title, where, when, duration, description)
-        pp.pprint(event)
+        print(event)
 
     def do_EOF(self, line):
         return True

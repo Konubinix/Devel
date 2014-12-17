@@ -22,4 +22,14 @@ def namedtuples_default_values(name, keys, default_values=None):
         attrs.update(kwarg)
         return parent.__new__(cls, **attrs)
     setattr(res, "__new__", __new__)
+    def __str__(self):
+        return self.__class__.__name__ \
+            + '(\n{})'.format(
+                ',\n'.join(
+                    "\t{name}={value}".format(
+                        name=name,
+                        value=getattr(self, name),
+                    )
+                    for name in keys))
+    res.__str__ = __str__
     return res

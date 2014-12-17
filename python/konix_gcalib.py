@@ -37,13 +37,16 @@ import atexit
 atexit.register(readline.write_history_file, histfile)
 del histfile
 
+readline.set_completer_delims(
+    readline.get_completer_delims().replace("/", "").replace("-", "")
+)
+
 DISCOVERY_URI = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}/rest'.format(
                      api="calendar",
                      apiVersion="v3")
 
 EVENT_STRFTIME="%Y-%m-%dT%H:%M:%S.000%z"
 EVENT_STRFTIME_ALL_DAY="%Y-%m-%d"
-DATETIME_STRPTIME =""
 
 def lazy(expire_key):
     def real_decorator(func):
@@ -154,8 +157,16 @@ class GCall(cmd.Cmd, object):
         )
         @property
         def duration(self):
-            start = dateutil.parser.parse(self.start["dateTime"])
-            end = dateutil.parser.parse(self.end["dateTime"])
+            start = dateutil.parser.parse(
+                self.start.get("dateTime")
+                or
+                self.start["date"]
+            )
+            end = dateutil.parser.parse(
+                self.end.get("dateTime")
+                or
+                self.end["date"]
+            )
             return end-start
         Event.duration = duration
 
@@ -184,6 +195,9 @@ class GCall(cmd.Cmd, object):
     def do_init(self, line=None):
         self.do_get_user_permission()
         self.do_get_access_token()
+
+    def do_show_event(self, event_id):
+        print(self.get_event(event_id))
 
     def do_clear_token(self, line=None):
         self.db.delete("access_token")
@@ -407,6 +421,7 @@ class GCall(cmd.Cmd, object):
     def do_select_calendar(self, calendar_id):
         if calendar_id:
             self.db.set("calendar_id", calendar_id)
+            self.db.delete("all_events")
         else:
             self.db.delete("calendar_id")
         self.set_prompt()
@@ -450,7 +465,7 @@ class GCall(cmd.Cmd, object):
         if not calendar_id:
             return None
         def get_events(page_token=None):
-            url='https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=2500'.format(
+            url='https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=2500&singleEvents=True'.format(
                 calendar_id
             )
             if page_token:

@@ -16,6 +16,7 @@ import time
 import collections
 import pytz
 import parsedatetime
+import dateutil.parser
 import konix_collections
 
 import logging
@@ -42,6 +43,7 @@ DISCOVERY_URI = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}
 
 EVENT_STRFTIME="%Y-%m-%dT%H:%M:%S.000%z"
 EVENT_STRFTIME_ALL_DAY="%Y-%m-%d"
+DATETIME_STRPTIME =""
 
 def lazy(expire_key):
     def real_decorator(func):
@@ -103,7 +105,7 @@ class GCall(cmd.Cmd, object):
         self.calendar_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.event_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.calendar_formatter = "str([x.id, x.summary])"
-        self.event_formatter = "str([x.id, x.summary])"
+        self.event_formatter = r'"{}, {}, {}".format(str(x.duration), x.summary, x.id,)'
         self.get_api()
         self.setup_types()
         if calendars_string:
@@ -150,6 +152,13 @@ class GCall(cmd.Cmd, object):
             self.types["Event"]["keys"],
             {k: "" for k in self.types["Event"]["keys"]}
         )
+        @property
+        def duration(self):
+            start = dateutil.parser.parse(self.start["dateTime"])
+            end = dateutil.parser.parse(self.end["dateTime"])
+            return end-start
+        Event.duration = duration
+
         self.types["CalendarListEntry"]["class"] = CalendarListEntry
         self.types["Event"]["class"] = Event
 

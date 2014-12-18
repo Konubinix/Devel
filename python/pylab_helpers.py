@@ -28,3 +28,18 @@ def scatter_plots(inputs, names=None, title=None, nrows=4):
     a.scatter(inputs[:, i], inputs[:, j])
     a.set_title("{} vs {}".format(names and names[i] or i,
                                   names and names[j] or j))
+
+def plot_all(inputs, names=None, title=None, nrows=4):
+  """inputs: lines of vectors"""
+  len_of_input = len(inputs[0])
+  assert names is None or len_of_input == len(names), (
+      "The names and the inputs must have the same length"
+  )
+
+  ncols = len_of_input / nrows
+  f, sp = subplots(nrows, ncols)
+  if title:
+      f.suptitle(title)
+  for figure, name in zip(sp.flat, inputs.dtype.names):
+      figure.plot(inputs[name])
+      figure.set_title(name)

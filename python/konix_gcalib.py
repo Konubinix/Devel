@@ -454,6 +454,7 @@ class GCall(cmd.Cmd, object):
            ][0]))
 
     @needs("calendar_id")
+    @needs("access_token")
     def get_event(self, event_id):
         calendar_id = self.db.get("calendar_id")
         req = urllib.request.Request(
@@ -470,6 +471,27 @@ class GCall(cmd.Cmd, object):
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
         return Event(**data)
+
+    @needs("access_token")
+    def del_event(self, event_id):
+        calendar_id = self.db.get("calendar_id")
+        req = urllib.request.Request(
+            url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
+                calendar_id,
+                event_id
+            ),
+            headers={"Content-Type": "application/json",
+                     "Authorization": "{} {}".format(
+                         self.db.get("token_type"),
+                         self.db.get("access_token"))},
+            method="DELETE"
+        )
+        f = urllib.request.urlopen(req)
+        assert f.code == 200
+        self.db.delete("all_events")
+
+    def do_del_event(self, event_id):
+        self.del_event(event_id)
 
     @provides("all_events")
     def list_all_events(self):

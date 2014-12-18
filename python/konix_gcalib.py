@@ -104,23 +104,29 @@ class GCall(cmd.Cmd, object):
         assert self.client_id, "redis-cli set client_id <yourid> (https://console.developers.google.com/project/<yourapp>/apiui/credential)"
         assert self.client_secret, "redis-cli set client_secret <yoursecret> (https://console.developers.google.com/project/<yourapp>/apiui/credential)"
         self.set_prompt()
-        calendars_string = self.db.get("calendars")
         self.calendar_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.event_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.calendar_formatter = "str([x.id, x.summary])"
         self.event_formatter = r'"{}, {}, {}".format(str(x.duration), x.summary, x.id,)'
         self.get_api()
         self.setup_types()
-        if calendars_string:
-            self.calendars = eval(calendars_string)
-        else:
-            self.calendars = []
         self.updatable_data = [
             "summary",
             "start",
             "end",
             "status"
         ]
+
+    @property
+    @needs("calendars")
+    def calendars(self):
+        calendars_string = self.db.get("calendars")
+        if calendars_string:
+            calendars = eval(calendars_string)
+        else:
+            calendars = []
+        return calendars
+
 
     def format(self, object_):
         object_formatters = {
@@ -280,8 +286,8 @@ class GCall(cmd.Cmd, object):
         self.db.set("device_code", data["device_code"])
         self.db.expire("device_code", int(data["expires_in"]))
 
-    @needs("access_token")
-    def list_calendars(self, search_term=None):
+    @provides("calendars")
+    def all_calendars(self):
         req = urllib.request.Request(
             url='https://www.googleapis.com/calendar/v3/users/me/calendarList',
             headers={"Authorization": "{} {}".format(
@@ -289,34 +295,31 @@ class GCall(cmd.Cmd, object):
                 self.db.get("access_token"))}
         )
         f = urllib.request.urlopen(req)
-        if search_term:
-            filter_ = eval("lambda x:" + self.calendar_filter.format(search_term=search_term))
-
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
+        calendars = [
+            CalendarListEntry(**item)
+            for item in data["items"]
+        ]
+        self.db.set("calendars", calendars)
+        return calendars
 
-        self.calendars = [
+    @needs("access_token")
+    def list_calendars(self, search_term=None):
+        if search_term:
+            filter_ = eval("lambda x:" + self.calendar_filter.format(search_term=search_term))
+        calendars = [
             cal
-            for cal in [
-                    CalendarListEntry(**item)
-                    for item in data["items"]
-            ]
+            for cal in self.all_calendars()
             if not search_term or filter_(cal)
         ]
-        self.db.set("calendars", self.calendars)
-        return self.calendars
+        return calendars
 
     @needs("access_token")
     def do_list_calendars(self, search_term=None):
         calendars = self.list_calendars(search_term)
         formatter = eval("lambda x:" + self.calendar_formatter)
         pp.pprint([formatter(calendar) for calendar in calendars])
-
-    def do__code(self, line=None):
-        import readline, rlcompleter
-        readline.parse_and_bind("tab: complete")
-        import code
-        code.interact(local=locals())
 
     def do_show_calendar(self, calendar_id):
         if not self.calendars:

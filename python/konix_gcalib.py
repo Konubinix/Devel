@@ -107,7 +107,7 @@ class GCall(cmd.Cmd, object):
         self.calendar_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.event_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.calendar_formatter = "str([x.id, x.summary])"
-        self.event_formatter = r'"{}, {}, {}".format(str(x.duration), x.summary, x.id,)'
+        self.event_formatter = r'"{} - {}, {}, {}".format(x.startdate.strftime("%d/%m %H:%M"), str(x.duration), x.summary, x.id,)'
         self.get_api()
         self.setup_types()
         self.updatable_data = [
@@ -161,19 +161,28 @@ class GCall(cmd.Cmd, object):
             self.types["Event"]["keys"],
             {k: "" for k in self.types["Event"]["keys"]}
         )
+
         @property
-        def duration(self):
-            start = dateutil.parser.parse(
+        def startdate(self):
+            return dateutil.parser.parse(
                 self.start.get("dateTime")
                 or
                 self.start["date"]
             )
-            end = dateutil.parser.parse(
+
+        @property
+        def enddate(self):
+            return dateutil.parser.parse(
                 self.end.get("dateTime")
                 or
                 self.end["date"]
             )
-            return end-start
+
+        @property
+        def duration(self):
+            return self.enddate-self.startdate
+        Event.startdate = startdate
+        Event.enddate = enddate
         Event.duration = duration
 
         self.types["CalendarListEntry"]["class"] = CalendarListEntry

@@ -141,6 +141,7 @@ cursor stays in the org buffer."
 (setq-default org-file-apps
 			  '(
 				(".org" . emacs)
+				(".py" . emacs)
 				(".*" . "mimeopen %s")
 				(auto-mode . emacs)
 				)

@@ -20,7 +20,7 @@ def scatter_plots(inputs, names=None, title=None, nrows=4):
         range(len_of_input))
     if i < j]
 
-  ncols = len(ij) / nrows
+  ncols = len(ij) / nrows + 1
   f, sp = subplots(nrows, ncols)
   if title:
     f.suptitle(title)
@@ -36,7 +36,7 @@ def plot_all(inputs, names=None, title=None, nrows=4):
       "The names and the inputs must have the same length"
   )
 
-  ncols = len_of_input / nrows
+  ncols = len_of_input / nrows + 1
   f, sp = subplots(nrows, ncols)
   if title:
       f.suptitle(title)

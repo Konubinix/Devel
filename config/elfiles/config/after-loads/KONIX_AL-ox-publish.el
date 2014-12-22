@@ -93,9 +93,10 @@
  'org-publish-project-alist
  "public_data"
  :base-directory (expand-file-name "wiki/public/data" perso-dir)
- :base-extension ".*"
+ :base-extension 'any
+ :recursive t
  :publishing-directory "~/public_html/data"
- :completion-function 'konix/org-publish-send-server
+ :publishing-function 'org-publish-attachment
  )
 
 (provide 'KONIX_AL-org-publish)

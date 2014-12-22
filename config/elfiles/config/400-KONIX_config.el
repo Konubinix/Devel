@@ -476,56 +476,8 @@
 (setq-default calendar-view-diary-initially-flag t)
 
 ;; Pour avoir le calendar en français
-(setq-default calendar-date-style 'european)
+(setq-default calendar-date-style 'iso)
 (setq-default calendar-week-start-day 1)
-
-(defvar konix/calendar-names-saved nil "")
-
-(defvar calendar-day-name-array-french
-  ["dimanche" "lundi" "mardi" "mercredi" "jeudi" "vendredi" "samedi"] "")
-(defvar calendar-day-abbrev-array-french
-  ["dim" "lun" "mar" "mer" "jeu" "ven" "sam"] "")
-(defvar calendar-month-name-array-french
-  ["janvier" "fevrier" "mars" "avril" "mai" "juin"
-   "juillet" "aout" "septembre" "octobre" "novembre" "decembre"] "")
-(defvar calendar-month-abbrev-array-french
-  ["jan" "fev" "mar" "avr" "mai" "jun"
-   "jul" "aou" "sep" "oct" "nov" "dec"] "")
-
-(defun konix/calendar-save-names ()
-  (and konix/calendar-names-saved
-	   (error "Calendar names are already saved")
-	   )
-  (require 'calendar)
-  (setq-default konix/calendar-names-saved t)
-  (setq-default calendar-day-name-array-save calendar-day-name-array)
-  (setq-default calendar-day-abbrev-array-save calendar-day-abbrev-array)
-  (setq-default calendar-month-name-array-save calendar-month-name-array)
-  (setq-default calendar-month-abbrev-array-save calendar-month-abbrev-array)
-  )
-
-(defun konix/calendar-restore-names ()
-  (interactive)
-  (and (not konix/calendar-names-saved)
-	   (error "Calendar names have not been saved yet")
-	   )
-  (setq-default konix/calendar-names-saved nil)
-  (setq-default calendar-day-name-array calendar-day-name-array-save)
-  (setq-default calendar-day-abbrev-array calendar-day-abbrev-array-save)
-  (setq-default calendar-month-name-array calendar-month-name-array-save)
-  (setq-default calendar-month-abbrev-array calendar-month-abbrev-array-save)
-  )
-
-(defun konix/calendar-to-french ()
-  (interactive)
-  (konix/calendar-save-names)
-  (setq-default calendar-day-name-array calendar-day-name-array-french)
-  (setq-default calendar-day-abbrev-array calendar-day-abbrev-array-french)
-  (setq-default calendar-month-name-array calendar-month-name-array-french)
-  (setq-default calendar-month-abbrev-array calendar-month-abbrev-array-french)
-  )
-
-;;(konix/calendar-to-french)
 
 ;; ************************************************************
 ;; Grep

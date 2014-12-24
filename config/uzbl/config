@@ -22,7 +22,7 @@ set default_encoding utf-8
 @ignore_key <Mod5>
 @ebind <Mod1>p = request HISTORY_PREV
 @ebind <Mod1>n = request HISTORY_NEXT
-@cbind zz = exit
+@cbind zz = chain 'spawn_sync @scripts_dir/save_page_to_undolist.sh' 'exit'
 @cbind <Ctrl>i = inspector show
 @cbind <Up>          = scroll vertical -20
 @cbind <Down>        = scroll vertical 20

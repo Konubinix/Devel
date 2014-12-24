@@ -521,53 +521,6 @@
 (add-to-list 'auto-coding-alist (cons "\\.\\sh" 'unix))
 
 ;; ************************************************************
-;; Holidays
-;; ************************************************************
-(setq-default holiday-general-holidays nil)
-(setq-default holiday-christian-holidays nil)
-(setq-default holiday-hebrew-holidays nil)
-(setq-default holiday-islamic-holidays nil)
-(setq-default holiday-bahai-holidays nil)
-(setq-default holiday-oriental-holidays nil)
-(setq-default holiday-solar-holidays nil)
-(setq-default calendar-holidays nil)
-
-(setq-default holiday-other-holidays nil)
-
-(setq-default holiday-local-holidays
-			  '(
-				(holiday-fixed 1 1 "Jour de l'an")
-				(holiday-easter-etc -14 "Passion Sunday")
-				(holiday-easter-etc 0 "Easter Sunday")
-				(holiday-easter-etc 39 "Ascension")
-				(holiday-easter-etc 50 "Whitmonday")
-				(holiday-fixed 5 1 "Fête du travail")
-				(holiday-fixed 5 8 "Armistice 1945")
-				(holiday-fixed 7 14 "Fête Nationale")
-				(holiday-fixed 8 15 "Fête Assomption")
-				(holiday-fixed 11 1 "Toussaint")
-				(holiday-fixed 11 11 "Armistice 1918")
-				(holiday-fixed 12 25 "Noël")
-				)
-			  )
-
-(setq calendar-holidays
-	  (append
-	   holiday-general-holidays
-	   holiday-christian-holidays
-	   holiday-hebrew-holidays
-	   holiday-islamic-holidays
-	   holiday-bahai-holidays
-	   holiday-oriental-holidays
-	   holiday-solar-holidays
-	   holiday-other-holidays
-	   holiday-local-holidays
-	   )
-	  )
-
-(setq-default calendar-mark-holidays-flag t)
-
-;; ************************************************************
 ;; workgroups
 ;; ************************************************************
 (setq wg-prefix-key (kbd "C-c C-w"))

@@ -21,8 +21,8 @@ $UZBL_EDITOR $tmp_file
 if [ "$value" != "$(< $tmp_file)" ]
     then
     # in case that actelem.type has changed, we do this test
-    echo "js konix_edited_elem.value = Base64.decode('`base64 $tmp_file | tr -d '\n'`');" > "$UZBL_FIFO"
-    echo 'js \$(konix_edited_elem).css("background-color", konix_edited_elem_old_background_color);' > "$UZBL_FIFO"
+    echo "js page string \"konix_edited_elem.value = Base64.decode('`base64 $tmp_file | tr -d '\n'`');\"" > "$UZBL_FIFO"
+    echo 'js page string "konix_edited_elem.style.backgroundColor = konix_edited_elem_old_background_color;"' > "$UZBL_FIFO"
 fi
 
 rm -rf $tmp_file

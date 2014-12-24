@@ -65,14 +65,14 @@ def tryNetrc(authInfo, authHost, authRealm):
 
 if __name__ == '__main__':
     fifo = open(os.environ.get('UZBL_FIFO'), 'w')
-    me, info, host, realm = sys.argv
-    rv, output = tryNetrc(info, host, realm)
+    me, host, realm, retry, scheme, proxy, port, save = sys.argv
+    rv, output = tryNetrc(me, host, realm)
     if (rv != gtk.RESPONSE_OK):
-        rv, output = getText(info, host, realm)
+        rv, output = getText(me, host, realm)
 
     if (rv == gtk.RESPONSE_OK):
-        print >> fifo, 'auth "%s" "%s" "%s"' % (
-            info, output['username'], output['password']
-        )
+        print """AUTH
+{}
+{}""".format(output['username'], output['password'])
     else:
         exit(1)

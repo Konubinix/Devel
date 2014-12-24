@@ -1,348 +1,43 @@
-# Example uzbl config. All settings are optional. You can use uzbl without
-# any config at all (but it won't do much).
+# Load the default uzbl config
+include @(echo $KONIX_DEVEL_DIR/uzbl/install/share/uzbl/examples/config/config)@
 
-# === Core settings ==========================================================
-
-# common directory locations
-set prefix      = @(echo $PREFIX)@
-set data_home   = @(echo $XDG_DATA_HOME)@
-set cache_home  = @(echo $XDG_CACHE_HOME)@
-set config_home = @(echo $XDG_CONFIG_HOME)@
-set perso_dir   = @(echo $KONIX_PERSO_DIR)@
-set devel_dir   = @(echo $KONIX_DEVEL_DIR)@
-set share_dir   = @(echo $KONIX_SHARE_DIR)@
-
-# Interface paths.
-set fifo_dir   = /tmp
-set socket_dir = /tmp
-
-set shell_cmd       = sh -c
-set proxy_url = @(echo $http_proxy)@
-
-# === General config aliases =================================================
-
-# Config related events (use the request function):
-# request MODE_CONFIG <mode> <key> = <value>
-set mode_config     = request MODE_CONFIG
-# request ON_EVENT <EVENT_NAME> <command>
-set on_event        = request ON_EVENT
-# request ON_SET   <key/glob> <command>
-set on_set          = request ON_SET
-# request MODMAP <From> <To>
-set modmap          = request MODMAP
-# request IGNORE_KEY <glob>
-set ignore_key      = request IGNORE_KEY
-# request TOGGLE_MODES <mode1> <mode2> ... <moden>
-set toggle_modes    = request TOGGLE_MODES
-
-set set_mode        = set mode =
-set set_status      = set status_message =
-
-# Spawn path shortcuts. In spawn the first dir+path match is used in "dir1:dir2:dir3:executable"
-set scripts_dir      = @data_home/uzbl:@share_dir/uzbl:@devel_dir/uzbl/examples/data:scripts
-
-# === Hardcoded handlers =====================================================
-
-# These handlers can't be moved to the new event system yet as we don't
-# support events that can wait for a response from a script.
-set scheme_handler      = sync_spawn @scripts_dir/scheme.py
-set request_handler     = sync_spawn @scripts_dir/request.sh
-
-# Download stuff
-set download_handler = sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" || dm-dm.sh -s "$1"'
-@cbind !downloads    = sh 'dm-dm.sh -g'
-
-# === Dynamic event handlers =================================================
-
-#   What to do when a website wants to open a new window:
-# Open link in new window
-@on_event   NEW_WINDOW     sh 'uzbl ${1:+-u "$1"}' %r
-# Open in current window (also see the REQ_NEW_WINDOW event handler below)
-#@on_event   NEW_WINDOW     uri %s
-# Open in new tab. Other options are NEW_TAB_NEXT, NEW_BG_TAB and NEW_BG_TAB_NEXT.
-#@on_event   NEW_WINDOW     event NEW_TAB %s
-
-#   What to do when the user requests a new window:
-# If your the NEW_WINDOW handler opens the uri in the current window, you'll
-# probably want to change this handler to open a new window or tab.
-@on_event   REQ_NEW_WINDOW sh 'exec konix_uzbl.sh "%s"'
-
-# Load start handler
-@on_event   LOAD_START     @set_status <span foreground="khaki">wait</span>
-# Reset the keycmd on navigation
-@on_event   LOAD_START     @set_mode
-@on_event   LOAD_START    chain 'set title_format_short =\@PID - \@TITLE' 'set title_format_long =\@PID - \@keycmd_prompt \@raw_modcmd \@raw_keycmd \@TITLE - Uzbl browser <\@NAME> \@SELECTED_URI'
-
-# Load commit handlers
-@on_event   LOAD_COMMIT    @set_status <span foreground="green">recv</span>
-@on_event   LOAD_COMMIT    chain 'set title_format_short =\@PID - \@TITLE' 'set title_format_long =\@PID - \@keycmd_prompt \@raw_modcmd \@raw_keycmd \@TITLE - Uzbl browser <\@NAME> \@SELECTED_URI'
-
-# add some javascript to the page for other 'js' and 'script' commands to access later.
-@on_event   LOAD_COMMIT    js uzbl = uzbl || {};
-@on_event   LOAD_COMMIT    script @scripts_dir/follow.js
-@on_event   LOAD_COMMIT    script @scripts_dir/formfiller.js
-@on_event   LOAD_COMMIT    script @scripts_dir/pocket.js
-@on_event   LOAD_COMMIT    script @scripts_dir/revealAnchors.js
-@on_event   LOAD_COMMIT    spawn @scripts_dir/change_style.sh
-@on_event   LOAD_COMMIT    script @scripts_dir/lib.js
-@on_event   LOAD_COMMIT    script @scripts_dir/highlight_anchor.js
-@on_event   LOAD_COMMIT    script @scripts_dir/js-base64/base64.js
-
-@on_event   REQUEST_STARTING sync_spawn @scripts_dir/per_site_user_agent.sh "\@uri"
-
-# Userscripts/per-site-settings. See the script and the example configuration for details
-#@on_event   LOAD_COMMIT    spawn @scripts_dir/per-site-settings.py @data_home/uzbl/per-site-settings
-
-# Load finish handlers
-@on_event   LOAD_FINISH    @set_status <span foreground="gold">done</span>
-@on_event   LOAD_FINISH    spawn @scripts_dir/history.sh
-@on_event   LOAD_FINISH    chain 'set title_format_short =\@PID - [LOADED] \@TITLE' 'set title_format_long =\@PID - [LOADED] \@title_format_long'
-@on_event   LOAD_FINISH    spawn @scripts_dir/per_site_commands.sh
-
-# Switch to insert mode if a (editable) html form is clicked
-@on_event   FOCUS_ELEMENT  sh 'if [ "$1" = INPUT -o "$1" = TEXTAREA -o "$1" = SELECT ]; then echo "@set_mode insert" > $UZBL_FIFO; fi' %s
-@on_event   FORM_ACTIVE  sh 'echo "@set_mode insert" > $UZBL_FIFO'
-
-# Switch to command mode if anything else is clicked
-@on_event   ROOT_ACTIVE    @set_mode command
-
-# authentication handler
-@on_event   AUTHENTICATE   spawn @scripts_dir/konix_auth.py "%1" "%2" "%3"
-
-# Example CONFIG_CHANGED event handler
-#@on_event  CONFIG_CHANGED print Config changed: %1 = %2
-
-# Scroll percentage calculation
-@on_event   SCROLL_VERT    set scroll_message = \@<(function(curr, min, max, size){if(max == size) return '--'; var p=(curr/(max - size)); return Math.round(10000*p)/100;})(%1,%2,%3,%4)>\@%
-
-# === Behaviour and appearance ===============================================
-
-# Custom CSS can be defined here, including link follower hint styles
-set stylesheet_uri = file://@config_home/uzbl/style.css
-
-set show_status       = 1
-set status_top        = 0
-set status_background = #303030
-
-set modcmd_style      = weight="bold" foreground="red"
-set keycmd_style      = weight="light" foreground="red"
-set prompt_style      = foreground="grey"
-set cursor_style      = underline="single"
-set completion_style  = foreground="green"
-
-set hint_style        = weight="bold"
-
-set mode_section      = <span background="khaki" foreground="black">[\@[\@mode_indicator]\@]</span>
-set keycmd_section    = [<span \@prompt_style>\@[\@keycmd_prompt]\@</span><span \@modcmd_style>\@modcmd</span><span \@keycmd_style>\@keycmd</span><span \@completion_style>\@completion_list</span>]
-set progress_section  = <span foreground="#606060">\@[\@progress.output]\@</span>
-set scroll_section    = <span foreground="#606060">\@[\@scroll_message]\@</span>
-set uri_section       = <span \@(konix_url_color.sh)\@>\@[\@proxy_url]\@:\@[\@uri]\@</span>
-set name_section      = <span foreground="khaki">\@[\@NAME]\@</span>
-set status_section    = <span foreground="orange">\@status_message</span>
-set selected_section  = <span foreground="#606060">\@[\@SELECTED_URI]\@</span>
-
-set download_section  = <span foreground="white">\@downloads</span>
-
-set status_format       = <span font_family="monospace">@mode_section @keycmd_section @progress_section @name_section @status_section @scroll_section @selected_section @download_section</span>
-set status_format_right = <span font_family="monospace"><span foreground="#666">uri:</span> @uri_section</span>
-
-set title_format_long = \@keycmd_prompt \@raw_modcmd \@raw_keycmd \@TITLE - Uzbl browser <\@NAME> \@SELECTED_URI
-
-# Progress bar config
-# %d = done, %p = pending %c = percent done, %i = int done, %s = spinner,
-# %t = percent pending, %o = int pending, %r = sprite scroll
-set progress.width      = 8
-set progress.format     = [%d>%p]%c
-set progress.done       = =
-set progress.pending    =
-
-# === Useragent setup ========================================================
-
-set useragent         = Uzbl (Webkit @{WEBKIT_MAJOR}.@{WEBKIT_MINOR}) (@(+uname -sm)@ [@ARCH_UZBL])
+# Config
+set ssl_ca_file @(echo $KONIX_CA_FILE)@
+uri uzbl.org/doesitwork
+set proxy_url @(echo $http_proxy)@
+set download_handler spawn_sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" || dm-dm.sh -s "$1"'
+set authentication_handler spawn_sync @scripts_dir/konix_auth.py
 #set useragent         = Mozilla/5.0 (X11; Linux x86_64; rv:10.0.6) Gecko/20100101 Firefox/10.0.6 Iceweasel/10.0.6
+set default_encoding utf-8
+@insert   status_background = #05bdc8
 
-# === Configure cookie blacklist ========================================================
+# Events
+@on_event LOAD_COMMIT js page file @scripts_dir/lib.js
+@on_event LOAD_FINISH js page file @scripts_dir/js-base64/base64.js
+@on_event LOAD_FINISH js page file @scripts_dir/highlight_anchor.js
+@on_event LOAD_FINISH spawn @scripts_dir/per_site_commands.sh
+@on_event REQUEST_STARTING sync_spawn @scripts_dir/per_site_user_agent.sh "\@uri"
 
-# Accept 'session cookies' from uzbl.org (when you have a whitelist all other cookies are dropped)
-#request WHITELIST_COOKIE domain 'uzbl.org$' expires '^$'
-
-# Drop google analytics tracking cookies (applied after whitelists if any)
-#request BLACKLIST_COOKIE name '^__utm.$'
-
-###################
-## Global config ##
-###################
-# use the cache by default
-set enable_pagecache = 1
-# default to zoom images with text
-set zoom_type = 1
-
-# === Key binding configuration ==============================================
-# --- Internal modmapping and ignoring ---------------------------------------
-
-#modmap <From>          <To>
-@modmap <Control>       <Ctrl>
-@modmap <ISO_Left_Tab>  <Shift-Tab>
-@modmap <space>         <Space>
-@modmap <KP_Enter>      <Enter>
-
-#ignore_key <glob>
-@ignore_key <ISO_*>
-@ignore_key <Shift>
-@ignore_key <Multi_key>
-@ignore_key <Mod2>
+# Bindings
 @ignore_key <Mod5>
-
-# --- Bind aliases -----------------------------------------------------------
-
-# request BIND <bind cmd> = <command>
-set bind      = request MODE_BIND global
-
-# request MODE_BIND <mode> <bind cmd> = <command>
-set mode_bind = request MODE_BIND
-
-# Insert mode binding alias
-set ibind     = @mode_bind insert
-
-# Command mode binding alias
-set cbind     = @mode_bind command
-
-# Non-insert mode bindings alias (ebind for edit-bind).
-set ebind     = @mode_bind global,-insert
-
-# --- Global & keycmd editing binds ------------------------------------------
-
-# Resets keycmd and returns to default mode.
-@on_event  ESCAPE    @set_mode
-@on_event  ESCAPE    event KEYCMD_CLEAR
-@on_event  ESCAPE    js uzbl.follow.clearHints()
-@bind   <Escape>     = event ESCAPE
-@bind   <Ctrl>[      = event ESCAPE
-
-# Commands for editing and traversing the keycmd.
-@ebind  <Return>     = event KEYCMD_EXEC_CURRENT
-@ebind  <Home>       = event SET_CURSOR_POS 0
-@ebind  <End>        = event SET_CURSOR_POS -1
-@ebind  <Left>       = event SET_CURSOR_POS -
-@ebind  <Right>      = event SET_CURSOR_POS +
-@ebind  <BackSpace>  = event KEYCMD_BACKSPACE
-@ebind  <Delete>     = event KEYCMD_DELETE
-@ebind  <Tab>        = event START_COMPLETION
-# Readline-ish bindings.
-@ebind  <Ctrl>w      = event KEYCMD_STRIP_WORD \ -./&?=
-@ebind  <Ctrl>u      = event SET_KEYCMD
-@ebind  <Ctrl>a      = event SET_CURSOR_POS 0
-@ebind  <Ctrl>e      = event SET_CURSOR_POS -1
-
-@ebind <Ctrl>r<search:>_ = event HISTORY_SEARCH %s
-@ebind <Mod1>p                 = request HISTORY_PREV
-@ebind <Mod1>n                 = request HISTORY_NEXT
-
-# load jquery on demand
-@bind   <Ctrl>j  = chain 'sync_sh "konix_display.py Loading_jquery"' 'script @scripts_dir/jquery-1.7.2.min.js' 'sync_sh "konix_display.py jquery_Loaded"'
-
-# Keycmd injection/append examples.
-#@ebind  <Ctrl>su = event INJECT_KEYCMD \@uri
-#@ebind  <Ctrl>st = event INJECT_KEYCMD \@title
-#@ebind  <Ctrl>du = event APPEND_KEYCMD \@uri
-#@ebind  <Ctrl>dt = event APPEND_KEYCMD \@title
-
-# --- Mouse bindings ---------------------------------------------------------
-
-# Middle click open in new window
-@bind  <Button2>  = spawn '@scripts_dir/open_new_window.sh' '\@SELECTED_URI'
-
-# --- Keyboard bindings ------------------------------------------------------
-
-# With this command you can enter in any command at runtime when prefixed with
-# a colon.
-@cbind    :_        = %s
-
-# open a new window or a new tab (see the on_event NEW_WINDOW settings above)
-@cbind  w            = event REQ_NEW_WINDOW
-
-# Page movement binds
+@ebind <Mod1>p = request HISTORY_PREV
+@ebind <Mod1>n = request HISTORY_NEXT
+@cbind zz = exit
+@cbind <Ctrl>i = inspector show
 @cbind <Up>          = scroll vertical -20
 @cbind <Down>        = scroll vertical 20
 @cbind <Left>        = scroll horizontal -20
 @cbind <Right>       = scroll horizontal 20
-@cbind  j            = scroll vertical 20
-@cbind  k            = scroll vertical -20
-@cbind  h            = scroll horizontal -20
-@cbind  l            = scroll horizontal 20
-@cbind  <Page_Up>    = scroll vertical -50%
-@cbind  <Page_Down>  = scroll vertical 50%
-@cbind  <Ctrl>f      = scroll vertical 100%
-@cbind  <Ctrl>b      = scroll vertical -100%
-@cbind  <<           = scroll vertical begin
-@cbind  >>           = scroll vertical end
-@cbind  <Home>       = scroll vertical begin
-@cbind  <End>        = scroll vertical end
-@cbind  ^            = scroll horizontal begin
-@cbind  $            = scroll horizontal end
-@cbind  <Space>      = scroll vertical end
-@cbind  G<Go To:>_   = scroll vertical %r!
-@cbind  _G<Go To:>_  = scroll horizontal %r!
-@cbind  <Ctrl><Mod1><Up>    = js scroll_up();
-@cbind  <Ctrl><Mod1><Down>  = js scroll_down();
-@cbind  <Ctrl><Mod1><Right>  = js scroll_faster();
-@cbind  <Ctrl><Mod1><Left>  = js scroll_slower();
-
-# Navigation binds
-@cbind  b   = back
+@cbind  <Ctrl><Mod1><Up>    = js page string scroll_up();
+@cbind  <Ctrl><Mod1><Down>  = js page string scroll_down();
+@cbind  <Ctrl><Mod1><Right>  = js page string scroll_faster();
+@cbind  <Ctrl><Mod1><Left>  = js page string scroll_slower();
 @cbind  <Mod1><Left>   = back
-@cbind  m   = forward
 @cbind  <Mod1><Right>   = forward
-@cbind  S   = stop
-@cbind  r   = reload
-@cbind  R   = reload_ign_cache
-
-# toggle current encoding
 @cbind  e   = toggle custom_encoding iso-8859-1 utf-8
 
-# toggle use of a proxy
-@cbind <Shift><Ctrl>P   = toggle proxy_url "" \@(echo $http_proxy)\@
-
-# Zoom binds
-@cbind  +   = zoom_in
-@cbind  -   = zoom_out
-@cbind  T   = toggle zoom_type
-@cbind  1   = set zoom_level = 1.0
-@cbind  2   = set zoom_level = 2.0
-
-# Appearance binds
-@cbind  t   = toggle show_status
-
-# Page searching binds
-@cbind  /*  = search %s
-@cbind  ?*  = search_reverse %s
-# Jump to next and previous items
-@cbind  n   = search
-@cbind  N   = search_reverse
-
-# Print pages to a printer
-@cbind  <Ctrl>p = hardcopy
-
-# Web searching binds
-@cbind  dss = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh'
-@cbind  dsd = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh -d'
-@cbind  dpa                  = js add_to_pocket();
-@cbind E = chain 'js var konix_edited_elem = document.activeElement;var konix_edited_elem_old_background_color = $(konix_edited_elem).css("background-color");$(konix_edited_elem).css("background-color", "lightBlue");' 'spawn @scripts_dir/external_editor.sh \@<document.activeElement.type>\@ \@<Base64.encode(document.activeElement.value)>\@'
-
-# Handy binds
-# Set function shortcut
-@cbind  s<var:>_<value:>_  = set %1 = %2
-# Exit binding
-@cbind  zz                 = chain 'spawn @scripts_dir/exit.sh' 'exit'
-# Dump config to stdout
-@cbind  !dump              = sh 'echo dump_config > "$UZBL_FIFO"'
-# Reload all variables in the config
-@cbind  !reload            = sh "sed '/^# === Post-load misc commands/,$d' \"$UZBL_CONFIG\" | grep '^set ' > \"$UZBL_FIFO\""
-
-# Use socat to directly inject commands into uzbl-core and view events
-# raised by uzbl-core:
-@cbind  <Ctrl><Mod1>t  = sh 'xterm -e "socat unix-connect:\"$UZBL_SOCKET\" -"'
-#@cbind  <Ctrl><Mod1>t  = sh 'urxvt -e socat unix-connect:"$UZBL_SOCKET" -'
+@cbind  dss = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh'
+@cbind  dsd = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh -d'
 
 # org protocol
 @cbind  <Ctrl>o  = spawn "@scripts_dir/org-capture.sh" "B" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
@@ -350,197 +45,34 @@ set ebind     = @mode_bind global,-insert
 @cbind  <Ctrl><Shift>O  = spawn "@scripts_dir/org-capture.sh" "D" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
 @cbind  <Ctrl><Mod1><Shift>O  = spawn "@scripts_dir/org-capture.sh" "E" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
 
-# show the inspector
-@cbind  <Ctrl>i  = show_inspector
-
-# Uri opening prompts
-@cbind  o<uri:>_       = uri %s
-# Or have it load the current uri into the keycmd for editing
-@cbind  O<uri:\@uri>_  = uri %s
-
-# Mode setting binds
-@cbind  i        = @set_mode insert
-@bind   <Ctrl>i  = @set_mode insert
-
-# Hard-bound bookmarks
-@cbind  gh  = uri http://www.uzbl.org
-
-# New window binds
-@cbind  gw  = event REQ_NEW_WINDOW
-
 # Open new page from here
 @cbind  zw  = uri \@(echo "http://www.mywot.com/en/scorecard/$UZBL_URI")\@
 @cbind  zb  = uri \@(echo "http://wayback.archive.org/web/*/$UZBL_URI")\@
 @cbind  zf  = spawn \@(which firefox)\@ "\@uri"
-@cbind  zss  = sh 'konix_web_search.sh "$(xclip -o)"'
-@cbind  zsd  = sh 'konix_web_search.sh -d "$(xclip -o)"'
+@cbind  zss  = spawn_sh 'konix_web_search.sh "$(xclip -o)"'
+@cbind  zsd  = spawn_sh 'konix_web_search.sh -d "$(xclip -o)"'
 
-# Yanking & pasting binds
-@cbind  yu  = sh 'echo -n "$UZBL_URI" | xclip'
-@cbind  yU  = sh 'printf "$1" | xclip' '\@SELECTED_URI'
-@cbind  yy  = sh 'printf "$UZBL_TITLE" | xclip'
+ # Yanking & pasting binds
+@cbind  yu  = spawn_sh 'echo -n "$UZBL_URI" | xclip'
 @cbind  ye  = uri \@(konix_uzbl_edit_uri.sh \@uri)\@
-@cbind  yt  = sh 'konix_uri_dwim.py "\@uri" "$(xclip -o)"'
-@cbind  yv  = sh "quvi '\@uri' --exec 'vlc %u'"
-@cbind  yd  = sh "konix_flash_dl.sh '\@uri'"
-@cbind  yas  = sh "konix_ril_save_url.sh '\@uri' && konix_display.py 'Saved \@uri'"
+@cbind  yt  = spawn_pawn_sh 'konix_uri_dwim.py "\@uri" "$(xclip -o)"'
+@cbind  yv  = spawn_pawn_sh "quvi '\@uri' --exec 'vlc %u'"
+@cbind  yas = spawn_sh "konix_ril_save_url.sh '\@uri' && konix_display.py 'Saved \@uri'"
+@bind <Ctrl>y = spawn_sh 'echo "event INJECT_KEYCMD $(xclip -o | sed s/\\\@/%40/g)" > "$UZBL_FIFO"'
 
-# Clone current window
-@cbind  c   = event REQ_NEW_WINDOW \@uri
-# Go the page from primary selection
-@cbind  p   = sh 'echo "uri $(xclip -o | sed s/\\\@/%40/g)" > "$UZBL_FIFO"'
-# Go to the page in clipboard
-@cbind  P   = sh 'echo "uri $(xclip -selection clipboard -o | sed s/\\\@/%40/g)" > "$UZBL_FIFO"'
-# Start a new uzbl instance from the page in primary selection
-@cbind  'p  = sh 'echo "event REQ_NEW_WINDOW $(xclip -o)" > "$UZBL_FIFO"'
-# paste primary selection into keycmd at the cursor position
-@bind <Shift><Insert> = sh 'echo "event INJECT_KEYCMD $(xclip -o | sed s/\\\@/%40/g)" > "$UZBL_FIFO"'
-@bind <Ctrl>y = sh 'echo "event INJECT_KEYCMD $(xclip -o | sed s/\\\@/%40/g)" > "$UZBL_FIFO"'
+@cbind  U  = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_history.sh'
+@cbind  <Ctrl>u  = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_history_undo.sh'
+@cbind  u  = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_bookmark.sh'
 
-# Bookmark inserting binds
-@cbind <Ctrl>m<tags:>_  = sh 'echo "$UZBL_URI $1" >> "$XDG_DATA_HOME"/uzbl/bookmarks' '%s'
-# Or use a script to insert a bookmark.
-@cbind  M  = spawn @scripts_dir/insert_bookmark.sh
+@cbind  <Ctrl>h  = js page string highlight_anchor_toggle();
 
-# Bookmark/history loading
-@cbind  U  = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_history.sh'
-@cbind  <Ctrl>u  = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_history_undo.sh'
-@cbind  u  = sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_bookmark.sh'
+set active_element_highlight js page string 'var konix_edited_elem = document.activeElement;var konix_edited_elem_old_background_color = konix_edited_elem.style.backgroundColor;konix_edited_elem.style.backgroundColor="lightBlue";'
+@cbind E = chain 'spawn_sync @scripts_dir/highlight_select_element.sh' 'spawn @scripts_dir/external_editor.sh \@<document.activeElement.type>\@ \@<Base64.encode(document.activeElement.value)>\@'
 
-# Temporary bookmarks
-@cbind  <Ctrl>d  = spawn @scripts_dir/insert_temp.sh
-@cbind  D        = spawn @scripts_dir/load_url_from_temps.sh
+# Menu
+menu add link "Copy Link" "spawn_sh 'echo -n \@SELECTED_URI | xclip'"
+menu add link "Do what I mean ?" "spawn_sh 'konix_uri_dwim.py \"\@SELECTED_URI\"'"
 
-# Link following (similar to vimperator and konqueror)
-# Set custom keys you wish to use for navigation. Some common examples:
-set follow_hint_keys = 0123456789
-#set follow_hint_keys = qwerty
-#set follow_hint_keys = asdfghjkl;
-#set follow_hint_keys = thsnd-rcgmvwb/;789aefijkopquxyz234
-@cbind  fl*  = spawn @scripts_dir/follow.sh \@< uzbl.follow("\@follow_hint_keys", "%s", 'click') >\@
-@cbind  Fl*  = spawn @scripts_dir/follow.sh \@< uzbl.follow("\@follow_hint_keys", "%s", 'newwindow') >\@
-@cbind  fL*  = spawn @scripts_dir/follow.sh \@< uzbl.follow("\@follow_hint_keys", "%s", 'returnuri') >\@ set
-@cbind  FL*  = spawn @scripts_dir/follow.sh \@< uzbl.follow("\@follow_hint_keys", "%s", 'returnuri') >\@ clipboard
-@cbind  fi   = spawn @scripts_dir/go_input.sh
-
-@cbind  fs  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('returnuri') >\@ set
-@cbind  fS  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('click') >\@
-@cbind  Fs  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('newwindow') >\@
-@cbind  FS  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('returnuri') >\@ clipboard
-
-@cbind  ft*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'returnuri') >\@ set
-@cbind  fT*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'click') >\@
-@cbind  Ft*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'newwindow') >\@
-@cbind  FT*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'returnuri') >\@ clipboard
-
-@cbind  '*  = spawn @scripts_dir/follow.sh \@< uzbl.follow.followTextContent("%s", 'click') >\@
-@cbind  " = spawn @scripts_dir/follow.sh \@< uzbl.follow.followSelection('returnuri') >\@ set
-
-#highlight anchors
-@cbind  <Ctrl>h  = js highlight_anchor_toggle();
-
-# Form filler binds
-# This script allows you to configure (per domain) values to fill in form
-# fields (eg login information) and to fill in these values automatically.
-# This implementation allows you to save multiple profiles for each form
-# (think about multiple accounts on some website).
-set formfiller = spawn @scripts_dir/formfiller.sh
-@cbind  ze  = @formfiller edit
-@cbind  zn  = @formfiller new
-@cbind  zl  = @formfiller load
-@cbind  zo  = @formfiller once
-
-# --- Uzbl tabbed binds ------------------------------------------------------
-
-# Tab opening
-@cbind  gn              = event NEW_TAB
-@cbind  gN              = event NEW_TAB_NEXT
-@cbind  go<uri:>_       = event NEW_TAB %s
-@cbind  gO<uri:>_       = event NEW_TAB_NEXT %s
-
-# Closing / resting
-@cbind  gC              = exit
-@cbind  gQ              = event CLEAN_TABS
-
-# Tab navigating
-@cbind  g<              = event FIRST_TAB
-@cbind  g>              = event LAST_TAB
-@cbind  gt              = event NEXT_TAB
-@cbind  gT              = event PREV_TAB
-@cbind  gi<index:>_     = event GOTO_TAB %s
-
-# Preset loading
-set preset = event PRESET_TABS
-@cbind  gs<preset save:>_   = @preset save %s
-@cbind  glo<preset load:>_  = @preset load %s
-@cbind  gd<preset del:>_    = @preset del %s
-# This doesn't work right now.
-#@cbind  gli                 = @preset list
-
-# === Context menu items =====================================================
-
-# Default context menu
-menu_separator separator_1
-menu_add Quit uzbl = exit
-
-# Link context menu
-menu_link_add Print Link = print \@SELECTED_URI
-menu_link_add Copy Link = sh 'echo -n \@SELECTED_URI | xclip'
-menu_link_add Do what I mean ? = sh 'konix_uri_dwim.py "\@SELECTED_URI"'
-
-# === Mode configuration =====================================================
-
-# Define some mode specific uzbl configurations.
-set command  = @mode_config command
-set insert   = @mode_config insert
-set stack    = @mode_config stack
-
-# Command mode config.
-@command  keycmd_style        = foreground="red"
-@command  status_background   = #202020
-@command  mode_indicator      = Cmd
-@command  keycmd_events       = 1
-@command  forward_keys        = 0
-@command  modcmd_updates      = 1
-
-# Insert mode config.
-@insert   status_background   = #05bdc8
-@insert   mode_indicator      = Ins
-@insert   forward_keys        = 1
-@insert   keycmd_events       = 0
-@insert   modcmd_updates      = 0
-
-# Multi-stage-binding mode config.
-@stack    keycmd_style        = foreground="red"
-@stack    status_background   = #202020
-@stack    mode_indicator      = Bnd
-@stack    prompt_style        = foreground="#888" weight="light"
-@stack    keycmd_events       = 1
-@stack    modcmd_updates      = 1
-@stack    forward_keys        = 0
-
-set default_encoding = utf-8
-set default_mode = command
-
-# === SSL related configuration ==============================================
-
-# Set it to certificates store of your distribution, or your own CAfile.
-set ssl_ca_file = @(echo $KONIX_CA_FILE)@
-set ssl_verify = 1
-# Command to toggle ssl_verify value:
-@cbind !ssl = chain 'toggle ssl_verify' 'reload'
-# Example SSL error handler:
-@on_event   LOAD_ERROR spawn @scripts_dir/error_handle.py '%1' '%2' '%3'
-
-# === Post-load misc commands ================================================
-sync_spawn_exec @scripts_dir/load_cookies.sh
-sync_spawn_exec @scripts_dir/load_cookies.sh @(echo $UZBL_SESSION_COOKIES_FILE)@
-
-# Set the "home" page.
-#set uri = uzbl.org/doesitwork/@COMMIT
-
-# === Get the custom machine config ================================================
+# Get the custom machine config
 include @(echo $KONIX_PERSO_DIR/config/uzbl/config)@
 include @(echo $HOME/.uzbl)@
-
-# vim: set fdm=syntax:

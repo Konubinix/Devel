@@ -739,19 +739,19 @@ items"
 
 (defun konix/org-agenda-skip-if-has-not-next-entry ()
   (if (save-excursion
-				  (catch 'found-next-entry
-					(when (org-goto-first-child)
-					  (when (string= "NEXT" (org-get-todo-state))
-						(throw 'found-next-entry t)
-						)
-					  (while (org-get-next-sibling)
-						(when (string= "NEXT" (org-get-todo-state))
-						  (throw 'found-next-entry t)
-						  )
-						)
-					  )
-					)
-				  )
+		(catch 'found-next-entry
+		  (when (org-goto-first-child)
+			(when (string= "NEXT" (org-get-todo-state))
+			  (throw 'found-next-entry t)
+			  )
+			(while (org-get-next-sibling)
+			  (when (string= "NEXT" (org-get-todo-state))
+				(throw 'found-next-entry t)
+				)
+			  )
+			)
+		  )
+		)
 	  (save-excursion (outline-next-heading) (1- (point)))
 	nil
 	)
@@ -3002,6 +3002,22 @@ of the clocksum."
 (konix/org-load-hook)
 
 (defalias 'string>= 'org-string>=)
+
+;;;;;;;;;;;;;;;;;;;;
+;; Setup holidays ;;
+;;;;;;;;;;;;;;;;;;;;
+(defun konix/org-setup-holidays ()
+  (interactive)
+  (save-window-excursion
+	(save-excursion
+	  (org-id-goto "holidays")
+	  (konix/calendar-setup-holidays
+	   (konix/org-extract-active-times-flattened)
+	   )
+	  )
+	)
+  )
+(konix/org-setup-holidays)
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

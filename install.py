@@ -83,63 +83,6 @@ if is_on_linux():
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "gtkrc-2.0"), os.path.join(environ["HOME"], ".gtkrc-2.0"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "rdesktop"), os.path.join(environ["HOME"], ".rdesktop"))
 
-        # ####################################################################################################
-        # Gnome conf
-        # ####################################################################################################
-        def install_icon_theme(archive):
-                icons_dir=os.path.join(environ["HOME"],".icons")
-                logging.info("install %s icon theme" % archive)
-                if not os.path.isdir(icons_dir):
-                        os.makedirs(icons_dir)
-                tempdir = tempfile.mkdtemp()
-                archive_tar = tarfile.open(name=archive)
-                archive_tar.extractall(path=tempdir)
-                theme_name = os.listdir(tempdir)
-                if len(theme_name) > 1:
-                        logging.warning("Bad icon archive "+archive)
-                        return False
-                else:
-                        theme_name = theme_name[0]
-                new_icons_dir = os.path.join(icons_dir, theme_name)
-                if confirm(prompt="Remove old icons dir "+new_icons_dir):
-                        shutil.rmtree(new_icons_dir, True)
-                else:
-                        return False
-                shutil.move(os.path.join(tempdir, theme_name), new_icons_dir)
-                subprocess.call(["gconftool", "-s", "/desktop/gnome/interface/icon_theme", "-t", "string", theme_name])
-                shutil.rmtree(tempdir)
-        def install_gtk_theme(archive):
-                themes_dir = os.path.join(environ["HOME"], ".themes")
-                logging.info("install %s theme" % archive)
-                if not os.path.isdir(themes_dir):
-                        os.makedirs(themes_dir)
-                tempdir = tempfile.mkdtemp()
-                archive_tar = tarfile.open(name=archive)
-                archive_tar.extractall(path=tempdir)
-                theme_name = os.listdir(tempdir)
-                if len(theme_name) > 1:
-                        logging.warning("Bad gtk archive "+archive)
-                        return False
-                else:
-                        theme_name = theme_name[0]
-                new_theme_dir = os.path.join(themes_dir, theme_name)
-
-                if confirm(prompt="Remove old theme dir "+new_theme_dir):
-                        shutil.rmtree(new_theme_dir)
-                else:
-                        return False
-                shutil.move(os.path.join(tempdir, theme_name), new_theme_dir)
-                subprocess.call(["gconftool", "-s", "/desktop/gnome/interface/gtk_theme", "-t", "string", theme_name])
-                shutil.rmtree(tempdir)
-
-        install_icon_theme (os.path.join(environ["KONIX_TUNING_DIR"], "Delta_Gnome_Icons.tar.gz"))
-        install_gtk_theme  (os.path.join(environ["KONIX_TUNING_DIR"], "Theme.tar.gz"))
-        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNING_DIR"], "gnome-terminal-profile.xml"), "/apps/gnome-terminal/profiles/Default"])
-        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNING_DIR"], "gnome-desktop-session.xml"), "/desktop/gnome/session"])
-        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNING_DIR"], "guake.xml"), "/apps/guake"])
-        subprocess.call(["gconftool", "--load", os.path.join(environ["KONIX_TUNING_DIR"], "notification-daemon.xml"), "/apps/notification-daemon"])
-        # Set emacs style bindings to firefox
-        subprocess.call(["gconftool-2", "--set", "/desktop/gnome/interface/gtk_key_theme Emacs", "--type", "string"])
         subprocess.call(["chmod", "+x", "-Rv",
                          os.path.join(environ["HOME"], "bin"),
                          os.path.join(environ["HOME"], ".fluxbox/startup"),

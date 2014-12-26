@@ -2473,6 +2473,14 @@ items"
 	)
   )
 
+(defun konix/org-sort-entries-ARCHIVE-last ()
+  (interactive)
+  (if (member "ARCHIVE" (org-get-tags))
+	  1
+	0
+	)
+  )
+
 (defun konix/org-adjust-effort ()
   "Set the value of the effort of the entry at point to the value
 of the clocksum."

@@ -17,7 +17,7 @@ trap "echo > /tmp/konix_mail_tray_stamp; echo B > '$MAIL_TRAY_DAEMON_CTRL' ; rm 
 notmuch new --verbose || exit 1
 
 #sync with imap server
-offlineimap -c "${KONIX_OFFLINEIMAPRC}" "$@" 2>&1 | tee "$LOG_FILE" || exit 1
+nice -n 10 offlineimap -c "${KONIX_OFFLINEIMAPRC}" "$@" 2>&1 | tee "$LOG_FILE" || exit 1
 #get messages from pop server
 # getmail
 #finally reflect externally changed maildir flags in notmuch tags

@@ -3004,6 +3004,24 @@ of the clocksum."
   (set (make-variable-buffer-local 'org-deadline-warning-days) org-deadline-warning-days)
   )
 
+(defun konix/org-map-entries-skip-deep-entries ()
+  "Return a lambda to be used in `org-map-entries' to scan only
+  the direct children"
+  `(lambda ()
+	 (when (not
+			(eq
+			 (org-current-level)
+			 (1+ ,(org-current-level))
+			 )
+			)
+	   (save-excursion
+		 (forward-line)
+		 (point)
+		 )
+	   )
+	 )
+  )
+
 ;; ######################################################################
 ;; Evaluation to be done after loading org
 ;; ######################################################################

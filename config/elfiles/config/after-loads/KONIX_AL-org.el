@@ -610,7 +610,7 @@ to be organized.
   )
 
 (defun konix/org-subtree-has-active-schedule ()
-  "Indocate whether the entry has scheduled and active times in its subtree."
+  "Indicate whether the entry has scheduled and active times in its subtree."
   (let (
         (res nil)
 		(end (save-excursion (org-end-of-subtree t)))
@@ -621,7 +621,9 @@ to be organized.
 			  (re-search-forward
 			   (format "\\(%s\\|%s\\)"
 					   org-scheduled-regexp
-					   org-deadline-regexp) end t) ;; go to the next schedule item
+					   org-deadline-regexp) ;; go to the next schedule item
+			   end ;; do not search after the end of the subtree
+			   t)
 			  (not
 			   (setq res (org-entry-is-todo-p)) ;; remember if one has been found
 			   ) ;; stop if one has been found
@@ -657,11 +659,25 @@ items"
 			   (point)
 			   )
 			 )
+		(end_of_subtree
+		 (save-excursion
+		   (org-end-of-subtree)
+		   (point)
+		   )
+		 )
 		)
 	(if (or
 		 ;; not a project
 		 (not
 		  (member "project" (org-get-tags))
+		  )
+		 ;; If it has a direct project child with status NEXT, the check will be
+		 ;; also done on the child, then this project may not be considered
+		 ;; stuck
+		 (re-search-forward
+		  (format "^\\*\\{%s\\} NEXT.+:project:" (1+ (org-current-level)))
+		  end_of_subtree
+		  t
 		  )
 		 ;; is an active project
 		 (konix/org-subtree-has-active-schedule)

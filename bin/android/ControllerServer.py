@@ -68,4 +68,10 @@ def cpufreqset():
     return False
 server.register_function(cpufreqset)
 
+def volumeclient():
+    """Use the phone as a remote volume controler"""
+    os.system("konix_volume_client.py")
+    return False
+server.register_function(volumeclient)
+
 server.serve_forever()

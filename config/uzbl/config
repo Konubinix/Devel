@@ -69,6 +69,10 @@ set default_encoding utf-8
 set active_element_highlight js page string 'var konix_edited_elem = document.activeElement;var konix_edited_elem_old_background_color = konix_edited_elem.style.backgroundColor;konix_edited_elem.style.backgroundColor="lightBlue";'
 @cbind E = chain 'spawn_sync @scripts_dir/highlight_select_element.sh' 'spawn @scripts_dir/external_editor.sh \@<document.activeElement.type>\@ \@<Base64.encode(document.activeElement.value)>\@'
 
+@cbind  <Ctrl><Mod1>t  = spawn_sh 'xterm -e "rlwrap socat unix-connect:\"$UZBL_SOCKET\" -"'
+
+@cbind  n  = search next
+@cbind  N  = search prev
 # Menu
 menu add link "Copy Link" "spawn_sh 'echo -n \@SELECTED_URI | xclip'"
 menu add link "Do what I mean ?" "spawn_sh 'konix_uri_dwim.py \"\@SELECTED_URI\"'"

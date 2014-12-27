@@ -665,6 +665,7 @@ items"
 		   (point)
 		   )
 		 )
+		(point (point))
 		)
 	(if (or
 		 ;; not a project
@@ -674,11 +675,14 @@ items"
 		 ;; If it has a direct project child with status NEXT, the check will be
 		 ;; also done on the child, then this project may not be considered
 		 ;; stuck
-		 (re-search-forward
-		  (format "^\\*\\{%s\\} NEXT.+:project:" (1+ (org-current-level)))
-		  end_of_subtree
-		  t
-		  )
+		 (save-excursion
+		   (goto-char point)
+		   (re-search-forward
+			(format "^\\*\\{%s\\} NEXT.+:project:" (1+ (org-current-level)))
+			end_of_subtree
+			t
+			)
+		   )
 		 ;; is an active project
 		 (konix/org-subtree-has-active-schedule)
 		 )

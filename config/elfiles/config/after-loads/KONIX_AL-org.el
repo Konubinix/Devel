@@ -2054,12 +2054,6 @@ items"
 				("DELEGATED" :foreground "magenta" :weight bold)
 				)
 			  )
-(setq-default org-todo-state-tags-triggers
-			  '(
-				("NOT_DONE" ("NOT_DONE" . t))
-				)
-			  )
-
 (setq-default org-agenda-compact-blocks nil)
 (setq-default org-agenda-columns-add-appointments-to-effort-sum t)
 (add-to-list 'org-effort-durations '("p" . 30))

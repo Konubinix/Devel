@@ -670,7 +670,9 @@ items"
 	(if (or
 		 ;; not a project
 		 (not
-		  (member "project" (org-get-tags))
+		  (save-excursion
+		   (member "project" (org-get-tags))
+		   )
 		  )
 		 ;; If it has a direct project child with status NEXT, the check will be
 		 ;; also done on the child, then this project may not be considered

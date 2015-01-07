@@ -307,7 +307,6 @@ class RILItem(object):
                    "--tries=%s" % os.environ.get("KONIX_RIL_TRIES", "3"),
                    "--reject=*robots.txt",
                    "--no-check-certificate",
-                   "--span-hosts",
                    "--user-agent=%s" % USERAGENT,
                    "--no-iri",
                    "--restrict-file-names=windows",
@@ -323,8 +322,8 @@ class RILItem(object):
 
         mode_to_attributes = {
                 DOWNLOAD_LIGHT_MODE : [],
-                DOWNLOAD_NORMAL_MODE : ["--page-requisites"],
-                DOWNLOAD_MIRROR_MODE : ["--page-requisites", "--mirror"],
+                DOWNLOAD_NORMAL_MODE : ["--page-requisites", "--span-hosts",],
+                DOWNLOAD_MIRROR_MODE : ["--page-requisites", "--mirror",],
                 }
         command += mode_to_attributes[mode]
         command += [self.url]

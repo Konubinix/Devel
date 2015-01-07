@@ -41,6 +41,10 @@ class RilCmd(cmd.Cmd, object):
         print "Bye"
         sys.exit(0)
 
+    def do_ipython(self, line=None):
+        import IPython
+        IPython.start_ipython(argv=[], user_ns=locals())
+
     def do_search_x(self, line):
         """Show only items for which the expression is True. x is an Item. See
         help_rilitem for more information about what is available."""

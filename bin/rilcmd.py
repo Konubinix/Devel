@@ -7,6 +7,17 @@ import urllib2
 import shlex
 import os
 import re
+import readline
+# handle the history
+histfile = os.environ.get("RILCMD_HISTORY",
+                          os.path.expanduser("~/.rilcmd_history"))
+try:
+    readline.read_history_file(histfile)
+except IOError:
+    pass
+import atexit
+atexit.register(readline.write_history_file, histfile)
+del histfile
 
 def str2int(string):
     if string == "":

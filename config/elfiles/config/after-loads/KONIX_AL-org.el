@@ -666,6 +666,9 @@ items"
 		   )
 		 )
 		(point (point))
+		(current_level (save-excursion
+						(org-current-level)
+						))
 		)
 	(if (or
 		 ;; not a project
@@ -680,7 +683,7 @@ items"
 		 (save-excursion
 		   (goto-char point)
 		   (re-search-forward
-			(format "^\\*\\{%s\\} NEXT.+:project:" (1+ (org-current-level)))
+			(format "^\\*\\{%s\\} NEXT.+:project:" (1+ current_level))
 			end_of_subtree
 			t
 			)

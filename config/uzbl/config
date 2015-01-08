@@ -5,7 +5,7 @@ include @(echo $KONIX_DEVEL_DIR/uzbl/install/share/uzbl/examples/config/config)@
 set ssl_ca_file @(echo $KONIX_CA_FILE)@
 uri uzbl.org/doesitwork
 set proxy_url @(echo $http_proxy)@
-set download_handler spawn_sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$1" || dm-dm.sh -s "$1"'
+set download_handler spawn_sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$0" || dm-dm.sh -s "$0"'
 set authentication_handler spawn_sync @scripts_dir/konix_auth.py
 #set useragent         = Mozilla/5.0 (X11; Linux x86_64; rv:10.0.6) Gecko/20100101 Firefox/10.0.6 Iceweasel/10.0.6
 set default_encoding utf-8

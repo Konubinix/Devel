@@ -42,8 +42,8 @@ set default_encoding utf-8
 # org protocol
 @cbind  <Ctrl>o  = spawn "@scripts_dir/org-capture.sh" "B" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
 @cbind  <Ctrl><Mod1>o  = spawn "@scripts_dir/org-capture.sh" "C" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
-@cbind  <Ctrl><Shift>O  = spawn "@scripts_dir/org-capture.sh" "D" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
-@cbind  <Ctrl><Mod1><Shift>O  = spawn "@scripts_dir/org-capture.sh" "E" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
+@cbind  <Ctrl>O  = spawn "@scripts_dir/org-capture.sh" "D" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
+@cbind  <Ctrl><Mod1>O  = spawn "@scripts_dir/org-capture.sh" "E" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
 
 # Open new page from here
 @cbind  zw  = uri \@(echo "http://www.mywot.com/en/scorecard/$UZBL_URI")\@

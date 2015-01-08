@@ -46,11 +46,11 @@ set default_encoding utf-8
 @cbind  <Ctrl><Mod1>O  = spawn "@scripts_dir/org-capture.sh" "E" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"
 
 # Open new page from here
-@cbind  zw  = uri \@(echo "http://www.mywot.com/en/scorecard/$UZBL_URI")\@
+@cbind  zo  = uri \@(echo "http://www.mywot.com/en/scorecard/$UZBL_URI")\@
 @cbind  zb  = uri \@(echo "http://wayback.archive.org/web/*/$UZBL_URI")\@
 @cbind  zf  = spawn \@(which firefox)\@ "\@uri"
-@cbind  zss  = spawn_sh 'konix_web_search.sh "$(xclip -o)"'
-@cbind  zsd  = spawn_sh 'konix_web_search.sh -d "$(xclip -o)"'
+@cbind  zws  = spawn_sh 'konix_web_search.sh "$(xclip -o)"'
+@cbind  zwd  = spawn_sh 'konix_web_search.sh -d "$(xclip -o)"'
 
  # Yanking & pasting binds
 @cbind  yu  = spawn_sh 'echo -n "$UZBL_URI" | xclip'

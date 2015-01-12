@@ -96,7 +96,7 @@ def provides(key, interactive=False):
 PROMPT="GCal({calendar_id}, {extra_query})\n> "
 
 class GCall(cmd.Cmd, object):
-    def __init__(self):
+    def __init__(self, make_place=False):
         cmd.Cmd.__init__(self)
         self.db = redis.StrictRedis(decode_responses=True)
         self.client_id = self.db.get("client_id")
@@ -116,6 +116,7 @@ class GCall(cmd.Cmd, object):
             "end",
             "status"
         ]
+        self._make_place = make_place
 
     @property
     @needs("calendars")
@@ -555,9 +556,22 @@ class GCall(cmd.Cmd, object):
         pp.pprint([formatter(event) for event in events])
 
     @needs("access_token")
-    def add_event(self, title, where, when, duration, description="", attendees_emails=None):
+    def add_event(self,
+                  title,
+                  where,
+                  when,
+                  duration,
+                  description="",
+                  attendees_emails=None,
+                  make_place=None,
+                  sendNotifications=False
+              ):
+        if make_place is None:
+            make_place = self._make_place
         calendar_id = self.db.get("calendar_id")
+
         attendees_emails = attendees_emails or []
+        sendNotifications = "true" if sendNotifications else "false"
         if not calendar_id:
             print("Use the command select_calendar first")
             return
@@ -574,6 +588,8 @@ class GCall(cmd.Cmd, object):
                              minutes=int(time_dict['minutes'] or "0"),
                              hours=int(time_dict['hours'] or "0"))
         end = start + duration
+        if make_place:
+            self.make_place(calendar_id, start, end)
         if flag == 0:
             start = {
                 "date": start.strftime(EVENT_STRFTIME_ALL_DAY),
@@ -599,8 +615,9 @@ class GCall(cmd.Cmd, object):
         }
 
         req = urllib.request.Request(
-            url='https://www.googleapis.com/calendar/v3/calendars/{}/events'.format(
-                calendar_id
+            url='https://www.googleapis.com/calendar/v3/calendars/{}/events?sendNotifications={}'.format(
+                calendar_id,
+                sendNotifications,
             ),
             data=json.dumps(event).encode("utf-8"),
             headers={"Content-Type": "application/json",

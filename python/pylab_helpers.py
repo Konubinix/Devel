@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import itertools
+import matplotlib
 from matplotlib.pyplot import subplots
 import numpy
 
@@ -35,9 +36,11 @@ def plot_all(inputs, names=None, title=None, nrows=4):
   assert names is None or len_of_input == len(names), (
       "The names and the inputs must have the same length"
   )
-
-  ncols = len_of_input / nrows + 1
+  nrows = min(nrows, len_of_input)
+  ncols = ( (len_of_input - 1) / nrows ) + 1
   f, sp = subplots(nrows, ncols)
+  if isinstance(sp, matplotlib.axes.Axes):
+      sp = numpy.array([sp,])
   if title:
       f.suptitle(title)
   for figure, name in zip(sp.flat, inputs.dtype.names):

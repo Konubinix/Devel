@@ -24,21 +24,23 @@
 
 ;;; Code:
 
-(defun konix/shell/rename-async-shell-buffer ()
-  (let (
-		(async_shell_buffer (get-buffer "*Async Shell Command*"))
-		)
-	(when (and async_shell_buffer
-			   (save-window-excursion
-				 (switch-to-buffer async_shell_buffer)
-				 (y-or-n-p
-				  (format "%s buffer already exists, rename it ?"
-						  async_shell_buffer)
-				  )
-				 (rename-uniquely)
-				 )
+(defun konix/shell/rename-async-shell-buffer (&optional output-buffer)
+  (unless output-buffer
+	(setq output-buffer (get-buffer "*Async Shell Command*"))
+	)
+  (when output-buffer
+	(setq output-buffer (get-buffer output-buffer))
+	)
+  (when (and output-buffer
+			 (save-window-excursion
+			   (switch-to-buffer output-buffer)
+			   (y-or-n-p
+				(format "%s buffer already exists, rename it ?"
+						output-buffer)
+				)
+			   (rename-uniquely)
 			   )
-	  )
+			 )
 	)
   )
 

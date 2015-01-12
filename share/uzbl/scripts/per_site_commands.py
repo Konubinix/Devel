@@ -36,14 +36,13 @@ else:
 config = ConfigParser.ConfigParser()
 config.optionxform = str    # keys not converted into lower case
 config.read(COMMANDS_FILE)
-print "Attempt to run custom commands for URI %s" % UZBL_URI
+print "Attempt to run custom commands form %s for URI %s" % (COMMANDS_FILE, UZBL_URI)
 for section in config.sections():
     items = dict(config.items(section))
     regexp = items["uri_re"]
     script_name_tpl = string.Template(items["script"])
     script_name = script_name_tpl.safe_substitute(os.environ)
     continu = items.get("continue", None)
-
     if re.search(regexp, UZBL_URI):
         print "Applying section %s" % section
         print "Reading config from %s" % script_name
@@ -52,7 +51,8 @@ for section in config.sections():
             with open(os.environ["UZBL_FIFO"], "w") as uzbl_fifo:
                 uzbl_fifo.write(script)
 
-    if not continu:
-        break
-    else:
-        print "Continuing the matching"
+        if not continu:
+            print "Stop here for this file"
+            break
+        else:
+            print "Continuing the matching"

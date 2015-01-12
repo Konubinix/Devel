@@ -1814,6 +1814,7 @@ items"
 	)
   )
 (setq-default org-refile-use-outline-path 'full-file-path)
+(setq-default org-refile-use-cache t)
 (setq-default org-outline-path-complete-in-steps nil)
 (setq-default org-src-fontify-natively t)
 (setq-default org-src-tab-acts-natively t)

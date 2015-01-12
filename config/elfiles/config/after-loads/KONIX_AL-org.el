@@ -457,7 +457,7 @@ with a precise timestamp)."
 		 )
 		)
 	  )
-	(list beg end)
+	(cons beg end)
 	)
   )
 

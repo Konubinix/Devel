@@ -119,7 +119,7 @@
 ;; ******************************************************************************************
 (defadvice shell-command (before kill_async_shell_buffer ())
   (when (string-match ".+[ \r\n&]+$" command)
-	(konix/shell/rename-async-shell-buffer)
+	(konix/shell/rename-async-shell-buffer output-buffer)
 	)
   )
 (ad-activate 'shell-command)

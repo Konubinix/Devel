@@ -74,5 +74,47 @@ make sure to insert any mml content after the secure tag
   )
 (ad-activate 'message-forward-make-body-mml)
 
+;; ######################################################################
+;; Mail cryptographic config
+;; ######################################################################
+(require 'jl-encrypt)
+(setq mml2015-encrypt-to-self t)
+
+(setq-default jl-encrypt-without-signature t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Check attachments of mails ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun konix/message-send-and-exit (&optional arg)
+  "Delegate work to `konix/message-send-maybe-exit', passing ARG."
+  (interactive "p")
+  (konix/message-send-maybe-exit t arg))
+
+(defun konix/message-send (&optional arg)
+  "Delegate work to `konix/message-send-maybe-exit', passing ARG."
+  (interactive "p")
+  (konix/message-send-maybe-exit nil arg))
+
+(defun konix/message-send-maybe-exit (exit arg)
+  (save-excursion
+    (goto-char (point-min))
+    (if (or
+		 (not (re-search-forward "find.attached\\|ci.joint" nil t))
+		 (and
+		  (goto-char (point-min))
+		  (re-search-forward "disposition=attachment>" nil t)
+		  )
+		 (yes-or-no-p "No attachment while I think it should, continue?")
+		 )
+		(if exit
+			(jl-message-send-and-exit arg)
+		  (jl-message-send arg))
+	  (message "Aborting message sending")
+	  )))
+
+(define-key message-mode-map (kbd "C-c C-c") 'konix/message-send-and-exit)
+(define-key message-mode-map (kbd "C-c C-s") 'konix/message-send)
+
 (provide '400-KONIX_message)
 ;;; 400-KONIX_message.el ends here

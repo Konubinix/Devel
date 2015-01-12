@@ -607,14 +607,6 @@
   )
 
 ;; ######################################################################
-;; Mail cryptographic config
-;; ######################################################################
-(require 'jl-encrypt)
-(setq mml2015-encrypt-to-self t)
-
-(setq-default jl-encrypt-without-signature t)
-
-;; ######################################################################
 ;; clipboard
 ;; ######################################################################
 (setq-default save-interprogram-paste-before-kill t)

@@ -12,11 +12,11 @@ set default_encoding utf-8
 @insert   status_background = #05bdc8
 
 # Events
+@on_event NAVIGATION_STARTING spawn_sync @scripts_dir/per_site_pre_commands.sh "%1"
 @on_event LOAD_COMMIT js page file @scripts_dir/lib.js
 @on_event LOAD_FINISH js page file @scripts_dir/js-base64/base64.js
 @on_event LOAD_FINISH js page file @scripts_dir/highlight_anchor.js
-@on_event LOAD_FINISH spawn @scripts_dir/per_site_commands.sh
-@on_event REQUEST_STARTING sync_spawn @scripts_dir/per_site_user_agent.sh "\@uri"
+@on_event LOAD_FINISH spawn_sync @scripts_dir/per_site_commands.sh
 
 # Bindings
 @ignore_key <Mod5>

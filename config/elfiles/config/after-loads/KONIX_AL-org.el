@@ -2248,6 +2248,17 @@ items"
   (find-file (expand-file-name "todo.org" org-directory))
   )
 
+(defmacro konix/org-with-point-at-clocked-entry (&rest body)
+  `(save-window-excursion
+	 (save-excursion
+	   (org-clock-goto)
+	   ,@body
+	   )
+	 )
+  )
+(def-edebug-spec konix/org-with-point-at-clocked-entry (form body))
+(put 'konix/org-with-point-at-clocked-entry 'lisp-indent-function 1)
+
 (defun konix/org-goto-org-directory ()
   (interactive)
   (find-file (expand-file-name org-directory))

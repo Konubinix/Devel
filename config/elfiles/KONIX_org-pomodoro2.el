@@ -441,7 +441,15 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 	 ((or
 	   (member "interruption" tags)
 	   (member "lunch" tags)
-	   (member "diary" tags)
+	   (and
+		(member "diary" tags)
+		(not (konix/org-with-point-at-clocked-entry
+			  (org-entry-is-todo-p)
+			  )) ; I may enter TODO entries to prepare a
+										; meeting. They will be tagged diary but are
+										; to be taken into account in the pomodorow
+										; process
+		)
 	   )
 	  ;; do not ask for a new pomodoro, but may be increase the pomodoro number
 	  (setq ask_for_new_pomodoro nil)
@@ -532,11 +540,11 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 (defun konix/konix/org-capture-interruption-pre-hook ()
   (konix/org-pomodoro-tray-daemon-put "j" t)
   (setq konix/org-pomodoro-interruption-timer
-   (run-with-timer (* 60 konix/org-pomodoro-interruption-warn-time)
-				   nil
-				   'konix/org-pomodoro-interruption-warn
-				   )
-   )
+		(run-with-timer (* 60 konix/org-pomodoro-interruption-warn-time)
+						nil
+						'konix/org-pomodoro-interruption-warn
+						)
+		)
   )
 (add-hook 'konix/org-capture-interruption-pre-hook
 		  'konix/konix/org-capture-interruption-pre-hook)
@@ -547,10 +555,10 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 				(org-get-tags-at (point))
 				)
 	(if konix/org-pomodoro-tray-daemon-prev-state
-	(konix/org-pomodoro-tray-daemon-put
-	 konix/org-pomodoro-tray-daemon-prev-state)
-	(warn "Could not find previous pomodoro state")
-	)
+		(konix/org-pomodoro-tray-daemon-put
+		 konix/org-pomodoro-tray-daemon-prev-state)
+	  (warn "Could not find previous pomodoro state")
+	  )
 	;; if more than 5 minutes in interruption, recommend to start a new pomodoro
 	(when (> (org-clock-get-clocked-time) 5)
 	  (message

@@ -487,7 +487,7 @@ class GCall(cmd.Cmd, object):
             method="DELETE"
         )
         f = urllib.request.urlopen(req)
-        assert f.code == 200
+        assert f.code == 204
         self.db.delete("all_events")
 
     def do_del_event(self, event_id):

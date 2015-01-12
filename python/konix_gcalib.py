@@ -493,19 +493,15 @@ class GCall(cmd.Cmd, object):
     def do_del_event(self, event_id):
         self.del_event(event_id)
 
-    @provides("all_events")
-    def list_all_events(self):
-        calendar_id = self.db.get("calendar_id")
-        if not calendar_id:
-            return None
+    def get_events(self, calendar_id, extra_query=None):
         def get_events(page_token=None):
             url='https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=2500&singleEvents=True'.format(
                 calendar_id
             )
             if page_token:
                 url += "&pageToken={}".format(page_token)
-            if self.db.get("event_list_extra_query"):
-                url += self.db.get("event_list_extra_query")
+            if extra_query:
+                url += extra_query
             req = urllib.request.Request(
                 url=url,
                 headers={"Content-Type": "application/json",
@@ -526,6 +522,14 @@ class GCall(cmd.Cmd, object):
             Event(**i)
             for i in items
             ]
+        return events
+
+    @provides("all_events")
+    def list_all_events(self):
+        calendar_id = self.db.get("calendar_id")
+        if not calendar_id:
+            return None
+        events = self.get_events(calendar_id, self.db.get("event_list_extra_query"))
         self.db.set("all_events", events)
 
     @needs("access_token")
@@ -610,22 +614,69 @@ class GCall(cmd.Cmd, object):
         event = Event(**data)
         return event
 
-    @needs("access_token")
-    @needs("calendar_id")
-    def update_event(self, event_id, new_summary):
-        calendar_id = self.db.get("calendar_id")
-        event = self.get_event(event_id)
+    def make_place(self, calendar_id, start, end):
+        # get the events in a reasonable range around start and end
+        extra_query = "&timeMin={}T00:00:00Z&timeMax={}T23:59:59Z".format(
+            start.strftime("%Y-%m-%d"),
+            end.strftime("%Y-%m-%d"),
+        )
+        events = self.get_events(calendar_id, extra_query)
+        # an event to move start before the end and end after the start
+        events = [event for event in events
+                  if event.startdate <= end
+                  and event.enddate >= start
+                  ]
+        for event in events:
+            # there are 4 cases
+            # the event is around start, end. I need to split it in two
+            if event.startdate < start and event.enddate > end:
+                new_start = end
+                new_end = event.enddate
+                new_duration = new_end - new_start
+                self.add_event(event.summary, event.location,
+                               new_start.strftime("%m/%d/%YT%H:%M:%S"),
+                               "{}s".format(int(new_duration.total_seconds())),
+                               event.description,
+                               make_place=False)
+                new_values = { "end" :
+                             {
+                                 'dateTime' : start.strftime(EVENT_STRFTIME)
+                             }
+                }
+                self._update_event(calendar_id, event, new_values)
+            # the event is inside start, end, it must be removed
+            elif event.startdate >= start and event.enddate <= end:
+                self.del_event(event.id)
+            # the event overlap not entirely with the start, end
+            # if the event is after
+            elif event.startdate >= start:
+                new_values = { "start" :
+                               {
+                                   'dateTime' : end.strftime(EVENT_STRFTIME)
+                               }
+                           }
+                self._update_event(calendar_id, event, new_values)
+            # if the event is before
+            elif event.enddate <= end:
+                new_values = { "end" :
+                               {
+                                   'dateTime' : start.strftime(EVENT_STRFTIME)
+                               }
+                           }
+                self._update_event(calendar_id, event, new_values)
+
+    def _update_event(self, calendar_id, event, new_values):
         dict_ = dict(event._asdict())
         dict_ = {
             k: dict_[k]
             for k in dict_
             if k in self.updatable_data
         }
-        dict_["summary"] = new_summary
+        dict_.update(new_values)
         req = urllib.request.Request(
             url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
                 calendar_id,
-                event_id
+                event.id
             ),
             data=json.dumps(
                 dict_
@@ -641,6 +692,14 @@ class GCall(cmd.Cmd, object):
         data = json.loads(f.read().decode("utf-8"))
         event = Event(**data)
         return event
+
+    @needs("access_token")
+    @needs("calendar_id")
+    def update_event(self, event_id, new_summary):
+        calendar_id = self.db.get("calendar_id")
+        event = self.get_event(event_id)
+        new_values = {"summary" : new_summary}
+        return self._update_event(calendar_id, event, _dict)
 
     def do_update_event(self, line):
         event_id, new_summary = shlex.split(line)

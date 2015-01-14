@@ -52,7 +52,7 @@
 	url = https://github.com/rocky/emacs-dbgr.git
 [submodule "config/elfiles/load-relative"]
 	path = config/elfiles/load-relative
-	url = https://github.com/emacsmirror/load-relative.git
+	url = https://github.com/rocky/emacs-load-relative
 [submodule "config/elfiles/loc-changes"]
 	path = config/elfiles/loc-changes
 	url = https://github.com/rocky/emacs-loc-changes.git

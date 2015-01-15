@@ -332,9 +332,27 @@ make the line non empty"
   (with-current-buffer buffer
 	(not
 	 (string-match "circe"
-	  (format "%s" major-mode)
-	  )
+				   (format "%s" major-mode)
+				   )
 	 )
+	)
+  )
+
+(defun konix/circe-dead-p (buffer)
+  (with-current-buffer buffer
+	(when (not
+		   (or
+			(konix/not-circe-query-buffer-p buffer)
+			(konix/not-circe-buffer-p buffer)
+			)
+		   )
+	  (not
+	   (process-live-p
+		(with-circe-server-buffer
+		  circe-server-process)
+		)
+	   )
+	  )
 	)
   )
 
@@ -357,10 +375,10 @@ make the line non empty"
 
 (defun konix/not-client-p (buffer)
   (with-current-buffer buffer
-   (not
-	server-buffer-clients
+	(not
+	 server-buffer-clients
+	 )
 	)
-   )
   )
 
 (defun konix/server-buffer-still-has-client-p ()
@@ -417,7 +435,7 @@ current buffer still has clients"
 	  (backup-buffer)
 	  (message "Wrote and backup-ed file '%s'"
 			   file_name)
-	 )
+	  )
 	)
   )
 

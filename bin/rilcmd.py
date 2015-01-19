@@ -198,11 +198,7 @@ class RilCmd(cmd.Cmd, object):
             return
         else:
             print "Opening %s" % item
-        os.system("%s '%s'" % (
-            os.environ["BROWSER"],
-            item.index_abs_path.encode("utf-8"),
-            )
-            )
+            item.open()
 
     def print_items(self, items):
         self.printed_items = items

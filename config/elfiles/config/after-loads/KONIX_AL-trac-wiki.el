@@ -62,8 +62,6 @@
 	  )
 	)
   )
-(add-to-list 'kill-emacs-query-functions 'konix/tracking/kill-emacs-query-function)
-
 
 (defun konix/trac-wiki-escape-camel-case-links ()
   (interactive)

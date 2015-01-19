@@ -298,6 +298,15 @@ class RILItem(object):
         elif self.in_dl:
             return 16
         self.in_dl = True
+        rc = self._download_wget(mode)
+        if os.path.exists(self.dl_mode_file_path):
+            os.unlink(self.dl_mode_file_path)
+        open(self.dl_mode_file_path, "w").write(str(mode))
+        self.in_dl = False
+        assert self.in_dl == False
+        return rc
+
+    def _download_wget(self, mode):
         command = ["wget",
                    "--unlink",
                    "--convert-links",
@@ -342,11 +351,6 @@ class RILItem(object):
         p.wait()
         output.write("\nreturncode: "+ str(p.returncode))
         output.close()
-        if os.path.exists(self.dl_mode_file_path):
-            os.unlink(self.dl_mode_file_path)
-        open(self.dl_mode_file_path, "w").write(str(mode))
-        self.in_dl = False
-        assert self.in_dl == False
         return p.returncode
 
     @property

@@ -298,7 +298,19 @@ class RILItem(object):
         elif self.in_dl:
             return 16
         self.in_dl = True
-        rc = self._download_wget(mode)
+        if self.url.startswith("file:"):
+            path = self.url.replace("file:", "")
+            name = os.path.split(path)[1]
+            # a simple symbolic link should suffice
+            if os.path.exists(path):
+                os.symlink(path, os.path.join(self.dir, name))
+                with open(self.index_file_path, "w") as index:
+                    index.write(name)
+                rc = 0
+            else:
+                rc = 1
+        else:
+            rc = self._download_wget(mode)
         if os.path.exists(self.dl_mode_file_path):
             os.unlink(self.dl_mode_file_path)
         open(self.dl_mode_file_path, "w").write(str(mode))

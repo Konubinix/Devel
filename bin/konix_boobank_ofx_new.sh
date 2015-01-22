@@ -20,6 +20,10 @@ DATE="$(date '+%Y-%m-%d %H:%M:%S' -d@"${DATE_STR}")"
 NOW_STR="$(date '+%s')"
 
 echo "Importing the bank account ${ACCOUNT} from date ${DATE}"
-boobank -q history -n 0 "${ACCOUNT}@${BANK}" "${DATE}" -f ofx > "${ACCOUNT}_${BANK}_${NOW_STR}.ofx"
+OFX_FILE_NAME="${ACCOUNT}_${BANK}_${NOW_STR}.ofx"
+trap "rm '${OFX_FILE_NAME}'" 0
+boobank -q history -n 0 "${ACCOUNT}@${BANK}" "${DATE}" -f ofx \
+		> "${OFX_FILE_NAME}"
+trap "" 0
 echo "Calling the post hook"
 konix_boobank_ofx_new_post_hook.sh "${ACCOUNT}_${BANK}_${NOW_STR}.ofx"

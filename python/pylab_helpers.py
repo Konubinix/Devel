@@ -61,3 +61,17 @@ dimension.
   for figure, input, name in zip(sp.flat, inputs.T, names):
       figure.plot(input)
       figure.set_title(name)
+
+def viewasfloatarray(array):
+    return array.view(dtype="f").reshape(len(array), len(array[0]))
+
+def array_center(array):
+    """Return a new array, whose mean is 0 on the axis=0."""
+    return array - array.mean(axis=0)
+
+def array_reduce(array):
+    """Return a new array, whose values are in the interval [0-1]. The maximum
+    and minimum values taken into account are along the axis=0."""
+    M = array.max(axis=0)
+    m = array.min(axis=0)
+    return (array - m) / (M - m)

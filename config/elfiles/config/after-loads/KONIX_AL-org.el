@@ -370,7 +370,7 @@ with a precise timestamp)."
 		(org-clock-goto)
 		)
 	   )
-	 (eval ,body)
+	 ,body
 	 )
   )
 

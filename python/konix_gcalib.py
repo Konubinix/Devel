@@ -432,6 +432,7 @@ class GCall(cmd.Cmd, object):
 
     @provides("calendar_id", True)
     def do_select_calendar(self, calendar_id):
+        calendar_id = shlex.split(calendar_id)[0]
         if calendar_id:
             self.db.set("calendar_id", calendar_id)
             self.db.delete("all_events")

@@ -2796,7 +2796,7 @@ of the clocksum."
   ""
   )
 
-(defface konix/org-agenda-future-deadline-face
+(defface konix/org-agenda-dimmed-deadline-face
   '(
 	(
 	 ((class color)
@@ -2812,11 +2812,24 @@ of the clocksum."
   ""
   )
 
+(defun konix/org-is-in-schedule-p ()
+  (let (
+		(scheduled_time (konix/org-with-point-on-heading
+						 (org-get-scheduled-time (point))
+						 ))
+		)
+	(and
+	 scheduled_time
+	 (time-less-p scheduled_time (current-time))
+	 )
+	)
+  )
+
 (defvar konix/org-agenda-text-properties
   '(
 	("([0-9]+:[0-9]+) .+:INTERRUPTION:.*$" 0 konix/org-agenda-interruption-face)
 	("^.*:perso:.*$" 0 konix/org-agenda-perso-face)
-	("^.+In +.+ d\..*$" 0 konix/org-agenda-future-deadline-face)
+	("^.+In +.+ d\..*$" 0 konix/org-agenda-dimmed-deadline-face (not (konix/org-is-in-schedule-p)))
 	;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)
 	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
 	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
@@ -2831,13 +2844,28 @@ of the clocksum."
 	   (let (
 			 (regexp (first property))
 			 (match (second property))
+			 (match_beg nil)
+			 (match_end nil)
 			 (prop (third property))
+			 (predicate (and (>
+							  (length property)
+							  3
+							  )
+							 (fourth property)
+							 ))
 			 )
 		 (while (re-search-forward regexp nil t)
-		   (let (
-				 (ov (make-overlay (match-beginning match) (match-end match)))
-				 )
-			 (overlay-put ov 'face prop)
+		   (setq match_beg (match-beginning match))
+		   (setq match_end (match-end match))
+		   (when (or
+				  (not predicate)
+				  (eval predicate)
+				  )
+			 (let (
+				   (ov (make-overlay match_beg match_end))
+				   )
+			   (overlay-put ov 'face prop)
+			   )
 			 )
 		   )
 		 )

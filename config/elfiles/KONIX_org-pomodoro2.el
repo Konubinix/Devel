@@ -225,7 +225,7 @@ long              in %ss seconds (%s min) %s"
 			  (error "You must start a pomodoro in a org buffer")
 			  )
 		  )
-		(org-timer-set-timer '(16))
+		(org-timer-set-timer '(64))
 		(when (and (not (org-clocking-p))
 				   (y-or-n-p "Clock in ?")
 				   )
@@ -265,7 +265,7 @@ long              in %ss seconds (%s min) %s"
 	)
   (save-window-excursion
 	(konix/org-clock-goto)
-	(org-timer-set-timer '(16))
+	(org-timer-set-timer '(64))
 	)
   (message "Taking a break of %s minutes" org-timer-default-timer)
   )

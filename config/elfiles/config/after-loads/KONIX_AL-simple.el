@@ -26,12 +26,11 @@
 
 (defun konix/shell/rename-async-shell-buffer (&optional output-buffer)
   (unless output-buffer
-	(setq output-buffer (get-buffer "*Async Shell Command*"))
-	)
-  (when output-buffer
-	(setq output-buffer (get-buffer output-buffer))
+	(setq output-buffer "*Async Shell Command*")
 	)
   (when (and output-buffer
+			 (stringp output-buffer)
+			 (get-buffer output-buffer)
 			 (save-window-excursion
 			   (switch-to-buffer output-buffer)
 			   (y-or-n-p

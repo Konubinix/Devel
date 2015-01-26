@@ -199,7 +199,10 @@ long              in %ss seconds (%s min) %s"
   (defalias 'konix/org-timer-done-hook 'konix/org-timer-done-pomodoro-hook)
   (save-excursion
 	(save-window-excursion
-	  (org-timer-cancel-timer)
+	  (require 'org-timer)
+	  (when org-timer-start-time
+		(org-timer-stop)
+		)
 	  (setq konix/org-pomodoro-in-pomodoro t)
 	  )
 	)
@@ -245,7 +248,10 @@ long              in %ss seconds (%s min) %s"
   (setq konix/org-pomodoro-in-pomodoro nil)
   (setq-default org-timer-default-timer time)
   (message "Canceling current timer")
-  (org-timer-cancel-timer)
+  (require 'org-timer)
+  (when org-timer-start-time
+   (org-timer-stop)
+   )
   (konix/org-pomodoro-tray-daemon-put "i")
   (when konix/org-pomodoro-break-clocks-out
 	(message "Clocking out of current task")
@@ -444,8 +450,8 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 	   (and
 		(member "diary" tags)
 		(not (konix/org-with-point-at-clocked-entry
-			  (org-entry-is-todo-p)
-			  )) ; I may enter TODO entries to prepare a
+				 (org-entry-is-todo-p)
+			   )) ; I may enter TODO entries to prepare a
 										; meeting. They will be tagged diary but are
 										; to be taken into account in the pomodorow
 										; process

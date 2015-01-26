@@ -55,8 +55,8 @@ set default_encoding utf-8
  # Yanking & pasting binds
 @cbind  yu  = spawn_sh 'echo -n "$UZBL_URI" | xclip'
 @cbind  ye  = uri \@(konix_uzbl_edit_uri.sh \@uri)\@
-@cbind  yt  = spawn_pawn_sh 'konix_uri_dwim.py "\@uri" "$(xclip -o)"'
-@cbind  yv  = spawn_pawn_sh "quvi '\@uri' --exec 'vlc %u'"
+@cbind  yt  = spawn_sh 'konix_uri_dwim.py "\@uri" "$(xclip -o)"'
+@cbind  yv  = spawn_sh "quvi '\@uri' --exec 'vlc %u'"
 @cbind  yas = spawn_sh "konix_ril_save_url.sh '\@uri' && konix_display.py 'Saved \@uri'"
 @bind <Ctrl>y = spawn_sh 'echo "event INJECT_KEYCMD $(xclip -o | sed s/\\\@/%40/g)" > "$UZBL_FIFO"'
 

@@ -661,21 +661,16 @@ items"
 			 )
 		(end_of_subtree
 		 (save-excursion
-		   (org-end-of-subtree)
+		   (org-end-of-subtree t t)
 		   (point)
 		   )
 		 )
 		(point (point))
-		(current_level (save-excursion
-						(org-current-level)
-						))
+		(current_level (org-current-level))
 		)
 	(if (or
 		 ;; not a project
-		 (not
-		  (save-excursion
-		   (member "project" (org-get-tags))
-		   )
+		 (not (member "project" (org-get-tags)))
 		  )
 		 ;; If it has a direct project child with status NEXT, the check will be
 		 ;; also done on the child, then this project may not be considered

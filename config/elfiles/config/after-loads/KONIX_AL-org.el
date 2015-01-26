@@ -671,6 +671,9 @@ items"
 	(if (or
 		 ;; not a project
 		 (not (member "project" (org-get-tags)))
+		 ;; done
+		 (konix/org-with-point-on-heading
+		  (org-entry-is-done-p)
 		  )
 		 ;; If it has a direct project child with status NEXT, the check will be
 		 ;; also done on the child, then this project may not be considered

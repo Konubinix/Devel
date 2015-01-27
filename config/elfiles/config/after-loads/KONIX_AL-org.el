@@ -49,6 +49,27 @@
   )
 (ad-activate 'org-attach-commit)
 
+(defun konix/org-open-at-point-move-to-link (orig-fun &rest args)
+  (let* ((context
+	      ;; Only consider supported types, even if they are not
+	      ;; the closest one.
+	      (org-element-lineage
+	       (org-element-context)
+	       '(comment paragraph item)
+	       t))
+	     (type (org-element-type context))
+	     (value (org-element-property :value context)))
+	(cond
+	 ;; On a paragraph, find a link on the current line after point.
+	 ((memq type '(paragraph item))
+	  (save-excursion
+	    (if (re-search-forward org-any-link-re (line-end-position) t)
+			(apply orig-fun args)
+	      (user-error "No link found"))))
+	 (t (apply orig-fun args))))
+  )
+(advice-add 'org-open-at-point :around #'konix/org-open-at-point-move-to-link)
+
 (defun konix/org-agenda-appt-reload ()
   (interactive)
   (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)

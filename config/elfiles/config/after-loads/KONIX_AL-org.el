@@ -377,17 +377,21 @@ with a precise timestamp)."
 (defun konix/org-guess-category-at-point_internal ()
   (let (
 		(archive_cat (org-entry-get-with-inheritance "ARCHIVE_CATEGORY"))
-		(cat (org-entry-get-with-inheritance "CATEGORY"))
+		(cat_property (org-entry-get-with-inheritance "CATEGORY"))
+		(cat (org-get-category))
 		)
 	(cond
 	 (cat
 	  cat
 	  )
+	 (cat_property
+	  cat_property
+	  )
 	 (archive_cat
 	  archive_cat
 	  )
 	 (t
-	  (org-get-category)
+	  (error "I don't know how to extract the category here...")
 	  )
 	 )
 	)

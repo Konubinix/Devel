@@ -429,7 +429,7 @@ with a precise timestamp)."
   )
 
 (defun konix/org-agenda-region-same-category ()
-  "Return the beg and end of the region around pount in the
+  "Return the beg and end of the region around point in the
   agenda of events of the same category"
   (let (
 		(here (point))
@@ -487,6 +487,39 @@ with a precise timestamp)."
 		)
 	  )
 	(cons beg end)
+	)
+  )
+
+(defun konix/org-agenda-move-to-next-event (&optional exclude_tags)
+  (unless exclude_tags
+	(setq exclude_tags '())
+	)
+  (while
+	  (and
+	   (or
+		(not
+		 (org-get-at-bol 'org-marker)
+		 )
+		(remove-if
+		 'null
+		 (mapcar
+		  (lambda (tag)
+			(member
+			 tag
+			 (konix/org-with-point-on-heading
+			  (org-get-tags-at (point))
+			  )
+			 )
+			)
+		  exclude_tags
+		  )
+		 )
+		)
+	   (not
+		(equal (point) (point-max))
+		)
+	   )
+	(forward-line)
 	)
   )
 

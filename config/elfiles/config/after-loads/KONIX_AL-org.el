@@ -55,11 +55,15 @@
 	      ;; the closest one.
 	      (org-element-lineage
 	       (org-element-context)
-	       '(comment paragraph item)
+	       '(comment paragraph item link)
 	       t))
 	     (type (org-element-type context))
 	     (value (org-element-property :value context)))
 	(cond
+	 ;; already in a link, just call the function
+	 ((memq type '(link))
+	  (apply orig-fun args)
+	  )
 	 ;; On a paragraph, find a link on the current line after point.
 	 ((memq type '(paragraph item))
 	  (save-excursion

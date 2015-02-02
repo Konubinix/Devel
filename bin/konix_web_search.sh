@@ -48,7 +48,9 @@ then
 fi
 
 URI=`konix_web_search_engine_find_uri.sh "$ENGINE"`
-URI="${URI//%s/$*}"
+REQUEST="${*}"
+REQUEST="${REQUEST// /+}"
+URI="${URI//%s/${REQUEST}}"
 # if the scheme indicates so, the URI must be evaled
 if echo "$URI" | grep -q -e "^eval:"
 then

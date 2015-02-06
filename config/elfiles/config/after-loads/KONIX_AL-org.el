@@ -937,7 +937,10 @@ items"
   )
 
 (defun konix/org-agenda-goto-char-biggest-duration-in-region (&optional beg end)
-  (when (region-active-p)
+  (when (and
+		 (not beg)
+		 (region-active-p)
+		 )
 	(setq beg (region-beginning)
 		  end (region-end)
 		  )

@@ -1,3 +1,4 @@
 #!/bin/bash
 
-exec ssh -f -L9635:127.0.0.1:9635 -L6660:127.0.0.1:6600 "${MPD_HOST}" sleep 5000000000
+set -eu
+exec ssh -f -L9635:${MPD_HOST}:9635 -L6660:${MPD_HOST}:6600 "${MPD_HOST_TUNNELER}" sleep 5000000000

@@ -167,10 +167,31 @@ cursor stays in the org buffer."
 		(tags (org-get-tags))
 		)
 	(add-to-list 'tags tag)
-	(org-set-tags-to
-	 (format ":%s:"
-			 (mapconcat 'identity tags ":")
-			 ))
+	(org-set-tags-to tags)
+	)
+  )
+
+(defun konix/org-del-tag (tag)
+  (interactive "sTag:")
+  (let (
+		(tags (org-get-tags))
+		)
+	(setq tags
+		  (remove-if (lambda (_tag) (equal _tag tag)) tags)
+		  )
+	(org-set-tags-to tags)
+	)
+  )
+
+(defun konix/org-toggle-tag (tag)
+  (interactive "sTag:")
+  (let (
+		(tags (org-get-tags))
+		)
+	(if (member tag tags)
+		(konix/org-del-tag tag)
+	  (konix/org-add-tag tag)
+	  )
 	)
   )
 

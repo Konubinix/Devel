@@ -424,7 +424,7 @@ with a precise timestamp)."
 		(org-agenda-switch-to)
 		)
 	   ('org-mode
-		t
+		(org-back-to-heading)
 		)
 	   (t
 		(org-clock-goto)

@@ -1329,9 +1329,7 @@ items"
 					(org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline
 																		 'scheduled)
 											  )
-					(
-					 (dummy (konix/org-agenda-inhibit-context-filtering))
-					 )
+					(dummy (konix/org-agenda-inhibit-context-filtering))
 					)
 				   )
 				  ("al" "log today"

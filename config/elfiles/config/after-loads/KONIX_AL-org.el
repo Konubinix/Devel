@@ -58,7 +58,10 @@
 	       '(comment paragraph item link)
 	       t))
 	     (type (org-element-type context))
-	     (value (org-element-property :value context)))
+	     (value (org-element-property :value context))
+		 (here (point))
+		 (goback nil)
+		 )
 	(cond
 	 ;; already in a link, just call the function
 	 ((memq type '(link))
@@ -66,10 +69,21 @@
 	  )
 	 ;; On a paragraph, find a link on the current line after point.
 	 ((memq type '(paragraph item))
-	  (save-excursion
-	    (if (re-search-forward org-any-link-re (line-end-position) t)
+	  (if (re-search-forward org-any-link-re (line-end-position) t)
+		  (progn
+			(unless (org-element-lineage
+				   (org-element-context)
+				   '(link)
+				   t)
+			  (setq goback t)
+			  )
 			(apply orig-fun args)
-	      (user-error "No link found"))))
+			(when goback
+			  (goto-char here)
+			  )
+			)
+		(user-error "No link found"))
+	  )
 	 (t (apply orig-fun args))))
   )
 (advice-add 'org-open-at-point :around #'konix/org-open-at-point-move-to-link)

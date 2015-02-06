@@ -205,8 +205,12 @@ class GCall(cmd.Cmd, object):
     def set_prompt(self):
         self.prompt = PROMPT.format(
             calendar_id=self.db.get("calendar_id"),
-            extra_query=self.db.get("event_list_extra_query")
+            extra_query=self.event_list_extra_query
         )
+
+    @property
+    def event_list_extra_query(self):
+        return self.db.get("event_list_extra_query")
 
     def do_init(self, line=None):
         self.do_get_user_permission()
@@ -389,7 +393,7 @@ class GCall(cmd.Cmd, object):
             print("Clearing the list of events")
             self.do_clear_list_event()
         else:
-            print(self.db.get("event_list_extra_query"))
+            print(self.event_list_extra_query)
         self.set_prompt()
 
     def do_del_event_list_extra_query(self, line):
@@ -531,7 +535,7 @@ class GCall(cmd.Cmd, object):
         calendar_id = self.db.get("calendar_id")
         if not calendar_id:
             return None
-        events = self.get_events(calendar_id, self.db.get("event_list_extra_query"))
+        events = self.get_events(calendar_id, self.event_list_extra_query)
         self.db.set("all_events", events)
 
     @needs("access_token")

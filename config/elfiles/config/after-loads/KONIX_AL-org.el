@@ -59,7 +59,9 @@
 	       t))
 	     (type (org-element-type context))
 	     (value (org-element-property :value context))
-		 (here (point))
+		 (start_point (point))
+		 (temp_point nil)
+		 (start_buffer (current-buffer))
 		 (goback nil)
 		 )
 	(cond
@@ -71,20 +73,31 @@
 	 ((memq type '(paragraph item))
 	  (if (re-search-forward org-any-link-re (line-end-position) t)
 		  (progn
-			(unless (org-element-lineage
-				   (org-element-context)
-				   '(link)
-				   t)
-			  (setq goback t)
-			  )
+			(setq temp_point (point))
 			(apply orig-fun args)
-			(when goback
-			  (goto-char here)
+			(when (or
+				   ;; moved to another buffer
+				   (not
+					(eq
+					 start_buffer
+					 (current-buffer)
+					 )
+					)
+				   ;; or stayed in the same buffer and did not move
+				   (eq
+					temp_point
+					(point)
+					)
+				   )
+			  (with-current-buffer start_buffer
+				(goto-char start_point)
+				)
 			  )
 			)
 		(user-error "No link found"))
 	  )
-	 (t (apply orig-fun args))))
+	 (t (apply orig-fun args)))
+	)
   )
 (advice-add 'org-open-at-point :around #'konix/org-open-at-point-move-to-link)
 

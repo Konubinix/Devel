@@ -509,6 +509,7 @@ class GCall(cmd.Cmd, object):
     def do_del_event(self, event_id):
         self.del_event(event_id)
 
+    @needs("access_token")
     def get_events(self, calendar_id, extra_query=None):
         def get_events(page_token=None):
             url='https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=2500&singleEvents=True'.format(

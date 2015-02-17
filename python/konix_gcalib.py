@@ -47,6 +47,7 @@ DISCOVERY_URI = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}
                      apiVersion="v3")
 
 EVENT_STRFTIME="%Y-%m-%dT%H:%M:%S.000%z"
+EVENT_URL_STRFTIME="%Y-%m-%dT%H:%M:%SZ"
 EVENT_STRFTIME_ALL_DAY="%Y-%m-%d"
 
 def lazy(expire_key):

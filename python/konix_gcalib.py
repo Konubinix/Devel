@@ -165,19 +165,21 @@ class GCall(cmd.Cmd, object):
 
         @property
         def startdate(self):
-            return dateutil.parser.parse(
-                self.start.get("dateTime")
-                or
-                self.start["date"]
-            )
+            if self.start.get("dateTime"):
+                return dateutil.parser.parse(self.start.get("dateTime"))
+            else:
+                return dateutil.parser.parse(
+                    self.start.get("date")
+                ).replace(tzinfo=datetime.timezone.utc)
 
         @property
         def enddate(self):
-            return dateutil.parser.parse(
-                self.end.get("dateTime")
-                or
-                self.end["date"]
-            )
+            if self.end.get("dateTime"):
+                return dateutil.parser.parse(self.end.get("dateTime"))
+            else:
+                return dateutil.parser.parse(
+                    self.end.get("date")
+                ).replace(tzinfo=datetime.timezone.utc)
 
         @property
         def uid(self):

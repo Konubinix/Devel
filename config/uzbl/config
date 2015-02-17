@@ -28,10 +28,10 @@ set default_encoding utf-8
 @cbind <Down>        = scroll vertical 20
 @cbind <Left>        = scroll horizontal -20
 @cbind <Right>       = scroll horizontal 20
-@cbind  <Ctrl><Mod1><Up>    = js page string scroll_up();
-@cbind  <Ctrl><Mod1><Down>  = js page string scroll_down();
-@cbind  <Ctrl><Mod1><Right>  = js page string scroll_faster();
-@cbind  <Ctrl><Mod1><Left>  = js page string scroll_slower();
+@cbind  <Ctrl><Mod1><Up>    = spawn_sync konix_display.py -u \@<scroll_up();>\@
+@cbind  <Ctrl><Mod1><Down>  = spawn_sync konix_display.py -u \@<scroll_down();>\@
+@cbind  <Ctrl><Mod1><Right>  = spawn_sync konix_display.py -u \@<scroll_faster();>\@
+@cbind  <Ctrl><Mod1><Left>  = spawn_sync konix_display.py -u \@<scroll_slower();>\@
 @cbind  <Mod1><Left>   = back
 @cbind  <Mod1><Right>   = forward
 @cbind  e   = toggle custom_encoding iso-8859-1 utf-8

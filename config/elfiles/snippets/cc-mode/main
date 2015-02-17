@@ -1,7 +1,10 @@
-#name: int main(argc, argv) { ... }
+# key: main
+# name: int main(argc, argv) { ... }
 # --
-int main(int argc, char *argv[])
-{
-    $0
-    return 0;
-}
+$>int main(int argc, char *argv[])
+$>{
+$>(void)argc;
+$>(void)argv;
+$>$0
+$>return 0;
+$>}

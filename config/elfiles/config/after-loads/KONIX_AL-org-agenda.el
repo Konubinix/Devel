@@ -111,5 +111,50 @@
   )
 
 
+(defvar konix/org-agenda/hide-dimmed-not-scheduled_overlays '())
+(defun konix/org-agenda/hide-dimmed-not-scheduled ()
+  (interactive)
+  (save-excursion
+	(goto-char (point-min))
+	(let (
+		  (intervalles '())
+		  )
+	  (while (re-search-forward "^.+In +.+ d\..*$" nil t)
+		(setq beg (match-beginning 0)
+			  end (1+
+				   (match-end 0)
+				   ))
+		(unless (konix/org-is-in-schedule-p)
+		  (add-to-list
+		   'intervalles
+		   (cons beg end)
+		   )
+		  )
+		)
+	  (mapc
+	   (lambda (intervalle)
+		 (let (
+			   (ov (make-overlay (car intervalle) (cdr intervalle)))
+			   )
+		   (add-to-list 'konix/org-agenda/hide-dimmed-not-scheduled_overlays ov)
+		   (overlay-put ov 'invisible t)
+		   )
+		 )
+	   intervalles
+	   )
+
+	  )
+	)
+  )
+
+
+(defun konix/org-agenda/remove-hidden-dimmed-not-scheduled ()
+  (interactive)
+  (mapc
+   'delete-overlay
+   konix/org-agenda/hide-dimmed-not-scheduled_overlays
+   )
+  )
+
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

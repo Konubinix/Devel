@@ -35,6 +35,80 @@
 (define-key org-agenda-mode-map [remap org-agenda-refile]
   'konix/org-agenda-refile-noupdate)
 
+(defun konix/org-agenda/dump-categories (&optional beg end)
+  (interactive)
+  (unless beg
+	(setq beg
+		  (if (region-active-p)
+			  (region-beginning)
+			(point-min)
+			)))
+  (unless end
+	(setq end
+		  (if (region-active-p)
+			  (region-end)
+			(point-max)
+			)))
+  (when (> beg end)
+	(user-error "beg must not be greater than end")
+	)
+  (let (
+		(line-end
+		 (save-excursion
+		   (goto-char end)
+		   (line-number-at-pos)))
+		(categories_times '())
+		(current_category nil)
+		(current_duration nil)
+		(assoc nil)
+		)
+	;; aggregating the data
+	(save-excursion
+	  (goto-char beg)
+	  (while (not (eq
+				   (line-number-at-pos)
+				   line-end
+				   ))
+		(when (org-get-at-bol 'org-marker)
+		  (setq current_category (konix/org-with-point-on-heading
+								  (org-get-category)
+								  )
+				current_duration (get-text-property (point) 'duration)
+				assoc (assoc current_category categories_times)
+				)
+		  (if assoc
+			  (setcdr assoc
+					  (+ current_duration
+						 (cdr assoc))
+					  )
+			;; add it to the map
+			(add-to-list
+			 'categories_times
+			 (cons
+			  current_category
+			  current_duration
+			  )
+			 )
+			)
+		  )
+		(forward-line)
+		)
+	  )
+	;; sort the values
+	(setq categories_times
+		  (sort categories_times
+				(lambda (cat1 cat2)
+				  (>
+				   (cdr cat1)
+				   (cdr cat2)
+				   )
+				  )
+				)
+		  )
+	(message "Categories:
+%s" categories_times)
+	)
+  )
 
 
 (provide 'KONIX_AL-org-agenda)

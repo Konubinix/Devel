@@ -180,11 +180,18 @@ class GCall(cmd.Cmd, object):
             )
 
         @property
+        def uid(self):
+            """Id that is uniq between recurring events"""
+            return re.match(
+                "^(?P<id>.+?)(_.{16})?$", self.id).group("id")
+
+        @property
         def duration(self):
             return self.enddate-self.startdate
         Event.startdate = startdate
         Event.enddate = enddate
         Event.duration = duration
+        Event.uid = uid
 
         self.types["CalendarListEntry"]["class"] = CalendarListEntry
         self.types["Event"]["class"] = Event

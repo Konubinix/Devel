@@ -476,6 +476,21 @@ with a precise timestamp)."
    )
   )
 
+(defun konix/org-element-cache-reset-all ()
+  (interactive)
+  (mapc
+   (lambda (file)
+	 (save-window-excursion
+	   (save-excursion
+		 (find-file file)
+		 (org-element-cache-reset)
+		 )
+	   )
+	 )
+   (org-agenda-files)
+   )
+  )
+
 (defun konix/org-agenda-region-same-category ()
   "Return the beg and end of the region around point in the
   agenda of events of the same category"

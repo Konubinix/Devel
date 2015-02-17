@@ -18,6 +18,7 @@ import pytz
 import parsedatetime
 import dateutil.parser
 import konix_collections
+import urllib.parse
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -511,7 +512,7 @@ class GCall(cmd.Cmd, object):
     def get_events(self, calendar_id, extra_query=None):
         def get_events(page_token=None):
             url='https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=2500&singleEvents=True'.format(
-                calendar_id
+                urllib.parse.quote(calendar_id)
             )
             if page_token:
                 url += "&pageToken={}".format(page_token)

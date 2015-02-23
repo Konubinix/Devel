@@ -100,7 +100,7 @@ PROMPT="GCal({calendar_id}, {extra_query})\n> "
 class GCall(cmd.Cmd, object):
     def __init__(self, make_place=False):
         cmd.Cmd.__init__(self)
-        self.db = redis.StrictRedis(decode_responses=True)
+        self.db = redis.StrictRedis(decode_responses=True, port=6380)
         self.client_id = self.db.get("client_id")
         self.client_secret = self.db.get("client_secret")
         assert self.client_id, "redis-cli set client_id <yourid> (https://console.developers.google.com/project/<yourapp>/apiui/credential)"

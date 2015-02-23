@@ -18,6 +18,9 @@
 [app] (class=Zenity)
   [Layer]	{6}
 [end]
+[app] (name=graphviz)
+  [Maximized]	{yes}
+[end]
 [app] (name=gecko) (class=Thunderbird-bin)
   [Maximized]	{yes}
   [Close]	{yes}

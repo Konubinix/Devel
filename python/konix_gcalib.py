@@ -54,10 +54,10 @@ def lazy(expire_key):
     def real_decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            if self.db.get(expire_key):
-                LOGGER.debug("{} up to date".format(expire_key))
+            if self.db.get(self.db_name_transform(expire_key)):
+                LOGGER.debug("{} up to date".format(self.db_name_transform(expire_key)))
             else:
-                LOGGER.debug("{} out of date (reeval)".format(expire_key))
+                LOGGER.debug("{} out of date (reeval)".format(self.db_name_transform(expire_key)))
                 return func(self, *args, **kwargs)
         return wrapper
     return real_decorator
@@ -69,19 +69,19 @@ def needs(expire_key):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if not (
-                    self.db.get(expire_key)
+                    self.db.get(self.db_name_transform(expire_key))
                     and expire_key in PROVIDERS_KEYS
             ):
-                LOGGER.debug("Calling the provider of the needed key {}".format(expire_key))
+                LOGGER.debug("Calling the provider of the needed key {}".format(self.db_name_transform(expire_key)))
                 provider, interactive = PROVIDERS_KEYS[expire_key]
                 if interactive:
                     LOGGER.error("You must call {}".format(provider))
                     return
                 provider(self)
-            if self.db.get(expire_key):
+            if self.db.get(self.db_name_transform(expire_key)):
                 return func(self, *args, **kwargs)
             else:
-                LOGGER.error("{} is needed".format(expire_key))
+                LOGGER.error("{} is needed".format())
         return wrapper
     return real_decorator
 
@@ -98,14 +98,13 @@ def provides(key, interactive=False):
 PROMPT="GCal({calendar_id}, {extra_query})\n> "
 
 class GCall(cmd.Cmd, object):
-    def __init__(self, make_place=False):
+    def __init__(self, make_place=False, account=""):
         cmd.Cmd.__init__(self)
         self.db = redis.StrictRedis(decode_responses=True, port=6380)
         self.client_id = self.db.get("client_id")
         self.client_secret = self.db.get("client_secret")
         assert self.client_id, "redis-cli set client_id <yourid> (https://console.developers.google.com/project/<yourapp>/apiui/credential)"
         assert self.client_secret, "redis-cli set client_secret <yoursecret> (https://console.developers.google.com/project/<yourapp>/apiui/credential)"
-        self.set_prompt()
         self.calendar_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.event_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.calendar_formatter = "str([x.id, x.summary])"
@@ -119,11 +118,14 @@ class GCall(cmd.Cmd, object):
             "status"
         ]
         self._make_place = make_place
+        self.account = account
+
+        self.set_prompt()
 
     @property
     @needs("calendars")
     def calendars(self):
-        calendars_string = self.db.get("calendars")
+        calendars_string = self.db.get(self.calendars_name)
         if calendars_string:
             calendars = eval(calendars_string)
         else:
@@ -215,7 +217,7 @@ class GCall(cmd.Cmd, object):
 
     def set_prompt(self):
         self.prompt = PROMPT.format(
-            calendar_id=self.db.get("calendar_id"),
+            calendar_id=self.db.get(self.calendar_id_name),
             extra_query=self.event_list_extra_query
         )
 
@@ -231,15 +233,56 @@ class GCall(cmd.Cmd, object):
         print(self.get_event(event_id))
 
     def do_clear_token(self, line=None):
-        self.db.delete("access_token")
-        self.db.delete("refresh_token")
+        self.db.delete(self.access_token_name)
+        self.db.delete(self.refresh_token_name)
+
+    def db_name_transform(self, name):
+        if name in ["access_token",
+                    "refresh_token",
+                    "user_code",
+                    "device_code",
+                    "all_events",
+                    "calendar_id",
+                    "calendars"
+                ]:
+            return "{}_{}".format(self.account, name)
+        else:
+            return name
+
+    @property
+    def access_token_name(self):
+        return self.db_name_transform("access_token")
+
+    @property
+    def user_code_name(self):
+        return self.db_name_transform("user_code")
+
+    @property
+    def device_code_name(self):
+        return self.db_name_transform("device_code")
+
+    @property
+    def refresh_token_name(self):
+        return self.db_name_transform("refresh_token")
+
+    @property
+    def all_events_name(self):
+        return self.db_name_transform("all_events")
+
+    @property
+    def calendar_id_name(self):
+        return self.db_name_transform("calendar_id")
+
+    @property
+    def calendars_name(self):
+        return self.db_name_transform("calendars")
 
     def do_clear_user_permission(self, line=None):
-        self.db.delete("user_code")
-        self.db.delete("device_code")
+        self.db.delete(self.user_code_name)
+        self.db.delete(self.device_code_name)
 
     def do_clear_list_event(self, line=None):
-        self.db.delete("all_events")
+        self.db.delete(self.all_events_name)
 
     @needs("device_code")
     def get_access_token(self):
@@ -248,18 +291,18 @@ class GCall(cmd.Cmd, object):
             data='client_id={}&client_secret={}&code={}&grant_type=http://oauth.net/grant_type/device/1.0'.format(
                 self.client_id,
                 self.client_secret,
-                self.db.get("device_code"),
+                self.db.get(self.device_code_name),
             ).encode("utf-8"))
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
-        self.db.set("access_token", data["access_token"])
-        self.db.expire("access_token", int(data["expires_in"]))
+        self.db.set(self.access_token_name, data["access_token"])
+        self.db.expire(self.access_token_name, int(data["expires_in"]))
         self.db.set("token_type", data["token_type"])
         assert self.db.get("token_type") == "Bearer"
-        self.db.set("refresh_token", data["refresh_token"])
+        self.db.set(self.refresh_token_name, data["refresh_token"])
         # now that I have a token, the device code is no longer expiring
-        self.db.persist("device_code")
+        self.db.persist(self.device_code_name)
 
     def get_refresh_token(self):
         req = urllib.request.Request(
@@ -267,13 +310,13 @@ class GCall(cmd.Cmd, object):
             data='client_id={}&client_secret={}&refresh_token={}&grant_type=refresh_token'.format(
                 self.client_id,
                 self.client_secret,
-                self.db.get("refresh_token")
+                self.db.get(self.refresh_token_name)
             ).encode("utf-8"))
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
-        self.db.set("access_token", data["access_token"])
-        self.db.expire("access_token", int(data["expires_in"]))
+        self.db.set(self.access_token_name, data["access_token"])
+        self.db.expire(self.access_token_name, int(data["expires_in"]))
         self.db.set("token_type", data["token_type"])
         assert self.db.get("token_type") == "Bearer"
 
@@ -281,7 +324,7 @@ class GCall(cmd.Cmd, object):
     @needs("device_code")
     @provides("access_token")
     def do_get_access_token(self, line=None):
-        if self.db.get("refresh_token"):
+        if self.db.get(self.refresh_token_name):
             self.get_refresh_token()
         else:
             self.get_access_token()
@@ -302,14 +345,14 @@ class GCall(cmd.Cmd, object):
         data = json.loads(f.read().decode("utf-8"))
         self.db.set("verification_url", data["verification_url"])
         self.db.set("interval", data["interval"])
-        self.db.set("user_code", data["user_code"])
-        self.db.expire("user_code", int(data["expires_in"]))
-        print("Write the code {}".format(self.db.get("user_code")))
+        self.db.set(self.user_code_name, data["user_code"])
+        self.db.expire(self.user_code_name, int(data["expires_in"]))
+        print("Write the code {}".format(self.db.get(self.user_code_name)))
         os.system("$BROWSER {}".format(self.db.get("verification_url")))
         print("Press Enter when done")
         sys.stdin.readline()
-        self.db.set("device_code", data["device_code"])
-        self.db.expire("device_code", int(data["expires_in"]))
+        self.db.set(self.device_code_name, data["device_code"])
+        self.db.expire(self.device_code_name, int(data["expires_in"]))
 
     @provides("calendars")
     def all_calendars(self):
@@ -317,7 +360,7 @@ class GCall(cmd.Cmd, object):
             url='https://www.googleapis.com/calendar/v3/users/me/calendarList',
             headers={"Authorization": "{} {}".format(
                 self.db.get("token_type"),
-                self.db.get("access_token"))}
+                self.db.get(self.access_token_name))}
         )
         f = urllib.request.urlopen(req)
         assert f.code == 200
@@ -326,7 +369,7 @@ class GCall(cmd.Cmd, object):
             CalendarListEntry(**item)
             for item in data["items"]
         ]
-        self.db.set("calendars", calendars)
+        self.db.set(self.calendars_name, calendars)
         return calendars
 
     @needs("access_token")
@@ -449,10 +492,10 @@ class GCall(cmd.Cmd, object):
     def do_select_calendar(self, calendar_id):
         calendar_id = shlex.split(calendar_id)[0]
         if calendar_id:
-            self.db.set("calendar_id", calendar_id)
-            self.db.delete("all_events")
+            self.db.set(self.calendar_id_name, calendar_id)
+            self.db.delete(self.all_events_name)
         else:
-            self.db.delete("calendar_id")
+            self.db.delete(self.calendar_id_name)
         self.set_prompt()
 
     def complete_select_calendar(self, text, line, begidx, endidx):
@@ -463,7 +506,7 @@ class GCall(cmd.Cmd, object):
 
     @needs("calendar_id")
     def do_describe_calendar(self, line):
-        calendar_id = self.db.get("calendar_id")
+        calendar_id = self.db.get(self.calendar_id_name)
         formatter = eval("lambda x:" + self.calendar_formatter)
         print(formatter([cal
                for cal in self.list_calendars()
@@ -473,7 +516,7 @@ class GCall(cmd.Cmd, object):
     @needs("calendar_id")
     @needs("access_token")
     def get_event(self, event_id):
-        calendar_id = self.db.get("calendar_id")
+        calendar_id = self.db.get(self.calendar_id_name)
         req = urllib.request.Request(
             url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
                 calendar_id,
@@ -482,7 +525,7 @@ class GCall(cmd.Cmd, object):
             headers={"Content-Type": "application/json",
                      "Authorization": "{} {}".format(
                 self.db.get("token_type"),
-                self.db.get("access_token"))}
+                self.db.get(self.access_token_name))}
         )
         f = urllib.request.urlopen(req)
         assert f.code == 200
@@ -491,7 +534,7 @@ class GCall(cmd.Cmd, object):
 
     @needs("access_token")
     def del_event(self, event_id):
-        calendar_id = self.db.get("calendar_id")
+        calendar_id = self.db.get(self.calendar_id_name)
         req = urllib.request.Request(
             url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
                 calendar_id,
@@ -500,12 +543,12 @@ class GCall(cmd.Cmd, object):
             headers={"Content-Type": "application/json",
                      "Authorization": "{} {}".format(
                          self.db.get("token_type"),
-                         self.db.get("access_token"))},
+                         self.db.get(self.access_token_name))},
             method="DELETE"
         )
         f = urllib.request.urlopen(req)
         assert f.code == 204
-        self.db.delete("all_events")
+        self.db.delete(self.all_events_name)
 
     def do_del_event(self, event_id):
         self.del_event(event_id)
@@ -525,7 +568,7 @@ class GCall(cmd.Cmd, object):
                 headers={"Content-Type": "application/json",
                          "Authorization": "{} {}".format(
                              self.db.get("token_type"),
-                             self.db.get("access_token"))}
+                             self.db.get(self.access_token_name))}
             )
             f = urllib.request.urlopen(req)
             assert f.code == 200
@@ -544,17 +587,17 @@ class GCall(cmd.Cmd, object):
 
     @provides("all_events")
     def list_all_events(self):
-        calendar_id = self.db.get("calendar_id")
+        calendar_id = self.db.get(self.calendar_id_name)
         if not calendar_id:
             return None
         events = self.get_events(calendar_id, self.event_list_extra_query)
-        self.db.set("all_events", events)
+        self.db.set(self.all_events_name, events)
 
     @needs("access_token")
     @needs("all_events")
     @needs("calendar_id")
     def list_events(self, search_terms=""):
-        events = eval(self.db.get("all_events"))
+        events = eval(self.db.get(self.all_events_name))
         search_terms = shlex.split(search_terms)
 
         for search_term in search_terms:
@@ -565,7 +608,7 @@ class GCall(cmd.Cmd, object):
 
     @needs("access_token")
     def do_list_events(self, search_term=None):
-        if not self.db.get("calendar_id"):
+        if not self.db.get(self.calendar_id_name):
             print("Use the command select_calendar first")
             return
         events = self.list_events(search_term)
@@ -585,7 +628,7 @@ class GCall(cmd.Cmd, object):
               ):
         if make_place is None:
             make_place = self._make_place
-        calendar_id = self.db.get("calendar_id")
+        calendar_id = self.db.get(self.calendar_id_name)
 
         attendees_emails = attendees_emails or []
         sendNotifications = "true" if sendNotifications else "false"
@@ -640,7 +683,7 @@ class GCall(cmd.Cmd, object):
             headers={"Content-Type": "application/json",
                      "Authorization": "{} {}".format(
                 self.db.get("token_type"),
-                self.db.get("access_token"))}
+                self.db.get(self.access_token_name))}
         )
         f = urllib.request.urlopen(req)
         assert f.code == 200
@@ -718,7 +761,7 @@ class GCall(cmd.Cmd, object):
             headers={"Content-Type": "application/json",
                      "Authorization": "{} {}".format(
                          self.db.get("token_type"),
-                         self.db.get("access_token"))},
+                         self.db.get(self.access_token_name))},
             method='PUT'
         )
         f = urllib.request.urlopen(req)
@@ -730,7 +773,7 @@ class GCall(cmd.Cmd, object):
     @needs("access_token")
     @needs("calendar_id")
     def update_event(self, event_id, new_summary):
-        calendar_id = self.db.get("calendar_id")
+        calendar_id = self.db.get(self.calendar_id_name)
         event = self.get_event(event_id)
         new_values = {"summary" : new_summary}
         return self._update_event(calendar_id, event, _dict)

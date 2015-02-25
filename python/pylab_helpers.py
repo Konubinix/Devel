@@ -113,6 +113,11 @@ def recfunctions_flatten_descr(ndtype, joinchar=None, __parents=None):
                 descr.append((prefix + field, typ))
         return tuple(descr)
 
+def recfunctions_view_flatten_array(array, joinchar=None):
+    return array.view(
+        dtype(list(recfunctions_flatten_descr(array.dtype, joinchar)))
+    )
+
 # def recfunctions_filter_descr(ndtype, nameregexp):
 #     if isinstance(nameregexp, basestring):
 #         nameregexp = re.compile(nameregexp)

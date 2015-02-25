@@ -5,6 +5,7 @@ import itertools
 import matplotlib
 from matplotlib.pyplot import subplots
 import numpy
+import re
 
 def timeseries_scatter_plots(inputs, names=None, title=None, nrows=4):
   """inputs: matrix of measures
@@ -75,3 +76,59 @@ def array_reduce(array):
     M = array.max(axis=0)
     m = array.min(axis=0)
     return (array - m) / (M - m)
+
+def recfunctions_flatten_descr(ndtype, joinchar=None, __parents=None):
+    """
+    Flatten a structured data-type description.
+
+    Examples
+    --------
+    >>> from numpy.lib import recfunctions as rfn
+    >>> ndtype = np.dtype([('a', '<i4'), ('b', [('ba', '<f8'), ('bb', '<i4')])])
+    >>> rfn.flatten_descr(ndtype)
+    (('a', dtype('int32')), ('ba', dtype('float64')), ('bb', dtype('int32')))
+    >>> rfn.flatten_descr(ndtype, joinchar="_")
+    (('a', dtype('int32')), ('b_ba', dtype('float64')), ('b_bb', dtype('int32')))
+
+    """
+    names = ndtype.names
+    if not __parents:
+        __parents = []
+    if joinchar and __parents:
+        prefix = joinchar.join(__parents) + joinchar
+    else:
+        prefix = ""
+    if names is None:
+        return ndtype.descr
+    else:
+        descr = []
+        for field in names:
+            (typ, _) = ndtype.fields[field]
+            if typ.names:
+                descr.extend(recfunctions_flatten_descr(
+                    typ,
+                    joinchar,
+                    __parents + [field ,]))
+            else:
+                descr.append((prefix + field, typ))
+        return tuple(descr)
+
+# def recfunctions_filter_descr(ndtype, nameregexp):
+#     if isinstance(nameregexp, basestring):
+#         nameregexp = re.compile(nameregexp)
+#     if not ndtype.names:
+#         return ndtype
+#     names = ndtype.names
+#     if names is None:
+#         return ndtype, True
+#     else:
+#         descr = []
+#         for field in names:
+#             (typ, _) = ndtype.fields[field]
+#             res, keepit = recfunctions_filter_descr(typ, nameregexp)
+#             if res is not None and keepit:
+#                 descr.append((field, res))
+#         if descr:
+#             return dtype(descr)
+#         else:
+#             return None

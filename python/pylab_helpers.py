@@ -98,13 +98,21 @@ def recfunctions_flatten_descr(ndtype, joinchar=None, __parents=None):
         prefix = joinchar.join(__parents) + joinchar
     else:
         prefix = ""
+    if ndtype.subdtype:
+        typ, (number, ) = ndtype.subdtype
+        descr = []
+        for index in range(1, number + 1):
+            descr.append(
+                ("{}{}".format(prefix, index), typ)
+            )
+        return tuple(descr)
     if names is None:
         return ndtype.descr
     else:
         descr = []
         for field in names:
             (typ, _) = ndtype.fields[field]
-            if typ.names:
+            if typ.names or typ.subdtype:
                 descr.extend(recfunctions_flatten_descr(
                     typ,
                     joinchar,
@@ -115,7 +123,7 @@ def recfunctions_flatten_descr(ndtype, joinchar=None, __parents=None):
 
 def recfunctions_view_flatten_array(array, joinchar=None):
     return array.view(
-        dtype(list(recfunctions_flatten_descr(array.dtype, joinchar)))
+        numpy.dtype(list(recfunctions_flatten_descr(array.dtype, joinchar)))
     )
 
 # def recfunctions_filter_descr(ndtype, nameregexp):

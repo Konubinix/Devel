@@ -178,3 +178,7 @@
 [submodule "gui2py"]
 	path = gui2py
 	url = https://github.com/reingart/gui2py.git
+[submodule "PulseDroid"]
+	path = PulseDroid
+	url = https://github.com/Konubinix/PulseDroid.git
+

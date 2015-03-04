@@ -84,7 +84,7 @@
 									 )
 	 (konix/push-or-replace-in-alist 'bs-configurations "circe-dead-buffers"
 									 nil nil nil
-									 'konix/circe-dead-p
+									 'konix/not-circe-dead-p
 									 'bs-sort-buffer-interns-are-last
 									 )
 	 )

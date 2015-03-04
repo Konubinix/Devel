@@ -431,9 +431,13 @@ is_sourced () {
 }
 
 my_location () {
-    RES="$(dirname "${BASH_SOURCE[0]}")"
+    echo "$(dirname "${0}")"
 }
 
 my_name () {
-    RES="$(basename "${BASH_SOURCE[0]}")"
+    echo "$(basename "${0}")"
+}
+
+call_second_like_me () {
+    "$(konix_find_next_in_path.sh -n "$(my_name)")" "$@"
 }

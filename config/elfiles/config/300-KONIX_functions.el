@@ -341,7 +341,7 @@ make the line non empty"
 (defun konix/circe-dead-p (buffer)
   (with-current-buffer buffer
 	(when (not
-		   (or
+		   (and
 			(konix/not-circe-query-buffer-p buffer)
 			(konix/not-circe-buffer-p buffer)
 			)

@@ -6,6 +6,7 @@ import matplotlib
 from matplotlib.pyplot import subplots
 import numpy
 import re
+import pandas
 
 def timeseries_scatter_plots(inputs, names=None, title=None, nrows=4):
   """inputs: matrix of measures
@@ -145,3 +146,22 @@ def recfunctions_view_flatten_array(array, joinchar=None):
 #             return dtype(descr)
 #         else:
 #             return None
+
+def pd_lexicographic_lesser_than(vector1, vector2):
+    if isinstance(vector1, pandas.core.frame.DataFrame):
+        vector1 = vector1.iloc[:,0]
+    if isinstance(vector2, pandas.core.frame.DataFrame):
+        vector2 = vector2.iloc[:,0]
+    difference = vector1 != vector2
+    difference = difference[difference]
+    if len(difference) == 0:
+        # equal
+        return 0
+    first_different_index = difference.index[0]
+    return 1 if vector1[first_different_index] < vector2[first_different_index] else -1
+
+def pd_lexicographic_sort(df):
+    # make a list of vectors out of df
+    vector_list = [df[[c]] for c in df.columns]
+    vector_list.sort(cmp=pd_lexicographic_lesser_than)
+    return pandas.concat(vector_list, axis=1)

@@ -182,3 +182,6 @@
 	path = PulseDroid
 	url = https://github.com/Konubinix/PulseDroid.git
 
+[submodule "xapers"]
+	path = xapers
+	url = https://github.com/Konubinix/xapers.git

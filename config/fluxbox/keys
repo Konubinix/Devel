@@ -334,6 +334,7 @@ Mod4 m u :ExecCommand konix_display.py "Updating mpd" && mpc --wait update && ko
 Mod4 m Down :ExecCommand konix_do_cron_job.sh mpc volume -5 && konix_display_unique.py "MPD : $(mpc volume)"
 Mod4 m Up :ExecCommand konix_do_cron_job.sh mpc volume +5 && konix_display_unique.py "MPD : $(mpc volume)"
 Mod4 m s :ExecCommand konix_do_cron_job.sh konix_mpc_display.sh
+Mod4 m e :ExecCommand konix_do_cron_job.sh konix_mpc_display.sh
 
 # command the mpc with the same kind of bindings than the volume
 Mod4 Mod1 Left :ExecCommand konix_do_cron_job.sh mpc seek -00:00:05 && konix_display.py "Backward 5 seconds"

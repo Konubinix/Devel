@@ -35,6 +35,7 @@ set default_encoding utf-8
 @cbind  <Mod1><Left>   = back
 @cbind  <Mod1><Right>   = forward
 @cbind  e   = toggle custom_encoding iso-8859-1 utf-8
+@cbind  2   = set zoom_level 1.5
 
 @cbind  dss = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh'
 @cbind  dsd = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh -d'

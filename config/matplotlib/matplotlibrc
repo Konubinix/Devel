@@ -138,7 +138,8 @@ backend      : TkAgg
 # settings for axes and ticks. Special text sizes can be defined
 # relative to font.size, using the following values: xx-small, x-small,
 # small, medium, large, x-large, xx-large, larger, or smaller
-#font.size           : 12.0
+font.size           : 8.0
+#font.size           : xx-small
 #font.serif          : Bitstream Vera Serif, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
 #font.sans-serif     : Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
 #font.cursive        : Apple Chancery, Textile, Zapf Chancery, Sand, cursive
@@ -233,6 +234,7 @@ backend      : TkAgg
 #axes.grid           : False   # display grid or not
 #axes.titlesize      : large   # fontsize of the axes title
 #axes.labelsize      : medium  # fontsize of the x any y labels
+axes.labelsize      : xx-small  # fontsize of the x any y labels
 #axes.labelweight    : normal  # weight of the x and y labels
 #axes.labelcolor     : black
 #axes.axisbelow      : False   # whether axis gridlines and ticks are below
@@ -269,6 +271,7 @@ backend      : TkAgg
 #xtick.minor.pad      : 4      # distance to the minor tick label in points
 #xtick.color          : k      # color of the tick labels
 #xtick.labelsize      : medium # fontsize of the tick labels
+xtick.labelsize      : xx-small # fontsize of the tick labels
 #xtick.direction      : in     # direction: in, out, or inout
 
 #ytick.major.size     : 4      # major tick size in points
@@ -279,6 +282,7 @@ backend      : TkAgg
 #ytick.minor.pad      : 4      # distance to the minor tick label in points
 #ytick.color          : k      # color of the tick labels
 #ytick.labelsize      : medium # fontsize of the tick labels
+ytick.labelsize      : xx-small # fontsize of the tick labels
 #ytick.direction      : in     # direction: in, out, or inout
 
 
@@ -290,10 +294,12 @@ backend      : TkAgg
 
 ### Legend
 #legend.fancybox      : False  # if True, use a rounded box for the
+legend.fancybox      : True  # if True, use a rounded box for the
                                # legend, else a rectangle
 #legend.isaxes        : True
 #legend.numpoints     : 2      # the number of points in the legend line
 #legend.fontsize      : large
+legend.fontsize      : xx-small
 #legend.borderpad     : 0.5    # border whitespace in fontsize units
 #legend.markerscale   : 1.0    # the relative size of legend markers vs. original
 # the following dimensions are in axes coords
@@ -311,6 +317,7 @@ backend      : TkAgg
 # See http://matplotlib.org/api/figure_api.html#matplotlib.figure.Figure
 #figure.figsize   : 8, 6    # figure size in inches
 #figure.dpi       : 80      # figure dots per inch
+figure.dpi       : 160      # figure dots per inch
 #figure.facecolor : 0.75    # figure facecolor; 0.75 is scalar gray
 #figure.edgecolor : white   # figure edgecolor
 #figure.autolayout : False  # When True, automatically adjust subplot
@@ -371,7 +378,7 @@ backend      : TkAgg
 # e.g., you may want a higher resolution, or to make the figure
 # background white
 #savefig.dpi         : 100      # figure dots per inch
-savefig.dpi         : 300
+savefig.dpi         : 600
 #savefig.facecolor   : white    # figure facecolor when saving
 #savefig.edgecolor   : white    # figure edgecolor when saving
 #savefig.format      : png      # png, ps, pdf, svg
@@ -429,6 +436,7 @@ savefig.dpi         : 300
 # You can access the verbose instance in your code
 #   from matplotlib import verbose.
 #verbose.level  : silent      # one of silent, helpful, debug, debug-annoying
+verbose.level  : helpful      # one of silent, helpful, debug, debug-annoying
 #verbose.fileo  : sys.stdout  # a log filename, sys.stdout or sys.stderr
 
 # Event keys to interact with figures/plots via keyboard.

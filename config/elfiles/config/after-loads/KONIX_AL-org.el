@@ -3193,6 +3193,28 @@ of the clocksum."
 	  (org-add-link-props :link link :description desc)
 	  link)))
 
+;;;;;;;;;;;;
+;; Xapers ;;
+;;;;;;;;;;;;
+(defun konix/org-xaper-open-link (id)
+  (let* (
+		 (id (replace-regexp-in-string "id:" "" id))
+		 (file
+		  (org-trim
+		   (shell-command-to-string
+			(format
+			 "xapers search --output=files id:%s" id))
+		   ))
+		 )
+	(if file
+		(org-open-file file)
+	  (user-error "No file associated to id %s" id)
+	  )
+	)
+  )
+
+(org-add-link-type "xapers" 'konix/org-xaper-open-link)
+
 ;; ######################################################################
 ;; Calfw integration
 ;; ######################################################################

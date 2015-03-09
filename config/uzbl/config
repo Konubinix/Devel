@@ -50,6 +50,7 @@ set default_encoding utf-8
 @cbind  zo  = uri \@(echo "http://www.mywot.com/en/scorecard/$UZBL_URI")\@
 @cbind  zb  = uri \@(echo "http://wayback.archive.org/web/*/$UZBL_URI")\@
 @cbind  zf  = spawn \@(which firefox)\@ "\@uri"
+@cbind  zc  = spawn \@(which chromium)\@ "\@uri"
 @cbind  zws  = spawn_sh 'konix_web_search.sh "$(xclip -o)"'
 @cbind  zwd  = spawn_sh 'konix_web_search.sh -d "$(xclip -o)"'
 

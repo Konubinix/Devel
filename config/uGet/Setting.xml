@@ -34,21 +34,23 @@
     <Statusbar value='1'/>
     <Category value='1'/>
     <Summary value='1'/>
+    <Banner value='1'/>
     <x value='0'/>
     <y value='0'/>
-    <width value='0'/>
-    <height value='0'/>
+    <width value='1920'/>
+    <height value='1035'/>
     <maximized value='1'/>
   </Window>
   <UserInterface>
     <CloseConfirmation value='0'/>
     <CloseAction value='1'/>
-    <DeleteConfirmation value='1'/>
+    <DeleteConfirmation value='0'/>
     <ShowTrayIcon value='1'/>
     <StartInTray value='0'/>
     <StartInOfflineMode value='0'/>
     <StartNotification value='1'/>
     <SoundNotification value='0'/>
+    <ApplyRecently value='1'/>
   </UserInterface>
   <Clipboard>
     <pattern value='ZIP|BIN|GZ|7Z|Z|TAR|TGZ|BZ2|A[0-9]?|LZH|MP3|RPM|DEB|EXE|RAR|R[0-9][0-9]'/>
@@ -56,10 +58,20 @@
     <quiet value='0'/>
     <NthCategory value='0'/>
   </Clipboard>
+  <SpeedLimit>
+    <NormalUpload value='0'/>
+    <NormalDownload value='0'/>
+    <SchedulerUpload value='0'/>
+    <SchedulerDownload value='0'/>
+  </SpeedLimit>
   <Scheduler>
     <enable value='0'/>
     <state>3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,</state>
   </Scheduler>
+  <Commandline>
+    <quiet value='0'/>
+    <CategoryIndex value='-1'/>
+  </Commandline>
   <Plug-in>
     <aria2-enable value='0'/>
     <aria2-launch value='1'/>
@@ -68,5 +80,10 @@
     <aria2-args value='--enable-rpc'/>
     <aria2-uri value='http://localhost:6800/rpc'/>
   </Plug-in>
-  <FolderList/>
+  <FolderList>
+    <string value='/home/slo/data/DL'/>
+    <string value='/home/slo/Prog/devel/../perso/DL'/>
+    <string value='/home/slo/gits/DL'/>
+    <string value='/home/slo/perso/DL'/>
+  </FolderList>
 </UgSetting>

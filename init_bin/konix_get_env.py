@@ -9,6 +9,7 @@ import re
 import logging
 import socket
 import random
+import glob
 
 logging.basicConfig(level=logging.DEBUG)
 default_config_file = os.path.join(os.path.expanduser("~"),".env_"+os.sys.platform+".conf")
@@ -36,6 +37,9 @@ def mergeItemsOfSection(items):
     return (new_items, items_keys,)
 
 def parse_value(key, value, previous_config, new_config):
+    # the value may be evaled
+    if value.startswith("eval:"):
+        value = eval(value.replace("eval:", ""))
     # first step is to make sure to correctly unquote the values
     value = re.sub('^"(.*)"$', r"'\1'", value)
     value = re.sub("^'(.*)'$", r"\1", value)

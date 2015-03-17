@@ -5,12 +5,14 @@ usage () {
 $0 [-h] [-e engine] [-d]
 -d: default engine
 -e: choose the engine
+-c: use clipboard content
 -h: show this
 EOF
 }
 
 ENGINE=""
-while getopts "he:d" opt; do
+CLIPBOARD=""
+while getopts "he:dc" opt; do
     case $opt in
         h)
             usage
@@ -20,7 +22,15 @@ while getopts "he:d" opt; do
             ENGINE="$OPTARG"
             ;;
         d)
-            ENGINE="`konix_web_search_engines.sh|head -1`"
+            if [ -e "${KONIX_WEB_SEARCH_DEFAULT_ENGINE_FILE}" ]
+            then
+                ENGINE="$(cat "${KONIX_WEB_SEARCH_DEFAULT_ENGINE_FILE}")"
+            else
+                ENGINE="`konix_web_search_engines.sh|head -1`"
+            fi
+            ;;
+        c)
+            CLIPBOARD="1"
             ;;
     esac
 done
@@ -35,16 +45,23 @@ then
     fi
 fi
 
-if [ -z "$1" ]
+if [ -n "${CLIPBOARD}" ]
 then
-	RES=`konix_gtk_entry.py --text "Search what in $ENGINE ?"`
-    if [ -n "$RES" ]
-    then
-        set $RES
-    else
-        exit 1
-    fi
+    CONTENT="`xclip -o`"
+else
+    CONTENT="${1}"
+fi
 
+if [ -z "${CONTENT}" ]
+then
+	CONTENT=`konix_gtk_entry.py --text "Search what in $ENGINE ?"`
+fi
+
+if [ -n "$CONTENT" ]
+then
+    set ${CONTENT}
+else
+    exit 1
 fi
 
 URI=`konix_web_search_engine_find_uri.sh "$ENGINE"`

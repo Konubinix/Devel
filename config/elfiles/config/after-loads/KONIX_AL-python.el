@@ -45,10 +45,19 @@
 		(list #'autopair-default-handle-action
 			  #'autopair-python-triple-quote-action)
 		)
-  (add-hook 'after-save-hook 'konix/make-executable t t)
+  (add-hook 'after-save-hook 'konix/python/make-executable t t)
   )
 (add-hook 'python-mode-hook
 		  'konix/python-mode-hook)
+
+(defun konix/python/make-executable ()
+  (when (save-excursion
+		  (goto-char (point-min))
+		  (re-search-forward "__name__.+==.+\"__main__\"" nil t)
+		 )
+   (konix/make-executable)
+   )
+  )
 
 (defun konix/inferior-python-mode-hook ()
   (auto-complete-mode t)

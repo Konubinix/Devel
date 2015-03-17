@@ -25,6 +25,18 @@
 ;;; Code:
 
 (define-key grep-mode-map (kbd "o") 'konix/compile-goto-error-other-window)
+(konix/push-or-replace-in-alist
+ 'grep-host-defaults-alist
+ 'localhost
+ '(grep-command "grep -i -nH -r -e ")
+ '(grep-template "grep <C> -nH -r -e  <R> <F>")
+ '(grep-use-null-device nil)
+ '(grep-find-command "find . -type f -print0 | xargs -0 -e grep -nH -e ")
+ '(grep-find-template "find . <X> -type f <F> -exec grep <C> -nH -e <R> {} +")
+ '(grep-find-use-xargs exec-plus)
+ '(grep-highlight-matches auto)
+ )
+
 
 (provide 'KONIX_AL-grep)
 ;;; KONIX_AL-grep.el ends here

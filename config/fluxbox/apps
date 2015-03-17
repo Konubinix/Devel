@@ -73,7 +73,6 @@
   [Layer]	{6}
 [end]
 [app] (name=evince) (class=Evince)
-#  [Maximized]	{yes}
 [end]
 [app] (name=VCLSalFrame.DocumentWindow) (class=OpenOffice.org 3.2)
   [Workspace]	{6}

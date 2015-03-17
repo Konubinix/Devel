@@ -37,8 +37,10 @@ set default_encoding utf-8
 @cbind  e   = toggle custom_encoding iso-8859-1 utf-8
 @cbind  2   = set zoom_level 1.5
 
-@cbind  dss = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh'
-@cbind  dsd = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh -d'
+@cbind  dss = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh -c'
+@cbind  dsS = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh'
+@cbind  dsd = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh -dc'
+@cbind  dsD = spawn_sh 'BROWSER=konix_browser_uzbl_inject.sh konix_web_search.sh -d'
 
 # org protocol
 @cbind  <Ctrl>o  = spawn "@scripts_dir/org-capture.sh" "B" "\@<encodeURIComponent(location.href)>\@" "\@<encodeURIComponent(document.title)>\@" "\@<encodeURIComponent(window.getSelection())>\@"

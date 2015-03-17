@@ -244,9 +244,13 @@ Control Mod4 r :ExecCommand $(konix_goto_true_exec.sh recoll konix_recoll.py)
 Mod4 w u :MacroCmd {ExecCommand konix_display.py "Executing konix_web_bookmark"} {ExecCommand $(konix_do_cron_job.sh konix_web_bookmark.sh)}
 Mod4 w Shift U :MacroCmd {ExecCommand konix_display.py "Executing konix_web_history"} {ExecCommand $(konix_do_cron_job.sh konix_web_history.sh)}
 Mod4 w Control u :MacroCmd {ExecCommand konix_display.py "Executing konix_web_history_undo"} {ExecCommand $(konix_do_cron_job.sh konix_web_history_undo.sh)}
-Mod4 w s s :MacroCmd {ExecCommand konix_display.py "Executing konix_web_search"} {ExecCommand $(konix_do_cron_job.sh konix_web_search.sh)}
-Mod4 w s d :MacroCmd {ExecCommand konix_display.py "Executing konix_web_search default"} {ExecCommand $(konix_do_cron_job.sh konix_web_search.sh -d)}
+Mod4 w s shift s :MacroCmd {ExecCommand konix_display.py "Executing konix_web_search"} {ExecCommand $(konix_do_cron_job.sh konix_web_search.sh)}
+Mod4 w s s :MacroCmd {ExecCommand konix_display.py "Executing konix_web_search clipboard"} {ExecCommand $(konix_do_cron_job.sh konix_web_search.sh -c)}
+Mod4 w s shift d :MacroCmd {ExecCommand konix_display.py "Executing konix_web_search default"} {ExecCommand $(konix_do_cron_job.sh konix_web_search.sh -d)}
+Mod4 w s d :MacroCmd {ExecCommand konix_display.py "Executing konix_web_search default clipboard"} {ExecCommand $(konix_do_cron_job.sh konix_web_search.sh -dc)}
+Mod4 w s t :MacroCmd {ExecCommand konix_display.py "Selecting default search engine"} {ExecCommand $(konix_do_cron_job.sh konix_web_search_set_default_engine.sh)}
 Mod4 w d :MacroCmd {ExecCommand konix_display.py "Executing download manager"} {ExecCommand $(konix_do_cron_job.sh uget-gtk || dm-dm.sh -g)}
+Mod4 w p :MacroCmd {ExecCommand konix_display.py "Loading uzbl with clipboard content $(xclip -o)"} {ExecCommand $(konix_do_cron_job.sh konix_uzbl.sh "$(xclip -o)")}
 
 # ////////////////////////////////////////
 # xset related shorcut (Mod4 s)

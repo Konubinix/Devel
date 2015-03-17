@@ -1,13 +1,21 @@
 #!/bin/bash
 
 ARGS=""
-if [ -n "${KONIX_XAPERS_AUTO_TAG}" ]
+if [ -n "${KONIX_XAPERS_ADD_TAGS}" ]
 then
-    for tag in ${KONIX_XAPERS_AUTO_TAG}
-    do
-        ARGS="${ARGS} --tags=${tag}"
-    done
-else
+    ARGS="--tags=${KONIX_XAPERS_ADD_TAGS}"
+fi
+if [ -n "${KONIX_XAPERS_ADD_AUTO_VIEW}" ]
+then
+    ARGS="${ARGS} --views"
+fi
+if [ -n "${KONIX_XAPERS_ADD_AUTO_PROMPT}" ]
+then
+    ARGS="${ARGS} --prompt"
+fi
+if [ -n "${KONIX_XAPERS_ADD_AUTO_MOVE}" ]
+then
+    ARGS="${ARGS} --move"
 fi
 
-exec xapers add ${ARGS} --prompt --view "$@"
+exec xapers add ${ARGS} "$@"

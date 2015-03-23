@@ -13,7 +13,7 @@ if __name__ == "__main__":
     ext = os.path.splitext(file_name)[1]
 
     process = subprocess.Popen(
-        shlex.split("exiftool -p '$CreateDate|$Model' -d '%Y:%m:%d %H:%M:%S' '{}'".format(file_name)),
+        shlex.split("exiftool -p '$CreateDate|$Model' -d '%Y/%m/%d %H:%M:%S' '{}'".format(file_name)),
         stdout=subprocess.PIPE
     )
     process.wait()

@@ -43,6 +43,7 @@
 				(holiday-fixed 1 1 "Jour de l'an")
 				(holiday-easter-etc -14 "Passion Sunday")
 				(holiday-easter-etc 0 "Easter Sunday")
+				(holiday-easter-etc 1 "Easter Monday")
 				(holiday-easter-etc 39 "Ascension")
 				(holiday-easter-etc 50 "Whitmonday")
 				(holiday-fixed 5 1 "Fête du travail")

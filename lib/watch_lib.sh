@@ -3,14 +3,23 @@
 source "${KONIX_LIB_DIR}/lib_bash.sh"
 
 watch () {
+    set -eu
     source "${KONIX_LIB_DIR}/lib_bash.sh"
+
     konix_assert_var KONIX_LOG_DIR
     konix_assert_var KONIX_LOG_ERR_DIR
+    mkdir -p "${KONIX_LOG_DIR}"
+    mkdir -p "${KONIX_LOG_ERR_DIR}"
 
-    zenity --help > /dev/null || {
+    konix_gtk_zenity.py --help > /dev/null || {
         echo "No way to inform you of program ending"
         exit 1
     }
+    if ! [ -d "${KONIX_WATCHER_CTRL_DIR}" ]
+    then
+        echo "KONIX_WATCHER_CTRL_DIR does not point to a directory" >&2
+        exit 1
+    fi
     program_name="$(basename "${1}")"
     OUTPUT_FILE="${KONIX_LOG_DIR}/${program_name}"
     ERROR_FILE="${KONIX_LOG_ERR_DIR}/${program_name}"
@@ -25,15 +34,15 @@ EOF
     cat <<EOF|tee -a "${OUTPUT_FILE}" >> "${ERROR_FILE}"
 PID=$pid
 EOF
-    if [ -d "${KONIX_WATCHER_CTRL_DIR}" ]
-    then
-        printf "$pid $*\n${DATE}\n" > "${KONIX_WATCHER_CTRL_DIR}/${program_name}_${pid}"
-        trap "rm '${KONIX_WATCHER_CTRL_DIR}/${program_name}_${pid}'" 0
-    else
-        echo "KONIX_WATCHER_CTRL_DIR does not point to a directory" >&2
-    fi
+    printf "$pid $*\n${DATE}\n" > "${KONIX_WATCHER_CTRL_DIR}/${program_name}_${pid}"
+    trap "rm '${KONIX_WATCHER_CTRL_DIR}/${program_name}_${pid}'" 0
+    set +e
     wait %1
-    zenity --info --text "Command line '${*//&/&amp;}' ended"
+    res=$?
+    set -e
+    konix_gtk_entry.py \
+        --info \
+        --text "Command line '${*//&/&amp;}' ended with status $res"
 }
 
 watch_compute_watch_listing () {

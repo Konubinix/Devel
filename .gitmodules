@@ -185,3 +185,6 @@
 [submodule "xapers"]
 	path = xapers
 	url = https://github.com/Konubinix/xapers.git
+[submodule "notmuch"]
+	path = notmuch
+	url = git://notmuchmail.org/git/notmuch

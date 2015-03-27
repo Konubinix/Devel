@@ -8,7 +8,7 @@ echo "######"
 mimeopen "${FILE}" &
 #set -x
 echo "$FILE"
-echo "${KONIX_XAPERS_ADD_TAGS}"
+export KONIX_XAPERS_ADD_TAGS="`konix_gtk_entry.py -n -t "Tags" -i "${KONIX_XAPERS_ADD_TAGS}"`"
 konix_xapers_gtk_guess_source
 unset KONIX_XAPERS_ADD_AUTO_PROMPT
 unset KONIX_XAPERS_ADD_AUTO_VIEW

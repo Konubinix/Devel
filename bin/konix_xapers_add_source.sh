@@ -11,6 +11,7 @@ else
     konix_xapers_open_pdf.sh "${@}" &
 fi
 
+export KONIX_XAPERS_ADD_TAGS="$(konix_gtk_entry.py -t Tags -n -i "${KONIX_XAPERS_ADD_TAGS}")"
 konix_xapers_gtk_guess_source
 unset KONIX_XAPERS_ADD_AUTO_PROMPT
 unset KONIX_XAPERS_ADD_AUTO_VIEW

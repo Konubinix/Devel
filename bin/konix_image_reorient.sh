@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -eu
 INPUT="${1}"
 
 if exiftool -p '$Orientation' "${INPUT}"|grep -q "Horizontal"

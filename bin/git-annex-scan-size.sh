@@ -11,5 +11,7 @@ echo Git object size
 du -sh .git/objects
 echo Git object tmp size
 du -sch .git/objects/pack/tmp*
+echo "Number of pack files (best is 2)"
+ls .git/objects/pack/|wc -l
 echo Size in git annexed files here
 git annex info --fast --in here .

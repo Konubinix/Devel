@@ -404,7 +404,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 		until (not (notmuch-show-goto-message-next)))
   ;; Move to the next item in the search results, if any.
   (let ((parent-buffer notmuch-show-parent-buffer))
-	(notmuch-kill-this-buffer)
+	(notmuch-bury-or-kill-this-buffer)
 	(if parent-buffer
 		(progn
 		  (switch-to-buffer parent-buffer)

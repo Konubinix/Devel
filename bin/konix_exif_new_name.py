@@ -7,6 +7,12 @@ import subprocess
 import shlex
 import dateutil.parser
 import re
+import hashlib
+
+def hash_of_file(file_name):
+    m = hashlib.md5()
+    m.update(open(os.path.realpath(file_name)).read())
+    return m.hexdigest()
 
 if __name__ == "__main__":
     file_name = sys.argv[1]
@@ -22,11 +28,21 @@ if __name__ == "__main__":
     assert match, "Could not parse {}".format(output)
     create_date = dateutil.parser.parse(match.group("create_date"))
     model = match.group("model").replace(" ", "_")
-    print(
-        create_date.strftime(
-            "%y%m%d_%H%M%S_{}{}".format(
-                model,
-                ext,
-            )
+    new_name = create_date.strftime(
+        "%y%m%d_%H%M%S_{}{}".format(
+            model,
+            ext,
         )
     )
+    index = 0
+    while os.path.exists(new_name) and hash_of_file(new_name) != hash_of_file(file_name):
+        sys.stderr.write("{} already exists, find another name\n".format(new_name))
+        index += 1
+        new_name = create_date.strftime(
+            "%y%m%d_%H%M%S_{}_{}{}".format(
+                model,
+                ext,
+                index,
+            )
+        )
+    print(new_name)

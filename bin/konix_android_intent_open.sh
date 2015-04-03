@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 FILE="${1}"
 FILE="$(readlink -f "$FILE")"

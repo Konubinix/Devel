@@ -55,3 +55,7 @@ say_and_do chmod +r $deb_root/etc/mtab
 /system/bin/chmod 777 $deb_root/dev/pts/*
 # allow everyone to use fuse
 /system/bin/chmod 777 /dev/fuse
+# setup the sound
+/system/bin/chmod 777 /dev/snd/*
+ln -s /dev/snd/* /dev/
+

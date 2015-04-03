@@ -591,6 +591,7 @@ class GCall(cmd.Cmd, object):
         if not calendar_id:
             return None
         events = self.get_events(calendar_id, self.event_list_extra_query)
+        events.sort(key=lambda event:event.startdate)
         self.db.set(self.all_events_name, events)
 
     @needs("access_token")

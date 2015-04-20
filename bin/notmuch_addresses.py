@@ -23,6 +23,8 @@ import email.utils
 import os.path
 import sys
 import re
+import logging
+#logging.basicConfig(level=logging.DEBUG)
 
 # email.utils.parseaddr() is very slow for some reason. I'm still
 # using it, though, but I'm considering whether it's necessary. This
@@ -129,12 +131,12 @@ class NotmuchAddressMatcher(object):
 
     def trivial_match_function(self, name):
         """ This outputs a trivial matching function (case
-        independent, same starting letters). More sophisticated ones
+        independent, the query_name in the name). More sophisticated ones
         could be developed. It is the default match function, but can
         be overwritten by the user.
         """
         def output (x):
-            return x.lower().startswith(name.lower())
+            return name.lower() in x.lower()
         return output
 
 
@@ -143,36 +145,46 @@ class NotmuchAddressMatcher(object):
         # notmuch in a more efficient way.
 
         notmuch_db = notmuch.Database(self.db_path)
-        query_string = "(from:" + self.email
+        # query_string = "(from:" + self.email
 
-        for addr in self.other_emails:
-            query_string += (" OR from:" + addr)
+        # for addr in self.other_emails:
+        #     query_string += (" OR from:" + addr)
 
-        query_string += ") and to:" + self.query_name + "*"
-
+        # query_string += ") and to:" + self.query_name + "*"
+        query_string = "from:*{}* OR to:*{}*".format(
+            self.query_name,
+            self.query_name
+        )
         query = notmuch.Query(notmuch_db, query_string)
         return query.search_messages()
-
 
     def generate_matches(self):
         msgs = self._get_matching_messages()
         emails = EmailsWithNames()
+        logging.debug("Extracting all the addresses")
+        limit = 500
+        current_number = 0
+        addrs = []
         for m in msgs:
-            addrs = []
-            for h in ('to', 'cc', 'bcc'):
+            if not current_number < limit:
+                logging.info("Reached the limit {}".format(limit))
+                break
+            current_number+=1
+            for h in ('from', 'to', 'cc', 'bcc'):
                 v = m.get_header(h)
                 if v > '':
                     addrs.append(v)
-                    parsed_addrs = email.utils.getaddresses(addrs)
-            for addr in parsed_addrs:
-                mail = addr[1].lower()
-                split_names = addr[0].split(" ")
-                if (len([name for name in split_names
-                         if self.match_function(name)]) > 0
-                    or
-                    self.match_function(mail)):
+        parsed_addrs = email.utils.getaddresses(addrs)
+        logging.debug("Extracted all the addresses, analysing them")
+        for addr in set(parsed_addrs):
+            mail = addr[1].lower()
+            split_names = addr[0].split(" ")
+            if (len([name for name in split_names
+                     if self.match_function(name)]) > 0
+                or
+                self.match_function(mail)):
 
-                    emails.add_email_and_name(mail, addr[0])
+                emails.add_email_and_name(mail, addr[0])
 
         self.matches = emails.sorted_email_and_names_list()
 
@@ -182,6 +194,7 @@ if __name__ == '__main__':
         print "You must enter a name query"
     else:
         name = " ".join(sys.argv[1:])
+
         matcher = NotmuchAddressMatcher(name)
         matcher.generate_matches()
 

@@ -188,3 +188,7 @@
 [submodule "notmuch"]
 	path = notmuch
 	url = git://notmuchmail.org/git/notmuch
+[submodule "lddtree"]
+	path = lddtree
+	#url = https://github.com/ncopa/lddtree.git
+	url = https://github.com/Konubinix/lddtree

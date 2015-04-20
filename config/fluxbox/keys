@@ -238,6 +238,13 @@ Control Mod4 g :ExecCommand $(konix_goto_true_exec.sh gmpc)
 Control Mod4 h :ExecCommand $(konix_goto_true_exec.sh icedove)
 Control Mod4 r :ExecCommand $(konix_goto_true_exec.sh recoll konix_recoll.py)
 
+# ,----------
+# | Clipboard
+# `----------
+Control Mod4 Shift M :ExecCommand konix_display.py "Executing middle click" && xdotool click 2
+Control Mod4 Shift R :ExecCommand konix_display.py "Executing right click" && xdotool click 3
+Control Mod4 Shift L :ExecCommand konix_display.py "Executing left click" && xdotool click 1
+
 # ////////////////////////////////////////
 # web related shorcut (Mod4 w)
 # ////////////////////////////////////////

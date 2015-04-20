@@ -820,6 +820,8 @@ items"
 	(if (or
 		 ;; not a project
 		 (not (member "project" (org-get-tags)))
+		 ;; stuck ok
+		 (member "stuckok" (org-get-tags))
 		 ;; done
 		 (konix/org-with-point-on-heading
 		  (org-entry-is-done-p)

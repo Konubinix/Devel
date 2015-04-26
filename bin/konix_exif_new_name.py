@@ -11,7 +11,7 @@ import hashlib
 
 def hash_of_file(file_name):
     m = hashlib.md5()
-    m.update(open(os.path.realpath(file_name)).read())
+    m.update(open(os.path.realpath(file_name), "rb").read())
     return m.hexdigest()
 
 if __name__ == "__main__":

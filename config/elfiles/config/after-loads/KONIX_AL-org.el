@@ -3255,6 +3255,29 @@ of the clocksum."
   )
 
 ;; ######################################################################
+;; Ediff
+;; ######################################################################
+(add-hook 'ediff-prepare-buffer-hook 'konix/org-ediff-prepare-buffer-hook-setup)
+(defun konix/org-ediff-prepare-buffer-hook-setup ()
+  ;; specific modes
+  (cond ((eq major-mode 'org-mode)
+		 (konix/org-vis-mod-maximum))
+		;; room for more modes
+		)
+  ;; all modes
+  (setq truncate-lines nil))
+
+(defun konix/org-vis-mod-maximum ()
+  "Visibility: Show the most possible."
+  (cond
+   ((eq major-mode 'org-mode)
+	(visible-mode 1)  ; default 0
+	(setq truncate-lines nil)  ; no `org-startup-truncated' in hook
+	(setq org-hide-leading-stars t))  ; default nil
+   (t
+	(message "ERR: not in Org mode")
+	(ding))))
+;; ######################################################################
 ;; Evaluation to be done after loading org
 ;; ######################################################################
 (konix/org-load-hook)

@@ -17,7 +17,7 @@ def hash_of_file(file_name):
 if __name__ == "__main__":
     file_name = sys.argv[1]
     ext = os.path.splitext(file_name)[1]
-
+    dirname = os.path.dirname(file_name)
     process = subprocess.Popen(
         shlex.split("exiftool -p '$CreateDate|$Model' -d '%Y/%m/%d %H:%M:%S' '{}'".format(file_name)),
         stdout=subprocess.PIPE
@@ -35,7 +35,9 @@ if __name__ == "__main__":
         )
     )
     index = 0
-    while os.path.exists(new_name) and hash_of_file(new_name) != hash_of_file(file_name):
+    while os.path.exists(os.path.join(dirname, new_name)) \
+          and \
+          hash_of_file(os.path.join(dirname, new_name)) != hash_of_file(file_name):
         sys.stderr.write("{} already exists, find another name\n".format(new_name))
         index += 1
         new_name = create_date.strftime(

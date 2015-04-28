@@ -5,6 +5,26 @@
 
 import itertools
 
+def base26_to_decimal(value):
+    if len(value) == 1:
+        return ord(value.lower()) - ord("a") + 1
+    else:
+        return base26_to_decimal(value[-1]) \
+            + 26 * base26_to_decimal(value[:-1])
+
+def decimal_to_base26(value):
+    value = value - 1
+    d, m = divmod(value, 26)
+    res = chr(m + ord("a"))
+    if d:
+        return decimal_to_base26(d) + res
+    else:
+        return res
+
+def get_all_sheets(workbook):
+    return [workbook.sheet_by_name(name)
+            for name in workbook.sheet_names()]
+
 def fix_indices(rows, cols):
   if type(rows) == int:
     rows = (rows, rows)
@@ -15,8 +35,8 @@ def fix_indices(rows, cols):
     rows[1],
   )
   cols = (
-    ord(cols[0].lower()) - ord('a'),
-    ord(cols[1].lower()) - ord('a') + 1,
+      base26_to_decimal(cols[0]) - 1,
+      base26_to_decimal(cols[1]),
   )
   return (rows, cols)
 
@@ -30,8 +50,8 @@ def unfix_indices(rows, cols):
     rows[1],
   )
   cols = (
-    chr(cols[0] + ord("a")),
-    chr(cols[1] + ord("a") - 1),
+      decimal_to_base26(cols[0]),
+      decimal_to_base26(cols[1] - 1),
   )
   return (rows, cols)
 
@@ -40,9 +60,19 @@ def get_indices(rows, cols):
   return itertools.product(range(*rows), range(*cols))
 
 def get_values(page, rows, cols):
-  return [page.row_values(coord[0])[coord[1]]
-          for coord in get_indices(rows, cols)
-  ]
+    return [page.row_values(coord[0])[coord[1]]
+            for coord in get_indices(rows, cols)
+        ]
+
+def get_values_axes(page, rows, cols):
+    rows, cols = fix_indices(rows, cols)
+    return [
+        [
+            page.row_values(row)[col]
+            for col in xrange(*cols)
+        ]
+        for row in xrange(*rows)
+    ]
 
 def compute_expected_values(rows, cols, expected_values):
   expected_values_lines = [value.rstrip('\n') for value in

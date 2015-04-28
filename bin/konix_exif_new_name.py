@@ -43,8 +43,8 @@ if __name__ == "__main__":
         new_name = create_date.strftime(
             "%y%m%d_%H%M%S_{}_{}{}".format(
                 model,
-                ext,
                 index,
+                ext,
             )
         )
     print(new_name)

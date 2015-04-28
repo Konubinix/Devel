@@ -133,7 +133,7 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:background "gainsboro")
+	 (:background "dim grey")
 	 )
 	(
 	 ((class color)

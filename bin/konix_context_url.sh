@@ -9,6 +9,7 @@ $0 [-h] [-a] name
 
 -h: print this and exit
 -a: show the url for all contexts
+-c: show the url for this particular context
 name: name of the machine of which to print the context
 EOF
 }

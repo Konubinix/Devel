@@ -2163,7 +2163,7 @@ items"
 				("organization" . ?r)
 				)
 			  )
-(setq-default org-tags-exclude-from-inheritance '("project" "draft" "phantom"))
+(setq-default org-tags-exclude-from-inheritance '("project" "draft" "phantom" "EXPIRY" "NOEXPIRY"))
 (setq-default org-fast-tag-selection-single-key t)
 (setq-default org-reverse-note-order t)
 (setq org-tag-alist nil)
@@ -3046,12 +3046,15 @@ of the clocksum."
   (interactive "sFilters: ")
   (setq raw_filters filters)
   (setq filters '())
-  (while (not
-		  (string-equal raw_filters "")
+  (while (and
+		  (not
+		   (string-equal raw_filters "")
+		   )
+		  (not (null raw_filters))
 		  )
-	(if (string-match "^\\([+-]?[^+-]+\\)\\(.*\\)$" raw_filters)
+	(if (string-match "^\\([+-][^+-]+\\)\\(.*\\)$" raw_filters)
 		(add-to-list 'filters (match-string 1 raw_filters))
-	  (add-to-list 'filters raw_filters)
+	  (add-to-list 'filters (format "+%s" raw_filters))
 	  )
 	(setq raw_filters (match-string 2 raw_filters))
 	)

@@ -156,5 +156,18 @@
    )
   )
 
+(defun konix/org-agenda-update-current-line ()
+  (let (
+		(hdmarker (or (org-get-at-bol 'org-hd-marker)
+					  (org-agenda-error)))
+		(newhead (save-window-excursion
+				   (org-agenda-switch-to)
+				   (org-get-heading)
+				   ))
+		)
+	(org-agenda-change-all-lines newhead hdmarker)
+	)
+  )
+
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

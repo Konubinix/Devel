@@ -13,6 +13,7 @@ def base26_to_decimal(value):
             + 26 * base26_to_decimal(value[:-1])
 
 def decimal_to_base26(value):
+    assert value>0
     value = value - 1
     d, m = divmod(value, 26)
     res = chr(m + ord("a"))

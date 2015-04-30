@@ -79,9 +79,34 @@
 
 (defun konix/org-expiry/handler ()
   (interactive)
-  (konix/org-add-tag "EXPIRED")
+  (if (or
+	   (member "NOEXPIRY" (org-get-tags))
+	   (member "NOEXPIRYRECURSIVE" (org-get-tags))
+	   )
+	  (message "Prevent the expiration of %s" (org-get-heading t t))
+	(konix/org-add-tag "EXPIRED")
+	)
   )
 (setq-default org-expiry-handler-function 'konix/org-expiry/handler)
+
+(defun konix/org-expiry/unexpire ()
+  (interactive)
+  (let (
+		(newhead nil)
+		)
+	(save-window-excursion
+	  (when (equal major-mode 'org-agenda-mode)
+		(org-agenda-switch-to)
+		)
+	  (konix/org-add-tag "NOEXPIRY")
+	  (konix/org-del-tag "EXPIRED")
+	  )
+	)
+  (when (equal major-mode 'org-agenda-mode)
+	(konix/org-agenda-update-current-line)
+	)
+  )
+
 
 (provide 'KONIX_AL-org-expiry)
 ;;; KONIX_AL-org-expiry.el ends here

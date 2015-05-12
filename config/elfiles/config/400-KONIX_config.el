@@ -278,7 +278,7 @@
 ;; ************************************************************
 (when (require 'winner nil t)
   (winner-mode t)
- )
+  )
 
 ;; ************************************************************
 ;; Sticky windows allow dedicated windows
@@ -362,15 +362,15 @@
 ;;Virer la toolbar (que j'utilise jamais)
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1)
- )
+  )
 ;;Virer la scrollbar (que j'utilise jamais)
 (when (fboundp 'scroll-bar-mode)
- (scroll-bar-mode -1)
- )
+  (scroll-bar-mode -1)
+  )
 ;; virer le menu-bar
 (when  (fboundp 'menu-bar-mode)
- (menu-bar-mode -1)
- )
+  (menu-bar-mode -1)
+  )
 ;; when truncating window, truncate words and not characters
 (setq-default word-wrap t)
 (setq-default truncate-lines t)
@@ -661,7 +661,7 @@
 ;; make backup of git tracked files thanks to git-wip
 (when (locate-library "git-wip")
   (load-library "git-wip")
- )
+  )
 
 ;; ####################################################################################################
 ;; Maximize frame when visiting a file from emacs client
@@ -689,6 +689,16 @@
 ;; Use quilt
 ;; **********************************************************************
 (require 'quilt)
+
+;; **********************************************************************
+;; Themes
+;; **********************************************************************
+(add-to-list 'custom-theme-load-path
+			 (expand-file-name
+			  "zenburn"
+			  elfiles
+			  )
+			 )
 
 ;; ######################################################################
 ;; Custom display table

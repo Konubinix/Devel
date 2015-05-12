@@ -40,3 +40,5 @@ bindkey ^x2 split
 bindkey ^x1 only
 bindkey ^x0 remove
 bindkey ^x^b windows
+escape ^Bb
+defescape ^Bb

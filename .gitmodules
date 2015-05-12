@@ -192,3 +192,6 @@
 	path = lddtree
 	#url = https://github.com/ncopa/lddtree.git
 	url = https://github.com/Konubinix/lddtree
+[submodule "config/elfiles/zenburn"]
+	path = config/elfiles/zenburn
+	url = https://github.com/bbatsov/zenburn-emacs

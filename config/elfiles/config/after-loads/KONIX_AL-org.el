@@ -2163,7 +2163,7 @@ items"
 				("organization" . ?r)
 				)
 			  )
-(setq-default org-tags-exclude-from-inheritance '("project" "draft" "phantom" "EXPIRY" "NOEXPIRY"))
+(setq-default org-tags-exclude-from-inheritance '("project" "draft" "phantom" "EXPIRED" "NOEXPIRY"))
 (setq-default org-fast-tag-selection-single-key t)
 (setq-default org-reverse-note-order t)
 (setq org-tag-alist nil)

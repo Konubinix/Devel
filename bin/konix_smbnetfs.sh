@@ -5,4 +5,4 @@ then
     mkdir "${KONIX_SMB_MOUNT}"
 fi
 
-smbnetfs "${KONIX_SMB_MOUNT}"
+smbnetfs "${KONIX_SMB_MOUNT}" "$@"

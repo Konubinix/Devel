@@ -54,5 +54,5 @@ do
     then
         from_found=1
     fi
-done < <(which -a "$NAME")
+done < <(PATH="$(echo ${PATH} | konix_path_canonize.py)" which -a "$NAME")
 exit 1

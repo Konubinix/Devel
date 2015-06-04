@@ -4,6 +4,7 @@
 echo "Initializing interactive bash configuration"
 echo "Sourcing shrc configuration"
 source "$KONIX_CONFIG_DIR/shrc"
+source "$KONIX_LIB_DIR/soblib.sh"
 
 # Use emacs key bindings
 set -o emacs

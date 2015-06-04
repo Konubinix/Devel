@@ -61,5 +61,22 @@
 	)
   )
 
+(defun konix/time-substract-days (time days)
+  (time-subtract time (apply 'encode-time `(0 0 0 ,(1+ days) 1 1970)))
+  )
+
+(defun konix/time-extract-day (time)
+  "Format: (MM DD YYYY)"
+  (let (
+		(decoded_time (decode-time time))
+		)
+	(list
+	 (fifth decoded_time)
+	 (fourth decoded_time)
+	 (sixth decoded_time)
+	 )
+	)
+  )
+
 (provide 'KONIX_AL-time-date)
 ;;; KONIX_AL-time-date.el ends here

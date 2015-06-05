@@ -941,16 +941,34 @@ items"
 	)
   )
 
+(defun konix/org-yesterworkday-time ()
+  (let (
+		(time (konix/time-substract-days (current-time) 1))
+		(holidays (save-window-excursion (holidays)))
+		)
+	(while (or
+			;; holidays
+			(member (konix/time-extract-day time)
+					(mapcar
+					 'car
+					 holidays
+					 )
+					)
+			;; Sunday
+			(string= "7"
+					 (format-time-string "%u" time))
+			;; Saturday
+			(string= "6"
+					 (format-time-string "%u" time))
+			)
+	  (setq time (konix/time-substract-days time 1))
+	  )
+	time
+	)
+  )
+
 (defun konix/org-yesterworkday ()
-  (-
-   (org-today)
-   (if (string= "1"
-				(format-time-string "%u" (current-time))
-				)
-	   3
-	 1
-	 )
-   )
+  (time-to-days (konix/org-yesterworkday-time))
   )
 
 (defun konix/org-agenda-sum-duration (beg end)

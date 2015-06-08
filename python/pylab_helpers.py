@@ -165,3 +165,34 @@ def pd_lexicographic_sort(df):
     vector_list = [df[[c]] for c in df.columns]
     vector_list.sort(cmp=pd_lexicographic_lesser_than)
     return pandas.concat(vector_list, axis=1)
+
+def asciify(k):
+    return k.encode("ascii", errors="ignore").replace("?", "").replace(" ", "").replace("(", "").replace(")", "").replace("/", "")
+
+def asciify_dataframe(dataframe):
+    res = dataframe.applymap(
+        lambda x: asciify(x)
+        if isinstance(
+                x,
+                basestring)
+        else x)
+    res.columns = [asciify(c) for c in res.columns]
+    return res
+
+def pandas_put_into_hdf_tstable(dataframe, file_name, name="Values"):
+    import tables
+    import tstables
+    f = tables.open_file(file_name, "a")
+    dict_ = {"timestamp":tables.Int64Col(pos=0)}
+    dict_.update({asciify(k): tables.Float64Col(pos=i+1) for i,k in enumerate(list(dataframe.columns))})
+    MyClass = type("MyClass", (tables.IsDescription, ), dict_)
+    ts = f.create_ts("/", asciify(name), MyClass)
+    ts.append(asciify_dataframe(dataframe).astype("f8"))
+    f.close()
+
+def hdf_keys(hdf_file):
+    import h5py
+    file_ = h5py.File(hdf_file)
+    keys = file_.keys()
+    file_.close()
+    return keys

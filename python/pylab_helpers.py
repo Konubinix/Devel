@@ -237,3 +237,16 @@ def pd_display_size_no_limit():
 def pd_display_size_reset():
     pandas.reset_option('display.max_columns')
     pandas.reset_option('display.max_rows')
+
+def nb_set_fig_size():
+    from IPython.html import widgets
+    from IPython.display import display
+    width, height = matplotlib.rcParams["figure.figsize"]
+    width_slider = widgets.IntSlider(min=1, max=40, value=width)
+    height_slider = widgets.IntSlider(min=1, max=40, value=height)
+    def set_figsize(width, height):
+        matplotlib.rcParams["figure.figsize"] = width, height
+        matplotlib.pyplot.plot(numpy.sin(numpy.arange(100)))
+
+    w = widgets.interactive(set_figsize,width=width_slider, height=height_slider)
+    display(w)

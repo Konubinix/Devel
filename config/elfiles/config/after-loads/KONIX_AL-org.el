@@ -3321,5 +3321,114 @@ of the clocksum."
   )
 (konix/org-setup-holidays)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Automatic handling of ical files ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar konix/org-ical/current_entry nil
+  "Marker to the entry currently being processed"
+  )
+
+(defun konix/org-kill-subtree-at-point ()
+  (interactive)
+  (kill-region
+   (org-entry-beginning-position)
+   (save-excursion
+	 (org-end-of-subtree t t)
+	 (point)
+	 )
+   )
+  )
+
+(defun konix/org-ical/handle-entry_cleanup_hook ()
+  "Hook to widen the buffers after the merge"
+  (with-current-buffer ediff-buffer-A
+	(widen)
+	)
+  (with-current-buffer ediff-buffer-B
+	(widen)
+	)
+  (remove-hook 'ediff-cleanup-hook 'konix/org-ical/handle-entry_cleanup_hook)
+  (save-window-excursion
+	(set-buffer (marker-buffer konix/org-ical/current_entry))
+	(goto-char (marker-position konix/org-ical/current_entry))
+	(when (y-or-n-p "Can I remove the ical entry?")
+	  (konix/org-kill-subtree-at-point)
+	  )
+	)
+  (setq konix/org-ical/current_entry nil)
+  )
+
+(defun konix/org-ical/handle-entry ()
+  "Get the entry at point and decide whether it needs to be refiled or
+removed. The attribute ID allows to find out whether another entry already
+exists and the attribute VERSION allows to find out whether the ical entry
+should be considered as newer than the one already present.
+
+If there does not exist any entry yet, simply launch a refile
+process.
+
+Else, if the VERSION is the same, remove the entry (I already
+refiled this version earlier).
+
+If the VERSION is bigger than the VERSION already present, then
+launch a merge process to let the user merge the contents.
+
+If the VERSION is lower than the already present one, then launch
+an error (this should never happen)."
+  (interactive)
+  (let* (
+		 (current_id (org-id-get))
+		 (other_location   (org-id-find current_id))
+		 )
+	(when (string-match "ical" (car other_location))
+	  (error "Would merge with itself")
+	  )
+	(if (not other_location)
+		(org-refile)
+	  ;; here, we must handle the merge
+	  (progn
+		(let* (
+			   (current_version (cdar
+								 (org-entry-properties nil "VERSION")
+								 ))
+			   (current_buffer (current-buffer))
+			   (other_buffer (save-window-excursion
+							   (org-id-goto current_id)
+							   (current-buffer)
+							   )
+							 )
+			   (other_version (save-window-excursion
+								(set-buffer other_buffer)
+								(cdar
+								 (org-entry-properties nil "VERSION")
+								 )
+								)
+							  )
+			   )
+		  (if (equal current_version other_version)
+			  (konix/org-kill-subtree-at-point)
+			;; now the fusion takes place
+			(progn
+			  (org-show-subtree)
+			  (org-narrow-to-subtree)
+			  (save-window-excursion
+				(set-buffer other_buffer)
+				(org-show-subtree)
+				(org-narrow-to-subtree)
+				)
+			  (setq konix/org-ical/current_entry (save-excursion
+												   (goto-char (org-entry-beginning-position))
+												   (point-marker)
+												   ))
+			  (add-hook 'ediff-cleanup-hook 'konix/org-ical/handle-entry_cleanup_hook)
+			  (ediff-buffers current_buffer other_buffer)
+			  )
+			)
+		  )
+		)
+	  )
+	)
+  )
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

@@ -103,8 +103,8 @@ class GCall(cmd.Cmd, object):
         self.db = redis.StrictRedis(decode_responses=True, port=6380)
         self.client_id = self.db.get("client_id")
         self.client_secret = self.db.get("client_secret")
-        assert self.client_id, "redis-cli set client_id <yourid> (https://console.developers.google.com/project/<yourapp>/apiui/credential)"
-        assert self.client_secret, "redis-cli set client_secret <yoursecret> (https://console.developers.google.com/project/<yourapp>/apiui/credential)"
+        assert self.client_id, "redis-cli set client_id <yourid> (https://console.developers.google.com/project/<yourapp>/apiui/credential). Use a native application type."
+        assert self.client_secret, "redis-cli set client_secret <yoursecret> (https://console.developers.google.com/project/<yourapp>/apiui/credential). Use a native application type."
         self.calendar_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.event_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.calendar_formatter = "str([x.id, x.summary])"

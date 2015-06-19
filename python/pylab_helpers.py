@@ -196,3 +196,19 @@ def hdf_keys(hdf_file):
     keys = file_.keys()
     file_.close()
     return keys
+
+def pd_scale(input_dataframe, axis=0, with_mean=True, with_std=True):
+    from sklearn.preprocessing import scale
+    from pandas import DataFrame
+    return DataFrame(scale(input_dataframe, axis=axis, with_mean=with_mean, with_std=with_std), index=input_dataframe.index, columns=input_dataframe.columns)
+
+def pd_stripna(input_dataframe):
+    return input_dataframe.dropna(axis=0, how="all").dropna(axis=1, how="all")
+
+def pd_display_size_no_limit():
+    pandas.set_option('display.max_columns', None)
+    pandas.set_option('display.max_rows', None)
+
+def pd_display_size_reset():
+    pandas.reset_option('display.max_columns')
+    pandas.reset_option('display.max_rows')

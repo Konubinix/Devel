@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ipython notebook --matplotlib=inline --profile=notebook "$@"

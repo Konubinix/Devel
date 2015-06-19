@@ -192,7 +192,7 @@ def pandas_put_into_hdf_tstable(dataframe, file_name, name="Values"):
 
 def hdf_keys(hdf_file):
     import h5py
-    file_ = h5py.File(hdf_file)
+    file_ = h5py.File(hdf_file, mode="r")
     keys = file_.keys()
     file_.close()
     return keys

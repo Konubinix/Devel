@@ -496,6 +496,8 @@ class GCall(cmd.Cmd, object):
             self.db.delete(self.all_events_name)
         else:
             self.db.delete(self.calendar_id_name)
+        # sanity check: attempt to get the calendar
+        self.get_calendar(calendar_id)
         self.set_prompt()
 
     def complete_select_calendar(self, text, line, begidx, endidx):

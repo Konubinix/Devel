@@ -205,6 +205,31 @@ def pd_scale(input_dataframe, axis=0, with_mean=True, with_std=True):
 def pd_stripna(input_dataframe):
     return input_dataframe.dropna(axis=0, how="all").dropna(axis=1, how="all")
 
+def mpl_get_color_cycle_from_color_map_name(number=10, name="coolwarm"):
+    color = matplotlib.cm.get_cmap(name)(numpy.linspace(0.1,0.9,number)) # This returns RGBA; convert:
+    return map(lambda rgb:'#%02x%02x%02x' % (rgb[0]*255,rgb[1]*255,rgb[2]*255),
+               tuple(color[:,0:-1]))
+
+def mpl_set_color_cycle_from_color_map_name(number=10, name="coolwarm"):
+    """See mpl.cm and http://matplotlib.org/examples/color/colormaps_reference.html"""
+    matplotlib.rcParams["axes.color_cycle"] = mpl_get_color_cycle_from_color_map_name(name=name, number=number)
+
+mpl_set_color_cycle_from_color_map_name()
+
+def mpl_show_colors_maps():
+    """see http://wiki.scipy.org/Cookbook/Matplotlib/Show_colormaps"""
+    a=outer(arange(0,1,0.01),ones(10))
+    figure(figsize=(10,5))
+    subplots_adjust(top=0.8,bottom=0.05,left=0.01,right=0.99)
+    maps=[m for m in cm.datad if not m.endswith("_r")]
+    maps.sort(key=lambda x:x.lower())
+    l=len(maps)+1
+    for i, m in enumerate(maps):
+        subplot(1,l,i+1)
+        axis("off")
+        imshow(a,aspect='auto',cmap=get_cmap(m),origin="lower")
+        title(m,rotation=90,fontsize=10)
+
 def pd_display_size_no_limit():
     pandas.set_option('display.max_columns', None)
     pandas.set_option('display.max_rows', None)

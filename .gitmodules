@@ -198,3 +198,6 @@
 [submodule "python/pyftplib"]
 	path = python/pyftplib
 	url = https://github.com/giampaolo/pyftpdlib
+[submodule "gorgeous"]
+	path = gorgeous
+	url = https://github.com/mislav/gorgeous

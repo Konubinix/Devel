@@ -195,3 +195,6 @@
 [submodule "config/elfiles/zenburn"]
 	path = config/elfiles/zenburn
 	url = https://github.com/bbatsov/zenburn-emacs
+[submodule "python/pyftplib"]
+	path = python/pyftplib
+	url = https://github.com/giampaolo/pyftpdlib

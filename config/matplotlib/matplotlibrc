@@ -436,7 +436,6 @@ savefig.dpi         : 600
 # You can access the verbose instance in your code
 #   from matplotlib import verbose.
 #verbose.level  : silent      # one of silent, helpful, debug, debug-annoying
-verbose.level  : helpful      # one of silent, helpful, debug, debug-annoying
 #verbose.fileo  : sys.stdout  # a log filename, sys.stdout or sys.stderr
 
 # Event keys to interact with figures/plots via keyboard.

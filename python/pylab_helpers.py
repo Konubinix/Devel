@@ -255,6 +255,12 @@ def pd_display_size_reset():
     pandas.reset_option('display.max_columns')
     pandas.reset_option('display.max_rows')
 
+def pd_get_notnull_coordinates(dataframe_with_nan):
+    """pd_get_coordinates(df[df >0])"""
+    for column in dataframe_with_nan.columns:
+        for row in dataframe_with_nan[column].dropna().index:
+            yield (row, column)
+
 def nb_set_fig_size():
     from IPython.html import widgets
     from IPython.display import display

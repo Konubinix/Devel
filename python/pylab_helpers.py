@@ -4,6 +4,7 @@
 import itertools
 import matplotlib
 from matplotlib.pyplot import subplots
+from matplotlib import pyplot
 import numpy
 import re
 import pandas
@@ -215,6 +216,22 @@ def mpl_set_color_cycle_from_color_map_name(number=10, name="coolwarm"):
     matplotlib.rcParams["axes.color_cycle"] = mpl_get_color_cycle_from_color_map_name(name=name, number=number)
 
 mpl_set_color_cycle_from_color_map_name()
+
+def mpl_wait_for_key_press(fig, key="enter", close=False):
+    # I need to use an object. The pointer to the pause list will be captured by
+    # closer in key_press_event. When the callback will change the pause
+    # content, the outer function will see it. With the simple pause = True
+    # code, the inner function would have changed a local copy of pause.
+    pause = [True, ]
+    def key_press_event(event):
+        if event.key == key:
+            pause[0] = False
+    cid = fig.canvas.mpl_connect('key_press_event', key_press_event)
+    while pause[0] and pyplot.fignum_exists(fig.number):
+        fig.canvas.get_tk_widget().update()
+    fig.canvas.mpl_disconnect(cid)
+    if close and pyplot.fignum_exists(fig.number):
+        pyplot.close(fig.number)
 
 def mpl_show_colors_maps():
     """see http://wiki.scipy.org/Cookbook/Matplotlib/Show_colormaps"""

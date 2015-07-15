@@ -201,3 +201,6 @@
 [submodule "gorgeous"]
 	path = gorgeous
 	url = https://github.com/mislav/gorgeous
+[submodule "simple-pastebin-server"]
+	path = simple-pastebin-server
+	url = https://github.com/Konubinix/simple-pastebin-server

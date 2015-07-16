@@ -204,3 +204,6 @@
 [submodule "simple-pastebin-server"]
 	path = simple-pastebin-server
 	url = https://github.com/Konubinix/simple-pastebin-server
+[submodule "pdbpp"]
+	path = pdbpp
+	url = hg::https://bitbucket.org/antocuni/pdb

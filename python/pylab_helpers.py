@@ -322,6 +322,16 @@ def pd_get_notnull_coordinates(dataframe_with_nan):
         for row in dataframe_with_nan[column].dropna().index:
             yield (row, column)
 
+def pd_heatmap(dataframe):
+    ax = pyplot.imshow(dataframe.astype("f"), interpolation="none").get_axes()
+    ax.set_xticklabels(dataframe.columns, rotation=90)
+    ax.set_yticklabels(dataframe.index)
+    ax.set_xticks(numpy.linspace(0, len(dataframe.columns) - 1, len(dataframe.columns)))
+    ax.set_yticks(numpy.linspace(0, len(dataframe.index) - 1, len(dataframe.index)))
+
+def pd_heatmap_correlation(dataframe):
+    pd_heatmap(dataframe.corr())
+
 def nb_set_fig_size():
     from IPython.html import widgets
     from IPython.display import display

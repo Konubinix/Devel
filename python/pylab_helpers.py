@@ -249,6 +249,64 @@ def mpl_show_colors_maps():
         imshow(a,aspect='auto',cmap=get_cmap(m),origin="lower")
         title(m,rotation=90,fontsize=10)
 
+def mpl_layout_bigger():
+    matplotlib.rcParams["figure.subplot.left"] = 0
+    matplotlib.rcParams["figure.subplot.right"] = 1
+    matplotlib.rcParams["figure.subplot.bottom"] = 0
+    matplotlib.rcParams["figure.subplot.top"] = 1
+    matplotlib.rcParams["figure.subplot.wspace"] = 0
+    matplotlib.rcParams["figure.subplot.hspace"] = 0
+
+def mpl_layout_reset():
+    matplotlib.rcParams["figure.subplot.left"] = matplotlib.rcParamsDefault["figure.subplot.left"]
+    matplotlib.rcParams["figure.subplot.right"] = matplotlib.rcParamsDefault["figure.subplot.right"]
+    matplotlib.rcParams["figure.subplot.bottom"] = matplotlib.rcParamsDefault["figure.subplot.bottom"]
+    matplotlib.rcParams["figure.subplot.top"] = matplotlib.rcParamsDefault["figure.subplot.top"]
+    matplotlib.rcParams["figure.subplot.wspace"] = matplotlib.rcParamsDefault["figure.subplot.wspace"]
+    matplotlib.rcParams["figure.subplot.hspace"] = matplotlib.rcParamsDefault["figure.subplot.hspace"]
+
+def mpl_click_coordinates_get(fig=None):
+    fig = fig or pyplot.gcf()
+    def onclick(event):
+        print 'button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
+            event.button, event.x, event.y, event.xdata, event.ydata)
+    global mpl_click_coordinates_get_cid
+    mpl_click_coordinates_get_cid = fig.canvas.mpl_connect('button_press_event', onclick)
+    return mpl_click_coordinates_get_cid
+
+def mpl_click_coordinates_reset(cid=None, fig=None):
+    fig = fig or pyplot.gcf()
+    cid = cid or mpl_click_coordinates_get_cid
+    fig.canvas.mpl_disconnect(cid)
+
+def mpl_annotate_interactive(text, ax=None, arrowprops={"facecolor":'black', "shrink":0.05}):
+    ax = ax or pyplot.gca()
+    fig = ax.figure
+    coordinates = [
+        None, # xy
+        None  # xytext
+    ]
+    pause = [True,]
+    def get_xy(event):
+        if coordinates[0] is None:
+            coordinates[0] = (event.x, event.y)
+            print("xy     : {}".format(coordinates[0]))
+        else:
+            coordinates[1] = (event.x, event.y)
+            print("xytext : {}".format(coordinates[1]))
+            pause[0] = False
+    cid = fig.canvas.mpl_connect('button_press_event', get_xy)
+    while pause[0] and pyplot.fignum_exists(fig.number):
+        fig.canvas.get_tk_widget().update()
+    fig.canvas.mpl_disconnect(cid)
+    ax.annotate(
+        text,
+        xycoords='figure pixels',
+        xy=coordinates[0],
+        xytext=coordinates[1],
+        arrowprops=arrowprops,
+    )
+
 def pd_display_size_no_limit():
     pandas.set_option('display.max_columns', None)
     pandas.set_option('display.max_rows', None)

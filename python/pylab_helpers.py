@@ -217,11 +217,13 @@ def mpl_set_color_cycle_from_color_map_name(number=10, name="coolwarm"):
 
 mpl_set_color_cycle_from_color_map_name()
 
-def mpl_wait_for_key_press(fig, key="enter", close=False):
+def mpl_wait_for_key_press(fig=None, key="enter", close=False):
     # I need to use an object. The pointer to the pause list will be captured by
     # closer in key_press_event. When the callback will change the pause
     # content, the outer function will see it. With the simple pause = True
     # code, the inner function would have changed a local copy of pause.
+    if fig is None:
+        fig = pyplot.gcf()
     pause = [True, ]
     def key_press_event(event):
         if event.key == key:

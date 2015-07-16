@@ -332,6 +332,18 @@ def pd_heatmap(dataframe):
 def pd_heatmap_correlation(dataframe):
     pd_heatmap(dataframe.corr())
 
+def pd_like(dataframe_or_serie, values):
+    if isinstance(dataframe_or_serie, pandas.Series):
+        return pandas.Series(
+            matplotlib.cbook.flatten(values),
+            index=dataframe_or_serie.index
+        )
+    else:
+        return pandas.DataFrame(
+            values,
+            index=dataframe.index,
+            columns=dataframe.columns
+        )
 
 def pd_mpl_change():
     pandas.options.display.mpl_style = "default"

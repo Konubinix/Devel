@@ -26,6 +26,9 @@
 
 ;; make sure the agendas are sticky
 (org-toggle-sticky-agenda t)
+;; http://orgmode.org/worg/agenda-optimization.html#sec-3
+(setq-default org-agenda-dimmed-todo-face nil)
+(setq-default org-agenda-inhibit-startup t)
 
 (defun konix/org-agenda-refile-noupdate (&optional goto rfloc no-update)
   (interactive)

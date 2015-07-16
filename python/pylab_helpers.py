@@ -332,6 +332,13 @@ def pd_heatmap(dataframe):
 def pd_heatmap_correlation(dataframe):
     pd_heatmap(dataframe.corr())
 
+
+def pd_mpl_change():
+    pandas.options.display.mpl_style = "default"
+
+def pd_mpl_reset():
+    pandas.options.display.mpl_style = None
+
 def nb_set_fig_size():
     from IPython.html import widgets
     from IPython.display import display

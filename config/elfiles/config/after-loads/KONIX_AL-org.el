@@ -3433,5 +3433,9 @@ an error (this should never happen)."
 	)
   )
 
+(setq-default org-yank-adjusted-subtrees t)
+(setq-default org-return-follows-link t)
+(setq-default org-tab-follows-link t)
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

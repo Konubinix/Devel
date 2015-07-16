@@ -8,6 +8,7 @@ from matplotlib import pyplot
 import numpy
 import re
 import pandas
+from mpldatacursor import datacursor
 
 def timeseries_scatter_plots(inputs, names=None, title=None, nrows=4):
   """inputs: matrix of measures

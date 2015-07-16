@@ -25,6 +25,7 @@ def call_recoll(program="recoll", args=None):
     environ = os.environ
     environ["RECOLL_EXTRA_DBS"] = os.pathsep.join(glob.glob(os.path.expanduser("~/.recoll/*")))
     environ["RECOLL_ACTIVE_EXTRA_DBS"] = ""
+    environ["TMPDIR"] = os.path.expanduser("~/tmp")
     if recoll_dir:
         logger.info("Using {}".format(recoll_dir))
         subprocess.call([program, "-c", recoll_dir] + sys.argv[1:], env=environ)

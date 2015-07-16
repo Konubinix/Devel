@@ -334,3 +334,36 @@ def nb_set_fig_size():
 
     w = widgets.interactive(set_figsize,width=width_slider, height=height_slider)
     display(w)
+
+def sk_nested_cross_val(model,
+                        X,
+                        y,
+                        param_grid,
+                        inner_cv=3,
+                        outer_cv=10,
+                        outer_n_jobs=-1,
+                        verbose=0,
+                        scoring="mean_squared_error"
+):
+    """
+    model = RandomForestRegressor()
+    sk_nested_cross_val(model, X, y, param_grid={"n_estimators":arange(10, 20)},)
+    """
+    clf = sklearn.grid_search.GridSearchCV(
+        estimator=model,
+        cv=inner_cv,
+        verbose=verbose,
+        param_grid=param_grid,
+        scoring=scoring
+    )
+
+    # run the cross validation to find the score of the cross validated clf
+    sklearn.cross_validation.cross_val_score(
+        clf,
+        X,
+        y,
+        cv=outer_cv,
+        n_jobs=outer_n_jobs,
+        verbose=verbose,
+        scoring=scoring
+    )

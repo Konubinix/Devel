@@ -15,3 +15,8 @@ def giv(strings, pattern, i=True):
 
 def find_duplicates(seq):
     return [i[0] for i in collections.Counter(seq).items() if i[1] > 1]
+
+false = False
+true = True
+f = false
+t = true

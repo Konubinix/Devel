@@ -79,25 +79,25 @@ interruption timer, if any")
 
 (defun konix/org-pomodoro-echo ()
   (interactive)
-  (message "Already done %s pomorodo and %s"
+  (message "%s pomorodos done%s"
 		   konix/org-pomodoro-set-count
 		   (if konix/org-pomodoro-in-pomodoro
 			   (format
-				"working on another and
-shortly available in %ss seconds (%s min) %s or for
-long              in %ss seconds (%s min) %s"
-				(konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
+				"working
+%s: %s min (%s sec) => short
+%s: %s min (%s sec) => long"
+				(konix/org-pomodoro-next-available-timestamp)
 				(/
 				 (konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
 				 60
 				 )
-				(konix/org-pomodoro-next-available-timestamp)
-				(konix/org-pomodoro-number-of-seconds-till-next-pause t t)
+				(konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
+				(konix/org-pomodoro-next-available-timestamp t)
 				(/
 				 (konix/org-pomodoro-number-of-seconds-till-next-pause t t)
 				 60
 				 )
-				(konix/org-pomodoro-next-available-timestamp t)
+				(konix/org-pomodoro-number-of-seconds-till-next-pause t t)
 				)
 			 "in pause"
 			 )

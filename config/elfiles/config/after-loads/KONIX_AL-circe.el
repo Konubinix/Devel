@@ -64,5 +64,22 @@
 (setq-default circe-server-buffer-name "{network}")
 (setq-default circe-format-self-say "(me)<{nick}> {body}")
 
+
+(defun konix/circe-kill-all-dead-buffers ()
+  "Run with C-u to force kill"
+  (interactive)
+  (mapc
+   (lambda (buffer)
+	 (when (and
+			(konix/circe-dead-p buffer)
+			(y-or-n-p (format "Kill buffer %s" buffer))
+			)
+	   (kill-buffer buffer)
+	   )
+	 )
+   (buffer-list)
+   )
+  )
+
 (provide 'KONIX_AL-circe)
 ;;; KONIX_AL-circe.el ends here

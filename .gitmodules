@@ -207,3 +207,6 @@
 [submodule "pdbpp"]
 	path = pdbpp
 	url = hg::https://bitbucket.org/antocuni/pdb
+[submodule "config/elfiles/Fill-Column-Indicator"]
+	path = config/elfiles/Fill-Column-Indicator
+	url = https://github.com/alpaker/Fill-Column-Indicator

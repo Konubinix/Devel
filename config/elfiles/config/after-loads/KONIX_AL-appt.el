@@ -53,19 +53,15 @@
   )
 
 (defun konix/appt-disp-window (min-to-app new-time appt-msg)
-  (call-process "konix_gtk_entry.py"
-				nil
-				0
-				nil
-				"-n"
-				"--info"
-				"-t"
-				(format
-				 "Appt in %s mins:
+  (konix/notify
+   (format
+	"Appt in %s mins:
 %s (%s)"
-				 min-to-app
-				 appt-msg
-				 new-time))
+	min-to-app
+	appt-msg
+	new-time)
+   4
+   )
   (appt-disp-window min-to-app new-time appt-msg)
   (set-window-dedicated-p (get-buffer-window "*appt-buf*") t)
   (save-window-excursion

@@ -12,6 +12,8 @@
 (defvar konix/org-pomodoro-in-pomodoro nil)
 (defvar konix/org-pomodoro-global-mode t)
 (defvar konix/org-pomodoro-sprint-steps 4)
+(defvar konix/org-pomodoro-done-notify-level 5)
+
 (defcustom konix/org-pomodoro-tray-daemon-controller
   "/tmp/pomodorow_tray_daemon_control" "")
 
@@ -497,7 +499,12 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 	  )
 	 )
 	(if take_pomodoro_into_account
-		(ignore-errors (konix/org-pomodoro-increase))
+		(progn
+		  (ignore-errors (konix/org-pomodoro-increase))
+		  (when konix/org-pomodoro-done-notify-level
+			(konix/notify "Done pomodoro" konix/org-pomodoro-done-notify-level)
+			)
+		 )
 	  ;; else
 	  (message "This pomodoro won't be taken into account because of %s" reason)
 	  )

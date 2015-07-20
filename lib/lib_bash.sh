@@ -446,3 +446,7 @@ call_second_like_me () {
     fi
     exec "${SECOND}" "$@"
 }
+
+mkvirtualenv_system-site-packages () {
+    mkvirtualenv --system-site-packages "$@"
+}

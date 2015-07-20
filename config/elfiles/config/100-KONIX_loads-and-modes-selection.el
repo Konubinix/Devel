@@ -54,6 +54,7 @@
 		 (expand-file-name "ctable" elfiles)
 		 (expand-file-name "epc" elfiles)
 		 (expand-file-name "text-translator" elfiles)
+		 (expand-file-name "Fill-Column-Indicator" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

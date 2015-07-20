@@ -27,6 +27,7 @@
 (require 'xcscope nil t)
 (require 'KONIX_auto-complete)
 (require 'highlight-parentheses)
+(require 'fill-column-indicator)
 
 ;; ####################################################################################################
 ;; VARIABLES
@@ -151,6 +152,8 @@ They can be relative or absolute
 (defun konix/prog/config ()
   "Mes configuration communes à tous les mode de programmation."
   (interactive)
+  ;; Show the right limits column
+  (fci-mode)
   ;; in a prog buffer, showing trailing whitespaces may be relevant
   (setq show-trailing-whitespace t)
   ;; making tabs show up is also relevant

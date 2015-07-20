@@ -9,6 +9,11 @@ parser.add_argument('-t','--text',
                     help="""The text to display""",
                     type=str,
                     required=True)
+parser.add_argument('-T','--timeout',
+                    help="""Close after that amount of ms""",
+                    type=int,
+                    default=0,
+                    required=False)
 parser.add_argument('-i','--initial',
                     help="""The initial text""",
                     type=str)
@@ -17,6 +22,9 @@ parser.add_argument('--info',
                     action="store_true")
 parser.add_argument('-n','--no-clipboard',
                     help="""Disable clipboard handling""",
+                    action="store_true")
+parser.add_argument('-a','--above-all',
+                    help="""Set the window above all""",
                     action="store_true")
 
 entry = None
@@ -35,8 +43,14 @@ def get_from_clipboard(button=None, event=None):
     entry.grab_focus()
     konix_notify.main("Updated the entry with clipboard content")
 
-def getText(info=False, text="Something", initial="", clipboard=True):
+def getText(info=False,
+            text="Something",
+            initial="",
+            clipboard=True,
+            above_all=False,
+            timeout=0):
     #base this on a message dialog
+    text = text.replace("<", "_").replace(">", "_")
     dialog = gtk.MessageDialog(
         None,
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -44,6 +58,8 @@ def getText(info=False, text="Something", initial="", clipboard=True):
         gtk.BUTTONS_OK,
         None)
     dialog.set_markup(text)
+    if above_all:
+        dialog.set_keep_above(True)
 
     hbox = gtk.HBox()
     dialog.vbox.pack_end(hbox, True, True, 0)
@@ -69,8 +85,14 @@ def getText(info=False, text="Something", initial="", clipboard=True):
             dialog.vbox.pack_end(checkbutton)
 
     dialog.show_all()
+
     if not info:
         entry.grab_focus()
+
+    if timeout:
+        def _quit():
+            dialog.destroy()
+        gtk.timeout_add(timeout, _quit)
     dialog.run()
     text = entry.get_text()
     dialog.destroy()
@@ -81,7 +103,10 @@ def main():
     print getText(info=args.info,
                   text=args.text,
                   initial=args.initial,
-                  clipboard=not args.no_clipboard),
+                  clipboard=not args.no_clipboard,
+                  above_all=args.above_all,
+                  timeout=args.timeout
+    ),
 
 if __name__ == '__main__':
     main()

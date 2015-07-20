@@ -15,6 +15,10 @@
 (defcustom konix/org-pomodoro-tray-daemon-controller
   "/tmp/pomodorow_tray_daemon_control" "")
 
+(defcustom konix/org-pomodoro-frame-title-format
+  '("" org-timer-mode-line-string org-mode-line-string)
+  "Customize the org-clock-frame-title-format value, set to nil to not change it")
+
 (defvar konix/org-pomodoro-interruption-warn-time 4
   "How many minutes of interruption to wait before warning the user")
 
@@ -24,6 +28,25 @@ interruption timer, if any")
 ;; ####################################################################################################
 ;; FUNCTIONS
 ;; ####################################################################################################
+(setq konix/org-clock-frame-title-format/old-value org-clock-frame-title-format)
+(defun konix/org-pomodoro-setup-frame-title-format ()
+  (interactive)
+  (setq org-clock-frame-title-format
+		konix/org-pomodoro-frame-title-format
+		)
+  )
+
+(defun konix/org-pomodoro-reset-frame-title-format ()
+  (interactive)
+  (setq org-clock-frame-title-format
+		konix/org-clock-frame-title-format/old-value
+		)
+  )
+
+(when konix/org-pomodoro-frame-title-format
+  (konix/org-pomodoro-setup-frame-title-format)
+  )
+
 (defun konix/org-pomodoro-reset-count ()
   (interactive)
   (setq konix/org-pomodoro-set-count 0)
@@ -237,8 +260,10 @@ interruption timer, if any")
 	)
   ;; remember the clocked-in entry where the pomodoro started
   (setq konix/org-pomodoro-start_entry (copy-marker org-clock-marker))
-  (message "Starting a pomodoro of %s minutes (%s)" org-timer-default-timer konix/org-pomodoro-set-count)
+  (message "Starting a pomodoro of %s minutes (%s)" org-timer-default-timer
+		   konix/org-pomodoro-set-count)
   )
+
 
 (defun konix/org-pomodoro-break (&optional time)
   (interactive)
@@ -251,8 +276,8 @@ interruption timer, if any")
   (message "Canceling current timer")
   (require 'org-timer)
   (when org-timer-start-time
-   (org-timer-stop)
-   )
+	(org-timer-stop)
+	)
   (konix/org-pomodoro-tray-daemon-put "i")
   (when konix/org-pomodoro-break-clocks-out
 	(message "Clocking out of current task")

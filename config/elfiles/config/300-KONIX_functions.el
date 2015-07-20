@@ -723,8 +723,35 @@ retourne ('fichier','extension')."
 	(shell-command-to-string (format "konix_display.py '%s'" msg))
 	)
    ((equal intrusivity_level 3)
-	(konix/notify msg 2 remove_date)
-	(konix/notify msg 1 remove_date)
+	(konix/notify msg 2 t)
+	(konix/notify msg 1 t)
+	)
+   ((equal intrusivity_level 4)
+	(call-process "konix_gtk_entry.py"
+				  nil
+				  0
+				  nil
+				  "-n"
+				  "--info"
+				  "-T"
+				  "10000"
+				  "-t"
+				  msg)
+	(konix/notify msg 3 t)
+	)
+   ((equal intrusivity_level 5)
+	(call-process "konix_gtk_entry.py"
+				  nil
+				  0
+				  nil
+				  "-a"
+				  "-T"
+				  "10000"
+				  "-n"
+				  "--info"
+				  "-t"
+				  msg)
+	(konix/notify msg 3 t)
 	)
    (t
 	(display-warning 'notification msg)

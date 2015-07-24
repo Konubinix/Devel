@@ -238,17 +238,17 @@ def mpl_wait_for_key_press(fig=None, key="enter", close=False):
 
 def mpl_show_colors_maps():
     """see http://wiki.scipy.org/Cookbook/Matplotlib/Show_colormaps"""
-    a=outer(arange(0,1,0.01),ones(10))
-    figure(figsize=(10,5))
-    subplots_adjust(top=0.8,bottom=0.05,left=0.01,right=0.99)
-    maps=[m for m in cm.datad if not m.endswith("_r")]
+    a=numpy.outer(numpy.arange(0,1,0.01),numpy.ones(10))
+    pyplot.figure(figsize=(10,5))
+    pyplot.subplots_adjust(top=0.8,bottom=0.05,left=0.01,right=0.99)
+    maps=[m for m in matplotlib.cm.datad if not m.endswith("_r")]
     maps.sort(key=lambda x:x.lower())
     l=len(maps)+1
     for i, m in enumerate(maps):
-        subplot(1,l,i+1)
-        axis("off")
-        imshow(a,aspect='auto',cmap=get_cmap(m),origin="lower")
-        title(m,rotation=90,fontsize=10)
+        pyplot.subplot(1,l,i+1)
+        pyplot.axis("off")
+        pyplot.imshow(a,aspect='auto',cmap=get_cmap(m),origin="lower")
+        pyplot.title(m,rotation=90,fontsize=10)
 
 def mpl_layout_bigger():
     matplotlib.rcParams["figure.subplot.left"] = 0

@@ -26,6 +26,10 @@ parser.add_argument('-n','--no-clipboard',
 parser.add_argument('-a','--above-all',
                     help="""Set the window above all""",
                     action="store_true")
+parser.add_argument('-b','--background-color',
+                    help="""Can be anything that goes into
+                    http://www.pygtk.org/pygtk2reference/class-gdkcolor.html#function-gdk--color-parse""",
+                    type=str)
 
 entry = None
 def responseToDialog(entry, dialog, response):
@@ -48,7 +52,9 @@ def getText(info=False,
             initial="",
             clipboard=True,
             above_all=False,
-            timeout=0):
+            timeout=0,
+            background_color=None
+):
     #base this on a message dialog
     text = text.replace("<", "_").replace(">", "_")
     dialog = gtk.MessageDialog(
@@ -58,6 +64,13 @@ def getText(info=False,
         gtk.BUTTONS_OK,
         None)
     dialog.set_markup(text)
+    if background_color:
+        dialog.modify_bg(
+            gtk.STATE_NORMAL,
+            gtk.gdk.color_parse(
+                background_color
+            )
+        )
     if above_all:
         dialog.set_keep_above(True)
 
@@ -105,7 +118,8 @@ def main():
                   initial=args.initial,
                   clipboard=not args.no_clipboard,
                   above_all=args.above_all,
-                  timeout=args.timeout
+                  timeout=args.timeout,
+                  background_color=args.background_color
     ),
 
 if __name__ == '__main__':

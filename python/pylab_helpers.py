@@ -312,9 +312,15 @@ def pd_display_size_no_limit():
     pandas.set_option('display.max_columns', None)
     pandas.set_option('display.max_rows', None)
 
-def pd_display_size_reset():
-    pandas.reset_option('display.max_columns')
-    pandas.reset_option('display.max_rows')
+def pd_display_size_set(max_columns=None, max_rows=None):
+    if max_columns:
+        pandas.set_option('display.max_columns', max_columns)
+    else:
+        pandas.reset_option('display.max_columns')
+    if max_rows:
+        pandas.set_option('display.max_rows', max_rows)
+    else:
+        pandas.reset_option('display.max_rows')
 
 def pd_get_notnull_coordinates(dataframe_with_nan):
     """pd_get_coordinates(df[df >0])"""

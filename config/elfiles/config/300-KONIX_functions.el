@@ -349,7 +349,7 @@ make the line non empty"
 	  (not
 	   (process-live-p
 		(with-circe-server-buffer
-		  circe-server-process)
+		 circe-server-process)
 		)
 	   )
 	  )
@@ -687,6 +687,38 @@ retourne ('fichier','extension')."
 	)
   )
 
+(defcustom konix/notify-gtk/background-color "#3bffdc"
+  "Background color of the gtk popup showing the notification"
+  )
+
+(defun konix/notify-gtk (msg &optional above_all)
+  (let (
+		(args `(
+			   "-n"
+			   "--info"
+			   "-b"
+			   ,konix/notify-gtk/background-color
+			   "-T"
+			   "10000"
+			   "-t"
+			   ))
+		)
+	(when above_all
+	  (add-to-list
+	   'args
+	   "-a"
+	   ))
+	(apply
+	 `(call-process "konix_gtk_entry.py"
+					nil
+					0
+					nil
+					,@args
+					,msg)
+	 )
+	)
+  )
+
 (defun konix/notify (msg &optional intrusivity_level remove_date)
   (let (
 		(visible-bell nil)
@@ -727,30 +759,11 @@ retourne ('fichier','extension')."
 	(konix/notify msg 1 t)
 	)
    ((equal intrusivity_level 4)
-	(call-process "konix_gtk_entry.py"
-				  nil
-				  0
-				  nil
-				  "-n"
-				  "--info"
-				  "-T"
-				  "10000"
-				  "-t"
-				  msg)
+	(konix/notify-gtk msg)
 	(konix/notify msg 3 t)
 	)
    ((equal intrusivity_level 5)
-	(call-process "konix_gtk_entry.py"
-				  nil
-				  0
-				  nil
-				  "-a"
-				  "-T"
-				  "10000"
-				  "-n"
-				  "--info"
-				  "-t"
-				  msg)
+	(konix/notify-gtk msg t)
 	(konix/notify msg 3 t)
 	)
    (t

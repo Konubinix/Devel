@@ -402,3 +402,21 @@ def sk_nested_cross_val(model,
         verbose=verbose,
         scoring=scoring
     )
+
+def sk_model_plot(i, o, model, model_name, save=True):
+    model.fit(i, o)
+    h = model.predict(i)
+    e = h - o
+    pyplot.clf()
+    pyplot.subplot(211)
+    pyplot.plot(i, o, ".", label="raw values")
+    pyplot.plot(i, h, label=model_name)
+    pyplot.legend()
+    pyplot.gca().set_xlabel(i.columns[0])
+    pyplot.gca().set_ylabel(o.columns[0])
+    pyplot.draw()
+    pyplot.subplot(212)
+    e.plot(kind="hist", ax=pyplot.gca())
+    pyplot.suptitle("{} vs {} (coef={}, intercept={})".format(i.columns[0], o.columns[0], model.coef_[0][0], model.intercept_[0]))
+    if save:
+        pyplot.savefig("{}_{}.png".format(i.columns[0], o.columns[0]))

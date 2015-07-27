@@ -421,3 +421,6 @@ def sk_model_plot(i, o, model, model_name, save=True):
     pyplot.suptitle("{} vs {} (coef={}, intercept={})".format(i.columns[0], o.columns[0], model.coef_[0][0], model.intercept_[0]))
     if save:
         pyplot.savefig("{}_{}.png".format(i.columns[0], o.columns[0]))
+
+def close_all():
+    pyplot.close("all")

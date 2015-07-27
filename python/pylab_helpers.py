@@ -422,5 +422,13 @@ def sk_model_plot(i, o, model, model_name, save=True):
     if save:
         pyplot.savefig("{}_{}.png".format(i.columns[0], o.columns[0]))
 
+def pd_movingaverage(df, window_size=None):
+    result = df.copy()
+    window_size = window_size if window_size else result.shape[0] / 10.
+    window = numpy.ones(int(window_size))/float(window_size)
+    for c in result.columns:
+        result[c] = numpy.convolve(result[c], window, 'same')
+    return result
+
 def close_all():
     pyplot.close("all")

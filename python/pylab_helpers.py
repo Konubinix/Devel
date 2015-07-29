@@ -210,8 +210,8 @@ def pd_stripna(input_dataframe):
 
 def mpl_get_color_cycle_from_color_map_name(number=10, name="coolwarm"):
     color = matplotlib.cm.get_cmap(name)(numpy.linspace(0.1,0.9,number)) # This returns RGBA; convert:
-    return map(lambda rgb:'#%02x%02x%02x' % (rgb[0]*255,rgb[1]*255,rgb[2]*255),
-               tuple(color[:,0:-1]))
+    return list(map(lambda rgb:'#%02x%02x%02x' % (rgb[0]*255,rgb[1]*255,rgb[2]*255),
+               tuple(color[:,0:-1])))
 
 def mpl_set_color_cycle_from_color_map_name(number=10, name="coolwarm"):
     """See mpl.cm and http://matplotlib.org/examples/color/colormaps_reference.html"""
@@ -270,8 +270,8 @@ def mpl_layout_reset():
 def mpl_click_coordinates_get(fig=None):
     fig = fig or pyplot.gcf()
     def onclick(event):
-        print 'button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
-            event.button, event.x, event.y, event.xdata, event.ydata)
+        print('button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
+            event.button, event.x, event.y, event.xdata, event.ydata))
     global mpl_click_coordinates_get_cid
     mpl_click_coordinates_get_cid = fig.canvas.mpl_connect('button_press_event', onclick)
     return mpl_click_coordinates_get_cid

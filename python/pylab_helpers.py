@@ -17,6 +17,8 @@ try:
 except:
     print("Could not import odo")
 
+idx = pandas.IndexSlice
+
 def timeseries_scatter_plots(inputs, names=None, title=None, nrows=4):
   """inputs: matrix of measures
   each line is a measure. len(inputs) is the number of measures. len(inputs[0])

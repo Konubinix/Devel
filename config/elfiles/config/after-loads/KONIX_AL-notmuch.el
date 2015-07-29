@@ -133,7 +133,7 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:background "dim grey")
+	 (:background "grey")
 	 )
 	(
 	 ((class color)

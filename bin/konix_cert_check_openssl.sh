@@ -6,7 +6,8 @@ PORT="${2:-443}"
 OPENSSL_OUT="$(mktemp -t openssl_out.XXXX)"
 trap "rm ${OPENSSL_OUT}" 0
 
-echo | openssl s_client \
+# SSL_CERT_DIR="" => http://unix.stackexchange.com/questions/162969/why-openssl-s-client-verifies-a-cert-against-a-mismatching-cafile
+echo | SSL_CERT_DIR="" openssl s_client \
     -CAfile "${KONIX_CA_FILE}" \
     -connect "${SERVER}:${PORT}" > "${OPENSSL_OUT}" 2>&1
 

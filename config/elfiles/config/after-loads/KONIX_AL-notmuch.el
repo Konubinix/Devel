@@ -133,7 +133,7 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:background "grey")
+	 (:background "dim grey")
 	 )
 	(
 	 ((class color)
@@ -163,7 +163,7 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:inherit default :foreground "royal blue")
+	 (:inherit default :foreground "cyan3")
 	 )
 	(
 	 ((class color)

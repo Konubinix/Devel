@@ -482,7 +482,7 @@ user may need or want to edit them.")
 	(
 	 ((class color)
 	  (background dark))
-	 (:inherit font-lock-function-name-face :background "light salmon")
+	 (:inherit font-lock-function-name-face :background "blue4")
 	 )
 	(
 	 ((class color)

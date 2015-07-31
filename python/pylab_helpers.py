@@ -467,3 +467,144 @@ def pd_plotm(arg, window_size=None, *args, **kwargs):
 pandas.DataFrame.plotm = pd_plotm
 pandas.Series.plotm = pd_plotm
 
+mpl_toggle_visibility_numbers = None
+def mpl_toggle_visibility(ax=None):
+    """
+http://matplotlib.org/examples/event_handling/legend_picking.html
+"""
+    ax = ax if ax else pyplot.gca()
+    fig = ax.get_figure()
+    global mpl_toggle_visibility_numbers
+    if mpl_toggle_visibility_numbers:
+        for number in mpl_toggle_visibility_numbers:
+            fig.canvas.mpl_disconnect(number)
+        mpl_toggle_visibility_numbers = None
+        print("Deactivated")
+        return
+    lines = ax.get_lines()
+    lined = dict()
+    lined2 = dict()
+    leg = ax.get_legend()
+    for legline, origline in zip(leg.get_lines(), lines):
+        legline.set_picker(5)  # 5 pts tolerance
+        origline.set_picker(5)
+        lined[legline] = origline
+        lined2[origline] = legline
+
+    def toggle_visibility(origline, legline, vis=None):
+        vis = vis if vis is not None else not origline.get_visible()
+        origline.set_visible(vis)
+        # Change the alpha on the line in the legend so we can see what lines
+        # have been toggled
+        if vis:
+            legline.set_alpha(1.0)
+        else:
+            legline.set_alpha(0.2)
+
+    def onscroll(event):
+        if event.button == "up":
+            for origline, legline in lined2.items():
+                toggle_visibility(origline, legline, True)
+        elif event.button == "down":
+            for origline, legline in lined2.items():
+                toggle_visibility(origline, legline, False)
+        pyplot.draw_if_interactive()
+
+    def onclick(event):
+        if event.button == 3: # right click
+            mpl_zoom_on_visible_lines()
+
+    def onpick(event):
+        # on the pick event, find the orig line corresponding to the
+        # legend proxy line, and toggle the visibility
+        if not event.mouseevent.button in [1, 2]: # right click
+            return
+
+        legline = event.artist
+        if not legline in lined:
+            # not a legline, thus a normal line
+            origline = legline
+            #epick it only if visible (making a invisible line appear is
+            #strange)
+            if not origline.get_visible():
+                return
+            legline = lined2[origline]
+        else:
+            origline = lined[legline]
+
+        if event.mouseevent.button == 2: # middle click
+            to_toggle = [(origline2, legline2)
+             for origline2, legline2 in lined2.items()
+             if origline2 != origline
+             and origline2.get_visible()
+            ]
+            if to_toggle:
+                [toggle_visibility(origline2, legline2)
+                 for origline2, legline2 in to_toggle
+                ]
+            else:
+                [toggle_visibility(origline2, legline2)
+                 for origline2, legline2 in lined2.items()
+                 if origline2 != origline
+                ]
+        else:
+            toggle_visibility(origline, legline)
+
+        fig.canvas.draw()
+
+    mpl_toggle_visibility_numbers = (
+        fig.canvas.mpl_connect('pick_event', onpick),
+        fig.canvas.mpl_connect('button_press_event', onclick),
+        fig.canvas.mpl_connect('scroll_event', onscroll),
+    )
+    print("Activated")
+    return mpl_toggle_visibility_numbers
+
+def mpl_zoom_on_line(line):
+    ax = line.get_axes()
+    xmax, ymax=line.get_xydata().max(axis=0)
+    xmin, ymin=line.get_xydata().min(axis=0)
+    pyplot.axis([xmin, xmax, ymin, ymax])
+
+def mpl_zoom_on_visible_lines(ax=None):
+    ax = ax if ax else pyplot.gca()
+    xmax, ymax = array([
+        line.get_xydata().max(axis=0).data
+        for line in ax.get_lines()
+        if line.get_visible()]).max(axis=0)
+    xmin, ymin = array([
+        line.get_xydata().min(axis=0).data
+        for line in ax.get_lines()
+        if line.get_visible()]).min(axis=0)
+    pyplot.axis([xmin, xmax, ymin, ymax])
+
+mpl_toggle_zoom_on_line_numbers = None
+def mpl_toggle_zoom_on_line(ax=None):
+    ax = ax if ax else pyplot.gca()
+    fig = ax.get_figure()
+    global mpl_toggle_zoom_on_line_numbers
+    if mpl_toggle_zoom_on_line_numbers:
+        for number in mpl_toggle_zoom_on_line_numbers:
+            fig.canvas.mpl_disconnect(mpl_toggle_zoom_on_line_number)
+        mpl_toggle_zoom_on_line_numbers = None
+        print("Deactivated")
+        return
+
+    for line in ax.get_lines():
+        line.set_picker(5)
+
+    def onpick(event):
+        if event.mouseevent.button == 1:
+            line = event.artist
+            mpl_zoom_on_line(line)
+
+    def onclick(event):
+        if event.button == 3: # right click
+            pyplot.axis("auto")
+
+    mpl_toggle_zoom_on_line_numbers = (
+        fig.canvas.mpl_connect('pick_event', onpick),
+        fig.canvas.mpl_connect('button_press_event', onclick),
+    )
+    print("Activated")
+    return mpl_toggle_zoom_on_line_numbers

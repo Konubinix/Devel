@@ -112,10 +112,6 @@
   (set-face-attribute 'org-agenda-dimmed-todo-face nil
 					  :foreground "OrangeRed4"
 					  )
-  ;; less dimmed face for blocks
-  (set-face-attribute 'org-block nil
-					  :foreground "grey30"
-					  )
   (set-face-attribute 'org-agenda-date nil
 					  :inherit 'org-agenda-structure
 					  :box '(:line-width 2 :color "black" :style released-button))

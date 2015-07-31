@@ -364,6 +364,18 @@ def pd_mpl_change():
     pandas.options.display.mpl_style = "default"
 pd_mpl_change()
 
+def pd_fill_between(dataframe, *args, **kwargs):
+    assert dataframe.shape[1] == 2, "Bad value for the shape"
+    pyplot.fill_between(
+        dataframe.index,
+        dataframe.ix[:, 0],
+        dataframe.ix[:, 1],
+        *args,
+        **kwargs
+    )
+
+pandas.DataFrame.fill_between = pd_fill_between
+
 def pd_mpl_reset():
     pandas.options.display.mpl_style = None
 

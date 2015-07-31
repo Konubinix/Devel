@@ -453,3 +453,17 @@ def pd_movingaverage(df, window_size=None):
 
 def close_all():
     pyplot.close("all")
+
+def pd_rolling_mean(df, window_size=None):
+    window_size = window_size if window_size else df.shape[0] / 10.
+    return df.rolling_mean(window_size)
+
+pandas.DataFrame.rolm=pd_rolling_mean
+pandas.Series.rolm=pd_rolling_mean
+
+def pd_plotm(arg, window_size=None, *args, **kwargs):
+    return arg.rolm(window_size).plot(*args, **kwargs)
+
+pandas.DataFrame.plotm = pd_plotm
+pandas.Series.plotm = pd_plotm
+

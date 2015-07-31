@@ -362,6 +362,7 @@ def pd_like(dataframe_or_serie, values):
 
 def pd_mpl_change():
     pandas.options.display.mpl_style = "default"
+pd_mpl_change()
 
 def pd_mpl_reset():
     pandas.options.display.mpl_style = None

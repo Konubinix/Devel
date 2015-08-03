@@ -1113,7 +1113,7 @@ items"
 						 (org-agenda-tag-filter-preset nil)
 						 )
 						)
-				  (tags-todo "+project"
+				  (tags "+project"
 							 (
 							  (org-agenda-overriding-header
 							   "A project MUST have a NEXT entry")

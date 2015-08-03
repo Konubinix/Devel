@@ -210,3 +210,6 @@
 [submodule "config/elfiles/Fill-Column-Indicator"]
 	path = config/elfiles/Fill-Column-Indicator
 	url = https://github.com/alpaker/Fill-Column-Indicator
+[submodule "config/elfiles/rainbow-mode"]
+	path = config/elfiles/rainbow-mode
+	url = https://github.com/emacsmirror/rainbow-mode

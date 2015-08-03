@@ -1113,7 +1113,7 @@ items"
 						 (org-agenda-tag-filter-preset nil)
 						 )
 						)
-				  (tags "+project"
+				  (tags "+project//-DONE-NOT_DONE"
 							 (
 							  (org-agenda-overriding-header
 							   "A project MUST have a NEXT entry")
@@ -1172,10 +1172,10 @@ items"
 							   "If those waiting items are not blocking anymore, move them to TODO")
 							  )
 							 )
-				  (tags "project"
+				  (tags "+project//-DONE-NOT_DONE"
 						(
 						 (org-agenda-overriding-header
-						  "Keep an eye on those projects (they may well be stuck or done)")
+						  "Keep an eye on those projects (they may well be stuck)")
 						 (org-agenda-tag-filter-preset nil)
 						 (org-agenda-skip-function
 						  '(or

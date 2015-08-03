@@ -608,3 +608,22 @@ def mpl_toggle_zoom_on_line(ax=None):
     )
     print("Activated")
     return mpl_toggle_zoom_on_line_numbers
+
+mpl_rotation_X_axes = None
+def mpl_rotation_X():
+    global mpl_rotation_X_axes
+    if mpl_rotation_X_axes:
+        pyplot.gcf().delaxes(mpl_rotation_X_axes)
+        pyplot.draw()
+        mpl_rotation_X_axes = None
+        return
+    from matplotlib.widgets import Slider
+    ax = pyplot.gca()
+    mpl_rotation_X_axes = pyplot.axes([0.25, 0.1, 0.65, 0.03],)
+    rotation_slider = Slider(mpl_rotation_X_axes, 'Rotation', -90.0, 90.0, valinit=5)
+    def set_rotation(rotation):
+        for label in ax.get_xticklabels():
+            label.set_rotation(rotation)
+    rotation_slider.on_changed(set_rotation)
+    # must be returned : cf https://github.com/matplotlib/matplotlib/issues/3105/
+    return mpl_rotation_X_axes, rotation_slider

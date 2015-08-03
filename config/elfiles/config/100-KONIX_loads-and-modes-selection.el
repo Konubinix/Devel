@@ -55,11 +55,13 @@
 		 (expand-file-name "epc" elfiles)
 		 (expand-file-name "text-translator" elfiles)
 		 (expand-file-name "Fill-Column-Indicator" elfiles)
+		 (expand-file-name "rainbow-mode" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
   (mapc '(lambda (dir) (add-to-list 'load-path dir)) konix/personal-load-path)
   )
+
 ;; ;; add the official site-lisp at the end of the load-path
 ;; (let (
 ;; 	  (site-lisp "/usr/share/emacs/site-lisp")
@@ -223,6 +225,8 @@
 (autoload 'ebib "ebib" "" t)
 ;; text translator
 (require 'text-translator-load)
+;; rainbow mode
+(autoload 'rainbow-mode "rainbow-mode" "" t)
 
 ;; ************************************************************
 ;; Automodes

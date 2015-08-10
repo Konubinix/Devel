@@ -484,7 +484,7 @@ def close_all():
 
 def pd_rolling_mean(df, window_size=None):
     window_size = window_size if window_size else df.shape[0] / 10.
-    return df.rolling_mean(window_size)
+    return df.rolling.mean(window_size)
 
 pandas.DataFrame.rolm=pd_rolling_mean
 pandas.Series.rolm=pd_rolling_mean

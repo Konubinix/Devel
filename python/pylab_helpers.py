@@ -244,12 +244,12 @@ def pd_scale(input_dataframe, axis=0, with_mean=True, with_std=True):
 def pd_stripna(input_dataframe):
     return input_dataframe.dropna(axis=0, how="all").dropna(axis=1, how="all")
 
-def mpl_get_color_cycle_from_color_map_name(number=10, name="coolwarm"):
+def mpl_get_color_cycle_from_color_map_name(number=10, name="cubehelix"):
     color = matplotlib.cm.get_cmap(name)(numpy.linspace(0.1,0.9,number)) # This returns RGBA; convert:
     return list(map(lambda rgb:'#%02x%02x%02x' % (rgb[0]*255,rgb[1]*255,rgb[2]*255),
                tuple(color[:,0:-1])))
 
-def mpl_set_color_cycle_from_color_map_name(number=10, name="coolwarm"):
+def mpl_set_color_cycle_from_color_map_name(number=10, name="cubehelix"):
     """See mpl.cm and http://matplotlib.org/examples/color/colormaps_reference.html"""
     matplotlib.rcParams["axes.color_cycle"] = mpl_get_color_cycle_from_color_map_name(name=name, number=number)
 

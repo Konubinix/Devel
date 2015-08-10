@@ -19,6 +19,7 @@ import parsedatetime
 import dateutil.parser
 import konix_collections
 import urllib.parse
+import pandas
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -384,6 +385,13 @@ class GCall(cmd.Cmd, object):
         return calendars
 
     @needs("access_token")
+    def list_calendars_pandas(self, search_term=None):
+        return pandas.DataFrame(
+            [ce.__dict__.values() for ce in self.list_calendars(search_term)],
+            columns=self.api["schemas"]["CalendarListEntry"]["properties"].keys(),
+        )
+
+    @needs("access_token")
     def do_list_calendars(self, search_term=None):
         calendars = self.list_calendars(search_term)
         formatter = eval("lambda x:" + self.calendar_formatter)
@@ -608,6 +616,15 @@ class GCall(cmd.Cmd, object):
             events = [e for e in events if filter_(e)]
 
         return events
+
+    def list_events_pandas(self, search_terms=""):
+        return pandas.DataFrame(
+            [
+                list(event.__dict__.values()) + [event.startdate, event.enddate]
+                for event in self.list_events(search_terms)
+            ],
+            columns=list(self.api["schemas"]["Event"]["properties"].keys()) + ["startdate", "enddate"]
+        )
 
     @needs("access_token")
     def do_list_events(self, search_term=None):

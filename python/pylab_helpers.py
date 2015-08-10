@@ -8,6 +8,7 @@ from matplotlib import pyplot
 import numpy
 import re
 import pandas
+import sklearn
 try:
     from mpldatacursor import datacursor
 except:

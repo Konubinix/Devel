@@ -443,7 +443,7 @@ def sk_nested_cross_val(model,
     )
 
     # run the cross validation to find the score of the cross validated clf
-    sklearn.cross_validation.cross_val_score(
+    return sklearn.cross_validation.cross_val_score(
         clf,
         X,
         y,

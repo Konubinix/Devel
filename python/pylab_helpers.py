@@ -596,12 +596,12 @@ def mpl_zoom_on_line(line):
 
 def mpl_zoom_on_visible_lines(ax=None):
     ax = ax if ax else pyplot.gca()
-    xmax, ymax = array([
-        line.get_xydata().max(axis=0).data
+    xmax, ymax = np.array([
+        line.get_xydata().max(axis=0)
         for line in ax.get_lines()
         if line.get_visible()]).max(axis=0)
-    xmin, ymin = array([
-        line.get_xydata().min(axis=0).data
+    xmin, ymin = np.array([
+        line.get_xydata().min(axis=0)
         for line in ax.get_lines()
         if line.get_visible()]).min(axis=0)
     pyplot.axis([xmin, xmax, ymin, ymax])

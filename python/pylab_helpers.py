@@ -638,7 +638,7 @@ def mpl_toggle_zoom_on_line(ax=None):
     return mpl_toggle_zoom_on_line_numbers
 
 mpl_rotation_X_axes = None
-def mpl_rotation_X():
+def mpl_rotation_X(wait_for_key="enter"):
     global mpl_rotation_X_axes
     if mpl_rotation_X_axes:
         pyplot.gcf().delaxes(mpl_rotation_X_axes)
@@ -654,4 +654,8 @@ def mpl_rotation_X():
             label.set_rotation(rotation)
     rotation_slider.on_changed(set_rotation)
     # must be returned : cf https://github.com/matplotlib/matplotlib/issues/3105/
+    if wait_for_key:
+        mpl_wait_for_key_press(key=wait_for_key)
+        # to deactivate it
+        mpl_rotation_X()
     return mpl_rotation_X_axes, rotation_slider

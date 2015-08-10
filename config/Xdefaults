@@ -511,3 +511,6 @@ emacsclient.toolBar:							0
 !!!-------------- used for internal checking - DO NOT CHANGE THIS! --------------
 !!!------------------------------------------------------------------------------
 *appDefaultsFileVersion: 20030303
+
+Xcursor.theme: mytheme
+Xcursor.size: 16

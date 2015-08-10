@@ -118,7 +118,7 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:background "aquamarine")
+	 (:background "DarkSlateBlue")
 	 )
 	(
 	 ((class color)

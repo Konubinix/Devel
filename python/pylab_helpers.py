@@ -159,6 +159,21 @@ def recfunctions_view_flatten_array(array, joinchar=None):
 #         else:
 #             return None
 
+
+def pd_prettytable(df):
+    from prettytable import PrettyTable
+    table = PrettyTable([''] + list(df.columns))
+    for row in df.itertuples():
+        table.add_row(row)
+    return str(table)
+
+def pd_prettytable_no_index(df):
+    from prettytable import PrettyTable
+    table = PrettyTable(list(df.columns))
+    for row in df.itertuples():
+        table.add_row(row[1:])
+    return str(table)
+
 def pd_lexicographic_lesser_than(vector1, vector2):
     if isinstance(vector1, pandas.core.frame.DataFrame):
         vector1 = vector1.iloc[:,0]

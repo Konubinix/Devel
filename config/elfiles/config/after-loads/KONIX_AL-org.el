@@ -2856,7 +2856,7 @@ of the clocksum."
 	(
 	 ((class color)
 	  (background dark))
-	 (:background "LightSteelBlue4")
+	 (:background "SpringGreen4")
 	 )
 	(
 	 ((class color)

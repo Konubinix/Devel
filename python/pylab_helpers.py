@@ -159,6 +159,18 @@ def recfunctions_view_flatten_array(array, joinchar=None):
 #         else:
 #             return None
 
+def _pd_upsample_month_to_days_generator(df):
+    for row in [pandas.DataFrame(df.loc[r] / float(r.day)) for r in df.index]:
+        yield pandas.DataFrame(
+            row.iloc[:, 0].to_dict(),
+            index=pandas.date_range(
+                row.columns[0].strftime("%Y-%m-01"),
+                row.columns[0].strftime("%Y-%m-%d")
+            ),
+            columns=row.index)
+
+def pd_upsample_month_to_days(df):
+    return pandas.concat(_pd_upsample_month_to_days_generator(df))
 
 def pd_prettytable(df):
     from prettytable import PrettyTable

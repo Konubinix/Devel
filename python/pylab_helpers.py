@@ -420,6 +420,12 @@ def nb_set_fig_size():
     w = widgets.interactive(set_figsize,width=width_slider, height=height_slider)
     display(w)
 
+def pd_sk_fit(clf, i, o):
+    return clf.fit(sk_reshape_for_model(i), sk_reshape_for_model(o))
+
+def pd_sk_predict(clf, i):
+    return clf.predict(sk_reshape_for_model(i))
+
 def sk_nested_cross_val(model,
                         X,
                         y,
@@ -470,6 +476,31 @@ def sk_model_plot(i, o, model, model_name, save=True):
     pyplot.suptitle("{} vs {} (coef={}, intercept={})".format(i.columns[0], o.columns[0], model.coef_[0][0], model.intercept_[0]))
     if save:
         pyplot.savefig("{}_{}.png".format(i.columns[0], o.columns[0]))
+
+def sk_reshape_for_model(df, dim=1):
+    if isinstance(df, pandas.Series):
+        return df.reshape(len(df) / dim, dim)
+    else:
+        return df
+
+def sk_classification(clf, i, o, nx=500, ny=500, plot=True):
+    xx, yy = np.meshgrid(
+        np.linspace(i.min(), i.max(), nx),
+        np.linspace(o.min(), o.max(), ny)
+    )
+    xxyy = c_[xx.ravel(), yy.ravel()]
+    io = c_[i.ravel(), o.ravel()]
+    clf.fit(io)
+    z = clf.decision_function(xxyy).reshape(xx.shape)
+    if plot:
+        contour(xx, yy, z)
+    return xx, yy, z
+
+def pd_index_intersections(i, o):
+    ind = i.index.intersection(o.index)
+    i = i.reindex(ind)
+    o = o.reindex(ind)
+    return i, o
 
 def pd_movingaverage(df, window_size=None):
     result = df.copy()

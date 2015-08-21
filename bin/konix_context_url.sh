@@ -10,13 +10,15 @@ $0 [-h] [-a] name
 -h: print this and exit
 -a: show the url for all contexts
 -c: show the url for this particular context
+-e: exclude those contexts
 name: name of the machine of which to print the context
 EOF
 }
 
 ALL=""
 CONTEXT=""
-while getopts "hac:" opt; do
+EXCLUDE=""
+while getopts "hac:e:" opt; do
     case $opt in
         h)
             usage
@@ -27,7 +29,9 @@ while getopts "hac:" opt; do
             ;;
         c)
             CONTEXT="${OPTARG}"
-            echo "Filtering with context ${CONTEXT}" >&2
+            ;;
+        e)
+            EXCLUDE="${OPTARG}"
             ;;
     esac
 done
@@ -50,6 +54,6 @@ then
         echo "${context}: $(cat "${context_path}/url")"
     done
 else
-    remoterc_setup_or_quit "${HOST}" "${CONTEXT}"
+    remoterc_setup_or_quit "${HOST}" "${CONTEXT}" "${EXCLUDE}"
     echo -n "${remote_url}"
 fi

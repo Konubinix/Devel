@@ -227,6 +227,8 @@
 (require 'text-translator-load)
 ;; rainbow mode
 (autoload 'rainbow-mode "rainbow-mode" "" t)
+;; EIN
+(autoload 'ein:notebooklist-open "ein-notebooklist" "" t)
 
 ;; ************************************************************
 ;; Automodes

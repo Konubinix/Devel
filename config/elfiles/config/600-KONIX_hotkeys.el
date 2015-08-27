@@ -173,6 +173,14 @@
 (define-key 'konix/bbdb/map (kbd "s") 'bbdb)
 (define-key 'konix/bbdb/map (kbd "c") 'bbdb-create)
 
+;; **********************************************************************
+;; EIN
+;; **********************************************************************
+(define-prefix-command 'konix/ein/map)
+(define-key 'konix/global-slow-key-map (kbd "n") 'konix/ein/map)
+
+(define-key 'konix/ein/map (kbd "l") 'ein:notebooklist-open)
+
 ;; ******************************************************************************************
 ;; Delete lines
 ;; ******************************************************************************************

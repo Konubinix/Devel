@@ -24,10 +24,11 @@
 
 ;;; Code:
 
-(defvar konix/diary-shared (expand-file-name "diary_shared" perso-dir))
-(defvar konix/diary-anniversary (expand-file-name "diary_anniversary" perso-dir))
+(setq-default konix/diary-dir (getenv "KONIX_DIARY_DIR"))
+(defvar konix/diary-shared (expand-file-name "diary_shared" konix/diary-dir))
+(defvar konix/diary-anniversary (expand-file-name "diary_anniversary" konix/diary-dir))
 
-(setq-default diary-file (expand-file-name "diary" perso-dir))
+(setq-default diary-file (expand-file-name "diary" konix/diary-dir))
 (unless (file-exists-p diary-file)
   (make-directory (file-name-directory diary-file) t)
   (with-temp-buffer

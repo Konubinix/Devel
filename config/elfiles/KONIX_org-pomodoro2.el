@@ -105,7 +105,7 @@ interruption timer, if any")
 
 (defun konix/org-pomodoro-echo ()
   (interactive)
-  (message "%s pomorodos done%s"
+  (message "%s pomorodos done: %s"
 		   konix/org-pomodoro-set-count
 		   (if konix/org-pomodoro-in-pomodoro
 			   (format

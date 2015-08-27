@@ -1,3 +1,4 @@
 #!/bin/bash
 
-ipython notebook --matplotlib=inline --profile=notebook "$@"
+source ~/.virtualenvs/maths/bin/activate
+jupyter notebook --browser ${KONIX_NOTEBOOK_BROWSER} "$@"

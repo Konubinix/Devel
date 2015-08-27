@@ -210,9 +210,9 @@ cursor stays in the org buffer."
 ;; ####################################################################################################
 (setq-default org-file-apps
 			  '(
-				(".org" . emacs)
-				(".py" . emacs)
-				(".log" . emacs)
+				(".org$" . emacs)
+				(".py$" . emacs)
+				(".log$" . emacs)
 				(".*" . "mimeopen %s")
 				(auto-mode . emacs)
 				)

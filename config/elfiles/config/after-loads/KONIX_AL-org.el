@@ -420,12 +420,17 @@ with a precise timestamp)."
   )
 
 (defun konix/org-agenda-appt-p ()
-  (save-window-excursion
-	(save-excursion
-	  (org-agenda-goto)
-	  (konix/org-appt-p)
+  (or (string-equal
+	   (get-text-property (point) 'type)
+	   "diary"
+	   )
+	  (save-window-excursion
+		(save-excursion
+		  (org-agenda-goto)
+		  (konix/org-appt-p)
+		  )
+		)
 	  )
-	)
   )
 
 (defmacro konix/org-with-point-on-heading (body)
@@ -1115,15 +1120,15 @@ items"
 						 )
 						)
 				  (tags "+project//-DONE-NOT_DONE"
-							 (
-							  (org-agenda-overriding-header
-							   "A project MUST have a NEXT entry")
-							  (org-agenda-tag-filter-preset nil)
-							  (org-agenda-skip-function
-							   'konix/org-agenda-skip-if-has-not-next-entry
-							   )
-							  )
-							 )
+						(
+						 (org-agenda-overriding-header
+						  "A project MUST have a NEXT entry")
+						 (org-agenda-tag-filter-preset nil)
+						 (org-agenda-skip-function
+						  'konix/org-agenda-skip-if-has-not-next-entry
+						  )
+						 )
+						)
 				  (todo "NEXT"
 						(
 						 (org-agenda-skip-function
@@ -1283,6 +1288,7 @@ items"
 					(org-agenda-start-with-clockreport-mode t)
 					(org-agenda-start-with-log-mode t)
 					(org-agenda-show-log 'clockcheck)
+					(org-agenda-include-diary nil)
 					(dummy (konix/org-agenda-inhibit-context-filtering))
 					)
 				   )
@@ -1566,6 +1572,7 @@ items"
 					(org-agenda-start-with-clockreport-mode t)
 					(org-agenda-start-with-log-mode t)
 					(org-agenda-archives-mode t)
+					(org-agenda-include-diary nil)
 					(org-agenda-show-log 'clockcheck)
 					)
 				   )
@@ -1850,7 +1857,6 @@ items"
   )
 (setq-default org-agenda-diary-file (concat org-directory "/diary.org"))
 (setq-default org-agenda-include-all-todo nil)
-(setq-default org-agenda-include-diary nil)
 (setq-default org-agenda-insert-diary-strategy 'top-level)
 ;; to have entries of type * 9pm stuff to timed entry
 (setq-default org-agenda-insert-diary-extract-time t)
@@ -2981,16 +2987,21 @@ of the clocksum."
   )
 
 (defun konix/org-is-in-schedule-p ()
-  (let (
-		(scheduled_time (konix/org-with-point-on-heading
-						 (org-get-scheduled-time (point))
-						 ))
+  (or (string-equal
+	   (get-text-property (point) 'type)
+	   "diary"
+	   )
+	  (let (
+			(scheduled_time (konix/org-with-point-on-heading
+							 (org-get-scheduled-time (point))
+							 ))
+			)
+		(and
+		 scheduled_time
+		 (time-less-p scheduled_time (current-time))
+		 )
 		)
-	(and
-	 scheduled_time
-	 (time-less-p scheduled_time (current-time))
-	 )
-	)
+	  )
   )
 
 (defvar konix/org-agenda-text-properties

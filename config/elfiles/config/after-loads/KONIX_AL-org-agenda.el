@@ -29,6 +29,7 @@
 ;; http://orgmode.org/worg/agenda-optimization.html#sec-3
 (setq-default org-agenda-inhibit-startup t)
 (setq-default org-agenda-dim-blocked-tasks nil)
+(setq-default org-agenda-include-diary t)
 
 (defun konix/org-agenda-refile-noupdate (&optional goto rfloc no-update)
   (interactive)

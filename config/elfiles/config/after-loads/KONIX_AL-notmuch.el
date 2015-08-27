@@ -148,7 +148,7 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:background "peach puff")
+	 (:background "blue violet")
 	 )
 	(
 	 ((class color)

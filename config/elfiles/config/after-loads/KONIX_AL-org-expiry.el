@@ -80,8 +80,8 @@
 (defun konix/org-expiry/handler ()
   (interactive)
   (if (or
-	   (member "NOEXPIRY" (org-get-tags))
-	   (member "NOEXPIRYRECURSIVE" (org-get-tags))
+	   (member "NOEXPIRY" (org-get-tags-at (point)))
+	   (member "NOEXPIRYRECURSIVE" (org-get-tags-at (point)))
 	   )
 	  (message "Prevent the expiration of %s" (org-get-heading t t))
 	(konix/org-add-tag "EXPIRED")

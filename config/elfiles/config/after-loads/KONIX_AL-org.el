@@ -31,6 +31,7 @@
 (require 'org-clock)
 (require 'org-expiry)
 (require 'org-collector)
+(require 'holidays)
 
 ;; ######################################################################
 ;; My variables

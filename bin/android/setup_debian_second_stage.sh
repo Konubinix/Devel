@@ -12,4 +12,4 @@ EOF
 apt-get update
 apt-get install aptitude
 aptitude update
-aptitude install vim git-annex python bash-completion openssh-server screen myrepos
+aptitude install packages

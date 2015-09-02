@@ -10,6 +10,7 @@ deb http://ftp.fr.debian.org/debian/ testing main contrib non-free
 deb-src http://ftp.fr.debian.org/debian/ testing main contrib non-free
 EOF
 apt-get update
-apt-get install aptitude
+echo Y|apt-get install aptitude
 aptitude update
-aptitude install packages
+/debootstrap/android_setup_perso.sh
+dpkg-reconfigure locales

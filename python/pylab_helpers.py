@@ -97,7 +97,7 @@ def recfunctions_flatten_descr(ndtype, joinchar=None, __parents=None):
     Examples
     --------
     >>> from numpy.lib import recfunctions as rfn
-    >>> ndtype = np.dtype([('a', '<i4'), ('b', [('ba', '<f8'), ('bb', '<i4')])])
+    >>> ndtype = numpy.dtype([('a', '<i4'), ('b', [('ba', '<f8'), ('bb', '<i4')])])
     >>> rfn.flatten_descr(ndtype)
     (('a', dtype('int32')), ('ba', dtype('float64')), ('bb', dtype('int32')))
     >>> rfn.flatten_descr(ndtype, joinchar="_")
@@ -384,8 +384,8 @@ def pd_like(dataframe_or_serie, values):
     else:
         return pandas.DataFrame(
             values,
-            index=dataframe.index,
-            columns=dataframe.columns
+            index=dataframe_or_serie.index,
+            columns=dataframe_or_serie.columns
         )
 
 def pd_mpl_change():
@@ -479,14 +479,14 @@ def sk_model_plot(i, o, model, model_name, save=True):
 
 def sk_reshape_for_model(df, dim=1):
     if isinstance(df, pandas.Series):
-        return df.reshape(len(df) / dim, dim)
+        return numpy.array(df.reshape(len(df) / dim, dim))
     else:
-        return df
+        return numpy.array(df)
 
 def sk_classification(clf, i, o, nx=500, ny=500, plot=True):
-    xx, yy = np.meshgrid(
-        np.linspace(i.min(), i.max(), nx),
-        np.linspace(o.min(), o.max(), ny)
+    xx, yy = numpy.meshgrid(
+        numpy.linspace(i.min(), i.max(), nx),
+        numpy.linspace(o.min(), o.max(), ny)
     )
     xxyy = c_[xx.ravel(), yy.ravel()]
     io = c_[i.ravel(), o.ravel()]
@@ -627,11 +627,11 @@ def mpl_zoom_on_line(line):
 
 def mpl_zoom_on_visible_lines(ax=None):
     ax = ax if ax else pyplot.gca()
-    xmax, ymax = np.array([
+    xmax, ymax = numpy.array([
         line.get_xydata().max(axis=0)
         for line in ax.get_lines()
         if line.get_visible()]).max(axis=0)
-    xmin, ymin = np.array([
+    xmin, ymin = numpy.array([
         line.get_xydata().min(axis=0)
         for line in ax.get_lines()
         if line.get_visible()]).min(axis=0)

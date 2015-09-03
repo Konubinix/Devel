@@ -2,7 +2,8 @@
 
 OLD="$1"
 NEW="$2"
-diff \
+shift 2
+diff "$@" \
     --unchanged-group-format='' \
     --old-group-format='' \
     --new-group-format='%>' \

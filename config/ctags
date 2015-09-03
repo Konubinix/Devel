@@ -3,6 +3,7 @@
 --c++-kinds=+cdefglmnpstuv
 --Java-kinds=cefgilmp
 --extra=+fq
+--exclude=build
 --fields=+ialStmnsz
 --file-scope=yes
 --langmap=c++:.c++.cc.cp.cpp.cxx.h.h++.hh.hp.hpp.hxx.C.H.txx.ixx(*.hxx.in)

@@ -17,6 +17,7 @@ import collections
 import pytz
 import parsedatetime
 import dateutil.parser
+import dateutil
 import konix_collections
 import urllib.parse
 import pandas
@@ -618,13 +619,29 @@ class GCall(cmd.Cmd, object):
         return events
 
     def list_events_pandas(self, search_terms=""):
-        return pandas.DataFrame(
+        res = pandas.DataFrame(
             [
-                list(event.__dict__.values()) + [event.startdate, event.enddate]
+                list(event.__dict__.values()) + [
+                    event.startdate,
+                    event.enddate,
+                    event.duration,
+                ]
                 for event in self.list_events(search_terms)
             ],
-            columns=list(self.api["schemas"]["Event"]["properties"].keys()) + ["startdate", "enddate"]
+            columns=list(self.api["schemas"]["Event"]["properties"].keys()) + [
+                "startdate",
+                "enddate",
+                "duration",
+            ]
         )
+        res.startdate = pandas.DatetimeIndex(res.startdate)\
+                              .tz_localize(dateutil.tz.tzutc())\
+                              .tz_convert(dateutil.tz.tzlocal())
+        res.enddate = pandas.DatetimeIndex(res.enddate)\
+                            .tz_localize(dateutil.tz.tzutc())\
+                            .tz_convert(dateutil.tz.tzlocal())
+        res.duration = res.duration
+        return res
 
     @needs("access_token")
     def do_list_events(self, search_term=None):

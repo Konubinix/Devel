@@ -1,2 +1,3 @@
 [MIME Cache]
 application/x-gui2py=gui2py.desktop;
+application/x-notebook=notebook.desktop;

@@ -1,3 +1,4 @@
 [Default Applications]
 application/pdf=evince.desktop;
 image/svg=mirage.desktop;
+application/x-notebook=notebook.desktop;

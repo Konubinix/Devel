@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: ipython_global
+# key: ipython_global
+# binding: direct-keybinding
+# --
+$>import IPython
+$>dict_ = globals()
+$>dict_.update(locals())
+$>IPython.start_ipython(argv=[], user_ns=dict_)

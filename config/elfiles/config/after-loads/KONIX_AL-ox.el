@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(setq-default org-export-preserve-breaks nil)
+
 (defun konix/ox/org-export-filter-link-functions (text backend info)
   (if (string-match-p
 	   "href=.("

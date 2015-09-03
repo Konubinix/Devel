@@ -1990,7 +1990,6 @@ items"
 (setq-default org-outline-path-complete-in-steps nil)
 (setq-default org-src-fontify-natively t)
 (setq-default org-src-tab-acts-natively t)
-(setq-default org-export-preserve-breaks t)
 (setq-default org-export-html-link-up "..")
 (setq-default org-export-html-link-home "index.html")
 (setq-default org-export-with-archived-trees t)

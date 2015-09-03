@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source ~/.virtualenvs/maths/bin/activate
+jupyter-console --existing "$@"

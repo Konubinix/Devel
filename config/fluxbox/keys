@@ -229,6 +229,7 @@ Control Mod4 Delete :ExecCommand konix_ask_poweroff.sh
 Control Mod4 t :ExecCommand $(konix_goto_true_exec.sh terminator)
 Control Mod4 w :ExecCommand $(konix_goto_true_exec.sh x-www-browser)
 Control Mod4 i :ExecCommand $(konix_goto_true_exec.sh iceweasel)
+Control Mod4 c :ExecCommand $(konix_goto_true_exec.sh chromium)
 Control Mod4 u :ExecCommand $(konix_goto_window.sh \.uzbl konix_uzbl.sh)
 Control Mod4 p :ExecCommand $(konix_goto_true_exec.sh pidgin)
 Control Mod4 v :ExecCommand $(konix_goto_true_exec.sh vlc)

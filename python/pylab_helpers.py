@@ -421,10 +421,31 @@ def nb_set_fig_size():
     display(w)
 
 def pd_sk_fit(clf, i, o):
-    return clf.fit(sk_reshape_for_model(i), sk_reshape_for_model(o))
+    return clf.fit(sk_reshape_for_model(i), numpy.ravel(sk_reshape_for_model(o)))
 
-def pd_sk_predict(clf, i):
-    return clf.predict(sk_reshape_for_model(i))
+def pd_sk_predict(clf, i, o=None):
+    res = clf.predict(sk_reshape_for_model(i))
+    if not o is None and (
+            isinstance(o, pandas.DataFrame)
+            or
+            isinstance(o, pandas.Series)
+    ):
+        res = pd_like(o, res)
+    return res
+
+def pd_sk_score(clf, i, o, *args, **kwargs):
+    return clf.score(
+        sk_reshape_for_model(i),
+        numpy.ravel(sk_reshape_for_model(o)),
+        *args,
+        **kwargs
+    )
+
+def pd_sk_fit_and_predict(clf, i_fit, o, i_predict=None):
+    if i_predict is None:
+        i_predict = i_fit
+    pd_sk_fit(clf, i_fit, o)
+    return pd_sk_predict(clf, i_predict, o)
 
 def sk_nested_cross_val(model,
                         X,

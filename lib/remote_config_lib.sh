@@ -104,6 +104,12 @@ remoterc_setup() {
     else
         local forced_context=""
     fi
+    if [ $# -gt 2 ]
+    then
+        local excluded_context="$3"
+    else
+        local excluded_context=""
+    fi
     remoterc_compute_contexts
     local found=1
     # add a dump value for the first shift to be ok
@@ -116,6 +122,12 @@ remoterc_setup() {
             && [ "${forced_context}" != "${context}" ]
         then
             echo "Ignoring context ${context}" >&2
+            continue
+        fi
+        if [ "${excluded_context}" != "" ] \
+            && echo "${context}"|grep -q "${excluded_context}"
+        then
+            echo "Excluding context ${context}" >&2
             continue
         fi
         remoterc_extract_remote_info "${context}" "${host}" \

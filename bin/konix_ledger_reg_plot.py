@@ -23,7 +23,7 @@ parser.add_argument("-a", '--account',
 
 def get_dataframe_for_account(account_name, reg_args=None):
     reg_args = reg_args or []
-    command = ["ledger", "reg", "-J"] + reg_args + [account_name]
+    command = ["ledger", "-S", "date", "reg", "-J"] + reg_args + [account_name]
     p = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,

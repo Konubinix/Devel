@@ -503,6 +503,10 @@ gaps_remotes_fix ( ) {
                     gaps_log ".gitannexremote: ${group}"
                     if gaps_ask_for_confirmation "Record ${group} in git-annex?"
                     then
+						if [ -n "${recorded_group}" ]
+						then
+							git annex ungroup "${remote_or_here}" "${recorded_group}"
+						fi
                         git annex group "${remote_or_here}" "${group}"
                     elif gaps_ask_for_confirmation "Replace .gitannexremote value (${group}) by git-annex one (${recorded_group})"
                     then
@@ -523,7 +527,12 @@ gaps_setup_context_independent_remote_info ( ) {
     if [ -n "$group" ]
     then
         gaps_log "$remote_name is in group $group"
-        git annex group "$remote_name" $group
+		old_group="$(git annex group "${remote_name}")"
+		if [ -n "${old_group}" ]
+		then
+			git annex ungroup "${remote_name}" "${old_group}"
+		fi
+        git annex group "${remote_name}" "${group}"
     fi
 }
 

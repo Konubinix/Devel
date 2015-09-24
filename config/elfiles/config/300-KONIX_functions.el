@@ -2,7 +2,7 @@
 ;; General use function
 ;; ################################################################################
 (defun konix/server-buffer-clients()
-  (if (boundp server-buffer-clients)
+  (if (boundp 'server-buffer-clients)
 	  server-buffer-clients
 	'()
 	)

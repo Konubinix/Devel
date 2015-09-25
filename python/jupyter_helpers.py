@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-def jupyter_edit(content, suffix=".py"):
+def jupyter_edit(content, cell_type="code"):
     """
 Use with a custom.js code that looks like
 
@@ -32,11 +32,18 @@ require(["base/js/events", "base/js/utils"], function (events, utils) {
 		IPython.keyboard_manager.command_shortcuts.add_shortcuts(add_command_shortcuts);
 	})
 });
+- cell_type: "code", "raw" and "markdown"
 """
     import tempfile
     import subprocess
     import os
     import sys
+    type_to_extension = {
+        "code": "py",
+        "raw": "txt",
+        "markdown": "md",
+    }
+    suffix = ".{}".format(type_to_extension[cell_type])
     tf = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
     tf.write(content.encode("utf-8"))
     tf.close()

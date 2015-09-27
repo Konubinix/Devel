@@ -42,3 +42,9 @@ bindkey ^x0 remove
 bindkey ^x^b windows
 escape ^Bb
 defescape ^Bb
+
+# layouts
+layout autosave on
+layout new mylayout
+layout attach mylayout
+layout select mylayout

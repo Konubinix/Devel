@@ -2,7 +2,6 @@
 
 source "${KONIX_LIB_DIR}/pslib.sh"
 
-SOB_TERMINAL_EMULATOR="python.+terminator"
 _SOB_SETUP_DEPTH=0
 
 trap _sob_reset EXIT SIGQUIT  SIGKILL SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT SIGTERM
@@ -43,7 +42,7 @@ function sob_uid () {
 }
 
 function sob_sons_of_terminal_emulator () {
-    pgrep -f -u "$(sob_uid)" "${SOB_TERMINAL_EMULATOR}"
+    cat "${HOME}/.bash_ppid"
 }
 
 function sob_bash_sessions () {

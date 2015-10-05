@@ -140,8 +140,8 @@ def createBackupEnvFile(stamp):
         os.remove(env_backup_file_name)
     f = open(env_backup_file_name, "w")
     f.write("[replace]\n")
-    for item in os.environ.items():
-        f.write(item[0]+"='"+item[1]+"'\n")
+    for key, value in os.environ.items():
+        f.write(key+"='"+value.replace("\n", "\n\t")+"'\n")
     f.close()
 
 def createBackupFileOrUseIt(stamp):

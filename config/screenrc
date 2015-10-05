@@ -48,3 +48,25 @@ layout autosave on
 layout new mylayout
 layout attach mylayout
 layout select mylayout
+
+# F2 puts Screen into resize mode. Resize regions using hjkl keys.
+bindkey "^[OQ" eval "command -c rsz" # enter resize mode
+
+# use hjkl keys to resize regions
+bind -c rsz h eval "resize -h -5" "command -c rsz"
+bind -c rsz j eval "resize -v -5" "command -c rsz"
+bind -c rsz k eval "resize -v +5" "command -c rsz"
+bind -c rsz l eval "resize -h +5" "command -c rsz"
+
+# use auie keys to resize regions (bepo equivalents for the left hand)
+bind -c rsz a eval "resize -h -5" "command -c rsz"
+bind -c rsz u eval "resize -v -5" "command -c rsz"
+bind -c rsz i eval "resize -v +5" "command -c rsz"
+bind -c rsz e eval "resize -h +5" "command -c rsz"
+
+# quickly switch between regions using tab and arrows
+bind -c rsz \t    eval "focus"       "command -c rsz" # Tab
+bind -c rsz -k kl eval "focus left"  "command -c rsz" # Left
+bind -c rsz -k kr eval "focus right" "command -c rsz" # Right
+bind -c rsz -k ku eval "focus up"    "command -c rsz" # Up
+bind -c rsz -k kd eval "focus down"  "command -c rsz" # Down

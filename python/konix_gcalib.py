@@ -388,7 +388,7 @@ class GCall(cmd.Cmd, object):
     @needs("access_token")
     def list_calendars_pandas(self, search_term=None):
         return pandas.DataFrame(
-            [ce.__dict__.values() for ce in self.list_calendars(search_term)],
+            [ce._asdict().values() for ce in self.list_calendars(search_term)],
             columns=self.api["schemas"]["CalendarListEntry"]["properties"].keys(),
         )
 
@@ -621,7 +621,7 @@ class GCall(cmd.Cmd, object):
     def list_events_pandas(self, search_terms=""):
         res = pandas.DataFrame(
             [
-                list(event.__dict__.values()) + [
+                list(event._asdict().values()) + [
                     event.startdate,
                     event.enddate,
                     event.duration,

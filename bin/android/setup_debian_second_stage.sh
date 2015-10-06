@@ -13,5 +13,5 @@ apt-get update
 echo Y|apt-get install aptitude
 aptitude update
 setcap cap_net_raw+epi /bin/ping
-/debootstrap/android_setup_perso.sh
 dpkg-reconfigure locales
+/debootstrap/android_setup_perso.sh

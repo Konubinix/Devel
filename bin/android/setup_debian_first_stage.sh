@@ -20,6 +20,8 @@ chroot $targetdir /bin/adduser --uid 10054 --gid 10054 ${USERNAME}
 chroot $targetdir /bin/adduser ${USERNAME} disk
 chroot $targetdir /bin/adduser ${USERNAME} adm
 chroot $targetdir /bin/adduser ${USERNAME} sudo
+chroot $targetdir /bin/adduser ${USERNAME} aid_net
+chroot $targetdir /bin/adduser ${USERNAME} sdcard-rw
 
 mkdir $targetdir/media/host
 mount --bind / $targetdir/media/host

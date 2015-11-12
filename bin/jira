@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source /home/sam/.virtualenvs/jira3/bin/activate
+exec ipython3 --profile jira "$@"

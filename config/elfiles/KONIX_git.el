@@ -602,7 +602,10 @@
   )
 
 (defun konix/git/log (&optional history_size alog file custom_cmd custom_log_cmd)
-  (interactive "P")
+  (interactive)
+  (when current-prefix-arg
+	(setq custom_cmd (read-string "Custom args: "))
+	)
   (let* (
 		 (history_cmd
 		  (if history_size (concat "-" (format "%s" history_size))

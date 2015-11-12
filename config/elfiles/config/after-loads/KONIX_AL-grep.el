@@ -28,7 +28,14 @@
 (konix/push-or-replace-in-alist
  'grep-host-defaults-alist
  'localhost
- '(grep-command "grep -i -nH -r -e ")
+ '(grep-command "grep \
+--exclude-dir build \
+--exclude-dir Build \
+--exclude-dir BUILD \
+--exclude-dir .git \
+--exclude-dir .svn \
+-i -nH \
+-r -e ")
  '(grep-template "grep <C> -nH -r -e  <R> <F>")
  '(grep-use-null-device nil)
  '(grep-find-command "find . -type f -print0 | xargs -0 -e grep -nH -e ")

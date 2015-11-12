@@ -23,6 +23,7 @@
 		 (expand-file-name "cc-mode" elfiles)
 		 (expand-file-name "rebox2" elfiles)
 		 (expand-file-name "helm" elfiles)
+		 (expand-file-name "helm-descbinds" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)
 		 (expand-file-name "notmuch/contrib/notmuch-pick" devel-dir)
 		 (expand-file-name "readline-complete" elfiles)

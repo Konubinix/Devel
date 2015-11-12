@@ -285,8 +285,6 @@
 (global-set-key (kbd "<f2>") 'konix/global-fast-key-map)
 
 (define-key 'konix/global-fast-key-map (kbd "m") 'man)
-;;to move easily between windows with M-Arrows
-(windmove-default-keybindings 'meta)
 
 ;; speedbar
 (define-key 'konix/global-fast-key-map (kbd "p") 'speedbar)

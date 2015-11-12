@@ -413,10 +413,6 @@
 ;; ************************************************************
 ;; Buffers
 ;; ************************************************************
-;;Changer de buffer par C-x b plus facilement
-;; (ido-mode 'buffer)
-(iswitchb-mode 1)
-
 ;; Ne cache pas les commentaires quand on fait TOUT cacher
 (setq-default hs-hide-comments-when-hiding-all nil)
 (setq-default hs-allow-nesting t)

@@ -213,3 +213,6 @@
 [submodule "config/elfiles/rainbow-mode"]
 	path = config/elfiles/rainbow-mode
 	url = https://github.com/emacsmirror/rainbow-mode
+[submodule "rtags"]
+	path = rtags
+	url = https://github.com/Andersbakken/rtags/

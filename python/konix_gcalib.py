@@ -203,6 +203,7 @@ class GCall(cmd.Cmd, object):
 
         self.types["CalendarListEntry"]["class"] = CalendarListEntry
         self.types["Event"]["class"] = Event
+        self.Event = Event
 
     @property
     @needs("api")
@@ -642,6 +643,55 @@ class GCall(cmd.Cmd, object):
                             .tz_convert(dateutil.tz.tzlocal())
         res.duration = res.duration
         return res
+
+    def setup_blaze(self):
+        import blaze
+        from datashape import discover, from_numpy
+        columns=list(self.api["schemas"]["Event"]["properties"].keys()) + [
+            "startdate",
+            "enddate",
+            "duration",
+        ]
+        @discover.register(self.Event)
+        def discover_events(event, **kwargs):
+            df = pandas.DataFrame(
+                [
+                    list(event._asdict().values()) + [
+                        event.startdate,
+                        event.enddate,
+                        event.duration,
+                    ]
+                    for event in [event,]
+                ],
+                columns=list(self.api["schemas"]["Event"]["properties"].keys()) + [
+                    "startdate",
+                    "enddate",
+                    "duration",
+                ]
+            )
+            shape = (len(df),)
+            dtype = df.values.dtype
+            return from_numpy(shape, dtype)
+
+        from odo import convert
+        @convert.register(pandas.DataFrame, self.Event)
+        def event_to_dataframe(event, **kwargs):
+            df = pandas.DataFrame(
+                [
+                    list(event._asdict().values()) + [
+                        event.startdate,
+                        event.enddate,
+                        event.duration,
+                    ]
+                    for event in [event,]
+                ],
+                columns=list(self.api["schemas"]["Event"]["properties"].keys()) + [
+                    "startdate",
+                    "enddate",
+                    "duration",
+                ]
+            )
+            return df
 
     @needs("access_token")
     def do_list_events(self, search_term=None):

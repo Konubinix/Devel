@@ -1843,10 +1843,17 @@ items"
 						   (dummy (konix/org-agenda-inhibit-context-filtering))
 						   )
 						  )
-					(tags "EXPIRED"
+					(tags "EXPIRED//-TODO|-NEXT"
 						  (
 						   (org-agenda-overriding-header
 							"Expired entries (archive them)")
+						   (dummy (konix/org-agenda-inhibit-context-filtering))
+						   )
+						  )
+					(tags "EXPIRED//+TODO|+NEXT"
+						  (
+						   (org-agenda-overriding-header
+							"Expired entries but still active (check them)")
 						   (dummy (konix/org-agenda-inhibit-context-filtering))
 						   )
 						  )

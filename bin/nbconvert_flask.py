@@ -12,8 +12,22 @@ CUSTOM_CSS_PATH=os.path.join(
     "custom",
     "custom.css"
 )
-INPUT = sys.argv[1]
-OUTPUT = sys.argv[2]
+import argparse
+parser = argparse.ArgumentParser(description="""Nb viewer.""")
+
+parser.add_argument('-i','--input-notebooks',
+                    help="""Directory with notebooks inside""",
+                    type=str,
+                    default=os.environ["KONIX_NOTEBOOKS_DIR"])
+
+parser.add_argument('-o','--output-html',
+                    help="""Directory with rendered html files""",
+                    type=str,
+                    default=os.environ["KONIX_NBVIEWER_HTML_DIR"])
+args = parser.parse_args()
+
+INPUT = args.input_notebooks
+OUTPUT = args.output_html
 logging.debug("INPUT :{}".format(INPUT))
 logging.debug("OUTPUT:{}".format(OUTPUT))
 if not os.path.exists(OUTPUT):
@@ -57,4 +71,4 @@ def serve_ipynb(filename):
     )
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=9638, debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ["KONIX_NBVIEWER_PORT"]), debug=True)

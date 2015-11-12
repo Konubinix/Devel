@@ -104,7 +104,9 @@
 
 (defun konix/org-agenda-appt-reload ()
   (interactive)
+  (require 'appt)
   (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
+  (appt-activate 1)
   (appt-check)
   )
 
@@ -125,9 +127,7 @@
   (require 'org-checklist)
 
   ;; Pour les appointments
-  (require 'appt)
-  (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
-  (appt-activate 1)
+  (konix/org-agenda-appt-reload)
 
   ;; set hook to remember clock when exiting
   (org-clock-persistence-insinuate)
@@ -2744,7 +2744,7 @@ of the clocksum."
 
 (defun konix/org-agenda-mode-hook()
   (hl-line-mode t)
-  (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
+  (konix/org-agenda-appt-reload)
   (appt-check)
   )
 (add-hook 'org-agenda-mode-hook 'konix/org-agenda-mode-hook)

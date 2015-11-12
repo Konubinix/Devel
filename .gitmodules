@@ -219,3 +219,6 @@
 [submodule "config/elfiles/helm-descbinds"]
 	path = config/elfiles/helm-descbinds
 	url = https://github.com/emacs-helm/helm-descbinds
+[submodule "searx"]
+	path = searx
+	url = https://github.com/asciimoo/searx

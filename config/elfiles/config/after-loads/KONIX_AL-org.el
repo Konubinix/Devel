@@ -2068,6 +2068,14 @@ items"
   :END:"
 				 :kill-buffer
 				 )
+				("d" "Diary" entry (file+headline (expand-file-name "diary.org" org-directory) "Refile")
+				 "* %?
+  :PROPERTIES:
+  :CREATED:  %U
+  :END:
+  %t"
+				 :kill-buffer
+				 )
 				("B" "Bookmark (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
 				 "* %:description
   :PROPERTIES:

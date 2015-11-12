@@ -82,5 +82,6 @@ menu add link "Copy Link" "spawn_sh 'echo -n \@SELECTED_URI | xclip'"
 menu add link "Do what I mean ?" "spawn_sh 'konix_uri_dwim.py \"\@SELECTED_URI\"'"
 
 # Get the custom machine config
-include @(echo $KONIX_PERSO_DIR/config/uzbl/config)@
+include @(echo ${KONIX_PERSO_DIR}/config/uzbl/config)@
+include @(echo ${KONIX_PERSO_DIR}/${HOSTNAME}/config/uzbl/config)@
 include @(echo $HOME/.uzbl)@

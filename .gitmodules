@@ -216,3 +216,6 @@
 [submodule "rtags"]
 	path = rtags
 	url = https://github.com/Andersbakken/rtags/
+[submodule "config/elfiles/helm-descbinds"]
+	path = config/elfiles/helm-descbinds
+	url = https://github.com/emacs-helm/helm-descbinds

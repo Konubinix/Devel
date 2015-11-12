@@ -143,19 +143,6 @@
 	)
   )
 (ad-activate 'org-set-tags-command)
-;; Icicles disturb also konix/git/command-with-completion
-(defadvice konix/git/command-with-completion (around disable-icy ())
-  (let (
-		(konix/org-set-tags-command_icy_before icicle-mode)
-		)
-	(konix/icy-mode nil)
-	(unwind-protect
-		ad-do-it
-	  (konix/icy-mode konix/org-set-tags-command_icy_before)
-	  )
-	)
-  )
-(ad-activate 'konix/git/command-with-completion)
 
 ;; **********************************************************************
 ;; Org

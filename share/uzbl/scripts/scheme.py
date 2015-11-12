@@ -43,8 +43,18 @@ def main(uri):
         smb_mount = os.environ.get("KONIX_SMB_MOUNT", None)
         if not smb_mount:
             konix_notify.main("KONIX_SMB_MOUNT not set")
-            print "USED"
+            print("USED")
         else:
             real_path = os.path.join(smb_mount, u.netloc, u.path[1:])
             konix_notify.main("Opening %s with mimeopen" % real_path)
             detach_open(['mimeopen', "-n", real_path])
+
+if __name__ == '__main__':
+    try:
+        uri = sys.argv[1]
+    except IndexError:
+        print('Error: No uri given to handle.')
+
+        os.exit(1)
+
+    main(uri)

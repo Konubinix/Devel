@@ -711,3 +711,12 @@ def mpl_rotation_X(wait_for_key="enter"):
         # to deactivate it
         mpl_rotation_X()
     return mpl_rotation_X_axes, rotation_slider
+
+def pd_fill_between(df1, df2, columns=None):
+    columns = columns or df1.columns
+    for column in columns:
+        pyplot.fill_between(
+            df1.index,
+            df1[column],
+            df2[column]
+        )

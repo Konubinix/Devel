@@ -222,3 +222,6 @@
 [submodule "searx"]
 	path = searx
 	url = https://github.com/asciimoo/searx
+[submodule "XKCD-password-generator"]
+	path = XKCD-password-generator
+	url = https://github.com/redacted/XKCD-password-generator

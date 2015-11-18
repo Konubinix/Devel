@@ -58,6 +58,7 @@
 		 (expand-file-name "Fill-Column-Indicator" elfiles)
 		 (expand-file-name "rainbow-mode" elfiles)
 		 (expand-file-name "swiper" elfiles)
+		 (expand-file-name "skewer-mode" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

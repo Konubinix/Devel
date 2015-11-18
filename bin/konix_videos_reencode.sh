@@ -1,8 +1,5 @@
 #!/bin/bash
 
 set -eu
-find -iname '*.mov' | while read video
-do
-	HandBrakeCLI -2 -Z "Universal" -i "${video}" -o "${video}.mkv"
-	rm -rf "${video}"
-done
+find \( -iname '*.mov' -o -iname "*.mp4" -o -iname "*.avi" \) \
+ -exec "konix_video_reencode.sh" "{}" ";"

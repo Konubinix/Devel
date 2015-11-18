@@ -222,3 +222,6 @@
 [submodule "config/elfiles/swiper"]
 	path = config/elfiles/swiper
 	url = https://github.com/abo-abo/swiper
+[submodule "config/elfiles/skewer-mode"]
+	path = config/elfiles/skewer-mode
+	url = https://github.com/skeeto/skewer-mode

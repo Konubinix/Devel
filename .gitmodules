@@ -20,9 +20,6 @@
 [submodule "config/elfiles/rebox2"]
 	path = config/elfiles/rebox2
 	url = https://github.com/lewang/rebox2.git
-[submodule "config/elfiles/helm"]
-	path = config/elfiles/helm
-	url = https://github.com/emacs-helm/helm.git
 [submodule "config/elfiles/readline-complete"]
 	path = config/elfiles/readline-complete
 	url = https://github.com/monsanto/readline-complete.el.git
@@ -216,12 +213,12 @@
 [submodule "rtags"]
 	path = rtags
 	url = https://github.com/Andersbakken/rtags/
-[submodule "config/elfiles/helm-descbinds"]
-	path = config/elfiles/helm-descbinds
-	url = https://github.com/emacs-helm/helm-descbinds
 [submodule "searx"]
 	path = searx
 	url = https://github.com/asciimoo/searx
 [submodule "XKCD-password-generator"]
 	path = XKCD-password-generator
 	url = https://github.com/redacted/XKCD-password-generator
+[submodule "config/elfiles/swiper"]
+	path = config/elfiles/swiper
+	url = https://github.com/abo-abo/swiper

@@ -57,6 +57,7 @@
 		 (expand-file-name "text-translator" elfiles)
 		 (expand-file-name "Fill-Column-Indicator" elfiles)
 		 (expand-file-name "rainbow-mode" elfiles)
+		 (expand-file-name "swiper" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

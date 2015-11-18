@@ -2,7 +2,6 @@
 (require 'maxframe)
 (add-hook 'window-setup-hook 'maxframe/maximize-frame t)
 
-(setq-default ivy-use-virtual-buffers t)
 (require 'ivy)
 (ivy-mode)
 

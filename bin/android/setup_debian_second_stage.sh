@@ -17,4 +17,8 @@ echo Y|apt-get install aptitude
 aptitude update
 setcap cap_net_raw+epi /bin/ping
 dpkg-reconfigure locales
+
+/usr/sbin/addgroup --gid 3003 aid_net
+/usr/sbin/addgroup --gid 1015 sdcard-rw
+
 /debootstrap/android_setup_perso.sh

@@ -485,6 +485,7 @@
 (define-prefix-command 'konix/imenu/map)
 (define-key 'konix/global-fast-key-map (kbd "i") 'konix/imenu/map)
 (define-key 'konix/imenu/map (kbd "t") 'imenu-tree)
+(define-key 'konix/imenu/map (kbd "i") 'imenu)
 (define-key 'konix/imenu/map (kbd "g") 'konix/imenu-tree-goto)
 (define-key 'konix/imenu/map (kbd "s") 'konix/imenu-tree-show)
 

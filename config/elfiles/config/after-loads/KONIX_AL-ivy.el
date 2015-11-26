@@ -55,9 +55,36 @@
 (setq-default ivy-count-format "(%d/%d) ")
 (setq-default ivy-re-builders-alist
 			  '(
-				(t . ivy--regex-plus) ; ivy–regex-ignore-order ?
+				(t . ivy--regex-plus)
 				)
 			  )
 
+(defun konix/ivy-on-del-error-function ()
+  (message "Cannot delete more")
+  )
+(setq-default ivy-on-del-error-function 'konix/ivy-on-del-error-function)
+
+(progn
+  ;; customize the ivy-initial-inputs-alist
+  (konix/push-or-replace-assoc-in-alist
+   'ivy-initial-inputs-alist
+   '(org-refile . "")
+   )
+
+  (konix/push-or-replace-assoc-in-alist
+   'ivy-initial-inputs-alist
+   '(org-agenda-refile . "")
+   )
+
+  (konix/push-or-replace-assoc-in-alist
+   'ivy-initial-inputs-alist
+   '(org-capture-refile . "")
+   )
+
+  (konix/push-or-replace-assoc-in-alist
+   'ivy-initial-inputs-alist
+   '(counsel-M-x . "")
+   )
+  )
 (provide 'KONIX_AL-ivy)
 ;;; KONIX_AL-ivy.el ends here

@@ -143,6 +143,7 @@
 (autoload 'konix/org-pomodoro-global-mode "KONIX_org-pomodoro2")
 (autoload 'org-timer-cancel-timer "org-timer")
 (autoload 'notmuch "notmuch")
+(autoload 'notmuch-search "notmuch")
 (autoload 'appt-check "appt")
 (autoload 'elk-test-mode "elk-test" nil t)
 (autoload 'macro-math-eval-and-round-region "macro-math" t nil)
@@ -192,6 +193,7 @@
 (autoload 'cmake-mode "cmake-mode" "" t)
 ;; bbdb mode
 (autoload 'bbdb-create "bbdb-com" "" t)
+(autoload 'bbdb "bbdb-com" "" t)
 ;; bbdb mode
 (autoload 'bbdb-complete-mail "bbdb-com" "" t)
 ;; etags stack

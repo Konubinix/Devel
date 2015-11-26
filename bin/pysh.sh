@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ipython3 --profile=pysh "$@"
+ipython --profile=pysh "$@"

@@ -59,6 +59,7 @@
 		 (expand-file-name "rainbow-mode" elfiles)
 		 (expand-file-name "swiper" elfiles)
 		 (expand-file-name "skewer-mode" elfiles)
+		 (expand-file-name "pdf-tools/pdf-tools-0.70" devel-dir)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -232,6 +233,7 @@
 (autoload 'rainbow-mode "rainbow-mode" "" t)
 ;; EIN
 (autoload 'ein:notebooklist-open "ein-notebooklist" "" t)
+(autoload 'pdf-view-mode "pdf-view" "" t)
 
 ;; ************************************************************
 ;; Automodes
@@ -305,6 +307,8 @@
 (add-to-list 'auto-mode-alist (cons "\\.compilog$" 'compilation-mode))
 ;; taskjuggler files
 (add-to-list 'auto-mode-alist (cons "\\.tj..?$" 'taskjuggler-mode))
+;; pdf-tools
+(add-to-list 'auto-mode-alist (cons "\\.[pP][dD][fF]$" 'pdf-view-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

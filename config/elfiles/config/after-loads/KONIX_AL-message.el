@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'bbdb-com)
 ;; Configuration of mail sending
 (setq message-send-mail-function 'message-send-mail-with-sendmail)
 (setq-default message-sendmail-envelope-from 'header)

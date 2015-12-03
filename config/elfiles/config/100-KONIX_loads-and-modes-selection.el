@@ -55,6 +55,7 @@
 		 (expand-file-name "swiper" elfiles)
 		 (expand-file-name "skewer-mode" elfiles)
 		 (expand-file-name "pdf-tools/pdf-tools-0.70" devel-dir)
+		 (expand-file-name "Pymacs" devel-dir)
 		 )
 		)
   ;; add my personal load path to the load-path

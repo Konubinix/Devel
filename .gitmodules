@@ -225,3 +225,6 @@
 [submodule "pdf-tools"]
 	path = pdf-tools
 	url = https://github.com/politza/pdf-tools
+[submodule "Pymacs"]
+	path = Pymacs
+	url = https://github.com/pinard/Pymacs

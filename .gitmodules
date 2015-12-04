@@ -228,3 +228,6 @@
 [submodule "Pymacs"]
 	path = Pymacs
 	url = https://github.com/pinard/Pymacs
+[submodule "whatsapp-purple"]
+	path = whatsapp-purple
+	url = https://github.com/davidgfnet/whatsapp-purple

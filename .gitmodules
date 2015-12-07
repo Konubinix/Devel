@@ -234,3 +234,6 @@
 [submodule "clang-ctags"]
 	path = clang-ctags
 	url = https://github.com/drothlis/clang-ctags
+[submodule "config/elfiles/ycmd"]
+	path = config/elfiles/ycmd
+	url = https://github.com/abingham/emacs-ycmd

@@ -50,7 +50,6 @@
 		 (expand-file-name "ctable" elfiles)
 		 (expand-file-name "epc" elfiles)
 		 (expand-file-name "text-translator" elfiles)
-		 (expand-file-name "Fill-Column-Indicator" elfiles)
 		 (expand-file-name "rainbow-mode" elfiles)
 		 (expand-file-name "swiper" elfiles)
 		 (expand-file-name "skewer-mode" elfiles)

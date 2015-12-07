@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ipykernel.sh --profile pylab
+ipykernel.sh --profile pylab "$@"

@@ -231,3 +231,6 @@
 [submodule "whatsapp-purple"]
 	path = whatsapp-purple
 	url = https://github.com/davidgfnet/whatsapp-purple
+[submodule "clang-ctags"]
+	path = clang-ctags
+	url = https://github.com/drothlis/clang-ctags

@@ -856,6 +856,8 @@ items"
 			 (org-agenda-overriding-header
 			  "Agenda for projects")
 			 (org-agenda-use-time-grid nil)
+			 ; it will be already included in the no project view
+			 (org-agenda-include-diary nil)
 			 (org-agenda-skip-function
 			  '(or
 				(konix/org-agenda-skip-if-tags

@@ -56,6 +56,7 @@
 		 (expand-file-name "skewer-mode" elfiles)
 		 (expand-file-name "pdf-tools/pdf-tools-0.70" devel-dir)
 		 (expand-file-name "Pymacs" devel-dir)
+		 (expand-file-name "ycmd" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

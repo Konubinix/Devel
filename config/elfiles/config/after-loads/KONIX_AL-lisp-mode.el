@@ -25,7 +25,7 @@
 ;;; Code:
 
 (defun konix/lisp-mode-hook ()
-  (setq indent-tabs-mode t)
+  (setq indent-tabs-mode nil)
   (konix/prog/config)
   (konix/tab-size 4)
   (setq ac-sources (append

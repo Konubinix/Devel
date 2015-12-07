@@ -1,4 +1,4 @@
- #!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import cmd
@@ -21,6 +21,7 @@ import dateutil
 import konix_collections
 import urllib.parse
 import pandas
+import hashlib
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -97,7 +98,7 @@ def provides(key, interactive=False):
         return wrapper
     return real_decorator
 
-PROMPT="GCal({calendar_id}, {extra_query})\n> "
+PROMPT="GCal({calendar_id}, {event_list_extra_query}, {time_min}, {time_max})\n> "
 
 class GCall(cmd.Cmd, object):
     def __init__(self, make_place=False, account=""):
@@ -121,8 +122,66 @@ class GCall(cmd.Cmd, object):
         ]
         self._make_place = make_place
         self.account = account
-
         self.set_prompt()
+
+    def parse_time(self, value):
+        calendar_id = self.db.get(self.calendar_id_name)
+        calendar = self.get_calendar(calendar_id)
+        tz = pytz.timezone(calendar.timeZone)
+        cal = parsedatetime.Calendar()
+        return cal.parseDT(value,
+                           sourceTime=datetime.datetime.today(),
+                           tzinfo=tz)
+
+    @property
+    def time_min_name(self):
+        return self.db_name_transform("time_min")
+
+    @property
+    def time_min(self):
+        result = self.db.get(self.time_min_name)
+        if result:
+            result = dateutil.parser.parse(result)
+        return result
+
+    @time_min.setter
+    def time_min(self, value):
+        if value == "":
+            self.db.delete(self.time_min_name)
+            return
+        date_, _ = self.parse_time(value)
+        self.db.set(self.time_min_name, date_.isoformat())
+        self.do_clear_list_event()
+        self.set_prompt()
+
+    def do_time_min(self, value):
+        self.time_min = value
+        print("Set TimeMin to {}".format(self.time_min))
+
+    @property
+    def time_max_name(self):
+        return self.db_name_transform("time_max")
+
+    @property
+    def time_max(self):
+        result = self.db.get(self.time_max_name)
+        if result:
+            result = dateutil.parser.parse(result)
+        return result
+
+    @time_max.setter
+    def time_max(self, value):
+        if value == "":
+            self.db.delete(self.time_max_name)
+            return
+        date_, _ = self.parse_time(value)
+        self.db.set(self.time_max_name, date_.isoformat())
+        self.do_clear_list_event()
+        self.set_prompt()
+
+    def do_time_max(self, value):
+        self.time_max = value
+        print("Set Timemax to {}".format(self.time_max))
 
     @property
     @needs("calendars")
@@ -169,6 +228,17 @@ class GCall(cmd.Cmd, object):
             {k: "" for k in self.types["Event"]["keys"]}
         )
 
+        def print_diary(self):
+            print("{}-{} {} ({}) [{}]".
+                  format(
+                      self.startdate.strftime("%Y-%m-%d %H:%M"),
+                      self.enddate.strftime("%H:%M"),
+                      self.summary,
+                      self.htmlLink,
+                      self.id
+                  )
+            )
+
         @property
         def startdate(self):
             if self.start.get("dateTime"):
@@ -196,10 +266,16 @@ class GCall(cmd.Cmd, object):
         @property
         def duration(self):
             return self.enddate-self.startdate
+
+        def event_hash(self):
+            return int(hashlib.sha1(self.id.encode("utf-8")).hexdigest(), 16)
+
         Event.startdate = startdate
         Event.enddate = enddate
         Event.duration = duration
         Event.uid = uid
+        Event.print_diary = print_diary
+        Event.__hash__ = event_hash
 
         self.types["CalendarListEntry"]["class"] = CalendarListEntry
         self.types["Event"]["class"] = Event
@@ -218,10 +294,23 @@ class GCall(cmd.Cmd, object):
         api = json.loads(f.read().decode("utf-8"))
         self.db.set("api", api)
 
+    def get_attr(self, key):
+        return eval("self.{}".format(key))
+
     def set_prompt(self):
+        dict_ = self.__dict__.copy()
+        added = {
+            key: self.get_attr(key)
+            for key in [
+                    "calendar_id",
+                    "event_list_extra_query",
+                    "time_min",
+                    "time_max",
+            ]
+        }
+        dict_.update(added)
         self.prompt = PROMPT.format(
-            calendar_id=self.db.get(self.calendar_id_name),
-            extra_query=self.event_list_extra_query
+            **added
         )
 
     @property
@@ -246,7 +335,9 @@ class GCall(cmd.Cmd, object):
                     "device_code",
                     "all_events",
                     "calendar_id",
-                    "calendars"
+                    "calendars",
+                    "time_min",
+                    "time_max",
                 ]:
             return "{}_{}".format(self.account, name)
         else:
@@ -275,6 +366,10 @@ class GCall(cmd.Cmd, object):
     @property
     def calendar_id_name(self):
         return self.db_name_transform("calendar_id")
+
+    @property
+    def calendar_id(self):
+        return self.db.get(self.calendar_id_name)
 
     @property
     def calendars_name(self):
@@ -575,6 +670,15 @@ class GCall(cmd.Cmd, object):
                 url += "&pageToken={}".format(page_token)
             if extra_query:
                 url += extra_query
+            if self.time_min:
+                url += "&timeMin={}T00:00:00Z".format(
+                    self.time_min.strftime("%Y-%m-%d")
+                )
+            if self.time_max:
+                url += "&timeMax={}T00:00:00Z".format(
+                    self.time_max.strftime("%Y-%m-%d")
+                )
+
             req = urllib.request.Request(
                 url=url,
                 headers={"Content-Type": "application/json",
@@ -722,13 +826,7 @@ class GCall(cmd.Cmd, object):
         if not calendar_id:
             print("Use the command select_calendar first")
             return
-        calendar = self.get_calendar(calendar_id)
-        tz = pytz.timezone(calendar.timeZone)
-
-        cal = parsedatetime.Calendar()
-        start, flag = cal.parseDT(when,
-                                  sourceTime=datetime.datetime.today(),
-                                  tzinfo=tz)
+        start, flag = self.parse_time(when)
         time_dict = re.match('^\s*((?P<hours>\d+)\s*h)?\s*((?P<minutes>\d+)\s*m)?\s*((?P<seconds>\d+)\s*s)?\s*$',
                              duration).groupdict()
         duration = datetime.timedelta(seconds=int(time_dict['seconds'] or "0"),

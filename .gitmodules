@@ -237,3 +237,9 @@
 [submodule "config/elfiles/ycmd"]
 	path = config/elfiles/ycmd
 	url = https://github.com/abingham/emacs-ycmd
+[submodule "config/elfiles/ac-irony"]
+	path = config/elfiles/ac-irony
+	url = https://github.com/Sarcasm/ac-irony
+[submodule "config/elfiles/irony-mode"]
+	path = config/elfiles/irony-mode
+	url = https://github.com/Sarcasm/irony-mode

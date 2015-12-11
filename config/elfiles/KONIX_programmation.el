@@ -27,7 +27,6 @@
 (require 'xcscope nil t)
 (require 'KONIX_auto-complete)
 (require 'highlight-parentheses)
-(require 'fill-column-indicator)
 
 ;; ####################################################################################################
 ;; VARIABLES

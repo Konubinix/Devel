@@ -49,14 +49,20 @@ function sob_bash_sessions () {
     pgrep -u "$(sob_uid)" --parent "$(sob_sons_of_terminal_emulator)"
 }
 
+# implements ps_ls
 function sob_ls () {
+    local res_file="$(mktemp)"
     for parent in $(sob_bash_sessions)
     do
         pgrep --parent "$parent" -u "$(sob_uid)" --list-full ''
-    done
-    return 0
+    done > "${res_file}"
+    grep -i "$*" "${res_file}"
+    local res="$?"
+    rm "${res_file}"
+    return $res
 }
 
+# implements ps_select
 function sob_select () {
     _sob_setup
     ps_select "$@"

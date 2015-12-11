@@ -90,6 +90,28 @@
 	)
   )
 
+(defun konix/nxml/pop-buffer-cdata ()
+  (interactive)
+  (unless (konix/nxml-in-cdata-p)
+	(error "This works only in cdata section")
+	)
+  (let (
+		beg
+		end
+		)
+	(save-excursion
+	  (nxml-move-outside-backwards)
+	  (setq beg (+ 9 (point)))			;moves just after <![CDATA[
+	  (xmltok-forward)
+	  (setq end (-
+				 (point)
+				 3						;moves just before ]]>
+				 ))
+	  )
+    (konix/new-buffer-region beg end)
+	)
+  )
+
 (defun konix/nxml-indent-line ()
   "Indent only relevent lines"
   ;; fill in the value of xmltok-type

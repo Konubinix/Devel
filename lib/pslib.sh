@@ -10,7 +10,14 @@ function ps_uid () {
 }
 
 function ps_ls () {
-    pgrep -u "$(ps_uid)" --list-full ''
+    # I can't directly pipe the result into grep because I don't want grep in
+    # the results
+    local res_file="$(mktemp)"
+    pgrep -u "$(ps_uid)" --list-full '' > "${res_file}"
+    grep -i "$*" "${res_file}"
+    local res=$?
+    rm "${res_file}"
+    return $res
 }
 
 function ps_ls_line_to_pid () {

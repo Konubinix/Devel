@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-# name: ipython_global
-# key: ipython_global
+# name: ipython_here
+# key: ipython_here
 # binding: direct-keybinding
 # --
 $>import IPython

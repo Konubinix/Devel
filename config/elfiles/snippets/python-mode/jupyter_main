@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: jupyter_main
+# key: jupyter_main
+# binding: direct-keybinding
+# --
+$>from jupyter_console.app import main
+$>main()

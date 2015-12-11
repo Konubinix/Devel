@@ -51,3 +51,24 @@ require(["base/js/events", "base/js/utils"], function (events, utils) {
     content = open(tf.name, "r").read().decode("utf-8")
     sys.stdout.write(content)
     os.remove(tf.name)
+
+def start_kernel_and_console():
+    import os
+    import zmq
+
+    pid = os.fork()
+    if pid == 0:
+        # child
+        from IPython import embed_kernel
+
+        dict_ = globals()
+        import inspect
+        frame = inspect.currentframe()
+        local_ns = frame.f_back.f_locals
+        dict_.update(local_ns)
+        embed_kernel(local_ns=dict_)
+    else:
+        import time
+        time.sleep(2)
+        from jupyter_console.app import main
+        main(argv=["--existing"])

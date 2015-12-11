@@ -49,7 +49,9 @@ function ps_wait () {
         return 1
     fi
     echo "Waiting for ${chosen_pid} ($(ps --no-headers -p "${chosen_pid}" -o args))"
-    while ps -p "${chosen_pid}" > /dev/null
+    # Need to check for the result of the internal sleep function to be able to
+    # quit the program
+    while [ $? == 0 ] && ps -p "${chosen_pid}" > /dev/null
     do
         sleep "${PS_WAITING_TIME}"
     done

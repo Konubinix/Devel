@@ -29,6 +29,9 @@
   "Mode to set for indirect buffers.")
 
 (make-variable-buffer-local 'konix/indirect-mode-name)
+(make-variable-buffer-local 'konix/new-buffer-mode-name)
+(make-variable-buffer-local 'konix/new-buffer-start)
+(make-variable-buffer-local 'konix/new-buffer-end)
 
 (defun konix/org-ehtml-start ()
   (interactive)
@@ -120,6 +123,74 @@
 	(pop-to-buffer (make-indirect-buffer (current-buffer) buffer-name))
 	(funcall mode)
 	(narrow-to-region start end)
+	(shrink-window-if-larger-than-buffer)))
+
+
+(defun konix/new-buffer-region-capture-content-in-original ()
+  (interactive)
+  (let* (
+         (original_buffer (marker-buffer konix/new-buffer-start))
+         (start (marker-position konix/new-buffer-start))
+         (end (marker-position konix/new-buffer-end))
+         (content (buffer-substring-no-properties (point-min) (point-max)))
+         )
+    (with-current-buffer original_buffer
+      (delete-region start end)
+      (insert content)
+      )
+    (kill-buffer)
+    (switch-to-buffer original_buffer)
+    )
+  )
+
+(defun konix/new-buffer-region (start end)
+  "Edit the current region in another buffer.
+    If the buffer-local variable `konix/new-buffer-mode-name' is not set, prompt
+    for mode name to choose for the new buffer interactively.
+    Otherwise, use the value of said variable as argument to a funcall."
+  (interactive "r")
+  (let ((buffer (get-buffer-create "*indirect*"))
+        (content (buffer-substring-no-properties start end))
+        (start (copy-marker start))
+        (end (copy-marker end))
+		(mode
+		 (if (or
+			  (not konix/new-buffer-mode-name)
+			  current-prefix-arg
+			  )
+			 (setq konix/new-buffer-mode-name
+				   (intern
+					(completing-read
+					 "Mode: "
+					 (mapcar (lambda (e)
+							   (list (symbol-name e)))
+							 (apropos-internal "-mode$" 'commandp))
+					 nil t)))
+		   konix/new-buffer-mode-name)))
+    (with-current-buffer buffer
+      (funcall mode)
+      (setq konix/new-buffer-start start
+            konix/new-buffer-end end
+            )
+      (delete-region (point-min) (point-max))
+      (insert content)
+      (let (
+            (overriding_map (make-sparse-keymap))
+            )
+        (define-key overriding_map (kbd "C-c C-c")
+          'konix/new-buffer-region-capture-content-in-original)
+        (if (null minor-mode-overriding-map-alist)
+            (setq minor-mode-overriding-map-alist
+                  `(
+                    (t . ,overriding_map)
+                    ))
+          (konix/push-or-replace-assoc-in-alist minor-mode-overriding-map-alist
+                                                `(t . ,overriding_map))
+         )
+        )
+
+      )
+	(pop-to-buffer buffer)
 	(shrink-window-if-larger-than-buffer)))
 
 (defun konix/load-default-env-file ()

@@ -242,7 +242,8 @@ class GCall(cmd.Cmd, object):
         @property
         def startdate(self):
             if self.start.get("dateTime"):
-                return dateutil.parser.parse(self.start.get("dateTime"))
+                return dateutil.parser.parse(self.start.get("dateTime")
+                ).replace(tzinfo=datetime.timezone.utc)
             else:
                 return dateutil.parser.parse(
                     self.start.get("date")
@@ -251,7 +252,8 @@ class GCall(cmd.Cmd, object):
         @property
         def enddate(self):
             if self.end.get("dateTime"):
-                return dateutil.parser.parse(self.end.get("dateTime"))
+                return dateutil.parser.parse(self.end.get("dateTime")
+                ).replace(tzinfo=datetime.timezone.utc)
             else:
                 return dateutil.parser.parse(
                     self.end.get("date")
@@ -739,12 +741,8 @@ class GCall(cmd.Cmd, object):
                 "duration",
             ]
         )
-        res.startdate = pandas.DatetimeIndex(res.startdate)\
-                              .tz_localize(dateutil.tz.tzutc())\
-                              .tz_convert(dateutil.tz.tzlocal())
-        res.enddate = pandas.DatetimeIndex(res.enddate)\
-                            .tz_localize(dateutil.tz.tzutc())\
-                            .tz_convert(dateutil.tz.tzlocal())
+        res.startdate = pandas.DatetimeIndex(res.startdate)
+        res.enddate = pandas.DatetimeIndex(res.enddate)
         res.duration = res.duration
         return res
 
@@ -883,6 +881,7 @@ class GCall(cmd.Cmd, object):
             end.strftime("%Y-%m-%d"),
         )
         events = self.get_events(calendar_id, extra_query)
+
         # an event to move start before the end and end after the start
         events = [event for event in events
                   if event.startdate <= end

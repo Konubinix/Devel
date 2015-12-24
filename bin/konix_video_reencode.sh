@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -xeu
 
 video="$1"
 video_no_ext="${video%.*}"

@@ -1,4 +1,4 @@
-#! /system/xbin/env bash
+#! /system/bin/env bash
 set -x
 #RUNNING="$(ps|grep android_scripting|wc -l)"
 #if [ "$RUNNING" != "0" ]

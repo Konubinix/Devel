@@ -1,4 +1,4 @@
-#!/system/xbin/env bash
+#!/system/bin/env bash
 
 #set -x
 deb_root=/data/debian
@@ -18,4 +18,4 @@ TERM=linux \
     SHELL=/bin/bash \
     HOME=/root \
     PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
-    /system/xbin/chroot $deb_root /bin/bash -l "$@"
+    /system/bin/chroot $deb_root /bin/bash -l "$@"

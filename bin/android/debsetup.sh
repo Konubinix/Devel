@@ -1,10 +1,10 @@
-#!/system/xbin/env bash
+#!/system/bin/env bash
 
 set -u
 deb_root="$1"
 cur_dir="$(dirname $0)"
 
-CARD_DEVICE=/dev/block/mmcblk1p1
+CARD_DEVICE=/dev/block/mmcblk1p2
 
 mkdir_maybe ( ) {
     [ -d "$1" ] || mkdir -p "$1"
@@ -58,4 +58,3 @@ say_and_do chmod +r $deb_root/etc/mtab
 # setup the sound
 /system/bin/chmod 777 /dev/snd/*
 ln -s /dev/snd/* /dev/
-

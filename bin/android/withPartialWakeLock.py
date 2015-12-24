@@ -1,4 +1,4 @@
-#! /system/xbin/env python
+#! /system/bin/env python
 
 import subprocess
 import sys

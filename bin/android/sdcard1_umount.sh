@@ -1,4 +1,4 @@
-#!/system/xbin/env bash
+#!/system/bin/env bash
 
 CARD_AUTO_MOUNTED="/storage/sdcard1 /mnt/fuse/sdcard1"
 

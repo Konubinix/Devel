@@ -3,7 +3,7 @@
 ;; ####################################################################################################
 (require 'org-clock)
 (defvar konix/org-pomodoro-set-count 0)
-(defvar konix/org-pomodoro-default-timer 25)
+(defvar konix/org-pomodoro-default-timer 30)
 (defvar konix/org-pomodoro-default-timer-break
   4)
 (defvar konix/org-pomodoro-default-timer-long-break

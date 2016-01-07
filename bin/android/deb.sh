@@ -14,6 +14,7 @@ fi
 
 umask 0022
 echo "Chrooting"
+unset TMPDIR
 TERM=linux \
     SHELL=/bin/bash \
     HOME=/root \

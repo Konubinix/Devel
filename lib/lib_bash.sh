@@ -444,7 +444,7 @@ call_second_like_me () {
     then
         echo "Calling ${SECOND}"
     fi
-    exec "${SECOND}" "$@"
+    "${SECOND}" "$@"
 }
 
 mkvirtualenv_system-site-packages () {

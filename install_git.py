@@ -39,7 +39,7 @@ def install_git():
     GITCONFIG_DEFAULT_FILE.close()
     GITCONFIG_FILE.close()
     # set some env variables into the git config file
-    KONIX_MSMTP=os.path.join(environ["KONIX_BIN_DIR"], "konix_msmtp.sh")
+    KONIX_MSMTP=os.path.join(environ["KONIX_BIN_DIR"], "konix_sendmail.sh")
     subprocess.Popen(["git", "config", "--global", "sendemail.smtpserver", KONIX_MSMTP])
 
     print "Successful installed git config"

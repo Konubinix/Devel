@@ -93,7 +93,7 @@
    - sources the gdbinit file in KONIX_CONFIG_DIR
    - sources the stl-views.gdb file in KONIX_CONFIG_DIR, this file may be useful to debug stl objects in debugging sessions. It has been made obsolete in gdb 7 by the possibility to add python printers but that is another story
 ** install_git.py
-   Because git does not provide any way to source another file, this file is directly copied in the home. This means that the KONIX_CONFIG_DIR/gitconfig file should be changed by hand and then install_git.py re launched each time a change is to be done in the configuration. This is really a pain, and I hope I will find a solution to make it easier in the future. Luckily, I barely change this file. The script copies the KONIX_CONFIG_DIR/gitconfig file in ~/.gitconfig, making sure to conserve the previous values of user name and email. It also adds the konix_msmtp.sh script as sendemail.smtpserver default value because it use it.
+   Because git does not provide any way to source another file, this file is directly copied in the home. This means that the KONIX_CONFIG_DIR/gitconfig file should be changed by hand and then install_git.py re launched each time a change is to be done in the configuration. This is really a pain, and I hope I will find a solution to make it easier in the future. Luckily, I barely change this file. The script copies the KONIX_CONFIG_DIR/gitconfig file in ~/.gitconfig, making sure to conserve the previous values of user name and email. It also adds the konix_sendmail.sh script as sendemail.smtpserver default value because it use it.
 
    This install script should be re done in the future.
 ** install_lib.py

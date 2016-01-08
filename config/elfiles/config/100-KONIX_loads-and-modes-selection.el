@@ -228,7 +228,7 @@
 ;; ebib
 (autoload 'ebib "ebib" "" t)
 ;; text translator
-(require 'text-translator-load)
+(require 'text-translator-load nil t)
 ;; rainbow mode
 (autoload 'rainbow-mode "rainbow-mode" "" t)
 ;; EIN

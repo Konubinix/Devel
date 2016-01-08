@@ -1,0 +1,2 @@
+initial_command="search tag:unread not tag:flagged"
+theme='theme.theme'

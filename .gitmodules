@@ -240,3 +240,6 @@
 [submodule "config/elfiles/irony-mode"]
 	path = config/elfiles/irony-mode
 	url = https://github.com/Sarcasm/irony-mode
+[submodule "alot"]
+	path = alot
+	url = https://github.com/pazz/alot/

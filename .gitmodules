@@ -243,3 +243,6 @@
 [submodule "alot"]
 	path = alot
 	url = https://github.com/pazz/alot/
+[submodule "pymsmtpq"]
+	path = pymsmtpq
+	url = https://github.com/darkfeline/pymsmtpq

@@ -123,7 +123,7 @@ class RILItem(object):
         # sanity check that the url is ok
         if os.path.exists(self.url_file_path):
             actualcontent = open(self.url_file_path, "r").read()
-            assert actualcontent == self.url, "%s != %s (%s)" % (actualcontent, self.url, self.hash)
+            assert actualcontent.strip() == self.url.strip(), "%s != %s (%s)" % (actualcontent, self.url, self.hash)
         else:
             open(self.url_file_path, "w").write(self.url.encode("utf-8"))
 
@@ -449,11 +449,17 @@ class RILItems(object):
             item = RILItem.from_url_path(url_path)
             # sanity check
             new_url_path = item.url_file_path
-            assert new_url_path == url_path, "%s should be deleted since it is a dupliate of %s (%s vs %s)" % (
+            if new_url_path.strip() != url_path.strip():
+                print "%s should be deleted since it is a dupliate of %s (%s vs %s)" % (
                         url_path,
                         new_url_path,
                         open(url_path, "r").read(),
                         open(new_url_path, "r").read()
+                        )
+                shutil.rmtree(os.path.dirname(new_url_path))
+                os.rename(
+                    os.path.dirname(url_path),
+                    os.path.dirname(new_url_path),
                         )
             self.items.add(item)
 

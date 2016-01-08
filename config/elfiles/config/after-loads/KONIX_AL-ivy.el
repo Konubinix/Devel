@@ -55,7 +55,7 @@
 (setq-default ivy-count-format "(%d/%d) ")
 (setq-default ivy-re-builders-alist
 			  '(
-				(t . ivy--regex-plus)
+				(t . ivy--regex-ignore-order)
 				)
 			  )
 

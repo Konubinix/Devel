@@ -690,6 +690,10 @@
 			  elfiles
 			  )
 			 )
+(setq custom-safe-themes
+      '("d0c4cea7365681d3b883f7e6459749ae1969325fb480cef9eb7cbc216f1b361d"))
+
+(load-theme 'zenburn)
 
 ;; ######################################################################
 ;; Custom display table

@@ -1225,7 +1225,7 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 				  "--all"
 				  ))
 		)
-	(start-process "gitk" nil "gitk" append)
+	(start-process "konix_gitk.sh" nil "konix_gitk.sh" append)
 	)
   (message "git k launched")
   )

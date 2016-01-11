@@ -4,7 +4,7 @@ source "${KONIX_LIB_DIR}/parano.sh"
 
 usage () {
     cat<<EOF
-$0 -t <TO> <REMOTE> [args]
+$0 -t <TO> <FILE> [args]
 
 Get a file and copy it to the given remote.
 args are given to the copy command
@@ -27,5 +27,5 @@ FILE="${1}"
 shift
 echo "Getting ${FILE} and copying it to ${TO}"
 set -x
-git annex get "${FILE}"
+git annex get --not --in "${TO}" "${FILE}"
 git annex copy --to "${TO}" "${FILE}" "$@"

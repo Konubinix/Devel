@@ -58,3 +58,4 @@ say_and_do chmod +r $deb_root/etc/mtab
 # setup the sound
 /system/bin/chmod 777 /dev/snd/*
 ln -s /dev/snd/* /dev/
+ln -s /proc/self/fd /dev/fd

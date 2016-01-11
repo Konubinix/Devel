@@ -280,7 +280,7 @@ def step():
                 chooser.choose_get_res()
             elif type(choice) == str and choice == "gtd mail origin":
                 chooser.choose_show("Click on ok when done", (item.url,), "OK")
-                os.system("echo '%s'|andgtd.sh" % item.url)
+                os.system("echo '%s'|konix_gtd_mail.sh" % item.url)
                 chooser.choose_get_res()
             elif type(choice) == str and choice == "back":
                 choice = False

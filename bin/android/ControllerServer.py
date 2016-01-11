@@ -46,7 +46,7 @@ server.register_function(pyril_fast)
 
 def mail_me():
     """Email me"""
-    os.system("andgtd2.sh &")
+    os.system("konix_gtd_mail.sh &")
     return False
 server.register_function(mail_me)
 
@@ -73,23 +73,5 @@ def volumeclient():
     os.system("konix_volume_client.py")
     return False
 server.register_function(volumeclient)
-
-def mpdtunnel():
-    """Create a tunnel to the MPD host"""
-    os.system("konix_mpd_ssh_tunnel.sh")
-    return False
-server.register_function(mpdtunnel)
-
-def mpdstream():
-    """Listen to the mpd host stream"""
-    os.system("konix_mpd_listener.sh")
-    return False
-server.register_function(mpdstream)
-
-def mpdstreamlocal():
-    """Listen to the mpd host stream via the tunnel"""
-    os.system("konix_mpd_listener_local.sh")
-    return False
-server.register_function(mpdstreamlocal)
 
 server.serve_forever()

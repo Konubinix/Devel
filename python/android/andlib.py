@@ -80,3 +80,10 @@ def display(droid, title, msg):
     droid.dialogCreateAlert(title, msg)
     droid.dialogShow()
     droid.dialogGetResponse()
+
+def input(droid, title, message=None, defaulttext=None, inputtype=None):
+    droid.dialogCreateInput(title, message, defaulttext, inputtype)
+    droid.dialogSetPositiveButtonText("Ok")
+    droid.dialogSetNegativeButtonText("Cancel")
+    droid.dialogShow()
+    return droid.dialogGetResponse().result

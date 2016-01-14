@@ -26,4 +26,5 @@ then
 fi
 #echo "$@"
 #xmessage "$*"
+mkdir -p "${HOME}/cryptoff/.pymsmtpq.queue"
 pymsmtpq -t --read-envelope-from -oi -C "${KONIX_PERSO_DIR}/msmtprc" --aliases="${KONIX_MSMTP_ALIASES}" --logfile "${KONIX_MSMTP_LOG}" "$@"

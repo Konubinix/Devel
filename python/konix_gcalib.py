@@ -125,6 +125,8 @@ class GCall(cmd.Cmd, object):
         self.set_prompt()
 
     def parse_time(self, value):
+        if isinstance(value, datetime.datetime):
+            return value, None
         calendar_id = self.db.get(self.calendar_id_name)
         calendar = self.get_calendar(calendar_id)
         tz = pytz.timezone(calendar.timeZone)
@@ -146,7 +148,7 @@ class GCall(cmd.Cmd, object):
 
     @time_min.setter
     def time_min(self, value):
-        if value == "":
+        if value == "" or value is None:
             self.db.delete(self.time_min_name)
             return
         date_, _ = self.parse_time(value)
@@ -171,7 +173,7 @@ class GCall(cmd.Cmd, object):
 
     @time_max.setter
     def time_max(self, value):
-        if value == "":
+        if value == "" or value is None:
             self.db.delete(self.time_max_name)
             return
         date_, _ = self.parse_time(value)
@@ -960,7 +962,7 @@ class GCall(cmd.Cmd, object):
         calendar_id = self.db.get(self.calendar_id_name)
         event = self.get_event(event_id)
         new_values = {"summary" : new_summary}
-        return self._update_event(calendar_id, event, _dict)
+        return self._update_event(calendar_id, event, new_values)
 
     def do_update_event(self, line):
         event_id, new_summary = shlex.split(line)

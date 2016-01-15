@@ -32,7 +32,6 @@ numlockx
 sleep 4
 {
     konix_setbg.sh
-	konix_seeks.sh
 } &
 
 wait $fbpid

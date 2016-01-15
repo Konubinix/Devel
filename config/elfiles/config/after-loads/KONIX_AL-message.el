@@ -117,5 +117,11 @@ make sure to insert any mml content after the secure tag
 (define-key message-mode-map (kbd "C-c C-c") 'konix/message-send-and-exit)
 (define-key message-mode-map (kbd "C-c C-s") 'konix/message-send)
 
+(defun konix/message-send-hook ()
+  (async-shell-command "konix_sendmail_flush.sh")
+  )
+
+(add-hook 'message-sent-hook 'konix/message-send-hook)
+
 (provide '400-KONIX_message)
 ;;; 400-KONIX_message.el ends here

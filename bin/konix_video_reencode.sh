@@ -6,7 +6,7 @@ video_no_ext="${video%.*}"
 avconv -i "${video}" \
 	   -r 30 \
 	   -f mp4 \
-	   -s 720x576  \
+	   -vf "scale=-1:576" \
 	   -vcodec libx264 \
 	   -vprofile high \
 	   -preset slower \

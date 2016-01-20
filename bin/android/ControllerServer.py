@@ -46,7 +46,7 @@ server.register_function(pyril_fast)
 
 def mail_me():
     """Email me"""
-    os.system("konix_gtd_mail.sh &")
+    os.system("konix_gtd_mail_interactive.sh &")
     return False
 server.register_function(mail_me)
 

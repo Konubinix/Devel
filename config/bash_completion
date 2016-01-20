@@ -1,19 +1,27 @@
 #!/bin/bash
 
+_konix_load_completions()
+{
+    local bin dir bin_basename
+    bin="${1}"
+    dir="${2}"
+    bin_basename="${bin##*/}"
+    # override with my local one if possible
+    local compfile="${dir}/bash-completion/${bin_basename}"
+
+    # Avoid trying to source dirs; https://bugzilla.redhat.com/903540
+    [[ -f "$compfile" ]] && . "$compfile" &>/dev/null && return 124
+}
+
 _konix_completion_loader()
 {
     # use the system wide completion
     _completion_loader "$@"
     local res="$?"
 
-    # override with my local one if possible
-    local compfile=./bash-completion
-    [[ $BASH_SOURCE == */* ]] && compfile="${BASH_SOURCE%/*}/bash-completion"
-    compfile+="/${1##*/}"
-
-    # Avoid trying to source dirs; https://bugzilla.redhat.com/903540
-    [[ -f "$compfile" ]] && . "$compfile" &>/dev/null && return 124
-
+    _konix_load_completions "$1" "${KONIX_CONFIG_DIR}"
+    _konix_load_completions "$1" "${KONIX_PERSO_CONFIG_DIR}"
+    _konix_load_completions "$1" "${KONIX_PERSO_HOST_CONFIG_DIR}"
     # Propagate the result of the system completion
     return "${res}"
 } &&

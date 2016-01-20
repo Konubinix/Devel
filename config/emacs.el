@@ -37,7 +37,7 @@
   ;; for each file in after-loads with the pattern .*KONIX_AL_\(.+\).el directory, make sure it will be loaded after
   ;; the file with the exact name \1 will be loaded
   (mapc
-   '(lambda(elt)
+   #'(lambda(elt)
 	  (string-match "KONIX_AL-\\(.+\\).el" elt)
 	  (eval-after-load (match-string-no-properties 1 elt)
 		`(progn
@@ -59,7 +59,7 @@
 (defun konix/load-config-files (directory)
   (mapc
    ;; Load every .el file in my config
-   '(lambda(elt)
+   #'(lambda(elt)
 	  (let
 		  (
 		   (konix/loading-directory directory)

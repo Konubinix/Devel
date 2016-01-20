@@ -246,3 +246,12 @@
 [submodule "pymsmtpq"]
 	path = pymsmtpq
 	url = https://github.com/darkfeline/pymsmtpq
+[submodule "beets"]
+	path = beets
+	url = https://github.com/beetbox/beets
+[submodule "mopidy"]
+	path = mopidy
+	url = https://github.com/mopidy/mopidy
+[submodule "mopidy-beets"]
+	path = mopidy-beets
+	url = https://github.com/mopidy/mopidy-beets

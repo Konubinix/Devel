@@ -15,3 +15,4 @@ done
 shift $((OPTIND-1))
 pymsmtpq --manage "${COMMAND}"
 echo OK
+notmuch new

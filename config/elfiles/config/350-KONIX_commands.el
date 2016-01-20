@@ -47,7 +47,7 @@
    'null
    (mapcar
 	(lambda (buf_)
-	  (when (string-match "Async Shell Command" (buffer-name buf_))
+	  (when (string-match "^\\*.+Shell\\|Async.+\\*.+$" (buffer-name buf_))
 		buf_
 		)
 	  )

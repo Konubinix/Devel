@@ -33,5 +33,12 @@
 	 )
   )
 
+(setq-default
+ ediff-diff-options "-b"
+ ediff-actual-diff-options ediff-diff-options
+ ediff-cmp-program "diff"
+ ediff-cmp-options '("-b")
+ )
+
 (provide '700-KONIX_ediff)
 ;;; 700-KONIX_ediff.el ends here

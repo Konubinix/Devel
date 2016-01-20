@@ -43,5 +43,14 @@
 	)
   )
 
+;; When popping the mark, continue popping until the cursor
+;; actually moves
+;; (http://endlessparentheses.com/faster-pop-to-mark-command.html)
+(defadvice pop-to-mark-command (around ensure-new-position activate)
+  (let ((p (point)))
+    (dotimes (i 10)
+      (when (= p (point)) ad-do-it))))
+(ad-activate 'pop-to-mark-command)
+
 (provide 'KONIX_AL-simple)
 ;;; KONIX_AL-simple.el ends here

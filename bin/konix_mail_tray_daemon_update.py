@@ -7,6 +7,7 @@ import shlex
 import os
 import sys
 import konix_notify
+import tempfile
 
 def main():
     files = os.environ["KONIX_NOTMUCH_SAVED_SEARCHES"].split(os.pathsep)
@@ -36,7 +37,7 @@ def main():
             res = q.count_messages()
             if res != 0:
                 open(
-                    "/tmp/mail_tray_daemon_control",
+                    "{}/mail_tray_daemon_control".format(tempfile.gettempdir()),
                     "w").write(icon_letter)
                 sys.exit(0)
     open(

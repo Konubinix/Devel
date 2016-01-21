@@ -81,7 +81,7 @@ background no
 # border_margin 4
 
 # # border width
-# border_width 1
+border_width 10
 
 # # Default colors and also border colors
 # default_color white
@@ -106,7 +106,7 @@ default_color white
 background no
 
 double_buffer yes
-draw_outline yes
+draw_outline no
 
 gap_x 15
 gap_y 50
@@ -121,43 +121,33 @@ use_spacer none
 
 
 color1 123456
-color2 green
+color2 0099FF
 color3 green
+color4 6666CC
 
 maximum_width 600
-minimum_size 600
+minimum_size 600 800
 
 # default_bar_size 0 10
 # default_graph_size 0 25
 TEXT
-${color yellow}${font Comic sans MS:size=20}$alignc${time %A %d %B %Y} - ${time %H:%M:%S}$color$font
-${font Comic sans MS : size=15}$alignc${color2}Archi$color $font
-$sysname ${outlinecolor blue}$kernel$outlinecolor sur ${outlinecolor blue}$machine$outlinecolor cadencée à ${outlinecolor blue}$freq_g GHz $outlinecolor
-Allumée depuis ${outlinecolor blue}$uptime${outlinecolor}
-${font Comic sans MS:size=15}$alignc${color2}Système$color $font
-$alignc$color3 CPU0 $color: ${outlinecolor blue}${cpu cpu0}% / ${freq 0}MHz
-${cpugraph cpu0}${outlinecolor}
-$alignc$color3 CPU1$color :${outlinecolor blue} ${cpu cpu1}% / ${freq 1}MHz
-${cpugraph cpu1}${outlinecolor}
-${color3}RAM $color: ${outlinecolor blue}$alignr$mem/$memmax(${memperc}%)${outlinecolor}
-${color3}SWAP $color: ${outlinecolor blue}$alignr$swap/$swapmax($swapperc%)${outlinecolor}
-${color3}Température moyenne du PC $color: ${outlinecolor blue}$alignr${acpitemp}°C${outlinecolor}
-${color3}${alignc}${outlinecolor blue}Top 4 des process les plus gourmands ($running_processes/$processes)${color}
+${outlinecolor white}${color4}${font Comic sans MS:size=20}$alignc${time %A %d %B %Y} - ${time %H:%M:%S}$color$font$outlinecolor
+Uptime ${outlinecolor black}$uptime${outlinecolor}
+${font Comic sans MS:size=15}$alignc${color2}System$color $font
+${execp _konix_conky_cpu_gauges.sh}
+${color3}RAM $color: ${outlinecolor black}$alignr$mem/$memmax(${memperc}%)${outlinecolor}
+${color3}SWAP $color: ${outlinecolor black}$alignr$swap/$swapmax($swapperc%)${outlinecolor}
+${color3}PC mean temperature $color: ${outlinecolor black}$alignr${acpitemp}°C${outlinecolor}
+${color3}${alignc}${outlinecolor black}4 most greedy processes ($running_processes/$processes)${color}
 ${top name 1}$alignr${top cpu 1}%
 ${top name 2}$alignr${top cpu 2}%
 ${top name 3}$alignr${top cpu 3}%
 ${top name 4}$alignr${top cpu 4}%
 
-${outlinecolor}${color2}Batterie :$color${outlinecolor blue}$alignc${battery_time BAT0}
-${battery_bar BAT0}${outlinecolor}
+${execp _konix_conky_battery.sh}
 
-${font Comic sans MS : size=15}$alignc${color2}Système de fichiers$color $font
-
-/             $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /}/${fs_size /}(${fs_used_perc /}%)${outlinecolor}$font
-/data    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /data}/${fs_size /data}(${fs_used_perc /data}%)${outlinecolor}$font
-/usr    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /usr}/${fs_size /usr}(${fs_used_perc /usr}%)${outlinecolor}$font
-/var    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /var}/${fs_size /var}(${fs_used_perc /var}%)${outlinecolor}$font
-/tmp    $alignc${outlinecolor blue}${font Comic sans MS:size=11}${fs_used /tmp}/${fs_size /tmp}(${fs_used_perc /tmp}%)${outlinecolor}$font
-${color3}Diskio :$color${outlinecolor blue}
+${color3}Diskio :$color${outlinecolor black}
+${color3}Read $color:
 $diskiograph_read
+${color3}Write $color:
 $diskiograph_write

@@ -108,7 +108,7 @@ Mod4 Insert : AddWorkspace
 Mod4 Delete   : RemoveLastWorkspace
 
 # special case of the logging of interuption that is non handling windows
-Mod4 j : Exec ec --eval '(konix/org-capture-interruption)'
+Mod4 j : Exec konix_do_cron_job.sh "ec --eval '(konix/org-capture-interruption)'"
 # capture something in emacs
 Mod4 c : Exec konix_goto_window.sh emacs && ec --eval '(org-capture)'
 

@@ -12,9 +12,10 @@ def main():
     share_dir = os.environ.get("KONIX_SHARE_DIR",
                                os.path.join(os.environ["HOME"],"share"))
     icons_dir = os.path.join(share_dir, "icons")
-
-    mtd = TrayDaemon(os.path.join(tempfile.gettempdir(),
-                                  "mail_tray_daemon_control"),
+    ctrl_file = os.path.join(tempfile.gettempdir(),
+                             "mail_tray_daemon_control")
+    print("CTRL_FILE: {}".format(ctrl_file))
+    mtd = TrayDaemon(ctrl_file,
                      200,
                      {"i" : os.path.join(icons_dir, "mail_icon_empty.png"),
                       "n" : os.path.join(icons_dir, "mail_icon_new_mail.png"),

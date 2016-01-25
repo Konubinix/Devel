@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ME="$(basename "${BASH_SOURCE[0]}")"
+
+complete -F _parse_help_candidates "$ME"

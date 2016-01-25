@@ -1,5 +1,16 @@
 #!/bin/bash
 
+_parse_help_candidates ()
+{
+    local cur prev words cword split
+    _init_completion || return
+    if [[ "$cur" == -* ]]; then
+        local opts=$( _parse_help "$1" )
+        COMPREPLY=( $( compgen -W "$opts" -- "$cur" ) )
+        return 0
+    fi
+}
+
 _konix_load_completions()
 {
     local bin dir bin_basename

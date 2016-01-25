@@ -195,9 +195,6 @@
 [submodule "gorgeous"]
 	path = gorgeous
 	url = https://github.com/mislav/gorgeous
-[submodule "simple-pastebin-server"]
-	path = simple-pastebin-server
-	url = https://github.com/Konubinix/simple-pastebin-server
 [submodule "pdbpp"]
 	path = pdbpp
 	url = hg::https://bitbucket.org/antocuni/pdb
@@ -255,3 +252,6 @@
 [submodule "mopidy-beets"]
 	path = mopidy-beets
 	url = https://github.com/mopidy/mopidy-beets
+[submodule "0bin"]
+	path = 0bin
+	url = https://github.com/sametmax/0bin

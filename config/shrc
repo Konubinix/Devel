@@ -47,7 +47,7 @@ source "${KONIX_LIB_DIR}/colors.sh"
 # Log sur l'agent SSH
 if is_on_linux
 then
-	gpg_agent_start_KONIX
+	konix_gpg_use
 	GPG_TTY=$(tty)
     export GPG_TTY
 fi

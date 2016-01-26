@@ -255,3 +255,6 @@
 [submodule "0bin"]
 	path = 0bin
 	url = https://github.com/sametmax/0bin
+[submodule "config/elfiles/highlight-symbol.el"]
+	path = config/elfiles/highlight-symbol.el
+	url = https://github.com/nschum/highlight-symbol.el

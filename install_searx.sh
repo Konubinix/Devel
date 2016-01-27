@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cd searx
-make
+pip install --user -e searx
 echo "Change the settings"
-ec searx/settings.yml
+ec searx/searx/settings.yml

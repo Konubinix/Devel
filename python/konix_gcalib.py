@@ -148,11 +148,11 @@ class GCall(cmd.Cmd, object):
 
     @time_min.setter
     def time_min(self, value):
-        if value == "" or value is None:
+        if value == "" or value is None or value == "never":
             self.db.delete(self.time_min_name)
-            return
-        date_, _ = self.parse_time(value)
-        self.db.set(self.time_min_name, date_.isoformat())
+        else:
+            date_, _ = self.parse_time(value)
+            self.db.set(self.time_min_name, date_.isoformat())
         self.do_clear_list_event()
         self.set_prompt()
 
@@ -173,11 +173,11 @@ class GCall(cmd.Cmd, object):
 
     @time_max.setter
     def time_max(self, value):
-        if value == "" or value is None:
+        if value == "" or value is None or value == "never":
             self.db.delete(self.time_max_name)
-            return
-        date_, _ = self.parse_time(value)
-        self.db.set(self.time_max_name, date_.isoformat())
+        else:
+            date_, _ = self.parse_time(value)
+            self.db.set(self.time_max_name, date_.isoformat())
         self.do_clear_list_event()
         self.set_prompt()
 

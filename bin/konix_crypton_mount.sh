@@ -1,12 +1,10 @@
 #!/bin/bash
 
 set -ue
-CRYPTON="${KONIX_PERSO_DIR}/crypton"
-CRYPTOFF="${HOME}/cryptoff"
-mkdir -p "${CRYPTOFF}"
+mkdir -p "${KONIX_CRYPTOFF}"
 if which konix_dump_crypton-passphrase.sh > /dev/null
 then
-    encfs --extpass=konix_dump_crypton-passphrase.sh "${CRYPTON}" "${CRYPTOFF}"
+    encfs --extpass=konix_dump_crypton-passphrase.sh "${KONIX_CRYPTON}" "${KONIX_CRYPTOFF}"
 else
-    encfs "${CRYPTON}" "${CRYPTOFF}"
+    encfs "${KONIX_CRYPTON}" "${KONIX_CRYPTOFF}"
 fi

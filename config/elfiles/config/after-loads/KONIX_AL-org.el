@@ -2534,7 +2534,7 @@ items"
   (interactive)
   (save-window-excursion
 	(org-clock-goto)
-	(org-timer-cancel-timer)
+	(org-timer-stop)
 	(org-timer-set-timer '(16))
 	)
   )

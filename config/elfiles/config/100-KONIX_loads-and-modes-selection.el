@@ -145,7 +145,7 @@
 (autoload 'konix/org-meta-context/toggle-restrict "KONIX_org-meta-context")
 (autoload 'konix/org-pomodoro-start "KONIX_org-pomodoro2")
 (autoload 'konix/org-pomodoro-global-mode "KONIX_org-pomodoro2")
-(autoload 'org-timer-cancel-timer "org-timer")
+(autoload 'org-timer-stop "org-timer")
 (autoload 'notmuch "notmuch")
 (autoload 'notmuch-search "notmuch")
 (autoload 'appt-check "appt")

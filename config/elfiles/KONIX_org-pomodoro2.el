@@ -567,8 +567,9 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 	(konix/org-pomodoro-decide-start-or-break "Canceled a pomodoro")
 	)
   (setq konix/org-pomodoro-in-pomodoro nil)
+  (setq-default org-timer-mode-line-string "")
   )
-(add-hook 'org-timer-cancel-hook
+(add-hook 'org-timer-stop-hook
 		  'konix/org-timer-cancel-pomodoro-hook)
 
 (defun konix/org-pomodoro-interruption-warn ()

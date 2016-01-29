@@ -60,7 +60,7 @@ flush_command () {
 		echo "Marking ${@} as automatically installed"
 		sudo aptitude markauto -y ${@}
 	else
-		TAG="${DATE_READABLE} (${DATE}):${command}"
+		TAG="${DATE}:${command}"
 		echo "Applying to ${@} the user tag '${TAG}'"
 		sudo aptitude add-user-tag "${TAG}" ${@}
 	fi

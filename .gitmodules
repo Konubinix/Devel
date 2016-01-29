@@ -258,3 +258,6 @@
 [submodule "config/elfiles/highlight-symbol.el"]
 	path = config/elfiles/highlight-symbol.el
 	url = https://github.com/nschum/highlight-symbol.el
+[submodule "encfs"]
+	path = encfs
+	url = https://github.com/Konubinix/encfs

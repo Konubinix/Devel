@@ -6,7 +6,7 @@ pos=0
 found=""
 for arg in "$@"
 do
-    if [ "$arg" == "-r" ]
+    if [ "$arg" == "-r" ] ||  [ "$arg" == "-f" ]
     then
         found="$pos"
     fi

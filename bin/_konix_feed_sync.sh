@@ -13,8 +13,9 @@ do
         echo "$line"
     fi
 done
-# clean the old rss
-#feed2imap-cleaner -f "$KONIX_PERSO_DIR/feed2imaprc"
+pushd "${KONIX_FEED_IMAP_FLEXGET_DIR}"
+flexget execute
+popd
 # init the tags for the new mails
 echo "Initing tags"
 konix_mail_init_tags.sh

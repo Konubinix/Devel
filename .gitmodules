@@ -261,3 +261,6 @@
 [submodule "encfs"]
 	path = encfs
 	url = https://github.com/Konubinix/encfs
+[submodule "Flexget"]
+	path = Flexget
+	url = https://github.com/Konubinix/Flexget.git

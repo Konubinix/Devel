@@ -11,5 +11,5 @@ MY_DIR="$(dirname "$0")"
 IFS=":"
 for COMMAND_FILE in ${COMMANDS_FILES}
 do
-    "${MY_DIR}/per_site_commands.py" "$UZBL_URI" "${COMMAND_FILE}"
+    "${MY_DIR}/per_site_commands.py" "$UZBL_URI" "${COMMAND_FILE}" >&2
 done

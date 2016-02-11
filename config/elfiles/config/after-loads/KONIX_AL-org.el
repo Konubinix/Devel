@@ -212,6 +212,8 @@ cursor stays in the org buffer."
 			  '(
 				(".org$" . emacs)
 				(".py$" . emacs)
+				("..xx$" . emacs)
+				(".xml$" . emacs)
 				(".log$" . emacs)
 				(".*" . "mimeopen %s")
 				(auto-mode . emacs)

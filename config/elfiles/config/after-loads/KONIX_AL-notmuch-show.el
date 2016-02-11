@@ -41,5 +41,7 @@
   )
 (ad-activate 'notmuch-hello-widget-search)
 
+(define-key 'notmuch-show-mode-map "v" 'notmuch-show-view-part)
+
 (provide 'KONIX_AL-notmuch-show)
 ;;; KONIX_AL-notmuch-show.el ends here

@@ -41,7 +41,7 @@ def main():
                     "w").write(icon_letter)
                 sys.exit(0)
     open(
-        "/tmp/mail_tray_daemon_control",
+        "{}/mail_tray_daemon_control".format(tempfile.gettempdir()),
         "w").write(default_letter)
     sys.exit(1)
 

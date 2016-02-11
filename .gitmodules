@@ -267,3 +267,6 @@
 [submodule "git-remote-hg"]
 	path = git-remote-hg
 	url = https://github.com/fingolfin/git-remote-hg
+[submodule "pyfilesystem"]
+	path = pyfilesystem
+	url = https://github.com/Konubinix/pyfilesystem.git

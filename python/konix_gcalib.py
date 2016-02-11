@@ -118,7 +118,9 @@ class GCall(cmd.Cmd, object):
             "summary",
             "start",
             "end",
-            "status"
+            "status",
+            "attendees",
+            "description"
         ]
         self._make_place = make_place
         self.account = account

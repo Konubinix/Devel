@@ -12,7 +12,16 @@ def by_konubinix_notificator(message, unique=False, duration=3000, type_="normal
     notification = session.get_object('konubinix.notificator',
                                       path)
     LOGGER.info("Displaying message "+message)
-    notification.Notify(message, duration, unique, type_)
+    urgency = 1
+    if type_ == "annoying":
+        duration = 0
+        unique = False
+    elif type_ == "boring":
+        duration = 0
+        unique = False
+        urgency = 2
+
+    notification.Notify(message, duration, unique, urgency)
     LOGGER.info("Message displayed")
 
 def by_pynotify(message):

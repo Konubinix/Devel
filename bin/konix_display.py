@@ -14,10 +14,16 @@ parser.add_argument('-d', '--duration', default=3000, type=int,
 parser.add_argument('-u', '--unique', action="store_true",
                     help="Unique message")
 
+parser.add_argument('-t', '--type', type=str,
+                    help="Type of the notification",
+                    choices=["normal", "annoying", "boring"],
+                    default="normal",
+)
+
 parser.add_argument('message', type=str, nargs="*",
                     help="The message")
 
 args = parser.parse_args()
 
 message = ' '.join(args.message)
-konix_notify.main(message, unique=args.unique, duration=args.duration)
+konix_notify.main(message, unique=args.unique, duration=args.duration, type_=args.type)

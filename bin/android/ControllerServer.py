@@ -5,6 +5,7 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 import os
 import subprocess
+import konix_notify
 
 # Restrict to a particular path.
 class RequestHandler(SimpleXMLRPCRequestHandler):
@@ -73,5 +74,11 @@ def volumeclient():
     os.system("konix_volume_client.py")
     return False
 server.register_function(volumeclient)
+
+def notify(message, type_):
+    """Display a notification"""
+    konix_notify.main(message, type_=type_)
+    return False
+server.register_function(notify)
 
 server.serve_forever()

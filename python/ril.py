@@ -11,6 +11,7 @@ import hashlib
 import subprocess
 import re
 import urllib2
+import urllib
 # create a html_unescape method to unescape titles
 # taken from http://blog.client9.com/2008/10/04/html-unescape-in-python.html
 from htmlentitydefs import name2codepoint
@@ -432,6 +433,12 @@ class RILItem(object):
     def open(self):
         assert self.dled
         os.system('mimeopen "%s"' % self.index_abs_path.encode("utf-8").replace('"', '\\"'))
+
+    def open_local_web(self):
+        assert self.dled
+        rel_path = os.path.relpath(self.index_abs_path, os.environ["HOME"])
+        rel_url = urllib.quote(rel_path)
+        os.system('"%s" "%s"' % (os.environ["BROWSER"], "http://127.0.0.1:9645/{}".format(rel_url)))
 
     def open_url(self):
         os.system('"%s" "%s"' % (os.environ["BROWSER"], self.url))

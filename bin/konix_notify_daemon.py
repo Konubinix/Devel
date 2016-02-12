@@ -15,14 +15,14 @@ class NotificationException(dbus.DBusException):
 class Notification(dbus.service.Object):
     notification = pynotify.Notification("Message", "")
     @dbus.service.method("konubinix.notificator",
-                         in_signature='sibs', out_signature='')
-    def Notify(self, message, show_time, unique, type_):
+                         in_signature='sibi', out_signature='')
+    def Notify(self, message, show_time, unique, urgency):
         logging.info(
-            "Notifying message {}{} for time {} of type {}".format(
+            "Notifying message {}{} for time {} of urgency {}".format(
                 "unique " if unique else "",
                 message,
                 show_time,
-                type_,
+                urgency,
             )
         )
         if unique:
@@ -30,7 +30,7 @@ class Notification(dbus.service.Object):
             notif.update("Message", message)
         else:
             notif = pynotify.Notification("Message", message)
-        notif.set_timeout(show_time);
+        notif.set_urgency(urgency)
         notif.show()
 
 if __name__ == '__main__':

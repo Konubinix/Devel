@@ -32,9 +32,19 @@ def by_pynotify(message):
     n.set_timeout(3000)
     n.show()
 
-def by_sl4a(message):
+def by_sl4a(message, type_):
     from konix_android import droid
-    droid.makeToast(message)
+    if type_ == "normal":
+        droid.makeToast(message)
+    if type_ == "annoying":
+        droid.notify("Konix Notify", message)
+    if type_ == "boring":
+        droid.dialogCreateInput(
+            "Konix Notify",
+            "Notification",
+            message
+        )
+        droid.dialogShow()
 
 def by_pyosd(message):
     import pyosd
@@ -57,4 +67,4 @@ def main(message, unique=False, duration=3000, type_="normal"):
             try:
                 by_pyosd(message)
             except:
-                by_sl4a(message)
+                by_sl4a(message, type_=type_)

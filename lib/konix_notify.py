@@ -4,18 +4,15 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
-def by_konubinix_notificator(message,unique=False, duration=3000):
+def by_konubinix_notificator(message, unique=False, duration=3000, type_="normal"):
     import dbus
     session = dbus.SessionBus()
-    if unique:
-        path = "/UniqueNotification"
-    else:
-        path = "/Notification"
+    path = "/Notification"
     LOGGER.info("Opening communication with "+path)
     notification = session.get_object('konubinix.notificator',
                                       path)
     LOGGER.info("Displaying message "+message)
-    notification.Notify(message, duration)
+    notification.Notify(message, duration, unique, type_)
     LOGGER.info("Message displayed")
 
 def by_pynotify(message):
@@ -35,13 +32,14 @@ def by_pyosd(message):
     p = pyosd.osd("-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-1", colour="green", pos=pyosd.POS_BOT,offset=40, align=pyosd.ALIGN_CENTER)
     p.display(message)
 
-def main(message,unique=False, duration=3000):
+# type_ is normal or annoying or boring
+def main(message, unique=False, duration=3000, type_="normal"):
     message = message.replace("<", "-")
-
     try:
         LOGGER.info("Trying with the notificator")
-        by_konubinix_notificator(message,unique, duration)
-    except:
+        by_konubinix_notificator(message, unique, duration, type_)
+    except Exception as e:
+        print(e.message)
         try:
             LOGGER.error("Fallbacking to pynotify")
             by_pynotify(message)

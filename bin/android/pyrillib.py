@@ -226,6 +226,7 @@ def step():
         while choice != False:
             choices = (
                 "open",
+                "open local web",
                 "open origin",
                 "gtd mail origin",
                 ("A", get_priority_setter('A')),
@@ -250,7 +251,7 @@ def step():
                 "back",
             )
             if choice == None and first_time and configs["auto_open"].activated:
-                choice = "open"
+                choice = "open local web"
             else:
                 choice = chooser.choose(str(item), choices,
                     "Menu",
@@ -269,6 +270,13 @@ def step():
                 chooser.choose_show("Opening url, click on ok when done (%s left)"% len(items), (item.title_html_unescaped,), "OK", "Rm and back")
                 print "Opening %s" % str(item)
                 item.open()
+                choice2 = chooser.choose_get_res()
+                if choice2 == False:
+                    choice = rm_item_and_back(item)
+            elif type(choice) == str and choice == "open local web":
+                chooser.choose_show("Opening url, click on ok when done (%s left)"% len(items), (item.title_html_unescaped,), "OK", "Rm and back")
+                print "Opening %s" % str(item)
+                item.open_local_web()
                 choice2 = chooser.choose_get_res()
                 if choice2 == False:
                     choice = rm_item_and_back(item)

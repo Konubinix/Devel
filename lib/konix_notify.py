@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import logging
+import subprocess
+import xmlrpclib
+import os
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
@@ -68,3 +71,14 @@ def main(message, unique=False, duration=3000, type_="normal"):
                 by_pyosd(message)
             except:
                 by_sl4a(message, type_=type_)
+    # if the phone is out there, use it for the notification also
+    if "PHONE_NAME" in os.environ:
+        p = subprocess.Popen(
+            ["konix_context_url.sh", "-e", "adb", os.environ["PHONE_NAME"]],
+            stdout=subprocess.PIPE
+        )
+        ip, _ = p.communicate()
+        p.wait()
+        if ip:
+            server = xmlrpclib.ServerProxy("http://{}:9000".format(ip))
+            server.notify(message, type_)

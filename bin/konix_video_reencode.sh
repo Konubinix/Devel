@@ -12,7 +12,8 @@ avconv -i "${video}" \
 	   -preset slower \
 	   -b:v 2000k \
 	   -maxrate 2000k \
-	   -acodec libvo_aacenc \
+	   -acodec libmp3lame \
+	   -map_metadata 0:s:0 \
 	   -ab 196k \
 	   "${video_no_ext}.mkv"
-rm -rf "${video}"
+#rm -rf "${video}"

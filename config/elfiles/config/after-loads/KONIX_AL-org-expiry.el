@@ -107,6 +107,30 @@
 	)
   )
 
+(defun konix/org-expiry/delay ()
+  (interactive)
+  (save-window-excursion
+    (when (equal major-mode 'org-agenda-mode)
+      (org-agenda-switch-to)
+      )
+    (konix/org-del-tag "EXPIRED")
+    (org-set-property "EXPIRY"
+                      (format
+                       "[%s]"
+                       (org-read-date
+                        nil
+                        nil
+                        nil
+                        "New expiry time"
+                        (if (org-entry-get (point) "EXPIRY")
+                            (org-read-date nil t (org-entry-get (point) "EXPIRY"))
+                          nil
+                          )
+                        )
+                       )
+                      )
+    )
+  )
 
 (provide 'KONIX_AL-org-expiry)
 ;;; KONIX_AL-org-expiry.el ends here

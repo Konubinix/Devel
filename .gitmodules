@@ -270,3 +270,6 @@
 [submodule "pyfilesystem"]
 	path = pyfilesystem
 	url = https://github.com/Konubinix/pyfilesystem.git
+[submodule "znc"]
+	path = znc
+	url = https://github.com/Konubinix/znc

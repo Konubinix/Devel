@@ -1,7 +1,3 @@
 #!/bin/bash
 
-set -eu
-
-DIR="${1:-$(pwd)}"
-
-exec fsserve -v -t http "${DIR}" -a 0.0.0.0 -p 9642
+konix_http_share_directory.sh -d "${HOME}/share" -p "${KONIX_HTTP_SHARE_PORT}"

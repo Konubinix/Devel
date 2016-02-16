@@ -7,9 +7,9 @@ DEST="${2:-${KONIX_TMP_SHARE_DIR}}"
 mkdir -p "${DEST}"
 fsmount "file://${SOURCE}" "${DEST}"
 trap "fusermount -u '${DEST}'" 0
-konix_ftp_share.sh &
+konix_ftp_share_directory.sh &
 ftppid=$!
-konix_http_share.sh &
+konix_http_share_directory.sh &
 httppid=$!
 set +eu
 set -x

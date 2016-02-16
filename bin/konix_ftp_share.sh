@@ -1,7 +1,3 @@
 #!/bin/bash
 
-set -eu
-
-DIR="${1:-$(pwd)}"
-
-exec fsserve -v -t ftp "${DIR}" -a 0.0.0.0 -p 2121
+konix_ftp_share_directory.sh -d "${HOME}" -p "${KONIX_FTP_SHARE_PORT}"

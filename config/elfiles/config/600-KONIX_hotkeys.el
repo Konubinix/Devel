@@ -488,6 +488,7 @@
 (define-key 'konix/imenu/map (kbd "i") 'imenu)
 (define-key 'konix/imenu/map (kbd "g") 'konix/imenu-tree-goto)
 (define-key 'konix/imenu/map (kbd "s") 'konix/imenu-tree-show)
+(define-key 'konix/imenu/map (kbd ".") 'counsel-imenu)
 
 ;; ************************************************************
 ;; Uniquify

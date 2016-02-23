@@ -1,4 +1,7 @@
 #!/bin/bash
 
-source ~/.virtualenvs/maths/bin/activate
+set -eu
+echo "Running in virtual env ${KONIX_NOTEBOOK_VIRTUALENV}"
+set +u
+source ~/.virtualenvs/${KONIX_NOTEBOOK_VIRTUALENV}/bin/activate
 jupyter notebook --browser ${KONIX_NOTEBOOK_BROWSER} "$@"

@@ -35,5 +35,12 @@
 (add-hook 'gdb-mode-hook
 		  'konix/gdb-mode-hook)
 
+;; replace the gdb-display-buffer to avoid making the window dedicated
+(defun gdb-display-buffer (buf)
+  "Show buffer BUF, and make that window dedicated."
+  (display-buffer buf)
+  )
+
+
 (provide '700-KONIX_gdb-mode)
 ;;; 700-KONIX_gdb-mode.el ends here

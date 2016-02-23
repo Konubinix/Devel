@@ -34,19 +34,35 @@ if not os.path.exists(OUTPUT):
     os.makedirs(OUTPUT)
 os.chdir(OUTPUT)
 
-def nbconvert(input_file_):
+def nbconvert(input_file_, execute=False):
     input_filename = os.path.join(
         INPUT,
         input_file_
     )
-
     os.chdir(OUTPUT)
     dir_ = os.path.dirname(input_file_)
     if dir_:
         if not os.path.exists(dir_):
             os.makedirs(dir_)
         os.chdir(dir_)
-    os.system("nbconvert_html " + input_filename)
+    input_basename = os.path.basename(input_filename)
+    output_basename = os.path.splitext(input_basename)[0] + ".html"
+    output_filename = os.path.join(dir_, output_basename)
+    if (
+            not execute
+            and
+            os.path.exists(output_basename)
+            and
+            os.stat(output_filename).st_mtime > os.stat(input_filename).st_mtime
+    ):
+        return
+    else:
+        os.system(
+            "nbconvert_html {} '{}'".format(
+                "--execute" if execute else "",
+                input_filename,
+            )
+        )
 
 app = Flask(__name__)
 
@@ -58,14 +74,24 @@ def serve_file(filename):
             CUSTOM_CSS_PATH
         )
     else:
-        return serve_ipynb(filename)
+        return serve_ipynb(filename, execute=False)
 
-def serve_ipynb(filename):
+@app.route('/getexecute/<path:filename>')
+def serve_file_and_execute(filename):
+    logging.debug("Serving: {}".format(filename))
+    if filename == "custom.css":
+        return send_file(
+            CUSTOM_CSS_PATH
+        )
+    else:
+        return serve_ipynb(filename, execute=True)
+
+def serve_ipynb(filename, execute=False):
     input_filename = "{}.{}".format(
         os.path.splitext(filename)[0],
         "ipynb"
     )
-    nbconvert(input_filename)
+    nbconvert(input_filename, execute=execute)
     return send_file(
         os.path.join(OUTPUT, filename)
     )

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ipython3 --profile=pylab3 "$@"
+jupyter console --kernel pylab3 "$@"

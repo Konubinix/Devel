@@ -1,8 +1,11 @@
 #!/bin/bash
+
 dir=`mktemp -d`
-trap "rm -r $dir" 0
-cat "$@" > "${dir}/msg"
-konix_munpack.py -i "${dir}/msg" -o "${dir}"
+file="${dir}/msg"
+cat > "${file}"
+trap "rm -r $dir" EXIT
+konix_munpack.py -i "${file}" -o "${dir}"
+ls "${dir}"
 HTMLs="${dir}"/*html
 for html in ${HTMLs}
 do

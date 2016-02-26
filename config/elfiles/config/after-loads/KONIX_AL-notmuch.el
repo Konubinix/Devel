@@ -368,7 +368,9 @@
   )
 (defun konix/notmuch-show-open-in-external-browser ()
   (interactive)
-  (notmuch-show-pipe-message nil "konix_view_html.sh")
+  (async-shell-command
+   (format "konix_notmuch_view_html.sh %s" (notmuch-show-get-message-id))
+   )
   )
 
 (defun konix/notmuch-show-open-in-explorer ()

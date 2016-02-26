@@ -423,6 +423,8 @@ import_env_autostash () {
 }
 
 is_sourced () {
+    echo "Don't use this function, copy it in your script and remove me"
+    return 1
     ! [ "$BASH_SOURCE" == "$0" ]
 }
 

@@ -8,7 +8,12 @@ from matplotlib import pyplot
 import numpy
 import re
 import pandas
-import sklearn
+import traceback
+import sys
+try:
+    from sklearn_heplers import *
+except:
+    print("Could not import sklearn_helpers")
 try:
     from mpldatacursor import datacursor
 except:
@@ -139,26 +144,6 @@ def recfunctions_view_flatten_array(array, joinchar=None):
         numpy.dtype(list(recfunctions_flatten_descr(array.dtype, joinchar)))
     )
 
-# def recfunctions_filter_descr(ndtype, nameregexp):
-#     if isinstance(nameregexp, basestring):
-#         nameregexp = re.compile(nameregexp)
-#     if not ndtype.names:
-#         return ndtype
-#     names = ndtype.names
-#     if names is None:
-#         return ndtype, True
-#     else:
-#         descr = []
-#         for field in names:
-#             (typ, _) = ndtype.fields[field]
-#             res, keepit = recfunctions_filter_descr(typ, nameregexp)
-#             if res is not None and keepit:
-#                 descr.append((field, res))
-#         if descr:
-#             return dtype(descr)
-#         else:
-#             return None
-
 def _pd_upsample_month_to_days_generator(df):
     for row in [pandas.DataFrame(df.loc[r] / float(r.day)) for r in df.index]:
         yield pandas.DataFrame(
@@ -218,7 +203,7 @@ def asciify_dataframe(dataframe):
     res.columns = [asciify(c) for c in res.columns]
     return res
 
-def pandas_put_into_hdf_tstable(dataframe, file_name, name="Values"):
+def pd_put_into_hdf_tstable(dataframe, file_name, name="Values"):
     import tables
     import tstables
     f = tables.open_file(file_name, "a")
@@ -254,7 +239,6 @@ def mpl_set_color_cycle_from_color_map_name(number=10, name="cubehelix"):
     matplotlib.rcParams["axes.color_cycle"] = mpl_get_color_cycle_from_color_map_name(name=name, number=number)
 
 mpl_set_color_cycle_from_color_map_name()
-
 def mpl_wait_for_key_press(fig=None, key="enter", close=False):
     # I need to use an object. The pointer to the pause list will be captured by
     # closer in key_press_event. When the callback will change the pause
@@ -419,103 +403,6 @@ def nb_set_fig_size():
 
     w = widgets.interactive(set_figsize,width=width_slider, height=height_slider)
     display(w)
-
-def pd_sk_fit(clf, i, o):
-    return clf.fit(sk_reshape_for_model(i), numpy.ravel(sk_reshape_for_model(o)))
-
-def pd_sk_predict(clf, i, o=None):
-    res = clf.predict(sk_reshape_for_model(i))
-    if not o is None and (
-            isinstance(o, pandas.DataFrame)
-            or
-            isinstance(o, pandas.Series)
-    ):
-        res = pd_like(o, res)
-    return res
-
-def pd_sk_score(clf, i, o, *args, **kwargs):
-    return clf.score(
-        sk_reshape_for_model(i),
-        numpy.ravel(sk_reshape_for_model(o)),
-        *args,
-        **kwargs
-    )
-
-def pd_sk_fit_and_predict(clf, i_fit, o, i_predict=None):
-    if i_predict is None:
-        i_predict = i_fit
-    pd_sk_fit(clf, i_fit, o)
-    return pd_sk_predict(clf, i_predict, o)
-
-def sk_nested_cross_val(model,
-                        X,
-                        y,
-                        param_grid,
-                        inner_cv=3,
-                        outer_cv=10,
-                        outer_n_jobs=-1,
-                        verbose=0,
-                        scoring="mean_squared_error"
-):
-    """
-    model = RandomForestRegressor()
-    sk_nested_cross_val(model, X, y, param_grid={"n_estimators":arange(10, 20)},)
-    """
-    clf = sklearn.grid_search.GridSearchCV(
-        estimator=model,
-        cv=inner_cv,
-        verbose=verbose,
-        param_grid=param_grid,
-        scoring=scoring
-    )
-
-    # run the cross validation to find the score of the cross validated clf
-    return sklearn.cross_validation.cross_val_score(
-        clf,
-        X,
-        y,
-        cv=outer_cv,
-        n_jobs=outer_n_jobs,
-        verbose=verbose,
-        scoring=scoring
-    )
-
-def sk_model_plot(i, o, model, model_name, save=True):
-    model.fit(i, o)
-    h = model.predict(i)
-    e = h - o
-    pyplot.clf()
-    pyplot.subplot(211)
-    pyplot.plot(i, o, ".", label="raw values")
-    pyplot.plot(i, h, label=model_name)
-    pyplot.legend()
-    pyplot.gca().set_xlabel(i.columns[0])
-    pyplot.gca().set_ylabel(o.columns[0])
-    pyplot.draw()
-    pyplot.subplot(212)
-    e.plot(kind="hist", ax=pyplot.gca())
-    pyplot.suptitle("{} vs {} (coef={}, intercept={})".format(i.columns[0], o.columns[0], model.coef_[0][0], model.intercept_[0]))
-    if save:
-        pyplot.savefig("{}_{}.png".format(i.columns[0], o.columns[0]))
-
-def sk_reshape_for_model(df, dim=1):
-    if isinstance(df, pandas.Series):
-        return numpy.array(df.reshape(len(df) / dim, dim))
-    else:
-        return numpy.array(df)
-
-def sk_classification(clf, i, o, nx=500, ny=500, plot=True):
-    xx, yy = numpy.meshgrid(
-        numpy.linspace(i.min(), i.max(), nx),
-        numpy.linspace(o.min(), o.max(), ny)
-    )
-    xxyy = c_[xx.ravel(), yy.ravel()]
-    io = c_[i.ravel(), o.ravel()]
-    clf.fit(io)
-    z = clf.decision_function(xxyy).reshape(xx.shape)
-    if plot:
-        contour(xx, yy, z)
-    return xx, yy, z
 
 def pd_index_intersections(i, o):
     ind = i.index.intersection(o.index)
@@ -731,3 +618,10 @@ def odo_sql_circular_foreign_keys_workaround():
     import odo.backends.sql
     odo.backends.sql.discover_foreign_key_relationship = do_not_discover_foreign_key_relationship
     print("You can now load databases with circular foreign keys")
+
+def nb_setup_plotly_cufflinks():
+    from plotly.offline import download_plotlyjs, init_notebook_mode
+    import cufflinks
+    download_plotlyjs("https://cdn.plot.ly/plotly-latest.min.js")
+    init_notebook_mode()
+    cufflinks.go_offline()

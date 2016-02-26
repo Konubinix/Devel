@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding:utf-8 -*-
 
 #Reads the file ${UZBL_DATA_DIR}/commands.conf and tries to match the uri

@@ -58,7 +58,7 @@ def by_pyosd(message):
     p = pyosd.osd("-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-1", colour="green", pos=pyosd.POS_BOT,offset=40, align=pyosd.ALIGN_CENTER)
     p.display(message)
 
-def to_phone(message, type_):
+def send_to_phone(message, type_):
     try:
         p = subprocess.Popen(
             ["konix_context_url.sh", "-e", "adb", os.environ["PHONE_NAME"]],
@@ -70,7 +70,7 @@ def to_phone(message, type_):
             server = xmlrpclib.ServerProxy("http://{}:9000".format(ip))
             server.notify(message, type_)
     except:
-        main("Phone not available", duration=500, not_to_phone=True)
+        main("Phone not available", duration=500, to_phone=False)
 
 def to_phone_subprocess(message, type_):
     subprocess.Popen(
@@ -83,11 +83,8 @@ def to_phone_subprocess(message, type_):
     )
 
 # type_ is normal or annoying or boring
-def main(message, unique=False, duration=3000, type_="normal", to_phone_only=False, not_to_phone=False):
+def main(message, unique=False, duration=3000, type_="normal", to_phone=False):
     message = message.replace("<", "-")
-    if to_phone_only:
-        to_phone(message, type_)
-        sys.exit(0)
     try:
         LOGGER.info("Trying with the notificator")
         by_konubinix_notificator(message, unique, duration, type_)
@@ -102,5 +99,5 @@ def main(message, unique=False, duration=3000, type_="normal", to_phone_only=Fal
                 by_pyosd(message)
             except:
                 by_sl4a(message, type_=type_)
-    if not not_to_phone:
+    if to_phone:
         to_phone_subprocess(message, type_)

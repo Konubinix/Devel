@@ -20,12 +20,8 @@ parser.add_argument('-t', '--type', type=str,
                     default="normal",
 )
 
-parser.add_argument('-n', '--not-to-phone', action="store_true",
+parser.add_argument('-o', '--to-phone', action="store_true",
                     help="Use the phone",
-)
-
-parser.add_argument('-T', '--to-phone-only', action="store_true",
-                    help="Use the phone only",
 )
 
 parser.add_argument('message', type=str, nargs="*",
@@ -35,4 +31,4 @@ args = parser.parse_args()
 
 message = ' '.join(args.message)
 konix_notify.main(message, unique=args.unique, duration=args.duration,
-                  type_=args.type, to_phone_only=args.to_phone_only, not_to_phone=args.not_to_phone)
+                  type_=args.type, to_phone=args.to_phone)

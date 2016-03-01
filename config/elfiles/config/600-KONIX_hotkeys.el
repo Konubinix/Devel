@@ -9,6 +9,8 @@
 (global-unset-key (kbd "<f3>"))
 (global-unset-key (kbd "<f4>"))
 
+(global-set-key (kbd "C-n") 'dabbrev-expand)
+
 ;; custom prefix key
 (define-prefix-command 'konix/global-custom-key-map)
 (global-set-key (kbd "<f11>") 'konix/global-custom-key-map)
@@ -112,6 +114,7 @@
 (define-prefix-command 'konix/global-slow-key-map)
 (global-set-key (kbd "C-<") 'konix/global-slow-key-map)
 (global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
+(global-set-key (kbd "C-f") 'konix/global-slow-key-map) ;for bépo keyboards
 
 ;; open recent file
 (define-key 'konix/global-slow-key-map (kbd "f") 'recentf-open-files)

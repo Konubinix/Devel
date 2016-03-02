@@ -38,3 +38,10 @@ def uniquify_preserve_order(seq, idfun=None):
         seen[marker] = 1
         result.append(item)
     return result
+
+@Pipe
+def fs(es, v):
+    return [e for e in es if v.lower() in str(e).lower()]
+@Pipe
+def ass(es):
+    return [str(e) for e in es]

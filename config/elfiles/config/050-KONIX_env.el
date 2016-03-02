@@ -51,24 +51,19 @@
 		 load-path
 		 )
 		)
-  ;; get the gpg environment variable from the GPG_INFO_FILE_NAME file
+  ;; get the ssh environment variable
   (let (
-		(gpg_env_file (getenv "GPG_INFO_FILE_NAME"))
-		)
-	(if (and gpg_env_file (file-exists-p gpg_env_file))
-		(with-temp-buffer
-		  (insert-file-contents-literally gpg_env_file)
-		  (goto-char 0)
-		  (while (re-search-forward "^\\(.+\\)=\\(.+\\)$" nil t)
-			(setenv (match-string-no-properties 1) (match-string-no-properties 2))
-			)
-		  )
-	  (display-warning
+        (ssh_auth_sock (format "%s/.gnupg/S.gpg-agent.ssh" (getenv "HOME")))
+        )
+    (if (file-exists-p ssh_auth_sock)
+        (setenv "SSH_AUTH_SOCK" ssh_auth_sock)
+      (display-warning
 	   'loading-env
-	   (format "%s cannot be loaded, gpg env not initialized"
-			   gpg_env_file)
+	   (format "%s cannot be loaded, ssh env not initialized"
+			   ssh_auth_sock)
 	   )
-	  )
-	)
+
+      )
+    )
   )
 (konix/initialize-env)

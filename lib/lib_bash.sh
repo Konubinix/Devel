@@ -133,10 +133,11 @@ function ssh_agent_start_maybe_KONIX {
 }
 
 konix_gpg_use () {
-	. "${GPG_INFO_FILE_NAME}"
-	export GPG_AGENT_INFO
-	export SSH_AUTH_SOCK
-	export SSH_AGENT_PID
+    konix_gpg_agent.sh
+    unset SSH_AGENT_PID
+    if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+        export SSH_AUTH_SOCK="${HOME}/.gnupg/S.gpg-agent.ssh"
+    fi
 }
 
 function est_connecte_KONIX {

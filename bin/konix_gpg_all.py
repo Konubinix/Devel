@@ -50,18 +50,6 @@ if not gpg_path:
 # **********************************************************************
 # Try to start a gpg agent file or use an already launched one
 # **********************************************************************
-def load_gpg_agent_info_file(gpg_agent_info_file):
-    with open(gpg_agent_info_file,"r") as f:
-        gpg_agent_info = f.readline().partition("=")
-        os.environ[gpg_agent_info[0]] = gpg_agent_info[2]
-        LOGGER.debug("Loading gpg-agent info: " + os.environ[gpg_agent_info[0]])
-
-gpg_agent_info_file = os.environ.get("GPG_INFO_FILE_NAME", None)
-if gpg_agent_info_file:
-    load_gpg_agent_info_file(gpg_agent_info_file)
-else:
-    LOGGER.warning("GPG_INFO_FILE_NAME not set, cannot use it")
-
 DEFAULT_RECIPIENT=konix_gpg.get_default_key()
 
 dir_walker = os.walk(".")

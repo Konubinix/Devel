@@ -52,4 +52,4 @@ if __name__ == "__main__":
     for account in args.account[1:]:
         get_dataframe_for_account(account, reg_args).plot(ax=axes)
 
-matplotlib.pyplot.show()
+    matplotlib.pyplot.show()

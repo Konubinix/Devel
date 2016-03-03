@@ -9,6 +9,7 @@
 (global-unset-key (kbd "<f3>"))
 (global-unset-key (kbd "<f4>"))
 
+;; some vim keys
 (global-set-key (kbd "C-n") 'dabbrev-expand)
 
 ;; custom prefix key
@@ -114,7 +115,7 @@
 (define-prefix-command 'konix/global-slow-key-map)
 (global-set-key (kbd "C-<") 'konix/global-slow-key-map)
 (global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
-(global-set-key (kbd "C-f") 'konix/global-slow-key-map) ;for bépo keyboards
+(global-set-key (kbd "C-f") 'konix/global-slow-key-map) ;for hacker's keyboard
 
 ;; open recent file
 (define-key 'konix/global-slow-key-map (kbd "f") 'recentf-open-files)
@@ -286,6 +287,7 @@
 ;; ####################################################################################################
 (define-prefix-command 'konix/global-fast-key-map)
 (global-set-key (kbd "<f2>") 'konix/global-fast-key-map)
+(global-set-key (kbd "²") 'konix/global-fast-key-map) ; hacker's keyboard
 
 (define-key 'konix/global-fast-key-map (kbd "m") 'man)
 
@@ -579,6 +581,7 @@
 ;; ####################################################################################################
 (define-prefix-command  'konix/org-global-map)
 (define-key 'konix/global-slow-key-map (kbd "o") 'konix/org-global-map)
+(define-key 'konix/global-key-map (kbd "o") 'konix/org-global-map)
 
 (define-key 'konix/org-global-map (kbd "M-e") 'konix/org-adjust-effort)
 (define-key 'konix/org-global-map "w" 'konix/org-toggle-wait-on-heading)

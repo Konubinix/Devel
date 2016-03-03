@@ -48,6 +48,7 @@
 (define-key ivy-minibuffer-map (kbd "C--") 'ivy-minibuffer-shrink)
 (define-key ivy-minibuffer-map (kbd "M-m") 'ivy-call)
 (define-key ivy-minibuffer-map (kbd "M-*") 'ivy-restrict-to-matches)
+(define-key ivy-minibuffer-map (kbd "M-RET") 'ivy-immediate-done)
 
 (setq-default ivy-use-virtual-buffers t)
 (setq-default ivy-height 10)

@@ -137,6 +137,7 @@ def compute_items():
     droid.dialogCreateSpinnerProgress("Please wait", "Computing ril items")
     droid.dialogShow()
     items = ril.rilitems_priority_stamp_sorted()
+    droid.dialogDismiss()
 
 def rm_item(item):
    global items
@@ -190,6 +191,9 @@ def step():
         items = [item
                 for item in items
                 if conditions[condition].apply(item)]
+    if not items:
+        droid.makeToast("No more items to see")
+        return False
     droid.dialogDismiss()
     chooser = andlib.Chooser(droid)
     conditions_string = ", ".join(
@@ -296,10 +300,10 @@ def step():
                 choice = choice(item)
             else:
                 assert False, "not handled choice %s" % choice
+    return True
 
 def main():
     compute_items()
-    while True:
-        step()
+    while step():
         if configs['recompute'].activated:
             compute_items()

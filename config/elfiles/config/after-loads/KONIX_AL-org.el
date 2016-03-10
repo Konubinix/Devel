@@ -1844,21 +1844,21 @@ items"
 						  (
 						   (org-agenda-overriding-header
 							"Entries with not creation date (konix/org-expiry/update-all)")
-						   (dummy (konix/org-agenda-inhibit-context-filtering))
+						   ; (dummy (konix/org-agenda-inhibit-context-filtering))
 						   )
 						  )
-					(tags-todo "EXPIRED//-TODO-NEXT"
+					(tags "EXPIRED-TODO=\"NEXT\"-TODO=\"TODO\""
 						  (
 						   (org-agenda-overriding-header
 							"Expired entries (archive them)")
-						   (dummy (konix/org-agenda-inhibit-context-filtering))
+						   ; (dummy (konix/org-agenda-inhibit-context-filtering))
 						   )
 						  )
 					(tags-todo "EXPIRED//TODO|NEXT"
 						  (
 						   (org-agenda-overriding-header
 							"Expired entries but still active (check them)")
-						   (dummy (konix/org-agenda-inhibit-context-filtering))
+						   ; (dummy (konix/org-agenda-inhibit-context-filtering))
 						   )
 						  )
 					)

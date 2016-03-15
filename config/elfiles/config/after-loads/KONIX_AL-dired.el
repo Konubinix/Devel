@@ -171,6 +171,14 @@
 (define-key konix/dired/epa-dired-map "s" 'epa-dired-do-sign)
 (define-key konix/dired/epa-dired-map "v" 'epa-dired-do-verify)
 
+(defun konix/image-dired-dired-display-image-mark-and-next ()
+  (interactive)
+  (image-dired-dired-display-image)
+  (call-interactively 'dired-mark)
+  )
+(define-key dired-mode-map (kbd "v") 'konix/image-dired-dired-display-image-mark-and-next)
+(define-key dired-mode-map (kbd "V") 'image-dired-mark-and-display-next)
+(define-key dired-mode-map (kbd "M-v") 'image-dired-display-thumb)
 
 (provide '700-KONIX_dired-mode)
 ;;; 700-KONIX_dired-mode.el ends here

@@ -101,7 +101,7 @@
 	url = https://github.com/Konubinix/uzbl.git
 [submodule "config/elfiles/cedet"]
 	path = config/elfiles/cedet
-	url = bzr://cedet.bzr.sourceforge.net/bzrroot/cedet/code/trunk
+	url = http://git.code.sf.net/p/cedet/git
 [submodule "config/elfiles/highlight-indentation"]
 	path = config/elfiles/highlight-indentation
 	url = https://github.com/antonj/Highlight-Indentation-for-Emacs.git

@@ -24,6 +24,24 @@ parser.add_argument('-o','--output-html',
                     help="""Directory with rendered html files""",
                     type=str,
                     default=os.environ["KONIX_NBVIEWER_HTML_DIR"])
+
+parser.add_argument('-p','--port',
+                    help="""No comment""",
+                    type=int,
+                    default=int(os.environ["KONIX_NBVIEWER_PORT"])
+)
+
+parser.add_argument('--ip',
+                    help="""No comment""",
+                    type=str,
+                    default=os.environ["KONIX_NBVIEWER_IP"]
+)
+
+parser.add_argument('--hide-input',
+                    help="""Hide the input""",
+                    action="store_true",
+)
+
 args = parser.parse_args()
 
 INPUT = args.input_notebooks
@@ -53,13 +71,13 @@ def nbconvert(input_file_, execute=False):
             and
             os.path.exists(output_basename)
             and
-            os.stat(output_filename).st_mtime > os.stat(input_filename).st_mtime
+            os.stat(output_basename).st_mtime > os.stat(input_filename).st_mtime
     ):
         return
     else:
         os.system(
-            "nbconvert_html {} '{}'".format(
-                "--execute" if execute else "",
+            "nbconvert_html {} --execute '{}'".format(
+                "--template=hide_input.tpl" if args.hide_input else "",
                 input_filename,
             )
         )
@@ -68,23 +86,15 @@ app = Flask(__name__)
 
 @app.route('/get/<path:filename>')
 def serve_file(filename):
+    execute = bool(request.values.get("execute"))
     logging.debug("Serving: {}".format(filename))
-    if filename == "custom.css":
-        return send_file(
-            CUSTOM_CSS_PATH
-        )
-    else:
-        return serve_ipynb(filename, execute=False)
 
-@app.route('/getexecute/<path:filename>')
-def serve_file_and_execute(filename):
-    logging.debug("Serving: {}".format(filename))
     if filename == "custom.css":
         return send_file(
             CUSTOM_CSS_PATH
         )
     else:
-        return serve_ipynb(filename, execute=True)
+        return serve_ipynb(filename, execute=execute)
 
 def serve_ipynb(filename, execute=False):
     input_filename = "{}.{}".format(
@@ -97,4 +107,4 @@ def serve_ipynb(filename, execute=False):
     )
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ["KONIX_NBVIEWER_PORT"]), debug=True)
+    app.run(host=args.ip, port=args.port, debug=True)

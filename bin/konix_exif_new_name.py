@@ -25,7 +25,7 @@ if __name__ == "__main__":
     process.wait()
     output = process.stdout.read().decode("utf-8")
     match = re.match("^(?P<create_date>[^|]+)\|(?P<model>.+)$", output)
-    assert match, "Could not parse {}".format(output)
+    assert match, "Could not parse '{}'".format(output)
     create_date = dateutil.parser.parse(match.group("create_date"))
     model = match.group("model").replace(" ", "_")
     new_name = create_date.strftime(
@@ -35,9 +35,11 @@ if __name__ == "__main__":
         )
     )
     index = 0
-    while os.path.exists(os.path.join(dirname, new_name)) \
-          and \
-          hash_of_file(os.path.join(dirname, new_name)) != hash_of_file(file_name):
+    while (
+            os.path.exists(os.path.join(dirname, new_name))
+            and
+            hash_of_file(os.path.join(dirname, new_name)) != hash_of_file(file_name)
+    ):
         sys.stderr.write("{} already exists, find another name\n".format(new_name))
         index += 1
         new_name = create_date.strftime(
@@ -47,4 +49,4 @@ if __name__ == "__main__":
                 ext,
             )
         )
-    print(new_name)
+    print(os.path.join(dirname, new_name))

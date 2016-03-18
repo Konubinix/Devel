@@ -1,4 +1,4 @@
 #!/bin/bash
 
-source ~/.virtualenvs/maths/bin/activate
+source envmaths35.sh
 nbconvert_flask.py "$@"

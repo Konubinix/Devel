@@ -43,5 +43,11 @@
 
 (define-key 'notmuch-show-mode-map "v" 'notmuch-show-view-part)
 
+(defun notmuch-show-insert-part-application/zip (msg part content-type nth depth
+                                                     button)
+  (insert "<Not shown. Download to see the content>")
+  t
+  )
+
 (provide 'KONIX_AL-notmuch-show)
 ;;; KONIX_AL-notmuch-show.el ends here

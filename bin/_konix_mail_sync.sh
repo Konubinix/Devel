@@ -8,10 +8,10 @@ echo "############"
 date
 echo "############"
 LOG_FILE="$(mktemp)"
-MAIL_TRAY_DAEMON_CTRL="/tmp/mail_tray_daemon_control"
+MAIL_TRAY_DAEMON_CTRL="${TMPDIR}/mail_tray_daemon_control"
 echo "?" > "$MAIL_TRAY_DAEMON_CTRL"
 echo "b" > "$MAIL_TRAY_DAEMON_CTRL"
-trap "echo > /tmp/konix_mail_tray_stamp; echo B > '$MAIL_TRAY_DAEMON_CTRL' ; rm '$LOG_FILE'" 0
+trap "echo > ${TMPDIR}/konix_mail_tray_stamp; echo B > '$MAIL_TRAY_DAEMON_CTRL' ; rm '$LOG_FILE'" 0
 
 # make notmuch db consistent (earlier removed mail files etc)
 notmuch new --verbose || exit 1

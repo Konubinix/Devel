@@ -4,6 +4,7 @@
 import re
 from pipe import *
 import collections
+import itertools
 
 @Pipe
 def gi(strings, pattern, i=True):
@@ -42,6 +43,38 @@ def uniquify_preserve_order(seq, idfun=None):
 @Pipe
 def fs(es, v):
     return [e for e in es if v.lower() in str(e).lower()]
+gi = fs
+
 @Pipe
 def ass(es):
     return [str(e) for e in es]
+
+@Pipe
+def mp(es, function):
+    if isinstance(function, basestring):
+        function = eval("lambda e: {}".format(function))
+    return map(function, es)
+
+@Pipe
+def ft(iterable, predicate):
+    if isinstance(predicate, basestring):
+        predicate = eval("lambda e: {}".format(predicate))
+    for elem in iterable:
+        if predicate(elem):
+            yield elem
+
+@Pipe
+def last(iterable):
+    return list(iterable)[-1]
+
+@Pipe
+def uniq(iterable):
+    return set(iterable)
+
+@Pipe
+def do(iterable, function):
+    if isinstance(function, basestring):
+        function = "def function(e):\n    " + "    \n".join(function.splitlines())
+        exec(function)
+    for elem in iterable:
+        function(elem)

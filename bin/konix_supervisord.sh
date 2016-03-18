@@ -1,4 +1,4 @@
 #!/bin/bash
 
-mkdir -p "${HOME}/tmp/supervisord"
+mkdir -p "${TMPDIR}/supervisord"
 supervisord -c "${KONIX_SUPERVISORDCONF}" "$@"

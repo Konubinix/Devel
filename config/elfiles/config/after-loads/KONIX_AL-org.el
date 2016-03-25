@@ -858,7 +858,7 @@ items"
 			 (org-agenda-overriding-header
 			  "Agenda for projects")
 			 (org-agenda-use-time-grid nil)
-			 ; it will be already included in the no project view
+                                        ; it will be already included in the no project view
 			 (org-agenda-include-diary nil)
 			 (org-agenda-skip-function
 			  '(or
@@ -1844,23 +1844,23 @@ items"
 						  (
 						   (org-agenda-overriding-header
 							"Entries with not creation date (konix/org-expiry/update-all)")
-						   ; (dummy (konix/org-agenda-inhibit-context-filtering))
+                                        ; (dummy (konix/org-agenda-inhibit-context-filtering))
 						   )
 						  )
 					(tags "EXPIRED-TODO=\"NEXT\"-TODO=\"TODO\""
 						  (
 						   (org-agenda-overriding-header
 							"Expired entries (archive them)")
-						   ; (dummy (konix/org-agenda-inhibit-context-filtering))
+                                        ; (dummy (konix/org-agenda-inhibit-context-filtering))
 						   )
 						  )
 					(tags-todo "EXPIRED//TODO|NEXT"
-						  (
-						   (org-agenda-overriding-header
-							"Expired entries but still active (check them)")
-						   ; (dummy (konix/org-agenda-inhibit-context-filtering))
-						   )
-						  )
+                               (
+                                (org-agenda-overriding-header
+                                 "Expired entries but still active (check them)")
+                                        ; (dummy (konix/org-agenda-inhibit-context-filtering))
+                                )
+                               )
 					)
 				   )
 				  )
@@ -3462,6 +3462,102 @@ an error (this should never happen)."
 (setq-default org-yank-adjusted-subtrees t)
 (setq-default org-return-follows-link t)
 (setq-default org-tab-follows-link t)
+
+(defun konix/org-get-not-done-children-markers-no-recursion ()
+  (let (
+        (first-child-begin (save-excursion (org-goto-first-child) (point)))
+        (end-of-subtree (save-excursion (org-end-of-subtree) (point)))
+        )
+    (save-excursion
+      (save-restriction
+        (narrow-to-region first-child-begin end-of-subtree)
+        (mapcar
+         (lambda (point)
+           (let (
+                 (marker (make-marker))
+                 )
+             (set-marker marker point)
+             marker
+             )
+           )
+         (remove-if
+          'null
+          (org-element-map
+              (org-element-parse-buffer 'headline t)
+              'headline
+            (lambda (hl)
+              (let* (
+                     (properties (second hl))
+                     (begin (plist-get properties :begin))
+                     (todo_type (plist-get properties :todo-type))
+                     )
+                (if (eq todo_type 'done)
+                    nil
+                  begin
+                  )
+                )
+              )
+            nil
+            nil
+            'headline
+            )
+          )
+         )
+        )
+      )
+    )
+  )
+)
+
+;; state change
+(defun konix/org-trigger-hook (change-plist)
+  (let* ((type (plist-get change-plist :type))
+         (pos (plist-get change-plist :position))
+         (from (plist-get change-plist :from))
+         (to (plist-get change-plist :to))
+         )
+    (when (and
+           (eq type 'todo-state-change)
+           (string= to "NOT_DONE")
+           )
+      (save-excursion
+        (org-back-to-heading)
+        (mapc
+         (lambda (marker)
+           (save-excursion
+             (goto-char (marker-position marker))
+             (warn "%s is automatically set to NOT_DONE" (org-get-heading t t))
+             (org-todo "NOT_DONE")
+             )
+           )
+         (konix/org-get-not-done-children-markers-no-recursion)
+         )
+        )
+      )
+    )
+  )
+(add-hook 'org-trigger-hook 'konix/org-trigger-hook)
+(defun konix/org-depend-block-todo/but_not_done (orig_func &rest args)
+  (let* (
+         (change-plist (first args))
+         (type (plist-get change-plist :type))
+         (pos (plist-get change-plist :position))
+         (from (plist-get change-plist :from))
+         (to (plist-get change-plist :to))
+         )
+    (if (string= to "NOT_DONE")
+        t
+      (apply orig_func args)
+      )
+    )
+  )
+(advice-add 'org-block-todo-from-children-or-siblings-or-parent :around
+            #'konix/org-depend-block-todo/but_not_done)
+(advice-add 'org-block-todo-from-checkboxes :around
+            #'konix/org-depend-block-todo/but_not_done)
+(advice-add 'org-depend-block-todo :around
+            #'konix/org-depend-block-todo/but_not_done)
+
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

@@ -49,6 +49,22 @@ def fs(es, v):
 gi = fs
 
 @Pipe
+def fsn(es, v):
+    return [e for e in es if not v.lower() in str(e).lower()]
+gv = fsn
+
+@Pipe
+def each(es, function):
+    if isinstance(function, bstring):
+        function = eval("lambda e: {}".format(function))
+    for e in es:
+        function(e)
+
+@Pipe
+def reverse(es):
+    return reversed(es)
+
+@Pipe
 def ass(es):
     return [str(e) for e in es]
 

@@ -5,6 +5,9 @@ import re
 from pipe import *
 import collections
 import itertools
+import six
+
+bstring = basestring if six.PY2 else str
 
 @Pipe
 def gi(strings, pattern, i=True):
@@ -51,13 +54,13 @@ def ass(es):
 
 @Pipe
 def mp(es, function):
-    if isinstance(function, basestring):
+    if isinstance(function, bstring):
         function = eval("lambda e: {}".format(function))
     return map(function, es)
 
 @Pipe
 def ft(iterable, predicate):
-    if isinstance(predicate, basestring):
+    if isinstance(predicate, bstring):
         predicate = eval("lambda e: {}".format(predicate))
     for elem in iterable:
         if predicate(elem):
@@ -73,7 +76,7 @@ def uniq(iterable):
 
 @Pipe
 def do(iterable, function):
-    if isinstance(function, basestring):
+    if isinstance(function, bstring):
         function = "def function(e):\n    " + "    \n".join(function.splitlines())
         exec(function)
     for elem in iterable:

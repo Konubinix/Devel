@@ -3507,7 +3507,6 @@ an error (this should never happen)."
       )
     )
   )
-)
 
 ;; state change
 (defun konix/org-trigger-hook (change-plist)

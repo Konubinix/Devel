@@ -58,7 +58,8 @@ IFS=$OLD_IFS
 
 # use the autocd feature to gain precious miliseconds
 shopt -s autocd
-
+# I like recursive globbing
+shopt -s globstar
 # ######################################################################
 # For a nice git prompt
 # ######################################################################

@@ -3463,7 +3463,7 @@ an error (this should never happen)."
 (setq-default org-return-follows-link t)
 (setq-default org-tab-follows-link t)
 
-(defun konix/org-get-not-done-children-markers-no-recursion ()
+(defun konix/org-get-todo-children-markers-no-recursion ()
   (let (
         (first-child-begin (save-excursion (org-goto-first-child) (point)))
         (end-of-subtree (save-excursion (org-end-of-subtree) (point)))
@@ -3491,9 +3491,9 @@ an error (this should never happen)."
                      (begin (plist-get properties :begin))
                      (todo_type (plist-get properties :todo-type))
                      )
-                (if (eq todo_type 'done)
-                    nil
-                  begin
+                (if (eq todo_type 'todo)
+                    begin
+                  nil
                   )
                 )
               )
@@ -3519,18 +3519,21 @@ an error (this should never happen)."
            (eq type 'todo-state-change)
            (string= to "NOT_DONE")
            )
-      (save-excursion
-        (org-back-to-heading)
-        (mapc
-         (lambda (marker)
-           (save-excursion
-             (goto-char (marker-position marker))
-             (warn "%s is automatically set to NOT_DONE" (org-get-heading t t))
-             (org-todo "NOT_DONE")
+      (save-restriction
+        (save-excursion
+          (org-back-to-heading)
+          (org-show-subtree)
+          (mapc
+           (lambda (marker)
+             (save-excursion
+               (goto-char (marker-position marker))
+               (warn "%s is automatically set to NOT_DONE" (org-get-heading t t))
+               (org-todo "NOT_DONE")
+               )
              )
+           (konix/org-get-todo-children-markers-no-recursion)
            )
-         (konix/org-get-not-done-children-markers-no-recursion)
-         )
+          )
         )
       )
     )
@@ -3556,7 +3559,6 @@ an error (this should never happen)."
             #'konix/org-depend-block-todo/but_not_done)
 (advice-add 'org-depend-block-todo :around
             #'konix/org-depend-block-todo/but_not_done)
-
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

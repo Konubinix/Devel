@@ -5,4 +5,5 @@ find \( \
     -iname '*.mov' \
            -o -iname "*.mp4" \
            -o -iname "*.avi" \
-           \) | parallel konix_video_reencode.sh
+           \) \
+     -exec "konix_video_rename.sh" "{}" ";"

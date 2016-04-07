@@ -1,4 +1,4 @@
-#!/bin/bash -xeu
+#!/bin/bash
 
 set -eu
 video="$1"

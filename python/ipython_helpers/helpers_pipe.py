@@ -2,12 +2,17 @@
 # -*- coding:utf-8 -*-
 
 import re
-from pipe import *
 import collections
 import itertools
 import six
+import inspect
+from pipe import *
 
-bstring = basestring if six.PY2 else str
+bstring = str if six.PY3 else basestring
+false = False
+true = True
+f = false
+t = true
 
 @Pipe
 def gi(strings, pattern, i=True):
@@ -17,13 +22,9 @@ def gi(strings, pattern, i=True):
 def giv(strings, pattern, i=True):
     return [string for string in strings if not re.search(pattern, string, re.I if i else 0)]
 
+@Pipe
 def find_duplicates(seq):
     return [i[0] for i in collections.Counter(seq).items() if i[1] > 1]
-
-false = False
-true = True
-f = false
-t = true
 
 @Pipe
 def uniquify_preserve_order(seq, idfun=None):
@@ -47,12 +48,10 @@ def uniquify_preserve_order(seq, idfun=None):
 def fs(es, v):
     return [e for e in es if v.lower() in str(e).lower()]
 gi = fs
-
 @Pipe
 def fsn(es, v):
     return [e for e in es if not v.lower() in str(e).lower()]
 gv = fsn
-
 @Pipe
 def each(es, function):
     if isinstance(function, bstring):
@@ -73,6 +72,21 @@ def mp(es, function):
     if isinstance(function, bstring):
         function = eval("lambda e: {}".format(function))
     return map(function, es)
+
+@Pipe
+def imp(es, function):
+    if isinstance(function, bstring):
+        function = eval("lambda e: {}".format(function))
+    return itertools.imap(function, es)
+
+@Pipe
+def inonone(es):
+    return (e for e in es if e is not None)
+
+@Pipe
+def get(es, *attributes):
+    l = lambda e: [getattr(e, attribute) for attribute in attributes]
+    return es|mp(l)
 
 @Pipe
 def ft(iterable, predicate):

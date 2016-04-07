@@ -214,13 +214,6 @@ def pd_put_into_hdf_tstable(dataframe, file_name, name="Values"):
     ts.append(asciify_dataframe(dataframe).astype("f8"))
     f.close()
 
-def hdf_keys(hdf_file):
-    import h5py
-    file_ = h5py.File(hdf_file, mode="r")
-    keys = file_.keys()
-    file_.close()
-    return keys
-
 def pd_scale(input_dataframe, axis=0, with_mean=True, with_std=True):
     from sklearn.preprocessing import scale
     from pandas import DataFrame

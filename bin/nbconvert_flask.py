@@ -37,11 +37,6 @@ parser.add_argument('--ip',
                     default=os.environ["KONIX_NBVIEWER_IP"]
 )
 
-parser.add_argument('--hide-input',
-                    help="""Hide the input""",
-                    action="store_true",
-)
-
 args = parser.parse_args()
 
 INPUT = args.input_notebooks
@@ -52,7 +47,7 @@ if not os.path.exists(OUTPUT):
     os.makedirs(OUTPUT)
 os.chdir(OUTPUT)
 
-def nbconvert(input_file_, execute=False):
+def nbconvert(input_file_, execute=False, show_input=False):
     input_filename = os.path.join(
         INPUT,
         input_file_
@@ -64,7 +59,11 @@ def nbconvert(input_file_, execute=False):
             os.makedirs(dir_)
         os.chdir(dir_)
     input_basename = os.path.basename(input_filename)
-    output_basename = os.path.splitext(input_basename)[0] + ".html"
+    if show_input:
+        suffix = "_input"
+    else:
+        suffix = ""
+    output_basename = os.path.splitext(input_basename)[0] + suffix + ".html"
     output_filename = os.path.join(dir_, output_basename)
     if (
             not execute
@@ -73,37 +72,40 @@ def nbconvert(input_file_, execute=False):
             and
             os.stat(output_basename).st_mtime > os.stat(input_filename).st_mtime
     ):
-        return
+        return output_filename
     else:
         os.system(
-            "nbconvert_html {} --execute '{}'".format(
-                "--template=hide_input.tpl" if args.hide_input else "",
+            "nbconvert_html --output={} {} --execute '{}'".format(
+                output_basename,
+                "" if show_input else "--template=hide_input.tpl",
                 input_filename,
             )
         )
+    return output_filename
 
 app = Flask(__name__)
 
 @app.route('/get/<path:filename>')
 def serve_file(filename):
     execute = bool(request.values.get("execute"))
+    show_input = bool(request.values.get("input"))
     logging.debug("Serving: {}".format(filename))
 
-    if filename == "custom.css":
+    if filename.endswith("custom.css"):
         return send_file(
             CUSTOM_CSS_PATH
         )
     else:
-        return serve_ipynb(filename, execute=execute)
+        return serve_ipynb(filename, execute=execute, show_input=show_input)
 
-def serve_ipynb(filename, execute=False):
+def serve_ipynb(filename, execute=False, show_input=False):
     input_filename = "{}.{}".format(
         os.path.splitext(filename)[0],
         "ipynb"
     )
-    nbconvert(input_filename, execute=execute)
+    output_filename = nbconvert(input_filename, execute=execute, show_input=show_input)
     return send_file(
-        os.path.join(OUTPUT, filename)
+        os.path.join(OUTPUT, output_filename)
     )
 
 if __name__ == "__main__":

@@ -1,8 +1,10 @@
 #!/bin/bash
 
 set -eu
+# i should not run this in parallel since one avconv process is already taking
+# advantage of all my cpus
 find \( \
     -iname '*.mov' \
            -o -iname "*.mp4" \
            -o -iname "*.avi" \
-           \) | parallel konix_video_reencode.sh
+           \) -exec konix_video_reencode.sh '{}' ';'

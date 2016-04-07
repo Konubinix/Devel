@@ -3,7 +3,6 @@
 
 from matplotlib import  pyplot as plt
 import matplotlib as mpl
-from pylab_helpers import *
 from matplotlib.widgets import Slider, Button, RadioButtons
 import numpy as np
 import cv2

@@ -368,8 +368,11 @@
   )
 (defun konix/notmuch-show-open-in-external-browser ()
   (interactive)
-  (async-shell-command
-   (format "konix_notmuch_view_html.sh %s" (notmuch-show-get-message-id))
+  (start-process
+   "open_external_browser"
+   nil
+   "konix_notmuch_view_html.sh"
+   (notmuch-show-get-message-id)
    )
   )
 

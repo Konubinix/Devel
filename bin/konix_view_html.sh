@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 dir=`mktemp -d`
 file="${dir}/msg"

@@ -97,8 +97,8 @@
 	url = https://github.com/kiwanami/emacs-calfw.git
 [submodule "uzbl"]
 	path = uzbl
-#	url = https://github.com/Dieterbe/uzbl.git
-	url = https://github.com/Konubinix/uzbl.git
+	url = https://github.com/Dieterbe/uzbl.git
+	#url = https://github.com/Konubinix/uzbl.git
 [submodule "config/elfiles/cedet"]
 	path = config/elfiles/cedet
 	url = http://git.code.sf.net/p/cedet/git

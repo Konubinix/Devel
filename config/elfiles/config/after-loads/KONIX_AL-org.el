@@ -3465,46 +3465,48 @@ an error (this should never happen)."
 
 (defun konix/org-get-todo-children-markers-no-recursion ()
   (let (
-        (first-child-begin (save-excursion (org-goto-first-child) (point)))
+        (first-child-begin (save-excursion (if (org-goto-first-child) (point) nil)))
         (end-of-subtree (save-excursion (org-end-of-subtree) (point)))
         )
-    (save-excursion
-      (save-restriction
-        (narrow-to-region first-child-begin end-of-subtree)
-        (mapcar
-         (lambda (point)
-           (let (
-                 (marker (make-marker))
+    (when first-child-begin
+     (save-excursion
+       (save-restriction
+         (narrow-to-region first-child-begin end-of-subtree)
+         (mapcar
+          (lambda (point)
+            (let (
+                  (marker (make-marker))
+                  )
+              (set-marker marker point)
+              marker
+              )
+            )
+          (remove-if
+           'null
+           (org-element-map
+               (org-element-parse-buffer 'headline t)
+               'headline
+             (lambda (hl)
+               (let* (
+                      (properties (second hl))
+                      (begin (plist-get properties :begin))
+                      (todo_type (plist-get properties :todo-type))
+                      )
+                 (if (eq todo_type 'todo)
+                     begin
+                   nil
+                   )
                  )
-             (set-marker marker point)
-             marker
+               )
+             nil
+             nil
+             'headline
              )
            )
-         (remove-if
-          'null
-          (org-element-map
-              (org-element-parse-buffer 'headline t)
-              'headline
-            (lambda (hl)
-              (let* (
-                     (properties (second hl))
-                     (begin (plist-get properties :begin))
-                     (todo_type (plist-get properties :todo-type))
-                     )
-                (if (eq todo_type 'todo)
-                    begin
-                  nil
-                  )
-                )
-              )
-            nil
-            nil
-            'headline
-            )
           )
          )
-        )
-      )
+       )
+     )
     )
   )
 

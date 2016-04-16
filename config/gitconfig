@@ -7,6 +7,7 @@
 	st = status
 	cl = clone
 	co = checkout
+	cp = cherry-pick
 	k = !gitk --all
 	ka = !gitk --all `git reflog | cut -c1-7`
       	kaa = !gitk --all `git fsck --no-reflog | awk '/dangling commit/ {print $3}'`

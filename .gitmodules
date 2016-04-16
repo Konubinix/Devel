@@ -273,3 +273,6 @@
 [submodule "znc"]
 	path = znc
 	url = https://github.com/Konubinix/znc
+[submodule "python/Pipe"]
+	path = python/Pipe
+	url = https://github.com/Konubinix/Pipe

@@ -134,7 +134,7 @@
 	url = https://github.com/Konubinix/circe.git
 [submodule "ledger-autosync"]
 	path = ledger-autosync
-	url = hg::https://bitbucket.org/egh/ledger-autosync
+	url = https://gitlab.com/egh/ledger-autosync.git
 [submodule "config/elfiles/ini"]
 	path = config/elfiles/ini
 	url = https://github.com/daniel-ness/ini.el.git

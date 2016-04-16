@@ -9,7 +9,7 @@ set download_handler spawn_sh 'uget-gtk --folder="$XDG_DOWNLOAD_DIR" --quiet "$0
 set authentication_handler spawn_sync @scripts_dir/konix_auth.py
 #set useragent         = Mozilla/5.0 (X11; Linux x86_64; rv:10.0.6) Gecko/20100101 Firefox/10.0.6 Iceweasel/10.0.6
 set default_encoding utf-8
-search option +case_insensitive
+search option case_insensitive
 @insert   status_background   #05bdc8
 
 # Events

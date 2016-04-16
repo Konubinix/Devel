@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source /home/sam/.virtualenvs/jenkins/bin/activate
+exec ipython3 --profile jenkins "$@"

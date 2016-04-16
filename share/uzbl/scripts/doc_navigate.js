@@ -1,5 +1,5 @@
 doc_next = function() {
-    var next_elem = $("a:contains(Thread Next),a:contains(suivant),a:contains(Next),a:contains(next),a:contains(Suivant),a:text(>),a[title='Next Page'],a[rel='next'],li:contains('Next message: ') a,td:contains('>>') a,.rst-footer-buttons[role='navigation'] a:first,[aria-label=Next],#pnnext");
+    var next_elem = $("a:contains(Thread Next),a:contains(suivant),a:contains(Next),a:contains(next),a:contains(Suivant),a:text(>),a[title='Next Page'],a[rel='next'],li:contains('Next message: ') a,td:contains('>>') a,.rst-footer-buttons[role='navigation'] a:first,[aria-label=Next],#pnnext,.navForward");
     if(next_elem)
     {
 		next_elem[0].click();
@@ -7,7 +7,7 @@ doc_next = function() {
 }
 
 doc_previous = function() {
-    var prev_elem = $("a:contains(Thread Previous), a:contains(Prev), a:contains(précédent), a:contains(prev), a:contains(previous), a:contains(Précédent),a[title='Previous Page'],a[rel='previous'],li:contains('Previous message: ') a,td:contains('<<') a,.rst-footer-buttons[role='navigation'] a:first,[aria-label=Previous],#pnprev");
+    var prev_elem = $("a:contains(Thread Previous), a:contains(Prev), a:contains(précédent), a:contains(prev), a:contains(previous), a:contains(Précédent),a[title='Previous Page'],a[rel='previous'],li:contains('Previous message: ') a,td:contains('<<') a,.rst-footer-buttons[role='navigation'] a:first,[aria-label=Previous],#pnprev,.navBack");
     if(prev_elem)
     {
 		prev_elem[0].click();
@@ -20,6 +20,7 @@ doc_toc = function() {
 
 doc_current = function() {
     $("a:contains(Current)")[0].click();
+
 }
 
 doc_home = function() {

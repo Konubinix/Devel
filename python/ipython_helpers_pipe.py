@@ -46,12 +46,14 @@ def uniquify_preserve_order(seq, idfun=None):
 
 @Pipe
 def fs(es, v):
-    return [e for e in es if v.lower() in str(e).lower()]
+    return [e for e in es if re.search(v, str(e), flags=re.I)]
 gi = fs
+
 @Pipe
 def fsn(es, v):
-    return [e for e in es if not v.lower() in str(e).lower()]
+    return [e for e in es if not re.search(v, str(e), flags=re.I)]
 gv = fsn
+
 @Pipe
 def each(es, function):
     if isinstance(function, bstring):

@@ -3,7 +3,7 @@
 
 import blaze
 from odo import odo
-import ipython_helpers.helpers_pandas as hpd
+import ipython_helpers_pandas as hpd
 
 def blaze_dump_hdf(db, file_name, prefix_key="", *args, **kwargs):
     for field in db.fields:

@@ -25,6 +25,8 @@
 ;;; Code:
 
 (require 'KONIX_org-meta-context)
+(require 'org-archive)
+(require 'org-element)
 (require 'org-notmuch)
 (require 'org-protocol)
 (require 'org-man)

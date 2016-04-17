@@ -257,7 +257,7 @@
 	url = https://github.com/Konubinix/encfs
 [submodule "Flexget"]
 	path = Flexget
-	url = https://github.com/Konubinix/Flexget.git
+	url = https://github.com/Flexget/Flexget.git
 [submodule "git-remote-hg"]
 	path = git-remote-hg
 	url = https://github.com/fingolfin/git-remote-hg

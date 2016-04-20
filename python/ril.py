@@ -333,14 +333,24 @@ class RILItem(object):
                    "--no-iri",
                    "--restrict-file-names=windows",
                  ]
-        cookie_file = os.environ.get("UZBL_COOKIES_FILE",
+        cookie_file = os.environ.get("UZBL_COOKIE_FILE",
                                      None)
-        session_cookie_file = os.environ.get("UZBL_COOKIES_FILE",
+        session_cookie_file = os.environ.get("UZBL_SESSION_COOKIE_FILE",
                                      None)
-        if cookie_file and os.path.exists(cookie_file):
-          command += ["--load-cookies", cookie_file,]
-        if session_cookie_file and os.path.exists(session_cookie_file):
-          command += ["--load-cookies", session_cookie_file,]
+        tmp_cookie_file = None
+        for _cookie_file in [cookie_file, session_cookie_file]:
+            if _cookie_file and os.path.exists(_cookie_file):
+                if tmp_cookie_file is None:
+                    tmp_cookie_file = tempfile.NamedTemporaryFile(delete=False)
+                    command += ["--load-cookies", tmp_cookie_file.name,]
+                tmp_cookie_file.write(
+                    "".join(
+                        [
+                            line.replace("#HttpOnly_", "")
+                            for line in open(_cookie_file).readlines()
+                        ]
+                    )
+                )
 
         mode_to_attributes = {
                 DOWNLOAD_LIGHT_MODE : [],
@@ -364,6 +374,7 @@ class RILItem(object):
         p.wait()
         output.write("\nreturncode: "+ str(p.returncode))
         output.close()
+        os.unlink(tmp_cookie_file.name)
         return p.returncode
 
     @property

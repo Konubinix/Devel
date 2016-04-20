@@ -43,7 +43,7 @@ DOWNLOAD_RC_TO_MSG={
         16:"Already downloading something about this item",
         0:"Everything went well",
         4:"Wget: Network Failure",
-        8:"Server issued an error response.(too many redirection?)",
+        8:"Server issued an error response.(probably not a big deal like a 403 error or 'too many redirection')",
         }
 DOWNLOAD_MODE_NAMES={
         DOWNLOAD_NORMAL_MODE:"DOWNLOAD_NORMAL_MODE",

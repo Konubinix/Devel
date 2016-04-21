@@ -19,4 +19,4 @@ def import_module_n_helpers(module, ip, populate=True):
                 ip.user_ns[name] = getattr(helpers, name)
         logger.info("Imported {} and its helpers".format(module))
     except Exception as e:
-        logger.exception("Could not import {} or modules".format(module))
+        logger.exception("Could not import {} or helpers".format(module))

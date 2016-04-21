@@ -7,6 +7,8 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 import numpy as np
 import cv2
 
+from ipython_helpers_pylab2 import *
+
 def mpl_cv2_image_mode_local():
     plt.tick_params(
         axis='both',

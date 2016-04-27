@@ -137,6 +137,9 @@ class RilCmd(cmd.Cmd, object):
         self.dl_item(item, dl_mode)
 
     def do_dl_all(self, line):
+        "dl_all DOWNLOAD_MODE (default to DOWNLOAD_NORMAL_MODE)"
+        if line == '':
+            line = ril.DOWNLOAD_NORMAL_MODE
         dl_mode = int(line)
         items = self.get_items(None, False)
         ok = 0

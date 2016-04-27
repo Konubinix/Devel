@@ -394,6 +394,10 @@ b () {
 	popd && ls
 }
 
+t () {
+	cd - && ls
+}
+
 source_if_possible () {
     local file="$1"
     if [ -r "$file" ]

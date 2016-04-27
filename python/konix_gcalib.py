@@ -24,9 +24,9 @@ import pandas
 import hashlib
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig()
 LOGGER = logging.getLogger(__file__)
-
+LOGGER.setLevel(logging.DEBUG)
 pp = pprint.PrettyPrinter(indent=4, width=200)
 
 import readline

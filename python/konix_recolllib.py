@@ -2,8 +2,9 @@
 # -*- coding:utf-8 -*-
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig()
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 import os
 import pathlib
 import sys

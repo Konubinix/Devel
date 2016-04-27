@@ -1,4 +1,4 @@
 #!/bin/bash
 
-source /home/sam/.virtualenvs/jira/bin/activate
-exec ipython --profile confluence "$@"
+source /home/sam/.virtualenvs/confluence/bin/activate
+exec ipython2 --profile confluence "$@"

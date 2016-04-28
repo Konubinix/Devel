@@ -270,3 +270,6 @@
 [submodule "Pipe"]
 	path = Pipe
 	url = https://github.com/Konubinix/Pipe
+[submodule "autojump"]
+	path = autojump
+	url = https://github.com/wting/autojump

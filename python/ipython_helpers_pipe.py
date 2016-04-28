@@ -72,7 +72,9 @@ def ass(es):
 @Pipe
 def mp(es, function):
     if isinstance(function, bstring):
-        function = eval("lambda e: {}".format(function))
+        import IPython
+        ip = IPython.get_ipython()
+        function = eval("lambda e: {}".format(function), ip.user_ns, ip.user_ns)
     return map(function, es)
 
 @Pipe

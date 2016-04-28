@@ -7,6 +7,7 @@ import importlib
 import logging
 #logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 def import_module_n_helpers(module, ip, populate=True):
     try:

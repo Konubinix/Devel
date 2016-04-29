@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import sklearn as sk
 import sklearn
+
 def sk_nested_cross_val(model,
                         X,
                         y,

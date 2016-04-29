@@ -41,3 +41,18 @@ def explort(f, sliders_properties):
     figure.canvas.mpl_connect('key_press_event', on_key_press)
     for s in sliders:
         s.on_changed(on_changed)
+
+def mpl_get_color_cycle_from_color_map_name(number=10, name="cubehelix"):
+    color = matplotlib.cm.get_cmap(name)(numpy.linspace(0.1,0.9,number)) # This returns RGBA; convert:
+    return list(map(lambda rgb:'#{:02x}{:02x}{:02x}'.format(
+        int(rgb[0]*255),
+        int(rgb[1]*255),
+        int(rgb[2]*255)
+    ),
+               tuple(color[:,0:-1])))
+
+def mpl_set_color_cycle_from_color_map_name(number=10, name="cubehelix"):
+    """See mpl.cm and http://matplotlib.org/examples/color/colormaps_reference.html"""
+    matplotlib.rcParams["axes.color_cycle"] = mpl_get_color_cycle_from_color_map_name(name=name, number=number)
+
+mpl_set_color_cycle_from_color_map_name()

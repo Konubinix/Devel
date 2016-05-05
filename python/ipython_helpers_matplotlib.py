@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import matplotlib
+import numpy
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button
 from functools import partial
@@ -14,7 +16,7 @@ Interval = namedtuple("Interval", ("label", "valmin", "valmax"))
 def explort(f, sliders_properties):
     nVars = len(sliders_properties)
     slider_width = 1.0/nVars
-    print slider_width
+    print(slider_width)
     # CREATE THE CANVAS
     global oldax
     oldax = plt.gca()

@@ -453,3 +453,11 @@ call_second_like_me () {
 mkvirtualenv_system-site-packages () {
     mkvirtualenv --system-site-packages "$@"
 }
+
+mkvirtualenv3 () {
+    mkvirtualenv -p/usr/bin/python3 "$@"
+}
+
+mkvirtualenv3_system-site-packages () {
+    mkvirtualenv3 --system-site-packages "$@"
+}

@@ -1,0 +1,5 @@
+program_options:
+  tray:             true
+  automount:        true
+  notify:           true
+  file_manager:     mimeopen

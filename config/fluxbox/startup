@@ -25,7 +25,6 @@ fbpid=$!
 numlockx
 
 (
-	source "${HOME}/.virtualenvs/supervisord/bin/activate"
 	konix_supervisord.sh
 )
 

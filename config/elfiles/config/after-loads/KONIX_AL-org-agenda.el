@@ -173,5 +173,20 @@
 	)
   )
 
+(defun konix/org-agenda-get-todo-list()
+  (let (
+        (todo-list '())
+        )
+    (goto-char (point-min))
+    (while (not (equal (point) (point-max)))
+      (goto-char (next-single-char-property-change (point) 'txt))
+      (when (get-text-property (point) 'txt)
+        (add-to-list 'todo-list (get-text-property (point) 'txt) t)
+        )
+      )
+    todo-(list )
+    )
+  )
+
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

@@ -54,9 +54,9 @@
   (when (save-excursion
 		  (goto-char (point-min))
 		  (re-search-forward "__name__.+==.+.__main__." nil t)
-		 )
-   (konix/make-executable)
-   )
+          )
+    (konix/make-executable)
+    )
   )
 
 (defun konix/inferior-python-mode-hook ()
@@ -69,6 +69,45 @@
   )
 (add-hook 'inferior-python-mode-hook
 		  'konix/inferior-python-mode-hook)
+
+(defun konix/python/explicit-unicode ()
+  (interactive)
+  (catch 'end
+    (while (not
+            (equal
+             (point)
+             (point-max)
+             )
+            )
+      (while (not
+              (equal
+               (get-text-property (point) 'face)
+               'font-lock-string-face
+               )
+              )
+        (goto-char (next-single-char-property-change (point) 'face))
+        (when (equal
+               (point)
+               (point-max)
+               )
+          (throw 'end nil)
+          )
+        )
+      ;; on a string face
+      (recenter-top-bottom)
+      (when (and
+             (not
+              (looking-back "u")
+              )
+             (yes-or-no-p "Do it here ?")
+             )
+        (insert "u")
+        )
+      (goto-char (next-single-char-property-change (point) 'face))
+      )
+    )
+  (message "Done")
+  )
 
 (provide '700-KONIX_python-mode)
 ;;; 700-KONIX_python-mode.el ends here

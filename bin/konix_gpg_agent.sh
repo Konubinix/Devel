@@ -8,7 +8,7 @@ Launch a preconfigured gpg-agent. Use -r to restart it.
 EOF
 }
 
-while getopts "hr" opt; do
+while getopts ":hr" opt; do
     case $opt in
         h)
             usage
@@ -30,5 +30,7 @@ then
 	    --default-cache-ttl "${KONIX_GPG_CACHE_TTL}" \
 	    --default-cache-ttl-ssh "${KONIX_GPG_CACHE_TTL_SSH}" \
 	    --max-cache-ttl "${KONIX_MAX_GPG_CACHE_TTL}" \
-	    --max-cache-ttl-ssh "${KONIX_MAX_GPG_CACHE_TTL_SSH}"
+	    --max-cache-ttl-ssh "${KONIX_MAX_GPG_CACHE_TTL_SSH}" \
+        --log-file "${KONIX_GPG_AGENT_LOG_FILE}" \
+        --debug-level "${KONIX_GPG_AGENT_LOG_LEVEL}"
 fi

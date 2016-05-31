@@ -22,6 +22,10 @@ parser.add_argument('-o','--output',
                     type=str,
                     required=True)
 
+parser.add_argument('--rel-path',
+                    help="""Use relative paths when adding cid links""",
+                    action="store_true")
+
 LEVELS = {'debug': logging.DEBUG,
           'info': logging.INFO,
           'warning': logging.WARNING,
@@ -55,7 +59,7 @@ def get_parts(message):
     )
     return parts
 
-def munpack(message, directory):
+def munpack(message, directory, rel_path=False):
     for part in get_parts(message):
         content = part.get_payload(decode=True)
         if content is None:
@@ -73,7 +77,7 @@ def munpack(message, directory):
             suffix=".{}".format(extension),
             prefix=prefix,
             delete=False)
-        file_name = file_.name
+        file_name = os.path.relpath(file_.name, directory) if rel_path else file_.name
         if text is not None:
             for cid, name in CID_TO_NAME.items():
                 text = text.replace(
@@ -110,5 +114,6 @@ if __name__ == "__main__":
     logging.basicConfig(level=LEVELS[args.verbosity])
     munpack(
         email.message_from_file(open(args.input, "r")),
-        args.output
+        args.output,
+        rel_path=args.rel_path
     )

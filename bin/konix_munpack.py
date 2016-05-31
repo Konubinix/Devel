@@ -60,6 +60,8 @@ def munpack(message, directory):
         content = part.get_payload(decode=True)
         if content is None:
             continue
+        charset = part.get_content_charset()
+        text = content.decode(charset) if charset else None
         content_type = part.get_content_type()
         main_type = part.get_content_maintype()
         sub_type = part.get_content_subtype()
@@ -72,11 +74,13 @@ def munpack(message, directory):
             prefix=prefix,
             delete=False)
         file_name = file_.name
-        for cid, name in CID_TO_NAME.items():
-            content = content.replace(
-                "cid:{}".format(cid).encode("utf-8"),
-                name.encode("utf-8")
-            )
+        if text is not None:
+            for cid, name in CID_TO_NAME.items():
+                text = text.replace(
+                    "cid:{}".format(cid),
+                    name
+                )
+            content = text.encode(charset)
         logger.debug("Writing in file {}".format(file_name))
         file_.write(content)
         file_.close()

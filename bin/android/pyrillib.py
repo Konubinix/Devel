@@ -255,7 +255,7 @@ def step():
                 "back",
             )
             if choice == None and first_time and configs["auto_open"].activated:
-                choice = "open local web"
+                choice = "open"
             else:
                 choice = chooser.choose(str(item), choices,
                     "Menu",

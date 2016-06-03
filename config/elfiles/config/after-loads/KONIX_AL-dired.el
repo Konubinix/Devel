@@ -65,7 +65,6 @@
 				"_MTN/"
 				".fmt"
 				".tfm"
-				".class"
 				".fas"
 				".lib"
 				".mem"

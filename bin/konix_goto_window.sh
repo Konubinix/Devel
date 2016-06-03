@@ -33,6 +33,7 @@ function findwindow {
                 then
                         HOSTNAME=`hostname`
                         WINDOW=${RUNNING#*${HOSTNAME} }
+                        WINDOW=${WINDOW#*N/A }
                         $2 -a $WINDOW
                         FOUND=1;
                 fi;

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Categories=Application;Network;X-Red-Hat-Base;
+Name=Qutebrowser
+Comment=Browse the web
+Exec=qutebrowser
+StartupNotify=true
+Terminal=false
+Type=Application

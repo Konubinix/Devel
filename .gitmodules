@@ -276,3 +276,6 @@
 [submodule "config/elfiles/wgrep"]
 	path = config/elfiles/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
+[submodule "qutebrowser"]
+	path = qutebrowser
+	url = https://github.com/The-Compiler/qutebrowser

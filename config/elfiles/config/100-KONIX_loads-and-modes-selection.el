@@ -59,6 +59,7 @@
 		 (expand-file-name "irony-mode" elfiles)
 		 (expand-file-name "ac-irony" elfiles)
 		 (expand-file-name "highlight-symbol.el" elfiles)
+		 (expand-file-name "wgrep" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

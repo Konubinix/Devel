@@ -1,3 +1,3 @@
 #!/bin/bash
 
-fbsetbg -A -R "${XDG_DATA_HOME}/backgrounds"
+fbsetbg -A -R "${KONIX_BACKGROUND_DIR}"

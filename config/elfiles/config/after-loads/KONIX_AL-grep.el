@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'wgrep)
+
 (define-key grep-mode-map (kbd "o") 'konix/compile-goto-error-other-window)
 (konix/push-or-replace-in-alist
  'grep-host-defaults-alist

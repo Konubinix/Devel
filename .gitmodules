@@ -273,3 +273,6 @@
 [submodule "autojump"]
 	path = autojump
 	url = https://github.com/wting/autojump
+[submodule "config/elfiles/wgrep"]
+	path = config/elfiles/wgrep
+	url = https://github.com/mhayashi1120/Emacs-wgrep.git

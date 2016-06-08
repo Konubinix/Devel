@@ -11,3 +11,4 @@ for html in ${HTMLs}
 do
     mimeopen "${html}"
 done
+sleep 1

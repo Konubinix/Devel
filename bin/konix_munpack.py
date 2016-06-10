@@ -62,10 +62,19 @@ def get_parts(message):
 def munpack(message, directory, rel_path=False):
     for part in get_parts(message):
         content = part.get_payload(decode=True)
+        bcontent = part.get_payload()
         if content is None:
             continue
         charset = part.get_content_charset()
-        text = content.decode(charset) if charset else None
+        try:
+            text = content.decode(charset) if charset else None
+        except UnicodeDecodeError:
+            # taken from the code of email/message.py:get_payload:
+            # This won't happen for RFC compliant messages (messages
+            # containing only ASCII code points in the unicode input).
+            # If it does happen, turn the string into bytes in a way
+            # guaranteed not to fail.
+            text = bcontent
         content_type = part.get_content_type()
         main_type = part.get_content_maintype()
         sub_type = part.get_content_subtype()

@@ -23,6 +23,6 @@ avconv -n \
 	   -maxrate 2000k \
 	   -acodec libmp3lame \
 	   -map_metadata 0:s:0 \
-	   -ab 196k \
-	   "${video_no_ext}.mkv"
+	   -ab 128k \
+	   "${video_no_ext}.webm"
 #rm -rf "${video}"

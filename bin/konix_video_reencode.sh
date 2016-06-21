@@ -10,19 +10,16 @@ then
     exit 1
 fi
 
-#HandBrakeCLI -2 -Z "Universal" -i "${video}" -o "${video_no_ext}.mkv"
+# By default the CRF value can be from 4–63, and 10 is a good starting point. Lower values mean better quality
+width=1024
+height=768
+downsize_force_ratio="-filter:v 'scale=iw*min($width/iw\,$height/ih):ih*min($width/iw\,$height/ih), pad=$width:$height:($width-iw*min($width/iw\,$height/ih))/2:($height-ih*min($width/iw\,$height/ih))/2'"
+downsize_keep_ratio="-vf scale='if(gt(a,$height/$width),$height,-1)':'if(gt(a,$height/$width),-1,$width)'"
 avconv -n \
-	   -i "${video}" \
-	   -r 30 \
-	   -f mp4 \
-	   -vf "scale=-1:576" \
-	   -vcodec libx264 \
-	   -vprofile high \
-	   -preset slower \
-	   -b:v 2000k \
-	   -maxrate 2000k \
-	   -acodec libmp3lame \
-	   -map_metadata 0:s:0 \
-	   -ab 128k \
-	   "${video_no_ext}.webm"
-#rm -rf "${video}"
+       -i "${video}" \
+       -codec:v vp8 \
+       -crf 20 \
+       -b:v 0 \
+       $downsize_keep_ratio \
+       -codec:a libvorbis \
+       "${video_no_ext}.webm"

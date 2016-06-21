@@ -9,6 +9,6 @@ if len(sys.argv) < 2:
 else:
         env = (sys.argv[1],)
 for key in env:
-        print "ENV :",key
+        print("ENV :",key)
         for val in os.environ[key].split(os.pathsep):
-                print "\t",val
+                print("\t",val)

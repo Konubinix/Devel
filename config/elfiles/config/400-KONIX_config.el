@@ -655,9 +655,7 @@
 ;; Make a backup of the file once everything else has been done
 (add-hook 'before-save-hook 'konix/force-backup-of-buffer-if-not-git t)
 ;; make backup of git tracked files thanks to git-wip
-(when (locate-library "git-wip")
-  (load-library "git-wip")
-  )
+(require 'git-wip-mode nil t)
 
 ;; ####################################################################################################
 ;; Maximize frame when visiting a file from emacs client

@@ -121,8 +121,18 @@ def munpack(message, directory, rel_path=False):
 if __name__ == "__main__":
     args = parser.parse_args()
     logging.basicConfig(level=LEVELS[args.verbosity])
+    def get_mail(encoding):
+        try:
+            return email.message_from_file(open(args.input, "r", encoding=encoding))
+        except UnicodeDecodeError:
+            return None
+    for encoding in ("utf-8", "latin-1"):
+        mail = get_mail(encoding)
+        if mail:
+            break
+    assert mail, "Could not read file"
     munpack(
-        email.message_from_file(open(args.input, "r")),
+        mail,
         args.output,
         rel_path=args.rel_path
     )

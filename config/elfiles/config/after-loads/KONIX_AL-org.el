@@ -2055,18 +2055,18 @@ items"
   %a"
 				 :kill-buffer
 				 )
-				("p" "Todo pomodoro next short pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("p" "Todo pomodoro after next short pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %? :INTERRUPTION:
-  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp nil 2)
+  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp nil konix/org-pomodoro-default-timer-break)
   :PROPERTIES:
   :CREATED:  %U
   :INTERRUPTION_HANDLED: t
   :END:"
 				 :kill-buffer
 				 )
-				("P" "Todo pomodoro next long pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("P" "Todo pomodoro after next long pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
 				 "* NEXT [#G] %? :INTERRUPTION:
-  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t 2)
+  SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t konix/org-pomodoro-default-timer-long-break)
   :PROPERTIES:
   :CREATED:  %U
   :INTERRUPTION_HANDLED: t

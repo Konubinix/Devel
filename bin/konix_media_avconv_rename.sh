@@ -1,10 +1,11 @@
 #!/bin/bash
 
 set -eu
+
 file="$1"
 NEW_NAME="`konix_avconv_new_name.sh "${file}"`"
-NEW_NAME_CP="$(readlink -f "${NEW_NAME}")"
-FILE_CP="$(readlink -f "${file}")"
+NEW_NAME_CP="$(konix_absolute_path.py "${NEW_NAME}")"
+FILE_CP="$(konix_absolute_path.py "${file}")"
 if [ "${NEW_NAME_CP}" != "${FILE_CP}" ]
 then
     echo "'${file}' -> '${NEW_NAME}'"

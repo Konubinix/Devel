@@ -188,7 +188,7 @@ interruption timer, if any")
 (defun konix/org-pomodoro-next-available-timestamp (&optional long add)
   (format-time-string
    (cdr org-time-stamp-formats)
-   (konix/org-pomodoro-next-available-time long add)
+   (konix/org-pomodoro-next-available-time long (* 60 add))
    )
   )
 

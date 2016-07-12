@@ -143,13 +143,16 @@
     )
   )
 
-(defun konix/new-buffer-region (start end)
+(defun konix/new-buffer-region (start end &optional buffer_name)
   "Edit the current region in another buffer.
     If the buffer-local variable `konix/new-buffer-mode-name' is not set, prompt
     for mode name to choose for the new buffer interactively.
     Otherwise, use the value of said variable as argument to a funcall."
   (interactive "r")
-  (let ((buffer (get-buffer-create "*indirect*"))
+  (unless buffer_name
+    (setq buffer_name "*somebuffer*")
+    )
+  (let ((buffer (get-buffer-create buffer_name))
         (content (buffer-substring-no-properties start end))
         (start (copy-marker start))
         (end (copy-marker end))

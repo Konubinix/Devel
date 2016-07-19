@@ -817,7 +817,8 @@ class GCall(cmd.Cmd, object):
                   description="",
                   attendees_emails=None,
                   make_place=None,
-                  sendNotifications=False
+                  sendNotifications=False,
+                  reminders=None,
               ):
         if make_place is None:
             make_place = self._make_place
@@ -860,6 +861,17 @@ class GCall(cmd.Cmd, object):
             "end" : end,
             "attendees": attendees,
         }
+        if not reminders is None:
+            event["reminders"] = {
+                "useDefault": False,
+                "overrides": [
+                    {
+                        "method": "email",
+                        "minutes": reminder
+                    }
+                    for reminder in reminders
+                ]
+            }
 
         req = urllib.request.Request(
             url='https://www.googleapis.com/calendar/v3/calendars/{}/events?sendNotifications={}'.format(

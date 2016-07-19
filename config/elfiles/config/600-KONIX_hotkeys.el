@@ -657,6 +657,7 @@
   '(progn
 	 (define-key org-agenda-mode-map (kbd "T") 'org-agenda-todo-yesterday)
 	 (define-key org-agenda-mode-map (kbd "$") 'self-insert-command)
+	 (define-key org-agenda-mode-map (kbd "n") 'konix/org-agenda-toggle-filter-important-items)
 	 )
   )
 

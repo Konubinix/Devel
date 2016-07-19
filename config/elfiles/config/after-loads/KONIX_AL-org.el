@@ -945,7 +945,7 @@ items"
   (let (
 		(org-agenda-view-columns-initially t)
 		)
-	(org-agenda nil "aA")
+	(org-agenda nil "aa")
 	)
   )
 
@@ -1342,7 +1342,6 @@ items"
 								 '(or
 								   (konix/org-agenda-skip-if-tags
 									'("phantom"))
-								   (konix/org-agenda-skip-non-important-item)
 								   )
 								 )
 								)
@@ -1355,7 +1354,6 @@ items"
 								 '(or
 								   (konix/org-agenda-skip-if-tags
 									'("phantom"))
-								   (konix/org-agenda-skip-non-important-item)
 								   )
 								 )
 								)
@@ -1431,41 +1429,12 @@ items"
 					(dummy (konix/org-agenda-inhibit-context-filtering))
 					)
 				   )
-				  ("aS" "Stuck view (Important stuff to do)"
-				   ,konix/org-agenda-stuck-view
-				   (
-					(org-agenda-skip-function
-					 'konix/org-agenda-skip-non-important-item)
-					(dummy (konix/org-agenda-inhibit-context-filtering))
-					)
-				   )
 				  ("aa" "Agenda view"
 				   ,(konix/org-agenda-view-generate-list)
-				   )
-				  ("aA" "Agenda view (Important stuff to do)"
-				   ,(konix/org-agenda-view-generate-list t)
-				   )
-				  ("aF" "Full review (important stuff)"
-				   ,konix/org-agenda-full-view
-				   (
-					(org-agenda-skip-function 'konix/org-agenda-skip-non-important-item)
-					)
 				   )
 				  ("af" "Full review"
 				   ,konix/org-agenda-full-view
 				   (
-					)
-				   )
-				  ("aM" "Month view (important stuff)"
-				   ,konix/org-agenda-month-view
-				   (
-					(org-agenda-skip-function
-					 '(or
-					   (konix/org-agenda-skip-if-tags
-						'("no_monthly"))
-					   (konix/org-agenda-skip-non-important-item)
-					   )
-					 )
 					)
 				   )
 				  ("am" "Month review"
@@ -1475,52 +1444,8 @@ items"
 					 '(or
 					   (konix/org-agenda-skip-if-tags
 						'("no_monthly"))
-					   (konix/org-agenda-skip-non-important-item)
 					   )
 					 )
-					)
-				   )
-				  ("aW" "Weekly view (important stuff)"
-				   (
-					(agenda nil
-							(
-							 (org-agenda-overriding-header
-							  "Agenda without projects (week overview)")
-							 (org-agenda-skip-function
-							  '(or
-								(konix/org-agenda-skip-if-tags
-								 '("project"
-								   "no_weekly"
-								   "phantom"
-								   ))
-								(konix/org-agenda-skip-non-important-item)
-								)
-							  )
-							 (org-agenda-span 7)
-							 )
-							)
-					(agenda nil
-							(
-							 (org-agenda-overriding-header
-							  "Agenda for projects (week overview)")
-							 (org-agenda-use-time-grid nil)
-							 (org-agenda-skip-function
-							  '(or
-								(konix/org-agenda-skip-if-tags
-								 '("project")
-								 t)
-								(konix/org-agenda-skip-if-tags
-								 '("phantom"
-								   "no_weekly")
-								 )
-								(konix/org-agenda-skip-non-important-item)
-								)
-							  )
-							 (org-agenda-span 7)
-							 )
-							)
-					)
-				   (
 					)
 				   )
 				  ("aw" "Week review"
@@ -2875,137 +2800,6 @@ of the clocksum."
 	)
   )
 
-;; ######################################################################
-;; Make pause and interrup appear clearly in the agenda
-;; ######################################################################
-(defface konix/org-agenda-perso-face
-  '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "SpringGreen4")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "light blue")
-	 )
-	)
-  ""
-  )
-(defface konix/org-agenda-urgent-items-face
-  '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "light coral" :weight bold)
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "light coral" :weight bold)
-	 )
-	)
-  ""
-  )
-(defface konix/org-agenda-non-urgent-items-face
-  '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "khaki" :slant italic)
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "khaki" :slant italic)
-	 )
-	)
-  ""
-  )
-
-(defface konix/org-agenda-interruption-face
-  '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "chocolate4")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "orange")
-	 )
-	)
-  ""
-  )
-
-(defface org-agenda-current-time
-  '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "orange")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:inherit 'org-time-grid
-			   :inverse-video t
-			   )
-	 )
-	)
-  ""
-  )
-
-(defface konix/org-agenda-discret-face
-  '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "grey50")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "grey90")
-	 )
-	)
-  ""
-  )
-
-(defface konix/org-agenda-less-discret-face
-  '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "grey50")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "grey70")
-	 )
-	)
-  ""
-  )
-
-(defface konix/org-agenda-dimmed-deadline-face
-  '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "hot pink")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "hot pink")
-	 )
-	)
-  ""
-  )
-
 (defun konix/org-is-in-schedule-p ()
   (or (string-equal
 	   (get-text-property (point) 'type)
@@ -3022,178 +2816,6 @@ of the clocksum."
 		 )
 		)
 	  )
-  )
-
-(defvar konix/org-agenda-text-properties
-  '(
-	("([0-9]+:[0-9]+) .+:INTERRUPTION:.*$" 0 konix/org-agenda-interruption-face)
-	("^.*:perso:.*$" 0 konix/org-agenda-perso-face)
-	("^.+\bIn +.+ d\..*$" 0 konix/org-agenda-dimmed-deadline-face (not (konix/org-is-in-schedule-p)))
-	;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)
-	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
-	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
-	)
-  "")
-(defun konix/org-agenda-set-text-properties ()
-  (setq buffer-read-only nil)
-  (save-excursion
-	(mapc
-	 (lambda (property)
-	   (goto-char (point-min))
-	   (let (
-			 (regexp (first property))
-			 (match (second property))
-			 (match_beg nil)
-			 (match_end nil)
-			 (prop (third property))
-			 (predicate (and (>
-							  (length property)
-							  3
-							  )
-							 (fourth property)
-							 ))
-			 )
-		 (while (re-search-forward regexp nil t)
-		   (setq match_beg (match-beginning match))
-		   (setq match_end (match-end match))
-		   (when (or
-				  (not predicate)
-				  (eval predicate)
-				  )
-			 (let (
-				   (ov (make-overlay match_beg match_end))
-				   )
-			   (overlay-put ov 'face prop)
-			   )
-			 )
-		   )
-		 )
-	   )
-	 konix/org-agenda-text-properties
-	 )
-	)
-  (setq buffer-read-only t)
-  )
-
-(defun konix/org-apply-org-agenda-auto-exclude-function ()
-  (org-agenda-filter-show-all-tag)
-  (when org-agenda-auto-exclude-function
-	(setq org-agenda-tag-filter '())
-	(dolist (tag (org-agenda-get-represented-tags))
-	  (let ((modifier (funcall org-agenda-auto-exclude-function tag)))
-		(if modifier
-			(push modifier org-agenda-tag-filter))))
-	(if (not (null org-agenda-tag-filter))
-		(org-agenda-filter-apply org-agenda-tag-filter 'tag)))
-  (setq maybe-refresh t)
-  )
-
-(defun konix/org-agenda-reset-apply-filter (filters)
-  (interactive "sFilters: ")
-  (setq raw_filters filters)
-  (setq filters '())
-  (while (and
-		  (not
-		   (string-equal raw_filters "")
-		   )
-		  (not (null raw_filters))
-		  )
-	(if (string-match "^\\([+-][^+-]+\\)\\(.*\\)$" raw_filters)
-		(add-to-list 'filters (match-string 1 raw_filters))
-	  (add-to-list 'filters (format "+%s" raw_filters))
-	  )
-	(setq raw_filters (match-string 2 raw_filters))
-	)
-
-  (with-current-buffer org-agenda-buffer
-	(org-agenda-filter-show-all-tag)
-	(org-agenda-filter-apply filters 'tag)
-	)
-  )
-
-(defvar konix/org-agenda-filter-context-show-appt t "")
-(defvar konix/org-agenda-filter-context-show-empty-context t "")
-(defun konix/org-agenda-filter-context_1 (tags)
-  ;; Deactivate `org-agenda-entry-text-mode' when filtering
-  (if org-agenda-entry-text-mode (org-agenda-entry-text-mode))
-  (let (tags
-		cat
-		(konix/org-entry-predicate
-		 (append
-		  '(and)
-		  (mapcar
-		   (lambda (disjunction)
-			 (append
-			  '(or)
-			  (mapcar
-			   (lambda (elem)
-				 `(member ,elem tags)
-				 )
-			   disjunction
-			   )
-			  )
-			 )
-		   tags
-		   )
-		  ))
-		)
-	(save-excursion
-	  (goto-char (point-min))
-	  (while (not (eobp))
-		(if (org-get-at-bol 'org-marker)
-			(progn
-			  (setq tags (org-get-at-bol 'tags) ; used in eval
-					cat (get-text-property (point) 'org-category))
-			  (if (and
-				   (not (eval konix/org-entry-predicate))
-				   ;; do not hide appointment if the associated setting is set
-				   (or (not konix/org-agenda-filter-context-show-appt)
-					   (not
-						(konix/org-agenda-appt-p)
-						)
-					   )
-				   ;; show empty context entries if the associated setting is set
-				   (or (not konix/org-agenda-filter-context-show-empty-context)
-					   (not
-						(konix/org-agenda-no-context-p)
-						)
-					   )
-				   )
-				  (org-agenda-filter-hide-line 'tag))
-			  (beginning-of-line 2))
-		  (beginning-of-line 2))))
-	)
-  (if (get-char-property (point) 'invisible)
-	  (ignore-errors (org-agenda-previous-line))
-	)
-  )
-
-(defun konix/org-agenda-filter-context ()
-  (cond
-   (konix/org-agenda-inhibit-context-filtering
-	(setq header-line-format "Context filtering inhibited")
-	)
-   (konix/org-agenda-tag-filter-contexts
-	(konix/org-agenda-filter-context_1 konix/org-agenda-tag-filter-contexts)
-	(setq header-line-format
-		  `("Context filtered with "
-			,(mapconcat
-			  (lambda (disjunction)
-				(mapconcat 'identity disjunction " or ")
-				)
-			  konix/org-agenda-tag-filter-contexts
-			  " and ")
-			", appt display = " ,(if konix/org-agenda-filter-context-show-appt
-									 "on" "off")
-			", no context display = " ,(if konix/org-agenda-filter-context-show-empty-context
-										   "on" "off")
-			)
-		  )
-	)
-   ((not konix/org-agenda-tag-filter-contexts)
-	(setq header-line-format "No context filter")
-	)
-   )
   )
 
 ;; ######################################################################

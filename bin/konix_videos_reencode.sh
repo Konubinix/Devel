@@ -14,4 +14,5 @@ find \
     -iname '*.mov' \
            -o -iname "*.mp4" \
            -o -iname "*.avi" \
+           -o -iname "*.3gp" \
            \) -exec konix_video_reencode.sh '{}' ';'

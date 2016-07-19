@@ -111,7 +111,9 @@ interruption timer, if any")
 			   (format
 				"working
 %s: %s min (%s sec) => short
-%s: %s min (%s sec) => long"
+%s: %s min (%s sec) => long
+%s                  => interruption
+%s                  => long interruption"
 				(konix/org-pomodoro-next-available-timestamp)
 				(/
 				 (konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
@@ -124,6 +126,8 @@ interruption timer, if any")
 				 60
 				 )
 				(konix/org-pomodoro-number-of-seconds-till-next-pause t t)
+				(konix/org-pomodoro-next-available-timestamp t konix/org-pomodoro-default-timer-break)
+				(konix/org-pomodoro-next-available-timestamp t konix/org-pomodoro-default-timer-long-break)
 				)
 			 "in pause"
 			 )
@@ -188,7 +192,7 @@ interruption timer, if any")
 (defun konix/org-pomodoro-next-available-timestamp (&optional long add)
   (format-time-string
    (cdr org-time-stamp-formats)
-   (konix/org-pomodoro-next-available-time long (* 60 add))
+   (konix/org-pomodoro-next-available-time long (when add (* 60 add)))
    )
   )
 
@@ -370,7 +374,7 @@ what to do ? (Show agenda (a),  New pomodoro (n), Quit (q))" warning prompt))
 			   (konix/org-pomodoro-start)
 			   )
 			  (?a
-			   (org-agenda nil "aA")
+			   (org-agenda nil "aa")
 			   )
 			  (?q
 			   (when (and

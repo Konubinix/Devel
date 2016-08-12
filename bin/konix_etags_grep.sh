@@ -80,5 +80,5 @@ do
 }" "$tag_file" | while read source_file
     do
         cat "$relpath$source_file"
-    done | grin.py $CASE --emacs "$REF"
+    done | grep -i -n $CASE "$REF"
 done

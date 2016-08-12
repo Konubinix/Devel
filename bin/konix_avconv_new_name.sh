@@ -6,15 +6,16 @@ file="$1"
 file_abs="$(konix_absolute_path.py "${file}")"
 ext="${file##*.}"
 dir="$(dirname "${file}")"
-new_file_basename="$(avconv -i "${file}" 2>&1 \
+utc_date="$(avconv -i "${file}" 2>&1 \
 	| grep creation_time \
 	| head -1 \
-	| sed -r 's|^.+creation_time   : [0-9][0-9]([0-9]+)-([0-9]+)-([0-9]+) ([0-9]+):([0-9]+):([0-9]+).*$|\1\2\3_\4\5\6|')"
-if [ "${new_file_basename}" == "" ]
+	| sed -r 's|^.+creation_time   : ([0-9][0-9][0-9][0-9]-[0-9]+-[0-9]+) ([0-9]+:[0-9]+:[0-9]+).*$|\1T\2+0000|')"
+if [ "${utc_date}" == "" ]
 then
     echo "no new name" >&2
     exit 1
 fi
+new_file_basename="$(date -d"${utc_date}" '+%y%m%d_%H%M%S')"
 new_file_name="${new_file_basename}.${ext}"
 candidate="${dir}/${new_file_name}"
 candidate_abs="$(konix_absolute_path.py "${candidate}")"

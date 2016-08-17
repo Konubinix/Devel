@@ -91,7 +91,7 @@ def munpack(message, directory, rel_path=False):
             for cid, name in CID_TO_NAME.items():
                 text = text.replace(
                     "cid:{}".format(cid),
-                    "file://{}".format(name)
+                    "{}".format(name) if rel_path else "file://{}".format(name)
                 )
             content = text.encode(charset)
         logger.debug("Writing in file {}".format(file_name))

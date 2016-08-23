@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 SERVER="$1"
 PORT="${2:-443}"

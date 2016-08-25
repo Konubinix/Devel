@@ -51,5 +51,8 @@
 	textconv = gpg -d
 [sendemail]
 	chainreplyto = yes
+	smtpserver = /home/sam/Prog/devel/bin/konix_msmtp.sh
+[push]
+	default = simple
 [svn]
     rmdir = true

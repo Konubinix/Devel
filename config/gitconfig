@@ -21,6 +21,8 @@
  	ri = rebase --interactive --autosquash
 	# fetch = fetch --upload-pack="git upload-pack"
 	amu = !curl ${1} | git am -
+	rv = remote -v
+	fri = fixup-ri.sh
 [diff]
   	tool = meld #konix_emacs_diff
 	renamelimit = 888

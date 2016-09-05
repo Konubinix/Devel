@@ -2,7 +2,7 @@
 
 set -eu
 targetdir=rootfs
-distro=testing
+distro=stable
 
 mkdir -p $targetdir
 debootstrap --arch=armhf --foreign $distro $targetdir

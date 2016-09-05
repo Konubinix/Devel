@@ -1,7 +1,9 @@
 #!/bin/bash
 
+
 set -eu
 OFX_FILE_PATH="$(readlink -f "${1}")"
+echo "Importing ${OFX_FILE_PATH}"
 OUTPUT_FILE="${OFX_FILE_PATH%%.ofx}.dat"
 KONIX_LEDGER_BANK_DIR="$(dirname "${KONIX_LEDGER_BANK_FILE}")"
 OUTPUT_FILE_NAME="$(basename "${OUTPUT_FILE}")"

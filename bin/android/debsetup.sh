@@ -1,6 +1,6 @@
 #!/system/bin/env bash
 
-set -u
+set -ux
 deb_root="$1"
 cur_dir="$(dirname $0)"
 
@@ -56,6 +56,6 @@ say_and_do chmod +r $deb_root/etc/mtab
 # allow everyone to use fuse
 /system/bin/chmod 777 /dev/fuse
 # setup the sound
-/system/bin/chmod 777 /dev/snd/*
-ln -s /dev/snd/* /dev/
-ln -s /proc/self/fd /dev/fd
+#/system/bin/chmod 777 /dev/snd/*
+#ln -s /dev/snd/* /dev/
+#ln -s /proc/self/fd /dev/fd

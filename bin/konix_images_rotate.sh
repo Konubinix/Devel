@@ -1,3 +1,3 @@
 #!/bin/bash
 
-find -name '*.JPG' -o -name '*.jpg' | parallel konix_image_reorient.sh '{}' ';'
+find -name .git -prune -o -\( -name '*.JPG' -o -name '*.jpg' -\) -print | parallel konix_image_reorient.sh '{}' ';'

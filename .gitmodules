@@ -279,3 +279,6 @@
 [submodule "qutebrowser"]
 	path = qutebrowser
 	url = https://github.com/The-Compiler/qutebrowser
+[submodule "git-annex-remote-rclone"]
+	path = git-annex-remote-rclone
+	url = https://github.com/DanielDent/git-annex-remote-rclone

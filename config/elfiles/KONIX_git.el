@@ -1767,7 +1767,7 @@ Uses the macro konix/git/status-buffer/next-or-previous
 
 (defun konix/git/standup/log/incremental ()
   (interactive)
-  (konix/git/log nil nil nil "-i -k" "standup.sh")
+  (konix/git/log nil nil nil "-i" "standup.sh")
   )
 
 (defun konix/git/standup/log/incremental/validate ()

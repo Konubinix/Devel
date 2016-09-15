@@ -16,8 +16,9 @@ def _greedy_completer(self, event):
     line = re.match('(?P<line>.+)\\.', event.line).group("line")
     try:
         obj = eval(line, ip.user_global_ns, ip.user_ns)
-    except Exception(e):
+    except Exception as e:
         print(e)
+        return []
     return [symbol + s for s in dir(obj)]
 
 ip.set_hook('complete_command', _greedy_completer, re_key = '.+\\|.+?\\.[a-zA-Z_-]*$')

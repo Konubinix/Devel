@@ -30,5 +30,14 @@ def pandas_mpl_imshow_adjust_ticks(df, x_step=5, y_step=5):
 
 pd.DataFrame.dump_hdf = pandas_dump_hdf
 
+def pandas_open_in_browser(df):
+    import tempfile
+    htmlfile = tempfile.NamedTemporaryFile(delete=False, suffix=".html")
+    htmlfile.write(df.to_html().encode("utf-8"))
+    htmlfile.close()
+    os.system("$BROWSER '{}'".format(htmlfile.name))
+    os.unlink(htmlfile.name)
+pd.DataFrame.open_in_browser = pandas_open_in_browser
+
 def pd_stripna(input_dataframe):
     return input_dataframe.dropna(axis=0, how="all").dropna(axis=1, how="all")

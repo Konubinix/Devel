@@ -29,14 +29,14 @@ then
             ARGS="${ARGS} -c"
         fi
     else
-            ARGS="${ARGS} -nw"
+        ARGS="${ARGS} -nw"
     fi
 else
-        source konix_assert.sh
+    source konix_assert.sh
 fi
-	if [ -z "$*" ] && [ -z "${ARGS}" ]
-	then
-		# Need at least an argument when launching without -c
-		set "."
-	fi
-	emacsclient -a "" ${ARGS} "$@"
+if [ -z "$*" ] && [ -z "${ARGS}" ]
+then
+	# Need at least an argument when launching without -c
+	set "."
+fi
+emacsclient -a "" ${ARGS} "$@"

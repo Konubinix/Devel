@@ -111,14 +111,25 @@ konix_prompt_post ( ) {
 echo -n
 }
 
-PATH_COLOR="${COLOR_FG_CYAN}${COLOR_BOLD}${COLOR_BG_BLACK}"
+NORMAL_PATH_COLOR="${COLOR_FG_CYAN}${COLOR_BOLD}${COLOR_BG_BLACK}"
+PLAY_PATH_COLOR="${COLOR_FG_MAGENTA}${COLOR_BOLD}${COLOR_BG_BLACK}"
 if [ -n "${KONIX_BASH_PRIVATE_NAV}" ]
 then
 	echo "Private navigation"
 	unset HISTFILE
-	PATH_COLOR="${COLOR_FG_RED}${COLOR_BOLD}${COLOR_BG_BLACK}"
+	NORMAL_PATH_COLOR="${COLOR_FG_RED}${COLOR_BOLD}${COLOR_BG_BLACK}"
 fi
 
+path_color ( ) {
+    if pwd | grep -q play_
+    then
+        printf "${PLAY_PATH_COLOR}"
+    else
+        printf "${NORMAL_PATH_COLOR}"
+    fi
+
+}
+
 #set +x
-export PS1="\${PS1_PREFIX}\$(rc=\$? ; konix_prompt_pre; [ \$rc -ne 0 ] && printf \"\[$BAD_PROMPT_COLOR\]\" || printf \"\[$GOOD_PROMPT_COLOR\]\" ; printf \"%03d$DEFAULT_COLOR\" \$rc ;)\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]$PATH_COLOR|path=\w|\[\033[00m\]${GIT_COLOR}\$(konix_git_prompt_maybe)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\$(konix_prompt_post)\n\$ "
+export PS1="\${PS1_PREFIX}\$(rc=\$? ; konix_prompt_pre; [ \$rc -ne 0 ] && printf \"\[$BAD_PROMPT_COLOR\]\" || printf \"\[$GOOD_PROMPT_COLOR\]\" ; printf \"%03d$DEFAULT_COLOR\" \$rc ;)\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\$(path_color)|path=\w|\[\033[00m\]${GIT_COLOR}\$(konix_git_prompt_maybe)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\$(konix_prompt_post)\n\$ "
 [[ -s "${HOME}/.autojump/etc/profile.d/autojump.sh" ]] && source "${HOME}/.autojump/etc/profile.d/autojump.sh"

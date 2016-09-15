@@ -445,9 +445,18 @@ call_second_like_me () {
     local SECOND="$(konix_find_next_in_path.sh -n "$(my_name)" -f "${0}")"
     if [ -n "${CALL_SECOND_LIKE_ME_DEBUG}" ]
     then
-        echo "Calling ${SECOND}"
+        echo "Calling ${SECOND} from $(my_name)"
     fi
     "${SECOND}" "$@"
+}
+
+exec_second_like_me () {
+    local SECOND="$(konix_find_next_in_path.sh -n "$(my_name)" -f "${0}")"
+    if [ -n "${CALL_SECOND_LIKE_ME_DEBUG}" ]
+    then
+        echo "Executing ${SECOND} from $(my_name)"
+    fi
+    exec "${SECOND}" "$@"
 }
 
 mkvirtualenv_system-site-packages () {

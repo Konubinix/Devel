@@ -461,3 +461,11 @@ mkvirtualenv3 () {
 mkvirtualenv3_system-site-packages () {
     mkvirtualenv3 --system-site-packages "$@"
 }
+
+mkvirtualenv2 () {
+    mkvirtualenv -p/usr/bin/python2 "$@"
+}
+
+mkvirtualenv2_system-site-packages () {
+    mkvirtualenv2 --system-site-packages "$@"
+}

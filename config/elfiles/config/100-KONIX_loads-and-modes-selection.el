@@ -60,6 +60,7 @@
 		 (expand-file-name "ac-irony" elfiles)
 		 (expand-file-name "highlight-symbol.el" elfiles)
 		 (expand-file-name "wgrep" elfiles)
+		 (expand-file-name "elf-mode" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -236,6 +237,7 @@
 ;; EIN
 (autoload 'ein:notebooklist-open "ein-notebooklist" "" t)
 (autoload 'pdf-view-mode "pdf-view" "" t)
+(autoload 'elf-mode "elf-mode" "" t)
 
 ;; ************************************************************
 ;; Automodes
@@ -311,6 +313,7 @@
 (add-to-list 'auto-mode-alist (cons "\\.tj..?$" 'taskjuggler-mode))
 ;; pdf-tools
 (add-to-list 'auto-mode-alist (cons "\\.[pP][dD][fF]$" 'pdf-view-mode))
+(add-to-list 'auto-mode-alist (cons "\\.so$" 'elf-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

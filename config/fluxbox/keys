@@ -259,7 +259,7 @@ Mod4 w s shift d :MacroCmd {ExecCommand konix_display.py "Executing konix_web_se
 Mod4 w s d :MacroCmd {ExecCommand konix_display.py "Executing konix_web_search default clipboard"} {ExecCommand $(konix_do_cron_job.sh konix_web_search.sh -dc)}
 Mod4 w s t :MacroCmd {ExecCommand konix_display.py "Selecting default search engine"} {ExecCommand $(konix_do_cron_job.sh konix_web_search_set_default_engine.sh)}
 Mod4 w d :MacroCmd {ExecCommand konix_display.py "Executing download manager"} {ExecCommand $(konix_do_cron_job.sh uget-gtk || dm-dm.sh -g)}
-Mod4 w p :MacroCmd {ExecCommand konix_display.py "Loading uzbl with clipboard content $(xclip -o)"} {ExecCommand $(konix_do_cron_job.sh konix_uzbl.sh "$(xclip -o)")}
+Mod4 w p :MacroCmd {ExecCommand konix_display.py "Loading ${BROWSER} with clipboard content $(xclip -o)"} {ExecCommand $(konix_do_cron_job.sh konix_browser.sh "$(xclip -o)")}
 
 # ////////////////////////////////////////
 # xset related shorcut (Mod4 s)

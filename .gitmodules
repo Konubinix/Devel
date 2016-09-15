@@ -282,3 +282,9 @@
 [submodule "git-annex-remote-rclone"]
 	path = git-annex-remote-rclone
 	url = https://github.com/DanielDent/git-annex-remote-rclone
+[submodule "config/elfiles/elf-mode"]
+	path = config/elfiles/elf-mode
+	url = https://github.com/abo-abo/elf-mode
+[submodule "config/bash-completion-virtualbox"]
+	path = config/bash-completion-virtualbox
+	url = https://github.com/tfmalt/bash-completion-virtualbox

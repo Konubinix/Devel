@@ -112,8 +112,8 @@ interruption timer, if any")
 				"working
 %s: %s min (%s sec) => short
 %s: %s min (%s sec) => long
-%s                  => interruption
-%s                  => long interruption"
+%s: %s min (%s sec) => interruption
+%s: %s min (%s sec) => long interruption"
 				(konix/org-pomodoro-next-available-timestamp)
 				(/
 				 (konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
@@ -127,7 +127,29 @@ interruption timer, if any")
 				 )
 				(konix/org-pomodoro-number-of-seconds-till-next-pause t t)
 				(konix/org-pomodoro-next-available-timestamp t konix/org-pomodoro-default-timer-break)
+				(/
+                 (+
+                  (konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
+                  (* 60 konix/org-pomodoro-default-timer-break)
+                  )
+                 60
+                 )
+                (+
+                  (konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
+                  (* 60 konix/org-pomodoro-default-timer-break)
+                  )
 				(konix/org-pomodoro-next-available-timestamp t konix/org-pomodoro-default-timer-long-break)
+				(/
+                 (+
+                  (konix/org-pomodoro-number-of-seconds-till-next-pause t t)
+                  (* 60 konix/org-pomodoro-default-timer-long-break)
+                  )
+                 60
+                 )
+                (+
+                  (konix/org-pomodoro-number-of-seconds-till-next-pause t t)
+                  (* 60 konix/org-pomodoro-default-timer-long-break)
+                  )
 				)
 			 "in pause"
 			 )

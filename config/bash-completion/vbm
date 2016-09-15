@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source "${KONIX_CONFIG_DIR}/bash-completion-virtualbox/vboxmanage_completion.bash"
+complete -F _vboxmanage vbm

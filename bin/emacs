@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source "${KONIX_LIB_DIR}/lib_bash.sh"
+exec_second_like_me --no-site-file --no-splash "$@"

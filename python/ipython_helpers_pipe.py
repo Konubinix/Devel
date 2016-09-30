@@ -11,8 +11,11 @@ from pipe import *
 bstring = str if six.PY3 else basestring
 false = False
 true = True
-f = false
-t = true
+ff = false
+tt = true
+ll = list
+ss = set
+dd = dict
 
 @Pipe
 def gi(strings, pattern, i=True):

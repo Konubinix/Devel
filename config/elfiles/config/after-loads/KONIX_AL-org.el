@@ -35,6 +35,8 @@
 (require 'org-collector)
 (require 'holidays)
 
+(setq-default org--matcher-tags-todo-only nil)
+
 ;; ######################################################################
 ;; My variables
 ;; ######################################################################
@@ -76,6 +78,7 @@
 	 ((memq type '(paragraph item))
 	  (if (re-search-forward org-any-link-re (line-end-position) t)
 		  (progn
+            (left-char)
 			(setq temp_point (point))
 			(apply orig-fun args)
 			(when (or
@@ -103,6 +106,7 @@
 	)
   )
 (advice-add 'org-open-at-point :around #'konix/org-open-at-point-move-to-link)
+;(advice-remove 'org-open-at-point #'konix/org-open-at-point-move-to-link)
 
 (defun konix/org-agenda-appt-reload ()
   (interactive)
@@ -227,15 +231,15 @@ cursor stays in the org buffer."
   )
 (setq-default org-directory (concat perso-dir "/wiki"))
 (setq-default org-agenda-clockreport-parameter-plist
-			  '(:fileskip0
-				:stepskip0
-				:link t
-				:maxlevel 5
-				:emphasize t
-				:link t
-				:timestamp t
-				:tags "-lunch"
-				)
+			  '(:tags "-lunch"
+                      :fileskip0
+                      :stepskip0
+                      :link t
+                      :maxlevel 5
+                      :emphasize t
+                      :link t
+                      :timestamp t
+                      )
 			  )
 (defun konix/org-skip-other-meta-context ()
   "Skip trees that are not in current meta context"
@@ -1932,9 +1936,17 @@ items"
 (setq-default org-export-html-link-home "index.html")
 (setq-default org-export-with-archived-trees t)
 (setq-default org-export-with-drawers '("LOGBOOK"))
+(defun konix/org-todo_file ()
+  (expand-file-name "todo.org" org-directory))
+(defun konix/org-notes_file ()
+  (expand-file-name "notes.org" org-directory))
+(defun konix/org-diary_file ()
+  (expand-file-name "diary.org" org-directory))
+(defun konix/org-bookmarks_file ()
+  (expand-file-name "bookmarks.org" org-directory))
 (setq-default org-capture-templates
 			  '(
-				("t" "Todo Item" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile") "* TODO %?
+				("t" "Todo Item" entry (file+headline konix/org-todo_file "Refile") "* TODO %?
   :PROPERTIES:
   :CREATED:  %U
   :END:"
@@ -1946,7 +1958,7 @@ items"
   :END:"
 				 :kill-buffer
 				 )
-				("l" "Todo Item for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("l" "Todo Item for current stuff" entry (file+headline konix/org-todo_file "Refile")
 				 "* TODO %?
   :PROPERTIES:
   :CREATED:  %U
@@ -1954,7 +1966,7 @@ items"
   %a"
 				 :kill-buffer
 				 )
-				("a" "Todo Item for git annexed stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("a" "Todo Item for git annexed stuff" entry (file+headline konix/org-todo_file "Refile")
 				 "* TODO %?%(file-name-nondirectory (car (konix/org-capture/git-annex-info)))
   :PROPERTIES:
   :CREATED:  %U
@@ -1963,7 +1975,7 @@ items"
   %(konix/org-capture/git-annex)"
 				 :kill-buffer
 				 )
-				("u" "Todo Item URGENT" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("u" "Todo Item URGENT" entry (file+headline konix/org-todo_file "Refile")
 				 "* NEXT [#G] %?
   DEADLINE: %t
   :PROPERTIES:
@@ -1971,7 +1983,7 @@ items"
   :END:"
 				 :kill-buffer
 				 )
-				("U" "Todo Item URGENT for current stuff" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("U" "Todo Item URGENT for current stuff" entry (file+headline konix/org-todo_file "Refile")
 				 "* NEXT [#G] %?
   DEADLINE: %t
   :PROPERTIES:
@@ -1980,7 +1992,7 @@ items"
   %a"
 				 :kill-buffer
 				 )
-				("p" "Todo pomodoro after next short pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("p" "Todo pomodoro after next short pause" entry (file+headline konix/org-todo_file "Refile")
 				 "* NEXT [#G] %? :INTERRUPTION:
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp nil konix/org-pomodoro-default-timer-break)
   :PROPERTIES:
@@ -1989,7 +2001,7 @@ items"
   :END:"
 				 :kill-buffer
 				 )
-				("P" "Todo pomodoro after next long pause" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("P" "Todo pomodoro after next long pause" entry (file+headline konix/org-todo_file "Refile")
 				 "* NEXT [#G] %? :INTERRUPTION:
   SCHEDULED: %(konix/org-pomodoro-next-available-timestamp t konix/org-pomodoro-default-timer-long-break)
   :PROPERTIES:
@@ -1998,15 +2010,14 @@ items"
   :END:"
 				 :kill-buffer
 				 )
-				("n" "Note" entry (file (expand-file-name "notes.org"
-														  org-directory))
+				("n" "Note" entry (file konix/org-notes_file)
 				 "* %?
   :PROPERTIES:
   :CREATED:  %U
   :END:"
 				 :kill-buffer
 				 )
-				("d" "Diary" entry (file+headline (expand-file-name "diary.org" org-directory) "Refile")
+				("d" "Diary" entry (file+headline konix/org-diary_file "Refile")
 				 "* %?
   :PROPERTIES:
   :CREATED:  %U
@@ -2014,7 +2025,7 @@ items"
   %t"
 				 :kill-buffer
 				 )
-				("B" "Bookmark (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
+				("B" "Bookmark (use with org-protocol)" entry (file+headline konix/org-bookmarks_file "Refile")
 				 "* %:description
   :PROPERTIES:
   :CREATED:  %U
@@ -2032,7 +2043,7 @@ items"
    %:initial"
 				 :kill-buffer
 				 )
-				("D" "Bookmark TODO (use with org-protocol)" entry (file+headline (expand-file-name "todo.org" org-directory) "Refile")
+				("D" "Bookmark TODO (use with org-protocol)" entry (file+headline konix/org-todo_file "Refile")
 				 "* TODO Read %:description
   :PROPERTIES:
   :CREATED:  %U
@@ -2050,7 +2061,7 @@ items"
    %:initial"
 				 :kill-buffer
 				 )
-				("R" "Bookmark to read (use with org-protocol)" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
+				("R" "Bookmark to read (use with org-protocol)" entry (file+headline konix/org-bookmarks_file "Refile")
 				 "* TODO Read %:description
   :PROPERTIES:
   :CREATED:  %U
@@ -2059,21 +2070,21 @@ items"
    %:initial"
 				 :kill-buffer
 				 )
-				("b" "Bookmark" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
+				("b" "Bookmark" entry (file+headline konix/org-bookmarks_file "Refile")
 				 "* %?
   :PROPERTIES:
   :CREATED:  %U
   :END:"
 				 :kill-buffer
 				 )
-				("r" "Bookmark To Read" entry (file+headline (expand-file-name "bookmarks.org" org-directory) "Refile")
+				("r" "Bookmark To Read" entry (file+headline konix/org-bookmarks_file "Refile")
 				 "* TODO Read %?
   :PROPERTIES:
   :CREATED:  %U
   :END:"
 				 :kill-buffer
 				 )
-				("j" "Interruption" entry (file+headline (expand-file-name "diary.org" org-directory) "Interruptions")
+				("j" "Interruption" entry (file+headline konix/org-diary_file "Interruptions")
 				 "* Interruption %? :INTERRUPTION:
   :PROPERTIES:
   :CREATED:  %U
@@ -2362,7 +2373,7 @@ items"
 
 (defun konix/org-goto-todo ()
   (interactive)
-  (find-file (expand-file-name "todo.org" org-directory))
+  (find-file (konix/org-todo_file))
   )
 
 (defmacro konix/org-with-point-at-clocked-entry (&rest body)
@@ -2388,7 +2399,7 @@ items"
 
 (defun konix/org-goto-bookmarks ()
   (interactive)
-  (find-file (expand-file-name "bookmarks.org" org-directory))
+  (find-file (konix/org-bookmarks_file))
   )
 
 (defun konix/org-add-note ()

@@ -53,7 +53,7 @@
 		)
   ;; get the ssh environment variable
   (let (
-        (ssh_auth_sock (format "%s/.gnupg/S.gpg-agent.ssh" (getenv "HOME")))
+        (ssh_auth_sock (format "%s/gnupg/S.gpg-agent.ssh" (getenv "XDG_RUNTIME_DIR")))
         )
     (if (file-exists-p ssh_auth_sock)
         (setenv "SSH_AUTH_SOCK" ssh_auth_sock)

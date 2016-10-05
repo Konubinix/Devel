@@ -50,9 +50,8 @@ gaps_log "Syncing limited by remote ${REMOTE}"
 
 pushd "${TOP_LEVEL}"
 fail=0
-inc_fail_and_continue () {
+inc_fail () {
     fail=$((fail + 1))
-    continue
 }
 gaps_remotes_fix "${REMOTE}"
 if [ -d "${GITANNEXSYNC_REMOTES}" ]
@@ -78,7 +77,8 @@ then
         if ! gaps_extract_remote_info "${contexts}" "${remote}"
         then
             gaps_warn "Could not find info for remote ${remote} in contexts ${contexts}"
-            inc_fail_and_continue
+            inc_fail
+            continue
         fi
 
 		if [ "${type}" == "git" ] || [ "${type}" == "ssh" ] || [ "${type}" == "local" ]
@@ -104,7 +104,8 @@ then
 			git annex sync "${remote_name}" || {
 				gaps_error "Failed git annex syncing with ${remote}" ;
 				trap "" 0
-				inc_fail_and_continue
+				inc_fail
+                continue
 			}
 			NEW_MASTER_SHA=`git log -1 master --pretty=format:"%H"`
 			NEW_GIT_ANNEX_SHA=`git log -1 git-annex --pretty=format:"%H"`

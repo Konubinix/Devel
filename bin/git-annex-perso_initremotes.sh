@@ -23,7 +23,8 @@ then
         gaps_extract_remote_info_or_continue "${contexts}" "${remote}"
         if gaps_remote_initialized_p "${remote}"
         then
-            gaps_warn_and_continue "Aborting initialization because $remote_name is already a remote"
+            gaps_warn "Aborting initialization because $remote_name is already a remote"
+			continue
         fi
 		if [ "$type" == "rsync" ]
 		then

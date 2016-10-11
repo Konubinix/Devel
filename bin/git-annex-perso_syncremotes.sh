@@ -68,11 +68,14 @@ then
         gaps_log_info "Syncing with $remote"
         if ! gaps_remote_initialized_p "${remote}"
         then
-            gaps_warn_and_continue "Remote ${remote} not initialized, cannot do anything with it"
+			gaps_warn "Remote ${remote} not initialized, cannot do anything with it"
+			continue
         fi
         if ! gaps_remote_considered_available_p "${remote}"
         then
-            gaps_warn_and_continue "Remote ${remote} not considered available. Cannot do anything with it"
+
+            gaps_warn "Remote ${remote} not considered available. Cannot do anything with it"
+			continue
         fi
         if ! gaps_extract_remote_info "${contexts}" "${remote}"
         then
@@ -124,14 +127,14 @@ then
             pushd "${LIMIT_PATH}"
             gaps_log "Transferring data"
             if ( [ "${type}" == "git" ] || [ "${type}" == "ssh" ] || [ "${type}" == "local" ] ) && [ "${OLD_GIT_ANNEX_SHA}" == "${NEW_GIT_ANNEX_SHA}" \
-                -a \
-                "${OLD_MASTER_SHA}" == "${NEW_MASTER_SHA}" \
-                -a \
-                "${OLD_REMOTE_MASTER_SHA}" == "${NEW_REMOTE_MASTER_SHA}" \
-                -a \
-                "${OLD_REMOTE_GIT_ANNEX_SHA}" == "${NEW_REMOTE_GIT_ANNEX_SHA}" \
-                -a \
-                -z "${KONIX_GIT_ANNEX_PERSO_SYNC_FORCE}" ]
+																															-a \
+																															"${OLD_MASTER_SHA}" == "${NEW_MASTER_SHA}" \
+																															-a \
+																															"${OLD_REMOTE_MASTER_SHA}" == "${NEW_REMOTE_MASTER_SHA}" \
+																															-a \
+																															"${OLD_REMOTE_GIT_ANNEX_SHA}" == "${NEW_REMOTE_GIT_ANNEX_SHA}" \
+																															-a \
+																															-z "${KONIX_GIT_ANNEX_PERSO_SYNC_FORCE}" ]
             then
                 gaps_log "Git branches have not been impacted by sync with ${remote} and force not set"
                 gaps_log "-> do not attempt to copy anything"

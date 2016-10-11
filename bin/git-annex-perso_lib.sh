@@ -117,11 +117,6 @@ gaps_error_and_quit ( ) {
     exit 2
 }
 
-gaps_warn_and_continue ( ) {
-    gaps_warn "$@"
-    continue
-}
-
 gaps_assert ( ) {
     local condition="$1"
     local message="$2"

@@ -8,7 +8,7 @@ if [ -z "${NEW_NAME}" ]
 then
 	echo "Could not find a new name fo ${file}"
 	exit 1
-!fi
+fi
 
 NEW_NAME_CP="$(konix_absolute_path.py "${NEW_NAME}")"
 FILE_CP="$(konix_absolute_path.py "${file}")"

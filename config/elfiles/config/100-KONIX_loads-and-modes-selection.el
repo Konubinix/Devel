@@ -238,6 +238,7 @@
 (autoload 'ein:notebooklist-open "ein-notebooklist" "" t)
 (autoload 'pdf-view-mode "pdf-view" "" t)
 (autoload 'elf-mode "elf-mode" "" t)
+(autoload 'konix/gdbserver "gdb-mi" "" t)
 
 ;; ************************************************************
 ;; Automodes

@@ -6,7 +6,9 @@ import collections
 import itertools
 import six
 import inspect
+from konix_iterable_accessor import IterableAccessorProxy
 from pipe import *
+iap = Pipe(IterableAccessorProxy)
 
 bstring = str if six.PY3 else basestring
 false = False

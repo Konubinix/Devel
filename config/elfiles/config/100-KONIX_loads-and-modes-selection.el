@@ -315,6 +315,7 @@
 ;; pdf-tools
 (add-to-list 'auto-mode-alist (cons "\\.[pP][dD][fF]$" 'pdf-view-mode))
 (add-to-list 'auto-mode-alist (cons "\\.so$" 'elf-mode))
+(add-to-list 'auto-mode-alist (cons "\\.md$" 'markdown-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

@@ -41,6 +41,20 @@
   (display-buffer buf)
   )
 
+(defvar konix/gdbserver-history '())
+(defun konix/gdbserver (command-line)
+  (interactive
+   (list
+    (read-string
+     "Command line: "
+     "konix_gdbserver_connect.sh -i=mi"
+     konix/gdbserver-history
+     "konix_gdbserver_connect.sh -i=mi"
+     )
+    )
+   )
+  (gdb command-line)
+  )
 
 (provide '700-KONIX_gdb-mode)
 ;;; 700-KONIX_gdb-mode.el ends here

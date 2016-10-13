@@ -133,7 +133,7 @@
 		  ac-source-dabbrev
 		  )
 		)
-  (autopair-mode 1)
+  (electric-pair-mode 1)
   )
 (add-hook 'comint-mode-hook 'konix/comint-mode-hook)
 

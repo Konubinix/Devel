@@ -62,9 +62,6 @@
 [submodule "config/elfiles/codesearch"]
 	path = config/elfiles/codesearch
 	url = https://github.com/abingham/codesearch.el.git
-[submodule "config/elfiles/autopair"]
-	path = config/elfiles/autopair
-	url = https://github.com/capitaomorte/autopair.git
 [submodule "config/elfiles/yasnippet"]
 	path = config/elfiles/yasnippet
 	url = https://github.com/capitaomorte/yasnippet.git

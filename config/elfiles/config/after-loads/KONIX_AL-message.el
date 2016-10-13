@@ -46,7 +46,7 @@
 (defun konix/message-mode-hook ()
   (visual-line-mode 1)
   (flyspell-mode 1)
-  (autopair-mode 1)
+  (electric-pair-mode 1)
   (orgtbl-mode)
   (orgstruct-mode)
   ;; footnote overrides some keybindings made by orgstruct-mode

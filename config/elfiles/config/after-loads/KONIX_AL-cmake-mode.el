@@ -126,7 +126,7 @@
   )
 
 (defun konix/cmake-mode-hook ()
-  (autopair-mode 1)
+  (electric-pair-mode 1)
   (hs-minor-mode 1)
   (konix/prog/config)
   (setq fill-column 120)

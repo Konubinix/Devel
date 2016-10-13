@@ -25,7 +25,7 @@
 ;;; Code:
 
 (defun konix/taskjuggler-mode-hook ()
-  (autopair-mode)
+  (electric-pair-mode)
   (hs-minor-mode)
   )
 

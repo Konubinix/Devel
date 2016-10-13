@@ -248,7 +248,7 @@
   (auto-complete-mode t)
   (ansi-color-for-comint-mode-on)
   (setq show-trailing-whitespace nil)
-  (autopair-mode t)
+  (electric-pair-mode t)
   (cond
    ((string-match-p "shell" (buffer-name))
 	(set (make-variable-buffer-local 'dirtrack-list)

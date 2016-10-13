@@ -397,7 +397,7 @@ immediately after the section's start-tag."
 	 )
 	)
   (auto-fill-mode t)
-  ;; (autopair-mode 1)
+  ;; (electric-pair-mode 1)
   (setq show-trailing-whitespace t)
   (setq indent-line-function 'konix/nxml-indent-line)
   ;; (ac-flyspell-workaround)

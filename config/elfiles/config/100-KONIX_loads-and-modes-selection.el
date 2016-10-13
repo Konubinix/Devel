@@ -36,7 +36,6 @@
 		 (expand-file-name "miniedit" elfiles)
 		 (expand-file-name "bash-completion" elfiles)
 		 (expand-file-name "codesearch" elfiles)
-		 (expand-file-name "autopair" elfiles)
 		 (expand-file-name "ace-jump-mode" elfiles)
 		 (expand-file-name "calfw" elfiles)
 		 (expand-file-name "highlight-indentation" elfiles)

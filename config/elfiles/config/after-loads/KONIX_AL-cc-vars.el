@@ -125,7 +125,6 @@
 	  )
   (set (make-local-variable 'find-tag-default-function)
 	   'konix/c++-find-tag-default)
-  (setq-local autopair-pair-criteria 'always)
   (local-set-key (kbd "C-M-q") 'rebox-dwim)
   )
 (add-hook 'c++-mode-hook 'konix/c++-mode-hook)

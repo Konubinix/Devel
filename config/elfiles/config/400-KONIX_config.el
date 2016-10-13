@@ -302,13 +302,6 @@
 (setq-default yas-fallback-behavior 'call-other-command)
 
 ;; ************************************************************
-;; Autopair (parenthèsage automatique et bien pensé)
-;; ************************************************************
-(require 'autopair)
-(setq-default autopair-autowrap t) ;; Pour qu'un mot sélectionnée puisse être wrappé par ( ou "
-(setq-default autopair-blink nil)
-
-;; ************************************************************
 ;; Enregistrement de la position dans le texte quand on quitte
 ;; ************************************************************
 (require 'saveplace)

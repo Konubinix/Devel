@@ -40,11 +40,6 @@
 		  ac-source-files-in-current-dir
 		  )
 		)
-  ;; Autopair des """ en python
-  (setq autopair-handle-action-fns
-		(list #'autopair-default-handle-action
-			  #'autopair-python-triple-quote-action)
-		)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
   )
 (add-hook 'python-mode-hook

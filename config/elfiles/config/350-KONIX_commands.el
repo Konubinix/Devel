@@ -1573,12 +1573,12 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 
 (defun konix/www/goto-bookmarks ()
   (interactive)
-  (find-file (getenv "UZBL_BOOKMARKS_FILE"))
+  (find-file (format "%s/urls" (getenv "QUTE_BOOKMARK_DIRECTORY")))
   )
 
 (defun konix/www/goto-history ()
   (interactive)
-  (find-file (getenv "UZBL_HISTORY_FILE"))
+  (find-file (format "%s/qutebrowser/history" (getenv "XDG_DATA_HOME")))
   )
 
 (defun konix/www/web-search (string &optional default)

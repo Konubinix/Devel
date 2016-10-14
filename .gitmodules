@@ -268,7 +268,8 @@
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
 [submodule "qutebrowser"]
 	path = qutebrowser
-	url = https://github.com/The-Compiler/qutebrowser
+	url = https://github.com/Konubinix/qutebrowser
+	#url = https://github.com/The-Compiler/qutebrowser
 [submodule "git-annex-remote-rclone"]
 	path = git-annex-remote-rclone
 	url = https://github.com/DanielDent/git-annex-remote-rclone

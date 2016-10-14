@@ -25,7 +25,9 @@ while getopts "nhN:" opt; do
 done
 [ -n "${NAME}" ] || { echo "You must provide a name" >&2 ; usage ; exit 127 ; }
 shift $((OPTIND-1))
+
 (
     flock ${FLOCK_ARGS} 9 || { echo "A script associated to ${NAME} is already running" >&2 ; exit 128 ; }
     "$@"
+    echo "Command ${*} ended" 2>&1
 ) 9>"/var/lock/${NAME}.lock"

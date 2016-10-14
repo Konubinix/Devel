@@ -384,9 +384,15 @@
 (defun konix/notmuch-message-completion-toggle ()
   (interactive)
   (require 'notmuch)
-  (let (
-		(need_to_remove (not (not (member notmuch-address-message-alist-member message-completion-alist))))
-		)
+  (let* (
+         (notmuch-address-message-alist-member
+          (cons notmuch-address-completion-headers-regexp
+                #'notmuch-address-expand-name)
+          )
+         (need_to_remove (not (not (member notmuch-address-message-alist-member
+                                           message-completion-alist))))
+         (msg (if need_to_remove "Disable" "Enable"))
+         )
 	(if need_to_remove
 		(setq message-completion-alist (remove
 										notmuch-address-message-alist-member
@@ -394,7 +400,7 @@
 	  (add-to-list 'message-completion-alist
 				   notmuch-address-message-alist-member)
 	  )
-	(message "Activation of notmuch completion : %s" (not need_to_remove))
+	(message "%s of notmuch completion" msg)
 	)
   )
 (defun konix/notmuch-define-key-search-show (key function)

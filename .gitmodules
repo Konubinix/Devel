@@ -280,3 +280,24 @@
 [submodule "config/bash-completion-virtualbox"]
 	path = config/bash-completion-virtualbox
 	url = https://github.com/tfmalt/bash-completion-virtualbox
+[submodule "config/elfiles/fakir"]
+	path = config/elfiles/fakir
+	url = https://github.com/nicferrier/emacs-fakir
+[submodule "config/elfiles/dash"]
+	path = config/elfiles/dash
+	url = https://github.com/nicferrier/dash.el
+[submodule "config/elfiles/noflet"]
+	path = config/elfiles/noflet
+	url = https://github.com/nicferrier/emacs-noflet
+[submodule "config/elfiles/kv"]
+	path = config/elfiles/kv
+	url = https://github.com/nicferrier/emacs-kv
+[submodule "config/elfiles/s"]
+	path = config/elfiles/s
+	url = https://github.com/nicferrier/s.el
+[submodule "config/elfiles/web"]
+	path = config/elfiles/web
+	url = https://github.com/nicferrier/emacs-web
+[submodule "config/elfiles/db"]
+	path = config/elfiles/db
+	url = https://github.com/nicferrier/emacs-db

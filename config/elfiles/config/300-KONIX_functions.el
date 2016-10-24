@@ -1033,13 +1033,30 @@ you can still examine the changes via M-x ediff-files"
 (defun konix/elnode-show-my-buffer (httpcon)
   "(elnode-start 'konix/elnode-show-my-buffer :port 9000 :host \"*\")
    (elnode-stop 9000)"
-  (elnode-http-start httpcon 200 '("Content-Type: text/html"))
   (with-current-buffer (with-current-buffer (car (buffer-list))
 						 (htmlfontify-buffer)
 						 )
-	;; go after the xml declaration
-	(elnode-http-return httpcon (buffer-substring 40 (point-max)))
+	(elnode-send-html httpcon (buffer-substring (point-min) (point-max)))
 	)
+  )
+
+(defun konix/elnode-start-sharing-buffer (buffer port)
+  (interactive "bBuffer: \nnPort: \n")
+  (elnode-stop port)
+  (let (
+        (handler `(lambda (httpcon)
+                     (with-current-buffer
+                         (with-current-buffer
+                             (get-buffer ,buffer)
+                           (htmlfontify-buffer)
+                           )
+                       (elnode-send-html httpcon (buffer-substring (point-min) (point-max)))
+                     )
+                   )
+                 )
+        )
+    (elnode-start handler :port port :host "*")
+    )
   )
 
 (defun konix/lorem-ipsum ()

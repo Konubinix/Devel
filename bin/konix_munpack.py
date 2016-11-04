@@ -66,6 +66,9 @@ def munpack(message, directory, rel_path=False):
         if content is None:
             continue
         charset = part.get_content_charset()
+        sub_type = part.get_content_subtype()
+        if charset is None and sub_type == "html":
+            charset = "utf-8"
         try:
             text = content.decode(charset) if charset else None
         except UnicodeDecodeError:
@@ -77,7 +80,6 @@ def munpack(message, directory, rel_path=False):
             text = bcontent
         content_type = part.get_content_type()
         main_type = part.get_content_maintype()
-        sub_type = part.get_content_subtype()
         prefix = main_type
         extension = sub_type
         file_ = tempfile.NamedTemporaryFile(

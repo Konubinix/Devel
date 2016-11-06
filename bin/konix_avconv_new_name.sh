@@ -6,19 +6,17 @@ file="$1"
 file_abs="$(konix_absolute_path.py "${file}")"
 ext="${file##*.}"
 dir="$(dirname "${file}")"
-utc_date="$(avconv -i "${file}" 2>&1 \
+creation_date="$(avconv -i "${file}" 2>&1 \
 	| grep creation_time \
 	| head -1 \
-	| sed -r 's|^.+creation_time   : ([0-9][0-9][0-9][0-9]-[0-9]+-[0-9]+) ([0-9]+:[0-9]+:[0-9]+).*$|\1T\2+0000|')"
-local_date="$(avconv -i "${file}" 2>&1 \
-	| grep creation_time \
-	| head -1 \
-	| sed -r 's|^.+creation_time   : ([0-9][0-9][0-9][0-9]-[0-9]+-[0-9]+) ([0-9]+:[0-9]+:[0-9]+).*$|\1T\2|')"
+	| sed -r 's|^.+creation_time   : ([0-9][0-9][0-9][0-9]-[0-9]+-[0-9]+)[ T]([0-9]+:[0-9]+:[0-9]+).*$|\1T\2|')"
 if avconv -i "${file}" 2>&1 |grep -q "handler_name.\+:.\+VideoHandle"
 then
-	date_to_parse="${utc_date}"
+	# utc date
+	date_to_parse="${creation_date}+0000"
 else
-	date_to_parse="${local_date}"
+	# local date
+	date_to_parse="${creation_date}"
 fi
 if [ "${date_to_parse}" == "" ]
 then

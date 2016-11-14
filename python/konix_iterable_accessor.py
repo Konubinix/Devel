@@ -3,6 +3,7 @@
 
 from padme import proxy
 import functools
+from pprint import pformat
 
 class IterableCaller(object):
     def __init__(self, list_, name):
@@ -28,14 +29,19 @@ class IterableAccessorProxy(list):
     def __dir__(self):
         return dir(self._first) + ["l"]
 
+    @property
+    def df(self):
+        from pandas import DataFrame
+        return DataFrame(self.l)
+
     def __repr__(self):
-        return repr(self.l)
+        return pformat(self.l)
 
     def __iter__(self):
         return iter(self.l)
 
     def __getattribute__(self, name):
-        if name in ["l", "_first", "__dir__", "__class__"]:
+        if name in ["l", "__repr__", "df", "_first", "__dir__", "__class__"]:
             return super(IterableAccessorProxy, self).__getattribute__(name)
         if hasattr(getattr(self._first, name), "__call__"):
             # callable, need to call it on each object

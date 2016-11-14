@@ -79,7 +79,7 @@ def getConfigFromEnvFile(envfile, previous_config):
                   previous_config,
                   new_config,
                 )
-                logging.debug("Attempting to include env from %s (%s)" %
+                logging.debug("## Attempting to include env from %s (%s)" %
                               (file_to_include, condition,))
                 if condition == "assert_exists":
                   assert os.path.exists(file_to_include)
@@ -189,15 +189,15 @@ def main():
             config_os_file = os.path.join(konix_config, "env_"+os.sys.platform+".conf")
             config_os_user_file = os.path.join(os.path.expanduser("~"),"env_"+os.sys.platform+".conf")
             if backup_file:
-                logging.debug("Beginning with the backup env "+backup_file+" that will override the default env")
+                logging.debug("## Beginning with the backup env "+backup_file+" that will override the default env")
                 config = getConfigFromEnvFile(backup_file,config)
-            logging.debug("Parsing "+config_file)
+            logging.debug("## Parsing "+config_file)
             config = getConfigFromEnvFile(config_file,config)
-            logging.debug("Parsing "+config_user_file)
+            logging.debug("## Parsing "+config_user_file)
             config = getConfigFromEnvFile(config_user_file,config)
-            logging.debug("Parsing "+config_os_file)
+            logging.debug("## Parsing "+config_os_file)
             config = getConfigFromEnvFile(config_os_file,config)
-            logging.debug("Parsing "+config_os_user_file)
+            logging.debug("## Parsing "+config_os_user_file)
             config = getConfigFromEnvFile(config_os_user_file,config)
         else:
             logging.debug("Ignoring the env")

@@ -301,3 +301,6 @@
 [submodule "config/elfiles/db"]
 	path = config/elfiles/db
 	url = https://github.com/nicferrier/emacs-db
+[submodule "config/elfiles/golden-ratio"]
+	path = config/elfiles/golden-ratio
+	url = https://github.com/roman/golden-ratio.el.git

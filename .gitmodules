@@ -19,10 +19,6 @@ ignore=dirty
 ignore=dirty
 	path = bash_optparse
 	url = https://github.com/carlobaldassi/bash_optparse.git
-[submodule "config/elfiles/cc-mode"]
-ignore=dirty
-	path = config/elfiles/cc-mode
-	url = https://github.com/emacsmirror/cc-mode.git
 [submodule "config/elfiles/rebox2"]
 ignore=dirty
 	path = config/elfiles/rebox2
@@ -201,10 +197,6 @@ ignore=dirty
 ignore=dirty
 	path = syncplay
 	url = https://github.com/Uriziel/syncplay.git
-[submodule "config/elfiles/text-translator"]
-ignore=dirty
-	path = config/elfiles/text-translator
-	url = bzr::http://bazaar.launchpad.net/~khiker/+junk/text-translator
 [submodule "gui2py"]
 ignore=dirty
 	path = gui2py
@@ -239,10 +231,6 @@ ignore=dirty
 ignore=dirty
 	path = gorgeous
 	url = https://github.com/mislav/gorgeous
-[submodule "pdbpp"]
-ignore=dirty
-	path = pdbpp
-	url = hg::https://bitbucket.org/antocuni/pdb
 [submodule "config/elfiles/rainbow-mode"]
 ignore=dirty
 	path = config/elfiles/rainbow-mode

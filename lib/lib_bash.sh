@@ -445,7 +445,7 @@ call_second_like_me () {
     local SECOND="$(konix_find_next_in_path.sh -n "$(my_name)" -f "${0}")"
     if [ -n "${CALL_SECOND_LIKE_ME_DEBUG}" ]
     then
-        echo "Calling ${SECOND} from $(my_name)" 2>&1
+        echo "Calling ${SECOND} from $(my_name)" >&2
     fi
     "${SECOND}" "$@"
 }
@@ -454,7 +454,7 @@ exec_second_like_me () {
     local SECOND="$(konix_find_next_in_path.sh -n "$(my_name)" -f "${0}")"
     if [ -n "${CALL_SECOND_LIKE_ME_DEBUG}" ]
     then
-        echo "Executing ${SECOND} from $(my_name)" 2>&1
+        echo "Executing ${SECOND} from $(my_name)" >&2
     fi
     exec "${SECOND}" "$@"
 }

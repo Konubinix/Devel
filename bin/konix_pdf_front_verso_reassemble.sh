@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eux
 
 front="${1:-front.pdf}"
 verso="${2:-verso.pdf}"

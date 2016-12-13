@@ -392,3 +392,7 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/golden-ratio
 	url = https://github.com/roman/golden-ratio.el.git
+[submodule "pymimedetacher"]
+	path = pymimedetacher
+	url = https://github.com/Konubinix/pymimedetacher.git
+        ignore=dirty

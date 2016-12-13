@@ -1,11 +1,9 @@
 #!/bin/bash
 
-log ( ) {
-    echo "## $*"
-}
+source "git-annex-perso_lib.sh"
 
 die ( ) {
-    log "$*"
+    gaps_error "$*"
     exit 1
 }
 
@@ -14,7 +12,7 @@ gaps_launch_freeze_pre_hook ( ) {
     local message="${2}"
     if [ -f "${hook}" ]
     then
-        log "Launching the freeze prehook (${hook}) for $message"
+        gaps_log "Launching the freeze prehook (${hook}) for $message"
         bash -x "${hook}" \
             || die "Failed to launch the freeze prehook for ${message}"
     fi
@@ -25,7 +23,7 @@ gaps_launch_freeze_post_hook ( ) {
     local message="${2}"
     if [ -f "${hook}" ]
     then
-        log "Launching the freeze posthook (${hook}) for $message"
+        gaps_log "Launching the freeze posthook (${hook}) for $message"
         bash -x "${hook}" \
             || die "Failed to launch the freeze posthook for ${message}"
     fi
@@ -35,25 +33,25 @@ GITANNEXFREEZE_PRE_HOOK=".gitannexfreeze_prehook"
 GITANNEXFREEZE_POST_HOOK=".gitannexfreeze_posthook"
 
 pushd `git -c core.bare=false rev-parse --show-toplevel`
-log "First merge the annex in case someone else pushed the sync branch here"
+gaps_log "First merge the annex in case someone else pushed the sync branch here"
 git annex merge || die "Could not merge"
 gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}" "$(pwd)"
 gaps_launch_freeze_pre_hook "${GITANNEXFREEZE_PRE_HOOK}_${HOSTNAME}" "$(pwd)"
 if [ "$(git config annex.direct)" == "true" ]
 then
-    log "In direct mode, I have to make git sync before git annex"
+    gaps_log "In direct mode, I have to make git sync before git annex"
     git -c core.bare=false diff --name-only --diff-filter=M -z | xargs --no-run-if-empty -0 git -c core.bare=false add -v
-    log "Remove from the index files that were deleted in the working tree"
+    gaps_log "Remove from the index files that were deleted in the working tree"
     git -c core.bare=false diff --name-only --diff-filter=D -z | xargs --no-run-if-empty -0 git -c core.bare=false rm --cached || die "Could not remove deleted files"
 fi
-log "Annex add new files"
+gaps_log "Annex add new files"
 git annex add || die "Could not annex add"
 if ! [ "$(git config annex.direct)" == "true" ]
 then
-	log "In indirect mode, syncing the working copy to index after git annex"
+	gaps_log "In indirect mode, syncing the working copy to index after git annex"
 	git add -A :/ || die "Could not add -A files"
 else
-    log "Add files ignored by git annex"
+    gaps_log "Add files ignored by git annex"
     git -c core.bare=false ls-files --others --exclude-standard -z|xargs -0 --no-run-if-empty git -c core.bare=false add -v
 fi
 # taken from https://github.com/svend/home-bin/blob/master/git-autocommit

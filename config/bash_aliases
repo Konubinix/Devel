@@ -26,7 +26,6 @@ alias REmake="make clean && make"
 alias CTRL_CAPS="setxkbmap -option ctrl:swapcaps"
 alias pud="pushd"
 alias pod="popd"
-alias dia="dia --integrated"
 alias makej=konix_makej.sh
 alias ctestj=konix_ctestj.sh
 alias alert='echo -en "\a"'

@@ -1,306 +1,406 @@
 [submodule "config/elfiles/org"]
+ignore=dirty
 	path = config/elfiles/org
 	url = https://github.com/Konubinix/org-mode
 	# url = git://repo.or.cz/org-mode.git
 [submodule "config/elfiles/full-ack"]
+ignore=dirty
 	path = config/elfiles/full-ack
 	url = https://github.com/nschum/full-ack.git
 [submodule "lib/ftputil"]
+ignore=dirty
 	path = lib/ftputil
 	url = https://github.com/mafalb/python-ftputil.git
 [submodule "config/elfiles/w3m"]
+ignore=dirty
 	path = config/elfiles/w3m
 	url = https://github.com/emacsmirror/w3m.git
 [submodule "bash_optparse"]
+ignore=dirty
 	path = bash_optparse
 	url = https://github.com/carlobaldassi/bash_optparse.git
 [submodule "config/elfiles/cc-mode"]
+ignore=dirty
 	path = config/elfiles/cc-mode
 	url = https://github.com/emacsmirror/cc-mode.git
 [submodule "config/elfiles/rebox2"]
+ignore=dirty
 	path = config/elfiles/rebox2
 	url = https://github.com/lewang/rebox2.git
 [submodule "config/elfiles/readline-complete"]
+ignore=dirty
 	path = config/elfiles/readline-complete
 	url = https://github.com/monsanto/readline-complete.el.git
 [submodule "config/elfiles/elnode"]
+ignore=dirty
 	path = config/elfiles/elnode
 	url = https://github.com/nicferrier/elnode.git
 [submodule "config/elfiles/langtool"]
+ignore=dirty
 	path = config/elfiles/langtool
 	url = https://github.com/mhayashi1120/Emacs-langtool.git
 [submodule "config/elfiles/auto-complete"]
+ignore=dirty
 	path = config/elfiles/auto-complete
 	url = https://github.com/auto-complete/auto-complete.git
 [submodule "config/elfiles/popup"]
+ignore=dirty
 	path = config/elfiles/popup
 	url = https://github.com/auto-complete/popup-el.git
 [submodule "config/elfiles/elim"]
+ignore=dirty
 	path = config/elfiles/elim
 	url = git://git.sv.gnu.org/elim.git
 [submodule "config/elfiles/icicles"]
+ignore=dirty
 	path = config/elfiles/icicles
 	url = https://github.com/emacsmirror/icicles.git
 [submodule "config/elfiles/dbgr"]
+ignore=dirty
 	path = config/elfiles/dbgr
 	url = https://github.com/rocky/emacs-dbgr.git
 [submodule "config/elfiles/load-relative"]
+ignore=dirty
 	path = config/elfiles/load-relative
 	url = https://github.com/rocky/emacs-load-relative
 [submodule "config/elfiles/loc-changes"]
+ignore=dirty
 	path = config/elfiles/loc-changes
 	url = https://github.com/rocky/emacs-loc-changes.git
 [submodule "config/elfiles/popwin"]
+ignore=dirty
 	path = config/elfiles/popwin
 	url = https://github.com/m2ym/popwin-el.git
 [submodule "config/elfiles/miniedit"]
+ignore=dirty
 	path = config/elfiles/miniedit
 	url = https://github.com/emacsmirror/miniedit.git
 [submodule "config/elfiles/bash-completion"]
+ignore=dirty
 	path = config/elfiles/bash-completion
 	url = https://github.com/szermatt/emacs-bash-completion.git
 [submodule "config/elfiles/codesearch"]
+ignore=dirty
 	path = config/elfiles/codesearch
 	url = https://github.com/abingham/codesearch.el.git
 [submodule "config/elfiles/yasnippet"]
+ignore=dirty
 	path = config/elfiles/yasnippet
 	url = https://github.com/capitaomorte/yasnippet.git
 [submodule "config/elfiles/bbdb"]
+ignore=dirty
 	path = config/elfiles/bbdb
 	url = git://git.savannah.nongnu.org/bbdb.git
 [submodule "config/elfiles/jinja2-mode"]
+ignore=dirty
 	path = config/elfiles/jinja2-mode
 	url = https://github.com/paradoxxxzero/jinja2-mode.git
 [submodule "config/elfiles/graphviz-dot-mode"]
+ignore=dirty
 	path = config/elfiles/graphviz-dot-mode
 	url = https://github.com/ppareit/graphviz-dot-mode.git
 [submodule "seeks"]
+ignore=dirty
 	path = seeks
 	url = git://seeks.git.sourceforge.net/gitroot/seeks/seeks
 [submodule "sjoubert_dot_rc"]
+ignore=dirty
 	path = sjoubert_dot_rc
 	url = https://github.com/sjoubert/dotrcfiles.git
 [submodule "config/elfiles/ace-jump-mode"]
+ignore=dirty
 	path = config/elfiles/ace-jump-mode
 	url = https://github.com/winterTTr/ace-jump-mode.git
 [submodule "merge-ics"]
+ignore=dirty
 	path = merge-ics
 	url = https://github.com/Konubinix/merge-ics.git
 [submodule "config/elfiles/calfw"]
+ignore=dirty
 	path = config/elfiles/calfw
 	url = https://github.com/kiwanami/emacs-calfw.git
 [submodule "config/elfiles/highlight-indentation"]
+ignore=dirty
 	path = config/elfiles/highlight-indentation
 	url = https://github.com/antonj/Highlight-Indentation-for-Emacs.git
 [submodule "git-fs"]
+ignore=dirty
 	path = git-fs
 	url = https://github.com/g2p/git-fs.git
 [submodule "hobeika_cfg"]
+ignore=dirty
 	path = hobeika_cfg
 	url = https://github.com/hobeika/cfg
 [submodule "smartcd"]
+ignore=dirty
 	path = smartcd
 	url = https://github.com/cxreg/smartcd.git
 [submodule "git-wip"]
+ignore=dirty
 	path = git-wip
 	url = https://github.com/bartman/git-wip.git
 [submodule "lazygal"]
+ignore=dirty
 	path = lazygal
 	url = https://github.com/Konubinix/lazygal.git
 [submodule "lib/log.sh"]
+ignore=dirty
 	path = lib/log.sh
 	url = https://github.com/livibetter/log.sh.git
 [submodule "config/elfiles/org-ehtml"]
+ignore=dirty
 	path = config/elfiles/org-ehtml
 	url = https://github.com/eschulte/org-ehtml
 [submodule "config/elfiles/znc"]
+ignore=dirty
 	path = config/elfiles/znc
 	url = https://github.com/sshirokov/ZNC.el.git
 [submodule "supervisord"]
+ignore=dirty
 	path = supervisord
 	url = https://github.com/Supervisor/supervisor.git
 [submodule "config/elfiles/circe"]
+ignore=dirty
 	path = config/elfiles/circe
 	url = https://github.com/Konubinix/circe.git
 [submodule "ledger-autosync"]
+ignore=dirty
 	path = ledger-autosync
 	#url = https://gitlab.com/egh/ledger-autosync.git
 	url = https://github.com/Konubinix/ledger-autosync
 [submodule "config/elfiles/ini"]
+ignore=dirty
 	path = config/elfiles/ini
 	url = https://github.com/daniel-ness/ini.el.git
 [submodule "config/elfiles/ebib"]
+ignore=dirty
 	path = config/elfiles/ebib
 	url = https://github.com/joostkremers/ebib.git
 [submodule "config/elfiles/deferred"]
+ignore=dirty
 	path = config/elfiles/deferred
 	url = https://github.com/kiwanami/emacs-deferred.git
 [submodule "config/elfiles/ctable"]
+ignore=dirty
 	path = config/elfiles/ctable
 	url = https://github.com/kiwanami/emacs-ctable.git
 [submodule "config/elfiles/epc"]
+ignore=dirty
 	path = config/elfiles/epc
 	url = https://github.com/kiwanami/emacs-epc.git
 [submodule "dmenu-frecency"]
+ignore=dirty
 	path = dmenu-frecency
 	url = https://github.com/kspi/dmenu-frecency.git
 [submodule "offlineimap"]
+ignore=dirty
 	path = offlineimap
 	url = https://github.com/Konubinix/offlineimap.git
 	# https://github.com/OfflineIMAP/offlineimap.git
 [submodule "syncplay"]
+ignore=dirty
 	path = syncplay
 	url = https://github.com/Uriziel/syncplay.git
 [submodule "config/elfiles/text-translator"]
+ignore=dirty
 	path = config/elfiles/text-translator
 	url = bzr::http://bazaar.launchpad.net/~khiker/+junk/text-translator
 [submodule "gui2py"]
+ignore=dirty
 	path = gui2py
 	url = https://github.com/reingart/gui2py.git
 [submodule "PulseDroid"]
+ignore=dirty
 	path = PulseDroid
 	url = https://github.com/Konubinix/PulseDroid.git
 
 [submodule "xapers"]
+ignore=dirty
 	path = xapers
 	url = https://github.com/Konubinix/xapers.git
 [submodule "notmuch"]
+ignore=dirty
 	path = notmuch
 	url = git://notmuchmail.org/git/notmuch
 [submodule "lddtree"]
+ignore=dirty
 	path = lddtree
 	#url = https://github.com/ncopa/lddtree.git
 	url = https://github.com/Konubinix/lddtree
 [submodule "config/elfiles/zenburn"]
+ignore=dirty
 	path = config/elfiles/zenburn
 	url = https://github.com/bbatsov/zenburn-emacs
 [submodule "python/pyftplib"]
+ignore=dirty
 	path = python/pyftplib
 	url = https://github.com/giampaolo/pyftpdlib
 [submodule "gorgeous"]
+ignore=dirty
 	path = gorgeous
 	url = https://github.com/mislav/gorgeous
 [submodule "pdbpp"]
+ignore=dirty
 	path = pdbpp
 	url = hg::https://bitbucket.org/antocuni/pdb
 [submodule "config/elfiles/rainbow-mode"]
+ignore=dirty
 	path = config/elfiles/rainbow-mode
 	url = https://github.com/emacsmirror/rainbow-mode
 [submodule "rtags"]
+ignore=dirty
 	path = rtags
 	url = https://github.com/Andersbakken/rtags/
 [submodule "searx"]
+ignore=dirty
 	path = searx
 	url = https://github.com/asciimoo/searx
 [submodule "XKCD-password-generator"]
+ignore=dirty
 	path = XKCD-password-generator
 	url = https://github.com/redacted/XKCD-password-generator
 [submodule "config/elfiles/swiper"]
+ignore=dirty
 	path = config/elfiles/swiper
 	url = https://github.com/abo-abo/swiper
 [submodule "config/elfiles/skewer-mode"]
+ignore=dirty
 	path = config/elfiles/skewer-mode
 	url = https://github.com/skeeto/skewer-mode
 [submodule "pdf-tools"]
+ignore=dirty
 	path = pdf-tools
 	url = https://github.com/politza/pdf-tools
 [submodule "Pymacs"]
+ignore=dirty
 	path = Pymacs
 	url = https://github.com/pinard/Pymacs
 [submodule "whatsapp-purple"]
+ignore=dirty
 	path = whatsapp-purple
 	url = https://github.com/davidgfnet/whatsapp-purple
 [submodule "clang-ctags"]
+ignore=dirty
 	path = clang-ctags
 	url = https://github.com/drothlis/clang-ctags
 [submodule "config/elfiles/ycmd"]
+ignore=dirty
 	path = config/elfiles/ycmd
 	url = https://github.com/abingham/emacs-ycmd
 [submodule "config/elfiles/ac-irony"]
+ignore=dirty
 	path = config/elfiles/ac-irony
 	url = https://github.com/Sarcasm/ac-irony
 [submodule "config/elfiles/irony-mode"]
+ignore=dirty
 	path = config/elfiles/irony-mode
 	url = https://github.com/Sarcasm/irony-mode
 [submodule "alot"]
+ignore=dirty
 	path = alot
 	url = https://github.com/pazz/alot/
 [submodule "pymsmtpq"]
+ignore=dirty
 	path = pymsmtpq
 	url = https://github.com/darkfeline/pymsmtpq
 [submodule "beets"]
+ignore=dirty
 	path = beets
 	url = https://github.com/beetbox/beets
 [submodule "mopidy"]
+ignore=dirty
 	path = mopidy
 	url = https://github.com/mopidy/mopidy
 [submodule "mopidy-beets"]
+ignore=dirty
 	path = mopidy-beets
 	url = https://github.com/mopidy/mopidy-beets
 [submodule "0bin"]
+ignore=dirty
 	path = 0bin
 	url = https://github.com/sametmax/0bin
 [submodule "config/elfiles/highlight-symbol.el"]
+ignore=dirty
 	path = config/elfiles/highlight-symbol.el
 	url = https://github.com/nschum/highlight-symbol.el
 [submodule "encfs"]
+ignore=dirty
 	path = encfs
 	url = https://github.com/Konubinix/encfs
 [submodule "Flexget"]
+ignore=dirty
 	path = Flexget
 	url = https://github.com/Flexget/Flexget.git
 [submodule "git-remote-hg"]
+ignore=dirty
 	path = git-remote-hg
 	url = https://github.com/fingolfin/git-remote-hg
 [submodule "pyfilesystem"]
+ignore=dirty
 	path = pyfilesystem
 	url = https://github.com/Konubinix/pyfilesystem.git
 [submodule "znc"]
+ignore=dirty
 	path = znc
 	url = https://github.com/Konubinix/znc
 [submodule "Pipe"]
+ignore=dirty
 	path = Pipe
 	url = https://github.com/Konubinix/Pipe
 [submodule "autojump"]
+ignore=dirty
 	path = autojump
 	url = https://github.com/wting/autojump
 [submodule "config/elfiles/wgrep"]
+ignore=dirty
 	path = config/elfiles/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
 [submodule "qutebrowser"]
+ignore=dirty
 	path = qutebrowser
 	url = https://github.com/Konubinix/qutebrowser
 	#url = https://github.com/The-Compiler/qutebrowser
 [submodule "git-annex-remote-rclone"]
+ignore=dirty
 	path = git-annex-remote-rclone
 	url = https://github.com/DanielDent/git-annex-remote-rclone
 [submodule "config/elfiles/elf-mode"]
+ignore=dirty
 	path = config/elfiles/elf-mode
 	url = https://github.com/abo-abo/elf-mode
 [submodule "config/bash-completion-virtualbox"]
+ignore=dirty
 	path = config/bash-completion-virtualbox
 	url = https://github.com/tfmalt/bash-completion-virtualbox
 [submodule "config/elfiles/fakir"]
+ignore=dirty
 	path = config/elfiles/fakir
 	url = https://github.com/nicferrier/emacs-fakir
 [submodule "config/elfiles/dash"]
+ignore=dirty
 	path = config/elfiles/dash
 	url = https://github.com/nicferrier/dash.el
 [submodule "config/elfiles/noflet"]
+ignore=dirty
 	path = config/elfiles/noflet
 	url = https://github.com/nicferrier/emacs-noflet
 [submodule "config/elfiles/kv"]
+ignore=dirty
 	path = config/elfiles/kv
 	url = https://github.com/nicferrier/emacs-kv
 [submodule "config/elfiles/s"]
+ignore=dirty
 	path = config/elfiles/s
 	url = https://github.com/nicferrier/s.el
 [submodule "config/elfiles/web"]
+ignore=dirty
 	path = config/elfiles/web
 	url = https://github.com/nicferrier/emacs-web
 [submodule "config/elfiles/db"]
+ignore=dirty
 	path = config/elfiles/db
 	url = https://github.com/nicferrier/emacs-db
 [submodule "config/elfiles/golden-ratio"]
+ignore=dirty
 	path = config/elfiles/golden-ratio
 	url = https://github.com/roman/golden-ratio.el.git

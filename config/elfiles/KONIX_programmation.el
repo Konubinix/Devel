@@ -158,6 +158,7 @@ They can be relative or absolute
    nil
    '(("\t" 0 'konix/prog/tabs prepend)))
   (hs-minor-mode t)
+  (flycheck-mode t)
   ;; highlight parentheses in prog
   (highlight-parentheses-mode 1)
   (auto-complete-mode t)

@@ -32,6 +32,7 @@
   ;; fed up with auto line breaks
   (setq indent-tabs-mode nil)
   (auto-complete-mode 1)
+  (flycheck-select-checker 'python-flake8)
   (setq ac-sources
 		'(
 		  ac-source-yasnippet

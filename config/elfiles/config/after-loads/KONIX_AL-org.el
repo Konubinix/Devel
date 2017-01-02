@@ -238,7 +238,6 @@ cursor stays in the org buffer."
                       :maxlevel 5
                       :emphasize t
                       :link t
-                      :timestamp t
                       )
 			  )
 (defun konix/org-skip-other-meta-context ()

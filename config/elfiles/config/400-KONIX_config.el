@@ -511,7 +511,7 @@
 ;; ************************************************************
 ;; Coding
 ;; ************************************************************
-(add-to-list 'auto-coding-alist (cons "\\.\\tex" 'latin-1-unix))
+(konix/push-or-replace-assoc-in-alist 'auto-coding-alist '("\\.\\tex" . utf-8))
 (add-to-list 'auto-coding-alist (cons "\\.\\sh" 'unix))
 
 ;; ************************************************************

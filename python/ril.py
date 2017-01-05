@@ -466,6 +466,7 @@ class RILItem(object):
 
     def open(self):
         assert self.dled
+        print("Opening {}".format(self.ipfs_hash))
         os.system(
             "$BROWSER http://localhost:9647/ipfs/{}/{}"
             .format(self.ipfs_hash, self.index))

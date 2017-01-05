@@ -74,6 +74,7 @@ class RILItem(object):
                 SCRAP,
                 self.hash
                 )
+        self.dldir = os.path.join(self.dir, "dl")
         self.url_file_path = os.path.join(
                 self.dir,
                 "url.txt"
@@ -85,6 +86,10 @@ class RILItem(object):
         self.stamp_file_path = os.path.join(
                 self.dir,
                 "stamp.txt"
+                )
+        self.ipfs_hash_path = os.path.join(
+                self.dir,
+                "ipfs.txt"
                 )
         self.index_file_path = os.path.join(
                 self.dir,
@@ -111,6 +116,10 @@ class RILItem(object):
                 "read.lock"
                 )
         self.update()
+
+    @property
+    def ipfs_hash(self):
+        return open(self.ipfs_hash_path, "r").read().decode("utf-8").strip()
 
     def __hash__(self):
             return int(self.hash, 16)
@@ -285,6 +294,9 @@ class RILItem(object):
             os.unlink(self.read_file_path)
 
     def remove(self):
+        subprocess.call([
+            "ipfs", "pin", "rm", self.ipfs_hash
+        ])
         shutil.rmtree(self.dir)
 
     def clean(self):
@@ -311,12 +323,23 @@ class RILItem(object):
             else:
                 rc = 1
         else:
+            if os.path.exists(self.dldir):
+                shutil.rmtree(self.dldir)
+            os.makedirs(self.dldir)
             rc = self._download_wget(mode)
         if os.path.exists(self.dl_mode_file_path):
             os.unlink(self.dl_mode_file_path)
         open(self.dl_mode_file_path, "w").write(str(mode))
         self.in_dl = False
         assert self.in_dl == False
+        open(self.ipfs_hash_path, "w").write(
+            subprocess.check_output(
+                [
+                    "ipfs", "add", "-r", "-q", self.dldir
+                ]
+            ).decode("utf-8").splitlines()[-1].encode("utf-8")
+        )
+        shutil.rmtree(self.dldir)
         return rc
 
     def _download_wget(self, mode):
@@ -367,7 +390,7 @@ class RILItem(object):
         environ = os.environ.copy()
         environ['LC_ALL'] = 'C'
         p = subprocess.Popen(command,
-                cwd=self.dir,
+                cwd=self.dldir,
                 stdout=output,
                 stderr=output,
                 env=environ)
@@ -443,7 +466,9 @@ class RILItem(object):
 
     def open(self):
         assert self.dled
-        os.system('mimeopen "%s"' % self.index_abs_path.encode("utf-8").replace('"', '\\"'))
+        os.system(
+            "$BROWSER http://localhost:9647/ipfs/{}/{}"
+            .format(self.ipfs_hash, self.index))
 
     def open_local_web(self):
         assert self.dled

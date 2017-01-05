@@ -720,7 +720,10 @@ one."
 ;;; **************************************************************************
 (defun gnus-alias-ensure-message-mode ()
   "Assert that the current buffer is a message buffer."
-  (when (not (eq major-mode 'notmuch-message-mode))
+  (when (and
+         (not (eq major-mode 'notmuch-message-mode))
+         (not (eq major-mode 'message-mode))
+         )
     (gnus-alias-error "Must be in `message-mode'.? ")))
 
 ;;; **************************************************************************

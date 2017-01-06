@@ -1294,7 +1294,7 @@ items"
 					)
 				   (
 					(org-agenda-start-day (konix/org-yesterworkday))
-					(org-agenda-start-with-clockreport-mode t)
+					;;(org-agenda-start-with-clockreport-mode t)
 					(org-agenda-start-with-log-mode t)
 					(org-agenda-show-log 'clockcheck)
 					(org-agenda-include-diary nil)
@@ -1421,7 +1421,7 @@ items"
 					)
 				   (
 					(org-agenda-start-with-log-mode t)
-					(org-agenda-start-with-clockreport-mode t)
+					;; (org-agenda-start-with-clockreport-mode t)
 					(org-agenda-show-log 'clockcheck)
 					(dummy (konix/org-agenda-inhibit-context-filtering))
 					)
@@ -1503,7 +1503,7 @@ items"
 				   (
 					(org-agenda-start-day "-7d")
 					(org-agenda-start-on-weekday 1)
-					(org-agenda-start-with-clockreport-mode t)
+					;; (org-agenda-start-with-clockreport-mode t)
 					(org-agenda-start-with-log-mode t)
 					(org-agenda-archives-mode t)
 					(org-agenda-include-diary nil)

@@ -60,7 +60,9 @@ TAB:complete
 # C-space to set-mark
 "\C-Space":set-mark
 "\C-o":"> log"
+"\e\C-j":"\C-e 2>&1"
 "\e\C-l":"\C-e | less\C-m"
+"\e\C-d":"\e\C-j \e\C-l"
 "\e\C-g":"\C-e | gi "
 "\e\C-m":"\C-aman \C-m"
 #This example wraps the line in su -c '', if Alt+S is pressed:

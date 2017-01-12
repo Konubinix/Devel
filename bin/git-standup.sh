@@ -137,4 +137,4 @@ then
     exit 2
 fi
 
-$COMMAND --name-status -w --since="${DATE}" $(git config konix.standup.extra) ${GIT_STANDUP_EXTRAS} "$@"
+$COMMAND --name-status --reverse -w --since="${DATE}" $(git config konix.standup.extra) ${GIT_STANDUP_EXTRAS} "$@"

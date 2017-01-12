@@ -1,6 +1,19 @@
-;; ################################################################################
-;; General use function
-;; ################################################################################
+;;; package --- Summary
+;;; General use functions
+;;; Commentary:
+;;; Code:
+
+(defun konix/0binpaste (file)
+  (interactive "fFile: ")
+  (let (
+        (x-select-enable-clipboard t)
+        (url (shell-command-to-sptring (format "konix_0binpaste.sh %s" file)))
+        )
+    (kill-new url)
+    (message "Saved url: %s" url)
+    )
+  )
+
 (defun konix/server-buffer-clients()
   (if (boundp 'server-buffer-clients)
 	  server-buffer-clients

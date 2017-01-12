@@ -117,6 +117,8 @@
 (global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
 (global-set-key (kbd "C-f") 'konix/global-slow-key-map) ;for hacker's keyboard
 
+;; 0bin paste
+(define-key 'konix/global-slow-key-map (kbd "p") 'konix/0binpaste)
 ;; open recent file
 (define-key 'konix/global-slow-key-map (kbd "f") 'recentf-open-files)
 ;; toggle gatls_dired

@@ -17,13 +17,19 @@ def main(source, dest):
         os.makedirs(dest)
     m = mailbox.Maildir(source)
     for mess in m:
-        l = os.path.join(
-            dest,
-            base64.b64encode(
-                mess["Message-ID"].encode("utf-8")
-            ).decode("utf-8")
-        )
-        open(l, "wb").write(mess.as_bytes())
+        l = None
+        try:
+            l = os.path.join(
+                dest,
+                base64.b64encode(
+                    mess["Message-ID"].encode("utf-8")
+                ).decode("utf-8")
+            )
+        except Exception as e:
+            print("#### Error: {}".format(e))
+
+        if l is not None and not os.path.exists(l):
+            open(l, "wb").write(mess.as_bytes())
 
 
 if __name__ == "__main__":

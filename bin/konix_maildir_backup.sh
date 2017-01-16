@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+
+SRC="$(readlink -f "${1}")"
+PREF="$(konix_relative_path.py "${SRC}" "${SRC}/../..")"
+DST="$(readlink -f "${2}")"
+DST="${DST}/${PREF}"
+echo "${SRC} -> ${DST}"
+konix_uniform_mails.py "${SRC}" "${DST}"

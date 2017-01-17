@@ -294,9 +294,12 @@ class RILItem(object):
             os.unlink(self.read_file_path)
 
     def remove(self):
-        subprocess.call([
-            "ipfs", "pin", "rm", self.ipfs_hash
-        ])
+        try:
+            subprocess.call([
+                "ipfs", "pin", "rm", self.ipfs_hash
+            ])
+        except IOError:
+            pass
         shutil.rmtree(self.dir)
 
     def clean(self):

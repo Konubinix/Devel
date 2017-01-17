@@ -17,4 +17,3 @@ am start \
         -t text/html \
         -n com.android.browser/.BrowserActivity \
         -d "${FILE}"
-sleep 20

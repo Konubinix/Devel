@@ -15,8 +15,6 @@ parser.add_argument('dest')
 
 def main(source, dest):
     invalid = os.path.join(dest, "invalid")
-    if not os.path.exists(invalid):
-        os.makedirs(invalid)
     m = mailbox.Maildir(source)
     for mess in m:
         l = None
@@ -34,6 +32,8 @@ def main(source, dest):
             )
             l += ":" + mess.get_info()
         except Exception as e:
+            if not os.path.exists(invalid):
+                os.makedirs(invalid)
             invalidfile = tempfile.NamedTemporaryFile(
                 delete=False,
                 prefix=invalid + "/")

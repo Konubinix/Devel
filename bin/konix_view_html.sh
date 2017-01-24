@@ -1,14 +1,18 @@
-#!/bin/bash -x
+#!/bin/bash -eu
 
 dir=`mktemp -d`
 file="${dir}/msg"
 cat > "${file}"
-trap "rm -r $dir" EXIT
-konix_munpack.py -i "${file}" -o "${dir}" "$@"
-ls "${dir}"
-HTMLs="${dir}"/*html
-for html in ${HTMLs}
-do
-    mimeopen "${html}"
-done
-sleep 1
+if [ -z "${KONIX_VIEW_HTML_KEEP}" ]
+then
+	trap "rm -r $dir" EXIT
+fi
+{
+	konix_munpack.py -i "${file}" -o "${dir}" "$@"
+	HTMLs="${dir}"/*html
+	for html in ${HTMLs}
+	do
+		mimeopen "${html}"
+	done
+} >&2
+echo "${dir}"

@@ -3,6 +3,7 @@
 dir=`mktemp -d`
 file="${dir}/msg"
 cat > "${file}"
+KONIX_VIEW_HTML_KEEP="${KONIX_VIEW_HTML_KEEP:-}"
 if [ -z "${KONIX_VIEW_HTML_KEEP}" ]
 then
 	trap "rm -r $dir" EXIT

@@ -396,3 +396,6 @@ ignore=dirty
 	path = pymimedetacher
 	url = https://github.com/Konubinix/pymimedetacher.git
         ignore=dirty
+[submodule "weboob"]
+	path = weboob
+	url = https://git.weboob.org/weboob/devel.git

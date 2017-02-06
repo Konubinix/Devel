@@ -157,9 +157,9 @@ else
 	    fi
         gaps_log "################## Launching the getting dropping command"
         gaps_log "Auto getting data (only what is not already here)"
-        git annex get --fast --auto --not --in here
+        git annex get --fast --auto --not --in here "."
         gaps_log "Auto dropping data (only what is already here)"
-        git annex drop --fast --auto --in here
+        git annex drop --fast --auto --in here "."
         gaps_log "Syncing to make sure everything is alright"
         git annex sync
     fi

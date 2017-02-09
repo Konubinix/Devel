@@ -399,3 +399,6 @@ ignore=dirty
 [submodule "weboob"]
 	path = weboob
 	url = https://git.weboob.org/weboob/devel.git
+[submodule "flexx"]
+	path = flexx
+	url = https://github.com/zoofio/flexx

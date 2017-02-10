@@ -302,11 +302,11 @@
 				  ))
 			)
 	  (setq old_prop_pos prop_pos)
-	)
+      )
 	(unless (equal old_prop_pos max)
 	  (goto-char old_prop_pos)
 	  )
-   )
+    )
   )
 
 (defun nxml-heading-start-position ()
@@ -424,6 +424,8 @@ immediately after the section's start-tag."
   (local-set-key (kbd "C-M-d") 'konix/nxml-down-element)
   (local-set-key (kbd "C-M-n") 'konix/nxml-forward-element)
   (local-set-key (kbd "C-c C-c") 'konix/nxml-show-context)
+  (set (make-local-variable 'comment-region-function) 'konix/nxml-comment-region)
+  (set (make-local-variable 'uncomment-region-function) 'konix/nxml-uncomment-region)
   (auto-complete-mode 1)
   (setq header-line-format '(:eval (format "Schema : %s"
 										   (or rng-current-schema-file-name "Vacuous")
@@ -467,6 +469,32 @@ immediately after the section's start-tag."
   (push-mark)
   )
 (ad-activate 'nxml-backward-up-element)
+
+;; Inspired from https://www.emacswiki.org/emacs/NxmlMode#toc13
+(defun konix/nxml-comment-region (beg end &optional arg)
+  (interactive)
+  (save-restriction
+    (save-excursion
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      (save-excursion (replace-string "--" "\\-\\-"))
+      (insert "<!--\n")
+      (goto-char (point-max))
+      (insert "-->\n")
+      )))
+
+(defun konix/nxml-uncomment-region (beg end &optional arg)
+  (interactive)
+  (save-restriction
+    (save-excursion
+      (narrow-to-region beg end)
+      (goto-char (point-max))
+      (search-backward "<!--\n")
+      (delete-char 5)
+      (goto-char (point-min))
+      (search-forward "-->\n")
+      (delete-char -4)
+      (replace-string "\\-\\-" "--" nil beg end))))
 
 (provide '700-KONIX_nxml)
 ;;; 700-KONIX_nxml.el ends here

@@ -28,6 +28,7 @@
 (setq-default gud-tooltip-mode t)
 (defun konix/gud-mode-hook ()
   (tooltip-mode 1)
+  (abbrev-mode 1)
   (gud-tooltip-mode 1)
   (global-set-key (kbd "<f12>n") 'gud-next)
   (global-set-key (kbd "<f12>r") 'gud-run)

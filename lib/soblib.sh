@@ -79,3 +79,10 @@ function sob_xeyes () {
     sob_wait "$@"
     xeyes
 }
+
+function sob_kill () {
+    _sob_setup
+    local pid="$(ps_select)"
+    kill "$@" "${pid}"
+    _sob_teardown
+}

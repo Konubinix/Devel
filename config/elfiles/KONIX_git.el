@@ -418,7 +418,7 @@
 									   ))
   )
 
-(defun konix/git/commit (&optional amend message file)
+(defun konix/git/commit (&optional amend message file no_edit)
   "Lance un git commit."
   (interactive)
   (when konix/git/precommit-hook
@@ -439,6 +439,7 @@
   (konix/git/command (concat "commit -v"
 							 (if amend " --amend" "")
 							 (if message (concat " -m \""message"\"") "")
+                             (if no_edit " --no-edit" "")
 							 (if file (concat "  \""file"\"") "")
 							 )
 					 (null file)
@@ -459,6 +460,11 @@
   "Lance un git commit."
   (interactive)
   (konix/git/commit t)
+  )
+
+(defun konix/git/commit/amend-no-edit ()
+  (interactive)
+  (konix/git/commit t nil nil t)
   )
 
 (defun konix/git/commit/untracked ()

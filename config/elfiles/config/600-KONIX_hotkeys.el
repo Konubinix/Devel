@@ -841,6 +841,7 @@
 (define-key konix/git-global-map-commit "c" 'konix/git/commit)
 (define-key konix/git-global-map-commit "m" 'konix/git/commit/message)
 (define-key konix/git-global-map-commit "a" 'konix/git/commit/amend)
+(define-key konix/git-global-map-commit "A" 'konix/git/commit/amend-no-edit)
 (define-key konix/git-global-map-commit "u" 'konix/git/commit/untracked)
 (define-key konix/git-global-map-commit "f" 'konix/git/commit/file)
 

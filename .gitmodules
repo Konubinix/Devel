@@ -402,3 +402,6 @@ ignore=dirty
 [submodule "flexx"]
 	path = flexx
 	url = https://github.com/zoofio/flexx
+[submodule "pickups"]
+	path = pickups
+	url = https://github.com/mtomwing/pickups

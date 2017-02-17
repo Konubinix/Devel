@@ -1146,7 +1146,7 @@ fallbacking to HEAD")
 	 (konix/git/_get-origin-commit
 	  file
 	  line
-	  (format "%s~1" commit)
+	  (format "%s" commit)
 	  )
 	 (and current-prefix-arg
 		  file)

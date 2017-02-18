@@ -4,7 +4,7 @@
 deb_root=/data/debian
 
 echo "attempt to check the filesystem"
-if test -e "${deb_root}/etc"
+if test -e "${deb_root}/proc/cpuinfo"
 then
     echo "System already set up"
 else

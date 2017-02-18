@@ -19,5 +19,5 @@ TERM=linux \
 	TERMINFO=/etc/terminfo \
     SHELL=/bin/bash \
     HOME=/root \
-    PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+    PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/system/sbin:/system/bin:/system/xbin" \
     /system/bin/chroot $deb_root /bin/bash -l "$@"

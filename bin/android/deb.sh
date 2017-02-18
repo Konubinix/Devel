@@ -16,6 +16,7 @@ umask 0022
 echo "Chrooting"
 unset TMPDIR
 TERM=linux \
+	TERMINFO=/etc/terminfo \
     SHELL=/bin/bash \
     HOME=/root \
     PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \

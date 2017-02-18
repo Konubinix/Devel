@@ -5,8 +5,8 @@ export LANG=C
 /debootstrap/debootstrap --second-stage
 
 cat <<EOF > /etc/apt/sources.list
-deb http://ftp.fr.debian.org/debian/ stable main contrib non-free
-deb-src http://ftp.fr.debian.org/debian/ stable main contrib non-free
+deb http://httpredir.debian.org/debian/ stable main contrib non-free
+deb-src http://httpredir.debian.org/debian/ stable main contrib non-free
 EOF
 cat <<EOF > /etc/resolv.conf
 nameserver 8.8.8.8

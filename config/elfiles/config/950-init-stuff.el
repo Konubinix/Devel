@@ -9,3 +9,5 @@
 (load-library "KONIX_git")
 (require 'golden-ratio)
 (golden-ratio-mode 1)
+
+(require 'which-key)

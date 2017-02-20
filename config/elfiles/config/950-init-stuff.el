@@ -10,4 +10,9 @@
 (require 'golden-ratio)
 (golden-ratio-mode 1)
 
-(require 'which-key)
+(defun konix/emacs-startup-hooks ()
+  (require 'which-key)
+)
+
+(add-hook 'emacs-startup-hook
+	  'konix/emacs-startup-hooks)

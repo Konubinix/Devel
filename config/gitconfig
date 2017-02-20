@@ -18,7 +18,9 @@
 	civ = commit -v
 	sm = submodule
 	alog = log --graph --decorate=full --all --full-history -m
+	glog = log --decorate=full --full-history --graph -m
  	ri = rebase --interactive --autosquash
+	resup = reset HEAD~
 	# fetch = fetch --upload-pack="git upload-pack"
 	amu = !curl ${1} | git am -
 	rv = remote -v
@@ -52,7 +54,16 @@
 [sendemail]
 	chainreplyto = yes
 	smtpserver = /home/sam/Prog/devel/bin/konix_msmtp.sh
-[push]
-	default = simple
 [svn]
     rmdir = true
+[push]
+	default = simple
+[commit]
+#	gpgSign = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	required = true
+	process = git-lfs filter-process
+[pull]
+	rebase = preserve

@@ -14,6 +14,13 @@
     )
   )
 
+;; from https://www.emacswiki.org/emacs/ElispCookbook
+(defun string/starts-with (string prefix)
+  "Return t if STRING starts with prefix."
+  (and (string-match (rx-to-string `(: bos ,prefix) t)
+                     string)
+       t))
+
 (defun konix/server-buffer-clients()
   (if (boundp 'server-buffer-clients)
 	  server-buffer-clients

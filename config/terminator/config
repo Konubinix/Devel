@@ -1,29 +1,29 @@
 [global_config]
-  dbus = True
-  window_state = maximise
-  title_transmit_bg_color = "#2a3bff"
   title_font = Sans 7
   title_inactive_bg_color = "#0021fb"
+  title_transmit_bg_color = "#2a3bff"
+  window_state = maximise
 [keybindings]
-[profiles]
-  [[default]]
-    background_image = None
-    visible_bell = True
-    background_darkness = 0.88
-    urgent_bell = True
-    background_type = transparent
-    cursor_color = "#FFFFFF"
-    cursor_blink = False
-    scroll_on_output = False
-    color_scheme = green_on_black
-    copy_on_selection = True
-    scrollback_lines = 100000
 [layouts]
   [[default]]
     [[[child1]]]
-      type = Terminal
       parent = window0
+      type = Terminal
     [[[window0]]]
-      type = Window
       parent = ""
+      type = Window
 [plugins]
+[profiles]
+  [[default]]
+    background_darkness = 0.39
+    background_type = transparent
+    color_scheme = green_on_black
+    copy_on_selection = True
+    cursor_blink = False
+    cursor_color = "#FFFFFF"
+    scroll_on_keystroke = False
+    scrollback_infinite = True
+    scrollback_lines = 100000
+    urgent_bell = True
+    use_system_font = False
+    visible_bell = True

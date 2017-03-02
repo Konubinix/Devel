@@ -21,7 +21,6 @@
     copy_on_selection = True
     cursor_blink = False
     cursor_color = "#FFFFFF"
-    scroll_on_keystroke = False
     scrollback_infinite = True
     scrollback_lines = 100000
     urgent_bell = True

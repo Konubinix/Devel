@@ -21,4 +21,4 @@ dpkg-reconfigure locales
 /usr/sbin/addgroup --gid 3003 aid_net
 /usr/sbin/addgroup --gid 1015 sdcard-rw
 
-/debootstrap/android_setup_perso.sh
+/sbin/android_setup_perso.sh

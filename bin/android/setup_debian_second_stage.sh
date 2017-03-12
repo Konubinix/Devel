@@ -14,7 +14,7 @@ EOF
 apt-get update
 apt-get install -y aptitude
 aptitude update
-aptitude install -y iputils-ping
+aptitude install -y iputils-ping locales
 setcap cap_net_raw+epi /bin/ping
 dpkg-reconfigure locales
 

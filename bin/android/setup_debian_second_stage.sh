@@ -8,17 +8,31 @@ cat <<EOF > /etc/apt/sources.list
 deb http://httpredir.debian.org/debian/ stable main contrib non-free
 deb http://httpredir.debian.org/debian/ testing main contrib non-free
 EOF
-cat <<EOF > /etc/apt/apt.conf
+
+cat <<EOF >> /etc/apt/apt.conf
 APT::Get::Install-Recommends "false";
 APT::Get::Install-Suggests "false";
 EOF
+
+cat <<EOF > /etc/apt/preferences
+Package: *
+Pin: release a=stable
+Pin-Priority: 600
+
+Package: *
+Pin: release a=testing
+Pin-Priority: 900
+EOF
+
 cat <<EOF > /etc/resolv.conf
 nameserver 8.8.8.8
 EOF
+
 apt-get update
-apt-get install -y aptitude
+apt-get -y install aptitude
 aptitude update
-aptitude install -y iputils-ping locales
+aptitude -y full-upgrade
+aptitude -y install iputils-ping locales
 setcap cap_net_raw+epi /bin/ping
 dpkg-reconfigure locales
 

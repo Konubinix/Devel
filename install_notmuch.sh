@@ -4,4 +4,4 @@ set -eu
 pushd notmuch
 make
 popd
-pip install --user -e notmuch/bindings/python
+pip2 install --user -e notmuch/bindings/python

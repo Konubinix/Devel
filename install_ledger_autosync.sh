@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pip install --user -e ledger-autosync
+pip2 install --user -e ledger-autosync

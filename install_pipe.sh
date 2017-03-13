@@ -1,4 +1,4 @@
 #!/bin/bash
 
-pip install --user -e Pipe/
+pip2 install --user -e Pipe/
 pip3 install --user -e Pipe/

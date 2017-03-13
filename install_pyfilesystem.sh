@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pip install --user -e pyfilesystem
+pip2 install --user -e pyfilesystem

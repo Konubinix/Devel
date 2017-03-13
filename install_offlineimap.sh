@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pip install --user -e offlineimap
+pip2 install --user -e offlineimap

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pip install --user -e beets
+pip2 install --user -e beets

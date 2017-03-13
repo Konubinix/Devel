@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -eux
 
 export LANG=C
 
@@ -22,6 +22,10 @@ Pin-Priority: 600
 Package: *
 Pin: release a=testing
 Pin-Priority: 900
+
+Package: systemd
+Pin: release *
+Pin-Priority: -1
 EOF
 
 cat <<EOF > /etc/resolv.conf

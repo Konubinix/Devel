@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pip install --user -e Flexget
+pip2 install --user -e Flexget

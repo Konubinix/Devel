@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pip install --user -e mopidy
+pip2 install --user -e mopidy

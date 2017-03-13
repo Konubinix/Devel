@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pip install --user -e weboob
+pip3 install --user -e weboob

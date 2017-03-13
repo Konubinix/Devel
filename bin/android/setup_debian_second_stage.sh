@@ -6,7 +6,7 @@ export LANG=C
 
 cat <<EOF > /etc/apt/sources.list
 deb http://httpredir.debian.org/debian/ stable main contrib non-free
-deb http://httpredir.debian.org/debian/ testing main contrib non-free
+deb http://httpredir.debian.org/debian/ testing main contrib
 EOF
 
 cat <<EOF >> /etc/apt/apt.conf
@@ -24,7 +24,7 @@ Pin: release a=testing
 Pin-Priority: 900
 
 Package: systemd
-Pin: release *
+Pin: origin ""
 Pin-Priority: -1
 EOF
 

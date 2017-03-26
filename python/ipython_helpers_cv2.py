@@ -11,7 +11,7 @@ from ipython_helpers_pylab2 import *
 
 def mpl_cv2_image_mode_local():
     plt.tick_params(
-        axis='bothm',
+        axis='both',
         which='both',
         bottom='off',
         top='off',

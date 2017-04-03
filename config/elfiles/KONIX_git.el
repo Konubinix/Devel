@@ -839,7 +839,13 @@
 
 (defun konix/git/_get-origin-commit (file line commit)
   (let* (
-		 (blame_output (shell-command-to-string (format "git blame -C -C -C -w -p -L%s,+1 %s -- %s" line commit file)))
+		 (blame_output (shell-command-to-string
+                        (format
+                         "git blame %s -w -p -L%s,+1 %s -- %s"
+                         (if current-prefix-arg "" "-C -C -C")
+                         line
+                         commit
+                         file)))
 		 )
 	(string-match "^\\([^ \t\n]+\\) [0-9]+ [0-9]+ [0-9]+$" blame_output)
 	(match-string-no-properties 1 blame_output)

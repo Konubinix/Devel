@@ -11,7 +11,7 @@
 (golden-ratio-mode 1)
 
 (defun konix/emacs-startup-hooks ()
-  (require 'which-key)
+  (require 'which-key nil t)
 )
 
 (add-hook 'emacs-startup-hook

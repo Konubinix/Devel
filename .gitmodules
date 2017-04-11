@@ -408,3 +408,6 @@ ignore=dirty
 [submodule "stream2chromecast"]
 	path = stream2chromecast
 	url = https://github.com/Pat-Carter/stream2chromecast
+[submodule "config/elfiles/ledger-mode"]
+	path = config/elfiles/ledger-mode
+	url = https://github.com/ledger/ledger-mode

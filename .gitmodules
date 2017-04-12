@@ -411,3 +411,6 @@ ignore=dirty
 [submodule "config/elfiles/ledger-mode"]
 	path = config/elfiles/ledger-mode
 	url = https://github.com/ledger/ledger-mode
+[submodule "config/elfiles/flycheck"]
+	path = config/elfiles/flycheck
+	url = https://github.com/flycheck/flycheck

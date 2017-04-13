@@ -414,3 +414,6 @@ ignore=dirty
 [submodule "config/elfiles/flycheck"]
 	path = config/elfiles/flycheck
 	url = https://github.com/flycheck/flycheck
+[submodule "cask"]
+	path = cask
+	url = https://github.com/cask/cask.git

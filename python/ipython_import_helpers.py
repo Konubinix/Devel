@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import inspect
 import importlib
 
 import logging
-logging.basicConfig(
-
-)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+
 
 def import_module_n_helpers(module, ip, populate=True):
     try:

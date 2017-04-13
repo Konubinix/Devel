@@ -69,7 +69,6 @@
 		 (expand-file-name "elf-mode" elfiles)
 		 (expand-file-name "golden-ratio" elfiles)
 		 (expand-file-name "ledger-mode/build/" elfiles)
-		 (expand-file-name "flycheck" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -251,7 +250,6 @@
 
 (autoload 'ledger-mode "ledger-mode" "" t)
 
-(autoload 'flycheck-mode "flycheck" "" t)
 
 ;; ************************************************************
 ;; Automodes

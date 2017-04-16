@@ -2,7 +2,7 @@
 
 set -eux
 #sudo aptitude install debootstrap
-arch=${1:-arm64}
+arch=${1:-armhf}
 
 # testing won't work because of resolv.conf problems
 sudo debootstrap --arch=${arch} --variant=minbase --foreign stable debian-${arch} http://httpredir.debian.org/debian

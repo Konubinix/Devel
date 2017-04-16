@@ -19,6 +19,8 @@ say_and_do ( ) {
     "$@"
 }
 
+mount -oremount,exec,dev /data
+
 echo "Mounting filesystem"
 mkdir_maybe $deb_root/sdcard
 is_mounted $deb_root/sdcard || say_and_do mount -o bind /sdcard $deb_root/sdcard

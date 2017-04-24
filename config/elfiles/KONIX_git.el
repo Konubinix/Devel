@@ -590,6 +590,7 @@
 (defun konix/git/log/commit-prev ()
   (interactive)
   (re-search-backward "^commit \\([a-h0-9]+\\)")
+  (recenter-top-bottom '(4))
   )
 
 (defun konix/git/log/commit-kill-n-prev ()
@@ -600,11 +601,12 @@
 
 (defun konix/git/log/commit-next ()
   (interactive)
-  (when (looking-at "^commit \\([a-h0-9]+\\)"
-					(right-char)
-					)
+  (when (looking-at "^commit \\([a-h0-9]+\\)")
+    (right-char)
 	)
   (re-search-forward "^commit \\([a-h0-9]+\\)")
+  (beginning-of-line)
+  (recenter-top-bottom '(4))
   )
 
 (defun konix/git/log (&optional history_size alog file custom_cmd custom_log_cmd)

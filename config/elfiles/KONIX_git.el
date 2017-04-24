@@ -643,19 +643,25 @@
 	 buffer_name
 	 )
 	;; set up the log buffer
-	(with-current-buffer buffer_name
-	  (let (
-			(local_map (make-sparse-keymap))
-			)
-		(define-key local_map (kbd "=") 'konix/git/log/show)
-		(define-key local_map (kbd "C-k") 'konix/git/log/commit-kill)
-		(define-key local_map (kbd "M-n") 'konix/git/log/commit-next)
-		(define-key local_map (kbd "M-p") 'konix/git/log/commit-prev)
-		(define-key local_map (kbd "M-P") 'konix/git/log/commit-kill-n-prev)
-		(use-local-map local_map)
-		)
-	  )
+    (with-current-buffer buffer_name
+      (konix/git/log/setup-buffer)
+      )
 	)
+  )
+
+(defun konix/git/log/setup-buffer ()
+  (interactive)
+  (let (
+        (local_map (make-sparse-keymap))
+        )
+    (define-key local_map (kbd "=") 'konix/git/log/show)
+    (define-key local_map (kbd "C-k") 'konix/git/log/commit-kill)
+    (define-key local_map (kbd "M-n") 'konix/git/log/commit-next)
+    (define-key local_map (kbd "M-p") 'konix/git/log/commit-prev)
+    (define-key local_map (kbd "M-P") 'konix/git/log/commit-kill-n-prev)
+    (use-local-map local_map)
+    )
+
   )
 
 (defun konix/git/alog (&optional history_size)

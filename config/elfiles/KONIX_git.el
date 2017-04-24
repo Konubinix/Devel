@@ -765,9 +765,16 @@
   (konix/git/command-with-completion "push ")
   )
 
-(defun konix/git/fetch ()
+(defun konix/git/fetch (&optional remote)
   (interactive)
-  (konix/git/command-with-completion "fetch ")
+  (konix/git/command-with-completion
+   (format
+    "fetch %s"
+    (if (not (null remote))
+        remote
+      ""
+      )
+    ))
   )
 
 (defun konix/git/pull ()
@@ -1451,14 +1458,14 @@ fallbacking to HEAD")
 		  (beg (match-beginning 0))
 		  (end (match-end 0))
 		  )
-	 (set-text-properties
-	  beg end
-	  (list
-	   'face
-	   compilation-error-face
-	   )
-	  )
-	 )
+      (set-text-properties
+       beg end
+       (list
+        'face
+        compilation-error-face
+        )
+       )
+      )
 	)
   (goto-char 0)
   (when (narrow_to_block "\\(?:# \\)?Unmerged paths:")

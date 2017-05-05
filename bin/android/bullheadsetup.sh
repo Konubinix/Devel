@@ -13,6 +13,10 @@ cat <<EOF > "debian-${arch}/bin/kbd_mode"
 #!/bin/bash
 exit 1
 EOF
+cat <<EOF > "debian-${arch}/bin/setupcon"
+#!/bin/bash
+exit 1
+EOF
 sudo tar cf debian-${arch}.tar debian-${arch}
      adb push debian-${arch}.tar /sdcard/
 adb shell su -c 'rm -rf /data/debian* && cp /sdcard/debian-${arch}.tar /data/debian-${arch}.tar && cd /data && tar xf debian-${arch}.tar && rm debian-${arch}.tar && mv debian-${arch} debian'

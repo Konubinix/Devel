@@ -34,11 +34,13 @@ EOF
 
 apt-get update
 apt-get -y install aptitude
+sed -i 's/_apt:x:104:65534/_apt:x:104:3004/g' /etc/passwd
 aptitude update
 aptitude -y full-upgrade
 aptitude -y install iputils-ping locales
 setcap cap_net_raw+epi /bin/ping
 dpkg-reconfigure locales
+# en_GB + en_US + fr_FR : 133 134 135 150 151 152 225 226 227
 
 /usr/sbin/addgroup --gid 3003 aid_net
 /usr/sbin/addgroup --gid 1015 sdcard-rw

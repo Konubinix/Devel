@@ -15,5 +15,4 @@ am start \
         --user 0 \
         -a android.intent.action.VIEW \
         -t text/html \
-        -n com.android.browser/.BrowserActivity \
         -d "${FILE}"

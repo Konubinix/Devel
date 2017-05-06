@@ -36,6 +36,7 @@
 --exclude-dir BUILD \
 --exclude-dir .git \
 --exclude-dir .svn \
+--exclude-dir node_modules \
 -i -nH \
 -r -e ")
  '(grep-template "grep <C> -nH -r -e  <R> <F>")

@@ -25,6 +25,7 @@ else
 	avconv -n \
 		   -i "${video}" \
 		   -codec:v vp8 \
+           -r 30 \
 		   -crf 20 \
 		   -b:v 0 \
 		   $downsize_keep_ratio \

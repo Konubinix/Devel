@@ -98,17 +98,33 @@
 (setq-default notmuch-archive-tags '("-inbox" "-unread"))
 (setq notmuch-address-command "notmuch_addresses.py")
 
+(defface konix/notmuch-search-flagged
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:weight bold)
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:weight bold)
+	 )
+	)
+  ""
+  )
+
 (defface konix/notmuch-search-unread
   '(
 	(
 	 ((class color)
 	  (background dark))
-	 (:inherit default :foreground "green")
+	 (:foreground "cyan")
 	 )
 	(
 	 ((class color)
 	  (background light))
-	 (:inherit default :foreground "dark green")
+	 (:foreground "dark blue")
 	 )
 	)
   ""
@@ -163,12 +179,12 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:inherit default :foreground "cyan3")
+	 (:foreground "cyan3")
 	 )
 	(
 	 ((class color)
 	  (background light))
-	 (:inherit default :foreground "royal blue")
+	 (:foreground "royal blue")
 	 )
 	)
   ""
@@ -178,12 +194,12 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:inherit default :slant italic)
+	 (:slant italic)
 	 )
 	(
 	 ((class color)
 	  (background light))
-	 (:inherit default :slant italic)
+	 (:slant italic)
 	 )
 	)
   ""
@@ -192,7 +208,8 @@
 								  ("temp" . konix/notmuch-search-temp)
 								  ("answer" . konix/notmuch-search-answer)
 								  ("perso" . konix/notmuch-search-perso)
-								  ("deleted" . '(:foreground "red"))
+								  ("deleted" . (:foreground "red"))
+								  ("flagged" . konix/notmuch-search-flagged)
 								  ("unread" . konix/notmuch-search-unread)
 								  ("replied" . konix/notmuch-search-replied)
  								  ("sent" . konix/notmuch-search-sent)
@@ -203,7 +220,7 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:inherit default :foreground "green")
+	 (:foreground "green")
 	 )
 	(
 	 ((class color)
@@ -218,12 +235,12 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:inherit default :foreground "cyan")
+	 (:foreground "cyan")
 	 )
 	(
 	 ((class color)
 	  (background light))
-	 (:inherit default :foreground "blue")
+	 (:foreground "blue")
 	 )
 	)
   ""
@@ -233,12 +250,12 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:inherit default :foreground "white")
+	 (:foreground "white")
 	 )
 	(
 	 ((class color)
 	  (background light))
-	 (:inherit default :foreground "blue")
+	 (:foreground "blue")
 	 )
 	)
   ""
@@ -248,12 +265,12 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:inherit default :foreground "light green")
+	 (:foreground "light green")
 	 )
 	(
 	 ((class color)
 	  (background light))
-	 (:inherit default :foreground "sienna")
+	 (:foreground "sienna")
 	 )
 	)
   ""

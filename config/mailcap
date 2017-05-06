@@ -50,7 +50,6 @@ text/troff; /usr/bin/man -X100 -l '%s'; test=test -n "$DISPLAY" -a -e /usr/bin/g
 application/x-troff-man; /usr/bin/man -l '%s'; needsterminal; description=Man page
 text/troff; /usr/bin/man -l '%s'; needsterminal; description=Man page
 text/html; /usr/bin/sensible-browser %s; description=HTML Text; nametemplate=%s.html
-application/pdf; /usr/bin/xpdf %s; test=test "$DISPLAY" != ""; description=Portable Document Format; nametemplate=%s.pdf
 application/x-pdf; /usr/bin/xpdf %s; test=test "$DISPLAY" != ""; description=Portable Document Format; nametemplate=%s.pdf
 application/x-dia-diagram; dia '%s'; description="DIA diagram"; test=test -n "$DISPLAY"; nametemplate=%s.dia
 text/html; /usr/bin/firefox-esr %s; description=HTML Text; test=test -n "$DISPLAY";  nametemplate=%s.html
@@ -252,7 +251,6 @@ image/x-pcx; eog %s; test=test -n "$DISPLAY"
 image/svg+xml; eog %s; test=test -n "$DISPLAY"
 image/svg+xml-compressed; eog %s; test=test -n "$DISPLAY"
 image/vnd.wap.wbmp; eog %s; test=test -n "$DISPLAY"
-application/pdf; evince %s; test=test -n "$DISPLAY"
 application/x-bzpdf; evince %s; test=test -n "$DISPLAY"
 application/x-gzpdf; evince %s; test=test -n "$DISPLAY"
 application/x-xzpdf; evince %s; test=test -n "$DISPLAY"
@@ -312,7 +310,6 @@ image/png; gimp-2.8 %s; test=test -n "$DISPLAY"
 image/x-icon; gimp-2.8 %s; test=test -n "$DISPLAY"
 image/x-xpixmap; gimp-2.8 %s; test=test -n "$DISPLAY"
 image/svg+xml; gimp-2.8 %s; test=test -n "$DISPLAY"
-application/pdf; gimp-2.8 %s; test=test -n "$DISPLAY"
 image/x-wmf; gimp-2.8 %s; test=test -n "$DISPLAY"
 image/x-xcursor; gimp-2.8 %s; test=test -n "$DISPLAY"
 application/vnd.openofficeorg.extension; libreoffice --math %s; test=test -n "$DISPLAY"
@@ -322,7 +319,7 @@ application/vnd.oasis.opendocument.spreadsheet-flat-xml; libreoffice %s; test=te
 application/vnd.oasis.opendocument.graphics-flat-xml; libreoffice %s; test=test -n "$DISPLAY"
 application/vnd.oasis.opendocument.presentation-flat-xml; libreoffice %s; test=test -n "$DISPLAY"
 inode/directory; pcmanfm %s; test=test -n "$DISPLAY"
-application/pdf; pdfshuffler %s; test=test -n "$DISPLAY"
+application/pdf; mimeopen %s; test=test -n "$DISPLAY"
 text/x-puredata; /usr/lib/puredata/tcl/pd-gui.tcl %s; test=test -n "$DISPLAY"
 text/x-maxmsp; /usr/lib/puredata/tcl/pd-gui.tcl %s; test=test -n "$DISPLAY"
 application/sqlitebrowser; sqlitebrowser %s; test=test -n "$DISPLAY"

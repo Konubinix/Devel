@@ -56,5 +56,11 @@
   (gdb command-line)
   )
 
+(defun gdb--check-interpreter (filter proc string)
+  (unless (zerop (length string))
+    (remove-function (process-filter proc) #'gdb--check-interpreter)
+    (funcall filter proc string)))
+
+
 (provide '700-KONIX_gdb-mode)
 ;;; 700-KONIX_gdb-mode.el ends here

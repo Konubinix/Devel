@@ -477,7 +477,7 @@
 
 (defun konix/flyspell-mode (&optional arg)
   (interactive)
-  (setq arg (if arg 1 (if flyspell-mode -1 1)))
+  (setq arg (if (not (null arg)) arg (if flyspell-mode -1 1)))
   (if (and konix/on-windows-p (not current-prefix-arg))
 	  (message "Flyspell mode deactivated on windows...")
 	(progn

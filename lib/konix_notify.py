@@ -86,6 +86,15 @@ def to_phone_subprocess(message, type_):
 def main(message, unique=False, duration=3000, type_="normal", to_phone=False):
     message = message.replace("<", "-")
     try:
+        local_display(message, unique, duration, type_)
+    except:
+        LOGGER.critical("Could not display locally")
+    if to_phone:
+        send_to_phone(message, type_)
+
+
+def local_display(message, unique=False, duration=3000, type_="normal"):
+    try:
         LOGGER.info("Trying with the notificator")
         by_konubinix_notificator(message, unique, duration, type_)
     except Exception as e:
@@ -99,5 +108,3 @@ def main(message, unique=False, duration=3000, type_="normal", to_phone=False):
                 by_pyosd(message)
             except:
                 by_sl4a(message, type_=type_)
-    if to_phone:
-        send_to_phone(message, type_)

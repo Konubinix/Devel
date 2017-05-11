@@ -67,8 +67,8 @@ def send_to_phone(message, type_):
         ip, _ = p.communicate()
         p.wait()
         if ip:
-            server = xmlrpclib.ServerProxy("http://{}:9000".format(ip))
-            server.notify(message, type_)
+            server = xmlrpclib.ServerProxy("http://{}:9000/RPC2".format(ip))
+            server.notify("{}: {}".format(os.environ.get("HOSTNAME", "unknown host"), message), type_)
     except:
         main("Phone not available", duration=500, to_phone=False)
 
@@ -77,7 +77,7 @@ def to_phone_subprocess(message, type_):
         [
             "konix_display.py",
             "-t", str(type_),
-            "-T",
+            "-o",
             message
         ]
     )
@@ -100,4 +100,4 @@ def main(message, unique=False, duration=3000, type_="normal", to_phone=False):
             except:
                 by_sl4a(message, type_=type_)
     if to_phone:
-        to_phone_subprocess(message, type_)
+        send_to_phone(message, type_)

@@ -66,7 +66,7 @@ def munpack(message, directory, rel_path=False):
         if content is None:
             continue
         charset = part.get_content_charset()
-        if "ascii" in charset:
+        if charset is not None and "ascii" in charset:
             charset = "utf-8"
         sub_type = part.get_content_subtype()
         if charset is None and sub_type == "html":

@@ -2681,7 +2681,7 @@ of the clocksum."
   (define-key org-mode-map "\C-p" 'org-previous-link)
 
   (setq indent-tabs-mode nil)
-  (konix/flyspell-mode -1)
+  (konix/flyspell-mode 1)
   (auto-complete-mode t)
   (electric-pair-mode t)
   (abbrev-mode t)

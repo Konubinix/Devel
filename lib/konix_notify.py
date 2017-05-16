@@ -48,7 +48,6 @@ def by_sl4a(message, type_):
     if type_ == "boring":
         droid.vibrate(1000)
         andlib.display(droid, "Konix notify", message)
-        droid.dialogShow()
 
 def by_pyosd(message):
     import pyosd

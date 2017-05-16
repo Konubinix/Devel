@@ -39,18 +39,15 @@ def by_pynotify(message):
 
 def by_sl4a(message, type_):
     from konix_android import droid
+    import andlib
     if type_ == "normal":
         droid.makeToast(message)
     if type_ == "annoying":
         droid.notify("Konix Notify", message)
         droid.vibrate(1000)
     if type_ == "boring":
-        droid.dialogCreateInput(
-            "Konix Notify",
-            "Notification",
-            message
-        )
         droid.vibrate(1000)
+        andlib.display(droid, "Konix notify", message)
         droid.dialogShow()
 
 def by_pyosd(message):

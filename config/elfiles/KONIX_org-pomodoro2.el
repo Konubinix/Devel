@@ -135,9 +135,9 @@ interruption timer, if any")
                  60
                  )
                 (+
-                  (konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
-                  (* 60 konix/org-pomodoro-default-timer-break)
-                  )
+                 (konix/org-pomodoro-number-of-seconds-till-next-pause nil t)
+                 (* 60 konix/org-pomodoro-default-timer-break)
+                 )
 				(konix/org-pomodoro-next-available-timestamp t konix/org-pomodoro-default-timer-long-break)
 				(/
                  (+
@@ -147,9 +147,9 @@ interruption timer, if any")
                  60
                  )
                 (+
-                  (konix/org-pomodoro-number-of-seconds-till-next-pause t t)
-                  (* 60 konix/org-pomodoro-default-timer-long-break)
-                  )
+                 (konix/org-pomodoro-number-of-seconds-till-next-pause t t)
+                 (* 60 konix/org-pomodoro-default-timer-long-break)
+                 )
 				)
 			 "in pause"
 			 )
@@ -242,6 +242,7 @@ interruption timer, if any")
   (konix/org-pomodoro-next-available-time-echo t)
   )
 
+(defvar konix/org-pomodoro-donotdisturb-hooks nil)
 (defvar konix/org-pomodoro-start_entry nil)
 (defun konix/org-pomodoro-start ()
   (interactive)
@@ -278,6 +279,7 @@ interruption timer, if any")
 			  )
 		  )
 		(org-timer-set-timer '(64))
+        (run-hooks 'konix/org-pomodoro-donotdisturb-hooks)
 		(when (and (not (org-clocking-p))
 				   (y-or-n-p "Clock in ?")
 				   )
@@ -307,6 +309,7 @@ interruption timer, if any")
 	(org-timer-stop)
 	)
   (konix/org-pomodoro-tray-daemon-put "i")
+  (run-hooks 'konix/org-pomodoro-done-hooks)
   (when konix/org-pomodoro-break-clocks-out
 	(message "Clocking out of current task")
 	(when org-clock-current-task
@@ -486,6 +489,8 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 	)
   )
 
+(defvar konix/org-pomodoro-done-hooks nil)
+
 ;; ####################################################################################################
 ;; HOOKS
 ;; ####################################################################################################
@@ -524,13 +529,14 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 	  (setq ask_for_new_pomodoro t)
 	  )
 	 )
+    (run-hooks 'konix/org-pomodoro-done-hooks)
 	(if take_pomodoro_into_account
 		(progn
 		  (ignore-errors (konix/org-pomodoro-increase))
 		  (when konix/org-pomodoro-done-notify-level
 			(konix/notify "Done pomodoro" konix/org-pomodoro-done-notify-level)
 			)
-		 )
+          )
 	  ;; else
 	  (message "This pomodoro won't be taken into account because of %s" reason)
 	  )
@@ -589,28 +595,27 @@ of 25 minutes with a 25 minutes pause between each set of `konix/org-pomodoro-sp
 		  'konix/org-clock-in-pomodoro-hook)
 
 (defun konix/org-timer-cancel-pomodoro-hook ()
-  (when konix/org-pomodoro-in-pomodoro
-	(konix/org-pomodoro-decide-start-or-break "Canceled a pomodoro")
-	)
-  (setq konix/org-pomodoro-in-pomodoro nil)
-  (setq-default org-timer-mode-line-string "")
+  (konix/notify "Pomodoro cancelled")
   )
 (add-hook 'org-timer-stop-hook
 		  'konix/org-timer-cancel-pomodoro-hook)
 
-(defun konix/org-pomodoro-interruption-warn ()
-  (konix/notify "You should really GO BACK TO WORK"
+(defun konix/org-pomodoro-interruption-too-long ()
+  (konix/notify "Interruption too long: Starting a break: You should really GO BACK TO WORK"
 				3 t)
+  (konix/org-pomodoro-break)
   )
 
 (defun konix/konix/org-capture-interruption-pre-hook ()
   (konix/org-pomodoro-tray-daemon-put "j" t)
-  (setq konix/org-pomodoro-interruption-timer
-		(run-with-timer (* 60 konix/org-pomodoro-interruption-warn-time)
-						nil
-						'konix/org-pomodoro-interruption-warn
-						)
-		)
+  (when konix/org-pomodoro-in-pomodoro
+    (setq konix/org-pomodoro-interruption-timer
+          (run-with-timer (* 60 konix/org-pomodoro-interruption-warn-time)
+                          nil
+                          'konix/org-pomodoro-interruption-too-long
+                          )
+          )
+    )
   )
 (add-hook 'konix/org-capture-interruption-pre-hook
 		  'konix/konix/org-capture-interruption-pre-hook)

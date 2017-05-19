@@ -801,6 +801,9 @@ retourne ('fichier','extension')."
    )
   )
 
+(defvar konix/away-hooks nil)
+(defvar konix/back-hooks nil)
+
 (defun konix/select-lowest-window ()
   "APPT : Select the lowest window on the frame."
   (let (

@@ -1,0 +1,203 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+
+import os
+from collections import defaultdict, ChainMap, OrderedDict
+import configparser
+import re
+from pathlib import Path
+from contextlib import contextmanager
+import logging
+import subprocess
+import shlex
+
+from xdg import BaseDirectory
+from click import command, argument, Choice, option, style, echo, pass_context
+import click_log
+
+LOGGER = logging.getLogger(__name__)
+
+
+@contextmanager
+def cd(dir):
+    u"""Change to a directory temporarily. To be used in a with statement"""
+    prevdir = os.getcwd()
+    os.chdir(dir)
+    LOGGER.debug("In {}".format(dir))
+    yield os.path.realpath(dir)
+    os.chdir(prevdir)
+
+
+def global_handler(items):
+    for k, v in items:
+        if k == "include":
+            read_file(Path(v))
+
+
+def file_handler(items):
+    pass
+
+
+handlers = defaultdict(
+    lambda: file_handler,
+    GLOBAL=global_handler,
+)
+
+
+config = OrderedDict()
+
+
+def parse_str(str):
+    return str.format(**os.environ)
+
+
+def parse_str_dict(dict):
+    return {
+        parse_str(k): parse_str(v)
+        for k, v in dict.items()
+    }
+
+
+def read_file(path):
+    p = configparser.ConfigParser()
+    p.read_file(path.open())
+    for section in p.sections():
+        parsed_section = parse_str(section)
+        os.environ["MS_SECTION"] = parsed_section
+        d = parse_str_dict(dict(p[section].items()))
+        if is_path(parsed_section):
+            parsed_section = str(path.parent / parsed_section)
+        if parsed_section not in config:
+            config[parsed_section] = ChainMap()
+        config[parsed_section].maps.append(d)
+        try:
+            handlers[parsed_section](list(d.items()))
+        except Exception as e:
+            print("When reading section {} of {}".format(section, path))
+            raise e
+        sub_path = Path(parsed_section) / "ms.conf"
+        if is_path(parsed_section) and sub_path.exists():
+            read_file(sub_path)
+
+
+def is_path(section):
+    return not re.match("^[A-Z]+$", section)
+
+
+def is_in_cwd(path):
+    cwd = os.getcwd()
+    return os.path.commonprefix((cwd, path)) == cwd
+
+
+def dump_config(config):
+    for section, values in config.items():
+        print("[{}]".format(section))
+        for k, v in values.items():
+            print("{}={}".format(k, v))
+
+
+@command(context_settings=dict(ignore_unknown_options=True))
+@argument("args", nargs=-1)
+@option("--log-level", "-l", type=Choice(logging._nameToLevel), default="INFO")
+@option("--debug", "-d", is_flag=True)
+@option("--all", "-a", is_flag=True)
+@option("--ls", is_flag=True)
+@click_log.simple_verbosity_option()
+@click_log.init(__name__)
+@pass_context
+def main(ctx, args, log_level, debug, all, ls):
+    if debug:
+        log_level = "DEBUG"
+    logging.basicConfig(level=logging._nameToLevel[log_level])
+    config_home = BaseDirectory.xdg_config_home
+    assert os.path.exists(config_home), (
+        "Put your configuration into {}".format(config_home)
+    )
+
+    read_file(Path(BaseDirectory.xdg_config_home) / "ms.conf")
+    paths = []
+    cwd = os.getcwd()
+    for path in config.keys():
+        os.environ["MS_SECTION"] = path
+        if not is_path(path):
+            continue
+        if (
+                not is_in_cwd(path) and
+                not all
+        ):
+            LOGGER.debug(
+                "{} ignored for not in {} (use --all)".format(path, cwd)
+            )
+            continue
+        if not os.path.exists(path):
+            LOGGER.warning("{} does not exist".format(path))
+        paths.append(path)
+    if ls:
+        for path in paths:
+            echo(path)
+        exit(0)
+    if args:
+        res = OrderedDict()
+        for path in paths:
+            LOGGER.info(style("""
+##### In {}
+""", fg="green").format(path))
+            cmd = (
+                config[path].get(args[0]) or
+                config.get("GLOBAL", {}).get(args[0])
+            )
+            if cmd is None:
+                if (
+                        not os.path.exists(path) and
+                        config.get("GLOBAL", {}).get("skip_missing")
+                ):
+                    LOGGER.warn("{} does not exist: skipped".format(path))
+                    res[path] = "skipped"
+                    continue
+                with cd(path):
+                    res[path] = subprocess.call(
+                        args
+                    )
+            else:
+                if cmd.startswith("!"):
+                    indir = cwd
+                    cmd = cmd[1:]
+                else:
+                    indir = path
+                    if (
+                            not os.path.exists(path) and
+                            config.get("GLOBAL", {}).get("skip_missing")
+                    ):
+                        LOGGER.warn("{} does not exist: skipped".format(path))
+                        continue
+                with cd(indir):
+                    res[path] = subprocess.call(
+                        shlex.split(cmd)
+                    )
+        print("""
+--------RES------------
+""")
+        code_to_style = {
+            0: {"fg": "green"},
+            "skipped": {"fg": "blue"},
+        }
+        for k, v in res.items():
+            s = code_to_style.get(v) or {"fg": "red"}
+            echo(
+                "{}: {}".format(
+                    k,
+                    style("success" if v == 0 else str(v), **s)
+                )
+            )
+    else:
+        dump_config(config)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        raise e
+        import ipdb
+        import sys
+        ipdb.post_mortem(sys.exc_info()[2])

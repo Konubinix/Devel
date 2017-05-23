@@ -76,10 +76,11 @@ def show_progress(droid, title, msg, progress, max):
     droid.dialogShow()
     droid.dialogSetCurrentProgress(progress)
 
-def display(droid, title, msg):
+def display(droid, title, msg, wait=True):
     droid.dialogCreateAlert(title, msg)
     droid.dialogShow()
-    droid.dialogGetResponse()
+    if wait:
+        droid.dialogGetResponse()
 
 def input(droid, title, message=None, defaulttext=None, inputtype=None):
     droid.dialogCreateInput(title, message, defaulttext, inputtype)

@@ -57,18 +57,19 @@ def by_pyosd(message):
     p.display(message)
 
 def send_to_phone(message, type_):
-    try:
-        p = subprocess.Popen(
-            ["konix_context_url.sh", "-e", "adb", os.environ["PHONE_NAME"]],
-            stdout=subprocess.PIPE
-        )
-        ip, _ = p.communicate()
-        p.wait()
-        if ip:
-            server = xmlrpclib.ServerProxy("http://{}:9000/RPC2".format(ip))
-            server.notify("{}: {}".format(os.environ.get("HOSTNAME", "unknown host"), message), type_)
-    except:
-        main("Phone not available", duration=500, to_phone=False)
+    if not os.path.exists(os.path.expanduser("~/.here")):
+        try:
+            p = subprocess.Popen(
+                ["konix_context_url.sh", "-e", "adb", os.environ["PHONE_NAME"]],
+                stdout=subprocess.PIPE
+            )
+            ip, _ = p.communicate()
+            p.wait()
+            if ip:
+                server = xmlrpclib.ServerProxy("http://{}:9000/RPC2".format(ip))
+                server.notify("{}: {}".format(os.environ.get("HOSTNAME", "unknown host"), message), type_)
+        except:
+            main("Phone not available", duration=500, to_phone=False)
 
 def to_phone_subprocess(message, type_):
     subprocess.Popen(

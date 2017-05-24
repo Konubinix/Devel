@@ -57,3 +57,4 @@ then
     cat "$LOG_FILE" >&2
     exit 1
 fi
+konix_sendmail_flush.sh

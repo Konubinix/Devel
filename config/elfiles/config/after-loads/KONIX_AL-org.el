@@ -1117,88 +1117,81 @@ items"
 				  			  (org-agenda-overriding-header
 				  			   "Close a TODO before archiving it")
 				  			  (org-agenda-tag-filter-preset nil)
-							  (org-agenda-archives-mode t)
+				    		  (org-agenda-archives-mode t)
 				  			  )
 				  			 )
 				  (tags "refile"
-						(
-						 (org-agenda-overriding-header "Refile those entries")
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-heading "Refile"))
-						 (org-agenda-tag-filter-preset nil)
-						 )
-						)
+				    	(
+				    	 (org-agenda-overriding-header "Refile those entries")
+				    	 (org-agenda-skip-function
+				    	  '(konix/org-agenda-skip-if-heading "Refile"))
+				    	 (org-agenda-tag-filter-preset nil)
+				    	 )
+				    	)
 				  (tags "+project//-DONE-NOT_DONE"
-						(
-						 (org-agenda-overriding-header
-						  "A project MUST have a NEXT entry")
-						 (org-agenda-tag-filter-preset nil)
-						 (org-agenda-skip-function
-						  'konix/org-agenda-skip-if-has-not-next-entry
-						  )
-						 )
-						)
+				    	(
+				    	 (org-agenda-overriding-header
+				    	  "A project MUST have a NEXT entry")
+				    	 (org-agenda-tag-filter-preset nil)
+				    	 (org-agenda-skip-function
+				    	  'konix/org-agenda-skip-if-has-not-next-entry
+				    	  )
+				    	 )
+				    	)
 				  (todo "NEXT"
-						(
-						 (org-agenda-skip-function
-						  '(konix/org-agenda-skip-if-tags
-							'("phantom" "maybe")
-							t
-							)
-						  )
-						 (org-agenda-tag-filter-preset nil)
-						 (org-agenda-overriding-header
-						  "phantom and maybe items should not be NEXT actions")
-						 )
-						)
+				    	(
+				    	 (org-agenda-skip-function
+				    	  '(konix/org-agenda-skip-if-tags
+				    		'("phantom" "maybe")
+				    		t
+				    		)
+				    	  )
+				    	 (org-agenda-tag-filter-preset nil)
+				    	 (org-agenda-overriding-header
+				    	  "phantom and maybe items should not be NEXT actions")
+				    	 )
+				    	)
 				  (tags-todo "//-NEXT"
-							 (
-							  (org-agenda-skip-function
-							   '(or
-								 (konix/org-agenda-skip-if-tags
-								  '("project" "phantom" "maybe")
-								  )
-								 (org-agenda-skip-entry-if 'scheduled)
-								 (konix/org-agenda-skip-if-task-of-project)
-								 )
-							   )
-							  (org-agenda-tag-filter-preset nil)
-							  (org-agenda-overriding-header
-							   "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
-							  )
-							 )
+				    		 (
+				    		  (org-agenda-skip-function
+				    		   '(or
+				    			 (konix/org-agenda-skip-if-tags
+				    			  '("project" "phantom" "maybe")
+				    			  )
+				    			 (org-agenda-skip-entry-if 'scheduled)
+				    			 (konix/org-agenda-skip-if-task-of-project)
+				    			 )
+				    		   )
+				    		  (org-agenda-tag-filter-preset nil)
+				    		  (org-agenda-overriding-header
+				    		   "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
+				    		  )
+				    		 )
 				  (tags-todo "-{@.+}-project//+NEXT"
-							 (
-							  (org-agenda-overriding-header
-							   "Assign a context to all NEXT (not project) items")
-							  (org-agenda-tag-filter-preset nil)
-							  )
-							 )
-				  (tags-todo "+Effort={.}+Effort<>{^[0-7]:}//+NEXT"
-							 (
-							  (org-agenda-overriding-header
-							   "This NEXT action has too much time (>7:59) set as effort, split it into smaller next actions.")
-							  (org-agenda-tag-filter-preset nil)
-							  )
-							 )
+				    		 (
+				    		  (org-agenda-overriding-header
+				    		   "Assign a context to all NEXT (not project) items")
+				    		  (org-agenda-tag-filter-preset nil)
+				    		  )
+				    		 )
 				  (tags-todo "DELEGATED|WAIT//NEXT"
-							 (
-							  (org-agenda-overriding-header
-							   "If those waiting items are not blocking anymore, move them to TODO")
-							  )
-							 )
+				    		 (
+				    		  (org-agenda-overriding-header
+				    		   "If those waiting items are not blocking anymore, move them to TODO")
+				    		  )
+				    		 )
 				  (tags "+project//-DONE-NOT_DONE"
-						(
-						 (org-agenda-overriding-header
-						  "Keep an eye on those projects (they may well be stuck)")
-						 (org-agenda-tag-filter-preset nil)
-						 (org-agenda-skip-function
-						  '(or
-							(konix/org-agenda-keep-if-is-unactive-project)
-							))
-						 )
-						)
-				  )
+				    	(
+				    	 (org-agenda-overriding-header
+				    	  "Keep an eye on those projects (they may well be stuck)")
+				    	 (org-agenda-tag-filter-preset nil)
+				    	 (org-agenda-skip-function
+				    	  '(or
+				    		(konix/org-agenda-keep-if-is-unactive-project)
+				    		))
+				    	 )
+				    	)
+ 				  )
 				)
   (setq-default konix/org-agenda-full-view
 				(append

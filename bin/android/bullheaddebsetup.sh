@@ -19,7 +19,7 @@ say_and_do ( ) {
     "$@"
 }
 
-mount -oremount,exec,dev /data
+mount -oremount,exec,dev,suid /data
 
 echo "Mounting filesystem"
 mkdir_maybe $deb_root/sdcard

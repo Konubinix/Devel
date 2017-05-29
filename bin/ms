@@ -146,34 +146,28 @@ def main(ctx, args, log_level, debug, all, ls):
                 config[path].get(args[0]) or
                 config.get("GLOBAL", {}).get(args[0])
             )
-            if cmd is None:
+            assert cmd is not None, (
+                "You must provide a valid command, availables are {}".format(
+                    ", ".join(
+                        set.union(*list(map(lambda d: set(d.keys()), list(config.values()))))
+                    )
+                )
+            )
+            if cmd.startswith("!"):
+                indir = cwd
+                cmd = cmd[1:]
+            else:
+                indir = path
                 if (
                         not os.path.exists(path) and
                         config.get("GLOBAL", {}).get("skip_missing")
                 ):
                     LOGGER.warn("{} does not exist: skipped".format(path))
-                    res[path] = "skipped"
                     continue
-                with cd(path):
-                    res[path] = subprocess.call(
-                        args
-                    )
-            else:
-                if cmd.startswith("!"):
-                    indir = cwd
-                    cmd = cmd[1:]
-                else:
-                    indir = path
-                    if (
-                            not os.path.exists(path) and
-                            config.get("GLOBAL", {}).get("skip_missing")
-                    ):
-                        LOGGER.warn("{} does not exist: skipped".format(path))
-                        continue
-                with cd(indir):
-                    res[path] = subprocess.call(
-                        shlex.split(cmd)
-                    )
+            with cd(indir):
+                res[path] = subprocess.call(
+                    shlex.split(cmd)
+                )
         print("""
 --------RES------------
 """)

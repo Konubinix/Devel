@@ -244,6 +244,21 @@ class GCall(cmd.Cmd, object):
             )
 
         @property
+        def org_mode(self):
+            return """* {}-{} {}
+:PROPERTIES:
+:ID: {}
+:END:
+[[{}][Go]]
+""".format(
+    self.startdate.strftime("%Y-%m-%d %H:%M"),
+    self.enddate.strftime("%H:%M"),
+    self.summary,
+    self.id,
+    self.htmlLink,
+)
+
+        @property
         def startdate(self):
             if self.start.get("dateTime"):
                 return dateutil.parser.parse(self.start.get("dateTime")
@@ -281,6 +296,7 @@ class GCall(cmd.Cmd, object):
         Event.duration = duration
         Event.uid = uid
         Event.print_diary = print_diary
+        Event.org_mode = org_mode
         Event.__hash__ = event_hash
 
         self.types["CalendarListEntry"]["class"] = CalendarListEntry

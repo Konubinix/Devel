@@ -22,6 +22,7 @@ import konix_collections
 import urllib.parse
 import pandas
 import hashlib
+from dateutil import parser
 
 import logging
 logging.basicConfig()
@@ -244,18 +245,56 @@ class GCall(cmd.Cmd, object):
             )
 
         @property
+        def org_mode_timestamp(self):
+            stamp = "<{}-{}".format(
+                self.startdate.strftime("%Y-%m-%d %H:%M"),
+                self.enddate.strftime("%H:%M"),
+            )
+            if self.recurrence:
+                weekly = re.compile("RRULE:FREQ=WEEKLY(;COUNT=[0-9]+)?(;INTERVAL=(?P<interval>[0-9]+))?(;UNTIL=[^;]+)?(;WKST=[^;]+)?;BYDAY=(.+)")
+                assert len(self.recurrence) == 1, "Cannot handle several recurrences yet"
+                rule = self.recurrence[0]
+                if weekly.match(rule):
+                    stamp += " ++{}w".format(
+                        weekly.match(rule).group("interval") or 1
+                    )
+                else:
+                    raise NotImplementedError(str(self.recurrence))
+            stamp += ">"
+            return stamp
+
+        @property
         def org_mode(self):
-            return """* {}-{} {}
+            return """* {} ({})
 :PROPERTIES:
 :ID: {}
+:LOCATION: {}
+:CREATED: {}
+:UPDATED: {}
 :END:
+{}
 [[{}][Go]]
+By: {}
+Attendees:
+{}
+
+{}
+#+BEGIN_EXAMPLE
+{}
+#+END_EXAMPLE
 """.format(
-    self.startdate.strftime("%Y-%m-%d %H:%M"),
-    self.enddate.strftime("%H:%M"),
     self.summary,
+    self.location,
     self.id,
+    self.location,
+    parser.parse(self.created).strftime("[%Y-%m-%d %H:%M]"),
+    parser.parse(self.updated).strftime("[%Y-%m-%d %H:%M]"),
+    self.org_mode_timestamp,
     self.htmlLink,
+    self.organizer.get("displayName", self.organizer.get("email", "NA")),
+    "\n".join(map(lambda a: " - {} ({})".format(a.get("email", "NA"), a.get("responseStatus")), self.attendees)),
+    re.sub("^\*", ",*", self.description, flags=re.MULTILINE),
+    re.sub("^\*", ",*", str(self), flags=re.MULTILINE),
 )
 
         @property
@@ -296,6 +335,7 @@ class GCall(cmd.Cmd, object):
         Event.duration = duration
         Event.uid = uid
         Event.print_diary = print_diary
+        Event.org_mode_timestamp = org_mode_timestamp
         Event.org_mode = org_mode
         Event.__hash__ = event_hash
 

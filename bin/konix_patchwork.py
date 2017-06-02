@@ -15,12 +15,13 @@ def main():
     height = 1080
     thumbwidth = 700
     thumbheight = 700
+    dist_ratio = 3. / 4.
     background_color = 300
     rotation = 15
     b = Image.new("RGB", (width, height), background_color)
     coordinates = itertools.product(
-        range(-thumbwidth // 2, width, thumbwidth // 2),
-        range(-thumbheight // 2, height, thumbheight // 2),
+        range(int(-thumbwidth * dist_ratio) , width, int(thumbwidth * dist_ratio)),
+        range(int(-thumbheight * dist_ratio), height, int(thumbheight * dist_ratio)),
     )
     values = list(zip(coordinates, itertools.cycle(imagepaths)))
     random.shuffle(values)

@@ -293,8 +293,8 @@ Attendees:
     self.htmlLink,
     self.organizer.get("displayName", self.organizer.get("email", "NA")),
     "\n".join(map(lambda a: " - {} ({})".format(a.get("email", "NA"), a.get("responseStatus")), self.attendees)),
-    re.sub("^\*", ",*", self.description, flags=re.MULTILINE),
-    re.sub("^\*", ",*", str(self), flags=re.MULTILINE),
+    re.sub("^\*", ",*", self.description.strip(), flags=re.MULTILINE),
+    re.sub("^\*", ",*", str(self).strip(), flags=re.MULTILINE),
 )
 
         @property

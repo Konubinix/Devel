@@ -37,7 +37,11 @@ def main():
                              255,
                              255))
         i.thumbnail((thumbwidth, thumbheight))
-        i = i.rotate(random.randint(-rotation, rotation), expand=True)
+        i = i.rotate(
+            random.randint(-rotation, rotation),
+            resample=Image.BILINEAR,
+            expand=True,
+        )
         b.paste(i, (nx, ny), i)
         b.save(finalpath)
     b.save(finalpath)

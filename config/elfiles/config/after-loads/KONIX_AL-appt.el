@@ -55,8 +55,8 @@
 (defun konix/appt-disp-window (min-to-app new-time appt-msg)
   (konix/notify
    (format
-	"Appt in %s mins:
-%s (%s)"
+	"In %s mins: %s
+(%s)"
 	min-to-app
 	appt-msg
 	new-time)

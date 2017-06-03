@@ -759,7 +759,7 @@ retourne ('fichier','extension')."
 	(beep t)
 	)
   (unless remove_date
-	(setq msg (concat (format-time-string "<%Y-%m-%d %a %H:%M:%S> : ") msg))
+	(setq msg (concat (format-time-string "%H:%M:") msg))
 	)
   (cond
    ((or (equal intrusivity_level 0) (not intrusivity_level))

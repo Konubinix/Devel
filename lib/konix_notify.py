@@ -43,13 +43,13 @@ def by_sl4a(message, type_):
     if type_ == "normal":
         droid.makeToast(message)
     if type_ == "annoying":
-        droid.notify("Konix Notify", message)
+        droid.notify("!", message)
         droid.vibrate(1000)
     if type_ == "boring":
         droid.vibrate(1000)
-        droid.notify("Konix Notify", message)
+        droid.notify("!", message)
         droid.dialogDismiss()
-        andlib.display(droid, "Konix notify", message, wait=False)
+        andlib.display(droid, "!", message, wait=False)
 
 def by_pyosd(message):
     import pyosd
@@ -67,7 +67,7 @@ def send_to_phone(message, type_):
             p.wait()
             if ip:
                 server = xmlrpclib.ServerProxy("http://{}:9000/RPC2".format(ip))
-                server.notify("{}: {}".format(os.environ.get("HOSTNAME", "unknown host"), message), type_)
+                server.notify(message, type_)
         except:
             main("Phone not available", duration=500, to_phone=False)
 

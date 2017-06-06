@@ -827,11 +827,11 @@ Attendees:
     def setup_blaze(self):
         import blaze
         from datashape import discover, from_numpy
-        columns=list(self.api["schemas"]["Event"]["properties"].keys()) + [
+        columns = list(self.api["schemas"]["Event"]["properties"].keys()) + [
             "startdate",
             "enddate",
             "duration",
-        ]
+        ] + ["calendar_id"]
         @discover.register(self.Event)
         def discover_events(event, **kwargs):
             df = pandas.DataFrame(
@@ -843,11 +843,7 @@ Attendees:
                     ]
                     for event in [event,]
                 ],
-                columns=list(self.api["schemas"]["Event"]["properties"].keys()) + [
-                    "startdate",
-                    "enddate",
-                    "duration",
-                ]
+                columns=columns,
             )
             shape = (len(df),)
             dtype = df.values.dtype
@@ -865,11 +861,7 @@ Attendees:
                     ]
                     for event in [event,]
                 ],
-                columns=list(self.api["schemas"]["Event"]["properties"].keys()) + [
-                    "startdate",
-                    "enddate",
-                    "duration",
-                ]
+                columns=columns,
             )
             return df
 

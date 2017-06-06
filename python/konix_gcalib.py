@@ -229,7 +229,7 @@ class GCall(cmd.Cmd, object):
 
         Event = konix_collections.namedtuples_default_values(
             "Event",
-            self.types["Event"]["keys"],
+            list(self.types["Event"]["keys"]) + ["calendar_id"],
             {k: "" for k in self.types["Event"]["keys"]}
         )
 
@@ -264,8 +264,21 @@ class GCall(cmd.Cmd, object):
             return stamp
 
         @property
+        def my_response_status(self):
+            me_as_attendee = [
+                attendee
+                for attendee in self.attendees
+                if attendee.get("email") == self.calendar_id
+            ]
+            if me_as_attendee:
+                assert len(me_as_attendee) == 1
+                return me_as_attendee[0]["responseStatus"]
+            else:
+                return ""
+
+        @property
         def org_mode(self):
-            return """* {} ({})
+            return """* {} ({})   :{}:
 :PROPERTIES:
 :ID: {}
 :LOCATION: {}
@@ -285,6 +298,7 @@ Attendees:
 """.format(
     self.summary,
     self.location,
+    self.my_response_status,
     self.id,
     self.location,
     parser.parse(self.created).strftime("[%Y-%m-%d %H:%M]"),
@@ -338,6 +352,7 @@ Attendees:
         Event.org_mode_timestamp = org_mode_timestamp
         Event.org_mode = org_mode
         Event.__hash__ = event_hash
+        Event.my_response_status = my_response_status
 
         self.types["CalendarListEntry"]["class"] = CalendarListEntry
         self.types["Event"]["class"] = Event
@@ -699,6 +714,7 @@ Attendees:
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
+        data["calendar_id"] = self.calendar_id
         return Event(**data)
 
     @needs("access_token")
@@ -757,6 +773,8 @@ Attendees:
         while data.get("nextPageToken", None):
             data = get_events(page_token=data.get("nextPageToken", None))
             items += data["items"]
+        for i in items:
+            i["calendar_id"] = self.calendar_id
         events = [
             Event(**i)
             for i in items

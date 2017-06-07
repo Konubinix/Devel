@@ -43,7 +43,6 @@
 		 (expand-file-name "ini" elfiles)
 		 (expand-file-name "ebib" elfiles)
 		 (expand-file-name "deferred" elfiles)
-		 (expand-file-name "ctable" elfiles)
 		 (expand-file-name "epc" elfiles)
 		 (expand-file-name "text-translator" elfiles)
 		 (expand-file-name "rainbow-mode" elfiles)

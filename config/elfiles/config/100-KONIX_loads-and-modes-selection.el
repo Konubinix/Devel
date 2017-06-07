@@ -60,8 +60,6 @@
 		 (expand-file-name "pdf-tools/pdf-tools-0.70" devel-dir)
 		 (expand-file-name "Pymacs" devel-dir)
 		 (expand-file-name "ycmd" elfiles)
-		 (expand-file-name "irony-mode" elfiles)
-		 (expand-file-name "ac-irony" elfiles)
 		 (expand-file-name "highlight-symbol.el" elfiles)
 		 (expand-file-name "wgrep" elfiles)
 		 (expand-file-name "elf-mode" elfiles)

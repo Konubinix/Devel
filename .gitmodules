@@ -267,14 +267,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/ycmd
 	url = https://github.com/abingham/emacs-ycmd
-[submodule "config/elfiles/ac-irony"]
-ignore=dirty
-	path = config/elfiles/ac-irony
-	url = https://github.com/Sarcasm/ac-irony
-[submodule "config/elfiles/irony-mode"]
-ignore=dirty
-	path = config/elfiles/irony-mode
-	url = https://github.com/Sarcasm/irony-mode
 [submodule "alot"]
 ignore=dirty
 	path = alot

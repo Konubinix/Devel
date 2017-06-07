@@ -10,3 +10,4 @@
 (depends-on "auto-complete")
 (depends-on "pdf-tools")
 (depends-on "bbdb")
+(depends-on "ledger-mode")

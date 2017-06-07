@@ -61,7 +61,6 @@
 		 (expand-file-name "wgrep" elfiles)
 		 (expand-file-name "elf-mode" elfiles)
 		 (expand-file-name "golden-ratio" elfiles)
-		 (expand-file-name "ledger-mode/build/" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -232,8 +231,6 @@
 (autoload 'elf-mode "elf-mode" "" t)
 (autoload 'konix/gdbserver "gdb-mi" "" t)
 
-(autoload 'ledger-mode "ledger-mode" "" t)
-
 
 ;; ************************************************************
 ;; Automodes
@@ -309,7 +306,6 @@
 (add-to-list 'auto-mode-alist (cons "\\.tj..?$" 'taskjuggler-mode))
 (add-to-list 'auto-mode-alist (cons "\\.so$" 'elf-mode))
 (add-to-list 'auto-mode-alist (cons "\\.md$" 'markdown-mode))
-(add-to-list 'auto-mode-alist (cons "\\.dat$" 'ledger-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

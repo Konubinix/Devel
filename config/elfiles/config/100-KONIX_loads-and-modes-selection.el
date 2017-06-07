@@ -33,7 +33,6 @@
 		 (expand-file-name "noflet" elfiles)
 		 (expand-file-name "dash" elfiles)
 		 (expand-file-name "langtool" elfiles)
-		 (expand-file-name "auto-complete" elfiles)
 		 (expand-file-name "popup" elfiles)
 		 (expand-file-name "elim/elisp" elfiles)
 		 (expand-file-name "dbgr" elfiles)

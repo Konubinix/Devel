@@ -35,10 +35,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/langtool
 	url = https://github.com/mhayashi1120/Emacs-langtool.git
-[submodule "config/elfiles/auto-complete"]
-ignore=dirty
-	path = config/elfiles/auto-complete
-	url = https://github.com/auto-complete/auto-complete.git
 [submodule "config/elfiles/popup"]
 ignore=dirty
 	path = config/elfiles/popup

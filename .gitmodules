@@ -67,10 +67,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/miniedit
 	url = https://github.com/emacsmirror/miniedit.git
-[submodule "config/elfiles/bash-completion"]
-ignore=dirty
-	path = config/elfiles/bash-completion
-	url = https://github.com/szermatt/emacs-bash-completion.git
 [submodule "config/elfiles/codesearch"]
 ignore=dirty
 	path = config/elfiles/codesearch

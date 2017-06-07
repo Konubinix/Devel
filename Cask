@@ -7,3 +7,4 @@
 (depends-on "csv-mode")
 (depends-on "jedi")
 (depends-on "jedi-direx")
+(depends-on "auto-complete")

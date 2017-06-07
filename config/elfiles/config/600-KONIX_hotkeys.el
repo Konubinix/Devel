@@ -210,8 +210,6 @@
 (define-key 'konix/global-key-map (kbd "i") 'konix/indent-region-or-buffer)
 ;; goto
 (define-key 'konix/global-key-map (kbd "M-g") 'goto-line)
-;; ace jump
-(define-key 'konix/global-key-map (kbd "M-j") 'ace-jump-mode)
 ;; flyspell
 (define-key 'konix/global-key-map (kbd "f") 'konix/flyspell-mode)
 ;; add file name in kill ring

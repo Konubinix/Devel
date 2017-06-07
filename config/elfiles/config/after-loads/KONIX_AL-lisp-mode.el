@@ -41,7 +41,6 @@
   (auto-complete-mode t)
   (local-set-key (kbd "C-h C-f") 'find-function)
   (local-set-key (kbd "C-h C-v") 'find-variable)
-  (local-set-key (kbd "C-M-q") 'rebox-dwim)
   (turn-on-eldoc-mode)
   ;; (require 'button-lock)
   ;; (button-lock-mode 1)

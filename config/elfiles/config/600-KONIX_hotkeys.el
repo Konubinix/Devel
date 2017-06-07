@@ -33,10 +33,6 @@
 ;; handle interruption quickly
 (global-set-key (kbd "C-M-S-J") 'konix/org-capture-interruption)
 
-;; rebox
-(global-set-key (kbd "C-M-q") 'rebox-dwim)
-(global-set-key (kbd "C-M-S-q") 'rebox-cycle)
-
 ;;to move easily between windows with C-M-Arrows
 (global-set-key (kbd "<C-M-left>") 'windmove-left)
 (global-set-key (kbd "<C-M-right>") 'windmove-right)

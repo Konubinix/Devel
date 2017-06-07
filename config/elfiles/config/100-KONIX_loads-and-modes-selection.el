@@ -19,7 +19,6 @@
 		 (expand-file-name "dictionary-1.8.7" elfiles)
 		 (expand-file-name "icicles" elfiles)
 		 (expand-file-name "full-ack" elfiles)
-		 (expand-file-name "rebox2" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)
 		 (expand-file-name "readline-complete" elfiles)
 		 (expand-file-name "elnode" elfiles)
@@ -170,9 +169,6 @@
 ;; trac-wiki
 (autoload 'trac-wiki-mode "trac-wiki" nil t)
 (autoload 'trac-wiki "trac-wiki" nil t)
-;; rebox
-(autoload 'rebox-dwim "rebox2" nil t)
-(autoload 'rebox-cycle "rebox2" nil t)
 ;; helm
 (autoload 'helm-mini "helm-config" nil t)
 (autoload 'helm-recentf "helm" nil t)

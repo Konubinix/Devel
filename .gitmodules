@@ -3,10 +3,6 @@ ignore=dirty
 	path = config/elfiles/org
 	url = https://github.com/Konubinix/org-mode
 	# url = git://repo.or.cz/org-mode.git
-[submodule "config/elfiles/full-ack"]
-ignore=dirty
-	path = config/elfiles/full-ack
-	url = https://github.com/nschum/full-ack.git
 [submodule "lib/ftputil"]
 ignore=dirty
 	path = lib/ftputil

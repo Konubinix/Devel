@@ -56,7 +56,6 @@
 		 (expand-file-name "rainbow-mode" elfiles)
 		 (expand-file-name "swiper" elfiles)
 		 (expand-file-name "skewer-mode" elfiles)
-		 (expand-file-name "pdf-tools/pdf-tools-0.70" devel-dir)
 		 (expand-file-name "Pymacs" devel-dir)
 		 (expand-file-name "ycmd" elfiles)
 		 (expand-file-name "highlight-symbol.el" elfiles)
@@ -314,8 +313,6 @@
 (add-to-list 'auto-mode-alist (cons "\\.compilog$" 'compilation-mode))
 ;; taskjuggler files
 (add-to-list 'auto-mode-alist (cons "\\.tj..?$" 'taskjuggler-mode))
-;; pdf-tools
-(add-to-list 'auto-mode-alist (cons "\\.[pP][dD][fF]$" 'pdf-view-mode))
 (add-to-list 'auto-mode-alist (cons "\\.so$" 'elf-mode))
 (add-to-list 'auto-mode-alist (cons "\\.md$" 'markdown-mode))
 (add-to-list 'auto-mode-alist (cons "\\.dat$" 'ledger-mode))

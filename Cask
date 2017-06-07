@@ -8,3 +8,4 @@
 (depends-on "jedi")
 (depends-on "jedi-direx")
 (depends-on "auto-complete")
+(depends-on "pdf-tools")

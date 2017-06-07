@@ -243,10 +243,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/skewer-mode
 	url = https://github.com/skeeto/skewer-mode
-[submodule "pdf-tools"]
-ignore=dirty
-	path = pdf-tools
-	url = https://github.com/politza/pdf-tools
 [submodule "Pymacs"]
 ignore=dirty
 	path = Pymacs

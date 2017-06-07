@@ -35,10 +35,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/popup
 	url = https://github.com/auto-complete/popup-el.git
-[submodule "config/elfiles/elim"]
-ignore=dirty
-	path = config/elfiles/elim
-	url = git://git.sv.gnu.org/elim.git
 [submodule "config/elfiles/icicles"]
 ignore=dirty
 	path = config/elfiles/icicles

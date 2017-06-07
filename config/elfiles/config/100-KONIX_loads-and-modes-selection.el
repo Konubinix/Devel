@@ -22,7 +22,6 @@
 		 (expand-file-name "elnode" elfiles)
 		 (expand-file-name "langtool" elfiles)
 		 (expand-file-name "popup" elfiles)
-		 (expand-file-name "elim/elisp" elfiles)
 		 (expand-file-name "popwin" elfiles)
 		 (expand-file-name "miniedit" elfiles)
 		 (expand-file-name "highlight-indentation" elfiles)

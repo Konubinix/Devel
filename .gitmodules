@@ -135,10 +135,6 @@ ignore=dirty
 ignore=dirty
 	path = supervisord
 	url = https://github.com/Supervisor/supervisor.git
-[submodule "config/elfiles/circe"]
-ignore=dirty
-	path = config/elfiles/circe
-	url = https://github.com/Konubinix/circe.git
 [submodule "ledger-autosync"]
 ignore=dirty
 	path = ledger-autosync

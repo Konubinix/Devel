@@ -40,7 +40,6 @@
 		 (expand-file-name "loc-changes" elfiles)
 		 (expand-file-name "popwin" elfiles)
 		 (expand-file-name "miniedit" elfiles)
-		 (expand-file-name "bash-completion" elfiles)
 		 (expand-file-name "codesearch" elfiles)
 		 (expand-file-name "calfw" elfiles)
 		 (expand-file-name "highlight-indentation" elfiles)
@@ -193,8 +192,6 @@
 (autoload 'elnode-start "elnode" nil t)
 ;; miniedit
 (autoload 'miniedit "miniedit" nil t)
-;; bash-completion
-(autoload 'bash-completion-dynamic-complete "bash-completion" nil t)
 ;; org search goto
 (autoload 'osg "org-search-goto" nil t)
 ;; gnus alias

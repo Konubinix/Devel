@@ -15,7 +15,6 @@
 		 (expand-file-name "git" elfiles)
 		 (expand-file-name "org/lisp" elfiles)
 		 (expand-file-name "org/contrib/lisp" elfiles)
-		 (expand-file-name "full-ack" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)
 		 (expand-file-name "readline-complete" elfiles)
 		 (expand-file-name "langtool" elfiles)
@@ -26,7 +25,6 @@
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "org-ehtml/src" elfiles)
 		 (expand-file-name "ini" elfiles)
-		 (expand-file-name "epc" elfiles)
 		 (expand-file-name "text-translator" elfiles)
 		 (expand-file-name "rainbow-mode" elfiles)
 		 (expand-file-name "swiper" elfiles)
@@ -131,11 +129,6 @@
 (autoload 'highlight-symbol-at-point "highlight-symbol" t nil)
 (autoload 'highlight-symbol-next "highlight-symbol" t nil)
 (autoload 'highlight-symbol-prev "highlight-symbol" t nil)
-;; full ack autoloads
-(autoload 'ack-same "full-ack" nil t)
-(autoload 'ack "full-ack" nil t)
-(autoload 'ack-find-same-file "full-ack" nil t)
-(autoload 'ack-find-file "full-ack" nil t)
 ;; grin
 (autoload 'grin "grin" nil t)
 (autoload 'hide/show-comments "hide-comnt" nil t)
@@ -164,8 +157,6 @@
 (autoload 'gnus-alias-determine-identity "gnus-alias" "" t)
 ;; cmake mode
 (autoload 'cmake-mode "cmake-mode" "" t)
-;; etags stack
-(autoload 'etags-stack-show "etags-stack" "" t)
 ;; tags
 (autoload 'konix/tags/create "KONIX_tags" "" t)
 (autoload 'konix/tags/visit-tags-file "KONIX_tags" "" t)

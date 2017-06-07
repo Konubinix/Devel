@@ -128,21 +128,6 @@
   (konix/shell/rename-async-shell-buffer)
   )
 (ad-activate 'dired-do-async-shell-command)
-;; ******************************************************************************************
-;; Icicles disturb tags completion
-;; ******************************************************************************************
-(defadvice org-set-tags-command (around disable-icy ())
-  (let (
-		(konix/org-set-tags-command_icy_before icicle-mode)
-		)
-	(konix/icy-mode nil)
-	(unwind-protect
-		ad-do-it
-	  (konix/icy-mode konix/org-set-tags-command_icy_before)
-	  )
-	)
-  )
-(ad-activate 'org-set-tags-command)
 
 ;; **********************************************************************
 ;; Org

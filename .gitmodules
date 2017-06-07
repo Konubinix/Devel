@@ -31,10 +31,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/popup
 	url = https://github.com/auto-complete/popup-el.git
-[submodule "config/elfiles/icicles"]
-ignore=dirty
-	path = config/elfiles/icicles
-	url = https://github.com/emacsmirror/icicles.git
 [submodule "config/elfiles/loc-changes"]
 ignore=dirty
 	path = config/elfiles/loc-changes

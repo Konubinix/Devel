@@ -15,7 +15,6 @@
 		 (expand-file-name "git" elfiles)
 		 (expand-file-name "org/lisp" elfiles)
 		 (expand-file-name "org/contrib/lisp" elfiles)
-		 (expand-file-name "icicles" elfiles)
 		 (expand-file-name "full-ack" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)
 		 (expand-file-name "readline-complete" elfiles)

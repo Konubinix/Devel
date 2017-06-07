@@ -19,10 +19,6 @@ ignore=dirty
 ignore=dirty
 	path = bash_optparse
 	url = https://github.com/carlobaldassi/bash_optparse.git
-[submodule "config/elfiles/rebox2"]
-ignore=dirty
-	path = config/elfiles/rebox2
-	url = https://github.com/lewang/rebox2.git
 [submodule "config/elfiles/readline-complete"]
 ignore=dirty
 	path = config/elfiles/readline-complete

@@ -67,10 +67,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/miniedit
 	url = https://github.com/emacsmirror/miniedit.git
-[submodule "config/elfiles/codesearch"]
-ignore=dirty
-	path = config/elfiles/codesearch
-	url = https://github.com/abingham/codesearch.el.git
 [submodule "config/elfiles/yasnippet"]
 ignore=dirty
 	path = config/elfiles/yasnippet

@@ -43,14 +43,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/icicles
 	url = https://github.com/emacsmirror/icicles.git
-[submodule "config/elfiles/dbgr"]
-ignore=dirty
-	path = config/elfiles/dbgr
-	url = https://github.com/rocky/emacs-dbgr.git
-[submodule "config/elfiles/load-relative"]
-ignore=dirty
-	path = config/elfiles/load-relative
-	url = https://github.com/rocky/emacs-load-relative
 [submodule "config/elfiles/loc-changes"]
 ignore=dirty
 	path = config/elfiles/loc-changes
@@ -119,10 +111,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/org-ehtml
 	url = https://github.com/eschulte/org-ehtml
-[submodule "config/elfiles/znc"]
-ignore=dirty
-	path = config/elfiles/znc
-	url = https://github.com/sshirokov/ZNC.el.git
 [submodule "supervisord"]
 ignore=dirty
 	path = supervisord
@@ -136,14 +124,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/ini
 	url = https://github.com/daniel-ness/ini.el.git
-[submodule "config/elfiles/ebib"]
-ignore=dirty
-	path = config/elfiles/ebib
-	url = https://github.com/joostkremers/ebib.git
-[submodule "config/elfiles/deferred"]
-ignore=dirty
-	path = config/elfiles/deferred
-	url = https://github.com/kiwanami/emacs-deferred.git
 [submodule "config/elfiles/epc"]
 ignore=dirty
 	path = config/elfiles/epc
@@ -312,34 +292,6 @@ ignore=dirty
 ignore=dirty
 	path = config/bash-completion-virtualbox
 	url = https://github.com/tfmalt/bash-completion-virtualbox
-[submodule "config/elfiles/fakir"]
-ignore=dirty
-	path = config/elfiles/fakir
-	url = https://github.com/nicferrier/emacs-fakir
-[submodule "config/elfiles/dash"]
-ignore=dirty
-	path = config/elfiles/dash
-	url = https://github.com/nicferrier/dash.el
-[submodule "config/elfiles/noflet"]
-ignore=dirty
-	path = config/elfiles/noflet
-	url = https://github.com/nicferrier/emacs-noflet
-[submodule "config/elfiles/kv"]
-ignore=dirty
-	path = config/elfiles/kv
-	url = https://github.com/nicferrier/emacs-kv
-[submodule "config/elfiles/s"]
-ignore=dirty
-	path = config/elfiles/s
-	url = https://github.com/nicferrier/s.el
-[submodule "config/elfiles/web"]
-ignore=dirty
-	path = config/elfiles/web
-	url = https://github.com/nicferrier/emacs-web
-[submodule "config/elfiles/db"]
-ignore=dirty
-	path = config/elfiles/db
-	url = https://github.com/nicferrier/emacs-db
 [submodule "config/elfiles/golden-ratio"]
 ignore=dirty
 	path = config/elfiles/golden-ratio

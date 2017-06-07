@@ -11,8 +11,7 @@
 		 (expand-file-name "graphviz-dot-mode" elfiles)
 		 (expand-file-name "jinja2-mode" elfiles)
 		 (expand-file-name "w3m" elfiles)
-		 (expand-file-name "csharp" elfiles)
-		 (expand-file-name "yasnippet" elfiles)
+         (expand-file-name "yasnippet" elfiles)
 		 (expand-file-name "git" elfiles)
 		 (expand-file-name "org/lisp" elfiles)
 		 (expand-file-name "org/contrib/lisp" elfiles)
@@ -109,7 +108,6 @@
 (autoload 'maxima-mode "maxima" "Mode maxima" t)
 (autoload 'lua-mode "lua-mode")
 (autoload 'nsi-mode "nsi-mode" "Loading nsi mode" t nil)
-(autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
 (autoload 'doc-mode "doc-mode" "Loading doc mode" t nil)
 (autoload 'batch-mode "batch-mode" "Loading batch mode" t nil)
 (autoload 'konix/prog/config "KONIX_programmation" "Loading konix programmation stuffs" t nil)
@@ -260,8 +258,6 @@
 (add-to-list 'auto-mode-alist (cons "\\.scene$" 'xml-mode))
 ;; nsi files
 (add-to-list 'auto-mode-alist (cons "\\.nsi$" 'nsi-mode))
-;; cs -> java
-(add-to-list 'auto-mode-alist (cons "\\.cs$" 'csharp-mode))
 ;; .bat in batch mode
 (add-to-list 'auto-mode-alist (cons "\\.bat$" 'batch-mode))
 ;; .wiki -> wikipedia

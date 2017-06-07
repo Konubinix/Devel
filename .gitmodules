@@ -284,10 +284,6 @@ ignore=dirty
 ignore=dirty
 	path = git-annex-remote-rclone
 	url = https://github.com/DanielDent/git-annex-remote-rclone
-[submodule "config/elfiles/elf-mode"]
-ignore=dirty
-	path = config/elfiles/elf-mode
-	url = https://github.com/abo-abo/elf-mode
 [submodule "config/bash-completion-virtualbox"]
 ignore=dirty
 	path = config/bash-completion-virtualbox

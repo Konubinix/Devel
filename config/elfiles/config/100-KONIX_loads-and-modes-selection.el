@@ -40,7 +40,6 @@
 		 (expand-file-name "popwin" elfiles)
 		 (expand-file-name "miniedit" elfiles)
 		 (expand-file-name "codesearch" elfiles)
-		 (expand-file-name "calfw" elfiles)
 		 (expand-file-name "highlight-indentation" elfiles)
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "org-ehtml/src" elfiles)
@@ -205,8 +204,6 @@
 (autoload 'imenu-tree "imenu-tree" "" t)
 ;; undo tree
 (autoload 'undo-tree-mode "undo-tree" "" t)
-;; calfw
-(autoload 'cfw:open-org-calendar "calfw-org" "" t)
 ;; taskjuggler
 (autoload 'taskjuggler-mode "taskjuggler-mode" "" t)
 ;; org mime

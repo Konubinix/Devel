@@ -144,10 +144,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/deferred
 	url = https://github.com/kiwanami/emacs-deferred.git
-[submodule "config/elfiles/ctable"]
-ignore=dirty
-	path = config/elfiles/ctable
-	url = https://github.com/kiwanami/emacs-ctable.git
 [submodule "config/elfiles/epc"]
 ignore=dirty
 	path = config/elfiles/epc

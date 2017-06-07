@@ -75,10 +75,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/yasnippet
 	url = https://github.com/capitaomorte/yasnippet.git
-[submodule "config/elfiles/bbdb"]
-ignore=dirty
-	path = config/elfiles/bbdb
-	url = git://git.savannah.nongnu.org/bbdb.git
 [submodule "config/elfiles/jinja2-mode"]
 ignore=dirty
 	path = config/elfiles/jinja2-mode

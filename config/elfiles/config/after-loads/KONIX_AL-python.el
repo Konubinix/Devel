@@ -36,11 +36,13 @@
   (setq ac-sources
 		'(
 		  ac-source-yasnippet
-		  ac-source-dictionary
-		  ac-source-words-in-same-mode-buffers
 		  ac-source-files-in-current-dir
 		  )
 		)
+  (when (require 'jedi nil t)
+    (jedi:setup)
+    (setq-default jedi:complete-on-dot t)
+   )
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
   )
 (add-hook 'python-mode-hook

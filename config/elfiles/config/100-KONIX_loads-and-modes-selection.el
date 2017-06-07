@@ -19,7 +19,6 @@
 		 (expand-file-name "full-ack" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)
 		 (expand-file-name "readline-complete" elfiles)
-		 (expand-file-name "elnode" elfiles)
 		 (expand-file-name "langtool" elfiles)
 		 (expand-file-name "popup" elfiles)
 		 (expand-file-name "popwin" elfiles)
@@ -158,8 +157,6 @@
 (autoload 'mediawiki-simple-outline-promote "mediawiki" nil t)
 ;; ioccur
 (autoload 'ioccur "ioccur" nil t)
-;; elnode
-(autoload 'elnode-start "elnode" nil t)
 ;; miniedit
 (autoload 'miniedit "miniedit" nil t)
 ;; org search goto

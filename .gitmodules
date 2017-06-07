@@ -23,10 +23,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/readline-complete
 	url = https://github.com/monsanto/readline-complete.el.git
-[submodule "config/elfiles/elnode"]
-ignore=dirty
-	path = config/elfiles/elnode
-	url = https://github.com/nicferrier/elnode.git
 [submodule "config/elfiles/langtool"]
 ignore=dirty
 	path = config/elfiles/langtool

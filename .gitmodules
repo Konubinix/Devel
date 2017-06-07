@@ -99,10 +99,6 @@ ignore=dirty
 ignore=dirty
 	path = sjoubert_dot_rc
 	url = https://github.com/sjoubert/dotrcfiles.git
-[submodule "config/elfiles/ace-jump-mode"]
-ignore=dirty
-	path = config/elfiles/ace-jump-mode
-	url = https://github.com/winterTTr/ace-jump-mode.git
 [submodule "merge-ics"]
 ignore=dirty
 	path = merge-ics

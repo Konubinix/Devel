@@ -42,7 +42,6 @@
 		 (expand-file-name "miniedit" elfiles)
 		 (expand-file-name "bash-completion" elfiles)
 		 (expand-file-name "codesearch" elfiles)
-		 (expand-file-name "ace-jump-mode" elfiles)
 		 (expand-file-name "calfw" elfiles)
 		 (expand-file-name "highlight-indentation" elfiles)
 		 (expand-file-name "git-wip/emacs" devel-dir)
@@ -217,8 +216,6 @@
 (autoload 'konix/push-tags-mark "KONIX_tags" "" t)
 ;; imenu
 (autoload 'imenu-tree "imenu-tree" "" t)
-;; ace-jump
-(autoload 'ace-jump-mode "ace-jump-mode" "" t)
 ;; undo tree
 (autoload 'undo-tree-mode "undo-tree" "" t)
 ;; calfw

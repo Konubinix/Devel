@@ -12,7 +12,6 @@
 		 (expand-file-name "jinja2-mode" elfiles)
 		 (expand-file-name "w3m" elfiles)
          (expand-file-name "yasnippet" elfiles)
-		 (expand-file-name "git" elfiles)
 		 (expand-file-name "org/lisp" elfiles)
 		 (expand-file-name "org/contrib/lisp" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)

@@ -128,7 +128,6 @@
 (autoload 'notmuch "notmuch")
 (autoload 'notmuch-search "notmuch")
 (autoload 'appt-check "appt")
-(autoload 'elk-test-mode "elk-test" nil t)
 (autoload 'macro-math-eval-and-round-region "macro-math" t nil)
 (autoload 'macro-math-eval-region "macro-math" t nil)
 (autoload 'highlight-symbol-at-point "highlight-symbol" t nil)
@@ -249,8 +248,6 @@
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 (add-to-list 'auto-mode-alist '("/Mail/" . message-mode))
 (add-to-list 'auto-mode-alist '(".+\.mail$" . message-mode))
-;; elk
-(add-to-list 'auto-mode-alist '("\\.elk\\'" . elk-test-mode))
 ;; c templates in c mode
 (add-to-list 'auto-mode-alist '("\\.c\\.tpl$" . c-mode))
 ;; txx and ixx are c++ files

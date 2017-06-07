@@ -10,7 +10,6 @@
 		(list
 		 (expand-file-name "graphviz-dot-mode" elfiles)
 		 (expand-file-name "jinja2-mode" elfiles)
-		 (expand-file-name "bbdb/lisp" elfiles)
 		 (expand-file-name "w3m" elfiles)
 		 (expand-file-name "csharp" elfiles)
 		 (expand-file-name "yasnippet" elfiles)
@@ -197,11 +196,6 @@
 (autoload 'gnus-alias-determine-identity "gnus-alias" "" t)
 ;; cmake mode
 (autoload 'cmake-mode "cmake-mode" "" t)
-;; bbdb mode
-(autoload 'bbdb-create "bbdb-com" "" t)
-(autoload 'bbdb "bbdb-com" "" t)
-;; bbdb mode
-(autoload 'bbdb-complete-mail "bbdb-com" "" t)
 ;; etags stack
 (autoload 'etags-stack-show "etags-stack" "" t)
 ;; tags

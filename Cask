@@ -9,3 +9,4 @@
 (depends-on "jedi-direx")
 (depends-on "auto-complete")
 (depends-on "pdf-tools")
+(depends-on "bbdb")

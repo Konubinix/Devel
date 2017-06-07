@@ -38,7 +38,6 @@
 		 (expand-file-name "loc-changes" elfiles)
 		 (expand-file-name "popwin" elfiles)
 		 (expand-file-name "miniedit" elfiles)
-		 (expand-file-name "codesearch" elfiles)
 		 (expand-file-name "highlight-indentation" elfiles)
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "org-ehtml/src" elfiles)

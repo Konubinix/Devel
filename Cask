@@ -14,3 +14,4 @@
 (depends-on "calfw-gcal")
 (depends-on "calfw")
 (depends-on "circe")
+(depends-on "diredful")

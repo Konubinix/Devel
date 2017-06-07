@@ -19,7 +19,6 @@
 		 (expand-file-name "dictionary-1.8.7" elfiles)
 		 (expand-file-name "icicles" elfiles)
 		 (expand-file-name "full-ack" elfiles)
-		 (expand-file-name "cc-mode" elfiles)
 		 (expand-file-name "rebox2" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)
 		 (expand-file-name "readline-complete" elfiles)

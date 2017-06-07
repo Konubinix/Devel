@@ -5,3 +5,5 @@
 (depends-on "feature-mode")
 (depends-on "groovy-mode")
 (depends-on "csv-mode")
+(depends-on "jedi")
+(depends-on "jedi-direx")

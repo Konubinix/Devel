@@ -95,10 +95,6 @@ ignore=dirty
 ignore=dirty
 	path = merge-ics
 	url = https://github.com/Konubinix/merge-ics.git
-[submodule "config/elfiles/calfw"]
-ignore=dirty
-	path = config/elfiles/calfw
-	url = https://github.com/kiwanami/emacs-calfw.git
 [submodule "config/elfiles/highlight-indentation"]
 ignore=dirty
 	path = config/elfiles/highlight-indentation

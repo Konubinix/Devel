@@ -43,7 +43,6 @@
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "org-ehtml/src" elfiles)
 		 (expand-file-name "znc" elfiles)
-		 (expand-file-name "circe/lisp" elfiles)
 		 (expand-file-name "ini" elfiles)
 		 (expand-file-name "ebib" elfiles)
 		 (expand-file-name "deferred" elfiles)
@@ -212,9 +211,6 @@
 ;; znc + erc
 (autoload 'znc-erc "znc" "" t)
 (autoload 'znc-all "znc" "" t)
-;; circe
-(autoload 'circe "circe" "" t)
-(autoload 'circe-server-buffers "circe" "" t)
 ;; ebib
 (autoload 'ebib "ebib" "" t)
 ;; text translator

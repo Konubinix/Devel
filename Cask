@@ -13,3 +13,4 @@
 (depends-on "ledger-mode")
 (depends-on "calfw-gcal")
 (depends-on "calfw")
+(depends-on "circe")

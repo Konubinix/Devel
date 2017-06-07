@@ -18,3 +18,4 @@
 (depends-on "dired-sort")
 (depends-on "elf-mode")
 (depends-on "elnode")
+(depends-on "framemove")

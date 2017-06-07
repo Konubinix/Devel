@@ -15,3 +15,5 @@
 (depends-on "calfw")
 (depends-on "circe")
 (depends-on "diredful")
+(depends-on "dired-sort")
+(depends-on "elf-mode")

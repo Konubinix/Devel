@@ -1,7 +1,3 @@
-;; Maximize the current frame because I like it
-(require 'maxframe)
-(add-hook 'window-setup-hook 'maxframe/maximize-frame t)
-
 (require 'ivy)
 (ivy-mode)
 
@@ -12,7 +8,7 @@
 
 (defun konix/emacs-startup-hooks ()
   (require 'which-key nil t)
-)
+  )
 
 (add-hook 'emacs-startup-hook
-	  'konix/emacs-startup-hooks)
+          'konix/emacs-startup-hooks)

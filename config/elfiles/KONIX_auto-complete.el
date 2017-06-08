@@ -35,9 +35,12 @@
 (setq-default ac-auto-show-menu t)
 (setq-default ac-expand-on-auto-complete nil)
 (ac-set-trigger-key "TAB")
-(setq-default ac-dwim-enable t)
+(setq-default ac-dwim t)
 (setq-default global-auto-complete-mode t)
 (setq-default ac-candidate-max 1000)
+(ac-flyspell-workaround)
+(ac-syntax-checker-workaround)
+(ac-linum-workaround)
 
 ;; ####################################################################################################
 ;; MACROS

@@ -19,3 +19,4 @@
 (depends-on "elf-mode")
 (depends-on "elnode")
 (depends-on "framemove")
+(depends-on "golden-ratio")

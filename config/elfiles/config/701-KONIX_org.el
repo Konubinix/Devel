@@ -18,3 +18,8 @@
 				org-checklist
 				)
 			  )
+
+(defun konix/org-goto-id (id)
+  (interactive "sID: ")
+  (org-goto-marker-or-bmk (org-id-find id 'marker))
+  )

@@ -323,13 +323,6 @@
 (require 'KONIX_auto-complete)
 
 ;; ************************************************************
-;; Multi eshell
-;; ************************************************************
-(require 'multi-eshell)
-(setq-default multi-eshell-name "*shell*")
-(setq-default multi-eshell-shell-function '(shell))
-
-;; ************************************************************
 ;; Git blame
 ;; ************************************************************
 ;; (require 'git-blame)
@@ -389,8 +382,6 @@
 ;; hide ifdef
 (setq-default hide-ifdef-initially t)
 (setq-default hide-ifdef-shadow t)
-;; Hide region
-(require 'hide-region)
 ;; I do not want to draw block cursor as wide as the glyph under it
 (setq-default x-stretch-cursor nil)
 
@@ -666,14 +657,9 @@
 ;; **********************************************************************
 ;; Themes
 ;; **********************************************************************
-(add-to-list 'custom-theme-load-path
-			 (expand-file-name
-			  "zenburn"
-			  elfiles
-			  )
-			 )
-(setq custom-safe-themes
-      '("d0c4cea7365681d3b883f7e6459749ae1969325fb480cef9eb7cbc216f1b361d"))
+(setq-default
+ custom-safe-themes
+ '("67e998c3c23fe24ed0fb92b9de75011b92f35d3e89344157ae0d544d50a63a72" default))
 
 (load-theme 'zenburn)
 

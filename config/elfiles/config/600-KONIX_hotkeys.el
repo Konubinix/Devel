@@ -88,9 +88,6 @@
 ;; Auto complete
 (global-set-key (kbd "C-j") 'hippie-expand)
 (global-set-key (kbd "C-S-j") 'ac-stop)
-;; SHELL
-(global-set-key (kbd "<C-next>") 'multi-eshell-switch-to-next-live-shell)
-(global-set-key (kbd "<C-prior>") 'multi-eshell-switch)
 ;; ISPELL
 (global-set-key (kbd "C-$") 'konix/ispell-region-or-buffer)
 (global-set-key (kbd "C-?") 'konix/flyspell-region-or-buffer)
@@ -101,9 +98,6 @@
 (global-set-key (kbd "C-x 9") 'sticky-window-toggle-dedicated)
 (global-set-key (kbd "C-x 7") 'konix/toggle-window-resizable)
 (define-key ctl-x-4-map "t" 'toggle-window-split)
-;; macro-maths
-(global-set-key "\C-x~" 'macro-math-eval-and-round-region)
-(global-set-key "\C-x=" 'macro-math-eval-region)
 
 ;; ####################################################################################################
 ;; Slow keymap keys
@@ -223,15 +217,6 @@
 (define-key 'konix/dictionary-key-map (kbd "d") 'dictionary)
 (define-key 'konix/dictionary-key-map (kbd "s") 'dictionary-search)
 
-
-;; ************************************************************
-;; hide region
-;; ************************************************************
-(define-prefix-command 'konix/hide-key-map)
-(define-key konix/global-key-map (kbd "M-h") 'konix/hide-key-map)
-(define-key 'konix/hide-key-map (kbd "h") 'hide-region-hide)
-(define-key 'konix/hide-key-map (kbd "u") 'hide-region-unhide)
-(define-key 'konix/hide-key-map (kbd "p") 'hide-region-unhide-at-point)
 ;; ************************************************************
 ;; Ediff
 ;; ************************************************************
@@ -261,11 +246,7 @@
 ;; Backup
 ;; ************************************************************
 (define-prefix-command 'konix/backup-key-map)
-(define-key konix/global-key-map (kbd "b") 'konix/backup-key-map)
-(define-key 'konix/backup-key-map (kbd "v") 'pick-backup-and-view)
-(define-key 'konix/backup-key-map (kbd "d") 'pick-backup-and-diff)
-(define-key 'konix/backup-key-map (kbd "e") 'pick-backup-and-ediff)
-(define-key 'konix/backup-key-map (kbd "r") 'pick-backup-and-revert)
+(define-key konix/global-key-map (kbd "b") 'backup-walker-start)
 
 ;; ************************************************************
 
@@ -301,10 +282,6 @@
 (define-key 'konix/global-fast-key-map (kbd ">") 'end-of-buffer)
 (define-key 'konix/global-fast-key-map (kbd "C-f") 'ffap)
 
-;; SHELL
-(define-key 'konix/global-fast-key-map (kbd "<next>") 'multi-eshell-switch-to-next-live-shell)
-(define-key 'konix/global-fast-key-map (kbd "<prior>") 'multi-eshell-switch)
-
 ;; In case the previous keywords are already taken by the mode (like in org-mode)
 (define-key 'konix/global-fast-key-map (kbd "<left>") 'windmove-left)
 (define-key 'konix/global-fast-key-map (kbd "<up>") 'windmove-up)
@@ -317,8 +294,6 @@
 ;; sort lines
 (define-key 'konix/global-fast-key-map (kbd "C-s") 'sort-lines)
 ;; SHELL
-(define-key 'konix/global-fast-key-map "e" 'multi-eshell)
-(define-key 'konix/global-fast-key-map "E" 'konix/multi-eshell-term)
 (define-key 'konix/global-fast-key-map (kbd "C-e") 'konix/term)
 
 ;; ******************************************************************************************
@@ -657,24 +632,6 @@
   )
 
 ;; ####################################################################################################
-;; Cscope
-;; ####################################################################################################
-(eval-after-load "xcscope"
-  '(progn
-     (define-key global-map (kbd "C-c s") cscope-list-entry-keymap)
-     (define-key cscope-list-entry-keymap "b" '(lambda()(interactive)
-												 (when (string-match "^\*" (buffer-name(current-buffer)))
-												   (rename-buffer
-													(generate-new-buffer-name
-													 "cscope_result")
-													)
-												   )
-												 )
-       )
-     )
-  )
-
-;; ####################################################################################################
 ;; Compilation
 ;; ####################################################################################################
 (define-prefix-command 'konix/compile/map)
@@ -746,15 +703,6 @@
 (global-set-key (kbd "<C-f3>") 'highlight-symbol-at-point)
 (global-set-key (kbd "<S-f3>") 'highlight-symbol-next)
 (global-set-key (kbd "<C-S-f3>") 'highlight-symbol-prev)
-
-;; ####################################################################################################
-;; hide show with hide comments
-;; ####################################################################################################
-(eval-after-load "hide-comnt"
-  '(progn
-     (define-key hs-minor-mode-map "\C-c@C" 'hide/show-comments)
-     )
-  )
 
 ;; ####################################################################################################
 ;; special bs custo
@@ -918,13 +866,6 @@
 (define-key 'konix/global-slow-key-map (kbd "z") 'konix/znc/map)
 
 (define-key 'konix/znc/map (kbd "g") 'konix/znc/goto)
-
-;;;;;;;;;;;;;;;;
-;; key chords ;;
-;;;;;;;;;;;;;;;;
-(require 'key-chord)
-(key-chord-mode 1)
-(key-chord-define-global ",;" 'info)
 
 ;; ######################################################################
 ;; minibuffer hotkeys

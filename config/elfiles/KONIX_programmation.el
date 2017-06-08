@@ -24,7 +24,6 @@
 
 ;;; Code:
 (require 'thingatpt)
-(require 'xcscope nil t)
 (require 'KONIX_auto-complete)
 (require 'highlight-parentheses)
 

@@ -278,17 +278,6 @@
 	)
   )
 
-(defun konix/multi-eshell-term ()
-  (interactive)
-  (let (
-		(multi-eshell-shell-function '(term explicit-shell-file-name))
-		)
-	(call-interactively
-	 'multi-eshell
-	 )
-	)
-  )
-
 (defun konix/browse-url-browser (url &optional new-window)
   (interactive (browse-url-interactive-arg "URL: "))
   (start-process (format "%s '%s'" (getenv "BROWSER") url)

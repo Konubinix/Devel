@@ -33,7 +33,6 @@
 		 (expand-file-name "highlight-symbol.el" elfiles)
 		 (expand-file-name "wgrep" elfiles)
 		 (expand-file-name "elf-mode" elfiles)
-		 (expand-file-name "golden-ratio" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

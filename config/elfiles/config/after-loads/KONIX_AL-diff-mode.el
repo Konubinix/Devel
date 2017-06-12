@@ -57,6 +57,16 @@
 	 )
    )
   )
+
+(set-face-foreground
+ 'diff-added
+ "white"
+ )
+(set-face-foreground
+ 'diff-removed
+ "white"
+ )
+
 (add-hook 'diff-mode-hook 'konix/diff-mode-hook)
 
 (provide '700-KONIX_diff)

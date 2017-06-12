@@ -4,12 +4,14 @@
 import email
 import tempfile
 import re
+import uuid
 import os
+from bs4 import BeautifulSoup as bs
 import logging
-logger = logging.getLogger("munpack")
 from collections import namedtuple
 
 import argparse
+logger = logging.getLogger("munpack")
 parser = argparse.ArgumentParser(description="""Munpack, with better support for cid.""")
 
 parser.add_argument('-i','--input',
@@ -100,6 +102,18 @@ def munpack(message, directory, rel_path=False):
             content = text.encode(charset)
         logger.debug("Writing in file {}".format(file_name))
         if sub_type == "html":
+            s = bs(text, "lxml")
+
+            for img in s.find_all("img", src=True):
+                src = img.attrs.pop("src")
+                id = img.attrs.get("id", str(uuid.uuid1()))
+                img.attrs["id"] = id
+                img.attrs["datasrc"] = src
+                img.attrs["src"] = "http://a.a"
+                img.attrs["alt"] = img.attrs.get("alt", "Load me")
+                img.attrs["onmousedown"] = 'this.src = this.getAttribute("datasrc");'
+                img.attrs["ontouchstart"] = img.attrs["onmousedown"]
+            text = str(s)
             text = """<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

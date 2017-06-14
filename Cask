@@ -46,3 +46,4 @@
 (depends-on "xml-rpc") ;; trac-wiki
 (depends-on "zoom-frm")
 (depends-on "mic-paren")
+(depends-on "skewer-mode")

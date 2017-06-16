@@ -27,6 +27,7 @@
 (require 'notmuch-address)
 (require 'notmuch-tree)
 (require 'thingatpt)
+(require 'uuidgen)
 
 (defun konix/notmuch/record-url-to-ril-unflag-and-next (url)
   (interactive
@@ -51,8 +52,30 @@
 	(newline)
 	)
   (gnus-alias-determine-identity)
+  (when (getenv "KONIX_CUSTOM_SIGNATURE_SERVER")
+    (save-excursion
+      (let
+          (
+           (id (format "%s@konubinix" (uuidgen-4)))
+           )
+        (goto-char (point-max))
+        (insert (format "
+<#part type=\"text/html\" disposition=inline>
+<img src=\"%s/%s\" width=\"1\" height=\"1\"/>
+<#/part>
+" (getenv "KONIX_CUSTOM_SIGNATURE_SERVER") id)
+                )
+        (goto-char (point-min))
+        (search-forward "--text follows this line--")
+        (previous-line)
+        (end-of-line)
+        (insert (format "
+Message-Id: <%s>" id)
+                )
+        )
+      )
+    )
   )
-
 (add-hook 'message-setup-hook 'konix/message-setup-hook)
 ;; for notmuch to sort mails like I want
 (setq-default notmuch-search-oldest-first nil)

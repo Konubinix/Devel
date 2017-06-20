@@ -3,10 +3,13 @@
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from bs4 import BeautifulSoup as bs
+import uuid
 import email
 import datetime
 import mailbox
 import html2text
+
 
 def format_markdown(from_, to, subject, date, content):
     import markdown
@@ -28,6 +31,7 @@ def format_markdown(from_, to, subject, date, content):
     msg.attach(plain_part)
     msg.attach(html_part)
     return msg
+
 
 def format_mail(from_, to, subject, date, pure_text_prefix, content):
     content_lines = content.splitlines()
@@ -53,7 +57,22 @@ def format_mail(from_, to, subject, date, pure_text_prefix, content):
     msg.attach(html_part)
     return msg
 
+
 def add_to_maildir(from_, to, subject, date, pure_text_prefix, content, directory):
     msg = format_mail(from_, to, subject, date, pure_text_prefix, content)
     box = mailbox.Maildir(directory)
     return box.add(str(msg))
+
+
+def make_part_harmless(html):
+    s = bs(html, "lxml")
+    for img in s.find_all("img", src=True):
+        src = img.attrs.pop("src")
+        id = img.attrs.get("id", str(uuid.uuid1()))
+        img.attrs["id"] = id
+        img.attrs["datasrc"] = src
+        img.attrs["src"] = "http://a.a"
+        img.attrs["alt"] = img.attrs.get("alt", "Load me")
+        img.attrs["onmousedown"] = 'this.src = this.getAttribute("datasrc");'
+        img.attrs["ontouchstart"] = img.attrs["onmousedown"]
+    return str(s)

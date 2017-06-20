@@ -1151,7 +1151,7 @@ items"
 				    	  "phantom and maybe items should not be NEXT actions")
 				    	 )
 				    	)
-				  (tags-todo "//-NEXT"
+				  (todo "TODO"
 				    		 (
 				    		  (org-agenda-skip-function
 				    		   '(or
@@ -1316,7 +1316,7 @@ items"
 				   )
 				  ("an" "Next action list (without habits)"
 				   (
-					(tags-todo "STYLE<>\"habit\"-habit//NEXT")
+					(todo "NEXT")
 					)
 				   (
 					)

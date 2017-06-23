@@ -58,9 +58,14 @@ def format_mail(from_, to, subject, date, pure_text_prefix, content):
     return msg
 
 
+add_to_maildir_hooks = []
+
+
 def add_to_maildir(from_, to, subject, date, pure_text_prefix, content, directory):
     msg = format_mail(from_, to, subject, date, pure_text_prefix, content)
     box = mailbox.Maildir(directory)
+    for hook in add_to_maildir_hooks:
+        msg = hook(msg)
     return box.add(str(msg))
 
 

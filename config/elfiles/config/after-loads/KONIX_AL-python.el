@@ -36,7 +36,6 @@
   (setq ac-sources
 		'(
 		  ac-source-yasnippet
-		  ac-source-files-in-current-dir
 		  )
 		)
   (when (require 'jedi nil t)

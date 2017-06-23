@@ -47,3 +47,6 @@
 (depends-on "zoom-frm")
 (depends-on "mic-paren")
 (depends-on "skewer-mode")
+(depends-on "yaml-mode")
+(depends-on "csv-mode")
+(depends-on "uuidgen")

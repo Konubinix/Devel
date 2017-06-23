@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: _li
+# key: _li
+# --
+$><li>
+$>$0
+$></li>

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: _p
+# key: _p
+# --
+$><p>
+$>$0
+$></p>

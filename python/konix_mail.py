@@ -3,12 +3,16 @@
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from bs4 import BeautifulSoup as bs
+
 import uuid
 import email
 import datetime
 import mailbox
+import re
+import base64
+
 import html2text
+from bs4 import BeautifulSoup as bs
 
 
 def format_markdown(from_, to, subject, date, content):
@@ -77,7 +81,25 @@ def make_part_harmless(html):
         img.attrs["id"] = id
         img.attrs["datasrc"] = src
         img.attrs["src"] = "http://a.a"
-        img.attrs["alt"] = img.attrs.get("alt", "Load me")
-        img.attrs["onmousedown"] = 'this.src = this.getAttribute("datasrc");'
+        img.attrs["oldstyle"] = img.attrs.get("style", "")
+        img.attrs["style"] = "border: solid 3px blue;" + img.attrs["oldstyle"]
+        img.attrs["alt"] = img.attrs.get("alt", "CLICKTOLOAD")
+        img.attrs["onmousedown"] = 'this.style = this.getAttribute("oldstyle") ; this.src = this.getAttribute("datasrc");'
         img.attrs["ontouchstart"] = img.attrs["onmousedown"]
     return str(s)
+
+
+def html_inject_cid(html, msg):
+    soup = bs(html, "lxml")
+    for img in soup.find_all(src=re.compile("cid:.+")):
+        cid = img.attrs["src"][4:]
+        for part in msg.walk():
+            if part["content-id"] == "<{}>".format(cid):
+                img.attrs["src"] = "data:{};base64,{}".format(
+                    part.get_content_type(),
+                    base64.encodestring(
+                        part.get_payload(decode=True)
+                    ).decode("utf-8").strip(),
+                )
+                break
+    return str(soup)

@@ -50,3 +50,4 @@
 (depends-on "yaml-mode")
 (depends-on "csv-mode")
 (depends-on "uuidgen")
+(depends-on "org-mime")

@@ -16,7 +16,7 @@ while getopts ":hr" opt; do
             ;;
         r)
             echo "Restarting"
-            pkill gpg-agent
+            pkill -9 gpg-agent
             ;;
     esac
 done

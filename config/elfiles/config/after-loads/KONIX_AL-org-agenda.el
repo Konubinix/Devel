@@ -513,5 +513,15 @@
     )
   )
 
+(defun konix/agenda/html ()
+  (interactive)
+  (let (
+        (buffer_name "*Org Agenda(aa)*")
+        )
+    (kill-buffer (get-buffer-create buffer_name))
+    (org-agenda nil "aa")
+    (org-agenda-write (format "%s/agenda.html" temporary-file-directory) t nil buffer_name))
+  )
+
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

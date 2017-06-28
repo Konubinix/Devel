@@ -8,7 +8,7 @@ else
     git stash
 fi
 
-git rebase "$@"
+git pull --rebase "$@"
 
 if [ "${NEED_STASH}" == "1" ]
 then

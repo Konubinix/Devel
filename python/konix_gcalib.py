@@ -278,7 +278,7 @@ class GCall(cmd.Cmd, object):
 
         @property
         def org_mode(self):
-            return """* {} ({})   :{}:
+            return """* {}{}{}
 :PROPERTIES:
 :ID: {}
 :LOCATION: {}
@@ -297,8 +297,8 @@ Attendees:
 #+END_EXAMPLE
 """.format(
     self.summary,
-    self.location,
-    self.my_response_status,
+    (" (in {})".format(self.location) if self.location else ""),
+    ("    :{}:".format(self.my_response_status) if self.my_response_status else ""),
     self.id,
     self.location,
     parser.parse(self.created).strftime("[%Y-%m-%d %H:%M]"),

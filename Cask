@@ -51,3 +51,5 @@
 (depends-on "csv-mode")
 (depends-on "uuidgen")
 (depends-on "org-mime")
+(depends-on "cheat-sh")
+(depends-on "gited")

@@ -828,10 +828,12 @@ Attendees:
         import blaze
         from datashape import discover, from_numpy
         columns = list(self.api["schemas"]["Event"]["properties"].keys()) + [
+            "calendar_id",
             "startdate",
             "enddate",
             "duration",
-        ] + ["calendar_id"]
+        ]
+        calendar_id = self.db.get(self.calendar_id_name)
         @discover.register(self.Event)
         def discover_events(event, **kwargs):
             df = pandas.DataFrame(

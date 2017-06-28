@@ -856,6 +856,7 @@
 (define-key konix/git-global-map-checkout "f" 'konix/git/checkout/file)
 (define-key konix/git-global-map-checkout "c" 'konix/git/checkout)
 (define-key konix/git-global-map-checkout (kbd "<down>") 'konix/git/checkout/parent)
+(define-key konix/git-global-map-checkout "g" 'gited-list-branches)
 
 (global-set-key (kbd "C-< g") 'konix/git/command-with-completion)
 

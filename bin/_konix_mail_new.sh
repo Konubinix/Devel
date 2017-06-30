@@ -26,10 +26,3 @@ fi
 konix_mail_tray_daemon_update.py -d || exit 1
 
 konix_mail_unnew.sh || exit 1
-
-if grep -q ERROR "$LOG_FILE"
-then
-    echo "Errors in offlineimap call" >&2
-    cat "$LOG_FILE" >&2
-    exit 1
-fi

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+notmuch new || exit 1
 # Some mua like AppleMail like to add attachment inline. Notmuch doesn't
 # consider them as attachment. This call will fix that.
 konix_notmuch_mail_fix_attachment.py

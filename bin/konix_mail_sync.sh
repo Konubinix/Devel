@@ -13,3 +13,10 @@ konix_lock_run.sh -n -N offlineimap timeout 1200  offlineimap -c "${KONIX_OFFLIN
 konix_sendmail_flush.sh
 
 konix_mail_new.sh "$@"
+
+if grep -q ERROR "$LOG_FILE"
+then
+    echo "Errors in offlineimap call" >&2
+    cat "$LOG_FILE" >&2
+    exit 1
+fi

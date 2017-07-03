@@ -86,6 +86,8 @@ def make_part_harmless(html):
         img.attrs["alt"] = img.attrs.get("alt", "CLICKTOLOAD")
         img.attrs["onmousedown"] = 'this.style = this.getAttribute("oldstyle") ; this.src = this.getAttribute("datasrc");'
         img.attrs["ontouchstart"] = img.attrs["onmousedown"]
+    for elem in s.find_all("meta", attrs={"name": "viewport"}):
+        elem.extract()
     return str(s)
 
 

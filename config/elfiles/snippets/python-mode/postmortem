@@ -3,6 +3,6 @@
 # key: postmortem
 # binding: direct-keybinding
 # --
-$>import sys
-$>import ipdb
-$>ipdb.post_mortem(sys.exc_info()[2])
+import sys
+import ipdb
+ipdb.post_mortem(sys.exc_info()[2])

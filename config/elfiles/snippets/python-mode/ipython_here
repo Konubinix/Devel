@@ -3,7 +3,7 @@
 # key: ipython_here
 # binding: direct-keybinding
 # --
-$>import IPython
-$>dict_ = globals()
-$>dict_.update(locals())
-$>IPython.start_ipython(argv=[], user_ns=dict_)
+import IPython
+dict_ = globals()
+dict_.update(locals())
+IPython.start_ipython(argv=[], user_ns=dict_)

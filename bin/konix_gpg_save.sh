@@ -2,7 +2,7 @@
 
 set -eu
 mkdir -p "$KONIX_PERSO_DIR/gnupg"
-if [ -f "$HOME/.gnupg/pubring.gpg" ]
+if [ -f "$HOME/.gnupg/pubring.gpg" ] || [ -f "$HOME/.gnupg/pubring.kbx" ]
 then
     echo "Saving the public keys"
     gpg --export --armor \

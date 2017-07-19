@@ -2,10 +2,74 @@
 ;; -*- Mode: Emacs-Lisp -*-
 ;; -*- coding: utf-8 -*-
 
-;; Copyright (C) 2011, 2012 Jens Lechtenbörger
+;; Copyright (C) 2011, 2012, 2013, 2014, 2016 Jens Lechtenbörger
+;; Copyright (C) 2013 konubinix
 
-;; Version: $Id: jl-encrypt.el,v 1.1 2012/03/09 10:37:08 lechten Exp lechten $
-;; Compatibility: Should work with GNU Emacs 23.1 and later
+;; Changelog:
+;; 2012/03/09, Version 1.1, initial release
+;; 2013/03/18, Version 2.1, integrate patch by konubinix to also encrypt
+;;   e-mail that already contains a secure sign tag:
+;;   - Add functions jl-is-signed-p and jl-do-not-sign-p.
+;;   - Change jl-secure-message-gpg and jl-secure-message-smime to use
+;;     jl-do-not-sign-p (and not only jl-encrypt-without-signature).
+;;   - Change jl-message-send-maybe-exit to look for secure encrypt tag
+;;     (instead of any secure tag).
+;;   - Add Changelog, give credit to konubinix
+;; 2013/07/01, Version 3.1, support XEmacs, don't break news, don't replace
+;;   S/MIME tag with GnuPG tag if possible.  New version started based on
+;;   feedback and testing by Michael Strauss.
+;;   - Replace delete-dups with mm-delete-duplicates as XEmacs does not have
+;;     delete-dups.
+;;   - Bug fixed when rebinding keys: Use (interactive "P") instead of
+;;     (interactive "p").
+;;   - Do not attempt to encrypt news postings, only go for e-mails with
+;;     non-empty recipient lists.
+;;   - If the user inserted an S/MIME signature tag, and S/MIME as well as
+;;     GnuPG keys are available, don't prefer GnuPG any more but upgrade
+;;     S/MIME signature to S/MIME sign+encrypt.
+;;   - Refactoring.
+;;     - Added jl-method-table, jl-access-method-table, jl-mail-recipients,
+;;       jl-maybe-add-tag, jl-maybe-add-tag-for-args, jl-is-smime-p.
+;;     - Based on above, simplified jl-proceed-without-encryption-p and
+;;       jl-encrypt-if-possible.
+;;     - Moved jl-certfile-available-p and jl-secure-message-smime to
+;;       jl-smime.
+;;   - Explain potential unsafety of Bcc headers.  Safety check added.
+;;     Added jl-encrypt-safe-bcc-list.
+;;   - Changed jl-gpgkey-available-p to produce less false positives.
+;;   - Replaced jl-encrypt-without-signature with jl-encrypt-insert-signature.
+;;     Have jl-encrypt-if-possible use it.  Bug fix in jl-is-signed-p.
+;;   - Different treatment of From header.  See comment for new variable
+;;     jl-encrypt-ignore-from.
+;;   - Simplified internal recipient lists now contain just lower-case e-mail
+;;     addresses (no names any longer).
+;;   - Use defcustom instead of defvar for user variables, which are also
+;;     renamed.
+;; 2013/12/20, Version 4-beta, unified use of EasyPG for gpg and gpgsm.
+;;   - Removed variables jl-encrypt-ignore-from and
+;;     jl-encrypt-recipient-headers.
+;;     Treatment of encryption targets now controlled entirely by EasyPG
+;;     (and GnuPG configuration files).  New functions jl-epg-find-usable-keys
+;;     and jl-epg-check-unique-keys towards that end.
+;;   - New variable jl-encrypt-manual-choice.
+;;     If several public keys are available for a recipient, ask user which
+;;     one to use.  (Requires `mm-encrypt-option' introduced in Emacs 23.2.)
+;; 2013/12/31, Version 4.1.
+;;   - Take care of interface change for mml2015-epg-find-usable-key
+;;     starting with Ma Gnus v0.7.
+;;   - Updated documentation.
+;; 2014/09/16, Version 4.2.
+;;   - No change in functionality.
+;;   - Use message-send-hook instead of key rebinding.
+;;   - Replaced jl-encrypt-manual-choice with
+;;     jl-encrypt-i-am-aware-of-mm-encrypt-option.
+;;   - Renamed jl-mail-recipients to jl-message-recipients and
+;;     jl-encrypt-address-list to jl-message-address-list.
+;; 2016/03/28, Version 4.3.
+;;   - No change in functionality.
+;;   - Adapted for Emacs 25.1.
+
+;; Compatibility: GNU Emacs 25.1
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -23,7 +87,7 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
-;; Keywords: mail, encryption, GnuPG, gpg, S/MIME, OpenPGP
+;; Keywords: mail, encryption, GnuPG, gpg, OpenPGP, gpgsm, S/MIME, CMS
 
 ;; URL: http://www.emacswiki.org/emacs/jl-encrypt.el
 ;; EmacsWiki: DefaultEncrypt
@@ -32,26 +96,74 @@
 ;; http://www.informationelle-selbstbestimmung-im-internet.de/emacs/
 
 ;;; Commentary:
-;; If you sometimes send plaintext e-mails that really should have been
-;; encrypted ones, then this file may be for you.
+;; Gnus supports GnuPG via the insertion of so-called MML secure tags, which
+;; contain encryption instructions to be performed before a message is sent.
+;; However, by default those tags need to be added manually, which can easily
+;; be forgotten.  In contrast, DefaultEncrypt aims to insert those tags
+;; automatically if public keys for all recipients are available.
+;;
 ;; I assume that you are familiar with GnuPG support for Gnus messages as
 ;; described in Info node `(message) Security':
 ;; https://www.gnu.org/software/emacs/manual/html_node/message/Security.html
+;; Moreover, DefaultEncrypt is based on EasyPG, the default interface of
+;; Emacs for OpenPGP and S/MIME, see Info node `(epa)':
+;; https://www.gnu.org/software/emacs/manual/html_node/epa/index.html
 ;;
-;; The code aims for automatic insertion of MML secure tags into messages
-;; if public keys (either GnuPG public keys or S/MIME certificates) for
-;; all recipients are available.  In addition, before a message is sent,
-;; the user is asked if plaintext should really be sent unencryptedly when
-;; public keys for all recipients are available.
-;; This works by rebinding `C-c C-c' and `C-c C-s' as well as by adding
-;; `jl-encrypt-if-possible' to `gnus-message-setup-hook'.
-;; If you are really interested in S/MIME then I suggest that you take a
-;; look at jl-smime.el in addition to this file.
+;; DefaultEncrypt aims for automatic insertion of an MML secure encryption
+;; tags into messages if public keys (either GnuPG public keys or S/MIME
+;; certificates) for all recipients are available.  In addition, before a
+;; message is sent, the user is asked whether plaintext should really be sent
+;; unencryptedly when public keys for all recipients are available.
+;;
+;; The above works by adding
+;; `mml-secure-encrypt-if-possible' to `gnus-message-setup-hook' and
+;; `mml-secure-check-encryption-p' to `message-send-hook'.
+;;
+;; Note that with EasyPG, e-mail is *not* encrypted to (a key for) the
+;; From address (see Info node `(epa) Mail-mode integration').
+;; Instead, to make sure that you can decrypt your own e-mails, typical
+;; options are
+;; * to customize mml-secure-openpgp-encrypt-to-self or
+;; * to use a Bcc header to encrypt the e-mail to one of your own
+;;   GnuPG identities (see `mml-secure-safe-bcc-list' then) or
+;; * to use the encrypt-to or hidden-encrypt-to option in gpg.conf or
+;; * to use the encrypt-to option in gpgsm.conf.
+;; Note that encrypt-to gives away your identity for *every*
+;; encryption without warning, which is not what you want if you are
+;; using, e.g., remailers.
+;; Also, be careful with Bcc headers; it *might* be possible to make
+;; this work without giving away the Bcc'ed identities, but it did
+;; not work by default in my case, and I recommend against such a
+;; thing: Only add Bcc if you are absolutely sure that you know what
+;; you are doing.  See also `mml-secure-bcc-is-safe'.
+;;
+;; If you are interested in S/MIME then I suggest that you read this:
+;; https://blogs.fsfe.org/jens.lechtenboerger/2013/12/23/openpgp-and-smime/
+;; If you are still interested in S/MIME afterwards, take a look
+;; at ExtendSMIME (jl-smime.el) in addition to this file.
 
 ;; Install:
 ;; Place this file into your load-path and add the following to ~/.emacs.
 ;;     (require 'jl-encrypt)
-;; In general, no further configuration should be necessary.
+;; If you share my preferences, no further configuration should be necessary.
+;;
+;; Customizable variables defined in this file are
+;; `mml-secure-insert-signature', `mml-secure-pgp-without-mime'.
+;;
+;; In addition, as explained in the following `mml-default-encrypt-method' and
+;; `mml-default-sign-method' influence whether to prefer S/MIME or GnuPG in
+;; certain situations, and the value of `gnus-message-replysignencrypted' may
+;; be changed by this code.
+;; If `mml-secure-insert-signature' is nil (the default),
+;; `gnus-message-replysignencrypted' will be set to nil to avoid signatures
+;; for reply messages.  You may manually add MML sign tags any time, of
+;; course, but the whole point of this file is to create MML tags automatically
+;; (e.g., by customizing `mml-secure-insert-signature').
+;; If GnuPG and S/MIME keys are both available for the given recipients and no
+;; MML tag is present, `mml-default-encrypt-method' determines what method to
+;; prefer.  If `mml-secure-insert-signature' is set to `always',
+;; `mml-default-sign-method' determines what method to prefer upon message
+;; creation.
 
 ;; Sanity check:
 ;; Without any further configuration, send a GnuPG encrypted e-mail to
@@ -62,7 +174,8 @@
 ;; will be asked whether you really want to send that e-mail as plaintext.
 ;; Answering `no' will insert an MML secure tag for you.  Press `C-c C-c'
 ;; again, and an encrypted e-mail will be sent.  If you receive that e-mail
-;; with garbled attachments read the comment for `jl-gpg-without-mime'.
+;; with garbled attachments read the comment for
+;; `mml-secure-pgp-without-mime'.
 
 ;; You may want to check the subsequent comments to understand the rationale
 ;; of my changes to standard message behavior.
@@ -72,210 +185,249 @@
 ;;; Code:
 (require 'gnus)
 (require 'message)
-
-;; For pgp(mime) the following variable ensures that replies to encrypted
-;; e-mails are encrypted (i.e., an MML tag is inserted into the message
-;; buffer).
-;; However, this does not work for S/MIME encrypted e-mails.  Once decrypted,
-;; they loose their encrypted property in gnus-article-wash-types.  If you
-;; are interested in S/MIME, you may want to consider jl-smime.el.
-(setq gnus-message-replyencrypt t)
-
-;; Rebind keys for sending messages to check whether encryption is possible
-;; (all necessary public keys are available).
-;; In the past, this could have prevented me from sending plaintext e-mails
-;; that should have been sent encrypted.
-(define-key message-mode-map (kbd "C-c C-c") 'jl-message-send-and-exit)
-(define-key message-mode-map (kbd "C-c C-s") 'jl-message-send)
+(require 'mml-sec)
+(require 'epg)
 
 ;; Make gnus insert MML encryption tags if keys for all recipients are
 ;; available.  Thus, if you reply (or wide reply) to a message or edit
 ;; a saved draft, then MML encryption tags will be inserted right away.
-(add-hook 'gnus-message-setup-hook 'jl-encrypt-if-possible)
+;; Moreover, if mml-secure-insert-signature is always, an MML signature
+;; tag will be added immediately.
+(add-hook 'gnus-message-setup-hook 'mml-secure-encrypt-if-possible)
+(add-hook 'message-send-hook 'mml-secure-check-encryption-p)
 
-(defvar jl-gpg-without-mime nil
-  "Control whether MML encryption should use MIME Security with OpenPGP.
-RFC 3156 specifies how OpenPGP (and, thus, GnuPG) and MIME work together.
-In Gnus, `mml-secure-message-encrypt-pgpmime' follows that standard.
-An alternative is `mml-secure-message-encrypt-pgp', which represents a
-less powerful approach.  If you (like me in the past) happen to send
+(defgroup jl-encrypt nil
+  "Customization options for jl-encrypt.el.")
+
+(defcustom mml-secure-insert-signature nil
+  "Control whether MML signature tags should be produced.
+If it is nil, no signatures are created.  If it is `always', signature
+tags are inserted for new messages (with their type determined by
+`mml-default-sign-method').  If is is `encrypted', messages that are
+encrypted are also signed."
+  :group 'jl-encrypt
+  :type '(choice (const nil) (const always) (const encrypted)))
+
+;; Note that mml-default-encrypt-method combines two separate concepts: First,
+;; whether to use OpenPGP or S/MIME.  Second, if OpenPGP is chosen whether to
+;; use MIME Security or not.  For me, this is not good enough.  Suppose I
+;; preferred S/MIME in general (which I do not).  Then, I would need to
+;; customize mml-default-encrypt-method for S/MIME.  If I then send an e-mail
+;; to someone who does not use S/MIME but OpenPGP, the variable
+;; mml-default-encrypt-method does not help at all, and there is no way to
+;; know whether MIME Security should be used or not.  Thus, I introduce an
+;; additional variable that focuses on MIME Security for OpenPGP:
+(defcustom mml-secure-pgp-without-mime nil
+  "Non-nil to use MML encryption without MIME Security for OpenPGP.
+RFC 3156 specifies how OpenPGP (and, thus, GnuPG) and MIME work
+together.  In Gnus, `mml-secure-message-encrypt-pgpmime' follows
+that standard.  An alternative is
+`mml-secure-message-encrypt-pgp', which represents a less
+powerful approach.  If you (like me in the past) happen to send
 e-mails in an environment using broken M$ SMTP servers, then your
-beautiful e-mails produced by `mml-secure-message-encrypt-pgpmime',
-following RFC 3156, will be corrupted along the way.  E.g., the SMTP
-server at my department throws away the e-mail's Content-Type
-`multipart/encrypted' and its `protocol=\"application/pgp-encrypted\"'
-and inserts a meaningless `multipart/mixed' one.  Thus, the recipient
-will have a hard time figuring out what the e-mail's strange attachments
-are good for.  FUBAR.
-If this variable is set to nil (the default) then your e-mails are built
-according to RFC 3156.  I suggest that you send an encrypted e-mail to
-yourself.  Complain to your IT department if you receive garbled
-attachments.  Then set this variable to non-nil, while they are setting
-up a reasonable SMTP server.")
-
-(defvar jl-encrypt-without-signature t
-  "Control whether MML encryption tags should also produce signatures.
-Set to nil to produce an MML tag that signs in addition to encryption.
-In general, I'm not interested in signing my e-mails.  In contrast, I
-believe that off-the-record communication aims for the correct set of
-security goals: Confidentiality with perfect forward secrecy, integrity,
-and repudiability, see: http://www.cypherpunks.ca/otr/
-Unfortunately, that's not an option for e-mail.")
-
-(defvar jl-recipient-headers '("to" "cc")
-  "List of headers that determine whose keys must be available.
-An MML secure tag will only be inserted based on `jl-encrypt' if public keys
-or certificates are available for all recipients mentioned in these headers.
-Note that this list does not include From; in case of GnuPG, I recommend the
-encrypt-to option in gpg.conf instead (which makes sure that you can decrypt
-e-mails sent by yourself).
-Also, be careful with Bcc headers; it *might* be possible to make this work
-without giving away the Bcc'ed identities, but I did not test this and
-recommend against such a thing: Only add Bcc if you are absolutely sure that
-you know what you are doing.  And let me know how to do that properly ;)")
-
-;; For the reason stated in the docstring of jl-encrypt-without-signature,
-;; I'm not using:
-;; (setq gnus-message-replysign t)
-
-;; Moreover, I don't think that setting mml-default-encrypt-method makes much
-;; sense.  The code in this file determines what method to use based on the
-;; availability of public keys or certificates.  And on jl-gpg-without-mime.
-;; Be sure to read its comment.
+beautiful e-mails produced by
+`mml-secure-message-encrypt-pgpmime', following RFC 3156, will be
+corrupted along the way.  E.g., the SMTP server at my department
+throws away the e-mail's Content-Type \"multipart/encrypted\" and
+its \"protocol=application/pgp-encrypted\" and inserts a
+meaningless \"multipart/mixed\" one.  Thus, the recipient will
+have a hard time figuring out what the e-mail's strange
+attachments are good for.  FUBAR.
+If this variable is set to nil (the default) then your e-mails
+are built according to RFC 3156.  I suggest that you send an
+encrypted e-mail to yourself.  Complain to your IT department if
+you receive garbled attachments.  Then set this variable to
+non-nil, while they are setting up a reasonable SMTP server.
+If you are signing all your e-mails with GnuPG you probably also
+want to set `mml-default-sign-method' to \"pgp\" (instead of
+\"pgpmime\")."
+  :group 'jl-encrypt
+  :type 'boolean)
 
 ;;
 ;; No configuration options beyond this point.  Just code.
 ;;
 
-(defun jl-message-send-and-exit (&optional arg)
-  "Delegate work to `jl-message-send-maybe-exit', passing ARG."
-  (interactive "p")
-  (jl-message-send-maybe-exit t arg))
+;; Message header functions.
+;; Could go into message.el
 
-(defun jl-message-send (&optional arg)
-  "Delegate work to `jl-message-send-maybe-exit', passing ARG."
-  (interactive "p")
-  (jl-message-send-maybe-exit nil arg))
+(defun jl-message-address-list (header)
+  "Return e-mail addresses of HEADER as list."
+  (let ((hdr (mail-strip-quoted-names (message-fetch-field header))))
+    (when hdr
+      ;; Split recipients at "," boundary, omit empty strings (t),
+      ;; and strip whitespace.
+      (split-string hdr "," t "\\s-+"))))
 
-(defun jl-message-send-maybe-exit (exit arg)
-  "Send message if MML secure tag is present or not appropriate.
-If MML secure tag is not present check via
-`jl-proceed-without-encryption-p' whether public keys for all
+(defun jl-message-recipients ()
+  "Return recipients of current message or nil.
+Recipients are only returned if the message is an e-mail with at
+least one recipient."
+  (if (message-mail-p)
+      (let ((recipients
+	     (delete-dups
+	      ;; Split recipients at "," boundary, omit empty strings (t),
+	      ;; and strip whitespace.
+	      (split-string (message-options-set-recipient)
+			    "," t "\\s-+"))))
+	(if (>= (length recipients) 1)
+	    recipients
+	  nil))
+    nil))
+
+
+;; epa functions.
+;; Could go into mml-sec.el or a new file mml-epg.el.
+
+(defun mml-epg-gpgkey-available-p (recipient)
+  "Check whether EasyPG knows a public OpenPGP key for RECIPIENT."
+  (mml-secure-find-usable-keys
+   (epg-make-context 'OpenPGP) recipient 'encrypt t))
+
+
+;; MML functions.
+;; Could go into mml-sec.el
+
+(defun mml-secure-message-gpg ()
+  "Invoke MML function to add appropriate secure tag for GnuPG.
+The choice between pgp or pgpmime is based on `mml-secure-pgp-without-mime'.
+Creation of signatures is controlled by `mml-secure-do-not-sign-p'."
+  (if mml-secure-pgp-without-mime
+      (mml-secure-message-encrypt-pgp (mml-secure-do-not-sign-p))
+    (mml-secure-message-encrypt-pgpmime (mml-secure-do-not-sign-p))))
+
+(defun mml-secure-is-secure-p (string)
+  "Check whether secure tag containing STRING is present."
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward
+     (concat "^" (regexp-quote mail-header-separator) "\n"
+	     "<#secure[^>]+" string)
+     nil t)))
+
+(defun mml-secure-is-encrypted-p ()
+  "Check whether secure encrypt tag is present."
+  (mml-secure-is-secure-p "encrypt"))
+
+(defun mml-secure-is-smime-p ()
+  "Check whether secure tag for S/MIME is present."
+  (mml-secure-is-secure-p "method=smime"))
+
+(defun mml-secure-is-signed-p ()
+  "Check whether secure sign tag is present."
+  (mml-secure-is-secure-p "sign"))
+
+(defun mml-secure-do-not-sign-p ()
+  "Check whether the message should not be signed.
+This is the case if `mml-secure-insert-signature' is nil and
+no secure sign tag is present."
+  (and (not mml-secure-insert-signature)
+       (not (mml-secure-is-signed-p))))
+
+(defun mml-secure-encrypt-if-possible ()
+  "Insert MML security tag if appropriate.
+This function may insert MML tags for signing and/or encryption.
+Creation of sign tags is controlled by `mml-secure-insert-signature'.  If
+that variable is `always', a sign tag for method `mml-default-sign-method'
+is created.
+Moreover, the creation of an encrypt tag is determined based on the existence
+of public keys for all recipients of the current message, see
+`mml-secure-maybe-add-tag'.  If an encrypt tag is added, the message will
+additionally be signed if `mml-secure-insert-signature' is `encrypted'."
+  (if (not mml-secure-insert-signature)
+      (setq gnus-message-replysignencrypted nil)
+    (if (eq 'always mml-secure-insert-signature)
+	(mml-secure-message mml-default-sign-method 'sign)))
+  (mml-secure-maybe-add-tag t))
+
+(defun mml-secure-maybe-add-tag-for-args (recipients method &optional dontask)
+  "Maybe add MML secure tag for RECIPIENTS and METHOD.
+If keys are available for all RECIPIENTS and METHOD and DONTASK is
+nil, ask whether no encryption should be performed.  If the user
+answers \"yes\",don't add an MML tag and return `yes'; if the user
+answers \"no\", insert tag and return `no'.
+Otherwise, if DONTASK is t, insert tag and return 'inserted.
+Otherwise, return `failed'."
+  (if (gnus-test-list recipients
+		      (mml-secure-access-method-table method "test"))
+      (if (not dontask)
+	  (if (yes-or-no-p (mml-secure-access-method-table method "ask"))
+	      'yes
+	    (funcall (mml-secure-access-method-table method "doit"))
+	    'no)
+	(funcall (mml-secure-access-method-table method "doit"))
+	(message "Inserted %s tag" method)
+	'inserted)
+    (message "Failed to insert %s tag" method)
+    'failed))
+
+(defun mml-secure-maybe-add-tag (&optional dontask)
+  "Maybe add MML secure encryption tag to current message.
+If no recipients are returned by `jl-message-recipients',
+immediately return `failed'.  Otherwise, try to add a tag for
+those recipients.  If jl-smime.el has been loaded, S/MIME tags
+may be inserted; otherwise only the default of GnuPG tags.
+Which method is tried first if both are available depends on the
+current message and the value of `mml-default-encrypt-method': If
+`mml-default-encrypt-method' indicates S/MIME or if the message
+carries an S/MIME signature tag, go for S/MIME first; otherwise
+for GnuPG.  Call `mml-secure-maybe-add-tag-for-args' with recipients,
+chosen method, and DONTASK.
+If that call does not return `failed', return this result.
+Otherwise, re-try the call with the second method and return its
+result."
+  (let ((recipients (jl-message-recipients)))
+    (if recipients
+	(let* ((smime-supported (assq 'CMS mml-secure-method-table))
+	       (is-smime (and smime-supported
+			      (or (string= "smime" mml-default-encrypt-method)
+				  (mml-secure-is-smime-p))))
+	       (first-method (if is-smime 'CMS 'OpenPGP))
+	       (second-method (if is-smime 'OpenPGP
+				(if smime-supported 'CMS)))
+	       (first-result (mml-secure-maybe-add-tag-for-args
+			      recipients first-method dontask)))
+	  (if (and (eq 'failed first-result) second-method)
+	      (mml-secure-maybe-add-tag-for-args
+	       recipients second-method dontask)
+	    first-result))
+      'failed)))
+
+(defun mml-secure-proceed-without-encryption-p (&optional dontask)
+  "Return t if no (additional) encryption is necessary.
+This happens if `mml-secure-maybe-add-tag' called with DONTASK does
+not return 'no.  Otherwise, raise an error."
+  (if (not (eq 'no (mml-secure-maybe-add-tag dontask)))
+      t
+    (error "Encryption is a Good Thing.")))
+
+(defun mml-secure-check-encryption-p ()
+  "Check whether MML secure encrypt tag is present or not appropriate.
+If MML secure encrypt tag is not present, check via
+`mml-secure-proceed-without-encryption-p' whether public keys for all
 recipients are available and an MML secure tag should be added, or
 whether the message should be sent without encryption.  In the latter
-case EXIT controls whether `message-send-and-exit' or `message-send'
-is called, and ARG is passed as argument."
+case return t.  Otherwise, raise an error."
   (save-excursion
-    (goto-char (point-min))
-    (if (or (re-search-forward "<#secure.+encrypt>" nil t)
-			(jl-proceed-without-encryption-p))
-		(if exit
-			(message-send-and-exit arg)
-		  (message-send arg)))))
+    (or (mml-secure-is-encrypted-p)
+	(mml-secure-proceed-without-encryption-p))))
 
-(defun jl-proceed-without-encryption-p ()
-  "Return t if no (additional) encryption is necessary.
-This happens if (a) the message cannot be encrypted because a key
-for some recipient is missing, or (b) all keys are available but
-the user explicitly answered `yes' to proceed without encryption.
-Otherwise, i.e., all keys are available and the user answered
-`no', an appropriate MML tag is inserted, and nil is returned."
-  (interactive)
-  (let ((recipients (jl-message-fetch-recipients)))
-    (if (jl-test-list recipients 'jl-gpgkey-available-p)
-		(if (yes-or-no-p "GnuPG public keys available for all recipients.  Really proceed *without* encryption? ")
-			t
-		  (jl-secure-message-gpg)
-		  nil)
-	  (if (jl-test-list recipients 'jl-certfile-available-p)
-		  (if (yes-or-no-p "S/MIME certificates available for all recipients.  Reylly proceed *without* encryption? ")
-			  t
-			(jl-secure-message-smime)
-			nil)
-		t))))
+(defvar mml-secure-method-table '((OpenPGP
+				   (("test" mml-epg-gpgkey-available-p)
+				    ("doit" mml-secure-message-gpg)
+				    ("ask" "GnuPG public keys available \
+for all recipients.  Really proceed *without* encryption? "))))
+  "Internal functionality for supported security methods.")
 
-(defun jl-message-fetch-recipients ()
-  "Return list of current message's recipients.
-Each list element represents one recipient (among those listed in the
-headers `jl-recipient-headers') using the format of
-`mail-extract-address-components'."
-  (save-excursion
-    (save-restriction
-      (message-narrow-to-headers)
-      (let ((recipients
-			 (mapconcat 'identity
-						(remove nil (delete-dups
-									 (mapcar 'message-fetch-field
-											 jl-recipient-headers)))
-						",")))
-		(mail-extract-address-components recipients t)))))
-
-(defun jl-certfile-available-p (recipient)
-  "Check whether certificate file is available for RECIPIENT.
-This tests whether `smime-certificate-directory' contains a
-certificate file whose name equals the e-mail address of
-RECIPIENT (which is in the format of
-`mail-extract-address-components').
-Probably this test is only useful in combination with `jl-smime'."
-  (file-exists-p (concat smime-certificate-directory (cadr recipient))))
-
-(defun jl-gpgkey-available-p (recipient)
-  "Check whether GnuPG knows a public key for the given RECIPIENT.
-RECIPIENT must be in the format of `mail-extract-address-components'."
-  (= 0 (call-process "gpg" nil nil nil "--list-key" (cadr recipient))))
-
-(defun jl-test-list (list predicate)
-  "To each element of LIST apply PREDICATE.
-Return nil if some test returns nil; otherwise, return t."
-  (let ((result (mapcar predicate list)))
-    (if (memq nil result)
-		nil
-      t)))
-
-(defun jl-secure-message-gpg ()
-  "Invoke MML function to add appropriate secure tag for GnuPG.
-The choice between pgp or pgpmime is based on `jl-gpg-without-mime'.
-Creation of signatures is controlled by `jl-encrypt-without-signature'."
-  (if jl-gpg-without-mime
-      (mml-secure-message-encrypt-pgp (jl-do-not-sign-p))
-    (mml-secure-message-encrypt-pgpmime (jl-do-not-sign-p))))
-
-(defun jl-secure-message-smime ()
-  "Invoke MML function to add appropriate secure tag for S/MIME.
-Creation of signatures is controlled by `jl-encrypt-without-signature'."
-  (mml-secure-message-encrypt-smime (jl-do-not-sign-p)))
-
-(defun jl-is-signed-p ()
-  (save-excursion
-    (goto-char (point-min))
-	(re-search-forward "<#secure.+sign>" nil t)
-	)
-  )
-
-(defun jl-do-not-sign-p ()
-  "Do not sign if the user explicitely asked not to and the
-message was not previously configured to be signed."
-  (and jl-encrypt-without-signature
-	   (not
-		(jl-is-signed-p)
-		)
-	   )
-  )
-
-(defun jl-encrypt-if-possible ()
-  "Insert MML encryption tag if appropriate.
-If there is at least one recipient (not counting the From header)
-and GnuPG public keys or S/MIME certificates are available for all
-recipients in `jl-recipient-headers' then insert MML encryption tag."
-  (let ((recipients (jl-message-fetch-recipients)))
-    (if (> (length recipients)
-		   (if (member-ignore-case "from" jl-recipient-headers)
-			   1
-			 0))
-		(if (jl-test-list recipients 'jl-gpgkey-available-p)
-			(jl-secure-message-gpg)
-		  (if (jl-test-list recipients 'jl-certfile-available-p)
-			  (jl-secure-message-smime))))))
+(defun mml-secure-access-method-table (method what)
+  "Return object for METHOD representing WHAT."
+  (let ((method-spec (assq method mml-secure-method-table)))
+    (if method-spec
+	(cadr (assoc what (cadr method-spec)))
+      (if (eq method 'CMS)
+	  (error "You must load jl-smime for S/MIME support")
+	(error
+	 "Method `%s' not supported by `mml-secure-method-table'" method)))))
 
 (provide 'jl-encrypt)
 ;;; jl-encrypt.el ends here

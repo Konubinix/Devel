@@ -53,3 +53,4 @@
 (depends-on "org-mime")
 (depends-on "cheat-sh")
 (depends-on "gited")
+(depends-on "scala-mode")

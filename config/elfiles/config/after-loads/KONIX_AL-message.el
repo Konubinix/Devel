@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'org-mime)
 (require 'bbdb-com)
 ;; Configuration of mail sending
 (setq message-send-mail-function 'message-send-mail-with-sendmail)
@@ -41,7 +42,7 @@
 (define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
 (define-key message-mode-map (kbd "C-c I") 'gnus-alias-select-identity)
 (define-key message-mode-map (kbd "C-c i") 'konix/gnus-alias-determine-identity)
-(define-key message-mode-map (kbd "C-c o m") 'org-mime-htmlize)
+(define-key message-mode-map (kbd "C-c o m") 'konix/org-mime-htmlize-current)
 
 (defun konix/message-mode-hook ()
   (visual-line-mode 1)
@@ -97,31 +98,42 @@ make sure to insert any mml content after the secure tag
   (interactive "p")
   (konix/message-send-maybe-exit nil arg))
 
-(defun konix/message-send-maybe-exit (exit arg)
-  (save-excursion
-    (goto-char (point-min))
-    (if (or
-		 (not (re-search-forward "find.attached\\|ci.joint" nil t))
-		 (and
-		  (goto-char (point-min))
-		  (re-search-forward "disposition=attachment>" nil t)
-		  )
-		 (yes-or-no-p "No attachment while I think it should, continue?")
-		 )
-		(if exit
-			(jl-message-send-and-exit arg)
-		  (jl-message-send arg))
-	  (message "Aborting message sending")
-	  )))
-
-(define-key message-mode-map (kbd "C-c C-c") 'konix/message-send-and-exit)
-(define-key message-mode-map (kbd "C-c C-s") 'konix/message-send)
-
-(defun konix/message-send-hook ()
+(defun konix/message-sent-hook ()
   (async-shell-command "konix_sendmail_flush.sh")
   )
 
-(add-hook 'message-sent-hook 'konix/message-send-hook)
+(add-hook 'message-sent-hook 'konix/message-sent-hook)
+
+(defun konix/message-send-hook ()
+  (save-excursion
+    (goto-char (point-min))
+    (unless (and
+             (or
+              (not (save-excursion
+                     (re-search-forward "part type=.text/html..+ disposition=inline" nil t)
+                     )
+                   )
+              (not
+               (yes-or-no-p
+                "Has an inline attachment, should I convert the plain text part to html?")
+               )
+              (konix/org-mime-htmlize-current)
+              )
+             (or
+              (not (re-search-forward "find.attached\\|ci.joint" nil t))
+              (and
+               (goto-char (point-min))
+               (re-search-forward "disposition=attachment>" nil t)
+               )
+              (yes-or-no-p "No attachment while I think it should, continue?")
+              )
+             )
+      (error "Aborting message sending")
+	  )
+    )
+  )
+
+(add-hook 'message-send-hook 'konix/message-send-hook)
 
 (provide '400-KONIX_message)
 ;;; 400-KONIX_message.el ends here

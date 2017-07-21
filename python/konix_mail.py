@@ -76,6 +76,8 @@ def add_to_maildir(from_, to, subject, date, pure_text_prefix, content, director
 def make_part_harmless(html):
     s = bs(html, "lxml")
     for img in s.find_all("img", src=True):
+        if img.attrs["src"].startswith("data:"):
+            continue
         src = img.attrs.pop("src")
         id = img.attrs.get("id", str(uuid.uuid1()))
         img.attrs["id"] = id

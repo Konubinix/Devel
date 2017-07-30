@@ -14,6 +14,7 @@
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "ini" elfiles)
 		 (expand-file-name "Pymacs" devel-dir)
+		 (expand-file-name "beancount/editors/emacs" devel-dir)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -129,6 +130,7 @@
 (autoload 'ein:notebooklist-open "ein-notebooklist" "" t)
 (autoload 'pdf-view-mode "pdf-view" "" t)
 (autoload 'konix/gdbserver "gdb-mi" "" t)
+(autoload 'beancount-mode "beancount" "" t)
 
 
 ;; ************************************************************
@@ -190,6 +192,8 @@
 (add-to-list 'auto-mode-alist (cons "\\.compilog$" 'compilation-mode))
 ;; taskjuggler files
 (add-to-list 'auto-mode-alist (cons "\\.md$" 'markdown-mode))
+;; taskjuggler files
+(add-to-list 'auto-mode-alist (cons "\\.beancount$" 'beancount-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

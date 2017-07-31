@@ -294,3 +294,6 @@ ignore=dirty
 [submodule "beancount"]
 	path = beancount
 	url = https://github.com/beancount/beancount
+[submodule "prosody"]
+	path = prosody
+	url = git://github.com/bjc/prosody.git

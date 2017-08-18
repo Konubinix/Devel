@@ -15,4 +15,5 @@ find \
            -o -iname "*.mp4" \
            -o -iname "*.avi" \
            -o -iname "*.3gp" \
+           -o -iname "*.MPG" \
            \) -exec konix_video_reencode.sh '{}' ';'

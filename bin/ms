@@ -13,7 +13,6 @@ import shlex
 
 from xdg import BaseDirectory
 from click import command, argument, Choice, option, style, echo, pass_context
-import click_log
 
 LOGGER = logging.getLogger(__name__)
 
@@ -106,8 +105,6 @@ def dump_config(config):
 @option("--debug", "-d", is_flag=True)
 @option("--all", "-a", is_flag=True)
 @option("--ls", is_flag=True)
-@click_log.simple_verbosity_option()
-@click_log.init(__name__)
 @pass_context
 def main(ctx, args, log_level, debug, all, ls):
     if debug:

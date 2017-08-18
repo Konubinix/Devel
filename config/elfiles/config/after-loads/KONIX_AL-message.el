@@ -110,12 +110,12 @@ make sure to insert any mml content after the secure tag
     (unless (and
              (or
               (not (save-excursion
-                     (re-search-forward "part type=.text/html..+ disposition=inline" nil t)
+                     (re-search-forward "part type=.+ disposition=inline" nil t)
                      )
                    )
               (not
                (yes-or-no-p
-                "Has an inline attachment, should I convert the plain text part to html?")
+                "Has an attachment, should I convert the plain text part to html?")
                )
               (konix/org-mime-htmlize-current)
               )

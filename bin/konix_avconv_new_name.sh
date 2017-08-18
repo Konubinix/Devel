@@ -10,7 +10,7 @@ creation_date="$(avconv -i "${file}" 2>&1 \
 	| grep creation_time \
 	| head -1 \
 	| sed -r 's|^.+creation_time   : ([0-9][0-9][0-9][0-9]-[0-9]+-[0-9]+)[ T]([0-9]+:[0-9]+:[0-9]+).*$|\1T\2|')"
-if avconv -i "${file}" 2>&1 |grep -q "handler_name.\+:.\+VideoHandle"
+if avconv -i "${file}" 2>&1 |grep -q -e "handler_name.\+:.\+VideoHandle" -e "com.apple.quicktime.make: Apple"
 then
 	# utc date
 	date_to_parse="${creation_date}+0000"

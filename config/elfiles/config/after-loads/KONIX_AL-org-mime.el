@@ -26,6 +26,7 @@
 
 (defun konix/org-mime-htmlize-current (&optional arg)
   (interactive "P")
+  (konix/change-directory (getenv "TMPDIR"))
   (let (
         (beg nil)
         (end nil)

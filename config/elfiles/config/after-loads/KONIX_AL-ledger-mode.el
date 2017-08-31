@@ -1,16 +1,26 @@
 (defvar konix/ledger-accounts nil "List of all ledger accounts")
+(make-variable-buffer-local 'konix/ledger-accounts)
 
 (defun konix/ledger-accounts (&optional recompute)
-  (unless
-      (and
-       konix/ledger-accounts
-       (not recompute)
-       )
-    (setq konix/ledger-accounts
-          (split-string (shell-command-to-string "ledger accounts") "\n")
-          )
+  (let (
+        (current-ledger-file (konix/find-file-in-parents "ledger.dat")
+         )
+        (old-env-value (getenv "LEDGER_FILE"))
+        )
+    (setenv "LEDGER_FILE" current-ledger-file)
+    (unless
+        (and
+         konix/ledger-accounts
+         (not recompute)
+         )
+      (setq konix/ledger-accounts
+            (split-string (shell-command-to-string "ledger accounts") "\n")
+            )
+
+      )
+    (setenv "LEDGER_FILE" old-env-value)
+    konix/ledger-accounts
     )
-  konix/ledger-accounts
   )
 
 (defun konix/ledger-accounts (&optional recompute)

@@ -89,3 +89,7 @@ def pd_read_apache_logs(path):
                     'size': int,
                     'referer': parse_str,
                     'user_agent': parse_str})
+
+
+def groupby_split(groupby):
+    return [groupby.get_group(x) for x in sorted(groupby.groups)]

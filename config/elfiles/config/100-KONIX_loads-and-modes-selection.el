@@ -194,6 +194,7 @@
 (add-to-list 'auto-mode-alist (cons "\\.md$" 'markdown-mode))
 ;; taskjuggler files
 (add-to-list 'auto-mode-alist (cons "\\.beancount$" 'beancount-mode))
+(add-to-list 'auto-mode-alist (cons "\\.js$" 'js2-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

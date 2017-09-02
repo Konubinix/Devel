@@ -1,6 +1,6 @@
-;;; 700-KONIX_javascript-mode.el ---
+;;; KONIX_AL-tern.el --- y                           -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012  konubinix
+;; Copyright (C) 2017  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -23,19 +23,16 @@
 ;;
 
 ;;; Code:
-(defun konix/js-mode-hook ()
-  (tern-mode 1)
-  (flycheck-select-checker 'javascript-eslint)
-  (setq
-   indent-tabs-mode nil
-   js2-basic-offset 4
-   )
-  (konix/prog/config)
+
+(require 'tern-auto-complete)
+(tern-ac-setup)
+
+(defadvice tern-go-to-position (before push-tag-mark ())
+  (push-tag-mark)
   )
-
-(add-hook 'js-mode-hook
-		  'konix/js-mode-hook)
+(ad-activate 'tern-go-to-position)
 
 
-(provide '700-KONIX_javascript-mode)
-;;; 700-KONIX_javascript-mode.el ends here
+
+(provide 'KONIX_AL-tern)
+;;; KONIX_AL-tern.el ends here

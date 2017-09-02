@@ -54,3 +54,7 @@
 (depends-on "cheat-sh")
 (depends-on "gited")
 (depends-on "scala-mode")
+(depends-on "markdown-mode")
+(depends-on "tern")
+(depends-on "js2-mode")
+(depends-on "indium")

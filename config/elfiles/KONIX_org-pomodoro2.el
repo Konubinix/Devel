@@ -10,7 +10,7 @@
   20)
 (defvar konix/org-pomodoro-break-clocks-out nil)
 (defvar konix/org-pomodoro-in-pomodoro nil)
-(defvar konix/org-pomodoro-global-mode t)
+(defvar konix/org-pomodoro-global-mode nil)
 (defvar konix/org-pomodoro-sprint-steps 4)
 (defvar konix/org-pomodoro-done-notify-level 5)
 

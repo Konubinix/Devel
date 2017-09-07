@@ -6,6 +6,9 @@
   [Position]	(CENTER)	{0 0}
   [Layer]	{2}
 [end]
+[app] (title=konix_gtk_entry)
+  [Position]	(CENTER)	{0 0}
+[end]
 [app] (title=uzbl_socket.*)
   [Layer]	{3}
 [end]

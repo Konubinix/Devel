@@ -61,8 +61,9 @@ def getText(info=False,
         None,
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
         gtk.MESSAGE_INFO if info else gtk.MESSAGE_QUESTION,
-        gtk.BUTTONS_OK,
+        gtk.BUTTONS_NONE if info else gtk.BUTTONS_OK,
         None)
+    dialog.set_title("konix_gtk_entry")
     dialog.set_markup(text)
     if background_color:
         dialog.modify_bg(

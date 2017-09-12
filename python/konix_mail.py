@@ -85,7 +85,12 @@ def make_part_harmless(html):
         img.attrs["src"] = "http://a.a"
         img.attrs["oldstyle"] = img.attrs.get("style", "")
         img.attrs["style"] = "border: solid 3px blue;" + img.attrs["oldstyle"]
-        img.attrs["alt"] = img.attrs.get("alt", "CLICKTOLOAD")
+        alt = img.attrs.get("alt")
+        if alt is None:
+            alt = "CLICKTOLOAD"
+        elif alt == "":
+            alt = "EmptyAlt CLICKTOLOAD"
+        img.attrs["alt"] = alt
         img.attrs["onmousedown"] = 'this.style = this.getAttribute("oldstyle") ; this.src = this.getAttribute("datasrc");'
         img.attrs["ontouchstart"] = img.attrs["onmousedown"]
     for elem in s.find_all("meta", attrs={"name": "viewport"}):

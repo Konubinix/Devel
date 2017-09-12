@@ -52,25 +52,58 @@
 	)
   )
 
-(defun konix/appt-disp-window (min-to-app new-time appt-msg)
-  (konix/notify
-   (format
-	"In %s mins: %s
-(%s)"
-	min-to-app
-	appt-msg
-	new-time)
-   4
+(defun konix/appt-delete ()
+  (interactive)
+  (mapc
+   (lambda (appt-msg)
+     (let ((tmp-msg-list appt-time-msg-list))
+       (dolist (element tmp-msg-list)
+         (if (string-equal appt-msg (cadr element))
+             (setq appt-time-msg-list (delq element appt-time-msg-list)))))
+     )
+   konix/appt-msg
    )
+  )
+
+(defvar konix/appt-msg)
+(make-variable-buffer-local 'konix/appt-msg)
+(defun konix/appt-disp-window (min-to-app new-time appt-msg)
+  (unless (listp min-to-app)
+    (setq min-to-app (list min-to-app))
+    )
+  (unless (listp appt-msg)
+    (setq appt-msg (list appt-msg))
+    )
+  (mapcar* (lambda (min appt)
+             (konix/notify
+              (format
+               "In %s mins: %s\n(%s)"
+               min
+               appt
+               new-time)
+              4
+              )
+             )
+           min-to-app
+           appt-msg
+           )
+
   (appt-disp-window min-to-app new-time appt-msg)
   (set-window-dedicated-p (get-buffer-window "*appt-buf*") t)
-  (save-window-excursion
-	(pop-to-buffer "*appt-buf*")
-	(setq window-size-fixed t)
-	)
+  (with-current-buffer "*appt-buf*"
+    (setq window-size-fixed t)
+    (setq konix/appt-msg appt-msg)
+    (let (
+          (local_map (make-sparse-keymap))
+          )
+      (define-key local_map (kbd "d") 'konix/appt-delete)
+      (define-key local_map (kbd "q") 'konix/kill-current-buffer)
+      (use-local-map local_map)
+      )
+    )
   )
+
 (setq-default appt-disp-window-function 'konix/appt-disp-window)
-(setq-default appt-delete-window-function 'konix/appt-delete-window)
 
 (provide 'KONIX_AL-appt)
 ;;; KONIX_AL-appt.el ends here

@@ -516,6 +516,11 @@
 (defun konix/agenda/html ()
   (interactive)
   (let (
+        (revert-without-query '(".*.org"))
+        )
+    (konix/org-element-cache-reset-all)
+    )
+  (let (
         (buffer_name "*Org Agenda(aa)*")
         )
     (kill-buffer (get-buffer-create buffer_name))

@@ -41,17 +41,17 @@
   ;; the file with the exact name \1 will be loaded
   (mapc
    #'(lambda(elt)
-	  (string-match "KONIX_AL-\\(.+\\).el" elt)
-	  (eval-after-load (match-string-no-properties 1 elt)
-		`(progn
-		   (message "Loading %s triggered by %s" ,elt ,(match-string-no-properties 1 elt))
-		   (when (getenv "KONIX_EMACS_DEBUG_AFTER_LOAD")
-			 (backtrace)
-			 )
-		   (load-file ,elt)
-		   )
-		)
-	  )
+       (string-match "KONIX_AL-\\(.+\\).el" elt)
+       (eval-after-load (match-string-no-properties 1 elt)
+         `(progn
+            (message "Loading %s triggered by %s" ,elt ,(match-string-no-properties 1 elt))
+            (when (getenv "KONIX_EMACS_DEBUG_AFTER_LOAD")
+              (backtrace)
+              )
+            (konix/load-file ,elt)
+            )
+         )
+       )
    (sort
 	(file-expand-wildcards (concat directory "/after-loads/*KONIX_AL-*.el"))
 	'string<
@@ -59,28 +59,29 @@
    )
   )
 
+(defun konix/load-file (file)
+  (let
+      (
+       time_before_load
+       time_after_load
+       diff_time
+       )
+    (setq time_before_load (current-time))
+    (load-file file)
+    (setq time_after_load (current-time))
+    (setq diff_time (time-subtract time_after_load time_before_load))
+    (message "%s loaded in %ss, %sms and %sµs" file
+             (second diff_time)
+             (/ (third diff_time) 1000)
+             (mod (third diff_time) 1000)
+             )
+    )
+  )
+
 (defun konix/load-config-files (directory)
   (mapc
    ;; Load every .el file in my config
-   #'(lambda(elt)
-	  (let
-		  (
-		   (konix/loading-directory directory)
-		   time_before_load
-		   time_after_load
-		   diff_time
-		   )
-		(setq time_before_load (current-time))
-		(load-file elt)
-		(setq time_after_load (current-time))
-		(setq diff_time (time-subtract time_after_load time_before_load))
-		(message "%s loaded in %ss, %sms and %sµs" elt
-				 (second diff_time)
-				 (/ (third diff_time) 1000)
-				 (mod (third diff_time) 1000)
-				 )
-		)
-	  )
+   #'konix/load-file
    (sort
 	(file-expand-wildcards (concat directory "/*.el"))
 	'string<

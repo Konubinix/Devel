@@ -59,6 +59,23 @@
 	 )
 	)
    )
+ '(lui-button-face
+   (
+    (
+     ((class color)
+      (background light))
+     (:foreground "Purple" :underline t)
+     )
+    (
+     ((class color)
+      (background dark))
+     (:foreground "Cyan" :underline t)
+     )
+    (t
+     (:underline t)
+     )
+    )
+   )
  )
 
 (setq-default circe-server-buffer-name "{network}")
@@ -97,7 +114,7 @@
     number
     )
    )
-)
+  )
 
 (defun konix/irc--handle-line/ignore-empty-lines (orig-fun proc line)
   (unless (string= line "")

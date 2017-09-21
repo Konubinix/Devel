@@ -3,6 +3,8 @@
 
 import pandas as pd
 import os
+import functools
+import operator
 from pandas import DataFrame as df, Index
 
 idx = pd.IndexSlice
@@ -93,3 +95,14 @@ def pd_read_apache_logs(path):
 
 def groupby_split(groupby):
     return [groupby.get_group(x) for x in sorted(groupby.groups)]
+
+
+def datetime_mean(series):
+    dt_min = series.min()
+    deltas = [
+        x - dt_min
+        for x in series
+    ]
+    return (
+        dt_min +
+        functools.reduce(operator.add, deltas) / len(deltas))

@@ -28,9 +28,8 @@ if __name__ == "__main__":
     if args.event_formatter:
         program.event_formatter = args.event_formatter
     if len(args.argv) > 0:
-        command_line = args.argv[0]
-        if len(args.argv) > 1:
-            command_line += ' "' + '" "'.join(args.argv[1:]) + '"'
-        program.onecmd(command_line)
+        cmd = args.argv[0]
+        func = getattr(program, 'do_' + cmd)
+        func(*args.argv[1:])
     else:
         program.cmdloop()

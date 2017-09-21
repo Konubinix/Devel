@@ -81,5 +81,14 @@
    )
   )
 
+
+(defun konix/irc--handle-line/ignore-empty-lines (orig-fun proc line)
+  (unless (string= line "")
+    (funcall orig-fun proc line)
+    )
+  )
+(advice-add 'irc--handle-line :around #'konix/irc--handle-line/ignore-empty-lines)
+
+
 (provide 'KONIX_AL-circe)
 ;;; KONIX_AL-circe.el ends here

@@ -81,6 +81,23 @@
    )
   )
 
+(defun circe-command-BL (number)
+  (interactive "sContent: ")
+  (circe-command-MSG
+   "*backlog"
+   (format
+    "%s %s"
+    (replace-regexp-in-string
+     "\\([^>]+?\\)\\(<.+>\\)?"
+     "\\1"
+     (buffer-name
+      (current-buffer)
+      )
+     )
+    number
+    )
+   )
+)
 
 (defun konix/irc--handle-line/ignore-empty-lines (orig-fun proc line)
   (unless (string= line "")

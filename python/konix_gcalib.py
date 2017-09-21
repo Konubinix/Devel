@@ -104,6 +104,7 @@ PROMPT="GCal({calendar_id}, {event_list_extra_query}, {time_min}, {time_max})\n>
 class GCall(cmd.Cmd, object):
     def __init__(self, make_place=False, account=""):
         cmd.Cmd.__init__(self)
+        self.account = account
         self.db = redis.StrictRedis(decode_responses=True, port=6380)
         self.client_id = self.db.get("client_id")
         self.client_secret = self.db.get("client_secret")
@@ -124,7 +125,6 @@ class GCall(cmd.Cmd, object):
             "description"
         ]
         self._make_place = make_place
-        self.account = account
         self.set_prompt()
 
     def parse_time(self, value):

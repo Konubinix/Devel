@@ -38,8 +38,8 @@
 --exclude-dir .svn \
 --exclude-dir node_modules \
 -i -nH \
--r -e ")
- '(grep-template "grep <C> -nH -r -e  <R> <F>")
+-R -e ")
+ '(grep-template "grep <C> -nH -R -e  <R> <F>")
  '(grep-use-null-device nil)
  '(grep-find-command "find . -type f -print0 | xargs -0 -e grep -nH -e ")
  '(grep-find-template "find . <X> -type f <F> -exec grep <C> -nH -e <R> {} +")

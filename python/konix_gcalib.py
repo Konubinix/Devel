@@ -1015,7 +1015,75 @@ Attendees:
                            }
                 self._update_event(calendar_id, event, new_values)
 
-    def _update_event(self, calendar_id, event, new_values):
+    def accept(self, event):
+        data = {
+            "attendees": event.attendees + [
+                {
+                    "email": self.calendar_id,
+                    "responseStatus": "accepted",
+                }
+            ]
+        }
+        return self._update_insist(event, data)
+
+    def decline(self, event, why=""):
+        self._update_insist(
+            event,
+            {
+                "attendees": event.attendees + [
+                    {
+                        "email": self.calendar_id,
+                        "responseStatus": "declined",
+                        "comment": why,
+                    }
+                ]
+            }
+        )
+
+    def tentative(self, event):
+        self._update_insist(
+            event,
+            {
+                "attendees": event.attendees + [
+                    {
+                        "email": self.calendar_id,
+                        "responseStatus": "tentative",
+                    }
+                ]
+            }
+        )
+
+    def do_accept(self, id):
+        self.accept(
+            self.get_event(id),
+        )
+
+    def do_decline(self, id, why):
+        self.decline(
+            self.get_event(id),
+            why,
+        )
+
+    def do_tentative(self, id):
+        self.tentative(
+            self.get_event(id),
+        )
+
+    def _update_insist(self, event, data):
+        try:
+            self._update_event(
+                self.calendar_id,
+                event,
+                data
+            )
+        except urllib.error.HTTPError:
+            self._update_event(
+                event.organizer["email"],
+                event,
+                data
+            )
+
+    def _update_event(self, calendar_id, event, new_values, send_notif=False):
         dict_ = dict(event._asdict())
         dict_ = {
             k: dict_[k]
@@ -1023,11 +1091,14 @@ Attendees:
             if k in self.updatable_data
         }
         dict_.update(new_values)
+        url = 'https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
+            calendar_id,
+            event.id
+        )
+        if send_notif:
+            url += "?sendNotifications=true"
         req = urllib.request.Request(
-            url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
-                calendar_id,
-                event.id
-            ),
+            url=url,
             data=json.dumps(
                 dict_
             ).encode("utf-8"),

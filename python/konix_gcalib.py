@@ -281,6 +281,8 @@ class GCall(cmd.Cmd, object):
             return """* {}{}{}
 :PROPERTIES:
 :ID: {}
+:CALENDAR_ID: {}
+:ACCOUNT_NAME: {}
 :LOCATION: {}
 :CREATED: {}
 :UPDATED: {}
@@ -300,6 +302,8 @@ Attendees:
     (" (in {})".format(self.location) if self.location else ""),
     ("    :{}:".format(self.my_response_status) if self.my_response_status else ""),
     self.id,
+    self.calendar_id,
+    self.account,
     self.location,
     parser.parse(self.created).strftime("[%Y-%m-%d %H:%M]"),
     parser.parse(self.updated).strftime("[%Y-%m-%d %H:%M]"),
@@ -348,6 +352,7 @@ Attendees:
         Event.enddate = enddate
         Event.duration = duration
         Event.uid = uid
+        Event.account = self.account
         Event.print_diary = print_diary
         Event.org_mode_timestamp = org_mode_timestamp
         Event.org_mode = org_mode

@@ -11,6 +11,7 @@ import sys
 import subprocess
 import glob
 
+
 def find_recoll_in_hierarchy(directory):
     path = pathlib.Path(directory).absolute()
     for parent in [path,] + list(path.parents):
@@ -19,6 +20,7 @@ def find_recoll_in_hierarchy(directory):
             logger.debug("Found {}".format(candidate))
             return candidate
     return None
+
 
 def call_recoll(program="recoll", args=None):
     args = args or []

@@ -2135,6 +2135,7 @@ items"
                 ("no_weekly" . ?n)
                 ("no_appt" . ?a)
                 ("organization" . ?r)
+                ("perso" . ?P)
                 )
               )
 (setq-default org-tags-exclude-from-inheritance

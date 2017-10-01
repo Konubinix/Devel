@@ -2,6 +2,7 @@
 (make-variable-buffer-local 'konix/ledger-accounts)
 
 (defun konix/ledger-accounts (&optional recompute)
+  (setq recompute (or recompute current-prefix-arg))
   (let (
         (current-ledger-file (konix/find-file-in-parents "ledger.dat")
          )
@@ -21,19 +22,6 @@
     (setenv "LEDGER_FILE" old-env-value)
     konix/ledger-accounts
     )
-  )
-
-(defun konix/ledger-accounts (&optional recompute)
-  (unless
-      (and
-       konix/ledger-accounts
-       (not recompute)
-       )
-    (setq konix/ledger-accounts
-          (split-string (shell-command-to-string "ledger accounts") "\n")
-          )
-    )
-  konix/ledger-accounts
   )
 
 (defun konix/ledger/completion-at-point ()

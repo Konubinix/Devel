@@ -1789,6 +1789,7 @@ items"
                               '(konix/org-agenda-skip-if-tags
                                 '(
                                   "needsAction"
+                                  "tentative"
                                   )
                                 t
                                 )

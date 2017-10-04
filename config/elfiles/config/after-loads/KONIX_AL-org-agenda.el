@@ -169,6 +169,38 @@
   ""
   )
 
+(defface konix/org-agenda-needs-action
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "OrangeRed4")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "OrangeRed4")
+	 )
+	)
+  ""
+  )
+
+(defface konix/org-agenda-tentative
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "DeepSkyBlue4")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "DeepSkyBlue4")
+	 )
+	)
+  ""
+  )
+
 (defvar konix/org-agenda-text-properties
   '(
 	("([0-9]+:[0-9]+) .+:INTERRUPTION:.*$" 0 konix/org-agenda-interruption-face)
@@ -219,6 +251,13 @@
 	)
   (setq buffer-read-only t)
   )
+
+(add-to-list 'konix/org-agenda-text-properties
+             '("^.+:needsAction:" 0 konix/org-agenda-needs-action)
+             )
+(add-to-list 'konix/org-agenda-text-properties
+             '("^.+:tentative:" 0 konix/org-agenda-tentative)
+             )
 
 (defun konix/org-apply-org-agenda-auto-exclude-function ()
   (org-agenda-filter-show-all-tag)

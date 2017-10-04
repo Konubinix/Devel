@@ -1785,16 +1785,14 @@ items"
 							(
 							 (org-agenda-overriding-header
 							  "Must say something about those invitations")
+							 (org-agenda-span 'week)
                              (org-agenda-skip-function
                               '(konix/org-agenda-skip-if-tags
                                 '(
-                                  "needsAction"
-                                  "tentative"
-                                  )
-                                t
-                                )
-							  )
-							 (org-agenda-span 'week)
+                                  "no_weekly"
+                                  "phantom"
+                                  ))
+                              )
 							 )
 							)
                     )
@@ -3244,27 +3242,27 @@ an error (this should never happen)."
 (defun konix/org-gcal-decline (why)
   (interactive "sWhy: ")
   (konix/org-with-point-on-heading
-  (let* (
-         (id (org-entry-get (point) "ID"))
-         (account (org-entry-get (point) "ACCOUNT_NAME"))
-         (calendar_id (org-entry-get (point) "CALENDAR_ID"))
-         )
-    (shell-command
-     (format
-      "konix_gcal.py -a '%s' select_calendar %s"
-      account
-      calendar_id
+   (let* (
+          (id (org-entry-get (point) "ID"))
+          (account (org-entry-get (point) "ACCOUNT_NAME"))
+          (calendar_id (org-entry-get (point) "CALENDAR_ID"))
+          )
+     (shell-command
+      (format
+       "konix_gcal.py -a '%s' select_calendar %s"
+       account
+       calendar_id
+       )
       )
-     )
-    (shell-command
-     (format
-      "konix_gcal.py -a '%s' decline %s '%s'"
-      account
-      id
-      why
+     (shell-command
+      (format
+       "konix_gcal.py -a '%s' decline %s '%s'"
+       account
+       id
+       why
+       )
       )
-     )
-    ))
+     ))
   )
 
 (defun konix/org-gcal-tentative ()

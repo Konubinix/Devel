@@ -46,12 +46,12 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:background "SpringGreen4")
+	 (:slant italic :weight light)
 	 )
 	(
 	 ((class color)
 	  (background light))
-	 (:background "light blue")
+	 (:slant italic :weight light)
 	 )
 	)
   ""

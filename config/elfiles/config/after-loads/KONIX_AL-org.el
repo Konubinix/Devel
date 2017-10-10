@@ -488,17 +488,23 @@ with a precise timestamp)."
 
 (defun konix/org-element-cache-reset-all ()
   (interactive)
-  (mapc
-   (lambda (file)
-	 (save-window-excursion
-	   (save-excursion
-		 (find-file file)
-		 (org-element-cache-reset)
-		 )
-	   )
-	 )
-   (org-agenda-files)
-   )
+  (let (
+        (revert-without-query
+         (if current-prefix-arg '(".*.org") revert-without-query)
+         )
+        )
+    (mapc
+     (lambda (file)
+       (save-window-excursion
+         (save-excursion
+           (find-file file)
+           (org-element-cache-reset)
+           )
+         )
+       )
+     (org-agenda-files)
+     )
+    )
   )
 
 (defun konix/org-agenda-region-same-category ()

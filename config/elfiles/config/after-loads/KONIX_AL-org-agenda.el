@@ -201,6 +201,22 @@
   ""
   )
 
+(defface konix/org-agenda-holiday
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "DarkOliveGreen4")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "DarkOliveGreen4")
+	 )
+	)
+  ""
+  )
+
 (defvar konix/org-agenda-text-properties
   '(
 	("([0-9]+:[0-9]+) .+:INTERRUPTION:.*$" 0 konix/org-agenda-interruption-face)
@@ -257,6 +273,9 @@
              )
 (add-to-list 'konix/org-agenda-text-properties
              '("^.+:tentative:" 0 konix/org-agenda-tentative)
+             )
+(add-to-list 'konix/org-agenda-text-properties
+             '("^.+Holiday.+$" 0 konix/org-agenda-holiday)
              )
 
 (defun konix/org-apply-org-agenda-auto-exclude-function ()

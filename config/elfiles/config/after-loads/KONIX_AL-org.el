@@ -321,7 +321,7 @@ cursor stays in the org buffer."
 				 (org-get-heading t t)
 				 ))
 		 (command (format
-				   "gcalcli --desc='' --where '' --title '%s' --when '%s %s' --duration '%s' add"
+				   "gcalcli --desc='' --where '' --title \"%s\" --when '%s %s' --duration \"%s\" add"
 				   (subst-char-in-string ?' ?_ entry)
 				   date
 				   time
@@ -1910,7 +1910,7 @@ items"
                             ))
            (file_name (file-name-nondirectory file_path))
            (key (shell-command-to-string
-                 (format "git annex find '%s' --format='${key}'"
+                 (format "git annex find \"%s\" --format='${key}'"
                          file_name
                          ))
                 )
@@ -3221,14 +3221,14 @@ an error (this should never happen)."
           (account (org-entry-get (point) "ACCOUNT_NAME"))
           (calendar_id (org-entry-get (point) "CALENDAR_ID"))
           (command (format
-                    "konix_gcal.py -a '%s' accept %s"
+                    "konix_gcal.py -a \"%s\" accept %s"
                     account
                     id
                     ))
           )
      (shell-command
       (format
-       "konix_gcal.py -a '%s' select_calendar %s"
+       "konix_gcal.py -a \"%s\" select_calendar %s"
        account
        calendar_id
        )
@@ -3249,14 +3249,14 @@ an error (this should never happen)."
           )
      (shell-command
       (format
-       "konix_gcal.py -a '%s' select_calendar %s"
+       "konix_gcal.py -a \"%s\" select_calendar %s"
        account
        calendar_id
        )
       )
      (shell-command
       (format
-       "konix_gcal.py -a '%s' decline %s '%s'"
+       "konix_gcal.py -a \"%s\" decline %s \"%s\""
        account
        id
        why
@@ -3273,14 +3273,14 @@ an error (this should never happen)."
           (account (org-entry-get (point) "ACCOUNT_NAME"))
           (calendar_id (org-entry-get (point) "CALENDAR_ID"))
           (command (format
-                    "konix_gcal.py -a '%s' tentative %s"
+                    "konix_gcal.py -a \"%s\" tentative %s"
                     account
                     id
                     ))
           )
      (shell-command
       (format
-       "konix_gcal.py -a '%s' select_calendar %s"
+       "konix_gcal.py -a \"%s\" select_calendar %s"
        account
        calendar_id
        )

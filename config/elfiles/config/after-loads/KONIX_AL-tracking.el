@@ -25,10 +25,26 @@
 ;;; Code:
 
 (defun konix/tracking/kill-emacs-query-function ()
-  (or
-   (not tracking-buffers)
-   (y-or-n-p "Still some buffers tracked and not seen, kill anyway")
-   )
+  (with-temp-buffer
+    (insert
+     (mapconcat
+      (lambda (buffer)
+        (concat
+         "# BUFFER : "
+         buffer
+         "\n\n"
+         (with-current-buffer buffer
+           (buffer-substring-no-properties (point-min) (point-max))
+           )
+         )
+        )
+      tracking-buffers
+      "\n"
+      )
+     )
+    (write-file (expand-file-name "tracking_buffers.txt" perso-dir))
+    )
+  t
   )
 (add-to-list 'kill-emacs-query-functions 'konix/tracking/kill-emacs-query-function)
 

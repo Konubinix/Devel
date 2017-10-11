@@ -40,5 +40,26 @@
  ediff-cmp-options '("-b")
  )
 
+(defvar konix/ediff/in-golden-ratio nil)
+(defun konix/ediff-prepare-buffer-hook ()
+  ""
+  (setq konix/ediff/in-golden-ratio golden-ratio-mode)
+  (golden-ratio-mode -1)
+  )
+
+(add-to-list 'ediff-prepare-buffer-hook 'konix/ediff-prepare-buffer-hook)
+
+(defun konix/ediff-cleanup-hook ()
+  "cleanup"
+  (golden-ratio-mode
+   (case konix/ediff/in-golden-ratio
+     (nil -1)
+     (t  1)
+     )
+   )
+  )
+
+(add-to-list 'ediff-cleanup-hook 'konix/ediff-cleanup-hook)
+
 (provide '700-KONIX_ediff)
 ;;; 700-KONIX_ediff.el ends here

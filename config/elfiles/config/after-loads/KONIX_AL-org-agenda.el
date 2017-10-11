@@ -275,6 +275,9 @@
              '("^.+:tentative:" 0 konix/org-agenda-tentative)
              )
 (add-to-list 'konix/org-agenda-text-properties
+             '("^.+:declined:" 0 konix/org-agenda-discret-face)
+             )
+(add-to-list 'konix/org-agenda-text-properties
              '("^.+Holiday.+$" 0 konix/org-agenda-holiday)
              )
 

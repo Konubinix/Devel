@@ -189,7 +189,7 @@
                     ))
           (konix/push-or-replace-assoc-in-alist minor-mode-overriding-map-alist
                                                 `(t . ,overriding_map))
-         )
+          )
         )
 
       )
@@ -1852,6 +1852,14 @@ FExport diary data into iCalendar file: ")
 (defun konix/znc/goto ()
   (interactive)
   (find-file (getenv "KONIX_ZNC_DATADIR"))
+  )
+
+(defun konix/camelcase-to-snakecase ()
+  (interactive)
+  (save-excursion
+    (replace-regexp "\\([A-Z]\\)" "_\\1" nil (region-beginning) (region-end))
+    (downcase-region (region-beginning) (region-end))
+    )
   )
 
 (provide '350-KONIX_commands)

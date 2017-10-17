@@ -42,7 +42,6 @@
   )
 
 (defun konix/semantic-init-hook()
-  (doc-mode)
   )
 (add-hook 'semantic-init-hook 'konix/semantic-init-hook)
 

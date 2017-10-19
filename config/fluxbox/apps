@@ -145,5 +145,6 @@
   [Layer]	{7}
 [end]
 [app] (class=Assword)
+  [Position]	(CENTER)	{0 0}
   [Layer]	{7}
 [end]

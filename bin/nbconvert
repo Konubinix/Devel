@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/bin/bash
 
 source ~/.virtualenvs/maths35/bin/activate
 jupyter nbconvert "$@"

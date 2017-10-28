@@ -547,7 +547,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 (konix/notmuch-define-key-search-show (kbd "<deletechar>") 'konix/notmuch-toggle-deleted-tag)
 (konix/notmuch-define-key-search-show "S" 'konix/notmuch-toggle-spam-tag)
 (konix/notmuch-define-key-search-show "i" 'konix/notmuch-toggle-inbox-tag)
-(konix/notmuch-define-key-search-show (kbd "C-f") 'konix/notmuch-toggle-flagged-tag)
+(konix/notmuch-define-key-search-show (kbd "M-f") 'konix/notmuch-toggle-flagged-tag)
 (konix/notmuch-define-key-search-show "u" 'konix/notmuch-toggle-unread-tag)
 (konix/notmuch-define-key-search-show "H" 'konix/notmuch-unread-and-hide-tag)
 (konix/notmuch-define-key-search-show (kbd "a") 'konix/notmuch-archive)

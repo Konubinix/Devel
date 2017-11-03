@@ -1862,5 +1862,14 @@ FExport diary data into iCalendar file: ")
     )
   )
 
+(defun konix/json-pretty-print (file)
+  (interactive
+   (list
+	(konix/git/_get-file-name "Pretty print" t)
+	)
+   )
+  (shell-command (format "konix_json_pretty_print.py '%s'" file))
+  )
+
 (provide '350-KONIX_commands)
 ;;; 350-KONIX_commands.el ends here

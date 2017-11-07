@@ -136,14 +136,6 @@ then
 fi
 
 unset PROMPT_COMMAND
-
-UNDISTRACT_ME="${KONIX_DEVEL_DIR}/undistract-me/long-running.bash"
-if [ -e "${UNDISTRACT_ME}" ]
-then
-    source "${UNDISTRACT_ME}"
-    notify_when_long_running_commands_finish_install
-fi
-
 #set +x
 export PS1="\${PS1_PREFIX}\$(rc=\$? ; konix_prompt_pre; [ \$rc -ne 0 ] && printf \"\[$BAD_PROMPT_COLOR\]\" || printf \"\[$GOOD_PROMPT_COLOR\]\" ; printf \"%03d$DEFAULT_COLOR\" \$rc ;)\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\$(path_color)|path=\w|\[\033[00m\]${GIT_COLOR}\$(konix_git_prompt_maybe)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\$(konix_prompt_post)\n\$ "
 [[ -s "${HOME}/.autojump/etc/profile.d/autojump.sh" ]] && source "${HOME}/.autojump/etc/profile.d/autojump.sh"

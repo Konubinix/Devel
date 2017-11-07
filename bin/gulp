@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source "${KONIX_LIB_DIR}/lib_bash.sh"
+SECOND="$(konix_find_next_in_path.sh -n "$(my_name)" -f "${0}")"
+echo "Running gulp in debug mode from ${SECOND}" >&2
+exec node --inspect "$SECOND" "${@}"

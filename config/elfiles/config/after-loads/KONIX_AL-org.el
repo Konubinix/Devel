@@ -2009,6 +2009,8 @@ items"
   :INTERRUPTION_HANDLED: t
   :END:"
                  :kill-buffer
+                 :clock-in t
+                 :clock-resume t
                  )
                 ("n" "Note" entry (file konix/org-notes_file)
                  "* %?

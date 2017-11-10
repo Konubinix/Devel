@@ -13,6 +13,8 @@ parser = argparse.ArgumentParser(
     For now, exporting the keystore into pkcs12 and reading the secret with
     openssl raises a warning "Warning unsupported bag type: secretBag" and won't
     show the secret.
+
+    Using the code from https://stackoverflow.com/a/36484915
 """
 )
 

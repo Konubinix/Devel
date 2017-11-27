@@ -649,7 +649,7 @@ retourne ('fichier','extension')."
 	)
   )
 
-(defun konix/push-or-replace-assoc-in-alist (alist elem)
+(defun konix/push-or-replace-assoc-in-alist (alist elem &optional append)
   (or (symbolp alist) (error "Not a symbol"))
   (let*(
 		(key (car elem))
@@ -658,7 +658,7 @@ retourne ('fichier','extension')."
 		)
 	(if _assoc
 		(setcdr _assoc value)
-	  (add-to-list alist elem)
+	  (add-to-list alist elem append)
 	  )
 	)
   )

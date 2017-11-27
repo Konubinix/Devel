@@ -40,5 +40,7 @@
 			 'konix/ox/org-export-filter-link-functions
 )
 
+(add-to-list 'org-latex-packages-alist '("AUTO" "babel" nil))
+
 (provide 'KONIX_AL-ox)
 ;;; KONIX_AL-ox.el ends here

@@ -17,7 +17,9 @@ else
 	# remove the file in case it is not complete
 	trap "rm '${new_file}'" 0
 
-	# By default the CRF value can be from 4–63, and 10 is a good starting point. Lower values mean better quality
+	# By default the CRF value can be from 4–63, and 10 is a good starting
+	# point. Lower values mean better quality
+    # -max_muxing_queue_size: see https://github.com/muammar/mkchromecast/issues/86
 	width=1024
 	height=768
 	downsize_force_ratio="-filter:v 'scale=iw*min($width/iw\,$height/ih):ih*min($width/iw\,$height/ih), pad=$width:$height:($width-iw*min($width/iw\,$height/ih))/2:($height-ih*min($width/iw\,$height/ih))/2'"
@@ -30,6 +32,7 @@ else
 		   -b:v 0 \
 		   $downsize_keep_ratio \
 		   -codec:a libvorbis \
+           -max_muxing_queue_size 9999 \
 		   "${new_file}"
 	# no need to remove the file anymore
 	trap "" 0

@@ -59,3 +59,4 @@
 (depends-on "js2-mode")
 (depends-on "indium")
 (depends-on "interleave")
+(depends-on "langtool")

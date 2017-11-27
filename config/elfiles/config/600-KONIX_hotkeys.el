@@ -233,6 +233,15 @@
 (define-key 'konix/ediff-key-map (kbd "m") 'ediff-merge)
 (define-key 'konix/ediff-key-map (kbd "M") 'ediff-merge-with-ancestor)
 
+;; Language tool
+(define-prefix-command 'konix/langtool-key-map)
+(define-key konix/global-key-map (kbd "l") 'konix/langtool-key-map)
+(define-key 'konix/langtool-key-map (kbd "l") 'langtool-check)
+(define-key 'konix/langtool-key-map (kbd "d") 'langtool-check-done)
+(define-key 'konix/langtool-key-map (kbd "L") 'langtool-switch-default-language)
+(define-key 'konix/langtool-key-map (kbd "e") 'langtool-show-message-at-point)
+(define-key 'konix/langtool-key-map (kbd "?") 'langtool-correct-buffer)
+
 ;; ************************************************************
 ;; diff-mode
 ;; ************************************************************

@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# heilroom gives -r to specify the sender while msmtp expects -a or -f
-# find the position of a -r
+# When given the -r option, heilroom while add the From field in the envelope
+# and pass this -r option through to the msmtp call. msmtp does not recognize
+# the -r option, and because here we use the --read-envelope-from, it while find
+# out the correct account, reading the From field.
+
+# As a conclusion, we just need to get rid of this extra -r option
+
 pos=0
 found=""
 for arg in "$@"
@@ -12,16 +17,16 @@ do
     fi
     pos=$((pos + 1))
 done
-#echo $found
+
+# inspired from http://stackoverflow.com/questions/4827690/change-a-command-line-argument-bash
 #echo "$@"
-# took from http://stackoverflow.com/questions/4827690/change-a-command-line-argument-bash
 if [ "$found" != "" ]
 then
     if [ "$found" -gt "0" ]
     then
-        set -- "${@:1:${found}}" "-a" "${@:$((found + 2 ))}"
+        set -- "${@:1:${found}}" "${@:$((found + 3 ))}"
     else
-        set -- "-a" "${@:2}"
+        set -- "${@:3}"
     fi
 fi
 #echo "$@"

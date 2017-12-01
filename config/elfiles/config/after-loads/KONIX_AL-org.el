@@ -1872,7 +1872,7 @@ items"
                            (ltoc . "1")
                            (up . :link-up)
                            (home . :link-home)))
-(setq-default org-link-to-org-use-id t)
+(setq-default org-id-link-to-org-use-id t)
 (setq-default org-log-done (quote time))
 (setq-default org-log-done-with-time t)
 (setq-default org-log-into-drawer "LOGBOOK")

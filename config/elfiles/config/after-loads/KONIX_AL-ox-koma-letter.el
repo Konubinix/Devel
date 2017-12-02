@@ -25,6 +25,7 @@
 ;;; Code:
 
 (setq-default org-koma-letter-author nil)
+(setq-default org-koma-letter-class-option-file "NF id")
 
 (provide 'KONIX_AL-ox-koma-letter)
 ;;; KONIX_AL-ox-koma-letter.el ends here

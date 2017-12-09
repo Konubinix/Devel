@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-source /home/sam/.virtualenvs/maths35/bin/activate
+source /home/sam/.virtualenvs/maths36/bin/activate
 
 is_sourced () {
     ! [ "$BASH_SOURCE" == "$0" ]

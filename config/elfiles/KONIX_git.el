@@ -1139,7 +1139,7 @@ force recomputation"
 (defun konix/git/diff/_get-commit ()
   (save-excursion
 	(goto-char 0)
-	(if (re-search-forward "^commit \\(.+\\)$" nil t)
+	(if (re-search-forward "^commit \\([a-z0-9]+\\)" nil t)
 		(match-string-no-properties 1)
 	  (progn
 		(message "Could not find a commit for this diff,

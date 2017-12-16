@@ -398,6 +398,10 @@ t () {
 	cd - && ls
 }
 
+m () {
+	mkdir -p "$1" && c "$1"
+}
+
 source_if_possible () {
     local file="$1"
     if [ -r "$file" ]

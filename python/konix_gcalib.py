@@ -68,6 +68,11 @@ def lazy(expire_key):
 
 PROVIDERS_KEYS = {}
 
+
+class EventNotFound(BaseException):
+    pass
+
+
 def needs(expire_key):
     def real_decorator(func):
         @functools.wraps(func)
@@ -716,7 +721,10 @@ Attendees:
                 self.db.get("token_type"),
                 self.db.get(self.access_token_name))}
         )
-        f = urllib.request.urlopen(req)
+        try:
+            f = urllib.request.urlopen(req)
+        except urllib.error.HTTPError:
+            raise EventNotFound()
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
         data["calendar_id"] = self.calendar_id

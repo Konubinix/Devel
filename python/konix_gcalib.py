@@ -289,7 +289,7 @@ class GCall(cmd.Cmd, object):
 :CALENDAR_ID: {}
 :ACCOUNT_NAME: {}
 :LOCATION: {}
-:CREATED: {}
+:CREATION_DATE: {}
 :UPDATED: {}
 :END:
 {}

@@ -119,8 +119,8 @@ ignore=dirty
 [submodule "offlineimap"]
 ignore=dirty
 	path = offlineimap
-	url = https://github.com/Konubinix/offlineimap.git
-	# https://github.com/OfflineIMAP/offlineimap.git
+	# url = https://github.com/Konubinix/offlineimap.git
+	url = https://github.com/OfflineIMAP/offlineimap.git
 [submodule "syncplay"]
 ignore=dirty
 	path = syncplay

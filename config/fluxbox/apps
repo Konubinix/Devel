@@ -54,11 +54,14 @@
   [Close]	{yes}
 [end]
 [app] (name=gimp) (class=Gimp) (role=gimp-toolbox)
-  [Position]	(UPPERLEFT)	{1026 291}
+  [Position]	(UPPERLEFT)	{61% 27%}
   [Close]	{yes}
 [end]
+[app] (name=gimp) (class=Gimp) (role=gimp-image-window)
+  [Maximized]	{yes}
+[end]
 [app] (name=gimp) (class=Gimp) (role=gimp-dock)
-  [Position]	(UPPERLEFT)	{950 -163}
+  [Position]	(UPPERLEFT)	{64% 0%}
   [Close]	{yes}
 [end]
 [app] (name=emacs) (class=Emacs)

@@ -4,17 +4,19 @@ pushd "$(git rev-parse --show-toplevel)"
 
 usage () {
     cat<<EOF
-$0 [-s][-l]
+$0 [-s][-l][-r]
 
 -s: sort
 -l: location tracking
+-r: restore
 EOF
 }
 
 
 SORT=""
 LOCATION=""
-while getopts "hsl" opt; do
+RESTORE=""
+while getopts "hslr" opt; do
 	case $opt in
 		h)
 			usage
@@ -26,6 +28,9 @@ while getopts "hsl" opt; do
 		l)
 			LOCATION=1
 			;;
+		r)
+			RESTORE=1
+			;;
 	esac
 done
 
@@ -33,13 +38,21 @@ shift $((OPTIND-1))
 
 cut -f2 -d ' ' .git/annex/unused | while read sha
 do
-	lastname="$(git log -1 --format=oneline --name-status  -S "${sha}"|tail -1)"
+	lastname="$(git log -1 --format=oneline --name-status  -S "${sha}"|tail -1|sed 's|^[A-Z]\+[ \t]\+||')"
 	lastchanged="$(git annex metadata -g lastchanged --key "${sha}")"
 	echo "############### ${lastchanged}: ${lastname}"
 	if [ -n "${LOCATION}" ]
 	then
 		git log --format=oneline --name-status  -S "${sha}" 2>&1|cat
 		echo
+	fi
+	if [ -n "${RESTORE}" ]
+	then
+	   git annex get --key "${sha}"
+	   annexobjectlocation="$(git annex contentlocation "${sha}")"
+	   dst="RESTORED/${lastname}"
+	   mkdir -p "$(dirname "${dst}")"
+	   ln -r -s "${annexobjectlocation}" "${dst}"
 	fi
 done | {
 	if [ -n "${SORT}" ]

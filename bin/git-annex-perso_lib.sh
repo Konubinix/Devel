@@ -60,8 +60,13 @@ gaps_compute_remotes_internal ( ) {
         then
             gaps_warn "Remote ${remote} considered dead then ignored"
         else
+			if [ "${all_remotes}" == "" ]
+			then
+				all_remotes="${remote}"
+			else
             all_remotes="${all_remotes}
 ${remote}"
+			fi
         fi
     done
 }

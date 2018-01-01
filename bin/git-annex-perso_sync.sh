@@ -99,9 +99,6 @@ then
 	exit 0
 fi
 
-OLD_MASTER_SHA=`git log -1 master --pretty=format:"%H"`
-OLD_GIT_ANNEX_SHA=`git log -1 git-annex --pretty=format:"%H"`
-
 git-annex-perso_freeze.sh || gaps_error_n_quit "Failure when freezing"
 [ -n "${KONIX_GIT_ANNEX_PERSO_SYNC_FIX}" ] && git-annex-perso_remotefix.sh
 gaps_log "Annex merging"
@@ -131,40 +128,3 @@ then
 fi
 
 git-annex-perso_syncremotes.sh -r "${SYNC_REMOTE}" ${ARGUMENTS} -p "${LIMIT_PATH}"
-[ -n "${KONIX_GIT_ANNEX_PERSO_SHOW_DATES}" ] && date
-
-NEW_MASTER_SHA=`git log -1 master --pretty=format:"%H"`
-NEW_GIT_ANNEX_SHA=`git log -1 git-annex --pretty=format:"%H"`
-if [ -n "${KONIX_GIT_ANNEX_PERSO_SYNC_SKIP_DATA}" ]
-then
-    gaps_log "Skipping data transfer"
-else
-    gaps_log "Limiting to path ${LIMIT_PATH}"
-    pushd "${LIMIT_PATH}"
-    gaps_log "Data transfer !"
-    if [ "${OLD_GIT_ANNEX_SHA}" == "${NEW_GIT_ANNEX_SHA}" \
-        -a \
-        "${OLD_MASTER_SHA}" == "${NEW_MASTER_SHA}" \
-        -a \
-        -z "${KONIX_GIT_ANNEX_PERSO_SYNC_FORCE}" ]
-    then
-        gaps_log "Nothing changed in any branch"
-        gaps_log "-> do not try to launch the get/drop commands"
-    else
-	    if [ -n "${KONIX_GIT_ANNEX_PERSO_SYNC_FORCE}" ]
-	    then
-		    gaps_log "-> Force set, then force copy/drop"
-	    fi
-        gaps_log "################## Launching the getting dropping command"
-        gaps_log "Auto getting data (only what is not already here)"
-        git annex get --fast --auto --not --in here "."
-        gaps_log "Auto dropping data (only what is already here)"
-        git annex drop --fast --auto --in here "."
-        gaps_log "Syncing to make sure everything is alright"
-        git annex sync
-    fi
-    popd
-fi
-
-[ -n "${KONIX_GIT_ANNEX_PERSO_SHOW_DATES}" ] && date
-popd

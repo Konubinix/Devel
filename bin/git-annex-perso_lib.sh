@@ -213,18 +213,6 @@ gaps_launch_posthook ( ) {
     fi
 }
 
-gaps_posthook_launch_maybe ( ) {
-    if [ -f "${posthook}" ]
-    then
-        gaps_log "Launching the posthook"
-        bash -x "${posthook}" "$url"
-        if [ $? -ne 0 ]
-        then
-            gaps_log "Failed to launch the posthook"
-        fi
-    fi
-}
-
 gaps_remote_initialized_p ( ) {
     local remote_name="${1}"
     git remote | grep -q "^$remote_name$"

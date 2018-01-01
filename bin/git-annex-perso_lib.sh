@@ -107,11 +107,6 @@ gaps_warn ( ) {
     } >&2
 }
 
-gaps_error_and_continue ( ) {
-    gaps_error "$@"
-    continue
-}
-
 gaps_error_and_quit ( ) {
     gaps_error "$@"
     exit 2
@@ -178,14 +173,6 @@ gaps_launch_availhook ( ) {
 	return 0
 }
 
-gaps_launch_availhook_or_continue ( ) {
-    local availhook="${1}"
-    local url="${2}"
-    local message="${3}"
-	gaps_launch_availhook "$@" \
-		|| gaps_error_and_continue "Failed to launch the availhook for ${message}"
-}
-
 gaps_launch_prehook ( ) {
     local prehook="${1}"
     local url="${2}"
@@ -194,8 +181,9 @@ gaps_launch_prehook ( ) {
     if [ -f "${prehook}" ]
     then
         gaps_launch_script "${prehook}" "${url}" \
-            || gaps_error_and_continue "Failed to launch the prehook for ${message}"
+            || return 1
     fi
+    return 0
 }
 
 gaps_launch_freeze_pre_hook ( ) {
@@ -329,7 +317,6 @@ gaps_remotes_fix ( ) {
         gaps_compute_remotes "${REMOTES}"
         for remote in ${remotes}
         do
-
 	        gaps_log_info "Checking remote $remote"
             if gaps_remote_here_p "${remote}"
             then
@@ -347,7 +334,11 @@ gaps_remotes_fix ( ) {
                     # only need to initialize it
                     gaps_warn "Remote $remote_name not initialized"
 				    gaps_log "Is it available ?"
-				    gaps_launch_availhook_or_continue "${availhook}" "${url}" "${remote_name}"
+				    if ! gaps_launch_availhook "${availhook}" "${url}" "${remote_name}"
+					then
+						gaps_warn "${remote_name} not available"
+						continue
+					fi
 				    gaps_log "It is available! Now, trying to initialize it"
                     if ! git-annex-perso_initremotes.sh "\b${remote}\b"
                     then
@@ -559,13 +550,6 @@ gaps_extract_remote_info ( ) {
     fi
     gaps_extract_context_independent_remote_info "${remote_path}"
     return ${res}
-}
-
-gaps_extract_remote_info_or_continue ( ) {
-    local contexts="$1"
-    local _remote_name="$2"
-    gaps_extract_remote_info "$@" \
-        || gaps_error_and_continue "Could not extract info for remote $_remote_name in any context of $contexts"
 }
 
 gaps_compute_contexts ( ) {

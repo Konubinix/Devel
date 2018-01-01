@@ -6,9 +6,8 @@ FILTER="$1"
 
 failure=0
 
-inc_failure_and_continue () {
+inc_failure () {
     failure=$((failure + 1))
-    continue
 }
 
 if [ -d ".gitannexremotes" ]
@@ -20,7 +19,11 @@ then
 	for remote in ${remotes}
     do
         gaps_show_date_maybe
-        gaps_extract_remote_info_or_continue "${contexts}" "${remote}"
+        if ! gaps_extract_remote_info "${contexts}" "${remote}"
+		then
+			gaps_error "Could not extract info for remote $_remote_name in any context of $contexts"
+			continue
+		fi
         if gaps_remote_initialized_p "${remote}"
         then
             gaps_warn "Aborting initialization because $remote_name is already a remote"
@@ -30,7 +33,7 @@ then
 		then
 			if ! gaps_ask_for_confirmation "Initing remote $remote_name of type $type ?"
 			then
-				inc_failure_and_continue
+				inc_failure && continue
 			fi
 			git annex enableremote "$remote"
 			continue
@@ -38,16 +41,19 @@ then
 		if [ "$type" != "ssh" ] && [ "$type" != "git" ] && [ "$type" != "local" ]
 		then
 			gaps_error "I don't know how to initialize the remote $remote of type $type"
-			inc_failure_and_continue
+			inc_failure && continue
 		fi
 		# remote in ssh mode
 		if ! gaps_ask_for_confirmation "Initing remote $remote_name
 to url $url ?"
 		then
-			inc_failure_and_continue
+			inc_failure && continue
 		fi
-        gaps_launch_availhook_or_continue "${availhook}" "${url}" "${remote_name}"
-
+        if ! gaps_launch_availhook "${availhook}" "${url}" "${remote_name}"
+		then
+			gaps_warn "${remote_name} not available"
+			continue
+		fi
         gaps_log "Initializing remote '$remote_name'"
 		# perform the substitution in url
         git remote add "$remote_name" "$url"
@@ -66,7 +72,7 @@ to url $url ?"
 				    git remote remove "${remote_name}"
                     # reinit the trap.
                     trap "" 0
-                    inc_failure_and_continue
+                    inc_failure && continue
                 }
             elif gaps_ask_for_confirmation "Keep $remote_name anyway ?"
             then
@@ -76,7 +82,7 @@ to url $url ?"
 				git remote remove "$remote_name"
                 # reinit the trap.
                 trap "" 0
-                inc_failure_and_continue
+                inc_failure && continue
             fi
         fi
         if [ $? -ne 0 ]
@@ -85,7 +91,7 @@ to url $url ?"
 			git remote remove "$remote_name"
             # reinit the trap.
             trap "" 0
-            inc_failure_and_continue
+            inc_failure && continue
         fi
 
         gaps_setup_context_independent_remote_info

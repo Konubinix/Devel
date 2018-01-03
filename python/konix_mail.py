@@ -95,6 +95,8 @@ def make_part_harmless(html):
         img.attrs["ontouchstart"] = img.attrs["onmousedown"]
     for elem in s.find_all("meta", attrs={"name": "viewport"}):
         elem.extract()
+    for elem in s.find_all("link", attrs={"type": "text/css"}, src=True):
+        elem.extract()
     return str(s)
 
 

@@ -3,6 +3,6 @@
 set -x
 NUMBER="${1:-100}"
 mpc clear
-mpc add < <(beet random -n "${NUMBER}" -f 'beets:library:track;${id}')
+mpc add < <(konix_mpc_beet.sh random -n "${NUMBER}")
 mpc consume on
 mpc play

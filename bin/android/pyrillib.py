@@ -232,7 +232,7 @@ def step():
                 "open",
                 "open local web",
                 "open origin",
-                "gtd mail origin",
+                "to org",
                 ("A", get_priority_setter('A')),
                 ("B", get_priority_setter('B')),
                 ("C", get_priority_setter('C')),
@@ -290,9 +290,9 @@ def step():
                 chooser.choose_show("Click on ok when done", (item.url,), "OK")
                 os.system("konix_android_browser_open.sh '%s'" % item.url)
                 chooser.choose_get_res()
-            elif type(choice) == str and choice == "gtd mail origin":
+            elif type(choice) == str and choice == "to org":
                 chooser.choose_show("Click on ok when done", (item.url,), "OK")
-                os.system("echo '%s'|konix_gtd_mail.sh" % item.url)
+                os.system("echo '%s'|konix_gtd_org.sh" % item.url)
                 chooser.choose_get_res()
             elif type(choice) == str and choice == "back":
                 choice = False

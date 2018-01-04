@@ -22,4 +22,4 @@ while getopts "hl:" opt; do
 done
 shift $((OPTIND-1))
 
-pypdfocr -l "${lang}" "$@"
+pypdfocr -d -l "${lang}" "$@"

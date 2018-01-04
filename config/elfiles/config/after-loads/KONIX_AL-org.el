@@ -2001,7 +2001,7 @@ items"
   %a"
                  :kill-buffer
                  )
-                ("J" "External interruption" entry (file+headline konix/org-todo_file "Refile")
+                ("J" "External interruption" entry (file+headline konix/org-diary_file "Interruptions")
                  "* NEXT [#G] %? :INTERRUPTION:external:
   SCHEDULED: %T
   :PROPERTIES:

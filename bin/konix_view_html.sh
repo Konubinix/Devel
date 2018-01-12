@@ -17,3 +17,7 @@ fi
 	done
 } >&2
 echo "${dir}"
+if [ -z "${KONIX_VIEW_HTML_KEEP}" ]
+then
+   sleep 10
+fi

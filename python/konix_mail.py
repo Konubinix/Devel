@@ -61,7 +61,11 @@ def format_mail(from_, to, subject, date, pure_text_prefix, content):
     html_part = MIMEText(html_content, _subtype='html', _charset="utf-8")
     msg.attach(plain_part)
     msg.attach(html_part)
-    msg["Message-Id"] = "<{}>".format(md5(msg.as_string()).hexdigest())
+    if six.PY3:
+        msg_bytes = msg.as_bytes()
+    else:
+        msg_bytes = msg.as_string()
+    msg["Message-Id"] = "<{}>".format(md5(msg_bytes).hexdigest())
     return msg
 
 

@@ -10,6 +10,7 @@ import datetime
 import mailbox
 import re
 import base64
+import six
 
 import html2text
 from bs4 import BeautifulSoup as bs
@@ -26,7 +27,7 @@ def format_markdown(from_, to, subject, date, content):
     msg['From'] = from_
     msg['To'] = to
     if date:
-        if isinstance(date, basestring):
+        if isinstance(date, six.string_types):
             msg['Date'] = date
         else:
             msg["Date"] = email.utils.formatdate((int(date.strftime("%s"))), date)
@@ -51,7 +52,7 @@ def format_mail(from_, to, subject, date, pure_text_prefix, content):
     msg['From'] = from_
     msg['To'] = to
     if date:
-        if isinstance(date, basestring):
+        if isinstance(date, six.string_types):
             msg['Date'] = date
         else:
             msg["Date"] = email.utils.formatdate((int(date.strftime("%s"))), date)

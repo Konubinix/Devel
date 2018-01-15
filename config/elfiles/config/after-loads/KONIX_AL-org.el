@@ -2008,7 +2008,6 @@ items"
   :CREATED:  %U
   :INTERRUPTION_HANDLED: t
   :END:"
-                 :kill-buffer
                  :clock-in t
                  :clock-resume t
                  )

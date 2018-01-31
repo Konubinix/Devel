@@ -42,7 +42,10 @@ def format_markdown(from_, to, subject, date, content):
 def format_mail(from_, to, subject, date, pure_text_prefix, content):
     content_lines = content.splitlines()
 
-    text_content = pure_text_prefix + u"\n\n" + html2text.html2text(content)
+    try:
+        text_content = pure_text_prefix + u"\n\n" + html2text.html2text(content)
+    except:
+        text_content = "No able to convert to text, sorry. Read the html version instead"
     html_content = pure_text_prefix + u"\n\n" + content
 
     text_content = text_content.encode("utf-8")

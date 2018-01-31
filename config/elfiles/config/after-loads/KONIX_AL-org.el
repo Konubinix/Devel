@@ -1340,30 +1340,23 @@ items"
 							   (
 								(org-agenda-overriding-header
 								 "Projects (without subprojects nor maybe)")
-								(org-agenda-skip-function
-								 '(or
-								   (konix/org-agenda-skip-if-tags
-									'("phantom"))
-								   )
-								 )
 								)
 							   )
 					(tags-todo "+project+maybe"
 							   (
 								(org-agenda-overriding-header
 								 "Maybe Projects (without subprojects)")
-								(org-agenda-skip-function
-								 '(or
-								   (konix/org-agenda-skip-if-tags
-									'("phantom"))
-								   )
-								 )
 								)
 							   )
 					)
 				   (
 					(org-agenda-skip-function
-					 'konix/org-agenda-skip-if-task-of-project)
+                     '(or
+                       (konix/org-agenda-skip-if-tags
+                        '("phantom"))
+                       (konix/org-agenda-skip-if-task-of-project)
+                       )
+					 )
 					;; projects should not be filtered by default
 					(org-agenda-tag-filter-preset nil)
 					)

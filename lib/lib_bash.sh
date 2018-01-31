@@ -482,3 +482,22 @@ mkvirtualenv2 () {
 mkvirtualenv2_system-site-packages () {
     mkvirtualenv2 --system-site-packages "$@"
 }
+
+redis_cache_key ( ) {
+    local hash="$(echo "$*"|openssl md5 |cut -f2 -d' ')"
+    echo "bash_redis_cache_${hash}"
+}
+
+get_redis_cache ( ) {
+    local cache_key="$(redis_cache_key "$@")"
+    if [ -z "$(konix_redis-cli.sh --raw get "${cache_key}")" ]
+    then
+        return 1
+    fi
+    konix_redis-cli.sh --raw get "${cache_key}" 2> /dev/null
+}
+
+set_redis_cache ( ) {
+    local cache_key="$(redis_cache_key "$@")"
+    konix_redis-cli.sh --raw set "${cache_key}" "$(cat)" > /dev/null
+}

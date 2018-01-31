@@ -298,6 +298,7 @@ By: {}
 Attendees:
 {}
 
+** Description
 {}
 #+BEGIN_EXAMPLE
 {}

@@ -115,6 +115,8 @@
     )
    )
   )
+(setq-default circe-format-server-join "*** Join: {nick}")
+(setq-default circe-format-server-rejoin "*** Re-join: {nick}, left {departuredelta} ago")
 
 (defun konix/irc--handle-line/ignore-empty-lines (orig-fun proc line)
   (unless (string= line "")

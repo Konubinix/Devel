@@ -16,7 +16,7 @@ BANK="$(konix_ofx_get_info.sh -b "${LAST_OFX}")"
 konix_assert_var ACCOUNT
 konix_assert_var DATE_STR
 konix_assert_var BANK
-DATE="$(date '+%Y-%m-%d %H:%M:%S' -d@"${DATE_STR}")"
+DATE="$(date '+%Y-%m-%dT%H:%M:%S' -d@"${DATE_STR}")"
 NOW_STR="$(date '+%s')"
 
 echo "Importing the bank account ${ACCOUNT} from date ${DATE}"

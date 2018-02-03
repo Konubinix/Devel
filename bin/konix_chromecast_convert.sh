@@ -2,7 +2,19 @@
 
 SUB=""
 ARGS=""
-while getopts "i:sy" opt; do
+
+usage () {
+    cat<<EOF
+$0 [-s][-h][-y]
+y: auto yes
+s: use subtitle files from a file with the same name as input in .webvtt format
+    (hint: use submarine to convert the subtitle)
+Description
+EOF
+}
+
+
+while getopts "i:syh" opt; do
 	case $opt in
 		h)
 			usage

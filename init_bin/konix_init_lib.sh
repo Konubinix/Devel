@@ -32,7 +32,10 @@ import_env () {
             then
                 eval "unset $(echo "$line"|cut -f1 -d"=")"
             else
-                eval "${EXPORT_KEYWORD} $line"
+                if ! eval "${EXPORT_KEYWORD} $line"
+				then
+					echo "Failure when evaluating line '${line}'" >&2
+				fi
             fi
         fi
     done < "${TEMP_FILE}"

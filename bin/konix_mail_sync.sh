@@ -9,7 +9,7 @@ echo "?" > "$MAIL_TRAY_DAEMON_CTRL"
 echo "b" > "$MAIL_TRAY_DAEMON_CTRL"
 trap "echo > ${TMPDIR}/konix_mail_tray_stamp; echo B > '$MAIL_TRAY_DAEMON_CTRL' ; rm '$LOG_FILE'" 0
 
-konix_lock_run.sh -n -N offlineimap timeout 1200  offlineimap -c "${KONIX_OFFLINEIMAPRC}" "$@" 2>&1 | tee "$LOG_FILE" || exit 1
+konix_lock_run.sh -n -N offlineimap timeout "${KONIX_OFFLINEIMAP_TIMEOUT:-1200}" offlineimap -c "${KONIX_OFFLINEIMAPRC}" "$@" 2>&1 | tee "$LOG_FILE" || exit 1
 
 konix_sendmail_flush.sh
 

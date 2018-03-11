@@ -356,7 +356,7 @@ Mod4 Mod1 Left :ExecCommand konix_do_cron_job.sh mpc seek -00:00:05 && konix_dis
 Mod4 Mod1 Right :ExecCommand konix_do_cron_job.sh mpc seek +00:00:05 && konix_display.py "Forward 5 seconds"
 
 # ####################################################################################################
-# Assword (Mod4 a ...)
+# Impass (previously Assword) (Mod4 a ...)
 # ####################################################################################################
-Mod4 a g :ExecCommand konix_display.py "Assword Gui" && konix_do_with_gpg_agent.sh assword gui
-Mod4 a y :ExecCommand konix_display.py "Assword Yank" && konix_do_with_gpg_agent.sh assword_yank.sh gui
+Mod4 a g :ExecCommand konix_display.py "Impass Gui" && konix_do_with_gpg_agent.sh impass gui
+Mod4 a y :ExecCommand konix_display.py "Impass Yank" && konix_do_with_gpg_agent.sh impass_yank.sh gui

@@ -40,10 +40,10 @@ cut -f2 -d ' ' .git/annex/unused | while read sha
 do
 	lastname="$(git log -1 --format=oneline --name-status  -S "${sha}"|tail -1|sed 's|^[A-Z]\+[ \t]\+||')"
 	lastchanged="$(git annex metadata -g lastchanged --key "${sha}")"
-	echo "############### ${lastchanged}: ${lastname}"
+	echo "############### ${lastchanged}: ${lastname} : ${sha}"
 	if [ -n "${LOCATION}" ]
 	then
-		git log --format=oneline --name-status  -S "${sha}" 2>&1|cat
+		git log --format=oneline --name-status -S "${sha}" 2>&1|cat
 		echo
 	fi
 	if [ -n "${RESTORE}" ]

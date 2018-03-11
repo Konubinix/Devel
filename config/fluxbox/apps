@@ -147,7 +147,6 @@
 [app] (title=Uzbl WebInspector)
   [Layer]	{7}
 [end]
-[app] (class=Assword)
-  [Position]	(CENTER)	{0 0}
+[app] (class=Impass)
   [Layer]	{7}
 [end]

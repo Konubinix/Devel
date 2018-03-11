@@ -1868,7 +1868,7 @@ items"
 (setq-default org-id-link-to-org-use-id t)
 (setq-default org-log-done (quote time))
 (setq-default org-log-done-with-time t)
-(setq-default org-log-into-drawer "LOGBOOK")
+(setq-default org-log-state-notes-into-drawer "LOGBOOK")
 (setq-default org-clock-into-drawer "CLOCK")
 (setq-default org-log-note-clock-out nil)
 (setq-default org-log-note-headings (quote ((done . "CLOSING NOTE %t") (state . "State %-12s %t") (note . "Note prise le %t") (clock-out . ""))))

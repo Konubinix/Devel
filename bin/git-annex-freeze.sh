@@ -44,21 +44,15 @@ then
     gaps_log "Remove from the index files that were deleted in the working tree"
     git -c core.bare=false diff --name-only --diff-filter=D -z | xargs --no-run-if-empty -0 git -c core.bare=false rm --cached || die "Could not remove deleted files"
 fi
-if [ "$(git config annex.version)" == "6" ]
+gaps_log "Annex add new files"
+git annex add || die "Could not annex add"
+if ![ "$(git config annex.direct)" == "true" ]
 then
-	gaps_log "Add new files in (v6 mode)"
-	git add -A :/ || die "Could not add -A files (in v6 mode)"
+	gaps_log "In indirect mode, syncing the working copy to index after git annex"
+	git add -A :/ || die "Could not add -A files"
 else
-	gaps_log "Annex add new files"
-	git annex add || die "Could not annex add"
-	if ![ "$(git config annex.direct)" == "true" ]
-	then
-		gaps_log "In indirect mode, syncing the working copy to index after git annex"
-		git add -A :/ || die "Could not add -A files"
-	else
-		gaps_log "Add files ignored by git annex"
-		git -c core.bare=false ls-files --others --exclude-standard -z|xargs -0 --no-run-if-empty git -c core.bare=false add -v
-	fi
+	gaps_log "Add files ignored by git annex"
+	git -c core.bare=false ls-files --others --exclude-standard -z|xargs -0 --no-run-if-empty git -c core.bare=false add -v
 fi
 # taken from https://github.com/svend/home-bin/blob/master/git-autocommit
 hostname=`hostname`

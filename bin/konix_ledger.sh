@@ -1,3 +1,3 @@
 #!/bin/bash
 
-exec ledger -S date "$@"
+exec ledger --prepend-format '  %(note)\n' -S date "$@"

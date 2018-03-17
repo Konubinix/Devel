@@ -46,7 +46,7 @@ then
 fi
 gaps_log "Annex add new files"
 git annex add || die "Could not annex add"
-if ![ "$(git config annex.direct)" == "true" ]
+if ! [ "$(git config annex.direct)" == "true" ]
 then
 	gaps_log "In indirect mode, syncing the working copy to index after git annex"
 	git add -A :/ || die "Could not add -A files"

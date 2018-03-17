@@ -14,7 +14,7 @@ sed -i 's/[()]/_/g' "${OFX_FILE_PATH}"
 export PYTHONIOENCODING=utf_8
 
 CMD="ledger-autosync --assertions --fid 1 -a ${ACCOUNT}"
-if ! ledger accounts|grep -q "${ACCOUNT}"
+if ! konix_ledger.sh accounts|grep -q "${ACCOUNT}"
 then
     CMD="${CMD} --initial"
 fi

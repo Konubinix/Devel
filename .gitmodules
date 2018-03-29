@@ -264,7 +264,7 @@ ignore=dirty
 ignore=dirty
 	path = qutebrowser
 	url = https://github.com/Konubinix/qutebrowser
-	#url = https://github.com/The-Compiler/qutebrowser
+	#url = https://github.com/qutebrowser/qutebrowser
 [submodule "git-annex-remote-rclone"]
 ignore=dirty
 	path = git-annex-remote-rclone

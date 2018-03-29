@@ -3213,17 +3213,18 @@ an error (this should never happen)."
 (advice-add 'org-depend-block-todo :around
             #'konix/org-depend-block-todo/but_not_done)
 
-(defun konix/org-gcal-accept ()
-  (interactive)
+(defun konix/org-gcal-accept (comment)
+  (interactive "sComment: ")
   (konix/org-with-point-on-heading
    (let* (
           (id (org-entry-get (point) "ID"))
           (account (org-entry-get (point) "ACCOUNT_NAME"))
           (calendar_id (org-entry-get (point) "CALENDAR_ID"))
           (command (format
-                    "konix_gcal.py -a \"%s\" accept %s"
+                    "konix_gcal.py -a \"%s\" accept %s \"%s\""
                     account
                     id
+                    comment
                     ))
           )
      (shell-command
@@ -3265,17 +3266,18 @@ an error (this should never happen)."
      ))
   )
 
-(defun konix/org-gcal-tentative ()
-  (interactive)
+(defun konix/org-gcal-tentative (comment)
+  (interactive "sComment: ")
   (konix/org-with-point-on-heading
    (let* (
           (id (org-entry-get (point) "ID"))
           (account (org-entry-get (point) "ACCOUNT_NAME"))
           (calendar_id (org-entry-get (point) "CALENDAR_ID"))
           (command (format
-                    "konix_gcal.py -a \"%s\" tentative %s"
+                    "konix_gcal.py -a \"%s\" tentative %s \"%s\""
                     account
                     id
+                    comment
                     ))
           )
      (shell-command

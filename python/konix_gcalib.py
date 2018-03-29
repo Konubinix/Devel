@@ -9,6 +9,7 @@ import os
 import re
 import sys
 import pprint
+import html2text
 import redis
 import functools
 import shlex
@@ -283,6 +284,15 @@ class GCall(cmd.Cmd, object):
                 return ""
 
         @property
+        def text_description(self):
+            description = self.description.strip()
+            try:
+                description = html2text.html2text(description)
+            except:
+                description = "(Not valid html) " + description
+            return description
+
+        @property
         def org_mode(self):
             return """* {}{}{}
 :PROPERTIES:
@@ -317,8 +327,15 @@ Attendees:
     self.org_mode_timestamp,
     self.htmlLink,
     self.organizer.get("displayName", self.organizer.get("email", "NA")),
-    "\n".join(map(lambda a: " - {} ({})".format(a.get("email", "NA"), a.get("responseStatus")), self.attendees)),
-    re.sub("^\*", ",*", self.description.strip(), flags=re.MULTILINE),
+    "\n".join(
+        map(
+            lambda a: " - {} ({}) ({})".format(
+                a.get("email", "NA"),
+                a.get("responseStatus"),
+                a.get("comment", "no comment"),
+            ),
+            self.attendees)),
+    re.sub("^\*", ",*", self.text_description, flags=re.MULTILINE),
     re.sub("^\*", ",*", str(self).strip(), flags=re.MULTILINE),
 )
 
@@ -365,6 +382,7 @@ Attendees:
         Event.org_mode = org_mode
         Event.__hash__ = event_hash
         Event.my_response_status = my_response_status
+        Event.text_description = text_description
 
         self.types["CalendarListEntry"]["class"] = CalendarListEntry
         self.types["Event"]["class"] = Event

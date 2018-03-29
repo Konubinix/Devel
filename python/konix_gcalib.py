@@ -931,7 +931,7 @@ Attendees:
             print("Use the command select_calendar first")
             return
         start, flag = self.parse_time(when)
-        time_dict = re.match('^\s*((?P<hours>\d+)\s*h)?\s*((?P<minutes>\d+)\s*m)?\s*((?P<seconds>\d+)\s*s)?\s*$',
+        time_dict = re.match('^\s*((?P<hours>\d+)\s*h)?\s*((?P<minutes>\d+)\s*m?)?\s*((?P<seconds>\d+)\s*s)?\s*$',
                              duration).groupdict()
         duration = datetime.timedelta(seconds=int(time_dict['seconds'] or "0"),
                              minutes=int(time_dict['minutes'] or "0"),

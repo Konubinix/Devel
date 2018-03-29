@@ -241,6 +241,7 @@ Control Mod4 m :ExecCommand $(konix_goto_true_exec.sh gmpc)
 Control Mod4 g :ExecCommand $(konix_goto_true_exec.sh gmpc)
 Control Mod4 h :ExecCommand $(konix_goto_true_exec.sh icedove)
 Control Mod4 r :ExecCommand $(konix_goto_true_exec.sh recoll konix_recoll.py)
+Control Mod4 s :ExecCommand $(konix_goto_true_exec.sh slack slack-desktop)
 
 # ,----------
 # | Clipboard

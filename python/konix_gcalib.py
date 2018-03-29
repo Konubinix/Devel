@@ -1043,16 +1043,17 @@ Attendees:
                            }
                 self._update_event(calendar_id, event, new_values)
 
-    def accept(self, event):
+    def accept(self, event, comment=""):
         data = {
             "attendees": event.attendees + [
                 {
                     "email": self.calendar_id,
                     "responseStatus": "accepted",
+                    "comment": comment,
                 }
             ]
         }
-        return self._update_insist(event, data)
+        return self._update_insist(event, data, send_notif=True if comment else False)
 
     def decline(self, event, why=""):
         self._update_insist(
@@ -1065,10 +1066,11 @@ Attendees:
                         "comment": why,
                     }
                 ]
-            }
+            },
+            send_notif=True if why else False
         )
 
-    def tentative(self, event):
+    def tentative(self, event, comment=""):
         self._update_insist(
             event,
             {
@@ -1076,14 +1078,17 @@ Attendees:
                     {
                         "email": self.calendar_id,
                         "responseStatus": "tentative",
+                        "comment": comment,
                     }
                 ]
-            }
+            },
+            send_notif=True if comment else False
         )
 
-    def do_accept(self, id):
+    def do_accept(self, id, comment=""):
         self.accept(
             self.get_event(id),
+            comment,
         )
 
     def do_decline(self, id, why):
@@ -1092,23 +1097,26 @@ Attendees:
             why,
         )
 
-    def do_tentative(self, id):
+    def do_tentative(self, id, comment=""):
         self.tentative(
             self.get_event(id),
+            comment,
         )
 
-    def _update_insist(self, event, data):
+    def _update_insist(self, event, data, send_notif=False):
         try:
             self._update_event(
                 self.calendar_id,
                 event,
-                data
+                data,
+                send_notif=send_notif,
             )
         except urllib.error.HTTPError:
             self._update_event(
                 event.organizer["email"],
                 event,
-                data
+                data,
+                send_notif=send_notif,
             )
 
     def _update_event(self, calendar_id, event, new_values, send_notif=False):

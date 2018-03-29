@@ -87,6 +87,8 @@ def getConfigFromEnvFile(envfile, previous_config):
                   logging.critical("File %s not found" % file_to_include)
                 # update the existing config with the one included
                 new_config = getConfigFromEnvFile(file_to_include, new_config)
+                logging.debug("## Attempted to include env from %s (%s)" %
+                              (file_to_include, condition,))
             continue
 
         assert(section in ("prefix","replace","suffix",))

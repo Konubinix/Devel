@@ -3,6 +3,7 @@
 
 import cmd
 import urllib.request
+import markdown
 import json
 import os
 import re
@@ -938,7 +939,7 @@ Attendees:
         event = {
             "summary" : title,
             "location" : where,
-            "description" : description,
+            "description": markdown.markdown(description),
             "start" : start,
             "end" : end,
             "attendees": attendees,

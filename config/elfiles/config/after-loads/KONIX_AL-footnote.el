@@ -33,5 +33,12 @@
 (define-key footnote-mode-map (kbd "C-c C-b") 'Footnote-back-to-message)
 (define-key footnote-mode-map (kbd "C-c C-f") 'Footnote-add-footnote)
 
+(defun konix/footnote-reset ()
+  (interactive)
+  (setq footnote-pointer-marker-alist '()
+        footnote-text-marker-alist '()
+        )
+  )
+
 (provide 'KONIX_AL-footnote)
 ;;; KONIX_AL-footnote.el ends here

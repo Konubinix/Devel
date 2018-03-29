@@ -67,3 +67,5 @@
 	process = git-lfs filter-process
 [pull]
 	rebase = preserve
+[fetch]
+	prune = true

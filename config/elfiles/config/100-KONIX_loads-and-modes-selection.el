@@ -182,6 +182,8 @@
 (add-to-list 'auto-mode-alist '(".+\.mail$" . message-mode))
 ;; c templates in c mode
 (add-to-list 'auto-mode-alist '("\\.c\\.tpl$" . c-mode))
+(add-to-list 'auto-mode-alist '("\\.cxx\\.tpl$" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.java\\.tpl$" . java-mode))
 ;; txx and ixx are c++ files
 (add-to-list 'auto-mode-alist (cons "\\.ixx$" 'c++-mode))
 (add-to-list 'auto-mode-alist (cons "\\.txx$" 'c++-mode))

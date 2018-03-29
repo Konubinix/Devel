@@ -98,6 +98,10 @@
   [Workspace]	{4}
   [Jump]	{yes}
 [end]
+[app] (class=Slack)
+  [Workspace]	{4}
+  [Jump]	{no}
+[end]
 [app] (name=google-chrome) (class=Google-chrome)
   [Workspace]	{1}
 [end]

@@ -49,8 +49,6 @@
   (flyspell-mode 1)
   (electric-pair-mode 1)
   (orgtbl-mode)
-  (orgstruct-mode)
-  ;; footnote overrides some keybindings made by orgstruct-mode
   (footnote-mode)
   )
 (add-hook 'message-mode-hook

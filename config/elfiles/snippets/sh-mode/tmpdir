@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: tmpdir
+# key: tmpdir
+# --
+
+${100:TMPDIR}="$(mktemp -d)"
+trap "rm -rf '\${$100}'" 0

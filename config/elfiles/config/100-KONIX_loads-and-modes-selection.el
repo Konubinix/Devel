@@ -138,7 +138,7 @@
 ;; Automodes
 ;; ************************************************************
 ;; .h -> cpp-mode
-(add-to-list 'auto-mode-alist (cons "\\.h$" 'dummy-h-mode))
+(add-to-list 'auto-mode-alist (cons "\\.h$" 'c-mode))
 ;; Assembleur
 (add-to-list 'auto-mode-alist (cons "\\.deca$" 'java-mode))
 (add-to-list 'auto-mode-alist (cons "\\.ass$" 'asm-mode))
@@ -184,6 +184,8 @@
 (add-to-list 'auto-mode-alist '("\\.c\\.tpl$" . c-mode))
 (add-to-list 'auto-mode-alist '("\\.cxx\\.tpl$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.java\\.tpl$" . java-mode))
+;; arduino
+(add-to-list 'auto-mode-alist '("\\.ino$" . arduino-mode))
 ;; txx and ixx are c++ files
 (add-to-list 'auto-mode-alist (cons "\\.ixx$" 'c++-mode))
 (add-to-list 'auto-mode-alist (cons "\\.txx$" 'c++-mode))
@@ -199,6 +201,7 @@
 (add-to-list 'auto-mode-alist (cons "\\.beancount$" 'beancount-mode))
 (add-to-list 'auto-mode-alist (cons "\\.js$" 'js2-mode))
 (add-to-list 'auto-mode-alist (cons "\\.java$" 'java-mode))
+(add-to-list 'auto-mode-alist (cons "\\.kv$" 'yaml-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

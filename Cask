@@ -60,3 +60,4 @@
 (depends-on "indium")
 (depends-on "interleave")
 (depends-on "langtool")
+(depends-on "arduino-mode")

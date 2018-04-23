@@ -49,5 +49,12 @@
   t
   )
 
+(konix/push-or-replace-assoc-in-alist
+ 'notmuch-show-stash-mlarchive-link-alist
+ '(
+   "Gmail" . "https://mail.google.com/mail/u/0/#search/rfc822msgid%3A"
+   )
+ )
+
 (provide 'KONIX_AL-notmuch-show)
 ;;; KONIX_AL-notmuch-show.el ends here

@@ -1,3 +1,5 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-echo -n $(impass_dump_clear.sh "$@"|grep password|sed -r 's/^.+"password":.+"(.+)"$/\1/')
+PASSWORD="$1"
+
+echo -n $(impass_dump_clear.sh "$PASSWORD"|jq -r ."$PASSWORD".password)

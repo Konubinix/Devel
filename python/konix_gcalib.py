@@ -431,6 +431,9 @@ Attendees:
     def do_show_event(self, event_id):
         print(self.get_event(event_id))
 
+    def do_dump_org(self, event_id):
+        print(self.get_event(event_id).org_mode)
+
     def do_clear_token(self, line=None):
         self.db.delete(self.access_token_name)
         self.db.delete(self.refresh_token_name)

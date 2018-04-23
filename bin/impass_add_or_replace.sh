@@ -1,3 +1,3 @@
 #!/bin/bash
 
-assword add "$@" || assword replace "$@"
+impass add "$@" || impass replace "$@"

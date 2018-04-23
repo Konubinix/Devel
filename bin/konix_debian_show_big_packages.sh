@@ -1,8 +1,5 @@
 #!/bin/bash
-# inspired from a work from ThArGos
 
 export LC_ALL=C
-for package in `aptitude -O installsize search ~i | tac | sed -r 's|^i +([^ ]+) - .+$|\1|'`
-do
-    echo -e "`aptitude reinstall -sy ${package} | grep archive | sed -e "s@.*/\(.*\)B of archives.*@\1@"` \t${package}"
-done
+
+aptitude -O installsize search ~i -F '%I | %p' --disable-columns|sed -r 's/^([0-9]+) ([a-zA-Z]+)(.*)$/\1\2\3/'|sort -h

@@ -105,8 +105,9 @@ def dump_config(config):
 @option("--debug", "-d", is_flag=True)
 @option("--all", "-a", is_flag=True)
 @option("--ls", is_flag=True)
+@option("--run", is_flag=True)
 @pass_context
-def main(ctx, args, log_level, debug, all, ls):
+def main(ctx, args, log_level, debug, all, ls, run):
     if debug:
         log_level = "DEBUG"
     logging.basicConfig(level=logging._nameToLevel[log_level])
@@ -145,7 +146,8 @@ def main(ctx, args, log_level, debug, all, ls):
 """, fg="green").format(path))
             cmd = (
                 config[path].get(args[0]) or
-                config.get("GLOBAL", {}).get(args[0])
+                config.get("GLOBAL", {}).get(args[0]) or
+                (run and args)
             )
             all_cmds = set.union(*list(map(lambda d: set(d.keys()), list(config.values()))))
             assert cmd is not None or args[0] in all_cmds, (

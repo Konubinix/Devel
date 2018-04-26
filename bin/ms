@@ -147,7 +147,7 @@ def main(ctx, args, log_level, debug, all, ls, run):
             cmd = (
                 config[path].get(args[0]) or
                 config.get("GLOBAL", {}).get(args[0]) or
-                (run and args)
+                (run and args[0])
             )
             all_cmds = set.union(*list(map(lambda d: set(d.keys()), list(config.values()))))
             assert cmd is not None or args[0] in all_cmds, (

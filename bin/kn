@@ -7,7 +7,11 @@ from click_project.lib import get_authenticator_hints
 get_authenticator_hints["slack_token"] = "Slack token"
 
 
-@basic_entry_point(__name__, extra_command_packages=["kn_commands", "kn_commands_perso"])
+@basic_entry_point(
+    __name__,
+    extra_command_packages=["kn_commands", "kn_commands_perso"],
+    include_core_commands=["parameters", "alias", "flow", "flowdeps", "completion"],
+)
 def kn(**kwargs):
     pass
 

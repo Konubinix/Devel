@@ -1,4 +1,10 @@
 #!/bin/bash
+
+if [ "$1" == "--help" ]
+then
+	echo "${0}: TODO"
+	exit 0
+fi
 set -eux
 
 front="${1:-front.pdf}"

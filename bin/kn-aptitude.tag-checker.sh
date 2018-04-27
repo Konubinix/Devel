@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$1" == "--help" ]
+then
+	echo "${0}: TODO"
+	exit 0
+fi
+
 # use this in cron with something like
 # 0 1 * * * path_to_here/konix_aptitude_tag_checker.sh
 

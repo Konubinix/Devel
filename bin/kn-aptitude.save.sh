@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$1" == "--help" ]
+then
+	echo "${0}: TODO"
+	exit 0
+fi
+
 set -eux
 DIR="${KONIX_PERSO_DIR}/${HOSTNAME}/aptitude_nd"
 mkdir -p "${DIR}"

@@ -1,8 +1,14 @@
 #!/bin/bash
 
+if [ "$1" == "--help" ]
+then
+	echo "${0}: TODO"
+	exit 0
+fi
+
 TIMEOUT="${3:-10}"
 
-TESTS="konix_cert_check_openssl.sh konix_cert_check_gnutls.sh"
+TESTS="kn-cert.check.openssl.sh kn-cert.check.gnutls.sh"
 
 for t in $TESTS
 do

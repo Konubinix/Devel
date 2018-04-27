@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$1" == "--help" ]
+then
+	echo "${0}: TODO"
+	exit 0
+fi
+
 # taken from
 # http://superuser.com/questions/466031/how-do-i-reduce-a-pdfs-size-and-preserve-the-bookmarks
 SRC="$1"

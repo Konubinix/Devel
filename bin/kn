@@ -10,7 +10,8 @@ get_authenticator_hints["slack_token"] = "Slack token"
 @basic_entry_point(
     __name__,
     extra_command_packages=["kn_commands", "kn_commands_perso"],
-    include_core_commands=["parameters", "alias", "flow", "flowdeps", "completion"],
+    include_core_commands=["parameters", "alias", "flow", "flowdeps",
+                           "completion", "triggers", "echo", "log"],
 )
 def kn(**kwargs):
     pass

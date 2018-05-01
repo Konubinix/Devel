@@ -35,7 +35,7 @@ on startup."
 }
 
 
-if [ "$1" = "-h" ] || [ "$1" == "--help" ]; then
+if [ "$1" = "-h" ] || [ $# -gt 0 ] && [ "$1" == "--help" ]; then
     Help
 fi
 

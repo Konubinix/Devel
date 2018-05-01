@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$1" == "--help" ]
+if [ $# -gt 0 ] && [ "$1" == "--help" ]
 then
 	echo "${0}: TODO"
 	exit 0

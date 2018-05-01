@@ -1,4 +1,9 @@
 #!/bin/bash
+if [ $# -gt 0 ] && [ "$1" == "--help" ]
+then
+	echo "${0}: TODO"
+	exit 0
+fi
 
 set -eu
 find \
@@ -14,4 +19,4 @@ find \
            -o -iname "*.avi" \
            -o -iname "*.3gp" \
            -\) \
-    -exec "konix_video_rename.sh" "{}" ";"
+    -exec "kn-video.rename.sh" "{}" ";"

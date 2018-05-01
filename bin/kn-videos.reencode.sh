@@ -1,4 +1,9 @@
 #!/bin/bash
+if [ $# -gt 0 ] && [ "$1" == "--help" ]
+then
+	echo "${0}: TODO"
+	exit 0
+fi
 
 set -eu
 # i should not run this in parallel since one avconv process is already taking
@@ -16,4 +21,4 @@ find \
            -o -iname "*.avi" \
            -o -iname "*.3gp" \
            -o -iname "*.MPG" \
-           \) -exec konix_video_reencode.sh '{}' ';'
+           \) -exec kn-video.reencode.sh '{}' ';'

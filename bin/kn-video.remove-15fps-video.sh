@@ -7,7 +7,7 @@ fi
 
 set -eux
 
-if [ "$(kn-video-fps.py "$1")" == "15" ]
+if [ "$(kn-video.fps.py "$1")" == "15" ]
 then
 	rm -v "$1"
 fi

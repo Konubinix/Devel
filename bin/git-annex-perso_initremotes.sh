@@ -38,7 +38,7 @@ then
 			git annex enableremote "$remote"
 			continue
 		fi
-		if [ "$type" != "special" ]
+		if [ "$type" == "special" ]
 		then
 			gaps_warn "$remote of type $type should be initialized manually, continuing anyway"
 			continue

@@ -61,3 +61,4 @@
 (depends-on "interleave")
 (depends-on "langtool")
 (depends-on "arduino-mode")
+(depends-on "orgalist")

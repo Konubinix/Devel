@@ -50,6 +50,7 @@
   (electric-pair-mode 1)
   (orgtbl-mode)
   (footnote-mode)
+  (orgalist-mode 1)
   )
 (add-hook 'message-mode-hook
 		  'konix/message-mode-hook)

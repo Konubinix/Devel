@@ -32,18 +32,6 @@
   )
 (ad-activate 'check-parens)
 
-(defadvice tags-search (before push-tag-mark ())
-  "Push a tag mark before going to the function definition"
-  (ring-insert find-tag-marker-ring (point-marker))
-  )
-(ad-activate 'tags-search)
-
-(defadvice tags-query-replace (before push-tag-mark ())
-  "Push a tag mark before going to the function definition"
-  (ring-insert find-tag-marker-ring (point-marker))
-  )
-(ad-activate 'tags-query-replace)
-
 (defadvice semantic-decoration-include-visit (before push-tag-mark ())
   "Push a tag mark before going to the function definition"
   (push-tag-mark)
@@ -102,11 +90,6 @@
 ;; ******************************************************************************************
 ;; TAGS
 ;; ******************************************************************************************
-(defadvice tags-search (before save-window-excursion)
-  (setq konix/tags/windows-configuration-saved (current-window-configuration))
-  )
-(ad-activate 'tags-search)
-
 (defadvice tags-loop-continue (after recontinue-if-on-comment)
   (when (and konix/tags/avoid-comments (hs-inside-comment-p))
 	(message "Avoiding comment")

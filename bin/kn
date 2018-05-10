@@ -8,7 +8,8 @@ from click_project.setup import basic_entry_point, main
     __name__,
     extra_command_packages=["kn_commands", "kn_commands_perso"],
     include_core_commands=["parameters", "alias", "flow", "flowdeps",
-                           "completion", "triggers", "echo", "log", "passwords"],
+                           "completion", "triggers", "echo", "log", "passwords",
+                           "exec"],
     authenticator_hints={"slack_token": "Slack token"},
 )
 def kn(**kwargs):

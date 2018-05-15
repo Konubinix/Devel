@@ -16,10 +16,11 @@ import parsedatetime
 from click_project.decorators import group, table_fields, table_format, \
     argument, param_config, option
 from click_project.log import get_logger
-from click_project.lib import get_authenticator, TablePrinter, cache_disk,\
+from click_project.lib import get_authenticator, TablePrinter,\
     ParameterType, makedirs
 from click_project.completion import startswith
 from click_project.config import config
+from click_project.core import cache_disk
 
 LOGGER = get_logger(__name__)
 

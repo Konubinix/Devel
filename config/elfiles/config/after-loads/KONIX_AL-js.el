@@ -25,7 +25,9 @@
 ;;; Code:
 (defun konix/js-mode-hook ()
   (tern-mode 1)
-  (flycheck-select-checker 'javascript-eslint)
+  ;; (unwind-protect
+  ;;  (flycheck-select-checker 'javascript-eslint)
+  ;;  )
   (setq
    indent-tabs-mode nil
    js2-basic-offset 4

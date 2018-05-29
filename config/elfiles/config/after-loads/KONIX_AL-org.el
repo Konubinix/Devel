@@ -1961,11 +1961,10 @@ items"
                  :kill-buffer
                  )
                 ("l" "Todo Item for current stuff" entry (file+headline konix/org-todo_file "Refile")
-                 "* TODO %?
+                 "* TODO %? %a
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-  %a"
+  :END:"
                  :kill-buffer
                  )
                 ("a" "Todo Item for git annexed stuff" entry (file+headline konix/org-todo_file "Refile")
@@ -1986,12 +1985,11 @@ items"
                  :kill-buffer
                  )
                 ("U" "Todo Item URGENT for current stuff" entry (file+headline konix/org-todo_file "Refile")
-                 "* NEXT [#G] %?
+                 "* NEXT [#G] %? %a
   DEADLINE: %t
   :PROPERTIES:
   :CREATED:  %U
-  :END:
-  %a"
+  :END:"
                  :kill-buffer
                  )
                 ("J" "External interruption" entry (file+headline konix/org-diary_file "Interruptions")

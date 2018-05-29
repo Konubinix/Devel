@@ -298,6 +298,3 @@ ignore=dirty
 [submodule "prosody"]
 	path = prosody
 	url = git://github.com/bjc/prosody.git
-[submodule "bash-it"]
-	path = bash-it
-	url = https://github.com/Bash-it/bash-it

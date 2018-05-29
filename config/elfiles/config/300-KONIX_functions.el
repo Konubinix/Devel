@@ -935,29 +935,29 @@ The behavior I want is :
     (ediff-maybe-checkout buf-to-patch)
 
     (ediff-with-current-buffer patch-diagnostics
-      (insert-buffer-substring patch-buf)
-      (message "Applying patch ... ")
-      ;; fix environment for gnu patch, so it won't make numbered extensions
-      (setq backup-style (getenv "VERSION_CONTROL"))
-      (setenv "VERSION_CONTROL" nil)
-      (setq patch-return-code
-            (call-process-region
-             (point-min) (point-max)
-             shell-file-name
-             t   ; delete region (which contains the patch
-             t   ; insert output (patch diagnostics) in current buffer
-             nil ; don't redisplay
-             shell-command-switch   ; usually -c
-             (format "%s %s %s -o '%s' %s"
-                     ediff-patch-program
-                     ediff-patch-options
-                     ediff-backup-specs
-                     konix/ediff-patch-new-filename
-                     (expand-file-name true-source-filename))
-             ))
+                               (insert-buffer-substring patch-buf)
+                               (message "Applying patch ... ")
+                               ;; fix environment for gnu patch, so it won't make numbered extensions
+                               (setq backup-style (getenv "VERSION_CONTROL"))
+                               (setenv "VERSION_CONTROL" nil)
+                               (setq patch-return-code
+                                     (call-process-region
+                                      (point-min) (point-max)
+                                      shell-file-name
+                                      t   ; delete region (which contains the patch
+                                      t   ; insert output (patch diagnostics) in current buffer
+                                      nil ; don't redisplay
+                                      shell-command-switch   ; usually -c
+                                      (format "%s %s %s -o '%s' %s"
+                                              ediff-patch-program
+                                              ediff-patch-options
+                                              ediff-backup-specs
+                                              konix/ediff-patch-new-filename
+                                              (expand-file-name true-source-filename))
+                                      ))
 
-      ;; restore environment for gnu patch
-      (setenv "VERSION_CONTROL" backup-style))
+                               ;; restore environment for gnu patch
+                               (setenv "VERSION_CONTROL" backup-style))
 
     (message "Applying patch ... done")
     (message "")
@@ -971,7 +971,7 @@ The behavior I want is :
 		(progn
 		  (with-output-to-temp-buffer ediff-msg-buffer
 			(ediff-with-current-buffer standard-output
-              (fundamental-mode))
+                                       (fundamental-mode))
 			(princ (format
 					"Patch program has failed due to a bad patch file,
 it couldn't apply all hunks, OR
@@ -1048,8 +1048,8 @@ you can still examine the changes via M-x ediff-files"
 		   buf-to-patch target-buf nil
 		   startup-hooks 'epatch))
     (ediff-with-current-buffer ctl-buf
-      (setq ediff-patchbufer patch-buf
-            ediff-patch-diagnostics patch-diagnostics))
+                               (setq ediff-patchbufer patch-buf
+                                     ediff-patch-diagnostics patch-diagnostics))
 
     (bury-buffer patch-diagnostics)
     (message "Type `P', if you need to see patch diagnostics")
@@ -1190,3 +1190,100 @@ Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
 		  result
 		  )))))
 (defalias 'netrc-parse 'konix/netrc-parse)
+
+(defun xah-html-replace-html-named-entities (@p1 @p2)
+  "Replace HTML entities to Unicode character in current line or selection.
+For example, “&copy;” becomes “©”.
+
+The following HTML Entities are not replaced:
+ &amp; &
+ &lt; <
+ &gt; >
+
+When called in lisp code, *p1 *p2 are begin/end positions.
+
+See also:
+`xah-html-replace-html-chars-to-entities'
+`xah-html-replace-html-chars-to-unicode'
+
+URL `http://ergoemacs.org/emacs/elisp_replace_html_entities_command.html'
+Version 2015-04-23"
+  (interactive
+   (if (use-region-p)
+       (list (region-beginning) (region-end))
+     (list (line-beginning-position) (line-end-position))))
+  (let (
+        ($replaceMap
+         [
+          ["&nbsp;" " "] ["&ensp;" " "] ["&emsp;" " "] ["&thinsp;" " "]
+          ["&rlm;" "‏"] ["&lrm;" "‎"] ["&zwj;" "‍"] ["&zwnj;" "‌"]
+          ["&iexcl;" "¡"] ["&cent;" "¢"] ["&pound;" "£"] ["&curren;" "¤"] ["&yen;" "¥"] ["&brvbar;" "¦"] ["&sect;" "§"] ["&uml;" "¨"] ["&copy;" "©"] ["&ordf;" "ª"] ["&laquo;" "«"] ["&not;" "¬"] ["&shy;" "­"] ["&reg;" "®"] ["&macr;" "¯"] ["&deg;" "°"] ["&plusmn;" "±"] ["&sup2;" "²"] ["&sup3;" "³"] ["&acute;" "´"] ["&micro;" "µ"] ["&para;" "¶"] ["&middot;" "·"] ["&cedil;" "¸"] ["&sup1;" "¹"] ["&ordm;" "º"] ["&raquo;" "»"] ["&frac14;" "¼"] ["&frac12;" "½"] ["&frac34;" "¾"] ["&iquest;" "¿"]
+          ["&Agrave;" "À"] ["&Aacute;" "Á"] ["&Acirc;" "Â"] ["&Atilde;" "Ã"] ["&Auml;" "Ä"] ["&Aring;" "Å"] ["&AElig;" "Æ"] ["&Ccedil;" "Ç"] ["&Egrave;" "È"] ["&Eacute;" "É"] ["&Ecirc;" "Ê"] ["&Euml;" "Ë"] ["&Igrave;" "Ì"] ["&Iacute;" "Í"] ["&Icirc;" "Î"] ["&Iuml;" "Ï"] ["&ETH;" "Ð"] ["&Ntilde;" "Ñ"] ["&Ograve;" "Ò"] ["&Oacute;" "Ó"] ["&Ocirc;" "Ô"] ["&Otilde;" "Õ"] ["&Ouml;" "Ö"] ["&times;" "×"] ["&Oslash;" "Ø"] ["&Ugrave;" "Ù"] ["&Uacute;" "Ú"] ["&Ucirc;" "Û"] ["&Uuml;" "Ü"] ["&Yacute;" "Ý"] ["&THORN;" "Þ"] ["&szlig;" "ß"] ["&agrave;" "à"] ["&aacute;" "á"] ["&acirc;" "â"] ["&atilde;" "ã"] ["&auml;" "ä"] ["&aring;" "å"] ["&aelig;" "æ"] ["&ccedil;" "ç"] ["&egrave;" "è"] ["&eacute;" "é"] ["&ecirc;" "ê"] ["&euml;" "ë"] ["&igrave;" "ì"] ["&iacute;" "í"] ["&icirc;" "î"] ["&iuml;" "ï"] ["&eth;" "ð"] ["&ntilde;" "ñ"] ["&ograve;" "ò"] ["&oacute;" "ó"] ["&ocirc;" "ô"] ["&otilde;" "õ"] ["&ouml;" "ö"]
+          ["&divide;" "÷"] ["&oslash;" "ø"] ["&ugrave;" "ù"] ["&uacute;" "ú"] ["&ucirc;" "û"] ["&uuml;" "ü"] ["&yacute;" "ý"] ["&thorn;" "þ"] ["&yuml;" "ÿ"] ["&fnof;" "ƒ"]
+          ["&Alpha;" "Α"] ["&Beta;" "Β"] ["&Gamma;" "Γ"] ["&Delta;" "Δ"] ["&Epsilon;" "Ε"] ["&Zeta;" "Ζ"] ["&Eta;" "Η"] ["&Theta;" "Θ"] ["&Iota;" "Ι"] ["&Kappa;" "Κ"] ["&Lambda;" "Λ"] ["&Mu;" "Μ"] ["&Nu;" "Ν"] ["&Xi;" "Ξ"] ["&Omicron;" "Ο"] ["&Pi;" "Π"] ["&Rho;" "Ρ"] ["&Sigma;" "Σ"] ["&Tau;" "Τ"] ["&Upsilon;" "Υ"] ["&Phi;" "Φ"] ["&Chi;" "Χ"] ["&Psi;" "Ψ"] ["&Omega;" "Ω"] ["&alpha;" "α"] ["&beta;" "β"] ["&gamma;" "γ"] ["&delta;" "δ"] ["&epsilon;" "ε"] ["&zeta;" "ζ"] ["&eta;" "η"] ["&theta;" "θ"] ["&iota;" "ι"] ["&kappa;" "κ"] ["&lambda;" "λ"] ["&mu;" "μ"] ["&nu;" "ν"] ["&xi;" "ξ"] ["&omicron;" "ο"] ["&pi;" "π"] ["&rho;" "ρ"] ["&sigmaf;" "ς"] ["&sigma;" "σ"] ["&tau;" "τ"] ["&upsilon;" "υ"] ["&phi;" "φ"] ["&chi;" "χ"] ["&psi;" "ψ"] ["&omega;" "ω"] ["&thetasym;" "ϑ"] ["&upsih;" "ϒ"] ["&piv;" "ϖ"]
+          ["&bull;" "•"] ["&hellip;" "…"] ["&prime;" "′"] ["&Prime;" "″"] ["&oline;" "‾"] ["&frasl;" "⁄"] ["&weierp;" "℘"] ["&image;" "ℑ"] ["&real;" "ℜ"] ["&trade;" "™"] ["&alefsym;" "ℵ"] ["&larr;" "←"] ["&uarr;" "↑"] ["&rarr;" "→"] ["&darr;" "↓"] ["&harr;" "↔"] ["&crarr;" "↵"] ["&lArr;" "⇐"] ["&uArr;" "⇑"] ["&rArr;" "⇒"] ["&dArr;" "⇓"] ["&hArr;" "⇔"] ["&forall;" "∀"] ["&part;" "∂"] ["&exist;" "∃"] ["&empty;" "∅"] ["&nabla;" "∇"] ["&isin;" "∈"] ["&notin;" "∉"] ["&ni;" "∋"] ["&prod;" "∏"] ["&sum;" "∑"] ["&minus;" "−"] ["&lowast;" "∗"] ["&radic;" "√"] ["&prop;" "∝"] ["&infin;" "∞"] ["&ang;" "∠"] ["&and;" "∧"] ["&or;" "∨"] ["&cap;" "∩"] ["&cup;" "∪"] ["&int;" "∫"] ["&there4;" "∴"] ["&sim;" "∼"] ["&cong;" "≅"] ["&asymp;" "≈"] ["&ne;" "≠"] ["&equiv;" "≡"] ["&le;" "≤"] ["&ge;" "≥"] ["&sub;" "⊂"] ["&sup;" "⊃"] ["&nsub;" "⊄"] ["&sube;" "⊆"] ["&supe;" "⊇"] ["&oplus;" "⊕"] ["&otimes;" "⊗"] ["&perp;" "⊥"] ["&sdot;" "⋅"] ["&lceil;" "⌈"] ["&rceil;" "⌉"] ["&lfloor;" "⌊"] ["&rfloor;" "⌋"] ["&lang;" "〈"] ["&rang;" "〉"] ["&loz;" "◊"] ["&spades;" "♠"] ["&clubs;" "♣"] ["&hearts;" "♥"] ["&diams;" "♦"] ["&quot;" "\""] ["&OElig;" "Œ"] ["&oelig;" "œ"] ["&Scaron;" "Š"] ["&scaron;" "š"] ["&Yuml;" "Ÿ"] ["&circ;" "ˆ"] ["&tilde;" "˜"] ["&ndash;" "–"] ["&mdash;" "—"] ["&lsquo;" "‘"] ["&rsquo;" "’"] ["&sbquo;" "‚"] ["&ldquo;" "“"] ["&rdquo;" "”"] ["&bdquo;" "„"] ["&dagger;" "†"] ["&Dagger;" "‡"] ["&permil;" "‰"] ["&lsaquo;" "‹"] ["&rsaquo;" "›"] ["&euro;" "€"]
+          ]))
+    (save-restriction
+      (narrow-to-region @p1 @p2)
+      (let ( (case-fold-search nil))
+        (mapc
+         (lambda ($x)
+           (goto-char (point-min))
+           (while (search-forward (elt $x 0) nil t)
+             (replace-match (elt $x 1) "FIXEDCASE" "LITERAL")))
+         $replaceMap)))))
+
+(defun xah-html-replace-html-chars-to-entities (@begin @end &optional @entity-to-char-p)
+  "Replace HTML chars & < > to HTML entities on current line or selection.
+The string replaced are:
+ & ⇒ &amp;
+ < ⇒ &lt;
+ > ⇒ &gt;
+
+Print to message buffer occurrences of replacement (if any), with position.
+
+If `universal-argument' is called, the replacement direction is reversed.
+
+When called in lisp code, *begin *end are region begin/end positions. If entity-to-char-p is true, change entities to chars instead.
+
+See also: `xah-html-replace-html-named-entities', `xah-html-replace-html-chars-to-unicode'
+
+URL `http://ergoemacs.org/emacs/elisp_replace_html_entities_command.html'
+Version 2016-09-02"
+  (interactive
+   (list
+    ;; These are done separately here
+    ;; so that command-history will record these expressions
+    ;; rather than the values they had this time.
+    ;; 2016-07-06 note, if you add a else, it won't work
+    (if (use-region-p) (region-beginning))
+    (if (use-region-p) (region-end))
+    (if current-prefix-arg t nil)))
+
+  (if (null @begin) (setq @begin (line-beginning-position)))
+  (if (null @end) (setq @end (line-end-position)))
+
+  (let (($changedItems '())
+        ($findReplaceMap
+         (if @entity-to-char-p
+             ;; this to prevent creating a replacement sequence out of blue
+             [
+              ["&amp;" "&"] ["&lt;" "<"] ["&gt;" ">"]
+              ["&" "&"] ["<" "<"] [">" ">"]
+              ]
+           [ ["&" "&amp;"] ["<" "&lt;"] [">" "&gt;"] ]
+           )))
+    (save-excursion
+      (save-restriction
+        (narrow-to-region @begin @end)
+        (let ( (case-fold-search nil))
+          (mapc
+           (lambda ($x)
+             (goto-char (point-min))
+             (while (search-forward (elt $x 0) nil t)
+               (push (format "%s %s" (point) $x) $changedItems)
+               (replace-match (elt $x 1) "FIXEDCASE" "LITERAL")))
+           $findReplaceMap))))
+    (mapcar
+     (lambda ($x) (princ $x) (terpri))
+     (reverse $changedItems))))

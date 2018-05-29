@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: new-file-tpl-js
+# key: new-file-tpl-js
+# --
+#!/usr/bin/env node
+
+$0

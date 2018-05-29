@@ -696,6 +696,8 @@ def redis_bot(conversations, types, channel_control, channel_to,
 @argument("message")
 def send(conversation, message):
     ""
+    for user in config.slack.users.values():
+        message = message.replace("@" + user.name, "<@{}>".format(user.id))
     async_get(
         config.slack.rtm.write(
             {

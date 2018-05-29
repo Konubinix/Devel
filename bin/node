@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source "${KONIX_LIB_DIR}/lib_bash.sh"
+
+SECOND="$(konix_find_next_in_path.sh -n "$(my_name)" -f "${0}")"
+NODE_NO_READLINE=1 exec rlwrap -ppurple "${SECOND}" "$@"

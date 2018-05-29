@@ -33,11 +33,29 @@
    js2-basic-offset 4
    )
   (konix/prog/config)
+  (add-hook 'after-save-hook 'konix/js/make-executable t t)
   )
+
 
 (add-hook 'js-mode-hook
 		  'konix/js-mode-hook)
 
+
+(defun konix/js/make-executable ()
+  (when
+      (string=
+       "bin"
+       (file-name-base
+        (directory-file-name
+         (file-name-directory
+          (buffer-file-name)
+          )
+         )
+        )
+       )
+    (konix/make-executable)
+    )
+  )
 
 (provide '700-KONIX_javascript-mode)
 ;;; 700-KONIX_javascript-mode.el ends here

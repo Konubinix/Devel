@@ -202,6 +202,7 @@
 (add-to-list 'auto-mode-alist (cons "\\.js$" 'js2-mode))
 (add-to-list 'auto-mode-alist (cons "\\.java$" 'java-mode))
 (add-to-list 'auto-mode-alist (cons "\\.kv$" 'yaml-mode))
+(add-to-list 'auto-mode-alist (cons "Jenkinsfile$" 'groovy-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

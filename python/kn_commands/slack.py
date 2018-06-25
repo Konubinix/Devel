@@ -390,6 +390,18 @@ class SlackConfig():
             self._users = _users()
         return self._users
 
+    @property
+    def active_users(self):
+        return {
+            key: value
+            for key, value in self.users.items()
+            if (
+                    not value.data.get("deleted")
+                    and not value.data.get("is_bot")
+                    and not value.data.get("real_name") == "slackbot"
+            )
+        }
+
     def get_user(self, name_or_id):
         return [
             u

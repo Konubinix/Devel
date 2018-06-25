@@ -26,6 +26,8 @@ import pandas
 import hashlib
 from dateutil import parser
 
+from konix_time_helper import get_local_timezone
+
 import logging
 logging.basicConfig()
 LOGGER = logging.getLogger(__file__)
@@ -342,12 +344,15 @@ Attendees:
         @property
         def startdate(self):
             if self.start.get("dateTime"):
-                return dateutil.parser.parse(self.start.get("dateTime")
-                ).replace(tzinfo=datetime.timezone.utc)
+                date = dateutil.parser.parse(self.start.get("dateTime")
+                )
             else:
-                return dateutil.parser.parse(
+                date = dateutil.parser.parse(
                     self.start.get("date")
-                ).replace(tzinfo=datetime.timezone.utc)
+                )
+            if date.tzinfo is None:
+                date = date.replace(tzinfo=get_local_timezone())
+            return date
 
         @property
         def enddate(self):
@@ -792,7 +797,6 @@ Attendees:
                 url += "&timeMax={}T00:00:00Z".format(
                     self.time_max.strftime("%Y-%m-%d")
                 )
-
             req = urllib.request.Request(
                 url=url,
                 headers={"Content-Type": "application/json",

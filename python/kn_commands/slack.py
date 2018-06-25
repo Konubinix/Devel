@@ -624,16 +624,14 @@ def record_log(output_directory):
             oldest = None
         makedirs(output_directory_conversation)
         with open(os.path.join(
-                output_directory_conversation, "messages.txt"),
+                output_directory_conversation, "messages.json"),
                   "a",
                   encoding="utf-8"
         ) as message_file:
             now = datetime.datetime.now()
             for message in c.history(oldest=oldest):
-                message_file.write("{} - {} : {}\n".format(
-                    message.data["datetime"], message.data["username"],
-                    message.data["text"])
-                )
+                message_file.write(json.dumps(message.data))
+                message_file.write("\n")
         with open(last_record_file, "w", encoding="utf-8") as f:
             f.write("{}".format(now.strftime("%s")))
 

@@ -50,9 +50,24 @@ do
 	then
 	   git annex get --key "${sha}"
 	   annexobjectlocation="$(git annex contentlocation "${sha}")"
-	   dst="RESTORED/${lastname}"
-	   mkdir -p "$(dirname "${dst}")"
-	   ln -r -s "${annexobjectlocation}" "${dst}"
+	   dst="${lastname}"
+	   if [ "${dst}" == "" ]
+	   then
+		   dst="noname"
+	   fi
+	   while [ -e "$dst" ] || [ -L "$dst" ]
+	   do
+		   dst="$(mktemp -u "${dst}.XXXX")"
+	   done
+	   set -x
+	   DIR="$(dirname "${dst}")"
+	   if [ "${DIR}" != "" ]
+	   then
+		   mkdir -p "$(dirname "${dst}")"
+	   fi
+	   ln -v -r -s "${annexobjectlocation}" "${dst}"
+	   git annex metadata --set ack=restored --key="${sha}"
+	   set +x
 	fi
 done | {
 	if [ -n "${SORT}" ]

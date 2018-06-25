@@ -929,21 +929,25 @@ items"
 	)
   )
 
-(defun konix/org-agenda-skip-if-has-not-next-entry ()
-  (if (save-excursion
-		(catch 'found-next-entry
-		  (when (org-goto-first-child)
-			(when (string= "NEXT" (org-get-todo-state))
-			  (throw 'found-next-entry t)
-			  )
-			(while (org-get-next-sibling)
-			  (when (string= "NEXT" (org-get-todo-state))
-				(throw 'found-next-entry t)
-				)
-			  )
-			)
-		  )
-		)
+(defun konix/org-agenda-skip-if-not-waiting-nor-has-next-entry ()
+  (if (or
+       (member "WAIT" (org-get-tags))
+       (member "DELEGATED" (org-get-tags))
+       (save-excursion
+         (catch 'found-next-entry
+           (when (org-goto-first-child)
+             (when (string= "NEXT" (org-get-todo-state))
+               (throw 'found-next-entry t)
+               )
+             (while (org-get-next-sibling)
+               (when (string= "NEXT" (org-get-todo-state))
+                 (throw 'found-next-entry t)
+                 )
+               )
+             )
+           )
+         )
+       )
 	  (save-excursion (outline-next-heading) (1- (point)))
 	nil
 	)
@@ -1140,7 +1144,7 @@ items"
 				    	  "A project MUST have a NEXT entry")
 				    	 (org-agenda-tag-filter-preset nil)
 				    	 (org-agenda-skip-function
-				    	  'konix/org-agenda-skip-if-has-not-next-entry
+				    	  'konix/org-agenda-skip-if-not-waiting-nor-has-next-entry
 				    	  )
 				    	 )
 				    	)
@@ -1183,7 +1187,7 @@ items"
 				  (tags-todo "DELEGATED|WAIT//NEXT"
 				    		 (
 				    		  (org-agenda-overriding-header
-				    		   "If those waiting items are not blocking anymore, move them to TODO")
+				    		   "Check whether those items are still waiting for something")
 				    		  )
 				    		 )
 				  (tags "+project//-DONE-NOT_DONE"

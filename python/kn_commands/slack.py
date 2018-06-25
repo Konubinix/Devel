@@ -757,8 +757,8 @@ def ipython():
 @slack.command()
 @argument("name")
 def create_group(name):
-    resp = config.slack.groups.create(name).body
-    LOGGER.info("Group created with id {}".format(resp["id"]))
+    resp = config.slack.client.groups.create(name).body
+    LOGGER.info("Group created with id {}".format(resp["group"]["id"]))
 
 
 @slack.command()

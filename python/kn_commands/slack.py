@@ -113,7 +113,9 @@ class Conversation():
     @property
     def members_fmt(self):
         return ", ".join(
-            config.slack.users[u]["name"] for u in self.data["members"]
+            builtins.sorted(
+                config.slack.users[u]["name"] for u in self.data["members"]
+            )
         )
 
     @property

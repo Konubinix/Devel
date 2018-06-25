@@ -273,8 +273,12 @@ class Channels(Conversations):
 class User():
     def __init__(self, data):
         self.data = data
+        data["real_name"] = data.get("real_name", data["name"])
+        data["display_name"] = data["profile"].get("display_name", data["name"])
         self.id = data["id"]
         self.name = data["name"]
+        self.email = data["profile"].get("email")
+        data["email"] = self.email
 
     def __getitem__(self, item):
         return self.data[item]
@@ -446,14 +450,20 @@ class UserType(ParameterType):
     def complete(self, ctx, incomplete):
         return [
             user["name"] for user in config.slack.users.values()
-            if startswith(user["name"], incomplete)
+            if startswith(user.name, incomplete)
+            or (user.email and startswith(user.email, incomplete))
+            or startswith(user["real_name"], incomplete)
+            or startswith(user["display_name"], incomplete)
         ]
 
     def convert(self, value, param, ctx):
         try:
             return [
                 user for user in config.slack.users.values()
-                if user["name"] == value
+                if user.name == value
+                or (user.email and user.email == value)
+                or user["real_name"] == value
+                or user["display_name"] == value
             ][0]
         except (ValueError, UnicodeError):
             self.fail('%s is not a valid user name' % value, param, ctx)
@@ -491,16 +501,29 @@ def slack():
     choices=[
         'id',
         "name",
+        "real_name",
+        "email",
+        "deleted",
+        "is_bot",
     ],
     default=(
         "id",
         "name",
+        "email",
     )
 )
 @table_format()
-def users(fields, format):
+@option("--missing-in", type=ConversationType())
+def users(fields, format, missing_in):
+    users = config.slack.active_users
+    if missing_in:
+        keys = set(users) - set(missing_in.data["members"])
+        users = {
+            key: users[key]
+            for key in keys
+        }
     with TablePrinter(fields, format) as tp:
-        tp.echo_records(u.data for u in config.slack.users.values())
+        tp.echo_records(u.data for u in users.values())
 
 
 @slack.command()

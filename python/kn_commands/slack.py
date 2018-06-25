@@ -65,7 +65,7 @@ class Message():
         data["orig_text"] = data["text"]
         data["text"] = data["text"].replace("{", "{{").replace("}", "}}")
         data["text"] = re.sub("<@([^>|]+)([|][^>]+)?>", r"{\1}", data["text"])
-        data["date"] = datetime.datetime.fromtimestamp(float(data["ts"]))
+        self.date = datetime.datetime.fromtimestamp(float(data["ts"]))
         data["ts_str"] = "ts: " + data["ts"]
         data["text"] = data["text"].format(
             **{
@@ -82,7 +82,7 @@ class Message():
             self.data["datetime"], self.data["username"], self.data["text"])
 
     def __lt__(self, o):
-        return self.data["date"] < o.data["date"]
+        return self.date < o.date
 
 
 class Conversation():

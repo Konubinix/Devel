@@ -1,11 +1,5 @@
 #!/bin/bash
 
-if [ $# -gt 0 ] && [ "$1" == "--help" ]
-then
-	echo "${0}: TODO"
-	exit 0
-fi
-
 usage () {
     cat<<EOF
 $0 [-o output] input...
@@ -13,6 +7,12 @@ $0 [-o output] input...
 Really?
 EOF
 }
+
+if [ $# -gt 0 ] && [ "$1" == "--help" ]
+then
+	usage
+	exit 0
+fi
 
 set -eu
 OUTPUT=output.pdf

@@ -3,7 +3,7 @@
 import logging
 import subprocess
 import shlex
-import xmlrpclib
+from six.moves.xmlrpc_client import ServerProxy
 import os
 import sys
 logging.basicConfig(level=logging.DEBUG)
@@ -66,7 +66,7 @@ def send_to_phone(message, type_):
             ip, _ = p.communicate()
             p.wait()
             if ip:
-                server = xmlrpclib.ServerProxy("http://{}:9000/RPC2".format(ip))
+                server = ServerProxy("http://{}:9000/RPC2".format(ip))
                 server.notify(message, type_)
         except:
             main("Phone not available", duration=500, to_phone=False)

@@ -790,3 +790,58 @@ def set_conversation_topic(conversation, topic):
 @argument("user", type=UserType(), nargs=-1)
 def create_mpim(user):
     config.slack.client.mpim.open([u.id for u in user])
+
+
+@slack.command()
+@argument("conversation", type=ConversationType())
+@argument("url")
+@argument("title")
+@option("--subtitle")
+@option("--language", default="en")
+@argument("author-name")
+@argument("author-email")
+@argument("output-path")
+def rss(conversation,
+        url,
+        author_name,
+        author_email,
+        title,
+        subtitle,
+        language,
+        output_path):
+    from feedgen.feed import FeedGenerator
+    fg = FeedGenerator()
+    fg.id(url)
+    fg.title(title)
+    fg.author(
+        {
+            'name': author_name,
+            'email': author_email,
+        }
+    )
+    fg.link(
+        href=url,
+        rel='alternate'
+    )
+    if subtitle:
+        fg.subtitle(subtitle)
+    fg.language(language)
+    for message in conversation.history():
+        match = re.search(
+            "^.*<(?P<url>[^>|]+)\|?(?P<title>[^>]+)?>.*$",
+            message.data["text"],
+            flags=re.MULTILINE
+        )
+        if match is not None:
+            fe = fg.add_entry()
+            fe.id(match.group("url"))
+            fe.title(match.group("title") or match.group("url"))
+            fe.link(href=match.group("url"))
+            user = config.slack.get_user(message.data["user"])
+            author = {
+                "name": message.data["username"],
+                "email": user.email or "noemail",
+            }
+            fe.author(author)
+            fe.description(message.data["text"])
+    fg.rss_file(output_path)

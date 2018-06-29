@@ -4,10 +4,6 @@ ignore=dirty
 	# url = https://github.com/Konubinix/org-mode
 	url = https://code.orgmode.org/bzg/org-mode
 	# url = git://repo.or.cz/org-mode.git
-[submodule "lib/ftputil"]
-ignore=dirty
-	path = lib/ftputil
-	url = https://github.com/mafalb/python-ftputil.git
 [submodule "config/elfiles/w3m"]
 ignore=dirty
 	path = config/elfiles/w3m

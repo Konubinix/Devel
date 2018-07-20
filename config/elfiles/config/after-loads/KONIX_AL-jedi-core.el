@@ -29,5 +29,7 @@
   )
 (advice-add 'jedi:goto-definition :before #'konix/jedi:goto-definition/push-tag-mark)
 
+(setq-default jedi:complete-on-dot t)
+
 (provide 'KONIX_AL-jedi-core)
 ;;; KONIX_AL-jedi-core.el ends here

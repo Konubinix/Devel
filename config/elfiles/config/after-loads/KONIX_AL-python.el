@@ -40,7 +40,6 @@
 		)
   (when (require 'jedi nil t)
     (jedi:setup)
-    (setq-default jedi:complete-on-dot t)
    )
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
   )

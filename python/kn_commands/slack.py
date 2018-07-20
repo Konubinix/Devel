@@ -41,6 +41,8 @@ from click_project.completion import startswith
 from click_project.config import config
 from click_project.core import cache_disk
 
+from konix_time_helper import naive_to_local
+
 LOGGER = get_logger(__name__)
 
 
@@ -834,14 +836,26 @@ def rss(conversation,
         )
         if match is not None:
             fe = fg.add_entry()
-            fe.id(match.group("url"))
-            fe.title(match.group("title") or match.group("url"))
-            fe.link(href=match.group("url"))
+            link = match.group("url")
+            title = match.group("title") or link
+            date = naive_to_local(datetime.datetime.fromtimestamp(float(message.data["ts"])))
+            description = message.data["text"]
+            if "attachments" in message.data:
+                attachment = [a for a in message.data["attachments"] if
+                              a["title_link"] == link][0]
+                title += " | " + attachment["title"]
+                description += """
+
+""" + attachment["text"]
+            fe.id(link)
+            fe.title(title)
+            fe.link(href=link)
+            fe.published(date)
             user = config.slack.get_user(message.data["user"])
             author = {
                 "name": message.data["username"],
                 "email": user.email or "noemail",
             }
             fe.author(author)
-            fe.description(message.data["text"])
-    fg.rss_file(output_path)
+            fe.description(description)
+    fg.rss_file(output_path, pretty=True)

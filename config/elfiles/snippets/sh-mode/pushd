@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: pushd
+# key: pushd
+# --
+pushd "$1"
+{
+$>$0
+}
+popd

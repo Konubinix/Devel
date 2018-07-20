@@ -160,7 +160,7 @@ They can be relative or absolute
   (if (functionp 'flycheck-mode)
       (flycheck-mode t)
     (message "flycheck mode not installed")
-   )
+    )
   ;; highlight parentheses in prog
   (highlight-parentheses-mode 1)
   (auto-complete-mode t)

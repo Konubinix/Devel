@@ -33,16 +33,18 @@
   (setq indent-tabs-mode nil)
   (auto-complete-mode 1)
   (flycheck-select-checker 'python-flake8)
-  (setq ac-sources
-		'(
-		  ac-source-yasnippet
-		  )
-		)
   ;; this must be set prior to loading jedi for it influence the way jedi is initialized
-  (setq-default jedi:environment-root "jedi")
-  (when (require 'jedi nil t)
-    (jedi:setup)
-   )
+  (when (require 'lsp-python nil t)
+    (lsp-python-enable)
+    )
+  (setq ac-sources
+		(append '(
+                  ac-source-konix/python-lsp
+                  ac-source-yasnippet
+                  )
+                ac-sources
+                )
+		)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
   )
 (add-hook 'python-mode-hook

@@ -224,74 +224,115 @@
 	)
   )
 
+(defun konix/lsp-ac-candidates ()
+  (let* ((resp (lsp--send-request
+                (lsp--make-request
+                 "textDocument/completion"
+                 (lsp--text-document-position-params))))
+         (items (cond
+                 ((null resp) nil)
+                 ((hash-table-p resp) (gethash "items" resp nil))
+                 ((sequencep resp) resp))))
+    (setq items (mapcar #'lsp--make-completion-item items))
+    items
+    )
+  )
+
+(defun konix/lsp-prefix ()
+  (let* ((prefix-function (or (lsp--client-prefix-function
+                               (lsp--workspace-client lsp--cur-workspace))
+                              #'lsp--default-prefix-function))
+         (bounds (funcall prefix-function)))
+    (if bounds (car bounds)
+      (if (
+           (string=
+            (buffer-substring-no-properties (1- (point)) (point))
+            "."
+            )
+           )
+          (point)
+        )
+      )
+    )
+  )
+
+(ac-define-source konix/python-lsp
+  '(
+    (prefix . konix/lsp-prefix)
+    (candidates . konix/lsp-ac-candidates)
+    (symbol . "lsp")
+    (requires . 0)
+    )
+  )
+
 ;; **********************************************************************
 ;; c-mode
 ;; **********************************************************************
 (defvar konix/c/ac-project-files-directories '())
 (defun konix/c/ac-project-files-candidates ()
   (let
-	  (
-	   (konix/c/ac-project-files-directories
-		(or konix/c/ac-project-files-directories
-			(remove-if
-			 (lambda (elem)
-			   (equalp nil elem)
-			   )
-			 (mapcar
-			  (lambda (dir_name)
-				(konix/find-file-in-parents dir_name)
-				)
-			  '("Lib" "Extensions" ".")
-			  )
-			 )
-			)
-		)
-	   (prefix_dir (or (file-name-directory ac-prefix) ""))
-	   (prefix_file_name (file-name-nondirectory ac-prefix))
-	   (completions_ '())
-	   )
-	(mapcar
-	 (lambda (dir)
-	   (when (file-directory-p (expand-file-name prefix_dir dir))
-		 (let*(
-			   (dir_start (expand-file-name prefix_dir dir))
-			   (completions_no_dir (file-name-all-completions prefix_file_name
-															  dir_start))
-			   )
-		   (setq completions_
-				 (append
-				  completions_
-				  (mapcar
-				   (lambda (file)
-					 (concat prefix_dir file)
-					 )
-				   completions_no_dir
-				   )
-				  )
-				 )
-		   )
-		 )
-	   )
-	 konix/c/ac-project-files-directories
-	 )
-	completions_
-	)
+      (
+       (konix/c/ac-project-files-directories
+        (or konix/c/ac-project-files-directories
+            (remove-if
+             (lambda (elem)
+               (equalp nil elem)
+               )
+             (mapcar
+              (lambda (dir_name)
+                (konix/find-file-in-parents dir_name)
+                )
+              '("Lib" "Extensions" ".")
+              )
+             )
+            )
+        )
+       (prefix_dir (or (file-name-directory ac-prefix) ""))
+       (prefix_file_name (file-name-nondirectory ac-prefix))
+       (completions_ '())
+       )
+    (mapcar
+     (lambda (dir)
+       (when (file-directory-p (expand-file-name prefix_dir dir))
+         (let*(
+               (dir_start (expand-file-name prefix_dir dir))
+               (completions_no_dir (file-name-all-completions prefix_file_name
+                                                              dir_start))
+               )
+           (setq completions_
+                 (append
+                  completions_
+                  (mapcar
+                   (lambda (file)
+                     (concat prefix_dir file)
+                     )
+                   completions_no_dir
+                   )
+                  )
+                 )
+           )
+         )
+       )
+     konix/c/ac-project-files-directories
+     )
+    completions_
+    )
   )
 
 (defun konix/c/ac-prefix-in-include ()
   (if (looking-back "#include +[\"<]\\(.+\\)")
-	  (match-beginning 1)
-	)
+      (match-beginning 1)
+    )
   )
 
 (ac-define-source konix/c/project-files
   '(
-	(candidates . konix/c/ac-project-files-candidates)
+    (candidates . konix/c/ac-project-files-candidates)
     (prefix . konix/c/ac-prefix-in-include)
     (requires . 0)
     (action . ac-start)
     (limit . nil)
-	)
+    )
   )
 
 ;; ####################################################################################################
@@ -301,48 +342,48 @@
 
 (defun konix/rng/ac-prefix ()
   (when (looking-back
-		 konix/rng/ac-prefix nil t)
-	(match-beginning 1)
-	)
+         konix/rng/ac-prefix nil t)
+    (match-beginning 1)
+    )
   )
 
 (defun konix/rng/ac-candidates ()
   (konix/rng/ac-prefix)
   ;; initialize rng for completion
   (save-match-data
-	(rng-set-state-after (match-beginning 0))
-	)
+    (rng-set-state-after (match-beginning 0))
+    )
   (let (
-		(prefix (match-string-no-properties 1))
-		(rng-complete-target-names (rng-match-possible-start-tag-names))
-		)
-	(all-completions prefix 'rng-complete-qname-function)
-	)
+        (prefix (match-string-no-properties 1))
+        (rng-complete-target-names (rng-match-possible-start-tag-names))
+        )
+    (all-completions prefix 'rng-complete-qname-function)
+    )
   )
 
 (defun konix/rng/ac-action ()
   (insert ">")
   (save-excursion (nxml-finish-element))
   (let (
-		(beg (point))
-		(end (save-excursion
-			   (skip-syntax-forward "-")
-			   (point)
-			   ))
-		)
-	(delete-region beg end)
-	)
+        (beg (point))
+        (end (save-excursion
+               (skip-syntax-forward "-")
+               (point)
+               ))
+        )
+    (delete-region beg end)
+    )
   )
 
 (ac-define-source konix/rng
   '(
-	(prefix . konix/rng/ac-prefix)
-	(candidates . konix/rng/ac-candidates)
+    (prefix . konix/rng/ac-prefix)
+    (candidates . konix/rng/ac-candidates)
 
-	(symbol . "kr")
-	(requires . 0)
-	(action . konix/rng/ac-action)
-	)
+    (symbol . "kr")
+    (requires . 0)
+    (action . konix/rng/ac-action)
+    )
   )
 
 (provide 'KONIX_auto-complete)

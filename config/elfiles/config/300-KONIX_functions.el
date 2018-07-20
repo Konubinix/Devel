@@ -74,12 +74,17 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
   )
 
 (defun konix/time-string-to-hours (timestring)
-  (if (string-match "\\([0-9]+\\):\\([0-9]+\\)" timestring)
+  (if (string-match "\\(\\([0-9]+\\)d \\)?\\([0-9]+\\):\\([0-9]+\\)" timestring)
 	  (let* (
-			 (hours (string-to-int (match-string-no-properties 1 timestring)))
-			 (minutes (string-to-int (match-string-no-properties 2 timestring)))
+			 (days (string-to-number (or
+                                   (match-string-no-properties 2 timestring)
+                                   "0"
+                                   )))
+			 (hours (string-to-number (match-string-no-properties 3 timestring)))
+			 (minutes (string-to-number (match-string-no-properties 4 timestring)))
 			 (minutes_hour_fraction (/ minutes 60.0))
-			 (new_hour (+ hours minutes_hour_fraction))
+			 (days_to_hour (* days 24))
+			 (new_hour (+ days_to_hour hours minutes_hour_fraction))
 			 )
 		new_hour
 		)

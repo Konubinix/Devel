@@ -38,6 +38,8 @@
 		  ac-source-yasnippet
 		  )
 		)
+  ;; this must be set prior to loading jedi for it influence the way jedi is initialized
+  (setq-default jedi:environment-root "jedi")
   (when (require 'jedi nil t)
     (jedi:setup)
    )

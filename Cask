@@ -64,6 +64,7 @@
 (depends-on "orgalist")
 (depends-on "lsp-mode")
 (depends-on "lsp-python")
+(depends-on "lsp-javascript-typescript")
 (depends-on "lsp-ui")
 (depends-on "cquery")
 (depends-on "ivy-xref")

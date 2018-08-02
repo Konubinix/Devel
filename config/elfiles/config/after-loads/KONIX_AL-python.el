@@ -39,10 +39,9 @@
     )
   (setq ac-sources
 		(append '(
-                  ac-source-konix/python-lsp
+                  ac-source-konix/lsp
                   ac-source-yasnippet
                   )
-                ac-sources
                 )
 		)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)

@@ -224,6 +224,8 @@
 	)
   )
 
+;; LSP
+
 (defun konix/lsp-ac-candidates ()
   (let* ((resp (lsp--send-request
                 (lsp--make-request
@@ -244,11 +246,9 @@
                               #'lsp--default-prefix-function))
          (bounds (funcall prefix-function)))
     (if bounds (car bounds)
-      (if (
-           (string=
-            (buffer-substring-no-properties (1- (point)) (point))
-            "."
-            )
+      (if (string=
+           (buffer-substring-no-properties (1- (point)) (point))
+           "."
            )
           (point)
         )
@@ -256,12 +256,12 @@
     )
   )
 
-(ac-define-source konix/python-lsp
+(ac-define-source konix/lsp
   '(
     (prefix . konix/lsp-prefix)
     (candidates . konix/lsp-ac-candidates)
     (symbol . "lsp")
-    (requires . 0)
+    (requires . 3)
     )
   )
 

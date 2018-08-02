@@ -37,7 +37,14 @@
   )
 
 (defcustom konix/prog/toggle-source-header-src-directories
-  (list "./" "../src/" "../*/src/" "../../*/src/")
+  (list
+   "./"
+   "../src/"
+   "../*/src/"
+   "../../*/src/"
+   "../Source/"
+   "../*/Source/"
+   "../../*/Source/")
   "A list of directories used to search in for a source file
 They can be relative or absolute an can contain wildcards
 "
@@ -46,12 +53,16 @@ They can be relative or absolute an can contain wildcards
   )
 
 (defcustom konix/prog/toggle-source-header-hdr-directories
-  (list "./" "../include/"
-		"../../include/"
-		"/usr/include"
-		"/usr/local/include/"
-		"/include"
-		)
+  (list
+   "./"
+   "../include/"
+   "../../include/"
+   "../Include/"
+   "../../Include/"
+   "/usr/include"
+   "/usr/local/include/"
+   "/include"
+   )
   "A list of directories used to search in for a header file
 They can be relative or absolute
 "

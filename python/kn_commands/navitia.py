@@ -55,6 +55,16 @@ class AttrDict(dict):
         self.__dict__ = self
 
 
+def extract_vehicle_journey_id(links):
+    try:
+        return [
+            link["id"] for link in links
+            if link["type"] == "vehicle_journey"
+        ][0]
+    except IndexError:
+        return None
+
+
 def get_navitia_key():
     values = get_authenticator(f"navitia_{config.navitia.coverage}_key", required=False, askpass=False)
     if values is not None:
@@ -66,11 +76,7 @@ def get_navitia_key():
 class HasVehicleJourneyMixin:
     @property
     def vehicle_journey_id(self):
-        id = [
-            l for l in self.links
-            if l['type'] == "vehicle_journey"
-        ][0]["id"]
-        return id
+        return extract_vehicle_journey_id(self.links)
 
     @property
     def vehicle_journey(self):
@@ -223,6 +229,25 @@ class Disruption:
         for stop in self.impacted_stops:
             stop["stop_point"] = StopPoint(**stop["stop_point"])
         self.impacted_pt_object = self.impacted_objects[0]["pt_object"]
+        self.application_periods = [
+            {
+                "begin": parsetime(application_period["begin"]),
+                "end": parsetime(application_period["end"]),
+            }
+            for application_period in self.application_periods
+        ]
+
+    def format_stop(self, stop_id):
+        stop = [
+            s
+            for s in self.impacted_objects[0]["impacted_stops"]
+            if s["stop_point"].id == stop_id
+        ][0]
+        return f"""Impact:
+cause: {stop["cause"]}
+{stop["base_arrival_time"]} -> {stop["base_departure_time"]}
+{stop["amended_arrival_time"]} -> {stop["amended_departure_time"]} ({stop["arrival_status"]}, {stop["stop_time_effect"]}, {stop["departure_status"]})
+"""
 
     def format_impact(self):
         res = ""
@@ -250,21 +275,42 @@ class VehicleJourney:
     disruptions:str
     calendars:str = None
 
-    def format_impact(self):
-        res = self.id + "\n"
-        res += self.disruption.format_impact()
-        return res
+    def __post_init__(self):
+        for st in self.stop_times:
+            st["arrival_time_today"] = parsetime(datetime.datetime.now().strftime("%Y%m%dT") + st["arrival_time"])
+            st["departure_time_today"] = parsetime(datetime.datetime.now().strftime("%Y%m%dT") + st["departure_time"])
+            st["stop_point"] = StopPoint(**st["stop_point"])
 
     @property
     def disruption(self):
-        try:
-            return next(self.disruptions_)
-        except StopIteration:
-            return None
+        disruptions = [
+            d for d in self.disruptions_
+            if d.application_periods[0]["begin"] <= self.stop_times[-1]["departure_time_today"]
+            and self.stop_times[0]["arrival_time_today"] <= d.application_periods[0]["end"]
+        ]
+        if disruptions:
+            return disruptions[0]
+        return None
+
+    def format_impact(self):
+        res = self.id + "\n"
+        disruption = self.disruption
+        for st in self.stop_times:
+            sp = st["stop_point"]
+            trainstation_info = sp.format_trainstation(self.trip["name"])
+            res += f"""{sp.name}
+ {trainstation_info}
+{st["arrival_time_today"].strftime("%m/%d %H:%M")} -> {st["departure_time_today"].strftime("%m/%d %H:%M")}
+"""
+            if disruption:
+                res += disruption.format_stop(sp.id)
+            res += """
+"""
+        return res
 
     @property
     def stop_points(self):
-        return [StopPoint(**time["stop_point"]) for time in self.stop_times]
+        return [time["stop_point"] for time in self.stop_times]
 
     @property
     def disruptions_(self):
@@ -299,6 +345,11 @@ class StopPoint:
         "42": "auvergne-rhone-alpes",
         "83": "paca",
     })
+    address: str = None
+
+    def format_trainstation(self, trip_name):
+        trainstation_info = self.trainstation_info.get(trip_name, {})
+        return f"""quay: {trainstation_info.get("quay", "N/A")}, prob: {trainstation_info.get("problem", "N/A")}"""
 
     @property
     def region(self):
@@ -324,13 +375,13 @@ class StopPoint:
                 if row.get("class") == ["problem"]:
                     res[number.text.strip()]["problem"] = row.text.strip()
                     continue
-                hour, destination, glass, number, mode, quay = row.find_all("td")
+                hour, destination, glass, number, mode, *quay = row.find_all("td")
                 res[number.text.strip()] = {
                     "hour": hour.text.strip(),
                     "destination": destination.text.strip(),
                     "number": number.text.strip(),
                     "mode": mode.text.strip(),
-                    "quay": quay.text.strip(),
+                    "quay": ", ".join([q.text.strip() for q in quay]),
                 }
             return res
 
@@ -347,7 +398,7 @@ class StopPoint:
         return [
             StopSchedule(**item)
             for item in
-            config.navitia.get(f"stop_areas/{self.id}/stop_schedules").json()["stop_schedules"]
+            config.navitia.get(f"stop_areas/{self.id}/stop_schedules?data_freshness=realtime").json()["stop_schedules"]
         ]
 
 
@@ -360,9 +411,44 @@ class Stop(HasVehicleJourneyMixin):
     stop_date_time: dict
 
     @property
+    def way_schedules(self):
+        return [
+            {
+                "stop_point": row.stop_point,
+                "dt": date_time,
+            }
+            for schedule in self.route.schedules
+            for row in schedule.rows
+            for date_time in row.date_times
+            if extract_vehicle_journey_id(date_time["links"]) == self.vehicle_journey_id
+        ]
+
+    @property
+    def format_way_schedules(self):
+        res = ""
+        disruption = self.disruption
+        for ws in self.way_schedules:
+            trainstation_info = ws['stop_point'].format_trainstation(self.vehicle_journey.trip["name"])
+            res += f"""{ws["stop_point"].name}
+  {trainstation_info}
+{parsetime(ws["dt"]["base_date_time"]).strftime("%m/%d %H:%M")} ({parsetime(ws["dt"]["date_time"]).strftime("%m/%d %H:%M")})
+"""
+
+            if disruption is not None:
+                res += disruption.format_stop(ws["stop_point"].id)
+            res += """
+"""
+        return res
+
+    @property
     def disruption(self):
-        disruption = self.vehicle_journey.disruption
-        if disruption is not None:
+        disruptions = [
+            d for d in self.vehicle_journey.disruptions_
+            if d.application_periods[0]["begin"] <= self.stop_date_time["departure_date_time"]
+            and self.stop_date_time["arrival_date_time"] <= d.application_periods[0]["end"]
+        ]
+        if disruptions:
+            disruption = disruptions[0]
             return [
                 impact for impact in disruption.impacted_stops
                 if impact["stop_point"].id == self.stop_point.id
@@ -384,8 +470,8 @@ class Stop(HasVehicleJourneyMixin):
     def format(self):
         res = f"""{self.display_informations.direction}
 quay: {self.quay}, prob: {self.problem}, vehicle: {self.vehicle_journey.id}
-{self.stop_date_time['base_arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['arrival_date_time'].strftime("%m/%d %H:%M")}
-{self.stop_date_time['base_departure_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['departure_date_time'].strftime("%m/%d %H:%M")}
+{self.stop_date_time['base_arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['base_departure_date_time'].strftime("%m/%d %H:%M")}
+{self.stop_date_time['arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['departure_date_time'].strftime("%m/%d %H:%M")}
 """
         disruption = self.disruption
         if disruption is not None:
@@ -749,6 +835,18 @@ def departures(stop, to):
 @option("--from", "from_", type=StopParameterType())
 def arrivals(stop, from_):
     print(stop.stop_area.format_arrivals(from_=from_))
+
+
+@navitia.command()
+@argument("journey")
+@argument("stop", type=StopParameterType())
+def way_impact(journey, stop):
+    d = [
+        dep
+        for dep in stop.stop_area.departures
+        if dep.vehicle_journey.id == journey
+    ][0]
+    print(d.format_way_schedules)
 
 
 @navitia.command()

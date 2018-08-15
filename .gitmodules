@@ -282,9 +282,6 @@ ignore=dirty
 [submodule "pickups"]
 	path = pickups
 	url = https://github.com/mtomwing/pickups
-[submodule "stream2chromecast"]
-	path = stream2chromecast
-	url = https://github.com/Pat-Carter/stream2chromecast
 [submodule "cask"]
 	path = cask
 	url = https://github.com/cask/cask.git

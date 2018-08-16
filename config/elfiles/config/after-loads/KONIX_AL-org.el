@@ -3295,5 +3295,7 @@ an error (this should never happen)."
    )
   )
 
+(setq-default org-babel-python-command "python3")
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

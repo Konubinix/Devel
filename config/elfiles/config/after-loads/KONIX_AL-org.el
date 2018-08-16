@@ -34,6 +34,8 @@
 (require 'org-expiry)
 (require 'org-collector)
 (require 'holidays)
+(require 'ob-python)
+(require 'ob-shell)
 
 (setq-default org--matcher-tags-todo-only nil)
 

@@ -68,3 +68,4 @@
 (depends-on "lsp-ui")
 (depends-on "cquery")
 (depends-on "ivy-xref")
+(depends-on "htmlize")

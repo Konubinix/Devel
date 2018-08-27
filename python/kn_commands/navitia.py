@@ -15,6 +15,7 @@ import asyncio
 import base64
 from requests.exceptions import HTTPError
 import requests
+from fuzzywuzzy import fuzz
 from dataclasses import dataclass, field
 import requests
 
@@ -346,45 +347,55 @@ class StopPoint:
     })
     address: str = None
 
+    @property
+    def tvs(self):
+        return self.info_gare["fields"]["tvs"]
+
+    @property
+    def info_gare(self):
+        @cache_disk(expire=3600*24*365)
+        def _get_referentiel_gares_voyageurs():
+            url = "https://ressources.data.sncf.com/explore/dataset/referentiel-gares-voyageurs/download?format=json"
+            LOGGER.info(f"Getting {url}")
+            r = requests.get(url)
+            return json.loads(r.content)
+
+        @cache_disk(expire=3600*24*365)
+        def _get_info_gare(name):
+            return builtins.max(
+                _get_referentiel_gares_voyageurs(),
+                key=lambda e: fuzz.ratio(
+                    e["fields"]["intitule_plateforme"],
+                    name
+                )
+            )
+        return _get_info_gare(self.name)
+
     def format_trainstation(self, trip_name):
         trainstation_info = self.trainstation_info.get(trip_name, {})
         return f"""quay: {trainstation_info.get("quay", "N/A")}, prob: {trainstation_info.get("problem", "N/A")}"""
 
     @property
-    def region(self):
-        if self.administrative_regions is None:
-            self.administrative_regions = config.navitia.get(f"stop_points/{self.id}").json()["stop_points"][0]["administrative_regions"]
-        return self.zip_codes_to_regions[self.administrative_regions[0]["zip_code"][:2]]
-
-    @property
     def trainstation_info(self):
-        match = re.match("^stop_point:OCE:SP:.+-(.+)$", self.id)
-        if match is None:
-            return {}
-
-        @cache_disk(expire=300)
-        def _trainstation_info(id, name, region):
-            url = f"https://www.ter.sncf.com/{region}/gares/{id}/{name}/prochains-departs"
+        @cache_disk(expire=60)
+        def _get_trainstation_info(tvs):
+            url = f"https://www.gares-sncf.com/fr/train-times/{tvs}/departure"
             LOGGER.info(f"Getting {url}")
             r = requests.get(url)
-            s = soup(r.content, "lxml")
-            res = {}
-            rows = s.find(attrs={"class":"train_depart_table"}).find("tbody")
-            for row in rows.find_all("tr"):
-                if row.get("class") == ["problem"]:
-                    res[number.text.strip()]["problem"] = row.text.strip()
-                    continue
-                hour, destination, glass, number, mode, *quay = row.find_all("td")
-                res[number.text.strip()] = {
-                    "hour": hour.text.strip(),
-                    "destination": destination.text.strip(),
-                    "number": number.text.strip(),
-                    "mode": mode.text.strip(),
-                    "quay": ", ".join([q.text.strip() for q in quay]),
-                }
-            return res
+            trains = json.loads(r.content)["trains"]
+            return {
+                train["num"]: {
+                    **train,
+                    "hour": train["heure"],
+                    "destination": train["origdest"],
+                    "number": train["num"],
+                    "mode": train["type"],
+                    "quay": train["voie"],
 
-        return _trainstation_info(match.group(1), self.name.split(" ")[0], self.region)
+                }
+                for train in trains
+            }
+        return _get_trainstation_info(self.tvs)
 
     @property
     def _stop_area(self):

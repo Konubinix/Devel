@@ -19,8 +19,6 @@ from dataclasses import dataclass, field
 import requests
 
 from bs4 import BeautifulSoup as soup
-import asyncio_redis
-import websockets
 import click
 import parsedatetime
 
@@ -338,6 +336,7 @@ class StopPoint:
     commercial_modes:str = None
     administrative_regions:str = None
     physical_modes:str = None
+    fare_zone:str = None
     zip_codes_to_regions: str = field(default_factory=lambda: {
         "01": "auvergne-rhone-alpes",
         "38": "auvergne-rhone-alpes",

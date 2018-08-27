@@ -357,7 +357,7 @@ class StopPoint:
         @cache_disk(expire=3600*24*365)
         def _get_referentiel_gares_voyageurs():
             url = "https://ressources.data.sncf.com/explore/dataset/referentiel-gares-voyageurs/download?format=json"
-            LOGGER.info(f"Getting {url}")
+            LOGGER.debug(f"Getting {url}")
             r = requests.get(url)
             return json.loads(r.content)
 
@@ -381,7 +381,7 @@ class StopPoint:
         @cache_disk(expire=60)
         def _get_trainstation_info(tvs):
             url = f"https://www.gares-sncf.com/fr/train-times/{tvs}/departure"
-            LOGGER.info(f"Getting {url}")
+            LOGGER.debug(f"Getting {url}")
             r = requests.get(url)
             trains = json.loads(r.content)["trains"]
             return {
@@ -715,7 +715,7 @@ class NavitiaConfig:
                 path += "?"
             path += parameters
             url = f"https://api.navitia.io/v1/coverage/{self.coverage}/{path}"
-            LOGGER.info(f"Getting {url}")
+            LOGGER.debug(f"Getting {url}")
             return requests.get(
                 url,
                 headers={"Authorization": self.key})

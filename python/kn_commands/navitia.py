@@ -386,12 +386,16 @@ class StopPoint:
             return {
                 train["num"]: {
                     **train,
+                    "problem": ", ".join([
+                        train[key]
+                        for key in ["etat", "retard", "infos"]
+                        if train[key] != ""
+                    ]) or None,
                     "hour": train["heure"],
                     "destination": train["origdest"],
                     "number": train["num"],
                     "mode": train["type"],
                     "quay": train["voie"],
-
                 }
                 for train in trains
             }

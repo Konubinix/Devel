@@ -293,6 +293,7 @@ class VehicleJourney:
 
     def format_impact(self):
         res = self.id + "\n"
+        res += self.trip["name"] + "\n"
         disruption = self.disruption
         for st in self.stop_times:
             sp = st["stop_point"]

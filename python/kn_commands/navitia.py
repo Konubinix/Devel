@@ -472,7 +472,17 @@ class Stop(HasVehicleJourneyMixin):
 
     @property
     def trainstation_info(self):
-        return self.stop_point.trainstation_info.get(self.display_informations["headsign"], {})
+        headsign = int(self.display_informations["headsign"])
+        # the headsign from display_informations may differ from the one given
+        # in the trainstation_info, due to
+        # http://maligne-ter.com/st-etienne-lyon/la-numerotation-des-trains-pair-ou-impair/
+        # . Either navitia, or sncf did it wrong, but I can't tell yet
+        odd = lambda x: x % 2 == 1
+        even = lambda x: x % 2 == 0
+        even_headsign = str(headsign if even(headsign) else headsign - 1)
+        odd_headsign = str(headsign if odd(headsign) else headsign + 1)
+        ti = self.stop_point.trainstation_info
+        return ti.get(even_headsign) or ti.get(odd_headsign) or {}
 
     @property
     def quay(self):

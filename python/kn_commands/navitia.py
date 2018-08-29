@@ -740,6 +740,9 @@ class NavitiaConfig:
             for it in self.get(f"journeys?from={from_.id}&to={to.id}&data_freshness=realtime").json()["journeys"]
         ]
 
+    def vehicle_journey(self, journey):
+        return VehicleJourney(**self.get(f"vehicle_journeys/{journey}").json()["vehicle_journeys"][0])
+
     def place(self, q, embedded_types=[]):
         return self.places(q, embedded_types)[0]
 
@@ -878,7 +881,7 @@ def way_impact(journey, stop):
 @argument("journey")
 def vehicle_journey_impact(journey):
     print(
-        VehicleJourney(**config.navitia.get(f"vehicle_journeys/{journey}").json()["vehicle_journeys"][0]).format_impact()
+        config.navitia.vehicle_journey(journey).format_impact()
     )
 
 

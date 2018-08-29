@@ -563,12 +563,17 @@ class StopArea:
                     res.append(arrival)
         return res
 
-    def format_departures(self, to=None):
+    def format_departures(self, to=None, after=None):
         if to is not None:
             departures = self.departures_going_to(to)
         else:
             departures = self.departures
         res = ""
+        if after:
+            departures = [
+                d for d in departures
+                if d.stop_date_time["departure_date_time"] > after
+            ]
         for departure in departures:
             res += departure.format() + "\n"
         return res
@@ -854,8 +859,11 @@ def impact(from_, to):
 @navitia.command()
 @argument("stop", type=StopParameterType())
 @option("--to", type=StopParameterType())
-def departures(stop, to):
-    print(stop.stop_area.format_departures(to=to))
+@option("--after")
+def departures(stop, to, after):
+    if after:
+        after = parsetime(after)
+    print(stop.stop_area.format_departures(to=to, after=after))
 
 
 @navitia.command()

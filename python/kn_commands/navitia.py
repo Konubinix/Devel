@@ -82,8 +82,8 @@ class HasVehicleJourneyMixin:
         x = config.navitia.get(f"vehicle_journeys/{self.vehicle_journey_id}").json()["vehicle_journeys"][0]
         return VehicleJourney(**x)
 
-    def format_impact(self):
-        return self.vehicle_journey.format_impact()
+    def format_impact(self, stop_point_ids=None):
+        return self.vehicle_journey.format_impact(stop_point_ids)
 
 
 @dataclass
@@ -224,7 +224,7 @@ class Disruption:
     messages: str = ""
 
     def __post_init__(self):
-        self.impacted_stops = self.impacted_objects[0]["impacted_stops"]
+        self.impacted_stops = self.impacted_objects[0].get("impacted_stops", [])
         for stop in self.impacted_stops:
             stop["stop_point"] = StopPoint(**stop["stop_point"])
         self.impacted_pt_object = self.impacted_objects[0]["pt_object"]
@@ -236,6 +236,14 @@ class Disruption:
             for application_period in self.application_periods
         ]
 
+    def disrupt(self, stop_id):
+        stop = [
+            s
+            for s in self.impacted_objects[0]["impacted_stops"]
+            if s["stop_point"].id == stop_id
+        ][0]
+        return stop["cause"] or stop["base_arrival_time"] != stop["amended_arrival_time"] or stop["amended_departure_time"] != stop["base_departure_time"]
+
     def format_stop(self, stop_id):
         stop = [
             s
@@ -243,9 +251,9 @@ class Disruption:
             if s["stop_point"].id == stop_id
         ][0]
         return f"""Impact:
-cause: {stop["cause"]}
-{stop["base_arrival_time"]} -> {stop["base_departure_time"]}
-{stop["amended_arrival_time"]} -> {stop["amended_departure_time"]} ({stop["arrival_status"]}, {stop["stop_time_effect"]}, {stop["departure_status"]})
+  cause: {stop["cause"]}
+  {stop["base_arrival_time"]} -> {stop["base_departure_time"]}
+  {stop["amended_arrival_time"]} -> {stop["amended_departure_time"]} ({stop["arrival_status"]}, {stop["stop_time_effect"]}, {stop["departure_status"]})
 """
 
     def format_impact(self):
@@ -291,21 +299,39 @@ class VehicleJourney:
             return disruptions[0]
         return None
 
-    def format_impact(self):
-        res = self.id + "\n"
-        res += self.trip["name"] + "\n"
+    def format_impact(self, stop_point_ids=None):
         disruption = self.disruption
+        res = ""
         for st in self.stop_times:
             sp = st["stop_point"]
+            if stop_point_ids is not None and sp.id not in stop_point_ids:
+                continue
+            res += self._format_stop_impact(disruption, st, sp)
+        return res
+
+    def _format_stop_impact(self, disruption, st, sp):
+        trainstation_info = ""
+        if sp.trainstation_info.get(self.trip["name"], {}).get("problem"):
             trainstation_info = sp.format_trainstation(self.trip["name"])
-            res += f"""{sp.name}
- {trainstation_info}
-{st["arrival_time_today"].strftime("%m/%d %H:%M")} -> {st["departure_time_today"].strftime("%m/%d %H:%M")}
+        disruption_info = ""
+        if disruption and disruption.disrupt(sp.id):
+            disruption_info = f"""Hours: {st["arrival_time_today"].strftime("%m/%d %H:%M")} -> {st["departure_time_today"].strftime("%m/%d %H:%M")}\n"""
+            disruption_info += disruption.format_stop(sp.id)
+        if disruption_info or trainstation_info:
+            return f"""{sp.name}
+Trainstation info: {trainstation_info or "N/A"}
+{disruption_info}
 """
-            if disruption:
-                res += disruption.format_stop(sp.id)
-            res += """
-"""
+        return ""
+
+    def format_legacy_impact(self, last_stop_point_id):
+        disruption = self.disruption
+        res = ""
+        for st in self.stop_times:
+            sp = st["stop_point"]
+            if sp.id == last_stop_point_id:
+                break
+            res += self._format_stop_impact(disruption, st, sp)
         return res
 
     @property
@@ -374,7 +400,7 @@ class StopPoint:
 
     def format_trainstation(self, trip_name):
         trainstation_info = self.trainstation_info.get(trip_name, {})
-        return f"""quay: {trainstation_info.get("quay", "N/A")}, prob: {trainstation_info.get("problem", "N/A")}"""
+        return f"""num: {trainstation_info.get("number")}, quay: {trainstation_info.get("quay", "N/A")}, prob: {trainstation_info.get("problem", "N/A")}"""
 
     @property
     def trainstation_info(self):
@@ -383,6 +409,8 @@ class StopPoint:
             url = f"https://www.gares-sncf.com/fr/train-times/{tvs}/departure"
             LOGGER.debug(f"Getting {url}")
             r = requests.get(url)
+            if r.content == b'""':
+                return {}
             trains = json.loads(r.content)["trains"]
             return {
                 train["num"]: {
@@ -417,14 +445,70 @@ class StopPoint:
         ]
 
 
-@dataclass
-class Stop(HasVehicleJourneyMixin):
-    display_informations: str
-    stop_point: dict
-    route: dict
-    links: list
-    stop_date_time: dict
+class HasTrainstationInfo:
+    def post_init_trainstation_info(self):
+        self.display_informations = AttrDict(self.display_informations)
+        for key in ("base_arrival_date_time", "base_departure_date_time", "arrival_date_time", "departure_date_time"):
+            try:
+                self.stop_date_time[key] = parsetime(self.stop_date_time[key])
+            except KeyError:
+                pass
 
+    @property
+    def trainstation_info(self):
+        headsign = int(self.display_informations["headsign"])
+        # the headsign from display_informations may differ from the one given
+        # in the trainstation_info, due to
+        # http://maligne-ter.com/st-etienne-lyon/la-numerotation-des-trains-pair-ou-impair/
+        # . Either navitia, or sncf did it wrong, but I can't tell yet
+        odd = lambda x: x % 2 == 1
+        even = lambda x: x % 2 == 0
+        even_headsign = str(headsign if even(headsign) else headsign - 1)
+        odd_headsign = str(headsign if odd(headsign) else headsign + 1)
+        ti = self.stop_point.trainstation_info
+        return ti.get(even_headsign) or ti.get(odd_headsign) or {}
+
+    @property
+    def quay(self):
+        return self.trainstation_info.get("quay", "N/A")
+
+    @property
+    def problem(self):
+        return self.trainstation_info.get("problem", "N/A")
+
+    @property
+    def train_number(self):
+        return self.trainstation_info.get("number", "N/A")
+
+    @property
+    def trainstation_str(self):
+        return self.stop_point.format_trainstation(self.display_informations["headsign"])
+
+    def format_stop(self):
+        res = f"""Dest: {self.display_informations.direction}
+num: {self.train_number}, quay: {self.quay}, prob: {self.problem}, vehicle: {self.vehicle_journey.id}
+{self.stop_date_time['base_arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['base_departure_date_time'].strftime("%m/%d %H:%M")}
+{self.stop_date_time['arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['departure_date_time'].strftime("%m/%d %H:%M")}
+"""
+        return res
+
+    @property
+    def disruption(self):
+        disruptions = [
+            d for d in self.vehicle_journey.disruptions_
+            if d.application_periods[0]["begin"] <= self.stop_date_time["departure_date_time"]
+            and self.stop_date_time["arrival_date_time"] <= d.application_periods[0]["end"]
+        ]
+        if disruptions:
+            disruption = disruptions[0]
+            return [
+                impact for impact in disruption.impacted_stops
+                if impact["stop_point"].id == self.stop_point.id
+            ][0]
+        return None
+
+
+class HasWaySchedules:
     @property
     def way_schedules(self):
         return [
@@ -455,64 +539,22 @@ class Stop(HasVehicleJourneyMixin):
 """
         return res
 
-    @property
-    def disruption(self):
-        disruptions = [
-            d for d in self.vehicle_journey.disruptions_
-            if d.application_periods[0]["begin"] <= self.stop_date_time["departure_date_time"]
-            and self.stop_date_time["arrival_date_time"] <= d.application_periods[0]["end"]
-        ]
-        if disruptions:
-            disruption = disruptions[0]
-            return [
-                impact for impact in disruption.impacted_stops
-                if impact["stop_point"].id == self.stop_point.id
-            ][0]
-        return None
 
-    @property
-    def trainstation_info(self):
-        headsign = int(self.display_informations["headsign"])
-        # the headsign from display_informations may differ from the one given
-        # in the trainstation_info, due to
-        # http://maligne-ter.com/st-etienne-lyon/la-numerotation-des-trains-pair-ou-impair/
-        # . Either navitia, or sncf did it wrong, but I can't tell yet
-        odd = lambda x: x % 2 == 1
-        even = lambda x: x % 2 == 0
-        even_headsign = str(headsign if even(headsign) else headsign - 1)
-        odd_headsign = str(headsign if odd(headsign) else headsign + 1)
-        ti = self.stop_point.trainstation_info
-        return ti.get(even_headsign) or ti.get(odd_headsign) or {}
-
-    @property
-    def quay(self):
-        return self.trainstation_info.get("quay", "N/A")
-
-    @property
-    def problem(self):
-        return self.trainstation_info.get("problem", "N/A")
-
-    def format(self):
-        res = f"""{self.display_informations.direction}
-quay: {self.quay}, prob: {self.problem}, vehicle: {self.vehicle_journey.id}
-{self.stop_date_time['base_arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['base_departure_date_time'].strftime("%m/%d %H:%M")}
-{self.stop_date_time['arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['departure_date_time'].strftime("%m/%d %H:%M")}
-"""
-        disruption = self.disruption
-        if disruption is not None:
-            res += f"""Impact:
-cause: {disruption["cause"]}
-{disruption["base_arrival_time"]} -> {disruption["base_departure_time"]}
-{disruption["amended_arrival_time"]} -> {disruption["amended_departure_time"]} ({disruption["arrival_status"]}, {disruption["stop_time_effect"]}, {disruption["departure_status"]})
-"""
-        return res
+@dataclass
+class Stop(HasVehicleJourneyMixin, HasTrainstationInfo, HasWaySchedules):
+    display_informations: str
+    stop_point: dict
+    route: dict
+    links: list
+    stop_date_time: dict
 
     def __post_init__(self):
         self.route = Route(**self.route)
-        self.display_informations = AttrDict(self.display_informations)
         self.stop_point = StopPoint(**self.stop_point)
-        for key in ("base_arrival_date_time", "base_departure_date_time", "arrival_date_time", "departure_date_time"):
-            self.stop_date_time[key] = parsetime(self.stop_date_time[key])
+        self.post_init_trainstation_info()
+
+    def format(self):
+        return self.format_stop()
 
 
 @dataclass
@@ -592,7 +634,10 @@ class StopArea:
     def departures(self):
         return [
             Stop(**d)
-            for d in config.navitia.get(f"stop_areas/{self.id}/departures?data_freshness=realtime").json()["departures"]
+            for d in config.navitia.get(
+                    f"stop_areas/{self.id}/departures?data_freshness=realtime",
+                    count=50
+            ).json()["departures"]
         ]
 
     @property
@@ -663,7 +708,6 @@ class Journey:
     nb_transfers:str
     durations:str
     arrival_date_time:str
-    calendars:str
     departure_date_time:str
     requested_date_time:str
     fare:str
@@ -671,10 +715,12 @@ class Journey:
     type:str
     duration:str
     sections:str
+    calendars:str = None
 
     def format(self):
         res = ""
         for section in self.sections:
+            res += "--------------\n"
             res += section.format() + "\n"
         return res
 
@@ -690,7 +736,7 @@ class Journey:
 
 
 @dataclass
-class Section:
+class Section(HasVehicleJourneyMixin, HasTrainstationInfo, HasWaySchedules):
     arrival_date_time:str
     co2_emission:str
     departure_date_time:str
@@ -710,20 +756,50 @@ class Section:
     stop_date_times:str = None
 
     def format(self):
-        return f"""{self.from_.name} ({self.base_departure_date_time}) -> {self.type} -> {self.to.name} ({self.base_arrival_date_time})"""
+        if self.departure_date_time == self.arrival_date_time:
+            return f"{self.mode}"
+        res = f"""{self.from_.name} ({self.departure_date_time}) -> {self.type} -> {self.to.name} ({self.arrival_date_time})"""
+        if self.type == "public_transport":
+            res += "\n\n" + self.format_stop()
+            impact = self.vehicle_journey.format_impact(
+                [
+                    sdt["stop_point"]["id"] for sdt in self.stop_date_times
+                ]
+            )
+            if impact:
+                res += "\n### Impact\n" + impact
+            legacy = self.vehicle_journey.format_legacy_impact(self.stop_point.id)
+            if legacy:
+                res += "### Legacy:\n" + legacy
+        return res
 
     def __post_init__(self):
         if self.from_ is not None:
             self.from_ = PTObject(**self.from_)
         if self.to is not None:
             self.to = PTObject(**self.to)
+        if self.base_departure_date_time is not None:
+            self.base_departure_date_time = parsetime(self.base_departure_date_time)
+        if self.base_arrival_date_time is not None:
+            self.base_arrival_date_time = parsetime(self.base_arrival_date_time)
+        if self.departure_date_time is not None:
+            self.departure_date_time = parsetime(self.departure_date_time)
+        if self.arrival_date_time is not None:
+            self.arrival_date_time = parsetime(self.arrival_date_time)
+        if self.stop_date_times is not None:
+            self.stop_date_time = self.stop_date_times[0]
+            self.stop_point = StopPoint(**self.stop_date_time["stop_point"])
+            self.post_init_trainstation_info()
+        for link in self.links:
+            if link["type"] == "route":
+                self.route = Route(**config.navitia.get(f"routes/{link['id']}").json()["routes"][0])
 
 
 class NavitiaConfig:
-    def get(self, path):
+    def get(self, path, count=20):
         @cache_disk(expire=300)
-        def _get(path):
-            parameters = "items_per_page=1000"
+        def _get(path, count):
+            parameters = f"items_per_page=1000&count={count}"
             if '?' in path:
                 path += "&"
             else:
@@ -734,19 +810,27 @@ class NavitiaConfig:
             return requests.get(
                 url,
                 headers={"Authorization": self.key})
-        return _get(path)
+        return _get(path, count)
 
-    def journey(self, from_, to):
-        return self.journeys(from_, to)[0]
+    def journey(self, from_, to, leave_on=None):
+        return self.journeys(from_, to, leave_on)[0]
 
-    def journeys(self, from_, to):
+    def journeys(self, from_, to, leave_on=None):
+        url = f"journeys?from={from_.id}&to={to.id}"
+        if leave_on is not None:
+            url += f"&datetime={leave_on.strftime('%Y%m%dT%H%M%S')}"
+        url += "&data_freshness=realtime"
         return [
             Journey(**it)
-            for it in self.get(f"journeys?from={from_.id}&to={to.id}&data_freshness=realtime").json()["journeys"]
+            for it in self.get(url).json()["journeys"]
         ]
 
     def vehicle_journey(self, journey):
-        return VehicleJourney(**self.get(f"vehicle_journeys/{journey}").json()["vehicle_journeys"][0])
+        if journey.startswith("vehicle_journey:"):
+            url = f"vehicle_journeys/{journey}"
+        else:
+            url = f"vehicle_journeys?headsign={journey}"
+        return VehicleJourney(**self.get(url).json()["vehicle_journeys"][0])
 
     def place(self, q, embedded_types=[]):
         return self.places(q, embedded_types)[0]
@@ -890,6 +974,16 @@ def way_impact(journey, stop):
 def vehicle_journey_impact(journey):
     print(
         config.navitia.vehicle_journey(journey).format_impact()
+    )
+
+
+@navitia.command()
+@argument("from_", type=StopParameterType())
+@argument("to", type=StopParameterType())
+@option("--leave-on", type=parsetime)
+def journey(from_, to, leave_on):
+    print(
+        config.navitia.journey(from_, to, leave_on).format()
     )
 
 

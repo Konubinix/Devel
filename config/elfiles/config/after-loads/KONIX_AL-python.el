@@ -34,7 +34,10 @@
   (auto-complete-mode 1)
   (flycheck-select-checker 'python-flake8)
   ;; this must be set prior to loading jedi for it influence the way jedi is initialized
-  (when (require 'lsp-python nil t)
+  (when (and
+         (require 'lsp-python nil t)
+         (executable-find "pyls")
+         )
     (lsp-python-enable)
     )
   (setq ac-sources

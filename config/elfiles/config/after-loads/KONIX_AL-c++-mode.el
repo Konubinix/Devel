@@ -25,8 +25,11 @@
 ;;; Code:
 
 (defun konix/c++-mode-hook ()
-  (when (require 'lsp-clangd  nil t)
-    (lsp-clangd-c++-enable)
+  (when (and
+         (require 'cquery  nil t)
+         (executable-find "cquery")
+         )
+    (lsp-cquery-enable)
     )
   (setq ac-sources
 		(append '(

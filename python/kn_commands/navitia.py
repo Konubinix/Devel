@@ -913,14 +913,16 @@ class GetType(ParameterType):
     "navitia", "--coverage",
     typ=NavitiaConfig,
     default="sncf",
-    required=True)
+    required=True,
+    help="The coverage to use when communicating with navitia")
 @param_config(
     "navitia", "--key",
     typ=NavitiaConfig,
     default=get_navitia_key,
-    required=True)
+    required=True,
+    help="Your navitia key.")
 def navitia():
-    pass
+    """Some commands to find your train and whether it will arrive late or not."""
 
 
 class StopParameterType(ParameterType):
@@ -986,9 +988,9 @@ def vehicle_journey_impact(journey):
 
 
 @navitia.command()
-@argument("from_", type=StopParameterType())
-@argument("to", type=StopParameterType())
-@option("--leave-on", type=parsetime)
+@argument("from_", type=StopParameterType(), help="Where do you travel from.")
+@argument("to", type=StopParameterType(), help="Where you want to go.")
+@option("--leave-on", type=parsetime, help="When you want to leave.")
 def journey(from_, to, leave_on):
     print(
         config.navitia.journey(from_, to, leave_on).format()

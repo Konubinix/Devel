@@ -481,12 +481,20 @@ class HasTrainstationInfo:
         return self.trainstation_info.get("number", "N/A")
 
     @property
+    def geolocalize(self):
+        number = self.trainstation_info.get("number")
+        if number:
+            return f"https://www.sncf.com/sncv1/fr/geolocalisation?data-map-livemap-infotexts=RT|{number}"
+        else:
+            return "N/A"
+
+    @property
     def trainstation_str(self):
         return self.stop_point.format_trainstation(self.display_informations["headsign"])
 
     def format_stop(self):
         res = f"""Dest: {self.display_informations.direction}
-num: {self.train_number}, quay: {self.quay}, prob: {self.problem}, vehicle: {self.vehicle_journey.id}
+num: {self.train_number}, quay: {self.quay}, prob: {self.problem}, vehicle: {self.vehicle_journey.id}, geo: {self.geolocalize}
 {self.stop_date_time['base_arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['base_departure_date_time'].strftime("%m/%d %H:%M")}
 {self.stop_date_time['arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['departure_date_time'].strftime("%m/%d %H:%M")}
 """

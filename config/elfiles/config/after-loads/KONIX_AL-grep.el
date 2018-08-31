@@ -37,6 +37,7 @@
 --exclude-dir .git \
 --exclude-dir .svn \
 --exclude-dir node_modules \
+--exclude-dir .cquery_cached_index \
 -i -nH \
 -R -e ")
  '(grep-template "grep <C> -nH -R -e  <R> <F>")

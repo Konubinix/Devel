@@ -338,6 +338,11 @@ Trainstation info: {trainstation_info or "N/A"}
     def _track_step(self, st):
         sp = st["stop_point"]
         ti = sp.trainstation_info.get(self.trip["name"], {})
+        date = ti.get("date")
+        # the trainstation info may show the info for tomorrow, don't take this
+        # info into account
+        if date is not None and date.day != st["arrival_time_today"].day:
+            ti = {}
         if datetime.datetime.now() < st["arrival_time_today"] and not (ti.get("problem") or ti.get("quay")):
             # not yet there
             return True, "Not yet announced"
@@ -480,7 +485,7 @@ class StopPoint:
                     h, m = _hour.split("h")
                     date = date.replace(hour=int(h), minute=int(m), second=0)
                 else:
-                    date = "N/A"
+                    date = None
                 res[number.text.strip()] = {
                     "hour": hour,
                     "destination": destination.text.strip(),

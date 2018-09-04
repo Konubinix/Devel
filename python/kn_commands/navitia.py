@@ -311,7 +311,8 @@ class VehicleJourney:
 
     def _format_stop_impact(self, disruption, st, sp):
         trainstation_info = ""
-        if sp.trainstation_info.get(self.trip["name"], {}).get("problem"):
+        ti = sp.trainstation_info.get(self.trip["name"], {})
+        if ti.get("quay") or ti.get("problem"):
             trainstation_info = sp.format_trainstation(self.trip["name"])
         disruption_info = ""
         if disruption and disruption.disrupt(sp.id):
@@ -323,6 +324,28 @@ Trainstation info: {trainstation_info or "N/A"}
 {disruption_info}
 """
         return ""
+
+    def track(self):
+        for st in self.stop_times:
+            sp = st["stop_point"]
+            status = True
+            while status:
+                status, message = self._track_step(st)
+                yield f"{sp.name}: {message}"
+                if status:
+                    time.sleep(30)
+
+    def _track_step(self, st):
+        sp = st["stop_point"]
+        ti = sp.trainstation_info.get(self.trip["name"], {})
+        if datetime.datetime.now() < st["arrival_time_today"] and not (ti.get("problem") or ti.get("quay")):
+            # not yet there
+            return True, "Not yet announced"
+        elif datetime.datetime.now() > st["arrival_time_today"] and not (ti.get("problem") or ti.get("quay")):
+            # in the past
+            return False, "Gone"
+        elif (ti.get("problem") or ti.get("quay")):
+            return True, sp.format_trainstation(self.trip["name"])
 
     def format_legacy_impact(self, last_stop_point_id):
         disruption = self.disruption
@@ -400,34 +423,51 @@ class StopPoint:
 
     def format_trainstation(self, trip_name):
         trainstation_info = self.trainstation_info.get(trip_name, {})
-        return f"""num: {trainstation_info.get("number")}, quay: {trainstation_info.get("quay", "N/A")}, prob: {trainstation_info.get("problem", "N/A")}"""
+        return f"""num: {trainstation_info.get("number")}, quay: {trainstation_info.get("quay", "N/A")}, prob: {trainstation_info.get("problem", "N/A")}, date: {trainstation_info.get("date", "N/A")}"""
 
     @property
     def trainstation_info(self):
-        @cache_disk(expire=60)
+        @cache_disk(expire=30)
         def _get_trainstation_info(tvs):
             url = f"https://www.gares-sncf.com/fr/train-times/{tvs}/departure"
-            LOGGER.debug(f"Getting {url}")
+            LOGGER.info(f"Getting {url}")
             r = requests.get(url)
             if r.content == b'""':
                 return {}
             trains = json.loads(r.content)["trains"]
-            return {
-                train["num"]: {
+            res = {}
+            today = datetime.datetime.today()
+            date = None
+            last_date = None
+            for train in trains:
+                hour = train["heure"]
+                if hour is None:
+                    date = None
+                else:
+                    date = last_date or today
+                    h, m = hour.split(":")
+                    date = date.replace(hour=int(h), minute=int(m))
+                    if last_date is not None and last_date > date:
+                        date = date + datetime.timedelta(days=1)
+
+                value = {
                     **train,
                     "problem": ", ".join([
                         train[key]
                         for key in ["etat", "retard", "infos"]
                         if train[key] != ""
                     ]) or None,
-                    "hour": train["heure"],
+                    "hour": hour,
                     "destination": train["origdest"],
                     "number": train["num"],
                     "mode": train["type"],
                     "quay": train["voie"],
+                    "date": date,
                 }
-                for train in trains
-            }
+                res[train["num"]] = value
+                if date is not None:
+                    last_date = date
+            return res
         return _get_trainstation_info(self.tvs)
 
     @property
@@ -494,7 +534,8 @@ class HasTrainstationInfo:
 
     def format_stop(self):
         res = f"""Dest: {self.display_informations.direction}
-num: {self.train_number}, quay: {self.quay}, prob: {self.problem}, vehicle: {self.vehicle_journey.id}, geo: {self.geolocalize}
+num: {self.train_number}, quay: {self.quay}, prob: {self.problem}, vehicle: {self.vehicle_journey.id}
+geo: {self.geolocalize}
 {self.stop_date_time['base_arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['base_departure_date_time'].strftime("%m/%d %H:%M")}
 {self.stop_date_time['arrival_date_time'].strftime("%m/%d %H:%M")} -> {self.stop_date_time['departure_date_time'].strftime("%m/%d %H:%M")}
 """
@@ -725,6 +766,10 @@ class Journey:
     sections:str
     calendars:str = None
 
+    def track(self):
+        for section in self.sections:
+            yield from section.track()
+
     def format(self):
         res = ""
         for section in self.sections:
@@ -762,6 +807,10 @@ class Section(HasVehicleJourneyMixin, HasTrainstationInfo, HasWaySchedules):
     display_informations:str = None
     geojson:str = None
     stop_date_times:str = None
+
+    def track(self):
+        if self.type == "public_transport":
+            yield from self.vehicle_journey.track()
 
     def format(self):
         if self.departure_date_time == self.arrival_date_time:
@@ -991,10 +1040,13 @@ def vehicle_journey_impact(journey):
 @argument("from_", type=StopParameterType(), help="Where do you travel from.")
 @argument("to", type=StopParameterType(), help="Where you want to go.")
 @option("--leave-on", type=parsetime, help="When you want to leave.")
-def journey(from_, to, leave_on):
-    print(
-        config.navitia.journey(from_, to, leave_on).format()
-    )
+@flag("--track/--dont-track")
+def journey(from_, to, leave_on, track):
+    j = config.navitia.journey(from_, to, leave_on)
+    print(j.format())
+    if track:
+        for info in j.track():
+            print(info)
 
 
 @navitia.command()

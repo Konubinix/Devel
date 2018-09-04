@@ -426,7 +426,75 @@ class StopPoint:
         return f"""num: {trainstation_info.get("number")}, quay: {trainstation_info.get("quay", "N/A")}, prob: {trainstation_info.get("problem", "N/A")}, date: {trainstation_info.get("date", "N/A")}"""
 
     @property
+    def region(self):
+        if self.administrative_regions is None:
+            self.administrative_regions = config.navitia.get(f"stop_points/{self.id}").json()["stop_points"][0]["administrative_regions"]
+        return self.zip_codes_to_regions[self.administrative_regions[0]["zip_code"][:2]]
+
+    @property
     def trainstation_info(self):
+        match = re.match("^stop_point:OCE:SP:.+-(.+)$", self.id)
+        if match is None:
+            return {}
+
+        @cache_disk(expire=30)
+        def _trainstation_info(id, name, region):
+            url = f"https://www.ter.sncf.com/{region}/gares/{id}/{name}/prochains-departs"
+            LOGGER.info(f"Getting {url}")
+            r = requests.post(
+                url,
+                data={
+                    'Filters[0].Key': 'TGV_IC',
+                    'Filters[0].Value': 'TGV',
+                    'Filters[1].IsUsed': 'true',
+                    'Filters[1].Key': 'TRAIN_TER',
+                    'Filters[1].Value': 'TER TRAIN',
+                    'Filters[2].IsUsed': 'true',
+                    'Filters[2].Key': 'CAR_TER',
+                    'Filters[2].Value': 'TER CAR',
+                    'Filters[3].IsUsed': 'true',
+                    'Filters[3].Key': 'AUTRES',
+                    'Filters[3].Value': 'AUTRES',
+                    'NbDeparturesToDisplay': '100',
+                    'reload': 'voir + de résultats',
+                    'Filters[0].IsUsed': 'true'
+                }
+            )
+            s = soup(r.content, "lxml")
+            res = {}
+            rows = s.find(attrs={"class":"train_depart_table"}).find("tbody")
+            today = datetime.datetime.today()
+            for row in rows.find_all("tr"):
+                if row.get("class") == ["problem"]:
+                    res[number.text.strip()]["problem"] = row.text.strip()
+                    continue
+                hour, destination, glass, number, mode, *quay = row.find_all("td")
+                hour = hour.text.strip()
+                if hour:
+                    if "J+1" in hour:
+                        date = today + datetime.timedelta(days=1)
+                        _hour = hour.replace("J+1", "")
+                    else:
+                        date = today
+                        _hour = hour
+                    h, m = _hour.split("h")
+                    date = date.replace(hour=int(h), minute=int(m), second=0)
+                else:
+                    date = "N/A"
+                res[number.text.strip()] = {
+                    "hour": hour,
+                    "destination": destination.text.strip(),
+                    "number": number.text.strip(),
+                    "mode": mode.text.strip(),
+                    "quay": ", ".join([q.text.strip() for q in quay]),
+                    "date": date,
+                }
+            return res
+
+        return _trainstation_info(match.group(1), self.name.split(" ")[0], self.region)
+
+    @property
+    def trainstation_info2(self):
         @cache_disk(expire=30)
         def _get_trainstation_info(tvs):
             url = f"https://www.gares-sncf.com/fr/train-times/{tvs}/departure"

@@ -48,6 +48,9 @@ from click_project.core import cache_disk
 from konix_time_helper import naive_to_local
 
 LOGGER = get_logger(__name__)
+# http://ascii-table.com/ansi-escape-sequences.php
+ERASE_LINE="\r\u001b[K\r"
+CURSOR_UP="\u001b[A"
 
 
 class AttrDict(dict):
@@ -330,31 +333,63 @@ Trainstation info: {trainstation_departures or "N/A"}
     def track(self):
         for st in self.stop_times:
             sp = st["stop_point"]
-            status = True
-            while status:
-                status, message = self._track_step(st)
-                yield f"\r\u001b[K\r{sp.name}: {message}"
-                if status:
-                    time.sleep(30)
+            gone = False
+            first_time = True
+            while not gone:
+                gone, arrival_message, departure_message = self._track_step(st)
+                if gone and not first_time:
+                    break
+                if not first_time:
+                    yield f"{ERASE_LINE}{CURSOR_UP}{ERASE_LINE}{CURSOR_UP}{ERASE_LINE}{CURSOR_UP}{ERASE_LINE}"
                 else:
-                    yield "\n"
+                    if gone:
+                        message = "gone"
+                    else:
+                        message = f"\n <- {arrival_message}\n -> {departure_message}"
+                yield f"{sp.name} ({datetime.datetime.now().strftime('%m/%d %H:%M')}): {message}\n"
+                if not gone:
+                    time.sleep(30)
+                first_time = False
 
     def _track_step(self, st):
         sp = st["stop_point"]
-        ti = sp.trainstation_departures.get(self.trip["name"], {})
-        date = ti.get("date")
+        ti_departure = sp.trainstation_departures.get(self.trip["name"], {})
+        date_departure = ti_departure.get("date")
+        ti_arrival = sp.trainstation_arrivals.get(self.trip["name"], {})
+        date_arrival = ti_arrival.get("date")
         # the trainstation info may show the info for tomorrow, don't take this
         # info into account
-        if date is not None and date.day != st["departure_time_today"].day:
-            ti = {}
-        if datetime.datetime.now() < st["departure_time_today"] and not (ti.get("problem") or ti.get("quay")):
-            # not yet there
-            return True, "Not yet announced"
-        elif datetime.datetime.now() > st["departure_time_today"] and not (ti.get("problem") or ti.get("quay")):
-            # in the past
-            return False, "Gone"
-        elif (ti.get("problem") or ti.get("quay")):
-            return True, sp.format_trainstation(self.trip["name"])
+        if date_departure is not None and date_departure.day != st["departure_time_today"].day:
+            ti_departure = {}
+        if date_arrival is not None and date_arrival.day != st["arrival_time_today"].day:
+            ti_arrival = {}
+        arrival_status = None
+        departure_status = None
+        gone = False
+        if (
+                datetime.datetime.now() < st["departure_time_today"]
+                and not (ti_departure.get("problem") or ti_departure.get("quay"))
+        ):
+            departure_status = "Not yet announced"
+        elif (
+                datetime.datetime.now() > st["departure_time_today"]
+                and not (ti_departure.get("problem") or ti_departure.get("quay"))
+        ):
+            departure_status = "Gone"
+            arrival_status = "Gone"
+            gone = True
+        elif (ti_departure.get("problem") or ti_departure.get("quay")):
+            departure_status = sp.format_trainstation(self.trip["name"])
+
+        if (
+                datetime.datetime.now() < st["arrival_time_today"]
+                and not (ti_arrival.get("problem") or ti_arrival.get("quay"))
+        ):
+            arrival_status = "Not yet announced"
+        elif (ti_arrival.get("problem") or ti_arrival.get("quay")):
+            arrival_status = sp.format_trainstation(self.trip["name"], arrival=True)
+
+        return gone, arrival_status, departure_status
 
     def format_legacy_impact(self, last_stop_point_id):
         disruption = self.disruption

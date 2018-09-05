@@ -554,7 +554,17 @@ class StopPoint:
                     "quay": train["voie"],
                     "date": date,
                 }
-                res[train["num"]] = value
+                num = train["num"]
+                # fill the value for the train in its odd and even
+                # fashion. Navitia and SNCF not being in sync about which one to
+                # choose.
+                even_num = str((int(num) // 2) * 2)
+                odd_num = str(int(even_num) + 1)
+                assert even_num not in res
+                assert odd_num not in res
+                res[even_num] = value
+                res[odd_num] = value
+
                 if date is not None:
                     last_date = date
             return res

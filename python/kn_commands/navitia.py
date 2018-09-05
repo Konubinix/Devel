@@ -8,8 +8,10 @@ import os
 import re
 import datetime
 import builtins
+import sys
 import json
 from dateutil.parser import parse as parsetime
+from click_project.lib import natural_time
 import pprint
 import asyncio
 import base64
@@ -331,9 +333,11 @@ Trainstation info: {trainstation_info or "N/A"}
             status = True
             while status:
                 status, message = self._track_step(st)
-                yield f"{sp.name}: {message}"
+                yield f"\r\u001b[K\r{sp.name}: {message}"
                 if status:
                     time.sleep(30)
+                else:
+                    yield "\n"
 
     def _track_step(self, st):
         sp = st["stop_point"]
@@ -341,12 +345,12 @@ Trainstation info: {trainstation_info or "N/A"}
         date = ti.get("date")
         # the trainstation info may show the info for tomorrow, don't take this
         # info into account
-        if date is not None and date.day != st["arrival_time_today"].day:
+        if date is not None and date.day != st["departure_time_today"].day:
             ti = {}
-        if datetime.datetime.now() < st["arrival_time_today"] and not (ti.get("problem") or ti.get("quay")):
+        if datetime.datetime.now() < st["departure_time_today"] and not (ti.get("problem") or ti.get("quay")):
             # not yet there
             return True, "Not yet announced"
-        elif datetime.datetime.now() > st["arrival_time_today"] and not (ti.get("problem") or ti.get("quay")):
+        elif datetime.datetime.now() > st["departure_time_today"] and not (ti.get("problem") or ti.get("quay")):
             # in the past
             return False, "Gone"
         elif (ti.get("problem") or ti.get("quay")):
@@ -428,7 +432,20 @@ class StopPoint:
 
     def format_trainstation(self, trip_name):
         trainstation_info = self.trainstation_info.get(trip_name, {})
-        return f"""num: {trainstation_info.get("number")}, quay: {trainstation_info.get("quay", "N/A")}, prob: {trainstation_info.get("problem", "N/A")}, date: {trainstation_info.get("date", "N/A")}"""
+        date = trainstation_info.get("date")
+        if date is None:
+            date = "N/A"
+            departure = "N/A"
+        else:
+            departure = natural_time(datetime.datetime.now() - date)
+            date = date.strftime("%m/%d %H:%M")
+        return (
+            f'num: {trainstation_info.get("number")}'
+            f', quay: {trainstation_info.get("quay", "N/A")}'
+            f', prob: {trainstation_info.get("problem", "N/A")}'
+            f', date: {date}'
+            f', in: {departure}'
+        )
 
     @property
     def region(self):
@@ -1119,7 +1136,7 @@ def journey(from_, to, leave_on, track):
     print(j.format())
     if track:
         for info in j.track():
-            print(info)
+            sys.stdout.write(info)
 
 
 @navitia.command()

@@ -462,7 +462,7 @@ class StopPoint:
         @cache_disk(expire=30)
         def _trainstation_info(id, name, region):
             url = f"https://www.ter.sncf.com/{region}/gares/{id}/{name}/prochains-departs"
-            LOGGER.info(f"Getting {url}")
+            LOGGER.debug(f"Getting {url}")
             r = requests.post(
                 url,
                 data={
@@ -520,7 +520,7 @@ class StopPoint:
         @cache_disk(expire=30)
         def _get_trainstation_info(tvs):
             url = f"https://www.gares-sncf.com/fr/train-times/{tvs}/departure"
-            LOGGER.info(f"Getting {url}")
+            LOGGER.debug(f"Getting {url}")
             r = requests.get(url)
             if r.content == b'""':
                 return {}

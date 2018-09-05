@@ -430,8 +430,8 @@ class StopPoint:
             )
         return _get_info_gare(self.name)
 
-    def format_trainstation(self, trip_name, arrivals=False):
-        trainstation_info = self.trainstation_info(arrivals=arrivals).get(trip_name, {})
+    def format_trainstation(self, trip_name, arrival=False):
+        trainstation_info = self.trainstation_info(arrivals=arrival).get(trip_name, {})
         date = trainstation_info.get("date")
         if date is None:
             date = "N/A"

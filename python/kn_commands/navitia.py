@@ -1140,7 +1140,7 @@ def vehicle_journey_impact(journey):
 @argument("from_", type=StopParameterType(), help="Where do you travel from.")
 @argument("to", type=StopParameterType(), help="Where you want to go.")
 @option("--leave-on", type=parsetime, help="When you want to leave.")
-@flag("--track/--dont-track")
+@flag("--track/--dont-track", help="Continuously try to find out the location of the train")
 def journey(from_, to, leave_on, track):
     j = config.navitia.journey(from_, to, leave_on)
     print(j.format())

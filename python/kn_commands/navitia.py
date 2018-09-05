@@ -261,10 +261,10 @@ class Disruption:
     def format_impact(self):
         res = ""
         for i in self.impacted_stops:
-            trainstation_info = i['stop_point'].trainstation_info.get(self.impacted_pt_object["trip"]["name"], {})
+            trainstation_departures = i['stop_point'].trainstation_departures.get(self.impacted_pt_object["trip"]["name"], {})
             res += f"""
 {i['stop_point'].name}
-  quay: {trainstation_info.get("quay", "N/A")}, prob: {trainstation_info.get("problem", "N/A")}
+  quay: {trainstation_departures.get("quay", "N/A")}, prob: {trainstation_departures.get("problem", "N/A")}
   cause: {i['cause']}
   {i['base_arrival_time']} -> {i['base_departure_time']}
   {i.get('amended_arrival_time', 'never')} -> {i.get('amended_departure_time', 'never')} ({i['arrival_status']}, {i['departure_status']})
@@ -312,17 +312,17 @@ class VehicleJourney:
         return res
 
     def _format_stop_impact(self, disruption, st, sp):
-        trainstation_info = ""
-        ti = sp.trainstation_info.get(self.trip["name"], {})
+        trainstation_departures = ""
+        ti = sp.trainstation_departures.get(self.trip["name"], {})
         if ti.get("quay") or ti.get("problem"):
-            trainstation_info = sp.format_trainstation(self.trip["name"])
+            trainstation_departures = sp.format_trainstation(self.trip["name"])
         disruption_info = ""
         if disruption and disruption.disrupt(sp.id):
             disruption_info = f"""Hours: {st["arrival_time_today"].strftime("%m/%d %H:%M")} -> {st["departure_time_today"].strftime("%m/%d %H:%M")}\n"""
             disruption_info += disruption.format_stop(sp.id)
-        if disruption_info or trainstation_info:
+        if disruption_info or trainstation_departures:
             return f"""{sp.name}
-Trainstation info: {trainstation_info or "N/A"}
+Trainstation info: {trainstation_departures or "N/A"}
 {disruption_info}
 """
         return ""
@@ -341,7 +341,7 @@ Trainstation info: {trainstation_info or "N/A"}
 
     def _track_step(self, st):
         sp = st["stop_point"]
-        ti = sp.trainstation_info.get(self.trip["name"], {})
+        ti = sp.trainstation_departures.get(self.trip["name"], {})
         date = ti.get("date")
         # the trainstation info may show the info for tomorrow, don't take this
         # info into account
@@ -430,8 +430,8 @@ class StopPoint:
             )
         return _get_info_gare(self.name)
 
-    def format_trainstation(self, trip_name):
-        trainstation_info = self.trainstation_info.get(trip_name, {})
+    def format_trainstation(self, trip_name, arrivals=False):
+        trainstation_info = self.trainstation_info(arrivals=arrivals).get(trip_name, {})
         date = trainstation_info.get("date")
         if date is None:
             date = "N/A"
@@ -454,32 +454,45 @@ class StopPoint:
         return self.zip_codes_to_regions[self.administrative_regions[0]["zip_code"][:2]]
 
     @property
-    def trainstation_info(self):
+    def trainstation_arrivals(self):
+        return self.trainstation_info(arrivals=True)
+
+    @property
+    def trainstation_departures(self):
+        return self.trainstation_info(arrivals=False)
+
+    def trainstation_info(self, arrivals=False):
         match = re.match("^stop_point:OCE:SP:.+-(.+)$", self.id)
         if match is None:
             return {}
 
         @cache_disk(expire=30)
-        def _trainstation_info(id, name, region):
-            url = f"https://www.ter.sncf.com/{region}/gares/{id}/{name}/prochains-departs"
+        def _trainstation_info(id, name, region, arrivals):
+            suffix = "prochaines-arrivees" if arrivals else "prochains-departs"
+            url = f"https://www.ter.sncf.com/{region}/gares/{id}/{name}/{suffix}"
             LOGGER.debug(f"Getting {url}")
             r = requests.post(
                 url,
                 data={
+                    'Filters[0].IsUsed': 'true',
                     'Filters[0].Key': 'TGV_IC',
                     'Filters[0].Value': 'TGV',
+
                     'Filters[1].IsUsed': 'true',
                     'Filters[1].Key': 'TRAIN_TER',
                     'Filters[1].Value': 'TER TRAIN',
+
                     'Filters[2].IsUsed': 'true',
                     'Filters[2].Key': 'CAR_TER',
                     'Filters[2].Value': 'TER CAR',
+
                     'Filters[3].IsUsed': 'true',
                     'Filters[3].Key': 'AUTRES',
                     'Filters[3].Value': 'AUTRES',
+
                     'NbDeparturesToDisplay': '100',
+                    'NbArrivalsToDisplay': '100',
                     'reload': 'voir + de résultats',
-                    'Filters[0].IsUsed': 'true'
                 }
             )
             s = soup(r.content, "lxml")
@@ -513,7 +526,9 @@ class StopPoint:
                 }
             return res
 
-        return _trainstation_info(match.group(1), self.name.split(" ")[0], self.region)
+        return _trainstation_info(
+            match.group(1), self.name.split(" ")[0],
+            self.region, arrivals)
 
     @property
     def trainstation_info2(self):
@@ -595,34 +610,34 @@ class HasTrainstationInfo:
                 pass
 
     @property
-    def trainstation_info(self):
+    def trainstation_departures(self):
         headsign = int(self.display_informations["headsign"])
         # the headsign from display_informations may differ from the one given
-        # in the trainstation_info, due to
+        # in the trainstation_departures, due to
         # http://maligne-ter.com/st-etienne-lyon/la-numerotation-des-trains-pair-ou-impair/
         # . Either navitia, or sncf did it wrong, but I can't tell yet
         odd = lambda x: x % 2 == 1
         even = lambda x: x % 2 == 0
         even_headsign = str(headsign if even(headsign) else headsign - 1)
         odd_headsign = str(headsign if odd(headsign) else headsign + 1)
-        ti = self.stop_point.trainstation_info
+        ti = self.stop_point.trainstation_departures
         return ti.get(even_headsign) or ti.get(odd_headsign) or {}
 
     @property
     def quay(self):
-        return self.trainstation_info.get("quay", "N/A")
+        return self.trainstation_departures.get("quay", "N/A")
 
     @property
     def problem(self):
-        return self.trainstation_info.get("problem", "N/A")
+        return self.trainstation_departures.get("problem", "N/A")
 
     @property
     def train_number(self):
-        return self.trainstation_info.get("number", "N/A")
+        return self.trainstation_departures.get("number", "N/A")
 
     @property
     def geolocalize(self):
-        number = self.trainstation_info.get("number")
+        number = self.trainstation_departures.get("number")
         if number:
             return f"https://www.sncf.com/sncv1/fr/geolocalisation?data-map-livemap-infotexts=RT|{number}"
         else:
@@ -676,9 +691,9 @@ class HasWaySchedules:
         res = ""
         disruption = self.disruption
         for ws in self.way_schedules:
-            trainstation_info = ws['stop_point'].format_trainstation(self.vehicle_journey.trip["name"])
+            trainstation_departures = ws['stop_point'].format_trainstation(self.vehicle_journey.trip["name"])
             res += f"""{ws["stop_point"].name}
-  {trainstation_info}
+  {trainstation_departures}
 {parsetime(ws["dt"]["base_date_time"]).strftime("%m/%d %H:%M")} ({parsetime(ws["dt"]["date_time"]).strftime("%m/%d %H:%M")})
 """
 

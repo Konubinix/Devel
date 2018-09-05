@@ -24,7 +24,7 @@ def updated_env(**kwargs):
     os.environ.update(oldenv)
 
 
-class AsswordKeyring(keyring.backend.KeyringBackend):
+class ImpassKeyring(keyring.backend.KeyringBackend):
     priority = 1
 
     def set_password(self, servicename, username, password):
@@ -36,7 +36,7 @@ class AsswordKeyring(keyring.backend.KeyringBackend):
             return json.loads(
                 subprocess.check_output(
                     [
-                        "assword",
+                        "impass",
                         "dump",
                         key,
                     ]

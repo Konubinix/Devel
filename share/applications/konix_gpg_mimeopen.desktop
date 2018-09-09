@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=konix_gpg_mimeopen
+Type=Application
+Terminal=false
+Exec=konix_gpg_mimeopen.sh

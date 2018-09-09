@@ -38,5 +38,5 @@ if has_ocr "${filename}"
 then
     echo "${filename} already has an ocr version"
 else
-    konix_ocr.sh -l "${lang}" "${filename}"
+    kn tesseract --language "${lang}" "${filename}"
 fi

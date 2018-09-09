@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -eux
 
-FILE_PATH="${1}"
+FILE_PATH="$(readlink -f "${1}")"
 FILE_NAME="${FILE_PATH##*/}"
 set -ue
 DIR="$(mktemp -d)"

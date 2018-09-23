@@ -38,6 +38,12 @@ shift $((OPTIND-1))
 
 cut -f2 -d ' ' .git/annex/unused | while read sha
 do
+	ack="(git annex metadata -g ack --key "${sha}")"
+	if [ "${ack}" == "delete" ]
+	then
+		git annex drop --key "${sha}"
+		continue
+	fi
 	lastname="$(git log -1 --format=oneline --name-status  -S "${sha}"|tail -1|sed 's|^[A-Z]\+[ \t]\+||')"
 	lastchanged="$(git annex metadata -g lastchanged --key "${sha}")"
 	echo "############### ${lastchanged}: ${lastname} : ${sha}"

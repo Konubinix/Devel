@@ -28,6 +28,10 @@
   (when (and
          (require 'cquery  nil t)
          (executable-find "cquery")
+         (buffer-file-name)
+         (file-exists-p
+          (buffer-file-name)
+          )
          )
     (lsp-cquery-enable)
     )

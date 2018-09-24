@@ -69,3 +69,4 @@
 (depends-on "cquery")
 (depends-on "ivy-xref")
 (depends-on "htmlize")
+(depends-on "realgud")

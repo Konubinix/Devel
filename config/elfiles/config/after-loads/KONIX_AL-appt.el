@@ -88,7 +88,14 @@
            appt-msg
            )
 
-  (appt-disp-window min-to-app new-time appt-msg)
+  (let (
+        (old-golden-ratio-mode golden-ratio-mode)
+        )
+    (golden-ratio-mode -1)
+    (appt-disp-window min-to-app new-time appt-msg)
+    (golden-ratio-mode old-golden-ratio-mode)
+    )
+
   (set-window-dedicated-p (get-buffer-window "*appt-buf*") t)
   (with-current-buffer "*appt-buf*"
     (setq window-size-fixed t)

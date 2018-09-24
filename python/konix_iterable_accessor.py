@@ -71,6 +71,24 @@ class IterableAccessorProxy(list):
     def __and__(self, other):
         return IterableAccessorProxy(list(powerzip(self.l, other.l)))
 
+    def __getitem__(self, name):
+        if isinstance(name, list):
+            return IterableAccessorProxy(zip(*[getattr(self, n) for n in name]))
+        elif isinstance(name, int):
+            return IterableAccessorProxy([i[name] for i in self.l])
+        elif isinstance(name, slice):
+            return IterableAccessorProxy(
+                [
+                    i[slice(
+                        start=name.start,
+                        step=name.step or 1,
+                        stop=name.stop
+                    )]
+                    for i in self.l
+                ]
+            )
+        return getattr(self, name)
+
     def __getattribute__(self, name):
         if name in [
                 "l", "__repr__", "df", "_first", "__dir__", "__class__",

@@ -505,9 +505,12 @@ class ConversationType(ParameterType):
     "slack", "--token",
     typ=SlackConfig,
     default=get_slack_token,
-    required=True)
+    required=True,
+    help="The token provided by slack")
 def slack():
-    pass
+    """Play with slack
+
+    Talk to people, record the history, etc."""
 
 
 @slack.command()
@@ -591,12 +594,14 @@ def conversations(fields, format, type):
     )
 )
 @table_format()
-@argument("conversation", type=ConversationType())
-@option("--oldest")
-@option("--latest")
-@option("--user", type=UserType())
+@argument("conversation", type=ConversationType(),
+          help="The conversation to get the history from")
+@option("--oldest", help="The oldest timestamp to consider")
+@option("--latest", help="The latest timestamp to consider")
+@option("--user", type=UserType(), help="Show only messages from this user")
 def history(fields, format, conversation, oldest, latest,
             user):
+    """Show the history of messages from a conversation"""
     if oldest:
         cal = parsedatetime.Calendar()
         oldest = cal.parseDT(oldest)[0].strftime("%s")
@@ -640,14 +645,21 @@ def record_log(output_directory):
 
 @slack.group()
 def rtm():
-    ""
+    """Real Time Chat"""
 
 
 @rtm.command()
-@argument("conversations", type=ConversationType(), nargs=-1)
-@option("--type", "types", multiple=True)
-@option("--user", type=UserType())
+@argument("conversations", type=ConversationType(), nargs=-1,
+          help="The conversation to listen to")
+@option("--type", "types", multiple=True, help="The type of message to let through")
+@option("--user", type=UserType(), help="Show only messages from this user")
 def listen(conversations, types, user):
+    """Listen to slack event in a conversation
+
+    The events are printed as-is, allowing you to pipe them for further
+    processing.
+
+    """
     _listen = config.slack.rtm.listen
 
     async def do():

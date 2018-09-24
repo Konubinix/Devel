@@ -10,7 +10,7 @@ import datetime
 import builtins
 import sys
 import json
-from dateutil.parser import parse as parsetime
+from dateutil.parser import parse as _parsetime
 from click_project.lib import natural_time
 import pprint
 import asyncio
@@ -46,6 +46,14 @@ from click_project.config import config
 from click_project.core import cache_disk
 
 from konix_time_helper import naive_to_local
+
+
+def parsetime(time):
+    if time == "now":
+        return datetime.datetime.now()
+    else:
+        return _parsetime(time)
+
 
 LOGGER = get_logger(__name__)
 # http://ascii-table.com/ansi-escape-sequences.php
@@ -330,9 +338,24 @@ Trainstation info: {trainstation_departures or "N/A"}
 """
         return ""
 
-    def track(self):
+    def track(self, emphasis):
+        ti_departure = emphasis.trainstation_departures.get(self.trip["name"], {})
         for st in self.stop_times:
             sp = st["stop_point"]
+            if sp.id != emphasis.id:
+                new_ti_departure = emphasis.trainstation_departures.get(self.trip["name"], {})
+                if (
+                        new_ti_departure
+                        and
+                        (
+                            ti_departure["problem"] != new_ti_departure["problem"]
+                            or
+                            ti_departure["quay"] != new_ti_departure["quay"]
+                            or
+                            ti_departure["date"] != new_ti_departure["date"]
+                        )
+                ):
+                    yield f"\nATTENTION, change on {emphasis.name}!\n" + emphasis.format_trainstation(self.trip["name"]) + "\n"
             gone = False
             first_time = True
             while not gone:
@@ -346,7 +369,7 @@ Trainstation info: {trainstation_departures or "N/A"}
                         message = "gone"
                     else:
                         message = f"\n <- {arrival_message}\n -> {departure_message}"
-                yield f"{sp.name} ({datetime.datetime.now().strftime('%m/%d %H:%M')}): {message}\n"
+                yield f"{sp.name} ({datetime.datetime.now().strftime('%m/%d %H:%M:%S')}): {message}\n"
                 if not gone:
                     time.sleep(30)
                 first_time = False
@@ -501,7 +524,7 @@ class StopPoint:
         if match is None:
             return {}
 
-        @cache_disk(expire=30)
+        @cache_disk(expire=20)
         def _trainstation_info(id, name, region, arrivals):
             suffix = "prochaines-arrivees" if arrivals else "prochains-departs"
             url = f"https://www.ter.sncf.com/{region}/gares/{id}/{name}/{suffix}"
@@ -551,23 +574,57 @@ class StopPoint:
                     date = date.replace(hour=int(h), minute=int(m), second=0)
                 else:
                     date = None
-                res[number.text.strip()] = {
+                num = number.text.strip()
+                value = {
                     "hour": hour,
                     "destination": destination.text.strip(),
-                    "number": number.text.strip(),
+                    "number": num,
                     "mode": mode.text.strip(),
                     "quay": ", ".join([q.text.strip() for q in quay]),
                     "date": date,
+                    "problem": "",
                 }
+                # fill the value for the train in its odd and even
+                # fashion. Navitia and SNCF not being in sync about which one to
+                # choose.
+                even_num = str((int(num) // 2) * 2)
+                odd_num = str(int(even_num) + 1)
+                # assert even_num not in res
+                # assert odd_num not in res
+                match = re.match("^(0+)", num)
+                if match is not None:
+                    even_num = match.group(1) + even_num
+                    odd_num = match.group(1) + odd_num
+
+                res[even_num] = value
+                res[odd_num] = value
             return res
 
-        return _trainstation_info(
+        res = _trainstation_info(
             match.group(1), self.name.split(" ")[0],
             self.region, arrivals)
+        res2 = self.trainstation_info2
+        def merge(*items):
+            try:
+                candidate = next(
+                    i
+                    for i in items
+                    if isinstance(i, datetime.datetime)
+                )
+            except StopIteration:
+                candidate = None
+            if candidate:
+                return candidate
+            return ", ".join(set([i for i in items if i]))
+        for num, info in res.items():
+            info2 = res2.get(num, {})
+            for key in info:
+                info[key] = merge(info[key], info2.get(key))
+        return res
 
     @property
     def trainstation_info2(self):
-        @cache_disk(expire=30)
+        @cache_disk(expire=20)
         def _get_trainstation_info(tvs):
             url = f"https://www.gares-sncf.com/fr/train-times/{tvs}/departure"
             LOGGER.debug(f"Getting {url}")
@@ -608,12 +665,21 @@ class StopPoint:
                 # fill the value for the train in its odd and even
                 # fashion. Navitia and SNCF not being in sync about which one to
                 # choose.
-                even_num = str((int(num) // 2) * 2)
-                odd_num = str(int(even_num) + 1)
-                assert even_num not in res
-                assert odd_num not in res
-                res[even_num] = value
-                res[odd_num] = value
+                if "car" in str(value["mode"]).lower() or "bus" in str(value["quay"]).lower():
+                    res[num] = value
+                else:
+                    even_num = str((int(num) // 2) * 2)
+                    odd_num = str(int(even_num) + 1)
+                    if even_num in res:
+                        pass
+                        #assert value["hour"].replace("J+1", "") == res[even_num]["hour"]
+                    else:
+                        res[even_num] = value
+                    if odd_num in res:
+                        pass
+                        #assert value["hour"].replace("J+1", "") == res[odd_num]["hour"]
+                    else:
+                        res[odd_num] = value
 
                 if date is not None:
                     last_date = date
@@ -920,11 +986,20 @@ class Journey:
         for section in self.sections:
             yield from section.track()
 
-    def format(self):
-        res = ""
+    @property
+    def departure_date_time_dt(self):
+        return parsetime(self.departure_date_time)
+
+    @property
+    def arrival_date_time_dt(self):
+        return parsetime(self.arrival_date_time)
+
+    def format(self, with_impact=False, with_legacy=False):
+        res = f"""{self.departure_date_time_dt.strftime("%m/%d %H:%M")} -> {self.arrival_date_time_dt.strftime("%m/%d %H:%M")}
+"""
         for section in self.sections:
             res += "--------------\n"
-            res += section.format() + "\n"
+            res += section.format(with_impact=with_impact, with_legacy=with_legacy) + "\n"
         return res
 
     def __post_init__(self):
@@ -957,27 +1032,32 @@ class Section(HasVehicleJourneyMixin, HasTrainstationInfo, HasWaySchedules):
     display_informations:str = None
     geojson:str = None
     stop_date_times:str = None
+    transfer_type: str = None
 
     def track(self):
         if self.type == "public_transport":
-            yield from self.vehicle_journey.track()
+            yield from self.vehicle_journey.track(self.from_.stop_point)
 
-    def format(self):
+    def format(self, with_impact=False, with_legacy=False):
+        if self.type == "waiting":
+            return "waiting"
         if self.departure_date_time == self.arrival_date_time:
             return f"{self.mode}"
         res = f"""{self.from_.name} ({self.departure_date_time}) -> {self.type} -> {self.to.name} ({self.arrival_date_time})"""
         if self.type == "public_transport":
             res += "\n\n" + self.format_stop()
-            impact = self.vehicle_journey.format_impact(
-                [
-                    sdt["stop_point"]["id"] for sdt in self.stop_date_times
-                ]
-            )
-            if impact:
-                res += "\n### Impact\n" + impact
-            legacy = self.vehicle_journey.format_legacy_impact(self.stop_point.id)
-            if legacy:
-                res += "### Legacy:\n" + legacy
+            if with_impact:
+                impact = self.vehicle_journey.format_impact(
+                    [
+                        sdt["stop_point"]["id"] for sdt in self.stop_date_times
+                    ]
+                )
+                if impact:
+                    res += "\n### Impact\n" + impact
+            if with_legacy:
+                legacy = self.vehicle_journey.format_legacy_impact(self.stop_point.id)
+                if legacy:
+                    res += "### Legacy:\n" + legacy
         return res
 
     def __post_init__(self):
@@ -1189,11 +1269,13 @@ def vehicle_journey_impact(journey):
 @navitia.command()
 @argument("from_", type=StopParameterType(), help="Where do you travel from.")
 @argument("to", type=StopParameterType(), help="Where you want to go.")
-@option("--leave-on", type=parsetime, help="When you want to leave.")
+@option("--leave-on", type=parsetime, help="When you want to leave.", default="now")
 @flag("--track/--dont-track", help="Continuously try to find out the location of the train")
-def journey(from_, to, leave_on, track):
+@flag("--with-impact/--without-impact", help="Show the impact on future stops")
+@flag("--with-legacy/--without-legacy", help="Show the legacy on past stops")
+def journey(from_, to, leave_on, track, with_impact, with_legacy):
     j = config.navitia.journey(from_, to, leave_on)
-    print(j.format())
+    print(j.format(with_impact=with_impact, with_legacy=with_legacy))
     if track:
         for info in j.track():
             sys.stdout.write(info)

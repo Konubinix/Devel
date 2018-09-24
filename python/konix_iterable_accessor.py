@@ -51,7 +51,7 @@ class IterableAccessorProxy(list):
         return DataFrame(self.l)
 
     def __repr__(self):
-        return pformat(self.l)
+        return "|" + pformat(self.l)
 
     def __iter__(self):
         return iter(self.l)

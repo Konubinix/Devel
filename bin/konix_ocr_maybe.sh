@@ -38,5 +38,6 @@ if has_ocr "${filename}"
 then
     echo "${filename} already has an ocr version"
 else
+	echo "Handling ${filename}"
     kn tesseract --language "${lang}" "${filename}"
 fi

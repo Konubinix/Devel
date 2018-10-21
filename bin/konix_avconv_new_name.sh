@@ -7,9 +7,9 @@ file_abs="$(konix_absolute_path.py "${file}")"
 ext="${file##*.}"
 dir="$(dirname "${file}")"
 creation_date="$(avconv -i "${file}" 2>&1 \
-	| grep creation_time \
+	| grep -i creation_time \
 	| head -1 \
-	| sed -r 's|^.+creation_time   : ([0-9][0-9][0-9][0-9]-[0-9]+-[0-9]+)[ T]([0-9]+:[0-9]+:[0-9]+).*$|\1T\2|')"
+	| sed -r 's|^.+[Cc][Rr][Ee][Aa][Tt][Ii][Oo][Nn]_[Tt][Ii][Mm][Ee]   : ([0-9][0-9][0-9][0-9]-[0-9]+-[0-9]+)[ T]([0-9]+:[0-9]+:[0-9]+).*$|\1T\2|')"
 if avconv -i "${file}" 2>&1 |grep -q -e "handler_name.\+:.\+VideoHandle" -e "com.apple.quicktime.make: Apple"
 then
 	# utc date

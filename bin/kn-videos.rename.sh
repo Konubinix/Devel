@@ -18,5 +18,6 @@ find \
            -o -iname "*.mp4" \
            -o -iname "*.avi" \
            -o -iname "*.3gp" \
+           -o -iname "*.mkv" \
            -\) \
     -exec "kn-video.rename.sh" "{}" ";"

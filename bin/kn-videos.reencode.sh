@@ -21,4 +21,5 @@ find \
            -o -iname "*.avi" \
            -o -iname "*.3gp" \
            -o -iname "*.MPG" \
+           -o -iname "*.mkv" \
            \) -exec kn-video.reencode.sh '{}' ';'

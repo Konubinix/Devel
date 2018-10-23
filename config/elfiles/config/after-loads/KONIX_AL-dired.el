@@ -43,6 +43,20 @@
     )
   )
 
+(defun konix/dired-ok-annex (arg file-list)
+  (interactive
+   (let ((files (dired-get-marked-files t current-prefix-arg)))
+     (list
+      current-prefix-arg
+      files)))
+  (when (yes-or-no-p "Really git annex ok those files?")
+    (dired-do-shell-command
+     "konix_git_annex_ok.sh * &"
+     arg file-list
+     )
+    )
+  )
+
 (defun konix/dired-mimeopen ()
   "Open the currectly selected file with mimeopen."
   (interactive)
@@ -186,6 +200,7 @@
 (define-key konix/dired/epa-dired-map "v" 'epa-dired-do-verify)
 
 (define-key dired-mode-map (kbd "C-D") 'konix/dired-remove-annex)
+(define-key dired-mode-map (kbd "C-A") 'konix/dired-ok-annex)
 
 (defun konix/image-dired-dired-display-image-mark-and-next ()
   (interactive)

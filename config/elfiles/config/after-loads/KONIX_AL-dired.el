@@ -53,6 +53,12 @@
     )
   )
 
+(defun konix/dired-ok-cut ()
+  (interactive)
+  (wuxch-dired-cut)
+  (call-interactively #'konix/dired-ok-annex)
+  )
+
 (defun konix/dired-ok-annex (arg file-list)
   (interactive
    (let ((files (dired-get-marked-files t current-prefix-arg)))
@@ -211,6 +217,7 @@
 
 (define-key dired-mode-map (kbd "C-D") 'konix/dired-remove-annex)
 (define-key dired-mode-map (kbd "C-A") 'konix/dired-ok-annex)
+(define-key dired-mode-map (kbd "C-c C-a") 'konix/dired-ok-cut)
 
 (defun konix/image-dired-dired-display-image-mark-and-next ()
   (interactive)

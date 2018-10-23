@@ -37,7 +37,7 @@
       files)))
   (when (yes-or-no-p "Really git annex remove those files?")
     (dired-do-shell-command
-     "konix_git_annex_remove.sh &"
+     "konix_git_annex_remove.sh * &"
      arg file-list
      )
     )

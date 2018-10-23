@@ -29,6 +29,20 @@
 (require 'dired-sort)
 (require 'diredful)
 
+(defun konix/dired-remove-annex (arg file-list)
+  (interactive
+   (let ((files (dired-get-marked-files t current-prefix-arg)))
+     (list
+      current-prefix-arg
+      files)))
+  (when (yes-or-no-p "Really remove those files?")
+    (dired-do-shell-command
+     "echo '###### adding to git annex' && git annex add * && echo '##### setting the metadata to delete' && git annex metadata --force -s ack=delete && echo ' ####### removing the file' && rm -rf * &"
+     arg file-list
+     )
+    )
+  )
+
 (defun konix/dired-mimeopen ()
   "Open the currectly selected file with mimeopen."
   (interactive)
@@ -170,6 +184,8 @@
 (define-key konix/dired/epa-dired-map "d" 'epa-dired-do-decrypt)
 (define-key konix/dired/epa-dired-map "s" 'epa-dired-do-sign)
 (define-key konix/dired/epa-dired-map "v" 'epa-dired-do-verify)
+
+(define-key dired-mode-map (kbd "C-D") 'konix/dired-remove-annex)
 
 (defun konix/image-dired-dired-display-image-mark-and-next ()
   (interactive)

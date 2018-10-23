@@ -29,6 +29,16 @@
 (require 'dired-sort)
 (require 'diredful)
 
+(defun konix/dired-git-annex-find-restored ()
+  (interactive)
+  (let (
+        (find-program "git annex find --metadata ack=restored | xargs ls -ld")
+        (find-ls-option '("" . ""))
+        )
+    (find-dired "." "")
+    )
+  )
+
 (defun konix/dired-remove-annex (arg file-list)
   (interactive
    (let ((files (dired-get-marked-files t current-prefix-arg)))

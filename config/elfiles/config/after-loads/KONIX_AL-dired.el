@@ -35,9 +35,9 @@
      (list
       current-prefix-arg
       files)))
-  (when (yes-or-no-p "Really remove those files?")
+  (when (yes-or-no-p "Really git annex remove those files?")
     (dired-do-shell-command
-     "echo '###### adding to git annex' && git annex add * && echo '##### setting the metadata to delete' && git annex metadata --force -s ack=delete && echo ' ####### removing the file' && rm -rf * &"
+     "konix_git_annex_remove.sh &"
      arg file-list
      )
     )

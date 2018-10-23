@@ -36,7 +36,7 @@
         (find-program "konix_git_annex_find_restored.sh")
         (find-ls-option '("" . ""))
         )
-    (find-dired "" "")
+    (find-dired "." "")
     )
   )
 

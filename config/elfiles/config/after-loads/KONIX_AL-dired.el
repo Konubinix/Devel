@@ -32,7 +32,7 @@
 (defun konix/dired-git-annex-find-restored ()
   (interactive)
   (let (
-        (find-program "git annex find --metadata ack=restored | xargs ls -ld")
+        (find-program "git annex find --print0 --metadata ack=restored | xargs -0 -n 1 ls -ld")
         (find-ls-option '("" . ""))
         )
     (find-dired "." "")

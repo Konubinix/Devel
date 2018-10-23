@@ -216,8 +216,8 @@
 (define-key konix/dired/epa-dired-map "s" 'epa-dired-do-sign)
 (define-key konix/dired/epa-dired-map "v" 'epa-dired-do-verify)
 
-(define-key dired-mode-map (kbd "C-D") 'konix/dired-remove-annex)
-(define-key dired-mode-map (kbd "C-A") 'konix/dired-ok-annex)
+(define-key dired-mode-map (kbd "C-S-D") 'konix/dired-remove-annex)
+(define-key dired-mode-map (kbd "C-S-A") 'konix/dired-ok-annex)
 (define-key dired-mode-map (kbd "C-c C-a") 'konix/dired-ok-cut)
 
 (defun konix/image-dired-dired-display-image-mark-and-next ()

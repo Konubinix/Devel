@@ -37,6 +37,7 @@
         (find-ls-option '("" . ""))
         )
     (find-dired "." "")
+    (rename-buffer (generate-new-buffer-name "git annex find restored"))
     )
   )
 

@@ -107,6 +107,8 @@
 (global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
 (global-set-key (kbd "C-f") 'konix/global-slow-key-map) ;for hacker's keyboard
 
+(define-key 'konix/global-slow-key-map (kbd "<") 'beginning-of-buffer)
+(define-key 'konix/global-slow-key-map (kbd ">") 'end-of-buffer)
 ;; 0bin paste
 (define-key 'konix/global-slow-key-map (kbd "p") 'konix/0binpaste)
 ;; open recent file

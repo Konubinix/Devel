@@ -776,10 +776,13 @@ def create_group(name):
 
 
 @slack.command()
-@option("--user", "users", type=UserType(), multiple=True)
-@option("--all-but-user", "all_but_users", type=UserType(), multiple=True)
-@argument("conversation", type=ConversationType())
+@option("--user", "users", type=UserType(), multiple=True,
+        help="Invite those users")
+@option("--all-but-user", "all_but_users", type=UserType(), multiple=True,
+        help="Don't invite those users")
+@argument("conversation", type=ConversationType(), help="The conversation")
 def invite_to_conversation(users, all_but_users, conversation):
+    """Invite those users in the conversation"""
     assert (
         (users and not all_but_users)
         or (all_but_users and not users)

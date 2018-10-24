@@ -792,6 +792,7 @@ def invite_to_conversation(users, all_but_users, conversation):
         users_to_invite = list(users)
     if all_but_users:
         users_to_invite = set(config.slack.users.values()) - set(all_but_users)
+        users_to_invite.remove(config.slack.get_user("slackbot"))
     for user in users_to_invite:
         conversation.invite(user)
 

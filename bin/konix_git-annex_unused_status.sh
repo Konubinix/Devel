@@ -41,7 +41,7 @@ do
 	ack="$(git annex metadata -g ack --key "${sha}")"
 	if [ "${ack}" == "delete" ]
 	then
-		git annex drop --key "${sha}"
+		git annex drop --force --key "${sha}"
 		continue
 	fi
 	# git log return an expression to be evaluated 3 times before giving the correct string, hence the two nested printf

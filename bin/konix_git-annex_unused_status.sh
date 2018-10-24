@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -eux
 
 pushd "$(git rev-parse --show-toplevel)"
 
@@ -66,7 +66,6 @@ do
 	   do
 		   dst="$(mktemp -u "${dst}.XXXX")"
 	   done
-	   set -x
 	   DIR="$(dirname "${dst}")"
 	   if [ "${DIR}" != "" ]
 	   then
@@ -74,7 +73,6 @@ do
 	   fi
 	   ln -v -r -s "${annexobjectlocation}" "${dst}"
 	   git annex metadata --set ack=restored --key="${sha}"
-	   set +x
 	fi
 done | {
 	if [ -n "${SORT}" ]

@@ -646,6 +646,20 @@ with a precise timestamp)."
    )
   )
 
+(defun konix/skip-not-todo-file ()
+  (let (
+        (file_name (buffer-file-name))
+        )
+    (if (or
+         (s-ends-with-p ".com.org" file_name)
+         (s-ends-with-p "notes.org" file_name)
+         )
+        (point-max)
+      nil
+      )
+    )
+  )
+
 (defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip)
   (let (beg end skip tags current_tag)
 	(org-back-to-heading t)
@@ -1130,13 +1144,20 @@ items"
 				  			   "Close a TODO before archiving it")
 				  			  (org-agenda-tag-filter-preset nil)
 				    		  (org-agenda-archives-mode t)
+                              (org-agenda-skip-function
+                               '(or
+                                 (konix/skip-not-todo-file)
+                                 ))
 				  			  )
 				  			 )
 				  (tags "refile"
 				    	(
 				    	 (org-agenda-overriding-header "Refile those entries")
 				    	 (org-agenda-skip-function
-				    	  '(konix/org-agenda-skip-if-heading "Refile"))
+				    	  '(or
+                            (konix/skip-not-todo-file)
+                            (konix/org-agenda-skip-if-heading "Refile")
+                            ))
 				    	 (org-agenda-tag-filter-preset nil)
 				    	 )
 				    	)
@@ -1146,17 +1167,23 @@ items"
 				    	  "A project MUST have a NEXT entry")
 				    	 (org-agenda-tag-filter-preset nil)
 				    	 (org-agenda-skip-function
-				    	  'konix/org-agenda-skip-if-not-waiting-nor-has-next-entry
+				    	  '(or
+                            (konix/skip-not-todo-file)
+                            (konix/org-agenda-skip-if-not-waiting-nor-has-next-entry)
+                            )
 				    	  )
 				    	 )
 				    	)
 				  (todo "NEXT"
 				    	(
 				    	 (org-agenda-skip-function
-				    	  '(konix/org-agenda-skip-if-tags
-				    		'("phantom" "maybe")
-				    		t
-				    		)
+				    	  '(or
+                            (konix/skip-not-todo-file)
+                            (konix/org-agenda-skip-if-tags
+                             '("phantom" "maybe")
+                             t
+                             )
+                            )
 				    	  )
 				    	 (org-agenda-tag-filter-preset nil)
 				    	 (org-agenda-overriding-header
@@ -1167,6 +1194,7 @@ items"
                         (
                          (org-agenda-skip-function
                           '(or
+                            (konix/skip-not-todo-file)
                             (konix/org-agenda-skip-if-tags
                              '("project" "phantom" "maybe")
                              )
@@ -1184,12 +1212,20 @@ items"
 				    		  (org-agenda-overriding-header
 				    		   "Assign a context to all NEXT (not project) items")
 				    		  (org-agenda-tag-filter-preset nil)
-				    		  )
+                              (org-agenda-skip-function
+                               '(or
+                                 (konix/skip-not-todo-file)
+                                 ))
+                              )
 				    		 )
 				  (tags-todo "DELEGATED|WAIT//NEXT"
 				    		 (
 				    		  (org-agenda-overriding-header
 				    		   "Check whether those items are still waiting for something")
+                              (org-agenda-skip-function
+                               '(or
+                                 (konix/skip-not-todo-file)
+                                 ))
 				    		  )
 				    		 )
 				  (tags "+project//-DONE-NOT_DONE"
@@ -1199,6 +1235,7 @@ items"
 				    	 (org-agenda-tag-filter-preset nil)
 				    	 (org-agenda-skip-function
 				    	  '(or
+                            (konix/skip-not-todo-file)
 				    		(konix/org-agenda-keep-if-is-unactive-project)
 				    		))
 				    	 )
@@ -1242,11 +1279,13 @@ items"
 							(org-agenda-overriding-header
 							 "Agenda without projects (month overview)")
 							(org-agenda-skip-function
-							 '(konix/org-agenda-skip-if-tags
-							   '("project"
-								 "no_weekly"
-								 "phantom"
-								 ))
+							 '(or
+                               (konix/org-agenda-skip-if-tags
+                                '("project"
+                                  "no_weekly"
+                                  "phantom"
+                                  ))
+                               )
 							 )
 							(org-agenda-span 30)
 							)

@@ -38,7 +38,7 @@ shift $((OPTIND-1))
 
 cut -f2 -d ' ' .git/annex/unused | while read sha
 do
-	ack="(git annex metadata -g ack --key "${sha}")"
+	ack="$(git annex metadata -g ack --key "${sha}")"
 	if [ "${ack}" == "delete" ]
 	then
 		git annex drop --key "${sha}"

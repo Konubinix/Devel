@@ -442,6 +442,25 @@ Trainstation info: {trainstation_departures or "N/A"}
         return RouteSchedule(**rs[0])
 
 
+@cache_disk(expire=3600*24*365)
+def _get_referentiel_gares_voyageurs():
+    url = "https://ressources.data.sncf.com/explore/dataset/referentiel-gares-voyageurs/download?format=json"
+    LOGGER.debug(f"Getting {url}")
+    r = requests.get(url)
+    return json.loads(r.content)
+
+
+@cache_disk(expire=3600*24*365)
+def _get_info_gare(name):
+    return builtins.max(
+        _get_referentiel_gares_voyageurs(),
+        key=lambda e: fuzz.ratio(
+            e["fields"].get("ut", e["fields"]["intitule_gare"]).lower(),
+            name.lower() + "gare"
+        )
+    )
+
+
 @dataclass
 class StopPoint:
     name:str
@@ -470,23 +489,7 @@ class StopPoint:
 
     @property
     def info_gare(self):
-        @cache_disk(expire=3600*24*365)
-        def _get_referentiel_gares_voyageurs():
-            url = "https://ressources.data.sncf.com/explore/dataset/referentiel-gares-voyageurs/download?format=json"
-            LOGGER.debug(f"Getting {url}")
-            r = requests.get(url)
-            return json.loads(r.content)
-
-        @cache_disk(expire=3600*24*365)
-        def _get_info_gare(name):
-            return builtins.max(
-                _get_referentiel_gares_voyageurs(),
-                key=lambda e: fuzz.ratio(
-                    e["fields"]["intitule_plateforme"],
-                    name
-                )
-            )
-        return _get_info_gare(self.name)
+        return _get_info_gare(self.name.lower().replace("-", " ")) #administrative_regions[0]["name"])
 
     def format_trainstation(self, trip_name, arrival=False):
         trainstation_info = self.trainstation_info(arrivals=arrival).get(trip_name, {})
@@ -824,13 +827,13 @@ class Stop(HasVehicleJourneyMixin, HasTrainstationInfo, HasWaySchedules):
 
 @dataclass
 class StopArea:
-    codes: dict
     name: str
     links: list
     coord: dict
     label: str
     timezone: str
     id: str
+    codes: dict = None
     administrative_regions: list = None
 
     @property

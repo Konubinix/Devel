@@ -44,7 +44,8 @@ do
 		git annex drop --key "${sha}"
 		continue
 	fi
-	lastname="$(git log -1 --format=oneline --name-status  -S "${sha}"|tail -1|sed 's|^[A-Z]\+[ \t]\+||')"
+	# git log return an expression to be evaluated 3 times before giving the correct string, hence the two nested printf
+	lastname="$(printf $(printf $(git log -1 --format='%e %s' --name-status -S "${sha}" | tail -1|sed 's|^[A-Z]\+[ \t]\+||'|sed 's|^"\\"||'|sed 's|\\""$||')))"
 	lastchanged="$(git annex metadata -g lastchanged --key "${sha}")"
 	echo "############### ${lastchanged}: ${lastname} : ${sha}"
 	if [ -n "${LOCATION}" ]

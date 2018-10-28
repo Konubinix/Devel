@@ -7,6 +7,7 @@ usage () {
 $0 [-s][-l][-r]
 
 -s: sort
+-c: compute them before doing the other stuff
 -l: location tracking
 -r: restore
 EOF
@@ -16,7 +17,7 @@ EOF
 SORT=""
 LOCATION=""
 RESTORE=""
-while getopts "hslr" opt; do
+while getopts "hslrc" opt; do
 	case $opt in
 		h)
 			usage
@@ -24,6 +25,9 @@ while getopts "hslr" opt; do
 			;;
 		s)
 			SORT=1
+			;;
+		c)
+			git annex unused
 			;;
 		l)
 			LOCATION=1

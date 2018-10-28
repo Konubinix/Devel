@@ -1,5 +1,7 @@
 #!/bin/bash
 
+MESSAGE="${1:-Freezing of repo}"
+
 source "git-annex-perso_lib.sh"
 
 die ( ) {
@@ -68,7 +70,7 @@ fi
 if [ -n "$(git diff --cached --name-only --diff-filter=ACDMRUXB)" ]
 then
     echo "Perform the commit"
-    git -c core.bare=false commit -m "Freezing of repo by $LOGNAME at $HOSTNAME" || die "Could not commit"
+    git -c core.bare=false commit -m "${MESSAGE} by $LOGNAME at $HOSTNAME" || die "Could not commit"
 
     gaps_launch_freeze_post_hook "${GITANNEXFREEZE_POST_HOOK}" "$(pwd)"
     gaps_launch_freeze_post_hook "${GITANNEXFREEZE_POST_HOOK}_${HOSTNAME}" "$(pwd)"

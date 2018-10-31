@@ -889,6 +889,7 @@ items"
 			 (org-agenda-include-diary nil)
 			 (org-agenda-skip-function
 			  '(or
+                (konix/skip-not-todo-file)
 				(konix/org-agenda-skip-if-tags
 				 '("project")
 				 t)
@@ -902,6 +903,11 @@ items"
 	(tags-todo "WAIT|DELEGATED"
 			   (
 				(org-agenda-overriding-header "WAITING items")
+                (org-agenda-skip-function
+                 '(or
+                   (konix/skip-not-todo-file)
+                   )
+                 )
 				)
 			   )
 	(agenda nil
@@ -921,9 +927,12 @@ items"
 	(todo "NEXT"
 		  (
 		   (org-agenda-skip-function
-			'(konix/org-agenda-skip-if-tags
-			  '("phantom" "maybe" "project")
-			  )
+			'(or
+              (konix/skip-not-todo-file)
+              (konix/org-agenda-skip-if-tags
+               '("phantom" "maybe" "project")
+               )
+              )
 			)
 		   (org-agenda-tag-filter-preset nil)
 		   (org-agenda-overriding-header "Unscheduled NEXT Items")

@@ -573,6 +573,9 @@ class StopPoint:
                     else:
                         date = today
                         _hour = hour
+                    # when several lines are given, it means the first ones are
+                    # striked through and the last one is the good one
+                    _hour = _hour.splitlines()[-1]
                     h, m = _hour.split("h")
                     date = date.replace(hour=int(h), minute=int(m), second=0)
                 else:

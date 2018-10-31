@@ -73,7 +73,7 @@ do
 	   DIR="$(dirname "${dst}")"
 	   if [ "${DIR}" != "" ]
 	   then
-		   mkdir -p "$(dirname "${dst}")"
+		   mkdir -p "$DIR"
 	   fi
 	   ln -v -r -s "${annexobjectlocation}" "${dst}"
 	   git annex metadata --set ack=restored --key="${sha}"

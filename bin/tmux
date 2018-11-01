@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source "${KONIX_LIB_DIR}/lib_bash.sh"
+
+call_second_like_me -f "${KONIX_CONFIG_DIR}/tmux.conf" "$@"

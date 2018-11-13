@@ -30,7 +30,7 @@ gaps_launch_freeze_post_hook ( ) {
             || die "Failed to launch the freeze posthook for ${message}"
     fi
 }
-git config user "${USER}"
+git config user.name "${USER}"
 git config user.email "${USER}@${HOSTNAME}"
 GITANNEXFREEZE_PRE_HOOK=".gitannexfreeze_prehook"
 GITANNEXFREEZE_POST_HOOK=".gitannexfreeze_posthook"

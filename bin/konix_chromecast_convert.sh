@@ -35,6 +35,7 @@ shift $((OPTIND-1))
 OUTPUT="${INPUT%*.*}.webm"
 if [ -n "${SUB}" ]
 then
+	# use submarine
 	ARGS="${ARGS} -vf subtitles=${INPUT%*.*}.webvtt"
 fi
 

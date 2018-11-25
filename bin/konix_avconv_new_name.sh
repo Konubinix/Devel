@@ -14,6 +14,10 @@ if avconv -i "${file}" 2>&1 |grep -q -e "handler_name.\+:.\+VideoHandle" -e "com
 then
 	# utc date
 	date_to_parse="${creation_date}+0000"
+elif avconv -i "${file}" 2>&1 |grep -q -i 'iCatch Alias Data Handler' # xp120
+then
+	# local date
+	date_to_parse="${creation_date}"
 elif avconv -i "${file}" 2>&1 |grep -q -i 'creation_time.\+Z$'
 then
 	# utc date

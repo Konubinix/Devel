@@ -1,2 +1,3 @@
 [Default Applications]
 text/html=qutebrowser-usercreated-1.desktop;
+application/x-ipynb+json=notebook-usercreated-1.desktop;

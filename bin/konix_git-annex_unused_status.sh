@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/bin/bash -eu
 
 pushd "$(git rev-parse --show-toplevel)"
 

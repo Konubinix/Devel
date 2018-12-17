@@ -570,6 +570,9 @@ class StopPoint:
                     if "J+1" in hour:
                         date = today + datetime.timedelta(days=1)
                         _hour = hour.replace("J+1", "")
+                    elif "J+2" in hour:
+                        date = today + datetime.timedelta(days=2)
+                        _hour = hour.replace("J+2", "")
                     else:
                         date = today
                         _hour = hour

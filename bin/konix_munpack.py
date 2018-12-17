@@ -109,14 +109,14 @@ def munpack(message, directory, rel_path=False):
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>{}</title>
-<meta  http-equiv="Content-Type" content="text/html;charset={}" />
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 </head>
 <body>
 {}
 </body>
 </html>
-""".format("Mail", charset, text)
-            content = text.encode(charset)
+""".format("Mail", text)
+            content = text.encode("utf-8")
         file_.write(content)
         file_.close()
         cid = part.get("Content-Id", None)

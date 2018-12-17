@@ -1052,7 +1052,7 @@ Attendees:
 
     def accept(self, event, comment=""):
         data = {
-            "attendees": event.attendees + [
+            "attendees": (event.attendees or []) + [
                 {
                     "email": self.calendar_id,
                     "responseStatus": "accepted",
@@ -1066,7 +1066,7 @@ Attendees:
         self._update_insist(
             event,
             {
-                "attendees": event.attendees + [
+                "attendees": (event.attendees or []) + [
                     {
                         "email": self.calendar_id,
                         "responseStatus": "declined",
@@ -1081,7 +1081,7 @@ Attendees:
         self._update_insist(
             event,
             {
-                "attendees": event.attendees + [
+                "attendees": (event.attendees or []) + [
                     {
                         "email": self.calendar_id,
                         "responseStatus": "tentative",

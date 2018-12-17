@@ -1838,7 +1838,7 @@ items"
 							(
 							 (org-agenda-overriding-header
 							  "Must say something about those invitations")
-							 (org-agenda-span 'week)
+							 (org-agenda-span 15)
                              (org-agenda-skip-function
                               '(konix/org-agenda-skip-if-tags
                                 '(

@@ -8,9 +8,11 @@ import os
 import re
 import datetime
 import builtins
+from dateutil.parser import parse as dateparse
 import json
 import pprint
 import asyncio
+import redis
 import base64
 from requests.exceptions import HTTPError
 
@@ -35,7 +37,8 @@ from click_project.lib import (
     get_authenticator,
     TablePrinter,
     ParameterType,
-    makedirs
+    makedirs,
+    json_dumps,
 )
 from click_project.completion import startswith
 from click_project.config import config
@@ -44,6 +47,8 @@ from click_project.core import cache_disk
 from konix_time_helper import naive_to_local
 
 LOGGER = get_logger(__name__)
+
+db = redis.StrictRedis(decode_responses=True)
 
 
 def get_slack_token():
@@ -150,27 +155,38 @@ class Conversation():
     def set_topic(self, topic):
         self.endpoint.set_topic(self.id, topic)
 
-    def history(self, oldest=None, latest=None, user=None):
-        def get_history_unpage(latest, oldest):
+    def history(self, oldest=None, latest=None, user=None, count=1000):
+        def get_history_unpage(latest, oldest, count):
             res = self.endpoint.history(
                 self.data["id"],
-                count=1000,
+                count=count,
                 latest=latest,
                 oldest=oldest,
             ).body
             messages = res["messages"]
             if res["has_more"]:
                 messages += get_history_unpage(latest=messages[-1]["ts"],
-                                               oldest=oldest)
+                                               oldest=oldest,
+                                               count=count,
+                )
             return messages
         return builtins.sorted([
             Message(message)
-            for message in get_history_unpage(oldest=oldest, latest=latest)
+            for message in get_history_unpage(
+                    oldest=oldest, latest=latest,
+                    count=count
+            )
             if not user or message.get("user") == user.id
         ])
 
     def __repr__(self):
         return "<{} - {}>".format(self.data["id"], self.name)
+
+    def get_message(self, timestamp):
+        return Message(config.slack.client.reactions.get(
+            channel=self.id,
+            timestamp=timestamp,
+        ).body["message"])
 
 
 class Group(Conversation):
@@ -310,9 +326,10 @@ class RTM():
 
     async def write(self, message):
         message = message.copy()
-        message["id"] = self.id
-        await self.ws.send(json.dumps(message))
         self.id = self.id + 1
+        message["id"] = self.id
+        res = await self.ws.send(json.dumps(message))
+        return res
 
     async def listen(
             self,
@@ -326,6 +343,10 @@ class RTM():
                     (
                         not conversations
                         or chunk.get("channel") in [
+                            conversation.id
+                            for conversation in conversations
+                        ]
+                        or chunk.get("item", {}).get("channel") in [
                             conversation.id
                             for conversation in conversations
                         ]
@@ -460,6 +481,16 @@ class SlackConfig():
         return _conversations()
 
 
+def find_user(value):
+    return [
+        user for user in config.slack.users.values()
+        if user.name == value
+        or (user.email and user.email == value)
+        or user["real_name"] == value
+        or user["display_name"] == value
+    ][0]
+
+
 class UserType(ParameterType):
     def complete(self, ctx, incomplete):
         return [
@@ -472,13 +503,7 @@ class UserType(ParameterType):
 
     def convert(self, value, param, ctx):
         try:
-            return [
-                user for user in config.slack.users.values()
-                if user.name == value
-                or (user.email and user.email == value)
-                or user["real_name"] == value
-                or user["display_name"] == value
-            ][0]
+            return find_user(value)
         except (ValueError, UnicodeError):
             self.fail('%s is not a valid user name' % value, param, ctx)
 
@@ -491,13 +516,22 @@ class ConversationType(ParameterType):
         ]
 
     def convert(self, value, param, ctx):
+        def fail():
+            self.fail('%s is not a valid group name' % value, param, ctx)
         try:
             return [
                 c for c in config.slack.conversations.values()
                 if c.name == value
             ][0]
+        except IndexError as e:
+            try:
+                user = find_user(value)
+                channel_id = config.slack.client.im.open(user.id).body["channel"]["id"]
+                return IMS().get(channel_id)
+            except IndexError:
+                fail()
         except (ValueError, UnicodeError):
-            self.fail('%s is not a valid group name' % value, param, ctx)
+            fail()
 
 
 @group()
@@ -511,6 +545,68 @@ def slack():
     """Play with slack
 
     Talk to people, record the history, etc."""
+
+
+def message_handle(message):
+    for user in config.slack.users.values():
+        message = message.replace("@" + user.name, "<@{}>".format(user.id))
+    return message
+
+
+class MessageType(ParameterType):
+    def convert(self, value, param, ctx):
+        return message_handle(value)
+
+
+@slack.command()
+@argument("conversation", type=ConversationType(),
+        help="The conversation of interest")
+@option("--reaction",
+        multiple=True,
+        help="Some reactions to put in it."
+        " Implies --wait-server-response")
+@flag("--me/--no-me", help="Send a me message")
+@argument("message", help="The message to send", type=MessageType())
+def post_message(conversation, message, reaction, me):
+    """Post a message to this conversation"""
+    endpoint = (
+        config.slack.client.chat.me_message
+        if me
+        else config.slack.client.chat.post_message
+    )
+    response = endpoint(conversation.id, message)
+    for r in reaction:
+        config.slack.client.reactions.add(
+            channel=conversation.id,
+            timestamp=response.body["ts"],
+            name=r,
+        )
+
+
+@slack.command()
+@argument("conversation", type=ConversationType(),
+          help="The conversation of interest")
+@argument("timestamp",
+          help="The timestamp of the message")
+def delete(conversation, timestamp):
+    """Delete a message from this conversation"""
+    config.slack.client.chat.delete(
+        conversation.id,
+        timestamp,
+    )
+
+
+@slack.command()
+@argument("conversation", type=ConversationType(),
+          help="The conversation of interest")
+@argument("text",
+          help="The text of the message")
+def me_message(conversation, text):
+    """Delete a message from this conversation"""
+    config.slack.client.chat.me_message(
+        conversation.id,
+        text,
+    )
 
 
 @slack.command()
@@ -588,6 +684,7 @@ def conversations(fields, format, type):
         "ts_str",
     ],
     default=(
+        "ts_str",
         'datetime',
         "username",
         "text",
@@ -598,8 +695,10 @@ def conversations(fields, format, type):
           help="The conversation to get the history from")
 @option("--oldest", help="The oldest timestamp to consider")
 @option("--latest", help="The latest timestamp to consider")
+@option("--count", help="The number of messages to show")
 @option("--user", type=UserType(), help="Show only messages from this user")
 def history(fields, format, conversation, oldest, latest,
+            count,
             user):
     """Show the history of messages from a conversation"""
     if oldest:
@@ -611,7 +710,7 @@ def history(fields, format, conversation, oldest, latest,
     with TablePrinter(fields, format) as tp:
         tp.echo_records(
             message.data for message in conversation.history(
-                oldest=oldest, latest=latest, user=user)
+                oldest=oldest, latest=latest, user=user, count=count)
         )
 
 
@@ -741,12 +840,22 @@ def redis_bot(conversations, types, channel_control, channel_to,
 
 
 @rtm.command()
-@option("--conversation", type=ConversationType())
-@argument("message")
-def send(conversation, message):
-    ""
-    for user in config.slack.users.values():
-        message = message.replace("@" + user.name, "<@{}>".format(user.id))
+@option("--conversation", type=ConversationType(),
+        help="The conversation of interest")
+@option("--reaction",
+        multiple=True,
+        help="Some reactions to put in it."
+        " Implies --wait-server-response")
+@argument("message", help="The message to send", type=MessageType())
+@flag("--wait-server-response/--no-wait-server-response", default=True,
+      help="Wait for the server to acknowledge the message")
+def send(conversation, message, reaction, wait_server_response):
+    return _send(conversation, message, reaction, wait_server_response)
+
+
+def _send(conversation, message, reaction, wait_server_response):
+    """Send a message to this conversation"""
+    wait_server_response = reaction or wait_server_response
     async_get(
         config.slack.rtm.write(
             {
@@ -756,6 +865,22 @@ def send(conversation, message):
             }
         )
     )
+    response = None
+    if wait_server_response:
+        LOGGER.info("Message sent, waiting for server response")
+        response = async_get(config.slack.rtm.read())
+        LOGGER.debug("Got response: {}".format(json_dumps(response)))
+        while response.get("reply_to") != config.slack.rtm.id:
+            response = async_get(config.slack.rtm.read())
+            LOGGER.debug("Got response: {}".format(json_dumps(response)))
+        LOGGER.info(json_dumps(response))
+    for r in reaction:
+        config.slack.client.reactions.add(
+            channel=conversation.id,
+            timestamp=response["ts"],
+            name=r,
+        )
+    return response
 
 
 @slack.command()
@@ -780,8 +905,11 @@ def create_group(name):
         help="Invite those users")
 @option("--all-but-user", "all_but_users", type=UserType(), multiple=True,
         help="Don't invite those users")
+@flag("--only-active-users/--also-inactive-users",
+      default=True,
+      help="Invite only the really active users")
 @argument("conversation", type=ConversationType(), help="The conversation")
-def invite_to_conversation(users, all_but_users, conversation):
+def invite_to_conversation(users, all_but_users, conversation, only_active_users):
     """Invite those users in the conversation"""
     assert (
         (users and not all_but_users)
@@ -791,8 +919,11 @@ def invite_to_conversation(users, all_but_users, conversation):
     if users:
         users_to_invite = list(users)
     if all_but_users:
-        users_to_invite = set(config.slack.users.values()) - set(all_but_users)
-        users_to_invite.remove(config.slack.get_user("slackbot"))
+        all_users = (
+            config.slack.active_users
+            if only_active_users else config.slack.users
+        )
+        users_to_invite = set(all_users.values()) - set(all_but_users)
     for user in users_to_invite:
         conversation.invite(user)
 
@@ -808,6 +939,13 @@ def set_conversation_topic(conversation, topic):
 @argument("user", type=UserType(), nargs=-1)
 def create_mpim(user):
     config.slack.client.mpim.open([u.id for u in user])
+
+
+@slack.command()
+@argument("user", type=UserType(), nargs=-1)
+def create_im(user):
+    for u in user:
+        config.slack.client.im.open(u.id)
 
 
 @slack.command()
@@ -875,3 +1013,467 @@ def rss(conversation,
             fe.author(author)
             fe.description(description)
     fg.rss_file(output_path, pretty=True)
+
+
+class SlackReaction():
+    pass
+
+
+@slack.group()
+@param_config(
+    "slack_reaction", "--conversation",
+    typ=SlackReaction,
+    required=True,
+    type=ConversationType(),
+    help="The conversation with the message to react on",
+)
+@param_config(
+    "slack_reaction", "--timestamp",
+    typ=SlackReaction,
+    required=True,
+    help="The timestamp of the message to react on",
+)
+def reaction():
+    """Handle reactions on a message"""
+
+
+@reaction.command()
+@argument("reaction", nargs=-1, help="The reaction to add")
+def add(reaction):
+    """Add a reaction to this message"""
+    for r in reaction:
+        config.slack.client.reactions.add(
+            channel=config.slack_reaction.conversation.id,
+            timestamp=config.slack_reaction.timestamp,
+            name=r,
+        )
+
+
+def reaction_handle(reaction):
+    return {
+        **reaction,
+        "users_txt": [
+            config.slack.users[u]["display_name"]
+            for u in reaction["users"]
+        ]
+    }
+
+
+class MessageReactionType(ParameterType):
+    @staticmethod
+    def list():
+        return [
+            reaction_handle(reaction)
+            for reaction in config.slack.client.reactions.get(
+                channel=config.slack_reaction.conversation.id,
+                timestamp=config.slack_reaction.timestamp,
+            ).body["message"].get("reactions", [])
+        ]
+
+    def complete(self, ctx, incomplete):
+        return [
+            reaction["name"]
+            for reaction in self.list()
+        ]
+
+    def convert(self, value, param, ctx):
+        try:
+            return [
+                reaction["name"]
+                for reaction in self.list()
+            ][0]
+        except (ValueError, UnicodeError):
+            self.fail('%s is not a valid user name' % value, param, ctx)
+
+
+@reaction.command()
+@argument("reaction", nargs=-1, help="The reaction to remove",
+          type=MessageReactionType())
+def remove(reaction):
+    """Remove a reaction from this message"""
+    for r in reaction:
+        config.slack.client.reactions.remove(
+            channel=config.slack_reaction.conversation.id,
+            timestamp=config.slack_reaction.timestamp,
+            name=r,
+        )
+
+
+@reaction.command()
+@table_fields(
+    choices=[
+        "name",
+        "users_txt",
+        "count",
+    ],
+)
+@table_format()
+def show(fields, format):
+    """Remove a reaction from this message"""
+    message = config.slack.client.reactions.get(
+        channel=config.slack_reaction.conversation.id,
+        timestamp=config.slack_reaction.timestamp,
+    ).body["message"]
+    reactions = message.get("reactions", [])
+    print(message["text"])
+    with TablePrinter(fields, format) as tp:
+        tp.echo_records(
+            sorted(
+                sorted(
+                    map(reaction_handle, reactions),
+                    key=lambda e: e["name"]
+                ),
+                key=lambda e: e["count"],
+                reverse=True,
+            )
+        )
+
+
+@slack.command()
+@argument("conversation", type=ConversationType(),
+          help="The conversation of interest")
+@argument("timestamp",
+          help="The timestamp of the message")
+@argument("text", required=False,
+          help="The text to use. If not given, an editor will be opened")
+def edit(conversation, timestamp, text):
+    """Edit the text of a message"""
+    text = text or click.edit(conversation.get_message(timestamp).data["text"])
+    if not text:
+        LOGGER.info("Aboooort!")
+        return
+    config.slack.client.chat.update(
+        channel=conversation.id,
+        text=text,
+        ts=timestamp,
+    )
+
+
+@reaction.command()
+@option("--result-timestamp",
+        help="Where to show the results. "
+        "In the original message if left empty.")
+@option("--ignore-reaction", multiple=True,
+        help="Ignore those reactions in the contest")
+def poll_update(result_timestamp, ignore_reaction):
+    """Update the text of the message to indicate the winning emoji"""
+    message = config.slack.client.reactions.get(
+        channel=config.slack_reaction.conversation.id,
+        timestamp=config.slack_reaction.timestamp,
+    ).body["message"]
+    result_message = config.slack.client.reactions.get(
+        channel=config.slack_reaction.conversation.id,
+        timestamp=result_timestamp or config.slack_reaction.timestamp,
+    ).body["message"]
+    reactions = [
+        r for r in message.get("reactions", [])
+        if r["name"] not in ignore_reaction
+    ]
+    try:
+        max_count = max(map(lambda e: e["count"], reactions))
+    except ValueError:
+        winner = """"no one yet" """
+    else:
+        winners = [
+            r for r in reactions
+            if r["count"] == max_count
+        ]
+        if winners:
+            if len(winners) > 3:
+                winner = "no clear winner yet. "
+            else:
+                winner = " or ".join(
+                    [
+                        ":{}: ({})".format(winner["name"], winner["count"])
+                        for winner in winners
+                    ]
+                )
+        else:
+            winner = """"no one yet" """
+    text = result_message["text"]
+    prefix = "Here comes the result:"
+    winner_text = "{} {}".format(prefix, winner)
+    if prefix in text:
+        text = re.sub("{} .+".format(prefix), winner_text, text)
+    else:
+        text += winner_text
+    config.slack.client.chat.update(
+        channel=config.slack_reaction.conversation.id,
+        text=text,
+        ts=result_timestamp or config.slack_reaction.timestamp,
+    )
+
+
+@reaction.command()
+@option("--result-timestamp",
+        help="Where to show the results. "
+        "In the original message if left empty.")
+@option("--ignore-reaction", multiple=True,
+        help="Ignore those reactions in the contest")
+def poll_listen(result_timestamp, ignore_reaction):
+    """Update the poll message when a reaction occurs"""
+    ctx = click.get_current_context()
+    _listen = config.slack.rtm.listen
+
+    async def do():
+        async for chunk in _listen(
+                conversations=[config.slack_reaction.conversation],
+                types=["reaction_added", "reaction_removed"],
+                user=None,
+                ):
+            if chunk["item"]["ts"] == config.slack_reaction.timestamp:
+                ctx.forward(poll_update)
+    async_get(do())
+
+
+class SlackPoll():
+    pass
+
+
+@slack.group()
+@param_config(
+    "slack_poll", "--conversation",
+    typ=SlackPoll,
+    required=True,
+    type=ConversationType(),
+    help="The conversation with the message to react on",
+)
+def poll():
+    """Create and manipulate polls, using emojis"""
+
+
+@poll.command()
+@argument("question", help="The question to ask in the poll")
+@option("--choice", multiple=True, nargs=2,
+        help="The choice and the emoji to use")
+@option("--dummy-choice", multiple=True, nargs=2,
+        help="The dummy choice and the emoji to use"
+        " (they won't be part of the poll)")
+def create(question, choice, dummy_choice):
+    """Create the poll"""
+    message = question + "\n"
+    for text, emoji in choice:
+        message += ":{}:: {}\n".format(emoji, text)
+    for text, emoji in dummy_choice:
+        message += ":{}:: {}\n".format(emoji, text)
+    response = config.slack.client.chat.post_message(
+        config.slack_poll.conversation.id,
+        message,
+    ).body
+    for text, r in choice:
+        config.slack.client.reactions.add(
+            channel=config.slack_poll.conversation.id,
+            timestamp=response["ts"],
+            name=r,
+        )
+    for text, r in dummy_choice:
+        config.slack.client.reactions.add(
+            channel=config.slack_poll.conversation.id,
+            timestamp=response["ts"],
+            name=r,
+        )
+    db.set(
+        "slack.poll.{}".format(config.slack_poll.conversation.id),
+        json.dumps(
+            {
+                "ts": response["ts"],
+                "assoc": {
+                    r: text
+                    for text, r in choice
+                },
+                "dummy_assoc": {
+                    r: text
+                    for text, r in dummy_choice
+                }
+            }
+        )
+    )
+
+
+@poll.command()
+def update():
+    """Update the poll message"""
+    info = json.loads(db.get("slack.poll.{}".format(
+        config.slack_poll.conversation.id)))
+    message = config.slack.client.reactions.get(
+        channel=config.slack_poll.conversation.id,
+        timestamp=info["ts"],
+    ).body["message"]
+    reactions = [
+        r for r in message.get("reactions", [])
+        if r["name"] in list(info["assoc"].keys())
+    ]
+    try:
+        max_count = max(map(lambda e: e["count"], reactions))
+    except ValueError:
+        winner = """"no one yet" """
+    else:
+        winners = [
+            r for r in reactions
+            if r["count"] == max_count
+        ]
+        if winners:
+            if len(winners) > 3:
+                winner = "no clear winner yet. "
+            else:
+                winner = " or ".join(
+                    [
+                        info["assoc"][winner["name"]]
+                        for winner in winners
+                    ]
+                )
+        else:
+            winner = """"no one yet" """
+    text = message["text"]
+    prefix = "Here comes the result:"
+    winner_text = "{} {}".format(prefix, winner)
+    if prefix in text:
+        text = re.sub("{} .+".format(prefix), winner_text, text)
+    else:
+        text += winner_text
+    config.slack.client.chat.update(
+        channel=config.slack_poll.conversation.id,
+        text=text,
+        ts=info["ts"],
+    )
+
+
+@poll.command()
+def _listen():
+    """Update the poll message when a reaction occurs"""
+    info = json.loads(db.get("slack.poll.{}".format(
+        config.slack_poll.conversation.id)))
+    ctx = click.get_current_context()
+    _listen = config.slack.rtm.listen
+
+    async def do():
+        async for chunk in _listen(
+                conversations=[config.slack_poll.conversation],
+                types=["reaction_added", "reaction_removed"],
+                user=None,
+                ):
+            if chunk["item"]["ts"] == info["ts"]:
+                ctx.invoke(update)
+    async_get(do())
+
+
+@slack.group()
+def status():
+    """Manipulate the status"""
+
+
+@status.command()
+@table_fields(
+    choices=['title', 'phone', 'skype', 'real_name', 'real_name_normalized',
+             'display_name', 'display_name_normalized', 'fields', 'status_text',
+             'status_emoji', 'status_expiration', 'avatar_hash', 'email',
+             'first_name', 'last_name', 'image_24', 'image_32', 'image_48',
+             'image_72', 'image_192', 'image_512', 'status_text_canonical'
+    ],
+    default=[
+        "real_name", "status_text", "status_emoji"
+    ]
+)
+@table_format()
+def get(fields, format):
+    """Get the status"""
+    with TablePrinter(fields, format) as tp:
+        tp.echo_records(
+            [config.slack.client.users.profile.get().body["profile"]]
+        )
+
+
+@status.command()
+@option("--text", help="The text of the status")
+@option("--emoji", help="The emoji of the status")
+def _set(text, emoji):
+    if text is None and emoji is None:
+        LOGGER.info("No change of status")
+        return
+    if emoji and not emoji.startswith(":"):
+        emoji = ":" + emoji
+    if emoji and not emoji.endswith(":"):
+        emoji = emoji + ":"
+
+    profile = {}
+    if text is not None:
+        profile["status_text"] = text
+    if emoji is not None:
+        profile["status_emoji"] = emoji
+    config.slack.client.users.profile.set(
+        profile=json.dumps(profile)
+    )
+
+
+@status.command()
+def unset():
+    ctx = click.get_current_context()
+    ctx.invoke(_set, text="", emoji="")
+
+
+@slack.command()
+@option("--text", help="The text of the status")
+@option("--emoji", help="The emoji of the status")
+def leave(text, emoji):
+    config.slack.client.users.set_presence("away")
+    ctx = click.get_current_context()
+    ctx.forward(_set)
+
+
+@slack.command()
+@option("--text", help="The text of the status")
+@option("--emoji", help="The emoji of the status")
+def back(text, emoji):
+    config.slack.client.users.set_presence("auto")
+    ctx = click.get_current_context()
+    ctx.forward(_set)
+
+
+@slack.group()
+def pomodoro_status():
+    """Handle the status to show the pomodoro state"""
+    presence = config.slack.client.users.get_presence(
+        config.slack.me["id"]
+    ).body["presence"]
+    if presence == "away":
+        LOGGER.info("Not updating the status if your are away")
+        exit(0)
+
+
+@pomodoro_status.command()
+@argument("end", help="The end of the pomodoro", type=dateparse)
+def start(end):
+    """Indicate you are in a pomodoro that will spend till end"""
+    ctx = click.get_current_context()
+    ctx.invoke(
+        _set,
+        text="In a pomodoro, hopefully till {}".format(
+            end.strftime("%H:%M")
+        ),
+        emoji="tomato"
+    )
+
+
+@pomodoro_status.command()
+@argument("end", help="The end of the pomodoro", type=dateparse)
+def _break(end):
+    """Indicate you are in a break that will spend till end"""
+    ctx = click.get_current_context()
+    ctx.invoke(
+        _set,
+        text="In a break, hopefully till {}".format(
+            end.strftime("%H:%M")
+        ),
+        emoji="zzz"
+    )
+
+
+@pomodoro_status.command()
+def _stop():
+    """Reset the status"""
+    ctx = click.get_current_context()
+    ctx.invoke(
+        _set,
+        text="",
+        emoji="",
+    )

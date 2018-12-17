@@ -3299,6 +3299,12 @@ an error (this should never happen)."
           (id (org-entry-get (point) "ID"))
           (account (org-entry-get (point) "ACCOUNT_NAME"))
           (calendar_id (org-entry-get (point) "CALENDAR_ID"))
+          (command (format
+                    "konix_gcal.py -a \"%s\" decline %s \"%s\""
+                    account
+                    id
+                    why
+                    ))
           )
      (shell-command
       (format
@@ -3307,14 +3313,8 @@ an error (this should never happen)."
        calendar_id
        )
       )
-     (shell-command
-      (format
-       "konix_gcal.py -a \"%s\" decline %s \"%s\""
-       account
-       id
-       why
-       )
-      )
+     (message command)
+     (shell-command command)
      ))
   )
 

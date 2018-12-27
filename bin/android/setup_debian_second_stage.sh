@@ -2,6 +2,21 @@
 
 export LANG=C
 
+groupadd -g 3001 aid_net_bt_admin
+groupadd -g 3002 aid_net_bt
+groupadd -g 3003 aid_inet
+groupadd -g 3004 aid_inet_raw
+groupadd -g 3005 aid_inet_admin
+groupadd -g 1015 sdcard-rw
+
+gpasswd -a root aid_net_bt_admin
+gpasswd -a root aid_net_bt
+gpasswd -a root aid_inet
+gpasswd -a root aid_inet_raw
+gpasswd -a root aid_inet_admin
+
+usermod -g 3003 _apt
+
 /debootstrap/debootstrap --second-stage
 
 cat <<EOF > /etc/apt/sources.list
@@ -34,7 +49,6 @@ EOF
 
 apt-get update
 apt-get -y install aptitude
-sed -i 's/_apt:x:104:65534/_apt:x:104:3004/g' /etc/passwd
 aptitude update
 aptitude -y full-upgrade
 aptitude -y install iputils-ping locales
@@ -42,7 +56,5 @@ setcap cap_net_raw+epi /bin/ping
 dpkg-reconfigure locales
 # en_GB + en_US + fr_FR : 133 134 135 150 151 152 225 226 227
 
-/usr/sbin/addgroup --gid 3003 aid_net
-/usr/sbin/addgroup --gid 1015 sdcard-rw
 
 /sbin/android_setup_perso.sh

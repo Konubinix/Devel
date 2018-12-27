@@ -546,7 +546,7 @@
 ;; framemove
 ;; ####################################################################################################
 (setq-default framemove-hook-into-windmove t)
-(require 'framemove)
+(require 'framemove nil t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; mic paren, a substitute for the normal paren matching but better. It ;;

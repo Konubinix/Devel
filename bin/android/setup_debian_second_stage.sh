@@ -51,7 +51,7 @@ apt-get update
 apt-get -y install aptitude
 aptitude update
 aptitude -y full-upgrade
-aptitude -y install iputils-ping locales
+aptitude -y install iputils-ping locales dialog
 setcap cap_net_raw+epi /bin/ping
 dpkg-reconfigure locales
 # en_GB + en_US + fr_FR : 133 134 135 150 151 152 225 226 227

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -eux
 source "git-annex-perso_lib.sh"
 
 gaps_log "Re run the config in case it changed"
+set -eux
 gaps_launch_config
 # this is a general configuration that avoid a lot of trouble when almost
 # running out of disk space

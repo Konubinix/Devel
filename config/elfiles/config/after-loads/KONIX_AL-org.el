@@ -1227,6 +1227,17 @@ items"
                                  ))
                               )
 				    		 )
+				  (tags-todo "-{_.+}//"
+				    		 (
+				    		  (org-agenda-overriding-header
+				    		   "Every action must be committed to someone, even to me")
+				    		  (org-agenda-tag-filter-preset nil)
+                              (org-agenda-skip-function
+                               '(or
+                                 (konix/skip-not-todo-file)
+                                 ))
+                              )
+				    		 )
 				  (tags-todo "DELEGATED|WAIT//NEXT"
 				    		 (
 				    		  (org-agenda-overriding-header

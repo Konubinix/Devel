@@ -1183,22 +1183,6 @@ items"
 				    	  )
 				    	 )
 				    	)
-				  (todo "NEXT"
-				    	(
-				    	 (org-agenda-skip-function
-				    	  '(or
-                            (konix/skip-not-todo-file)
-                            (konix/org-agenda-skip-if-tags
-                             '("phantom" "maybe")
-                             t
-                             )
-                            )
-				    	  )
-				    	 (org-agenda-tag-filter-preset nil)
-				    	 (org-agenda-overriding-header
-				    	  "phantom and maybe items should not be NEXT actions")
-				    	 )
-				    	)
 				  (todo "TODO"
                         (
                          (org-agenda-skip-function
@@ -1413,7 +1397,7 @@ items"
 				   )
 				  ("an" "Next action list (without habits)"
 				   (
-					(todo "NEXT")
+					(tags-todo "-maybe//+NEXT")
 					)
 				   (
 					)

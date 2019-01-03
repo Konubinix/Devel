@@ -3395,6 +3395,7 @@ an error (this should never happen)."
   )
 
 (setq-default org-babel-python-command "python3")
+(setq-default org-sort-agenda-noeffort-is-high nil)
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

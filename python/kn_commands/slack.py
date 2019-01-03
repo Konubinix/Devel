@@ -919,6 +919,7 @@ def invite_to_conversation(users, all_but_users, conversation, only_active_users
     if users:
         users_to_invite = list(users)
     if all_but_users:
+        all_but_users += config.slack.users[config.slack.me["id"]],
         all_users = (
             config.slack.active_users
             if only_active_users else config.slack.users

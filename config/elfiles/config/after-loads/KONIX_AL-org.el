@@ -1262,6 +1262,32 @@ items"
 				    	)
  				  )
 				)
+  (setq-default konix/org-agenda-stuck-view-hof
+                '(
+                  (tags-todo "-{2_.+}//"
+                             (
+                              (org-agenda-overriding-header
+                               "Assign a horizon 2 (accountability) to every action")
+                              (org-agenda-tag-filter-preset nil)
+                              (org-agenda-skip-function
+                               '(or
+                                 (konix/skip-not-todo-file)
+                                 ))
+                              )
+                             )
+                  (tags-todo "-{[345]_.+}//"
+                             (
+                              (org-agenda-overriding-header
+                               "Assign an horizon 3 (goals), 4 (vision) or 5 (purpose&principle) to every action")
+                              (org-agenda-tag-filter-preset nil)
+                              (org-agenda-skip-function
+                               '(or
+                                 (konix/skip-not-todo-file)
+                                 ))
+                              )
+                             )
+                  )
+                )
   (setq-default konix/org-agenda-full-view
 				(append
 				 '(
@@ -1485,6 +1511,12 @@ items"
 				   )
 				  ("as" "Stuck view"
 				   ,konix/org-agenda-stuck-view
+				   (
+					(dummy (konix/org-agenda-inhibit-context-filtering))
+					)
+				   )
+				  ("aS" "Stuck view HOF"
+				   ,konix/org-agenda-stuck-view-hof
 				   (
 					(dummy (konix/org-agenda-inhibit-context-filtering))
 					)

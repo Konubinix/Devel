@@ -2224,6 +2224,11 @@ items"
                 ("project" . ?p)
                 ("maybe" . ?y)
                 ("refile" . ?f)
+                (:startgroup . nil)
+                ("%s" . nil)
+                ("%m" . nil)
+                ("%l" . nil)
+                (:endgroup . nil)
                 (:newline)
                 ("no_weekly" . ?n)
                 ("no_appt" . ?a)
@@ -2234,6 +2239,7 @@ items"
 (setq-default org-tags-exclude-from-inheritance
               '(
                 "project" "draft" "phantom"
+                "%s" "%m" "%l"
                 "WAIT" "DELEGATED"
                 "EXPIRED" "NOEXPIRY"
                 ))

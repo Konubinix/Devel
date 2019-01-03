@@ -2199,6 +2199,7 @@ items"
 (setq-default konix/org-tag-contexts
               '(
                 ("@home" . ?h)
+                ("@meeting" . ?m)
                 ("@errand" . ?e)
                 ("@work" . ?w)
                 ("@workhours" . ?H)

@@ -926,6 +926,7 @@ def invite_to_conversation(users, all_but_users, conversation, only_active_users
         )
         users_to_invite = set(all_users.values()) - set(all_but_users)
     for user in users_to_invite:
+        LOGGER.info("Inviting {}".format(user["name"]))
         conversation.invite(user)
 
 

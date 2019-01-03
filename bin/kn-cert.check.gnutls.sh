@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 if [ $# -gt 0 ] && [ "$1" == "--help" ]
 then

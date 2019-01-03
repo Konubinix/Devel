@@ -21,7 +21,7 @@ grep "${OPENSSL_OUT}" \
     -e "Verify return code: "
 
 RES=`cat "${OPENSSL_OUT}" | sed -n '/Verify return code/ {
-s/.\+Verify return code: \([0-9]\+\) .\+/\1/
+s/.*Verify return code: \([0-9]\+\) .\+/\1/
 p
 }'`
 

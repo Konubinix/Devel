@@ -1170,7 +1170,7 @@ items"
 				    	 (org-agenda-tag-filter-preset nil)
 				    	 )
 				    	)
-				  (tags "+project//-DONE-NOT_DONE"
+				  (tags "+project-maybe//-DONE-NOT_DONE"
 				    	(
 				    	 (org-agenda-overriding-header
 				    	  "A project MUST have a NEXT entry")
@@ -1237,7 +1237,7 @@ items"
                                  ))
 				    		  )
 				    		 )
-				  (tags "+project//-DONE-NOT_DONE"
+				  (tags "+project-maybe//-DONE-NOT_DONE"
 				    	(
 				    	 (org-agenda-overriding-header
 				    	  "Keep an eye on those projects (they may well be stuck)")

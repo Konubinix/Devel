@@ -880,26 +880,6 @@ items"
 
 (defun konix/org-agenda-view-generate-list (&optional important)
   `(
-	(agenda nil
-			(
-			 (org-agenda-overriding-header
-			  "Agenda for projects")
-			 (org-agenda-use-time-grid nil)
-                                        ; it will be already included in the no project view
-			 (org-agenda-include-diary nil)
-			 (org-agenda-skip-function
-			  '(or
-                (konix/skip-not-todo-file)
-				(konix/org-agenda-skip-if-tags
-				 '("project")
-				 t)
-				(and ,important
-					 (konix/org-agenda-skip-non-important-item)
-					 )
-				)
-			  )
-			 )
-			)
 	(tags-todo "WAIT|DELEGATED"
 			   (
 				(org-agenda-overriding-header "WAITING items")
@@ -938,6 +918,26 @@ items"
 		   (org-agenda-overriding-header "Unscheduled NEXT Items")
 		   )
 		  )
+    (agenda nil
+            (
+             (org-agenda-overriding-header
+              "Agenda for projects")
+             (org-agenda-use-time-grid nil)
+                                        ; it will be already included in the no project view
+             (org-agenda-include-diary nil)
+             (org-agenda-skip-function
+              '(or
+                (konix/skip-not-todo-file)
+                (konix/org-agenda-skip-if-tags
+                 '("project")
+                 t)
+                (and ,important
+                     (konix/org-agenda-skip-non-important-item)
+                     )
+                )
+              )
+             )
+            )
 	)
   )
 

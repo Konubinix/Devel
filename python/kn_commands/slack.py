@@ -43,6 +43,7 @@ from click_project.lib import (
 from click_project.completion import startswith
 from click_project.config import config
 from click_project.core import cache_disk
+from click_project.commands.passwords import set as password_set_command
 
 from konix_time_helper import naive_to_local
 
@@ -566,6 +567,18 @@ def message_handle(message):
 class MessageType(ParameterType):
     def convert(self, value, param, ctx):
         return message_handle(value)
+
+
+@slack.command()
+def save_token():
+    """Save the given token in the keyring, associated to the given account"""
+    ctx = click.get_current_context()
+    ctx.invoke(
+        password_set_command,
+        machine=config.slack.account + "_slack_token",
+        username="not used",
+        password=config.slack.token,
+    )
 
 
 @slack.command()

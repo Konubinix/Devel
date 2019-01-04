@@ -2180,47 +2180,49 @@ items"
               '("+project-maybe/-DONE-NOT_DONE" ("NEXT") ("") ""))
 (setq-default org-timer-default-timer 25)
 (setq-default org-time-clocksum-format "%d:%02d")
-(setq-default konix/org-tag-contexts
-              '(
-                ("@home" . ?h)
-                ("@meeting" . ?m)
-                ("@errand" . ?e)
-                ("@work" . ?w)
-                ("@workhours" . ?H)
-                ("@car" . ?C)
-                (:newline)
-                ("@computer" . ?c)
-                ("@internet" . ?i)
-                ("@phone" . ?o)
-                (:newline)
-                )
-              )
-(setq-default org-tag-persistent-alist
-              `(
-                ,@konix/org-tag-contexts
-                ;; waiting status of the task
-                (:startgroup . nil)
-                ("WAIT" . ?W)
-                ("DELEGATED" . ?L)
-                (:endgroup . nil)
-                ;; a commitment is something I am contractually (morally or
-                ;; legally) engaged with
-                ("commitment" . ?i)
-                ("project" . ?p)
-                ("maybe" . ?y)
-                ("refile" . ?f)
-                (:startgroup . nil)
-                ("%s" . nil)
-                ("%m" . nil)
-                ("%l" . nil)
-                (:endgroup . nil)
-                (:newline)
-                ("no_weekly" . ?n)
-                ("no_appt" . ?a)
-                ("organization" . ?r)
-                ("perso" . ?P)
-                )
-              )
+
+(defvar konix/org-tag-persistent-alist
+  '(
+    ;; waiting status of the task
+    (:startgroup . nil)
+    ("WAIT" . ?W)
+    ("DELEGATED" . ?L)
+    (:endgroup . nil)
+    ;; a commitment is something I am contractually (morally or
+    ;; legally) engaged with
+    ("commitment" . ?i)
+    ("project" . ?p)
+    ("maybe" . ?y)
+    ("refile" . ?f)
+    (:startgroup . nil)
+    ("%s" . nil)
+    ("%m" . nil)
+    ("%l" . nil)
+    (:endgroup . nil)
+    (:newline)
+    ("no_weekly" . ?n)
+    ("no_appt" . ?a)
+    ("organization" . ?r)
+    ("perso" . ?P)
+    )
+  )
+
+(defvar konix/org-tag-persistent-alist-variables '(konix/org-gtd-tag-contexts konix/org-tag-persistent-alist))
+
+(defun konix/org-tag-persistent-alist-compute ()
+  (setq-default
+   org-tag-persistent-alist
+   (apply 'append (mapcar #'eval konix/org-tag-persistent-alist-variables))
+   )
+  )
+
+(defcustom konix/org-gtd-tag-contexts '() "The tags to use as contexts."
+  :set #'(lambda (symbol value)
+           (set-default symbol value)
+           (konix/org-tag-persistent-alist-compute)
+           )
+  )
+
 (setq-default org-tags-exclude-from-inheritance
               '(
                 "project" "draft" "phantom"

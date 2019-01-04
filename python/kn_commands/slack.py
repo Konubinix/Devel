@@ -52,7 +52,7 @@ db = redis.StrictRedis(decode_responses=True)
 
 
 def get_slack_token():
-    values = get_authenticator("slack_token", required=False, askpass=False)
+    values = get_authenticator(config.slack.account + "_slack_token", required=False, askpass=False)
     if values is not None:
         return values[1]
     else:
@@ -539,6 +539,12 @@ class ConversationType(ParameterType):
 
 
 @group()
+@param_config(
+    "slack", "--account",
+    typ=SlackConfig,
+    default="default",
+    required=True,
+    help="The authenticator key to use to get the token")
 @param_config(
     "slack", "--token",
     typ=SlackConfig,

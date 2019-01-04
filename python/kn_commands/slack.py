@@ -408,13 +408,13 @@ class SlackConfig():
     @property
     def users(self):
         @cache_disk(expire=36000)
-        def _users():
+        def _users(token):
             return {
                 user["id"]: User(user)
                 for user in self.client.users.list().body["members"]
             }
         if self._users is None:
-            self._users = _users()
+            self._users = _users(self.token)
         return self._users
 
     @property
@@ -474,7 +474,7 @@ class SlackConfig():
     @property
     def conversations(self):
         @cache_disk(expire=36000)
-        def _conversations():
+        def _conversations(token):
             return {
                 c.id: c
                 for c in Groups().list()
@@ -482,7 +482,7 @@ class SlackConfig():
                 + IMS().list()
                 + MPIM().list()
             }
-        return _conversations()
+        return _conversations(self.token)
 
 
 def find_user(value):

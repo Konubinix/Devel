@@ -1483,3 +1483,44 @@ def _stop():
         text="",
         emoji="",
     )
+
+
+@slack.group()
+def dnd():
+    """Handle the Do Not Disturb status"""
+
+
+@dnd.command()
+@argument("user", type=UserType(), required=False,
+          help="the user to take into account, defaulting to myself.")
+def info(user):
+    """Show the dnd status of the user"""
+    user = user or config.slack.me_user
+    resp = config.slack.client.dnd.info(user.id).body
+    print("Snoozing: {}".format("yes" if resp["snooze_enabled"] else "no"))
+    if resp["snooze_enabled"]:
+        print("From {}".format(
+            datetime.datetime.fromtimestamp(resp["next_dnd_start_ts"])))
+        print("To   {}".format(
+            datetime.datetime.fromtimestamp(resp["next_dnd_end_ts"])))
+
+
+@dnd.command()
+def end():
+    """End the dnd session"""
+    config.slack.client.dnd.end_dnd()
+
+
+@slack.command()
+@argument("minutes", help="The number of minutes to snooze", type=int)
+def snooze(minutes):
+    """Snooze notifications by that amount of minutes"""
+    resp = config.slack.client.dnd.set_snooze(minutes).body
+    endtime = datetime.datetime.fromtimestamp(resp["snooze_endtime"])
+    LOGGER.info("Snooze will end at {}".format(endtime))
+
+
+@slack.command()
+def end_snooze():
+    """End the snooze"""
+    config.slack.client.dnd.end_snooze()

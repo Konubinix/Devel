@@ -376,6 +376,10 @@ class SlackConfig():
         return self.rtm.data["self"]
 
     @property
+    def me_user(self):
+        return self.users[self.rtm.data["self"]["id"]]
+
+    @property
     def rtm(self):
         if self._rtm is None:
             tryit = True

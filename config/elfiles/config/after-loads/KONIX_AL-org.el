@@ -1211,7 +1211,7 @@ items"
                                  ))
                               )
 				    		 )
-				  (tags-todo "-{_.+}//"
+				  (tags-todo "-Commitment//"
 				    		 (
 				    		  (org-agenda-overriding-header
 				    		   "Every action must be committed to someone, even to me")
@@ -1248,10 +1248,10 @@ items"
 				)
   (setq-default konix/org-agenda-stuck-view-hof
                 '(
-                  (tags-todo "-{2_.+}//"
+                  (tags-todo "-AreaOfFocus//"
                              (
                               (org-agenda-overriding-header
-                               "Assign a horizon 2 (accountability) to every action")
+                               "Assign a horizon 2 (Area of Focus) to every action")
                               (org-agenda-tag-filter-preset nil)
                               (org-agenda-skip-function
                                '(or
@@ -1259,10 +1259,10 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "-{[345]_.+}//"
+                  (tags-todo "-Goal-Vision-Purpose//"
                              (
                               (org-agenda-overriding-header
-                               "Assign an horizon 3 (goals), 4 (vision) or 5 (purpose&principle) to every action")
+                               "Assign a horizon 3 (goals), 4 (vision) or 5 (purpose&principle) to every action")
                               (org-agenda-tag-filter-preset nil)
                               (org-agenda-skip-function
                                '(or
@@ -2183,23 +2183,27 @@ items"
 
 (defvar konix/org-tag-persistent-alist
   '(
-    ;; waiting status of the task
-    (:startgroup . nil)
+    (:startgroup)
+    ("mental_energy")
+    (:grouptags)
+    ("%s" . ?s)
+    ("%m" . ?m)
+    ("%l" . ?l)
+    (:endgroup)
+    (:startgroup)
+    ("physical_energy")
+    (:grouptags)
+    ("%0" . ?0)
+    ("%1" . ?1)
+    ("%2" . ?2)
+    (:endgroup)
+    (:startgroup)
     ("WAIT" . ?W)
     ("DELEGATED" . ?L)
-    (:endgroup . nil)
-    ;; a commitment is something I am contractually (morally or
-    ;; legally) engaged with
-    ("commitment" . ?i)
+    (:endgroup)
     ("project" . ?p)
     ("maybe" . ?y)
     ("refile" . ?f)
-    (:startgroup . nil)
-    ("%s" . nil)
-    ("%m" . nil)
-    ("%l" . nil)
-    (:endgroup . nil)
-    (:newline)
     ("no_weekly" . ?n)
     ("no_appt" . ?a)
     ("organization" . ?r)
@@ -2207,7 +2211,7 @@ items"
     )
   )
 
-(defvar konix/org-tag-persistent-alist-variables '(konix/org-gtd-tag-contexts konix/org-tag-persistent-alist))
+(defvar konix/org-tag-persistent-alist-variables '(konix/org-gtd-tag-contexts konix/org-gtd-commitments konix/org-tag-persistent-alist))
 
 (defun konix/org-tag-persistent-alist-compute ()
   (setq-default
@@ -2216,12 +2220,9 @@ items"
    )
   )
 
-(defcustom konix/org-gtd-tag-contexts '() "The tags to use as contexts."
-  :set #'(lambda (symbol value)
-           (set-default symbol value)
-           (konix/org-tag-persistent-alist-compute)
-           )
-  )
+(defvar konix/org-gtd-tag-contexts '() "The tags to use as contexts.")
+
+(defvar konix/org-gtd-commitments '() "The tags to use as contexts.")
 
 (setq-default org-tags-exclude-from-inheritance
               '(
@@ -2277,7 +2278,6 @@ items"
               )
 (setq-default org-agenda-compact-blocks nil)
 (setq-default org-agenda-columns-add-appointments-to-effort-sum t)
-(add-to-list 'org-effort-durations '("p" . 30))
 (setq-default org-agenda-sorting-strategy
               '(
                 ;; Strategy for Weekly/Daily agenda
@@ -3383,6 +3383,66 @@ an error (this should never happen)."
 
 (setq-default org-babel-python-command "python3")
 (setq-default org-sort-agenda-noeffort-is-high nil)
+
+(defun konix/org-all-tags ()
+  (mapcar (lambda (tag)
+            (substring-no-properties (car tag)))
+          (org-global-tags-completion-table))
+  )
+
+(defun konix/org-gtd-all-commitments ()
+  (remove-if-not
+   (lambda (tag)
+     (string-match-p "^C_" tag)
+     )
+   (konix/org-all-tags)
+   )
+  )
+
+(defun konix/org-gtd-get-all-projects ()
+  (remove-if-not
+   (lambda (tag)
+     (string-match-p "^p_" tag)
+     )
+   (konix/org-all-tags)
+   )
+  )
+
+(defun konix/org-gtd-get-all-areas-of-focus ()
+  (remove-if-not
+   (lambda (tag)
+     (string-match-p "^AOF_" tag)
+     )
+   (konix/org-all-tags)
+   )
+  )
+
+(defun konix/org-gtd-get-all-goals ()
+  (remove-if-not
+   (lambda (tag)
+     (string-match-p "^G_" tag)
+     )
+   (konix/org-all-tags)
+   )
+  )
+
+(defun konix/org-gtd-get-all-visions ()
+  (remove-if-not
+   (lambda (tag)
+     (string-match-p "^V_" tag)
+     )
+   (konix/org-all-tags)
+   )
+  )
+
+(defun konix/org-gtd-get-all-purposes ()
+  (remove-if-not
+   (lambda (tag)
+     (string-match-p "^V_" tag)
+     )
+   (konix/org-all-tags)
+   )
+  )
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

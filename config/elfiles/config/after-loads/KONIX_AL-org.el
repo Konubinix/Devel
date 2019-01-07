@@ -1208,7 +1208,7 @@ items"
                           "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
                          )
                         )
-				  (tags-todo "-{@.+}-project//+NEXT"
+				  (tags-todo "-Context-project-maybe//+NEXT"
 				    		 (
 				    		  (org-agenda-overriding-header
 				    		   "Assign a context to all NEXT (not project) items")

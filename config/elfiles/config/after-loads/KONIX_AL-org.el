@@ -963,11 +963,17 @@ items"
        (save-excursion
          (catch 'found-next-entry
            (when (org-goto-first-child)
-             (when (string= "NEXT" (org-get-todo-state))
+             (when (and
+                    (string= "NEXT" (org-get-todo-state))
+                    (not (member "maybe" (org-get-tags)))
+                    )
                (throw 'found-next-entry t)
                )
              (while (org-get-next-sibling)
-               (when (string= "NEXT" (org-get-todo-state))
+               (when (and
+                      (string= "NEXT" (org-get-todo-state))
+                      (not (member "maybe" (org-get-tags)))
+                      )
                  (throw 'found-next-entry t)
                  )
                )

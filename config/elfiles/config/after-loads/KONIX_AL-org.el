@@ -2430,7 +2430,7 @@ items"
        )
      (split-string
       (replace-regexp-in-string "\n" ""
-                                (shell-command-to-string "konix_contexts.sh")
+                                (shell-command-to-string "konix_gtd_contexts.sh")
                                 )
       " "
       )

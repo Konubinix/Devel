@@ -3444,5 +3444,40 @@ an error (this should never happen)."
    )
   )
 
+;; from https://emacs.stackexchange.com/questions/41438/rename-tags-in-org-agenda-files
+(defun konix/org-change-tag (old new)
+  (when (member old (org-get-tags))
+    (org-toggle-tag new 'on)
+    (org-toggle-tag old 'off)
+    ))
+
+(defvar konix/org-rename-tag-history '() "")
+(defun konix/org-rename-tag (old new)
+  (interactive
+   (list
+    (completing-read
+     "Old tag: "
+     (konix/org-all-tags)
+     nil
+     t
+     nil
+     'konix/org-rename-tag-history
+     )
+    (completing-read
+     "New tag: "
+     (konix/org-all-tags)
+     nil
+     nil
+     nil
+     'konix/org-rename-tag-history
+     )
+    )
+   )
+  (org-map-entries
+   (lambda () (konix/org-change-tag old new))
+   (format "+%s" old)
+   'agenda
+   ))
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

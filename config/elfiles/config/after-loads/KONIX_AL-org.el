@@ -1921,7 +1921,7 @@ items"
 (setq-default org-clock-report-include-clocking-task t)
 (setq-default org-columns-default-format "%CATEGORY %TODO %90ITEM %1PRIORITY
 %10Effort{:} %10CLOCKSUM %10CLOCKSUM_T %ORDERED %allocate %BLOCKER")
-(setq-default org-agenda-overriding-columns-format "%10Effort{:} %90ITEM
+(setq-default org-agenda-overriding-columns-format "%4Effort{:} %90ITEM
  %1PRIORITY %10CLOCKSUM_T
 %10CLOCKSUM %ORDERED %allocate %BLOCKER")
 (setq-default org-cycle-separator-lines -1)

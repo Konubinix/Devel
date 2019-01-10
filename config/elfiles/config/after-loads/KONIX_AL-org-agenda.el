@@ -285,6 +285,13 @@
 (add-to-list 'konix/org-agenda-text-properties
              '("^.+Holiday.+$" 0 konix/org-agenda-holiday)
              )
+(add-to-list 'konix/org-agenda-text-properties
+             '("^.+:milestone:.*$" 0 org-agenda-current-time)
+             )
+(add-to-list 'konix/org-agenda-text-properties
+             '("^.+\\(:discret:\\).*$" 0 konix/org-agenda-discret-face)
+             )
+
 
 (defun konix/org-apply-org-agenda-auto-exclude-function ()
   (org-agenda-filter-show-all-tag)

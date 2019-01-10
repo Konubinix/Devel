@@ -103,23 +103,28 @@
   ""
   )
 
-(defface org-agenda-current-time
-  '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "orange")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:inherit 'org-time-grid
-			   :inverse-video t
-			   )
-	 )
-	)
-  ""
-  )
+(custom-set-faces
+ '(org-agenda-current-time
+   (
+    (
+     ((class color)
+      (background dark))
+     (:background "DarkOrange4"
+                  :weight bold
+                  :height 1.3
+                  )
+     )
+    (
+     ((class color)
+      (background light))
+     (:inherit 'org-time-grid
+               :inverse-video t
+               )
+     )
+    )
+   ""
+   )
+ )
 
 (defface konix/org-agenda-discret-face
   '(

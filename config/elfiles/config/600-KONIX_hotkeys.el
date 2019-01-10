@@ -614,26 +614,6 @@
 (define-key 'konix/org-timer-map "s" 'konix/org-timer-start)
 (define-key 'konix/org-timer-map "S" 'org-timer-stop)
 
-(define-prefix-command 'konix/org-pomodoro-map)
-(define-key 'konix/org-global-map (kbd "p") 'konix/org-pomodoro-map)
-(define-key 'konix/org-pomodoro-map "B" 'konix/org-pomodoro-long-break)
-(define-key 'konix/org-pomodoro-map "I" 'konix/org-pomodoro-report-interrupt)
-(define-key 'konix/org-pomodoro-map "S" 'org-timer-stop)
-(define-key 'konix/org-pomodoro-map "b" 'konix/org-pomodoro-break)
-(define-key 'konix/org-pomodoro-map "a" 'konix/org-pomodoro-next-available-time-echo)
-(define-key 'konix/org-pomodoro-map "A" 'konix/org-pomodoro-next-available-long-time-echo)
-(define-key 'konix/org-pomodoro-map "d" 'konix/org-pomodoro-decrease)
-(define-key 'konix/org-pomodoro-map "e" 'konix/org-pomodoro-echo)
-(define-key 'konix/org-pomodoro-map "g" 'konix/org-pomodoro-goto)
-(define-key 'konix/org-pomodoro-map "i" 'konix/org-pomodoro-increase)
-(define-key 'konix/org-pomodoro-map "r" 'konix/org-pomodoro-reset-count)
-(define-key 'konix/org-pomodoro-map "s" 'konix/org-pomodoro-start)
-(define-key 'konix/org-pomodoro-map "t" 'konix/org-pomodoro-insert-table)
-(define-key 'konix/org-pomodoro-map "T" 'konix/org-pomodoro-insert-week-planning-table)
-(define-key 'konix/org-pomodoro-map "C" 'konix/org-pomodoro-convert-time-before-point-into-pomodoro)
-(define-key 'konix/org-pomodoro-map "m" 'konix/org-pomodoro-global-mode)
-(define-key 'konix/org-pomodoro-map "v" 'konix/org-agenda-pomodoro)
-
 (eval-after-load "org-agenda"
   '(progn
 	 (define-key org-agenda-mode-map (kbd "T") 'org-agenda-todo-yesterday)

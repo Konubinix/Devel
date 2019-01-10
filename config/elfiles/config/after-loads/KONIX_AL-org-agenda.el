@@ -386,33 +386,71 @@
 	)
   )
 
+(defun konix/org-agenda-refinalize ()
+  (interactive)
+  (let (
+        (filters '("tag" "regexp" "effort" "category" "top-headline"))
+        )
+    (mapc (lambda (type)
+            (set
+             (intern
+              (format "konix/org-agenda-%s-filter/save" (intern-soft type))
+              )
+             (eval
+              (intern
+               (format "org-agenda-%s-filter" (intern-soft type)))
+              )
+             )
+            )
+          filters
+          )
+    (org-agenda-filter-show-all-tag)
+    (mapc (lambda (type)
+            (set
+             (intern
+              (format "org-agenda-%s-filter" (intern-soft type))
+              )
+             (eval
+              (intern
+               (format "konix/org-agenda-%s-filter/save" (intern-soft type)))
+              )
+             )
+            )
+          filters
+          )
+    (konix/org-agenda-tag-filter-context-initialize-from-context)
+    (org-agenda-finalize)
+    )
+  )
+
 (defun konix/org-agenda-filter-context ()
   (cond
    (konix/org-agenda-inhibit-context-filtering
-	(setq header-line-format "Context filtering inhibited")
-	)
+    (setq header-line-format "Context filtering inhibited")
+    )
    (konix/org-agenda-tag-filter-contexts
-	(konix/org-agenda-filter-context_1 konix/org-agenda-tag-filter-contexts)
-	(setq header-line-format
-		  `("Context filtered with "
-			,(mapconcat
-			  (lambda (disjunction)
-				(mapconcat 'identity disjunction " or ")
-				)
-			  konix/org-agenda-tag-filter-contexts
-			  " and ")
-			", appt display = " ,(if konix/org-agenda-filter-context-show-appt
-									 "on" "off")
-			", no context display = " ,(if konix/org-agenda-filter-context-show-empty-context
-										   "on" "off")
-			)
-		  )
-	)
+    (konix/org-agenda-filter-context_1 konix/org-agenda-tag-filter-contexts)
+    (setq header-line-format
+          `("Context filtered with "
+            ,(mapconcat
+              (lambda (disjunction)
+                (mapconcat 'identity disjunction " or ")
+                )
+              konix/org-agenda-tag-filter-contexts
+              " and ")
+            ", appt display = " ,(if konix/org-agenda-filter-context-show-appt
+                                     "on" "off")
+            ", no context display = " ,(if konix/org-agenda-filter-context-show-empty-context
+                                           "on" "off")
+            )
+          )
+    )
    ((not konix/org-agenda-tag-filter-contexts)
-	(setq header-line-format "No context filter")
-	)
+    (setq header-line-format "No context filter")
+    )
    )
   )
+(add-hook 'org-agenda-finalize-hook 'konix/org-agenda-filter-context)
 
 (defvar konix/org-agenda-important-items-filtered nil)
 (defun konix/org-agenda-toggle-filter-important-items ()

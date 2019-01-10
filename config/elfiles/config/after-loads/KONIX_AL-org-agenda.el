@@ -478,76 +478,76 @@
 (defun konix/org-agenda/dump-categories (&optional beg end)
   (interactive)
   (unless beg
-	(setq beg
-		  (if (region-active-p)
-			  (region-beginning)
-			(point-min)
-			)))
+    (setq beg
+          (if (region-active-p)
+              (region-beginning)
+            (point-min)
+            )))
   (unless end
-	(setq end
-		  (if (region-active-p)
-			  (region-end)
-			(point-max)
-			)))
+    (setq end
+          (if (region-active-p)
+              (region-end)
+            (point-max)
+            )))
   (when (> beg end)
-	(user-error "beg must not be greater than end")
-	)
+    (user-error "beg must not be greater than end")
+    )
   (let (
-		(line-end
-		 (save-excursion
-		   (goto-char end)
-		   (line-number-at-pos)))
-		(categories_times '())
-		(current_category nil)
-		(current_duration nil)
-		(assoc nil)
-		)
-	;; aggregating the data
-	(save-excursion
-	  (goto-char beg)
-	  (while (not (eq
-				   (line-number-at-pos)
-				   line-end
-				   ))
-		(when (org-get-at-bol 'org-marker)
-		  (setq current_category (konix/org-with-point-on-heading
-								  (org-get-category)
-								  )
-				current_duration (get-text-property (point) 'duration)
-				assoc (assoc current_category categories_times)
-				)
-		  (if assoc
-			  (setcdr assoc
-					  (+ current_duration
-						 (cdr assoc))
-					  )
-			;; add it to the map
-			(add-to-list
-			 'categories_times
-			 (cons
-			  current_category
-			  current_duration
-			  )
-			 )
-			)
-		  )
-		(forward-line)
-		)
-	  )
-	;; sort the values
-	(setq categories_times
-		  (sort categories_times
-				(lambda (cat1 cat2)
-				  (>
-				   (cdr cat1)
-				   (cdr cat2)
-				   )
-				  )
-				)
-		  )
-	(message "Categories:
+        (line-end
+         (save-excursion
+           (goto-char end)
+           (line-number-at-pos)))
+        (categories_times '())
+        (current_category nil)
+        (current_duration nil)
+        (assoc nil)
+        )
+    ;; aggregating the data
+    (save-excursion
+      (goto-char beg)
+      (while (not (eq
+                   (line-number-at-pos)
+                   line-end
+                   ))
+        (when (org-get-at-bol 'org-marker)
+          (setq current_category (konix/org-with-point-on-heading
+                                  (org-get-category)
+                                  )
+                current_duration (get-text-property (point) 'duration)
+                assoc (assoc current_category categories_times)
+                )
+          (if assoc
+              (setcdr assoc
+                      (+ current_duration
+                         (cdr assoc))
+                      )
+            ;; add it to the map
+            (add-to-list
+             'categories_times
+             (cons
+              current_category
+              current_duration
+              )
+             )
+            )
+          )
+        (forward-line)
+        )
+      )
+    ;; sort the values
+    (setq categories_times
+          (sort categories_times
+                (lambda (cat1 cat2)
+                  (>
+                   (cdr cat1)
+                   (cdr cat2)
+                   )
+                  )
+                )
+          )
+    (message "Categories:
 %s" categories_times)
-	)
+    )
   )
 
 
@@ -555,36 +555,36 @@
 (defun konix/org-agenda/hide-dimmed-not-scheduled ()
   (interactive)
   (save-excursion
-	(goto-char (point-min))
-	(let (
-		  (intervalles '())
-		  )
-	  (while (re-search-forward "^.+In +.+ d\..*$" nil t)
-		(setq beg (match-beginning 0)
-			  end (1+
-				   (match-end 0)
-				   ))
-		(unless (konix/org-is-in-schedule-p)
-		  (add-to-list
-		   'intervalles
-		   (cons beg end)
-		   )
-		  )
-		)
-	  (mapc
-	   (lambda (intervalle)
-		 (let (
-			   (ov (make-overlay (car intervalle) (cdr intervalle)))
-			   )
-		   (add-to-list 'konix/org-agenda/hide-dimmed-not-scheduled_overlays ov)
-		   (overlay-put ov 'invisible t)
-		   )
-		 )
-	   intervalles
-	   )
+    (goto-char (point-min))
+    (let (
+          (intervalles '())
+          )
+      (while (re-search-forward "^.+In +.+ d\..*$" nil t)
+        (setq beg (match-beginning 0)
+              end (1+
+                   (match-end 0)
+                   ))
+        (unless (konix/org-is-in-schedule-p)
+          (add-to-list
+           'intervalles
+           (cons beg end)
+           )
+          )
+        )
+      (mapc
+       (lambda (intervalle)
+         (let (
+               (ov (make-overlay (car intervalle) (cdr intervalle)))
+               )
+           (add-to-list 'konix/org-agenda/hide-dimmed-not-scheduled_overlays ov)
+           (overlay-put ov 'invisible t)
+           )
+         )
+       intervalles
+       )
 
-	  )
-	)
+      )
+    )
   )
 
 
@@ -598,15 +598,15 @@
 
 (defun konix/org-agenda-update-current-line ()
   (let (
-		(hdmarker (or (org-get-at-bol 'org-hd-marker)
-					  (org-agenda-error)))
-		(newhead (save-window-excursion
-				   (org-agenda-switch-to)
-				   (org-get-heading)
-				   ))
-		)
-	(org-agenda-change-all-lines newhead hdmarker)
-	)
+        (hdmarker (or (org-get-at-bol 'org-hd-marker)
+                      (org-agenda-error)))
+        (newhead (save-window-excursion
+                   (org-agenda-switch-to)
+                   (org-get-heading)
+                   ))
+        )
+    (org-agenda-change-all-lines newhead hdmarker)
+    )
   )
 
 (defun konix/org-agenda-get-todo-list()
@@ -638,6 +638,210 @@
     (org-agenda nil "aa")
     (org-agenda-write (format "%s/agenda.html" temporary-file-directory) t nil buffer_name))
   )
+
+(defun konix/org-agenda-check-get-struct (start stop)
+  (let (
+        (result '())
+        )
+    (save-excursion
+      (goto-char start)
+      (forward-line 0)
+      (while (< (point) stop)
+        (when (and
+               (not
+                (equal
+                 (get-text-property (point) 'date)
+                 nil
+                 )
+                )
+               (string= (get-text-property (point) 'type) "timestamp")
+               )
+          (setq result (cons
+                        (append
+                         (text-properties-at (point))
+                         `(point ,(point))
+                         )
+                        result))
+          )
+        (forward-visible-line 1)
+        )
+      )
+    (reverse result)
+    )
+  )
+
+(defun konix/org-agenda-check-get-start (props)
+  (let* (
+         (hour_min (split-string
+                    (substring
+                     ;; "12:30"
+                     (plist-get props 'time)
+                     0
+                     5
+                     )
+                    ":"
+                    ))
+         (hour (string-to-int (car hour_min)))
+         (min (string-to-int (cadr hour_min)))
+         )
+    (+ min (* hour 60))
+    )
+  )
+
+(defun konix/org-agenda-check-format-time (minutes)
+  (let* (
+         (hour (/ minutes 60))
+         (minute (% minutes 60))
+         )
+    (format "%02d:%02d" hour minute)
+    )
+  )
+
+(defun konix/org-agenda-check-remove (start stop)
+  (mapc
+   (lambda (o)
+     (when (eq (overlay-get o 'konix/org-agenda-check)
+               t)
+       (delete-overlay o)
+       )
+     )
+   (overlays-in start stop)
+   )
+  )
+
+(defvar konix/org-agenda-check-min-distance 5 "")
+
+(defun konix/org-agenda-check (start stop)
+  (konix/org-agenda-check-remove start stop)
+  (let* (
+         (events (konix/org-agenda-check-get-struct start stop))
+         (current-event (pop events))
+         (next-event)
+         (current-start)
+         (current-end)
+         (next-start)
+         (next-end)
+         (current-position)
+         (next-position)
+         (min-distance konix/org-agenda-check-min-distance)
+         (distance)
+         (distance-handle-new)
+         (issue)
+         (now (konix/org-agenda-check-get-start `(time ,(format-time-string "%H:%M "))))
+         (current-end-handle-now)
+         (issue-position)
+         (pl org-agenda-clock-consistency-checks)
+         (face)
+         (def-issue-face (or (plist-get pl :default-face)
+                             '((:background "DarkRed") (:foreground "white"))))
+         (def-info-face (or (plist-get pl :default-info-face)
+                            '((:background "DarkGreen") (:foreground "white"))))
+         (def-warning-face (or (plist-get pl :default-warning-face)
+                               '((:background "DarkOrange") (:foreground "white"))))
+         )
+    (while events
+      (setq
+       next-event (pop events)
+       current-position (plist-get current-event 'point)
+       next-position (plist-get next-event 'point)
+       issue-position current-position
+       current-start (konix/org-agenda-check-get-start current-event)
+       current-end (+ current-start (or (plist-get current-event 'duration) 0))
+       next-start (konix/org-agenda-check-get-start next-event)
+       next-end (+ next-start (or (plist-get next-event 'duration) 0))
+       distance (truncate (- next-start current-end))
+       current-end-handle-now (if (> now current-end) now current-end)
+       distance-handle-new (truncate (- next-start current-end-handle-now))
+       face def-issue-face
+       )
+      (cond
+       ((and
+         (eq current-start next-start)
+         (not (member "declined" (plist-get current-event 'tags)))
+         (not (member "declined" (plist-get next-event 'tags)))
+         (not (member "orgagendanoconflict" (plist-get current-event 'tags)))
+         (not (member "orgagendanoconflict" (plist-get next-event 'tags)))
+         )
+        (setq issue (format "Same time %s" current-start)
+              face (or (plist-get pl :warning-face) def-warning-face)
+              position next-position)
+        )
+       ((> distance-handle-new min-distance)
+        (setq issue (format "free time: %s" (konix/org-agenda-check-format-time distance-handle-new))
+              face (or (plist-get pl :info-face) def-info-face)
+              position next-position
+              )
+        )
+       )
+      ;; taken from org-agenda.el org-agenda-show-clocking-issues
+      (save-excursion
+        (when issue
+          ;; OK, there was some issue, add an overlay to show the issue
+          (goto-char position)
+          (setq ov (make-overlay (point-at-bol) (point-at-eol)))
+          (overlay-put ov 'before-string
+                       (concat
+                        (org-add-props
+                            (format "%-43s" (concat " " issue))
+                            nil
+                          'face face)
+                        "\n"))
+          (overlay-put ov 'evaporate t)
+          (overlay-put ov 'konix/org-agenda-check t)
+          )
+        )
+      (setq current-event next-event
+            issue nil)
+      )
+    )
+  )
+
+(defun konix/org-agenda-find-next-agenda ()
+  (if (equal
+       (get-text-property (point) 'org-agenda-type)
+       'agenda
+       )
+      nil
+    (progn
+      (while (and
+              (not
+               (equal
+                (get-text-property (point) 'org-agenda-type)
+                'agenda
+                )
+               )
+              (next-single-property-change (point) 'org-agenda-type)
+              )
+        (goto-char (next-single-property-change (point) 'org-agenda-type))
+        )
+
+      (equal
+       (get-text-property (point) 'org-agenda-type)
+       'agenda
+       )
+      )
+    )
+  )
+
+(defun konix/org-agenda-check-buffer ()
+  (interactive)
+  (let (
+        next-step
+        )
+    (save-excursion
+      (goto-char (point-min))
+      (while (konix/org-agenda-find-next-agenda)
+        (setq next-step (or (next-single-property-change (point) 'org-agenda-type) (point-max)))
+        (konix/org-agenda-check
+         (point)
+         next-step
+         )
+        (goto-char next-step)
+        )
+      )
+    )
+  )
+(add-hook 'org-agenda-finalize-hook 'konix/org-agenda-check-buffer)
 
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

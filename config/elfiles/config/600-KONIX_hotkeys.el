@@ -576,6 +576,7 @@
 (define-key 'konix/org-global-map "c" 'org-capture)
 (define-key 'konix/org-global-map (kbd "C-e") 'org-clock-modify-effort-estimate)
 (define-key 'konix/org-global-map "C" 'konix/org-toggle-org-agenda-tag-filter-context)
+(define-key 'konix/org-global-map "k" 'konix/org-agenda-refinalize)
 (define-key 'konix/org-global-map "n" 'konix/org-goto-notes)
 (define-key 'konix/org-global-map "x" 'konix/org-link-toggle-cross)
 (define-key 'konix/org-global-map (kbd "<up>") 'org-mark-ring-push)

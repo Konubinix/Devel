@@ -365,11 +365,11 @@
 			  (if (and
 				   (not (eval konix/org-entry-predicate))
 				   ;; do not hide appointment if the associated setting is set
-				   (or (not konix/org-agenda-filter-context-show-appt)
-					   (not
-						(konix/org-agenda-appt-p)
-						)
-					   )
+				   ;; (or (not konix/org-agenda-filter-context-show-appt)
+				   ;;     (not
+				   ;;  	(konix/org-agenda-appt-p)
+				   ;;  	)
+				   ;;     )
 				   ;; show empty context entries if the associated setting is set
 				   (or (not konix/org-agenda-filter-context-show-empty-context)
 					   (not

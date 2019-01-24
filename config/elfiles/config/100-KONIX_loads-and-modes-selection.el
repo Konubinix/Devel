@@ -9,6 +9,7 @@
   (setq konix/personal-load-path
 		(list
 		 (expand-file-name "org/lisp" elfiles)
+		 (expand-file-name "org-edna" elfiles)
 		 (expand-file-name "org/contrib/lisp" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)
 		 (expand-file-name "git-wip/emacs" devel-dir)

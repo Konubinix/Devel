@@ -649,7 +649,7 @@ retourne ('fichier','extension')."
 	   )
 	(if _assoc
 		(setcdr _assoc values)
-	  (set alist (cons (append (list key) values) (eval alist)))
+	  (set alist (reverse (cons (append (list key) values) (reverse (eval alist)))))
 	  )
 	)
   )

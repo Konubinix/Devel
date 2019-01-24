@@ -110,50 +110,14 @@
   (appt-activate 1)
   (appt-check)
   )
+(konix/org-agenda-appt-reload)
 
-(defun konix/org-load-hook()
-  ;; better dimmed org agenda face
-  (set-face-attribute 'org-agenda-dimmed-todo-face nil
-					  :foreground "OrangeRed4"
-					  )
-  (set-face-attribute 'org-agenda-date nil
-					  :inherit 'org-agenda-structure
-					  :box '(:line-width 2 :color "black" :style released-button))
-  (setq-default org-agenda-files (list
-								  (expand-file-name "wiki" perso-dir)
-								  ))
-  ;; for checklists fun
-  (require 'org-checklist)
+(setq-default org-agenda-files
+              (list
+               (expand-file-name "wiki" perso-dir)
+               ))
 
-  ;; Pour les appointments
-  (konix/org-agenda-appt-reload)
-
-  ;; set hook to remember clock when exiting
-  (org-clock-persistence-insinuate)
-
-  (defun konix/org-open-at-point ()
-	"Like `org-open-at-point` exept that the file is opened in read only and the
-cursor stays in the org buffer."
-	(interactive)
-	(let(
-		 (org_buffer (current-buffer))
-		 )
-	  (org-open-at-point)
-	  (switch-to-buffer-other-window org_buffer)
-	  )
-	)
-
-  (defun org-info ()
-	(interactive)
-	(info (expand-file-name (concat elfiles "/org/doc/org")))
-	)
-
-  (define-key org-mode-map (kbd "C-c o") 'konix/org-open-at-point)
-
-  ;; (set 'org-open-at-mouse 'org-open-at-point)
-  ;; (ad-activate 'org-open-at-mouse)
-  )
-
+(org-clock-persistence-insinuate)
 
 (defadvice org-agenda-redo (after org-agenda-redo-add-appts)
   "Pressing `r' on the agenda will also add appointments."
@@ -183,47 +147,6 @@ cursor stays in the org buffer."
   )
 (advice-add 'org-agenda-redo :around #'konix/org-agenda-redo/keep-column)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; insert inactive timestamp when creating entries ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun konix/insert-inactive-timestamp ()
-  (interactive)
-  (org-insert-time-stamp nil t t nil nil nil))
-
-(defun konix/org-add-tag (tag)
-  (interactive "sTag:")
-  (let (
-		(tags (org-get-tags nil t))
-		)
-	(add-to-list 'tags tag)
-	(org-set-tags-to tags)
-	)
-  )
-
-(defun konix/org-del-tag (tag)
-  (interactive "sTag:")
-  (let (
-		(tags (org-get-tags nil t))
-		)
-	(setq tags
-		  (remove-if (lambda (_tag) (equal _tag tag)) tags)
-		  )
-	(org-set-tags-to tags)
-	)
-  )
-
-(defun konix/org-toggle-tag (tag)
-  (interactive "sTag:")
-  (let (
-		(tags (org-get-tags nil t))
-		)
-	(if (member tag tags)
-		(konix/org-del-tag tag)
-	  (konix/org-add-tag tag)
-	  )
-	)
-  )
-
 ;; ####################################################################################################
 ;; CONFIG
 ;; ####################################################################################################
@@ -240,219 +163,16 @@ cursor stays in the org buffer."
 				)
 			  )
 
-(defcustom konix/org-worday-number-hours 8
-  ""
-  )
 (setq-default org-directory (concat perso-dir "/wiki"))
 (setq-default org-agenda-clockreport-parameter-plist
-			  '(:tags "-lunch"
+			  '(:match "-lunch"
                       :fileskip0
                       :stepskip0
                       :link t
                       :maxlevel 5
                       :emphasize t
-                      :link t
                       )
 			  )
-(defun konix/org-skip-other-meta-context ()
-  "Skip trees that are not in current meta context"
-  (if (or
-	   current-prefix-arg
-	   (string-match (expand-file-name org-directory) (expand-file-name
-													   default-directory))
-	   )
-	  (progn
-		(message "Allowing for file %s" (buffer-file-name))
-		nil
-		)
-	(save-excursion
-	  (message "Skipping for file %s" (buffer-file-name))
-	  (end-of-buffer)
-	  (point)
-	  )
-	)
-  )
-
-(defun konix/org-entry-at-point-has-timestamp-no-schedule-nor-deadline-p ()
-  (let (
-		(end_of_appt_search (org-entry-end-position))
-		)
-	(save-excursion
-	  (org-back-to-heading)
-	  (if (and
-		   (re-search-forward org-ts-regexp end_of_appt_search t)
-		   (progn
-			 (goto-char (match-beginning 0))
-			 (and
-			  (not (looking-back
-					(format "\\(%s\\|%s\\) *"
-							org-scheduled-regexp
-							org-deadline-regexp)))
-			  )
-			 )
-		   )
-		  ;; found an appt
-		  t
-		nil
-		)
-	  )
-	)
-  )
-
-(defun konix/org-copy-as-gcalcli-command (&optional beg end)
-  (cond
-   ((and (region-active-p)
-		 (not beg)
-		 )
-	(setq beg (region-beginning)
-		  end (region-end)
-		  )
-	)
-   ((not beg)
-	(setq beg (point)
-		  end (point))
-	)
-   )
-  (let* (
-		 (date (eval
-				`(format "%s/%s/%s"
-						 ,@(get-text-property beg 'date)
-						 )))
-		 (duration (konix/org-agenda-sum-duration
-					beg
-					end
-					))
-		 (time (let (
-					 (time-stamps (get-text-property beg 'time))
-					 )
-				 (if (string-match "^\\([^-.]+\\)[-.].+$" time-stamps)
-					 (match-string-no-properties 1 time-stamps)
-				   time-stamps
-				   )
-				 )
-			   )
-		 (entry (konix/org-with-point-on-heading
-				 (org-get-heading t t)
-				 ))
-		 (command (format
-				   "gcalcli --desc='' --where '' --title \"%s\" --when '%s %s' --duration \"%s\" add"
-				   (subst-char-in-string ?' ?_ entry)
-				   date
-				   time
-				   duration
-				   ))
-		 )
-	(with-temp-buffer
-	  (insert command)
-	  (copy-region-as-kill (point-min) (point-max))
-	  (message "Copied %s" command)
-	  )
-	)
-  )
-
-(defun konix/org-agenda-copy-at-point-as-gcalcli-command ()
-  (interactive)
-  (konix/org-copy-as-gcalcli-command)
-  (konix/kill-ring-to-clipboard)
-  )
-
-(defun konix/org-ts-is-today-p (timestamp)
-  (let (
-		(decoded_ts (org-parse-time-string timestamp))
-		(decoded_today (decode-time (org-current-time)))
-		)
-	(and
-	 (equal (fourth decoded_today) (fourth decoded_ts))
-	 (equal (fifth decoded_today) (fifth decoded_ts))
-	 (equal (sixth decoded_today) (sixth decoded_ts))
-	 )
-	)
-  )
-
-(defun konix/org-ts-is-today-or-past-p (timestamp)
-  (let (
-		(decoded_ts (org-parse-time-string timestamp))
-		(decoded_today (decode-time (org-current-time)))
-		)
-	(or
-	 (> (sixth decoded_today) (sixth decoded_ts))
-	 (and
-	  (equal (sixth decoded_today) (sixth decoded_ts))
-	  (> (fifth decoded_today) (fifth decoded_ts))
-	  )
-	 (and
-	  (equal (fifth decoded_today) (fifth decoded_ts))
-	  (>= (fourth decoded_today) (fourth decoded_ts))
-	  )
-	 )
-	)
-  )
-
-(defun konix/org-ts-is-precise-p (timestamp)
-  (save-match-data
-	(string-match org-ts-regexp0 timestamp)
-	(not (not
-		  (and
-		   ;; minutes
-		   (match-string 8 timestamp)
-		   ;; hour
-		   (match-string 7 timestamp)
-		   )
-		  )
-		 )
-	)
-  )
-
-(defun konix/org-get-active-timestamp ()
-  (let (
-		timestamp
-		)
-	(if (save-excursion
-		  (org-back-to-heading)
-		  (re-search-forward org-ts-regexp (org-entry-end-position)
-							 t)
-		  )
-		(match-string 0)
-	  nil
-	  )
-	)
-  )
-
-(defun konix/org-appt-p ()
-  "Returns t if the entry at point is an appointment (not a todo or scheduled
-with a precise timestamp)."
-  (or
-   ;; an non todo entry is always important
-   (not (org-entry-is-todo-p))
-   ;; a task scheduled for today with a precise timestamp (with hour and
-   ;; minute) is always important
-   (let (
-		 (act_ts (konix/org-get-active-timestamp))
-		 )
-	 (and
-	  act_ts
-	  ;; tasks for today or past today but still scheduled are important if
-	  ;; there possess a precise timestamp
-	  (konix/org-ts-is-today-or-past-p act_ts)
-	  (konix/org-ts-is-precise-p act_ts)
-	  )
-	 )
-   )
-  )
-
-(defun konix/org-agenda-appt-p ()
-  (or (string-equal
-	   (get-text-property (point) 'type)
-	   "diary"
-	   )
-	  (save-window-excursion
-		(save-excursion
-		  (org-agenda-goto)
-		  (konix/org-appt-p)
-		  )
-		)
-	  )
-  )
 
 (defmacro konix/org-with-point-on-heading (body)
   `(save-window-excursion
@@ -469,35 +189,6 @@ with a precise timestamp)."
 	   )
 	 ,body
 	 )
-  )
-
-(defun konix/org-guess-category-at-point_internal ()
-  (let (
-		(archive_cat (org-entry-get-with-inheritance "ARCHIVE_CATEGORY"))
-		(cat_property (org-entry-get-with-inheritance "CATEGORY"))
-		(cat (org-get-category))
-		)
-	(cond
-	 (cat
-	  cat
-	  )
-	 (cat_property
-	  cat_property
-	  )
-	 (archive_cat
-	  archive_cat
-	  )
-	 (t
-	  (error "I don't know how to extract the category here...")
-	  )
-	 )
-	)
-  )
-
-(defun konix/org-guess-category-at-point ()
-  (konix/org-with-point-on-heading
-   (konix/org-guess-category-at-point_internal)
-   )
   )
 
 (defun konix/org-element-cache-reset-all ()
@@ -521,102 +212,7 @@ with a precise timestamp)."
     )
   )
 
-(defun konix/org-agenda-region-same-category ()
-  "Return the beg and end of the region around point in the
-  agenda of events of the same category"
-  (let (
-		(here (point))
-		beg
-		(upper_beg (point))
-		end
-		(lower_end (point))
-		(category (konix/org-guess-category-at-point))
-		)
-	(save-excursion
-	  (while (not beg)
-		(previous-line)
-		(cond
-		 ((equal
-		   (line-number-at-pos (point))
-		   1
-		   )
-		  (setq beg upper_beg)
-		  )
-		 ((org-get-at-bol 'org-marker)
-		  (if (not (equal
-					category
-					(konix/org-guess-category-at-point)
-					)
-				   )
-			  (setq beg upper_beg)
-			(setq upper_beg (point))
-			)
-		  )
-		 )
-		)
-	  )
-
-	(save-excursion
-	  (while (not end)
-		(next-line)
-		(cond
-		 ((equal
-		   (line-number-at-pos (point))
-		   (line-number-at-pos (point-max))
-		   )
-		  (setq end lower_end)
-		  )
-		 ((org-get-at-bol 'org-marker)
-		  (if (not (equal
-					category
-					(konix/org-guess-category-at-point)
-					)
-				   )
-			  (setq end lower_end)
-			(setq lower_end (point))
-			)
-		  )
-		 )
-		)
-	  )
-	(cons beg end)
-	)
-  )
-
-(defun konix/org-agenda-move-to-next-event (&optional exclude_tags)
-  (unless exclude_tags
-	(setq exclude_tags '())
-	)
-  (while
-	  (and
-	   (or
-		(not
-		 (org-get-at-bol 'org-marker)
-		 )
-		(remove-if
-		 'null
-		 (mapcar
-		  (lambda (tag)
-			(member
-			 tag
-			 (konix/org-with-point-on-heading
-			  (org-get-tags-at (point))
-			  )
-			 )
-			)
-		  exclude_tags
-		  )
-		 )
-		)
-	   (not
-		(equal (point) (point-max))
-		)
-	   )
-	(forward-line)
-	)
-  )
-
-(defun konix/org-agenda-no-context-p ()
+(defun konix/org-agenda-no-contesxt-p ()
   (let (
 		(no_c t)
 		)
@@ -630,32 +226,6 @@ with a precise timestamp)."
 	 )
 	no_c
 	)
-  )
-
-(defun konix/org-agenda-skip-non-appt-item ()
-  (if (konix/org-appt-p)
-	  nil
-	(org-end-of-subtree t)
-	)
-  )
-
-(defun konix/org-agenda-skip-non-important-item ()
-  (cond
-   ((konix/org-appt-p)
-	nil
-	)
-   ((and
-	 (save-excursion (re-search-forward org-deadline-time-regexp (org-entry-end-position) t))
-	 (org-deadline-close (match-string 0))
-	 )
-	;; keep deadlines
-	nil
-	)
-   (t
-	;; for other entries, the priority defines the importance
-	(org-agenda-skip-entry-if 'regexp "\\=.*\\[#[K-Z]\\]")
-	)
-   )
   )
 
 (defun konix/skip-not-todo-file ()
@@ -778,42 +348,6 @@ with a precise timestamp)."
     )
   )
 
-(defun konix/org-agenda-skip-if-done-last-week ()
-  (org-back-to-heading t)
-  (save-excursion
-	(save-restriction
-	  (org-narrow-to-element)
-	  (let* (
-			 (beg (point))
-			 (end (progn (outline-next-heading) (1- (point))))
-			 ts
-			 done_time
-			 (week (seconds-to-time (* 3600 24 7)))
-			 (last_week
-			  (time-subtract
-			   (current-time)
-			   week
-			   )
-			  )
-			 )
-		(goto-char beg)
-		(if (re-search-forward (org-re-timestamp 'inactive) end t)
-			(progn
-			  (setq ts (match-string-no-properties 1))
-			  (setq done_time (date-to-time ts))
-			  (if (time-less-p done_time last_week)
-				  nil
-				end
-				)
-			  )
-		  ;; could not find the closed time stamp. do not skip it
-		  nil
-		  )
-		)
-	  )
-	)
-  )
-
 (defun konix/org-is-task-of-project-p ()
   "Find out if entry at point is a task of a project.
 
@@ -882,21 +416,7 @@ to be organized.
 	)
   )
 
-(defun konix/org-skip-if-subtree-has-waiting-items ()
-  (let (
-		(end (save-excursion (org-end-of-subtree t)))
-		)
-    (save-excursion
-	  (org-back-to-heading)
-	  (if (re-search-forward "^\\*+.+:\\(WAIT\\|DELEGATED\\):" end t)
-		  end
-		nil
-		)
-	  )
-	)
-  )
-
-(defun konix/org-skip-if-scheduled-and-deadline ()
+(defun konix/org-agenda-for-today-skip-if-not-the-good-time ()
   (org-back-to-heading t)
   (let* ((beg (point))
          (end (org-entry-end-position))
@@ -932,12 +452,12 @@ to be organized.
   )
 
 (defun konix/org-toggle-wait ()
-  (konix/org-toggle-tag "WAIT")
+  (org-toggle-tag "WAIT")
   (org-add-note)
   )
 
 (defun konix/org-toggle-delegated ()
-  (konix/org-toggle-tag "DELEGATED")
+  (org-toggle-tag "DELEGATED")
   (org-add-note)
   )
 
@@ -1000,19 +520,6 @@ items"
 		end
 	  nil
 	  )
-	)
-  )
-
-(defun konix/show-todos-review (&optional todo-only)
-  (org-tags-view todo-only (org-get-heading t t))
-  )
-
-(defun konix/org-agenda-skip-if-heading (heading)
-  (if (string= heading
-			   (org-get-heading t t)
-			   )
-	  (save-excursion (outline-next-heading) (1- (point)))
-	nil
 	)
   )
 
@@ -1364,14 +871,13 @@ items"
                                  ))
                               )
                              )
-                  (tags "refile"
+                  (tags "refile-structure"
                         (
                          (org-agenda-overriding-header "Refile those entries")
                          (org-agenda-todo-ignore-deadlines nil)
                          (org-agenda-skip-function
                           '(or
                             (konix/skip-not-todo-file)
-                            (konix/org-agenda-skip-if-heading "Refile")
                             ))
                          (org-agenda-tag-filter-preset nil)
                          )
@@ -1402,15 +908,12 @@ items"
                           )
                          )
                         )
-                  (todo "TODO"
+                  (tags-todo "-project-maybe//TODO"
                         (
                          (org-agenda-todo-ignore-deadlines nil)
                          (org-agenda-skip-function
                           '(or
                             (konix/skip-not-todo-file)
-                            (konix/org-agenda-skip-if-tags
-                             '("project" "maybe")
-                             )
                             (org-agenda-skip-entry-if 'scheduled)
                             (konix/org-agenda-skip-if-task-of-project)
                             )
@@ -1560,7 +1063,7 @@ items"
                             '(or
                               (konix/org-agenda-skip-if-tags
                                '("project"))
-                              (konix/org-skip-if-scheduled-and-deadline)
+                              (konix/org-agenda-for-today-skip-if-not-the-good-time)
                               ;;(org-agenda-skip-entry-if 'scheduled)
                               )
                             )
@@ -2119,9 +1622,9 @@ items"
                 (agenda time-up user-defined-down habit-up priority-down
                         category-keep)
                 ;; Strategy for TODO lists
-                (todo priority-down category-keep)
+                (todo priority-down deadline-up category-keep)
                 ;; Strategy for Tags matches
-                (tags priority-down category-keep)
+                (tags priority-down deadline-up category-keep)
                 ;; Strategy for search matches
                 (search category-keep)
                 )
@@ -2186,47 +1689,6 @@ items"
     )
   )
 
-(defun konix/org-energy-compare (a b)
-  (let* (
-         (ma (or (get-text-property 0 'org-marker a)
-                 (get-text-property 0 'org-hd-marker a)))
-         (mb (or (get-text-property 0 'org-marker b)
-                 (get-text-property 0 'org-hd-marker b)))
-         (energy_a (org-entry-get ma "Energy"))
-         (energy_b (org-entry-get mb "Energy"))
-         )
-    (cond
-     ((and
-       (not energy_a)
-       (not energy_b)
-       )
-      nil
-      )
-     ((and
-       energy_a
-       (not energy_b)
-       )
-      1
-      )
-     ((and
-       (not energy_a)
-       energy_b
-       )
-      -1
-      )
-     ((> energy_a energy_b)
-      1
-      )
-     ((< energy_a energy_b)
-      -1
-      )
-     (t
-      nil
-      )
-     )
-    )
-  )
-
 (defun konix/org-agenda-cmp-user-defined (a b)
   (or
    ;;(konix/org-energy-compare a b)
@@ -2283,14 +1745,6 @@ items"
   (interactive)
   (assert nil "TODO")
   (message "org-agenda-tag-filter-preset (%s) recorded" org-agenda-tag-filter-preset)
-  )
-
-(defun konix/org-today-time-stamp (&optional with-hm active)
-  (interactive)
-  (with-temp-buffer
-    (org-insert-time-stamp nil with-hm (not active))
-    (buffer-substring-no-properties (point-min) (point-max))
-    )
   )
 
 (defun konix/org-clock-goto ()
@@ -2355,67 +1809,6 @@ items"
   (interactive)
   (org-mark-ring-goto -1)
   )
-
-(defun konix/org-table-toggle-cross ()
-  (interactive)
-  (let* (
-         (content_ (save-excursion
-                     (skip-chars-backward "^|\n")
-                     (backward-char 1)
-                     (search-forward-regexp "|\\([^|]+\\)|")
-                     (match-string-no-properties 1)
-                     )
-                   )
-         (beg_ (match-beginning 1))
-         (end_ (match-end 1))
-         )
-    (if (string-match " *\\+\\(.+\\)\\+ *" content_)
-        (setq content_ (match-string 1 content_))
-      (setq content_ (replace-regexp-in-string " *\\([^ ].+[^ ]\\) *" "+\\1+" content_))
-      )
-    (delete-region beg_ end_)
-    (insert content_)
-    (org-table-align)
-    )
-  )
-
-(defun konix/org-link-toggle-cross ()
-  (interactive)
-  (let* (
-         (content_ (if (org-in-regexp org-bracket-link-regexp 1)
-                       (org-match-string-no-properties 3)
-                     )
-                   )
-         (beg_ (match-beginning 3))
-         (end_ (match-end 3))
-         )
-    (if (string-match " \\+\\(.+\\)\\+ " content_)
-        (setq content_ (match-string 1 content_))
-      (setq content_ (replace-regexp-in-string " *\\([^ ].+[^ ]\\) *" " +\\1+ " content_))
-      )
-    (delete-region beg_ end_)
-    (insert content_)
-    (org-table-align)
-    )
-  )
-
-(defun konix/org-timer-start ()
-  (interactive)
-  (save-window-excursion
-    (org-clock-goto)
-    (org-timer-stop)
-    (org-timer-set-timer '(16))
-    )
-  )
-
-(defun konix/org-timer-start-or-pause-or-continue ()
-  (interactive)
-  (if org-timer-current-timer
-      (org-timer-pause-or-continue)
-    (konix/org-timer-start)
-    )
-  )
-
 (defun konix/org-publish-attachment-dia-thumbs (plist filename pub-dir)
   "Publish a thumbnail of a dia file."
   (if (locate-file "dia" exec-path exec-suffixes)
@@ -2430,127 +1823,6 @@ items"
        )
     (message "No dia found in exec-path")
     )
-  )
-
-(defun konix/org-depend-first-blocker-and-tag-blocked ()
-  (let (
-        (id_blockers (org-entry-get (point) "BLOCKER"))
-        (tested_blocker nil)
-        (first_blocker nil)
-        (last_buffer (current-buffer))
-        (last_point (point))
-        )
-    (when id_blockers
-      (setq id_blockers (split-string id_blockers " "))
-      )
-    (while (and id_blockers (not first_blocker))
-      (setq tested_blocker (pop id_blockers))
-      (save-excursion
-        (save-window-excursion
-          (org-id-goto tested_blocker)
-          (unless (org-entry-is-done-p)
-            (setq first_blocker tested_blocker)
-            )
-          )
-        )
-      )
-    ;; (switch-to-buffer last_buffer)
-    ;; (goto-char last_point)
-    (when first_blocker
-      (org-toggle-tag "blocked" 'on)
-      )
-    first_blocker
-    )
-  )
-
-(defun konix/org-depend-goto-blocker ()
-  (interactive)
-  (let (
-        (id_blocker (konix/org-depend-first-blocker-and-tag-blocked))
-        )
-    (when id_blocker
-      (org-mark-ring-push)
-      (org-id-goto (replace-regexp-in-string "^id:" ""id_blocker))
-      )
-    )
-  )
-
-(defun konix/org-depend-warn-if-blocked-task ()
-  (let (
-        (id_blocker (konix/org-depend-first-blocker-and-tag-blocked))
-        )
-    (when id_blocker
-      (konix/notify (format "Entry has a not done dependency %s" id_blocker))
-      )
-    )
-  )
-
-(defun konix/org-skip-drawers-and-newline ()
-  (interactive)
-  (beginning-of-line)
-  (while (looking-at "^ *:.+:$")
-    (re-search-forward "^ *:END:$")
-    (condition-case nil
-        (next-line)
-      (error
-       (progn
-         (end-of-line)
-         (newline)
-         )
-       )
-      )
-    (beginning-of-line)
-    (when (looking-at "^\\*+.+$")		;new heading
-      (newline)
-      (previous-line)
-      (beginning-of-line)
-      )
-    )
-  (unless (looking-at "^$")
-    (newline)
-    (previous-line)
-    (beginning-of-line)
-    )
-  )
-
-(defun konix/org-timer-when-finish ()
-  (interactive)
-  (if org-timer-current-timer
-      (let (
-            (current_timer_time
-             (list
-              (aref org-timer-current-timer 1)
-              (aref org-timer-current-timer 2)
-              (aref org-timer-current-timer 3)
-              )
-             )
-            )
-        (message "%s" (format-time-string "%H:%M:%S" current_timer_time))
-        )
-    (message "No timer currently run")
-    )
-  )
-
-(defun konix/org-is-errand-p ()
-  (save-excursion
-    (org-back-to-heading)
-    ;;(show-all)
-    (show-branches)
-    (not
-     (not
-      (member
-       "@errand"
-       (org-get-tags-at (point))
-       )
-      )
-     )
-    )
-
-  )
-
-(defun konix/org-sparse-next-actions ()
-  (interactive)
-  (org-occur (concat "^" org-outline-regexp " *\\(NEXT\\)\\>"))
   )
 
 (defun konix/org-list-sort-not-done-first ()
@@ -2585,8 +1857,6 @@ of the clocksum."
     )
   )
 
-;; un parent est DONE quand à 100%
-(setq org-after-todo-statistics-hook 'konix/org-summary-todo)
 (defcustom konix/org-mode-font-lock-keywords
   '(
     )
@@ -2636,12 +1906,6 @@ of the clocksum."
   (appt-check)
   )
 (add-hook 'org-agenda-mode-hook 'konix/org-agenda-mode-hook)
-
-(defun konix/org-clock-in-hook ()
-  (konix/org-depend-warn-if-blocked-task)
-  )
-(add-hook 'org-clock-in-hook
-          'konix/org-clock-in-hook)
 
 (defun konix/org-store-link-at-point ()
   (interactive)
@@ -2732,55 +1996,6 @@ of the clocksum."
     )
   )
 
-;; ####################################################################################################
-;; Sync with google calendar
-;; ####################################################################################################
-;;; define categories that should be excluded
-(setq-default org-export-exclude-category (list "google" "private"))
-
-;;; define filter. The filter is called on each entry in the agenda.
-;;; It defines a regexp to search for two timestamps, gets the start
-;;; and end point of the entry and does a regexp search. It also
-;;; checks if the category of the entry is in an exclude list and
-;;; returns either t or nil to skip or include the entry.
-
-(defun org-mycal-export-limit ()
-  "Limit the export to items that have a date, time and a range. Also exclude certain categories."
-  (setq org-tst-regexp "<\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\} ....? [0-9]\\{2\\}:[0-9]\\{2\\}\\)>")
-  (setq org-tstr-regexp (concat org-tst-regexp "--?-?" org-tst-regexp))
-  (save-excursion
-										; get categories
-    (setq mycategory (org-get-category))
-										; get start and end of tree
-    (org-back-to-heading t)
-    (setq mystart	 (point))
-    (org-end-of-subtree)
-    (setq myend		 (point))
-    (goto-char mystart)
-										; search for timerange
-    (setq myresult (re-search-forward org-tstr-regexp myend t))
-										; search for categories to exclude
-    (setq mycatp (member mycategory org-export-exclude-category))
-										; return t if ok, nil when not ok
-    (if (and myresult (not mycatp)) t nil)))
-
-;;; activate filter and call export function
-(defun org-mycal-export ()
-  (interactive)
-  (let ((org-icalendar-verify-function 'org-mycal-export-limit))
-    (org-export-icalendar-combine-agenda-files)))
-
-(defun konix/org-export-errands-as-ical ()
-  (interactive)
-  (require 'org-icalendar)
-  (let (
-        (org-icalendar-verify-function
-         'konix/org-is-errand-p)
-        )
-    (org-export-icalendar-combine-agenda-files)
-    )
-  )
-
 (defun konix/org-is-in-schedule-p ()
   (or (string-equal
        (get-text-property (point) 'type)
@@ -2819,28 +2034,6 @@ of the clocksum."
       (org-add-link-props :link link :description desc)
       link)))
 
-;;;;;;;;;;;;
-;; Xapers ;;
-;;;;;;;;;;;;
-(defun konix/org-xaper-open-link (id)
-  (let* (
-         (id (replace-regexp-in-string "id:" "" id))
-         (file
-          (org-trim
-           (shell-command-to-string
-            (format
-             "xapers search --output=files id:%s" id))
-           ))
-         )
-    (if file
-        (org-open-file file)
-      (user-error "No file associated to id %s" id)
-      )
-    )
-  )
-
-(org-add-link-type "xapers" 'konix/org-xaper-open-link)
-
 ;; ######################################################################
 ;; Calfw integration
 ;; ######################################################################
@@ -2857,24 +2050,6 @@ of the clocksum."
   (set (make-variable-buffer-local 'org-agenda-skip-function)
        org-agenda-skip-function)
   (set (make-variable-buffer-local 'org-deadline-warning-days) org-deadline-warning-days)
-  )
-
-(defun konix/org-map-entries-skip-deep-entries ()
-  "Return a lambda to be used in `org-map-entries' to scan only
-  the direct children"
-  `(lambda ()
-     (when (not
-            (eq
-             (org-current-level)
-             (1+ ,(org-current-level))
-             )
-            )
-       (save-excursion
-         (forward-line)
-         (point)
-         )
-       )
-     )
   )
 
 ;; ######################################################################
@@ -2900,10 +2075,6 @@ of the clocksum."
    (t
     (message "ERR: not in Org mode")
     (ding))))
-;; ######################################################################
-;; Evaluation to be done after loading org
-;; ######################################################################
-(konix/org-load-hook)
 
 (defalias 'string>= 'org-string>=)
 
@@ -2922,118 +2093,6 @@ of the clocksum."
     )
   )
 (konix/org-setup-holidays)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Automatic handling of ical files ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar konix/org-ical/current_entry nil
-  "Marker to the entry currently being processed"
-  )
-
-(defun konix/org-kill-subtree-at-point ()
-  (interactive)
-  (kill-region
-   (org-entry-beginning-position)
-   (save-excursion
-     (org-end-of-subtree t t)
-     (point)
-     )
-   )
-  )
-
-(defun konix/org-ical/handle-entry_cleanup_hook ()
-  "Hook to widen the buffers after the merge"
-  (with-current-buffer ediff-buffer-A
-    (widen)
-    )
-  (with-current-buffer ediff-buffer-B
-    (widen)
-    )
-  (remove-hook 'ediff-cleanup-hook 'konix/org-ical/handle-entry_cleanup_hook)
-  (save-window-excursion
-    (set-buffer (marker-buffer konix/org-ical/current_entry))
-    (goto-char (marker-position konix/org-ical/current_entry))
-    (when (y-or-n-p "Can I remove the ical entry?")
-      (konix/org-kill-subtree-at-point)
-      )
-    )
-  (setq konix/org-ical/current_entry nil)
-  )
-
-(defun konix/org-ical/handle-entry ()
-  "Get the entry at point and decide whether it needs to be refiled or
-removed. The attribute ID allows to find out whether another entry already
-exists and the attribute VERSION allows to find out whether the ical entry
-should be considered as newer than the one already present.
-
-If there does not exist any entry yet, simply launch a refile
-process.
-
-Else, if the VERSION is the same, remove the entry (I already
-refiled this version earlier).
-
-If the VERSION is bigger than the VERSION already present, then
-launch a merge process to let the user merge the contents.
-
-If the VERSION is lower than the already present one, then launch
-an error (this should never happen)."
-  (interactive)
-  (let* (
-         (current_id (org-id-get))
-         (other_location (org-id-find current_id))
-         )
-    (when (string-match "ical" (car other_location))
-      (if (y-or-n-p "Would merge with itself, attempt to refile?")
-          (org-refile)
-        (error "Cannot go further")
-        )
-      )
-    (if (not other_location)
-        (org-refile)
-      ;; here, we must handle the merge
-      (progn
-        (let* (
-               (current_version (cdar
-                                 (org-entry-properties nil "VERSION")
-                                 ))
-               (current_buffer (current-buffer))
-               (other_buffer (save-window-excursion
-                               (org-id-goto current_id)
-                               (current-buffer)
-                               )
-                             )
-               (other_version (save-window-excursion
-                                (set-buffer other_buffer)
-                                (cdar
-                                 (org-entry-properties nil "VERSION")
-                                 )
-                                )
-                              )
-               )
-          (if (equal current_version other_version)
-              (konix/org-kill-subtree-at-point)
-            ;; now the fusion takes place
-            (progn
-              (org-show-subtree)
-              (org-narrow-to-subtree)
-              (save-window-excursion
-                (set-buffer other_buffer)
-                (org-show-subtree)
-                (org-narrow-to-subtree)
-                )
-              (setq konix/org-ical/current_entry (save-excursion
-                                                   (goto-char (org-entry-beginning-position))
-                                                   (point-marker)
-                                                   ))
-              (add-hook 'ediff-cleanup-hook 'konix/org-ical/handle-entry_cleanup_hook)
-              (ediff-buffers current_buffer other_buffer)
-              )
-            )
-          )
-        )
-      )
-    )
-  )
 
 (setq-default org-yank-adjusted-subtrees t)
 (setq-default org-return-follows-link t)

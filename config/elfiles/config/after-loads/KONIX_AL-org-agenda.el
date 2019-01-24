@@ -697,42 +697,6 @@
 (add-hook 'org-agenda-finalize-hook 'konix/org-agenda-set-text-properties)
 ;; (remove-hook 'org-agenda-finalize-hook 'konix/org-agenda-set-text-properties)
 
-(defun konix/org-apply-org-agenda-auto-exclude-function ()
-  (org-agenda-filter-show-all-tag)
-  (when org-agenda-auto-exclude-function
-	(setq org-agenda-tag-filter '())
-	(dolist (tag (org-agenda-get-represented-tags))
-	  (let ((modifier (funcall org-agenda-auto-exclude-function tag)))
-		(if modifier
-			(push modifier org-agenda-tag-filter))))
-	(if (not (null org-agenda-tag-filter))
-		(org-agenda-filter-apply org-agenda-tag-filter 'tag)))
-  (setq maybe-refresh t)
-  )
-
-(defun konix/org-agenda-reset-apply-filter (filters)
-  (interactive "sFilters: ")
-  (setq raw_filters filters)
-  (setq filters '())
-  (while (and
-		  (not
-		   (string-equal raw_filters "")
-		   )
-		  (not (null raw_filters))
-		  )
-	(if (string-match "^\\([+-][^+-]+\\)\\(.*\\)$" raw_filters)
-		(add-to-list 'filters (match-string 1 raw_filters))
-	  (add-to-list 'filters (format "+%s" raw_filters))
-	  )
-	(setq raw_filters (match-string 2 raw_filters))
-	)
-
-  (with-current-buffer org-agenda-buffer
-	(org-agenda-filter-show-all-tag)
-	(org-agenda-filter-apply filters 'tag)
-	)
-  )
-
 (defvar konix/org-agenda-filter-context-show-appt t "")
 (defvar konix/org-agenda-filter-context-show-empty-context t "")
 (defun konix/org-agenda-filter-context_1 (tags)
@@ -768,12 +732,6 @@
 					cat (get-text-property (point) 'org-category))
 			  (if (and
 				   (not (eval konix/org-entry-predicate))
-				   ;; do not hide appointment if the associated setting is set
-				   ;; (or (not konix/org-agenda-filter-context-show-appt)
-				   ;;     (not
-				   ;;  	(konix/org-agenda-appt-p)
-				   ;;  	)
-				   ;;     )
 				   ;; show empty context entries if the associated setting is set
 				   (or (not konix/org-agenda-filter-context-show-empty-context)
 					   (not
@@ -860,150 +818,6 @@
 (add-hook 'org-agenda-finalize-hook 'konix/org-agenda-filter-context)
 ;; (remove-hook 'org-agenda-finalize-hook 'konix/org-agenda-filter-context)
 
-(defvar konix/org-agenda-important-items-filtered nil)
-(defun konix/org-agenda-toggle-filter-important-items ()
-  (interactive)
-  (if konix/org-agenda-important-items-filtered
-      (progn
-        (set (make-variable-buffer-local
-              'konix/org-agenda-important-items-filtered)
-             nil)
-        (setq org-agenda-regexp-filter (remove "\\[#[A-G]\\]"
-                                               org-agenda-regexp-filter))
-        (org-agenda-filter-show-all-re)
-        )
-    (progn
-      (set (make-variable-buffer-local
-            'konix/org-agenda-important-items-filtered)
-           t)
-      (push "\\[#[A-G]\\]" org-agenda-regexp-filter)
-      )
-    )
-  (org-agenda-filter-apply org-agenda-regexp-filter 'regexp)
-  (konix/org-agenda-filter-context)
-  )
-
-(defun konix/org-agenda/dump-categories (&optional beg end)
-  (interactive)
-  (unless beg
-    (setq beg
-          (if (region-active-p)
-              (region-beginning)
-            (point-min)
-            )))
-  (unless end
-    (setq end
-          (if (region-active-p)
-              (region-end)
-            (point-max)
-            )))
-  (when (> beg end)
-    (user-error "beg must not be greater than end")
-    )
-  (let (
-        (line-end
-         (save-excursion
-           (goto-char end)
-           (line-number-at-pos)))
-        (categories_times '())
-        (current_category nil)
-        (current_duration nil)
-        (assoc nil)
-        )
-    ;; aggregating the data
-    (save-excursion
-      (goto-char beg)
-      (while (not (eq
-                   (line-number-at-pos)
-                   line-end
-                   ))
-        (when (org-get-at-bol 'org-marker)
-          (setq current_category (konix/org-with-point-on-heading
-                                  (org-get-category)
-                                  )
-                current_duration (get-text-property (point) 'duration)
-                assoc (assoc current_category categories_times)
-                )
-          (if assoc
-              (setcdr assoc
-                      (+ current_duration
-                         (cdr assoc))
-                      )
-            ;; add it to the map
-            (add-to-list
-             'categories_times
-             (cons
-              current_category
-              current_duration
-              )
-             )
-            )
-          )
-        (forward-line)
-        )
-      )
-    ;; sort the values
-    (setq categories_times
-          (sort categories_times
-                (lambda (cat1 cat2)
-                  (>
-                   (cdr cat1)
-                   (cdr cat2)
-                   )
-                  )
-                )
-          )
-    (message "Categories:
-%s" categories_times)
-    )
-  )
-
-
-(defvar konix/org-agenda/hide-dimmed-not-scheduled_overlays '())
-(defun konix/org-agenda/hide-dimmed-not-scheduled ()
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (let (
-          (intervalles '())
-          )
-      (while (re-search-forward "^.+In +.+ d\..*$" nil t)
-        (setq beg (match-beginning 0)
-              end (1+
-                   (match-end 0)
-                   ))
-        (unless (konix/org-is-in-schedule-p)
-          (add-to-list
-           'intervalles
-           (cons beg end)
-           )
-          )
-        )
-      (mapc
-       (lambda (intervalle)
-         (let (
-               (ov (make-overlay (car intervalle) (cdr intervalle)))
-               )
-           (add-to-list 'konix/org-agenda/hide-dimmed-not-scheduled_overlays ov)
-           (overlay-put ov 'invisible t)
-           )
-         )
-       intervalles
-       )
-
-      )
-    )
-  )
-
-
-(defun konix/org-agenda/remove-hidden-dimmed-not-scheduled ()
-  (interactive)
-  (mapc
-   'delete-overlay
-   konix/org-agenda/hide-dimmed-not-scheduled_overlays
-   )
-  )
-
 (defun konix/org-agenda-update-current-line ()
   (let (
         (hdmarker (or (org-get-at-bol 'org-hd-marker)
@@ -1016,37 +830,6 @@
     (org-agenda-change-all-lines newhead hdmarker)
     )
   )
-
-(defun konix/org-agenda-get-todo-list()
-  (let (
-        (todo-list '())
-        )
-    (goto-char (point-min))
-    (while (not (equal (point) (point-max)))
-      (goto-char (next-single-char-property-change (point) 'txt))
-      (when (get-text-property (point) 'txt)
-        (add-to-list 'todo-list (get-text-property (point) 'txt) t)
-        )
-      )
-    todo-list
-    )
-  )
-
-(defun konix/agenda/html ()
-  (interactive)
-  (let (
-        (revert-without-query '(".*.org"))
-        )
-    (konix/org-element-cache-reset-all)
-    )
-  (let (
-        (buffer_name "*Org Agenda(aa)*")
-        )
-    (kill-buffer (get-buffer-create buffer_name))
-    (org-agenda nil "att")
-    (org-agenda-write (format "%s/agenda.html" temporary-file-directory) t nil buffer_name))
-  )
-
 
 (defvar konix/org-agenda-check-get-struct-exclude-tags '("declined") "")
 (defun konix/org-agenda-check-get-struct (start stop)

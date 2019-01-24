@@ -84,7 +84,7 @@
 	   (member "NOEXPIRYRECURSIVE" (org-get-tags-at (point)))
 	   )
 	  (message "Prevent the expiration of %s" (org-get-heading t t))
-	(konix/org-add-tag "EXPIRED")
+	(org-toggle-tag "EXPIRED" 'on)
 	)
   )
 (setq-default org-expiry-handler-function 'konix/org-expiry/handler)
@@ -98,8 +98,8 @@
 	  (when (equal major-mode 'org-agenda-mode)
 		(org-agenda-switch-to)
 		)
-	  (konix/org-add-tag "NOEXPIRY")
-	  (konix/org-del-tag "EXPIRED")
+	  (org-toggle-tag "NOEXPIRY" 'on)
+	  (org-toggle-tag "EXPIRED" 'off)
 	  )
 	)
   (when (equal major-mode 'org-agenda-mode)
@@ -113,7 +113,7 @@
     (when (equal major-mode 'org-agenda-mode)
       (org-agenda-switch-to)
       )
-    (konix/org-del-tag "EXPIRED")
+    (org-toggle-tag "EXPIRED" 'off)
     (org-set-property "EXPIRY"
                       (format
                        "[%s]"

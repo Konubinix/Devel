@@ -570,21 +570,19 @@
 (define-key 'konix/org-global-map "j" 'konix/org-jump-to)
 (define-key 'konix/org-global-map "P" 'org-publish)
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
+(define-key 'konix/org-global-map "G" 'konix/org-agenda-goto-today-clock)
 (define-key 'konix/org-global-map "b" 'konix/org-goto-bookmarks)
 (define-key 'konix/org-global-map "O" 'org-clock-out)
 (define-key 'konix/org-global-map "I" 'org-clock-in-last)
 (define-key 'konix/org-global-map "c" 'org-capture)
 (define-key 'konix/org-global-map (kbd "C-e") 'org-clock-modify-effort-estimate)
-(define-key 'konix/org-global-map "C" 'konix/org-toggle-org-agenda-tag-filter-context)
-(define-key 'konix/org-global-map "k" 'konix/org-agenda-refinalize)
-(define-key 'konix/org-global-map "n" 'konix/org-goto-notes)
+(define-key 'konix/org-global-map "n" 'konix/org-agenda-goto-today-now)
 (define-key 'konix/org-global-map "x" 'konix/org-link-toggle-cross)
 (define-key 'konix/org-global-map (kbd "<up>") 'org-mark-ring-push)
 (define-key 'konix/org-global-map (kbd "<left>") 'org-mark-ring-goto)
 (define-key 'konix/org-global-map (kbd "<right>") 'konix/org-mark-ring-goto-newest)
 (define-key 'konix/org-global-map "r" 'org-remember)
 (define-key 'konix/org-global-map "a" 'org-annotate-file)
-(define-key 'konix/org-global-map "d" 'konix/org-depend-goto-blocker)
 (define-key 'konix/org-global-map "s" 'org-sort)
 (define-key 'konix/org-global-map "l" 'org-store-link)
 (define-key 'konix/org-global-map "f" 'konix/org-timer-when-finish)
@@ -599,6 +597,8 @@
 (define-key 'konix/org-global-map "-" 'konix/org-sparse-next-actions)
 (define-key 'konix/org-global-map (kbd "C-l") 'org-toggle-link-display)
 (define-key 'konix/org-global-map (kbd "M-o") 'osg)
+(define-key 'konix/org-global-map (kbd "C-s") 'konix/org-store-agenda-views)
+(define-key 'konix/org-global-map (kbd "C-r") 'konix/org-element-cache-reset-all)
 
 (define-prefix-command 'konix/org-meta-context-map)
 (define-key 'konix/org-global-map (kbd "m") 'konix/org-meta-context-map)
@@ -614,14 +614,6 @@
 (define-key 'konix/org-timer-map "t" 'konix/org-timer-start-or-pause-or-continue)
 (define-key 'konix/org-timer-map "s" 'konix/org-timer-start)
 (define-key 'konix/org-timer-map "S" 'org-timer-stop)
-
-(eval-after-load "org-agenda"
-  '(progn
-	 (define-key org-agenda-mode-map (kbd "T") 'org-agenda-todo-yesterday)
-	 (define-key org-agenda-mode-map (kbd "$") 'self-insert-command)
-	 (define-key org-agenda-mode-map (kbd "n") 'konix/org-agenda-toggle-filter-important-items)
-	 )
-  )
 
 ;; ####################################################################################################
 ;; Compilation

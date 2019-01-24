@@ -10,11 +10,9 @@
 				org-info
 				org-jsinfo
 				org-irc
-				org-habit
 				org-w3m
 				org-wl
 				org-babel
-				org-depend
 				org-checklist
 				)
 			  )

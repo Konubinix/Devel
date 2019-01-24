@@ -1,7 +1,7 @@
 #!/bin/bash
 
 read title
-echo -n "* TODO Read ${title}
+echo -n "* NEXT ${title}
 :PROPERTIES:
 :CREATED: [$(date '+%Y-%m-%d %a %H:%M')]
 :END:

@@ -2,5 +2,4 @@
 # name: new-file-tpl-org
 # --
 * Refile :refile:NOEXPIRY:
-* Diary :diary:NOEXPIRY:
-* Someday/Maybe :maybe:NOEXPIRY:
+* Diary :diary:NOEXPIRY:structure:

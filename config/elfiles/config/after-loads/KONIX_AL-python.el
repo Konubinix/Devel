@@ -111,5 +111,15 @@
   (message "Done")
   )
 
+(defun konix/python/white-it ()
+  (interactive)
+  (when (buffer-modified-p)
+    (user-error "Save the file before it is too late")
+    )
+  (shell-command (format "black --line-length 79 '%s'" (buffer-file-name)))
+  (revert-buffer nil t)
+  (message "White-d it!")
+  )
+
 (provide '700-KONIX_python-mode)
 ;;; 700-KONIX_python-mode.el ends here

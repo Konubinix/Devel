@@ -3,4 +3,4 @@
 HOUR="$(date +%H)"
 
 [ ${HOUR} -gt 8 ] \
-    &&  [ ${HOUR} -lt 17 ]
+    &&  [ ${HOUR} -lt 19 ]

@@ -5,11 +5,11 @@ do
     if echo "${line}" | grep "^LOCK "
     then
         rm -f "${HOME}/.here"
-        emacsclient -e "(run-hooks 'konix/away-hooks)" -a "false"
+        konix_do_cron_job.sh konix_away_hook.sh
     fi
     if echo "${line}" | grep "^UNBLANK "
     then
         echo "1" > "${HOME}/.here"
-        emacsclient -e "(run-hooks 'konix/back-hooks)" -a "false"
+        konix_do_cron_job.sh konix_back_hook.sh
     fi
 done

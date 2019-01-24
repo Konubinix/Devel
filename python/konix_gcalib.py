@@ -310,8 +310,7 @@ class GCall(cmd.Cmd, object):
 By: {}
 Attendees:
 {}
-
-** Description
+# DESCRIPTION
 {}
 #+BEGIN_EXAMPLE
 {}
@@ -337,7 +336,7 @@ Attendees:
                 a.get("comment", "no comment"),
             ),
             self.attendees)),
-    re.sub("^\*", ",*", self.text_description, flags=re.MULTILINE),
+    re.sub("^\*", ",*", self.text_description.strip(), flags=re.MULTILINE),
     re.sub("^\*", ",*", str(self).strip(), flags=re.MULTILINE),
 )
 

@@ -1428,12 +1428,11 @@ items"
                  )
                 ("J" "External interruption" entry (file+headline konix/org-diary_file "Interruptions")
                  "* NEXT [#G] %? :INTERRUPTION:external:
-  %T
   :PROPERTIES:
   :CREATED:  %U
   :INTERRUPTION_HANDLED: t
   :END:
-  %U"
+  %T"
                  :clock-in t
                  :clock-resume t
                  )

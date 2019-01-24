@@ -40,6 +40,7 @@ from click_project.lib import (
     makedirs,
     json_dumps,
 )
+from cached_property import cached_property
 from click_project.completion import startswith
 from click_project.config import config
 from click_project.core import cache_disk
@@ -103,8 +104,18 @@ class Conversation():
         self.data["created_date"] = self.created_date
         self.data["creator_fmt"] = self.creator_fmt
         self.data["purpose_fmt"] = self.purpose_fmt
-        self.data["members_fmt"] = self.members_fmt
         self.data["name_fmt"] = self.name
+        self.name_fmt = self.name
+
+    def __getitem__(self, name):
+        return getattr(self, name)
+
+    @property
+    def members(self):
+        @cache_disk(expire=36000)
+        def _conversation_members(id, token):
+            return config.slack.client.conversations.members(id).body["members"]
+        return _conversation_members(self.id, config.slack.token)
 
     @property
     def num_members(self):
@@ -122,7 +133,7 @@ class Conversation():
     def members_fmt(self):
         return ", ".join(
             builtins.sorted(
-                config.slack.users[u]["name"] for u in self.data["members"]
+                config.slack.users[u]["name"] for u in self.members
             )
         )
 
@@ -649,11 +660,12 @@ def me_message(conversation, text):
     )
 )
 @table_format()
-@option("--missing-in", type=ConversationType())
+@option("--missing-in", type=ConversationType(), help="Only those that are not there")
 def users(fields, format, missing_in):
+    """Display the users"""
     users = config.slack.active_users
     if missing_in:
-        keys = set(users) - set(missing_in.data["members"])
+        keys = set(users) - set(missing_in.members)
         users = {
             key: users[key]
             for key in keys
@@ -685,7 +697,7 @@ def users(fields, format, missing_in):
 @option("--type", type=click.Choice(["channels", "groups", "ims", "pmim"]))
 def conversations(fields, format, type):
     vs = [
-        v.data
+        v
         for v in config.slack.conversations.values()
         if not type or
         (type == "channels" and isinstance(v, Channel)) or
@@ -928,60 +940,80 @@ def create_group(name):
         help="Invite those users")
 @option("--all-but-user", "all_but_users", type=UserType(), multiple=True,
         help="Don't invite those users")
+@flag("--all")
 @flag("--only-active-users/--also-inactive-users",
       default=True,
       help="Invite only the really active users")
 @argument("conversation", type=ConversationType(), help="The conversation")
-def invite_to_conversation(users, all_but_users, conversation, only_active_users):
+def invite_to_conversation(users, all, all_but_users, conversation, only_active_users):
     """Invite those users in the conversation"""
     assert (
+        all or
         (users and not all_but_users)
         or (all_but_users and not users)
     )
     users_to_invite = []
+    all_users = (
+        config.slack.active_users
+        if only_active_users else config.slack.users
+    )
     if users:
         users_to_invite = list(users)
     if all_but_users:
         all_but_users += config.slack.users[config.slack.me["id"]],
-        all_users = (
-            config.slack.active_users
-            if only_active_users else config.slack.users
-        )
         users_to_invite = set(all_users.values()) - set(all_but_users)
+    if all:
+        users_to_invite = all_users.values()
+    # don't invite already present users
+    users_to_invite = [
+        user
+        for user in users_to_invite
+        if user["id"] not in conversation.members
+    ]
     for user in users_to_invite:
         LOGGER.info("Inviting {}".format(user["name"]))
-        conversation.invite(user)
+        try:
+            conversation.invite(user)
+        except slacker.Error as e:
+            if e.args[0] == "already_in_channel":
+                LOGGER.warning("{} already in channel".format(user["name"]))
+            else:
+                raise e
 
 
 @slack.command()
-@argument("conversation", type=ConversationType())
-@argument("topic")
+@argument("conversation", type=ConversationType(), help="The conversation")
+@argument("topic", help="The topic")
 def set_conversation_topic(conversation, topic):
+    """Set the topic of the conversation"""
     conversation.set_topic(topic)
 
 
 @slack.command()
-@argument("user", type=UserType(), nargs=-1)
+@argument("user", type=UserType(), nargs=-1, help="The user to invite")
 def create_mpim(user):
+    """Create a conversation for multiple users"""
     config.slack.client.mpim.open([u.id for u in user])
 
 
 @slack.command()
-@argument("user", type=UserType(), nargs=-1)
+@argument("user", type=UserType(), nargs=-1, help="The user to discuss with")
 def create_im(user):
+    """Start single conversations"""
     for u in user:
         config.slack.client.im.open(u.id)
 
 
 @slack.command()
-@argument("conversation", type=ConversationType())
-@argument("url")
-@argument("title")
-@option("--subtitle")
-@option("--language", default="en")
-@argument("author-name")
-@argument("author-email")
-@argument("output-path")
+@argument("conversation", type=ConversationType(),
+          help="The conversation to scan")
+@argument("url", help="URL of the feed")
+@argument("title", help="Title of the feed")
+@option("--subtitle", help="Subtitle of the feed")
+@option("--language", default="en", help="Language of the feed")
+@argument("author-name", help="The name of the author of the feed")
+@argument("author-email", help="The email of the author")
+@argument("output-path", help="Where to put the RSS feed")
 def rss(conversation,
         url,
         author_name,
@@ -990,6 +1022,7 @@ def rss(conversation,
         subtitle,
         language,
         output_path):
+    """Export all the links of the conversation in a simple RSS feed"""
     from feedgen.feed import FeedGenerator
     fg = FeedGenerator()
     fg.id(url)
@@ -1393,18 +1426,27 @@ def status():
              'display_name', 'display_name_normalized', 'fields', 'status_text',
              'status_emoji', 'status_expiration', 'avatar_hash', 'email',
              'first_name', 'last_name', 'image_24', 'image_32', 'image_48',
-             'image_72', 'image_192', 'image_512', 'status_text_canonical'
+             'image_72', 'image_192', 'image_512', 'status_text_canonical',
+             "presence",
     ],
     default=[
-        "real_name", "status_text", "status_emoji"
+        "real_name", "presence", "status_text", "status_emoji",
     ]
 )
 @table_format()
 def get(fields, format):
     """Get the status"""
+    presence = config.slack.client.users.get_presence(
+        config.slack.me["id"]
+    ).body["presence"]
     with TablePrinter(fields, format) as tp:
         tp.echo_records(
-            [config.slack.client.users.profile.get().body["profile"]]
+            [
+                {
+                    "presence": presence,
+                    **config.slack.client.users.profile.get().body["profile"]
+                }
+            ]
         )
 
 
@@ -1412,6 +1454,7 @@ def get(fields, format):
 @option("--text", help="The text of the status")
 @option("--emoji", help="The emoji of the status")
 def _set(text, emoji):
+    """Set the text or the emoji of the status"""
     if text is None and emoji is None:
         LOGGER.info("No change of status")
         return
@@ -1432,6 +1475,7 @@ def _set(text, emoji):
 
 @status.command()
 def unset():
+    """Remove the text and the emoji from the status"""
     ctx = click.get_current_context()
     ctx.invoke(_set, text="", emoji="")
 
@@ -1440,6 +1484,7 @@ def unset():
 @option("--text", help="The text of the status")
 @option("--emoji", help="The emoji of the status")
 def leave(text, emoji):
+    """Leave for some time"""
     config.slack.client.users.set_presence("away")
     ctx = click.get_current_context()
     ctx.forward(_set)
@@ -1449,6 +1494,7 @@ def leave(text, emoji):
 @option("--text", help="The text of the status")
 @option("--emoji", help="The emoji of the status")
 def back(text, emoji):
+    """Back from a leave"""
     config.slack.client.users.set_presence("auto")
     ctx = click.get_current_context()
     ctx.forward(_set)
@@ -1457,12 +1503,12 @@ def back(text, emoji):
 @slack.group()
 def pomodoro_status():
     """Handle the status to show the pomodoro state"""
-    presence = config.slack.client.users.get_presence(
-        config.slack.me["id"]
-    ).body["presence"]
-    if presence == "away":
-        LOGGER.info("Not updating the status if your are away")
-        exit(0)
+    # presence = config.slack.client.users.get_presence(
+    #     config.slack.me["id"]
+    # ).body["presence"]
+    # if presence == "away":
+    #     LOGGER.info("Not updating the status if your are away")
+    #     exit(0)
 
 
 @pomodoro_status.command()
@@ -1531,12 +1577,25 @@ def end():
 
 
 @slack.command()
-@argument("minutes", help="The number of minutes to snooze", type=int)
-def snooze(minutes):
+@argument("enddate",
+          help="The end of the snooze, if prefixed with +, the number of minutes to snooze",
+          default="+30")
+@option("--text", help="The text of the status")
+@option("--emoji", help="The emoji of the status")
+def snooze(enddate, text, emoji):
     """Snooze notifications by that amount of minutes"""
+    if enddate.startswith("+"):
+        minutes = int(enddate[1:])
+    else:
+        cal = parsedatetime.Calendar()
+        enddate = cal.parseDT(enddate)[0]
+        minutes = (enddate - datetime.datetime.now()).total_seconds() / 60
     resp = config.slack.client.dnd.set_snooze(minutes).body
     endtime = datetime.datetime.fromtimestamp(resp["snooze_endtime"])
     LOGGER.info("Snooze will end at {}".format(endtime))
+    if text is not None or emoji is not None:
+        ctx = click.get_current_context()
+        ctx.invoke(_set, text=text, emoji=emoji)
 
 
 @slack.command()

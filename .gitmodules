@@ -291,3 +291,6 @@ ignore=dirty
 [submodule "prosody"]
 	path = prosody
 	url = git://github.com/bjc/prosody.git
+[submodule "config/elfiles/org-edna"]
+	path = config/elfiles/org-edna
+	url = bzr::https://bzr.savannah.gnu.org/r/org-edna-el/

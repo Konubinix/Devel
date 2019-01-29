@@ -888,8 +888,8 @@
                      )
                     ":"
                     ))
-         (hour (string-to-int (car hour_min)))
-         (min (string-to-int (cadr hour_min)))
+         (hour (string-to-number (car hour_min)))
+         (min (string-to-number (cadr hour_min)))
          )
     (truncate (+ min (* hour 60)))
     )

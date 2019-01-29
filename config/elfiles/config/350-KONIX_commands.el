@@ -493,7 +493,7 @@
 	(skip-chars-backward "0123456789")
 	(when (looking-at "[0-9]+")
 	  (let* (
-			 (number (string-to-int (match-string-no-properties 0)))
+			 (number (string-to-number (match-string-no-properties 0)))
 			 (next_int (+ increment number))
 			 (next_string (int-to-string next_int))
 			 )
@@ -770,7 +770,7 @@ NO : Ne pas truncater
   (let (added)
 	(save-excursion
 	  (backward-word 1)
-	  (setq added (format "%d" (+ (string-to-int (thing-at-point 'symbol)) number)))
+	  (setq added (format "%d" (+ (string-to-number (thing-at-point 'symbol)) number)))
 	  (message added)
 	  (backward-word 1)
 	  (kill-word 1)

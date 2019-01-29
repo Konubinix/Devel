@@ -1640,14 +1640,14 @@ items"
         (a_now (string-match-p deadline_regexp_now a))
         (a_past (and
                  (string-match deadline_regexp_past a)
-                 (string-to-int
+                 (string-to-number
                   (match-string 1 a)
                   )
                  )
                 )
         ;; (a_fut (and
         ;;		(string-match deadline_regexp_future a)
-        ;;		(string-to-int
+        ;;		(string-to-number
         ;;		 (match-string 1 a)
         ;;		 )
         ;;		)
@@ -1655,14 +1655,14 @@ items"
         (b_now (string-match-p deadline_regexp_now b))
         (b_past (and
                  (string-match deadline_regexp_past b)
-                 (string-to-int
+                 (string-to-number
                   (match-string 1 b)
                   )
                  )
                 )
         ;; (b_fut (and
         ;;		(string-match deadline_regexp_future b)
-        ;;		(string-to-int
+        ;;		(string-to-number
         ;;		 (match-string 1 b)
         ;;		 )
         ;;		)

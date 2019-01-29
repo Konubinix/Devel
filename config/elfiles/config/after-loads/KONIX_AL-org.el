@@ -128,24 +128,25 @@
   )
 (ad-activate 'org-agenda-redo)
 
-(defun konix/org-agenda-redo/keep-column (orig-fun &rest args)
+(defun konix/org-agenda/keep-column (orig-fun &rest args)
   (let* (
          (line (line-number-at-pos (point)))
          (column (current-column))
          (res (apply orig-fun args))
          )
     (goto-line line)
+    (line-move-to-column column)
     (when (and
            (eq (get-text-property (point) 'invisible) t)
            (not (eq (point-at-eol) (point-max)))
            )
       (forward-visible-line 1)
       )
-    (line-move-to-column column)
     res
     )
   )
-(advice-add 'org-agenda-redo :around #'konix/org-agenda-redo/keep-column)
+(advice-add 'org-agenda-redo :around #'konix/org-agenda/keep-column)
+(advice-add 'org-agenda-kill :around #'konix/org-agenda/keep-column)
 
 ;; ####################################################################################################
 ;; CONFIG
@@ -166,12 +167,12 @@
 (setq-default org-directory (concat perso-dir "/wiki"))
 (setq-default org-agenda-clockreport-parameter-plist
 			  '(:match "-lunch"
-                      :fileskip0
-                      :stepskip0
-                      :link t
-                      :maxlevel 5
-                      :emphasize t
-                      )
+                       :fileskip0
+                       :stepskip0
+                       :link t
+                       :maxlevel 5
+                       :emphasize t
+                       )
 			  )
 
 (defmacro konix/org-with-point-on-heading (body)
@@ -212,7 +213,7 @@
     )
   )
 
-(defun konix/org-agenda-no-contesxt-p ()
+(defun konix/org-agenda-no-context-p ()
   (let (
 		(no_c t)
 		)
@@ -453,12 +454,10 @@ to be organized.
 
 (defun konix/org-toggle-wait ()
   (org-toggle-tag "WAIT")
-  (org-add-note)
   )
 
 (defun konix/org-toggle-delegated ()
   (org-toggle-tag "DELEGATED")
-  (org-add-note)
   )
 
 (defun konix/org-toggle-wait-on-heading ()
@@ -909,20 +908,20 @@ items"
                          )
                         )
                   (tags-todo "-project-maybe//TODO"
-                        (
-                         (org-agenda-todo-ignore-deadlines nil)
-                         (org-agenda-skip-function
-                          '(or
-                            (konix/skip-not-todo-file)
-                            (org-agenda-skip-entry-if 'scheduled)
-                            (konix/org-agenda-skip-if-task-of-project)
-                            )
-                          )
-                         (org-agenda-tag-filter-preset nil)
-                         (org-agenda-overriding-header
-                          "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
-                         )
-                        )
+                             (
+                              (org-agenda-todo-ignore-deadlines nil)
+                              (org-agenda-skip-function
+                               '(or
+                                 (konix/skip-not-todo-file)
+                                 (org-agenda-skip-entry-if 'scheduled)
+                                 (konix/org-agenda-skip-if-task-of-project)
+                                 )
+                               )
+                              (org-agenda-tag-filter-preset nil)
+                              (org-agenda-overriding-header
+                               "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
+                              )
+                             )
                   (tags-todo "-Context-project-maybe//+NEXT"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
@@ -962,14 +961,25 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "DELEGATED|WAIT//NEXT"
+                  (tags-todo "DELEGATED-Agenda|WAIT-Agenda"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
-                               "Check whether those items are still waiting for something")
+                               "Put those waiting stuff on someone's agenda")
                               (org-agenda-skip-function
                                '(or
                                  (konix/skip-not-todo-file)
+                                 ))
+                              )
+                             )
+                  (tags-todo "DELEGATED|WAIT"
+                             (
+                              (org-agenda-todo-ignore-deadlines nil)
+                              (org-agenda-overriding-header
+                               "Make sure waiting items have due dates")
+                              (org-agenda-skip-function
+                               '(or
+                                 (org-agenda-skip-if t '(deadline))
                                  ))
                               )
                              )
@@ -1015,7 +1025,7 @@ items"
                          (org-agenda-skip-function
                           '(or
                             (konix/skip-not-todo-file)
-                            (konix/org-agenda-skip-not-clockable)
+                            (konix/org-agenda-skip-not-actionable)
                             ))
                          )
                         )
@@ -1028,7 +1038,7 @@ items"
                          (org-agenda-skip-function
                           '(or
                             (konix/skip-not-todo-file)
-                            (konix/org-agenda-skip-not-clockable)
+                            (konix/org-agenda-skip-not-actionable)
                             ))
                          )
                         )
@@ -1047,11 +1057,12 @@ items"
                      'org-agenda-todo-keyword-format)
                     ""
                     )
-                   )                    (dummy (konix/org-agenda-inhibit-context-filtering))
-                                        (org-agenda-todo-ignore-deadlines nil)
-                                        (org-agenda-todo-ignore-timestamp nil)
-                                        (org-agenda-todo-ignore-scheduled nil)
-                                        )
+                   )
+                  (dummy (konix/org-agenda-inhibit-context-filtering))
+                  (org-agenda-todo-ignore-deadlines nil)
+                  (org-agenda-todo-ignore-timestamp nil)
+                  (org-agenda-todo-ignore-scheduled nil)
+                  )
                  )
                 ("at" . "Time agenda views")
                 ("att" "Agenda for today (no filter context)"
@@ -1098,7 +1109,7 @@ items"
                            (org-agenda-overriding-header
                             "Must say something about those invitations")
                            (org-agenda-span 30)
-                           (org-agenda-include-deadlines nil)
+                           ;; (org-agenda-include-deadlines nil)
                            (org-agenda-skip-function
                             '(or
                               (org-agenda-skip-entry-if 'scheduled)
@@ -1134,7 +1145,14 @@ items"
                    (set
                     (make-variable-buffer-local
                      'org-agenda-prefix-format)
-                    '((tags . "%-8:c"))
+                    '((tags . ""))
+                    )
+                   )
+                  (dummy
+                   (set
+                    (make-variable-buffer-local
+                     'org-agenda-todo-keyword-format)
+                    ""
                     )
                    )
                   (org-agenda-skip-function
@@ -1376,20 +1394,17 @@ items"
   :PROPERTIES:
   :CREATED:  %U
   :END:"
-                 :kill-buffer
                  )
                 ("i" "Todo Item in current clock" entry (clock) "* NEXT %?
   :PROPERTIES:
   :CREATED:  %U
   :END:"
-                 :kill-buffer
                  )
                 ("l" "Todo Item for current stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %? %a
   :PROPERTIES:
   :CREATED:  %U
   :END:"
-                 :kill-buffer
                  )
                 ("a" "Todo Item for git annexed stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %?%(file-name-nondirectory (car (konix/org-capture/git-annex-info)))
@@ -1398,7 +1413,6 @@ items"
   :ID: %(cdr (konix/org-capture/git-annex-info))
   :END:
   %(konix/org-capture/git-annex)"
-                 :kill-buffer
                  )
                 ("u" "Todo Item URGENT" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT [#G] %?
@@ -1406,7 +1420,6 @@ items"
   :PROPERTIES:
   :CREATED:  %U
   :END:"
-                 :kill-buffer
                  )
                 ("U" "Todo Item URGENT for current stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT [#G] %? %a
@@ -1414,7 +1427,6 @@ items"
   :PROPERTIES:
   :CREATED:  %U
   :END:"
-                 :kill-buffer
                  )
                 ("j" "Interruption" entry (file+headline konix/org-diary_file "Interruptions")
                  "* Interruption %? :INTERRUPTION:
@@ -1436,12 +1448,21 @@ items"
                  :clock-in t
                  :clock-resume t
                  )
+                ("m" "Two minutes" entry (file+headline konix/org-diary_file "Interruptions")
+                 "* NEXT [#G] %? :INTERRUPTION:twominutes:
+  :PROPERTIES:
+  :CREATED:  %U
+  :INTERRUPTION_HANDLED: t
+  :END:
+  %T"
+                 :clock-in t
+                 :clock-resume t
+                 )
                 ("n" "Note" entry (file konix/org-notes_file)
                  "* %?
   :PROPERTIES:
   :CREATED:  %U
   :END:"
-                 :kill-buffer
                  )
                 ("d" "Diary" entry (file+headline konix/org-diary_file "Refile")
                  "* %?
@@ -1449,7 +1470,6 @@ items"
   :CREATED:  %U
   :END:
   %t"
-                 :kill-buffer
                  )
                 ("B" "Bookmark (use with org-protocol)" entry (file+headline konix/org-bookmarks_file "Refile")
                  "* %:description
@@ -1458,7 +1478,6 @@ items"
   :END:
    %:link
    %:initial"
-                 :kill-buffer
                  )
                 ("C" "Bookmark in current clock (use with org-protocol)" entry
                  (clock) "* %:description
@@ -1467,7 +1486,6 @@ items"
   :END:
    %:link
    %:initial"
-                 :kill-buffer
                  )
                 ("D" "Bookmark NEXT (use with org-protocol)" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT Read %:description
@@ -1476,7 +1494,6 @@ items"
   :END:
    %:link
    %:initial"
-                 :kill-buffer
                  )
                 ("E" "Bookmark NEXT in current clock (use with org-protocol)" entry (clock)
                  "* NEXT Read %:description
@@ -1485,7 +1502,6 @@ items"
   :END:
    %:link
    %:initial"
-                 :kill-buffer
                  )
                 ("R" "Bookmark to read (use with org-protocol)" entry (file+headline konix/org-bookmarks_file "Refile")
                  "* NEXT Read %:description
@@ -1494,21 +1510,18 @@ items"
   :END:
    %:link
    %:initial"
-                 :kill-buffer
                  )
                 ("b" "Bookmark" entry (file+headline konix/org-bookmarks_file "Refile")
                  "* %?
   :PROPERTIES:
   :CREATED:  %U
   :END:"
-                 :kill-buffer
                  )
                 ("r" "Bookmark To Read" entry (file+headline konix/org-bookmarks_file "Refile")
                  "* NEXT Read %?
   :PROPERTIES:
   :CREATED:  %U
   :END:"
-                 :kill-buffer
                  )
                 )
               )
@@ -1565,7 +1578,7 @@ items"
 (setq-default org-tags-exclude-from-inheritance
               '(
                 "project" "draft" "phantom"
-                "WAIT" "DELEGATED"
+                "WAIT" "DELEGATED" "structure"
                 "EXPIRED" "NOEXPIRY"
                 ))
 (setq-default org-fast-tag-selection-single-key t)
@@ -1936,6 +1949,40 @@ of the clocksum."
    )
   )
 
+(defvar konix/org-capture-two-minutes-interruption/interrupted nil "")
+(defun konix/org-capture-two-minutes-interruption ()
+  (interactive)
+  (let (
+        (previous-buffer (car (buffer-list)))
+        )
+    (save-window-excursion
+      (switch-to-buffer previous-buffer t)
+      (when (member major-mode '(org-mode org-agenda-mode))
+        (setq konix/org-capture-two-minutes-interruption/interrupted t)
+        (konix/org-with-point-on-heading
+         (progn
+           (org-clock-in)
+           (org-toggle-tag "twominutes" 'on)
+           (org-toggle-tag "INTERRUPTION" 'on)
+           (org-set-property "INTERRUPTION_HANDLED" "t")
+           )
+         )
+        )
+      ))
+  )
+
+(defun konix/org-two-minutes-handled ()
+  (interactive)
+  (if konix/org-capture-two-minutes-interruption/interrupted
+      (progn
+        (konix/org-clock-back-interrupted-task)
+        (message "Restored the clock to the interrupted task")
+        (setq konix/org-capture-two-minutes-interruption/interrupted nil)
+        )
+    (message "Did not clock anything during the two minutes")
+    )
+  )
+
 (defvar konix/org-capture/saved-window-configuration '() "")
 (defun konix/org-capture/restore-window-configuration ()
   (let (
@@ -2196,6 +2243,27 @@ of the clocksum."
 (advice-add 'org-depend-block-todo :around
             #'konix/org-depend-block-todo/but_not_done)
 
+(defun konix/org-agenda-kill/confirm-if-clock-info ()
+  (when
+      (and
+       (konix/org-with-point-on-heading
+        (save-excursion
+          (save-match-data
+            (re-search-forward
+             org-clock-line-re
+             (save-excursion (org-end-of-subtree t) (point)) t)
+            )
+          )
+
+        )
+       (not (yes-or-no-p "Contains clocked stuff, still remove it?"))
+       )
+    (user-error "Not removing the subtree containing clocked info")
+    )
+  )
+(advice-add 'org-agenda-kill :before
+            #'konix/org-agenda-kill/confirm-if-clock-info)
+
 (defun konix/org-gcal-reset-tags ()
   (org-agenda-set-tags "needsAction" 'off)
   (org-agenda-set-tags "declined" 'off)
@@ -2212,9 +2280,9 @@ of the clocksum."
   (konix/org-with-point-on-heading
    `(
      :id ,(org-entry-get (point) "ID")
-         :account ,(org-entry-get (point) "ACCOUNT_NAME")
-         :calendar_id ,(org-entry-get (point) "CALENDAR_ID")
-         )
+     :account ,(org-entry-get (point) "ACCOUNT_NAME")
+     :calendar_id ,(org-entry-get (point) "CALENDAR_ID")
+     )
    )
   )
 
@@ -2421,10 +2489,14 @@ of the clocksum."
 
 (defun konix/org-focus-next ()
   (interactive)
-  (save-restriction
-    (org-narrow-to-subtree)
-    (org-show-subtree)
-    (org-match-sparse-tree nil "todo=\"NEXT\"")
+  (if (eq major-mode 'org-agenda-mode)
+      (konix/org-agenda-focus-next)
+
+    (save-restriction
+      (org-narrow-to-subtree)
+      (org-show-subtree)
+      (org-match-sparse-tree nil "todo=\"NEXT\"")
+      )
     )
   )
 
@@ -2559,6 +2631,46 @@ of the clocksum."
   (call-interactively 'previous-line)
   )
 
+(defun konix/org-agenda-gtd-tool (tool)
+  (interactive "stool:")
+  (org-agenda-run-series
+   (format "@*%s*" tool)
+   `(
+     (
+      (tags
+       ,(string-join
+         (delq nil
+               (mapcar
+                (lambda (tag)
+                  (and (string-match-p (format "^@.*\\b%s\\b" tool) tag)
+                       tag
+                       )
+                  )
+                (konix/org-all-tags)
+                )
+               )
+         "|"
+         )
+       )
+      )
+     (
+      (dummy (konix/org-agenda-inhibit-context-filtering))
+      )
+     )
+   )
+  )
+
+(defun konix/org-clock-back-interrupted-task ()
+  (save-window-excursion
+    (save-excursion
+      (switch-to-buffer (marker-buffer org-clock-interrupted-task))
+      (goto-char (marker-position org-clock-interrupted-task))
+      (org-clock-in)
+      )
+    )
+  )
+
+(setq-default org-agenda-confirm-kill 5)
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

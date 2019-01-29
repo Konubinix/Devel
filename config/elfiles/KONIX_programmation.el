@@ -191,7 +191,7 @@ They can be relative or absolute
   (if (called-interactively-p)
       (progn
 		(setq indent-tabs-mode (y-or-n-p "Indent with tabs ?"))
-		(setq tab-width (string-to-int (read-string "Number of spaces by tab : "
+		(setq tab-width (string-to-number (read-string "Number of spaces by tab : "
 													nil
 													nil
 													(int-to-string tab-width)

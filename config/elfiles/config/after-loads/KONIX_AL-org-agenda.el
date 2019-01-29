@@ -587,7 +587,7 @@
     ("milestone" . konix/org-agenda-milestone)
     ("discret" . konix/org-agenda-discret-face)
     ("lunch" . konix/org-agenda-pause-face)
-    ("pause" . konix/org-agenda-lunch-face)
+    ("pause" . konix/org-agenda-pause-face)
 	)
   "")
 
@@ -972,7 +972,7 @@ STOP is the end of the agenda."
          (issue)
          (iscurrentnow)
          (isnextnow)
-         (now (konix/org-agenda-check-get-start `(time ,(format-time-string "%H:%M "))))
+         (foundnow)
          (issue-position)
          (pl org-agenda-clock-consistency-checks)
          (face)
@@ -1004,9 +1004,10 @@ STOP is the end of the agenda."
          after nil
          face def-issue-face
          iscurrentnow (string-match-p org-agenda-current-time-string (plist-get current-event 'txt))
-         current-past (and (not iscurrentnow) (< current-start now))
+         foundnow (or foundnow iscurrentnow)
+         current-past (and (not iscurrentnow) (not foundnow))
          isnextnow (string-match-p org-agenda-current-time-string (plist-get next-event 'txt))
-         next-past (and (not isnextnow) (< next-start now))
+         next-past (and (not isnextnow) (not foundnow))
          has-now (or isnextnow iscurrentnow)
          samedate (or
                    has-now
@@ -1042,7 +1043,8 @@ STOP is the end of the agenda."
           )
          ((and
            samedate
-           (not current-past) (> distance min-distance)
+           (not current-past)
+           (> distance min-distance)
            )
           (setq issue (format "free: at %s for %s, aka ~%s pomodoros"
                               (konix/org-agenda-check-format-time
@@ -1080,29 +1082,19 @@ STOP is the end of the agenda."
     )
   )
 
-(defun konix/org-agenda-find-next-agenda ()
-  (if (equal
-       (get-text-property (point) 'org-agenda-type)
-       'agenda
-       )
-      nil
-    (progn
+(defun konix/org-agenda-find-next-agenda (&optional end)
+  (let ((matching-tag (if end "endmilestone" "startmilestone")))
+    (save-excursion
       (while (and
-              (not
-               (equal
-                (get-text-property (point) 'org-agenda-type)
-                'agenda
-                )
-               )
-              (next-single-property-change (point) 'org-agenda-type)
+              (not (member matching-tag (get-text-property (point) 'tags)))
+              (not (eq (point-at-eol) (point-max)))
               )
-        (goto-char (next-single-property-change (point) 'org-agenda-type))
+        (forward-visible-line 1)
         )
-
-      (equal
-       (get-text-property (point) 'org-agenda-type)
-       'agenda
-       )
+      (if (member matching-tag (get-text-property (point) 'tags))
+          (point)
+        nil
+        )
       )
     )
   )
@@ -1122,29 +1114,20 @@ STOP is the end of the agenda."
   (when konix/org-agenda-check-buffer
     (let (
           next-step
+          next-stop
           )
-      (save-excursion
-        (goto-char (point-min))
-        (when
-            (equal
-             (get-text-property (point) 'org-agenda-type)
-             'agenda
-             )
-          (setq next-step (or (next-single-property-change (point) 'org-agenda-type) (point-max)))
-          (konix/org-agenda-check
-           (point)
-           next-step
-           )
-          (goto-char next-step)
+      (while (setq next-step (konix/org-agenda-find-next-agenda))
+        (goto-char next-step)
+        (setq next-stop (konix/org-agenda-find-next-agenda t))
+        (setq next-stop (save-excursion (goto-char next-stop) (forward-visible-line 1) (point)))
+        (unless next-stop
+          (user-error "No stop after %s" next-step)
           )
-        (while (konix/org-agenda-find-next-agenda)
-          (setq next-step (or (next-single-property-change (point) 'org-agenda-type) (point-max)))
-          (konix/org-agenda-check
-           (point)
-           next-step
-           )
-          (goto-char next-step)
-          )
+        (konix/org-agenda-check
+         next-step
+         next-stop
+         )
+        (goto-char next-stop)
         )
       )
     )
@@ -1201,7 +1184,6 @@ STOP is the end of the agenda."
   :PROPERTIES:
   :CREATED:  %U
   :END:"
-            :kill-buffer
             )
            )
          )

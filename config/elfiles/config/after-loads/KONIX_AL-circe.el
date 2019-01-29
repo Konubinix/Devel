@@ -27,9 +27,6 @@
 (require 'circe-color-nicks)
 (enable-circe-color-nicks)
 
-(require 'circe-highlight-all-nicks)
-(enable-circe-highlight-all-nicks)
-
 (custom-set-faces
  '(circe-my-message-face
    (

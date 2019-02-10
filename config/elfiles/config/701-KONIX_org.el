@@ -14,6 +14,7 @@
 				org-wl
 				org-babel
 				org-checklist
+                org-inlinetask
 				)
 			  )
 

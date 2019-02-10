@@ -98,9 +98,11 @@
 (define-key org-agenda-mode-map (kbd "$") 'self-insert-command)
 (define-key org-agenda-mode-map (kbd "i") 'konix/org-agenda-refinalize)
 (define-key org-agenda-mode-map (kbd "n") 'konix/org-agenda-goto-now)
-(define-key org-agenda-mode-map (kbd "o") 'konix/org-agenda-gtd-open-contexts)
+(define-key org-agenda-mode-map (kbd ";") 'konix/org-agenda-gtd-open-contexts)
+(define-key org-agenda-mode-map (kbd "o") 'org-agenda-open-link)
 (define-key org-agenda-mode-map (kbd "C") 'konix/org-toggle-org-agenda-tag-filter-context)
 (define-key org-agenda-mode-map (kbd "*") 'konix/org-agenda-refresh-buffer)
+(define-key org-agenda-mode-map (kbd "d") 'konix/org-agenda-toggle-filter-deadline)
 
 (defun konix/org-agenda-edit-headline ()
   (interactive)
@@ -785,33 +787,36 @@
     )
   )
 
+(defun konix/org-agenda-set-header-line-format nil
+  (setq header-line-format '())
+  (add-to-list
+   'header-line-format "K: " t)
+  (add-to-list
+   'header-line-format
+   (format "%s" konix/org-agenda-tag-filter-context-p)
+   t
+   )
+  (add-to-list
+   'header-line-format
+   (format ", appt: %s" konix/org-agenda-filter-context-show-appt)
+   t
+   )
+  (add-to-list
+   'header-line-format
+   (format ", no context: %s" konix/org-agenda-filter-context-show-empty-context)
+   t
+   )
+  (add-to-list
+   'header-line-format
+   (format ", d: %s" konix/org-agenda-toggle-filter-deadline)
+   t)
+  )
+
 (defun konix/org-agenda-filter-context ()
+  (konix/org-agenda-set-header-line-format)
   (cond
-   (konix/org-agenda-inhibit-context-filtering
-    (setq header-line-format "Context filtering inhibited")
-    )
-   ((not konix/org-agenda-tag-filter-context-p)
-    (setq header-line-format "Deactivated (use C to activate)")
-    )
-   (konix/org-agenda-tag-filter-contexts
+   ((and konix/org-agenda-tag-filter-context-p konix/org-agenda-tag-filter-contexts)
     (konix/org-agenda-filter-context_1 konix/org-agenda-tag-filter-contexts)
-    (setq header-line-format
-          `("Context filtered with "
-            ,(mapconcat
-              (lambda (disjunction)
-                (mapconcat 'identity disjunction " or ")
-                )
-              konix/org-agenda-tag-filter-contexts
-              " and ")
-            ", appt display = " ,(if konix/org-agenda-filter-context-show-appt
-                                     "on" "off")
-            ", no context display = " ,(if konix/org-agenda-filter-context-show-empty-context
-                                           "on" "off")
-            )
-          )
-    )
-   ((not konix/org-agenda-tag-filter-contexts)
-    (setq header-line-format "No context filter")
     )
    )
   )
@@ -986,7 +991,17 @@ STOP is the end of the agenda."
          after current-past next-past has-now
          samedate
          (pomodoros 0)
+         today
          )
+    ;; first, check if "now" is in all the events. If no, I assume we want to
+    ;; compute the free time for all the events of the day
+    (mapc
+     (lambda (current-event)
+       (when (string-match-p org-agenda-current-time-string (plist-get current-event 'txt))
+         (setq today t)
+         )
+       )
+     events)
     (when events
       (while events
         (setq
@@ -1005,9 +1020,9 @@ STOP is the end of the agenda."
          face def-issue-face
          iscurrentnow (string-match-p org-agenda-current-time-string (plist-get current-event 'txt))
          foundnow (or foundnow iscurrentnow)
-         current-past (and (not iscurrentnow) (not foundnow))
          isnextnow (string-match-p org-agenda-current-time-string (plist-get next-event 'txt))
-         next-past (and (not isnextnow) (not foundnow))
+         current-past (and (not iscurrentnow) (not foundnow) today)
+         next-past (and (not isnextnow) (not foundnow) today)
          has-now (or isnextnow iscurrentnow)
          samedate (or
                    has-now
@@ -1046,9 +1061,11 @@ STOP is the end of the agenda."
            (not current-past)
            (> distance min-distance)
            )
-          (setq issue (format "free: at %s for %s, aka ~%s pomodoros"
+          (setq issue (format "free:    %s-%s for %s, aka ~%s pomodoros"
                               (konix/org-agenda-check-format-time
                                greater-end)
+                              (konix/org-agenda-check-format-time
+                               (+ greater-end distance))
                               (konix/org-agenda-check-format-time
                                distance)
                               (/ distance 35)
@@ -1216,13 +1233,13 @@ STOP is the end of the agenda."
               )
         (forward-visible-line 1)
         )
-      (line-move-to-column colnum)
       (when konix/org-agenda-move-entry-recenter
         (recenter-top-bottom '(4))
         )
       (org-agenda-do-context-action)
       ;; return nil if not in an entry
       (setq res (get-text-property (point) 'org-category))
+      (line-move-to-column colnum)
       (if res
           (setq final-char (point))
         (message "No more entry after")
@@ -1249,13 +1266,13 @@ STOP is the end of the agenda."
               )
         (forward-visible-line -1)
         )
-      (line-move-to-column colnum)
       (when konix/org-agenda-move-entry-recenter
         (recenter-top-bottom '(4))
         )
       (org-agenda-do-context-action)
       ;; return nil if not in an entry
       (setq res (get-text-property (point) 'org-category))
+      (line-move-to-column colnum)
       (if res
           (setq final-char (point))
         (message "No more entry before")
@@ -1326,23 +1343,34 @@ STOP is the end of the agenda."
   (unless (string-match-p org-agenda-current-time-string (or (get-text-property (point) 'txt) ""))
     (let (
           (next-step (point-min))
+          (final_position (point))
+          found
           )
-      (while (and
-              (setq next-step (next-single-char-property-change next-step 'txt))
-              (not
-               (string-match-p
-                org-agenda-current-time-string
-                (or (get-text-property (point) 'txt) "")
+      (save-excursion
+        (while (and
+                (setq next-step (next-single-char-property-change next-step 'txt))
+                (not
+                 (setq found
+                       (string-match-p
+                        org-agenda-current-time-string
+                        (or (get-text-property (point) 'txt) "")
+                        )
+                       )
+                 )
+                (not (eq next-step (point-max)))
                 )
-               )
-              (not (eq next-step (point-max)))
-              )
-        (goto-char next-step)
+          (goto-char next-step)
+          )
+        (when (not (eq next-step (point-max)))
+          (goto-char next-step)
+          (goto-char (point-at-bol))
+          )
+        (if found
+            (setq final_position (point))
+          (user-error "Could not find now")
+          )
         )
-      (when (not (eq next-step (point-max)))
-        (goto-char next-step)
-        (goto-char (point-at-bol))
-        )
+      (goto-char final_position)
       )
     )
   )
@@ -1359,6 +1387,82 @@ STOP is the end of the agenda."
   (org-agenda nil "att")
   (konix/org-agenda-refresh-buffer)
   (konix/org-agenda-goto-now)
+  )
+
+(defvar konix/org-agenda-toggle-filter-deadline nil "")
+(make-variable-buffer-local 'konix/org-agenda-toggle-filter-deadline)
+(defun konix/org-agenda-toggle-filter-deadline nil
+  (interactive)
+  (setq konix/org-agenda-toggle-filter-deadline (not konix/org-agenda-toggle-filter-deadline))
+  (if konix/org-agenda-toggle-filter-deadline
+      (konix/org-agenda-filter-deadline)
+    (konix/org-agenda-show-all-deadline)
+    )
+  (konix/org-agenda-set-header-line-format)
+  )
+
+(defun konix/org-has-deadline ()
+  (save-excursion
+    (org-back-to-heading t)
+    (re-search-forward
+     org-deadline-regexp
+     (org-entry-end-position)
+     t
+     )
+    )
+  )
+
+(defun konix/org-agenda-in-deadline ()
+  (konix/org-with-point-on-heading
+   (konix/org-in-deadline)
+   )
+  )
+
+(defun konix/org-in-deadline ()
+  (or
+   (konix/org-has-deadline)
+   (progn (and (org-up-heading-safe) (konix/org-in-deadline)))
+   )
+  )
+
+(defun konix/org-agenda-filter-deadline ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (eobp))
+      (let* (
+             (pos (org-get-at-bol 'org-hd-marker))
+             )
+        (when (and pos (not (konix/org-agenda-in-deadline)))
+          (org-agenda-filter-hide-line 'not-in-deadline)))
+      (beginning-of-line 2)))
+  )
+
+(defun konix/org-agenda-show-all-deadline nil
+  (org-agenda-remove-filter 'not-in-deadline)
+  )
+
+(defun konix/org-agenda-reset-apply-filter (filters)
+  (interactive "sFilters: ")
+  (setq raw_filters filters)
+  (setq filters '())
+  (while (and
+		  (not
+		   (string-equal raw_filters "")
+		   )
+		  (not (null raw_filters))
+		  )
+	(if (string-match "^\\([+-][^+-]+\\)\\(.*\\)$" raw_filters)
+		(add-to-list 'filters (match-string 1 raw_filters))
+	  (add-to-list 'filters (format "+%s" raw_filters))
+	  )
+	(setq raw_filters (match-string 2 raw_filters))
+	)
+
+  (with-current-buffer org-agenda-buffer
+	(org-agenda-filter-show-all-tag)
+	(org-agenda-filter-apply filters 'tag)
+	)
   )
 
 (provide 'KONIX_AL-org-agenda)

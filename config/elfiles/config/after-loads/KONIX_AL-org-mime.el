@@ -50,7 +50,7 @@
         )
       (set-mark beg)
       (goto-char end)
-      (org-mime-htmlize arg)
+      (org-mime-htmlize)
       )
     )
   t

@@ -35,10 +35,9 @@
   (flycheck-select-checker 'python-flake8)
   ;; this must be set prior to loading jedi for it influence the way jedi is initialized
   (when (and
-         (require 'lsp-python nil t)
          (executable-find "pyls")
          )
-    (lsp-python-enable)
+    (lsp)
     )
   (setq ac-sources
 		(append '(
@@ -47,6 +46,7 @@
                   )
                 )
 		)
+  (auto-complete-mode 1)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
   )
 (add-hook 'python-mode-hook

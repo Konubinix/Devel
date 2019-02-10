@@ -24,9 +24,6 @@
 
 ;;; Code:
 (defun konix/js-mode-hook ()
-  (when (require 'lsp-javascript-typescript)
-    (lsp-javascript-typescript-enable)
-    )
   ;; (unwind-protect
   ;;  (flycheck-select-checker 'javascript-eslint)
   ;;  )

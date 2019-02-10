@@ -5,3 +5,4 @@ application/vnd.oasis.opendocument.spreadsheet=libreoffice-calc.desktop;
 application/pdf=org.gnome.Evince.desktop;
 audio/x-vorbis+ogg=vlc.desktop;
 text/x-emacs-lisp=emacsclient-usercreated-1.desktop;
+video/mp4=vlc.desktop;

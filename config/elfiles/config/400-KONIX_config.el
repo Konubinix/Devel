@@ -659,7 +659,8 @@
 ;; **********************************************************************
 (setq-default
  custom-safe-themes
- '("67e998c3c23fe24ed0fb92b9de75011b92f35d3e89344157ae0d544d50a63a72" default))
+ '("ec5f697561eaf87b1d3b087dd28e61a2fc9860e4c862ea8e6b0b77bd4967d0ba" "67e998c3c23fe24ed0fb92b9de75011b92f35d3e89344157ae0d544d50a63a72" default)
+ )
 
 (load-theme 'zenburn)
 

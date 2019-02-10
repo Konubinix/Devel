@@ -4,22 +4,39 @@ echo "############"
 date
 echo "############"
 LOG_FILE="$(mktemp)"
-MAIL_TRAY_DAEMON_CTRL="${TMPDIR}/mail_tray_daemon_control"
-echo "?" > "$MAIL_TRAY_DAEMON_CTRL"
-echo "b" > "$MAIL_TRAY_DAEMON_CTRL"
-trap "echo > ${TMPDIR}/konix_mail_tray_stamp; echo B > '$MAIL_TRAY_DAEMON_CTRL' ; rm '$LOG_FILE'" 0
+konix_redis-cli.sh rpush mail_tray_daemon "?"
 
-konix_lock_run.sh -n -N offlineimap timeout --kill-after=2m "${KONIX_OFFLINEIMAP_TIMEOUT:-1200}" offlineimap -c "${KONIX_OFFLINEIMAPRC}" "$@" 2>&1 | tee "$LOG_FILE" || exit 1
+EXITVALUE=0
+
+onerror () {
+    konix_redis-cli.sh rpush mail_tray_daemon "p"
+    EXITVALUE=1
+}
+
+onofflineimaperror () {
+    echo "Errors in offlineimap call" >&2
+    cat "$LOG_FILE" >&2
+    onerror
+}
+
+trap "echo > ${TMPDIR}/konix_mail_tray_stamp; rm '$LOG_FILE'" 0
+
+konix_lock_run.sh -n -N offlineimap timeout --kill-after=2m -s KILL "${KONIX_OFFLINEIMAP_TIMEOUT:-1200}" offlineimap -c "${KONIX_OFFLINEIMAPRC}" "$@" 2>&1 | tee "$LOG_FILE" || onofflineimaperror
 
 konix_sendmail_flush.sh
 
 konix_mail_new.sh "$@"
 
-if grep -q ERROR "$LOG_FILE"
+if [ "$(notmuch count tag:new and tag:google_invitation)" != "0" ]
 then
-    echo "Errors in offlineimap call" >&2
-    cat "$LOG_FILE" >&2
-    exit 1
+    konix_google_invitation_notif.sh
 fi
 
-konix_mail_tray_daemon_update.py -d || exit 1
+if grep -q ERROR "$LOG_FILE"
+then
+    onofflineimaperror
+fi
+
+konix_mail_tray_daemon_update.py -d || onerror
+
+exit $EXITVALUE

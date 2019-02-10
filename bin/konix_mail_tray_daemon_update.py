@@ -8,6 +8,13 @@ import os
 import sys
 import konix_notify
 import tempfile
+import redis
+
+db = redis.StrictRedis(port=6380)
+
+def write(letter):
+    db.rpush("mail_tray_daemon", letter)
+
 
 def main():
     files = os.environ["KONIX_NOTMUCH_SAVED_SEARCHES"].split(os.pathsep)
@@ -25,7 +32,7 @@ def main():
         default_letter = config.get("default", "icon_letter")
     sections = [section for section in sections if section != "default"]
     import notmuch
-    db=notmuch.Database()
+    db = notmuch.Database()
     for section in config.sections():
         try:
             icon_letter = config.get(section, "icon_letter")
@@ -36,13 +43,9 @@ def main():
             q = notmuch.Query(db, search)
             res = q.count_messages()
             if res != 0:
-                open(
-                    "{}/mail_tray_daemon_control".format(tempfile.gettempdir()),
-                    "w").write(icon_letter)
+                write(icon_letter)
                 sys.exit(0)
-    open(
-        "{}/mail_tray_daemon_control".format(tempfile.gettempdir()),
-        "w").write(default_letter)
+    write(default_letter)
     sys.exit(1)
 
 if __name__ == "__main__":

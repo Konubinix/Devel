@@ -12,18 +12,16 @@ def main():
     share_dir = os.environ.get("KONIX_SHARE_DIR",
                                os.path.join(os.environ["HOME"],"share"))
     icons_dir = os.path.join(share_dir, "icons")
-    ctrl_file = os.path.join(tempfile.gettempdir(),
-                             "mail_tray_daemon_control")
-    print("CTRL_FILE: {}".format(ctrl_file))
-    mtd = TrayDaemon(ctrl_file,
+    mtd = TrayDaemon("mail_tray_daemon",
                      200,
-                     {"i" : os.path.join(icons_dir, "mail_icon_empty.png"),
-                      "n" : os.path.join(icons_dir, "mail_icon_new_mail.png"),
-                      "N" : os.path.join(icons_dir, "mail_icon_new_mail_unread.png"),
-                      "u" : os.path.join(icons_dir, "mail_icon_unread.png"),
-                      "f" : os.path.join(icons_dir, "mail_icon_flagged.png"),
-                      "F" : os.path.join(icons_dir, "mail_icon_flagged_unread.png"),
-                      "?" : os.path.join(icons_dir, "mail_icon_fetching.png")
+                     {"i": os.path.join(icons_dir, "mail_icon_empty.png"),
+                      "n": os.path.join(icons_dir, "mail_icon_new_mail.png"),
+                      "N": os.path.join(icons_dir, "mail_icon_new_mail_unread.png"),
+                      "p": os.path.join(icons_dir, "mail_icon_problem.png"),
+                      "u": os.path.join(icons_dir, "mail_icon_unread.png"),
+                      "f": os.path.join(icons_dir, "mail_icon_flagged.png"),
+                      "F": os.path.join(icons_dir, "mail_icon_flagged_unread.png"),
+                      "?": os.path.join(icons_dir, "mail_icon_fetching.png")
                       },
                      "?"
                      )

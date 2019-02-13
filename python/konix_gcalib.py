@@ -89,7 +89,7 @@ def needs(expire_key):
                 provider, interactive = PROVIDERS_KEYS[expire_key]
                 if interactive:
                     LOGGER.error("You must call {}".format(provider))
-                    return
+                    raise Exception("You must call {}".format(provider))
                 provider(self)
             if self.db.get(self.db_name_transform(expire_key)):
                 return func(self, *args, **kwargs)

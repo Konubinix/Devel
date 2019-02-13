@@ -2794,7 +2794,7 @@ of the clocksum."
     (save-restriction
       (org-narrow-to-subtree)
       (org-show-subtree)
-      (org-match-sparse-tree nil "todo=\"NEXT\"")
+      (org-match-sparse-tree nil "todo=\"NEXT\"|todo=\"TODO\"")
       )
     )
   )

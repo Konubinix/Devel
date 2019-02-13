@@ -287,7 +287,11 @@
         )
     (or
      ;; a project
-     (member "project" tags)
+     (and
+      (member "project" tags)
+      ;; not inside a project
+      (not (konix/org-is-task-of-project-p))
+      )
      (and
       ;; not inside a project
       (not (konix/org-is-task-of-project-p))

@@ -202,7 +202,11 @@ class GCall(cmd.Cmd, object):
     def calendars(self):
         calendars_string = self.db.get(self.calendars_name)
         if calendars_string:
-            calendars = eval(calendars_string)
+            data = json.loads(calendars_string)
+            calendars = [
+                CalendarListEntry(**item)
+                for item in data["items"]
+            ]
         else:
             calendars = []
         return calendars
@@ -394,15 +398,14 @@ Attendees:
     @property
     @needs("api")
     def api(self):
-        return eval(self.db.get("api"))
+        return json.loads(self.db.get("api"))
 
     @provides("api")
     def get_api(self):
         req = urllib.request.Request(url=DISCOVERY_URI)
         f = urllib.request.urlopen(req)
         assert f.code == 200
-        api = json.loads(f.read().decode("utf-8"))
-        self.db.set("api", api)
+        self.db.set("api", f.read().decode("utf-8"))
 
     def get_attr(self, key):
         return eval("self.{}".format(key))
@@ -575,12 +578,13 @@ Attendees:
         )
         f = urllib.request.urlopen(req)
         assert f.code == 200
-        data = json.loads(f.read().decode("utf-8"))
+        calendars_string = f.read().decode("utf-8")
+        self.db.set(self.calendars_name, calendars_string)
+        data = json.loads(calendars_string)
         calendars = [
             CalendarListEntry(**item)
             for item in data["items"]
         ]
-        self.db.set(self.calendars_name, calendars)
         return calendars
 
     @needs("access_token")
@@ -813,11 +817,7 @@ Attendees:
             items += data["items"]
         for i in items:
             i["calendar_id"] = self.calendar_id
-        events = [
-            Event(**i)
-            for i in items
-            ]
-        return events
+        return items
 
     @provides("all_events")
     def list_all_events(self):
@@ -825,14 +825,16 @@ Attendees:
         if not calendar_id:
             return None
         events = self.get_events(calendar_id, self.event_list_extra_query)
-        events.sort(key=lambda event:event.startdate)
-        self.db.set(self.all_events_name, events)
+        self.db.set(self.all_events_name, json.dumps(events))
 
-    @needs("access_token")
-    @needs("all_events")
     @needs("calendar_id")
+    @needs("all_events")
     def list_events(self, search_terms=""):
-        events = eval(self.db.get(self.all_events_name))
+        items = json.loads(self.db.get(self.all_events_name))
+        events = sorted([
+            Event(**i)
+            for i in items
+            ], key=lambda e: e.startdate)
         search_terms = shlex.split(search_terms)
 
         for search_term in search_terms:
@@ -1002,7 +1004,11 @@ Attendees:
             start.strftime("%Y-%m-%d"),
             end.strftime("%Y-%m-%d"),
         )
-        events = self.get_events(calendar_id, extra_query)
+        items = json.loads(self.get_events(calendar_id, extra_query))
+        events = [
+            Event(**i)
+            for i in items
+            ]
 
         # an event to move start before the end and end after the start
         events = [event for event in events
@@ -1109,6 +1115,7 @@ Attendees:
         )
 
     def _update_insist(self, event, data, send_notif=False):
+        self.refresh_token()
         try:
             self._update_event(
                 self.calendar_id,

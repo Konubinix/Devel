@@ -2107,8 +2107,8 @@ of the clocksum."
       (when (org-in-regexp org-bracket-link-regexp 1)
         (add-to-list 'org-stored-links
                      (list
-                      (org-match-string-no-properties 1)
-                      (org-match-string-no-properties 3)
+                      (org-link-unescape (org-match-string-no-properties 1))
+                      (org-link-unescape (org-match-string-no-properties 3))
                       )
                      )
         (message "Stored link : %s" (org-match-string-no-properties 3))

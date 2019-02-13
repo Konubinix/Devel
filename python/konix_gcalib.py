@@ -491,36 +491,15 @@ Attendees:
     def calendars_name(self):
         return self.db_name_transform("calendars")
 
-    def do_clear_user_permission(self, line=None):
-        self.db.delete(self.user_code_name)
-        self.db.delete(self.device_code_name)
-
     def do_clear_list_event(self, line=None):
         self.db.delete(self.all_events_name)
 
-    @needs("device_code")
-    def get_access_token(self):
+    #@lazy("access_token")
+    @provides("access_token")
+    def refresh_token(self):
+        LOGGER.debug("Refreshing access token")
         req = urllib.request.Request(
-            url='https://accounts.google.com/o/oauth2/token',
-            data='client_id={}&client_secret={}&code={}&grant_type=http://oauth.net/grant_type/device/1.0'.format(
-                self.client_id,
-                self.client_secret,
-                self.db.get(self.device_code_name),
-            ).encode("utf-8"))
-        f = urllib.request.urlopen(req)
-        assert f.code == 200
-        data = json.loads(f.read().decode("utf-8"))
-        self.db.set(self.access_token_name, data["access_token"])
-        self.db.expire(self.access_token_name, int(data["expires_in"]))
-        self.db.set("token_type", data["token_type"])
-        assert self.db.get("token_type") == "Bearer"
-        self.db.set(self.refresh_token_name, data["refresh_token"])
-        # now that I have a token, the device code is no longer expiring
-        self.db.persist(self.device_code_name)
-
-    def get_refresh_token(self):
-        req = urllib.request.Request(
-            url='https://accounts.google.com/o/oauth2/token',
+            url='https://www.googleapis.com/oauth2/v4/token',
             data='client_id={}&client_secret={}&refresh_token={}&grant_type=refresh_token'.format(
                 self.client_id,
                 self.client_secret,
@@ -530,45 +509,15 @@ Attendees:
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
         self.db.set(self.access_token_name, data["access_token"])
-        self.db.expire(self.access_token_name, int(data["expires_in"]))
+        self.db.expire(self.access_token_name, 5) # int(data["expires_in"]))
         self.db.set("token_type", data["token_type"])
         assert self.db.get("token_type") == "Bearer"
 
-    @lazy("access_token")
-    @needs("device_code")
-    @provides("access_token")
-    def do_get_access_token(self, line=None):
-        if self.db.get(self.refresh_token_name):
-            self.get_refresh_token()
-        else:
-            self.get_access_token()
-
-    @lazy("device_code")
-    @provides("device_code")
-    @needs("api")
-    def do_get_user_permission(self, line=None):
-        api = eval(self.db.get("api"))
-        req = urllib.request.Request(
-            url='https://accounts.google.com/o/oauth2/device/code',
-            data='client_id={}&scope={scopes}'.format(
-                self.client_id,
-                scopes="+".join(api["auth"]["oauth2"]["scopes"].keys())
-            ).encode("utf-8"))
-        f = urllib.request.urlopen(req)
-        assert f.code == 200
-        data = json.loads(f.read().decode("utf-8"))
-        self.db.set("verification_url", data["verification_url"])
-        self.db.set("interval", data["interval"])
-        self.db.set(self.user_code_name, data["user_code"])
-        self.db.expire(self.user_code_name, int(data["expires_in"]))
-        print("Write the code {}".format(self.db.get(self.user_code_name)))
-        os.system("$BROWSER {}".format(self.db.get("verification_url")))
-        print("Press Enter when done")
-        sys.stdin.readline()
-        self.db.set(self.device_code_name, data["device_code"])
-        self.db.expire(self.device_code_name, int(data["expires_in"]))
+    def do_refresh_token(self, line=""):
+        self.refresh_token()
 
     @provides("calendars")
+    @needs("access_token")
     def all_calendars(self):
         req = urllib.request.Request(
             url='https://www.googleapis.com/calendar/v3/users/me/calendarList',

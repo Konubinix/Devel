@@ -516,28 +516,6 @@ to be organized.
     )
   )
 
-(defun konix/org-toggle-wait ()
-  (org-toggle-tag "WAIT")
-  )
-
-(defun konix/org-toggle-delegated ()
-  (org-toggle-tag "DELEGATED")
-  )
-
-(defun konix/org-toggle-wait-on-heading ()
-  (interactive)
-  (konix/org-with-point-on-heading
-   (konix/org-toggle-wait)
-   )
-  )
-
-(defun konix/org-toggle-delegated-on-heading ()
-  (interactive)
-  (konix/org-with-point-on-heading
-   (konix/org-toggle-delegated)
-   )
-  )
-
 (defun konix/org-agenda-keep-if-is-unactive-project ()
   "Skip if not a project or the project is active or the project contains scheduled
 items"

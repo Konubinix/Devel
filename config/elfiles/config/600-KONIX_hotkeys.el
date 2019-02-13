@@ -570,8 +570,6 @@
 (define-key 'konix/global-key-map (kbd "o") 'konix/org-global-map)
 
 (define-key 'konix/org-global-map (kbd "M-e") 'konix/org-adjust-effort)
-(define-key 'konix/org-global-map "w" 'konix/org-toggle-wait-on-heading)
-(define-key 'konix/org-global-map "W" 'konix/org-toggle-delegated-on-heading)
 (define-key 'konix/org-global-map "j" 'konix/org-jump-to)
 (define-key 'konix/org-global-map "P" 'org-publish)
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)

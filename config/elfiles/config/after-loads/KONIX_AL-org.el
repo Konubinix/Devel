@@ -2504,7 +2504,7 @@ of the clocksum."
           (format "Is that clear with %s"
                   (string-join
                    committed-parties
-                   " or "
+                   " and "
                    )
                   )
           )

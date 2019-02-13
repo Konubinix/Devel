@@ -2155,6 +2155,9 @@ of the clocksum."
   (interactive)
   (if konix/org-capture-two-minutes-interruption/interrupted
       (progn
+        (konix/org-with-point-at-clocked-entry
+            (org-todo 'done)
+            )
         (konix/org-clock-back-interrupted-task)
         (message "Restored the clock to the interrupted task")
         (setq konix/org-capture-two-minutes-interruption/interrupted nil)

@@ -296,7 +296,7 @@ class GCall(cmd.Cmd, object):
 
         @property
         def org_mode(self):
-            return """* {}{}{}
+            return """* [[{}][{}{}]]{}
 :PROPERTIES:
 :ID: {}
 :CALENDAR_ID: {}
@@ -306,7 +306,6 @@ class GCall(cmd.Cmd, object):
 :UPDATED: {}
 :END:
 {}
-[[{}][Go]]
 By: {}
 Attendees:
 {}
@@ -316,7 +315,8 @@ Attendees:
 {}
 #+END_EXAMPLE
 """.format(
-    self.summary,
+    self.htmlLink,
+    self.summary.replace("[", "{").replace("]", "}"),
     (" (in {})".format(self.location) if self.location else ""),
     ("    :{}:".format(self.my_response_status) if self.my_response_status else ""),
     self.id,
@@ -326,7 +326,6 @@ Attendees:
     parser.parse(self.created).strftime("[%Y-%m-%d %H:%M]"),
     parser.parse(self.updated).strftime("[%Y-%m-%d %H:%M]"),
     self.org_mode_timestamp,
-    self.htmlLink,
     self.organizer.get("displayName", self.organizer.get("email", "NA")),
     "\n".join(
         map(

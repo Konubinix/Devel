@@ -127,13 +127,13 @@
          (res (apply orig-fun args))
          )
     (goto-line line)
-    (line-move-to-column column)
     (when (and
            (eq (get-text-property (point) 'invisible) t)
            (not (eq (point-at-eol) (point-max)))
            )
       (forward-visible-line 1)
       )
+    (line-move-to-column column)
     res
     )
   )

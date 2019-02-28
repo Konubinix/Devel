@@ -1203,7 +1203,7 @@ STOP is the end of the agenda."
 (setq-default org-icalendar-alarm-time 30
               org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
               org-icalendar-include-bbdb-anniversaries t
-              org-icalendar-exclude-tags '("noical")
+              org-icalendar-exclude-tags '("noical" "declined")
               org-icalendar-store-UID t
               org-icalendar-include-todo t
               org-agenda-default-appointment-duration 5

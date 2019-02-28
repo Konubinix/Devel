@@ -97,6 +97,7 @@
 (define-key org-agenda-mode-map (kbd "T") 'org-agenda-todo-yesterday)
 (define-key org-agenda-mode-map (kbd "$") 'self-insert-command)
 (define-key org-agenda-mode-map (kbd "i") 'konix/org-agenda-refinalize)
+(define-key org-agenda-mode-map (kbd "K") 'konix/org-agenda-check-clean)
 (define-key org-agenda-mode-map (kbd "n") 'konix/org-agenda-goto-now)
 (define-key org-agenda-mode-map (kbd ";") 'konix/org-agenda-gtd-open-contexts)
 (define-key org-agenda-mode-map (kbd "o") 'org-agenda-open-link)
@@ -907,6 +908,11 @@
          )
     (format "%02d:%02d" hour minute)
     )
+  )
+
+(defun konix/org-agenda-check-clean nil
+  (interactive)
+  (konix/org-agenda-check-remove (point-min) (point-max))
   )
 
 (defun konix/org-agenda-check-remove (start stop)

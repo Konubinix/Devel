@@ -209,9 +209,9 @@
     (
      ((class color)
       (background dark))
-     (:background "magenta"
+     (:background "#003300"
                   :weight bold
-                  ;;:height 1.3
+                  :height 1.3
                   )
      )
     (

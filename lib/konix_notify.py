@@ -56,30 +56,16 @@ def by_pyosd(message):
     p = pyosd.osd("-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso8859-1", colour="green", pos=pyosd.POS_BOT,offset=40, align=pyosd.ALIGN_CENTER)
     p.display(message)
 
-def send_to_phone(message, type_):
-    if not os.path.exists(os.path.expanduser("~/.here")):
-        try:
-            p = subprocess.Popen(
-                ["konix_context_url.sh", "-e", "adb", os.environ["PHONE_NAME"]],
-                stdout=subprocess.PIPE
-            )
-            ip, _ = p.communicate()
-            p.wait()
-            if ip:
-                server = ServerProxy("http://{}:9000/RPC2".format(ip))
-                server.notify(message, type_)
-        except:
-            main("Phone not available", duration=500, to_phone=False)
 
-def to_phone_subprocess(message, type_):
-    subprocess.Popen(
-        [
-            "konix_display.py",
-            "-t", str(type_),
-            "-o",
-            message
-        ]
-    )
+def send_to_phone(message, type_):
+    here = os.path.exists(os.path.expanduser("~/.here"))
+    priority = {
+        "normal": 0 if here else 2,
+        "annoying": 4,
+        "boring": 8,
+    }[type_]
+    os.system("clk gotify 'Notify' '{}' -p '{}'".format(message, priority))
+
 
 # type_ is normal or annoying or boring
 def main(message, unique=False, duration=3000, type_="normal", to_phone=False):

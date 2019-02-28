@@ -679,6 +679,20 @@
 (aset konix/display-table ?‌ [? ])
 (setq-default buffer-display-table konix/display-table)
 
+(custom-set-faces
+ '(highlight
+   (
+    (
+     ((class color)
+      (background dark))
+     (:background "#222222"
+                  )
+     )
+    )
+   ""
+   )
+ )
+
 ;; Local Variables:
 ;; coding: utf-8-unix
 ;; End:

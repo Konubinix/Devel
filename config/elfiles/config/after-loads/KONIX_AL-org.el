@@ -230,7 +230,9 @@
          (s-ends-with-p "notes.org" file_name)
          (and
           (not keep-inbox)
-          (member "refile" org-file-tags))
+          (member "refile" org-file-tags)
+          )
+         (member "nottodo" org-file-tags)
          )
         (point-max)
       nil

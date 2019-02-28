@@ -190,6 +190,17 @@
   ""
   )
 
+(defface konix/org-agenda-gtd-highlight-unique-tags/face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:inherit 'highlight)
+	 )
+	)
+  ""
+  )
+
 (custom-set-faces
  '(org-agenda-current-time
    (
@@ -1471,5 +1482,66 @@ STOP is the end of the agenda."
 	)
   )
 
+(defun konix/org-agenda-gtd-unhighlight-unique-tags nil
+  (interactive)
+  (mapc
+   (lambda (o)
+     (when (eq (overlay-get o 'konix/org-agenda-gtd-highlight-unique-tags)
+               t)
+       (delete-overlay o)
+       )
+     )
+   (overlays-in (point-min) (point-max))
+   )
+  )
+
+(defvar konix/org-agenda-gtd-highlight-unique-tags
+  nil
+  "Do you want to highlight the uniq context agenda items?")
+(defun konix/org-agenda-gtd-highlight-unique-tags nil
+  (interactive)
+  (if konix/org-agenda-gtd-highlight-unique-tags
+   (let (
+         (tags (mapcar (lambda (elem) (concat "@" elem))
+                       (split-string (string-trim (shell-command-to-string "konix_gtd_contexts_unique.sh")) " ")
+                       )
+               )
+         linetags
+         ov
+         )
+     (konix/org-agenda-gtd-unhighlight-unique-tags)
+     (save-excursion
+       (goto-char (point-min))
+       (while (not (eq (point-at-eol) (point-max)))
+         (forward-visible-line 1)
+         (setq linetags
+               (remove-if-not
+                (lambda (tag)
+                  (string-prefix-p "@" tag)
+                  )
+                (org-get-at-bol 'tags)
+                )
+               )
+         (when (and
+                linetags
+                (-all?
+                 (lambda (tag)
+                   (member tag tags)
+                   )
+                 linetags
+                 )
+                )
+           (setq ov (make-overlay (point-at-bol) (point-at-eol)))
+           (overlay-put ov 'face 'konix/org-agenda-gtd-highlight-unique-tags/face)
+           (overlay-put ov 'konix/org-agenda-gtd-highlight-unique-tags t)
+           )
+         )
+       )
+     )
+   (message "Not showing uniq task in contexts (deactivated)")
+   )
+  )
+(add-hook 'org-agenda-finalize-hook
+          'konix/org-agenda-gtd-highlight-unique-tags)
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

@@ -441,7 +441,7 @@ class SlackConfig():
             if (
                     not value.data.get("deleted")
                     and not value.data.get("is_bot")
-                    and not value.data.get("real_name") == "slackbot"
+                    and not value.data.get("real_name").lower() == "slackbot"
             )
         }
 

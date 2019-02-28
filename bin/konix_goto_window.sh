@@ -16,7 +16,7 @@ then
 	FALLBACK="$WINDOW_MATCH"
 fi
 
-konix_display.py "goto $WINDOW_MATCH " &
+# konix_display.py "goto $WINDOW_MATCH " &
 shift 2
 ARGS="$@"
 BASENAME=`basename $WINDOW_MATCH`;

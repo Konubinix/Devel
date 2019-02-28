@@ -162,7 +162,11 @@ class Conversation():
         return self.data["name"]
 
     def invite(self, user):
-        self.endpoint.invite(self.id, user.id)
+        try:
+            self.endpoint.invite(self.id, user.id)
+        except slacker.Error as e:
+            LOGGER.error("Could not invite {}".format(user.name))
+            raise
 
     def set_topic(self, topic):
         self.endpoint.set_topic(self.id, topic)

@@ -1193,7 +1193,11 @@ STOP is the end of the agenda."
 
 (defun konix/org-agenda-gtd-open-contexts ()
   (interactive)
-  (find-file (getenv "KONIX_GTD_CONTEXTS_FILE"))
+  (find-file (string-trim
+              (shell-command-to-string (format "readlink '%s'" (getenv
+                                                                "KONIX_GTD_CONTEXTS_FILE")))
+              )
+             )
   )
 
 (setq-default org-icalendar-alarm-time 30

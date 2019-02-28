@@ -8,3 +8,4 @@ diff "$@" \
     --old-group-format='' \
     --new-group-format='%>' \
     "$OLD" "$NEW"
+exit 0

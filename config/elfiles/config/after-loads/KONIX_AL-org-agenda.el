@@ -104,6 +104,8 @@
 (define-key org-agenda-mode-map (kbd "C") 'konix/org-toggle-org-agenda-tag-filter-context)
 (define-key org-agenda-mode-map (kbd "*") 'konix/org-agenda-refresh-buffer)
 (define-key org-agenda-mode-map (kbd "d") 'konix/org-agenda-toggle-filter-deadline)
+(define-key org-agenda-mode-map (kbd "k") 'konix/org-gtd-choose-situation)
+
 
 (defun konix/org-agenda-edit-headline ()
   (interactive)
@@ -1543,5 +1545,42 @@ STOP is the end of the agenda."
   )
 (add-hook 'org-agenda-finalize-hook
           'konix/org-agenda-gtd-highlight-unique-tags)
+
+(defvar konix/org-gtd-choose-situation/history-file (expand-file-name ".gtd_contexts_history" (getenv "KONIX_PERSO_DIR")))
+
+(defun konix/org-gtd-choose-situation nil
+  (interactive)
+  (let* (
+         (context-file (expand-file-name "gtd_contexts" (getenv "KONIX_PERSO_DIR")))
+         (context-file-readlink (shell-command-to-string (format "readlink -f '%s'" context-file)))
+         (context-files
+          (remove-if
+           (lambda (e) (string= e ""))
+           (split-string
+            (shell-command-to-string
+             (format "ls %s/gtd_contexts_*" (getenv "KONIX_PERSO_DIR"))
+             )
+            "\n"
+            )
+           )
+          )
+         res
+         )
+    (setq res (completing-read
+               "Which one?"
+               context-files
+               )
+          )
+    (with-temp-buffer
+      (insert (format "%s;%s" (format-time-string "%Y-%m-%dT%H%M%S" (current-time)) res))
+      (insert "\n")
+      (append-to-file (point-min) (point-max) konix/org-gtd-choose-situation/history-file)
+      )
+    (delete-file context-file)
+    (f-symlink res context-file)
+    )
+  (konix/org-agenda-refinalize)
+  )
+
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

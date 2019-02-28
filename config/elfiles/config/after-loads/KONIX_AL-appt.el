@@ -81,13 +81,12 @@
                min
                appt
                new-time)
-              4
+              1
               )
              )
            min-to-app
            appt-msg
            )
-
   (let (
         (old-golden-ratio-mode golden-ratio-mode)
         )

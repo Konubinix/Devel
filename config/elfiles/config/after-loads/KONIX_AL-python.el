@@ -33,7 +33,7 @@
   (setq indent-tabs-mode nil)
   (auto-complete-mode 1)
   (flycheck-select-checker 'python-flake8)
-  ;; this must be set prior to loading jedi for it influence the way jedi is initialized
+  (add-hook 'after-save-hook 'konix/python/make-executable t t)
   (when (and
          (executable-find "pyls")
          )
@@ -47,7 +47,6 @@
                 )
 		)
   (auto-complete-mode 1)
-  (add-hook 'after-save-hook 'konix/python/make-executable t t)
   )
 (add-hook 'python-mode-hook
 		  'konix/python-mode-hook)

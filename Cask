@@ -63,8 +63,6 @@
 (depends-on "arduino-mode")
 (depends-on "orgalist")
 (depends-on "lsp-mode")
-(depends-on "lsp-javascript-typescript")
-(depends-on "lsp-ui")
 (depends-on "cquery")
 (depends-on "ivy-xref")
 (depends-on "htmlize")

@@ -103,6 +103,24 @@
 (advice-add 'org-open-at-point :around #'konix/org-open-at-point-move-to-link)
 ;; (advice-remove 'org-open-at-point #'konix/org-open-at-point-move-to-link)
 
+(defvar konix/org-log-into-drawer-per-purpose '((note . nil))
+  "Allow to specify the value of org-log-into-drawer, depending of the log purpose."
+  )
+
+(defun konix/org-log-into-drawer (orig-fun &rest args)
+  (let (
+        (org-log-into-drawer
+         (if (assq org-log-note-purpose konix/org-log-into-drawer-per-purpose)
+             (cdr (assoc org-log-note-purpose konix/org-log-into-drawer-per-purpose))
+           org-log-into-drawer
+           )
+         )
+        )
+    (apply orig-fun args)
+    )
+  )
+(advice-add 'org-log-into-drawer :around #'konix/org-log-into-drawer)
+
 (defun konix/org-agenda-appt-reload ()
   (interactive)
   (require 'appt)
@@ -1521,6 +1539,7 @@ items"
 (setq-default org-clock-into-drawer "CLOCK")
 (setq-default org-log-note-clock-out nil)
 (setq-default org-log-note-headings (quote ((done . "CLOSING NOTE %t") (state . "State %-12s %t") (note . "Note prise le %t") (clock-out . ""))))
+(setq-default org-log-state-notes-insert-after-drawers t)
 (setq-default org-log-redeadline 'time)
 (setq-default org-log-reschedule 'time)
 (setq-default org-log-repeat 'time)

@@ -3139,7 +3139,7 @@ of the clocksum."
 (defun konix/org-last-weeks-review-report nil
   (interactive)
   (let* (
-         (number_of_weeks 3)
+         (number_of_weeks 1)
          (from (format "-%sw" number_of_weeks))
          (to "now")
          )

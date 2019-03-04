@@ -1676,7 +1676,7 @@ items"
                  :clock-in t
                  :clock-resume t
                  )
-                ("m" "Two minutes" entry (file+headline konix/org-diary_file "Interruptions")
+                ("m" "Two minutes" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT [#G] %? :twominutes:
   :PROPERTIES:
   :CREATED:  %U

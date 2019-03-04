@@ -1697,7 +1697,7 @@ items"
   :END:"
                  )
                 ("s" "ISO9001" entry (file konix/org-iso9001_file)
-                 "* %U %?
+                 "* %U %?   :iso9001:
   :PROPERTIES:
   :CREATED:  %U
   :END:"

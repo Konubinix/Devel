@@ -1662,7 +1662,9 @@ items"
   :CREATED:  %U
   :INTERRUPTION_HANDLED: t
   :END:
-   %U"
+   %U
+
+"
                  :clock-in t
                  :clock-resume t
                  )
@@ -1672,6 +1674,7 @@ items"
   :CREATED:  %U
   :INTERRUPTION_HANDLED: t
   :END:
+
 "
                  :clock-in t
                  :clock-resume t
@@ -1683,6 +1686,7 @@ items"
   :INTERRUPTION_HANDLED: t
   :END:
   %T
+
 "
                  :clock-in t
                  )

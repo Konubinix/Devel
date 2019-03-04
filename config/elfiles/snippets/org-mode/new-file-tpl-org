@@ -1,6 +1,5 @@
 # -*- mode: snippet -*-
 # name: new-file-tpl-org
 # --
-* Refile :refile:NOEXPIRY:structure:
 * Diary :diary:NOEXPIRY:structure:
 * Recurrent :recurrent:NOEXPIRY:

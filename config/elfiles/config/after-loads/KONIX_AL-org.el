@@ -2202,25 +2202,24 @@ of the clocksum."
   (let (
         (previous-buffer (car (buffer-list)))
         )
-    (save-window-excursion
-      (switch-to-buffer previous-buffer t)
-      (setq konix/org-capture-two-minutes-interruption/interrupted t)
-      (cond
-       ((member major-mode '(org-mode org-agenda-mode))
-        (konix/org-with-point-on-heading
-         (progn
-           (org-clock-in)
-           (org-toggle-tag "twominutes" 'on)
-           (org-set-property "TWOMINUTES_HANDLED" "t")
-           )
-         ))
-       (t
-        (progn
-          (org-capture nil "m")
-          )
+    (switch-to-buffer previous-buffer t)
+    (setq konix/org-capture-two-minutes-interruption/interrupted t)
+    (cond
+     ((member major-mode '(org-mode org-agenda-mode))
+      (konix/org-with-point-on-heading
+       (progn
+         (org-clock-in)
+         (org-toggle-tag "twominutes" 'on)
+         (org-set-property "TWOMINUTES_HANDLED" "t")
+         )
+       ))
+     (t
+      (progn
+        (org-capture nil "m")
         )
-       )
-      ))
+      )
+     )
+    )
   )
 
 (defun konix/org-two-minutes-handled ()

@@ -115,7 +115,7 @@
   (when (buffer-modified-p)
     (user-error "Save the file before it is too late")
     )
-  (shell-command (format "black --line-length 79 '%s'" (buffer-file-name)))
+  (message (shell-command-to-string (format "black --line-length 79 '%s'" (buffer-file-name))))
   (revert-buffer nil t)
   (message "White-d it!")
   )

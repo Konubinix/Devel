@@ -41,6 +41,7 @@
   )
 
 (define-key ledger-mode-map (kbd "M-TAB") 'completion-at-point)
+(define-key ledger-mode-map (kbd "C-j") 'completion-at-point)
 
 (defun konix/legder-mode-hook ()
   (setq completion-at-point-functions

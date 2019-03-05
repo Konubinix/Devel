@@ -129,7 +129,6 @@
   (appt-activate 1)
   (appt-check)
   )
-(konix/org-agenda-appt-reload)
 
 (setq-default org-agenda-files
               (list
@@ -157,6 +156,23 @@
   )
 (advice-add 'org-agenda-redo :around #'konix/org-agenda/keep-column)
 (advice-add 'org-agenda-kill :around #'konix/org-agenda/keep-column)
+
+
+(defun konix/org-agenda/reload-appt-when-needed (&rest args)
+  (when (string= "*Org Agenda(att)*" (buffer-name))
+    (konix/org-agenda-appt-reload)
+    )
+  )
+(defun konix/org-agenda/reload-appt-when-needed-sticky (&rest args)
+  (when (and
+         (not (org-agenda-use-sticky-p))
+         (string= "*Org Agenda(att)*" (buffer-name))
+         )
+    (konix/org-agenda-appt-reload)
+    )
+  )
+(advice-add 'org-agenda-redo :after #'konix/org-agenda/reload-appt-when-needed)
+(advice-add 'org-agenda-prepare :after #'konix/org-agenda/reload-appt-when-needed-sticky)
 
 ;; ####################################################################################################
 ;; CONFIG
@@ -1218,8 +1234,6 @@ items"
                   )
                  (
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-
-                  (dummy (konix/org-agenda-appt-reload))
                   )
                  )
                 ("atm" "Agenda of the next month (no filter context)"

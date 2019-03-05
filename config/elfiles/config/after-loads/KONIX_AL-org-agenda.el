@@ -48,7 +48,7 @@
   'konix/org-clock-echo)
 
 (define-key org-agenda-mode-map (kbd "M-c")
-  'konix/org-agenda-capture-in-heading)
+  'konix/org-capture-na-in-heading)
 
 (define-key org-agenda-mode-map (kbd "M-e")
   'konix/org-agenda-edit-headline)
@@ -1064,11 +1064,11 @@ STOP is the end of the agenda."
                   (string=
                    (progn
                      (goto-char current-position)
-                     (konix/org-agenda-get-id)
+                     (konix/org-get-id)
                      )
                    (progn
                      (goto-char next-position)
-                     (konix/org-agenda-get-id)
+                     (konix/org-get-id)
                      )
                    )
                   )
@@ -1212,29 +1212,6 @@ STOP is the end of the agenda."
               org-icalendar-include-todo t
               org-agenda-default-appointment-duration 5
               )
-
-(defun konix/org-agenda-get-id ()
-  (konix/org-with-point-on-heading
-   (org-id-get nil 'create)
-   )
-  )
-
-(defun konix/org-agenda-capture-in-heading()
-  (interactive)
-  (let (
-        (org-capture-templates
-         `(
-           ("t" "Todo Item" entry (id ,(konix/org-agenda-get-id)) "* NEXT %?
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:"
-            )
-           )
-         )
-        )
-    (org-capture nil "t")
-    )
-  )
 
 (defun konix/org-agenda-next-entry/is-todo-p ()
   (and (get-text-property (point) 'org-category)

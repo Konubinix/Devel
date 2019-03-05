@@ -3179,5 +3179,28 @@ of the clocksum."
     )
   )
 
+(defun konix/org-get-id ()
+  (konix/org-with-point-on-heading
+   (org-id-get nil 'create)
+   )
+  )
+
+(defun konix/org-capture-na-in-heading()
+  (interactive)
+  (let (
+        (org-capture-templates
+         `(
+           ("t" "Todo Item" entry (id ,(konix/org-get-id)) "* NEXT %?
+  :PROPERTIES:
+  :CREATED:  %U
+  :END:"
+            )
+           )
+         )
+        )
+    (org-capture nil "t")
+    )
+  )
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

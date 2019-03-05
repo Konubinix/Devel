@@ -640,7 +640,6 @@
     ("^Sunday.+" 0 konix/org-agenda-sundy-face)
 	)
   "")
-(defcustom konix/org-agenda-text-properties '() "")
 (defun konix/org-agenda-set-text-properties ()
   (interactive)
   (konix/org-agenda-remove-text-properties)

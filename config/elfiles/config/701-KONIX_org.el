@@ -22,3 +22,5 @@
   (interactive "sID: ")
   (org-goto-marker-or-bmk (org-id-find id 'marker))
   )
+
+(defcustom konix/org-agenda-text-properties '() "")

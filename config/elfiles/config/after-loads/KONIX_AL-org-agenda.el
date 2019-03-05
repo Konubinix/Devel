@@ -1532,6 +1532,7 @@ STOP is the end of the agenda."
   )
 (add-hook 'org-agenda-finalize-hook
           'konix/org-agenda-gtd-highlight-unique-tags)
+;; (remove-hook 'org-agenda-finalize-hook 'konix/org-agenda-gtd-highlight-unique-tags)
 
 (defvar konix/org-gtd-choose-situation/history-file (expand-file-name ".gtd_contexts_history" (getenv "KONIX_PERSO_DIR")))
 

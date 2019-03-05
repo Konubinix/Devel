@@ -3202,5 +3202,28 @@ of the clocksum."
     )
   )
 
+(defun konix/org-capture-diary-in-heading()
+  (interactive)
+  (let (
+        (org-capture-templates
+         `(
+           ("d" "Diary Entry" entry (id ,(konix/org-get-id))
+            ,(format "* %%?
+  :PROPERTIES:
+  :CREATED:  %%U
+  :END:
+  <%s>
+"
+                     (org-read-date t)
+                     )
+            )
+           )
+         )
+        )
+    (org-capture nil "d")
+    )
+  )
+
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

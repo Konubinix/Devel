@@ -509,30 +509,42 @@ to be organized.
          (planning-end (line-end-position 2))
          (current (org-time-string-to-absolute (format-time-string "%Y-%m-%d" (current-time))))
          m)
-    (and
-     (org-entry-is-todo-p)
-     (re-search-forward org-scheduled-time-regexp planning-end t)
-     (or
-      ;; scheduled in the future => skip
+    (cond
+     (;; not a todo -> OK
+      (not (org-entry-is-todo-p))
+      nil
+      )
+     (;; (is a todo) and not scheduled -> OK
+      (not (save-excursion (re-search-forward org-scheduled-time-regexp planning-end t)))
+      nil
+      )
+     (;; (is a todo and scheduled) in the future -> PASS
       (let* (
              (s (match-string 1))
              (scheduled (org-time-string-to-absolute s))
              )
         (> scheduled current)
         )
-      ;; no deadline => skip
-      (not (re-search-forward org-deadline-time-regexp planning-end t))
-      ;; deadline after the prewarning period => skip
-      (let* (
-             (s (match-string 1))
-             (deadline (org-time-string-to-absolute s))
-             (wdays (org-get-wdays s))
-             (diff (- deadline current))
-             )
-        (> diff wdays)
-        )
+      end
       )
-     end
+     (;; (is a todo and scheduled in the past) and has a deadline in the prewarning zone -> OK
+      (and
+       (save-excursion (re-search-forward org-deadline-time-regexp planning-end t))
+       (let* (
+              (s (match-string 1))
+              (deadline (org-time-string-to-absolute s))
+              (wdays (org-get-wdays s))
+              (now-to-deadline (- deadline current))
+              )
+         (<= now-to-deadline wdays)
+         )
+       )
+      nil
+      )
+     (;; none of the above -> PASS
+      t
+      end
+      )
      )
     )
   )

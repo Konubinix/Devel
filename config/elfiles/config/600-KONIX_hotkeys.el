@@ -581,6 +581,7 @@
 (define-key 'konix/org-global-map "I" 'org-clock-in-last)
 (define-key 'konix/org-global-map "c" 'org-capture)
 (define-key 'konix/org-global-map (kbd "M-c") 'konix/org-capture-na-in-heading)
+(define-key 'konix/org-global-map (kbd "M-d") 'konix/org-capture-diary-in-heading)
 (define-key 'konix/org-global-map (kbd "C-e") 'org-clock-modify-effort-estimate)
 (define-key 'konix/org-global-map "n" 'konix/org-agenda-goto-today-now)
 (define-key 'konix/org-global-map "x" 'konix/org-link-toggle-cross)

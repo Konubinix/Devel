@@ -50,6 +50,9 @@
 (define-key org-agenda-mode-map (kbd "M-c")
   'konix/org-capture-na-in-heading)
 
+(define-key org-agenda-mode-map (kbd "M-d")
+  'konix/org-capture-diary-in-heading)
+
 (define-key org-agenda-mode-map (kbd "M-e")
   'konix/org-agenda-edit-headline)
 

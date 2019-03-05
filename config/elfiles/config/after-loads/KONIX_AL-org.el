@@ -522,39 +522,82 @@ to be organized.
   (org-back-to-heading t)
   (let* ((beg (point))
          (end (org-entry-end-position))
-         (planning-end (line-end-position 2))
-         (current (org-time-string-to-absolute (format-time-string "%Y-%m-%d" (current-time))))
+         scheduled-string
+         scheduled-time
+         current
+         planning-eol
+         planning-bol
+         res
          m)
     (cond
      (;; not a todo -> OK
       (not (org-entry-is-todo-p))
       nil
       )
-     (;; (is a todo) and not scheduled -> OK
-      (not (save-excursion (re-search-forward org-scheduled-time-regexp planning-end t)))
+     (;; todo, but without a planning -> OK
+      (save-excursion
+        (forward-line)
+        (setq res
+              (not
+               (looking-at org-planning-line-re)
+               )
+              )
+        (when (not res)
+          (setq planning-eol (point-at-eol))
+          (setq planning-bol (point-at-bol))
+          )
+        res
+        )
+      nil
+      )
+     (;; (is a todo, has a planning) and not scheduled -> OK
+      (save-excursion
+        (goto-char planning-eol)
+        (setq res (not
+                   (search-backward org-scheduled-string planning-bol t)
+                   ))
+        (when (not res)
+		  (goto-char (match-end 0))
+		  (skip-chars-forward " \t")
+          (looking-at org-ts-regexp-both)
+          (setq scheduled-string (match-string-no-properties 0))
+          (setq scheduled-time (org-time-string-to-absolute scheduled-string))
+          )
+        res
+        )
       nil
       )
      (;; (is a todo and scheduled) in the future -> PASS
-      (let* (
-             (s (match-string 1))
-             (scheduled (org-time-string-to-absolute s))
-             )
-        (> scheduled current)
-        )
+      (>
+       (time-to-days scheduled-time)
+       (setq current (time-to-days (current-time)))
+       )
       end
       )
      (;; (is a todo and scheduled in the past) and has a deadline in the prewarning zone -> OK
-      (and
-       (save-excursion (re-search-forward org-deadline-time-regexp planning-end t))
-       (let* (
-              (s (match-string 1))
-              (deadline (org-time-string-to-absolute s))
-              (wdays (org-get-wdays s))
-              (now-to-deadline (- deadline current))
-              )
-         (<= now-to-deadline wdays)
-         )
-       )
+      (let (
+            has-deadline
+            deadline-string
+            deadline-time
+            wdays
+            now-to-deadline
+            )
+        (save-excursion
+          (goto-char planning-eol)
+          (setq res nil)
+          (when (search-backward org-deadline-string planning-bol t)
+		    (goto-char (match-end 0))
+		    (skip-chars-forward " \t")
+            (looking-at org-ts-regexp-both)
+            (setq deadline-string (match-string-no-properties 0))
+            (setq deadline-time (org-time-string-to-absolute deadline-string))
+            (setq wdays (org-get-wdays deadline-string))
+            (setq now-to-deadline (- deadline-time current))
+            (setq res (<= now-to-deadline wdays))
+            )
+          res
+          )
+        )
       nil
       )
      (;; none of the above -> PASS
@@ -564,6 +607,7 @@ to be organized.
      )
     )
   )
+
 
 (defun konix/org-agenda-keep-if-is-unactive-project ()
   "Skip if not a project or the project is active or the project contains scheduled

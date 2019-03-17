@@ -2609,7 +2609,6 @@ of the clocksum."
              (save-excursion (org-end-of-subtree t) (point)) t)
             )
           )
-
         )
        (not (yes-or-no-p "Contains clocked stuff, still remove it?"))
        )
@@ -2618,6 +2617,30 @@ of the clocksum."
   )
 (advice-add 'org-agenda-kill :before
             #'konix/org-agenda-kill/confirm-if-clock-info)
+
+(defun konix/org-agenda-kill/confirm-if-committed ()
+  (konix/org-with-point-on-heading
+   (let (
+         (end (save-excursion (org-end-of-subtree t) (point)))
+         )
+     (while (save-match-data
+              (re-search-forward
+               ":C_"
+               end
+               t
+               )
+              )
+       (when (and (not (org-entry-is-done-p))
+                  (not (konix/org-ask-about-committed-parties))
+                  )
+         (user-error "Not removing the subtree till you clarify your commitments")
+         )
+       )
+     )
+   )
+  )
+(advice-add 'org-agenda-kill :before
+            #'konix/org-agenda-kill/confirm-if-committed)
 
 (defun konix/org-get-committed-parties (&optional tags)
   (unless tags

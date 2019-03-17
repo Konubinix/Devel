@@ -2965,11 +2965,9 @@ of the clocksum."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (konix/org-agenda-focus-next)
-
-    (save-restriction
-      (org-narrow-to-subtree)
+    (progn
       (org-show-subtree)
-      (org-match-sparse-tree nil "todo=\"NEXT\"-archive|todo=\"TODO\"-archive")
+      (org-match-sparse-tree nil (if current-prefix-arg "-archive" "todo=\"NEXT\"-archive|todo=\"TODO\"-archive"))
       )
     )
   )

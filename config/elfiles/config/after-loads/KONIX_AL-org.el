@@ -816,6 +816,9 @@ items"
                      )
                    )
                   )
+                 (
+                  ,(format "%s/radicale/sam/agenda.ics" (getenv "KONIX_PERSO_DIR"))
+                  )
                  )
                 ("apw" "Work (no filtering)"
                  (

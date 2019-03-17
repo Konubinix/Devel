@@ -569,7 +569,7 @@ to be organized.
       )
      (;; (is a todo and scheduled) in the future -> PASS
       (>
-       (time-to-days scheduled-time)
+       scheduled-time
        (setq current (time-to-days (current-time)))
        )
       end

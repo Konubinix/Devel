@@ -745,28 +745,36 @@
 		   )
 		  ))
 		)
-	(save-excursion
-	  (goto-char (point-min))
-	  (while (not (eobp))
-		(if (org-get-at-bol 'org-marker)
-			(progn
-			  (setq tags (org-get-at-bol 'tags) ; used in eval
-					cat (get-text-property (point) 'org-category))
-			  (if (and
-				   (not (eval konix/org-entry-predicate))
-				   ;; show empty context entries if the associated setting is set
-				   (or (not konix/org-agenda-filter-context-show-empty-context)
-					   (not
-						(konix/org-agenda-no-context-p)
-						)
-					   )
-				   )
-				  (org-agenda-filter-hide-line 'tag))
-			  (beginning-of-line 2))
-		  (beginning-of-line 2))))
-	)
-  (if (get-char-property (point) 'invisible)
-	  (ignore-errors (org-agenda-previous-line))
+    (let (
+          (col (current-column))
+          )
+	  (save-excursion
+	    (goto-char (point-min))
+	    (while (not (eobp))
+		  (if (org-get-at-bol 'org-marker)
+			  (progn
+			    (setq tags (org-get-at-bol 'tags) ; used in eval
+					  cat (get-text-property (point) 'org-category))
+			    (if (and
+				     (not (eval konix/org-entry-predicate))
+				     ;; show empty context entries if the associated setting is set
+				     (or (not konix/org-agenda-filter-context-show-empty-context)
+					     (not
+						  (konix/org-agenda-no-context-p)
+						  )
+					     )
+				     )
+				    (org-agenda-filter-hide-line 'tag))
+			    (beginning-of-line 2))
+		    (beginning-of-line 2))))
+      (while (and
+              (eq (get-text-property (point) 'invisible) t)
+              (not (eq (point-at-eol) (point-max)))
+             )
+        (forward-visible-line 1)
+        )
+      (line-move-to-column col)
+      )
 	)
   )
 
@@ -1490,45 +1498,45 @@ STOP is the end of the agenda."
 (defun konix/org-agenda-gtd-highlight-unique-tags nil
   (interactive)
   (if konix/org-agenda-gtd-highlight-unique-tags
-   (let (
-         (tags (mapcar (lambda (elem) (concat "@" elem))
-                       (split-string (string-trim (shell-command-to-string "konix_gtd_contexts_unique.sh")) " ")
-                       )
-               )
-         linetags
-         ov
-         )
-     (konix/org-agenda-gtd-unhighlight-unique-tags)
-     (save-excursion
-       (goto-char (point-min))
-       (while (not (eq (point-at-eol) (point-max)))
-         (forward-visible-line 1)
-         (setq linetags
-               (remove-if-not
-                (lambda (tag)
-                  (string-prefix-p "@" tag)
+      (let (
+            (tags (mapcar (lambda (elem) (concat "@" elem))
+                          (split-string (string-trim (shell-command-to-string "konix_gtd_contexts_unique.sh")) " ")
+                          )
                   )
-                (org-get-at-bol 'tags)
-                )
-               )
-         (when (and
-                linetags
-                (-all?
-                 (lambda (tag)
-                   (member tag tags)
+            linetags
+            ov
+            )
+        (konix/org-agenda-gtd-unhighlight-unique-tags)
+        (save-excursion
+          (goto-char (point-min))
+          (while (not (eq (point-at-eol) (point-max)))
+            (forward-visible-line 1)
+            (setq linetags
+                  (remove-if-not
+                   (lambda (tag)
+                     (string-prefix-p "@" tag)
+                     )
+                   (org-get-at-bol 'tags)
                    )
-                 linetags
-                 )
-                )
-           (setq ov (make-overlay (point-at-bol) (point-at-eol)))
-           (overlay-put ov 'face 'konix/org-agenda-gtd-highlight-unique-tags/face)
-           (overlay-put ov 'konix/org-agenda-gtd-highlight-unique-tags t)
-           )
-         )
-       )
-     )
-   (message "Not showing uniq task in contexts (deactivated)")
-   )
+                  )
+            (when (and
+                   linetags
+                   (-all?
+                    (lambda (tag)
+                      (member tag tags)
+                      )
+                    linetags
+                    )
+                   )
+              (setq ov (make-overlay (point-at-bol) (point-at-eol)))
+              (overlay-put ov 'face 'konix/org-agenda-gtd-highlight-unique-tags/face)
+              (overlay-put ov 'konix/org-agenda-gtd-highlight-unique-tags t)
+              )
+            )
+          )
+        )
+    (message "Not showing uniq task in contexts (deactivated)")
+    )
   )
 (add-hook 'org-agenda-finalize-hook
           'konix/org-agenda-gtd-highlight-unique-tags)

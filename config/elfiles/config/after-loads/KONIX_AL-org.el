@@ -1494,7 +1494,7 @@ items"
                  )
                 ("agr" "RIL"
                  (
-                  (tags "@ril"
+                  (tags "@ril-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe"
                         (
                          (org-agenda-overriding-header
                           "To Read Later")

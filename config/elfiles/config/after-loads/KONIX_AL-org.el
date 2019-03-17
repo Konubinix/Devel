@@ -1333,7 +1333,7 @@ items"
                 ("ag" . "GTD list views")
                 ("agP" "Projects & NA"
                  (
-                  (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe"
+                  (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
                         (
                          (org-agenda-overriding-header
                           "Projects & NA (things that are or should be committed)")
@@ -1348,7 +1348,7 @@ items"
                           )
                          )
                         )
-                  (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe"
+                  (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
                         (
                          (org-agenda-overriding-header
                           "Future projects & NA (things that are or should be committed)")
@@ -1363,7 +1363,7 @@ items"
                           )
                          )
                         )
-                  (tags "+maybe+todo=\"NEXT\"|+todo=\"TODO\"+maybe"
+                  (tags "+maybe+todo=\"NEXT\"|+todo=\"TODO\"+maybe|+project+maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
                         (
                          (org-agenda-overriding-header
                           "Maybe projects & NA (things that are or should be committed)")

@@ -1127,7 +1127,7 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "-Commitment-maybe//"
+                  (tags "-Commitment-maybe+todo=\"TODO\"|-Commitment-maybe+todo=\"NEXT\"|-Commitment-maybe+todo=\"DONE\"|-Commitment-maybe+todo=\"NOT_DONE\"|-Commitment-maybe+project"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header

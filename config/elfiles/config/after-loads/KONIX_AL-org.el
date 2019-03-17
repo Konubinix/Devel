@@ -1039,6 +1039,20 @@ items"
                         (
                          (org-agenda-overriding-header "Refile those entries")
                          (org-agenda-todo-ignore-deadlines nil)
+                         (dummy
+                          (set
+                           (make-variable-buffer-local
+                            'org-agenda-prefix-format)
+                           '((tags . ""))
+                           )
+                          )
+                         (dummy
+                          (set
+                           (make-variable-buffer-local
+                            'org-agenda-todo-keyword-format)
+                           ""
+                           )
+                          )
                          (org-agenda-skip-function
                           '(or
                             (konix/skip-not-todo-file t)

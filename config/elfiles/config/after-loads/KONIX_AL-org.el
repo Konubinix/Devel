@@ -3251,7 +3251,7 @@ of the clocksum."
 
 (defun konix/org-clock-echo nil
   (interactive)
-  (message "%s" (substring-no-properties (org-clock-get-clock-string)))
+  (message "%s%s" (if org-clock-current-task "" "Prev:") (substring-no-properties (org-clock-get-clock-string)))
   )
 
 (defun konix/org-time-stamp-now nil

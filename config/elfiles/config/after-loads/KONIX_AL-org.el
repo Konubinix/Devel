@@ -1822,58 +1822,6 @@ items"
   :END:
   %t"
                  )
-                ("B" "Bookmark (use with org-protocol)" entry (file+headline konix/org-bookmarks_file "Refile")
-                 "* %:description
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-   %:link
-   %:initial"
-                 )
-                ("C" "Bookmark in current clock (use with org-protocol)" entry
-                 (clock) "* %:description
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-   %:link
-   %:initial"
-                 )
-                ("D" "Bookmark NEXT (use with org-protocol)" entry (file+headline konix/org-todo_file "Refile")
-                 "* NEXT Read %:description
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-   %:link
-   %:initial"
-                 )
-                ("E" "Bookmark NEXT in current clock (use with org-protocol)" entry (clock)
-                 "* NEXT Read %:description
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-   %:link
-   %:initial"
-                 )
-                ("R" "Bookmark to read (use with org-protocol)" entry (file+headline konix/org-bookmarks_file "Refile")
-                 "* NEXT Read %:description
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-   %:link
-   %:initial"
-                 )
-                ("b" "Bookmark" entry (file+headline konix/org-bookmarks_file "Refile")
-                 "* %?
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:"
-                 )
-                ("r" "Bookmark To Read" entry (file+headline konix/org-bookmarks_file "Refile")
-                 "* NEXT Read %?
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:"
-                 )
                 )
               )
 (setq-default org-combined-agenda-icalendar-file (expand-file-name "org.ics" perso-dir))

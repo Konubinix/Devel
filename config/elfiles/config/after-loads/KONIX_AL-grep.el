@@ -34,6 +34,7 @@
 --exclude-dir build \
 --exclude-dir Build \
 --exclude-dir BUILD \
+--exclude-dir dist \
 --exclude-dir .git \
 --exclude-dir .svn \
 --exclude-dir node_modules \

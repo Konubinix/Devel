@@ -1309,12 +1309,16 @@ items"
                            (org-agenda-start-with-clockreport-mode nil)
                            (org-agenda-skip-function
                             '(or
-                              (org-agenda-skip-entry-if 'scheduled)
                               (konix/org-agenda-skip-if-tags
                                '(
                                  "no_weekly"
                                  "phantom"
-                                 )))
+                                 ))
+                              (and
+                               (org-agenda-skip-if nil '(scheduled))
+                               (org-agenda-skip-if nil '(notdeadline))
+                               )
+                              )
                             )
                            (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                            (dummy (konix/org-agenda-check-buffer/agenda t))

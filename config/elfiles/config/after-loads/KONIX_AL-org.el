@@ -1712,24 +1712,35 @@ items"
                 ("t" "Todo Item" entry (file+headline konix/org-todo_file "Refile") "* NEXT %?
   :PROPERTIES:
   :CREATED:  %U
-  :END:"
+  :END:
+  :CLOCK:
+  :END:
+"
                  )
                 ("i" "Todo Item in current clock" entry (clock) "* NEXT %?
   :PROPERTIES:
   :CREATED:  %U
-  :END:"
+  :END:
+  :CLOCK:
+  :END:
+"
                  )
                 ("l" "Todo Item for current stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %? %a
   :PROPERTIES:
   :CREATED:  %U
-  :END:"
+  :END:
+  :CLOCK:
+  :END:
+"
                  )
                 ("a" "Todo Item for git annexed stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %?%(file-name-nondirectory (car (konix/org-capture/git-annex-info)))
   :PROPERTIES:
   :CREATED:  %U
   :ID: %(cdr (konix/org-capture/git-annex-info))
+  :END:
+  :CLOCK:
   :END:
   %(konix/org-capture/git-annex)"
                  )
@@ -1738,20 +1749,28 @@ items"
   DEADLINE: %t
   :PROPERTIES:
   :CREATED:  %U
-  :END:"
+  :END:
+  :CLOCK:
+  :END:
+"
                  )
                 ("U" "Todo Item URGENT for current stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT [#G] %? %a
   DEADLINE: %t
   :PROPERTIES:
   :CREATED:  %U
-  :END:"
+  :END:
+  :CLOCK:
+  :END:
+"
                  )
                 ("j" "Interruption" entry (file+headline konix/org-todo_file "Refile")
                  "* Interruption %? :INTERRUPTION:
   :PROPERTIES:
   :CREATED:  %U
   :INTERRUPTION_HANDLED: t
+  :END:
+  :CLOCK:
   :END:
    %U
 
@@ -1765,7 +1784,8 @@ items"
   :CREATED:  %U
   :INTERRUPTION_HANDLED: t
   :END:
-
+  :CLOCK:
+  :END:
 "
                  :clock-in t
                  :clock-resume t
@@ -1776,8 +1796,9 @@ items"
   :CREATED:  %U
   :INTERRUPTION_HANDLED: t
   :END:
+  :CLOCK:
+  :END:
   %T
-
 "
                  :clock-in t
                  )
@@ -1785,7 +1806,8 @@ items"
                  "* %?
   :PROPERTIES:
   :CREATED:  %U
-  :END:"
+  :END:
+"
                  )
                 ("s" "ISO9001" entry (file konix/org-iso9001_file)
                  "* %U %?   :iso9001:

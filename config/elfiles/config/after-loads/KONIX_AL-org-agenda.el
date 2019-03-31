@@ -80,6 +80,9 @@
 (define-key org-agenda-mode-map (kbd "p")
   'konix/org-agenda-focus-next)
 
+(define-key org-agenda-mode-map (kbd "P")
+  '(lambda nil (interactive) (let ((current-prefix-arg '(4))) (konix/org-agenda-focus-next))))
+
 (define-key org-agenda-mode-map (kbd "1")
   'delete-other-windows)
 

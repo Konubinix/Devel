@@ -606,6 +606,7 @@
 (define-key 'konix/org-global-map (kbd "M-o") 'osg)
 (define-key 'konix/org-global-map (kbd "C-s") 'konix/org-store-agenda-views)
 (define-key 'konix/org-global-map (kbd "C-r") 'konix/org-element-cache-reset-all)
+(define-key 'konix/org-global-map (kbd "t") 'konix/org-clock-todo)
 
 (define-prefix-command 'konix/org-meta-context-map)
 (define-key 'konix/org-global-map (kbd "m") 'konix/org-meta-context-map)
@@ -616,11 +617,6 @@
 (define-key 'konix/org-meta-context-map "g" 'konix/org-meta-context/goto-root)
 (define-key 'konix/org-meta-context-map "t" 'konix/org-meta-context/toggle-restrict)
 
-(define-prefix-command 'konix/org-timer-map)
-(define-key 'konix/org-global-map (kbd "t") 'konix/org-timer-map)
-(define-key 'konix/org-timer-map "t" 'konix/org-timer-start-or-pause-or-continue)
-(define-key 'konix/org-timer-map "s" 'konix/org-timer-start)
-(define-key 'konix/org-timer-map "S" 'org-timer-stop)
 
 ;; ####################################################################################################
 ;; Compilation

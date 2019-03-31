@@ -220,6 +220,7 @@
 
 (defun konix/org-element-cache-reset-all ()
   (interactive)
+  (message "Refreshing the org files")
   (let (
         (revert-without-query
          (if current-prefix-arg '(".*.org") revert-without-query)

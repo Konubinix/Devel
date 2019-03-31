@@ -1265,6 +1265,7 @@ items"
                  (
                   (agenda nil
                           (
+                           (org-agenda-include-deadlines t)
                            (org-agenda-overriding-header "Agenda without projects")
                            (org-agenda-skip-function
                             '(or
@@ -1278,6 +1279,7 @@ items"
                           )
                   (agenda nil
                           (
+                           (org-agenda-include-deadlines t)
                            (org-agenda-overriding-header
                             "Agenda for projects")
                            (org-agenda-use-time-grid nil)

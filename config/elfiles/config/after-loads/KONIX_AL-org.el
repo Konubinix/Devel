@@ -1061,10 +1061,10 @@ items"
                          (org-agenda-tag-filter-preset nil)
                          )
                         )
-                  (tags "+project-maybe//-DONE-NOT_DONE"
+                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"-refile"
                         (
                          (org-agenda-overriding-header
-                          "A project MUST have a NEXT entry (and not a maybe one)")
+                          "A project MUST either be WAITING or have at least either a NEXT entry or a future diary (and not a maybe one)")
                          (org-agenda-tag-filter-preset nil)
                          (org-agenda-todo-ignore-deadlines nil)
                          (org-agenda-skip-function
@@ -1075,7 +1075,7 @@ items"
                           )
                          )
                         )
-                  (tags "+project+Context|-todo=\"NEXT\"-todo=\"TODO\"-todo=\"DONE\"-todo=\"NOT_DONE\"+Context"
+                  (tags "-refile+project+Context|-refile-todo=\"NEXT\"-todo=\"TODO\"-todo=\"DONE\"-todo=\"NOT_DONE\"+Context"
                         (
                          (org-agenda-overriding-header
                           "A project or a non action MUST not have a context")
@@ -1087,7 +1087,7 @@ items"
                           )
                          )
                         )
-                  (tags-todo "-project-maybe//TODO"
+                  (tags-todo "-project-maybe+todo=\"TODO\"-refile"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-skip-function
@@ -1102,7 +1102,7 @@ items"
                                "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
                               )
                              )
-                  (tags-todo "-Context-project-maybe//+NEXT"
+                  (tags-todo "-Context-project-maybe+todo=\"NEXT\"-refile"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
@@ -1125,19 +1125,6 @@ items"
                               (org-agenda-skip-function
                                '(or
                                  (konix/skip-not-todo-file)
-                                 ))
-                              )
-                             )
-                  (tags "-Commitment-maybe+todo=\"TODO\"|-Commitment-maybe+todo=\"NEXT\"|-Commitment-maybe+todo=\"DONE\"|-Commitment-maybe+todo=\"NOT_DONE\"|-Commitment-maybe+project"
-                             (
-                              (org-agenda-todo-ignore-deadlines nil)
-                              (org-agenda-overriding-header
-                               "Every action must be committed to someone, even to me")
-                              (org-agenda-tag-filter-preset nil)
-                              (org-agenda-skip-function
-                               '(or
-                                 (konix/skip-not-todo-file)
-                                 (konix/org-agenda-skip-if-task-of-project)
                                  ))
                               )
                              )
@@ -1167,6 +1154,19 @@ items"
                         (
                          (org-agenda-overriding-header
                           "Give a time judgment to the Interruption")
+                         )
+                        )
+                  (tags "-refile-Commitment-maybe+todo=\"TODO\"|-refile-Commitment-maybe+todo=\"NEXT\"|-refile-Commitment-maybe+todo=\"DONE\"|-refile-Commitment-maybe+todo=\"NOT_DONE\"|-refile-Commitment-maybe+project"
+                        (
+                         (org-agenda-todo-ignore-deadlines nil)
+                         (org-agenda-overriding-header
+                          "Every action must be committed to someone, even to me")
+                         (org-agenda-tag-filter-preset nil)
+                         (org-agenda-skip-function
+                          '(or
+                            (konix/skip-not-todo-file)
+                            (konix/org-agenda-skip-if-task-of-project)
+                            ))
                          )
                         )
                   )

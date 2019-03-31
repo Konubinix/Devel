@@ -798,9 +798,9 @@
 			    (beginning-of-line 2))
 		    (beginning-of-line 2))))
       (while (and
-              (eq (get-text-property (point) 'invisible) t)
+              (not (eq (get-text-property (point) 'invisible) nil))
               (not (eq (point-at-eol) (point-max)))
-             )
+              )
         (forward-visible-line 1)
         )
       (line-move-to-column col)

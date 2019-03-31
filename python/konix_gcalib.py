@@ -1103,7 +1103,7 @@ Attendees:
                      "Authorization": "{} {}".format(
                          self.db.get("token_type"),
                          self.db.get(self.access_token_name))},
-            method='PUT'
+            method='PATCH'
         )
         f = urllib.request.urlopen(req)
         assert f.code == 200

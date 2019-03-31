@@ -109,6 +109,7 @@ class PTObject:
     stop_point: dict = None
     administrative_region: dict = None
     line: dict = None
+    distance: int = None
 
     def __post_init__(self):
         if self.stop_area:

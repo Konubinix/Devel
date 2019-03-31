@@ -3282,6 +3282,8 @@ of the clocksum."
            ("t" "Todo Item" entry (id ,(konix/org-get-id)) "* NEXT %?
   :PROPERTIES:
   :CREATED:  %U
+  :END:
+  :CLOCK:
   :END:"
             )
            )

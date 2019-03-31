@@ -1051,7 +1051,7 @@ Attendees:
             comment,
         )
 
-    def do_decline(self, id, why):
+    def do_decline(self, id, why=""):
         self.decline(
             self.get_event(id),
             why,

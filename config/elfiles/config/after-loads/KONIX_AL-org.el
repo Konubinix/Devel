@@ -3203,24 +3203,28 @@ of the clocksum."
 
 (defun konix/org-start ()
   (interactive)
-  (progn
-    (dolist (buffer '("*Org Agenda(aat)*" "*Org Agenda(ann)*" "*Org Agenda(ada)*"))
-      (when (get-buffer buffer)
-        (kill-buffer buffer)
-        )
-      )
-    )
-  (konix/org-store-agenda-views)
   (let (
-        (konix/org-agenda-tag-filter-context-p nil)
+        (agendas '("att" "ann" "ada"))
+        buffer
         )
     (progn
-      (delete-other-windows)
-      (org-agenda nil "ada")
-      (delete-other-windows)
-      (org-agenda nil "att")
-      (delete-other-windows)
-      (org-agenda nil "ann")
+      (dolist (agenda agendas)
+        (setq buffer (format "*Org Agenda(%s)*" agenda))
+        (when (get-buffer buffer)
+          (kill-buffer buffer)
+          )
+        )
+      )
+    (konix/org-store-agenda-views)
+    (let (
+          (konix/org-agenda-tag-filter-context-p nil)
+          )
+      (progn
+        (dolist (agenda agendas)
+          (delete-other-windows)
+          (org-agenda nil agenda)
+          )
+        )
       )
     )
   )

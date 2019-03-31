@@ -83,6 +83,12 @@
 (define-key org-agenda-mode-map (kbd "P")
   '(lambda nil (interactive) (let ((current-prefix-arg '(4))) (konix/org-agenda-focus-next))))
 
+(define-key org-agenda-mode-map (kbd "h")
+  'konix/org-agenda-filter-for-now)
+
+(define-key org-agenda-mode-map (kbd "H")
+  'konix/org-agenda-filter-show-all-for-now)
+
 (define-key org-agenda-mode-map (kbd "1")
   'delete-other-windows)
 
@@ -721,6 +727,27 @@
   )
 (add-hook 'org-agenda-finalize-hook 'konix/org-agenda-set-text-properties)
 ;; (remove-hook 'org-agenda-finalize-hook 'konix/org-agenda-set-text-properties)
+
+(defun konix/org-agenda-filter-for-now nil
+  (interactive)
+  (let (
+        (col (current-column))
+        )
+    (org-agenda-filter-hide-line 'for-now)
+    (while (and
+            (not (eq (get-text-property (point) 'invisible) nil))
+            (not (eq (point-at-eol) (point-max)))
+            )
+      (forward-visible-line 1)
+      )
+    (line-move-to-column col)
+    )
+  )
+
+(defun konix/org-agenda-filter-show-all-for-now nil
+  (interactive)
+  (org-agenda-remove-filter 'for-now))
+
 
 (defvar konix/org-agenda-filter-context-show-appt t "")
 (defvar konix/org-agenda-filter-context-show-empty-context t "")

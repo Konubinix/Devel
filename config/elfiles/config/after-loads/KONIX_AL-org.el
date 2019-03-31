@@ -3306,6 +3306,12 @@ of the clocksum."
     )
   )
 
+(defun konix/org-clock-todo nil
+  (interactive)
+  (konix/org-with-point-at-clocked-entry
+      (call-interactively 'org-todo)
+      )
+  )
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

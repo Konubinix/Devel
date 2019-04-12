@@ -18,7 +18,6 @@
 (depends-on "dired-sort")
 (depends-on "elf-mode")
 (depends-on "elnode")
-(depends-on "framemove")
 (depends-on "golden-ratio")
 (depends-on "graphviz-dot-mode")
 (depends-on "highlight-symbol")

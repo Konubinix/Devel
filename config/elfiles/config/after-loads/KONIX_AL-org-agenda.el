@@ -897,7 +897,7 @@
     )
   )
 
-(defvar konix/org-agenda-check-get-struct-exclude-tags '("declined") "")
+(defvar konix/org-agenda-check-get-struct-exclude-tags '("declined" "tentative") "")
 (defun konix/org-agenda-check-get-struct (start stop)
   (let (
         (result '())

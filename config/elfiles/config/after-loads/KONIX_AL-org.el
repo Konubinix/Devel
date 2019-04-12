@@ -51,54 +51,54 @@
 
 (defun konix/org-open-at-point-move-to-link (orig-fun &rest args)
   (let* ((context
-	      ;; Only consider supported types, even if they are not
-	      ;; the closest one.
-	      (org-element-lineage
-	       (org-element-context)
-	       '(comment paragraph item link)
-	       t))
-	     (type (org-element-type context))
-	     (value (org-element-property :value context))
-		 (start_point (point))
-		 (temp_point nil)
-		 (start_buffer (current-buffer))
-		 (goback nil)
-		 )
-	(cond
-	 ;; already in a link, just call the function
-	 ((memq type '(link))
-	  (apply orig-fun args)
-	  )
-	 ;; On a paragraph, find a link on the current line after point.
-	 ((memq type '(paragraph item nil))
-	  (if (re-search-forward org-any-link-re (line-end-position) t)
-		  (progn
+          ;; Only consider supported types, even if they are not
+          ;; the closest one.
+          (org-element-lineage
+           (org-element-context)
+           '(comment paragraph item link)
+           t))
+         (type (org-element-type context))
+         (value (org-element-property :value context))
+         (start_point (point))
+         (temp_point nil)
+         (start_buffer (current-buffer))
+         (goback nil)
+         )
+    (cond
+     ;; already in a link, just call the function
+     ((memq type '(link))
+      (apply orig-fun args)
+      )
+     ;; On a paragraph, find a link on the current line after point.
+     ((memq type '(paragraph item nil))
+      (if (re-search-forward org-any-link-re (line-end-position) t)
+          (progn
             (left-char)
-			(setq temp_point (point))
-			(apply orig-fun args)
-			(when (or
-				   ;; moved to another buffer
-				   (not
-					(eq
-					 start_buffer
-					 (current-buffer)
-					 )
-					)
-				   ;; or stayed in the same buffer and did not move
-				   (eq
-					temp_point
-					(point)
-					)
-				   )
-			  (with-current-buffer start_buffer
-				(goto-char start_point)
-				)
-			  )
-			)
-		(user-error "No link found"))
-	  )
-	 (t (apply orig-fun args)))
-	)
+            (setq temp_point (point))
+            (apply orig-fun args)
+            (when (or
+                   ;; moved to another buffer
+                   (not
+                    (eq
+                     start_buffer
+                     (current-buffer)
+                     )
+                    )
+                   ;; or stayed in the same buffer and did not move
+                   (eq
+                    temp_point
+                    (point)
+                    )
+                   )
+              (with-current-buffer start_buffer
+                (goto-char start_point)
+                )
+              )
+            )
+        (user-error "No link found"))
+      )
+     (t (apply orig-fun args)))
+    )
   )
 (advice-add 'org-open-at-point :around #'konix/org-open-at-point-move-to-link)
 ;; (advice-remove 'org-open-at-point #'konix/org-open-at-point-move-to-link)
@@ -178,44 +178,44 @@
 ;; CONFIG
 ;; ####################################################################################################
 (setq-default org-file-apps
-			  '(
-				(".org$" . emacs)
-				(".org_archive$" . emacs)
-				(".py$" . emacs)
-				("..xx$" . emacs)
-				(".xml$" . emacs)
-				(".log$" . emacs)
-				(".*" . "mimeopen %s")
-				(auto-mode . emacs)
-				)
-			  )
+              '(
+                (".org$" . emacs)
+                (".org_archive$" . emacs)
+                (".py$" . emacs)
+                ("..xx$" . emacs)
+                (".xml$" . emacs)
+                (".log$" . emacs)
+                (".*" . "mimeopen %s")
+                (auto-mode . emacs)
+                )
+              )
 
 (setq-default org-directory (concat perso-dir "/wiki"))
 (setq-default org-agenda-clockreport-parameter-plist
-			  '(:match "-lunch"
+              '(:match "-lunch"
                        :fileskip0
                        :stepskip0
                        :link t
                        :maxlevel 5
                        :emphasize t
                        )
-			  )
+              )
 
 (defmacro konix/org-with-point-on-heading (body)
   `(save-window-excursion
-	 (case major-mode
-	   ('org-agenda-mode
-		(org-agenda-switch-to nil t)
-		)
-	   ('org-mode
-		(org-back-to-heading)
-		)
-	   (t
-		(org-clock-goto)
-		)
-	   )
-	 ,body
-	 )
+     (case major-mode
+       ('org-agenda-mode
+        (org-agenda-switch-to nil t)
+        )
+       ('org-mode
+        (org-back-to-heading)
+        )
+       (t
+        (org-clock-goto)
+        )
+       )
+     ,body
+     )
   )
 
 (defun konix/org-element-cache-reset-all ()
@@ -242,18 +242,18 @@
 
 (defun konix/org-agenda-no-context-p ()
   (let (
-		(no_c t)
-		)
-	(mapc
-	 (lambda (tag)
-	   (when (string-match-p "^@" tag)
-		 (setq no_c nil)
-		 )
-	   )
-	 (org-get-at-bol 'tags)
-	 )
-	no_c
-	)
+        (no_c t)
+        )
+    (mapc
+     (lambda (tag)
+       (when (string-match-p "^@" tag)
+         (setq no_c nil)
+         )
+       )
+     (org-get-at-bol 'tags)
+     )
+    no_c
+    )
   )
 
 (defun konix/skip-not-todo-file (&optional keep-inbox)
@@ -277,30 +277,30 @@
 
 (defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip)
   (let (beg end skip tags current_tag)
-	(org-back-to-heading t)
-	(setq beg (point)
-		  end (progn (outline-next-heading) (1- (point))))
-	(goto-char beg)
-	(setq tags (org-get-tags-at))
-	(while (and
-			(not skip)
-			request_tags
-			)
-	  (setq current_tag (pop request_tags))
-	  (when (member current_tag
-					tags
-					)
-		(setq skip t)
-		)
-	  )
-	(when invert_skip
-	  (setq skip (not skip))
-	  )
-	(if skip
-		end
-	  nil
-	  )
-	)
+    (org-back-to-heading t)
+    (setq beg (point)
+          end (progn (outline-next-heading) (1- (point))))
+    (goto-char beg)
+    (setq tags (org-get-tags-at))
+    (while (and
+            (not skip)
+            request_tags
+            )
+      (setq current_tag (pop request_tags))
+      (when (member current_tag
+                    tags
+                    )
+        (setq skip t)
+        )
+      )
+    (when invert_skip
+      (setq skip (not skip))
+      )
+    (if skip
+        end
+      nil
+      )
+    )
   )
 
 (defun konix/org-agenda-skip-if-subtask-of-something-dynamic ()
@@ -407,29 +407,29 @@
 For all the parents of the entry, check if it has the project tag. If it does,
 return t, else return nil."
   (save-excursion
-	(let (
-		  (res nil)
-		  (parent (org-up-heading-safe))
-		  )
-	  (while (and
-			  (not res)
-			  parent
-			  )
-		(if (member "project" (org-get-tags-at))
-			(setq res t)
-		  (setq parent (org-up-heading-safe))
-		  )
-		)
-	  res
-	  )
-	)
+    (let (
+          (res nil)
+          (parent (org-up-heading-safe))
+          )
+      (while (and
+              (not res)
+              parent
+              )
+        (if (member "project" (org-get-tags-at))
+            (setq res t)
+          (setq parent (org-up-heading-safe))
+          )
+        )
+      res
+      )
+    )
   )
 
 (defun konix/org-agenda-keep-if-scheduled-and-scheduled-in-the-future nil
   (let (
-		(end (org-entry-end-position))
+        (end (org-entry-end-position))
         scheduled
-		)
+        )
     (save-excursion
       (org-back-to-heading)
       (setq scheduled (re-search-forward org-scheduled-time-regexp end t))
@@ -439,22 +439,22 @@ return t, else return nil."
       end
       )
      ((> (org-time-stamp-to-now
-		  (match-string 1) org-agenda-todo-ignore-time-comparison-use-seconds)
+          (match-string 1) org-agenda-todo-ignore-time-comparison-use-seconds)
          0)
       nil
       )
      (t
       end
       )
-	 )
+     )
     )
   )
 
 (defun konix/org-agenda-keep-if-not-scheduled-or-scheduled-in-the-past nil
   (let (
-		(end (org-entry-end-position))
+        (end (org-entry-end-position))
         scheduled
-		)
+        )
     (save-excursion
       (org-back-to-heading)
       (setq scheduled (re-search-forward org-scheduled-time-regexp end t))
@@ -464,14 +464,14 @@ return t, else return nil."
       nil
       )
      ((> (org-time-stamp-to-now
-		  (match-string 1) org-agenda-todo-ignore-time-comparison-use-seconds)
+          (match-string 1) org-agenda-todo-ignore-time-comparison-use-seconds)
          0)
       end
       )
      (t
       nil
       )
-	 )
+     )
     )
   )
 
@@ -484,39 +484,39 @@ inside projects that are not scheduled may not be forgotten and thus don't need
 to be organized.
 "
   (let (
-		(end (save-excursion (org-end-of-subtree t)))
-		)
-	(if (konix/org-is-task-of-project-p)
-		end
-	  nil
-	  )
-	)
+        (end (save-excursion (org-end-of-subtree t)))
+        )
+    (if (konix/org-is-task-of-project-p)
+        end
+      nil
+      )
+    )
   )
 
 (defun konix/org-subtree-has-active-schedule ()
   "Indicate whether the entry has scheduled and active times in its subtree."
   (let (
         (res nil)
-		(end (save-excursion (org-end-of-subtree t)))
-		)
+        (end (save-excursion (org-end-of-subtree t)))
+        )
     (save-excursion
-	  (org-back-to-heading)
-	  (while (and
-			  (re-search-forward
-			   (format "\\(%s\\|%s\\)"
-					   org-scheduled-regexp
-					   org-deadline-regexp) ;; go to the next schedule item
-			   end ;; do not search after the end of the subtree
-			   t)
-			  (not
-			   (setq res (org-entry-is-todo-p)) ;; remember if one has been found
-			   ) ;; stop if one has been found
-			  )
-		;; Nothing to do in the body. Everything is in the condition.
-		)
-	  )
-	res
-	)
+      (org-back-to-heading)
+      (while (and
+              (re-search-forward
+               (format "\\(%s\\|%s\\)"
+                       org-scheduled-regexp
+                       org-deadline-regexp) ;; go to the next schedule item
+               end ;; do not search after the end of the subtree
+               t)
+              (not
+               (setq res (org-entry-is-todo-p)) ;; remember if one has been found
+               ) ;; stop if one has been found
+              )
+        ;; Nothing to do in the body. Everything is in the condition.
+        )
+      )
+    res
+    )
   )
 
 (defun konix/org-agenda-for-today-skip-if-not-the-good-time ()
@@ -558,8 +558,8 @@ to be organized.
                    (search-backward org-scheduled-string planning-bol t)
                    ))
         (when (not res)
-		  (goto-char (match-end 0))
-		  (skip-chars-forward " \t")
+          (goto-char (match-end 0))
+          (skip-chars-forward " \t")
           (looking-at org-ts-regexp-both)
           (setq scheduled-string (match-string-no-properties 0))
           (setq scheduled-time (org-time-string-to-absolute scheduled-string))
@@ -587,8 +587,8 @@ to be organized.
           (goto-char planning-eol)
           (setq res nil)
           (when (search-backward org-deadline-string planning-bol t)
-		    (goto-char (match-end 0))
-		    (skip-chars-forward " \t")
+            (goto-char (match-end 0))
+            (skip-chars-forward " \t")
             (looking-at org-ts-regexp-both)
             (setq deadline-string (match-string-no-properties 0))
             (setq deadline-time (org-time-string-to-absolute deadline-string))
@@ -614,48 +614,48 @@ to be organized.
   "Skip if not a project or the project is active or the project contains scheduled
 items"
   (let (
-		(end (save-excursion
-			   ;; I must not avoid a stuck subproject even if the current one is ok
-			   (forward-line)
-			   (point)
-			   )
-			 )
-		(end_of_subtree
-		 (save-excursion
-		   (org-end-of-subtree t t)
-		   (point)
-		   )
-		 )
-		(point (point))
-		(current_level (org-current-level))
-		)
-	(if (or
-		 ;; not a project
-		 (not (member "project" (org-get-tags nil t)))
-		 ;; stuck ok
-		 (member "stuckok" (org-get-tags nil t))
-		 ;; done
-		 (konix/org-with-point-on-heading
-		  (org-entry-is-done-p)
-		  )
-		 ;; If it has a direct project child with status NEXT, the check will be
-		 ;; also done on the child, then this project may not be considered
-		 ;; stuck
-		 (save-excursion
-		   (goto-char point)
-		   (re-search-forward
-			(format "^\\*\\{%s\\} NEXT.+:project:" (1+ current_level))
-			end_of_subtree
-			t
-			)
-		   )
-		 ;; is an active project
-		 (konix/org-subtree-has-active-schedule)
-		 )
-		end
-	  nil
-	  )
-	)
+        (end (save-excursion
+               ;; I must not avoid a stuck subproject even if the current one is ok
+               (forward-line)
+               (point)
+               )
+             )
+        (end_of_subtree
+         (save-excursion
+           (org-end-of-subtree t t)
+           (point)
+           )
+         )
+        (point (point))
+        (current_level (org-current-level))
+        )
+    (if (or
+         ;; not a project
+         (not (member "project" (org-get-tags nil t)))
+         ;; stuck ok
+         (member "stuckok" (org-get-tags nil t))
+         ;; done
+         (konix/org-with-point-on-heading
+          (org-entry-is-done-p)
+          )
+         ;; If it has a direct project child with status NEXT, the check will be
+         ;; also done on the child, then this project may not be considered
+         ;; stuck
+         (save-excursion
+           (goto-char point)
+           (re-search-forward
+            (format "^\\*\\{%s\\} NEXT.+:project:" (1+ current_level))
+            end_of_subtree
+            t
+            )
+           )
+         ;; is an active project
+         (konix/org-subtree-has-active-schedule)
+         )
+        end
+      nil
+      )
+    )
   )
 
 (defun konix/org-agenda-skip-if-not-waiting-nor-has-next-entry ()
@@ -683,35 +683,35 @@ items"
            )
          )
        )
-	  (save-excursion (outline-next-heading) (1- (point)))
-	nil
-	)
+      (save-excursion (outline-next-heading) (1- (point)))
+    nil
+    )
   )
 
 (defun konix/org-yesterworkday-time ()
   (let (
-		(time (konix/time-substract-days (current-time) 1))
-		(holidays (save-window-excursion (holidays)))
-		)
-	(while (or
-			;; holidays
-			(member (konix/time-extract-day time)
-					(mapcar
-					 'car
-					 holidays
-					 )
-					)
-			;; Sunday
-			(string= "7"
-					 (format-time-string "%u" time))
-			;; Saturday
-			(string= "6"
-					 (format-time-string "%u" time))
-			)
-	  (setq time (konix/time-substract-days time 1))
-	  )
-	time
-	)
+        (time (konix/time-substract-days (current-time) 1))
+        (holidays (save-window-excursion (holidays)))
+        )
+    (while (or
+            ;; holidays
+            (member (konix/time-extract-day time)
+                    (mapcar
+                     'car
+                     holidays
+                     )
+                    )
+            ;; Sunday
+            (string= "7"
+                     (format-time-string "%u" time))
+            ;; Saturday
+            (string= "6"
+                     (format-time-string "%u" time))
+            )
+      (setq time (konix/time-substract-days time 1))
+      )
+    time
+    )
   )
 
 (defun konix/org-yesterworkday ()
@@ -720,82 +720,82 @@ items"
 
 (defun konix/org-agenda-sum-duration (beg end)
   (let (
-		(line_beg (line-number-at-pos beg))
-		(line_end (line-number-at-pos end))
-		(result 0)
-		)
-	(save-excursion
-	  (goto-char beg)
-	  (while (<= (line-number-at-pos (point))
-				 line_end
-				 )
-		(setq result (+
-					  result
-					  (or
-					   (get-text-property (point) 'duration)
-					   0
-					   )
-					  ))
-		(next-line)
-		)
-	  )
-	result
-	)
+        (line_beg (line-number-at-pos beg))
+        (line_end (line-number-at-pos end))
+        (result 0)
+        )
+    (save-excursion
+      (goto-char beg)
+      (while (<= (line-number-at-pos (point))
+                 line_end
+                 )
+        (setq result (+
+                      result
+                      (or
+                       (get-text-property (point) 'duration)
+                       0
+                       )
+                      ))
+        (next-line)
+        )
+      )
+    result
+    )
   )
 
 (defun konix/org-agenda-echo-sum-duration-in-region ()
   (interactive)
   (unless (region-active-p)
-	(user-error "The region must be active")
-	)
+    (user-error "The region must be active")
+    )
   (message "Duration: %s"
-		   (konix/org-agenda-sum-duration
-			(region-beginning)
-			(region-end)
-			)
-		   )
+           (konix/org-agenda-sum-duration
+            (region-beginning)
+            (region-end)
+            )
+           )
   )
 
 (defun konix/org-agenda-goto-char-biggest-duration-in-region (&optional beg end)
   (when (and
-		 (not beg)
-		 (region-active-p)
-		 )
-	(setq beg (region-beginning)
-		  end (region-end)
-		  )
-	)
+         (not beg)
+         (region-active-p)
+         )
+    (setq beg (region-beginning)
+          end (region-end)
+          )
+    )
   (unless beg
-	(user-error "The region must be active")
-	)
+    (user-error "The region must be active")
+    )
   (let* (
-		 (line_beg (line-number-at-pos beg))
-		 (line_end (line-number-at-pos end))
-		 (biggest_duration_point beg)
-		 (biggest_duration 0)
-		 point_duration
-		 )
-	(goto-char beg)
-	(while (<= (line-number-at-pos (point))
-			   line_end
-			   )
-	  (setq point_duration
-			(or (get-text-property (point) 'duration) 0)
-			)
-	  (when (>
-			 point_duration
-			 biggest_duration
-			 )
-		(setq biggest_duration point_duration)
-		(setq biggest_duration_point (point))
-		(setq point_duration
-			  (or (get-text-property (point) 'duration) 0)
-			  )
-		)
-	  (next-line)
-	  )
-	(goto-char biggest_duration_point)
-	)
+         (line_beg (line-number-at-pos beg))
+         (line_end (line-number-at-pos end))
+         (biggest_duration_point beg)
+         (biggest_duration 0)
+         point_duration
+         )
+    (goto-char beg)
+    (while (<= (line-number-at-pos (point))
+               line_end
+               )
+      (setq point_duration
+            (or (get-text-property (point) 'duration) 0)
+            )
+      (when (>
+             point_duration
+             biggest_duration
+             )
+        (setq biggest_duration point_duration)
+        (setq biggest_duration_point (point))
+        (setq point_duration
+              (or (get-text-property (point) 'duration) 0)
+              )
+        )
+      (next-line)
+      )
+    (goto-char biggest_duration_point)
+    )
   )
 
 (setq-default org-agenda-custom-commands
@@ -1964,7 +1964,7 @@ items"
 "
   (let*(
         (deadline_regexp_past "\\([0-9]+\\) d\\. ago:")
-        ;;		(deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
+        ;;      (deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
         (deadline_regexp_now "Deadline:")
         (a_now (string-match-p deadline_regexp_now a))
         (a_past (and
@@ -1975,12 +1975,12 @@ items"
                  )
                 )
         ;; (a_fut (and
-        ;;		(string-match deadline_regexp_future a)
-        ;;		(string-to-number
-        ;;		 (match-string 1 a)
-        ;;		 )
-        ;;		)
-        ;;	   )
+        ;;      (string-match deadline_regexp_future a)
+        ;;      (string-to-number
+        ;;       (match-string 1 a)
+        ;;       )
+        ;;      )
+        ;;     )
         (b_now (string-match-p deadline_regexp_now b))
         (b_past (and
                  (string-match deadline_regexp_past b)
@@ -1990,12 +1990,12 @@ items"
                  )
                 )
         ;; (b_fut (and
-        ;;		(string-match deadline_regexp_future b)
-        ;;		(string-to-number
-        ;;		 (match-string 1 b)
-        ;;		 )
-        ;;		)
-        ;;	   )
+        ;;      (string-match deadline_regexp_future b)
+        ;;      (string-to-number
+        ;;       (match-string 1 b)
+        ;;       )
+        ;;      )
+        ;;     )
         (a_value (or a_past (and a_now 0) ;; a_fut
                      -99))
         (b_value (or b_past (and b_now 0) ;; b_fut
@@ -2695,11 +2695,11 @@ of the clocksum."
       (org-with-wide-buffer
        (let (commited-parties
              (tags (pcase tags
-		             ((pred listp) tags)
-		             ((pred stringp) (split-string (org-trim tags) ":" t))
-		             (_ (error "Invalid tag specification: %S" tags))))
-	         (old-tags (org-get-tags nil t))
-	         (tags-change? nil))
+                     ((pred listp) tags)
+                     ((pred stringp) (split-string (org-trim tags) ":" t))
+                     (_ (error "Invalid tag specification: %S" tags))))
+             (old-tags (org-get-tags nil t))
+             (tags-change? nil))
          (when (functionp org-tags-sort-function)
            (setq tags (sort tags org-tags-sort-function)))
          (setq tags-change? (not (equal tags old-tags)))
@@ -3319,7 +3319,7 @@ of the clocksum."
   (interactive)
   (konix/org-with-point-at-clocked-entry
       (call-interactively 'org-todo)
-      )
+    )
   )
 
 (provide 'KONIX_AL-org)

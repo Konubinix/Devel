@@ -2712,7 +2712,7 @@ of the clocksum."
 
 (defun konix/org-ask-about-committed-parties (&optional tags)
   (unless tags
-    (setq tags (org-get-tags (point)))
+    (setq tags (org-get-tags (point) t))
     )
   (let (
         (committed-parties (konix/org-get-committed-parties tags))

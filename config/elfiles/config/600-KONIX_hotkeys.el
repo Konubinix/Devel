@@ -63,13 +63,18 @@
 (global-set-key (kbd "<C-kp-subtract>") 'konix/decrease-at-point)
 
 ;; incr & decr font size
-(global-set-key (kbd "C-M-+") 'zoom-in)
-(global-set-key (kbd "C-M--") 'zoom-out)
-(global-set-key (kbd "<C-M-kp-add>") 'zoom-in)
-(global-set-key (kbd "<C-M-kp-subtract>") 'zoom-out)
-(global-set-key (kbd "<C-wheel-up>") 'zoom-in)
-(global-set-key (kbd "<C-wheel-down>") 'zoom-out)
-(global-set-key (kbd "<C-kp-0>") 'zoom-frm-unzoom)
+(global-set-key (kbd "C-M-+") 'text-scale-increase)
+(global-set-key (kbd "C-M--") 'text-scale-decrease)
+(global-set-key (kbd "C-M--") 'text-scale-decrease)
+(global-set-key (kbd "C-M-=") 'text-scale-adjust)
+(global-set-key (kbd "<C-M-kp-add>") 'text-scale-increase)
+(global-set-key (kbd "<C-M-kp-subtract>") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+(global-set-key (kbd "<C-kp-0>") 'text-scale-adjust)
+(global-set-key (kbd "C-M-*")
+                'konix/text-scale-propagate-current-scale-to-all-buffer)
+
 ;; Recentrage horizontal
 (global-set-key (kbd "C-S-L") 'konix/horizontal-recenter)
 ;; Kill emacs

@@ -578,7 +578,7 @@
 (define-key 'konix/org-global-map "j" 'konix/org-jump-to)
 (define-key 'konix/org-global-map "P" 'org-publish)
 (define-key 'konix/org-global-map "e" 'konix/org-clock-echo)
-(define-key 'konix/org-global-map (kbd "C-i") 'konix/org-clock-back-interrupted-task)
+(define-key 'konix/org-global-map (kbd "C-i") 'konix/org-clock-back-previous-task)
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
 (define-key 'konix/org-global-map "G" 'konix/org-agenda-goto-today-clock)
 (define-key 'konix/org-global-map "b" 'konix/org-goto-bookmarks)

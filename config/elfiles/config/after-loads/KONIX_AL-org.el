@@ -2341,7 +2341,7 @@ of the clocksum."
       (let (
             (two-minute-heading (konix/org-with-point-at-clocked-entry (point-marker)))
             )
-        (konix/org-clock-back-interrupted-task)
+        (konix/org-clock-back-previous-task)
         (message "Restored the clock to the interrupted task")
         (setq konix/org-capture-two-minutes-interruption/interrupted nil)
         (org-with-point-at two-minute-heading
@@ -3211,13 +3211,22 @@ of the clocksum."
    )
   )
 
-(defun konix/org-clock-back-interrupted-task ()
+(defun konix/org-clock-back-previous-task ()
   (interactive)
-  (save-window-excursion
-    (save-excursion
-      (switch-to-buffer (marker-buffer org-clock-interrupted-task) t)
-      (goto-char (marker-position org-clock-interrupted-task))
-      (org-clock-in)
+  (let (
+        (task (if (marker-position org-clock-interrupted-task)
+                  org-clock-interrupted-task
+                (first org-clock-history)
+                )
+              )
+        )
+    (save-window-excursion
+      (save-excursion
+        (switch-to-buffer (marker-buffer task) t)
+        (goto-char (marker-position task))
+        (org-clock-in)
+        (konix/org-clock-echo)
+        )
       )
     )
   )

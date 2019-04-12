@@ -44,7 +44,6 @@
 (depends-on "undo-tree")
 (depends-on "windata") ;; imenu-tree
 (depends-on "xml-rpc") ;; trac-wiki
-(depends-on "zoom-frm")
 (depends-on "mic-paren")
 (depends-on "skewer-mode")
 (depends-on "yaml-mode")

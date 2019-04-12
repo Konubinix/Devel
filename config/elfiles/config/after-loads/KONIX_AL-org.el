@@ -320,33 +320,47 @@
 (defun konix/org-gtd-can-have-aof ()
   (let (
         (tags (org-get-tags (point) t))
-        (end (org-entry-end-position))
         )
-    (or
-     ;; a project
-     (and
-      (member "project" tags)
-      ;; not inside a project
-      (not (konix/org-is-task-of-project-p))
+    (cond
+     ((and
+       (member "project" tags)
+       (not (konix/org-is-task-of-project-p))
+       )
+      ;; top level project -> ok
+      t
       )
-     (and
-      ;; not inside a project
-      (not (konix/org-is-task-of-project-p))
-      ;; either a diary entry
-      (and
+     ((and
+       (or
+        (org-entry-is-done-p)
+        (org-entry-is-todo-p)
+        )
+       (not (konix/org-is-task-of-project-p))
+       )
+      ;; a todo, not inside a project
+      t
+      )
+     ((and
        (member "diary" tags)
        (not (member "structure" tags))
        )
-      ;; or something that actually was planned
+      ;; a diary
+      t
+      )
+     (
       (save-excursion
         (org-back-to-heading)
         (re-search-forward org-ts-regexp end t)
         )
-      ;; or something that actually was clocked
+      ;; something that was planned
+      t
+      )
+     (
       (save-excursion
         (org-back-to-heading)
         (re-search-forward org-clock-string end t)
         )
+      ;; something that was clocked
+      t
       )
      )
     )

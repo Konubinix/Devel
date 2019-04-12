@@ -27,7 +27,7 @@
 (require 'dired-x)
 (require 'find-dired)
 (require 'wuxch-dired-copy-paste)
-(require 'dired-sort nil t)
+(require 'dired-sort)
 (require 'diredful)
 
 (defun konix/dired-git-annex-find-restored ()

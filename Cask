@@ -15,7 +15,6 @@
 (depends-on "calfw")
 (depends-on "circe")
 (depends-on "diredful")
-(depends-on "dired-sort")
 (depends-on "elf-mode")
 (depends-on "elnode")
 (depends-on "golden-ratio")

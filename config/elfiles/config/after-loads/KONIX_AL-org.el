@@ -1724,6 +1724,44 @@ items"
   (expand-file-name "diary.org" org-directory))
 (defun konix/org-bookmarks_file ()
   (expand-file-name "bookmarks.org" org-directory))
+
+(defun konix/org-capture-template-iso-9001 nil
+  (format
+   "* [%s] %%?   :iso9001:
+  :PROPERTIES:
+  :CREATED:  %%U
+  :END:"
+   (org-read-date
+    t
+    nil
+    nil
+    nil
+    nil
+    (format-time-string "%H:%M" (current-time))
+    )
+   )
+  )
+
+(defun konix/org-capture-template-diary nil
+  (format
+   "* <%s> %%?
+  :PROPERTIES:
+  :CREATED:  %%U
+  :END:
+  :CLOCK:
+  :END:
+"
+   (org-read-date
+    t
+    nil
+    nil
+    nil
+    nil
+    (format-time-string "%H:%M" (current-time))
+    )
+   )
+  )
+
 (setq-default org-capture-templates
               '(
                 ("t" "Todo Item" entry (file+headline konix/org-todo_file "Refile") "* NEXT %?
@@ -1827,17 +1865,10 @@ items"
 "
                  )
                 ("s" "ISO9001" entry (file konix/org-iso9001_file)
-                 "* %U %?   :iso9001:
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:"
+                 #'konix/org-capture-template-iso-9001
                  )
                 ("d" "Diary" entry (file+headline konix/org-diary_file "Refile")
-                 "* %?
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-  %t"
+                 #'konix/org-capture-template-diary
                  )
                 )
               )

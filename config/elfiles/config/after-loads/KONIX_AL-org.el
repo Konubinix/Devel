@@ -3004,7 +3004,28 @@ of the clocksum."
   (interactive)
   (let (
         (konix/org-agenda-tag-filter-context-p nil)
+        (cmds (org-agenda-normalize-custom-commands org-agenda-custom-commands))
+        thiscmdkey thiscmdcmd bufname cmd cmd-or-set files match
         )
+    (while cmds
+      (setq cmd (pop cmds)
+            thiscmdkey (car cmd)
+            thiscmdcmd (cdr cmd)
+            match (nth 2 thiscmdcmd)
+            bufname (if org-agenda-sticky
+                        (or (and (stringp match)
+                                 (format "*Org Agenda(%s:%s)*" thiscmdkey match))
+                            (format "*Org Agenda(%s)*" thiscmdkey))
+                      org-agenda-buffer-name)
+            cmd-or-set (nth 2 cmd)
+            files (nth (if (listp cmd-or-set) 4 5) cmd)
+            )
+      (when (and files (get-buffer bufname))
+        (message "Killing %s to prevent old content to be exported"
+                 bufname)
+        (kill-buffer bufname)
+        )
+      )
     (org-store-agenda-views)
     )
   )

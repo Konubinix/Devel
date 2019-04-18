@@ -672,10 +672,13 @@ items"
     )
   )
 
-(defun konix/org-agenda-skip-if-not-waiting-nor-has-next-entry ()
+(defun konix/org-agenda-skip-if-not-waiting-nor-has-next-entry-or-is-todo-subproject ()
   (if (or
        (member "WAIT" (org-get-tags nil t))
        (member "DELEGATED" (org-get-tags nil t))
+       (and (string= "TODO" (org-get-todo-state))
+            (konix/org-is-task-of-project-p)
+            )
        (save-excursion
          (catch 'found-next-entry
            (when (org-goto-first-child)
@@ -1078,13 +1081,13 @@ items"
                   (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"-refile"
                         (
                          (org-agenda-overriding-header
-                          "A project MUST either be WAITING or have at least either a NEXT entry or a future diary (and not a maybe one)")
+                          "A NEXT project MUST either be WAITING or have at least either a NEXT entry or a future diary (and not a maybe one)")
                          (org-agenda-tag-filter-preset nil)
                          (org-agenda-todo-ignore-deadlines nil)
                          (org-agenda-skip-function
                           '(or
                             (konix/skip-not-todo-file)
-                            (konix/org-agenda-skip-if-not-waiting-nor-has-next-entry)
+                            (konix/org-agenda-skip-if-not-waiting-nor-has-next-entry-or-is-todo-subproject)
                             )
                           )
                          )

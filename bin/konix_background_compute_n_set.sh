@@ -1,4 +1,4 @@
 #!/bin/bash -eux
 
-konix_background_compute.sh
-fbsetbg "${KONIX_BACKGROUND_IMAGE}"
+konix_backgrounds_compute.sh
+feh --bg-scale ${KONIX_BACKGROUND_IMAGE_PREFIX}*

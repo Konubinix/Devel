@@ -1156,11 +1156,11 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "DELEGATED|WAIT"
+                  (tags-todo "DELEGATED|WAIT-@me"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
-                               "Make sure waiting items have due dates")
+                               "Make sure items waiting other people have due dates")
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(deadline))

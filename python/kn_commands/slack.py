@@ -807,6 +807,7 @@ def listen(conversations, types, user):
                 user=user,
         ):
             pprint.pprint(message)
+            sys.stdout.flush()
     async_get(do())
 
 

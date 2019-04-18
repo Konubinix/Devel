@@ -7,6 +7,7 @@ import time
 import os
 import re
 import datetime
+import sys
 import builtins
 from dateutil.parser import parse as dateparse
 import json
@@ -61,6 +62,18 @@ def get_slack_token():
         return None
 
 
+def parse_text(text):
+    text = text.replace("{", "{{").replace("}", "}}")
+    text = re.sub("<@([^>|]+)([|][^>]+)?>", r"{\1}", text)
+    text = text.format(
+        **{
+            id: "@" + user["name"]
+            for id, user in config.slack.users.items()
+        }
+    )
+    return text
+
+
 class Message():
     def __init__(self, data):
         if "user" not in data:
@@ -72,16 +85,9 @@ class Message():
         if "username" not in data:
             data["username"] = config.slack.users[data["user"]]["name"]
         data["orig_text"] = data["text"]
-        data["text"] = data["text"].replace("{", "{{").replace("}", "}}")
-        data["text"] = re.sub("<@([^>|]+)([|][^>]+)?>", r"{\1}", data["text"])
+        data["text"] = parse_text(data["text"])
         self.date = datetime.datetime.fromtimestamp(float(data["ts"]))
         data["ts_str"] = "ts: " + data["ts"]
-        data["text"] = data["text"].format(
-            **{
-                id: user["name"]
-                for id, user in config.slack.users.items()
-            }
-        )
         data["datetime"] = datetime.datetime.fromtimestamp(
             float(data["ts"])).strftime("%Y-%m-%d %H:%M:%S")
         self.data = data
@@ -378,6 +384,18 @@ class RTM():
                         or chunk.get("user") == user.id
                     )
             ):
+                if "user" in chunk:
+                    chunk["username"] = config.slack.users[chunk["user"]]["name"]
+                if "item_user" in chunk:
+                    chunk["item_username"] = (
+                        config.slack.users[chunk["item_user"]]["name"]
+                    )
+                if "text" in chunk:
+                    chunk["parsed_text"] = parse_text(chunk["text"])
+                if "channel" in chunk:
+                    chunk["channelname"] = (
+                        config.slack.get_conversation(chunk["channel"]).name
+                    )
                 yield chunk
 
 

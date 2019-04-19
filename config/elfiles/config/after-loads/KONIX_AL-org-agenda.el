@@ -1546,7 +1546,7 @@ STOP is the end of the agenda."
          res
          )
     (setq res (completing-read
-               "Which one?"
+               "Which one? "
                context-files
                )
           )

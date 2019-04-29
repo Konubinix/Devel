@@ -320,6 +320,7 @@
 (defun konix/org-gtd-can-have-aof ()
   (let (
         (tags (org-get-tags (point) t))
+        (end (org-entry-end-position))
         )
     (cond
      ((and

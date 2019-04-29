@@ -65,12 +65,6 @@
 (define-key org-agenda-mode-map (kbd "<tab>")
   'konix/org-agenda-next-entry)
 
-(define-key org-agenda-mode-map (kbd "M-n")
-  'konix/org-agenda-next-entry)
-
-(define-key org-agenda-mode-map (kbd "M-p")
-  'konix/org-agenda-previous-entry)
-
 (define-key org-agenda-mode-map (kbd "<backtab>")
   'konix/org-agenda-previous-entry)
 
@@ -124,6 +118,8 @@
 (define-key org-agenda-mode-map (kbd "*") 'konix/org-agenda-refresh-buffer)
 (define-key org-agenda-mode-map (kbd "d") 'konix/org-agenda-toggle-filter-deadline)
 (define-key org-agenda-mode-map (kbd "k") 'konix/org-gtd-choose-situation)
+(define-key org-agenda-mode-map (kbd "M-b") 'konix/org-agenda-highlight-same-contexts)
+(define-key org-agenda-mode-map (kbd "M-n") 'konix/org-agenda-goto-clocked-in)
 
 
 (defun konix/org-agenda-edit-headline ()

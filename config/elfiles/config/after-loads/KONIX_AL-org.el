@@ -949,13 +949,6 @@ items"
                     ""
                     )
                    )
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'konix/org-agenda-gtd-highlight-unique-tags)
-                    t
-                    )
-                   )
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) t))
                   (org-agenda-tag-filter-preset nil)
                   (org-agenda-todo-ignore-time-comparison-use-seconds t)

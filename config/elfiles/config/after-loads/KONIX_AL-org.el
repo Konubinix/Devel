@@ -3392,5 +3392,16 @@ of the clocksum."
     )
   )
 
+(defun konix/org-force-refile-before-clocking-in/advice (orig_func &rest args)
+  (save-window-excursion
+    (when (member "forcerefileonclock" (org-get-tags))
+      (org-refile nil nil nil "Refile before clocking in")
+      (bookmark-jump (plist-get org-bookmark-names-plist :last-refile) 'set-buffer)
+      )
+    (apply orig_func args)
+    )
+  )
+(advice-add #'org-clock-in :around #'konix/org-force-refile-before-clocking-in/advice)
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

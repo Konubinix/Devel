@@ -211,7 +211,7 @@
         (org-back-to-heading)
         )
        (t
-        (org-clock-goto)
+        (org-clock-goto nil t)
         )
        )
      ,body
@@ -2124,11 +2124,11 @@ items"
   (message "org-agenda-tag-filter-preset (%s) recorded" org-agenda-tag-filter-preset)
   )
 
-(defun konix/org-clock-goto ()
+(defun konix/org-clock-goto (&optional select norecord)
   "Laisse une marque à l'emplacement courant et lance l'org-clock-goto ."
-  (interactive)
+  (interactive "@P")
   (org-mark-ring-push)
-  (org-clock-goto)
+  (org-clock-goto select norecord)
   )
 
 (defun konix/org-goto-todo ()

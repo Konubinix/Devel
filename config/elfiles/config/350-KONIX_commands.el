@@ -1339,63 +1339,6 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 	)
   )
 
-(defun konix/header-wrap (&optional marker)
-  "wrap."
-  (interactive)
-  (let (beg end)
-	(if marker
-		()
-	  (setq marker konix/header-marker-1)
-	  )
-	(if (use-region-p)
-										; région définie, on init beg et end
-		(progn()
-			  (if (< (point) (mark))
-				  (progn()
-						(setq beg (point))
-						(setq end (mark)))
-				(progn()
-					  (setq beg (mark))
-					  (setq end (point)))
-				)
-			  )
-										; region pas def
-	  (progn()
-			(backward-paragraph)
-			(forward-char)
-			(beginning-of-line)
-			(setq beg (point))
-			(forward-paragraph)
-			(backward-char)
-			(end-of-line)
-			(setq end (point))
-			)
-	  )
-										; Ajout fin de wrap
-	(goto-char end)
-	(let (av_marker)
-	  (setq av_marker (point))
-										;(newline)
-	  (insert marker)
-	  (comment-region av_marker (point))
-	  (indent-region av_marker (point))
-	  )
-										; Ajout début de wrap
-	(goto-char beg)
-	(newline)
-	(backward-char)
-	(set-mark (point))
-	(setq beg (point))
-	(let (message)
-	  (setq message (read-string "Message : " "" nil "J'aime les fruits au sirop"))
-	  (insert message)
-	  )
-	(save-excursion
-	  (konix/header marker)
-	  )
-	(push-mark (point))
-	)
-  )
 
 ;; ######################################################################
 ;; Windmove

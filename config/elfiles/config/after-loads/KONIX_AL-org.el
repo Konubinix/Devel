@@ -1086,7 +1086,7 @@ items"
                           )
                          )
                         )
-                  (tags "-refile+project+Context|-refile-todo=\"NEXT\"-todo=\"TODO\"-todo=\"DONE\"-todo=\"NOT_DONE\"+Context"
+                  (tags "-refile+project+Context-todo=\"DONE\"-todo=\"NOT_DONE\"|-refile-todo=\"NEXT\"-todo=\"TODO\"-todo=\"DONE\"-todo=\"NOT_DONE\"+Context"
                         (
                          (org-agenda-overriding-header
                           "A project or a non action MUST not have a context")

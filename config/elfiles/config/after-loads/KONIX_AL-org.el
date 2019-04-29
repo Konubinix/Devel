@@ -2369,16 +2369,11 @@ of the clocksum."
          (agenda-buffer (format "*Org Agenda(%s)*" agenda-code))
          (window-config (current-window-configuration))
          )
-    (if (get-buffer agenda-buffer)
-        (progn
-          (pop-to-buffer agenda-buffer)
-          (org-agenda-redo)
-          )
-      (progn
-        (org-agenda nil agenda-code)
-        (pop-to-buffer agenda-buffer)
-        )
+    (when (get-buffer agenda-buffer)
+      (kill-buffer agenda-buffer)
       )
+    (org-agenda nil agenda-code)
+    (pop-to-buffer agenda-buffer)
     (delete-other-windows)
     (add-to-list
      'konix/org-capture/saved-window-configuration

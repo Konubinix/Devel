@@ -2995,6 +2995,7 @@ of the clocksum."
 
 (defun konix/org-store-agenda-views ()
   (interactive)
+  (save-some-buffers)
   (message "Exporting all agenda views")
   (let (
         (konix/org-agenda-tag-filter-context-p nil)

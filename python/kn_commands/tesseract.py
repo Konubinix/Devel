@@ -11,7 +11,7 @@ from click_project.lib import call, temporary_file, rm
 @command()
 @argument("input", help="Input file to convert")
 @option("--language", default="fra", help="Language of the input file")
-@flag("--remove-after",
+@flag("--remove-after/--keep-original",
       default=True,
       help="Remove the original file when everything went well")
 def tesseract(input, language, remove_after):

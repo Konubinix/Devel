@@ -1292,7 +1292,8 @@ STOP is the end of the agenda."
       (line-move-to-column colnum)
       (if res
           (setq final-char (point))
-        (message "No more entry after")
+        (when (called-interactively-p)
+          (message "No more entry after"))
         )
       )
     (goto-char final-char)

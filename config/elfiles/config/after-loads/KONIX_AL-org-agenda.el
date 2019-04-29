@@ -1174,7 +1174,10 @@ STOP is the end of the agenda."
               )
         (forward-visible-line 1)
         )
-      (if (member matching-tag (get-text-property (point) 'tags))
+      (if (and
+           (member matching-tag (get-text-property (point) 'tags))
+           (equal (get-text-property (point) 'org-agenda-type) 'agenda)
+           )
           (point)
         nil
         )

@@ -1299,6 +1299,7 @@ items"
                            (org-agenda-skip-function
                             '(or
                               (konix/skip-not-todo-file)
+                              (konix/org-agenda-for-today-skip-if-not-the-good-time)
                               (konix/org-agenda-skip-if-tags
                                '("project")
                                t)

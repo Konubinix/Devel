@@ -211,7 +211,7 @@
   ""
   )
 
-(defface konix/org-agenda-gtd-highlight-unique-tags/face
+(defface konix/org-agenda-highlight/face
   '(
 	(
 	 ((class color)
@@ -1552,11 +1552,11 @@ STOP is the end of the agenda."
 	)
   )
 
-(defun konix/org-agenda-gtd-unhighlight-unique-tags nil
+(defun konix/org-agenda-unhighlight nil
   (interactive)
   (mapc
    (lambda (o)
-     (when (eq (overlay-get o 'konix/org-agenda-gtd-highlight-unique-tags)
+     (when (eq (overlay-get o 'konix/org-agenda-highlight)
                t)
        (delete-overlay o)
        )

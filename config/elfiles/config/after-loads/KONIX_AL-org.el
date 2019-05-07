@@ -1328,7 +1328,7 @@ items"
                             '(or
                               (konix/org-agenda-skip-if-tags
                                '(
-                                 "no_weekly"
+                                 "no_monthly"
                                  "phantom"
                                  ))
                               (and

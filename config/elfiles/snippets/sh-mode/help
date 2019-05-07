@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: help
+# key: --help
+# --
+if [ $# -gt 0 ] && [ "\$1" == "--help" ]
+then
+	usage
+	exit 0
+fi
+$0

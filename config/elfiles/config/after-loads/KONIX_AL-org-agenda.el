@@ -1394,7 +1394,7 @@ STOP is the end of the agenda."
             )
         (goto-char (point-min))
         (while (and
-                (konix/org-agenda-next-entry)
+                (konix/org-agenda-next-entry-1)
                 (not (setq res (string-equal (konix/org-get-id) clocked-in-id)))
                 )
           )
@@ -1404,6 +1404,7 @@ STOP is the end of the agenda."
           )
         res
         )
+
     (progn
       (when (called-interactively-p)
         (message "No item currently clocked")

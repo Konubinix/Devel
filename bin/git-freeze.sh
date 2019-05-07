@@ -19,4 +19,9 @@ fi
 if [ -z "$GIT_COMMITTER_EMAIL" ]; then
         export GIT_COMMITTER_EMAIL=`whoami`"@$hostname"
 fi
-git commit -m "Freezing of repo by $LOGNAME at $HOSTNAME"
+if LC_ALL=C git status|grep -q "nothing to commit, working tree clean"
+then
+        echo "Nothing to commit"
+else
+    git commit -m "Freezing of repo by $LOGNAME at $HOSTNAME"
+fi

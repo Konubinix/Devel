@@ -1587,7 +1587,7 @@ STOP is the end of the agenda."
     (delete-file context-file)
     (f-symlink res context-file)
     )
-  (konix/org-agenda-refinalize)
+  (konix/org-agenda-gtd-open-contexts)
   )
 
 (defun konix/org-agenda-get-contexts nil

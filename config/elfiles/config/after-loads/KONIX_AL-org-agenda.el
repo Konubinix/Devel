@@ -1263,70 +1263,62 @@ STOP is the end of the agenda."
 
 (defvar konix/org-agenda-move-entry-recenter nil "")
 
-(defun konix/org-agenda-next-entry ()
-  (interactive)
+(defun konix/org-agenda-next-entry-1 (&optional step)
+  (unless step
+    (setq step 1)
+    )
   (let (
-        (next-step nil)
-        (colnum (current-column))
-        (final-char (point))
+        (starting-point (point))
         res
         )
-    (save-excursion
-      (forward-visible-line 1)
-      (while (and
-              (not (konix/org-agenda-next-entry/is-todo-p))
-              (not (eq (point-at-eol) (point-max)))
-              )
-        (forward-visible-line 1)
+    (forward-visible-line step)
+    (while (and
+            (not (konix/org-agenda-next-entry/is-todo-p))
+            (not (or
+                  (and (> step 0) (eq (point-at-eol) (point-max)))
+                  (and (< step 0) (eq (point-at-bol) (point-min)))
+                  )
+                 )
+            )
+      (forward-visible-line step)
+      )
+    ;; return nil if not in an entry
+    (setq res (get-text-property (point) 'org-category))
+    (unless res
+      (goto-char starting-point)
+      )
+    res
+    )
+  )
+
+(defun konix/org-agenda-next-entry (&optional step)
+  (interactive)
+  (let (
+        (colnum (current-column))
+        (res (konix/org-agenda-next-entry-1 step))
         )
-      (when konix/org-agenda-move-entry-recenter
-        (recenter-top-bottom '(4))
-        )
-      (org-agenda-do-context-action)
-      ;; return nil if not in an entry
-      (setq res (get-text-property (point) 'org-category))
-      (line-move-to-column colnum)
-      (if res
-          (setq final-char (point))
-        (when (called-interactively-p)
-          (message "No more entry after"))
+    (if res
+        (progn
+          (when konix/org-agenda-move-entry-recenter
+            (recenter-top-bottom '(4))
+            )
+          (org-agenda-do-context-action)
+          (line-move-to-column colnum)
+          )
+      (when (called-interactively-p)
+        (message "No more entry after")
         )
       )
-    (goto-char final-char)
     res
     )
   )
 
 (defun konix/org-agenda-previous-entry ()
   (interactive)
-  (let (
-        (next-step nil)
-        (colnum (current-column))
-        (final-char (point))
-        res
-        )
-    (save-excursion
-      (forward-visible-line -1)
-      (while (and
-              (not (konix/org-agenda-next-entry/is-todo-p))
-              (not (eq (point-at-bol) (point-min)))
-              )
-        (forward-visible-line -1)
-        )
-      (when konix/org-agenda-move-entry-recenter
-        (recenter-top-bottom '(4))
-        )
-      (org-agenda-do-context-action)
-      ;; return nil if not in an entry
-      (setq res (get-text-property (point) 'org-category))
-      (line-move-to-column colnum)
-      (if res
-          (setq final-char (point))
-        (message "No more entry before")
-        )
+  (unless (konix/org-agenda-next-entry -1)
+    (when (called-interactively-p)
+      (message "No more entry before")
       )
-    (goto-char final-char)
-    res
     )
   )
 

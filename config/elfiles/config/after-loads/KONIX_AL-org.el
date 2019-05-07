@@ -206,12 +206,14 @@
      (case major-mode
        ('org-agenda-mode
         (org-agenda-switch-to nil t)
+        (org-back-to-heading)
         )
        ('org-mode
         (org-back-to-heading)
         )
        (t
         (org-clock-goto nil t)
+        (org-back-to-heading)
         )
        )
      ,body

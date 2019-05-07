@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: new-file-tpl-sh
 # --
-#!/bin/bash
+#!/bin/bash -eu
 
 $0

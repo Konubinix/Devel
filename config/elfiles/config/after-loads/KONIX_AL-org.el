@@ -2648,17 +2648,21 @@ of the clocksum."
 (advice-add 'org-depend-block-todo :around
             #'konix/org-depend-block-todo/but_not_done)
 
+(defun konix/org-contain-clocked-stuff-p nil
+  (save-excursion
+    (save-match-data
+      (re-search-forward
+       org-clock-line-re
+       (save-excursion (org-end-of-subtree t) (point)) t)
+      )
+    )
+  )
+
 (defun konix/org-agenda-kill/confirm-if-clock-info ()
   (when
       (and
        (konix/org-with-point-on-heading
-        (save-excursion
-          (save-match-data
-            (re-search-forward
-             org-clock-line-re
-             (save-excursion (org-end-of-subtree t) (point)) t)
-            )
-          )
+        (konix/org-contain-clocked-stuff-p)
         )
        (not (yes-or-no-p "Contains clocked stuff, still remove it?"))
        )

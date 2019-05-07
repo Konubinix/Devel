@@ -1947,7 +1947,7 @@ items"
               '(
                 "project" "draft" "phantom"
                 "WAIT" "DELEGATED" "structure"
-                "EXPIRED" "NOEXPIRY"
+                "EXPIRED" "NOEXPIRY" "external" "INTERRUPTION"
                 ))
 (setq-default org-fast-tag-selection-single-key t)
 (setq-default org-reverse-note-order t)

@@ -1725,20 +1725,34 @@ items"
 (defun konix/org-bookmarks_file ()
   (expand-file-name "bookmarks.org" org-directory))
 
+(defun konix/org-get-time nil
+  (let (
+        (time (org-read-date
+               t
+               t
+               nil
+               nil
+               nil
+               (format-time-string "%H:%M" (current-time))
+               ))
+        )
+    (format-time-string
+     (if org-time-was-given
+         "%Y-%m-%d %a %H:%M"
+       "%Y-%m-%d %a"
+       )
+     time
+     )
+    )
+  )
+
 (defun konix/org-capture-template-iso-9001 nil
   (format
    "* [%s] %%?   :iso9001:
   :PROPERTIES:
   :CREATED:  %%U
   :END:"
-   (org-read-date
-    t
-    nil
-    nil
-    nil
-    nil
-    (format-time-string "%H:%M" (current-time))
-    )
+   (konix/org-get-time)
    )
   )
 
@@ -1751,14 +1765,7 @@ items"
   :CLOCK:
   :END:
 "
-   (org-read-date
-    t
-    nil
-    nil
-    nil
-    nil
-    (format-time-string "%H:%M" (current-time))
-    )
+   (konix/org-get-time)
    )
   )
 

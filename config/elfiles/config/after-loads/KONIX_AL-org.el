@@ -1141,7 +1141,7 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "DELEGATED-Agenda|WAIT-Agenda"
+                  (tags-todo "DELEGATED-Agenda-maybe|WAIT-Agenda-maybe"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
@@ -1152,7 +1152,7 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "DELEGATED|WAIT-@me"
+                  (tags-todo "DELEGATED-maybe|WAIT-maybe"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header

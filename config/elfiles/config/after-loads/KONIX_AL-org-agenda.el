@@ -1638,7 +1638,7 @@ STOP is the end of the agenda."
 
 (advice-add 'org-agenda-clock-in :after #'konix/org-agenda-highlight-same-contexts)
 ;; (advice-remove 'org-agenda-clock-out #'konix/org-agenda-unhighlight)
-(add-hook 'org-agenda-finalize-hook #'konix/org-agenda-highlight-same-contexts-as-clocked-in)
+;; (remove-hook 'org-agenda-finalize-hook #'konix/org-agenda-highlight-same-contexts-as-clocked-in)
 
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

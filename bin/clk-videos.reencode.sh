@@ -6,6 +6,8 @@ then
 fi
 
 set -eu
+# i should not run this in parallel since one avconv process is already taking
+# advantage of all my cpus
 find \
 	-name "original_videos" \
 	-prune \
@@ -13,11 +15,11 @@ find \
 	-name ".git" \
 	-prune \
 	-o \
-	-\( \
+	\( \
     -iname '*.mov' \
            -o -iname "*.mp4" \
            -o -iname "*.avi" \
            -o -iname "*.3gp" \
+           -o -iname "*.MPG" \
            -o -iname "*.mkv" \
-           -\) \
-    -exec "kn-video.rename.sh" "{}" ";"
+           \) -exec clk-video.reencode.sh '{}' ';'

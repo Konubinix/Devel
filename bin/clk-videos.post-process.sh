@@ -5,5 +5,8 @@ then
 	exit 0
 fi
 
-kn-images.post-process.sh
-kn-videos.post-process.sh
+set -eu
+
+clk-video.remove-15fps-videos.sh
+clk-videos.rename.sh
+clk-videos.reencode.sh

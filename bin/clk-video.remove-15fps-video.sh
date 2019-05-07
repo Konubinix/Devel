@@ -5,8 +5,9 @@ then
 	exit 0
 fi
 
-set -eu
+set -eux
 
-kn-video.remove-15fps-videos.sh
-kn-videos.rename.sh
-kn-videos.reencode.sh
+if [ "$(clk-video.fps.py "$1")" == "15" ]
+then
+	rm -v "$1"
+fi

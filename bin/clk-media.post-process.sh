@@ -5,9 +5,5 @@ then
 	exit 0
 fi
 
-set -eux
-
-if [ "$(kn-video.fps.py "$1")" == "15" ]
-then
-	rm -v "$1"
-fi
+clk-images.post-process.sh
+clk-videos.post-process.sh

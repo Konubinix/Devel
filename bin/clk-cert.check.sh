@@ -8,7 +8,7 @@ fi
 
 TIMEOUT="${3:-10}"
 
-TESTS="kn-cert.check.openssl.sh kn-cert.check.gnutls.sh"
+TESTS="clk-cert.check.openssl.sh clk-cert.check.gnutls.sh"
 
 for t in $TESTS
 do

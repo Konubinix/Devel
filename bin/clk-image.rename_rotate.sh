@@ -7,5 +7,5 @@ fi
 
 file="$1"
 echo "# handling '${file}'"
-kn-image.reorient.sh "${file}"
-kn-image.rename.sh "${file}"
+clk-image.reorient.sh "${file}"
+clk-image.rename.sh "${file}"

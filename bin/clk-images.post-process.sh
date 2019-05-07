@@ -6,6 +6,6 @@ then
 	exit 0
 fi
 
-kn-images.convert.sh
-kn-images.rename.sh
-kn-images.rotate.sh
+clk-images.convert.sh
+clk-images.rename.sh
+clk-images.rotate.sh

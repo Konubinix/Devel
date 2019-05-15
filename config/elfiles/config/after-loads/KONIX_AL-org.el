@@ -3125,7 +3125,7 @@ of the clocksum."
       (konix/org-agenda-focus-next)
     (progn
       (org-show-subtree)
-      (org-match-sparse-tree nil (if current-prefix-arg "-archive" "todo=\"NEXT\"-archive|todo=\"TODO\"-archive"))
+      (org-match-sparse-tree nil (if current-prefix-arg "-archive-maybe" "todo=\"NEXT\"-archive-maybe|todo=\"TODO\"-archive-maybe"))
       )
     )
   )

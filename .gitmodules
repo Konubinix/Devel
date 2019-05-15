@@ -297,3 +297,6 @@ ignore=dirty
 [submodule "an2linuxserver"]
 	path = an2linuxserver
 	url = https://github.com/rootkiwi/an2linuxserver
+[submodule "SoundScrape"]
+	path = SoundScrape
+	url = https://github.com/Konubinix/SoundScrape

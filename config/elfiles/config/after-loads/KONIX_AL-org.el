@@ -818,6 +818,78 @@ items"
     )
   )
 
+(defun konix/org-agenda-per-commitment-toggle nil
+  (interactive)
+  (set (make-variable-buffer-local
+        'org-super-agenda-groups)
+       (if org-super-agenda-groups
+           nil
+         (mapcar
+          (lambda (ag)
+            (list :name (first ag)
+                  :tag (first ag))
+            )
+          konix/org-gtd-commitments-tags
+          )
+         )
+       )
+  (message "org-super-agenda per commitment: %s" (if org-super-agenda-groups t nil))
+  )
+
+(defun konix/org-agenda-per-context-toggle nil
+  (interactive)
+  (set (make-variable-buffer-local
+        'org-super-agenda-groups)
+       (if org-super-agenda-groups
+           nil
+         (mapcar
+          (lambda (ag)
+            (list :name (first ag)
+                  :tag (first ag))
+            )
+          konix/org-gtd-contexts
+          )
+         )
+       )
+  (message "org-super-agenda per contexts: %s" (if org-super-agenda-groups t nil))
+  )
+
+(defun konix/org-agenda-per-aof-toggle nil
+  (interactive)
+  (set (make-variable-buffer-local
+        'org-super-agenda-groups)
+       (if org-super-agenda-groups
+           nil
+         (mapcar
+          (lambda (ag)
+            (list :name (first ag)
+                  :tag (first ag))
+            )
+          konix/org-gtd-aof
+          )
+         )
+       )
+  (message "org-super-agenda per aof: %s" (if org-super-agenda-groups t nil))
+  )
+
+(defun konix/org-agenda-per-group-aof-toggle nil
+  (interactive)
+  (set (make-variable-buffer-local
+        'org-super-agenda-groups)
+       (if org-super-agenda-groups
+           nil
+         (mapcar
+          (lambda (ag)
+            (list :name (first ag)
+                  :tag (first ag))
+            )
+          konix/org-gtd-group-aof
+          )
+         )
+       )
+  (message "org-super-agenda per group aof: %s" (if org-super-agenda-groups t nil))
+  )
+
 (setq-default org-agenda-custom-commands
               `(
                 ("a" . "My custom agendas")
@@ -830,6 +902,15 @@ items"
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (org-agenda-todo-ignore-with-date nil)
                   (org-agenda-todo-ignore-deadlines nil)
+                  (org-super-agenda-groups
+                   (mapcar
+                    (lambda (ag)
+                      (list :name (first ag)
+                            :tag (first ag))
+                      )
+                    konix/org-gtd-agenda
+                    )
+                   )
                   (org-agenda-todo-ignore-timestamp nil)
                   (org-agenda-skip-function
                    '(or

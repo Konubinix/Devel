@@ -155,7 +155,6 @@
 (define-key 'konix/global-slow-key-map (kbd "c") 'calendar)
 ;; org agenda
 (define-key 'konix/global-slow-key-map (kbd "a") 'org-agenda)
-(define-key 'konix/global-slow-key-map (kbd "A") 'konix/org-agenda)
 ;; ffap
 (define-key 'konix/global-slow-key-map (kbd "C-f") 'ffap)
 ;; auto-fill-mode

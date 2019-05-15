@@ -1170,13 +1170,6 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
   (org-mode)
   )
 
-(defun konix/org-agenda ()
-  "My org agenda, in the whole frame"
-  (interactive)
-  (org-agenda 'a)
-  (delete-other-windows)
-  )
-
 ;; Make appt aware of appointments from the agenda
 (defun konix/org-agenda-to-appt ()
   "Activate appointments found in `org-agenda-files'."

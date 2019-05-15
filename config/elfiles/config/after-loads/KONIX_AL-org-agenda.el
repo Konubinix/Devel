@@ -24,6 +24,9 @@
 
 ;;; Code:
 
+(require 'org-super-agenda)
+(org-super-agenda-mode 1)
+
 ;; make sure the agendas are sticky
 (org-toggle-sticky-agenda t)
 ;; http://orgmode.org/worg/agenda-optimization.html#sec-3
@@ -62,6 +65,9 @@
 (define-key org-agenda-mode-map (kbd "SPC")
   'konix/org-agenda-next-entry)
 
+(define-key org-super-agenda-header-map (kbd "SPC")
+  'konix/org-agenda-next-entry)
+
 (define-key org-agenda-mode-map (kbd "<tab>")
   'konix/org-agenda-next-entry)
 
@@ -72,6 +78,9 @@
   'konix/org-agenda-previous-entry)
 
 (define-key org-agenda-mode-map (kbd "DEL")
+  'konix/org-agenda-previous-entry)
+
+(define-key org-super-agenda-header-map (kbd "DEL")
   'konix/org-agenda-previous-entry)
 
 (define-key org-agenda-mode-map (kbd "p")

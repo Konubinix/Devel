@@ -5,5 +5,5 @@ then
 	exit 0
 fi
 
-clk-images.post-process.sh
-clk-videos.post-process.sh
+clk images post-process@sh
+clk videos post-process@sh

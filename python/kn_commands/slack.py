@@ -22,7 +22,10 @@ import websockets
 import click
 import slacker
 import parsedatetime
-from redis_bot import lib as botlib
+try:
+    from redis_bot import lib as botlib
+except ImportError:
+    botlib = None
 
 from click_project.decorators import (
     group,
@@ -47,7 +50,6 @@ from click_project.config import config
 from click_project.core import cache_disk
 from click_project.commands.passwords import set as password_set_command
 
-from konix_time_helper import naive_to_local
 
 LOGGER = get_logger(__name__)
 
@@ -829,72 +831,73 @@ def listen(conversations, types, user):
     async_get(do())
 
 
-def mess_encode(mess):
-    return botlib.mess_encode(mess)
+if botlib is not None:
+    def mess_encode(mess):
+        return botlib.mess_encode(mess)
 
 
-def mess_decode(mess):
-    return botlib.mess_decode(mess)
+    def mess_decode(mess):
+        return botlib.mess_decode(mess)
 
 
-@rtm.command()
-@option("--conversation", "conversations", type=ConversationType(), multiple=True)
-@option("--type", "types", multiple=True)
-@option("--redis-host", default="localhost")
-@option("--redis-port", type=int, default=6379)
-@option("--channel-to", default="bot:comm:to")
-@option("--channel-control", default="bot:comm:control")
-@option("--channel-from", default="bot:comm:from")
-def redis_bot(conversations, types, channel_control, channel_to,
-              channel_from, redis_host, redis_port):
-    _listen = config.slack.rtm.listen
+    @rtm.command()
+    @option("--conversation", "conversations", type=ConversationType(), multiple=True)
+    @option("--type", "types", multiple=True)
+    @option("--redis-host", default="localhost")
+    @option("--redis-port", type=int, default=6379)
+    @option("--channel-to", default="bot:comm:to")
+    @option("--channel-control", default="bot:comm:control")
+    @option("--channel-from", default="bot:comm:from")
+    def redis_bot(conversations, types, channel_control, channel_to,
+                  channel_from, redis_host, redis_port):
+        _listen = config.slack.rtm.listen
 
-    redis_connection = botlib.ChanToRedis(
-        redis_host, redis_port,
-        channel_from, channel_to, channel_control
-    )
-    el = asyncio.get_event_loop()
+        redis_connection = botlib.ChanToRedis(
+            redis_host, redis_port,
+            channel_from, channel_to, channel_control
+        )
+        el = asyncio.get_event_loop()
 
-    async def slack_listen():
-        async for message in _listen(
-                conversations=conversations,
-                types=types
-        ):
-            def fixup_message(message):
-                if "channel" in message:
-                    message["mucroom"] = config.slack.get_conversation(
-                        message["channel"]
-                    ).name
-                if "user" in message:
-                    message["username"] = config.slack.get_user(
-                        message["user"]
-                    ).name
-                message["body"] = message.get("text", "")
-            try:
-                fixup_message(message)
-            except:
-                import sys
-                import ipdb
-                ipdb.post_mortem(sys.exc_info()[2])
+        async def slack_listen():
+            async for message in _listen(
+                    conversations=conversations,
+                    types=types
+            ):
+                def fixup_message(message):
+                    if "channel" in message:
+                        message["mucroom"] = config.slack.get_conversation(
+                            message["channel"]
+                        ).name
+                    if "user" in message:
+                        message["username"] = config.slack.get_user(
+                            message["user"]
+                        ).name
+                    message["body"] = message.get("text", "")
+                try:
+                    fixup_message(message)
+                except:
+                    import sys
+                    import ipdb
+                    ipdb.post_mortem(sys.exc_info()[2])
 
-            LOGGER.debug("Got message: {}".format(message))
-            mess = mess_encode(message)
-            await redis_connection.send(mess)
+                LOGGER.debug("Got message: {}".format(message))
+                mess = mess_encode(message)
+                await redis_connection.send(mess)
 
-    async def redis_listen():
-        async for message in redis_connection.listen():
-            if "channel" not in message and "mucroom" in message:
-                message["channel"] = config.slack.get_conversation(message["mucroom"]).id
-            if "text" not in message and "body" in message:
-                message["text"] = message["body"]
-            if "type" not in message:
-                message["type"] = "message"
-            LOGGER.debug("Write message: {}".format(message))
-            await config.slack.rtm.write(message)
+        async def redis_listen():
+            async for message in redis_connection.listen():
+                if "channel" not in message and "mucroom" in message:
+                    message["channel"] = config.slack.get_conversation(message["mucroom"]).id
+                if "text" not in message and "body" in message:
+                    message["text"] = message["body"]
+                if "type" not in message:
+                    message["type"] = "message"
+                LOGGER.debug("Write message: {}".format(message))
+                await config.slack.rtm.write(message)
 
-    asyncio.ensure_future(slack_listen())
-    asyncio.ensure_future(redis_listen())
-    el.run_forever()
+        asyncio.ensure_future(slack_listen())
+        asyncio.ensure_future(redis_listen())
+        el.run_forever()
 
 
 @rtm.command()
@@ -1047,6 +1050,7 @@ def rss(conversation,
         output_path):
     """Export all the links of the conversation in a simple RSS feed"""
     from feedgen.feed import FeedGenerator
+    from konix_time_helper import naive_to_local
     fg = FeedGenerator()
     fg.id(url)
     fg.title(title)

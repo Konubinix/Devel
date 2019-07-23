@@ -1593,12 +1593,6 @@ STOP is the end of the agenda."
   (konix/org-agenda-gtd-open-contexts)
   )
 
-(defun konix/org-agenda-get-contexts nil
-  (remove-if-not
-   (lambda (e) (string-prefix-p "@" e))
-   (org-get-at-bol 'tags))
-  )
-
 (defun konix/org-agenda-highlight-same-contexts nil
   (interactive)
   (if current-prefix-arg
@@ -1606,7 +1600,7 @@ STOP is the end of the agenda."
     (konix/org-agenda-unhighlight)
     )
   (let (
-        (contexts (konix/org-agenda-get-contexts))
+        (contexts (konix/org-get-contexts))
         )
     (save-excursion
       (goto-char (point-min))

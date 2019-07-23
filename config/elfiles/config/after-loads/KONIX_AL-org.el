@@ -3680,16 +3680,16 @@ of the clocksum."
 (defun konix/org-last-weeks-review-report nil
   (interactive)
   (let* (
-         (number_of_weeks 1)
-         (from (format "-%sw" number_of_weeks))
+         (number_of_days 10)
+         (from (format "-%sd" number_of_days))
          (to "now")
          )
     (konix/org-agenda-match-inactive-timestamp
      "-tagthatnobodyuses"
      from
      to
-     (format "* Last %s weeks report (%s - %s)"
-             number_of_weeks
+     (format "* Last %s days report (%s - %s)"
+             number_of_days
              (org-read-date nil nil from)
              (org-read-date nil nil to)
              )

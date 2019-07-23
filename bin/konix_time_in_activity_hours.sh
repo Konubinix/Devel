@@ -2,5 +2,5 @@
 
 HOUR="$(date +%H)"
 
-[ ${HOUR} -gt 8 ] \
+[ ${HOUR} -ge 8 ] \
     &&  [ ${HOUR} -lt 19 ]

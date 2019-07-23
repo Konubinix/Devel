@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # name: _aparg
 # --
-$>parser.add_argument('-${200:a}','--${300:argument}',
+$>parser.add_argument("-${200:a}", "--${300:argument}",
 $>${350:nargs=${400:?},
 $>}${450:const="${500:a}",
 $>}help="""${600:this argument...}""",

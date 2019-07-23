@@ -659,9 +659,10 @@
     (define-key local_map (kbd "M-n") 'konix/git/log/commit-next)
     (define-key local_map (kbd "M-p") 'konix/git/log/commit-prev)
     (define-key local_map (kbd "M-P") 'konix/git/log/commit-kill-n-prev)
+    (define-key local_map (kbd "C-c C-b") 'diff-refine-hunk)
+    (define-key local_map (kbd "C-c C-c") 'diff-goto-source)
     (use-local-map local_map)
     )
-
   )
 
 (defun konix/git/alog (&optional history_size)

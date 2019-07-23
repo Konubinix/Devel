@@ -2232,11 +2232,6 @@ items"
 (def-edebug-spec konix/org-with-point-at-clocked-entry (form body))
 (put 'konix/org-with-point-at-clocked-entry 'lisp-indent-function 1)
 
-(defun konix/org-goto-org-directory ()
-  (interactive)
-  (find-file (expand-file-name org-directory))
-  )
-
 (defun konix/org-goto-notes ()
   (interactive)
   (find-file (expand-file-name "notes.org" org-directory))
@@ -3497,5 +3492,86 @@ of the clocksum."
   )
 (advice-add #'org-clock-in :around #'konix/org-force-refile-before-clocking-in/advice)
 
+(defun konix/org-next-sibbling nil
+  (let (
+        (start-point (point))
+        )
+    (save-restriction
+      (save-excursion
+        (org-up-heading-safe)
+        (org-narrow-to-subtree)
+        )
+      (org-next-visible-heading 1)
+      (if (eq (point-max) (point))
+          (progn
+            (goto-char start-point)
+            nil
+            )
+        t
+        )
+      )
+    )
+  )
+
+(defun konix/org-done-and-next nil
+  (interactive)
+  (let (
+        parent-id
+        on-next-sibbling
+        )
+    (konix/org-with-point-at-clocked-entry
+        (unless current-prefix-arg
+          (org-todo 'done)
+          )
+      (save-excursion
+        (org-up-heading-safe)
+        (setq parent-id (konix/org-get-id))
+        )
+      (setq on-next-sibbling (konix/org-next-sibbling))
+      (when on-next-sibbling
+        (org-clock-in)
+        )
+      )
+    (unless on-next-sibbling
+      (konix/org-capture-na-in-heading parent-id t t)
+      )
+    )
+  )
+
+(defun konix/org-project-and-next nil
+  (interactive)
+  (let (
+        parent-id
+        )
+    (konix/org-with-point-at-clocked-entry
+        (setq parent-id (konix/org-get-id))
+      (org-toggle-tag "project" 'on)
+      )
+    (konix/org-capture-na-in-heading parent-id t t)
+    )
+  )
+
+(defun konix/org-create-next-sibbling nil
+  (interactive)
+  (let (
+        parent-id
+        )
+    (if current-prefix-arg
+        (konix/org-with-point-on-heading
+         (progn
+           (org-up-heading-safe)
+           (setq parent-id (konix/org-get-id))
+           )
+         )
+      (konix/org-with-point-at-clocked-entry
+          (progn
+            (org-up-heading-safe)
+            (setq parent-id (konix/org-get-id))
+            )
+        )
+      )
+    (konix/org-capture-na-in-heading parent-id)
+    )
+  )
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

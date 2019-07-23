@@ -562,7 +562,6 @@
 
 (define-key 'konix/org-global-map (kbd "M-e") 'konix/org-adjust-effort)
 (define-key 'konix/org-global-map "j" 'konix/org-jump-to)
-(define-key 'konix/org-global-map "P" 'org-publish)
 (define-key 'konix/org-global-map "e" 'konix/org-clock-echo)
 (define-key 'konix/org-global-map (kbd "C-i") 'konix/org-clock-back-previous-task)
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
@@ -589,7 +588,9 @@
 (define-key 'konix/org-global-map "u" 'org-id-update-id-locations)
 (define-key 'konix/org-global-map "L" 'konix/org-store-link-at-point)
 (define-key 'konix/org-global-map "T" 'konix/org-goto-todo)
-(define-key 'konix/org-global-map "D" 'konix/org-goto-org-directory)
+(define-key 'konix/org-global-map "D" 'konix/org-done-and-next)
+(define-key 'konix/org-global-map "P" 'konix/org-project-and-next)
+(define-key 'konix/org-global-map (kbd "C-n") 'konix/org-create-next-sibbling)
 (define-key 'konix/org-global-map "i" 'org-id-copy)
 (define-key 'konix/org-global-map "/" 'org-sparse-tree)
 (define-key 'konix/org-global-map "-" 'konix/org-sparse-next-actions)

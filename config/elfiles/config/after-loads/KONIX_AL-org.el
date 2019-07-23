@@ -3214,6 +3214,20 @@ of the clocksum."
 (setq-default org-babel-python-command "python3")
 (setq-default org-sort-agenda-noeffort-is-high nil)
 
+(defun konix/org-get-contexts nil
+  (remove-if-not
+   (lambda (e) (string-prefix-p "@" e))
+   (konix/org-get-tags)
+   )
+  )
+
+(defun konix/org-get-tags nil
+  (if (eq major-mode 'org-agenda-mode)
+      (org-get-at-bol 'tags)
+    (org-get-tags)
+    )
+  )
+
 (defun konix/org-all-tags ()
   (mapcar (lambda (tag)
             (substring-no-properties (car tag)))

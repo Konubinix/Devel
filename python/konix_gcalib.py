@@ -299,8 +299,17 @@ class GCall(cmd.Cmd, object):
             return description
 
         @property
+        def tags(self):
+            res = []
+            if self.my_response_status:
+                res.append(self.my_response_status)
+            if self.recurringEventId:
+                res.append("recurrent")
+            return res
+
+        @property
         def org_mode(self):
-            return """* [[{}][{}{}]]{}
+            return """* [[{}][{}]]{}
 :PROPERTIES:
 :ID: {}
 :CALENDAR_ID: {}
@@ -313,16 +322,16 @@ class GCall(cmd.Cmd, object):
 By: {}
 Attendees:
 {}
-# DESCRIPTION
+
 {}
+** Raw   :noexport:
 #+BEGIN_EXAMPLE
 {}
 #+END_EXAMPLE
 """.format(
     self.htmlLink,
     self.summary.replace("[", "{").replace("]", "}"),
-    (" (in {})".format(self.location) if self.location else ""),
-    ("    :{}:".format(self.my_response_status) if self.my_response_status else ""),
+    ("    :{}:".format(":".join(self.tags)) if self.tags else ""),
     self.id,
     self.calendar_id,
     self.account,
@@ -359,12 +368,15 @@ Attendees:
         @property
         def enddate(self):
             if self.end.get("dateTime"):
-                return dateutil.parser.parse(self.end.get("dateTime")
-                ).replace(tzinfo=datetime.timezone.utc)
+                date = dateutil.parser.parse(self.end.get("dateTime")
+                )
             else:
-                return dateutil.parser.parse(
+                date = dateutil.parser.parse(
                     self.end.get("date")
-                ).replace(tzinfo=datetime.timezone.utc)
+                )
+            if date.tzinfo is None:
+                date = date.replace(tzinfo=get_local_timezone())
+            return date
 
         @property
         def uid(self):
@@ -387,6 +399,7 @@ Attendees:
         Event.print_diary = print_diary
         Event.org_mode_timestamp = org_mode_timestamp
         Event.org_mode = org_mode
+        Event.tags = tags
         Event.__hash__ = event_hash
         Event.my_response_status = my_response_status
         Event.text_description = text_description

@@ -3722,17 +3722,19 @@ of the clocksum."
    )
   )
 
-(defun konix/org-capture-na-in-heading()
+(defun konix/org-capture-na-in-heading(&optional id clock-in clock-keep)
   (interactive)
   (let (
         (org-capture-templates
          `(
-           ("t" "Todo Item" entry (id ,(konix/org-get-id)) "* NEXT %?
+           ("t" "Todo Item" entry (id ,(or id (konix/org-get-id))) "* NEXT %?
   :PROPERTIES:
   :CREATED:  %U
   :END:
   :CLOCK:
   :END:"
+            :clock-in ,clock-in
+            :clock-keep ,clock-keep
             )
            )
          )

@@ -1602,21 +1602,25 @@ STOP is the end of the agenda."
   (let (
         (contexts (konix/org-get-contexts))
         )
-    (save-excursion
-      (goto-char (point-min))
-      (while (konix/org-agenda-next-entry)
-        (if (-intersection (konix/org-agenda-get-contexts) contexts)
-            (let (
-                  (ov (make-overlay (point-at-bol) (point-at-eol)))
-                  )
-              (overlay-put ov 'face
-                           'konix/org-agenda-highlight/face)
-              (overlay-put ov
-                           'konix/org-agenda-highlight t))
-          (when current-prefix-arg
-            (konix/org-agenda-filter-for-now)
-            (forward-line -1)
-            )
+    (konix/org-agenda-highlight-contexts contexts)
+    )
+  )
+
+(defun konix/org-agenda-highlight-contexts (contexts)
+  (save-excursion
+    (goto-char (point-min))
+    (while (konix/org-agenda-next-entry)
+      (if (-intersection (konix/org-get-contexts) contexts)
+          (let (
+                (ov (make-overlay (point-at-bol) (point-at-eol)))
+                )
+            (overlay-put ov 'face
+                         'konix/org-agenda-highlight/face)
+            (overlay-put ov
+                         'konix/org-agenda-highlight t))
+        (when current-prefix-arg
+          (konix/org-agenda-filter-for-now)
+          (forward-line -1)
           )
         )
       )
@@ -1625,11 +1629,13 @@ STOP is the end of the agenda."
 
 (defun konix/org-agenda-highlight-same-contexts-as-clocked-in nil
   (interactive)
-  (save-excursion
-    (if (konix/org-agenda-goto-clocked-in)
-        (konix/org-agenda-highlight-same-contexts)
-      (konix/org-agenda-unhighlight)
-      )
+  (let (
+        (contexts (konix/org-with-point-at-clocked-entry
+                      (konix/org-get-contexts)
+                    )
+                  )
+        )
+    (konix/org-agenda-highlight-contexts contexts)
     )
   )
 

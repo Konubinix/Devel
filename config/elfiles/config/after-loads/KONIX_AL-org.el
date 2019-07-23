@@ -3375,14 +3375,32 @@ of the clocksum."
             cmd-or-set (nth 2 cmd)
             files (nth (if (listp cmd-or-set) 4 5) cmd)
             )
-      (when (and files (get-buffer bufname))
-        (message "Killing %s to prevent old content to be exported"
-                 bufname)
-        (kill-buffer bufname)
+      (when files
+        (when (and (not current-prefix-arg) (get-buffer bufname))
+          (message "Killing %s to prevent old content to be exported"
+                   bufname)
+          (kill-buffer bufname)
+          )
+        (org-agenda nil thiscmdkey)
+        (with-current-buffer bufname
+          (message "Exporting %s" thiscmdkey)
+          (let (
+                (content (konix/org-agenda-to-ics))
+                )
+            (with-temp-buffer
+              (insert content)
+              (mapc 'write-file files)
+              )
+            )
+          )
+        (bury-buffer)
         )
       )
-    (org-store-agenda-views)
     )
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sam/calendar.ics")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sam/ril.ics")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sam/sms_n_calls.ics")
+  (konix/notify "Exported" 2)
   )
 
 (defun konix/org-focus-next ()

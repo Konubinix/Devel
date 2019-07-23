@@ -920,19 +920,23 @@ items"
     )
   )
 
+(defun konix/org-super-agenda-per (tags)
+  (mapcar
+   (lambda (ag)
+     (list :name (first ag)
+           :tag (first ag))
+     )
+   tags
+   )
+  )
+
 (defun konix/org-agenda-per-commitment-toggle nil
   (interactive)
   (set (make-variable-buffer-local
         'org-super-agenda-groups)
        (if org-super-agenda-groups
            nil
-         (mapcar
-          (lambda (ag)
-            (list :name (first ag)
-                  :tag (first ag))
-            )
-          konix/org-gtd-commitments-tags
-          )
+         (konix/org-super-agenda-per konix/org-gtd-commitments-tags)
          )
        )
   (message "org-super-agenda per commitment: %s" (if org-super-agenda-groups t nil))
@@ -944,13 +948,7 @@ items"
         'org-super-agenda-groups)
        (if org-super-agenda-groups
            nil
-         (mapcar
-          (lambda (ag)
-            (list :name (first ag)
-                  :tag (first ag))
-            )
-          konix/org-gtd-contexts
-          )
+         (konix/org-super-agenda-per konix/org-gtd-contexts)
          )
        )
   (message "org-super-agenda per contexts: %s" (if org-super-agenda-groups t nil))
@@ -962,16 +960,59 @@ items"
         'org-super-agenda-groups)
        (if org-super-agenda-groups
            nil
-         (mapcar
-          (lambda (ag)
-            (list :name (first ag)
-                  :tag (first ag))
-            )
-          konix/org-gtd-aof
-          )
+         (konix/org-super-agenda-per konix/org-gtd-aof)
          )
        )
   (message "org-super-agenda per aof: %s" (if org-super-agenda-groups t nil))
+  )
+
+(defun konix/org-agenda-per-recurrent-toggle nil
+  (interactive)
+  (set (make-variable-buffer-local
+        'org-super-agenda-groups)
+       (if org-super-agenda-groups
+           nil
+         '(
+           (:name "not recurrent"
+                  :not (:tag "recurrent")
+                  )
+           (:name "recurrent"
+                  :tag "recurrent")
+           )
+         )
+       )
+  (message "org-super-agenda per recurrent: %s" (if org-super-agenda-groups t nil))
+  )
+
+(defun konix/org-agenda-per-tag-toggle (&optional tag)
+  (interactive)
+  (set (make-variable-buffer-local
+        'org-super-agenda-groups)
+       (if org-super-agenda-groups
+           nil
+         (progn
+           (unless tag
+             (setq tag (completing-read
+                        "Old tag: "
+                        (konix/org-all-tags)
+                        nil
+                        t
+                        nil
+                        'konix/org-rename-tag-history
+                        )
+                   )
+             )
+           `(
+             (:name ,(format "not %s" tag)
+                    :not (:tag ,tag)
+                    )
+             (:name ,tag
+                    :tag ,tag)
+             )
+           )
+         )
+       )
+  (message "org-super-agenda per %s: %s" tag (if org-super-agenda-groups t nil))
   )
 
 (defun konix/org-agenda-per-group-aof-toggle nil
@@ -980,13 +1021,7 @@ items"
         'org-super-agenda-groups)
        (if org-super-agenda-groups
            nil
-         (mapcar
-          (lambda (ag)
-            (list :name (first ag)
-                  :tag (first ag))
-            )
-          konix/org-gtd-group-aof
-          )
+         (konix/org-super-agenda-per konix/org-gtd-group-aof)
          )
        )
   (message "org-super-agenda per group aof: %s" (if org-super-agenda-groups t nil))

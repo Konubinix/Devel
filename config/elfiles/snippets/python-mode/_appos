@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
 # name: _appos
 # --
-$>parser.add_argument('${100:integers}', metavar='${200:N}', type=${300:int}, nargs='${400:+}',
-$>help='${500:an integer for the accumulator}')
+$>parser.add_argument("${100:integers}", metavar="${200:N}", type=${300:int}, nargs="${400:+}",
+$>help="${500:an integer for the accumulator}")

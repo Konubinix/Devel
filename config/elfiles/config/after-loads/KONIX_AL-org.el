@@ -2686,6 +2686,22 @@ of the clocksum."
   )
 (add-hook 'org-capture-after-finalize-hook 'konix/org-capture/restore-window-configuration)
 
+(defun konix/org-agenda-count-entries nil
+  (interactive)
+  (let (
+        (res 0)
+        )
+    (save-excursion
+      (goto-char (point-min))
+      (while (konix/org-agenda-next-entry-1)
+        (setq res (1+ res))
+        )
+      )
+    (message "%s entries" res)
+    )
+  )
+(add-hook 'org-agenda-finalize-hook 'konix/org-agenda-count-entries)
+
 (defun konix/org-capture-external-interruption ()
   (interactive)
   (let* (

@@ -3864,5 +3864,54 @@ of the clocksum."
     (konix/org-capture-na-in-heading parent-id)
     )
   )
+
+(defun konix/org-get-done-time nil
+  (save-excursion
+    (or
+     (and
+      (re-search-forward "State .DONE. +\\([[][^]]+[]]\\)" (org-end-of-subtree) t)
+      (org-time-string-to-seconds (match-string-no-properties 1))
+      )
+     0
+     )
+    )
+  )
+
+(defun konix/org-replace-link-by-link-description ()
+  "Replace an org link by its description or if empty its address
+https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link"
+  (interactive)
+  (if (org-in-regexp org-bracket-link-regexp 1)
+      (let (
+            (remove (list (match-beginning 0) (match-end 0)))
+            (description (org-match-string-no-properties 2))
+            )
+        (apply 'delete-region remove)
+        (insert description))
+    )
+  )
+
+(defun konix/org-trim-link (text)
+  (with-temp-buffer
+    (insert text)
+    (goto-char (point-min))
+    (while (re-search-forward org-bracket-link-regexp (point-max) t)
+      (konix/org-replace-link-by-link-description)
+      )
+    (buffer-substring-no-properties (point-min) (point-max))
+    )
+  )
+
+(defun konix/org-trim-active-timestamp (text)
+  (with-temp-buffer
+    (insert text)
+    (goto-char (point-min))
+    (while (re-search-forward (format "%s *" org-ts-regexp) (point-max) t)
+      (delete-region (match-beginning 0) (match-end 0))
+      )
+    (buffer-substring-no-properties (point-min) (point-max))
+    )
+  )
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

@@ -125,9 +125,9 @@
 (define-key org-agenda-mode-map (kbd "o") 'org-agenda-open-link)
 (define-key org-agenda-mode-map (kbd "C") 'konix/org-toggle-org-agenda-tag-filter-context)
 (define-key org-agenda-mode-map (kbd "*") 'konix/org-agenda-refresh-buffer)
-(define-key org-agenda-mode-map (kbd "d") 'konix/org-agenda-toggle-filter-deadline)
+(define-key org-agenda-mode-map (kbd "d") 'konix/org-agenda-toggle-filter-calendar-commitment)
 (define-key org-agenda-mode-map (kbd "k") 'konix/org-gtd-choose-situation)
-(define-key org-agenda-mode-map (kbd "M-b") 'konix/org-agenda-highlight-same-contexts)
+(define-key org-agenda-mode-map (kbd "M-b") 'konix/org-agenda-highlight-same-contexts-as-clocked-in)
 (define-key org-agenda-mode-map (kbd "M-n") 'konix/org-agenda-goto-clocked-in)
 
 
@@ -874,7 +874,7 @@
    )
   (add-to-list
    'header-line-format
-   (format ", d: %s" konix/org-agenda-toggle-filter-deadline)
+   (format ", d: %s" konix/org-agenda-toggle-filter-calendar-commitment)
    t)
   )
 
@@ -1474,14 +1474,14 @@ STOP is the end of the agenda."
   (konix/org-agenda-goto-now)
   )
 
-(defvar konix/org-agenda-toggle-filter-deadline nil "")
-(make-variable-buffer-local 'konix/org-agenda-toggle-filter-deadline)
-(defun konix/org-agenda-toggle-filter-deadline nil
+(defvar konix/org-agenda-toggle-filter-calendar-commitment nil "")
+(make-variable-buffer-local 'konix/org-agenda-toggle-filter-calendar-commitment)
+(defun konix/org-agenda-toggle-filter-calendar-commitment nil
   (interactive)
-  (setq konix/org-agenda-toggle-filter-deadline (not konix/org-agenda-toggle-filter-deadline))
-  (if konix/org-agenda-toggle-filter-deadline
-      (konix/org-agenda-filter-deadline)
-    (konix/org-agenda-show-all-deadline)
+  (setq konix/org-agenda-toggle-filter-calendar-commitment (not konix/org-agenda-toggle-filter-calendar-commitment))
+  (if konix/org-agenda-toggle-filter-calendar-commitment
+      (konix/org-agenda-filter-calendar-commitment)
+    (konix/org-agenda-filter-calendar-commitment/remove)
     )
   (konix/org-agenda-set-header-line-format)
   )
@@ -1510,7 +1510,7 @@ STOP is the end of the agenda."
    )
   )
 
-(defun konix/org-agenda-filter-deadline ()
+(defun konix/org-agenda-filter-calendar-commitment ()
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -1518,13 +1518,16 @@ STOP is the end of the agenda."
       (let* (
              (pos (org-get-at-bol 'org-hd-marker))
              )
-        (when (and pos (not (konix/org-agenda-in-deadline)))
-          (org-agenda-filter-hide-line 'not-in-deadline)))
+        (when (and pos
+                   (not (konix/org-agenda-in-deadline))
+                   (not (member "accepted" (org-get-at-bol 'tags)))
+                   )
+          (org-agenda-filter-hide-line 'not-in-calenda-commitment)))
       (beginning-of-line 2)))
   )
 
-(defun konix/org-agenda-show-all-deadline nil
-  (org-agenda-remove-filter 'not-in-deadline)
+(defun konix/org-agenda-filter-calendar-commitment/remove nil
+  (org-agenda-remove-filter 'not-in-calenda-commitment)
   )
 
 (defun konix/org-agenda-reset-apply-filter (filters)

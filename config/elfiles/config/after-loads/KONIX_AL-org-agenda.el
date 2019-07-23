@@ -1889,5 +1889,13 @@ X-WR-TIMEZONE:CEST
     )
   )
 
+(defun konix/org-agenda-format-item/trim-active-timestamp (orig-fun extra txt &rest args)
+  (apply orig-fun extra (konix/org-trim-active-timestamp txt) args)
+  )
+
+(advice-add 'org-agenda-format-item :around #'konix/org-agenda-format-item/add-location)
+(advice-add 'org-agenda-format-item :around #'konix/org-agenda-format-item/trim-active-timestamp)
+;; (advice-remove 'org-agenda-format-item #'konix/org-agenda-format-item/add-location)
+
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

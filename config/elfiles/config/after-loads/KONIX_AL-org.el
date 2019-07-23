@@ -177,6 +177,20 @@
 (advice-add 'org-agenda-redo :after #'konix/org-agenda/reload-appt-when-needed)
 (advice-add 'org-agenda-prepare :after #'konix/org-agenda/reload-appt-when-needed-sticky)
 
+(defun konix/org-agenda/notify-on-done (orig-fun &rest args)
+  (let (
+        (sticky (org-agenda-use-sticky-p))
+        res
+        )
+    (setq res (apply orig-fun args))
+    (unless sticky
+      (konix/org-show-notification-handler (format "Done with agenda %s"
+                                                   (buffer-name)))
+      )
+    )
+  )
+(advice-add 'org-agenda-run-series :around #'konix/org-agenda/notify-on-done)
+
 ;; ####################################################################################################
 ;; CONFIG
 ;; ####################################################################################################

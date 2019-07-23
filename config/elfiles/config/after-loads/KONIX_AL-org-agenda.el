@@ -1388,38 +1388,29 @@ STOP is the end of the agenda."
 
 (defun konix/org-agenda-goto-clocked-in nil
   (interactive)
-  (if org-clock-current-task
-      (let (
-            (current-pos (point))
-            (clocked-in-id
-             (save-window-excursion
-               (save-excursion
-                 (konix/org-clock-goto nil t)
-                 (konix/org-get-id)
-                 )
-               )
+  (let (
+        (current-pos (point))
+        (clocked-in-id
+         (save-window-excursion
+           (save-excursion
+             (konix/org-clock-goto nil t)
+             (konix/org-get-id)
              )
-            (res nil)
+           )
+         )
+        (res nil)
+        )
+    (goto-char (point-min))
+    (while (and
+            (konix/org-agenda-next-entry-1)
+            (not (setq res (string-equal (konix/org-get-id) clocked-in-id)))
             )
-        (goto-char (point-min))
-        (while (and
-                (konix/org-agenda-next-entry-1)
-                (not (setq res (string-equal (konix/org-get-id) clocked-in-id)))
-                )
-          )
-        (unless res
-          (message "Could not find any clocked in entry")
-          (goto-char current-pos)
-          )
-        res
-        )
-
-    (progn
-      (when (called-interactively-p)
-        (message "No item currently clocked")
-        )
-      nil
       )
+    (unless res
+      (message "Could not find any clocked in entry")
+      (goto-char current-pos)
+      )
+    res
     )
   )
 

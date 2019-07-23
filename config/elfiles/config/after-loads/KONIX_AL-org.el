@@ -121,13 +121,17 @@
   )
 (advice-add 'org-log-into-drawer :around #'konix/org-log-into-drawer)
 
+(defvar konix/org-agenda-appt-reload-mode t "")
+
 (defun konix/org-agenda-appt-reload ()
   (interactive)
-  (require 'appt)
-  (setq appt-time-msg-list nil)
-  (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
-  (appt-activate 1)
-  (appt-check)
+  (when konix/org-agenda-appt-reload-mode
+    (require 'appt)
+    (setq appt-time-msg-list nil)
+    (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
+    (appt-activate 1)
+    (appt-check)
+    )
   )
 
 (setq-default org-agenda-files
@@ -156,7 +160,6 @@
   )
 (advice-add 'org-agenda-redo :around #'konix/org-agenda/keep-column)
 (advice-add 'org-agenda-kill :around #'konix/org-agenda/keep-column)
-
 
 (defun konix/org-agenda/reload-appt-when-needed (&rest args)
   (when (string= "*Org Agenda(att)*" (buffer-name))
@@ -2453,6 +2456,8 @@ of the clocksum."
          (agenda-code "att")
          (agenda-buffer (format "*Org Agenda(%s)*" agenda-code))
          (window-config (current-window-configuration))
+         ;; temporarily disable the appt reload to avoid the hanging window
+         (konix/org-agenda-appt-reload-mode nil)
          )
     (when (get-buffer agenda-buffer)
       (kill-buffer agenda-buffer)

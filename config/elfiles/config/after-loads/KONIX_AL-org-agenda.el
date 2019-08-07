@@ -129,6 +129,7 @@
 (define-key org-agenda-mode-map (kbd "k") 'konix/org-gtd-choose-situation)
 (define-key org-agenda-mode-map (kbd "M-b") 'konix/org-agenda-highlight-same-contexts-as-clocked-in)
 (define-key org-agenda-mode-map (kbd "M-n") 'konix/org-agenda-goto-clocked-in)
+(define-key org-agenda-mode-map (kbd "#") 'konix/org-agenda-count-entries)
 
 
 (defun konix/org-agenda-edit-headline ()

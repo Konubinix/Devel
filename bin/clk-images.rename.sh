@@ -5,4 +5,4 @@ then
 	exit 0
 fi
 
-find -name .git -prune -o -\( -name '*.JPG' -o -name '*.jpg' -\) -exec "clk-image.rename.sh" "{}" ";"
+find -name .git -prune -o -\( -iname '*.JPG' -o -iname '*.jpeg' -\) -exec "clk-image.rename.sh" "{}" ";"

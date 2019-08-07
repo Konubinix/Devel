@@ -1644,10 +1644,11 @@ STOP is the end of the agenda."
 ;; (advice-remove 'org-agenda-clock-out #'konix/org-agenda-unhighlight)
 ;; (remove-hook 'org-agenda-finalize-hook #'konix/org-agenda-highlight-same-contexts-as-clocked-in)
 
-(defun konix/org-agenda-get-start-time ()
+(defun konix/org-agenda-get-start-time (&optional dateprop)
+  (setq dateprop (or dateprop 'date))
   (let (
         (time-of-day (org-get-at-bol 'time-of-day))
-        (date (org-get-at-bol 'date))
+        (date (org-get-at-bol dateprop))
         )
     (unless (listp date)
       (setq date (calendar-gregorian-from-absolute date))

@@ -1927,7 +1927,13 @@ X-WR-TIMEZONE:CEST
 
 (advice-add 'org-agenda-format-item :around #'konix/org-agenda-format-item/add-location)
 (advice-add 'org-agenda-format-item :around #'konix/org-agenda-format-item/trim-active-timestamp)
-;; (advice-remove 'org-agenda-format-item #'konix/org-agenda-format-item/add-location)
+;; (advice-remove 'org-agenda-format-item
+;; #'konix/org-agenda-format-item/add-location)
+
+(defun konix/org-agenda-count-entries-after-tag-filter (&rest args)
+  (konix/org-agenda-count-entries)
+  )
+(advice-add 'org-agenda-filter-apply :after #'konix/org-agenda-count-entries-after-tag-filter)
 
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

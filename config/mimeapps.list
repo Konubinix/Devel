@@ -2,8 +2,9 @@
 text/html=qutebrowser-usercreated-1.desktop;
 application/x-ipynb+json=notebook-usercreated-1.desktop;
 application/vnd.oasis.opendocument.spreadsheet=libreoffice-calc.desktop;
-application/pdf=org.gnome.Evince.desktop;
 audio/x-vorbis+ogg=vlc.desktop;
 text/x-emacs-lisp=emacsclient-usercreated-1.desktop;
 video/mp4=vlc.desktop;
 video/webm=vlc.desktop;
+#application/pdf=pdfarranger-usercreated-2.desktop;
+application/pdf=evince.desktop;

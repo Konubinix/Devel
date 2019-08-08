@@ -1862,13 +1862,16 @@ X-WR-TIMEZONE:CEST
           warn-time
           )
       (while (konix/org-agenda-next-entry-1)
-        (when (not
-               (-any
-                (lambda (tag)
-                  (member tag konix/org-icalendar-exclude-tags)
-                  )
-                (org-get-at-bol 'tags)
+        (when (and
+               (not
+                (-any
+                 (lambda (tag)
+                   (member tag konix/org-icalendar-exclude-tags)
+                   )
+                 (org-get-at-bol 'tags)
+                 )
                 )
+               (not (string-match-p ".+ago" (or (org-get-at-bol 'extra) "")))
                )
           (when (or
                  (string-prefix-p "deadline" (org-get-at-bol 'type))

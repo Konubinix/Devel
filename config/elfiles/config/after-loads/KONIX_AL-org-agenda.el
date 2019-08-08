@@ -1655,8 +1655,8 @@ STOP is the end of the agenda."
       )
     (encode-time
      0
-     (% time-of-day 100)
-     (/ time-of-day 100)
+     (if time-of-day (% time-of-day 100) 0)
+     (if time-of-day (/ time-of-day 100) 0)
      (second date)
      (first date)
      (third date)

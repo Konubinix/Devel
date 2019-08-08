@@ -1703,44 +1703,65 @@ STOP is the end of the agenda."
 
 
 (defun konix/org-agenda-to-ics/format-item (type)
-  (let (
-        (res "")
-        (date (org-get-at-bol 'date))
-        (summary (konix/org-with-point-on-heading
-                  (konix/org-trim-active-timestamp
-                   (konix/org-trim-link
-                    (org-get-heading t t t t)
+  (let* (
+         (res "")
+         (date (org-get-at-bol 'date))
+         (day (org-get-at-bol 'day))
+         (summary (konix/org-with-point-on-heading
+                   (konix/org-trim-active-timestamp
+                    (konix/org-trim-link
+                     (org-get-heading t t t t)
+                     )
                     )
-                   )
-                  ))
-        (duration (org-get-at-bol 'duration))
-        (stamp (format-time-string "%Y%m%dT%H%M%SZ"))
-        (id (konix/org-get-id))
-        (categories (mapconcat 'identity (konix/org-get-tags) ","))
-        (description (konix/org-agenda-export-description))
-        (location
-         (konix/org-with-point-on-heading
-          (or (org-entry-get (point) "LOCATION") "NA")
+                   ))
+         (duration (org-get-at-bol 'duration))
+         (stamp (format-time-string "%Y%m%dT%H%M%SZ"))
+         (id (konix/org-get-id))
+         (categories (mapconcat 'identity (konix/org-get-tags) ","))
+         (description (konix/org-agenda-export-description))
+         (location
+          (konix/org-with-point-on-heading
+           (or (org-entry-get (point) "LOCATION") "NA")
+           )
+          )
+         (warn-time (konix/org-with-point-on-heading
+                     (string-to-number (or (org-entry-get (point) "APPT_WARNTIME") "30"))
+                     ))
+         (extra (or (org-get-at-bol 'extra) ""))
+         (deadline
+          (cond
+           ((string-match-p ".+ago" extra)
+            (konix/org-with-point-on-heading (org-get-deadline-time (point)))
+            )
+           ((string-match-p "Deadline" extra)
+            (konix/org-agenda-get-start-time 'day)
+            )
+           (t
+            nil
+            )
+           )
           )
          )
-        (warn-time (konix/org-with-point-on-heading
-                    (string-to-number (or (org-entry-get (point) "APPT_WARNTIME") "30"))
-                    ))
-        (deadline
-         (konix/org-with-point-on-heading (org-get-deadline-time (point))))
-        )
     (when (string-prefix-p "deadline" (org-get-at-bol 'type))
       (setq summary (concat "DL: " summary))
       )
-    (when (not (null date))
+    (when (and (not (null date)) (not (null day)))
       (unless (listp date)
-        (setq date (calendar-gregorian-from-absolute date))
+        ;; when the date is an integer, the real date is in the day
+        ;; property. Strange...
+        (setq date (calendar-gregorian-from-absolute day))
         )
       )
     (setq res (concat res "BEGIN:V" type))
     (when deadline
       (setq res (concat res "
-DUE:" (format-time-string "%Y%m%dT%H%M%S" deadline))))
+DUE" (if duration
+          (format-time-string ":%Y%m%dT%H%M%S" deadline)
+       (format-time-string ";VALUE=DATE:%Y%m%d" deadline)
+        )
+)
+            )
+      )
     (setq res (concat res
                       (format "
 SUMMARY:%s
@@ -1755,7 +1776,13 @@ TRIGGER:-PT%sM
 END:VALARM"
                               summary
                               categories
-                              description
+                              (concat
+                               description
+                               (format "\\\\n%s:%s"
+                                       (current-buffer)
+                                       (line-number-at-pos (point))
+                                       )
+                               )
                               location
                               stamp
                               summary

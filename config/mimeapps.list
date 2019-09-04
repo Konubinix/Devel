@@ -8,3 +8,4 @@ video/mp4=vlc.desktop;
 video/webm=vlc.desktop;
 #application/pdf=pdfarranger-usercreated-2.desktop;
 application/pdf=evince.desktop;
+video/x-matroska=vlc.desktop;

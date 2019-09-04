@@ -2287,6 +2287,7 @@ items"
                 "project" "draft" "phantom"
                 "WAIT" "DELEGATED" "structure"
                 "EXPIRED" "NOEXPIRY" "external" "INTERRUPTION"
+                "declined" "tentative" "accepted"
                 ))
 (setq-default org-fast-tag-selection-single-key t)
 (setq-default org-reverse-note-order t)

@@ -1,6 +1,4 @@
 [Default Applications]
-application/pdf=evince.desktop;
-#application/pdf=pdfshuffler.desktop;
 image/svg=mirage.desktop;
 application/x-notebook=notebook.desktop;
 application/pgp-encrypted=konix_gpg_mimeopen.desktop;

@@ -1208,6 +1208,7 @@ items"
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'agenda))
+                  )
                  )
                 ("aly" "Yesterworkday"
                  (

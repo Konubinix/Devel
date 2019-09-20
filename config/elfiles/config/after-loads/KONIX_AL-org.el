@@ -1526,11 +1526,12 @@ items"
                   (agenda nil
                           (
                            (org-agenda-include-deadlines t)
-                           (org-agenda-overriding-header "Agenda without projects")
+                           (org-agenda-overriding-header "Calendar")
                            (org-agenda-skip-function
                             '(or
                               (konix/org-agenda-skip-if-tags
                                '("project"))
+                              (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED"))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               ;;(org-agenda-skip-entry-if 'scheduled)
                               )
@@ -1540,8 +1541,24 @@ items"
                   (agenda nil
                           (
                            (org-agenda-include-deadlines t)
+                           (org-agenda-overriding-header "Waiting stuff")
+                           (org-agenda-skip-function
+                            '(or
+                              (konix/org-agenda-skip-if-tags
+                               '("project"))
+                              (konix/org-agenda-for-today-skip-if-not-the-good-time
+                               t)
+                              (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED") t)
+                              ;;(org-agenda-skip-entry-if 'scheduled)
+                              )
+                            )
+                           )
+                          )
+                  (agenda nil
+                          (
+                           (org-agenda-include-deadlines t)
                            (org-agenda-overriding-header
-                            "Agenda for projects")
+                            "Projects")
                            (org-agenda-use-time-grid nil)
                                         ; it will be already included in the no project view
                            (org-agenda-include-diary nil)

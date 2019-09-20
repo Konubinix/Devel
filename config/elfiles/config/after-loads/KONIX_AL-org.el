@@ -1580,6 +1580,30 @@ items"
                   (org-super-agenda-groups nil)
                   )
                  )
+                ("atT" "Agenda for today (no filter context)"
+                 (
+                  (agenda nil
+                          (
+                           (org-agenda-include-deadlines t)
+                           (org-agenda-overriding-header "Calendar")
+                           (org-agenda-skip-function
+                            '(or
+                              (konix/org-agenda-skip-if-tags
+                               '("project"))
+                              (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED"))
+                              (konix/org-agenda-for-today-skip-if-not-the-good-time t)
+                              ;;(org-agenda-skip-entry-if 'scheduled)
+                              )
+                            )
+                           )
+                          )
+                  )
+                 (
+                  (dummy (setq konix/org-agenda-type 'agenda))
+                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
+                  (org-super-agenda-groups nil)
+                  )
+                 )
                 ("atm" "Agenda of the next month (no filter context)"
                  (
                   (agenda ""

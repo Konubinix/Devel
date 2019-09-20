@@ -1358,7 +1358,7 @@ items"
                                "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
                               )
                              )
-                  (tags-todo "-Context-project-maybe+todo=\"NEXT\"-refile"
+                  (tags-todo "-Context-project-maybe+todo=\"NEXT\"-refile-WAIT-DELEGATED"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header

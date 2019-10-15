@@ -11,6 +11,7 @@ import sys
 import builtins
 from dateutil.parser import parse as dateparse
 import json
+import requests
 import pprint
 import asyncio
 import redis
@@ -342,15 +343,44 @@ async_get = asyncio.get_event_loop().run_until_complete
 
 
 class RTM():
-    def __init__(self, data):
-        self.data = data
-        url = data["url"]
-        self.ws = async_get(websockets.connect(url))
-        assert async_get(self.read())["type"] == "hello"
+    def __init__(self, endpoint):
+        self.endpoint = endpoint
+        async_get(self.reset())
+
+    async def reset(self):
+        attempt = 0
+        max_attempts = 10
+        self.data = None
+        while self.data is None:
+            attempt += 1
+            if attempt == max_attempts:
+                raise RuntimeError(f"Could not connect, tried {attempt} times")
+            try:
+                self.data = self.endpoint.connect().body
+            except requests.exceptions.ConnectionError:
+                LOGGER.info("Connection closed, reconnecting")
+                time.sleep(1)
+
+        url = self.data["url"]
+        self.ws = await websockets.connect(url)
+        hello = await self.read()
+        assert hello["type"] == "hello", f"{hello} must be of type hello"
         self.id = 0
 
     async def read(self):
-        msg = await self.ws.recv()
+        msg = None
+        attempt = 0
+        max_attempts = 10
+        while msg is None:
+            attempt += 1
+            if attempt == max_attempts:
+                raise RuntimeError(f"Could not connect, tried {attempt} times")
+            try:
+                msg = await self.ws.recv()
+            except websockets.exceptions.ConnectionClosed:
+                LOGGER.info("Connection closed, reconnecting")
+                await self.reset()
+                time.sleep(1)
         result = json.loads(msg)
         return result
 
@@ -427,7 +457,7 @@ class SlackConfig():
             tryit = True
             while tryit:
                 try:
-                    self._rtm = RTM(self.client.rtm.connect().body)
+                    self._rtm = RTM(self.client.rtm)
                 except HTTPError as e:
                     if e.response.status_code == 429:
                         wait_time = int(e.response.headers["Retry-After"]) * 1.2

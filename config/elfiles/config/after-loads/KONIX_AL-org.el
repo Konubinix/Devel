@@ -570,13 +570,13 @@ to be organized.
                     )
           (setq no-date nil)
           (if (string>= (match-string-no-properties 1) threshold-time-string)
-              (setq res end)
+              (setq res t)
             )
           )
         )
       )
     (if no-date
-        end
+        t
       res
       )
     )

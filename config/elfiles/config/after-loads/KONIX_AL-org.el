@@ -1409,6 +1409,19 @@ items"
                                  ))
                               )
                              )
+                  (tags-todo "-C_me-C_society-maybe"
+                             (
+                              (org-agenda-todo-ignore-deadlines nil)
+                              (org-agenda-overriding-header
+                               "7 days: Make explicit that those commitments are not forgotten")
+                              (org-agenda-skip-function
+                               '(or
+                                 (konix/skip-not-todo-file)
+                                 (konix/org-agenda-skip-if-task-of-project)
+                                 (konix/org-agenda-keep-if-expired 7 t)
+                                 ))
+                              )
+                             )
                   (tags-todo "DELEGATED-maybe|WAIT-maybe"
                              (
                               (org-agenda-todo-ignore-deadlines nil)

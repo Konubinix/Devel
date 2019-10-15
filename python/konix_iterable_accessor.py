@@ -50,6 +50,11 @@ class IterableAccessorProxy(list):
         from pandas import DataFrame
         return DataFrame(self.l)
 
+    @property
+    def series(self):
+        from pandas import Series
+        return Series(self.l)
+
     def __repr__(self):
         return "|" + pformat(self.l)
 
@@ -91,7 +96,7 @@ class IterableAccessorProxy(list):
 
     def __getattribute__(self, name):
         if name in [
-                "l", "__repr__", "df", "_first", "__dir__", "__class__",
+                "l", "__repr__", "df", "series", "_first", "__dir__", "__class__",
                 "__sub__", "__add__", "__gt__", "__lt__", "__and__",
         ]:
             return super(IterableAccessorProxy, self).__getattribute__(name)

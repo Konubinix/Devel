@@ -667,16 +667,6 @@ NO : Ne pas truncater
 	)
   )
 
-(defun konix/toggle-debug ()
-  "debug-on-error qui devient t ou nil."
-  (interactive)
-  (if debug-on-error
-	  (setq debug-on-error nil)
-	(setq debug-on-error t)
-	)
-  (message "debug-on-error passe à %s" debug-on-error)
-  )
-
 (defun konix/kill-current-buffer ()
   "Kill the current buffer."
   (interactive)

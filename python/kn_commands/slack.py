@@ -1452,6 +1452,83 @@ def _listen():
     async_get(do())
 
 
+@poll.command()
+def _clean():
+    info = json.loads(db.get("slack.poll.{}".format(
+        config.slack_poll.conversation.id)))
+    config.slack.client.chat.delete(
+        config.slack_poll.conversation.id,
+        info["ts"],
+    )
+    db.delete("slack.poll.{}".format(
+        config.slack_poll.conversation.id))
+
+
+@poll.command()
+def _exists():
+    has_entry_in_db = db.get(
+        "slack.poll.{}".format(config.slack_poll.conversation.id)
+    )
+    if has_entry_in_db is not None:
+        entry = json.loads(has_entry_in_db)
+        try:
+            message = config.slack_poll.conversation.get_message(
+                entry["ts"]
+            )
+        except slacker.Error as e:
+            if e.args[0] == "message_not_found":
+                db.delete(
+                    "slack.poll.{}".format(config.slack_poll.conversation.id)
+                )
+                has_entry_in_db = None
+            else:
+                raise
+    exit(
+        1 if (has_entry_in_db is None)
+        else 0
+    )
+
+
+@poll.command()
+def _get():
+    """Get the result of the poll"""
+    info = json.loads(db.get("slack.poll.{}".format(
+        config.slack_poll.conversation.id)))
+    message = config.slack.client.reactions.get(
+        channel=config.slack_poll.conversation.id,
+        timestamp=info["ts"],
+    ).body["message"]
+    reactions = [
+        r for r in message.get("reactions", [])
+        if r["name"] in list(info["assoc"].keys())
+    ]
+    try:
+        max_count = max(map(lambda e: e["count"], reactions))
+    except ValueError:
+        winner = None
+    else:
+        winners = [
+            r for r in reactions
+            if r["count"] == max_count
+        ]
+        if winners:
+            if len(winners) > 3:
+                winner = "no clear winner yet. "
+            else:
+                winner = " or ".join(
+                    [
+                        info["assoc"][winner["name"]]
+                        for winner in winners
+                    ]
+                )
+        else:
+            winner = None
+    if winner is not None:
+        print(winner)
+    else:
+        sys.exit(1)
+
+
 @slack.group()
 def status():
     """Manipulate the status"""

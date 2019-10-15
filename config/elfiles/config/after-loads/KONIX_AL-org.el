@@ -4047,7 +4047,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   (with-temp-buffer
     (insert text)
     (goto-char (point-min))
-    (while (re-search-forward (format "%s *" org-ts-regexp) (point-max) t)
+    (while (re-search-forward (format "%s\\(-%s\\)? *" org-ts-regexp org-ts-regexp) (point-max) t)
       (delete-region (match-beginning 0) (match-end 0))
       )
     (buffer-substring-no-properties (point-min) (point-max))

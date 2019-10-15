@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -eux
 
 src="$1"
 dst="$2"

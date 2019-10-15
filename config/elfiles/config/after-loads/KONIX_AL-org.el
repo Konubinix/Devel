@@ -3996,11 +3996,21 @@ of the clocksum."
     )
   )
 
-(defun konix/org-get-done-time nil
+(defun konix/org-sort-function-by-done-time nil
+  "Te be used with `'org-sort`'."
   (save-excursion
     (or
      (and
-      (re-search-forward "State .DONE. +\\([[][^]]+[]]\\)" (org-end-of-subtree) t)
+      (re-search-forward
+       "CLOSED: \\([[][^]]+[]]\\)"
+       (save-excursion
+         (progn
+           (org-end-of-subtree)
+           (point)
+           )
+         )
+       t
+       )
       (org-time-string-to-seconds (match-string-no-properties 1))
       )
      0

@@ -324,7 +324,7 @@ Attendees:
 {}
 
 {}
-** Raw   :noexport:
+** Raw   :noexport:structure:
 #+BEGIN_EXAMPLE
 {}
 #+END_EXAMPLE

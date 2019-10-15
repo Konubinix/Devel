@@ -330,7 +330,7 @@ Attendees:
 #+END_EXAMPLE
 """.format(
     self.htmlLink,
-    self.summary.replace("[", "{").replace("]", "}"),
+    self.summary.replace("[", "{").replace("]", "}") or "NoSummary",
     ("    :{}:".format(":".join(self.tags)) if self.tags else ""),
     self.id,
     self.calendar_id,

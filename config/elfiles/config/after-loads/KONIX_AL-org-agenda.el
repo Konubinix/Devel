@@ -101,9 +101,6 @@
 (define-key org-agenda-mode-map (kbd "u")
   'konix/org-agenda-refresh-line)
 
-(define-key org-agenda-mode-map (kbd "U")
-  'konix/org-agenda-refresh-buffer)
-
 (define-key org-agenda-mode-map (kbd "<")
   'beginning-of-buffer)
 
@@ -128,8 +125,11 @@
 (define-key org-agenda-mode-map (kbd "d") 'konix/org-agenda-toggle-filter-calendar-commitment)
 (define-key org-agenda-mode-map (kbd "k") 'konix/org-gtd-choose-situation)
 (define-key org-agenda-mode-map (kbd "M-b") 'konix/org-agenda-highlight-same-contexts-as-clocked-in)
+(define-key org-agenda-mode-map (kbd "M-p") 'konix/org-agenda-highlight-inactive)
 (define-key org-agenda-mode-map (kbd "M-n") 'konix/org-agenda-goto-clocked-in)
 (define-key org-agenda-mode-map (kbd "#") 'konix/org-agenda-count-entries)
+(define-key org-agenda-mode-map (kbd "U") 'konix/org-agenda-unhighlight)
+(define-key org-agenda-mode-map (kbd "D") 'konix/org-agenda-hide-done)
 
 
 (defun konix/org-agenda-edit-headline ()
@@ -1628,6 +1628,53 @@ STOP is the end of the agenda."
     )
   )
 
+(defun konix/org-agenda-hide-done ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (konix/org-agenda-next-entry)
+      (when (konix/org-with-point-on-heading (org-entry-is-done-p))
+        (konix/org-agenda-filter-for-now)
+        (forward-line -1)
+        )
+      )
+    )
+  )
+
+
+(setq-default konix/org-agenda-highlight-inactive-with-subtree nil)
+(make-variable-buffer-local 'konix/org-agenda-highlight-inactive-with-subtree)
+(setq-default konix/org-agenda-highlight-inactive-day 15)
+(make-variable-buffer-local 'konix/org-agenda-highlight-inactive-day)
+
+
+(defun konix/org-agenda-highlight-inactive (&optional subtree day)
+  (interactive)
+  (setq day (or day konix/org-agenda-highlight-inactive-day))
+  (setq subtree (or subtree konix/org-agenda-highlight-inactive-with-subtree))
+  (konix/org-agenda-unhighlight)
+  (save-excursion
+    (goto-char (point-min))
+    (while (konix/org-agenda-next-entry)
+      (if (not
+           (konix/org-with-point-on-heading (konix/org-has-activity-since-p day subtree))
+           )
+          (let (
+                (ov (make-overlay (point-at-bol) (point-at-eol)))
+                )
+            (overlay-put ov 'face
+                         'konix/org-agenda-highlight/face)
+            (overlay-put ov
+                         'konix/org-agenda-highlight t))
+        (when current-prefix-arg
+          (konix/org-agenda-filter-for-now)
+          (forward-line -1)
+          )
+        )
+      )
+    )
+  )
+
 (defun konix/org-agenda-highlight-same-contexts-as-clocked-in nil
   (interactive)
   (let (
@@ -1756,9 +1803,9 @@ STOP is the end of the agenda."
     (when deadline
       (setq res (concat res "
 DUE" (if duration
-          (format-time-string ":%Y%m%dT%H%M%S" deadline)
+         (format-time-string ":%Y%m%dT%H%M%S" deadline)
        (format-time-string ";VALUE=DATE:%Y%m%d" deadline)
-        )
+       )
 )
             )
       )

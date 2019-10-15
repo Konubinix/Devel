@@ -212,6 +212,12 @@ class Conversation():
             timestamp=timestamp,
         ).body["message"])
 
+    def delete_message(self, message):
+        config.slack.client.chat.delete(
+            self.id,
+            message.data["ts"],
+        )
+
 
 class Group(Conversation):
     @property

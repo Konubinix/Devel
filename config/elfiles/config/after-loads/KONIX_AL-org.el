@@ -536,17 +536,18 @@ to be organized.
     )
   )
 
-(defun konix/org-agenda-keep-if-expired (&optional in-agenda)
-  (org-back-to-heading t)
-  (let* ((beg (point))
-         (end (org-entry-end-position))
+(defun konix/org-has-activity-since-p (days &optional subtree)
+  (let* (
+         (beg (point))
+         (end (if subtree (save-excursion (org-end-of-subtree t) (point))
+                (org-entry-end-position)))
          (current-date (or
                         (and
                          (eq konix/org-agenda-type 'agenda)
                          org-agenda-current-date
                          )
                         (org-date-to-gregorian
-                         (- (time-to-days nil) 365)
+                         (- (time-to-days nil) days)
                          )
                         )
                        )
@@ -577,6 +578,19 @@ to be organized.
     (if no-date
         end
       res
+      )
+    )
+  )
+
+(defun konix/org-agenda-keep-if-expired (&optional days subtree)
+  (org-back-to-heading t)
+  (setq days (or days 365))
+  (let (
+        (end (org-entry-end-position))
+        )
+    (if (konix/org-has-activity-since-p days subtree)
+        end
+      nil
       )
     )
   )

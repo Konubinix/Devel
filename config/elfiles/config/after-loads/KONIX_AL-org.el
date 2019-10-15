@@ -3816,7 +3816,7 @@ of the clocksum."
          (to "now")
          )
     (konix/org-agenda-match-inactive-timestamp
-     "-tagthatnobodyuses"
+     "-structure-habit"
      from
      to
      (format "* Last %s days report (%s - %s)"

@@ -630,15 +630,19 @@ def save_token():
         help="Some reactions to put in it."
         " Implies --wait-server-response")
 @flag("--me/--no-me", help="Send a me message")
+@option("--thread", help="Reply in a thread")
 @argument("message", help="The message to send", type=MessageType())
-def post_message(conversation, message, reaction, me):
+def post_message(conversation, message, reaction, me, thread):
     """Post a message to this conversation"""
     endpoint = (
         config.slack.client.chat.me_message
         if me
         else config.slack.client.chat.post_message
     )
-    response = endpoint(conversation.id, message)
+    kwargs = {}
+    if thread:
+        kwargs["thread_ts"] = thread
+    response = endpoint(conversation.id, message, **kwargs)
     for r in reaction:
         config.slack.client.reactions.add(
             channel=conversation.id,

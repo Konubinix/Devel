@@ -1708,6 +1708,47 @@ items"
                   )
                  )
                 ("ag" . "GTD list views")
+                ("agC" "Commitments"
+                 (
+                  (tags "-maybe+todo=\"NEXT\"-C_me|-C_me+todo=\"TODO\"-maybe|-C_me+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
+                        (
+                         (org-agenda-overriding-header
+                          "Committed stuff, not to me")
+                         (org-agenda-skip-function
+                          '(or
+                            (konix/org-agenda-skip-if-tags
+                             '("phantom"))
+                            (konix/skip-not-todo-file)
+                            (konix/org-agenda-skip-if-task-of-project)
+                            (konix/org-agenda-for-today-skip-if-not-the-good-time)
+                            )
+                          )
+                         )
+                        )
+                  )
+                 (
+                  (dummy (setq konix/org-agenda-type 'tags))
+                  (dummy (setq konix/org-agenda-highlight-inactive-with-subtree t))
+                  (dummy
+                   (set
+                    (make-variable-buffer-local
+                     'org-agenda-prefix-format)
+                    '((tags . ""))
+                    )
+                   )
+                  (dummy
+                   (set
+                    (make-variable-buffer-local
+                     'org-agenda-todo-keyword-format)
+                    ""
+                    )
+                   )
+                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
+
+                  ;; projects should not be filtered by default
+                  (org-agenda-tag-filter-preset nil)
+                  )
+                 )
                 ("agP" "Projects & NA"
                  (
                   (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""

@@ -1340,7 +1340,7 @@ items"
                           '(or
                             (konix/skip-not-todo-file)
                             (konix/org-agenda-skip-if-not-waiting-nor-has-next-entry-or-is-todo-subproject)
-                            (konix/org-agenda-for-today-skip-if-not-the-good-time t)
+                            (konix/org-agenda-for-today-skip-if-not-the-good-time)
                             )
                           )
                          )

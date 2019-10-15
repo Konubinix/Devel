@@ -1798,6 +1798,7 @@ items"
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags))
+                  (dummy (setq konix/org-agenda-highlight-inactive-with-subtree t))
                   (dummy
                    (set
                     (make-variable-buffer-local

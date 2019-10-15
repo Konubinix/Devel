@@ -1510,13 +1510,13 @@ items"
                          (org-agenda-tag-filter-preset nil)
                          )
                         )
-                  (tags "-Goal-Vision-Purpose-structure"
-                        (
-                         (org-agenda-overriding-header
-                          "Assign a horizon 3 (goals), 4 (vision) or 5 (purpose&principle) to every action")
-                         (org-agenda-tag-filter-preset nil)
-                         )
-                        )
+                  ;; (tags "-Goal-Vision-Purpose-structure"
+                  ;;       (
+                  ;;        (org-agenda-overriding-header
+                  ;;         "Assign a horizon 3 (goals), 4 (vision) or 5 (purpose&principle) to every action")
+                  ;;        (org-agenda-tag-filter-preset nil)
+                  ;;        )
+                  ;;       )
                   )
                  (
                   (org-agenda-skip-function

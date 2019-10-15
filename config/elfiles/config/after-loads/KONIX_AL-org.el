@@ -4022,7 +4022,7 @@ of the clocksum."
   "Replace an org link by its description or if empty its address
 https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link"
   (interactive)
-  (if (org-in-regexp org-bracket-link-regexp 1)
+  (if (and (org-in-regexp org-bracket-link-regexp 1) (org-match-string-no-properties 2))
       (let (
             (remove (list (match-beginning 0) (match-end 0)))
             (description (org-match-string-no-properties 2))

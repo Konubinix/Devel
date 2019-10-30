@@ -1993,7 +1993,7 @@ items"
                           "Expired entries (subtask, soft)")
                          (org-agenda-skip-function
                           '(or
-                            (konix/org-agenda-keep-if-expired)
+                            (konix/org-agenda-keep-if-expired nil t)
                             (konix/org-agenda-skip-if-task-of-project t)
                             )
                           )
@@ -2005,7 +2005,7 @@ items"
                                "Expired undone stuff (check them)")
                               (org-agenda-skip-function
                                '(or
-                                 (konix/org-agenda-keep-if-expired)
+                                 (konix/org-agenda-keep-if-expired nil t)
                                  )
                                )
                               )

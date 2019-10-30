@@ -1982,7 +1982,7 @@ items"
                          (org-agenda-skip-function
                           '(or
                             (konix/org-agenda-keep-if-expired)
-                            (konix/org-agenda-skip-if-task-of-project)
+                            (konix/org-agenda-skip-if-task-of-project t)
                             )
                           )
                          )

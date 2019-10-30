@@ -513,4 +513,4 @@ emacsclient.toolBar:							0
 *appDefaultsFileVersion: 20030303
 
 Xcursor.theme: mytheme
-Xcursor.size: 16
+Xcursor.size: 24

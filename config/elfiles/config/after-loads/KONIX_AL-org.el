@@ -3251,6 +3251,7 @@ of the clocksum."
      :id ,(org-entry-get (point) "ID")
      :account ,(org-entry-get (point) "ACCOUNT_NAME")
      :calendar_id ,(org-entry-get (point) "CALENDAR_ID")
+     :updatedraw ,(org-entry-get (point) "UPDATEDRAW")
      )
    )
   )
@@ -3260,13 +3261,15 @@ of the clocksum."
   (let* (
          (info (konix/org-gcal-get-info))
          (id (plist-get info :id))
+         (updatedraw (plist-get info :updatedraw))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
          (command (format
-                   "konix_gcal.py -a \"%s\" accept %s \"%s\""
+                   "konix_gcal.py -a \"%s\" accept %s \"%s\" %s"
                    account
                    id
                    comment
+                   updatedraw
                    ))
          )
     (shell-command
@@ -3289,13 +3292,15 @@ of the clocksum."
   (let* (
          (info (konix/org-gcal-get-info))
          (id (plist-get info :id))
+         (updatedraw (plist-get info :updatedraw))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
          (command (format
-                   "konix_gcal.py -a \"%s\" decline %s \"%s\""
+                   "konix_gcal.py -a \"%s\" decline %s \"%s\" %s"
                    account
                    id
                    why
+                   updatedraw
                    ))
          )
     (shell-command
@@ -3318,13 +3323,15 @@ of the clocksum."
   (let* (
          (info (konix/org-gcal-get-info))
          (id (plist-get info :id))
+         (updatedraw (plist-get info :updatedraw))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
          (command (format
-                   "konix_gcal.py -a \"%s\" tentative %s \"%s\""
+                   "konix_gcal.py -a \"%s\" tentative %s \"%s\" %s"
                    account
                    id
                    comment
+                   updatedraw
                    ))
          )
     (shell-command

@@ -58,6 +58,11 @@ EVENT_STRFTIME="%Y-%m-%dT%H:%M:%S.000%z"
 EVENT_URL_STRFTIME="%Y-%m-%dT%H:%M:%SZ"
 EVENT_STRFTIME_ALL_DAY="%Y-%m-%d"
 
+
+class OutOfDateError(Exception):
+    pass
+
+
 def lazy(expire_key):
     def real_decorator(func):
         @functools.wraps(func)
@@ -317,6 +322,7 @@ class GCall(cmd.Cmd, object):
 :LOCATION: {}
 :CREATION_DATE: {}
 :UPDATED: {}
+:UPDATEDRAW: {}
 :END:
 {}
 By: {}
@@ -338,6 +344,7 @@ Attendees:
     self.location,
     parser.parse(self.created).strftime("[%Y-%m-%d %H:%M]"),
     parser.parse(self.updated).strftime("[%Y-%m-%d %H:%M]"),
+    self.updated,
     self.org_mode_timestamp,
     self.organizer.get("displayName", self.organizer.get("email", "NA")),
     "\n".join(
@@ -1028,7 +1035,7 @@ Attendees:
         }
         return self._update_insist(event, data, send_notif=True if comment else False)
 
-    def decline(self, event, why=""):
+    def decline(self, event, why="", updated=None):
         self._update_insist(
             event,
             {
@@ -1040,7 +1047,8 @@ Attendees:
                     }
                 ]
             },
-            send_notif=True if why else False
+            send_notif=True if why else False,
+            updated=updated,
         )
 
     def tentative(self, event, comment=""):
@@ -1058,25 +1066,28 @@ Attendees:
             send_notif=True if comment else False
         )
 
-    def do_accept(self, id, comment=""):
+    def do_accept(self, id, comment="", updated=""):
         self.accept(
             self.get_event(id),
             comment,
+            None if not updated else updated,
         )
 
-    def do_decline(self, id, why=""):
+    def do_decline(self, id, why="", updated=""):
         self.decline(
             self.get_event(id),
             why,
+            None if not updated else updated,
         )
 
-    def do_tentative(self, id, comment=""):
+    def do_tentative(self, id, comment="", updated=""):
         self.tentative(
             self.get_event(id),
             comment,
+            None if not updated else updated,
         )
 
-    def _update_insist(self, event, data, send_notif=False):
+    def _update_insist(self, event, data, send_notif=False, updated=None):
         self.refresh_token()
         try:
             self._update_event(
@@ -1084,6 +1095,7 @@ Attendees:
                 event,
                 data,
                 send_notif=send_notif,
+                updated=updated,
             )
         except urllib.error.HTTPError:
             self._update_event(
@@ -1091,9 +1103,13 @@ Attendees:
                 event,
                 data,
                 send_notif=send_notif,
+                updated=updated,
             )
 
-    def _update_event(self, calendar_id, event, new_values, send_notif=False):
+    def _update_event(self, calendar_id, event, new_values,
+                      send_notif=False, updated=None):
+        if updated is not None and event.updated != updated:
+            raise OutOfDateError()
         dict_ = dict(event._asdict())
         dict_ = {
             k: dict_[k]

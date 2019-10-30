@@ -1930,7 +1930,7 @@ items"
                  )
                 ("ags" "SMS & Calls"
                  (
-                  (tags "@sms-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe|@call-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe"
+                  (tags "@sms+todo=\"NEXT\"-maybe|@call+todo=\"NEXT\"-maybe"
                         (
                          (org-agenda-overriding-header
                           "SMS & Calls")

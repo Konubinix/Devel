@@ -3252,6 +3252,7 @@ of the clocksum."
      :account ,(org-entry-get (point) "ACCOUNT_NAME")
      :calendar_id ,(org-entry-get (point) "CALENDAR_ID")
      :updatedraw ,(org-entry-get (point) "UPDATEDRAW")
+     :optional ,(org-entry-get (point) "OPTIONAL")
      )
    )
   )
@@ -3287,22 +3288,34 @@ of the clocksum."
   (konix/org-gcal-refresh-line)
   )
 
-(defun konix/org-gcal-decline (why)
-  (interactive "sWhy: ")
+(defun konix/org-gcal-decline ()
+  (interactive)
   (let* (
          (info (konix/org-gcal-get-info))
          (id (plist-get info :id))
          (updatedraw (plist-get info :updatedraw))
+         (optional (plist-get info :optional))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
-         (command (format
-                   "konix_gcal.py -a \"%s\" decline %s \"%s\" %s"
-                   account
-                   id
-                   why
-                   updatedraw
-                   ))
+         command
+         why
          )
+    (when (and
+           (not optional)
+           (not (yes-or-no-p "This is mandatory meeting, still decline?"))
+           )
+      (user-error "Abort the declining")
+      )
+    (setq why (read-string "Why: "))
+    (setq command
+          (format
+           "konix_gcal.py -a \"%s\" decline %s \"%s\" %s"
+           account
+           id
+           why
+           updatedraw
+           )
+          )
     (shell-command
      (format
       "konix_gcal.py -a \"%s\" select_calendar %s"

@@ -314,6 +314,11 @@ class GCall(cmd.Cmd, object):
 
         @property
         def org_mode(self):
+            attendees_self = [a for a in self.attendees if a.get("self")]
+            if attendees_self:
+                optional = attendees_self[0].get("optional", False)
+            else:
+                optional = False
             return """* [[{}][{}]]{}
 :PROPERTIES:
 :ID: {}
@@ -323,6 +328,7 @@ class GCall(cmd.Cmd, object):
 :CREATION_DATE: {}
 :UPDATED: {}
 :UPDATEDRAW: {}
+:OPTIONAL: {}
 :END:
 {}
 By: {}
@@ -345,6 +351,7 @@ Attendees:
     parser.parse(self.created).strftime("[%Y-%m-%d %H:%M]"),
     parser.parse(self.updated).strftime("[%Y-%m-%d %H:%M]"),
     self.updated,
+    "t" if optional else "nil",
     self.org_mode_timestamp,
     self.organizer.get("displayName", self.organizer.get("email", "NA")),
     "\n".join(

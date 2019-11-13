@@ -1348,7 +1348,7 @@ items"
                   (tags "-refile+project+NoAgenda-todo=\"DONE\"-todo=\"NOT_DONE\"|-refile-todo=\"NEXT\"-todo=\"TODO\"-todo=\"DONE\"-todo=\"NOT_DONE\"+NoAgenda"
                         (
                          (org-agenda-overriding-header
-                          "A project or a non action MUST not have a non agenda context")
+                          "A project or a non action MUST not have a context other than US agenda")
                          (org-agenda-tag-filter-preset nil)
                          (org-agenda-skip-function
                           '(or

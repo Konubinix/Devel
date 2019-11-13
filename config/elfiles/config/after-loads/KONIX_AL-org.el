@@ -1047,7 +1047,7 @@ items"
                 ("ap" . "Agendas with people")
                 ("apa" "All (no filtering)"
                  (
-                  (tags "+Agenda+todo=\"NEXT\"-maybe")
+                  (tags "+Agenda+todo=\"NEXT\"-maybe-WAIT-DELEGATED")
                   )
                  (
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))

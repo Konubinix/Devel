@@ -336,6 +336,59 @@
     )
   )
 
+(defun konix/org-gtd-can-have-commitment ()
+  (let (
+        (tags (org-get-tags (point) t))
+        (end (org-entry-end-position))
+        )
+    (cond
+     ((member "structure" tags)
+      nil
+      )
+     ((and
+       (member "project" tags)
+       (not (konix/org-is-task-of-project-p))
+       )
+      ;; top level project -> ok
+      t
+      )
+     ((and
+       (or
+        (org-entry-is-done-p)
+        (org-entry-is-todo-p)
+        )
+       (not (konix/org-is-task-of-project-p))
+       )
+      ;; a todo, not inside a project
+      t
+      )
+     ((and
+       (member "diary" tags)
+       (not (member "structure" tags))
+       )
+      ;; a diary
+      t
+      )
+     (
+      (save-excursion
+        (org-back-to-heading)
+        (re-search-forward org-ts-regexp end t)
+        )
+      ;; something that was planned
+      t
+      )
+     (
+      (save-excursion
+        (org-back-to-heading)
+        (re-search-forward org-clock-string end t)
+        )
+      ;; something that was clocked
+      t
+      )
+     )
+    )
+  )
+
 (defun konix/org-gtd-can-have-aof ()
   (let (
         (tags (org-get-tags (point) t))
@@ -392,6 +445,13 @@
 (defun konix/org-agenda-skip-not-aof ()
   (and
    (not (konix/org-gtd-can-have-aof))
+   (org-entry-end-position)
+   )
+  )
+
+(defun konix/org-agenda-skip-not-commitmentable ()
+  (and
+   (not (konix/org-gtd-can-have-commitment))
    (org-entry-end-position)
    )
   )
@@ -1442,7 +1502,7 @@ items"
                           "Give a time judgment to the Interruption")
                          )
                         )
-                  (tags "-refile-Commitment-maybe+todo=\"TODO\"|-refile-Commitment-maybe+todo=\"NEXT\"|-refile-Commitment-maybe+todo=\"DONE\"|-refile-Commitment-maybe+todo=\"NOT_DONE\"|-refile-Commitment-maybe+project"
+                  (tags "-refile-Commitment-maybe"
                         (
                          (org-agenda-todo-ignore-deadlines nil)
                          (org-agenda-overriding-header
@@ -1451,7 +1511,7 @@ items"
                          (org-agenda-skip-function
                           '(or
                             (konix/skip-not-todo-file)
-                            (konix/org-agenda-skip-if-task-of-project)
+                            (konix/org-agenda-skip-not-commitmentable)
                             ))
                          )
                         )

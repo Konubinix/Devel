@@ -3655,7 +3655,11 @@ of the clocksum."
 (defvar konix/org-agenda-inactive-timestamp-interval-stop "" "")
 
 
-(defun konix/org-agenda-match-inactive-timestamp (match &optional start stop buffer-name matches)
+(defun konix/org-agenda-match-inactive-timestamp (match &optional start stop
+                                                        buffer-name matches
+                                                        subtree
+                                                        extra_skip
+                                                        )
   (interactive
    (list
     (car (org-make-tags-matcher nil))
@@ -3694,7 +3698,9 @@ of the clocksum."
                       (konix/org-agenda-skip-timestamp-interval
                        ,start
                        ,stop
+                       ,subtree
                        )
+                      (org-agenda-skip-eval ,extra_skip)
                       )
                     )
                    )
@@ -3917,6 +3923,9 @@ of the clocksum."
              (org-read-date nil nil from)
              (org-read-date nil nil to)
              )
+     nil
+     t
+     ''konix/org-agenda-skip-if-task-of-project
      )
     )
   )

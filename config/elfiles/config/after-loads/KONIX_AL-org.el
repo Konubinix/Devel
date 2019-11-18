@@ -2636,6 +2636,16 @@ items"
    )
   )
 
+(defun konix/org-agenda-show-manual-contexts ()
+  (interactive)
+  (shell-command "konix_gtd_contexts.sh -m -n")
+  )
+
+(defun konix/org-agenda-show-all-contexts ()
+  (interactive)
+  (shell-command "konix_gtd_contexts.sh -a -n")
+  )
+
 (defun konix/org/record-org-agenda-tag-filter-preset ()
   (interactive)
   (assert nil "TODO")

@@ -578,7 +578,7 @@ Attendees:
     def list_calendars_pandas(self, search_term=None):
         return pandas.DataFrame(
             [ce._asdict().values() for ce in self.list_calendars(search_term)],
-            columns=self.api["schemas"]["CalendarListEntry"]["properties"].keys(),
+            columns=self.api["schemas"]["CalendarListEntry"]["properties"].keys()
         )
 
     @needs("access_token")
@@ -1031,7 +1031,7 @@ Attendees:
                            }
                 self._update_event(calendar_id, event, new_values)
 
-    def accept(self, event, comment=""):
+    def accept(self, event, comment="", updated=None):
         data = {
             "attendees": (event.attendees or []) + [
                 {
@@ -1041,7 +1041,10 @@ Attendees:
                 }
             ]
         }
-        return self._update_insist(event, data, send_notif=True if comment else False)
+        return self._update_insist(
+            event, data, send_notif=True if comment else False,
+            updated=updated
+        )
 
     def decline(self, event, why="", updated=None):
         self._update_insist(
@@ -1059,7 +1062,7 @@ Attendees:
             updated=updated,
         )
 
-    def tentative(self, event, comment=""):
+    def tentative(self, event, comment="", updated=None):
         self._update_insist(
             event,
             {
@@ -1071,7 +1074,8 @@ Attendees:
                     }
                 ]
             },
-            send_notif=True if comment else False
+            send_notif=True if comment else False,
+            updated=updated,
         )
 
     def do_accept(self, id, comment="", updated=""):

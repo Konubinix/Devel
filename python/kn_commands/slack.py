@@ -45,7 +45,6 @@ from click_project.lib import (
     makedirs,
     json_dumps,
 )
-from cached_property import cached_property
 from click_project.completion import startswith
 from click_project.config import config
 from click_project.core import cache_disk

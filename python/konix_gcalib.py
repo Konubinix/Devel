@@ -830,13 +830,14 @@ Attendees:
                 for event in self.list_events(search_terms)
             ],
             columns=list(self.api["schemas"]["Event"]["properties"].keys()) + [
+                "calendarid",
                 "startdate",
                 "enddate",
                 "duration",
             ]
         )
-        res.startdate = pandas.DatetimeIndex(res.startdate)
-        res.enddate = pandas.DatetimeIndex(res.enddate)
+        res.startdate = pandas.to_datetime(res.startdate, utc=True)
+        res.enddate = pandas.to_datetime(res.enddate, utc=True)
         res.duration = res.duration
         return res
 

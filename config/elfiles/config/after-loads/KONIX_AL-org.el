@@ -342,6 +342,9 @@
         (end (org-entry-end-position))
         )
     (cond
+     ((member "structure" tags)
+      nil
+      )
      ((and
        (member "project" tags)
        (not (konix/org-is-task-of-project-p))
@@ -1503,7 +1506,7 @@ items"
                  )
                 ("adv" "Vision levels (HOF >= 2)"
                  (
-                  (tags "-AreaOfFocus-structure"
+                  (tags "-AreaOfFocus"
                         (
                          (org-agenda-overriding-header
                           "Assign a horizon 2 (Area of Focus) to every action")

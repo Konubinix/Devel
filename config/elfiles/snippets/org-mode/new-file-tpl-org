@@ -2,5 +2,5 @@
 # name: new-file-tpl-org
 # --
 * Diary :diary:NOEXPIRY:structure:
-* Recurrent :recurrent:NOEXPIRY:
-* Notes  :NOEXPIRY:iso9001:
+* Recurrent :recurrent:NOEXPIRY:structure:
+* Notes  :NOEXPIRY:iso9001:structure:

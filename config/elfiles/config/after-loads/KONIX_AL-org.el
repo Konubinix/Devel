@@ -3944,7 +3944,7 @@ of the clocksum."
          (to "now")
          )
     (konix/org-agenda-match-inactive-timestamp
-     "-structure-habit"
+     "-structure-habit-temp"
      from
      to
      (format "* Last %s days report (%s - %s)"
@@ -4036,7 +4036,7 @@ of the clocksum."
 
 (defun konix/org-force-refile-before-clocking-in/advice (orig_func &rest args)
   (save-window-excursion
-    (when (member "forcerefileonclock" (org-get-tags))
+    (when (member "temp" (org-get-tags))
       (org-refile nil nil nil "Refile before clocking in")
       (bookmark-jump (plist-get org-bookmark-names-plist :last-refile) 'set-buffer)
       )

@@ -2303,6 +2303,16 @@ items"
   :END:
 "
                  )
+                ("I" "Clocked todo Item in current clock" entry (clock) "* NEXT %?
+  :PROPERTIES:
+  :CREATED:  %U
+  :END:
+  :CLOCK:
+  :END:
+"
+                 :clock-in t
+                 :clock-keep t
+                 )
                 ("l" "Todo Item for current stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %? %a
   :PROPERTIES:

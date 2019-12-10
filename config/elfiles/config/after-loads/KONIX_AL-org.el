@@ -1488,14 +1488,15 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "DELEGATED-maybe|WAIT-maybe"
+                  (tags-todo "DELEGATED-maybe|WAIT-maybe|Commitment-C_me-C_society-maybe"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
-                               "Make sure items waiting other people have due dates")
+                               "Make sure all commitments have due dates")
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(deadline))
+                                 (konix/org-agenda-skip-if-task-of-project)
                                  ))
                               )
                              )

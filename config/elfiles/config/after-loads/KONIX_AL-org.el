@@ -3364,7 +3364,7 @@ of the clocksum."
   (let* (
          (info (konix/org-gcal-get-info))
          (id (plist-get info :id))
-         (updatedraw (plist-get info :updatedraw))
+         (updatedraw (if current-prefix-arg "" (plist-get info :updatedraw)))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
          (command (format
@@ -3395,7 +3395,7 @@ of the clocksum."
   (let* (
          (info (konix/org-gcal-get-info))
          (id (plist-get info :id))
-         (updatedraw (plist-get info :updatedraw))
+         (updatedraw (if current-prefix-arg "" (plist-get info :updatedraw)))
          (optional (plist-get info :optional))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
@@ -3438,7 +3438,7 @@ of the clocksum."
   (let* (
          (info (konix/org-gcal-get-info))
          (id (plist-get info :id))
-         (updatedraw (plist-get info :updatedraw))
+         (updatedraw (if current-prefix-arg "" (plist-get info :updatedraw)))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
          (command (format

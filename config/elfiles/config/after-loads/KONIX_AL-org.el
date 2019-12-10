@@ -3936,10 +3936,10 @@ of the clocksum."
     )
   )
 
-(defun konix/org-last-weeks-review-report nil
-  (interactive)
+(defun konix/org-last-weeks-review-report (&optional number_of_days)
+  (interactive "nNumber of days: ")
+  (setq number_of_days (or number_of_days 10))
   (let* (
-         (number_of_days 10)
          (from (format "-%sd" number_of_days))
          (to "now")
          )

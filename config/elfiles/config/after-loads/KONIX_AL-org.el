@@ -2508,6 +2508,21 @@ items"
     )
   ""
   )
+(defface konix/org-maybe-face
+  '(
+    (
+     ((class color)
+      (background dark))
+     (:inherit org-archived :foreground "#DCDCCC")
+     )
+    (
+     ((class color)
+      (background light))
+     (:inherit org-archived :foreground "#DCDCCC")
+     )
+    )
+  ""
+  )
 (setq-default org-todo-keyword-faces
               '(
                 ("TODO" :foreground "red" :weight bold)
@@ -4169,6 +4184,19 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     (buffer-substring-no-properties (point-min) (point-max))
     )
   )
+
+(defun konix/org-font-lock-set-keywords-hook ()
+  (add-to-list
+   'org-font-lock-extra-keywords
+   (list (concat
+		  org-outline-regexp-bol
+		  "\\(.*:maybe:.*\\)")
+		 '(1 'konix/org-maybe-face prepend))
+   )
+  )
+(add-hook 'org-font-lock-set-keywords-hook
+          'konix/org-font-lock-set-keywords-hook)
+
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

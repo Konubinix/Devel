@@ -345,9 +345,12 @@
      ((member "structure" tags)
       nil
       )
+     ((konix/org-is-task-of-project-p)
+      ;; not a toplevel stuff -> pass
+      nil
+      )
      ((and
        (member "project" tags)
-       (not (konix/org-is-task-of-project-p))
        )
       ;; top level project -> ok
       t
@@ -391,11 +394,11 @@
 
 (defun konix/org-gtd-can-have-aof ()
   (let (
-        (tags (org-get-tags (point) t))
+        (tags (org-get-tags (point) nil))
         (end (org-entry-end-position))
         )
     (cond
-     ((member "structure" tags)
+     ((or (member "structure" tags) (member "temp" tags))
       nil
       )
      ((and
@@ -410,10 +413,10 @@
         (org-entry-is-done-p)
         (org-entry-is-todo-p)
         )
-       (not (konix/org-is-task-of-project-p))
        )
-      ;; a todo, not inside a project
-      t
+      ;; a todo,
+      ;; not inside a project => ok, else nil
+      (not (konix/org-is-task-of-project-p))
       )
      ((and
        (member "diary" tags)

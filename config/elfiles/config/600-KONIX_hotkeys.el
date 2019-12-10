@@ -218,6 +218,7 @@
 (define-key 'konix/global-key-map "u" 'uncomment-region)
 ;; find
 (define-key 'konix/global-key-map (kbd "M-f") 'konix/find)
+
 ;; ******************************************************************************************
 ;; dictionary lookup
 ;; ******************************************************************************************
@@ -552,6 +553,7 @@
 (global-set-key (kbd "<f10>") 'jump-to-register)
 
 (define-key 'konix/global-slow-key-map (kbd "n") 'notmuch)
+(define-key 'konix/global-slow-key-map (kbd "SPC") 'cua-set-mark)
 
 ;; ####################################################################################################
 ;; Org Mode

@@ -713,7 +713,7 @@
              (when (member (car tag-prop) (get-text-property (point) 'tags))
                (save-excursion
                  (goto-char (point-at-bol))
-                 (re-search-forward "^\\([^:]+: +\\)?\\(.+[^ ]\\) +:[a-zA-Z:@_-]+:$" (point-at-eol) t)
+                 (re-search-forward "^\\([^:]+: +\\)?\\(.+[^ ]\\) +:[a-zA-Z:@_0-9-]+:$" (point-at-eol) t)
                  (setq start (match-beginning 2)
                        end (match-end 2)
                        )

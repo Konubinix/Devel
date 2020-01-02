@@ -3481,10 +3481,10 @@ of the clocksum."
     )
   )
 
-(defun konix/org-all-tags ()
+(defun konix/org-all-tags (&optional files)
   (mapcar (lambda (tag)
             (substring-no-properties (car tag)))
-          (org-global-tags-completion-table))
+          (org-global-tags-completion-table files))
   )
 
 (defun konix/org-gtd-all-commitments ()

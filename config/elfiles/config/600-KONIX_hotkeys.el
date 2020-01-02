@@ -554,7 +554,6 @@
 (global-set-key (kbd "<C-f10>") 'point-to-register)
 (global-set-key (kbd "<f10>") 'jump-to-register)
 
-(define-key 'konix/global-slow-key-map (kbd "n") 'notmuch)
 (define-key 'konix/global-slow-key-map (kbd "SPC") 'cua-set-mark)
 
 ;; ####################################################################################################
@@ -672,14 +671,23 @@
 ;; ####################################################################################################
 ;; news hotkeys
 ;; ####################################################################################################
-(define-prefix-command 'konix/global-fast-news-key-map)
-(define-key 'konix/global-fast-key-map "n" 'konix/global-fast-news-key-map)
+(define-prefix-command 'konix/global-fast-notmuch-key-map)
+(define-prefix-command 'konix/global-slow-notmuch-key-map)
+(define-key 'konix/global-fast-key-map "n" 'konix/global-fast-notmuch-key-map)
+(define-key 'konix/global-slow-key-map "n" 'konix/global-slow-notmuch-key-map)
 
-(define-key 'konix/global-fast-news-key-map "m" 'notmuch)
-(define-key 'konix/global-fast-news-key-map "s" 'notmuch-search)
-(define-key 'konix/global-fast-news-key-map "M" 'konix/notmuch-search-no-tag)
-(define-key 'konix/global-fast-news-key-map "t" 'newsticker-treeview)
-(define-key 'konix/global-fast-news-key-map "f" 'konix/open-mail-follow)
+(define-key 'konix/global-fast-notmuch-key-map "m" 'notmuch)
+(define-key 'konix/global-fast-notmuch-key-map "s" 'notmuch-search)
+(define-key 'konix/global-fast-notmuch-key-map "M" 'konix/notmuch-search-no-tag)
+(define-key 'konix/global-fast-notmuch-key-map "t" 'notmuchticker-treeview)
+(define-key 'konix/global-fast-notmuch-key-map "f" 'konix/open-mail-follow)
+
+(define-key 'konix/global-slow-notmuch-key-map "m" 'notmuch)
+(define-key 'konix/global-slow-notmuch-key-map "s" 'notmuch-search)
+(define-key 'konix/global-slow-notmuch-key-map "M" 'konix/notmuch-search-no-tag)
+(define-key 'konix/global-slow-notmuch-key-map "t" 'notmuchticker-treeview)
+(define-key 'konix/global-slow-notmuch-key-map "f" 'konix/open-mail-follow)
+
 ;; ####################################################################################################
 ;; highlight-symbol
 ;; ####################################################################################################

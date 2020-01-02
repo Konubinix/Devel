@@ -8,6 +8,7 @@ groupadd -g 3003 aid_inet
 groupadd -g 3004 aid_inet_raw
 groupadd -g 3005 aid_inet_admin
 groupadd -g 1015 sdcard-rw
+groupadd -g 1023 media_rw
 
 gpasswd -a root aid_net_bt_admin
 gpasswd -a root aid_net_bt

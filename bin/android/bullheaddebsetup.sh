@@ -25,6 +25,9 @@ echo "Mounting filesystem"
 mkdir_maybe $deb_root/sdcard
 is_mounted $deb_root/sdcard || say_and_do mount -o bind /sdcard $deb_root/sdcard
 
+mkdir_maybe $deb_root/mnt
+is_mounted $deb_root/mnt || say_and_do mount -o bind /mnt $deb_root/mnt
+
 mkdir_maybe $deb_root/data
 is_mounted $deb_root/data || say_and_do mount -o bind /data $deb_root/data
 

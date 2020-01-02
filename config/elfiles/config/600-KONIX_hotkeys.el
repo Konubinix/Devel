@@ -201,6 +201,8 @@
 (define-prefix-command 'konix/global-key-map)
 (global-set-key (kbd "M-g") 'konix/global-key-map)
 
+
+(define-key 'konix/global-key-map "|" 'piper)
 ;; Goto emacs config
 (define-key 'konix/global-key-map "h" 'konix/hack-on-emacs)
 ;; Update the env

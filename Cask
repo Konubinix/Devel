@@ -65,3 +65,11 @@
 (depends-on "htmlize")
 (depends-on "realgud")
 (depends-on "org-super-agenda")
+;; for emacs piper
+	(depends-on "cl")
+	(depends-on "dash")
+	(depends-on "f")
+	(depends-on "hydra")
+	(depends-on "s")
+	(depends-on "visual-regexp")
+	(depends-on "evil")

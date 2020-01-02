@@ -300,3 +300,6 @@ ignore=dirty
 [submodule "SoundScrape"]
 	path = SoundScrape
 	url = https://github.com/Konubinix/SoundScrape
+[submodule "config/elfiles/emacs-piper"]
+	path = config/elfiles/emacs-piper
+	url = https://gitlab.com/howardabrams/emacs-piper.git

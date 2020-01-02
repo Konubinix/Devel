@@ -1624,7 +1624,7 @@ items"
                            (org-agenda-skip-function
                             '(or
                               (konix/org-agenda-skip-if-tags
-                               '("project"))
+                               '("project" "goal"))
                               (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED"))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               ;;(org-agenda-skip-entry-if 'scheduled)
@@ -1639,7 +1639,7 @@ items"
                            (org-agenda-skip-function
                             '(or
                               (konix/org-agenda-skip-if-tags
-                               '("project"))
+                               '("project" "goal"))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time
                                t)
                               (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED") t)
@@ -1652,7 +1652,7 @@ items"
                           (
                            (org-agenda-include-deadlines t)
                            (org-agenda-overriding-header
-                            "Projects")
+                            "HOF > 0")
                            (org-agenda-use-time-grid nil)
                                         ; it will be already included in the no project view
                            (org-agenda-include-diary nil)
@@ -1661,7 +1661,7 @@ items"
                               (konix/skip-not-todo-file)
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               (konix/org-agenda-skip-if-tags
-                               '("project")
+                               '("project" "goal")
                                t)
                               )
                             )

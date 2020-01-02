@@ -11,6 +11,7 @@
 		 (expand-file-name "org/lisp" elfiles)
 		 (expand-file-name "org-edna" elfiles)
 		 (expand-file-name "org/contrib/lisp" elfiles)
+		 (expand-file-name "emacs-piper" elfiles)
 		 (expand-file-name "notmuch/emacs" devel-dir)
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "ini" elfiles)
@@ -130,9 +131,9 @@
 (autoload 'pdf-view-mode "pdf-view" "" t)
 (autoload 'konix/gdbserver "gdb-mi" "" t)
 (autoload 'beancount-mode "beancount" "" t)
-(autoload 'pdf-tools-pdf-buffer-p "pdf-tools" "" t)
 
 
+(autoload 'piper "piper" "" t)
 ;; ************************************************************
 ;; Automodes
 ;; ************************************************************

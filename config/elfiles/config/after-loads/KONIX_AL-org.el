@@ -2055,7 +2055,7 @@ items"
                 ("agw" "Waiting for list (no filter context)"
                  (
                   (tags-todo
-                   "WAIT|DELEGATED"
+                   "WAIT-maybe|DELEGATED-maybe"
                    (
                     (org-agenda-overriding-header "WAITING items")
                     (org-agenda-skip-function

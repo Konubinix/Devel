@@ -325,6 +325,7 @@ class GCall(cmd.Cmd, object):
 :CALENDAR_ID: {}
 :ACCOUNT_NAME: {}
 :LOCATION: {}
+:ORGANIZER: {}
 :CREATION_DATE: {}
 :UPDATED: {}
 :UPDATEDRAW: {}
@@ -348,6 +349,7 @@ Attendees:
     self.calendar_id,
     self.account,
     self.location,
+    self.organizer.get("displayName", self.organizer.get("email", "NA")),
     parser.parse(self.created).strftime("[%Y-%m-%d %H:%M]"),
     parser.parse(self.updated).strftime("[%Y-%m-%d %H:%M]"),
     self.updated,

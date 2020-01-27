@@ -110,7 +110,7 @@ then
     gaps_log "Limiting to path ${LIMIT_PATH}"
     set -x
     pushd "${LIMIT_PATH}"
-    git annex sync ${args} ${sync_remotes}
+    git annex sync ${args} ${sync_remotes} web bittorrent
     popd
     set +x
     for remote in ${sync_remotes}

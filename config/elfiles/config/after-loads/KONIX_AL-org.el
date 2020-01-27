@@ -1647,7 +1647,7 @@ items"
                            (org-agenda-skip-function
                             '(or
                               (konix/org-agenda-skip-if-tags
-                               '("project" "goal"))
+                               '("project" "goal" "aofs"))
                               (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED"))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               ;;(org-agenda-skip-entry-if 'scheduled)
@@ -1662,7 +1662,7 @@ items"
                            (org-agenda-skip-function
                             '(or
                               (konix/org-agenda-skip-if-tags
-                               '("project" "goal"))
+                               '("project" "goal" "aofs"))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time
                                t)
                               (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED") t)
@@ -1684,7 +1684,7 @@ items"
                               (konix/skip-not-todo-file)
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               (konix/org-agenda-skip-if-tags
-                               '("project" "goal")
+                               '("project" "goal" "aofs")
                                t)
                               )
                             )

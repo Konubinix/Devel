@@ -2846,6 +2846,7 @@ of the clocksum."
   (local-set-key (kbd "C-c <up>") 'konix/org-checkbox-toggle-and-up)
   (define-key org-mode-map (kbd "M-n") 'org-next-link)
   (define-key org-mode-map (kbd "M-p") 'org-previous-link)
+  (define-key org-mode-map (kbd "C-k") 'konix/org-kill)
 
   (setq indent-tabs-mode nil)
   (konix/flyspell-mode 1)
@@ -4233,6 +4234,28 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (add-hook 'org-font-lock-set-keywords-hook
           'konix/org-font-lock-set-keywords-hook)
 
+
+(defvar konix/org-kill-confirm nil "")
+(defun konix/org-kill ()
+  (interactive)
+  (if (and
+       (looking-at "^\*")
+       (or
+        (not konix/org-kill-confirm)
+        (yes-or-no-p "Kill the whole subtree?")
+        )
+       )
+      (progn
+        (konix/org-agenda-kill/confirm-if-clock-info)
+        (konix/org-agenda-kill/confirm-if-committed)
+        (kill-region
+         (save-excursion (beginning-of-line) (point))
+         (1+ (org-end-of-subtree))
+         )
+        )
+    (call-interactively 'kill-line)
+    )
+  )
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

@@ -1844,6 +1844,7 @@ items"
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags))
+                  (org-super-agenda-groups (konix/org-super-agenda-per konix/org-gtd-commitments-tags))
                   (dummy (setq konix/org-agenda-highlight-inactive-with-subtree t))
                   (dummy
                    (set

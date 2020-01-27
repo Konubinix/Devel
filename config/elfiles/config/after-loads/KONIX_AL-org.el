@@ -3987,22 +3987,68 @@ of the clocksum."
      )
     (delete-forward-char 1)
     )
+  )
+
+(defun konix/org-gtd-context-edit-toggle-comment-forward ()
+  (interactive)
+  (when (looking-at-p "^
+")
+    (goto-char (point-at-bol))
+    (skip-chars-forward "
+")
+    (goto-char (point-at-bol))
+    )
+  (save-excursion (konix/org-gtd-context-edit-toggle-comment))
   (forward-line 1)
+  (when (looking-at-p "^
+")
+    (goto-char (point-at-bol))
+    (skip-chars-forward "
+")
+    (goto-char (point-at-bol))
+    )
   )
 
 (defun konix/org-gtd-context-edit-toggle-comment-backward ()
   (interactive)
   (forward-line -1)
+  (when (looking-at-p "^
+")
+    (goto-char (point-at-bol))
+    (skip-chars-backward "
+")
+    (goto-char (point-at-bol))
+    )
   (save-excursion (konix/org-gtd-context-edit-toggle-comment))
+  (when (looking-at-p "^
+")
+    (goto-char (point-at-bol))
+    (skip-chars-backward "
+")
+    (goto-char (point-at-bol))
+    )
   )
 
 (defvar konix/org-gtd-context-edit-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd ",") 'konix/org-gtd-context-edit-toggle-comment)
-    (define-key map (kbd "<SPC>") 'konix/org-gtd-context-edit-toggle-comment)
+    (define-key map (kbd "<SPC>") 'konix/org-gtd-context-edit-toggle-comment-forward)
     (define-key map (kbd "<DEL>") 'konix/org-gtd-context-edit-toggle-comment-backward)
     (define-key map (kbd "k") '(lambda () (interactive) (save-buffer) (bury-buffer)))
+    (define-key map (kbd "i") '(lambda () (interactive) (save-buffer) (bury-buffer)))
+    (define-key map (kbd "o") 'konix/org-gtd-context-open-ref)
     map))
+
+(defun konix/org-gtd-context-open-ref()
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (when (re-search-forward ".+\\(plus\\|minus\\)-\\([^|]+\\)\\(|.+\\)?"
+                             (save-excursion (end-of-line) (point)))
+      (find-file (format "/home/sam/perso/perso/gtd_contexts_%s" (match-string 2)))
+      )
+    )
+  )
 
 (setq konix/org-gtd-context-edit-syntax-table
       (let (

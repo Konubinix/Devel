@@ -1,3 +1,4 @@
 #!/bin/bash
 
-pip2 install -U --user -e mopidy
+cd mopidy
+python3 setup.py develop --user

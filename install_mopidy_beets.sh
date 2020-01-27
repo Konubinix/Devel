@@ -1,3 +1,4 @@
 #!/bin/bash
 
-pip2 install --user -e mopidy-beets
+cd mopidy-beets
+python3 setup.py develop --user

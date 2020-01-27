@@ -131,6 +131,7 @@
 (autoload 'pdf-view-mode "pdf-view" "" t)
 (autoload 'konix/gdbserver "gdb-mi" "" t)
 (autoload 'beancount-mode "beancount" "" t)
+(autoload 'pdf-tools-pdf-buffer-p "pdf-tools" "" t)
 
 
 (autoload 'piper "piper" "" t)

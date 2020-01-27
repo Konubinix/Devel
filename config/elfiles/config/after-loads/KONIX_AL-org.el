@@ -1721,13 +1721,13 @@ items"
                   (org-super-agenda-groups nil)
                   )
                  )
-                ("atm" "Agenda of the next month (no filter context)"
+                ("atw" "Agenda of the next week (no habit)"
                  (
                   (agenda ""
                           (
                            (org-agenda-overriding-header
                             "Must say something about those invitations")
-                           (org-agenda-span 30)
+                           (org-agenda-span 10)
                            ;; (org-agenda-include-deadlines nil)
                            (org-agenda-start-with-log-mode nil)
                            (org-super-agenda-groups nil)
@@ -1738,12 +1738,9 @@ items"
                                '(
                                  "no_monthly"
                                  "phantom"
+                                 "habit"
                                  ))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
-                              ;; (and
-                              ;;  (org-agenda-skip-if nil '(scheduled))
-                              ;;  (org-agenda-skip-if nil '(notdeadline))
-                              ;;  )
                               )
                             )
                            (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
@@ -1758,13 +1755,46 @@ items"
                   ;;,(format "%s/radicale/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
-                ("atM" "Agenda of the next month (no habit)"
+                ("atm" "Agenda of the next month"
+                 (
+                  (agenda ""
+                          (
+                           (org-agenda-overriding-header
+                            "Next month at a glance")
+                           (org-agenda-span 30)
+                           ;; (org-agenda-include-deadlines nil)
+                           (org-agenda-start-with-log-mode nil)
+                           (org-super-agenda-groups nil)
+                           (org-agenda-start-with-clockreport-mode nil)
+                           (org-agenda-skip-function
+                            '(or
+                              (konix/org-agenda-skip-if-tags
+                               '(
+                                 "no_monthly"
+                                 "phantom"
+                                 ))
+                              (konix/org-agenda-for-today-skip-if-not-the-good-time t)
+                              )
+                            )
+                           (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
+                           (dummy (konix/org-agenda-check-buffer/agenda t))
+                           )
+                          )
+                  )
+                 (
+                  (dummy (setq konix/org-agenda-type 'agenda))
+                  )
+                 (
+                  ;;,(format "%s/radicale/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
+                  )
+                 )
+                ("atM" "Agenda of the past and next months"
                  (
                   (agenda ""
                           (
                            (org-agenda-include-deadlines t)
                            (org-agenda-overriding-header
-                            "Must say something about those invitations")
+                            "Past and next months")
                            (org-agenda-start-day "-30d")
                            (org-agenda-span 90)
                            ;; (org-agenda-include-deadlines nil)
@@ -1779,10 +1809,6 @@ items"
                                  "phantom"
                                  ))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
-                              ;; (and
-                              ;;  (org-agenda-skip-if nil '(scheduled))
-                              ;;  (org-agenda-skip-if nil '(notdeadline))
-                              ;;  )
                               )
                             )
                            (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))

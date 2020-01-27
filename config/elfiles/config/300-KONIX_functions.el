@@ -77,9 +77,9 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
   (if (string-match "\\(\\([0-9]+\\)d \\)?\\([0-9]+\\):\\([0-9]+\\)" timestring)
 	  (let* (
 			 (days (string-to-number (or
-                                   (match-string-no-properties 2 timestring)
-                                   "0"
-                                   )))
+                                      (match-string-no-properties 2 timestring)
+                                      "0"
+                                      )))
 			 (hours (string-to-number (match-string-no-properties 3 timestring)))
 			 (minutes (string-to-number (match-string-no-properties 4 timestring)))
 			 (minutes_hour_fraction (/ minutes 60.0))
@@ -136,31 +136,30 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
 
 (defun konix/process-sentinel-exit (process string)
   (with-current-buffer (process-buffer process)
-	;;(debug)
 	(if (string-equal "finished\n" string)
 		(progn
 		  (setq process_ended t)
 		  (when end_hook
-			(funcall end_hook)
+			(funcall end_hook process)
 			)
 		  )
 	  (when fail_hook
-		(funcall fail_hook)
+		(funcall fail_hook process)
 		)
 	  )
 	(when final_hook
-	  (funcall final_hook)
+	  (funcall final_hook process)
 	  )
 	)
   )
 
-(defun konix/set-process-sentinel-exit-hook (process hook &optional fail_hook final_hook)
+(defun konix/set-process-sentinel-exit-hook (process end_hook &optional fail_hook final_hook)
   (let (
 		(buffer_ (process-buffer process))
 		)
 	(with-current-buffer buffer_
 	  (set (make-variable-buffer-local 'process_ended) nil)
-	  (set (make-variable-buffer-local 'end_hook) hook)
+	  (set (make-variable-buffer-local 'end_hook) end_hook)
 	  (set (make-variable-buffer-local 'fail_hook) fail_hook)
 	  (set (make-variable-buffer-local 'final_hook) final_hook)
 	  (set-process-sentinel process 'konix/process-sentinel-exit)
@@ -173,13 +172,64 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
 			 (not process_ended)
 			 )
 		;; the sentinel did not have time to setUp and the process ended
-		(funcall hook)
+        (if (equal 0 (process-exit-status process))
+            (when end_hook
+              (funcall end_hook process)
+              )
+          (when fail_hook
+            (funcall fail_hook process)
+            )
+          )
 		(when final_hook
-		  (funcall final_hook)
+		  (funcall final_hook process)
 		  )
 		)
 	  )
 	)
+  )
+
+(defun konix/call-process-with-hook (program end-hook fail-hook final-hook &rest program-args)
+  (let (
+        (buffer (generate-new-buffer "* Konix Shell Command"))
+        process
+        )
+    (setq process
+          (apply 'start-process
+                 (append
+                  (list
+                   "konix called process"
+                   buffer
+                   program
+                   )
+                  program-args
+                  )
+                 )
+          )
+    (konix/set-process-sentinel-exit-hook process end-hook fail-hook final-hook)
+    )
+  )
+
+(defun konix/call-process-show-error (program &rest program-args)
+  (let (
+        (buffer (generate-new-buffer "* Konix Shell Command"))
+        process
+        res
+        )
+    (setq res
+          (apply
+           'call-process
+           program
+           nil
+           buffer
+           nil
+           program-args
+           )
+          )
+    (unless (equal res 0)
+      (pop-to-buffer buffer)
+     )
+    res
+    )
   )
 
 (defun konix/decorate-buffer (regexp keymap face &optional match-number)
@@ -387,7 +437,7 @@ make the line non empty"
 	  (not
 	   (process-live-p
 		(with-circe-server-buffer
-          circe-server-process)
+         circe-server-process)
 		)
 	   )
 	  )

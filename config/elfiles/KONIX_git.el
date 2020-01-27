@@ -1663,15 +1663,15 @@ fallbacking to HEAD")
 	)
   )
 
-(defun konix/git/status-sentinel()
+(defun konix/git/status-sentinel(process)
   (run-hooks 'konix/git/status-buffer/after-process-hooks)
   )
 
-(defun konix/git/status-sentinel_fail()
+(defun konix/git/status-sentinel_fail(process)
   (konix/notify "Git status exited abnormaly")
   )
 
-(defun konix/git/status-sentinel_final()
+(defun konix/git/status-sentinel_final(process)
   (if (get-buffer-window (current-buffer))
 	  (pop-to-buffer (current-buffer))
 	(switch-to-buffer (current-buffer))

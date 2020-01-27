@@ -222,20 +222,22 @@
 
 (defmacro konix/org-with-point-on-heading (body)
   `(save-window-excursion
-     (case major-mode
-       ('org-agenda-mode
-        (org-agenda-switch-to nil t)
-        (org-back-to-heading)
-        )
-       ('org-mode
-        (org-back-to-heading)
-        )
-       (t
-        (org-clock-goto nil t)
-        (org-back-to-heading)
-        )
+     (save-excursion
+       (case major-mode
+         ('org-agenda-mode
+          (org-agenda-switch-to nil t)
+          (org-back-to-heading)
+          )
+         ('org-mode
+          (org-back-to-heading)
+          )
+         (t
+          (org-clock-goto nil t)
+          (org-back-to-heading)
+          )
+         )
+       ,body
        )
-     ,body
      )
   )
 

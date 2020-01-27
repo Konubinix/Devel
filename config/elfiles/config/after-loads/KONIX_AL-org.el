@@ -1274,6 +1274,19 @@ items"
                   )
                  )
                 ("al" . "Clock logs")
+                ("alT" "What happened today"
+                 (
+                  (agenda nil)
+                  )
+                 (
+                  (dummy (setq konix/org-agenda-type 'agenda))
+                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
+                  (org-agenda-start-with-log-mode t)
+                  (org-agenda-log-mode-items '(closed state))
+                  (org-agenda-start-with-clockreport-mode t)
+                  (org-agenda-include-inactive-timestamps t)
+                  )
+                 )
                 ("alt" "Today"
                  (
                   (agenda nil)

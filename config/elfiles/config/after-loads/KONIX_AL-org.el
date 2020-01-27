@@ -1898,20 +1898,6 @@ items"
                           )
                          )
                         )
-                  (tags "+maybe+todo=\"NEXT\"|+todo=\"TODO\"+maybe|+project+maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
-                        (
-                         (org-agenda-overriding-header
-                          "Maybe projects & NA (things that are or should be committed)")
-                         (org-agenda-skip-function
-                          '(or
-                            (konix/org-agenda-skip-if-tags
-                             '("phantom"))
-                            (konix/skip-not-todo-file)
-                            (konix/org-agenda-skip-if-task-of-project)
-                            )
-                          )
-                         )
-                        )
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags))

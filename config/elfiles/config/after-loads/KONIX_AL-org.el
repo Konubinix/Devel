@@ -1536,6 +1536,12 @@ items"
                             ))
                          )
                         )
+                  (tags "+Expectation"
+                        (
+                         (org-agenda-overriding-header
+                          "Be clear about the expectations -> make commitment out of them")
+                         )
+                        )
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags))

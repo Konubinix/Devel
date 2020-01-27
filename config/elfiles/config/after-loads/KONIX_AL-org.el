@@ -379,7 +379,7 @@
      (
       (save-excursion
         (org-back-to-heading)
-        (re-search-forward org-ts-regexp end t)
+        (re-search-forward (format "^\\( *%s\\| *[^ #].*%s\\)" org-ts-regexp org-ts-regexp) end t)
         )
       ;; something that was planned
       t

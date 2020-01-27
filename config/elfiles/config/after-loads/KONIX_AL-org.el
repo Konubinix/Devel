@@ -213,6 +213,8 @@
                        :fileskip0
                        :stepskip0
                        :link t
+			           :timestamp nil
+			           :tags nil
                        :maxlevel 5
                        :emphasize t
                        )

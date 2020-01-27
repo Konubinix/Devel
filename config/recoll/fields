@@ -64,10 +64,12 @@ rclbes = XB
 # I hereby commit to not using XY for Recoll:
 # *** USE XY for beginning your local prefixes *** ie:
 # myfield = XYMYPREF
-ack = XYACK
+state = XYSTATE
 year = XYYEAR
 month = XYMONTH
 day = XYDAY
+link = XYLINK
+webpage_url = XYWEBPAGEURL
 
 [stored]
 ############################
@@ -88,10 +90,12 @@ keywords=
 rclaptg=
 rclbes=
 recipient=
-ack=
+state=
 year=
 month=
 day=
+link=
+webpage_url=
 
 [aliases]
 ##########################

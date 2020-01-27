@@ -208,8 +208,8 @@ Mod4 F2 :Exec ExecCommand $(konix_do_cron_job.sh konix_dmenu_run.sh)
 Mod4 F3 :Exec ExecCommand $(konix_do_cron_job.sh dmenu-frecency)
 
 # volume settings
-Mod4 Mod1 Down :Exec konix_display_unique.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-Mod4 Mod1 Up :Exec konix_display_unique.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+Mod4 Mod1 Up :Exec konix_display_unique.py "$(clk pulse up && clk pulse show)"
+Mod4 Mod1 Down :Exec konix_display_unique.py "$(clk pulse down && clk pulse show)"
 
 # Reconfigure
 control Mod4 f : MacroCmd {Reconfigure} {Exec konix_display.py 'reconfigure done'}
@@ -300,11 +300,8 @@ Mod4 o v : ExecCommand konix_display_n_launch.sh sh -c "pcmanfm $HOME/data/Video
 # Special window keys
 # ************************************************************
 XF86WWW :Exec konix_display_n_launch.sh x-www-browser
-None 160       :ToggleCmd {Exec amixer sset Master,0 toggle && konix_display_unique.py "Mute on" } {Exec amixer sset Master,0 toggle && konix_display_unique.py "Mute off"}
-None 174	:Exec konix_display_unique.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-None 176	:Exec konix_display_unique.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-XF86AudioLowerVolume    :Exec konix_display_unique.py "Master Volume : $(amixer set Master,0 5%- | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
-XF86AudioRaiseVolume	:Exec konix_display_unique.py "Master Volume : $(amixer set Master,0 5%+ | grep % | sed 's/.*[^0-9]\([0-9]\+\)\%.*/\1/')"
+XF86AudioLowerVolume    :Exec konix_display_unique.py "$(clk pulse down && clk pulse show)"
+XF86AudioRaiseVolume	:Exec konix_display_unique.py "$(clk pulse up && clk pulse show)"
 
 #162 Touche play
 162 : Exec gnome-alsamixer

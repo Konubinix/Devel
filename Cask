@@ -65,7 +65,7 @@
 (depends-on "htmlize")
 (depends-on "realgud")
 (depends-on "org-super-agenda")
-;; for emacs piper
+;; for emacs piper, not yet packaged in elpa
 	(depends-on "cl")
 	(depends-on "dash")
 	(depends-on "f")
@@ -73,3 +73,4 @@
 	(depends-on "s")
 	(depends-on "visual-regexp")
 	(depends-on "evil")
+(depends-on "orgalist")

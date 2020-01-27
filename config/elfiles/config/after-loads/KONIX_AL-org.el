@@ -3397,25 +3397,31 @@ of the clocksum."
      :calendar_id ,(org-entry-get (point) "CALENDAR_ID")
      :updatedraw ,(org-entry-get (point) "UPDATEDRAW")
      :optional ,(org-entry-get (point) "OPTIONAL")
+     :organizer ,(org-entry-get (point) "ORGANIZER")
      )
    )
   )
 
-(defun konix/org-gcal-accept (comment)
-  (interactive "sComment: ")
+(defun konix/org-gcal-get-organizer ()
+  (plist-get
+   (konix/org-gcal-get-info)
+   :organizer
+   )
+  )
+
+(defun konix/org-gcal-accept ()
+  (interactive)
   (let* (
          (info (konix/org-gcal-get-info))
+         (organizer (plist-get info :organizer))
+         (comment (read-string
+                   (format "Comment for %s: " organizer)
+                   )
+                  )
          (id (plist-get info :id))
          (updatedraw (if current-prefix-arg "" (plist-get info :updatedraw)))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
-         (command (format
-                   "konix_gcal.py -a \"%s\" accept %s \"%s\" %s"
-                   account
-                   id
-                   comment
-                   updatedraw
-                   ))
          )
     (shell-command
      (format
@@ -3424,13 +3430,25 @@ of the clocksum."
       calendar_id
       )
      )
-    (message command)
-    (shell-command command)
+    (when (equal 0
+                 (konix/call-process-show-error
+                  "konix_gcal.py"
+                  "-a"
+                  account
+                  "accept"
+                  id
+                  comment
+                  updatedraw
+                  )
+                 )
+      (konix/org-gcal-reset-tags)
+      (org-agenda-set-tags "accepted" 'on)
+      (konix/org-gcal-refresh-line)
+      (message "DONE")
+      )
     )
-  (konix/org-gcal-reset-tags)
-  (org-agenda-set-tags "accepted" 'on)
-  (konix/org-gcal-refresh-line)
   )
+
 
 (defun konix/org-gcal-decline ()
   (interactive)
@@ -3441,7 +3459,7 @@ of the clocksum."
          (optional (plist-get info :optional))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
-         command
+         (organizer (plist-get info :organizer))
          why
          )
     (when (and
@@ -3450,16 +3468,9 @@ of the clocksum."
            )
       (user-error "Abort the declining")
       )
-    (setq why (read-string "Why: "))
-    (setq command
-          (format
-           "konix_gcal.py -a \"%s\" decline %s \"%s\" %s"
-           account
-           id
-           why
-           updatedraw
-           )
-          )
+    (setq why (read-string
+               (format "Comment for %s: " organizer)
+               ))
     (shell-command
      (format
       "konix_gcal.py -a \"%s\" select_calendar %s"
@@ -3467,29 +3478,78 @@ of the clocksum."
       calendar_id
       )
      )
-    (message command)
-    (shell-command command)
+    (when
+        (equal 0 (konix/call-process-show-error
+                  "konix_gcal.py"
+                  "-a"
+                  account
+                  "decline"
+                  id
+                  why
+                  updatedraw
+                  )
+               )
+      (konix/org-gcal-reset-tags)
+      (org-agenda-set-tags "declined" 'on)
+      (konix/org-gcal-refresh-line)
+      (message "DONE")
+      )
     )
-  (konix/org-gcal-reset-tags)
-  (org-agenda-set-tags "declined" 'on)
-  (konix/org-gcal-refresh-line)
   )
 
-(defun konix/org-gcal-tentative (comment)
-  (interactive "sComment: ")
+(defun konix/org-gcal-delete ()
+  (interactive)
+  (let* (
+         (info (konix/org-gcal-get-info))
+         (id (plist-get info :id))
+         (updatedraw (if current-prefix-arg "" (plist-get info :updatedraw)))
+         (optional (plist-get info :optional))
+         (account (plist-get info :account))
+         (calendar_id (plist-get info :calendar_id))
+         (organizer (plist-get info :organizer))
+         command
+         )
+    (when (and
+           (not optional)
+           (not (yes-or-no-p "This is mandatory meeting, still delete?"))
+           )
+      (user-error "Abort the deletion")
+      )
+    (shell-command
+     (format
+      "konix_gcal.py -a \"%s\" select_calendar %s"
+      account
+      calendar_id
+      )
+     )
+    (when (equal 0
+                 (konix/call-process-show-error
+                  "konix_gcal.py"
+                  "-a"
+                  account
+                  "del_event"
+                  id
+                  )
+                 )
+      (call-interactively 'org-agenda-kill)
+      (message "DONE")
+      )
+    )
+  )
+
+(defun konix/org-gcal-tentative ()
+  (interactive)
   (let* (
          (info (konix/org-gcal-get-info))
          (id (plist-get info :id))
          (updatedraw (if current-prefix-arg "" (plist-get info :updatedraw)))
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
-         (command (format
-                   "konix_gcal.py -a \"%s\" tentative %s \"%s\" %s"
-                   account
-                   id
-                   comment
-                   updatedraw
-                   ))
+         (organizer (plist-get info :organizer))
+         (comment (read-string
+                   (format "Comment for %s: " organizer)
+                   )
+                  )
          )
     (shell-command
      (format
@@ -3498,12 +3558,23 @@ of the clocksum."
       calendar_id
       )
      )
-    (message command)
-    (shell-command command)
+    (when (equal 0
+                 (konix/call-process-show-error
+                  "konix_gcal.py"
+                  "-a"
+                  account
+                  "tentative"
+                  id
+                  comment
+                  updatedraw
+                  )
+                 )
+      (konix/org-gcal-reset-tags)
+      (org-agenda-set-tags "tentative" 'on)
+      (konix/org-gcal-refresh-line)
+      (message "DONE")
+      )
     )
-  (konix/org-gcal-reset-tags)
-  (org-agenda-set-tags "tentative" 'on)
-  (konix/org-gcal-refresh-line)
   )
 
 (setq-default org-babel-python-command "python3")

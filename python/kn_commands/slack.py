@@ -44,6 +44,7 @@ from click_project.lib import (
     ParameterType,
     makedirs,
     json_dumps,
+    createfile,
 )
 from click_project.completion import startswith
 from click_project.config import config
@@ -114,9 +115,85 @@ class Conversation():
         self.data["purpose_fmt"] = self.purpose_fmt
         self.data["name_fmt"] = self.name
         self.name_fmt = self.name
+        self.record_logs_dir = (
+            os.path.join(config.slack.records, self.name)
+            if config.slack.records else None
+        )
+        self.recorded_messages = (
+            os.path.join(self.record_logs_dir, "messages.json")
+            if config.slack.records else None
+        )
+        self.last_record_file = (
+            os.path.join(self.record_logs_dir, ".oldest")
+            if config.slack.records else None
+        )
+        self.archived_file = (
+            os.path.join(self.record_logs_dir, ".archived")
+            if config.slack.records else None
+        )
+
+    @property
+    def archived(self):
+        return (
+            self.archived_file is not None
+            and
+            os.path.exists(self.archived_file)
+        )
+
+    @property
+    def oldest_record_date(self):
+        if (
+                config.slack.records is None
+                or
+                not os.path.exists(self.last_record_file)
+        ):
+            return None
+        val = open(self.last_record_file).read()
+        cal = parsedatetime.Calendar()
+        return cal.parseDT(val)[0].strftime("%s")
+
+    def records(self,
+                oldest=None, latest=None, user=None, count=100000):
+        if (
+                config.slack.records is None
+                or
+                not os.path.exists(self.recorded_messages)
+        ):
+            return []
+        with open(self.recorded_messages, "r") as recordfile:
+            messages = [
+                Message(json.loads(line))
+                for line in recordfile
+            ]
+            return [
+                m for m in messages
+                if (
+                        (
+                            oldest is None
+                            or oldest <= m.date
+                        )
+                        and (
+                            latest is None
+                            or m.date <= latest
+                        )
+                        and (
+                            user is None
+                            or m.get("user") == user.id
+                        )
+                )
+            ]
 
     def __getitem__(self, name):
         return getattr(self, name)
+
+    def leave(self):
+        if config.dry_run:
+            LOGGER.info(f"Would leave {self.name}")
+        else:
+            self.endpoint.leave(self.id)
+
+    def archive(self):
+        createfile(self.archived_file, str(datetime.datetime.now()))
 
     @property
     def members(self):
@@ -179,7 +256,37 @@ class Conversation():
     def set_topic(self, topic):
         self.endpoint.set_topic(self.id, topic)
 
-    def history(self, oldest=None, latest=None, user=None, count=1000):
+    def history(self,
+                oldest=None, latest=None, user=None, count=1000,
+                record=False, combine=True, only_new=False,
+                with_subtypes=True):
+        if only_new:
+            records = []
+        else:
+            records = self.records(
+                oldest=oldest, latest=latest, user=user, count=count)
+        if record:
+            hist = records
+        else:
+            if combine:
+                if count is not None:
+                    count = count - len(records)
+                if records:
+                    oldest = records[-1].date
+            elif only_new:
+                oldest = self.oldest_record_date
+            hist_ = self._history(
+                oldest=oldest, latest=latest, user=user, count=count)
+            if combine:
+                hist = records + hist_
+            else:
+                hist = hist_
+        return [
+            m for m in hist
+            if with_subtypes or "subtype" not in m.data
+        ]
+
+    def _history(self, oldest=None, latest=None, user=None, count=1000):
         def get_history_unpage(latest, oldest, count):
             res = self.endpoint.history(
                 self.data["id"],
@@ -270,10 +377,13 @@ class Conversations():
     cls = Conversation
 
     def list(self):
-        return [
-            self.cls(self.endpoint, c)
-            for c in self.endpoint.list().body[self.list_index]
-        ]
+        @cache_disk(expire=36000)
+        def _list(token):
+            return [
+                self.cls(self.endpoint, c)
+                for c in self.endpoint.list().body[self.list_index]
+            ]
+        return _list(config.slack.token)
 
     def get(self, id_or_name):
         return [
@@ -543,17 +653,30 @@ class SlackConfig():
         ]
 
     @property
+    def all_conversations(self):
+        return {
+            c.id: c
+            for c in Groups().list()
+            + Channels().list()
+            + IMS().list()
+            + MPIM().list()
+        }
+
+    @property
     def conversations(self):
-        @cache_disk(expire=36000)
-        def _conversations(token):
-            return {
-                c.id: c
-                for c in Groups().list()
-                + Channels().list()
-                + IMS().list()
-                + MPIM().list()
-            }
-        return _conversations(self.token)
+        return {
+            k: v
+            for k, v in self.all_conversations.items()
+            if not v.archived
+        }
+
+    @property
+    def archived_conversations(self):
+        return {
+            k: v
+            for k, v in self.all_conversations.items()
+            if v.archived
+        }
 
 
 def find_user(value):
@@ -584,9 +707,20 @@ class UserType(ParameterType):
 
 
 class ConversationType(ParameterType):
+    def __init__(self, all=False, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.all = all
+
+    @property
+    def completer(self):
+        if self.all:
+            return config.slack.all_conversations
+        else:
+            return config.slack.conversations
+
     def complete(self, ctx, incomplete):
         return [
-            c.name for c in config.slack.conversations.values()
+            c.name for c in self.completer.values()
             if startswith(c.name, incomplete)
         ]
 
@@ -595,7 +729,7 @@ class ConversationType(ParameterType):
             self.fail('%s is not a valid group name' % value, param, ctx)
         try:
             return [
-                c for c in config.slack.conversations.values()
+                c for c in self.completer.values()
                 if c.name == value
             ][0]
         except IndexError as e:
@@ -622,6 +756,8 @@ class ConversationType(ParameterType):
     default=get_slack_token,
     required=True,
     help="The token provided by slack")
+@param_config(
+    "slack", "--records", help="therecords")
 def slack():
     """Play with slack
 
@@ -757,11 +893,17 @@ def users(fields, format, missing_in):
     )
 )
 @table_format()
-@option("--type", type=click.Choice(["channels", "groups", "ims", "pmim"]))
-def conversations(fields, format, type):
+@option("--type", type=click.Choice(["channels", "groups", "ims", "pmim"]),
+        help="What kind of conversation to dump")
+@flag("--archived", help="Only archived ones")
+def conversations(fields, format, type, archived):
+    """Dump all conversations"""
     vs = [
         v
-        for v in config.slack.conversations.values()
+        for v in (
+                config.slack.archived_conversations if archived else
+                config.slack.conversations
+        ).values()
         if not type or
         (type == "channels" and isinstance(v, Channel)) or
         (type == "groups" and isinstance(v, Group)) or
@@ -789,15 +931,19 @@ def conversations(fields, format, type):
     )
 )
 @table_format()
-@argument("conversation", type=ConversationType(),
+@argument("conversation", type=ConversationType(all=True),
           help="The conversation to get the history from")
 @option("--oldest", help="The oldest timestamp to consider")
 @option("--latest", help="The latest timestamp to consider")
 @option("--count", help="The number of messages to show")
 @option("--user", type=UserType(), help="Show only messages from this user")
+@flag("--record", help="Dump records instead of the history")
+@flag("--combine/--no-combine", help="Combine records and history",
+      default=True)
+@flag("--only-new", help="Show only new messages (not in the record)")
+@flag("--with-subtypes/--without-subtypes", help="Show the subtypes also", default=True)
 def history(fields, format, conversation, oldest, latest,
-            count,
-            user):
+            count, record, user, combine, only_new, with_subtypes):
     """Show the history of messages from a conversation"""
     if oldest:
         cal = parsedatetime.Calendar()
@@ -806,15 +952,16 @@ def history(fields, format, conversation, oldest, latest,
         cal = parsedatetime.Calendar()
         latest = cal.parseDT(latest)[0].strftime("%s")
     with TablePrinter(fields, format) as tp:
-        tp.echo_records(
-            message.data for message in conversation.history(
-                oldest=oldest, latest=latest, user=user, count=count)
-        )
+        tp.echo_records(message.data for message in conversation.history(
+            oldest=oldest, latest=latest, user=user, count=count,
+            record=record, combine=combine, only_new=only_new,
+            with_subtypes=with_subtypes
+        ))
 
 
 @slack.command()
-@option("--output-directory")
-def record_log(output_directory):
+def record_log():
+    output_directory = config.slack.records
     for c in config.slack.conversations.values():
         LOGGER.info("Dumping history of {}".format(c.data["name_fmt"]))
         output_directory_conversation = os.path.join(

@@ -1,0 +1,15 @@
+#! /bin/bash -eu
+
+PREFIX=`git -c core.bare=false rev-parse --show-prefix|sed -r 's|^(.+)/$|\1|'`
+if echo "${PREFIX}"|grep -q "/"
+then
+    ARGS="$(echo "${PREFIX}"|sed -r 's|(.+)/([^/]+)|\1=\2|')"
+elif [ -n "${PREFIX}" ]
+then
+    ARGS="/=${PREFIX}"
+else
+    ARGS=""
+fi
+
+cd `git -c core.bare=false rev-parse --show-toplevel`
+gav "${ARGS}" "$@"

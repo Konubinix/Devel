@@ -1133,6 +1133,10 @@ def _send(conversation, message, reaction, wait_server_response):
 
 @slack.command()
 def ipython():
+    """Start an interactive python session
+
+    With c = the client and s = the slack object
+    """
     c = config.slack.client
     s = config.slack
     import IPython

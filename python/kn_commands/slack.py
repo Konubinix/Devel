@@ -15,10 +15,8 @@ import requests
 import pprint
 import asyncio
 import redis
-import base64
 from requests.exceptions import HTTPError
 
-import asyncio_redis
 import websockets
 import click
 import slacker

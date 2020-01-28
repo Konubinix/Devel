@@ -181,6 +181,9 @@ class Conversation():
                 )
             ]
 
+    def __eq__(self, other):
+        return self.id == other.id
+
     def __getitem__(self, name):
         return getattr(self, name)
 

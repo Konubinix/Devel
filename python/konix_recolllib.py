@@ -15,7 +15,7 @@ import glob
 def find_recoll_in_hierarchy(directory):
     path = pathlib.Path(directory).absolute()
     for parent in [path,] + list(path.parents):
-        candidate = parent.joinpath("recoll")
+        candidate = parent.joinpath(".recoll")
         if candidate.exists():
             logger.debug("Found {}".format(candidate))
             return candidate

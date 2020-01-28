@@ -1198,6 +1198,56 @@ def invite_to_conversation(users, all, all_but_users, conversation, only_active_
                 raise e
 
 
+@slack.command(handle_dry_run=True)
+@option("--inactivity",
+        help="How much time for a conversation must be inactive"
+        " to leave it (xYxMxD)",
+        default="4M")
+@flag("--alone/--not-alone", default=True, help="Also leave groups where I am alone")
+@option("--keep", multiple=True, type=ConversationType(),
+        help="Keep this conversation, even if it matches the criteria.")
+@flag("--ask/--dont-ask", default=True, help="Interactively ask for each conversation")
+@flag("--with-subtypes/--without-subtypes", help="Show the subtypes also")
+def auto_archive(inactivity, alone, keep, ask, with_subtypes):
+    """Leave groups and MPIM where nothing is expected to happen soon."""
+    now = datetime.datetime.now()
+    time_dict = re.match(
+        "^\s*((?P<years>\d+)\s*Y)?"
+        "\s*((?P<months>\d+)\s*M?)?"
+        "\s*((?P<days>d\+)\s*D)?\s*$",
+        inactivity
+    ).groupdict()
+    years = int(time_dict['years'] or "0")
+    months = int(time_dict['months'] or "0")
+    days = int(time_dict['days'] or "0") + 30 * months + 365 * years
+    duration = datetime.timedelta(days=days)
+
+    def matching_conversations():
+        for conversation in config.slack.conversations.values():
+            LOGGER.debug(f"## Scanning conversation {conversation.name}")
+            hist = conversation.history(count=1, with_subtypes=with_subtypes)
+            if len(conversation.members) == 1 and alone:
+                LOGGER.info(f"Empty conversation {conversation.name}")
+                yield conversation
+            elif hist and (hist[-1].date + duration) < now:
+                LOGGER.info(f"Inactive conversation {conversation.name} ({hist[-1].date})")
+                yield conversation
+            elif not(hist):
+                LOGGER.info(f"Abandoned conversation {conversation.name}")
+                yield conversation
+
+    for conversation in matching_conversations():
+        if conversation in keep:
+            LOGGER.info(f"Unconditionally keep {conversation.name}")
+        elif (
+                not ask
+                or click.confirm(
+                    f"Really archive {conversation.name} ({len(conversation.members)})\n(use --dont-ask to avoid asking this)?"
+                )
+        ):
+            conversation.archive()
+
+
 @slack.command()
 @argument("conversation", type=ConversationType(), help="The conversation")
 @argument("topic", help="The topic")

@@ -1947,7 +1947,7 @@ items"
                  )
                 ("agp" "Projects"
                  (
-                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
+                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"-WAITING-DELEGATED"
                         (
                          (org-agenda-overriding-header
                           "Current projects (without subprojects nor maybe)")
@@ -1957,33 +1957,6 @@ items"
                              '("phantom"))
                             (konix/org-agenda-skip-if-task-of-project)
                             (konix/org-agenda-for-today-skip-if-not-the-good-time)
-                            )
-                          )
-                         )
-                        )
-                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
-                        (
-                         (org-agenda-overriding-header
-                          "Future projects (without subprojects)")
-                         (org-agenda-skip-function
-                          '(or
-                            (konix/org-agenda-skip-if-tags
-                             '("phantom"))
-                            (konix/org-agenda-skip-if-task-of-project)
-                            (konix/org-agenda-keep-if-scheduled-and-scheduled-in-the-future)
-                            )
-                          )
-                         )
-                        )
-                  (tags "+project+maybe"
-                        (
-                         (org-agenda-overriding-header
-                          "Maybe projects (without subprojects)")
-                         (org-agenda-skip-function
-                          '(or
-                            (konix/org-agenda-skip-if-tags
-                             '("phantom"))
-                            (konix/org-agenda-skip-if-task-of-project)
                             )
                           )
                          )

@@ -18,6 +18,8 @@ then
 	exit 0
 fi
 
-konix_recollq.py -b "$@" | \
-    sed 's|file://||' | \
-    konix_lines2args.py git annex "${CLK___METHOD}" --metadata state="${CLK___STATE}" "${@}"
+readarray -t files < <(konix_recollq.py -b mime:inode/symlink "$@" | sed 's|file://||')
+if ! [ "${files}" == "" ]
+then
+    git annex "${CLK___METHOD}" --metadata state="${CLK___STATE}" "${files[@]}"
+fi

@@ -1068,6 +1068,24 @@ items"
   (message "org-super-agenda per recurrent: %s" (if org-super-agenda-groups t nil))
   )
 
+(defun konix/org-agenda-per-perso-toggle nil
+  (interactive)
+  (set (make-variable-buffer-local
+        'org-super-agenda-groups)
+       (if org-super-agenda-groups
+           nil
+         '(
+           (:name "not perso"
+                  :not (:tag "perso")
+                  )
+           (:name "perso"
+                  :tag "perso")
+           )
+         )
+       )
+  (message "org-super-agenda per perso: %s" (if org-super-agenda-groups t nil))
+  )
+
 (defun konix/org-agenda-per-tag-toggle (&optional tag)
   (interactive)
   (set (make-variable-buffer-local

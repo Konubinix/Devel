@@ -26,6 +26,12 @@
 (setq-default sh-basic-offset 4
 	          sh-indentation 4)
 
+(defun konix/sh-script/make-executable nil
+  (unless (string-prefix-p "_" (buffer-name))
+    (konix/make-executable)
+    )
+  )
+
 (defun konix/sh-mode-hook ()
   (setq indent-tabs-mode t
 		tab-width 4
@@ -40,7 +46,7 @@
 		  ac-source-files-in-current-dir
 		  )
 		)
-  (add-hook 'after-save-hook 'konix/make-executable t t)
+  (add-hook 'after-save-hook 'konix/sh-script/make-executable t t)
   )
 (add-hook 'sh-mode-hook 'konix/sh-mode-hook)
 

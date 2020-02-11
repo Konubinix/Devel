@@ -138,18 +138,6 @@ class Conversation():
             os.path.exists(self.archived_file)
         )
 
-    @property
-    def oldest_record_date(self):
-        if (
-                config.slack.records is None
-                or
-                not os.path.exists(self.last_record_file)
-        ):
-            return None
-        val = open(self.last_record_file).read()
-        cal = parsedatetime.Calendar()
-        return cal.parseDT(val)[0].strftime("%s")
-
     def records(self,
                 oldest=None, latest=None, user=None, count=100000):
         if (
@@ -261,24 +249,25 @@ class Conversation():
                 oldest=None, latest=None, user=None, count=1000,
                 record=False, combine=True, only_new=False,
                 with_subtypes=True):
-        if only_new:
-            records = []
-        else:
-            records = self.records(
-                oldest=oldest, latest=latest, user=user, count=count)
+        if isinstance(oldest, datetime.datetime):
+            oldest = oldest.timestamp()
+        if isinstance(latest, datetime.datetime):
+            latest = latest.timestamp()
+        records = self.records(
+            oldest=oldest, latest=latest, user=user, count=count)
         if record:
             hist = records
         else:
-            if combine:
+            if combine and not only_new:
                 if count is not None:
                     count = count - len(records)
                 if records:
-                    oldest = records[-1].date
+                    oldest = records[-1].data["ts"]
             elif only_new:
-                oldest = self.oldest_record_date
+                oldest = records[-1].data["ts"] if records else None
             hist_ = self._history(
                 oldest=oldest, latest=latest, user=user, count=count)
-            if combine:
+            if combine and not only_new:
                 hist = records + hist_
             else:
                 hist = hist_
@@ -964,30 +953,14 @@ def history(fields, format, conversation, oldest, latest,
 
 @slack.command()
 def record_log():
-    output_directory = config.slack.records
+    """Dump the records for archiving purpose."""
     for c in config.slack.conversations.values():
         LOGGER.info("Dumping history of {}".format(c.data["name_fmt"]))
-        output_directory_conversation = os.path.join(
-            output_directory, c.data["name_fmt"])
-        last_record_file = os.path.join(
-            output_directory_conversation, ".oldest")
-        if os.path.exists(last_record_file):
-            with open(last_record_file) as f:
-                oldest = f.read()
-        else:
-            oldest = None
-        makedirs(output_directory_conversation)
-        with open(os.path.join(
-                output_directory_conversation, "messages.json"),
-                  "a",
-                  encoding="utf-8"
-        ) as message_file:
-            now = datetime.datetime.now()
-            for message in c.history(oldest=oldest):
+        makedirs(c.record_logs_dir)
+        with open(c.recorded_messages, "a", encoding="utf-8") as message_file:
+            for message in c.history(only_new=True):
                 message_file.write(json.dumps(message.data))
                 message_file.write("\n")
-        with open(last_record_file, "w", encoding="utf-8") as f:
-            f.write("{}".format(now.strftime("%s")))
 
 
 @slack.group()

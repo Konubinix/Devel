@@ -1554,10 +1554,15 @@ items"
                             ))
                          )
                         )
-                  (tags "+Expectation"
+                  (tags "+Expectation-Commitment"
                         (
                          (org-agenda-overriding-header
                           "Be clear about the expectations -> make commitment out of them")
+                         (org-agenda-skip-function
+                          '(or
+                            (konix/org-agenda-skip-if-task-of-project)
+                            )
+                          )
                          )
                         )
                   )

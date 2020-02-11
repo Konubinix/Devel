@@ -897,12 +897,14 @@ def users(fields, format, missing_in):
 @option("--type", type=click.Choice(["channels", "groups", "ims", "pmim"]),
         help="What kind of conversation to dump")
 @flag("--archived", help="Only archived ones")
-def conversations(fields, format, type, archived):
+@flag("--all", help="All of them")
+def conversations(fields, format, type, archived, all):
     """Dump all conversations"""
     vs = [
         v
         for v in (
                 config.slack.archived_conversations if archived else
+                config.slack.all_conversations if all else
                 config.slack.conversations
         ).values()
         if not type or

@@ -23,8 +23,9 @@
 ;;
 
 ;;; Code:
-(setq sh-basic-offset 4
-	  sh-indentation 4)
+(setq-default sh-basic-offset 4
+	          sh-indentation 4)
+
 (defun konix/sh-mode-hook ()
   (setq indent-tabs-mode t
 		tab-width 4

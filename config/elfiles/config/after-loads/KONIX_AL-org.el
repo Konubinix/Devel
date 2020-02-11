@@ -4397,5 +4397,19 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defmacro konix/org-with-point-set-to-next-visible-line (&rest body)
+  `(let (
+         (col (current-column))
+         )
+     (save-excursion ,@body)
+     (while (and
+             (not (eq (get-text-property (point) 'invisible) nil))
+             (not (eq (point-at-eol) (point-max)))
+             )
+       (forward-visible-line 1)
+       )
+     (line-move-to-column col)
+     )
+  )
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

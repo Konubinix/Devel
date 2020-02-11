@@ -739,18 +739,9 @@
 
 (defun konix/org-agenda-filter-for-now nil
   (interactive)
-  (let (
-        (col (current-column))
-        )
-    (org-agenda-filter-hide-line 'for-now)
-    (while (and
-            (not (eq (get-text-property (point) 'invisible) nil))
-            (not (eq (point-at-eol) (point-max)))
-            )
-      (forward-visible-line 1)
-      )
-    (line-move-to-column col)
-    )
+  (konix/org-with-point-set-to-next-visible-line
+   (org-agenda-filter-hide-line 'for-now)
+   )
   )
 
 (defun konix/org-agenda-filter-show-all-for-now nil
@@ -784,74 +775,65 @@
 		   )
 		  ))
 		)
-    (let (
-          (col (current-column))
-          )
-	  (save-excursion
-	    (goto-char (point-min))
-	    (while (not (eobp))
-		  (if (org-get-at-bol 'org-marker)
-			  (progn
-			    (setq tags (org-get-at-bol 'tags) ; used in eval
-					  cat (get-text-property (point) 'org-category))
-			    (if (and
-				     (not (eval konix/org-entry-predicate))
-				     ;; show empty context entries if the associated setting is set
-				     (or (not konix/org-agenda-filter-context-show-empty-context)
-					     (not
-						  (konix/org-agenda-no-context-p)
-						  )
-					     )
-				     )
-				    (org-agenda-filter-hide-line 'tag))
-			    (beginning-of-line 2))
-		    (beginning-of-line 2))))
-      (while (and
-              (not (eq (get-text-property (point) 'invisible) nil))
-              (not (eq (point-at-eol) (point-max)))
-              )
-        (forward-visible-line 1)
-        )
-      (line-move-to-column col)
-      )
-	)
+	(konix/org-with-point-set-to-next-visible-line
+	 (goto-char (point-min))
+	 (while (not (eobp))
+	   (if (org-get-at-bol 'org-marker)
+		   (progn
+			 (setq tags (org-get-at-bol 'tags) ; used in eval
+				   cat (get-text-property (point) 'org-category))
+			 (if (and
+				  (not (eval konix/org-entry-predicate))
+				  ;; show empty context entries if the associated setting is set
+				  (or (not konix/org-agenda-filter-context-show-empty-context)
+					  (not
+					   (konix/org-agenda-no-context-p)
+					   )
+					  )
+				  )
+				 (org-agenda-filter-hide-line 'tag))
+			 (beginning-of-line 2))
+		 (beginning-of-line 2))))
+    )
   )
 
 (defun konix/org-agenda-refinalize ()
   (interactive)
-  (let (
-        (filters '("tag" "regexp" "effort" "category" "top-headline"))
-        )
-    (mapc (lambda (type)
-            (set
-             (intern
-              (format "konix/org-agenda-%s-filter/save" (intern-soft type))
-              )
-             (eval
+  (konix/org-with-point-set-to-next-visible-line
+   (let (
+         (filters '("tag" "regexp" "effort" "category" "top-headline"))
+         )
+     (mapc (lambda (type)
+             (set
               (intern
-               (format "org-agenda-%s-filter" (intern-soft type)))
+               (format "konix/org-agenda-%s-filter/save" (intern-soft type))
+               )
+              (eval
+               (intern
+                (format "org-agenda-%s-filter" (intern-soft type)))
+               )
               )
              )
-            )
-          filters
-          )
-    (org-agenda-filter-show-all-tag)
-    (mapc (lambda (type)
-            (set
-             (intern
-              (format "org-agenda-%s-filter" (intern-soft type))
-              )
-             (eval
+           filters
+           )
+     (org-agenda-filter-show-all-tag)
+     (mapc (lambda (type)
+             (set
               (intern
-               (format "konix/org-agenda-%s-filter/save" (intern-soft type)))
+               (format "org-agenda-%s-filter" (intern-soft type))
+               )
+              (eval
+               (intern
+                (format "konix/org-agenda-%s-filter/save" (intern-soft type)))
+               )
               )
              )
-            )
-          filters
-          )
-    (konix/org-agenda-tag-filter-context-initialize-from-context)
-    (org-agenda-finalize)
-    )
+           filters
+           )
+     (konix/org-agenda-tag-filter-context-initialize-from-context)
+     (org-agenda-finalize)
+     )
+   )
   )
 
 (defun konix/org-agenda-set-header-line-format nil
@@ -1630,17 +1612,23 @@ STOP is the end of the agenda."
 
 (defun konix/org-agenda-hide-done ()
   (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (while (konix/org-agenda-next-entry)
-      (when (konix/org-with-point-on-heading (org-entry-is-done-p))
-        (konix/org-agenda-filter-for-now)
-        (forward-line -1)
-        )
-      )
-    )
+  (konix/org-with-point-set-to-next-visible-line
+   (goto-char (point-min))
+   (while (konix/org-agenda-next-entry)
+     (when (or
+            (konix/org-with-point-on-heading (string= "TODO" (org-get-todo-state)))
+            (konix/org-with-point-on-heading (org-entry-is-done-p))
+            (konix/org-with-point-on-heading
+             (null (konix/org-agenda-keep-if-scheduled-and-scheduled-in-the-future))
+             )
+            (member "maybe" (konix/org-with-point-on-heading (org-get-tags)))
+            )
+       (konix/org-agenda-filter-for-now)
+       (forward-line -1)
+       )
+     )
+   )
   )
-
 
 (setq-default konix/org-agenda-highlight-inactive-with-subtree nil)
 (make-variable-buffer-local 'konix/org-agenda-highlight-inactive-with-subtree)

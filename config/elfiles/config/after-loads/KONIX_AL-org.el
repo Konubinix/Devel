@@ -4389,5 +4389,8 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
      (line-move-to-column col)
      )
   )
+
+(setq-default org-agenda-todo-ignore-time-comparison-use-seconds t)
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

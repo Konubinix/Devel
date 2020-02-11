@@ -76,37 +76,42 @@
 
 ;;; Code:
 
+(defun dired-sort-compute-switches (switch)
+  "Return the switch to use.
+SWITCH: the switch to use as basis."
+  (concat dired-listing-switches switch (if current-prefix-arg "r" ""))
+  )
+
 (defun dired-sort-size ()
   "Dired sort by size."
   (interactive)
-  (dired-sort-other (concat dired-listing-switches "S")))
+  (dired-sort-other (dired-sort-compute-switches "S")))
 
 (defun dired-sort-extension ()
   "Dired sort by extension."
   (interactive)
-  (dired-sort-other (concat dired-listing-switches "X")))
+  (dired-sort-other (dired-sort-compute-switches "X")))
 
 (defun dired-sort-ctime ()
   "Dired sort by create time."
   (interactive)
-  (dired-sort-other (concat dired-listing-switches "ct")))
+  (dired-sort-other (dired-sort-compute-switches "ct")))
 
 (defun dired-sort-utime ()
   "Dired sort by access time."
   (interactive)
-  (dired-sort-other (concat dired-listing-switches "ut")))
+  (dired-sort-other (dired-sort-compute-switches "ut")))
 
 (defun dired-sort-time ()
   "Dired sort by time."
   (interactive)
-  (dired-sort-other (concat dired-listing-switches "t")))
+  (dired-sort-other (dired-sort-compute-switches "t")))
 
 (defun dired-sort-name ()
   "Dired sort by name."
   (interactive)
-  (dired-sort-other (concat dired-listing-switches "")))
+  (dired-sort-other (dired-sort-compute-switches "")))
 
 (provide 'dired-sort)
 
 ;;; dired-sort.el ends here
-

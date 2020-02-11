@@ -379,12 +379,12 @@ class Conversations():
 
     def list(self):
         @cache_disk(expire=36000)
-        def _list(token):
+        def _list(token, name):
             return [
                 self.cls(self.endpoint, c)
                 for c in self.endpoint.list().body[self.list_index]
             ]
-        return _list(config.slack.token)
+        return _list(config.slack.token, self.__class__.__name__)
 
     def get(self, id_or_name):
         return [

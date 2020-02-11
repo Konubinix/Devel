@@ -4109,7 +4109,7 @@ of the clocksum."
              (org-read-date nil nil to)
              )
      nil
-     t
+     nil
      ''konix/org-agenda-skip-if-task-of-project
      )
     )

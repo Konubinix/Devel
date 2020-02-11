@@ -3717,6 +3717,7 @@ of the clocksum."
 
 (defun konix/org-store-agenda-views ()
   (interactive)
+  (require 'org-agenda)
   (save-some-buffers)
   (message "Exporting all agenda views")
   (let (

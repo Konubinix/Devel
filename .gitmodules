@@ -8,10 +8,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/w3m
 	url = https://github.com/emacsmirror/w3m.git
-[submodule "bash_optparse"]
-ignore=dirty
-	path = bash_optparse
-	url = https://github.com/carlobaldassi/bash_optparse.git
 [submodule "config/elfiles/readline-complete"]
 ignore=dirty
 	path = config/elfiles/readline-complete
@@ -64,10 +60,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/highlight-indentation
 	url = https://github.com/antonj/Highlight-Indentation-for-Emacs.git
-[submodule "git-fs"]
-ignore=dirty
-	path = git-fs
-	url = https://github.com/g2p/git-fs.git
 [submodule "hobeika_cfg"]
 ignore=dirty
 	path = hobeika_cfg
@@ -80,14 +72,6 @@ ignore=dirty
 ignore=dirty
 	path = git-wip
 	url = https://github.com/bartman/git-wip.git
-[submodule "lazygal"]
-ignore=dirty
-	path = lazygal
-	url = https://github.com/Konubinix/lazygal.git
-[submodule "lib/log.sh"]
-ignore=dirty
-	path = lib/log.sh
-	url = https://github.com/livibetter/log.sh.git
 [submodule "config/elfiles/org-ehtml"]
 ignore=dirty
 	path = config/elfiles/org-ehtml
@@ -101,77 +85,36 @@ ignore=dirty
 	path = ledger-autosync
 	#url = https://gitlab.com/egh/ledger-autosync.git
 	url = https://github.com/Konubinix/ledger-autosync
-[submodule "config/elfiles/ini"]
-ignore=dirty
-	path = config/elfiles/ini
-	url = https://github.com/daniel-ness/ini.el.git
 [submodule "config/elfiles/epc"]
 ignore=dirty
 	path = config/elfiles/epc
 	url = https://github.com/kiwanami/emacs-epc.git
-[submodule "dmenu-frecency"]
-ignore=dirty
-	path = dmenu-frecency
-	url = https://github.com/kspi/dmenu-frecency.git
 [submodule "offlineimap"]
 ignore=dirty
 	path = offlineimap
 	# url = https://github.com/Konubinix/offlineimap.git
 	url = https://github.com/OfflineIMAP/offlineimap.git
-[submodule "syncplay"]
-ignore=dirty
-	path = syncplay
-	url = https://github.com/Uriziel/syncplay.git
-[submodule "gui2py"]
-ignore=dirty
-	path = gui2py
-	url = https://github.com/reingart/gui2py.git
 [submodule "PulseDroid"]
 ignore=dirty
 	path = PulseDroid
 	url = https://github.com/Konubinix/PulseDroid.git
 
-[submodule "xapers"]
-ignore=dirty
-	path = xapers
-	url = https://github.com/Konubinix/xapers.git
 [submodule "notmuch"]
 ignore=dirty
 	path = notmuch
 	url = git://notmuchmail.org/git/notmuch
-[submodule "lddtree"]
-ignore=dirty
-	path = lddtree
-	#url = https://github.com/ncopa/lddtree.git
-	url = https://github.com/Konubinix/lddtree
 [submodule "config/elfiles/zenburn"]
 ignore=dirty
 	path = config/elfiles/zenburn
 	url = https://github.com/bbatsov/zenburn-emacs
-[submodule "python/pyftplib"]
-ignore=dirty
-	path = python/pyftplib
-	url = https://github.com/giampaolo/pyftpdlib
-[submodule "gorgeous"]
-ignore=dirty
-	path = gorgeous
-	url = https://github.com/mislav/gorgeous
 [submodule "config/elfiles/rainbow-mode"]
 ignore=dirty
 	path = config/elfiles/rainbow-mode
 	url = https://github.com/emacsmirror/rainbow-mode
-[submodule "rtags"]
-ignore=dirty
-	path = rtags
-	url = https://github.com/Andersbakken/rtags/
 [submodule "searx"]
 ignore=dirty
 	path = searx
 	url = https://github.com/asciimoo/searx
-[submodule "XKCD-password-generator"]
-ignore=dirty
-	path = XKCD-password-generator
-	url = https://github.com/redacted/XKCD-password-generator
 [submodule "config/elfiles/swiper"]
 ignore=dirty
 	path = config/elfiles/swiper
@@ -180,26 +123,10 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/skewer-mode
 	url = https://github.com/skeeto/skewer-mode
-[submodule "Pymacs"]
-ignore=dirty
-	path = Pymacs
-	url = https://github.com/pinard/Pymacs
-[submodule "whatsapp-purple"]
-ignore=dirty
-	path = whatsapp-purple
-	url = https://github.com/davidgfnet/whatsapp-purple
-[submodule "clang-ctags"]
-ignore=dirty
-	path = clang-ctags
-	url = https://github.com/drothlis/clang-ctags
 [submodule "config/elfiles/ycmd"]
 ignore=dirty
 	path = config/elfiles/ycmd
 	url = https://github.com/abingham/emacs-ycmd
-[submodule "alot"]
-ignore=dirty
-	path = alot
-	url = https://github.com/pazz/alot/
 [submodule "pymsmtpq"]
 ignore=dirty
 	path = pymsmtpq
@@ -216,34 +143,14 @@ ignore=dirty
 ignore=dirty
 	path = mopidy-beets
 	url = https://github.com/mopidy/mopidy-beets
-[submodule "0bin"]
-ignore=dirty
-	path = 0bin
-	url = https://github.com/sametmax/0bin
 [submodule "config/elfiles/highlight-symbol.el"]
 ignore=dirty
 	path = config/elfiles/highlight-symbol.el
 	url = https://github.com/nschum/highlight-symbol.el
-[submodule "encfs"]
-ignore=dirty
-	path = encfs
-	url = https://github.com/Konubinix/encfs
 [submodule "Flexget"]
 ignore=dirty
 	path = Flexget
 	url = https://github.com/Flexget/Flexget.git
-[submodule "git-remote-hg"]
-ignore=dirty
-	path = git-remote-hg
-	url = https://github.com/fingolfin/git-remote-hg
-[submodule "pyfilesystem"]
-ignore=dirty
-	path = pyfilesystem
-	url = https://github.com/Konubinix/pyfilesystem.git
-[submodule "znc"]
-ignore=dirty
-	path = znc
-	url = https://github.com/Konubinix/znc
 [submodule "Pipe"]
 ignore=dirty
 	path = Pipe
@@ -261,14 +168,6 @@ ignore=dirty
 	path = qutebrowser
 	#url = https://github.com/Konubinix/qutebrowser
 	url = https://github.com/qutebrowser/qutebrowser
-[submodule "git-annex-remote-rclone"]
-ignore=dirty
-	path = git-annex-remote-rclone
-	url = https://github.com/DanielDent/git-annex-remote-rclone
-[submodule "config/bash-completion-virtualbox"]
-ignore=dirty
-	path = config/bash-completion-virtualbox
-	url = https://github.com/tfmalt/bash-completion-virtualbox
 [submodule "pymimedetacher"]
 	path = pymimedetacher
 	url = https://github.com/Konubinix/pymimedetacher.git
@@ -279,15 +178,9 @@ ignore=dirty
 [submodule "flexx"]
 	path = flexx
 	url = https://github.com/zoofio/flexx
-[submodule "pickups"]
-	path = pickups
-	url = https://github.com/mtomwing/pickups
 [submodule "cask"]
 	path = cask
 	url = https://github.com/cask/cask.git
-[submodule "beancount"]
-	path = beancount
-	url = https://github.com/beancount/beancount
 [submodule "prosody"]
 	path = prosody
 	url = git://github.com/bjc/prosody.git
@@ -297,9 +190,3 @@ ignore=dirty
 [submodule "an2linuxserver"]
 	path = an2linuxserver
 	url = https://github.com/rootkiwi/an2linuxserver
-[submodule "SoundScrape"]
-	path = SoundScrape
-	url = https://github.com/Konubinix/SoundScrape
-[submodule "config/elfiles/emacs-piper"]
-	path = config/elfiles/emacs-piper
-	url = https://gitlab.com/howardabrams/emacs-piper.git

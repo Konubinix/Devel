@@ -60,10 +60,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/highlight-indentation
 	url = https://github.com/antonj/Highlight-Indentation-for-Emacs.git
-[submodule "hobeika_cfg"]
-ignore=dirty
-	path = hobeika_cfg
-	url = https://github.com/hobeika/cfg
 [submodule "smartcd"]
 ignore=dirty
 	path = smartcd
@@ -94,11 +90,6 @@ ignore=dirty
 	path = offlineimap
 	# url = https://github.com/Konubinix/offlineimap.git
 	url = https://github.com/OfflineIMAP/offlineimap.git
-[submodule "PulseDroid"]
-ignore=dirty
-	path = PulseDroid
-	url = https://github.com/Konubinix/PulseDroid.git
-
 [submodule "notmuch"]
 ignore=dirty
 	path = notmuch
@@ -175,9 +166,6 @@ ignore=dirty
 [submodule "weboob"]
 	path = weboob
 	url = https://git.weboob.org/weboob/devel.git
-[submodule "flexx"]
-	path = flexx
-	url = https://github.com/zoofio/flexx
 [submodule "cask"]
 	path = cask
 	url = https://github.com/cask/cask.git

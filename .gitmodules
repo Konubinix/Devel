@@ -178,3 +178,6 @@ ignore=dirty
 [submodule "an2linuxserver"]
 	path = an2linuxserver
 	url = https://github.com/rootkiwi/an2linuxserver
+[submodule "flexx"]
+	path = flexx
+	url = https://github.com/flexxui/flexx

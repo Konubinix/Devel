@@ -9,7 +9,8 @@ import sys
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
-def by_konubinix_notificator(message, unique=False, duration=3000, type_="normal"):
+def by_konubinix_notificator(message, unique=False, duration=3000,
+                             type_="normal"):
     import dbus
     session = dbus.SessionBus()
     path = "/Notification"
@@ -30,10 +31,10 @@ def by_konubinix_notificator(message, unique=False, duration=3000, type_="normal
     LOGGER.info("Message displayed")
 
 def by_pynotify(message):
-    import pynotify
-    if not pynotify.init("Message"):
+    import notify2
+    if not notify2.init("Message"):
         sys.exit(1)
-    n = pynotify.Notification("Message", message)
+    n = notify2.Notification("Message", message)
     n.set_timeout(3000)
     n.show()
 
@@ -83,9 +84,8 @@ def local_display(message, unique=False, duration=3000, type_="normal"):
         LOGGER.info("Trying with the notificator")
         by_konubinix_notificator(message, unique, duration, type_)
     except Exception as e:
-        print(e.message)
         try:
-            LOGGER.error("Fallbacking to pynotify")
+            LOGGER.error("Fallbacking to notify2")
             by_pynotify(message)
         except:
             LOGGER.error("Fallbacking to pyosd")

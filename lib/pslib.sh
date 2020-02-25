@@ -61,3 +61,8 @@ function ps_xeyes () {
     ps_wait "$@"
     xeyes
 }
+
+function ps_notify () {
+    ps_wait "$@"
+    konix_display.py "$*"
+}

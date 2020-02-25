@@ -74,3 +74,7 @@
 	(depends-on "visual-regexp")
 	(depends-on "evil")
 (depends-on "orgalist")
+(depends-on "vue-mode")
+(depends-on "multiple-cursors")
+(depends-on "key-chord")
+(depends-on "lsp-java")

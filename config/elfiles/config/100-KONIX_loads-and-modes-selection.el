@@ -132,9 +132,12 @@
 (autoload 'konix/gdbserver "gdb-mi" "" t)
 (autoload 'beancount-mode "beancount" "" t)
 (autoload 'pdf-tools-pdf-buffer-p "pdf-tools" "" t)
-
-
 (autoload 'piper "piper" "" t)
+(autoload 'mc/edit-lines "multiple-cursors" "" t)
+
+
+
+
 ;; ************************************************************
 ;; Automodes
 ;; ************************************************************

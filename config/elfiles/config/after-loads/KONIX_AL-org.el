@@ -1523,11 +1523,11 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "DELEGATED-maybe|WAIT-maybe|Commitment-C_me-C_society-maybe"
+                  (tags-todo "DELEGATED-maybe|WAIT-maybe|Promise-maybe"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
-                               "Make sure all commitments have due dates")
+                               "Make sure all promises have due dates")
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(deadline))
@@ -1847,9 +1847,9 @@ items"
                   )
                  )
                 ("ag" . "GTD list views")
-                ("agC" "Commitments"
+                ("agC" "Commitment promises"
                  (
-                  (tags "-maybe+todo=\"NEXT\"-C_me|-C_me+todo=\"TODO\"-maybe|-C_me+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
+                  (tags "-maybe+todo=\"NEXT\"+Promise|+Promise+todo=\"TODO\"-maybe|+Promise+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
                         (
                          (org-agenda-overriding-header
                           "Committed stuff, not to me")

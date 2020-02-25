@@ -387,7 +387,7 @@
      (
       (save-excursion
         (org-back-to-heading)
-        (re-search-forward org-clock-string end t)
+        (re-search-forward org-clock-line-re end t)
         )
       ;; something that was clocked
       t

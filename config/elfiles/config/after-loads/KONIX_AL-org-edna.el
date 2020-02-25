@@ -49,7 +49,7 @@ set scheduled-lower-of!(\"01-01\" \"06-01\") so that it will be
 scheduled in January if it is triggered in July."
   (org-schedule nil (first
                      (sort
-                      (mapc (lambda (date) (org-read-date nil nil date)) dates)
+                      (mapcar (lambda (date) (org-read-date nil nil date)) dates)
                       'string<
                       )
                      )

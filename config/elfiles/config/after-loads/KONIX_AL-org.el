@@ -4397,5 +4397,17 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (setq-default org-agenda-todo-ignore-time-comparison-use-seconds t)
 
+
+(defun konix/verify-refile-target ()
+  (and
+   (not (member (nth 2 (org-heading-components)) org-done-keywords))
+   (not (member "maybe" (org-get-tags)))
+   (not (member "gcalgenerated" (org-get-tags)))
+   )
+  )
+
+(setq-default org-refile-target-verify-function 'konix/verify-refile-target)
+
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

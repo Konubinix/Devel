@@ -1970,5 +1970,11 @@ X-WR-TIMEZONE:CEST
   )
 (advice-add 'org-agenda-filter-apply :after #'konix/org-agenda-count-entries-after-tag-filter)
 
+(defun konix/org-agenda-get-heading nil
+  (konix/org-with-point-on-heading
+   (org-get-heading t t t t)
+   )
+  )
+
 (provide 'KONIX_AL-org-agenda)
 ;;; KONIX_AL-org-agenda.el ends here

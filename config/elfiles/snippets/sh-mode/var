@@ -3,4 +3,4 @@
 # key: $
 # binding: direct-keybinding
 # --
-\$\{${100:variable}\}$0
+"\$\{${100:variable}\}"$0

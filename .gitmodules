@@ -181,3 +181,6 @@ ignore=dirty
 [submodule "flexx"]
 	path = flexx
 	url = https://github.com/flexxui/flexx
+[submodule "config/elfiles/ini"]
+	path = config/elfiles/ini
+	url = https://github.com/daniel-ness/ini.el.git

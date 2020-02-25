@@ -80,6 +80,11 @@ function sob_xeyes () {
     xeyes
 }
 
+function sob_notify () {
+    sob_wait "$@"
+    konix_display.py "$*"
+}
+
 function sob_kill () {
     _sob_setup
     local pid="$(ps_select)"

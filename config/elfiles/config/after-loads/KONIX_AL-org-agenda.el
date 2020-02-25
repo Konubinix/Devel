@@ -1970,6 +1970,22 @@ X-WR-TIMEZONE:CEST
   )
 (advice-add 'org-agenda-filter-apply :after #'konix/org-agenda-count-entries-after-tag-filter)
 
+(defun konix/org-agenda-batch-unmaybe nil
+  (interactive)
+  (while t
+    (konix/goto-random-line)
+    (while (not (get-text-property (point) 'todo-state))
+      (konix/goto-random-line)
+      )
+    (recenter-top-bottom 0)
+    (when (y-or-n-p (format "Take this one (%s)?"
+                            (konix/org-agenda-get-heading)
+                            ))
+      (org-agenda-set-tags "maybe" 'off)
+      )
+    )
+  )
+
 (defun konix/org-agenda-get-heading nil
   (konix/org-with-point-on-heading
    (org-get-heading t t t t)

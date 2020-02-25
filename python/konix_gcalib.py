@@ -305,7 +305,7 @@ class GCall(cmd.Cmd, object):
 
         @property
         def tags(self):
-            res = []
+            res = ["gcalgenerated"]
             if self.my_response_status:
                 res.append(self.my_response_status)
             if self.recurringEventId:

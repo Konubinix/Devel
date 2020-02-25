@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-COMMAND="s"
+COMMAND="send"
 while getopts "hl" opt; do
     case $opt in
         h)
@@ -8,11 +8,11 @@ while getopts "hl" opt; do
             exit 0
             ;;
         l)
-            COMMAND="l"
+            COMMAND="list"
             ;;
     esac
 done
 shift $((OPTIND-1))
-pymsmtpq --manage "${COMMAND}"
+msmtpq --manage "${COMMAND}"
 echo OK
 notmuch new

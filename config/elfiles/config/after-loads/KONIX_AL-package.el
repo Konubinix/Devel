@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(setq-default gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+
 (add-to-list 'package-archives
     '("melpa" .
       "http://melpa.org/packages/"))

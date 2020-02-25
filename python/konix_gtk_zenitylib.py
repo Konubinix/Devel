@@ -1,5 +1,7 @@
-#!/usr/bin/env python2
-import gtk
+#!/usr/bin/env python3
+from gi.repository import Gtk as gtk
+from gi.repository import Gdk
+
 import sys
 import konix_notify
 
@@ -41,8 +43,8 @@ def key_pressed(entry, event):
 
 def get_from_clipboard(button=None, event=None):
     global entry
-    clipboard_text = gtk.Clipboard(selection="PRIMARY").wait_for_text() or \
-                     gtk.Clipboard(selection="CLIPBOARD").wait_for_text() or ""
+    clipboard_text = gtk.Clipboard.get(Gdk.SELECTION_PRIMARY).wait_for_text() or \
+                     gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text() or ""
     entry.set_text(clipboard_text)
     entry.grab_focus()
     konix_notify.main("Updated the entry with clipboard content")
@@ -59,9 +61,9 @@ def getText(info=False,
     text = text.replace("<", "_").replace(">", "_")
     dialog = gtk.MessageDialog(
         None,
-        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-        gtk.MESSAGE_INFO if info else gtk.MESSAGE_QUESTION,
-        gtk.BUTTONS_NONE if info else gtk.BUTTONS_OK,
+        gtk.DialogFlags.MODAL | gtk.DialogFlags.DESTROY_WITH_PARENT,
+        gtk.MessageType.INFO if info else gtk.MessageType.QUESTION,
+        gtk.ButtonsType.NONE if info else gtk.ButtonsType.OK,
         None)
     dialog.set_title("konix_gtk_entry")
     dialog.set_markup(text)
@@ -82,7 +84,7 @@ def getText(info=False,
     global entry
     entry = gtk.Entry()
     #allow the user to press enter to do ok
-    entry.connect("activate", responseToDialog, dialog, gtk.RESPONSE_OK)
+    entry.connect("activate", responseToDialog, dialog, gtk.ResponseType.OK)
     entry.connect("key_press_event", key_pressed)
     #create a horizontal box to pack the entry and a label
     if initial:
@@ -94,9 +96,9 @@ def getText(info=False,
 
     if not info:
         hbox.pack_start(gtk.Label("Input:"), False, 5, 5)
-        hbox.pack_end(entry)
+        hbox.pack_end(entry, True, True, 0)
         if clipboard:
-            dialog.vbox.pack_end(checkbutton)
+            dialog.vbox.pack_end(checkbutton, True, True, 0)
 
     dialog.show_all()
 
@@ -114,14 +116,14 @@ def getText(info=False,
 
 def main():
     args = parser.parse_args()
-    print getText(info=args.info,
+    print(getText(info=args.info,
                   text=args.text,
                   initial=args.initial,
                   clipboard=not args.no_clipboard,
                   above_all=args.above_all,
                   timeout=args.timeout,
                   background_color=args.background_color
-    ),
+    ))
 
 if __name__ == '__main__':
     main()

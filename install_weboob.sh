@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-pip2 install --user -e weboob
+pip3 install --user -e weboob
 weboob-config update

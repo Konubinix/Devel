@@ -1,3 +1,10 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import konix_gtk_zenitylib
-konix_gtk_zenitylib.main()
+
+
+def main():
+    konix_gtk_zenitylib.main()
+
+
+if __name__ == "__main__":
+    main()

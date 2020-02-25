@@ -1797,5 +1797,16 @@ FExport diary data into iCalendar file: ")
   (shell-command (format "konix_json_pretty_print.py '%s'" file))
   )
 
+(defun konix/goto-random-line ()
+  "Go to a random line in this buffer."
+  (interactive)
+  (goto-line (1+ (random (konix/buffer-line-count))))
+  (konix/go-to-next-visible-line)
+  )
+
+(defun konix/buffer-line-count ()
+  "Return the number of lines in this buffer."
+  (count-lines (point-min) (point-max)))
+
 (provide '350-KONIX_commands)
 ;;; 350-KONIX_commands.el ends here

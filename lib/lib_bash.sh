@@ -531,3 +531,7 @@ story () {
     history -s "${command}"
     eval "${command}"
 }
+
+lw () {
+    ls|wc -l
+}

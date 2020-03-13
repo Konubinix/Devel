@@ -852,6 +852,20 @@
 
 (global-set-key (kbd "C-< g") 'konix/git/command-with-completion)
 
+;; Multi cursor
+(define-prefix-command 'konix/multi-cursor-map)
+(define-key konix/global-slow-key-map "m" 'konix/multi-cursor-map)
+(define-key konix/multi-cursor-map "m" 'mc/mark-more-like-this-extended)
+(define-key konix/multi-cursor-map "d" 'mc/mark-all-dwim)
+(define-key konix/multi-cursor-map "l" 'mc/edit-lines)
+(define-key konix/multi-cursor-map "n" 'mc/mark-next-like-this)
+(define-key konix/multi-cursor-map "a" 'mc/mark-all-like-this)
+(define-key konix/multi-cursor-map "p" 'mc/mark-previous-like-this)
+(define-key konix/multi-cursor-map "w" 'mc/mark-next-like-this-word)
+(define-key konix/multi-cursor-map (kbd "C-a") 'mc/edit-beginnings-of-lines)
+(define-key konix/multi-cursor-map (kbd "C-e") 'mc/edit-ends-of-lines)
+(define-key konix/multi-cursor-map (kbd "<mouse-1>") 'mc/add-cursor-on-click)
+
 ;;;;;;;;;
 ;; ZNC ;;
 ;;;;;;;;;

@@ -602,6 +602,7 @@
 (define-key 'konix/org-global-map (kbd "C-s") 'konix/org-store-agenda-views)
 (define-key 'konix/org-global-map (kbd "C-r") 'konix/org-element-cache-reset-all)
 (define-key 'konix/org-global-map (kbd "t") 'konix/org-clock-todo)
+(define-key 'konix/org-global-map (kbd "C-f") 'org-roam-find-file)
 
 (define-prefix-command 'konix/org-meta-context-map)
 (define-key 'konix/org-global-map (kbd "m") 'konix/org-meta-context-map)

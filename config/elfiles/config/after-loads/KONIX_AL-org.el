@@ -4616,5 +4616,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(setq-default org-habit-show-habits nil)
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

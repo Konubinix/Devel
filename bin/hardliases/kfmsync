@@ -1,0 +1,3 @@
+#! /bin/bash
+
+exec konix_fast_rsync.sh --remove-source-files "$@"

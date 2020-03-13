@@ -2295,8 +2295,9 @@ items"
                nil
                nil
                nil
-               (format-time-string "%H:%M" (current-time))
-               ))
+               "n "
+               )
+              )
         )
     (format-time-string
      (if org-time-was-given
@@ -2307,6 +2308,18 @@ items"
      )
     )
   )
+
+(defun konix/org-read-date-analyze/empty-ans-means-current-time (orig-fun ans def defdecode)
+  (when (string-match-p "^ *n *$" ans)
+    (setq ans (format-time-string "%H:%M" (current-time)))
+    )
+  (apply orig-fun ans def defdecode '())
+  )
+
+(advice-add
+ 'org-read-date-analyze
+ :around
+ #'konix/org-read-date-analyze/empty-ans-means-current-time)
 
 (defun konix/org-capture-template-iso-9001 nil
   (format

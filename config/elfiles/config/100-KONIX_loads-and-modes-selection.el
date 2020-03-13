@@ -17,6 +17,7 @@
 		 (expand-file-name "ini" elfiles)
 		 (expand-file-name "Pymacs" devel-dir)
 		 (expand-file-name "beancount/editors/emacs" devel-dir)
+		 (expand-file-name "emacs-native-shell-complete" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

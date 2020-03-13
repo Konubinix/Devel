@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'native-complete)
+
 (defun konix/shell/find-command-completions (prefix)
   (let* (
          (filenondir     (file-name-nondirectory prefix))
@@ -176,6 +178,7 @@
   )
 
 (defun konix/shell-mode-hook ()
+  (setq completion-at-point-functions '(native-complete-at-point))
   )
 (add-hook 'shell-mode-hook
 		  'konix/shell-mode-hook

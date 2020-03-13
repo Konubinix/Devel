@@ -184,3 +184,6 @@ ignore=dirty
 [submodule "config/elfiles/ini"]
 	path = config/elfiles/ini
 	url = https://github.com/daniel-ness/ini.el.git
+[submodule "config/elfiles/emacs-native-shell-complete"]
+	path = config/elfiles/emacs-native-shell-complete
+	url = https://github.com/CeleritasCelery/emacs-native-shell-complete

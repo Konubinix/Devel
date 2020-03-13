@@ -18,6 +18,7 @@
 		 (expand-file-name "Pymacs" devel-dir)
 		 (expand-file-name "beancount/editors/emacs" devel-dir)
 		 (expand-file-name "emacs-native-shell-complete" elfiles)
+		 (expand-file-name "org-roam" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -135,6 +136,7 @@
 (autoload 'pdf-tools-pdf-buffer-p "pdf-tools" "" t)
 (autoload 'piper "piper" "" t)
 (autoload 'mc/edit-lines "multiple-cursors" "" t)
+(autoload 'org-roam-find-file "org-roam" "" t)
 
 
 

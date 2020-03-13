@@ -78,3 +78,7 @@
 (depends-on "multiple-cursors")
 (depends-on "key-chord")
 (depends-on "lsp-java")
+(depends-on "hydra")
+;; for org-roam, not yet packaged in elpa
+	(depends-on "emacsql")
+	(depends-on "emacsql-sqlite")

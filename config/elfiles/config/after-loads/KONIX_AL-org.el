@@ -2121,6 +2121,12 @@ items"
                  (
                   (dummy (setq konix/org-agenda-type 'tags))
                   (org-super-agenda-groups nil)
+                  (org-agenda-prefix-format
+                   '(
+                     (todo . "%-20b%-8:c %4e ")
+                     (tags . "%-20b%4e")
+                     )
+                   )
                   )
                  )
                 )

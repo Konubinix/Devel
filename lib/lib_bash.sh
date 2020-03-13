@@ -525,3 +525,9 @@ urldecode() {
     local url_encoded="${1//+/ }"
     printf '%b' "${url_encoded//%/\\x}"
 }
+
+story () {
+    local command="$(history|percol --query="$*"|sed 's/.........................//')"
+    history -s "${command}"
+    eval "${command}"
+}

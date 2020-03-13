@@ -376,6 +376,14 @@
       ;; a diary
       t
       )
+     ((-keep (lambda (tag)
+               (string-match-p "^\\([VPG]\\|aof\\)_" tag)
+               )
+             tags
+             )
+      ;; a HOF
+      t
+      )
      (
       (save-excursion
         (org-back-to-heading)

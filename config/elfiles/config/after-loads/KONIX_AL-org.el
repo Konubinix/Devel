@@ -4616,6 +4616,36 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org-toggle-maybe ()
+  (interactive)
+  (konix/org-with-point-on-heading
+   (org-toggle-tag "maybe")
+   )
+  (when (equal major-mode 'org-agenda-mode)
+    (konix/org-agenda-refresh-line)
+    )
+  )
+
+(defun konix/org-toggle-me ()
+  (interactive)
+  (konix/org-with-point-on-heading
+   (org-toggle-tag "C_me")
+   )
+  (when (equal major-mode 'org-agenda-mode)
+    (konix/org-agenda-refresh-line)
+    )
+  )
+
+(defun konix/org-toggle-society ()
+  (interactive)
+  (konix/org-with-point-on-heading
+   (org-toggle-tag "C_society")
+   )
+  (when (equal major-mode 'org-agenda-mode)
+    (konix/org-agenda-refresh-line)
+    )
+  )
+
 (setq-default org-habit-show-habits nil)
 
 (provide 'KONIX_AL-org)

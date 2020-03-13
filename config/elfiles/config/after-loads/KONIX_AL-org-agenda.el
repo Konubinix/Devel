@@ -1262,6 +1262,7 @@ STOP is the end of the agenda."
 (defun konix/org-agenda-next-entry/is-todo-p ()
   (and (get-text-property (point) 'org-category)
        (not (string= (get-text-property (point) 'org-category) ""))
+       (not (string= (get-text-property (point) 'type) "diary"))
        )
   )
 

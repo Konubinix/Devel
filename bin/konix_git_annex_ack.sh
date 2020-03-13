@@ -1,3 +1,3 @@
 #!/bin/bash
 
-git annex metadata -s ack=ack "$@"
+git annex metadata -s state=ack "$@"

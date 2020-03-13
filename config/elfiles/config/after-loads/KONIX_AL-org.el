@@ -4616,6 +4616,9 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(setq-default org-use-speed-commands
+              (lambda () (and (looking-at org-outline-regexp) (looking-back "^\**"))))
+
 (defun konix/org-toggle-maybe ()
   (interactive)
   (konix/org-with-point-on-heading
@@ -4645,6 +4648,20 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     (konix/org-agenda-refresh-line)
     )
   )
+
+(setq-default
+ org-speed-commands-user
+ '(("Outline Navigation")
+   ("P" . org-mark-ring-goto)
+   ("N" . konix/org-mark-ring-goto-newest)
+   ("Manipulation")
+   ("k" . konix/org-kill)
+   ("+" . konix/org-capture-na-in-heading)
+   ("y" . konix/org-toggle-maybe)
+   ("m" . konix/org-toggle-me)
+   ("S" . konix/org-toggle-society)
+   )
+ )
 
 (setq-default org-habit-show-habits nil)
 

@@ -4606,6 +4606,15 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (setq-default org-refile-target-verify-function 'konix/verify-refile-target)
 
+(defun konix/org-refile-use-all-targets nil
+  (interactive)
+  (let (
+        (org-refile-target-verify-function nil)
+        )
+    (org-refile-cache-clear)
+    (org-refile-get-targets)
+    )
+  )
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

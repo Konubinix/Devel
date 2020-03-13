@@ -768,7 +768,7 @@ to be organized.
           end
           )
         )
-       (;; has an active timestamp for today -> let it go
+       (;; has an active timestamp for today -> OK
         (save-excursion
           (goto-char beg)
           (setq today-time-string
@@ -796,7 +796,7 @@ to be organized.
           )
         nil
         )
-       ( ;; none of the above ?
+       (;; none of the above => PASS ?
         t
         end
         )

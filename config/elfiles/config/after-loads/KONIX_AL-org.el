@@ -2794,6 +2794,14 @@ items"
     )
   )
 
+(defun konix/org-change-tag ()
+  (interactive)
+  (save-window-excursion
+    (org-clock-goto)
+    (call-interactively 'org-set-tags-command)
+    )
+  )
+
 (defun konix/org-jump-to ()
   (interactive)
   (let (

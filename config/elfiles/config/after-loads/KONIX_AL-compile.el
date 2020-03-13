@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'KONIX_compilation)
-(setq-default compilation-auto-jump-to-first-error t)
+(setq-default compilation-auto-jump-to-first-error nil)
 (setq-default compilation-context-lines nil)
 (setq-default compilation-read-command nil)
 (setq-default compilation-scroll-output (quote first-error))

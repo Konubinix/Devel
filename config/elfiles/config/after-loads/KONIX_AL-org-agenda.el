@@ -40,6 +40,18 @@
   (org-agenda-refile goto rfloc t)
   )
 
+(define-key org-agenda-mode-map (kbd "+")
+  'konix/org-capture-na-in-heading)
+
+(define-key org-agenda-mode-map (kbd "y")
+  'konix/org-toggle-maybe)
+
+(define-key org-agenda-mode-map (kbd "m")
+  'konix/org-toggle-me)
+
+(define-key org-agenda-mode-map (kbd "S")
+  'konix/org-toggle-society)
+
 (define-key org-agenda-mode-map (kbd "w")
   'konix/org-agenda-refile-noupdate)
 

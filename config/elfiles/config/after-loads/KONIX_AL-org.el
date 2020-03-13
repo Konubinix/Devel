@@ -4599,6 +4599,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   (and
    (not (member (nth 2 (org-heading-components)) org-done-keywords))
    (not (member "maybe" (org-get-tags)))
+   (not (member "ARCHIVE" (org-get-tags)))
    (not (member "gcalgenerated" (org-get-tags)))
    )
   )

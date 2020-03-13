@@ -3383,6 +3383,43 @@ of the clocksum."
    )
   )
 
+(defun konix/org-get-informable-parties (&optional tags)
+  (unless tags
+    (setq tag (org-get-tags (point)))
+    )
+  (org-uniquify
+   (remove-if-not
+    (lambda (tag)
+      (or
+       (string-prefix-p "I_" tag)
+       (and (string-prefix-p "C_" tag)
+            (not
+             (or
+              (string= tag "C_me")
+              (string= tag "C_society")
+              )
+             )
+            )
+       (string-prefix-p "E_" tag)
+       )
+      )
+    tags
+    )
+   )
+  )
+
+(defun konix/org-get-expecting-parties (&optional tags)
+  (unless tags
+    (setq tag (org-get-tags (point)))
+    )
+  (org-uniquify
+   (remove-if-not
+    (apply-partially 'string-prefix-p "E_")
+    tags
+    )
+   )
+  )
+
 (defun konix/org-ask-about-committed-parties (&optional tags)
   (unless tags
     (setq tags (org-get-tags (point) t))
@@ -3395,7 +3432,10 @@ of the clocksum."
          (yes-or-no-p
           (format "Is that clear with %s"
                   (string-join
-                   committed-parties
+                   (mapcar
+                    (apply-partially 'string-remove-prefix "C_")
+                    committed-parties
+                    )
                    " and "
                    )
                   )
@@ -3403,6 +3443,70 @@ of the clocksum."
          )
         t
       (user-error "You must be clear with the committed parties.")
+      )
+    )
+  )
+
+(defun konix/org-inform-about-expecting-parties (&optional tags)
+  (unless tags
+    (setq tags (org-get-tags (point)))
+    )
+  (let (
+        (expecting-parties (konix/org-get-expecting-parties tags))
+        )
+    (when expecting-parties
+      (warn "You should warn %s about this"
+            (string-join
+             (mapcar
+              (lambda (tag)
+                (string-remove-prefix
+                 "C_"
+                 (string-remove-prefix
+                  "I_"
+                  (string-remove-prefix
+                   "E_"
+                   tag
+                   )
+                  )
+                 )
+                )
+              expecting-parties
+              )
+             " and "
+             )
+            )
+      )
+    )
+  )
+
+(defun konix/org-inform-about-informable-parties (&optional tags)
+  (unless tags
+    (setq tags (org-get-tags (point)))
+    )
+  (let (
+        (informable-parties (konix/org-get-informable-parties tags))
+        )
+    (when informable-parties
+      (warn "You should warn %s about this"
+            (string-join
+             (mapcar
+              (lambda (tag)
+                (string-remove-prefix
+                 "C_"
+                 (string-remove-prefix
+                  "I_"
+                  (string-remove-prefix
+                   "E_"
+                   tag
+                   )
+                  )
+                 )
+                )
+              informable-parties
+              )
+             " and "
+             )
+            )
       )
     )
   )
@@ -3641,7 +3745,7 @@ of the clocksum."
 
 (defun konix/org-get-contexts nil
   (remove-if-not
-   (lambda (e) (string-prefix-p "@" e))
+   (apply-partially 'string-prefix-p "@")
    (konix/org-get-tags)
    )
   )
@@ -4417,6 +4521,35 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
           'konix/org-font-lock-set-keywords-hook)
 
 
+(defun konix/org-kill/confirm-number-of-lines ()
+  (let (
+        (n 0)
+        (end (save-excursion (org-end-of-subtree t) (point)))
+        )
+    (save-excursion
+      (org-back-to-heading)
+      (save-match-data
+        (while (re-search-forward
+                "\n"
+                end
+                t
+                )
+          (incf n)
+          )
+        )
+      )
+    (unless (or
+		     (< n org-agenda-confirm-kill)
+             (y-or-n-p
+			  (format "Delete entry with %d lines" n)
+              )
+             )
+      (user-error "Not removing the subtree containing too many lines")
+      )
+    )
+  )
+
+
 (defvar konix/org-kill-confirm nil "")
 (defun konix/org-kill ()
   (interactive)
@@ -4430,6 +4563,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
       (progn
         (konix/org-agenda-kill/confirm-if-clock-info)
         (konix/org-agenda-kill/confirm-if-committed)
+        (konix/org-kill/confirm-number-of-lines)
         (kill-region
          (save-excursion (beginning-of-line) (point))
          (1+ (org-end-of-subtree))

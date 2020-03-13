@@ -2013,7 +2013,7 @@ items"
                   (dummy
                    (set
                     (make-variable-buffer-local
-                     'org-agenda-prefix-fo!rmat)
+                     'org-agenda-prefix-format)
                     '((tags . "%-8:c"))
                     )
                    )

@@ -1,0 +1,7 @@
+# key: dirbaseext
+# name: dirbaseext
+# --
+dir="$(dirname "$1")"
+base="$(basename "$1")"
+basenoext="\${base%%.*}"
+ext="\${base#*.}"

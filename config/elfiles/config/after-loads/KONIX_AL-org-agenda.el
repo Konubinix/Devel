@@ -1985,16 +1985,24 @@ X-WR-TIMEZONE:CEST
 
 (defun konix/org-agenda-batch-unmaybe nil
   (interactive)
-  (while t
-    (konix/goto-random-line)
-    (while (not (get-text-property (point) 'todo-state))
+  (let (
+        (visited-points '())
+        )
+    (while t
       (konix/goto-random-line)
-      )
-    (recenter-top-bottom 0)
-    (when (y-or-n-p (format "Take this one (%s)?"
-                            (konix/org-agenda-get-heading)
-                            ))
-      (org-agenda-set-tags "maybe" 'off)
+      (while (or
+              (not (get-text-property (point) 'todo-state))
+              (member (point) visited-points)
+              )
+        (konix/goto-random-line)
+        )
+      (add-to-list 'visited-points (point))
+      (recenter-top-bottom 0)
+      (when (y-or-n-p (format "Take this one (%s)?"
+                              (konix/org-agenda-get-heading)
+                              ))
+        (org-agenda-set-tags "maybe" 'off)
+        )
       )
     )
   )

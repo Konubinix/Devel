@@ -10,7 +10,7 @@
 (global-unset-key (kbd "<f4>"))
 
 ;; some vim keys
-(global-set-key (kbd "C-n") 'dabbrev-expand)
+(global-set-key (kbd "C-n") 'dabbrev-completion)
 
 ;; custom prefix key
 (define-prefix-command 'konix/global-custom-key-map)

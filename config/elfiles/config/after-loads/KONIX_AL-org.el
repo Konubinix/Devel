@@ -2876,6 +2876,7 @@ of the clocksum."
           )
   )
 (defun konix/org-mode-hook()
+  (setq konix/delete-trailing-whitespace nil)
   (font-lock-add-keywords nil konix/org-mode-font-lock-keywords)
   (require 'foldout)
   (setq konix/adjust-new-lines-at-end-of-file t)

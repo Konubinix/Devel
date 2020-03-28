@@ -137,8 +137,7 @@
 (autoload 'piper "piper" "" t)
 (autoload 'mc/edit-lines "multiple-cursors" "" t)
 (autoload 'org-roam-find-file "org-roam" "" t)
-
-
+(autoload 'org-roam-date "org-roam" "" t)
 
 
 ;; ************************************************************

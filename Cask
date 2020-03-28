@@ -85,3 +85,5 @@
 (depends-on "deft")
 (depends-on "el-patch")
 ;; (depends-on "org-journal") ; broken ?
+(depends-on "region-bindings-mode")
+(depends-on "which-key")

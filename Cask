@@ -82,3 +82,6 @@
 ;; for org-roam, not yet packaged in elpa
 	(depends-on "emacsql")
 	(depends-on "emacsql-sqlite")
+(depends-on "deft")
+(depends-on "el-patch")
+;; (depends-on "org-journal") ; broken ?

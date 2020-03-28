@@ -1,12 +1,9 @@
-(require 'ivy)
-(ivy-mode)
-
 (require 'region-bindings-mode)
 (require 'framemove)
 
+(ivy-mode)
 ;; till I find out how vc works, I send manually my custom git mode
 (load-library "KONIX_git")
-(require 'golden-ratio)
 (golden-ratio-mode 1)
 (which-key-mode)
 

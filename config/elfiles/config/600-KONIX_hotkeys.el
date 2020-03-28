@@ -614,6 +614,7 @@
 (define-key 'konix/org-global-map "l" 'org-store-link)
 (define-key 'konix/org-global-map "p" 'konix/org-focus-next)
 (define-key 'konix/org-global-map "z" 'konix/org-add-note)
+(define-key 'konix/org-global-map "Z" 'konix/org-add-timestamp)
 (define-key 'konix/org-global-map ":" 'konix/org-change-tag)
 (define-key 'konix/org-global-map (kbd "RET") 'org-open-at-point)
 (define-key 'konix/org-global-map "u" 'org-id-update-id-locations)

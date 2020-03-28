@@ -121,6 +121,37 @@
   )
 (advice-add 'org-log-into-drawer :around #'konix/org-log-into-drawer)
 
+(defun konix/org-add-timestamp ()
+  (interactive)
+  (let (
+        (time (if current-prefix-arg
+                  (konix/org-with-point-at-clocked-entry (konix/org-get-time))
+                (konix/org-with-point-on-heading (konix/org-get-time))
+                ))
+        (konix/org-log-into-drawer "TIMESTAMP")
+        (cmd (lambda nil
+               (progn
+                 (goto-char (org-log-beginning t))
+                 (save-excursion (insert "\n"))
+                 (org-indent-line)
+                 (insert (format
+                          "- On %s: <%s>"
+                          (format-time-string
+			               (org-time-stamp-format 'long 'inactive)
+                           (current-time)
+                           )
+                          time)
+                         )
+                 )
+               ))
+        )
+    (if current-prefix-arg
+        (konix/org-with-point-at-clocked-entry (funcall cmd))
+      (konix/org-with-point-on-heading (funcall cmd))
+      )
+    )
+  )
+
 (defvar konix/org-agenda-appt-reload-mode t "")
 
 (defun konix/org-agenda-appt-reload ()

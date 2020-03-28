@@ -1,4 +1,4 @@
-;;; KONIX_AL-key-chord.el ---                        -*- lexical-binding: t; -*-
+;;; KONIX_AL-which-key.el ---                        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  konubinix
 
@@ -24,9 +24,9 @@
 
 ;;; Code:
 
-(setq-default key-chord-two-keys-delay 0.02
-              key-chord-one-key-delay 0.05
-              )
+(setq-default which-key-show-early-on-C-h t)
+(setq-default which-key-idle-delay 3.0)
+(setq-default which-key-idle-secondary-delay 0.05)
 
-(provide 'KONIX_AL-key-chord)
-;;; KONIX_AL-key-chord.el ends here
+(provide 'KONIX_AL-which-key)
+;;; KONIX_AL-which-key.el ends here

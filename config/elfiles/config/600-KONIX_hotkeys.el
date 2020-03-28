@@ -1,6 +1,14 @@
 ;; ####################################################################################################
 ;; Unset the keys I want to free
 ;; ####################################################################################################
+(require 'key-chord)
+(key-chord-mode 1)
+(key-chord-define-global " u" 'undo)
+(key-chord-define-global "fh" 'find-file)
+(key-chord-define-global " a" 'beginning-of-line)
+(key-chord-define-global " e" 'end-of-line)
+(key-chord-define-global " m" 'cua-set-mark)
+
 (global-unset-key (kbd "C-<"))
 (global-unset-key (kbd "C-à"))			;for bépo keyboards
 (global-unset-key (kbd "<f2>"))
@@ -63,17 +71,36 @@
 (global-set-key (kbd "<C-kp-subtract>") 'konix/decrease-at-point)
 
 ;; incr & decr font size
-(global-set-key (kbd "C-M-+") 'text-scale-increase)
-(global-set-key (kbd "C-M--") 'text-scale-decrease)
-(global-set-key (kbd "C-M--") 'text-scale-decrease)
-(global-set-key (kbd "C-M-=") 'text-scale-adjust)
-(global-set-key (kbd "<C-M-kp-add>") 'text-scale-increase)
-(global-set-key (kbd "<C-M-kp-subtract>") 'text-scale-decrease)
-(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-(global-set-key (kbd "<C-kp-0>") 'text-scale-adjust)
-(global-set-key (kbd "C-M-*")
-                'konix/text-scale-propagate-current-scale-to-all-buffer)
+;; (global-set-key (kbd "C-M-+") 'text-scale-increase)
+;; (global-set-key (kbd "C-M--") 'text-scale-decrease)
+;; (global-set-key (kbd "C-M--") 'text-scale-decrease)
+;; (global-set-key (kbd "C-M-=") 'text-scale-adjust)
+;; (global-set-key (kbd "<C-M-kp-add>") 'text-scale-increase)
+;; (global-set-key (kbd "<C-M-kp-subtract>") 'text-scale-decrease)
+;; (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+;; (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+;; (global-set-key (kbd "<C-kp-0>") 'text-scale-adjust)
+;; (global-set-key (kbd "C-M-*")
+;;                 'konix/text-scale-propagate-current-scale-to-all-buffer)
+
+(defhydra konix/hydra-zoom ()
+  "zoom"
+  ("+" text-scale-increase "in")
+  ("-" text-scale-decrease "out")
+  ("*" konix/text-scale-propagate-current-scale-to-all-buffer "propagate")
+  ("=" text-scale-mode "reset toggle")
+  ("q" nil "quit")
+  )
+(key-chord-define-global "-+" 'konix/hydra-zoom/body)
+
+(defhydra konix/hydra-global-zoom ()
+  "zoom"
+  ("+" default-text-scale-increase "in")
+  ("-" default-text-scale-decrease "out")
+  ("=" default-text-scale-reset "reset")
+  ("q" nil "quit")
+  )
+(key-chord-define-global "-=" 'konix/hydra-global-zoom/body)
 
 ;; Recentrage horizontal
 (global-set-key (kbd "C-S-L") 'konix/horizontal-recenter)

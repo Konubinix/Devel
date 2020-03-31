@@ -3610,6 +3610,13 @@ of the clocksum."
                 )
            (konix/org-ask-about-committed-parties (append tags old-tags))
            )
+         (when (and
+                tags-change?
+                (not (member "maybe" tags))
+                (member "maybe" old-tags)
+                )
+           (konix/org-inform-about-informable-parties (append tags old-tags))
+           )
          )
        )
       )

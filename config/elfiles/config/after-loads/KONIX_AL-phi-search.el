@@ -108,8 +108,8 @@
     ((kbd "<up>") . 'phi-search-again-or-previous)
     ((kbd "<down>") . 'phi-search-again-or-next)
     ((kbd "C-<return>") . 'phi-search-complete-at-beginning)
-    ((kbd "M-s o") . 'konix/phi-search-to-swiper)
-    ((kbd "M-s O") . 'konix/phi-search-to-occur)
+    ((kbd "M-s O") . 'konix/phi-search-to-swiper)
+    ((kbd "M-s o") . 'konix/phi-search-to-occur)
     ((kbd "M-s h r") . 'konix/phi-search-to-highlight)
     )
   phi-search-additional-keybinds

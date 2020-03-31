@@ -968,9 +968,15 @@ def history(fields, format, conversation, oldest, latest,
 
 
 @slack.command()
-def record_log():
+@flag("--archived", help="Only archived ones")
+@flag("--all", help="All of them")
+def record_log(archived, all):
     """Dump the records for archiving purpose."""
-    for c in config.slack.conversations.values():
+    for c in (
+            config.slack.archived_conversations if archived else
+            config.slack.all_conversations if all else
+            config.slack.conversations
+    ).values():
         LOGGER.info("Dumping history of {}".format(c.data["name_fmt"]))
         makedirs(c.record_logs_dir)
         with open(c.recorded_messages, "a", encoding="utf-8") as message_file:

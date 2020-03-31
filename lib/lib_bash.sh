@@ -526,10 +526,42 @@ urldecode() {
     printf '%b' "${url_encoded//%/\\x}"
 }
 
+trim ( ) {
+    awk '{$1=$1};1'
+}
+
+lastcharacter ( ) {
+    local input="$*"
+    echo "${input: -1}"
+}
+
+allbutlastcharacter ( ) {
+    local input="$*"
+    echo "${input:0:-1}"
+}
+
 story () {
-    local command="$(history|percol --query="$*"|sed 's/.........................//')"
-    history -s "${command}"
-    eval "${command}"
+    local histprefixregexp="........................."
+    local input="$*"
+    # remove the call to story from the history
+    history -d -1
+    local command="$(HISTTIMEFORMAT="%y/%m/%d-%H:%M:%S:" history|tac|percol \
+ --match-method='regex' \
+ --prompt-bottom \
+ --result-bottom-up \
+ --query="${input}"|sed "s/${histprefixregexp}//"\
+ |trim)"
+    if [ -n "${command}" ]
+    then
+        read -i "${command}" -e -p "$ " command
+    fi
+    if [ -n "${command}" ]
+    then
+        history -s "${command}"
+        eval "${command}"
+    else
+        echo "Abort"
+    fi
 }
 
 lw () {

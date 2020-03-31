@@ -850,11 +850,18 @@ def me_message(conversation, text):
 )
 @table_format()
 @option("--missing-in", type=ConversationType(), help="Only those that are not there")
-def users(fields, format, missing_in):
+@option("--in", "ins", type=ConversationType(), help="Only those that are there")
+def users(fields, format, missing_in, ins):
     """Display the users"""
     users = config.slack.active_users
     if missing_in:
         keys = set(users) - set(missing_in.members)
+        users = {
+            key: users[key]
+            for key in keys
+        }
+    if ins:
+        keys = set(users).intersection(set(ins.members))
         users = {
             key: users[key]
             for key in keys

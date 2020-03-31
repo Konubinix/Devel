@@ -24,7 +24,7 @@ def up(value):
 def down(value):
     """Decrease the volume"""
     import pulsectl
-    with pulsectl.Pulse('volume-increaser') as pulse:
+    with pulsectl.Pulse('volume-decreaser') as pulse:
         for sink in pulse.sink_list():
             pulse.volume_change_all_chans(sink, -value)
 
@@ -35,4 +35,15 @@ def show():
     import pulsectl
     with pulsectl.Pulse('volume-increaser') as pulse:
         for sink in pulse.sink_list():
+            if sink.mute:
+                print(f"{sink.description} muted")
             print(f"{sink.description}:\n\t{sink.volume.values[0]:.2f}, {sink.volume.values[1]:.2f}")
+
+
+@pulse.command()
+def toggle_mute():
+    """Toggle mute"""
+    import pulsectl
+    with pulsectl.Pulse('volume-mute-toggler') as pulse:
+        for sink in pulse.sink_list():
+            pulse.mute(sink, not sink.mute)

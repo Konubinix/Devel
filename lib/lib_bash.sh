@@ -564,6 +564,14 @@ story () {
     fi
 }
 
+ipgrep () {
+    ps aux | percol | awk '{ print $2 }'
+}
+
+ipkill () {
+    ps aux | percol | awk '{ print $2 }' | xargs kill "$@"
+}
+
 lw () {
     ls|wc -l
 }

@@ -84,6 +84,7 @@ if is_on_linux():
         substitute(os.path.join(environ["HOME"],       ".xinitrc"),  os.path.join(environ["HOME"], ".xsession"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "gtkrc-2.0"), os.path.join(environ["HOME"], ".gtkrc-2.0"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "rdesktop"), os.path.join(environ["HOME"], ".rdesktop"))
+        substitute(os.path.join(environ["KONIX_CONFIG_DIR"], ".percol.d"), os.path.join(environ["HOME"], ".percol.d"))
 
         subprocess.call(["chmod", "+x", "-Rv",
                          os.path.join(environ["HOME"], "bin"),

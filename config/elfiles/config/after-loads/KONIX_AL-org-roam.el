@@ -41,7 +41,9 @@
                  :head "#+TITLE: ${title}
 #+LANGUAGE: fr
 #+CREATED: %U
+#+ROAM_ALIAS: \"\"
 ${title}
+
 
 "
                  :unnarrowed t
@@ -55,6 +57,7 @@ ${title}
 #+CREATED: %U
 
 [%(konix/org-get-time)]
+
 
 "
                  :unnarrowed t
@@ -76,6 +79,8 @@ ${title}
                                                     :head "#+TITLE: ${title}
 #+LANGUAGE: fr
 #+CREATED: %U
+
+
 ")))
             (org-roam--capture-context 'title)
             (org-roam--capture-info (list (cons 'title title))))
@@ -101,7 +106,9 @@ ${title}
                 )
               (unless (looking-at "$")
                 (beginning-of-line)
-                (insert "\n")
+                (unless (looking-at "- Org entry ::")
+                  (insert "\n")
+                  )
                 (forward-line -1)
                 )
               (insert (format "- Org entry :: %s\n" entry-link))

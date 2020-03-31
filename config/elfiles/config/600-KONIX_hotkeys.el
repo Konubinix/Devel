@@ -899,6 +899,9 @@
 (define-key konix/multi-cursor-map (kbd "C-e") 'mc/edit-ends-of-lines)
 (define-key konix/multi-cursor-map (kbd "<mouse-1>") 'mc/add-cursor-on-click)
 
+
+(define-key konix/global-slow-key-map (kbd "q") 'qutebrowser/map)
+
 ;;;;;;;;;
 ;; ZNC ;;
 ;;;;;;;;;

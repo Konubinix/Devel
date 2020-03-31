@@ -1,5 +1,6 @@
 (require 'region-bindings-mode)
 (require 'framemove)
+(require 'qutebrowser)
 
 (ivy-mode)
 ;; till I find out how vc works, I send manually my custom git mode

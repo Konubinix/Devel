@@ -86,7 +86,8 @@
   (auto-revert-mode 1)
   (dired-omit-mode t)
   (turn-on-tempbuf-mode)
-  (setq tempbuf-timeout 3600)
+  (setq tempbuf-timeout 3600) ; time before next grace
+  (setq-local tempbuf-minimum-timeout tempbuf-timeout) ; base time after next grace
   (local-set-key (kbd "<C-return>") 'konix/dired-mimeopen)
   )
 (add-hook 'dired-mode-hook 'konix/dired-mode-hook)

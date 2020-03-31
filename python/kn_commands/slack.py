@@ -880,6 +880,23 @@ def users(fields, format, missing_in, ins):
 
 
 @slack.command()
+@argument("conversation", type=ConversationType(), help="What conversation to spam")
+@argument("message", help="The message to send", type=MessageType())
+def spam(conversation, message):
+    """Say a message, with everyone marked in it"""
+    users = config.slack.active_users
+    keys = set(users).intersection(set(conversation.members))
+    users = [
+        f"@{users[key].name}"
+        for key in keys
+    ]
+    message = f"""{", ".join(users)}: {message}"""
+    message = message_handle(message)
+    ctx = click.get_current_context()
+    ctx.invoke(say, conversation=conversation, message=message)
+
+
+@slack.command()
 @table_fields(
     choices=[
         'id',

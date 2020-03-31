@@ -2535,8 +2535,8 @@ items"
     ("NOEXPIRYRECURSIVE")
     (:endgroup)
     (:startgroup)
-    ("WAIT" . ?W)
-    ("DELEGATED" . ?D)
+    ("WAIT" . ?w)
+    ("DELEGATED" . ?d)
     (:endgroup)
     ("project" . ?p)
     ("maybe" . ?y)
@@ -4660,6 +4660,16 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org-toggle-project ()
+  (interactive)
+  (konix/org-with-point-on-heading
+   (org-toggle-tag "project")
+   )
+  (when (equal major-mode 'org-agenda-mode)
+    (konix/org-agenda-refresh-line)
+    )
+  )
+
 (defun konix/org-toggle-me ()
   (interactive)
   (konix/org-with-point-on-heading
@@ -4680,17 +4690,29 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org-refile ()
+  (interactive)
+  (if org-capture-mode
+      (org-capture-refile)
+    (org-refile)
+    )
+  )
+
 (setq-default
  org-speed-commands-user
  '(("Outline Navigation")
-   ("P" . org-mark-ring-goto)
-   ("N" . konix/org-mark-ring-goto-newest)
+   ("P" . konix/org-toggle-project)
+   ("G" . org-mark-ring-goto)
    ("Manipulation")
    ("k" . konix/org-kill)
    ("+" . konix/org-capture-na-in-heading)
    ("y" . konix/org-toggle-maybe)
    ("m" . konix/org-toggle-me)
    ("S" . konix/org-toggle-society)
+   ("z" . org-add-note)
+   ("Z" . konix/org-add-timestamp)
+   ("N" . konix/org-roam-note)
+   ("w" . konix/org-refile)
    )
  )
 

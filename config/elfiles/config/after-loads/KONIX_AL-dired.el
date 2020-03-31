@@ -29,6 +29,7 @@
 (require 'wuxch-dired-copy-paste)
 (require 'dired-sort)
 (require 'diredful)
+(require 'phi-search-dired)
 
 (defun konix/dired-git-annex-find-restored ()
   (interactive)

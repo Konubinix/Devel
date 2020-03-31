@@ -793,7 +793,7 @@ def save_token():
 @flag("--me/--no-me", help="Send a me message")
 @option("--thread", help="Reply in a thread")
 @argument("message", help="The message to send", type=MessageType())
-def post_message(conversation, message, reaction, me, thread):
+def say(conversation, message, reaction, me, thread):
     """Post a message to this conversation"""
     endpoint = (
         config.slack.client.chat.me_message
@@ -810,6 +810,9 @@ def post_message(conversation, message, reaction, me, thread):
             timestamp=response.body["ts"],
             name=r,
         )
+
+
+slack.add_command(say, "post-message")
 
 
 @slack.command()

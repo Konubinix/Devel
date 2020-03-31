@@ -47,5 +47,7 @@
 	)
   )
 
+(add-to-list 'golden-ratio-exclude-buffer-names "*imenu-tree*")
+
 (provide 'KONIX_AL-imenu-tree)
 ;;; KONIX_AL-imenu-tree.el ends here

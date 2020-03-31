@@ -261,22 +261,26 @@
                        )
               )
 
+(defun konix/org-goto-heading nil
+  (case major-mode
+    ('org-agenda-mode
+     (org-agenda-switch-to nil t)
+     (org-back-to-heading)
+     )
+    ('org-mode
+     (org-back-to-heading)
+     )
+    (t
+     (org-clock-goto nil t)
+     (org-back-to-heading)
+     )
+    )
+  )
+
 (defmacro konix/org-with-point-on-heading (body)
   `(save-window-excursion
      (save-excursion
-       (case major-mode
-         ('org-agenda-mode
-          (org-agenda-switch-to nil t)
-          (org-back-to-heading)
-          )
-         ('org-mode
-          (org-back-to-heading)
-          )
-         (t
-          (org-clock-goto nil t)
-          (org-back-to-heading)
-          )
-         )
+       (konix/org-goto-heading)
        ,body
        )
      )
@@ -337,6 +341,10 @@
       nil
       )
     )
+  )
+
+(defun konix/org-agenda-keep-if-tags (request_tags)
+  (konix/org-agenda-skip-if-tags request_tags t)
   )
 
 (defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip)
@@ -1737,7 +1745,7 @@ items"
                                '("project" "goal" "aofs"))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time
                                t)
-                              (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED") t)
+                              (konix/org-agenda-keep-if-tags '("WAIT" "DELEGATED"))
                               ;;(org-agenda-skip-entry-if 'scheduled)
                               )
                             )
@@ -1755,9 +1763,8 @@ items"
                             '(or
                               (konix/skip-not-todo-file)
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
-                              (konix/org-agenda-skip-if-tags
-                               '("project" "goal" "aofs")
-                               t)
+                              (konix/org-agenda-keep-if-tags
+                               '("project" "goal" "aofs"))
                               )
                             )
                            )
@@ -1779,8 +1786,8 @@ items"
                             '(or
                               (konix/org-agenda-skip-if-tags
                                '("project"))
-                              (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED"))
-                              (konix/org-agenda-for-today-skip-if-not-the-good-time t)
+                              (konix/org-agenda-keep-if-tags '("WAIT" "DELEGATED"))
+                              (konix/org-agenda-for-today-skip-if-not-the-good-time)
                               ;;(org-agenda-skip-entry-if 'scheduled)
                               )
                             )

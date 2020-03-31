@@ -103,19 +103,29 @@
 (advice-add 'org-open-at-point :around #'konix/org-open-at-point-move-to-link)
 ;; (advice-remove 'org-open-at-point #'konix/org-open-at-point-move-to-link)
 
-(defvar konix/org-log-into-drawer-per-purpose '((note . nil))
+(defvar konix/org-log-into-drawer-per-purpose
+  '(
+    (note . nil)
+    )
   "Allow to specify the value of org-log-into-drawer, depending of the log purpose."
   )
+
+(defvar konix/org-log-into-drawer nil)
 
 (defun konix/org-log-into-drawer (orig-fun &rest args)
   (let (
         (org-log-into-drawer
-         (if (assq org-log-note-purpose konix/org-log-into-drawer-per-purpose)
-             (cdr (assoc org-log-note-purpose konix/org-log-into-drawer-per-purpose))
-           org-log-into-drawer
+         (if konix/org-log-into-drawer
+             konix/org-log-into-drawer
+           (if (assq org-log-note-purpose konix/org-log-into-drawer-per-purpose)
+               (cdr (assoc org-log-note-purpose konix/org-log-into-drawer-per-purpose))
+             org-log-into-drawer
+             )
+
            )
          )
         )
+    (setq konix/org-log-into-drawer nil)
     (apply orig-fun args)
     )
   )

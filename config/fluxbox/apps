@@ -154,3 +154,6 @@
 [app] (class=Impass)
   [Layer]	{7}
 [end]
+[app] (class=Xclock)
+  [Layer]	{7}
+[end]

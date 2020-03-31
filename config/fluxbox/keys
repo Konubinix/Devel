@@ -182,6 +182,8 @@ Mod4 Down :SetAlpha -20
 OnWindow Mod4 Mouse4 :SetAlpha +20
 OnWindow Mod4 Mouse5 :SetAlpha -20
 
+Mod4 x d c :ToggleCmd {Exec konix_supervisorctl.sh start camera & konix_display_unique.py "Started cam"} {Exec konix_supervisorctl.sh stop camera & konix_display_unique.py "Stopped cam"}
+
 # ************************************************************
 # Fluxbox specific shortcut (Mod4 Mod1)
 # ************************************************************

@@ -5,7 +5,7 @@
   (setq recompute (or recompute current-prefix-arg))
   (let (
         (current-ledger-file (konix/find-file-in-parents "ledger.dat")
-         )
+                             )
         (old-env-value (getenv "LEDGER_FILE"))
         )
     (setenv "LEDGER_FILE" current-ledger-file)
@@ -48,6 +48,8 @@
         '(konix/ledger/completion-at-point))
   )
 (add-hook 'ledger-mode-hook 'konix/legder-mode-hook)
+
+
 
 (provide 'KONIX_AL-ledger)
 ;;; KONIX_AL-ledger.el ends here

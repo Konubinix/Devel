@@ -47,7 +47,7 @@
 (defun konix/message-mode-hook ()
   (visual-line-mode 1)
   (flyspell-mode 1)
-  (electric-pair-mode 1)
+
   (orgtbl-mode)
   (footnote-mode)
   ;(orgalist-mode 1)

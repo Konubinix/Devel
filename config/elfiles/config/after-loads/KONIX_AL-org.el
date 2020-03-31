@@ -2927,7 +2927,7 @@ of the clocksum."
   (setq indent-tabs-mode nil)
   (konix/flyspell-mode 1)
   (auto-complete-mode t)
-  (electric-pair-mode t)
+
   (abbrev-mode t)
   ;; (visual-line-mode t)
   (setq ac-sources (append ac-sources

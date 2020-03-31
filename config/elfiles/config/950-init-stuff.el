@@ -7,6 +7,7 @@
 (load-library "KONIX_git")
 (golden-ratio-mode 1)
 (which-key-mode)
+(electric-pair-mode)
 
 (defun konix/emacs-startup-hooks ()
   (require 'which-key nil t)

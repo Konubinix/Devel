@@ -121,7 +121,7 @@
 
 (defun konix/jabber-chat-mode-hook ()
   (flyspell-mode 1)
-  (electric-pair-mode 1)
+
   (visual-line-mode 1)
   )
 

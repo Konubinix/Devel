@@ -43,6 +43,12 @@
 (define-key org-agenda-mode-map (kbd "+")
   'konix/org-capture-na-in-heading)
 
+(define-key org-agenda-mode-map (kbd "N")
+  'konix/org-roam-note)
+
+(define-key org-agenda-mode-map (kbd "Z")
+  'konix/org-add-timestamp)
+
 (define-key org-agenda-mode-map (kbd "y")
   'konix/org-toggle-maybe)
 
@@ -99,7 +105,7 @@
   'konix/org-agenda-focus-next)
 
 (define-key org-agenda-mode-map (kbd "P")
-  '(lambda nil (interactive) (let ((current-prefix-arg '(4))) (konix/org-agenda-focus-next))))
+  'konix/org-toggle-project)
 
 (define-key org-agenda-mode-map (kbd "h")
   'konix/org-agenda-filter-for-now)

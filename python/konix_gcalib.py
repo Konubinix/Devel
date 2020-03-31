@@ -319,7 +319,7 @@ class GCall(cmd.Cmd, object):
                 optional = attendees_self[0].get("optional", False)
             else:
                 optional = False
-            return """* [[{}][{}]]{}
+            return """* [[{}][{}]]{}{}
 :PROPERTIES:
 :ID: {}
 :CALENDAR_ID: {}
@@ -344,6 +344,7 @@ Attendees:
 """.format(
     self.htmlLink,
     self.summary.replace("[", "{").replace("]", "}") or "NoSummary",
+    (f" ([[{self.hangoutLink}][Hangout link]])" if self.hangoutLink else ""),
     ("    :{}:".format(":".join(self.tags)) if self.tags else ""),
     self.id,
     self.calendar_id,

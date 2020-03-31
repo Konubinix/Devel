@@ -210,6 +210,7 @@ Mod4 F3 :Exec ExecCommand $(konix_do_cron_job.sh dmenu-frecency)
 # volume settings
 Mod4 Mod1 Up :Exec konix_display_unique.py "$(clk pulse up && clk pulse show)"
 Mod4 Mod1 Down :Exec konix_display_unique.py "$(clk pulse down && clk pulse show)"
+Mod4 Mod1 m :Exec konix_display_unique.py "$(clk pulse toggle-mute && clk pulse show)"
 
 # Reconfigure
 control Mod4 f : MacroCmd {Reconfigure} {Exec konix_display.py 'reconfigure done'}
@@ -350,6 +351,7 @@ Mod4 m Up :ExecCommand konix_do_cron_job.sh mpc volume +5 && konix_display_uniqu
 Mod4 m s :ExecCommand konix_do_cron_job.sh konix_mpc_display.sh
 Mod4 m e :ExecCommand konix_do_cron_job.sh konix_mpc_display.sh
 Mod4 m v :ExecCommand konix_do_cron_job.sh pavucontrol && konix_display.py "Pavucontrol"
+Mod4 m m :Exec konix_display_unique.py "$(clk pulse toggle-mute && clk pulse show)"
 
 # command the mpc with the same kind of bindings than the volume
 Mod4 Mod1 Left :ExecCommand konix_do_cron_job.sh mpc seek -00:00:05 && konix_display.py "Backward 5 seconds"

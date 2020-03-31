@@ -44,3 +44,5 @@ settings:
     - \bolder\b
     - \b[<←≪]\b
     - \b(<<|«)\b
+  new_instance_open_target:
+    global: tab-silent

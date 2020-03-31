@@ -188,6 +188,21 @@
 	)
   ""
   )
+(defface konix/org-agenda-maybe-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:slant italic :weight light)
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:slant italic :weight light)
+	 )
+	)
+  ""
+  )
 (defface konix/org-agenda-urgent-items-face
   '(
 	(
@@ -674,6 +689,7 @@
     ("^Friday.+" 0 konix/org-agenda-friday-face)
     ("^Saturday.+" 0 konix/org-agenda-saturday-face)
     ("^Sunday.+" 0 konix/org-agenda-sundy-face)
+    ("^.+:maybe:.*$" 0 konix/org-agenda-maybe-face)
 	)
   "")
 (defun konix/org-agenda-set-text-properties ()

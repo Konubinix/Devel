@@ -494,6 +494,7 @@ class RTM():
             self,
             conversations=None,
             types=None,
+            subtypes=None,
             user=None,
     ):
         while True:
@@ -514,6 +515,11 @@ class RTM():
                     (
                         not types
                         or chunk["type"] in types
+                    )
+                    and
+                    (
+                        not subtypes
+                        or chunk.get("subtype") in subtypes
                     )
                     and
                     (
@@ -979,8 +985,10 @@ def rtm():
 @argument("conversations", type=ConversationType(), nargs=-1,
           help="The conversation to listen to")
 @option("--type", "types", multiple=True, help="The type of message to let through")
+@option("--subtype", "subtypes", multiple=True, help="The sub-type of message to let through")
 @option("--user", type=UserType(), help="Show only messages from this user")
-def listen(conversations, types, user):
+@option("--field", "fields", multiple=True, help="Show only this field")
+def listen(conversations, types, user, fields, subtypes):
     """Listen to slack event in a conversation
 
     The events are printed as-is, allowing you to pipe them for further
@@ -993,9 +1001,13 @@ def listen(conversations, types, user):
         async for message in _listen(
                 conversations=conversations,
                 types=types,
+                subtypes=subtypes,
                 user=user,
         ):
-            pprint.pprint(message)
+            if fields:
+                print("|".join(message[field] for field in fields))
+            else:
+                pprint.pprint(message)
             sys.stdout.flush()
     async_get(do())
 

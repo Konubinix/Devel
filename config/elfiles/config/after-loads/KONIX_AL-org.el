@@ -1755,7 +1755,7 @@ items"
                             '(or
                               (konix/org-agenda-skip-if-tags
                                '("project" "goal" "aofs"))
-                              (konix/org-agenda-skip-if-tags '("WAIT" "DELEGATED"))
+                              (konix/org-agenda-skip-if-tags '("maybe" "WAIT" "DELEGATED"))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               ;;(org-agenda-skip-entry-if 'scheduled)
                               )
@@ -1769,7 +1769,7 @@ items"
                            (org-agenda-skip-function
                             '(or
                               (konix/org-agenda-skip-if-tags
-                               '("project" "goal" "aofs"))
+                               '("project" "goal" "aofs" "maybe"))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time
                                t)
                               (konix/org-agenda-keep-if-tags '("WAIT" "DELEGATED"))
@@ -1790,6 +1790,7 @@ items"
                             '(or
                               (konix/skip-not-todo-file)
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
+                              (konix/org-agenda-skip-if-tags '("maybe"))
                               (konix/org-agenda-keep-if-tags
                                '("project" "goal" "aofs"))
                               )
@@ -1845,6 +1846,7 @@ items"
                                  "no_monthly"
                                  "phantom"
                                  "habit"
+                                 "maybe"
                                  ))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               )

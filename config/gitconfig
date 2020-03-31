@@ -25,6 +25,7 @@
 	amu = !curl ${1} | git am -
 	rv = remote -v
 	fri = fixup-ri.sh
+	diffpr = git diff --cc -w "$@"
 [diff]
   	tool = meld #konix_emacs_diff
 	renamelimit = 888

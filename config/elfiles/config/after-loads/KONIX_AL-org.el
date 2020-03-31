@@ -3337,7 +3337,8 @@ of the clocksum."
            (lambda (marker)
              (save-excursion
                (goto-char (marker-position marker))
-               (warn "%s is automatically set to NOT_DONE" (org-get-heading t t))
+               (konix/notify (format "%s is automatically set to NOT_DONE"
+                                     (org-get-heading t t)) 1)
                (org-todo "NOT_DONE")
                )
              )
@@ -3532,7 +3533,7 @@ of the clocksum."
         (expecting-parties (konix/org-get-expecting-parties tags))
         )
     (when expecting-parties
-      (warn "You should warn %s about this"
+      (konix/notify (format "You should warn %s about this"
             (string-join
              (mapcar
               (lambda (tag)
@@ -3551,7 +3552,7 @@ of the clocksum."
               )
              " and "
              )
-            )
+            ) 1)
       )
     )
   )
@@ -3564,7 +3565,7 @@ of the clocksum."
         (informable-parties (konix/org-get-informable-parties tags))
         )
     (when informable-parties
-      (warn "You should warn %s about this"
+      (konix/notify (format "You should warn %s about this"
             (string-join
              (mapcar
               (lambda (tag)
@@ -3583,7 +3584,7 @@ of the clocksum."
               )
              " and "
              )
-            )
+            ) 1)
       )
     )
   )

@@ -26,7 +26,7 @@
 
 (defun konix/makefile-gmake-mode-hook ()
   (setq konix/adjust-new-lines-at-end-of-file t)
-  (electric-pair-mode 1)
+
   )
 (add-hook 'makefile-gmake-mode-hook
 		  'konix/makefile-gmake-mode-hook)

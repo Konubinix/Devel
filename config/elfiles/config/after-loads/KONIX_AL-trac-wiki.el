@@ -69,7 +69,7 @@
   )
 (defun konix/trac-wiki-mode-hook ()
   (konix/outline-mode-hook)
-  (electric-pair-mode 1)
+
   (visual-line-mode 1)
   (setq show-trailing-whitespace t)
   (local-set-key (kbd "C-<left>") 'backward-word)

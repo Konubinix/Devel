@@ -540,16 +540,27 @@ allbutlastcharacter ( ) {
     echo "${input:0:-1}"
 }
 
-story () {
+call_history ( ) {
+    HISTTIMEFORMAT="%y/%m/%d-%H:%M:%S:" history "$@"
+}
+
+history_extract_commandline ( ) {
     local histprefixregexp="........................."
+    sed "s/${histprefixregexp}//"
+}
+
+story () {
     local input="$*"
     # remove the call to story from the history
-    history -d -1
-    local command="$(HISTTIMEFORMAT="%y/%m/%d-%H:%M:%S:" history|tac|percol \
+    if call_history|history_extract_commandline|tail -1|grep -q '^story'
+    then
+        history -d -1
+    fi
+    local command="$(call_history|tac|percol \
  --match-method='regex' \
  --prompt-bottom \
  --result-bottom-up \
- --query="${input}"|sed "s/${histprefixregexp}//"\
+ --query="${input}"|history_extract_commandline \
  |trim)"
     if [ -n "${command}" ]
     then
@@ -557,6 +568,11 @@ story () {
     fi
     if [ -n "${command}" ]
     then
+        # I don't know why the last command get replaced by the call to history
+        # -s, but since it happens, let's artificially put again the last
+        # command before inserting the new command into the history
+        local last_command="$(call_history|history_extract_commandline|tail -1)"
+        history -s "${last_command}"
         history -s "${command}"
         eval "${command}"
     else

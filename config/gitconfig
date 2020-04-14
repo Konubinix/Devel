@@ -1,3 +1,8 @@
+[user]
+    useConfigOnly = true
+	email = konubinixweb@gmail.com
+	name = "Samuel Loury"
+	signingKey = konubinix
 [gui]
 	fontui = -family helvetica -size 12 -weight bold -slant roman -underline 0 -overstrike 0
 	fontdiff = -family Courier -size 12 -weight normal -slant roman -underline 0 -overstrike 0
@@ -60,7 +65,7 @@
 [push]
 	default = simple
 [commit]
-#	gpgSign = true
+	gpgSign = true
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f

@@ -1683,31 +1683,6 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "-C_me-C_society-maybe"
-                             (
-                              (org-agenda-todo-ignore-deadlines nil)
-                              (org-agenda-overriding-header
-                               "7 days: Make explicit that those commitments are not forgotten")
-                              (org-agenda-skip-function
-                               '(or
-                                 (konix/skip-not-todo-file)
-                                 (konix/org-agenda-skip-if-task-of-project)
-                                 (konix/org-agenda-keep-if-expired 7 t)
-                                 ))
-                              )
-                             )
-                  (tags-todo "DELEGATED-maybe|WAIT-maybe|Promise-maybe"
-                             (
-                              (org-agenda-todo-ignore-deadlines nil)
-                              (org-agenda-overriding-header
-                               "Make sure all promises have due dates")
-                              (org-agenda-skip-function
-                               '(or
-                                 (org-agenda-skip-if t '(deadline))
-                                 (konix/org-agenda-skip-if-task-of-project)
-                                 ))
-                              )
-                             )
                   (tags "+INTERRUPTION-timejudgment-structure"
                         (
                          (org-agenda-overriding-header
@@ -1727,7 +1702,7 @@ items"
                             ))
                          )
                         )
-                  (tags "+Expectation-Commitment"
+                  (tags "+Expectation-Commitment-maybe"
                         (
                          (org-agenda-overriding-header
                           "Be clear about the expectations -> make commitment out of them")
@@ -1969,6 +1944,7 @@ items"
                                '(
                                  "no_monthly"
                                  "phantom"
+                                 "maybe"
                                  ))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               )
@@ -2063,9 +2039,9 @@ items"
                   (org-agenda-tag-filter-preset nil)
                   )
                  )
-                ("agP" "Projects & NA"
+                ("agP" "Actions to review and consider maybe-ing during the Weekly review"
                  (
-                  (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
+                  (tags "-maybe+todo=\"NEXT\"-WAIT-DELEGATED|+todo=\"TODO\"-maybe-WAIT-DELEGATED|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\"-WAIT-DELEGATED"
                         (
                          (org-agenda-overriding-header
                           "Projects & NA (things that are or should be committed)")
@@ -2080,24 +2056,35 @@ items"
                           )
                          )
                         )
-                  (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
-                        (
-                         (org-agenda-overriding-header
-                          "Future projects & NA (things that are or should be committed)")
-                         (org-agenda-skip-function
-                          '(or
-                            (konix/org-agenda-skip-if-tags
-                             '("phantom"))
-                            (konix/skip-not-todo-file)
-                            (konix/org-agenda-skip-if-task-of-project)
-                            (konix/org-agenda-keep-if-scheduled-and-scheduled-in-the-future)
-                            )
-                          )
-                         )
-                        )
+                  ;; (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
+                  ;;       (
+                  ;;        (org-agenda-overriding-header
+                  ;;         "Future projects & NA (things that are or should be committed)")
+                  ;;        (org-agenda-skip-function
+                  ;;         '(or
+                  ;;           (konix/org-agenda-skip-if-tags
+                  ;;            '("phantom"))
+                  ;;           (konix/skip-not-todo-file)
+                  ;;           (konix/org-agenda-skip-if-task-of-project)
+                  ;;           (konix/org-agenda-keep-if-scheduled-and-scheduled-in-the-future)
+                  ;;           )
+                  ;;         )
+                  ;;        )
+                  ;;       )
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags))
+                  (org-super-agenda-groups
+                   (konix/org-super-agenda-per
+                    (append
+                     konix/org-gtd-commitments-tags
+                     '(
+                       ("C_society")
+                       ("C_me")
+                       )
+                     )
+                    )
+                   )
                   (dummy (setq konix/org-agenda-highlight-inactive-with-subtree t))
                   (dummy
                    (set
@@ -2119,17 +2106,17 @@ items"
                   (org-agenda-tag-filter-preset nil)
                   )
                  )
-                ("agp" "Projects"
+                ("agp" "Projects for which to review the status, goal and outcome during the GTD weekly review"
                  (
                   (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"-WAITING-DELEGATED"
                         (
                          (org-agenda-overriding-header
-                          "Current projects (without subprojects nor maybe)")
+                          "Current projects, all of them (even subprojects), for gtd reviewing")
                          (org-agenda-skip-function
                           '(or
                             (konix/org-agenda-skip-if-tags
                              '("phantom"))
-                            (konix/org-agenda-skip-if-task-of-project)
+                            ;; (konix/org-agenda-skip-if-task-of-project)
                             (konix/org-agenda-for-today-skip-if-not-the-good-time)
                             )
                           )
@@ -2159,21 +2146,25 @@ items"
                  )
                 ("agy" "Maybe list"
                  (
-                  (tags-todo "+maybe-project"
+                  (tags-todo "+maybe"
                              (
                               (org-agenda-overriding-header
-                               "Maybe tasks (without projects)")
-                              (org-tags-exclude-from-inheritance nil)
-                              )
-                             )
-                  (tags-todo "+project+maybe"
-                             (
-                              (org-agenda-overriding-header
-                               "Maybe Projects")
+                               "Maybe actions")
+                              (org-tags-exclude-from-inheritance '("maybe"))
                               )
                              )
                   )
                  (
+                  (org-super-agenda-groups
+                   '(
+                     (:name "No dream"
+                            :not (:tag "dream")
+                            )
+                     (:name "Dream"
+                            :tag "dream"
+                            )
+                     )
+                   )
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (dummy (setq konix/org-agenda-type 'tags))
                   (dummy

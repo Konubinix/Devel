@@ -4731,6 +4731,23 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
          (save-excursion (beginning-of-line) (point))
          (1+ (org-end-of-subtree))
          )
+        (while (save-excursion
+                 (forward-line -1)
+                 (looking-at "^$")
+                 )
+          (kill-region (match-beginning 0)
+                       (1+
+                        (match-end 0)
+                        )
+                       )
+          )
+        (while (looking-at "^$")
+          (kill-region (match-beginning 0)
+                       (1+
+                        (match-end 0)
+                        )
+                       )
+          )
         )
     (call-interactively 'kill-line)
     )

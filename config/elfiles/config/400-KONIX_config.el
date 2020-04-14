@@ -245,11 +245,15 @@
 (add-to-list 'safe-local-variable-values
 			 '(auto-revert-mode . t))
 (add-to-list 'safe-local-variable-values
+			 '(eval hl-line-mode t))
+(add-to-list 'safe-local-variable-values
 			 '(ispell-dictionary . "francais"))
 (add-to-list 'safe-local-variable-values
 			 '(ispell-dictionary . "british"))
 (add-to-list 'safe-local-variable-values
 			 '(ispell-dictionary . "americain"))
+(add-to-list 'safe-local-variable-values
+			 '(eval visual-line-mode -1))
 
 (add-hook 'before-save-hook 'konix/delete-trailing-whitespace)
 (add-hook 'before-save-hook 'konix/adjust-new-lines-at-end-of-file)

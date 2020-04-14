@@ -93,6 +93,7 @@
 (add-hook 'dired-mode-hook 'konix/dired-mode-hook)
 
 (setq-default dired-backup-overwrite nil)
+(setq-default dired-omit-verbose nil)
 (setq-default dired-omit-files "^\.?#\|^\.$")
 (setq-default dired-omit-extensions
 			  '("~"

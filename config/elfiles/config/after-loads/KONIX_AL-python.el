@@ -47,6 +47,7 @@
                 )
 		)
   (auto-complete-mode 1)
+  (setq-local yas-indent-line 'fixed)
   )
 (add-hook 'python-mode-hook
 		  'konix/python-mode-hook)

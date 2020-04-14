@@ -143,6 +143,7 @@
 (autoload 'which-key-mode "which-key" "" t)
 (autoload 'ivy-mode "ivy" "" t)
 (autoload 'golden-ratio-mode "golden-ratio" "" t)
+(autoload 'konix/org-roam-note "org-roam" "" t)
 
 
 ;; ************************************************************

@@ -31,13 +31,17 @@
 (define-key org-roam-mode-map (kbd "C-c n b") #'org-roam-build-cache)
 (define-key org-roam-mode-map (kbd "C-c n j") #'org-roam-switch-to-buffer)
 (define-key org-roam-mode-map (kbd "C-c n i") #'org-roam-insert)
+(define-key org-roam-mode-map (kbd "C-c n I") 'konix/org-roam-separate_camelcase_and_insert)
+(key-chord-define org-roam-mode-map " i" 'konix/org-roam-separate_camelcase_and_insert)
+(key-chord-define org-roam-mode-map "ri" 'org-roam-insert)
+(define-key konix/region-bindings-mode-map "i" 'org-roam-insert)
 
 (setq-default org-roam-capture-templates
               '(
                 ("d" "default" plain
                  (function org-roam--capture-get-point)
                  "%?"
-                 :file-name "%<%Y%m%d%H%M%S>-${slug}"
+                 :file-name "%<%y%m%d-%H%M%S>-${slug}"
                  :head "#+TITLE: ${title}
 #+LANGUAGE: fr
 #+CREATED: %U
@@ -51,7 +55,7 @@ ${title}
                 ("n" "note" plain
                  (function org-roam--capture-get-point)
                  "%?"
-                 :file-name "%<%Y%m%d%H%M%S>-${slug}"
+                 :file-name "%<%y%m%d-%H%M%S>-${slug}"
                  :head "#+TITLE: ${title}
 #+LANGUAGE: fr
 #+CREATED: %U
@@ -68,14 +72,15 @@ ${title}
 
 (defun org-roam--file-for-time (time)
   "Create and find file for TIME."
-  (let* ((title (format-time-string "%Y-%m-%d" time))
-         (file-path (org-roam--file-path-from-id title)))
+  (let* ((filename (format-time-string "%y%m%d" time))
+         (title (format-time-string "%Y-%m-%d" time))
+         (file-path (org-roam--file-path-from-id filename)))
     (if (file-exists-p file-path)
         file-path
       (let ((org-roam-capture-templates (list (list "d" "daily" 'plain (list 'function #'org-roam--capture-get-point)
                                                     ""
                                                     :immediate-finish t
-                                                    :file-name "${title}"
+                                                    :file-name "${filename}"
                                                     :head "#+TITLE: ${title}
 #+LANGUAGE: fr
 #+CREATED: %U
@@ -83,7 +88,7 @@ ${title}
 
 ")))
             (org-roam--capture-context 'title)
-            (org-roam--capture-info (list (cons 'title title))))
+            (org-roam--capture-info (list (cons 'title title) (cons 'filename filename))))
         (org-roam-capture)))))
 
 
@@ -158,9 +163,6 @@ ${title}
     )
   (end-of-line)
   )
-
-(define-key org-roam-mode-map (kbd "C-c n I") 'konix/org-roam-separate_camelcase_and_insert)
-(key-chord-define org-roam-mode-map " i" 'konix/org-roam-separate_camelcase_and_insert)
 
 (add-to-list 'golden-ratio-exclude-buffer-names "*org-roam*")
 

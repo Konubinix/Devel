@@ -24,11 +24,7 @@
 
 ;;; Code:
 
-(defun konix/phi-search-mc/mark-here-and-moveto-next nil
-  (interactive)
-  (call-interactively 'phi-search-mc/mark-here)
-  (call-interactively 'phi-search-again-or-next)
-  )
+(require 'KONIX_AL-phi-search)
 
 (setq-default
  phi-search-additional-keybinds
@@ -43,6 +39,7 @@
   phi-search-additional-keybinds
   )
  )
+
 
 (provide 'KONIX_AL-phi-search-mc)
 ;;; KONIX_AL-phi-search-mc.el ends here

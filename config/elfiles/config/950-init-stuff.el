@@ -10,7 +10,6 @@
 (electric-pair-mode)
 
 (defun konix/emacs-startup-hooks ()
-  (require 'which-key nil t)
   )
 
 (add-hook 'emacs-startup-hook

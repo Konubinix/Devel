@@ -8,6 +8,8 @@
 (progn
   (setq konix/personal-load-path
 		(list
+		 (expand-file-name "config" elfiles)
+		 (expand-file-name "config/after-loads" elfiles)
 		 (expand-file-name "org/lisp" elfiles)
 		 (expand-file-name "org-edna" elfiles)
 		 (expand-file-name "org/contrib/lisp" elfiles)

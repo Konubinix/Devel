@@ -24,9 +24,9 @@
 
 ;;; Code:
 (require 'phi-replace)
+(require 'region-bindings-mode)
 
 (setq-default phi-search-limit 10000)
-
 
 (defvar konix/phi-search-to-occur/query nil)
 (defvar konix/phi-search-to-occur/point nil)
@@ -123,6 +123,12 @@
 (add-hook 'phi-search-init-hook
           'konix/phi-search-init-hook
           )
+
+(defun konix/phi-search-mc/mark-here-and-moveto-next nil
+  (interactive)
+  (call-interactively 'phi-search-mc/mark-here)
+  (call-interactively 'phi-search-again-or-next)
+  )
 
 (provide 'KONIX_AL-phi-search)
 ;;; KONIX_AL-phi-search.el ends here

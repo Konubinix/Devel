@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import pipe
 import IPython
 ip = IPython.get_ipython()
 
-def _pipe_completer(self, event):
-    import re
-    symbol = re.match('(?P<symbol>.+\\|)', event.symbol).group("symbol")
-    return [symbol + function.__name__ for function in pipe.pipe_functions]
+# import pipe
+# def _pipe_completer(self, event):
+#     import re
+#     symbol = re.match('(?P<symbol>.+\\|)', event.symbol).group("symbol")
+#     return [symbol + function.__name__ for function in pipe.pipe_functions]
+#ip.set_hook('complete_command', _pipe_completer, re_key = '.+\\|[a-zA-Z_-]*$')
 
 def _greedy_completer(self, event):
     import re
@@ -22,4 +23,3 @@ def _greedy_completer(self, event):
     return [symbol + s for s in dir(obj)]
 
 ip.set_hook('complete_command', _greedy_completer, re_key = '.+\\|.+?\\.[a-zA-Z_-]*$')
-ip.set_hook('complete_command', _pipe_completer, re_key = '.+\\|[a-zA-Z_-]*$')

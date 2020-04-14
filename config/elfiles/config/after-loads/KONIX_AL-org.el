@@ -1092,7 +1092,7 @@ items"
         'org-super-agenda-groups)
        (if org-super-agenda-groups
            nil
-         (konix/org-super-agenda-per konix/org-gtd-commitments-tags)
+         (konix/org-super-agenda-per (append '(("C_me") ("C_society")) konix/org-gtd-commitments-tags))
          )
        )
   (message "org-super-agenda per commitment: %s" (if org-super-agenda-groups t nil))

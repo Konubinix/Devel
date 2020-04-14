@@ -4869,5 +4869,33 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (setq-default org-habit-show-habits nil)
 
+(defun konix/org-deduplicate-subentries nil
+  (interactive)
+  (org-sort-entries t ?a)
+  (let (
+        prev
+        (org-agenda-confirm-kill 500)
+        (headings (reverse (org-element-map
+                               (org-element-parse-buffer)
+                               'headline
+                             #'identity
+                             )
+                           )
+                  )
+        )
+    (while headings
+      (setq prev (car headings))
+      (setq headings (cdr headings))
+      (when (string=
+             (org-element-property :raw-value prev)
+             (org-element-property :raw-value (car headings))
+             )
+        (goto-char (org-element-property :begin prev))
+        (konix/org-kill)
+        )
+      )
+    )
+  )
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

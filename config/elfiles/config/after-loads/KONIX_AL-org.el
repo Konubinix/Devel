@@ -4852,6 +4852,8 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
  '(("Outline Navigation")
    ("P" . konix/org-toggle-project)
    ("G" . org-mark-ring-goto)
+   ("h" . hl-line-mode)
+   (" " . org-next-visible-heading)
    ("Manipulation")
    ("k" . konix/org-kill)
    ("+" . konix/org-capture-na-in-heading)

@@ -42,14 +42,24 @@
   (mapc
    #'(lambda(elt)
        (string-match "KONIX_AL-\\(.+\\).el" elt)
-       (eval-after-load (match-string-no-properties 1 elt)
-         `(progn
-            (message "Loading %s triggered by %s" ,elt ,(match-string-no-properties 1 elt))
-            (when (getenv "KONIX_EMACS_DEBUG_AFTER_LOAD")
-              (backtrace)
+       (let (
+             (file-to-load (match-string-no-properties 1 elt))
+             )
+         (when (load-history-filename-element (load-history-regexp file-to-load))
+           (warn "%s was already loaded before configuring its after load\
+ -> configuring an after-load is useless in that case."
+		 file-to-load
+		 )
+           )
+         (eval-after-load file-to-load
+           `(progn
+              (message "Loading %s triggered by %s" ,elt ,(match-string-no-properties 1 elt))
+              (when (getenv "KONIX_EMACS_DEBUG_AFTER_LOAD")
+                (backtrace)
+                )
+              (konix/load-file ,elt)
               )
-            (konix/load-file ,elt)
-            )
+           )
          )
        )
    (sort

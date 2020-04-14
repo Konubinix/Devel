@@ -4388,7 +4388,7 @@ of the clocksum."
 
 (defun konix/org-get-id ()
   (konix/org-with-point-on-heading
-   (org-id-get nil 'create)
+   (org-id-get nil (unless konix/start-calendar 'create))
    )
   )
 

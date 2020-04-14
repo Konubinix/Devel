@@ -2,6 +2,17 @@
 ;; Unset the keys I want to free
 ;; ####################################################################################################
 (require 'key-chord)
+(require 'region-bindings-mode)
+
+(region-bindings-mode-enable)
+(define-prefix-command 'konix/region-bindings-mode-map)
+(define-key region-bindings-mode-map "r" 'konix/region-bindings-mode-map)
+
+(setq-default
+ region-bindings-mode-disable-predicates
+ '((lambda () buffer-read-only))
+ )
+
 (key-chord-mode 1)
 (key-chord-define-global " u" 'undo)
 (key-chord-define-global "fh" 'find-file)

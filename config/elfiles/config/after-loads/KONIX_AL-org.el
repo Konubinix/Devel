@@ -133,28 +133,43 @@
 
 (defun konix/org-add-timestamp ()
   (interactive)
-  (let (
-        (time (if current-prefix-arg
-                  (konix/org-with-point-at-clocked-entry (konix/org-get-time))
-                (konix/org-with-point-on-heading (konix/org-get-time))
+  (let* (
+         (time (if current-prefix-arg
+                   (konix/org-with-point-at-clocked-entry (konix/org-get-time))
+                 (konix/org-with-point-on-heading (konix/org-get-time))
+                 ))
+         (konix/org-log-into-drawer "TIMESTAMP")
+         (cmd (lambda nil
+                (progn
+                  (goto-char (org-log-beginning t))
+                  (save-excursion (insert "\n"))
+                  (org-indent-line)
+                  (insert (format
+                           "- On %s: <%s>"
+                           (format-time-string
+			                (org-time-stamp-format 'long 'inactive)
+                            (current-time)
+                            )
+                           time)
+                          )
+                  )
                 ))
-        (konix/org-log-into-drawer "TIMESTAMP")
-        (cmd (lambda nil
-               (progn
-                 (goto-char (org-log-beginning t))
-                 (save-excursion (insert "\n"))
-                 (org-indent-line)
-                 (insert (format
-                          "- On %s: <%s>"
-                          (format-time-string
-			               (org-time-stamp-format 'long 'inactive)
-                           (current-time)
-                           )
-                          time)
-                         )
-                 )
-               ))
-        )
+         )
+    (if current-prefix-arg
+        (konix/org-with-point-at-clocked-entry (funcall cmd))
+      (konix/org-with-point-on-heading (funcall cmd))
+      )
+    )
+  )
+
+(defun konix/org-add-outcome ()
+  (interactive)
+  (let* (
+         (cmd (lambda nil
+                (org-add-log-setup 'note nil nil nil "- Outcome :: ")
+                )
+              )
+         )
     (if current-prefix-arg
         (konix/org-with-point-at-clocked-entry (funcall cmd))
       (konix/org-with-point-on-heading (funcall cmd))
@@ -343,17 +358,17 @@
     )
   )
 
-(defun konix/org-agenda-keep-if-tags (request_tags)
-  (konix/org-agenda-skip-if-tags request_tags t)
+(defun konix/org-agenda-keep-if-tags (request_tags &optional local)
+  (konix/org-agenda-skip-if-tags request_tags t local)
   )
 
-(defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip)
+(defun konix/org-agenda-skip-if-tags (request_tags &optional invert_skip local)
   (let (beg end skip tags current_tag)
     (org-back-to-heading t)
     (setq beg (point)
           end (progn (outline-next-heading) (1- (point))))
     (goto-char beg)
-    (setq tags (org-get-tags-at))
+    (setq tags (org-get-tags-at (point) local))
     (while (and
             (not skip)
             request_tags

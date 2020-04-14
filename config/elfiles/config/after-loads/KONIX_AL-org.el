@@ -1201,6 +1201,75 @@ items"
   (message "org-super-agenda per group aof: %s" (if org-super-agenda-groups t nil))
   )
 
+(defun konix/org-agenda-prefix-format/ann nil
+  "test"
+  (let (
+        (res "         ")
+        )
+    (save-excursion
+      (org-back-to-heading)
+      (forward-line)
+      (when (looking-at org-planning-line-re)
+        (let* (
+               (planning-eol (point-at-eol))
+               (planning-bol (point-at-bol))
+               has-deadline
+               (current-date (or
+                              (and
+                               (eq konix/org-agenda-type 'agenda)
+                               org-agenda-current-date
+                               )
+                              (org-date-to-gregorian
+                               (time-to-days nil)
+                               )
+                              )
+                             )
+               (current-time
+                (time-to-days
+                 (encode-time
+                  0 0 0
+                  (second current-date)
+                  (first current-date)
+                  (third current-date)
+                  )
+                 )
+                )
+               diff
+               )
+          (goto-char planning-eol)
+          (setq has-deadline (search-backward org-deadline-string planning-bol t))
+          (when has-deadline
+            (goto-char (match-end 0))
+            (skip-chars-forward " \t")
+            (looking-at org-ts-regexp-both)
+            (setq deadline-string (match-string-no-properties 0))
+            (setq deadline-time (org-time-string-to-absolute deadline-string))
+            (setq wdays (org-get-wdays deadline-string))
+            (setq diff (- deadline-time current-time))
+            (setq res (format
+                       (if (< diff 0)
+                           "%2d d. ago"
+                         "In %3d d."
+                         )
+                       (abs diff)
+                       )
+                  )
+            )
+          )
+        )
+      (setq res (format "%s %s:"
+                        res
+                        (or
+                         (org-entry-get nil org-effort-property)
+                         "    "
+                         )
+                        )
+            )
+      )
+    res
+    )
+  )
+
 (setq-default org-agenda-custom-commands
               `(
                 ("a" . "My custom agendas")
@@ -1367,6 +1436,11 @@ items"
                   (tags-todo "-maybe-project-WAIT-DELEGATED+Context//+NEXT")
                   )
                  (
+                  (org-agenda-prefix-format
+                   '(
+                     (tags . "%(konix/org-agenda-prefix-format/ann)")
+                     )
+                   )
                   (dummy (setq konix/org-agenda-type 'tags-todo))
                   (org-agenda-skip-function
                    '(or

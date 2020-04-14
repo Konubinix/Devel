@@ -2445,30 +2445,32 @@ items"
   (expand-file-name "bookmarks.org" org-directory))
 
 (defun konix/org-get-time nil
-  (let (
-        (time (org-read-date
-               t
-               t
-               nil
-               nil
-               nil
-               "n "
+  (let* (
+         org-time-was-given
+         org-end-time-was-given
+         (time (org-read-date
+                t
+                t
+                nil
+                nil
+                nil
+                "n "
+                )
                )
-              )
-        )
-    (format-time-string
-     (if org-time-was-given
-         "%Y-%m-%d %a %H:%M"
-       "%Y-%m-%d %a"
-       )
-     time
-     )
+         )
+    (with-temp-buffer
+      (org-insert-time-stamp
+	   time (or org-time-was-given nil) nil nil nil
+	   (list org-end-time-was-given))
+      (buffer-substring-no-properties (+ 1 (point-min)) (- (point-max) 1))
+      )
     )
   )
 
 (defun konix/org-read-date-analyze/empty-ans-means-current-time (orig-fun ans def defdecode)
-  (when (string-match-p "^ *n *$" ans)
-    (setq ans (format-time-string "%H:%M" (current-time)))
+  (if (string-match-p "^n *$" ans)
+      (setq ans (format-time-string "%H:%M" (current-time)))
+    (setq ans (replace-regexp-in-string "^n *" "" ans))
     )
   (apply orig-fun ans def defdecode '())
   )
@@ -2644,7 +2646,7 @@ items"
     ("effortjudgment")
     (:grouptags)
     ("quickwin" . ?q)
-    ("higheffort" . ?h)
+    ("highfocus" . ?h)
     (:endgroup)
     (:startgroup)
     ("calendar_commitment")
@@ -3541,7 +3543,7 @@ of the clocksum."
    )
   )
 
-(defun konix/org-get-informable-parties (&optional tags)
+(defun konix/org-get-informable-parties (&optional tags nocommitted)
   (unless tags
     (setq tag (org-get-tags (point)))
     )
@@ -3550,14 +3552,16 @@ of the clocksum."
     (lambda (tag)
       (or
        (string-prefix-p "I_" tag)
-       (and (string-prefix-p "C_" tag)
-            (not
-             (or
-              (string= tag "C_me")
-              (string= tag "C_society")
-              )
-             )
-            )
+       (and
+        (string-prefix-p "C_" tag)
+        (not
+         (or
+          (string= tag "C_me")
+          (string= tag "C_society")
+          )
+         )
+        (not nocommitted)
+        )
        (string-prefix-p "E_" tag)
        )
       )
@@ -3605,6 +3609,33 @@ of the clocksum."
     )
   )
 
+(defun konix/org-format-parties (parties)
+  (string-join
+   (org-uniquify
+    (mapcar
+     (lambda (tag)
+       (format "<%s>"
+               (upcase
+                (string-remove-prefix
+                 "C_"
+                 (string-remove-prefix
+                  "I_"
+                  (string-remove-prefix
+                   "E_"
+                   tag
+                   )
+                  )
+                 )
+                )
+               )
+       )
+     parties
+     )
+    )
+   " and "
+   )
+  )
+
 (defun konix/org-inform-about-expecting-parties (&optional tags)
   (unless tags
     (setq tags (org-get-tags (point)))
@@ -3614,57 +3645,23 @@ of the clocksum."
         )
     (when expecting-parties
       (konix/notify (format "You should warn %s about this"
-            (string-join
-             (mapcar
-              (lambda (tag)
-                (string-remove-prefix
-                 "C_"
-                 (string-remove-prefix
-                  "I_"
-                  (string-remove-prefix
-                   "E_"
-                   tag
-                   )
-                  )
-                 )
-                )
-              expecting-parties
-              )
-             " and "
-             )
-            ) 1)
+                            (konix/org-format-parties expecting-parties)
+                            ) 1)
       )
     )
   )
 
-(defun konix/org-inform-about-informable-parties (&optional tags)
+(defun konix/org-inform-about-informable-parties (&optional tags nocommitted)
   (unless tags
     (setq tags (org-get-tags (point)))
     )
   (let (
-        (informable-parties (konix/org-get-informable-parties tags))
+        (informable-parties (konix/org-get-informable-parties tags nocommitted))
         )
     (when informable-parties
       (konix/notify (format "You should warn %s about this"
-            (string-join
-             (mapcar
-              (lambda (tag)
-                (string-remove-prefix
-                 "C_"
-                 (string-remove-prefix
-                  "I_"
-                  (string-remove-prefix
-                   "E_"
-                   tag
-                   )
-                  )
-                 )
-                )
-              informable-parties
-              )
-             " and "
-             )
-            ) 1)
+                            (konix/org-format-parties informable-parties)
+                            ) 1)
       )
     )
   )
@@ -3689,6 +3686,7 @@ of the clocksum."
                 (not (member "maybe" old-tags))
                 )
            (konix/org-ask-about-committed-parties (append tags old-tags))
+           (konix/org-inform-about-informable-parties (append tags old-tags))
            )
          (when (and
                 tags-change?

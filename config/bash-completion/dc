@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source /usr/share/bash-completion/completions/docker
+
+ME="$(basename "${BASH_SOURCE[0]}")"
+complete -F _docker "${ME}"

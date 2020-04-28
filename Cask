@@ -87,3 +87,4 @@
 ;; (depends-on "org-journal") ; broken ?
 (depends-on "region-bindings-mode")
 (depends-on "which-key")
+(depends-on "hcl-mode")

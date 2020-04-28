@@ -541,11 +541,11 @@ allbutlastcharacter ( ) {
 }
 
 call_history ( ) {
-    HISTTIMEFORMAT="%y/%m/%d-%H:%M:%S:" history "$@"
+    HISTTIMEFORMAT="" history "$@"
 }
 
 history_extract_commandline ( ) {
-    local histprefixregexp="........................."
+    local histprefixregexp="......."
     sed "s/${histprefixregexp}//"
 }
 
@@ -556,11 +556,11 @@ story () {
     then
         history -d -1
     fi
-    local command="$(call_history|tac|percol \
+    local command="$(call_history|history_extract_commandline|tac|percol \
  --match-method='regex' \
  --prompt-bottom \
  --result-bottom-up \
- --query="${input}"|history_extract_commandline \
+ --query="${input}" \
  |trim)"
     if [ -n "${command}" ]
     then

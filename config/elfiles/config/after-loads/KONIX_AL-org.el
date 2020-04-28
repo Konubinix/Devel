@@ -4466,9 +4466,17 @@ of the clocksum."
   )
 
 (defun konix/org-get-id ()
-  (konix/org-with-point-on-heading
-   (org-id-get nil (unless konix/start-calendar 'create))
-   )
+  (let (
+        (id (konix/org-with-point-on-heading
+             (org-id-get nil (unless konix/start-calendar 'create))
+             ))
+        )
+    (when (and (not id) konix/start-calendar)
+      (require 'uuidgen)
+      (setq id (uuidgen-4))
+      )
+    id
+    )
   )
 
 (defun konix/org-capture-na-in-heading(&optional id clock-in clock-keep)

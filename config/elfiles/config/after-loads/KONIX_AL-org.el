@@ -2779,9 +2779,9 @@ items"
                 (agenda time-up user-defined-down habit-up priority-down
                         category-keep)
                 ;; Strategy for TODO lists
-                (todo priority-down deadline-up category-keep)
+                (todo priority-down user-defined-down)
                 ;; Strategy for Tags matches
-                (tags priority-down deadline-up category-keep)
+                (tags priority-down user-defined-down)
                 ;; Strategy for search matches
                 (search category-keep)
                 )
@@ -2792,8 +2792,8 @@ items"
  <=> (konix/org-cmp-deadlines-past-and-due-first a b) == 1
 "
   (let*(
-        (deadline_regexp_past "\\([0-9]+\\) d\\. ago:")
-        ;;      (deadline_regexp_future "In +\\([0-9]+\\) d\\.:")
+        (deadline_regexp_past "\\([0-9]+\\) d\\. ago")
+        (deadline_regexp_future "In +\\([0-9]+\\) d\\.")
         (deadline_regexp_now "Deadline:")
         (a_now (string-match-p deadline_regexp_now a))
         (a_past (and
@@ -2803,13 +2803,13 @@ items"
                   )
                  )
                 )
-        ;; (a_fut (and
-        ;;      (string-match deadline_regexp_future a)
-        ;;      (string-to-number
-        ;;       (match-string 1 a)
-        ;;       )
-        ;;      )
-        ;;     )
+        (a_fut (and
+                (string-match deadline_regexp_future a)
+                (string-to-number
+                 (match-string 1 a)
+                 )
+                )
+               )
         (b_now (string-match-p deadline_regexp_now b))
         (b_past (and
                  (string-match deadline_regexp_past b)
@@ -2818,17 +2818,15 @@ items"
                   )
                  )
                 )
-        ;; (b_fut (and
-        ;;      (string-match deadline_regexp_future b)
-        ;;      (string-to-number
-        ;;       (match-string 1 b)
-        ;;       )
-        ;;      )
-        ;;     )
-        (a_value (or a_past (and a_now 0) ;; a_fut
-                     -99))
-        (b_value (or b_past (and b_now 0) ;; b_fut
-                     -99))
+        (b_fut (and
+                (string-match deadline_regexp_future b)
+                (string-to-number
+                 (match-string 1 b)
+                 )
+                )
+               )
+        (a_value (or a_past (and a_now 0) (and a_fut (- 0 a_fut)) -99))
+        (b_value (or b_past (and b_now 0) (and b_fut (- 0 b_fut)) -99))
         (lower (< a_value b_value))
         (equal (= a_value b_value))
         )

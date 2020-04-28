@@ -39,6 +39,9 @@
 (require 'appt)
 
 (setq-default org--matcher-tags-todo-only nil)
+;; force the use of scheduling instead of deadline prewarning. They both have the
+;; same purpose : hidding the task till I want it to appear.
+(setq-default org-deadline-warning-days -10000)
 
 ;; ####################################################################################################
 ;; Init hook

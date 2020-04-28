@@ -74,4 +74,5 @@ alias xva=konix_xapers_view_and.sh
 alias xv="xapers view"
 alias xvf=konix_xapers_view_fuzzy.sh
 alias dkc=docker-compose
+alias dc=docker
 alias vbm=vboxmanage

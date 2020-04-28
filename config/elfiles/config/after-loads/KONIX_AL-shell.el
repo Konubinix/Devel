@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'auto-complete)
 (require 'native-complete)
 
 (defun konix/shell/find-command-completions (prefix)

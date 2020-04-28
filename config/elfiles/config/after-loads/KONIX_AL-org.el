@@ -780,10 +780,6 @@ to be organized.
           )
          )
     (cond
-     (;; not a todo -> OK
-      (not (org-entry-is-todo-p))
-      nil
-      )
      (;; todo, but without a planning -> OK
       (save-excursion
         (forward-line)
@@ -861,6 +857,10 @@ to be organized.
              )
            )
           )
+        nil
+        )
+       (;; not a todo -> OK
+        (not (org-entry-is-todo-p))
         nil
         )
        (;; none of the above => PASS ?

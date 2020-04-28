@@ -4850,7 +4850,10 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (defun konix/org-refile ()
   (interactive)
-  (if org-capture-mode
+  (if (and
+       (boundp 'org-capture-mode)
+       org-capture-mode
+       )
       (org-capture-refile)
     (org-refile)
     )

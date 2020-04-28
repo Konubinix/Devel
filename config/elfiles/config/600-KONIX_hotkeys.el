@@ -94,12 +94,19 @@
 ;; (global-set-key (kbd "C-M-*")
 ;;                 'konix/text-scale-propagate-current-scale-to-all-buffer)
 
+(defun konix/text-scale-init nil
+  (interactive)
+  (setq text-scale-mode nil)
+  (message "Done, you can use text-scale-mode now")
+  )
+
 (defhydra konix/hydra-zoom ()
   "zoom"
   ("+" text-scale-increase "in")
   ("-" text-scale-decrease "out")
   ("*" konix/text-scale-propagate-current-scale-to-all-buffer "propagate")
   ("=" text-scale-mode "reset toggle")
+  ("s" konix/text-scale-init "init text-scale-mode")
   ("q" nil "quit")
   )
 (key-chord-define-global "-+" 'konix/hydra-zoom/body)

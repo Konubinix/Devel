@@ -11,6 +11,8 @@ Add a file in ipfs.
 --
 A:file:str:The file to add
 N:The metadata to add
+O:--rmin:int:Minimal number of allocations:-1
+O:--rmax:int:Maximal number of allocations:-1
 EOF
 }
 
@@ -27,6 +29,6 @@ then
     exit 1
 fi
 
-ipfs-cluster-ctl pin add "${cid}"
+ipfs-cluster-ctl pin add --rmin "${CLK___RMIN}" --rmax "${CLK___RMAX}" "${cid}"
 
 echo "$cid ${*}" >> "${IPFS_INDEX}"

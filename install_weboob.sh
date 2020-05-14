@@ -1,4 +1,4 @@
 #!/bin/bash -eu
 
-pip3 install --user -e weboob
+python3 -m pip install --user -e weboob
 weboob-config update

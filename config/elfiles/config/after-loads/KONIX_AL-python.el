@@ -55,7 +55,7 @@
 (defun konix/python/make-executable ()
   (when (save-excursion
 		  (goto-char (point-min))
-		  (re-search-forward "__name__.+==.+.__main__." nil t)
+		  (re-search-forward "__name__.+==.+__main__." nil t)
           )
     (konix/make-executable)
     )

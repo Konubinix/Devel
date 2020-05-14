@@ -2233,23 +2233,45 @@ items"
                  )
                 ("agw" "Waiting for list (no filter context)"
                  (
-                  (tags-todo
-                   "WAIT-maybe|DELEGATED-maybe"
-                   (
-                    (org-agenda-overriding-header "WAITING items")
-                    (org-agenda-skip-function
-                     '(or
-                       (konix/skip-not-todo-file)
-                       )
-                     )
-                    (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
+                  (tags "WAIT-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"|DELEGATED-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
+                        (
+                         (org-agenda-overriding-header "WAITING items")
+                         (org-agenda-skip-function
+                          '(or
+                            (konix/skip-not-todo-file)
+                            )
+                          )
+                         (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
-                    (org-agenda-todo-ignore-scheduled 'future)
-                    (org-agenda-todo-ignore-with-date nil)
-                    (org-agenda-todo-ignore-deadlines nil)
-                    (org-agenda-todo-ignore-timestamp nil)
-                    )
-                   )
+                         (org-agenda-todo-ignore-scheduled 'future)
+                         (org-agenda-todo-ignore-with-date nil)
+                         (org-agenda-todo-ignore-deadlines nil)
+                         (org-agenda-todo-ignore-timestamp nil)
+                         )
+                        )
+                  )
+                 (
+                  (dummy (setq konix/org-agenda-type 'tags))
+                  )
+                 )
+                ("agW" "All waiting for list (even maybe and future)"
+                 ;; useful when something new appears while the heading it still hidden
+                 (
+                  (tags "WAIT-todo=\"DONE\"-todo=\"NOT_DONE\"|DELEGATED-todo=\"DONE\"-todo=\"NOT_DONE\""
+                        (
+                         (org-agenda-overriding-header "WAITING items")
+                         (org-agenda-skip-function
+                          '(or
+                            (konix/skip-not-todo-file)
+                            (konix/org-agenda-for-today-skip-if-not-the-good-time)
+                            )
+                          )
+                         (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
+                         (org-agenda-todo-ignore-with-date nil)
+                         (org-agenda-todo-ignore-deadlines nil)
+                         (org-agenda-todo-ignore-timestamp nil)
+                         )
+                        )
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags))

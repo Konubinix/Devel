@@ -10,3 +10,4 @@ application/pdf=evince.desktop;
 video/x-matroska=vlc.desktop;
 #text/html=chromium.desktop;
 text/html=qutebrowser-usercreated-1.desktop;
+audio/x-mpegurl=konix_mpc_play_m3u.desktop

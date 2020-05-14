@@ -1,6 +1,6 @@
 #!/bin/bash -eux
 
 mpc clear
-mpc add < <(konix_mpc_beet.sh "$@")
+mpc add < <(konix_beet_url.sh "$@")
 mpc consume on
 mpc play

@@ -32,7 +32,6 @@
   ;; fed up with auto line breaks
   (setq indent-tabs-mode nil)
   (auto-complete-mode 1)
-  (flycheck-select-checker 'python-flake8)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
   (when (and
          (executable-find "pyls")
@@ -48,6 +47,9 @@
 		)
   (auto-complete-mode 1)
   (setq-local yas-indent-line 'fixed)
+  ;; the flycheck-select-checker part must be run last, for it might fail and
+  ;; prevent he following lines to be run
+  (flycheck-select-checker 'python-flake8)
   )
 (add-hook 'python-mode-hook
 		  'konix/python-mode-hook)

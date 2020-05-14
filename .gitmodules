@@ -102,10 +102,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/rainbow-mode
 	url = https://github.com/emacsmirror/rainbow-mode
-[submodule "searx"]
-ignore=dirty
-	path = searx
-	url = https://github.com/asciimoo/searx
 [submodule "config/elfiles/swiper"]
 ignore=dirty
 	path = config/elfiles/swiper
@@ -154,11 +150,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
-[submodule "qutebrowser"]
-ignore=dirty
-	path = qutebrowser
-	#url = https://github.com/Konubinix/qutebrowser
-	url = https://github.com/qutebrowser/qutebrowser
 [submodule "pymimedetacher"]
 	path = pymimedetacher
 	url = https://github.com/Konubinix/pymimedetacher.git

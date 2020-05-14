@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=konix_mpc_play_m3u
+Exec=konix_mpc_play_m3u.sh %f
+Icon=/usr/lib/firefox/icons/mozicon50.xpm
+StartupNotify=true
+Terminal=false
+Type=Application

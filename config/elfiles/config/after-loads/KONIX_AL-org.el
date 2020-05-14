@@ -2019,6 +2019,11 @@ items"
                         )
                   )
                  (
+                  (org-agenda-prefix-format
+                   '(
+                     (tags . "%(konix/org-agenda-prefix-format/ann)")
+                     )
+                   )
                   (dummy (setq konix/org-agenda-type 'tags))
                   (org-super-agenda-groups (konix/org-super-agenda-per konix/org-gtd-commitments-tags))
                   (dummy (setq konix/org-agenda-highlight-inactive-with-subtree t))
@@ -2076,6 +2081,11 @@ items"
                   ;;       )
                   )
                  (
+                  (org-agenda-prefix-format
+                   '(
+                     (tags . "%(konix/org-agenda-prefix-format/ann)")
+                     )
+                   )
                   (dummy (setq konix/org-agenda-type 'tags))
                   (org-super-agenda-groups
                    (konix/org-super-agenda-per
@@ -2127,6 +2137,11 @@ items"
                         )
                   )
                  (
+                  (org-agenda-prefix-format
+                   '(
+                     (tags . "%(konix/org-agenda-prefix-format/ann)")
+                     )
+                   )
                   (dummy (setq konix/org-agenda-type 'tags))
                   (dummy
                    (set

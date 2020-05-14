@@ -1330,7 +1330,7 @@ items"
                    )
                   )
                  ;; (
-                 ;;  ,(format "%s/radicale/sam/agenda.ics" (getenv "KONIX_PERSO_DIR"))
+                 ;;  ,(format "%s/radicale/collection-root/sam/agenda.ics" (getenv "KONIX_PERSO_DIR"))
                  ;;  )
                  )
                 ("apw" "Work (no filtering)"
@@ -1404,7 +1404,7 @@ items"
                   (org-agenda-todo-ignore-timestamp nil)
                   )
                  ;; (
-                 ;;  ,(format "%s/radicale/sam/todos.ics" (getenv "KONIX_PERSO_DIR"))
+                 ;;  ,(format "%s/radicale/collection-root/sam/todos.ics" (getenv "KONIX_PERSO_DIR"))
                  ;;  )
                  )
                 ("anr" "With filters, empty context also"
@@ -1927,7 +1927,7 @@ items"
                   (dummy (setq konix/org-agenda-type 'agenda))
                   )
                  (
-                  ;;,(format "%s/radicale/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
+                  ;;,(format "%s/radicale/collection-root/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("atm" "Agenda of the next month"
@@ -1961,7 +1961,7 @@ items"
                   (dummy (setq konix/org-agenda-type 'agenda))
                   )
                  (
-                  ;;,(format "%s/radicale/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
+                  ;;,(format "%s/radicale/collection-root/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("atM" "Agenda of the past and next months"
@@ -1996,7 +1996,7 @@ items"
                   (dummy (setq konix/org-agenda-type 'agenda))
                   )
                  (
-                  ,(format "%s/radicale/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
+                  ,(format "%s/radicale/collection-root/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("ag" . "GTD list views")
@@ -2192,7 +2192,7 @@ items"
                  (
                   )
                  (
-                  ,(format "%s/radicale/sam/ril.ics" (getenv "KONIX_PERSO_DIR"))
+                  ,(format "%s/radicale/collection-root/sam/ril.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("ags" "SMS & Calls"
@@ -2213,7 +2213,7 @@ items"
                    )
                   )
                  (
-                  ,(format "%s/radicale/sam/sms_n_calls.ics" (getenv "KONIX_PERSO_DIR"))
+                  ,(format "%s/radicale/collection-root/sam/sms_n_calls.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("agw" "Waiting for list (no filter context)"
@@ -4091,9 +4091,10 @@ of the clocksum."
         )
       )
     )
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sam/calendar.ics")
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sam/ril.ics")
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sam/sms_n_calls.ics")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/collection-root/sam/calendar.ics")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/collection-root/sam/ril.ics")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/collection-root/sam/sms_n_calls.ics")
+  (shell-command "konix_ical_radicalize_dir.sh /home/sam/perso/perso/radicale/collection-root/sam/")
   (konix/notify "Exported" 2)
   )
 

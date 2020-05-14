@@ -881,11 +881,15 @@ def users(fields, format, missing_in, ins):
 
 @slack.command()
 @argument("conversation", type=ConversationType(), help="What conversation to spam")
+@option("--but", type=UserType(), help="User not to spam", multiple=True)
 @argument("message", help="The message to send", type=MessageType())
-def spam(conversation, message):
+def spam(conversation, message, but):
     """Say a message, with everyone marked in it"""
     users = config.slack.active_users
-    keys = set(users).intersection(set(conversation.members))
+    users_id = set(users)
+    but_id = set(user.id for user in but)
+    members_id = set(conversation.members)
+    keys = (users_id & members_id) - but_id
     users = [
         f"@{users[key].name}"
         for key in keys

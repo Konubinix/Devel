@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+
+source /usr/share/bash-completion/completions/journalctl
+ME="$(basename "${BASH_SOURCE[0]}")"
+complete -F _journalctl "${ME}"

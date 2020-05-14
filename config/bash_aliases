@@ -76,3 +76,7 @@ alias xvf=konix_xapers_view_fuzzy.sh
 alias dkc=docker-compose
 alias dc=docker
 alias vbm=vboxmanage
+alias scu="systemctl --user"
+alias jcu="journalctl --user"
+alias ssc="sudo systemctl"
+alias sjc="sudo journalctl"

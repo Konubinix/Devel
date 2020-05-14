@@ -468,7 +468,7 @@ mkvirtualenv_system-site-packages () {
 }
 
 mkvirtualenv3 () {
-    mkvirtualenv -p/usr/bin/python3 "$@"
+    VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3 mkvirtualenv "$@"
 }
 
 mkvirtualenv3_system-site-packages () {
@@ -476,7 +476,7 @@ mkvirtualenv3_system-site-packages () {
 }
 
 mkvirtualenv2 () {
-    mkvirtualenv -p/usr/bin/python2 "$@"
+    VIRTUALENVWRAPPER_PYTHON=/usr/bin/python2 mkvirtualenv "$@"
 }
 
 mkvirtualenv2_system-site-packages () {

@@ -22,7 +22,7 @@ onofflineimaperror () {
 trap "echo > ${TMPDIR}/konix_mail_tray_stamp; rm '$LOG_FILE'" 0
 {
     konix_lock_run.sh -n -N offlineimap timeout --kill-after=2m -s KILL "${KONIX_OFFLINEIMAP_TIMEOUT:-1200}" offlineimap -c "${KONIX_OFFLINEIMAPRC}" "$@" 2>&1
-    konix_lock_run.sh -n -N offlineimap gmail-dump.py
+    konix_lock_run.sh -n -N offlineimap gmail-dump.py 2>&1
 } | tee "$LOG_FILE" || onofflineimaperror
 
 konix_sendmail_flush.sh

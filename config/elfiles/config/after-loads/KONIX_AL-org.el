@@ -4910,6 +4910,8 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
    ("y" . konix/org-toggle-maybe)
    ("m" . konix/org-toggle-me)
    ("S" . konix/org-toggle-society)
+   ("s" . org-save-all-org-buffers)
+   ("W" . org-toggle-narrow-to-subtree)
    ("z" . org-add-note)
    ("Z" . konix/org-add-timestamp)
    ("N" . konix/org-roam-note)

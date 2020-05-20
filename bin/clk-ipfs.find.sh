@@ -8,6 +8,8 @@ usage () {
 $0
 
 Find a file in ipfs.
+--
+N:arguments to start search
 EOF
 }
 
@@ -17,4 +19,4 @@ then
 	exit 0
 fi
 
-percol "${IPFS_INDEX}"|sed -r 's/^([^ ]+) .+/\1/'
+percol --query "${CLK___ARGS}" "${IPFS_INDEX}"|sed -r 's/^([^ ]+) .+/\1/'

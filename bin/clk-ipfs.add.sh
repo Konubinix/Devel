@@ -31,4 +31,4 @@ fi
 
 ipfs-cluster-ctl pin add --rmin "${CLK___RMIN}" --rmax "${CLK___RMAX}" "${cid}"
 
-echo "$cid ${*}" >> "${IPFS_INDEX}"
+echo "$cid ${CLK___ARGS}" >> "${IPFS_INDEX}"

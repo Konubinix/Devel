@@ -108,5 +108,5 @@ def replace_file_content(file_name, content):
         except:
                 pass
         the_file = open(file_name, "wb")
-        the_file.write(content)
+        the_file.write(content.encode("utf-8"))
         the_file.close()

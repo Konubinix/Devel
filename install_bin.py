@@ -12,7 +12,7 @@ from tempfile import NamedTemporaryFile
 def install_bin():
     environ = get_environ()
 
-    print "Successful installed bin config"
+    print("Successful installed bin config")
 
 if __name__ == '__main__':
     install_bin()

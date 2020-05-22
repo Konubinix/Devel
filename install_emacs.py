@@ -37,6 +37,6 @@ def install_emacs():
   )
 """ % environ)
 
-    print "Successfully installed emacs config"
+    print("Successfully installed emacs config")
 if __name__ == "__main__":
     install_emacs()

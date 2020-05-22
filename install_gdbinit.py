@@ -20,6 +20,6 @@ def install_gdbinit():
     with open(GDBINIT_FILE_NAME, "w") as gdbinitfile:
         gdbinitfile.write('source %s\nsource %s\n' % (gdbinit_stl_views, gdbinit_config))
 
-    print "Successful installed gdbinit config"
+    print("Successful installed gdbinit config")
 if __name__ == '__main__':
     install_gdbinit()

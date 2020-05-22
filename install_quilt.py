@@ -32,7 +32,7 @@ def install_quilt():
     os.symlink(pc, pc_home)
     os.symlink(patches, patches_home)
 
-    print "Successfully installed quilt config"
+    print("Successfully installed quilt config")
 
 if __name__ == "__main__":
     install_quilt()

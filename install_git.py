@@ -42,6 +42,6 @@ def install_git():
     KONIX_MSMTP=os.path.join(environ["KONIX_BIN_DIR"], "konix_sendmail.sh")
     subprocess.Popen(["git", "config", "--global", "sendemail.smtpserver", KONIX_MSMTP])
 
-    print "Successful installed git config"
+    print("Successful installed git config")
 if __name__ == '__main__':
     install_git()

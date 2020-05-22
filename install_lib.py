@@ -71,11 +71,11 @@ def confirm(prompt=None, resp=False):
     while True:
             sys.stdout.write(prompt)
             sys.stdout.flush()
-            ans = raw_input("")
+            ans = eval(input(""))
             if not ans:
                     return resp
             if ans not in ['y', 'Y', 'n', 'N']:
-                    print 'please enter y or n.'
+                    print('please enter y or n.')
                     continue
             if ans == 'y' or ans == 'Y':
                     return True
@@ -103,7 +103,7 @@ def substitute (src, dst):
         # make sure the parent directory exists
         if not os.path.isdir(os.path.dirname(dst)):
                 os.makedirs(os.path.dirname(dst))
-        print action.__name__,src,"to",dst
+        print((action.__name__,src,"to",dst))
         action(src,dst)
 
 def replace_file_content(file_name, content):

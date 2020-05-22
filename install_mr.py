@@ -9,6 +9,6 @@ def install_mr():
 include = cat $KONIX_MR_CONFIG
 """)
 
-    print "Successfully installed mr config"
+    print("Successfully installed mr config")
 if __name__ == "__main__":
     install_mr()

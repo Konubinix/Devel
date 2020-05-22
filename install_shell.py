@@ -60,6 +60,6 @@ source "${HOME}/.shrc_var"
 source "${KONIX_CONFIG_DIR}/zshrc"
 source "${KONIX_SH_CUSTOM_FILE}"
 """)
-        print "Successful installed shell config"
+        print("Successful installed shell config")
 if __name__ == '__main__':
         install_shell()

@@ -8,7 +8,7 @@ def install_vim():
     replace_file_content(os.path.join(environ["HOME"] , ".vimrc"),
                          "source %(KONIX_CONFIG_DIR)s/vimrc" % environ)
 
-    print "Successfully installed vim config"
+    print("Successfully installed vim config")
 
 if __name__ == "__main__":
     install_vim()

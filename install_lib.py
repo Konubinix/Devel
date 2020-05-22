@@ -67,7 +67,7 @@ def confirm(prompt=None, resp=False):
     while True:
             sys.stdout.write(prompt)
             sys.stdout.flush()
-            ans = eval(input(""))
+            ans = input("")
             if not ans:
                     return resp
             if ans not in ['y', 'Y', 'n', 'N']:

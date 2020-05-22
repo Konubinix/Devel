@@ -67,9 +67,9 @@ substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "procmailrc"), os.path.join
 substitute(os.path.join(environ["KONIX_SHARE_DIR"], "icons"),      os.path.join(environ["HOME"], ".icons"))
 
 if confirm(prompt="Fetch submodules?"):
-    print "Initializing the submodules"
+    print("Initializing the submodules")
     subprocess.call(["git", "submodule", "init"])
-    print "Updating the submodules"
+    print("Updating the submodules")
     subprocess.call(["git", "submodule", "update"])
 
 if is_on_linux():

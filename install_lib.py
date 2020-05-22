@@ -21,11 +21,7 @@ def get_environ():
         # add the lib dir to sys path in order to use the which lib so that I
         # can find python executable. sys.executable won't work with cygwin
         sys.path.insert(0, environ["KONIX_LIB_DIR"])
-        import which
-        python_bin = which.which("python").replace("\\", "/")
-        if python_bin == "":
-            sys.stderr("Python must be in the path for that install to work")
-            exit(1)
+        python_bin = sys.executable
         environ["PYTHON_BIN"] = python_bin
         logging.info("Python bin is : "+python_bin)
         environ["PYTHON_PATH"] = os.path.dirname(python_bin)

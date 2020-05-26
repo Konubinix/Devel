@@ -10,3 +10,7 @@ ipfs_cluster_name_to_pin () {
     local name="$1"
     ipfs-cluster-ctl pin ls|grep "| ${name} |"|cut -f1 -d'|'|trim
 }
+
+ipfs_cluster_list_peers ( ) {
+    ipfs-cluster-ctl peers ls |grep '^12D'|cut -f 1 -d' '
+}

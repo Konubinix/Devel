@@ -298,17 +298,21 @@
   (find-file konix/mail_follow)
   )
 
-(defun konix/mimeopen (file)
+(defun konix/mimeopen (&optional file)
   "Open the selected file with mimeopen."
-  (interactive "ffile:")
-  (message "Opening %s" file)
-  (start-process
-   (format "mimeopen '%s'" file)
-   nil
-   "mimeopen"
-   "-n"
-   file
-   )
+  (interactive)
+  (let (
+        (file (or file (ffap-file-at-point) (error "No file at point")))
+        )
+    (message "Opening %s" file)
+    (start-process
+     (format "mimeopen '%s'" file)
+     nil
+     "mimeopen"
+     "-n"
+     file
+     )
+    )
   )
 
 (defun konix/kill-ring-insert ()

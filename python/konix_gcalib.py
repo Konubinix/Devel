@@ -20,6 +20,7 @@ import pytz
 import parsedatetime
 import dateutil.parser
 import dateutil
+import requests
 import konix_collections
 import urllib.parse
 import pandas
@@ -432,10 +433,9 @@ Attendees:
 
     @provides("api")
     def get_api(self):
-        req = urllib.request.Request(url=DISCOVERY_URI)
-        f = urllib.request.urlopen(req)
-        assert f.code == 200
-        self.db.set("api", f.read().decode("utf-8"))
+        res = requests.get(DISCOVERY_URI)
+        assert res.status_code == 200
+        self.db.set("api", res.text)
 
     def get_attr(self, key):
         return eval("self.{}".format(key))

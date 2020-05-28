@@ -14,4 +14,4 @@ then
 	exit 0
 fi
 
-clk ipfs find@sh --dmenu | xclip -in
+clk ipfs find@sh --selector dmenu | xclip -in

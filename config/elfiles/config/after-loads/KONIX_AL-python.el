@@ -67,7 +67,7 @@
   (auto-complete-mode t)
   (setq ac-sources
 		'(
-		  ac-source-konix/python/dir
+		  ;;ac-source-konix/python/dir
 		  )
 		)
   )

@@ -144,7 +144,7 @@
 (autoload 'ivy-mode "ivy" "" t)
 (autoload 'golden-ratio-mode "golden-ratio" "" t)
 (autoload 'konix/org-roam-note "org-roam" "" t)
-
+(autoload 'konix/ledger-run "ledger-mode" "" t)
 
 ;; ************************************************************
 ;; Automodes

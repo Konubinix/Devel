@@ -362,5 +362,5 @@ Mod4 Mod1 Right :ExecCommand konix_do_cron_job.sh mpc seek +00:00:05 && konix_di
 # ####################################################################################################
 # Impass (previously Assword) (Mod4 a ...)
 # ####################################################################################################
-Mod4 a g :ExecCommand konix_display.py "Impass Gui" && konix_do_with_gpg_agent.sh impass gui
+Mod4 a g :ExecCommand konix_display.py "Impass Gui" && konix_do_with_gpg_agent.sh impass_gui.sh
 Mod4 a y :ExecCommand konix_display.py "Impass Yank" && konix_do_with_gpg_agent.sh impass_yank.sh gui

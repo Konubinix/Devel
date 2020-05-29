@@ -2,6 +2,8 @@
 
 source _clk.sh
 
+IPFS_CLUSTER_FILTER_OPTION='O:--filter:["cluster_error", "error", "pin_error", "pin_queued", "pinned", "pinning", "queued", "remote", "unpin_error", "unpin_queued", "unpinned", "unpinning"]: Filter to use'
+
 ipfs_cluster_pins_names () {
     ipfs-cluster-ctl pin ls|cut -f2 -d'|'|awk '{$1=$1};1'
 }

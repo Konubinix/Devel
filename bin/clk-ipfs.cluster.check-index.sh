@@ -7,6 +7,9 @@ usage () {
 $0
 
 Make sure all the index is in the cluster and vice versa.
+--
+F:--clean-cluster:Remove the extra files from the cluster
+F:--add-to-cluster:Add the extra files to the cluster
 EOF
 }
 
@@ -32,6 +35,14 @@ then
     do
         grep "^/ipfs/${cid}" "${IPFS_INDEX}"
     done
+    if [ "${CLK___ADD_TO_CLUSTER}" ]
+    then
+        cat "${TMPDIR}/index_no_cluster"|while read cid
+        do
+            ipfs-cluster-ctl pin add -r 2 "${cid}"
+        done
+    fi
+
     if [ -s "${TMPDIR}/cluster_no_index" ]
     then
         echo
@@ -47,4 +58,12 @@ then
         echo -n "/ipfs/"
         ipfs-cluster-ctl pin ls "${cid}"
     done
+    if [ "${CLK___CLEAN_CLUSTER}" == "True" ]
+    then
+        cat "${TMPDIR}/cluster_no_index"|while read cid
+        do
+            echo "Removing ${cid}"
+            ipfs-cluster-ctl pin rm --no-status "${cid}"
+        done
+    fi
 fi

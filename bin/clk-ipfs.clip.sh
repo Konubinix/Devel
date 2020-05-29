@@ -15,4 +15,4 @@ then
 fi
 
 setxkbmap fr bepo
-clk ipfs find@sh --selector dmenu |tr -d '\n'| xclip -in
+clk ipfs find@sh --selector dmenu |tr -d '\n'| xargs xdotool type

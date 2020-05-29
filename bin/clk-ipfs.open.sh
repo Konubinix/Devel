@@ -14,4 +14,6 @@ then
 	exit 0
 fi
 
-exec mimeopen "$(clk ipfs find@sh ${CLK___ARGS})"
+cid="$(clk ipfs find@sh ${CLK___ARGS})"
+echo "Opening ${cid}"
+exec mimeopen "${cid}"

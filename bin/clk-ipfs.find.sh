@@ -29,10 +29,10 @@ selector ( ) {
         percol --query "${CLK___ARGS}" "${IPFS_INDEX}"
     elif [ "${CLK___SELECTOR}" == "fzf" ]
     then
-        fzf --with-nth=2.. --query "${CLK___ARGS}" < "${IPFS_INDEX}"
+        fzf --with-nth=2.. --history="${TMPDIR}/ipfsfind" --query "${CLK___ARGS}" < "${IPFS_INDEX}"
     else
         exit 1
     fi
 }
 
-selector|sed -r 's|^([^ ]+) .+|\1|'|tr -d '\n'
+selector|sed -r 's|^([^ ]+) .+|\1|'

@@ -21,6 +21,7 @@ F:-v,--verbose:set -x
 F:--path-as-metadata/--no-path-as-metadata:Use the file path as metadata:True
 F:--delete:Delete the origin file afterwards
 F:--assert-not-present/--no-assert-not-present:Assert that the element is not already in the index:True
+O:-r,--recipient:str:Recipient to use in case of gpg encrypting the content
 EOF
 }
 
@@ -42,11 +43,23 @@ then
     set -x
 fi
 
-cid="$(ipfs add --quieter --progress --pin=false "$(readlink -f "${FILE}")")"
+TMPDIR="$(mktemp -d)"
+trap "rm -rf '${TMPDIR}'" 0
+
+if [ "${CLK___RECIPIENT}" != "" ]
+then
+    FILE_CONTENT="${TMPDIR}/file.gpg"
+    gpg --encrypt --recipient "${CLK___RECIPIENT}" --output "${FILE_CONTENT}" "$(readlink -f "${FILE}")"
+else
+    FILE_CONTENT="$(readlink -f "${FILE}")"
+fi
+
+cid="$(ipfs add --quieter --progress --pin=false "${FILE_CONTENT}")"
 path="/ipfs/${cid}"
 if grep -q "^${path}" "${IPFS_INDEX}" && [ "${CLK___ASSERT_NOT_PRESENT}" == "True" ]
 then
     echo "Stopping because ${path} is already in the index"
+    ipfs-cluster-ctl status "${cid}"
     exit 1
 fi
 
@@ -71,7 +84,11 @@ else
     then
         metadata+="${FILE} "
     fi
-    metadata+="${CLK___ARGS}"
+    if [ "${CLK___RECIPIENT}" != "" ]
+    then
+        metadata+="gpg encrypted for ${CLK___RECIPIENT}"
+    fi
+    metadata+="${CLK___ARGS} "
     echo "${path} ${metadata}" >> "${IPFS_INDEX}"
 fi
 

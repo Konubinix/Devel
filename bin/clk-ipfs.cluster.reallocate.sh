@@ -1,5 +1,7 @@
 #!/bin/bash -eu
 
+source _ipfs-cluster.sh
+
 usage () {
     cat<<EOF
 $0
@@ -7,7 +9,7 @@ $0
 Re add the pins so that they are reallocated
 --
 O:-m,--max:int:Maximum number to reallocate:1000
-O:--filter:["cluster_error", "error", "pin_error", "pin_queued", "pinned", "pinning", "queued", "remote", "unpin_error", "unpin_queued", "unpinned", "unpinning"]: Filter to use:pin_error
+${IPFS_CLUSTER_FILTER_OPTION}:pin_error
 F:-w,--wait/--no-wait:Wait for each reallocation to be complete:True
 EOF
 }

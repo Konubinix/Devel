@@ -556,11 +556,10 @@ story () {
     then
         history -d -1
     fi
-    local command="$(call_history|history_extract_commandline|tac|percol \
- --match-method='regex' \
- --prompt-bottom \
- --result-bottom-up \
+    local command="$(call_history|history_extract_commandline|tac|fzf \
  --query="${input}" \
+ --history="${TMPDIR}/story" \
+ --history-size=1000000 \
  |trim)"
     if [ -n "${command}" ]
     then

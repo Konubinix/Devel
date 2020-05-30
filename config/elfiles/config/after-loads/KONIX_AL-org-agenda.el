@@ -49,8 +49,11 @@
 (define-key org-agenda-mode-map (kbd "Z")
   'konix/org-add-timestamp)
 
-(define-key org-agenda-mode-map (kbd "y")
+(define-key org-agenda-mode-map (kbd "Y")
   'konix/org-toggle-maybe)
+
+(define-key org-agenda-mode-map (kbd "y")
+  #'(lambda () (interactive) (message "Intentionally disable y, too easily triggered to say yes")))
 
 (define-key org-agenda-mode-map (kbd "m")
   'konix/org-toggle-me)

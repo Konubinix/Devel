@@ -1670,7 +1670,7 @@ STOP is the end of the agenda."
 
 (setq-default konix/org-agenda-highlight-inactive-with-subtree nil)
 (make-variable-buffer-local 'konix/org-agenda-highlight-inactive-with-subtree)
-(setq-default konix/org-agenda-highlight-inactive-day 15)
+(setq-default konix/org-agenda-highlight-inactive-day 10)
 (make-variable-buffer-local 'konix/org-agenda-highlight-inactive-day)
 
 

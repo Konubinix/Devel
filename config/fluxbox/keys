@@ -366,3 +366,4 @@ Mod4 a g :ExecCommand konix_display.py "Impass Gui" && konix_do_with_gpg_agent.s
 Mod4 a y :ExecCommand konix_display.py "Impass Yank" && konix_do_with_gpg_agent.sh impass_yank.sh gui
 
 Mod4 i y :ExecCommand konix_display.py "Yanking ipfs" && konix_do_cron_job.sh clk ipfs yank@sh
+Mod4 i g :ExecCommand konix_display.py "Yanking ipfs" && konix_do_cron_job.sh clk ipfs clip@sh

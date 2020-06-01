@@ -54,7 +54,7 @@ else
     FILE_CONTENT="$(readlink -f "${FILE}")"
 fi
 
-cid="$(ipfs add --quieter --progress --pin=false "${FILE_CONTENT}")"
+cid="$(ipfs add --recursive --quieter --progress --pin=false "${FILE_CONTENT}")"
 path="/ipfs/${cid}"
 if grep -q "^${path}" "${IPFS_INDEX}" && [ "${CLK___ASSERT_NOT_PRESENT}" == "True" ]
 then

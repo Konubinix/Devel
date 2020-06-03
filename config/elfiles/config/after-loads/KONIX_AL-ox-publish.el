@@ -27,46 +27,6 @@
 (defvar konix/org-wiki-exclude-regex ".*" "")
 (defvar konix/org-wiki-include-list '("bookmarks.org") "")
 (defvar konix/org-wiki-author "Konubinix" nil)
-(defun konix/org-wiki-generate ()
-  "description."
-  (interactive)
-  (let (
-		(konix_wiki_dir (getenv "KONIX_WIKI_DIR"))
-		;; big hack because some php server don't understand xml headers
-		(org-export-html-xml-declaration '(("html" . "")))
-		;; save auto-insert-mode because It have to disable it
-		(auto-insert-mode_before auto-insert-mode)
-		(org-export-html-special-string-regexps nil)
-		)
-	(unless konix_wiki_dir
-	  (error "KONIX_WIKI_DIR env variable not set")
-	  )
-	(auto-insert-mode -1)
-	(org-publish
-	 (list
-	  "wiki"
-	  :base-directory org-directory
-	  :publishing-function 'org-publish-org-to-html
-	  :index-title "Some info I want to share"
-	  :index-filename "index.html"
-	  :auto-index t
-	  ;; deprecated sitemap notation
-	  :sitemap-filename "index.html"
-	  :auto-sitemap t
-	  :sitemap-title "Some info I want to share with the world (French/English mixed...)"
-	  :author konix/org-wiki-author
-	  :exclude konix/org-wiki-exclude-regex
-	  :include konix/org-wiki-include-list
-	  :publishing-directory konix_wiki_dir
-	  )
-	 t)
-	(when auto-insert-mode_before
-	  (auto-insert-mode 1)
-	  )
-	(message "Generated wiki %s from org directory %s" konix_wiki_dir org-directory)
-	)
-  )
-
 (defun konix/org-publish-send-server ()
   (interactive)
   (shell-command "konix_public_send.sh")
@@ -78,7 +38,6 @@
  "public"
  :base-directory (expand-file-name "wiki/public" perso-dir)
  :author konix/org-wiki-author
- :base-extension "org"
  :publishing-function 'org-html-publish-to-html
  :publishing-directory "~/public_html"
  :auto-index t
@@ -88,6 +47,8 @@
  :sitemap-title "Index"
  :exclude-tags '("draft" "noexport" "phantom")
  :exclude "draft_"
+ :with-tags nil
+ :recursive t
  )
 (konix/push-or-replace-in-alist
  'org-publish-project-alist

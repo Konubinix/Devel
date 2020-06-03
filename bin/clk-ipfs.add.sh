@@ -22,6 +22,7 @@ F:--path-as-metadata/--no-path-as-metadata:Use the file path as metadata:True
 F:--delete:Delete the origin file afterwards
 F:--assert-not-present/--no-assert-not-present:Assert that the element is not already in the index:True
 O:-r,--recipient:str:Recipient to use in case of gpg encrypting the content
+O:--key:$(ipfs_list_ipns_names|list_to_choice):The name of the ipfs key to update
 EOF
 }
 
@@ -102,5 +103,11 @@ then
     echo "Removing ${FILE}" >&2
     rm -rf "${FILE}"
 fi
+
+if [ -n "${CLK___KEY}" ]
+then
+    ipfs name publish --key "${CLK___KEY}" "${cid}"
+fi
+
 
 echo "${cid}"

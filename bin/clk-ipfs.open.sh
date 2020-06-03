@@ -5,6 +5,9 @@ usage () {
 $0
 
 Open an ipfs file
+--
+O:--selector:["dmenu", "fzf", "percol"]:The selector to use:fzf
+N:Start search
 EOF
 }
 
@@ -14,6 +17,6 @@ then
 	exit 0
 fi
 
-cid="$(clk ipfs find@sh ${CLK___ARGS})"
+cid="$(clk ipfs find@sh --selector "${CLK___SELECTOR}" ${CLK___ARGS})"
 echo "Opening ${cid}"
 exec mimeopen "${cid}"

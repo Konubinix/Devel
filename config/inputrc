@@ -84,3 +84,4 @@ TAB:complete
 C-r: reverse-search-history
 C-h: "\C-e \C-a\C-kstory \C-y\C-m"
 C-s: forward-search-history
+"\C-f": "\C-e\"\C-afzf --query=\"\C-m"

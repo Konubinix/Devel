@@ -100,7 +100,7 @@ fi
 if [ "${CLK___DELETE}" == "True" ]
 then
     echo "Removing ${FILE}" >&2
-    rm "${FILE}"
+    rm -rf "${FILE}"
 fi
 
 echo "${cid}"

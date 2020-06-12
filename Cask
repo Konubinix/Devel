@@ -87,3 +87,7 @@
 (depends-on "region-bindings-mode")
 (depends-on "which-key")
 (depends-on "hcl-mode")
+(depends-on "nix-mode")
+(depends-on "phi-search")
+(depends-on "phi-search-mc")
+(depends-on "phi-search-dired")

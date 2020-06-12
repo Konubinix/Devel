@@ -40,11 +40,13 @@
  :author konix/org-wiki-author
  :publishing-function 'org-html-publish-to-html
  :publishing-directory "~/public_html"
- :auto-index t
- :index-filename "index.html"
+ :makeindex t
  :auto-sitemap t
- :sitemap-filename "index.html"
- :sitemap-title "Index"
+ :sitemap-title "Konubinix' site sitemap"
+ :section-numbers nil
+ :with-toc t
+ :with-drawers nil
+ :html-head-extra "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://gongzhitaao.org/orgcss/org.css\"/>"
  :exclude-tags '("draft" "noexport" "phantom")
  :exclude "draft_"
  :with-tags nil

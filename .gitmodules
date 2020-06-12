@@ -32,10 +32,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/miniedit
 	url = https://github.com/emacsmirror/miniedit.git
-[submodule "config/elfiles/yasnippet"]
-ignore=dirty
-	path = config/elfiles/yasnippet
-	url = https://github.com/capitaomorte/yasnippet.git
 [submodule "config/elfiles/jinja2-mode"]
 ignore=dirty
 	path = config/elfiles/jinja2-mode
@@ -52,10 +48,6 @@ ignore=dirty
 ignore=dirty
 	path = sjoubert_dot_rc
 	url = https://github.com/sjoubert/dotrcfiles.git
-[submodule "merge-ics"]
-ignore=dirty
-	path = merge-ics
-	url = https://github.com/Konubinix/merge-ics.git
 [submodule "config/elfiles/highlight-indentation"]
 ignore=dirty
 	path = config/elfiles/highlight-indentation
@@ -72,10 +64,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/org-ehtml
 	url = https://github.com/eschulte/org-ehtml
-[submodule "supervisord"]
-ignore=dirty
-	path = supervisord
-	url = https://github.com/Supervisor/supervisor.git
 [submodule "ledger-autosync"]
 ignore=dirty
 	path = ledger-autosync
@@ -85,15 +73,6 @@ ignore=dirty
 ignore=dirty
 	path = config/elfiles/epc
 	url = https://github.com/kiwanami/emacs-epc.git
-[submodule "offlineimap"]
-ignore=dirty
-	path = offlineimap
-	# url = https://github.com/Konubinix/offlineimap.git
-	url = https://github.com/OfflineIMAP/offlineimap.git
-[submodule "notmuch"]
-ignore=dirty
-	path = notmuch
-	url = git://notmuchmail.org/git/notmuch
 [submodule "config/elfiles/zenburn"]
 ignore=dirty
 	path = config/elfiles/zenburn
@@ -118,18 +97,6 @@ ignore=dirty
 ignore=dirty
 	path = pymsmtpq
 	url = https://github.com/darkfeline/pymsmtpq
-[submodule "beets"]
-ignore=dirty
-	path = beets
-	url = https://github.com/beetbox/beets
-[submodule "mopidy"]
-ignore=dirty
-	path = mopidy
-	url = https://github.com/mopidy/mopidy
-[submodule "mopidy-beets"]
-ignore=dirty
-	path = mopidy-beets
-	url = https://github.com/mopidy/mopidy-beets
 [submodule "config/elfiles/highlight-symbol.el"]
 ignore=dirty
 	path = config/elfiles/highlight-symbol.el
@@ -142,10 +109,6 @@ ignore=dirty
 ignore=dirty
 	path = Pipe
 	url = https://github.com/Konubinix/Pipe
-[submodule "autojump"]
-ignore=dirty
-	path = autojump
-	url = https://github.com/wting/autojump
 [submodule "config/elfiles/wgrep"]
 ignore=dirty
 	path = config/elfiles/wgrep
@@ -157,30 +120,15 @@ ignore=dirty
 [submodule "weboob"]
 	path = weboob
 	url = https://git.weboob.org/weboob/devel.git
-[submodule "cask"]
-	path = cask
-	url = https://github.com/cask/cask.git
-[submodule "prosody"]
-	path = prosody
-	url = git://github.com/bjc/prosody.git
-[submodule "config/elfiles/org-edna"]
-	path = config/elfiles/org-edna
-	url = bzr::https://bzr.savannah.gnu.org/r/org-edna-el/
 [submodule "an2linuxserver"]
 	path = an2linuxserver
 	url = https://github.com/rootkiwi/an2linuxserver
-[submodule "flexx"]
-	path = flexx
-	url = https://github.com/flexxui/flexx
 [submodule "config/elfiles/ini"]
 	path = config/elfiles/ini
 	url = https://github.com/daniel-ness/ini.el.git
 [submodule "config/elfiles/emacs-native-shell-complete"]
 	path = config/elfiles/emacs-native-shell-complete
 	url = https://github.com/CeleritasCelery/emacs-native-shell-complete
-[submodule "config/elfiles/org-roam"]
-	path = config/elfiles/org-roam
-	url = https://github.com/jethrokuan/org-roam
 [submodule "nix-bash-completions"]
 	path = nix-bash-completions
 	url = https://github.com/hedning/nix-bash-completions

@@ -1,6 +1,7 @@
 (source gnu)
 (source melpa)
 
+(depends-on "cask")
 (depends-on "flycheck")
 (depends-on "feature-mode")
 (depends-on "groovy-mode")
@@ -78,9 +79,8 @@
 (depends-on "key-chord")
 (depends-on "lsp-java")
 (depends-on "hydra")
-;; for org-roam, not yet packaged in elpa
-	(depends-on "emacsql")
-	(depends-on "emacsql-sqlite")
+(depends-on "org-roam")
+(depends-on "org-edna")
 (depends-on "deft")
 (depends-on "el-patch")
 ;; (depends-on "org-journal") ; broken ?
@@ -91,3 +91,4 @@
 (depends-on "phi-search")
 (depends-on "phi-search-mc")
 (depends-on "phi-search-dired")
+(depends-on "notmuch")

@@ -5,7 +5,8 @@
 (require 'cl) ; a rare necessary use of REQUIRE
 (defvar *emacs-load-start* (current-time))
 
-(require 'cask (expand-file-name "cask/cask.el" (getenv "KONIX_DEVEL_DIR")))
+(require 'cask "/home/sam/.nix-profile/share/emacs/site-lisp/cask/cask.el")
+;(require 'cask (expand-file-name "cask/cask.el" (getenv "KONIX_DEVEL_DIR")))
 (cask-initialize (getenv "KONIX_DEVEL_DIR"))
 
 ;; ####################################################################################################

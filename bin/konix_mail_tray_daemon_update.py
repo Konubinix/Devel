@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-import ConfigParser
+import configparser
 import subprocess
 import shlex
 import os
@@ -24,7 +24,7 @@ def main():
       konix_notify.main("No valid file in KONIX_NOTMUCH_SAVED_SEARCHES")
       sys.exit(1)
     file = existing_files[0]
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.optionxform = str    # keys not converted into lower case
     config.read(file)
     sections = config.sections()
@@ -46,7 +46,8 @@ def main():
                 write(icon_letter)
                 sys.exit(0)
     write(default_letter)
-    sys.exit(1)
+    sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

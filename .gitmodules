@@ -181,3 +181,6 @@ ignore=dirty
 [submodule "config/elfiles/org-roam"]
 	path = config/elfiles/org-roam
 	url = https://github.com/jethrokuan/org-roam
+[submodule "nix-bash-completions"]
+	path = nix-bash-completions
+	url = https://github.com/hedning/nix-bash-completions

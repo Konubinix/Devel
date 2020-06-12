@@ -1,7 +1,7 @@
 #!/bin/bash -eu
 
 list_to_choice () {
-    echo "[$(cat | sed -r 's-(.+)- "\1"-'| paste -s - -d,)]"
+    echo "[$(sed -r 's-(.+)- "\1"-'| paste -s - -d,)]"
 }
 
 trim () {

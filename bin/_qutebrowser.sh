@@ -189,4 +189,24 @@ send_js_multiline ( ) {
     echo "jseval -q $(format_js)" | send_command_multiline
 }
 
+send_tab ( ) {
+    local number="${1:-1}"
+    {
+        for _ in $(seq "${number}")
+        do
+            echo "fake-key <TAB>"
+        done
+    } | send_command_multiline
+}
+
+send_return ( ) {
+    local number="${1:-1}"
+    {
+        for _ in $(seq "${number}")
+        do
+            echo "fake-key <return>"
+        done
+    } | send_command_multiline
+}
+
 comm_init

@@ -32,7 +32,6 @@
 (depends-on "zenburn-theme")
 (depends-on "gnus-alias")
 (depends-on "go-mode")
-(depends-on "grin")
 (depends-on "highlight-parentheses")
 (depends-on "mediawiki")
 (depends-on "lua-mode")

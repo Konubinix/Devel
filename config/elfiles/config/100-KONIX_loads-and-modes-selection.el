@@ -97,8 +97,6 @@
 (autoload 'notmuch "notmuch")
 (autoload 'notmuch-search "notmuch")
 (autoload 'appt-check "appt")
-;; grin
-(autoload 'grin "grin" nil t)
 (autoload 'dired-visit-history-enable "dired-visit-history")
 ;; dictionnary
 (autoload 'dictionary "dictionary")

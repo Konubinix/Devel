@@ -182,10 +182,6 @@
 (define-key 'konix/global-slow-key-map (kbd "C-k") 'konix/quit-and-delete-window)
 (define-key 'konix/global-slow-key-map "k" 'bury-buffer)
 ;; grep
-;; grin is nice, but it does not search through binary files. Some minbif log
-;; files are considered binary though because they contain special characters
-;; like 0x02, 0x03 or 0x0F
-(define-key 'konix/global-slow-key-map (kbd "C-S") 'grin)
 (define-key 'konix/global-slow-key-map (kbd "C-s") 'grep)
 ;; insert the date
 (define-key 'konix/global-slow-key-map (kbd "C-t") 'konix/insert-iso-time-string)

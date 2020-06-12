@@ -17,6 +17,8 @@ then
 	exit 0
 fi
 
-cid="$(clk ipfs find@sh --selector "${CLK___SELECTOR}" ${CLK___ARGS})"
-echo "Opening ${cid}"
-exec mimeopen "${cid}"
+while read cid
+do
+    echo "Opening ${cid}"
+    mimeopen "${cid}"
+done < <(clk ipfs find@sh --selector "${CLK___SELECTOR}" ${CLK___ARGS})

@@ -11,6 +11,8 @@ Find a file in ipfs.
 --
 N:arguments to start search
 O:--selector:["dmenu", "fzf", "percol"]:The selector to use:fzf
+F:--gateway:Prepend with the gateway
+F:--only-cid:Only the cid, not the full path
 EOF
 }
 
@@ -29,10 +31,30 @@ selector ( ) {
         percol --query "${CLK___ARGS}" "${IPFS_INDEX}"
     elif [ "${CLK___SELECTOR}" == "fzf" ]
     then
-        fzf --with-nth=2.. --history="${TMPDIR}/ipfsfind" --query "${CLK___ARGS}" < "${IPFS_INDEX}"
+        fzf --with-nth=2.. --multi --history="${TMPDIR}/ipfsfind" --query "${CLK___ARGS}" < "${IPFS_INDEX}"
     else
         exit 1
     fi
 }
 
-selector|sed -r 's|^([^ ]+) .+|\1|'
+gateway () {
+    while read cid
+    do
+        if [ "${CLK___GATEWAY}" == "True" ]
+        then
+            cid="http://192.168.1.2:9999${cid}"
+        fi
+        echo "${cid}"
+    done
+}
+
+only_cid ( ) {
+    if [ "${CLK___ONLY_CID}" == "True" ]
+    then
+        sed 's|^/ipfs/||'
+    else
+        cat
+    fi
+}
+
+selector|sed -r 's|^([^ ]+) .+|\1|'|gateway|only_cid

@@ -8,6 +8,7 @@ Get the ipfs file
 --
 O:-o,--output:str:The output file
 N:Somerhing to match
+F:--link/--no-link:Create a link instead of getting the file:True
 EOF
 }
 
@@ -23,4 +24,9 @@ then
     args+=("--output" "${CLK___OUTPUT}")
 fi
 cid="$(clk ipfs find@sh ${CLK___ARGS})"
-ipfs get "${args[@]}" "${cid}"
+if [ "${CLK___LINK}" == "True" ]
+then
+    ln -s "$cid" "${CLK___OUTPUT}"
+else
+    ipfs get "${args[@]}" "${cid}"
+fi

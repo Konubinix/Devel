@@ -64,6 +64,7 @@ then
         do
             echo "Removing ${cid}"
             ipfs-cluster-ctl pin rm --no-status "${cid}"
+            echo ""
         done
     fi
 fi

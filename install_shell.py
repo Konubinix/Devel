@@ -30,6 +30,7 @@ import_env
         # Install bashrc
         # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".bashrc"), """#!/bin/bash
+[ -n "${IN_NIX_SHELL}" ] && return
 [ -z "$PS1" ] && return
 # if the computer is in bad shape, do not load the whole configuration
 [ "$(cut -d. -f1 /proc/loadavg)" -gt "$(expr 2 \* $(nproc))" ] && return
@@ -42,6 +43,7 @@ source "${KONIX_SH_CUSTOM_FILE}"
         # SHRC
         # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".shrc"), """#!/bin/sh
+[ -n "${IN_NIX_SHELL}" ] && return
 [ -z "$PS1" ] && return
 # if the computer is in bad shape, do not load the whole configuration
 [ "$(cut -d. -f1 /proc/loadavg)" -gt "$(expr 2 \* $(nproc))" ] && return
@@ -53,6 +55,7 @@ source "${KONIX_SH_CUSTOM_FILE}"
         # ZSHRC
         # ####################################################################################################
         replace_file_content(os.path.join(environ["HOME"], ".zshrc"), """#!/bin/zsh
+[ -n "${IN_NIX_SHELL}" ] && return
 [ -z "$PS1" ] && return
 # if the computer is in bad shape, do not load the whole configuration
 [ "$(cut -d. -f1 /proc/loadavg)" -gt "$(expr 2 \* $(nproc))" ] && return

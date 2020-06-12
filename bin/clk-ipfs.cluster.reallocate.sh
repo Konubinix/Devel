@@ -31,7 +31,7 @@ then
 fi
 
 pinargs=()
-if [ "${CLK___WAIT}" != "False" ]
+if [ "${CLK___WAIT}" == "True" ]
 then
     pinargs+=("--wait")
 fi
@@ -51,4 +51,5 @@ do
     echo "Adding back ${cid} to cluster"
     ipfs-cluster-ctl pin add "${pinargs[@]}" --rmin "${rmin}" --rmax "${rmax}" "${cid}"
     trap 2
+    echo
 done

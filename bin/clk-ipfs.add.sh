@@ -19,10 +19,11 @@ O:--allocs:$(ipfs_cluster_list_peers|list_to_choice):The allocs
 F:--wait/--no-wait:Wait for the file to be correctly pinned everywhere:True
 F:-v,--verbose:set -x
 F:--path-as-metadata/--no-path-as-metadata:Use the file path as metadata:True
-F:--delete:Delete the origin file afterwards
+F:--delete/--no-delete:Delete the origin file afterwards:True
 F:--assert-not-present/--no-assert-not-present:Assert that the element is not already in the index:True
 O:-r,--recipient:str:Recipient to use in case of gpg encrypting the content
 O:--key:$(ipfs_list_ipns_names|list_to_choice):The name of the ipfs key to update
+F:-k,--add-to-clipboard:Add the cid to the clipboard
 EOF
 }
 
@@ -98,16 +99,30 @@ then
     echo "Waiting for ${path} to be stable" >&2
     ipfs-cluster-ctl pin add --wait "${args[@]}" >&2
 fi
+
+if [ -n "${CLK___KEY}" ]
+then
+    remount=""
+    if ! test -s "/ipns"
+    then
+        remount=1
+        fusermount -u /ipns
+    fi
+    ipfs name publish --key "${CLK___KEY}" "${cid}"
+    if [ -n "${remount}" ]
+    then
+        ipfs mount
+    fi
+fi
+
+if [ -n "${CLK___ADD_TO_CLIPBOARD}" ]
+then
+    echo "${cid}"|tr -d '\n'|xclip -in
+fi
+
+echo "${cid}"
 if [ "${CLK___DELETE}" == "True" ]
 then
     echo "Removing ${FILE}" >&2
     rm -rf "${FILE}"
 fi
-
-if [ -n "${CLK___KEY}" ]
-then
-    ipfs name publish --key "${CLK___KEY}" "${cid}"
-fi
-
-
-echo "${cid}"

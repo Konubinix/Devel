@@ -556,7 +556,7 @@ story () {
     then
         history -d -1
     fi
-    local command="$(call_history|history_extract_commandline|konix_remove_duplicate.py|tac|fzf \
+    local command="$(call_history|history_extract_commandline|tac|konix_remove_duplicate.py|fzf \
  --query="${input}" \
  --history="${TMPDIR}/story" \
  --history-size=1000000 \

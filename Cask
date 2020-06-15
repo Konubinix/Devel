@@ -1,5 +1,6 @@
 (source gnu)
 (source melpa)
+(source org)
 
 (depends-on "cask")
 (depends-on "flycheck")
@@ -92,3 +93,5 @@
 (depends-on "phi-search-mc")
 (depends-on "phi-search-dired")
 (depends-on "notmuch")
+(depends-on "org")
+(depends-on "org-plus-contrib")

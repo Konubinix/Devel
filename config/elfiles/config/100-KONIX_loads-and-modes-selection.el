@@ -10,8 +10,6 @@
 		(list
 		 (expand-file-name "config" elfiles)
 		 (expand-file-name "config/after-loads" elfiles)
-		 (expand-file-name "org/lisp" elfiles)
-		 (expand-file-name "org/contrib/lisp" elfiles)
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "ini" elfiles)
 		 (expand-file-name "emacs-native-shell-complete" elfiles)

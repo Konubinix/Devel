@@ -131,7 +131,7 @@
 (autoload 'piper "piper" "" t)
 (autoload 'mc/edit-lines "multiple-cursors" "" t)
 (autoload 'org-roam-find-file "org-roam" "" t)
-(autoload 'org-roam-date "org-roam" "" t)
+(autoload 'org-roam-dailies-date "org-roam" "" t)
 (autoload 'which-key-mode "which-key" "" t)
 (autoload 'ivy-mode "ivy" "" t)
 (autoload 'golden-ratio-mode "golden-ratio" "" t)

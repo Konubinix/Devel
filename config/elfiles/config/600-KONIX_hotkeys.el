@@ -647,7 +647,7 @@
 (define-key 'konix/org-global-map (kbd "C-r") 'konix/org-element-cache-reset-all)
 (define-key 'konix/org-global-map (kbd "t") 'konix/org-clock-todo)
 (define-key 'konix/org-global-map (kbd "f") 'org-roam-find-file)
-(define-key 'konix/org-global-map (kbd "d") 'org-roam-date)
+(define-key 'konix/org-global-map (kbd "d") 'org-roam-dailies-date)
 (define-key 'konix/org-global-map (kbd "C-d") 'deft)
 (define-key 'konix/org-global-map "N" 'konix/org-roam-note)
 

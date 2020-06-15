@@ -1,3 +1,3 @@
 #!/bin/bash
 
-supervisorctl -r "${KONIX_SUPERVISORCTL_HISTORY}" "$@"
+supervisorctl --config "${KONIX_SUPERVISORDCONF}" -r "${KONIX_SUPERVISORCTL_HISTORY}" "$@"

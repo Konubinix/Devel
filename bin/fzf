@@ -2,4 +2,4 @@
 
 source "${KONIX_LIB_DIR}/lib_bash.sh"
 
-exec_second_like_me --bind 'ctrl-k:kill-line' "$@"
+exec_second_like_me --bind 'ctrl-k:kill-line,ctrl-h:select-all' "$@"

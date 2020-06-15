@@ -673,14 +673,21 @@
 ;; ######################################################################
 (setq-default konix/display-table (make-display-table))
 ;; ZERO WIDTH characters made visible
-;; ZERO WIDTH JOINER
-(aset konix/display-table ?​ [? ])
-;; ZERO WIDTH NO-BREAK SPACE
-(aset konix/display-table ?‍ [? ])
-;; ZERO WIDTH NON-JOINER
-(aset konix/display-table ?﻿ [? ])
-;; ZERO WIDTH SPACE
-(aset konix/display-table ?‌ [? ])
+
+(mapc
+ (lambda (key)
+   (aset
+    konix/display-table
+    (char-from-name key)
+    (make-vector 1 (char-from-name "ENCLOSING SQUARE"))
+    )
+   )
+ (delete-if-not
+  (lambda (key) (string/starts-with key "ZERO WIDTH"))
+  (hash-table-keys (ucs-names))
+  )
+ )
+
 (setq-default buffer-display-table konix/display-table)
 
 (custom-set-faces

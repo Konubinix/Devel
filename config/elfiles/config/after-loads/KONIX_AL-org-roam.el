@@ -48,7 +48,6 @@
 #+ROAM_ALIAS: \"\"
 ${title}
 
-
 "
                  :unnarrowed t
                  )
@@ -62,7 +61,6 @@ ${title}
 
 [%(konix/org-get-time)]
 
-
 "
                  :unnarrowed t
                  )
@@ -70,26 +68,19 @@ ${title}
               )
 
 
-(defun org-roam--file-for-time (time)
-  "Create and find file for TIME."
-  (let* ((filename (format-time-string "%y%m%d" time))
-         (title (format-time-string "%Y-%m-%d" time))
-         (file-path (org-roam--file-path-from-id filename)))
-    (if (file-exists-p file-path)
-        file-path
-      (let ((org-roam-capture-templates (list (list "d" "daily" 'plain (list 'function #'org-roam--capture-get-point)
-                                                    ""
-                                                    :immediate-finish t
-                                                    :file-name "${filename}"
-                                                    :head "#+TITLE: ${title}
+(setq-default org-roam-dailies-capture-templates
+              '(
+                ("d" "daily" plain
+                 (function org-roam-capture--get-point)
+                 ""
+                 :immediate-finish t
+                 :file-name "%<%Y%m%d>"
+                 :head "#+title: %<%Y-%m-%d>
 #+LANGUAGE: fr
 #+CREATED: %U
+"))
+              )
 
-
-")))
-            (org-roam--capture-context 'title)
-            (org-roam--capture-info (list (cons 'title title) (cons 'filename filename))))
-        (org-roam-capture)))))
 
 
 (org-roam-mode 1)

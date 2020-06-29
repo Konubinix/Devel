@@ -95,3 +95,7 @@
 (depends-on "notmuch")
 (depends-on "org")
 (depends-on "org-plus-contrib")
+(depends-on "rg")
+(depends-on "ox-hugo")
+(depends-on "jupyter")
+(depends-on "cmake-mode")

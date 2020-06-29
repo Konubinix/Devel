@@ -24,6 +24,7 @@ F:--assert-not-present/--no-assert-not-present:Assert that the element is not al
 O:-r,--recipient:str:Recipient to use in case of gpg encrypting the content
 O:--key:$(ipfs_list_ipns_names|list_to_choice):The name of the ipfs key to update
 F:-k,--add-to-clipboard:Add the cid to the clipboard
+O:--replace:str:cid to use to replace in the index, instead of using a new one (= to interactively choose, key to replace the existing key hash)
 EOF
 }
 
@@ -60,7 +61,7 @@ cid="$(ipfs add --recursive --quieter --progress --pin=false "${FILE_CONTENT}")"
 path="/ipfs/${cid}"
 if grep -q "^${path}" "${IPFS_INDEX}" && [ "${CLK___ASSERT_NOT_PRESENT}" == "True" ]
 then
-    echo "Stopping because ${path} is already in the index"
+    echo "Stopping because ${path} is already in the index (see the status bellow)"
     ipfs-cluster-ctl status "${cid}"
     exit 1
 fi
@@ -78,7 +79,22 @@ ipfs-cluster-ctl pin add "${args[@]}" >&2
 
 if grep -q "^${path}" "${IPFS_INDEX}"
 then
-    echo "${path} Already added" >&2
+    echo "${path} Already added into the index" >&2
+elif [ -n "${CLK___REPLACE}" ]
+then
+    if [ "${CLK___REPLACE}" == "=" ]
+    then
+        oldcid="$(clk ipfs find@sh)"
+    elif [ "${CLK___REPLACE}" == "key" ]
+    then
+        keycid="$(ipns_key_name_to_cid "${CLK___KEY}")"
+        oldcid="$(ipfs_remove_prefix "$(ipfs resolve "/ipns/${keycid}")")"
+    else
+        oldcid="${CLK___REPLACE}"
+    fi
+    echo "${oldcid} -> ${path} in the index"
+    clk ipfs update@sh "${oldcid}" "${path}"
+    echo "Done"
 else
     echo "Adding ${path} to the index" >&2
     metadata="added=$(date -Iseconds) "
@@ -94,10 +110,10 @@ else
     echo "${path} ${metadata}" >> "${IPFS_INDEX}"
 fi
 
-if [ "${CLK___WAIT}" == "True" ]
+if [ -n "${CLK___ADD_TO_CLIPBOARD}" ]
 then
-    echo "Waiting for ${path} to be stable" >&2
-    ipfs-cluster-ctl pin add --wait "${args[@]}" >&2
+    echo "${path}"|tr -d '\n'|xclip -in
+    echo "Added to clipboard" >&2
 fi
 
 if [ -n "${CLK___KEY}" ]
@@ -115,14 +131,15 @@ then
     fi
 fi
 
-if [ -n "${CLK___ADD_TO_CLIPBOARD}" ]
+if [ "${CLK___WAIT}" == "True" ]
 then
-    echo "${cid}"|tr -d '\n'|xclip -in
+    echo "Waiting for ${path} to be stable" >&2
+    ipfs-cluster-ctl pin add --wait "${args[@]}" >&2
 fi
-
-echo "${cid}"
 if [ "${CLK___DELETE}" == "True" ]
 then
     echo "Removing ${FILE}" >&2
     rm -rf "${FILE}"
 fi
+
+echo "${cid}"

@@ -9,6 +9,12 @@ ipfs_list_ipns_names ( ) {
     ipfs key list -l|cut -f2 -d' '
 }
 
+ipns_key_name_to_cid ( ) {
+    local key="$1"
+    line="$(ipfs key list -l|grep " ${key} *$")"
+    echo "${line}"|cut -f1 -d' '
+}
+
 IPFS_INDEX=/home/sam/perso/perso/ipfs_index.txt
 
 ipfs_select_hash ( ) {
@@ -32,4 +38,15 @@ ipfs_remove_prefix ( ) {
     else
         echo "${key}"
     fi
+}
+
+ipfs_find_cid () {
+    local cid="$1"
+    local line="$(sed -n "/^\/ipfs\/${cid}/p" "${IPFS_INDEX}")"
+    if [ -z "${line}" ]
+    then
+        echo "${cid} no found in the index" >&2
+        return 1
+    fi
+    echo "${line}"
 }

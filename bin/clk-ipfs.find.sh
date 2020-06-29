@@ -13,6 +13,7 @@ N:arguments to start search
 O:--selector:["dmenu", "fzf", "percol"]:The selector to use:fzf
 F:--gateway:Prepend with the gateway
 F:--only-cid:Only the cid, not the full path
+F:--with-metadata:Show the metadata as well
 EOF
 }
 
@@ -57,4 +58,19 @@ only_cid ( ) {
     fi
 }
 
-selector|sed -r 's|^([^ ]+) .+|\1|'|gateway|only_cid
+extractor ( ) {
+    if test "${CLK___WITH_METADATA}" == "True"
+    then
+        cat
+    else
+        cut -f1 -d' '
+    fi
+}
+
+cid="$(selector|extractor|gateway|only_cid)"
+if [ -z "${cid}" ]
+then
+    exit 1
+else
+    echo "${cid}"
+fi

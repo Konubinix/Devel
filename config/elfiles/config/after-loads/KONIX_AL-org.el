@@ -3943,6 +3943,38 @@ of the clocksum."
     )
   )
 
+(defun konix/org-gcal-delete ()
+  (interactive)
+  (let* (
+         (info (konix/org-gcal-get-info))
+         (id (plist-get info :id))
+         (account (plist-get info :account))
+         (calendar_id (plist-get info :calendar_id))
+         (organizer (plist-get info :organizer))
+         )
+    (shell-command
+     (format
+      "konix_gcal.py -a \"%s\" select_calendar %s"
+      account
+      calendar_id
+      )
+     )
+    (when (equal 0
+                 (konix/call-process-show-error
+                  "konix_gcal.py"
+                  "-a"
+                  account
+                  "del_event"
+                  id
+                  )
+                 )
+      (konix/org-kill)
+      (konix/org-agenda-filter-for-now)
+      (message "DONE")
+      )
+    )
+  )
+
 (setq-default org-babel-python-command "python3")
 (setq-default org-sort-agenda-noeffort-is-high nil)
 

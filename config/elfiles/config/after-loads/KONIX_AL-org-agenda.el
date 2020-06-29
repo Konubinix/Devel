@@ -1358,13 +1358,15 @@ STOP is the end of the agenda."
         (newhead (konix/org-with-point-on-heading (org-get-heading)))
         (hdmarker (org-get-at-bol 'org-hd-marker))
         )
-    (let ((inhibit-read-only t))
-      (put-text-property (point-at-bol) (point-at-eol)
-                         'tags
-                         (org-with-point-at hdmarker
-                           (mapcar #'downcase (org-get-tags))))
+    (when hdmarker
+      (let ((inhibit-read-only t))
+        (put-text-property (point-at-bol) (point-at-eol)
+                           'tags
+                           (org-with-point-at hdmarker
+                             (mapcar #'downcase (org-get-tags))))
+        )
+      (org-agenda-change-all-lines newhead hdmarker)
       )
-    (org-agenda-change-all-lines newhead hdmarker)
     )
   )
 

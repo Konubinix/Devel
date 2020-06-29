@@ -1,0 +1,9 @@
+# key: ifs
+# name: ifs
+# --
+{
+OLDIFS="\${IFS}"
+IFS="$1"
+$0
+IFS="\${OLDIFS}"
+}

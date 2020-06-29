@@ -24,29 +24,32 @@
 
 ;;; Code:
 
+(setq-default org-export-with-tags nil)
+(setq-default org-export-with-properties nil)
+(setq-default org-export-with-drawers nil)
+
 (defvar konix/org-wiki-exclude-regex ".*" "")
 (defvar konix/org-wiki-include-list '("bookmarks.org") "")
 (defvar konix/org-wiki-author "Konubinix" nil)
-(defun konix/org-publish-send-server ()
+
+(defun konix/org-publish-hugo (plist filename pub-dir)
+  (find-file filename)
+  (org-hugo-export-wim-to-md)
+  )
+
+(defun konix/org-publish nil
   (interactive)
-  (shell-command "konix_public_send.sh")
-  (message "Sent to public server")
+  (shell-command "kfrsync --delete ${KONIX_PERSO_DIR}/site/ ${HOME}/hugo/")
+  (make-directory (expand-file-name "~/hugo/static"))
+  (org-publish "public" t)
   )
 
 (konix/push-or-replace-in-alist
  'org-publish-project-alist
  "public"
  :base-directory (expand-file-name "wiki/public" perso-dir)
- :author konix/org-wiki-author
- :publishing-function 'org-html-publish-to-html
- :publishing-directory "~/public_html"
- :makeindex t
- :auto-sitemap t
- :sitemap-title "Konubinix' site sitemap"
- :section-numbers nil
- :with-toc t
- :with-drawers nil
- :html-head-extra "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://gongzhitaao.org/orgcss/org.css\"/>"
+ :publishing-function 'konix/org-publish-hugo
+ :publishing-directory "~/hugo/content"
  :exclude-tags '("draft" "noexport" "phantom")
  :exclude "draft_"
  :with-tags nil

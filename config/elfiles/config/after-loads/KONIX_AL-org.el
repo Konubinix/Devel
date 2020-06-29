@@ -3006,7 +3006,7 @@ items"
         )
     (org-mark-ring-push)
     (find-file (second place_to_go))
-    (goto-char (fourth place_to_go))
+    (goto-char (or (fourth place_to_go) 0))
     (org-show-context 'org-goto)
     )
   )

@@ -673,7 +673,7 @@
 ;; ######################################################################
 (setq-default konix/display-table (make-display-table))
 ;; ZERO WIDTH characters made visible
-
+(require 'subr-x)
 (mapc
  (lambda (key)
    (aset

@@ -253,6 +253,8 @@
 (add-to-list 'safe-local-variable-values
 			 '(ispell-dictionary . "americain"))
 (add-to-list 'safe-local-variable-values
+			 '(eval org-hugo-auto-export-mode))
+(add-to-list 'safe-local-variable-values
 			 '(eval visual-line-mode -1))
 
 (add-hook 'before-save-hook 'konix/delete-trailing-whitespace)

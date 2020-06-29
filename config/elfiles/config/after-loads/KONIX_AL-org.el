@@ -282,14 +282,14 @@
 (defun konix/org-goto-heading nil
   (case major-mode
     ('org-agenda-mode
-     (org-agenda-switch-to nil t)
+     (org-agenda-switch-to nil)
      (org-back-to-heading)
      )
     ('org-mode
      (org-back-to-heading)
      )
     (t
-     (org-clock-goto nil t)
+     (org-clock-goto nil)
      (org-back-to-heading)
      )
     )
@@ -2954,7 +2954,7 @@ items"
   "Laisse une marque à l'emplacement courant et lance l'org-clock-goto ."
   (interactive "@P")
   (org-mark-ring-push)
-  (org-clock-goto select norecord)
+  (org-clock-goto select)
   )
 
 (defun konix/org-goto-todo ()
@@ -3200,21 +3200,23 @@ of the clocksum."
 
 (defun konix/org-agenda-count-entries nil
   (interactive)
-  (let (
-        (res 0)
-        (res_after_point 0)
-        (point (point))
-        )
-    (save-excursion
-      (goto-char (point-min))
-      (while (konix/org-agenda-next-entry-1)
-        (incf res)
-        (when (< point (point))
-          (incf res_after_point)
+  (unless (buffer-narrowed-p)
+    (let (
+          (res 0)
+          (res_after_point 0)
+          (point (point))
+          )
+      (save-excursion
+        (goto-char (point-min))
+        (while (konix/org-agenda-next-entry-1)
+          (incf res)
+          (when (< point (point))
+            (incf res_after_point)
+            )
           )
         )
+      (message "%s entries (%s after)" res res_after_point)
       )
-    (message "%s entries (%s after)" res res_after_point)
     )
   )
 (advice-add 'org-agenda-finalize :after #'konix/org-agenda-count-entries)
@@ -4763,40 +4765,45 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (defvar konix/org-kill-confirm nil "")
 (defun konix/org-kill ()
   (interactive)
-  (if (and
-       (looking-at "^\*")
-       (or
-        (not konix/org-kill-confirm)
-        (yes-or-no-p "Kill the whole subtree?")
-        )
-       )
-      (progn
-        (konix/org-agenda-kill/confirm-if-clock-info)
-        (konix/org-agenda-kill/confirm-if-committed)
-        (konix/org-kill/confirm-number-of-lines)
-        (kill-region
-         (save-excursion (beginning-of-line) (point))
-         (1+ (org-end-of-subtree))
+  (save-window-excursion
+    (when (equal major-mode 'org-agenda-mode)
+      (org-agenda-switch-to)
+      )
+    (if (and
+         (looking-at "^\*")
+         (or
+          (not konix/org-kill-confirm)
+          (yes-or-no-p "Kill the whole subtree?")
+          )
          )
-        (while (save-excursion
-                 (forward-line -1)
-                 (looking-at "^$")
-                 )
-          (kill-region (match-beginning 0)
-                       (1+
-                        (match-end 0)
-                        )
-                       )
+        (progn
+          (konix/org-agenda-kill/confirm-if-clock-info)
+          (konix/org-agenda-kill/confirm-if-committed)
+          (konix/org-kill/confirm-number-of-lines)
+          (kill-region
+           (save-excursion (beginning-of-line) (point))
+           (1+ (org-end-of-subtree))
+           )
+          (while (save-excursion
+                   (forward-line -1)
+                   (looking-at "^$")
+                   )
+            (kill-region (match-beginning 0)
+                         (1+
+                          (match-end 0)
+                          )
+                         )
+            )
+          (while (looking-at "^$")
+            (kill-region (match-beginning 0)
+                         (1+
+                          (match-end 0)
+                          )
+                         )
+            )
           )
-        (while (looking-at "^$")
-          (kill-region (match-beginning 0)
-                       (1+
-                        (match-end 0)
-                        )
-                       )
-          )
-        )
-    (call-interactively 'kill-line)
+      (call-interactively 'kill-line)
+      )
     )
   )
 

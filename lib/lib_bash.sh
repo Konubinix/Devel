@@ -590,3 +590,18 @@ ipkill () {
 lw () {
     ls|wc -l
 }
+
+popline ( ) {
+    local file="$1"
+    local variable="$2"
+    if ! [ -s "${file}" ]
+    then
+        return 1
+    fi
+    local thehead="$(head -1 "${file}")"
+    TMPDIR="$(mktemp -d)"
+    trap "rm -rf '${TMPDIR}'" 0
+    tail +2 "${file}" > "${TMPDIR}/temp"
+    mv "${TMPDIR}/temp" "${file}"
+    read "$2" < <(echo "${thehead}")
+}

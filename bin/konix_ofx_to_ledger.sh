@@ -13,7 +13,7 @@ sed -i 's/[()]/_/g' "${OFX_FILE_PATH}"
 # ledger-autosync does not explicitly encode output
 export PYTHONIOENCODING=utf_8
 
-CMD="ledger-autosync --assertions --fid 1 -a ${ACCOUNT}"
+CMD="ledger-autosync --unknown-account wtf --assertions --fid 1 -a ${ACCOUNT}"
 if ! konix_ledger.sh accounts|grep -q "${ACCOUNT}"
 then
     CMD="${CMD} --initial"

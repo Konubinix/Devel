@@ -112,6 +112,78 @@
   (sleep-for 3)
   )
 
+(defun qutebrowser/down ()
+  (interactive)
+  (call-process
+   "qutebrowser"
+   nil
+   nil
+   nil
+   (format ":fake-key <down>"))
+  )
+
+(defun qutebrowser/up ()
+  (interactive)
+  (call-process
+   "qutebrowser"
+   nil
+   nil
+   nil
+   (format ":fake-key <up>"))
+  )
+
+
+(defun qutebrowser/toggle-scroll ()
+  (interactive)
+  (call-process
+   "qutebrowser"
+   nil
+   nil
+   nil
+   (format ":spawn -u konix_qutebrowser_toggle_autoscroll.sh"))
+  )
+
+(defun qutebrowser/scroll-decr ()
+  (interactive)
+  (call-process
+   "qutebrowser"
+   nil
+   nil
+   nil
+   (format ":spawn -u konix_qutebrowser_decr_autoscroll.sh"))
+  )
+
+(defun qutebrowser/scroll-incr ()
+  (interactive)
+  (call-process
+   "qutebrowser"
+   nil
+   nil
+   nil
+   (format ":spawn -u konix_qutebrowser_incr_autoscroll.sh"))
+  )
+
+(defun qutebrowser/page-up ()
+  (interactive)
+  (call-process
+   "qutebrowser"
+   nil
+   nil
+   nil
+   (format ":fake-key <pgup>"))
+  )
+
+(defun qutebrowser/page-down ()
+  (interactive)
+  (call-process
+   "qutebrowser"
+   nil
+   nil
+   nil
+   (format ":fake-key <pgdown>"))
+  )
+
+
 (define-prefix-command 'qutebrowser/map)
 
 (define-key qutebrowser/map "o" 'qutebrowser/open)
@@ -119,6 +191,9 @@
 (define-key qutebrowser/map (kbd "w") 'qutebrowser/close-tab)
 (define-key qutebrowser/map (kbd "C-q") 'qutebrowser/quit)
 (define-key qutebrowser/map (kbd "y") 'qutebrowser/yank-url)
+(define-key qutebrowser/map (kbd "s") 'qutebrowser/toggle-scroll)
+(define-key qutebrowser/map (kbd "<next>") 'qutebrowser/page-down)
+(define-key qutebrowser/map (kbd "<prior>") 'qutebrowser/page-up)
 
 (defhydra qutebrowser/hydra-map ()
   "zoom"
@@ -130,6 +205,11 @@
   ("/" qutebrowser/search "search")
   ("yas" qutebrowser/ril-save "ril save")
   ("yy" qutebrowser/yank-url "yank url")
+  ("<down>" qutebrowser/page-down "down")
+  ("<up>" qutebrowser/page-up "up")
+  ("<C-M-up>" qutebrowser/scroll-decr "scroll-decr")
+  ("<C-M-down>" qutebrowser/scroll-incr "scroll-incr")
+  ("ss" qutebrowser/toggle-scroll "scroll")
   ("q" nil "quit")
   )
 (define-key qutebrowser/map (kbd "q") 'qutebrowser/hydra-map/body)

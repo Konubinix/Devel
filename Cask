@@ -99,3 +99,4 @@
 (depends-on "ox-hugo")
 (depends-on "jupyter")
 (depends-on "cmake-mode")
+(depends-on "dockerfile-mode")

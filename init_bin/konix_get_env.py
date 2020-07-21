@@ -108,7 +108,7 @@ def getConfigFromEnvFile(envfile, previous_config):
             else:
                 previous_value = env_value
 
-            logging.debug("analysing ["+key+"] = "+value+" (previous was "+previous_value+")")
+            logging.debug("analysing ["+key+"] = "+value+"\n\t(previous was "+previous_value+")")
             if section == "replace" or previous_value == "":
                 logging.debug("Replace previous value")
                 new_config[key] = value
@@ -167,8 +167,10 @@ def main():
             logging.warning("The file given as argument was not found, ignoring it : "+GIVEN_CONFIG_FILE)
             GIVEN_CONFIG_FILE=None
     if GIVEN_CONFIG_FILE:
+        logging.debug("## Parsing " + GIVEN_CONFIG_FILE)
         config = getConfigFromEnvFile(GIVEN_CONFIG_FILE, config)
     else:
+        logging.debug("## Parsing "+ default_config_file)
         config = getConfigFromEnvFile(default_config_file,config) # get the default config to know the platform
 
         # changing of platform must force a new env to be loaded. Then the env loading is done if
@@ -183,7 +185,7 @@ def main():
             config["HOSTNAME"] = config.get("HOSTNAME", socket.gethostname())
             (stamp, backup_file) = createBackupFileOrUseIt(os.environ.get("KONIX_ENV_STAMP", None))
             config["KONIX_ENV_STAMP"] = stamp
-            logging.debug("Parsing the env")
+            logging.debug("## Parsing the env")
             devel_dir = config["KONIX_DEVEL_DIR"]
             konix_config = os.path.join(devel_dir,"config")
             config_file = os.path.join(konix_config, "env.conf")

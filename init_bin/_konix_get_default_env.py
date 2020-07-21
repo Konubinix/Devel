@@ -1,12 +1,12 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import re
 import os
 import sys
 
-SEARCH=sys.argv[1]
-PLATFORM=os.environ["WANTED_PLATFORM"]
+SEARCH = sys.argv[1]
+PLATFORM = os.environ["WANTED_PLATFORM"]
 assert(PLATFORM)
 
 ENV_FILE = open(os.path.join(os.path.expanduser("~"), ".env_"+PLATFORM+".conf"), "r")

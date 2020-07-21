@@ -1,9 +1,9 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import sys
 import os
-import ConfigParser
+import configparser
 import string
 import re
 import logging
@@ -61,16 +61,16 @@ def parse_value(key, value, previous_config, new_config):
 
 def getConfigFromEnvFile(envfile, previous_config):
     if not os.path.exists(envfile):
-        print >>sys.stderr,"Config file",envfile,"does not exist"
+        print(f"Config file {envfile} does not exist", file=sys.stderr)
         return previous_config
 
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser(strict=False)
     config.optionxform = str    # keys not converted into lower case
     config.read(envfile)
     new_config = previous_config
     for section in config.sections():
         if section == "include":
-            items = config.items(section)
+            items = config.items(section, raw=True)
             for item in items:
                 condition, file_to_include=item
                 file_to_include, _ = parse_value(
@@ -92,7 +92,7 @@ def getConfigFromEnvFile(envfile, previous_config):
             continue
 
         assert(section in ("prefix","replace","suffix",))
-        (items, items_keys,) = mergeItemsOfSection(config.items(section))
+        (items, items_keys,) = mergeItemsOfSection(config.items(section, raw=True))
         for key in items_keys:
             value = items[key]
             value, env_value = parse_value(key, value, previous_config, new_config)
@@ -142,7 +142,7 @@ def createBackupEnvFile(stamp):
         os.remove(env_backup_file_name)
     f = open(env_backup_file_name, "w")
     f.write("[replace]\n")
-    for key, value in os.environ.items():
+    for key, value in list(os.environ.items()):
         f.write(key+"='"+value.replace("\n", "\n\t")+"'\n")
     f.close()
 
@@ -177,6 +177,7 @@ def main():
         # - the platforms are differents
         # or
         # - env_done is not set to 1
+
         logging.debug("the config is for "+config["KONIX_PLATFORM"]+", the environ says "+os.environ.get("KONIX_PLATFORM", "nothing"))
         if config["KONIX_PLATFORM"] != os.environ.get("KONIX_PLATFORM") or os.environ.get("KONIX_ENV_IGNORE", None) == None:
             # ####################################################################################################
@@ -207,9 +208,9 @@ def main():
             logging.debug("Ignoring the env")
             config = {}
     # Now, I can display the env
-    for key in config.keys():
+    for key in list(config.keys()):
         # make sure the final value will be correctly quoted
-        print "%s='%s'" % (key, config[key])
+        print("%s='%s'" % (key, config[key]))
 
 if __name__ == '__main__':
     main()

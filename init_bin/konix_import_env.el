@@ -14,7 +14,7 @@
 							(eq system-type 'gnu/kfreebsd)
 							(eq system-type 'gnu/linux)
 							)
-						   "linux2"
+						   "linux"
 						   )
 						  ((eq system-type 'darwin)
 						   "darwin"

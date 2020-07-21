@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: new-file-tpl-awk
+# --
+#!/usr/bin/awk -f
+
+$0

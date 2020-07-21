@@ -66,6 +66,11 @@ Add a yasnippet template with key %s"
 							  (auto-insert-use-yasnippet-template "js")
 							  )
 						   )
+	 (redefine-auto-insert "\\.awk\\'"
+						   '(lambda()
+							  (auto-insert-use-yasnippet-template "awk")
+							  )
+						   )
 	 )
   )
 

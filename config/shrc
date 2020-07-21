@@ -4,7 +4,7 @@
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-python "${KONIX_DEVEL_DIR}/bin/konix_check_env"
+"${KONIX_DEVEL_DIR}/bin/konix_check_env"
 # ####################################################################################################
 # Get the pwd, without paying attention to the given PWD because it may be wrong
 # ####################################################################################################

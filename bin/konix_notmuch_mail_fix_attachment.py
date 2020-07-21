@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import sys
@@ -14,6 +14,6 @@ for message in q.search_messages():
         pass
     if filenames != set():
         if "attachment" not in message.get_tags():
-            print "Adding the tag attachment to %s" % message
+            print("Adding the tag attachment to %s" % message)
             message.add_tag("attachment")
             message.add_tag("fixed_attachment")

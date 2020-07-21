@@ -45,12 +45,14 @@
 	  )
 	)
   ;; use the KONIX_EMACSLOADPATH env variable to extends load-path
-  (setq load-path
-		(append
-		 (split-string (getenv "KONIX_EMACSLOADPATH") path-separator)
-		 load-path
-		 )
-		)
+  (when (getenv "KONIX_EMACSLOADPATH")
+    (setq load-path
+	  (append
+	   (split-string (getenv "KONIX_EMACSLOADPATH") path-separator)
+	   load-path
+	   )
+	  )
+    )
   ;; get the ssh environment variable
   (let (
         (ssh_auth_sock (format "%s/gnupg/S.gpg-agent.ssh" (getenv "XDG_RUNTIME_DIR")))

@@ -1,9 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-
-import re
 import sys
 
 for line in sys.stdin.readlines():
-        print line.replace("\\","\\\\"),
+    print(line.replace("\\","\\\\"), end=' ')

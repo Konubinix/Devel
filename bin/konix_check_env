@@ -1,12 +1,29 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
+from pathlib import Path
+from collections import Counter
 import os
-#check the PATH
-for dir in [
-        var for var in
-        os.environ['PATH'].split(os.pathsep)
-        if var not in os.environ.get('PATH_CAN_BE_MISSING', "").split(os.pathsep)
-]:
-    if not os.path.exists(dir):
-        print "WARNING :",dir,"does not exist and yet it is in your path"
+import subprocess
+import sys
+
+IGNORED_PATHS = os.environ.get("PATH_IGNORE", "").split(os.path.pathsep)
+for key, value in os.environ.items():
+    if key.endswith("PATH") and key not in IGNORED_PATHS:
+        directories = Counter(value.split(os.pathsep))
+        for directory, count in directories.items():
+            if (
+                    directory not in os.environ.get("PATH_CAN_BE_MISSING")
+                    and not Path(directory).exists()
+            ):
+                print(f"WARNING: {directory} is missing and is"
+                      f" provided in {key}" + (
+                          f" {count} times." if count != 1 else "."
+                      ) + " Add it in PATH_CAN_BE_MISSING"
+                      " to avoid this message")
+                if len(sys.argv) > 1 and sys.argv[1] == "find":
+                    subprocess.check_call(
+                        [
+                            "konix_get_env_origin.sh", key, directory
+                        ]
+                    )

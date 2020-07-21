@@ -45,5 +45,12 @@
   )
 (add-hook 'c++-mode-hook #'konix/c++-mode-hook)
 
+(defun konix/awk-mode-hook ()
+  (add-hook 'after-save-hook 'konix/make-executable t t)
+  )
+(add-hook 'awk-mode-hook
+          'konix/awk-mode-hook)
+
+
 (provide 'KONIX_AL-c++-mode)
 ;;; KONIX_AL-c++-mode.el ends here

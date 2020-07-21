@@ -119,7 +119,7 @@ Message-Id: <%s>" id)
 (setq-default mm-default-directory mailcap-download-directory)
 (setq-default notmuch-crypto-process-mime t)
 (setq-default notmuch-archive-tags '("-inbox" "-unread"))
-(setq notmuch-address-command "notmuch_addresses.py")
+(setq-default notmuch-address-command 'internal)
 
 (defface konix/notmuch-search-flagged
   '(

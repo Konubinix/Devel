@@ -39,6 +39,6 @@ then
     onofflineimaperror
 fi
 
-konix_mail_tray_daemon_update.py -d || onerror
+# konix_mail_tray_daemon_update.py -d || onerror
 
 exit $EXITVALUE

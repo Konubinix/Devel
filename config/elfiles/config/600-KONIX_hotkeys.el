@@ -572,7 +572,7 @@
 ;; Macro
 (global-set-key (kbd "C-<f4>") 'kmacro-end-or-call-macro)
 ;; Magit
-(global-set-key (kbd "<f9>") 'konix/magit-status)
+(global-set-key (kbd "<f9>") 'magit-status)
 ;; Header
 (global-set-key (kbd "<f8>") 'konix/header)
 (global-set-key (kbd "<C-f8>")

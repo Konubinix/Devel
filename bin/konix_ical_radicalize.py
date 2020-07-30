@@ -9,12 +9,42 @@ from uuid import uuid4
 import vobject
 
 colors = {
-    "calendar_work": "#0000cd"
+    "calendar": "#667A0A",
+    "calendar_no_perso_no_tome_habit": "#71623A",
+    "calendar_no_perso_no_tome_no_habit": "#3A7147",
+    "calendar_no_perso_tome_habit": "#F2EEE5",
+    "calendar_no_perso_tome_no_habit": "#E5F2E8",
+    "calendar_perso_no_tome_habit": "#3A4A71",
+    "calendar_perso_no_tome_no_habit": "#713A65",
+    "calendar_perso_tome_habit": "#E5E9F2",
+    "calendar_perso_tome_no_habit": "#F2E5EF",
+    "contacts": "#0A7A56",
+    "ril": "#1E0A7A",
+    "ril_no_perso_no_tome_habit": "#1E0A7A",
+    "ril_no_perso_no_tome_no_habit": "#1E0A7A",
+    "ril_no_perso_tome_habit": "#1E0A7A",
+    "ril_no_perso_tome_no_habit": "#1E0A7A",
+    "ril_perso_no_tome_habit": "#1E0A7A",
+    "ril_perso_no_tome_no_habit": "#1E0A7A",
+    "ril_perso_tome_habit": "#1E0A7A",
+    "ril_perso_tome_no_habit": "#1E0A7A",
+    "sms_n_calls": "#7A0A2E",
+    "sms_n_calls_no_perso_no_tome_habit": "7A0A2E",
+    "sms_n_calls_no_perso_no_tome_no_habit": "7A0A2E",
+    "sms_n_calls_no_perso_tome_habit": "7A0A2E",
+    "sms_n_calls_no_perso_tome_no_habit": "7A0A2E",
+    "sms_n_calls_perso_no_tome_habit": "7A0A2E",
+    "sms_n_calls_perso_no_tome_no_habit": "7A0A2E",
+    "sms_n_calls_perso_tome_habit": "7A0A2E",
+    "sms_n_calls_perso_tome_no_habit": "7A0A2E",
 }
 
 
-def main(cal):
-    dir = os.path.splitext(cal)[0]
+def main(cal, destination):
+    dir = os.path.join(
+        destination,
+        os.path.basename(os.path.splitext(cal)[0]),
+    )
     if os.path.exists(dir):
         shutil.rmtree(dir)
     os.makedirs(dir)
@@ -34,4 +64,4 @@ X-WR-TIMEZONE:CEST
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1], sys.argv[2])

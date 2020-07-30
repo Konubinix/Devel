@@ -5003,5 +5003,8 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(setq-default org-attach-use-inheritance t)
+(setq-default org-use-property-inheritance nil)
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

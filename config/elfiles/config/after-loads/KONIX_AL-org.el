@@ -1996,7 +1996,7 @@ items"
                   (dummy (setq konix/org-agenda-type 'agenda))
                   )
                  (
-                  ,(format "%s/radicale/collection-root/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
+                  ,(format "%s/radicale/calendar.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("ag" . "GTD list views")
@@ -2207,7 +2207,7 @@ items"
                  (
                   )
                  (
-                  ,(format "%s/radicale/collection-root/sam/ril.ics" (getenv "KONIX_PERSO_DIR"))
+                  ,(format "%s/radicale/ril.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("ags" "SMS & Calls"
@@ -2228,7 +2228,7 @@ items"
                    )
                   )
                  (
-                  ,(format "%s/radicale/collection-root/sam/sms_n_calls.ics" (getenv "KONIX_PERSO_DIR"))
+                  ,(format "%s/radicale/sms_n_calls.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("agw" "Waiting for list (no filter context)"
@@ -4176,10 +4176,10 @@ of the clocksum."
         )
       )
     )
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/collection-root/sam/calendar.ics")
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/collection-root/sam/ril.ics")
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/collection-root/sam/sms_n_calls.ics")
-  (shell-command "konix_ical_radicalize_dir.sh /home/sam/perso/perso/radicale/collection-root/sam/")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/calendar.ics")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/ril.ics")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sms_n_calls.ics")
+  (shell-command "konix_ical_radicalize_dir.sh /home/sam/perso/perso/radicale/ /home/sam/perso/perso/radicale/collection-root/sam/")
   (konix/notify "Exported" 2)
   )
 

@@ -278,19 +278,21 @@ class Conversation():
 
     def _history(self, oldest=None, latest=None, user=None, count=1000):
         def get_history_unpage(latest, oldest, count):
-            res = self.endpoint.history(
-                self.data["id"],
-                count=count,
-                latest=latest,
-                oldest=oldest,
-            ).body
-            messages = res["messages"]
-            if res["has_more"]:
-                messages += get_history_unpage(latest=messages[-1]["ts"],
-                                               oldest=oldest,
-                                               count=count,
-                )
-            return messages
+            remaining_count = count
+            has_more = True
+            while remaining_count > 0 and has_more is True:
+                res = self.endpoint.history(
+                    self.data["id"],
+                    count=remaining_count,
+                    latest=latest,
+                    oldest=oldest,
+                ).body
+                messages = res["messages"]
+                yield from messages
+                remaining_count = count - len(messages)
+                has_more = res["has_more"]
+                if has_more:
+                    latest = messages[-1]["ts"]
         return builtins.sorted([
             Message(message)
             for message in get_history_unpage(

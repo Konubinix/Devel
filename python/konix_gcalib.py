@@ -23,7 +23,6 @@ import dateutil
 import requests
 import konix_collections
 import urllib.parse
-import pandas
 import hashlib
 from dateutil import parser
 
@@ -581,6 +580,7 @@ Attendees:
 
     @needs("access_token")
     def list_calendars_pandas(self, search_term=None):
+        import pandas
         return pandas.DataFrame(
             [ce._asdict().values() for ce in self.list_calendars(search_term)],
             columns=self.api["schemas"]["CalendarListEntry"]["properties"].keys()

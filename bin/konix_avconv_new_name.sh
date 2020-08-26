@@ -6,30 +6,7 @@ file="$1"
 file_abs="$(konix_absolute_path.py "${file}")"
 ext="${file##*.}"
 dir="$(dirname "${file}")"
-creation_date="$(avconv -i "${file}" 2>&1 \
-	| grep -i creation_time \
-	| head -1 \
-	| sed -r 's|^.+[Cc][Rr][Ee][Aa][Tt][Ii][Oo][Nn]_[Tt][Ii][Mm][Ee]   : ([0-9][0-9][0-9][0-9]-[0-9]+-[0-9]+)[ T]([0-9]+:[0-9]+:[0-9]+).*$|\1T\2|')"
-if avconv -i "${file}" 2>&1 |grep -q -e "handler_name.*:.*Video Handler"
-then
-    # xp120 => local date
-	date_to_parse="${creation_date}"
-elif avconv -i "${file}" 2>&1 |grep -q -e "com.apple.quicktime.make: Apple"
-then
-	# utc date
-	date_to_parse="${creation_date}+0000"
-elif avconv -i "${file}" 2>&1 |grep -q -i 'iCatch Alias Data Handler' # xp120
-then
-	# local date
-	date_to_parse="${creation_date}"
-elif avconv -i "${file}" 2>&1 |grep -q -i 'creation_time.\+Z$'
-then
-	# utc date
-	date_to_parse="${creation_date}+0000"
-else
-	# local date
-	date_to_parse="${creation_date}"
-fi
+date_to_parse="$(konix_avconv_creation_date.sh)"
 if [ "${date_to_parse}" == "" ]
 then
     echo "no new name" >&2

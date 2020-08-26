@@ -1342,3 +1342,7 @@ Version 2016-09-02"
     (mapcar
      (lambda ($x) (princ $x) (terpri))
      (reverse $changedItems))))
+
+(defun konix/line-and-buffer-at-point nil
+  (cons (konix/line-number-at-pos-widen) (current-buffer))
+  )

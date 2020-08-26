@@ -520,7 +520,7 @@ inspired from `notmuch-show-archive-thread-internal'"
 
 (defun konix/notmuch-hello-refresh-hook ()
   ;; launches an update on the mail daemon
-  (shell-command "konix_mail_tray_daemon_update.py")
+  ;; (shell-command "konix_mail_tray_daemon_update.py")
   )
 (add-hook 'notmuch-hello-refresh-hook
 		  'konix/notmuch-hello-refresh-hook)

@@ -1815,5 +1815,20 @@ FExport diary data into iCalendar file: ")
   "Return the number of lines in this buffer."
   (count-lines (point-min) (point-max)))
 
+(defun konix/scroll ()
+  (interactive)
+  (let (
+        (scroll-time (or current-prefix-arg 1))
+        )
+    (setq current-prefix-arg nil)
+    (while t
+      (sit-for scroll-time)
+      (call-interactively 'next-line)
+      (hl-line-highlight)
+      (call-interactively 'recenter-top-bottom)
+      )
+    )
+  )
+
 (provide '350-KONIX_commands)
 ;;; 350-KONIX_commands.el ends here

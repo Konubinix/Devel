@@ -51,19 +51,6 @@ ${title}
 "
                  :unnarrowed t
                  )
-                ("n" "note" plain
-                 (function org-roam--capture-get-point)
-                 "%?"
-                 :file-name "%<%y%m%d-%H%M%S>-${slug}"
-                 :head "#+TITLE: ${title}
-#+LANGUAGE: fr
-#+CREATED: %U
-
-[%(konix/org-get-time)]
-
-"
-                 :unnarrowed t
-                 )
                 )
               )
 

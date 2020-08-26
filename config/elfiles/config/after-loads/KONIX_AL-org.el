@@ -1919,7 +1919,7 @@ items"
                               )
                             )
                            (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-                           ; (dummy (konix/org-agenda-check-buffer/agenda t))
+                                        ; (dummy (konix/org-agenda-check-buffer/agenda t))
                            )
                           )
                   )
@@ -1953,7 +1953,7 @@ items"
                               )
                             )
                            (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-                           ; (dummy (konix/org-agenda-check-buffer/agenda t))
+                                        ; (dummy (konix/org-agenda-check-buffer/agenda t))
                            )
                           )
                   )
@@ -1988,7 +1988,7 @@ items"
                               )
                             )
                            (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-                           ; (dummy (konix/org-agenda-check-buffer/agenda t))
+                                        ; (dummy (konix/org-agenda-check-buffer/agenda t))
                            )
                           )
                   )
@@ -3093,7 +3093,14 @@ of the clocksum."
   (setq indent-tabs-mode nil)
   (konix/flyspell-mode 1)
   (auto-complete-mode t)
-
+  (save-excursion
+    (goto-char 0)
+    (save-match-data
+      (when (re-search-forward "^#\\+LANGUAGE: *\\(.+\\)$" 1000 t)
+        (ispell-change-dictionary (match-string-no-properties 1))
+        )
+      )
+    )
   (abbrev-mode t)
   ;; (visual-line-mode t)
   (setq ac-sources (append ac-sources
@@ -3482,16 +3489,16 @@ of the clocksum."
                    (upcase
                     (symbol-name from_value)
                     )
-                (substring-no-properties from_value)
-                )
+                 (substring-no-properties from_value)
+                 )
                )
          (to (if (symbolp to_value)
-                   (upcase
-                    (symbol-name to_value)
-                    )
-                (substring-no-properties to_value)
-                )
+                 (upcase
+                  (symbol-name to_value)
+                  )
+               (substring-no-properties to_value)
                )
+             )
          )
     (if (and
          (eq type 'todo-state-change)

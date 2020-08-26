@@ -32,7 +32,7 @@ class ImpassKeyring(keyring.backend.KeyringBackend):
 
     def get_password(self, servicename, username):
         key = "{}@{}".format(username, servicename)
-        with updated_env(ASSWORD_DUMP_PASSWORDS="1"):
+        with updated_env(IMPASS_DUMP_PASSWORDS="1"):
             return json.loads(
                 subprocess.check_output(
                     [

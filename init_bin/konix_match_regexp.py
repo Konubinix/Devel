@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import re
@@ -26,5 +26,5 @@ for line in sys.stdin.readlines():
         for match in re.findall(regexp, line, RE_FLAGS):
             RES=0
             if not QUIET:
-                print line,
+                print(line, end=' ')
 exit(RES)

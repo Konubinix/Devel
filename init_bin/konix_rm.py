@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import os
@@ -34,5 +34,5 @@ for to_delete_file in args:
                         delete_func=os.rmdir
         else:
                 delete_func=os.remove
-        print info
+        print(info)
         delete_func(to_delete_file)

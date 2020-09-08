@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import os
@@ -34,6 +34,8 @@ replace_file_content(DEFAULT_ENV_FILE_NAME, DEFAULT_ENV_FILE_CONTENT)
 # ####################################################################################################
 substitute(os.path.join(environ["KONIX_PWD"],"init_bin"), os.path.join(environ["HOME"],"init_bin"))
 
+os.makedirs(os.path.expanduser("~/bin"))
+
 # ####################################################################################################
 # Install shell and emacs
 # ####################################################################################################
@@ -43,17 +45,12 @@ from install_shell import install_shell
 from install_git import install_git
 from install_bin import install_bin
 from install_gdbinit import install_gdbinit
-from install_quilt import install_quilt
-from install_mr import install_mr
 install_shell()
 install_emacs()
 install_git()
 install_bin()
 install_gdbinit()
 install_vim()
-install_mr()
-if is_on_linux():
-    install_quilt()
 
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "mailcap"),   os.path.join(environ["HOME"], ".mailcap"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "Makefile"),   os.path.join(environ["HOME"], "Makefile"))

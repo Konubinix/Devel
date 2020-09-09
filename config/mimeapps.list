@@ -16,4 +16,4 @@ image/jpeg=eog.desktop;
 image/svg=eog.desktop;
 image/bmp=eog.desktop;
 video/webm=vlc.desktop;
-application/octet-stream=konix_gpg_mimeopen-usercreated-2.desktop;
+application/octet-stream=konix_gpg_mimeopen.desktop;

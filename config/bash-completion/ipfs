@@ -1,0 +1,10 @@
+#!/bin/bash -eu
+
+COMPLETION_SCRIPT="${HOME}/.ipfs/bash-completion.sh"
+
+if ! [ -e "${COMPLETION_SCRIPT}" ]
+then
+    wget -O "${COMPLETION_SCRIPT}" https://raw.githubusercontent.com/ipfs/go-ipfs/master/misc/completion/ipfs-completion.bash
+fi
+
+source "${COMPLETION_SCRIPT}"

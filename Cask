@@ -93,3 +93,4 @@
 (depends-on "cmake-mode")
 (depends-on "dockerfile-mode")
 (depends-on "magit")
+(depends-on "default-text-scale")

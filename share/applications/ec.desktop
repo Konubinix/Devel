@@ -1,5 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=ec
-Exec=ec %f
-NoDisplay=true

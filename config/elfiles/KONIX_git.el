@@ -277,7 +277,7 @@
 	(setq res
 		  (concat
 		   "Commande : " git_command "\n"
-		   (shell-command-to-string (concat git_command " && echo OK || echo PB&"))))
+		   (shell-command-to-string (concat git_command " && echo OK || echo PB"))))
 	(konix/disp-window res)
 	)
   )

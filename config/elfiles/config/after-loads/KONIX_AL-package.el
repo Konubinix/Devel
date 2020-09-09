@@ -30,7 +30,5 @@
              '("org" . "https://orgmode.org/elpa/")
              )
 
-(package-initialize)
-
 (provide 'KONIX_AL-package)
 ;;; KONIX_AL-package.el ends here

@@ -2,3 +2,9 @@
 image/svg=mirage.desktop;
 application/x-notebook=notebook.desktop;
 application/pgp-encrypted=konix_gpg_mimeopen.desktop;
+text/html=konix_open_html.desktop;
+application/xhtml_xml=konix_open_html.desktop;
+text/html=konix_open_html.desktop;
+text/xml=konix_open_html.desktop;
+x-scheme-handler/http=konix_open_html.desktop;
+x-scheme-handler/https=konix_open_html.desktop;

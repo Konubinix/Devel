@@ -8,7 +8,6 @@
 ;; Default font, simple, nice!!
 (setq-default konix/default-font "Monospace 10")
 
-(set-default-font konix/default-font)
 (setq-default default-frame-alist
 			  `(
 				(font . ,konix/default-font)

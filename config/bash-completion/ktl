@@ -1,5 +1,5 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-ME="$(basename "${BASH_SOURCE[0]}")"
+source <(kubectl completion bash)
 
-complete -o default -F __start_kubectl "${ME}"
+complete -o default -F __start_kubectl ktl

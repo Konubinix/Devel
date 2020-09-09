@@ -16,5 +16,7 @@ image/svg=eog.desktop;
 image/bmp=eog.desktop;
 video/webm=vlc.desktop;
 application/octet-stream=konix_gpg_mimeopen.desktop;
+text/x-python=emacsclient.desktop;
+application/x-shellscript=emacsclient.desktop;
 application/xhtml+xml=konix_open_html.desktop;
 text/html=konix_open_html.desktop;

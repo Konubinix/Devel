@@ -2210,6 +2210,22 @@ items"
                   ,(format "%s/radicale/ril.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
+                ("agg" "Garden"
+                 (
+                  (tags-todo "@garden-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe|@car-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe"
+                        (
+                         (org-agenda-overriding-header
+                          "Garden")
+                         )
+                        )
+                  )
+                 (
+                  (org-agenda-todo-ignore-scheduled 'future)
+                  )
+                 (
+                  ,(format "%s/radicale/garden.ics" (getenv "KONIX_PERSO_DIR"))
+                  )
+                 )
                 ("ags" "SMS & Calls"
                  (
                   (tags "@sms+todo=\"NEXT\"-maybe|@call+todo=\"NEXT\"-maybe"

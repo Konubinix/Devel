@@ -169,7 +169,7 @@ def main(ctx, args, log_level, debug, all, ls, run):
                         not os.path.exists(path) and
                         config.get("GLOBAL", {}).get("skip_missing")
                 ):
-                    LOGGER.warn("{} does not exist: skipped".format(path))
+                    LOGGER.warning("{} does not exist: skipped".format(path))
                     continue
             with cd(indir):
                 res[path] = subprocess.call(

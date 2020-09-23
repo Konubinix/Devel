@@ -94,3 +94,5 @@
 (depends-on "dockerfile-mode")
 (depends-on "magit")
 (depends-on "default-text-scale")
+(depends-on "terraform-mode")
+(depends-on "poporg")

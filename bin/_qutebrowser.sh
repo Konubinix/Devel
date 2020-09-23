@@ -209,4 +209,20 @@ send_return ( ) {
     } | send_command_multiline
 }
 
+send_space ( ) {
+    local number="${1:-1}"
+    {
+        for _ in $(seq "${number}")
+        do
+            echo "fake-key <space>"
+        done
+    } | send_command_multiline
+}
+
+click_by_text ( ) {
+    local type="$1"
+    local text="$2"
+    send_js "document.evaluate(\"//${type}[contains(text(),'${text}')]\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();"
+}
+
 comm_init

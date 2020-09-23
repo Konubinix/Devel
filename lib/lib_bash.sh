@@ -605,3 +605,10 @@ popline ( ) {
     mv "${TMPDIR}/temp" "${file}"
     read "$2" < <(echo "${thehead}")
 }
+
+map ( ) {
+    while read line
+    do
+        "$@" "${line}"
+    done
+}

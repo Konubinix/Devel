@@ -1639,6 +1639,8 @@ X-WR-TIMEZONE:CEST
           (when (or
                  (string-prefix-p "deadline" (org-get-at-bol 'type))
                  (string-prefix-p "timestamp" (org-get-at-bol 'type))
+                 ;; not sure what "block" means, but a simple * <date> is a block
+                 (string-prefix-p "block" (org-get-at-bol 'type))
                  )
             (setq res (concat res (konix/org-agenda-to-ics/format-item "EVENT")))
             )

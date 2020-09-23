@@ -56,5 +56,34 @@ scheduled in January if it is triggered in July."
                 )
   )
 
+(defun org-edna-action/scheduled-next-clocks-change! (_last_entry &optional at-least-next-month)
+  "Schedule the entry at the time of the next European clock change."
+  (let (
+        (time (current-time))
+        (found nil)
+        )
+    (when at-least-next-month
+      (setq time (time-add time (* 3600 24 31)))
+      )
+    (while (not
+            (and
+             (member (format-time-string "%m" time) '("10" "03")) ;; march or october
+             (equal (format-time-string "%w" time) "0") ;; sunday
+             (<
+              (-
+               31
+               (string-to-number (format-time-string "%e" time))
+               )
+              7
+              ) ;; less than 7 days of the end of the month => last sunday
+             )
+            )
+      (setq time (time-add time (* 24 3600)))
+      )
+    (org-schedule nil (format-time-string "%Y-%m-%d" time))
+    )
+  )
+
+
 (provide 'KONIX_AL-org-edna)
 ;;; KONIX_AL-org-edna.el ends here

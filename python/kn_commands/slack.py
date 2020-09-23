@@ -280,7 +280,7 @@ class Conversation():
         def get_history_unpage(latest, oldest, count):
             remaining_count = count
             has_more = True
-            while remaining_count > 0 and has_more is True:
+            while (remaining_count is None or remaining_count > 0) and has_more is True:
                 res = self.endpoint.history(
                     self.data["id"],
                     count=remaining_count,
@@ -289,7 +289,8 @@ class Conversation():
                 ).body
                 messages = res["messages"]
                 yield from messages
-                remaining_count = count - len(messages)
+                if remaining_count is not None:
+                    remaining_count = count - len(messages)
                 has_more = res["has_more"]
                 if has_more:
                     latest = messages[-1]["ts"]

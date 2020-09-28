@@ -1,12 +1,10 @@
-#!/bin/bash
-
-set -eu
+#!/bin/bash -eu
 
 file="$1"
 file_abs="$(konix_absolute_path.py "${file}")"
 ext="${file##*.}"
 dir="$(dirname "${file}")"
-date_to_parse="$(konix_avconv_creation_date.sh)"
+date_to_parse="$(konix_avconv_creation_date.sh "${file}")"
 if [ "${date_to_parse}" == "" ]
 then
     echo "no new name" >&2

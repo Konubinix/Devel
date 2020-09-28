@@ -67,9 +67,7 @@ Refresh token: {credentials.refresh_token}"""
 
     print(message)
     flask.session['credentials'] = credentials_to_dict(credentials)
-    db.set(f"{args.account}_access_token", credentials.token)
     db.set(f"{args.account}_refresh_token", credentials.refresh_token)
-
     return message.replace("\n", "<br/>")
 
 

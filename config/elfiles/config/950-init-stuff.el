@@ -30,3 +30,5 @@
   (kill-emacs)
   (message "Killed")
   )
+
+(setenv "INEMACS" "t")

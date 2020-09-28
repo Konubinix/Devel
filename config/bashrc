@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ -z "$PS1" ] && return
+( [ -z "$PS1" ] || [ "${TERM}" == "dumb" ] || [ -n "$INEMACS" ]) && return
 echo "Initializing interactive bash configuration"
 echo "Sourcing shrc configuration"
 source "$KONIX_CONFIG_DIR/shrc"

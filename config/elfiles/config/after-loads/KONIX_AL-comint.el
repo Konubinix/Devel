@@ -139,5 +139,8 @@
 
 (add-to-list 'comint-dynamic-complete-functions 'auto-complete t)
 
+(setq-default comint-process-echoes t)
+
+
 (provide '700-KONIX_comint)
 ;;; KONIX_AL-comint.el ends here

@@ -7,7 +7,6 @@ import sys
 import re
 import subprocess
 import socket                   # for hostname
-import which
 import logging
 LOGGER = logging.getLogger(__name__)
 
@@ -37,16 +36,7 @@ if args.verbose:
 # **********************************************************************
 # Need gpg to use it...
 # **********************************************************************
-gpg_path=None
-for gpg_exe_name in ["gpg", "gpg2"]:
-    try:
-        gpg_path=which.which(gpg_exe_name)
-        break
-    except:
-        pass
-if not gpg_path:
-    LOGGER.error("No gpg found, cannot go further")
-    exit(2)
+gpg_path="gpg2"
 # **********************************************************************
 # Try to start a gpg agent file or use an already launched one
 # **********************************************************************

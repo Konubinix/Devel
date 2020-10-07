@@ -150,3 +150,4 @@ unset PROMPT_COMMAND
 #set +x
 export PS1="\${PS1_PREFIX}\$(rc=\$? ; konix_prompt_pre; [ \$rc -ne 0 ] && printf \"\[$BAD_PROMPT_COLOR\]\" || printf \"\[$GOOD_PROMPT_COLOR\]\" ; printf \"%03d$DEFAULT_COLOR\" \$rc ;)\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\$(path_color)|path=\w|\[\033[00m\]${GIT_COLOR}\$(konix_git_prompt_maybe)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\$(konix_prompt_post)\n\$ "
 [[ -s "${HOME}/.autojump/etc/profile.d/autojump.sh" ]] && source "${HOME}/.autojump/etc/profile.d/autojump.sh"
+[[ -s "/usr/share/autojump/autojump.bash" ]] && source "/usr/share/autojump/autojump.bash"

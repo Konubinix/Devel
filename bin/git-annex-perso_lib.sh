@@ -157,6 +157,8 @@ gaps_launch_script ( ) {
 gaps_launch_config ( ) {
     # I don't want to run into disk left space troubles again
     git config annex.diskreserve 200M
+	# I don't want to be disturbed by the pinetry during automatic processes
+	git config commit.gpgsign false
     if [ -f "${GITANNEXSYNC_CONFIG}" ]
     then
         gaps_log "Launching the config script"

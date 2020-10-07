@@ -2,7 +2,7 @@
 
 docker-make-options () {
     echo "A:name:$(docker-make-targets|list_to_choice):Name of the image to build"
-    echo 'O:--platform:["linux/amd64", "linux/amd64,linux/386,linux/arm/v7", "linux/amd64,linux/386", "linux/arm/v6"]:Platform to build to:linux/amd64,linux/386,linux/arm/v7'
+    echo 'O:--platform:["linux/amd64", "linux/arm/v7", "linux/amd64,linux/386,linux/arm/v7", "linux/amd64,linux/386", "linux/arm/v6"]:Platform to build to:linux/amd64,linux/386,linux/arm/v7'
     echo 'N:Arguments to pass to docker buildx build as-is'
     echo "O:-t,--tag:str:Tag:latest"
     echo "O:--build-args:str:Build args"
@@ -37,7 +37,8 @@ docker-make-it () {
     docker buildx build \
            "${args[@]}" \
            -t "localhost:9692/${CLK___NAME}:${CLK___TAG}" \
-           --platform "${CLK___PLATFORM}" --push \
+           --platform "${CLK___PLATFORM}" \
+		   --push \
            "." \
            -f "./docker_makefiles/Dockerfile.${CLK___NAME}" \
            ${CLK___ARGS}

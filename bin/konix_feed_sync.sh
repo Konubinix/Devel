@@ -16,7 +16,7 @@ popd
 
 
 grep "ERROR\|CRITICAL\|WARNING" "${TMPDIR}/log"
-konix_display.py -o "Ended getting rss feeds $(wc -l "${TMPDIR}/log") problems"
+konix_display.py -o "Ended getting rss feeds $(wc -l < "${TMPDIR}/log") problems"
 
 # init the tags for the new mails
 echo "Initing tags"

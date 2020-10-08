@@ -41,4 +41,5 @@ fi
 
 # konix_mail_tray_daemon_update.py -d || onerror
 
+konix_display.py -o "Mails synchronized"
 exit $EXITVALUE

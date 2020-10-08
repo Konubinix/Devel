@@ -20,6 +20,10 @@ def by_pynotify(message):
     n.show()
 
 
+def by_notify_send(message):
+    subprocess.check_call(["notify-send", message])
+
+
 def by_sl4a(message, type_):
     from konix_android import droid
     import andlib
@@ -59,6 +63,7 @@ def main(message, unique=False, duration=3000, type_="normal", to_phone=False):
 
 def local_display(message, unique=False, duration=3000, type_="normal"):
     candidates = [
+        by_notify_send,
         by_pynotify,
         partial(by_sl4a, type_=type_),
     ]

@@ -1,3 +1,4 @@
 #!/bin/bash
 
-exec redis-cli -p 6380 "$@"
+echo "## konix_redis-cli.sh IS DEPRECATED, USE REDIS-CLI" >&2
+exec redis-cli "$@"

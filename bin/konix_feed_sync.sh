@@ -15,8 +15,8 @@ keep_color flexget execute | tee "${TMPDIR}/log"
 popd
 
 
-grep "ERROR\|CRITICAL\|WARNING" "${TMPDIR}/log"
-konix_display.py -o "Ended getting rss feeds $(wc -l < "${TMPDIR}/log") problems"
+keep_color grep "ERROR\|CRITICAL\|WARNING" "${TMPDIR}/log" | tee "${TMPDIR}/errors"
+konix_display.py -o "Ended getting rss feeds $(wc -l < "${TMPDIR}/errors") problems"
 
 # init the tags for the new mails
 echo "Initing tags"

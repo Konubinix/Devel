@@ -526,10 +526,6 @@ urldecode() {
     printf '%b' "${url_encoded//%/\\x}"
 }
 
-trim ( ) {
-    awk '{$1=$1};1'
-}
-
 lastcharacter ( ) {
     local input="$*"
     echo "${input: -1}"

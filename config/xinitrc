@@ -1,4 +1,6 @@
 {
-    ~/.fluxbox/startup
-    #dbus-launch gnome-session
+xset r rate 170 150
+xrandr --output HDMI-1 --auto --output eDP-1 --mode 1024x576 --auto --right-of HDMI-1
+/home/sam/init_bin/konix_do_cron_job.sh awesome
+#dbus-launch gnome-session
 } >> ~/.xinit_log 2>&1

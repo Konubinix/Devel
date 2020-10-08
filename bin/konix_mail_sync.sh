@@ -4,12 +4,10 @@ echo "############"
 date
 echo "############"
 LOG_FILE="$(mktemp)"
-konix_redis-cli.sh rpush mail_tray_daemon "?"
 
 EXITVALUE=0
 
 onerror () {
-    konix_redis-cli.sh rpush mail_tray_daemon "p"
     EXITVALUE=1
 }
 

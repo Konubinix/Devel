@@ -10,7 +10,7 @@ import konix_notify
 import tempfile
 import redis
 
-db = redis.StrictRedis(port=6380)
+db = redis.StrictRedis()
 
 def write(letter):
     db.rpush("mail_tray_daemon", letter)

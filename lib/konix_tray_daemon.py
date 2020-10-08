@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 import redis
 
-db = redis.StrictRedis(port=6380)
+db = redis.StrictRedis()
 
 class TrayDaemon(object):
     def __init__(self, fifo_name, period, command_dict, default_command):

@@ -10,7 +10,7 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 
-db = redis.StrictRedis(decode_responses=True, port=6380)
+db = redis.StrictRedis(decode_responses=True)
 
 import argparse
 parser = argparse.ArgumentParser(description="""Get some tokens.""")

@@ -15,7 +15,7 @@ from click_project.lib import check_output, progressbar
 from walrus import Database
 
 
-cache = Database(host='localhost', port=6380).cache(name=os.path.basename(__file__), default_timeout=24 * 3600)
+cache = Database(host='localhost').cache(name=os.path.basename(__file__), default_timeout=24 * 3600)
 cache2 = Memory("/home/sam/tmp/{}".format(os.path.basename(__file__)), verbose=0)
 ls_tree_re = re.compile("^[^ ]+ [^ ]+ (?P<object>[^\t]+)\t(?P<path>.+)$")
 

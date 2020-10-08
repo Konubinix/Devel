@@ -119,7 +119,7 @@ class GCall(cmd.Cmd, object):
     def __init__(self, make_place=False, account=""):
         cmd.Cmd.__init__(self)
         self.account = account
-        self.db = redis.StrictRedis(decode_responses=True, port=6380)
+        self.db = redis.StrictRedis(decode_responses=True)
         self.client_id = self.db.get("client_id")
         self.client_secret = self.db.get("client_secret")
         assert self.client_id, "redis-cli set client_id <yourid> (https://console.developers.google.com/project/<yourapp>/apiui/credential). Use a native application type."

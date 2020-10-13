@@ -82,6 +82,7 @@ all_delete () {
     fi
 }
 
+echo "Considering $(wc -l "${TMP_FILE}") mails"
 
 if [ "$SAFE" == "" ]
 then

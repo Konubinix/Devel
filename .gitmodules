@@ -126,3 +126,6 @@ ignore=dirty
 [submodule "nix-bash-completions"]
 	path = nix-bash-completions
 	url = https://github.com/hedning/nix-bash-completions
+[submodule "config/pip-bash-completion"]
+	path = config/pip-bash-completion
+	url = https://github.com/ekalinin/pip-bash-completion.git

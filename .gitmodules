@@ -117,11 +117,11 @@ ignore=dirty
 [submodule "an2linuxserver"]
 	path = an2linuxserver
 	url = https://github.com/rootkiwi/an2linuxserver
-[submodule "config/elfiles/ini"]
-	path = config/elfiles/ini
+[submodule "elfiles/ini"]
+	path = elfiles/ini
 	url = https://github.com/daniel-ness/ini.el.git
-[submodule "config/elfiles/emacs-native-shell-complete"]
-	path = config/elfiles/emacs-native-shell-complete
+[submodule "elfiles/emacs-native-shell-complete"]
+	path = elfiles/emacs-native-shell-complete
 	url = https://github.com/CeleritasCelery/emacs-native-shell-complete
 [submodule "nix-bash-completions"]
 	path = nix-bash-completions

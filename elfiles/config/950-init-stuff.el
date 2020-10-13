@@ -31,4 +31,8 @@
   (message "Killed")
   )
 
+(unless (getenv "KONIX_START_CALENDAR")
+  (server-start)
+  )
+
 (setenv "INEMACS" "t")

@@ -220,3 +220,4 @@ contexts list"
   )
 
 (provide 'KONIX_org-meta-context)
+;;; KONIX_org-meta-context.el ends here

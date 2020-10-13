@@ -41,8 +41,6 @@
   )
 (ad-activate 'notmuch-hello-widget-search)
 
-(define-key 'notmuch-show-mode-map "v" 'notmuch-show-view-part)
-
 (defun notmuch-show-insert-part-application/zip (msg part content-type nth depth
                                                      button)
   (insert "<Not shown. Download to see the content>")
@@ -55,6 +53,15 @@
    "Gmail" . "https://mail.google.com/mail/u/0/#search/rfc822msgid%3A"
    )
  )
+
+
+(defun konix/notmuch-draft-resume-this ()
+  (interactive)
+  (konix/notmuch-draft-resume (notmuch-show-get-message-id))
+  )
+
+(define-key 'notmuch-show-mode-map "v" 'notmuch-show-view-part)
+(define-key 'notmuch-show-mode-map (kbd "M-r") 'konix/notmuch-draft-resume-this)
 
 (provide 'KONIX_AL-notmuch-show)
 ;;; KONIX_AL-notmuch-show.el ends here

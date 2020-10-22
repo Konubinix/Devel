@@ -56,9 +56,9 @@ Add a yasnippet template with key %s"
 							  (auto-insert-use-yasnippet-template "py")
 							  )
 						   )
-	 (redefine-auto-insert "\\.org\\'"
+	 (redefine-auto-insert "/wiki/.+\\.org\\'"
 						   '(lambda()
-							  (auto-insert-use-yasnippet-template "org")
+                              (auto-insert-use-yasnippet-template "org")
 							  )
 						   )
 	 (redefine-auto-insert "\\.js\\'"

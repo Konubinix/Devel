@@ -292,12 +292,26 @@
 ;; ************************************************************
 (require 'yasnippet)
 (yas-global-mode 1)
-(setq yas-snippet-dirs
-	  (list (expand-file-name "~/.elfiles/yasnippet/snippets")
-			(expand-file-name "snippets" elfiles)
-			(expand-file-name "yasnippet/snippets" elfiles)
-			)
-	  )
+(setq-default
+ yas-snippet-dirs
+ (apply
+  'append
+  (mapcar
+   (lambda (dir)
+     (list
+      (expand-file-name "snippets" dir)
+      (expand-file-name "yasnippet/snippets" dir)
+      )
+     )
+   (list
+    home-elfiles
+    perso-host-elfiles
+    perso-elfiles
+    elfiles)
+   )
+  )
+ )
+
 (mapc '(lambda(elt) (if (not (file-exists-p elt)) (make-directory elt t))) yas-snippet-dirs)
 (mapc 'yas-load-directory yas-snippet-dirs)
 (setq-default yas-fallback-behavior 'call-other-command)

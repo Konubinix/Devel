@@ -368,7 +368,10 @@
 (cua-selection-mode 1)
 
 ;; on change le nom de la fenetre par le nom du fichier edité
-(setq frame-title-format '("konix_emacs: %b (%f)"))
+(setq frame-title-format (if (getenv "KONIX_START_CALENDAR")
+                             '("konix_calendar_generation")
+                           '("konix_emacs: %b (%f)")
+                           ))
 ;;pour que ca ne fasse pas bip !
 (setq-default visible-bell t)
 ;; Suppression de la scroll bar sur la gauche

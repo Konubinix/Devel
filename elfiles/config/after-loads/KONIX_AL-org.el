@@ -73,6 +73,10 @@
      ((memq type '(link))
       (apply orig-fun args)
       )
+     ;; in org-roam-backlinks-mode, just call the function
+     ((and (boundp 'org-roam-backlinks-mode) org-roam-backlinks-mode)
+      (apply orig-fun args)
+      )
      ;; On a paragraph, find a link on the current line after point.
      ((memq type '(paragraph item nil))
       (if (re-search-forward org-any-link-re (line-end-position) t)

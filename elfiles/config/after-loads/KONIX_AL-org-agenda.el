@@ -55,6 +55,9 @@
 (define-key org-agenda-mode-map (kbd "y")
   #'(lambda () (interactive) (message "Intentionally disable y, too easily triggered to say yes")))
 
+(define-key org-agenda-mode-map (kbd "!")
+  #'(lambda () (interactive) (message "Intentionally disable !, too easily triggered when saving files")))
+
 (define-key org-agenda-mode-map (kbd "m")
   'konix/org-toggle-me)
 

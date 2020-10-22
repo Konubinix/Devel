@@ -1,42 +1,30 @@
 #!/bin/bash
-source "${KONIX_LIB_DIR}/lib_bash.sh"
-findEmacsWindow () {
-	wmctrl -l -x|grep -q '.Emacs'
-}
 
-findEmacsProcess () {
-	if on_windows_p
-	then
-		ps -aW |grep -q 'emacs.exe'
-	else
-		ps -A -o comm|grep -q '^emacs$'
-	fi
-}
-
-printf "Starting an emacsclient " 1>&2
-if on_windows_p
+# no argument means ooen the current directory
+if test -z "$*"
 then
-	if ! findEmacsProcess
-	then
-		source konix_assert.sh
-	fi
-elif konix_on_linux_p
-then
-	if [ -n "$DISPLAY" ]
-    then
-        if ! findEmacsWindow
-        then
-            ARGS="${ARGS} -c"
-        fi
-    else
-        ARGS="${ARGS} -nw"
-    fi
-else
-    source konix_assert.sh
-fi
-if [ -z "$*" ] && [ -z "${ARGS}" ]
-then
-	# Need at least an argument when launching without -c
 	set "."
 fi
-emacsclient -a "" ${ARGS} "$@"
+
+# first, find out whether there is a server to connect to
+if test -e "${TMPDIR}/emacs${UID}/server"
+then
+	if test -n "${DISPLAY}"
+	then
+		# if a window already exists, simply reach it
+		if wmctrl -l -x|grep -q '.Emacs'
+		then
+			emacsclient "$@"
+		else
+			# in case a window does not exist (the server must have been opened
+			# in the tty somewhere, create a new frame)
+			emacsclient --create-frame "$@"
+		fi
+	else
+		# on a terminal, make sure to make it run on not in window mode
+		emacsclient -nw "$@"
+	fi
+else
+	# no running emacs yet, simply run emacs then
+	emacs "$@"
+fi

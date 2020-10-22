@@ -15,13 +15,10 @@
 (setq-default
  perso-elfiles (expand-file-name "elfiles" perso-dir)
  perso-host-elfiles (expand-file-name "elfiles"
-									  (expand-file-name
-									   "config"
 									   (expand-file-name
 										(getenv "HOSTNAME")
 										perso-dir
 										)
-									   )
 									  )
  home-elfiles (expand-file-name "~/.elfiles")
  )

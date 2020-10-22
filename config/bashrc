@@ -15,11 +15,11 @@ LESSPIPE="$(which lesspipe)"
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
-xterm*|rxvt*)
-    PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"'
-    ;;
-*)
-    ;;
+	xterm*|rxvt*)
+		PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"'
+		;;
+	*)
+		;;
 esac
 # ################################################################################
 # Others
@@ -73,8 +73,8 @@ fi
 # Source the smartcd package if available
 if [ -e "$HOME/.smartcd_config" ]
 then
-        echo "Loading smartcd"
-        source "$HOME/.smartcd_config"
+    echo "Loading smartcd"
+    source "$HOME/.smartcd_config"
 fi
 
 # ************************************************************
@@ -98,17 +98,17 @@ konix_int_to_color $((COLOR_GREEN+8)) -1
 GOOD_PROMPT_COLOR="$RES"
 konix_git_prompt_maybe ( ) {
     if [ -n "$KONIX_GIT_PROMPT_SOURCED" \
-        -a -n "$KONIX_GIT_PROMPT" ]
+			-a -n "$KONIX_GIT_PROMPT" ]
     then
         git_prompt
     fi
 }
 
 konix_prompt_pre ( ) {
-echo -n
+	echo -n
 }
 konix_prompt_post ( ) {
-echo -n
+	echo -n
 }
 
 NORMAL_PATH_COLOR="${COLOR_FG_CYAN}${COLOR_BOLD}${COLOR_BG_BLACK}"
@@ -146,8 +146,12 @@ then
     source "$(which virtualenvwrapper_lazy.sh)"
 fi
 
-unset PROMPT_COMMAND
-#set +x
-export PS1="\${PS1_PREFIX}\$(rc=\$? ; konix_prompt_pre; [ \$rc -ne 0 ] && printf \"\[$BAD_PROMPT_COLOR\]\" || printf \"\[$GOOD_PROMPT_COLOR\]\" ; printf \"%03d$DEFAULT_COLOR\" \$rc ;)\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\$(path_color)|path=\w|\[\033[00m\]${GIT_COLOR}\$(konix_git_prompt_maybe)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\$(konix_prompt_post)\n\$ "
 [[ -s "${HOME}/.autojump/etc/profile.d/autojump.sh" ]] && source "${HOME}/.autojump/etc/profile.d/autojump.sh"
 [[ -s "/usr/share/autojump/autojump.bash" ]] && source "/usr/share/autojump/autojump.bash"
+if which starship > /dev/null
+then
+	eval "$(starship init bash)"
+else
+	unset PROMPT_COMMAND
+	export PS1="\${PS1_PREFIX}\$(rc=\$? ; konix_prompt_pre; [ \$rc -ne 0 ] && printf \"\[$BAD_PROMPT_COLOR\]\" || printf \"\[$GOOD_PROMPT_COLOR\]\" ; printf \"%03d$DEFAULT_COLOR\" \$rc ;)\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\$(path_color)|path=\w|\[\033[00m\]${GIT_COLOR}\$(konix_git_prompt_maybe)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\$(konix_prompt_post)\n\$ "
+fi

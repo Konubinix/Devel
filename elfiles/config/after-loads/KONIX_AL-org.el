@@ -33,6 +33,7 @@
 (require 'org-clock)
 (require 'org-expiry)
 (require 'org-collector)
+(require 'org-protocol)
 (require 'holidays)
 (require 'ob-python)
 (require 'ob-shell)

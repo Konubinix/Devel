@@ -3,5 +3,5 @@
 # key: tmpdir
 # --
 
-${100:TMPDIR}="$(mktemp -d)"
+${100:TMP}="$(mktemp -d)"
 trap "rm -rf '\${$100}'" 0

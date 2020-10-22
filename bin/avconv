@@ -1,0 +1,4 @@
+#!/bin/bash -eu
+
+echo "## avconv IS DEPRECATED, USE ffmpeg" >&2
+exec ffmpeg "$@"

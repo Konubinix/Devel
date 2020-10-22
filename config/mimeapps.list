@@ -22,3 +22,4 @@ image/x-xcf=gimp.desktop;
 video/quicktime=vlc.desktop;
 video/webm=vlc.desktop;
 application/pdf=mupdf.desktop;
+x-scheme-handler/org-protocol=org-protocol.desktop

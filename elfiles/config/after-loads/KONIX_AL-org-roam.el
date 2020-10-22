@@ -138,5 +138,12 @@ ${title}
 
 (add-to-list 'golden-ratio-exclude-buffer-names "*org-roam*")
 
+(setq-default org-roam-graph-executable "neato")
+(setq-default org-roam-graph-extra-config
+              '(
+                ("overlap" . "false")
+                )
+              )
+
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

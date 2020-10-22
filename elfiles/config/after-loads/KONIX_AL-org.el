@@ -2215,14 +2215,34 @@ items"
                   ,(format "%s/radicale/ril.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
+                ("agb" "Web"
+                 (
+                  (tags "@web-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe"
+                        (
+                         (org-agenda-overriding-header
+                          "Web stuff")
+                         )
+                        )
+                  )
+                 (
+                  (org-agenda-skip-function
+                   '(or
+                     (konix/org-agenda-for-today-skip-if-not-the-good-time)
+                     )
+                   )
+                  )
+                 (
+                  ,(format "%s/radicale/web.ics" (getenv "KONIX_PERSO_DIR"))
+                  )
+                 )
                 ("agg" "Garden"
                  (
                   (tags-todo "@garden-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe|@car-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe"
-                        (
-                         (org-agenda-overriding-header
-                          "Garden")
-                         )
-                        )
+                             (
+                              (org-agenda-overriding-header
+                               "Garden")
+                              )
+                             )
                   )
                  (
                   (org-agenda-todo-ignore-scheduled 'future)
@@ -4206,6 +4226,7 @@ of the clocksum."
     )
   (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/calendar.ics")
   (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/ril.ics")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/web.ics")
   (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sms_n_calls.ics")
   (shell-command "konix_ical_radicalize_dir.sh /home/sam/perso/perso/radicale/ /home/sam/perso/perso/radicale/collection-root/sam/")
   (konix/notify "Exported" 2)

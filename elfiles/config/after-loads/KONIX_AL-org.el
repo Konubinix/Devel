@@ -5030,5 +5030,9 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (setq-default org-attach-use-inheritance t)
 (setq-default org-use-property-inheritance nil)
 
+(define-key org-mode-map (kbd "C-c n i") #'org-roam-insert)
+(key-chord-define org-mode-map "ri" 'org-roam-insert)
+(define-key konix/region-bindings-mode-map "i" 'org-roam-insert)
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

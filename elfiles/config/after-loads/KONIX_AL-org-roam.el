@@ -30,11 +30,8 @@
 (define-key org-roam-mode-map (kbd "C-c n f") #'org-roam-find-file)
 (define-key org-roam-mode-map (kbd "C-c n b") #'org-roam-db-build-cache)
 (define-key org-roam-mode-map (kbd "C-c n j") #'org-roam-switch-to-buffer)
-(define-key org-roam-mode-map (kbd "C-c n i") #'org-roam-insert)
 (define-key org-roam-mode-map (kbd "C-c n I") 'konix/org-roam-separate_camelcase_and_insert)
 (key-chord-define org-roam-mode-map " i" 'konix/org-roam-separate_camelcase_and_insert)
-(key-chord-define org-roam-mode-map "ri" 'org-roam-insert)
-(define-key konix/region-bindings-mode-map "i" 'org-roam-insert)
 
 (setq-default org-roam-capture-templates
               '(

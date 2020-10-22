@@ -49,5 +49,11 @@
 			   :formatter nil)
 			  )
 
+(setq-default org-clock-frame-title-format '(
+                                             "konix_emacs: "
+                                             t org-mode-line-string
+                                             )
+              )
+
 (provide 'KONIX_AL-org-clock)
 ;;; KONIX_AL-org-clock.el ends here

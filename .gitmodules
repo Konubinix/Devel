@@ -129,3 +129,6 @@ ignore=dirty
 [submodule "config/pip-bash-completion"]
 	path = config/pip-bash-completion
 	url = https://github.com/ekalinin/pip-bash-completion.git
+[submodule "config/awesome/awesome-cyclefocus"]
+	path = config/awesome/awesome-cyclefocus
+	url = https://github.com/blueyed/awesome-cyclefocus

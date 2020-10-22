@@ -1,6 +1,8 @@
 # -*- mode: snippet -*-
 # name: new-file-tpl-org
 # --
+#+AUTHOR: Konubinix
+
 * Diary :diary:NOEXPIRY:structure:
 * Recurrent :recurrent:NOEXPIRY:structure:
 * Notes  :NOEXPIRY:iso9001:structure:

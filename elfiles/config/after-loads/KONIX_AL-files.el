@@ -75,6 +75,8 @@
 		)
 	nil
 	)
+  (call-process "konix_autojump.sh" nil nil nil "-a" (expand-file-name
+                                                      (file-name-directory (buffer-file-name))))
   )
 (add-to-list 'find-file-hook 'konix/find-file-hook)
 

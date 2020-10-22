@@ -34,3 +34,15 @@ then
         --log-file "${KONIX_GPG_AGENT_LOG_FILE}" \
         --debug-level "${KONIX_GPG_AGENT_LOG_LEVEL}"
 fi
+
+if test -n "${DISPLAY}"
+then
+	sed -i '/^pinentry-program/d' "${HOME}/.gnupg/gpg-agent.conf"
+else
+	{
+		grep -q '^pinentry-program' "${HOME}/.gnupg/gpg-agent.conf" \
+			&& sed -i 's|^pinentry-program.+|pinentry-program /usr/bin/pinentry-curses|' "${HOME}/.gnupg/gpg-agent.conf"
+	} || echo "pinentry-program /usr/bin/pinentry-curses" >> "${HOME}/.gnupg/gpg-agent.conf"
+fi
+
+gpg-connect-agent reloadagent /bye

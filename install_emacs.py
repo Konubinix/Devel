@@ -12,7 +12,7 @@ def install_emacs():
 (defvar perso-dir (getenv "KONIX_PERSO_DIR"))
 (defvar perso-dirs (getenv "KONIX_PERSO_DIRS"))
 (defvar config-dir (getenv "KONIX_CONFIG_DIR") "where I put my config files")
-(defvar elfiles (expand-file-name "elfiles" (getenv "KONIX_CONFIG_DIR")) "where I put my emacs files")
+(defvar elfiles (expand-file-name "elfiles" (getenv "KONIX_DEVEL_DIR")) "where I put my emacs files")
 (defvar emacs-config-dir (expand-file-name "config" elfiles) "where I put my emacs custom config files")
 (defvar devel-dir (getenv "KONIX_DEVEL_DIR") "Where I pu my devel files (the installation path)")
 (setq custom-file (getenv "KONIX_EMACS_CUSTOM_FILE"))

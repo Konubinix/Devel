@@ -96,3 +96,6 @@
 (depends-on "default-text-scale")
 (depends-on "terraform-mode")
 (depends-on "poporg")
+(depends-on "alert")
+(depends-on "slack")
+

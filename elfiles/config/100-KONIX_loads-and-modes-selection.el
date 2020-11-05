@@ -135,6 +135,7 @@
 (autoload 'golden-ratio-mode "golden-ratio" "" t)
 (autoload 'konix/org-roam-note "org-roam" "" t)
 (autoload 'konix/ledger-run "ledger-mode" "" t)
+(autoload 'slack-start "slack" "" t)
 
 ;; ************************************************************
 ;; Automodes

@@ -225,4 +225,15 @@ click_by_text ( ) {
     send_js "document.evaluate(\"//${type}[contains(text(),'${text}')]\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();"
 }
 
-comm_init
+respawn ( ) {
+    send_command "spawn -u konix_qutebrowser_password.sh"
+}
+
+respawn_on ( ) {
+    local url="$*"
+    send_command "open ${url}"
+    sleep 5
+    respawn
+}
+
+# comm_init

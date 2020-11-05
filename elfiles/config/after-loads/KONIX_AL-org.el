@@ -4009,15 +4009,17 @@ of the clocksum."
       calendar_id
       )
      )
-    (when (equal 0
-                 (konix/call-process-show-error
-                  "konix_gcal.py"
-                  "-a"
-                  account
-                  "del_event"
-                  id
-                  )
-                 )
+    (when (and (yes-or-no-p "Sure ?")
+               (equal 0
+                      (konix/call-process-show-error
+                       "konix_gcal.py"
+                       "-a"
+                       account
+                       "del_event"
+                       id
+                       )
+                      )
+               )
       (call-interactively 'org-agenda-kill)
       (message "DONE")
       )

@@ -39,5 +39,11 @@
     )
   )
 
+(setq-default global-mode-string
+ (remove
+  'display-time-string
+  global-mode-string
+  )
+ )
 
 (setenv "INEMACS" "t")

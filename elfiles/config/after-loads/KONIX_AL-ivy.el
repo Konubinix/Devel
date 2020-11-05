@@ -27,6 +27,8 @@
 (require 'counsel)
 (require 'swiper)
 
+(setq-default ivy-case-fold-search-default t)
+
 (define-prefix-command 'konix/ivy/map)
 (define-key 'konix/global-slow-key-map (kbd "i") 'konix/ivy/map)
 

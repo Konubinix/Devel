@@ -2617,15 +2617,29 @@ items"
    )
   )
 
-(setq-default org-capture-templates
-              '(
-                ("t" "Todo Item" entry (file+headline konix/org-todo_file "Refile") "* NEXT %?
+(defvar konix/org-capture-template-title nil)
+
+(defun konix/org-capture-template-todo nil
+  (format
+   "* NEXT %s%%?
   :PROPERTIES:
-  :CREATED:  %U
+  :CREATED:  %%U
   :END:
   :CLOCK:
   :END:
 "
+   (if konix/org-capture-template-title
+       (format "%s " konix/org-capture-template-title)
+     ""
+     )
+   )
+  )
+
+(setq-default org-capture-templates
+              '(
+                ("t" "Todo Item" entry (file+headline konix/org-todo_file
+                                                      "Refile")
+                 #'konix/org-capture-template-todo
                  )
                 ("i" "Todo Item in current clock" entry (clock) "* NEXT %?
   :PROPERTIES:
@@ -2634,6 +2648,10 @@ items"
   :CLOCK:
   :END:
 "
+                 )
+                ("K" "Immediate todo Item in current clock" entry (clock)
+                 #'konix/org-capture-template-todo
+                 :immediate-finish t
                  )
                 ("I" "Clocked todo Item in current clock" entry (clock) "* NEXT %?
   :PROPERTIES:

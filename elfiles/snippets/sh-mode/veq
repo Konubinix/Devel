@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: veq
+# key: veq
+# --
+"\${$100}" == "$200"

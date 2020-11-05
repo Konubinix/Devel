@@ -128,6 +128,7 @@ ${title}
                 ("overlap" . "false")
                 )
               )
+(setq-default org-roam-completion-system 'ivy)
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

@@ -81,7 +81,7 @@ ${title}
             (org-roam-find-file)
             (save-excursion
               (goto-char (point-min))
-              (while (looking-at "#+")
+              (while (looking-at "#+\\|:")
                 (forward-line)
                 )
               (unless (looking-at "$")

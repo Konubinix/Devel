@@ -58,6 +58,16 @@
 (define-key org-agenda-mode-map (kbd "!")
   #'(lambda () (interactive) (message "Intentionally disable !, too easily triggered when saving files")))
 
+(define-key org-agenda-mode-map (kbd "f")
+  #'(lambda () (interactive) (when (yes-or-no-p "Really move later?")
+                              (call-interactively 'org-agenda-later)
+                              )))
+
+(define-key org-agenda-mode-map (kbd "b")
+  #'(lambda () (interactive) (when (yes-or-no-p "Really move earlier?")
+                              (call-interactively org-agenda-earlier)
+                              )))
+
 (define-key org-agenda-mode-map (kbd "m")
   'konix/org-toggle-me)
 

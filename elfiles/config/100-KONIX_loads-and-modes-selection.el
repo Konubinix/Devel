@@ -137,6 +137,7 @@
 (autoload 'windmove-do-window-select "windmove" "" t)
 (autoload 'ffap-file-at-point "ffap" "" t)
 (autoload 'slack-start "slack" "" t)
+(autoload 'konix/org-roam-export/org-publish-brain-dump "KONIX_org-roam-export" "" t)
 
 ;; ************************************************************
 ;; Automodes

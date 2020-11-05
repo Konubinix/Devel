@@ -3250,6 +3250,15 @@ of the clocksum."
    )
   )
 
+(defun konix/org-capture-screenshot (cid)
+  (run-hooks 'konix/org-capture-interruption-pre-hook)
+  (let (
+        (konix/org-capture-template-title cid)
+        )
+    (org-capture nil "t")
+    )
+  )
+
 (defvar konix/org-capture-two-minutes-interruption/interrupted nil "")
 (defun konix/org-capture-two-minutes-interruption ()
   (interactive)

@@ -38,6 +38,14 @@
 		sh-basic-offset 4
 		sh-indentation 4)
   (konix/prog/config)
+  (defvar electric-pair-pairs)
+  (setq-local electric-pair-pairs
+              (append
+               '(
+                 (?\' . ?\')
+                 )
+               electric-pair-pairs)
+              )
   (setq ac-sources
 		'(
 		  ac-source-yasnippet

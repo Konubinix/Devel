@@ -339,10 +339,6 @@
 (define-key 'konix/global-fast-key-map (kbd "p") 'speedbar)
 
 ;; for terminal mode
-(define-key 'konix/global-fast-key-map (kbd "j") 'shrink-window-horizontally)
-(define-key 'konix/global-fast-key-map (kbd "l") 'enlarge-window-horizontally)
-(define-key 'konix/global-fast-key-map (kbd "k") 'shrink-window)
-(define-key 'konix/global-fast-key-map (kbd "i") 'enlarge-window)
 (define-key 'konix/global-fast-key-map (kbd "C-k") 'bury-buffer)
 (define-key 'konix/global-fast-key-map (kbd "C-c") 'calc)
 (define-key 'konix/global-fast-key-map (kbd "<") 'beginning-of-buffer)

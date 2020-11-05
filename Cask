@@ -98,4 +98,4 @@
 (depends-on "poporg")
 (depends-on "alert")
 (depends-on "slack")
-
+(depends-on "plantuml-mode")

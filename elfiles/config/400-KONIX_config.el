@@ -280,6 +280,17 @@
 			 '(eval org-hugo-auto-export-mode))
 (add-to-list 'safe-local-variable-values
 			 '(eval visual-line-mode -1))
+(add-to-list 'safe-local-variable-values '(python-indent . 4))
+(add-to-list 'safe-local-variable-values '(ispell-dictionary . "american"))
+(add-to-list 'safe-local-variable-values '(eval visual-line-mode -1))
+(add-to-list 'safe-local-variable-values '(eval org-hugo-auto-export-mode))
+(add-to-list 'safe-local-variable-values '(ispell-dictionary . "americain"))
+(add-to-list 'safe-local-variable-values '(ispell-dictionary . "british"))
+(add-to-list 'safe-local-variable-values '(ispell-dictionary . "francais"))
+(add-to-list 'safe-local-variable-values '(eval hl-line-mode t))
+(add-to-list 'safe-local-variable-values '(auto-revert-mode . t))
+(add-to-list 'safe-local-variable-values '(konix/delete-trailing-whitespace))
+(add-to-list 'safe-local-variable-values '(konix/delete-trailing-whitespace . t))
 
 (add-hook 'before-save-hook 'konix/delete-trailing-whitespace)
 (add-hook 'before-save-hook 'konix/adjust-new-lines-at-end-of-file)

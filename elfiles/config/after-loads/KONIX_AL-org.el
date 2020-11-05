@@ -3181,6 +3181,14 @@ of the clocksum."
   (define-key org-mode-map (kbd "M-n") 'org-next-link)
   (define-key org-mode-map (kbd "M-p") 'org-previous-link)
   (define-key org-mode-map (kbd "C-k") 'konix/org-kill)
+  (defvar electric-pair-pairs)
+  (setq-local electric-pair-pairs
+              (append
+               '(
+                 (?\` . ?\`)
+                 )
+               electric-pair-pairs)
+              )
 
   (setq indent-tabs-mode nil)
   (konix/flyspell-mode 1)

@@ -1274,7 +1274,11 @@ items"
                         )
             )
       )
-    res
+    (format
+     "%10s: %s"
+     (org-get-at-bol 'org-category)
+     res
+     )
     )
   )
 

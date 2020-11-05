@@ -18,6 +18,8 @@ config.set('content.javascript.enabled', True, 'chrome://*/*')
 # Type: Bool
 config.set('content.javascript.enabled', True, 'qute://*/*')
 
+config.set("editor.command", ["ec", "{file}"])
+
 # Bindings for normal mode
 config.bind('Uc', 'set network user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36"')
 config.bind('Ud', 'set network user-agent ""')

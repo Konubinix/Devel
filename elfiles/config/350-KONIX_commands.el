@@ -1818,11 +1818,11 @@ FExport diary data into iCalendar file: ")
 (defun konix/scroll ()
   (interactive)
   (let (
-        (scroll-time (or current-prefix-arg 1))
+        (scroll-time (or current-prefix-arg 4))
         )
     (setq current-prefix-arg nil)
     (while t
-      (sit-for scroll-time)
+      (sit-for (/ (float scroll-time) 4))
       (call-interactively 'next-line)
       (hl-line-highlight)
       (call-interactively 'recenter-top-bottom)

@@ -26,6 +26,7 @@
 
 (setq-default lui-fill-column 700)
 (setq-default lui-time-stamp-position 'left)
+(setq-default lui-time-stamp-format "[%Y-%m-%d %a %H:%M] ")
 
 (provide 'KONIX_AL-lui)
 ;;; KONIX_AL-lui.el ends here

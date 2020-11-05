@@ -14,11 +14,15 @@
  )
 
 (key-chord-mode 1)
-(key-chord-define-global " u" 'undo)
 (key-chord-define-global "fh" 'find-file)
 (key-chord-define-global " a" 'beginning-of-line)
 (key-chord-define-global " e" 'end-of-line)
 (key-chord-define-global " m" 'cua-set-mark)
+(key-chord-define-global " l" 'hl-line-mode)
+(key-chord-define-global " s" 'konix/scroll)
+(key-chord-define-global " p" 'poporg-dwim)
+(key-chord-define-global " v" 'visual-line-mode)
+(key-chord-define-global " u" 'linum-mode)
 
 (global-unset-key (kbd "C-<"))
 (global-unset-key (kbd "C-à"))			;for bépo keyboards

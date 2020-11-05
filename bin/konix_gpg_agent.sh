@@ -35,14 +35,20 @@ then
         --debug-level "${KONIX_GPG_AGENT_LOG_LEVEL}"
 fi
 
-if test -n "${DISPLAY}"
-then
-	sed -i '/^pinentry-program/d' "${HOME}/.gnupg/gpg-agent.conf"
-else
-	{
-		grep -q '^pinentry-program' "${HOME}/.gnupg/gpg-agent.conf" \
-			&& sed -i 's|^pinentry-program.+|pinentry-program /usr/bin/pinentry-curses|' "${HOME}/.gnupg/gpg-agent.conf"
-	} || echo "pinentry-program /usr/bin/pinentry-curses" >> "${HOME}/.gnupg/gpg-agent.conf"
-fi
+reload ( ) {
+	gpg-connect-agent reloadagent /bye
+}
 
-gpg-connect-agent reloadagent /bye
+if grep -q '^pinentry-program' "${HOME}/.gnupg/gpg-agent.conf"
+then
+	if ! grep -q '^pinentry-program /bin/pinentry-gtk-2' "${HOME}/.gnupg/gpg-agent.conf"
+	then
+		konix_display.py "Replacing current pinentry with pinentry-gtk-2, compatible with tty + X11"
+		sed -r -i 's|^pinentry-program.+|pinentry-program /bin/pinentry-gtk-2|' "${HOME}/.gnupg/gpg-agent.conf"
+		reload
+	fi
+else
+	konix_display.py "Installing pinentry-gtk-2 as pinentry, compatible with tty + X11"
+	echo "pinentry-program /usr/bin/pinentry-gtk-2" >> "${HOME}/.gnupg/gpg-agent.conf"
+	reload
+fi

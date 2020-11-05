@@ -5020,6 +5020,71 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org-log-note-replace-escapes-format (note)
+  "Copy some code internally in `org-store-log-note'"
+  (org-replace-escapes
+   note
+   (list (cons "%u" (user-login-name))
+         (cons "%U" user-full-name)
+         (cons "%t" (format-time-string
+                     (org-time-stamp-format 'long 'inactive)
+                     org-log-note-effective-time))
+         (cons "%T" (format-time-string
+                     (org-time-stamp-format 'long nil)
+                     org-log-note-effective-time))
+         (cons "%d" (format-time-string
+                     (org-time-stamp-format nil 'inactive)
+                     org-log-note-effective-time))
+         (cons "%D" (format-time-string
+                     (org-time-stamp-format nil nil)
+                     org-log-note-effective-time))
+         (cons "%s" (cond
+                     ((not org-log-note-state) "")
+                     ((string-match-p org-ts-regexp
+                                      org-log-note-state)
+                      (format "\"[%s]\""
+                              (substring org-log-note-state 1 -1)))
+                     (t (format "\"%s\"" org-log-note-state))))
+         (cons "%S"
+               (cond
+                ((not org-log-note-previous-state) "")
+                ((string-match-p org-ts-regexp
+                                 org-log-note-previous-state)
+                 (format "\"[%s]\""
+                         (substring
+                          org-log-note-previous-state 1 -1)))
+                (t (format "\"%s\""
+                           org-log-note-previous-state))))))
+  )
+
+(defun konix/org-add-note-no-interaction (content)
+  (konix/org-with-point-on-heading
+   (let (
+         (org-log-note-purpose 'note)
+         )
+     (goto-char (org-log-beginning t))
+     (save-excursion (insert "\n"))
+     (unless (looking-back "^")
+       (end-of-line)
+       (insert "\n")
+       )
+     (org-indent-line)
+     (insert
+      "- "
+      (konix/org-log-note-replace-escapes-format
+       (alist-get org-log-note-purpose org-log-note-headings)
+       )
+      (if content " \\\\" "")
+      )
+     (dolist (line (org-split-string content "\n"))
+       (insert "\n")
+       (org-indent-line)
+       (insert line)
+       )
+     )
+   )
+  )
+
 (defun konix/org-toggle-project ()
   (interactive)
   (konix/org-with-point-on-heading

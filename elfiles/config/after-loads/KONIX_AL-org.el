@@ -1338,9 +1338,38 @@ items"
                      )
                    )
                   )
-                 ;; (
-                 ;;  ,(format "%s/radicale/collection-root/sam/agenda.ics" (getenv "KONIX_PERSO_DIR"))
-                 ;;  )
+                 )
+                ("apA" "All (no filtering, no promises)"
+                 (
+                  (tags "+Agenda+todo=\"NEXT\"-maybe-WAIT-DELEGATED"
+                        (
+                         (org-super-agenda-groups
+                          (mapcar
+                           (lambda (ag)
+                             (list :name (first ag)
+                                   :tag (first ag))
+                             )
+                           konix/org-gtd-agenda
+                           )
+                          )
+                         )
+                        )
+                  )
+                 (
+                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
+                  (dummy (setq konix/org-agenda-type 'tags))
+                  (org-agenda-todo-ignore-with-date nil)
+                  (org-agenda-todo-ignore-deadlines nil)
+                  (org-agenda-todo-ignore-timestamp nil)
+                  (org-agenda-skip-function
+                   '(or
+                     (konix/org-agenda-for-today-skip-if-not-the-good-time)
+                     )
+                   )
+                  )
+                 (
+                  ,(format "%s/radicale/agenda.ics" (getenv "KONIX_PERSO_DIR"))
+                  )
                  )
                 ("apw" "Work (no filtering)"
                  (
@@ -4230,6 +4259,7 @@ of the clocksum."
     )
   (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/calendar.ics")
   (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/ril.ics")
+  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/agenda.ics")
   (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/web.ics")
   (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sms_n_calls.ics")
   (shell-command "konix_ical_radicalize_dir.sh /home/sam/perso/perso/radicale/ /home/sam/perso/perso/radicale/collection-root/sam/")

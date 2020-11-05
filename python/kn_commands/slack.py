@@ -56,6 +56,8 @@ db = redis.StrictRedis(decode_responses=True)
 
 
 def get_slack_token():
+    if config.slack.account is None:
+        return None
     values = get_authenticator(config.slack.account + "_slack_token", required=False, askpass=False)
     if values is not None:
         return values[1]
@@ -114,7 +116,7 @@ class Conversation():
         self.data["name_fmt"] = self.name
         self.name_fmt = self.name
         self.record_logs_dir = (
-            os.path.join(config.slack.records, self.name)
+            os.path.join(config.slack.records, config.slack.account, self.name)
             if config.slack.records else None
         )
         self.recorded_messages = (
@@ -746,7 +748,6 @@ class ConversationType(ParameterType):
 @param_config(
     "slack", "--account",
     typ=SlackConfig,
-    default="default",
     required=True,
     help="The authenticator key to use to get the token")
 @param_config(
@@ -994,7 +995,7 @@ def history(fields, format, conversation, oldest, latest,
 @slack.command()
 @flag("--archived", help="Only archived ones")
 @flag("--all", help="All of them")
-@option("--count", type=int, default=1000, help="How many to record per conversation")
+@option("--count", type=int, default=100000, help="How many to record per conversation")
 def record_log(archived, all, count):
     """Dump the records for archiving purpose."""
     for c in (

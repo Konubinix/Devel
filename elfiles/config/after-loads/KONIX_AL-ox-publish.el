@@ -33,15 +33,14 @@
 (defvar konix/org-wiki-author "Konubinix" nil)
 
 (defun konix/org-publish-hugo (plist filename pub-dir)
-  (find-file filename)
-  (org-hugo-export-wim-to-md)
-  )
-
-(defun konix/org-publish nil
-  (interactive)
-  (shell-command "kfrsync --delete ${KONIX_PERSO_DIR}/site/ ${HOME}/hugo/")
-  (make-directory (expand-file-name "~/hugo/static"))
-  (org-publish "public" t)
+  (when (equal
+         (call-process "grep" nil nil nil "-q" "HUGO_BASE_DIR" filename)
+         0
+         )
+    (message "Exporting %s" filename)
+    (find-file filename)
+    (org-hugo-export-wim-to-md)
+    )
   )
 
 (konix/push-or-replace-in-alist
@@ -55,6 +54,7 @@
  :with-tags nil
  :recursive t
  )
+
 (konix/push-or-replace-in-alist
  'org-publish-project-alist
  "public_data"

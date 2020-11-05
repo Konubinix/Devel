@@ -1,0 +1,8 @@
+[custom.hostname]
+command = "echo ${HOSTNAME}"
+when = "true"
+description = "show hostname"
+[custom.date]
+command = "date +%H:%M:%S"
+when = "true"
+description = "show date"

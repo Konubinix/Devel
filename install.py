@@ -82,6 +82,7 @@ if is_on_linux():
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "gtkrc-2.0"), os.path.join(environ["HOME"], ".gtkrc-2.0"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "rdesktop"), os.path.join(environ["HOME"], ".rdesktop"))
         substitute(os.path.join(environ["KONIX_CONFIG_DIR"], ".percol.d"), os.path.join(environ["HOME"], ".percol.d"))
+        substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "starship.toml"), os.path.join(environ["HOME"], ".config", "starship.toml"))
 
         subprocess.call(["chmod", "+x", "-Rv",
                          os.path.join(environ["HOME"], "bin"),

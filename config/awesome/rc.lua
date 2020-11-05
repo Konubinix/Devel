@@ -72,8 +72,9 @@ modkey = "Mod4"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
-   awful.layout.suit.magnifier,
+   awful.layout.suit.max,
    awful.layout.suit.max.fullscreen,
+   awful.layout.suit.magnifier,
    awful.layout.suit.tile.left,
    awful.layout.suit.tile.bottom,
    awful.layout.suit.tile.top,
@@ -87,7 +88,6 @@ awful.layout.layouts = {
    awful.layout.suit.corner.sw,
    awful.layout.suit.corner.se,
    awful.layout.suit.floating,
-   awful.layout.suit.max,
 }
 
 -- Create a launcher widget and a main menu
@@ -480,9 +480,9 @@ globalkeys = gears.table.join(
    awful.key({ modkey,           }, ".", naughty.destroy_all_notifications,
       {description = "destroy all notif", group = "notif"}),
 
-   awful.key({ modkey,           }, "Print",
+   awful.key({         }, "Print",
       function()
-         awful.spawn({"import", os.getenv("HOME") .. "/capture.png"})
+         awful.spawn("konix_print_screen.sh")
       end,
       {description = "Print screen", group = "screen"}),
 
@@ -501,7 +501,12 @@ globalkeys = gears.table.join(
       {description = "open firefox", group = "launcher"}),
    awful.key({ modkey,   "Control"        }, "s", open_or_join("Slack", "slack --no-sandbox"),
       {description = "open emacs", group = "launcher"}),
-   awful.key({ modkey,           }, "Return", open_or_join("X-terminal-emulator", terminal),
+   awful.key({ modkey,           },
+      "Return",
+      open_or_join(
+	 "X-terminal-emulator",
+	 terminal
+      ),
       {description = "open a terminal", group = "launcher"}),
    awful.key({ modkey, "Control"          }, "t", open_or_join("X-terminal-emulator", terminal),
       {description = "open a terminal", group = "launcher"}),
@@ -525,6 +530,15 @@ globalkeys = gears.table.join(
          )
    end,
       {description = "toggle play", group = "music"}),
+   awful.key({ modkey, "Shift"          }, "p",     function ()
+         awful.spawn.easy_async(
+            "clk pulse toggle-mute",
+            function (stdout, stderr, exitreason, exitcode)
+	       tell_pulse_volume()
+            end
+         )
+   end,
+      {description = "toggle mute", group = "music"}),
    awful.key({ modkey, "Control"          }, "p",     function () awful.spawn("pavucontrol") end,
       {description = "pavucontrol", group = "music"}),
    awful.key({ modkey,  "Shift"         }, "Up",     function () awful.tag.incmwfact( 0.05)          end,
@@ -673,13 +687,11 @@ clientkeys = gears.table.join(
       },
       "n",
       function (c)
-         -- The client currently has the input focus, so it cannot be
-         -- minimized, since minimized clients can't have the focus.
-         c.minimized = true
+	 awful.spawn("konix_org_capture_screenshot.sh")
       end ,
       {
-         description = "minimize",
-         group = "client"
+         description = "capture a screenshot",
+         group = "org-mode"
       }
    ),
    awful.key(
@@ -695,6 +707,33 @@ clientkeys = gears.table.join(
       {
          description = "minimize",
          group = "client"
+      }
+   ),
+   awful.key(
+      {
+         modkey,
+      },
+      "j",
+      function (c)
+         awful.spawn("ec --eval '(konix/org-capture-interruption)'")
+      end ,
+      {
+         description = "interruption",
+         group = "org-mode"
+      }
+   ),
+   awful.key(
+      {
+         modkey,
+	 "Shift",
+      },
+      "j",
+      function (c)
+         awful.spawn("ec --eval '(konix/org-capture-external-interruption)'")
+      end ,
+      {
+         description = "interruption",
+         group = "org-mode"
       }
    ),
    awful.key(
@@ -998,7 +1037,9 @@ awful.rules.rules = {
          name = "Ediff",
       },
       properties = {
-         tag = "1"
+         tag = "1",
+	 floating = true,
+	 ontop = true,
       },
    },
 

@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(setq-default csv-separators '("," "	" ";"))
+(setq-default csv-separators '("," "	" "|" ";"))
 (funcall (get 'csv-separators 'custom-set) 'csv-separators csv-separators)
 
 (provide 'KONIX_AL-csv-mode)

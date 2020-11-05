@@ -134,6 +134,8 @@
 (autoload 'golden-ratio-mode "golden-ratio" "" t)
 (autoload 'konix/org-roam-note "org-roam" "" t)
 (autoload 'konix/ledger-run "ledger-mode" "" t)
+(autoload 'windmove-do-window-select "windmove" "" t)
+(autoload 'ffap-file-at-point "ffap" "" t)
 (autoload 'slack-start "slack" "" t)
 
 ;; ************************************************************
@@ -207,8 +209,7 @@
 (add-to-list 'auto-mode-alist (cons "Jenkinsfile$" 'groovy-mode))
 (add-to-list 'auto-mode-alist (cons "patch$" 'diff-mode))
 (add-to-list 'auto-mode-alist (cons "gtd_contexts" 'konix/org-gtd-context-edit-mode))
-(add-to-list 'auto-mode-alist (cons "windmove" 'windmove-do-window-select))
-(add-to-list 'auto-mode-alist (cons "ffap" 'ffap-file-at-point))
+
 
 ;; ******************************************************************************************
 ;; Magic modes

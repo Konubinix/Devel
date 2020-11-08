@@ -12,6 +12,7 @@
 		 (expand-file-name "config/after-loads" elfiles)
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "ini" elfiles)
+         (expand-file-name "ol-emacs-slack" elfiles)
          (expand-file-name "fence-edit" elfiles)
 		 )
 		)

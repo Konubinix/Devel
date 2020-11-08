@@ -132,6 +132,9 @@ ignore=dirty
 [submodule "config/awesome/awesome-cyclefocus"]
 	path = config/awesome/awesome-cyclefocus
 	url = https://github.com/blueyed/awesome-cyclefocus
+[submodule "elfiles/ol-emacs-slack"]
+	path = elfiles/ol-emacs-slack
+	url = https://github.com/Konubinix/ol-emacs-slack
 [submodule "elfiles/fence-edit"]
 	path = elfiles/fence-edit
 	url = https://github.com/aaronbieber/fence-edit.el

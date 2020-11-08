@@ -86,12 +86,21 @@
     )
   )
 
+(defun konix/slack-message-write-another-buffer ()
+  (interactive)
+  (goto-char (point-max))
+  (move-beginning-of-line nil)
+  (kill-region (point) (point-max))
+  (call-interactively 'slack-message-write-another-buffer)
+  (yank)
+  )
+
 (defun konix/slack-message-setup-keys (mode-map)
   (key-chord-define mode-map "ei" 'slack-message-embed-mention)
   (key-chord-define mode-map "ue" 'slack-insert-emoji)
   (key-chord-define mode-map "er" 'slack-message-add-reaction)
   (key-chord-define mode-map "et" 'slack-thread-show-or-create)
-  (key-chord-define mode-map "ec" 'slack-message-write-another-buffer)
+  (key-chord-define mode-map "ec" 'konix/slack-message-write-another-buffer)
   (key-chord-define mode-map "es" 'slack-message-share)
 
   (define-key mode-map (kbd "M-e") 'slack-message-edit)

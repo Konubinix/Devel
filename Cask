@@ -99,3 +99,5 @@
 (depends-on "alert")
 (depends-on "slack")
 (depends-on "plantuml-mode")
+(depends-on "org-noter")
+(depends-on "org-journal")

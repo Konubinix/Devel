@@ -86,29 +86,39 @@
           )
       (insert "\n* Links to this note\n")
       (dolist (link links)
-        (insert (format "   - [[https://konubinix.eu/%s/posts/%s][%s]]%s\n"
-                        (konix/org-roam-export/extract-kind link)
-                        (file-name-sans-extension
-                         (file-relative-name link org-roam-directory)
-                         )
-                        (org-roam--get-title-or-slug link)
-                        (if (not
-                             (equal
-                              kind
-                              (konix/org-roam-export/extract-kind link)
+        (insert (let (
+                      (link-kind (konix/org-roam-export/extract-kind link))
+                      )
+                  (if (equal link-kind kind)
+                      (format "   - [[file:%s][%s]]\n"
+                              (file-relative-name link org-roam-directory)
+                              (org-roam--get-title-or-slug link)
                               )
+                    (format "   - [[https://konubinix.eu/%s/posts/%s/][%s]]%s\n"
+                            (konix/org-roam-export/extract-kind link)
+                            (file-name-sans-extension
+                             (file-relative-name link org-roam-directory)
                              )
-                            (format " (%s)" (konix/org-roam-export/extract-kind link))
-                          ""
-                          )
-                        )
+                            (org-roam--get-title-or-slug link)
+                            (if (not
+                                 (equal
+                                  kind
+                                  link-kind
+                                  )
+                                 )
+                                (format " (%s)" link-kind)
+                              ""
+                              )
+                            )
+                    )
+                  )
                 )
         )
       )
     )
   )
 
-(defun konix/org-roam-export/toggle-publish ()
+(defun konix/org-roam-export/toggle-publish (&optional kind)
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -120,9 +130,27 @@
           )
       (progn
         (goto-char (point-min))
-        (re-search-forward "#\\+ROAM_ALIAS")
+        (while (looking-at "#+\\|:")
+          (forward-line)
+          )
+        (forward-line -1)
         (move-end-of-line nil)
-        (insert (format "\n#+HUGO_BASE_DIR: ~/%s/" (completing-read "Kind: " '("blog" "braindump") nil t)))
+        (insert (format "\n#+HUGO_BASE_DIR: ~/%s/"
+                        (or kind (let (
+                                       (kind (completing-read "Kind: " '("blog" "braindump")
+                                                              nil t
+                                                              nil
+                                                              nil
+                                                              konix/org-roam-auto-publish-last-value
+                                                              )
+                                             )
+                                       )
+                                   (setq konix/org-roam-auto-publish-last-value
+                                         kind)
+                                   kind
+                                   ))
+                        )
+                )
         )
       )
     )
@@ -153,7 +181,7 @@ citation key, for Org-ref cite links."
   (let ((conditions (--> sources
                          (mapcar (lambda (i) (list '= 'source i)) it)
                          (org-roam--list-interleave it :or))))
-    (org-roam-db-query `[:select [dest properties] :from links
+    (org-roam-db-query `[:select [dest type] :from links
                                  :where ,@conditions
                                  :order-by (asc source)])))
 
@@ -174,32 +202,43 @@ citation key, for Org-ref cite links."
 
 
 (defun konix/org-roam-replace-internal-links ()
-  (let (
-        (source (buffer-file-name))
-        )
+  (let* (
+         (source (buffer-file-name))
+         (source-kind (konix/org-roam-export/extract-kind source))
+         )
     (mapc
      (lambda (el)
        (let* (
-              (content (plist-get
-                        (second el)
-                        :content
-                        ))
+              (type (second el))
               (link (first el))
+              (link-key (if (string-equal type "id")
+                            (save-excursion
+                              (with-current-buffer (find-file link)
+                                (goto-char (point-min))
+                                (format "id:%s" (org-id-get))
+                                )
+                              )
+                          (format "file:%s" (file-relative-name link org-roam-directory))
+                          )
+                        )
+              (link-regexp (format "\\[\\[%s\\]\\[[^]]+\\]\\]" link-key))
               (kind (konix/org-roam-export/extract-kind link))
+              (new-link-value
+               (format
+                "[[https://konubinix.eu/%s/posts/%s/][%s]]"
+                kind
+                (file-name-sans-extension
+                 (file-relative-name link org-roam-directory)
+                 )
+                (org-roam--get-title-or-slug link)
+                )
+               )
               )
-         (progn
+         (when (not (equal kind source-kind))
            (goto-char (point-min))
-           (replace-string
-            content
-            (format
-             "[[https://konubinix.eu/%s/posts/%s][%s]]"
-             kind
-             (file-name-sans-extension
-              (file-relative-name link org-roam-directory)
-              )
-             (org-roam--get-title-or-slug link)
+           (while (re-search-forward link-regexp nil t)
+             (replace-match new-link-value)
              )
-            )
            )
          )
        )

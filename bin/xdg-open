@@ -1,9 +1,0 @@
-#!/bin/bash -eux
-
-if echo "$*" | grep -q '^https\?:'
-then
-    func=x-www-browser
-else
-    func=mimeopen
-fi
-exec $func "$@"

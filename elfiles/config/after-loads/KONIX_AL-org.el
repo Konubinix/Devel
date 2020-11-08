@@ -53,6 +53,24 @@
   )
 (ad-activate 'org-attach-commit)
 
+(defun konix/org-update-date ()
+  (when (equal major-mode 'org-mode)
+    (save-excursion
+      (goto-char (point-min))
+      (while (looking-at "^:")
+        (forward-line)
+        )
+      (when (re-search-forward "^#\\+DATE:" 3000 t)
+        (beginning-of-line)
+        (kill-line)
+        (kill-line)
+        )
+
+      (insert "#+DATE: " (format-time-string "[%Y-%m-%d %a %H:%M]") "\n")
+      )
+    )
+  )
+
 (defun konix/org-open-at-point-move-to-link (orig-fun &rest args)
   (let* ((context
           ;; Only consider supported types, even if they are not
@@ -3189,6 +3207,10 @@ of the clocksum."
                  )
                electric-pair-pairs)
               )
+  (make-local-variable 'before-save-hook)
+  (add-hook 'before-save-hook
+            'konix/org-update-date)
+
 
   (setq indent-tabs-mode nil)
   (konix/flyspell-mode 1)

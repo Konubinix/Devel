@@ -21,6 +21,7 @@
 (key-chord-define-global " l" 'hl-line-mode)
 (key-chord-define-global " s" 'konix/scroll)
 (key-chord-define-global " p" 'poporg-dwim)
+(key-chord-define-global " f" 'konix/fence-edit-dwim)
 (key-chord-define-global " v" 'visual-line-mode)
 (key-chord-define-global " u" 'linum-mode)
 

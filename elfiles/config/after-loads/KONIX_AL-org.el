@@ -1227,10 +1227,9 @@ items"
   (message "org-super-agenda per group aof: %s" (if org-super-agenda-groups t nil))
   )
 
-(defun konix/org-agenda-prefix-format/ann nil
-  "test"
+(defun konix/org-planning-information ()
   (let (
-        (res "         ")
+        (res '())
         )
     (save-excursion
       (org-back-to-heading)
@@ -1240,64 +1239,108 @@ items"
                (planning-eol (point-at-eol))
                (planning-bol (point-at-bol))
                has-deadline
-               (current-date (or
-                              (and
-                               (eq konix/org-agenda-type 'agenda)
-                               org-agenda-current-date
-                               )
-                              (org-date-to-gregorian
-                               (time-to-days nil)
-                               )
-                              )
-                             )
-               (current-time
-                (time-to-days
-                 (encode-time
-                  0 0 0
-                  (second current-date)
-                  (first current-date)
-                  (third current-date)
-                  )
-                 )
-                )
                diff
                )
           (goto-char planning-eol)
-          (setq has-deadline (search-backward org-deadline-string planning-bol t))
-          (when has-deadline
+          (when (search-backward org-scheduled-string planning-bol t)
             (goto-char (match-end 0))
             (skip-chars-forward " \t")
             (looking-at org-ts-regexp-both)
-            (setq deadline-string (match-string-no-properties 0))
-            (setq deadline-time (org-time-string-to-absolute deadline-string))
-            (setq wdays (org-get-wdays deadline-string))
-            (setq diff (- deadline-time current-time))
-            (setq res (format
-                       (if (< diff 0)
-                           "%2d d. ago"
-                         "In %3d d."
-                         )
-                       (abs diff)
-                       )
-                  )
+            (setq res (plist-put res :scheduled (match-string-no-properties 0)))
+            )
+          (goto-char planning-eol)
+          (when (search-backward org-deadline-string planning-bol t)
+            (goto-char (match-end 0))
+            (skip-chars-forward " \t")
+            (looking-at org-ts-regexp-both)
+            (setq res (plist-put res :deadline (match-string-no-properties 0)))
             )
           )
         )
-      (setq res (format "%s %s:"
-                        res
-                        (or
-                         (org-entry-get nil org-effort-property)
-                         "    "
+      )
+    res
+    )
+  )
+
+(defun konix/org-agenda-current-time ()
+  (let* (
+         (current-date (or
+                        (and
+                         (eq konix/org-agenda-type 'agenda)
+                         org-agenda-current-date
+                         )
+                        (org-date-to-gregorian
+                         (time-to-days nil)
                          )
                         )
+                       )
+         (current-time
+          (time-to-days
+           (encode-time
+            0 0 0
+            (second current-date)
+            (first current-date)
+            (third current-date)
             )
-      )
-    (format
-     "%10s: %s"
-     (org-get-at-bol 'org-category)
-     res
-     )
+           )
+          )
+         )
+    current-time
     )
+  )
+
+(defun konix/org-agenda-deadline-prefix ()
+  (let (
+        (planning-info (konix/org-planning-information))
+        diff
+        wdays
+        deadline-time
+        )
+    (if-let (
+             (deadline-string (plist-get planning-info :deadline))
+             )
+        (progn
+          (setq deadline-time (org-time-string-to-absolute deadline-string))
+          (setq wdays (org-get-wdays deadline-string))
+          (setq diff (- deadline-time (konix/org-agenda-current-time)))
+          (format
+           (if (< diff 0)
+               "%2d d.ago "
+             "In %3d d."
+             )
+           (abs diff)
+           )
+          )
+      nil
+      )
+    )
+  )
+
+(defun konix/org-agenda-deadline-in-parent-prefix ()
+  (or
+   (konix/org-agenda-deadline-prefix)
+   (and (org-up-heading-safe) (konix/org-agenda-deadline-in-parent-prefix))
+   )
+  )
+
+(defun konix/org-agenda-prefix-format/ann ()
+  (format
+   "%10s:%11s %5s:"
+   (org-get-at-bol 'org-category)
+   (or
+    (konix/org-agenda-deadline-prefix)
+    (when-let (
+               (deadline-in-parent (konix/org-agenda-deadline-in-parent-prefix))
+               )
+      (format "P-%s" deadline-in-parent)
+      )
+    ""
+    )
+   (or
+    (org-entry-get nil org-effort-property)
+    ""
+    )
+   )
   )
 
 (setq-default org-agenda-custom-commands
@@ -2904,6 +2947,21 @@ items"
     )
   ""
   )
+(defface konix/org-deadline-in-parent-face
+  '(
+    (
+     ((class color)
+      (background dark))
+     (:slant italic)
+     )
+    (
+     ((class color)
+      (background light))
+     (:slant italic)
+     )
+    )
+  ""
+  )
 (setq-default org-todo-keyword-faces
               '(
                 ("TODO" :foreground "red" :weight bold)
@@ -2939,9 +2997,12 @@ items"
  <=> (konix/org-cmp-deadlines-past-and-due-first a b) == 1
 "
   (let*(
-        (deadline_regexp_past "\\([0-9]+\\) d\\. ago")
-        (deadline_regexp_future "In +\\([0-9]+\\) d\\.")
-        (deadline_regexp_now "Deadline:")
+        (deadline_regexp_past " \\([0-9]+\\) d\\. ago")
+        (deadline_regexp_future " In +\\([0-9]+\\) d\\.")
+        (deadline_parent_regexp_past "P-\\([0-9]+\\) d\\. ago")
+        (deadline_parent_regexp_future "P-In +\\([0-9]+\\) d\\.")
+        (deadline_regexp_now " In   0 d\\.")
+        (deadline_parent_regexp_now "P-In   0 d\\.")
         (a_now (string-match-p deadline_regexp_now a))
         (a_past (and
                  (string-match deadline_regexp_past a)
@@ -2972,17 +3033,62 @@ items"
                  )
                 )
                )
+        (a_parent_now (string-match-p deadline_parent_regexp_now a))
+        (a_parent_past (and
+                 (string-match deadline_parent_regexp_past a)
+                 (string-to-number
+                  (match-string 1 a)
+                  )
+                 )
+                )
+        (a_parent_fut (and
+                (string-match deadline_parent_regexp_future a)
+                (string-to-number
+                 (match-string 1 a)
+                 )
+                )
+               )
+        (b_parent_now (string-match-p deadline_parent_regexp_now b))
+        (b_parent_past (and
+                 (string-match deadline_parent_regexp_past b)
+                 (string-to-number
+                  (match-string 1 b)
+                  )
+                 )
+                )
+        (b_parent_fut (and
+                (string-match deadline_parent_regexp_future b)
+                (string-to-number
+                 (match-string 1 b)
+                 )
+                )
+                      )
+        ;; no value -> assume 99 days
         (a_value (or a_past (and a_now 0) (and a_fut (- 0 a_fut)) -99))
         (b_value (or b_past (and b_now 0) (and b_fut (- 0 b_fut)) -99))
         (lower (< a_value b_value))
         (equal (= a_value b_value))
+        (a_parent_value (or a_parent_past (and a_parent_now 0) (and a_parent_fut (- 0 a_parent_fut)) -99))
+        (b_parent_value (or b_parent_past (and b_parent_now 0) (and b_parent_fut (- 0 b_parent_fut)) -99))
+        (parent_lower (< a_parent_value b_parent_value))
+        (parent_equal (= a_parent_value b_parent_value))
         )
     (cond
      (lower
       -1
       )
      (equal
-      nil
+      (cond
+       (parent_lower
+        -1
+        )
+       (parent_equal
+        nil
+        )
+       (t
+        +1
+        )
+       )
       )
      (t
       +1

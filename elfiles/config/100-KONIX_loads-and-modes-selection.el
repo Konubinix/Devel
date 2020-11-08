@@ -12,6 +12,7 @@
 		 (expand-file-name "config/after-loads" elfiles)
 		 (expand-file-name "git-wip/emacs" devel-dir)
 		 (expand-file-name "ini" elfiles)
+         (expand-file-name "fence-edit" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -138,6 +139,7 @@
 (autoload 'ffap-file-at-point "ffap" "" t)
 (autoload 'slack-start "slack" "" t)
 (autoload 'konix/org-roam-export/org-publish-brain-dump "KONIX_org-roam-export" "" t)
+(autoload 'konix/fence-edit-dwim "KONIX_fence-edit" "" t)
 
 ;; ************************************************************
 ;; Automodes

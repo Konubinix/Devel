@@ -140,6 +140,7 @@
 (autoload 'ffap-file-at-point "ffap" "" t)
 (autoload 'slack-start "slack" "" t)
 (autoload 'konix/org-roam-export/org-publish-brain-dump "KONIX_org-roam-export" "" t)
+(autoload 'konix/org-roam-export/toggle-publish "KONIX_org-roam-export" "" t)
 (autoload 'konix/fence-edit-dwim "KONIX_fence-edit" "" t)
 
 ;; ************************************************************
@@ -213,6 +214,7 @@
 (add-to-list 'auto-mode-alist (cons "Jenkinsfile$" 'groovy-mode))
 (add-to-list 'auto-mode-alist (cons "patch$" 'diff-mode))
 (add-to-list 'auto-mode-alist (cons "gtd_contexts" 'konix/org-gtd-context-edit-mode))
+(add-to-list 'auto-mode-alist (cons "\\.pdf$" 'pdf-view-mode))
 
 
 ;; ******************************************************************************************

@@ -60,13 +60,13 @@
 
 (define-key org-agenda-mode-map (kbd "f")
   #'(lambda () (interactive) (when (yes-or-no-p "Really move later?")
-                              (call-interactively 'org-agenda-later)
-                              )))
+                               (call-interactively 'org-agenda-later)
+                               )))
 
 (define-key org-agenda-mode-map (kbd "b")
   #'(lambda () (interactive) (when (yes-or-no-p "Really move earlier?")
-                              (call-interactively org-agenda-earlier)
-                              )))
+                               (call-interactively org-agenda-earlier)
+                               )))
 
 (define-key org-agenda-mode-map (kbd "m")
   'konix/org-toggle-me)
@@ -1215,7 +1215,7 @@
 (defun konix/org-in-deadline ()
   (or
    (konix/org-has-deadline)
-   (progn (and (org-up-heading-safe) (konix/org-in-deadline)))
+   (and (org-up-heading-safe) (konix/org-in-deadline))
    )
   )
 

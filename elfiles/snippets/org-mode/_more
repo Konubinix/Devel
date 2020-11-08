@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: _more
+# key: _more
+# --
+$0
+
+#+HUGO: more

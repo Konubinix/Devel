@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'org-roam-protocol)
+
 (setq-default org-roam-directory (expand-file-name "roam" perso-dir))
 
 (define-key org-roam-mode-map (kbd "C-c n l") #'org-roam)
@@ -39,10 +41,11 @@
                 ("d" "default" plain
                  (function org-roam--capture-get-point)
                  "%?"
-                 :file-name "%<%y%m%d-%H%M%S>-${slug}"
+                 :file-name "%<%Y%m%d-%H%M%S>-${slug}"
                  :head "#+TITLE: ${title}
 #+LANGUAGE: fr
 #+CREATED: %U
+#+DATE: %U
 #+ROAM_ALIAS: \"\"
 ${title}
 
@@ -63,6 +66,7 @@ ${title}
                  :head "#+title: %<%Y-%m-%d>
 #+LANGUAGE: fr
 #+CREATED: %U
+#+DATE: %U
 "))
               )
 
@@ -130,6 +134,31 @@ ${title}
                 )
               )
 (setq-default org-roam-completion-system 'ivy)
+
+(defvar konix/org-roam-auto-publish-last-value nil)
+
+(defun konix/org-roam-capture-after-find-file-hook ()
+  (let (
+        (kind (completing-read
+               "Publish to " '("braindump" "blog" "none")
+               nil
+               t
+               nil
+               nil
+               konix/org-roam-auto-publish-last-value
+               )
+              )
+        )
+    (setq konix/org-roam-auto-publish-last-value kind)
+    (unless (string-equal kind "none")
+      (konix/org-roam-export/toggle-publish kind)
+      )
+    )
+  )
+
+(add-hook 'org-roam-capture-after-find-file-hook
+          'konix/org-roam-capture-after-find-file-hook)
+
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

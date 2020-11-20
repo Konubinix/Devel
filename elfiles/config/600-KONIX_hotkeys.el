@@ -622,7 +622,6 @@
 (define-key 'konix/org-global-map (kbd "<up>") 'org-mark-ring-push)
 (define-key 'konix/org-global-map (kbd "<left>") 'org-mark-ring-goto)
 (define-key 'konix/org-global-map (kbd "<right>") 'konix/org-mark-ring-goto-newest)
-(define-key 'konix/org-global-map "r" 'org-remember)
 (define-key 'konix/org-global-map "a" 'org-annotate-file)
 (define-key 'konix/org-global-map "s" 'org-sort)
 (define-key 'konix/org-global-map "l" 'org-store-link)

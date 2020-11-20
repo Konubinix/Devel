@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'KONIX_org-roam-export)
+
 ;; enable the org toc when I find a way to put the summary_minus_toc.html partial into
 ;; the rss partial
 (setq-default org-hugo-export-with-toc nil)

@@ -131,7 +131,7 @@
 (autoload 'piper "piper" "" t)
 (autoload 'mc/edit-lines "multiple-cursors" "" t)
 (autoload 'org-roam-find-file "org-roam" "" t)
-(autoload 'org-roam-dailies-date "org-roam" "" t)
+(autoload 'org-roam-dailies-capture-date "org-roam-dailies" "" t)
 (autoload 'which-key-mode "which-key" "" t)
 (autoload 'ivy-mode "ivy" "" t)
 (autoload 'golden-ratio-mode "golden-ratio" "" t)
@@ -140,8 +140,8 @@
 (autoload 'windmove-do-window-select "windmove" "" t)
 (autoload 'ffap-file-at-point "ffap" "" t)
 (autoload 'slack-start "slack" "" t)
-(autoload 'konix/org-roam-export/org-publish-brain-dump "KONIX_org-roam-export" "" t)
 (autoload 'konix/org-roam-export/toggle-publish "KONIX_org-roam-export" "" t)
+(autoload 'konix/org-roam-export/yank-url "KONIX_org-roam-export" "" t)
 (autoload 'konix/fence-edit-dwim "KONIX_fence-edit" "" t)
 (autoload 'org-link-minor-mode "org-link-minor-mode" "" t)
 

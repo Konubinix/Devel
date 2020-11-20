@@ -33,7 +33,7 @@
    (string-trim
     (shell-command-to-string
      (format
-      "grep -r -l 'HUGO_BASE_DIR: ~/%s' %s"
+      "grep -r -l '#+HUGO_BASE_DIR: ~/%s/\\?' %s"
       (or kind "")
       org-roam-directory
       )
@@ -46,10 +46,14 @@
   "Re-exports all Org-roam files to Hugo markdown."
   (interactive)
   (setq kind (or kind "blog"))
-  (save-window-excursion
-    (dolist (f (konix/org-roam-export/exported-files kind))
-      (with-current-buffer (find-file f)
-        (org-hugo-export-wim-to-md)
+  (let (
+        (org-export-babel-evaluate nil)
+        )
+    (save-window-excursion
+      (dolist (f (konix/org-roam-export/exported-files kind))
+        (with-current-buffer (find-file f)
+          (org-hugo-export-wim-to-md)
+          )
         )
       )
     )
@@ -57,9 +61,12 @@
   )
 
 (defun konix/org-roam-export/backlinks-list (file &optional kind)
-  (-intersection
-   (mapcar #'car (org-roam--get-backlinks file))
-   (konix/org-roam-export/exported-files kind)
+  (remove-duplicates
+   (-intersection
+    (mapcar #'car (org-roam--get-backlinks file))
+    (konix/org-roam-export/exported-files kind)
+    )
+   :test #'string-equal
    )
   )
 
@@ -78,12 +85,148 @@
     )
   )
 
+(defun konix/org-roam-export/url-to-macro (url)
+  (save-match-data
+    (cond
+     ((string-match ".*youtube.com/watch\\?v=\\(.+\\)" url)
+      (format "{{{youtube(%s)}}}" (match-string 1 url))
+      )
+     (t
+      url
+      )
+     )
+    )
+  )
+
+(defun konix/org-roam-export/get-language ()
+  (or
+   (cdr (assoc "LANGUAGE" (org-roam--extract-global-props '("LANGUAGE"))))
+   "fr"
+   )
+  )
+
+(defun konix/org-roam-export/add-roam-key ()
+  (when-let* (
+              (roam-key (cdr (assoc "ROAM_KEY" (org-roam--extract-global-props '("ROAM_KEY")))))
+              (language (konix/org-roam-export/get-language))
+              (text (cond
+                     ((string-equal language "fr")
+                      "Cette note parle de :"
+                      )
+                     ((string-equal language "en")
+                      "This note is about:"
+                      )
+                     (t
+                      (error "Unsupported language %s" language)
+                      )
+                     )
+                    )
+              )
+    (save-excursion
+      (goto-char (point-min))
+      (insert (format "- %s %s\n" text (konix/org-roam-export/url-to-macro roam-key)))
+      )
+    )
+  )
+
+(defun konix/org-roam-export/get-url ()
+  (format "https://konubinix.eu/%s/posts/%s/"
+          (konix/org-roam-export/extract-kind (buffer-file-name))
+          (file-name-sans-extension
+           (file-relative-name
+            (buffer-file-name)
+            org-roam-directory)
+           )
+          )
+  )
+
+(defun konix/org-roam-export/yank-url ()
+  (interactive)
+  (if (and
+       (equal major-mode 'org-mode)
+       (string-prefix-p org-roam-directory (buffer-file-name))
+       )
+      (let (
+            (url (konix/org-roam-export/get-url))
+            )
+        (with-temp-buffer
+          (insert url)
+          (clipboard-kill-region (point-min) (point-max))
+          )
+        (message "%s copied into the clipboard" url)
+        )
+    (let* ((completions (org-roam--get-title-path-completions))
+           (title-with-tags (org-roam-completion--completing-read
+                             "File: "
+                             completions
+                             )
+                            )
+           (res (cdr (assoc title-with-tags completions)))
+           (file-path (plist-get res :path)))
+      (save-window-excursion
+        (with-current-buffer (find-file file-path)
+          (call-interactively 'konix/org-roam-export/yank-url)
+          )
+        )
+      )
+    )
+  )
+
+
+(defun konix/org-roam-export/add-roam-alias ()
+  (when-let* (
+              (aliases (org-roam--extract-titles-alias))
+              (language (konix/org-roam-export/get-language))
+              (text (cond
+                     ((string-equal language "fr")
+                      (format "Aussi connu sous le%s nom%s :"
+                              (if (> (length aliases) 1) "s" "")
+                              (if (> (length aliases) 1) "s" "")
+                              )
+                      )
+                     ((string-equal language "en")
+                      "Also known as:"
+                      )
+                     (t
+                      (error "Unsupported language %s" language)
+                      )
+                     )
+                    )
+              )
+    (setq aliases (remove-if (lambda (el) (string-equal "" (s-trim el))) aliases))
+    (when aliases
+      (save-excursion
+        (goto-char (point-min))
+        (insert (format "- %s %s\n" text (combine-and-quote-strings aliases ", ")))
+        )
+      )
+    )
+  )
+
+(defun konix/org-roam-export/copy-roam-tags-into-hugo-tags ()
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^#\\+ROAM_TAGS:\\(.+\\)$" 3000 t)
+      (move-end-of-line nil)
+      (insert "\n")
+      (insert (format "#+HUGO_TAGS:%s" (match-string 1)))
+      )
+    )
+  )
+
 (defun konix/org-roam-export/add-backlinks ()
   (when-let ((links (konix/org-roam-export/backlinks-list (buffer-file-name))))
     (goto-char (point-max))
     (let (
           (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
           )
+      (unless (save-excursion
+                (goto-char (point-min))
+                (re-search-forward "#\\+HUGO: more" nil t)
+                )
+        (insert "#+HUGO: more
+")
+        )
       (insert "\n* Links to this note\n")
       (dolist (link links)
         (insert (let (
@@ -156,19 +299,61 @@
     )
   )
 
-(defun konix/org-roam-export/org-export-preprocessor (_backend)
-  (goto-char 0)
-  (while (re-search-forward "- Org entry ::" nil t)
-    (move-beginning-of-line nil)
-    (kill-line)
-    (kill-line)
+(defun konix/org-roam-export/convert-standalone-links ()
+  (save-excursion
+    (goto-char (point-min))
+    (save-match-data
+      (while (re-search-forward
+              "^\n\\(http[^\n\t ]+\\)\n$"
+              nil
+              t)
+        (replace-match
+         (format
+          "\n%s\n"
+          (konix/org-roam-export/url-to-macro (match-string 1))
+          )
+         )
+        )
+      )
     )
-  ;; already done in the theme by Jethro
-  (konix/org-roam-export/add-backlinks)
-  (konix/org-roam-replace-internal-links)
+  )
+
+(defun konix/org-roam-export/remove-org-backlinks ()
+  (save-excursion
+    (goto-char 0)
+    (while (re-search-forward "- Org entry ::" nil t)
+      (move-beginning-of-line nil)
+      (kill-line)
+      (kill-line)
+      )
+    )
+  )
+
+(defun konix/org-roam-export/org-export-preprocessor (_backend)
+  (when (org-roam--extract-global-props '("HUGO_BASE_DIR"))
+    (konix/org-roam-export/remove-org-backlinks)
+    ;; already done in the theme by Jethro
+    (konix/org-roam-export/add-backlinks)
+    (konix/org-roam-export/add-roam-key)
+    (konix/org-roam-export/convert-standalone-links)
+    (konix/org-roam-export/add-roam-alias)
+    (konix/org-roam-replace-internal-links)
+    (konix/org-roam-export/assert-no-konix-org-roam-links)
+    )
   )
 
 (add-hook 'org-export-before-processing-hook #'konix/org-roam-export/org-export-preprocessor)
+
+(defun konix/org-roam-export/assert-no-konix-org-roam-links ()
+  (save-excursion
+    (org-with-wide-buffer
+     (goto-char (point-min))
+     (when (re-search-forward "konix-org-roam:" nil t)
+       (error "%s contains konix-org-roam links" (buffer-name))
+       )
+     )
+    )
+  )
 
 
 (defun konix/org-roam-get-links (sources)
@@ -221,25 +406,38 @@ citation key, for Org-ref cite links."
                           (format "file:%s" (file-relative-name link org-roam-directory))
                           )
                         )
-              (link-regexp (format "\\[\\[%s\\]\\[[^]]+\\]\\]" link-key))
+              (link-regexp (format "\\[\\[%s\\]\\[" link-key))
               (kind (konix/org-roam-export/extract-kind link))
+              (new-file-like-link-value
+               (format
+                "[[file:%s]["
+                (file-relative-name link org-roam-directory)
+                )
+               )
               (new-link-value
                (format
-                "[[https://konubinix.eu/%s/posts/%s/][%s]]"
+                "[[https://konubinix.eu/%s/posts/%s/]["
                 kind
                 (file-name-sans-extension
                  (file-relative-name link org-roam-directory)
                  )
-                (org-roam--get-title-or-slug link)
                 )
                )
               )
-         (when (not (equal kind source-kind))
+         (cond
+          ((not (equal kind source-kind))
            (goto-char (point-min))
            (while (re-search-forward link-regexp nil t)
              (replace-match new-link-value)
              )
            )
+          ((string-equal type "id")
+           (goto-char (point-min))
+           (while (re-search-forward link-regexp nil t)
+             (replace-match new-file-like-link-value)
+             )
+           )
+          )
          )
        )
      (konix/org-roam-get-internal-links source)

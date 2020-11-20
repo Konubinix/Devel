@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-# name: _comment
-# key: _comment
+# name: comment
+# key: comment
 # --
 $>#+BEGIN_COMMENT
 $>$0

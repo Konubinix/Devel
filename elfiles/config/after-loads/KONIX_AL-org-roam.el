@@ -27,6 +27,8 @@
 (require 'org-roam-protocol)
 
 (setq-default org-roam-directory (expand-file-name "roam" perso-dir))
+(setq-default org-roam-prefer-id-links nil)
+(setq-default org-roam-completion-everywhere t)
 
 (define-key org-roam-mode-map (kbd "C-c n l") #'org-roam)
 (define-key org-roam-mode-map (kbd "C-c n f") #'org-roam-find-file)
@@ -41,12 +43,11 @@
                 ("d" "default" plain
                  (function org-roam--capture-get-point)
                  "%?"
-                 :file-name "%<%Y%m%d-%H%M%S>-${slug}"
+                 :file-name "${slug}"
                  :head "#+TITLE: ${title}
 #+LANGUAGE: fr
 #+CREATED: %U
 #+DATE: %U
-#+ROAM_ALIAS: \"\"
 ${title}
 
 "
@@ -54,23 +55,6 @@ ${title}
                  )
                 )
               )
-
-
-(setq-default org-roam-dailies-capture-templates
-              '(
-                ("d" "daily" plain
-                 (function org-roam-capture--get-point)
-                 ""
-                 :immediate-finish t
-                 :file-name "%<%Y%m%d>"
-                 :head "#+title: %<%Y-%m-%d>
-#+LANGUAGE: fr
-#+CREATED: %U
-#+DATE: %U
-"))
-              )
-
-
 
 (org-roam-mode 1)
 
@@ -102,7 +86,12 @@ ${title}
             )
           )
          )
-    (konix/org-add-note-no-interaction (format "[[file:%s][Roam note]]" (buffer-file-name roam-buffer)))
+    (konix/org-add-note-no-interaction
+     (format "[[file:%s][Roam note]]"
+             (or
+              (buffer-file-name roam-buffer)
+              (plist-get (plist-get org-capture-current-plist :org-roam) :file-path)
+              )))
     (pop-to-buffer roam-buffer)
     )
   )
@@ -137,28 +126,224 @@ ${title}
 
 (defvar konix/org-roam-auto-publish-last-value nil)
 
-(defun konix/org-roam-capture-after-find-file-hook ()
-  (let (
-        (kind (completing-read
-               "Publish to " '("braindump" "blog" "none")
-               nil
-               t
-               nil
-               nil
-               konix/org-roam-auto-publish-last-value
-               )
-              )
+
+(setq-default
+ org-roam-capture-ref-templates
+ '(
+   (
+    "r"
+    "ref" plain (function org-roam-capture--get-point)
+    "%?"
+    :file-name "${slug}"
+    :head "#+TITLE: ${title}
+#+CREATED: %U
+#+DATE: %U
+#+ROAM_KEY: ${ref}
+"
+    :unnarrowed t
+    )
+   )
+ )
+
+(defun konix/org-add-roam-ref (url title body)
+  (let* (
+         (decoded-title (s-trim (org-link-decode title)))
+         (decoded-url (s-trim (org-link-decode url)))
+         (decoded-body (s-trim (org-link-decode body)))
+         (slug (org-roam--title-to-slug decoded-title))
+         (url-without-type (and
+                            (string-match org-link-plain-re decoded-url)
+                            (match-string 2 decoded-url)
+                            )
+                           )
+         (buffer
+          (save-window-excursion
+            (or
+             (org-roam--find-ref url-without-type)
+             (find-file (expand-file-name (format "%s.org" slug) org-roam-directory))
+             )
+            (current-buffer)
+            )
+          )
+         )
+    (with-current-buffer buffer
+      (when (equal (point-max) (point-min))
+        (insert
+         (format
+          "#+TITLE: %s
+#+CREATED: %s
+#+LANGUAGE: fr
+#+DATE: %s
+#+ROAM_KEY: %s
+%s
+"
+          decoded-title
+          (format-time-string "[%Y-%m-%d %a %H:%M]")
+          (format-time-string "[%Y-%m-%d %a %H:%M]")
+          decoded-url
+          decoded-title
+          )
+         )
         )
-    (setq konix/org-roam-auto-publish-last-value kind)
-    (unless (string-equal kind "none")
-      (konix/org-roam-export/toggle-publish kind)
+      ;; finally, insert the body(when (not (string-equal "" (s-trim decoded-body)))
+      (unless (string-equal "" decoded-body)
+        (delete-trailing-whitespace)
+        (goto-char (point-max))
+        (insert "\n#+BEGIN_QUOTE\n" decoded-body "\n#+END_QUOTE\n"))
+      )
+    (pop-to-buffer buffer)
+    )
+  )
+
+(defun org-roam--extract-tags-prop-from-hugo-tags (_file)
+  "Extract tags from the current buffer's \"#roam_tags\" global property."
+  (let* ((prop (cdr (assoc "HUGO_TAGS" (org-roam--extract-global-props '("HUGO_TAGS"))))))
+    (condition-case nil
+        (org-roam--str-to-list prop)
+      (error
+       (progn
+         (lwarn '(org-roam) :error
+                "Failed to parse tags for buffer: %s. Skipping"
+                (or org-roam-file-name
+                    (buffer-file-name)))
+         nil)))))
+
+(setq-default org-roam-tag-sources '(prop))
+
+(defun konix/org-roam-format-link/around (orig-fun target &optional description type)
+  "Replace file: link by konix-org-roam: links
+ when linking to org roam from outside of org roam"
+  (if (or
+       (string-equal org-roam-buffer (buffer-name (current-buffer)))
+       (string-prefix-p org-roam-directory
+                        (cond
+                         (org-capture-mode
+                          (with-current-buffer (org-capture-get :buffer) (buffer-file-name))
+                          )
+                         (t
+                          (buffer-file-name)
+                          )
+                         )
+                        )
+       )
+      (funcall orig-fun target description type)
+    (let (
+          (id (save-window-excursion (with-current-buffer (find-file target)
+                                       (save-excursion
+                                         (goto-char (point-min))
+                                         (org-id-get-create)
+                                         )
+                                       )
+                                     )
+              )
+          )
+      (warn "Using konix-org-roam link")
+      (org-link-make-string (format "konix-org-roam:%s" id) description)
+      )
+    )
+  )
+(advice-add 'org-roam-format-link :around #'konix/org-roam-format-link/around)
+
+(org-link-set-parameters "konix-org-roam"
+                         :follow #'konix/org-roam-follow-link
+                         )
+
+(defun konix/org-roam-follow-link (link)
+  "Follow a link of the form konix-org-roam:file.org"
+  (let* (
+         (link-info (org-roam-id-find link))
+         (file (car link-info))
+         (pos (cdr link-info))
+         )
+    (find-file file)
+    (goto-char pos)
+    (when (equal pos 1)
+      (while (and (looking-at-p "^:\\|^#\\|^$")
+                  (not (equal
+                        (line-number-at-pos (point))
+                        (line-number-at-pos (point-max))
+                        )
+                       )
+                  )
+        (forward-line)
+        )
       )
     )
   )
 
-(add-hook 'org-roam-capture-after-find-file-hook
-          'konix/org-roam-capture-after-find-file-hook)
+(defun konix/org-roam-publish-brain ()
+  (interactive)
+  (shell-command "clk org publish brain all --flow &")
+  )
 
+(defun konix/org-roam-publish-blog ()
+  (interactive)
+  (shell-command "clk org publish blog all --flow &")
+  )
+
+(defun konix/org-roam-publish-all ()
+  (interactive)
+  (shell-command "clk org publish all --flow &")
+  )
+
+(defun konix/org-roam--add-global-prop (name value)
+  "Add a file property called NAME to VALUE.
+
+If the property is already set, it's value is not replaced."
+  (save-excursion
+    (widen)
+    (goto-char (point-min))
+    (while (and (not (eobp))
+                (looking-at "^[#:]"))
+      (if (save-excursion (end-of-line) (eobp))
+          (progn
+            (end-of-line)
+            (insert "\n"))
+        (forward-line)
+        (beginning-of-line)))
+    (insert "#+" name ": " value "\n")))
+
+(defun konix/org-roam-key-add ()
+  "Add a ROAM_KEY to Org-roam file.
+
+Return added key."
+  (interactive)
+  (unless org-roam-mode (org-roam-mode))
+  (let ((key (read-string "Key: " )))
+    (when (string-empty-p key)
+      (user-error "Key can't be empty"))
+    (konix/org-roam--add-global-prop
+     "ROAM_KEY" key
+     )
+    (org-roam-db--update-file (buffer-file-name (buffer-base-buffer)))
+    key))
+
+
+(defun konix/org-roam/open-key (key)
+  (interactive
+   (let (
+         (keys (mapcar #'cdr (org-roam--extract-global-props '("ROAM_KEY"))))
+         )
+     (list
+      (pcase (length keys)
+        (0
+         (error "No key if file")
+         )
+        (1
+         (car keys)
+         )
+        (t
+         (completing-read
+          "Key: "
+          keys
+          )
+         )
+        )
+      )
+     )
+   )
+  (shell-command (format "xdg-open '%s' &" key))
+  )
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

@@ -65,7 +65,12 @@
 
 (define-key org-agenda-mode-map (kbd "b")
   #'(lambda () (interactive) (when (yes-or-no-p "Really move earlier?")
-                               (call-interactively org-agenda-earlier)
+                               (call-interactively 'org-agenda-earlier)
+                               )))
+
+(define-key org-agenda-mode-map (kbd "r")
+  #'(lambda () (interactive) (when (yes-or-no-p "Really redo?")
+                               (call-interactively 'org-agenda-redo)
                                )))
 
 (define-key org-agenda-mode-map (kbd "m")

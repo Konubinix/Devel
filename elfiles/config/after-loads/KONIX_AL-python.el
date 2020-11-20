@@ -34,6 +34,14 @@
   (setq-local yas-indent-line 'fixed)
   (auto-complete-mode 1)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
+  (defvar electric-pair-pairs)
+  (setq-local electric-pair-pairs
+              (append
+               '(
+                 (?\` . ?\`)
+                 )
+               electric-pair-pairs)
+              )
   (when (and
          (executable-find "pyls")
          )

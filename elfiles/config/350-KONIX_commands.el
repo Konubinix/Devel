@@ -470,14 +470,15 @@
 
 (defun konix/flyspell-mode (&optional arg)
   (interactive)
-  (setq arg (if (not (null arg)) arg (if flyspell-mode -1 1)))
-  (if (and konix/on-windows-p (not current-prefix-arg))
-	  (message "Flyspell mode deactivated on windows...")
-	(progn
-	  (flyspell-mode arg)
-	  (message "Flyspell mode is now %s" arg)
-	  )
-	)
+  (unless (getenv "KONIX_EMACS_BATCH")
+    (setq arg (if (not (null arg)) arg (if flyspell-mode -1 1)))
+    (if (and konix/on-windows-p (not current-prefix-arg))
+        (message "Flyspell mode deactivated on windows...")
+      (progn
+        (flyspell-mode arg)
+        (message "Flyspell mode is now %s" arg)
+        )
+      ))
   )
 
 (defun konix/make-executable (&optional file)

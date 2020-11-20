@@ -1022,7 +1022,7 @@ awful.rules.rules = {
          tag = "1"
       },
    },
-   -- move the emacs spawn to generate the calendars on tag 8
+   -- move the emacs spawn so that it will come back when ready
    {
       rule = {
          class = "Emacs"
@@ -1064,7 +1064,7 @@ awful.rules.rules = {
          local maybe_move_to_tag
 
          maybe_move_to_tag = function (c)
-            if c.name == "konix_calendar_generation"
+            if c.name == "konix_emacs_batch"
             then
                move_to_tag(c, c.screen.tags[8])
             elseif string.find(c.name, "konix_emacs")

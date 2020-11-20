@@ -643,13 +643,15 @@
 (define-key 'konix/org-global-map "/" 'org-sparse-tree)
 (define-key 'konix/org-global-map "-" 'konix/org-sparse-next-actions)
 (define-key 'konix/org-global-map (kbd "C-l") 'org-toggle-link-display)
+(define-key 'konix/org-global-map (kbd "M-l") 'org-insert-link-global)
 (define-key 'konix/org-global-map (kbd "M-o") 'osg)
 (define-key 'konix/org-global-map (kbd "C-s") 'konix/org-store-agenda-views)
 (define-key 'konix/org-global-map (kbd "C-r") 'konix/org-element-cache-reset-all)
 (define-key 'konix/org-global-map (kbd "t") 'konix/org-clock-todo)
 (define-key 'konix/org-global-map (kbd "f") 'org-roam-find-file)
-(define-key 'konix/org-global-map (kbd "d") 'org-roam-dailies-date)
-(define-key 'konix/org-global-map (kbd "C-d") 'deft)
+(define-key 'konix/org-global-map (kbd "r") 'org-roam-find-ref)
+(define-key 'konix/org-global-map (kbd "d") 'org-roam-dailies-capture-date)
+'(define-key 'konix/org-global-map (kbd "C-d") 'deft)
 (define-key 'konix/org-global-map "N" 'konix/org-roam-note)
 
 

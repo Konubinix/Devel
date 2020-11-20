@@ -53,19 +53,59 @@
   )
 (ad-activate 'org-attach-commit)
 
+(defun konix/org-roam-hugo-expose-before-saving-for-the-first-time ()
+  ""
+  (when (and
+         (equal major-mode 'org-mode)
+         (string-match-p org-roam-directory (buffer-file-name))
+         (not (string-match-p org-roam-dailies-directory (buffer-file-name)))
+         ;; first time saving
+         (not (file-exists-p (buffer-file-name)))
+         )
+    (let (
+          (kind (completing-read
+                 (format "Publish %s to " (buffer-name)) '("braindump" "blog" "none")
+                 nil
+                 t
+                 nil
+                 nil
+                 konix/org-roam-auto-publish-last-value
+                 )
+                )
+          )
+      (setq konix/org-roam-auto-publish-last-value kind)
+      (unless (string-equal kind "none")
+        (konix/org-roam-export/toggle-publish kind)
+        )
+      )
+    )
+  )
+
 (defun konix/org-update-date ()
-  (when (equal major-mode 'org-mode)
+  (when (and
+         (equal major-mode 'org-mode)
+         (not (save-excursion
+                (goto-char (point-min))
+                (re-search-forward "#\\+NODATE" 3000 t)
+                )
+              )
+         )
     (save-excursion
       (goto-char (point-min))
       (while (looking-at "^:")
         (forward-line)
         )
-      (when (re-search-forward "^#\\+DATE:" 3000 t)
-        (beginning-of-line)
-        (kill-line)
-        (kill-line)
+      (if (re-search-forward "^#\\+DATE:" 3000 t)
+          (progn
+            (beginning-of-line)
+            (kill-line)
+            (kill-line)
+            )
+                                        ; not found, put in at the bottom
+        (while (looking-at "^#")
+          (forward-line)
+          )
         )
-
       (insert "#+DATE: " (format-time-string "[%Y-%m-%d %a %H:%M]") "\n")
       )
     )
@@ -92,7 +132,7 @@
       (apply orig-fun args)
       )
      ;; in org-roam-backlinks-mode, just call the function
-     ((and (boundp 'org-roam-backlinks-mode) org-roam-backlinks-mode)
+     ((string-equal (buffer-name) org-roam-buffer)
       (apply orig-fun args)
       )
      ;; On a paragraph, find a link on the current line after point.
@@ -2288,7 +2328,7 @@ items"
                    (set
                     (make-variable-buffer-local
                      'org-agenda-prefix-format)
-                    '((tags . "%-8:c"))
+                    '((tags . "%-11:c"))
                     )
                    )
 
@@ -3001,7 +3041,7 @@ items"
         (deadline_regexp_future " In +\\([0-9]+\\) d\\.")
         (deadline_parent_regexp_past "P-\\([0-9]+\\) d\\. ago")
         (deadline_parent_regexp_future "P-In +\\([0-9]+\\) d\\.")
-        (deadline_regexp_now " In   0 d\\.")
+        (deadline_regexp_now "Deadline\\| In   0 d\\.")
         (deadline_parent_regexp_now "P-In   0 d\\.")
         (a_now (string-match-p deadline_regexp_now a))
         (a_past (and
@@ -3035,33 +3075,33 @@ items"
                )
         (a_parent_now (string-match-p deadline_parent_regexp_now a))
         (a_parent_past (and
-                 (string-match deadline_parent_regexp_past a)
-                 (string-to-number
-                  (match-string 1 a)
-                  )
-                 )
-                )
+                        (string-match deadline_parent_regexp_past a)
+                        (string-to-number
+                         (match-string 1 a)
+                         )
+                        )
+                       )
         (a_parent_fut (and
-                (string-match deadline_parent_regexp_future a)
-                (string-to-number
-                 (match-string 1 a)
-                 )
-                )
-               )
+                       (string-match deadline_parent_regexp_future a)
+                       (string-to-number
+                        (match-string 1 a)
+                        )
+                       )
+                      )
         (b_parent_now (string-match-p deadline_parent_regexp_now b))
         (b_parent_past (and
-                 (string-match deadline_parent_regexp_past b)
-                 (string-to-number
-                  (match-string 1 b)
-                  )
-                 )
-                )
+                        (string-match deadline_parent_regexp_past b)
+                        (string-to-number
+                         (match-string 1 b)
+                         )
+                        )
+                       )
         (b_parent_fut (and
-                (string-match deadline_parent_regexp_future b)
-                (string-to-number
-                 (match-string 1 b)
-                 )
-                )
+                       (string-match deadline_parent_regexp_future b)
+                       (string-to-number
+                        (match-string 1 b)
+                        )
+                       )
                       )
         ;; no value -> assume 99 days
         (a_value (or a_past (and a_now 0) (and a_fut (- 0 a_fut)) -99))
@@ -3288,9 +3328,23 @@ of the clocksum."
                 (sexp :tag "Face") )
           )
   )
+
+(defun konix/org-guess-ispell ()
+  (interactive)
+  (save-excursion
+    (goto-char 0)
+    (save-match-data
+      (when (re-search-forward "^#\\+LANGUAGE: *\\(.+\\)$" 1000 t)
+        (ispell-change-dictionary (match-string-no-properties 1))
+        )
+      )
+    )
+  )
+
 (defun konix/org-mode-hook()
   (setq konix/delete-trailing-whitespace nil)
   (font-lock-add-keywords nil konix/org-mode-font-lock-keywords)
+  (setq-local yas-indent-line 'fixed)
   (require 'foldout)
   (setq konix/adjust-new-lines-at-end-of-file t)
   (local-set-key (kbd "C-a") 'move-beginning-of-line)
@@ -3316,19 +3370,13 @@ of the clocksum."
   (make-local-variable 'before-save-hook)
   (add-hook 'before-save-hook
             'konix/org-update-date)
-
+  (add-hook 'before-save-hook
+            'konix/org-roam-hugo-expose-before-saving-for-the-first-time)
 
   (setq indent-tabs-mode nil)
   (konix/flyspell-mode 1)
   (auto-complete-mode t)
-  (save-excursion
-    (goto-char 0)
-    (save-match-data
-      (when (re-search-forward "^#\\+LANGUAGE: *\\(.+\\)$" 1000 t)
-        (ispell-change-dictionary (match-string-no-properties 1))
-        )
-      )
-    )
+  (konix/org-guess-ispell)
   (abbrev-mode t)
   ;; (visual-line-mode t)
   (setq ac-sources (append ac-sources
@@ -4380,6 +4428,8 @@ of the clocksum."
 (defun konix/org-store-agenda-views ()
   (interactive)
   (require 'org-agenda)
+  (require 'org-roam) ; to understand the konix-org-roam links
+  (require 'ledger-mode) ; to understand the konix/ledger links
   (save-some-buffers)
   (message "Exporting all agenda views")
   (let (
@@ -5263,6 +5313,11 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org-goto-next-open-list-entry ()
+  (interactive)
+  (re-search-forward " [[] []] " nil t)
+  )
+
 (setq-default
  org-speed-commands-user
  '(("Outline Navigation")
@@ -5270,6 +5325,8 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
    ("G" . org-mark-ring-goto)
    ("h" . hl-line-mode)
    (" " . org-next-visible-heading)
+   ("]" . konix/org-goto-next-open-list-entry)
+   ("l" . konix/org-goto-next-open-list-entry)
    ("Manipulation")
    ("k" . konix/org-kill)
    ("+" . konix/org-capture-na-in-heading)
@@ -5321,7 +5378,47 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (define-key org-mode-map (kbd "C-c n i") #'org-roam-insert)
 (key-chord-define org-mode-map "ri" 'org-roam-insert)
+(key-chord-define org-mode-map "rb" 'org-roam-db-build-cache)
 (define-key konix/region-bindings-mode-map "i" 'org-roam-insert)
+
+(setq-default
+ org-export-global-macros
+ '(
+   ("youtube" . "@@html:<div class=\"org-youtube\"><iframe src=\"https://www.youtube-nocookie.com/embed/$1\" allowfullscreen title=\"YouTube Video\"></iframe></div>@@")
+   )
+ )
+
+(defun konix/org-add-quote-at-point (url title body)
+  (with-current-buffer (window-buffer (selected-window))
+    (let* (
+           (decoded-title (s-trim (org-link-decode title)))
+           (decoded-url (s-trim (org-link-decode url)))
+           (decoded-body (s-trim (org-link-decode body)))
+           )
+      (move-beginning-of-line nil)
+      (unless (looking-at "^[\t ]*$")
+        (move-end-of-line nil)
+        (insert "\n")
+        )
+      (insert "\n")
+      (org-indent-line)
+      (unless (string-equal "" decoded-body)
+        (insert "- ")
+        )
+      (insert (format "[[%s][%s]]" decoded-url decoded-title))
+      (unless (string-equal "" decoded-body)
+        (insert " ::\n")
+        (org-indent-line)
+        (insert "#+BEGIN_QUOTE\n" decoded-body "\n")
+        (insert "#+END_QUOTE")
+        (org-indent-line)
+        (insert "\n")
+        )
+      (insert "\n")
+      (org-indent-line)
+      )
+    )
+  )
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

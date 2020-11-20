@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-# name: _ex
-# key: _ex
+# name: ex
+# key: ex
 # --
 $>#+BEGIN_EXAMPLE
 $>$0

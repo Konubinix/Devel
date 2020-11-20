@@ -31,6 +31,7 @@
   (konix/prog/config)
   ;; fed up with auto line breaks
   (setq indent-tabs-mode nil)
+  (setq-local yas-indent-line 'fixed)
   (auto-complete-mode 1)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
   (when (and

@@ -1,4 +1,4 @@
-;;; KONIX_AL-slack-thread-message-buffer-mode.el ---   -*- lexical-binding: t; -*-
+;;; KONIX_AL-slack-thread-message-buffer.el ---   -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  konubinix
 
@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'KONIX_slack-message-mode)
+(require 'KONIX_slack-edit)
 
 (add-hook 'slack-thread-message-buffer-mode-hook
           'konix/slack-message-edit-mode-hook)
@@ -32,5 +32,5 @@
 (konix/slack-message-setup-keys slack-thread-message-buffer-mode-map)
 
 
-(provide 'KONIX_AL-slack-thread-message-buffer-mode)
+(provide 'KONIX_AL-slack-thread-message-buffer)
 ;;; KONIX_AL-slack-thread-message-buffer-mode.el ends here

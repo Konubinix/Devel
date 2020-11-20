@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'KONIX_slack-message-mode)
+(require 'KONIX_slack-edit)
 
 (add-hook 'slack-message-buffer-mode-hook
           'konix/slack-message-edit-mode-hook)

@@ -73,6 +73,7 @@
 (depends-on "lsp-java")
 (depends-on "hydra")
 (depends-on "org-roam")
+(depends-on "org-roam-server")
 (depends-on "org-edna")
 (depends-on "deft")
 (depends-on "el-patch")

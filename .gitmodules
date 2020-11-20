@@ -138,3 +138,6 @@ ignore=dirty
 [submodule "elfiles/fence-edit"]
 	path = elfiles/fence-edit
 	url = https://github.com/aaronbieber/fence-edit.el
+[submodule "elfiles/org-link-minor-mode"]
+	path = elfiles/org-link-minor-mode
+	url = https://github.com/seanohalpin/org-link-minor-mode

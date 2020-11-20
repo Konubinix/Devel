@@ -14,6 +14,7 @@
 		 (expand-file-name "ini" elfiles)
          (expand-file-name "ol-emacs-slack" elfiles)
          (expand-file-name "fence-edit" elfiles)
+         (expand-file-name "org-link-minor-mode" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -142,6 +143,7 @@
 (autoload 'konix/org-roam-export/org-publish-brain-dump "KONIX_org-roam-export" "" t)
 (autoload 'konix/org-roam-export/toggle-publish "KONIX_org-roam-export" "" t)
 (autoload 'konix/fence-edit-dwim "KONIX_fence-edit" "" t)
+(autoload 'org-link-minor-mode "org-link-minor-mode" "" t)
 
 ;; ************************************************************
 ;; Automodes

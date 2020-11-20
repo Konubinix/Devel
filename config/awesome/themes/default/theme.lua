@@ -1,7 +1,6 @@
 ---------------------------
 -- Default awesome theme --
 ---------------------------
-
 local theme_assets = require("beautiful.theme_assets")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
@@ -55,6 +54,9 @@ theme.taglist_squares_unsel = theme_assets.taglist_squares_unsel(
 -- Variables set for theming notifications:
 -- notification_font
 -- notification_[bg|fg]
+theme.notification_font = "DejaVu Sans 10"
+theme.notification_bg = "cyan"
+theme.notification_fg = "black"
 -- notification_[width|height|margin]
 -- notification_[border_color|border_width|shape|opacity]
 

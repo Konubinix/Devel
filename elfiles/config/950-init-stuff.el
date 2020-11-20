@@ -31,7 +31,7 @@
   (message "Killed")
   )
 
-(if (getenv "KONIX_START_CALENDAR")
+(if (getenv "KONIX_EMACS_BATCH")
     (progn
       )
   (progn

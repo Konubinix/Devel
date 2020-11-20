@@ -2489,7 +2489,7 @@ items"
 (setq-default org-agenda-include-deadlines t)
 (setq-default org-agenda-window-setup 'current-window)
 (setq-default org-archive-location "%s_archive::")
-(setq-default org-clock-in-resume (not (getenv "KONIX_START_CALENDAR")))
+(setq-default org-clock-in-resume (not (getenv "KONIX_EMACS_BATCH")))
 (setq-default org-clock-out-remove-zero-time-clocks t)
 (setq-default org-clock-persist (quote clock))
 (setq-default org-clock-persist-file (expand-file-name "org-clock-save.el" user-emacs-directory))

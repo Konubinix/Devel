@@ -6,3 +6,7 @@ description = "show hostname"
 command = "date +%H:%M:%S"
 when = "true"
 description = "show date"
+[custom.X]
+command = "echo graphical"
+when = "test -n \"${DISPLAY}\""
+description = "show graphical"

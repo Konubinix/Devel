@@ -1,11 +1,15 @@
-#!/bin/bash -eu
+#!/bin/bash
+
+set -eu
+source _clk.sh
 
 docker-make-options () {
-    echo "A:name:$(docker-make-targets|list_to_choice):Name of the image to build"
+    echo "A:name:$(docker-make-targets|clk_list_to_choice):Name of the image to build"
     echo 'O:--platform:["linux/amd64", "linux/arm/v7", "linux/amd64,linux/386,linux/arm/v7", "linux/amd64,linux/386", "linux/arm/v6"]:Platform to build to:linux/amd64,linux/386,linux/arm/v7'
     echo 'N:Arguments to pass to docker buildx build as-is'
     echo "O:-t,--tag:str:Tag:latest"
     echo "O:--build-args:str:Build args"
+    echo "O:--port:str:Port hosting the registry:9692"
 }
 
 _docker-make-targets () {
@@ -36,7 +40,7 @@ docker-make-it () {
     docker-make -pn "${CLK___NAME}"
     docker buildx build \
            "${args[@]}" \
-           -t "localhost:9692/${CLK___NAME}:${CLK___TAG}" \
+           -t "localhost:${CLK___PORT}/${CLK___NAME}:${CLK___TAG}" \
            --platform "${CLK___PLATFORM}" \
 		   --push \
            "." \

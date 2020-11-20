@@ -1,4 +1,4 @@
-;;; KONIX_slack-message-mode.el ---                     -*- lexical-binding: t; -*-
+;;; KONIX_slack-edit.el ---                     -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  konubinix
 
@@ -24,6 +24,31 @@
 
 ;;; Code:
 
+(defun konix/slack-message-wrap-quote ()
+  (interactive)
+  (if (and
+       (region-active-p)
+       (not
+        (equal
+         (line-number-at-pos (region-beginning))
+         (line-number-at-pos (region-end))
+         )
+        )
+       )
+      (save-excursion
+        (goto-char (region-beginning))
+        (unless (looking-at "```")
+          (insert "```")
+          )
+        (goto-char (region-end))
+        (unless (looking-at "```")
+          (insert "```")
+          )
+        )
+    (call-interactively 'self-insert-command)
+    )
+  )
+
 (defun konix/slack-message-edit-mode-hook ()
   (visual-line-mode)
   (defvar electric-pair-pairs)
@@ -34,6 +59,7 @@
                  )
                electric-pair-pairs)
               )
+  (local-set-key (kbd "`") 'konix/slack-message-wrap-quote)
   (abbrev-mode 1)
   )
 
@@ -90,9 +116,30 @@
   (interactive)
   (goto-char (point-max))
   (move-beginning-of-line nil)
-  (kill-region (point) (point-max))
+  (copy-region-as-kill (point) (point-max))
   (call-interactively 'slack-message-write-another-buffer)
   (yank)
+  )
+
+(defun konix/slack-clipboard-image-upload ()
+  (interactive)
+  (let* ((file (make-temp-file "clip" nil ".png"))
+         (selection-coding-system 'no-conversion)
+         (coding-system-for-write 'binary)
+         buffer)
+
+    (write-region (or (gui-get-selection 'CLIPBOARD 'image/png)
+                      (error "No image in CLIPBOARD"))
+                  nil file nil 'quiet)
+
+    (save-window-excursion
+      (setq buffer (find-file file))
+      (when (yes-or-no-p "Send this image?")
+        (slack-file-upload file "png" "image.png")
+        )
+      (kill-buffer buffer)
+      )
+    )
   )
 
 (defun konix/slack-message-setup-keys (mode-map)
@@ -106,11 +153,10 @@
   (define-key mode-map (kbd "M-e") 'slack-message-edit)
   (define-key mode-map (kbd "M-r") 'konix/slack-message-buffer-go-to-new-message-marker)
   (define-key mode-map (kbd "M-d") 'slack-message-delete)
-  (define-key mode-map (kbd "M-u") 'slack-clipboard-image-upload)
+  (define-key mode-map (kbd "M-u") 'konix/slack-clipboard-image-upload)
   (define-key mode-map (kbd "M-f") 'slack-file-upload)
   )
 
 
-
-(provide 'KONIX_slack-message-mode)
+(provide 'KONIX_slack-edit)
 ;;; KONIX_slack-edit-mode.el ends here

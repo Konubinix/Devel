@@ -62,6 +62,7 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
 (konix/slack-with-change-team slack-select-rooms)
 (konix/slack-with-change-team slack-im-open)
 (konix/slack-with-change-team slack-im-select)
+(konix/slack-with-change-team slack-all-threads)
 
 
 (defun konix/slack-select-rooms ()
@@ -82,9 +83,11 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
 ;; team based commands
 (define-key konix/slack-global-map (kbd "u") 'konix/slack-select-unread-rooms)
 (define-key konix/slack-global-map (kbd "r") 'konix/slack-select-rooms)
-(define-key konix/slack-global-map (kbd "R") 'konix/slack-select-rooms)
+(define-key konix/slack-global-map (kbd "U") 'konix/slack-all-threads)
 (define-key konix/slack-global-map (kbd "o") 'konix/slack-im-open)
+(define-key konix/slack-global-map (kbd "g") 'slack-group-select)
 (define-key konix/slack-global-map (kbd "s") 'konix/slack-im-select)
+(define-key konix/slack-global-map (kbd "S") 'slack-room-user-select)
 (define-key konix/slack-global-map (kbd "M-u") 'slack-file-upload-snippet)
 
 (add-to-list 'tracking-ignored-buffers "\\*Slack - .+ : .+ Thread - [0-9.]+")

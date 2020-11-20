@@ -1,4 +1,4 @@
-;;; KONIX_AL-slack-message-compose-buffer-mode.el ---   -*- lexical-binding: t; -*-
+;;; KONIX_AL-slack-message-compose-buffer.el ---   -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  konubinix
 
@@ -24,22 +24,20 @@
 
 ;;; Code:
 
+(require 'KONIX_slack-edit)
+
+(konix/slack-message-setup-keys slack-message-compose-buffer-mode-map)
+
 (defun konix/slack-message-compose-buffer-mode-hook ()
-  (visual-line-mode)
-  (defvar electric-pair-pairs)
-  (setq-local electric-pair-pairs
-              (append
-               '(
-                 (?\` . ?\`)
-                 )
-               electric-pair-pairs)
-              )
-  (abbrev-mode 1)
+  ;; don't put it in the message-editmode, as it make emacs crash in
+  ;; message-buffer-mode
+  (flyspell-mode)
+  (konix/slack-message-edit-mode-hook)
   )
 
 (add-hook 'slack-message-compose-buffer-mode-hook
           'konix/slack-message-compose-buffer-mode-hook)
 
 
-(provide 'KONIX_AL-slack-message-compose-buffer-mode)
+(provide 'KONIX_AL-slack-message-compose-buffer)
 ;;; KONIX_AL-slack-message-compose-buffer-mode.el ends here

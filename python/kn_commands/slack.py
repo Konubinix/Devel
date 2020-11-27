@@ -998,6 +998,7 @@ def history(fields, format, conversation, oldest, latest,
 @option("--count", type=int, default=100000, help="How many to record per conversation")
 def record_log(archived, all, count):
     """Dump the records for archiving purpose."""
+    LOGGER.info(f"Dumping the logs for {config.slack.account}")
     for c in (
             config.slack.archived_conversations if archived else
             config.slack.all_conversations if all else

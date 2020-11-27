@@ -67,13 +67,7 @@ def get_slack_token():
 
 def parse_text(text):
     text = text.replace("{", "{{").replace("}", "}}")
-    text = re.sub("<@([^>|]+)([|][^>]+)?>", r"{\1}", text)
-    text = text.format(
-        **{
-            id: "@" + user["name"]
-            for id, user in config.slack.users.items()
-        }
-    )
+    text = re.sub("<@(?P<id>[^>|]+)([|][^>]+)?>", config.slack.users.formatter, text)
     return text
 
 
@@ -547,6 +541,37 @@ class RTM():
                 yield chunk
 
 
+class Users:
+    """Proxy to access the users.
+
+    It uses a cached version of the team users and
+    fetches users it does not about (like those in shared conversation)."""
+    def __init__(self, slackconfig):
+        @cache_disk(expire=36000)
+        def hosted_users(token):
+            return {
+                user["id"]: User(user)
+                for user in slackconfig.client.users.list().body["members"]
+            }
+        self.hosted_users = hosted_users(slackconfig.token)
+        self.slackconfig = slackconfig
+
+    def formatter(self, match):
+        user = self[match.group("id")]
+        return "@" + user["name"]
+
+    def __getitem__(self, key):
+        @cache_disk(expire=36000)
+        def get_user(key):
+            if key in self.hosted_users:
+                return self.hosted_users[key]
+            else:
+                return User(
+                    self.slackconfig.client.users.info(key).body["user"]
+                )
+        return get_user(key)
+
+
 class SlackConfig():
     def __init__(self):
         self._client = None
@@ -589,21 +614,13 @@ class SlackConfig():
 
     @property
     def users(self):
-        @cache_disk(expire=36000)
-        def _users(token):
-            return {
-                user["id"]: User(user)
-                for user in self.client.users.list().body["members"]
-            }
-        if self._users is None:
-            self._users = _users(self.token)
-        return self._users
+        return Users(self)
 
     @property
     def active_users(self):
         return {
             key: value
-            for key, value in self.users.items()
+            for key, value in self.users.hosted_users.items()
             if (
                     not value.data.get("deleted")
                     and not value.data.get("is_bot")

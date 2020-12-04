@@ -929,9 +929,9 @@
 ;; use phi search instead of the native one
 (require 'phi-search)
 (require 'phi-search-mc)
-(substitute-key-definition 'isearch-forward 'phi-search (current-global-map))
-(substitute-key-definition 'isearch-backward 'phi-search-backward (current-global-map))
-(substitute-key-definition 'query-replace 'phi-replace-query (current-global-map))
+;; (substitute-key-definition 'isearch-forward 'phi-search (current-global-map))
+;; (substitute-key-definition 'isearch-backward 'phi-search-backward (current-global-map))
+;; (substitute-key-definition 'query-replace 'phi-replace-query (current-global-map))
 
 ;; (substitute-key-definition 'isearch-forward-regexp 'phi-search (current-global-map))
 ;; (substitute-key-definition 'isearch-backward-regexp 'phi-search-backward (current-global-map))

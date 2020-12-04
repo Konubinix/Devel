@@ -435,6 +435,22 @@
   ""
   )
 
+(defface konix/org-agenda-waiting-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "MediumPurple4")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "MediumPurple4")
+	 )
+	)
+  ""
+  )
+
 (defface konix/org-agenda-milestone
   '(
 	(
@@ -682,6 +698,8 @@
     ("discret" . konix/org-agenda-discret-face)
     ("lunch" . konix/org-agenda-pause-face)
     ("pause" . konix/org-agenda-pause-face)
+    ("wait" . konix/org-agenda-waiting-face)
+    ("delegated" . konix/org-agenda-waiting-face)
 	)
   "")
 
@@ -954,6 +972,11 @@
      (org-remove-subtree-entries-from-agenda))
     )
   )
+
+(setq-default
+ org-agenda-deadline-leaders
+ '("Deadline:  " "In %3d d.- " "%2d d. ago- ")
+ )
 
 (setq-default
  org-agenda-prefix-format

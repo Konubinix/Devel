@@ -31,5 +31,21 @@
 
 (konix/slack-message-setup-keys slack-message-buffer-mode-map)
 
+(defun konix/slack-message-go-to-thread-context ()
+  (interactive)
+  (let*
+      (
+       (ts (org-get-at-bol 'ts))
+       (buf slack-current-buffer)
+       (team (slack-buffer-team buf))
+       (room (slack-buffer-room buf))
+       (message (slack-room-find-message room ts))
+       (thread-ts (slack-thread-ts message))
+       )
+    (slack-buffer-goto thread-ts)
+    )
+  )
+
+
 (provide 'KONIX_AL-slack-message-buffer)
 ;;; KONIX_AL-slack-message-buffer.el ends here

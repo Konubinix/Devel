@@ -3401,11 +3401,16 @@ of the clocksum."
                  )
                electric-pair-pairs)
               )
-  (make-local-variable 'before-save-hook)
   (add-hook 'before-save-hook
-            'konix/org-update-date)
+            'konix/org-update-date
+            nil
+            t
+            )
   (add-hook 'before-save-hook
-            'konix/org-roam-hugo-expose-before-saving-for-the-first-time)
+            'konix/org-roam-hugo-expose-before-saving-for-the-first-time
+            nil
+            t
+            )
 
   (setq indent-tabs-mode nil)
   (konix/flyspell-mode 1)

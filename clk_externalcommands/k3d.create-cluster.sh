@@ -9,6 +9,7 @@ Run k3d the way I like it
 F:--metallb/--no-metallb:Also install metallb:True
 F:--registry/--no-registry:Also connect to local registry:True
 F:--debug/--no-debug:Enable set -x
+O:--private-registry-file:str:Location of a private registry file to merge with the default one
 N:Remaining args to give to k3d cluster create
 EOF
 }
@@ -18,6 +19,9 @@ then
 	usage
 	exit 0
 fi
+
+TMP="$(mktemp -d)"
+trap "rm -rf '${TMP}'" 0
 
 args=(
 	--k3s-server-arg --no-deploy=traefik \
@@ -40,6 +44,17 @@ mirrors:
     endpoint:
       - "http://registry.localhost:5000"
 EOF
+	if [ -n "${CLK___PRIVATE_REGISTRY_FILE}" ]
+	then
+		mkdir -p "${TMP}/registries"
+		pushd "${TMP}/registries"
+		{
+			cp "${HOME}/.k3d/my-registries.yaml" "${CLK___PRIVATE_REGISTRY_FILE}" .
+			docker run --rm -i -v "${PWD}":/workdir mikefarah/yq yq m * > "${HOME}/.k3d/my-registries.yaml"
+		}
+		popd
+	fi
+
 	args+=(
 		--volume "${HOME}/.k3d/my-registries.yaml:/etc/rancher/k3s/registries.yaml"
 	)

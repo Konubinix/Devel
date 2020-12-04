@@ -1426,6 +1426,24 @@ items"
                                  ))
                               )
                              )
+                  (tags-todo "DELEGATED-maybe|WAIT-maybe"
+                             (
+                              (org-agenda-prefix-format
+                               '(
+                                 (tags . "%(konix/org-agenda-prefix-format/ann)")
+                                 )
+                               )
+                              (dummy (setq-local org-agenda-todo-keyword-format ""))
+                              (org-agenda-todo-ignore-deadlines nil)
+                              (org-agenda-overriding-header
+                               "Waiting stuff not yet scheduled but that someone might tell you about")
+                              (org-agenda-skip-function
+                               '(or
+                                 (org-agenda-skip-if t '(notdeadline))
+                                 (konix/org-agenda-skip-if-task-of-project)
+                                 ))
+                              )
+                             )
                   )
                  (
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
@@ -1961,24 +1979,8 @@ items"
                             '(or
                               (konix/org-agenda-skip-if-tags
                                '("project" "goal" "aofs"))
-                              (konix/org-agenda-skip-if-tags '("maybe" "WAIT" "DELEGATED"))
+                              (konix/org-agenda-skip-if-tags '("maybe"))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
-                              ;;(org-agenda-skip-entry-if 'scheduled)
-                              )
-                            )
-                           )
-                          )
-                  (agenda nil
-                          (
-                           (org-agenda-include-deadlines t)
-                           (org-agenda-overriding-header "Waiting stuff")
-                           (org-agenda-skip-function
-                            '(or
-                              (konix/org-agenda-skip-if-tags
-                               '("project" "goal" "aofs" "maybe"))
-                              (konix/org-agenda-for-today-skip-if-not-the-good-time
-                               t)
-                              (konix/org-agenda-keep-if-tags '("WAIT" "DELEGATED"))
                               ;;(org-agenda-skip-entry-if 'scheduled)
                               )
                             )
@@ -2003,6 +2005,28 @@ items"
                             )
                            )
                           )
+                  (tags "WAIT-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"|DELEGATED-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
+                        (
+                         (org-agenda-include-deadlines t)
+                         (org-agenda-overriding-header "Waiting stuff")
+                         (org-agenda-prefix-format
+                          '(
+                            (tags . "%(konix/org-agenda-prefix-format/ann)")
+                            )
+                          )
+                         (dummy (setq-local org-agenda-todo-keyword-format ""))
+                         (org-agenda-skip-function
+                          '(or
+                            (konix/org-agenda-skip-if-tags
+                             '("goal" "aofs" "maybe"))
+                            (konix/org-agenda-for-today-skip-if-not-the-good-time
+                             t)
+                            ;; (konix/org-agenda-keep-if-tags '("WAIT" "DELEGATED"))
+                            ;;(org-agenda-skip-entry-if 'scheduled)
+                            )
+                          )
+                         )
+                        )
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'agenda))
@@ -2417,7 +2441,12 @@ items"
                             )
                           )
                          (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-
+                         (org-agenda-prefix-format
+                          '(
+                            (tags . "%(konix/org-agenda-prefix-format/ann)")
+                            )
+                          )
+                         (dummy (setq-local org-agenda-todo-keyword-format ""))
                          (org-agenda-todo-ignore-scheduled 'future)
                          (org-agenda-todo-ignore-with-date nil)
                          (org-agenda-todo-ignore-deadlines nil)

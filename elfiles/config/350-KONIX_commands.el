@@ -1834,5 +1834,26 @@ FExport diary data into iCalendar file: ")
     )
   )
 
+(defun konix/find-executable (executable)
+  (interactive
+   (list
+    (completing-read
+     "executable: "
+     (split-string (s-trim (shell-command-to-string "konix_all_executables.sh")) "\n")
+     )
+    )
+   )
+  (find-file executable)
+  )
+
+(defun konix/find-customcommand (customcommand)
+  (interactive
+   (list
+    (completing-read "customcommand: " (split-string (s-trim (shell-command-to-string "clk customcommands list")) "\n"))
+    )
+   )
+  (find-file customcommand)
+  )
+
 (provide '350-KONIX_commands)
 ;;; 350-KONIX_commands.el ends here

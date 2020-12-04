@@ -1,7 +1,9 @@
 (require 'region-bindings-mode)
 (require 'framemove)
 (require 'qutebrowser)
+(require 'savehist)
 
+(savehist-mode 1)
 (ivy-mode)
 ;; till I find out how vc works, I send manually my custom git mode
 (load-library "KONIX_git")

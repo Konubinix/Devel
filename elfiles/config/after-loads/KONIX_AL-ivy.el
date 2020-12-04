@@ -41,9 +41,12 @@
 
 (define-key global-map [remap describe-variable] 'counsel-describe-variable)
 (define-key global-map [remap describe-function] 'counsel-describe-function)
+(define-key help-map (kbd "C-k") 'counsel-descbinds)
 (define-key global-map [remap execute-extended-command] 'counsel-M-x)
 (define-key global-map [remap konix/kill-ring-insert] 'counsel-yank-pop)
 (define-key global-map [remap occur] 'swiper)
+(define-key global-map (kbd "M-s M-a")  'swiper-all)
+(define-key konix/global-slow-key-map (kbd "M-s") 'counsel-fzf)
 
 (define-key 'konix/ivy/map (kbd "r") 'ivy-resume)
 (define-key ivy-minibuffer-map (kbd "C-+") 'ivy-minibuffer-grow)

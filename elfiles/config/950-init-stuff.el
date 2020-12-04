@@ -18,7 +18,6 @@
 (setq konix/start-calendar nil)
 
 (defun konix/start-calendar nil
-  (require 'org-roam)
   (toggle-debug-on-error)
 
   (setq konix/start-calendar t)

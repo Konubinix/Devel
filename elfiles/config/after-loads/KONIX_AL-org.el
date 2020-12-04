@@ -5421,6 +5421,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (define-key org-mode-map (kbd "C-c n i") #'org-roam-insert)
 (key-chord-define org-mode-map "ri" 'org-roam-insert)
+(key-chord-define org-mode-map "ry" 'konix/org-roam/insert-key)
 (key-chord-define org-mode-map "rb" 'org-roam-db-build-cache)
 (define-key konix/region-bindings-mode-map "i" 'org-roam-insert)
 

@@ -3371,7 +3371,11 @@ of the clocksum."
   )
 
 (defun konix/org-mode-hook()
-  (setq konix/delete-trailing-whitespace nil)
+  "My org mode hook."
+  ;; my todo tasks may be very big, with clocks and logs and...  Thus, only
+  ;; delete the trailing whitespaces on org roam notes, meant to be of rghuman
+  ;; size.
+  (setq konix/delete-trailing-whitespace (org-roam--org-roam-file-p))
   (font-lock-add-keywords nil konix/org-mode-font-lock-keywords)
   (setq-local yas-indent-line 'fixed)
   (goto-address-mode 1)

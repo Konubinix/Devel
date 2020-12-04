@@ -84,33 +84,31 @@
   )
 
 (defun konix/org-update-date ()
-  (when (and
-         (equal major-mode 'org-mode)
-         (not (save-excursion
-                (goto-char (point-min))
-                (re-search-forward "#\\+NODATE" 3000 t)
-                )
-              )
-         )
-    (save-excursion
-      (goto-char (point-min))
-      (while (looking-at "^:")
-        (forward-line)
-        )
-      (if (re-search-forward "^#\\+DATE:" 3000 t)
-          (progn
-            (beginning-of-line)
-            (kill-line)
-            (kill-line)
-            )
-                                        ; not found, put in at the bottom
-        (while (looking-at "^#")
-          (forward-line)
+  (org-with-wide-buffer
+   (when (and
+          (equal major-mode 'org-mode)
+          (not (save-excursion
+                 (goto-char (point-min))
+                 (re-search-forward "#\\+NODATE" 3000 t)
+                 )
+               )
           )
-        )
-      (insert "#+DATE: " (format-time-string "[%Y-%m-%d %a %H:%M]") "\n")
-      )
-    )
+     (save-excursion
+       (goto-char (point-min))
+       (while (looking-at "^:")
+         (forward-line)
+         )
+       (if (re-search-forward "^#\\+DATE:" 3000 t)
+           (delete-region (point-at-bol) (1+ (point-at-eol)))
+         ;; not found, put in at the bottom
+         (while (looking-at "^#")
+           (forward-line)
+           )
+         )
+       (insert "#+DATE: " (format-time-string "[%Y-%m-%d %a %H:%M]") "\n")
+       )
+     )
+   )
   )
 
 (defun konix/org-open-at-point-move-to-link (orig-fun &rest args)

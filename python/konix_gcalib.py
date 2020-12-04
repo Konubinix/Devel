@@ -247,7 +247,7 @@ class GCall(cmd.Cmd, object):
 
         Event = konix_collections.namedtuples_default_values(
             "Event",
-            list(self.types["Event"]["keys"]) + ["calendar_id"],
+            sorted(list(self.types["Event"]["keys"]) + ["calendar_id"]),
             {k: "" for k in self.types["Event"]["keys"]}
         )
 

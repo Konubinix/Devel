@@ -55,6 +55,9 @@
 (define-key org-agenda-mode-map (kbd "C-.")
   'org-agenda-set-tags)
 
+(define-key org-agenda-mode-map (kbd "M-l")
+  'hl-line-mode)
+
 (define-key org-agenda-mode-map (kbd "N")
   'konix/org-roam-note)
 

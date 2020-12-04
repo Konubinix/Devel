@@ -25,9 +25,10 @@
 ;;; Code:
 
 (require 'org-roam-protocol)
+(require 'KONIX_org-roam-export)
 
 (setq-default org-roam-directory (expand-file-name "roam" perso-dir))
-(setq-default org-roam-prefer-id-links nil)
+(setq-default org-roam-prefer-id-links t)
 (setq-default org-roam-completion-everywhere t)
 
 (define-key org-roam-mode-map (kbd "C-c n l") #'org-roam)
@@ -37,6 +38,7 @@
 (define-key org-roam-mode-map (kbd "C-c n I") 'konix/org-roam-separate_camelcase_and_insert)
 (define-key org-roam-mode-map (kbd "C-c n t") 'konix/org-roam-export/toggle-publish)
 (key-chord-define org-roam-mode-map " i" 'konix/org-roam-separate_camelcase_and_insert)
+(key-chord-define org-roam-mode-map " y" 'konix/org-roam-separate_camelcase_and_insert-key)
 
 (setq-default org-roam-capture-templates
               '(
@@ -87,31 +89,41 @@ ${title}
           )
          )
     (konix/org-add-note-no-interaction
-     (format "[[file:%s][Roam note]]"
-             (or
-              (buffer-file-name roam-buffer)
-              (plist-get (plist-get org-capture-current-plist :org-roam) :file-path)
+     (format "[[id:%s][Roam note]]"
+             (with-current-buffer roam-buffer
+               (save-excursion
+                 (goto-char (point-min))
+                 (org-id-get-create)
+                 )
               )))
     (pop-to-buffer roam-buffer)
     )
   )
 
-(defun konix/org-roam-separate_camelcase_and_insert ()
+(defun konix/org-roam-separate_camelcase_and_insert (&optional function)
   (interactive)
-  (save-excursion
-    (let (
-          beg
-          (end (point-marker))
-          )
+  (let (
+        beg
+        (end (point-marker))
+        (after-end-marker (save-excursion (goto-char (1+ (point))) (point-marker)))
+        )
+    (save-excursion
       (backward-word)
       (setq beg (point-marker))
       (replace-regexp "_" "  " nil (point) (marker-position end))
       (set-mark (marker-position beg))
       (goto-char (marker-position end))
-      (org-roam-insert nil)
+      (funcall (or function 'org-roam-insert))
       )
+    (goto-char (1-
+                (marker-position after-end-marker)
+                ))
     )
-  (end-of-line)
+  )
+
+(defun konix/org-roam-separate_camelcase_and_insert-key ()
+  (interactive)
+  (konix/org-roam-separate_camelcase_and_insert 'konix/org-roam/insert-key)
   )
 
 (add-to-list 'golden-ratio-exclude-buffer-names "*org-roam*")
@@ -208,6 +220,19 @@ ${title}
                     (buffer-file-name)))
          nil)))))
 
+(defun konix/org-roam-is-in-roam-p ()
+  (string-prefix-p org-roam-directory
+                   (cond
+                    (org-capture-mode
+                     (with-current-buffer (org-capture-get :buffer) (buffer-file-name))
+                     )
+                    (t
+                     (buffer-file-name)
+                     )
+                    )
+                   )
+  )
+
 (setq-default org-roam-tag-sources '(prop))
 
 (defun konix/org-roam-format-link/around (orig-fun target &optional description type)
@@ -215,16 +240,7 @@ ${title}
  when linking to org roam from outside of org roam"
   (if (or
        (string-equal org-roam-buffer (buffer-name (current-buffer)))
-       (string-prefix-p org-roam-directory
-                        (cond
-                         (org-capture-mode
-                          (with-current-buffer (org-capture-get :buffer) (buffer-file-name))
-                          )
-                         (t
-                          (buffer-file-name)
-                          )
-                         )
-                        )
+       (konix/org-roam-is-in-roam-p)
        )
       (funcall orig-fun target description type)
     (let (
@@ -344,6 +360,145 @@ Return added key."
    )
   (shell-command (format "xdg-open '%s' &" key))
   )
+
+(defun konix/org-roam-quotes-insert-semicolumns ()
+  (interactive)
+  (when (konix/org-roam-is-in-roam-p)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "^[ \t]*- \\[\\[\\([^]]+\\|[^]]+\\]\\[[^]]+\\)\\]\\]$" nil t)
+        (insert " ::")
+        )
+      )
+    )
+  )
+
+(defun konix/org-roam-make-sure-has-id ()
+  (when (konix/org-roam-is-in-roam-p)
+    (save-excursion
+      (goto-char (point-min))
+      (org-id-get-create)
+      )
+    )
+  )
+
+(defun konix/org-mode-hook--for-org-roam ()
+  (add-hook 'before-save-hook
+            'konix/org-roam-quotes-insert-semicolumns
+            nil
+            t)
+  (add-hook 'before-save-hook
+            'konix/org-roam-make-sure-has-id
+            nil
+            t)
+  )
+
+(add-hook #'org-mode-hook
+          #'konix/org-mode-hook--for-org-roam)
+
+
+(defun konix/org-roam-extract-keys ()
+  (mapcar #'cdr (reverse (org-roam--extract-global-props '("ROAM_KEY"))))
+  )
+
+(defun konix/org-roam/yank-key ()
+  (interactive)
+  (if (and
+       (equal major-mode 'org-mode)
+       (string-prefix-p org-roam-directory (buffer-file-name))
+       )
+      (let* (
+             (keys (konix/org-roam-extract-keys))
+             (key (cond
+                   ((equal (length keys) 1)
+                    (car keys)
+                    )
+                   ((equal (length keys) 0)
+                    (error "No key in %s" (buffer-file-name))
+                    )
+                   (t
+                    (completing-read "Key: " keys)
+                    )
+                   ))
+             )
+        (with-temp-buffer
+          (insert key)
+          (clipboard-kill-region (point-min) (point-max))
+          )
+        (message "%s copied into the clipboard" key)
+        )
+    (let* ((completions (org-roam--get-title-path-completions))
+           (title-with-tags (org-roam-completion--completing-read
+                             "File: "
+                             completions
+                             )
+                            )
+           (res (cdr (assoc title-with-tags completions)))
+           (file-path (plist-get res :path)))
+      (save-window-excursion
+        (with-current-buffer (find-file file-path)
+          (call-interactively 'konix/org-roam/yank-key)
+          )
+        )
+      )
+    )
+  )
+
+(defun konix/org-roam/insert-key ()
+  (interactive)
+  (let* (
+         (link-text (when (region-active-p)
+                      (buffer-substring-no-properties (region-beginning) (region-end))
+                      ))
+         (completions (org-roam--get-title-path-completions))
+         (title-with-tags (org-roam-completion--completing-read
+                           "File: "
+                           completions
+                           :initial-input link-text
+                           )
+                          )
+         (res (cdr (assoc title-with-tags completions)))
+         (file-path (plist-get res :path))
+         (title (plist-get res :title))
+         (keys (with-current-buffer (save-window-excursion
+                                      (find-file
+                                       file-path
+                                       )
+                                      )
+                 (konix/org-roam-extract-keys)
+                 )
+               )
+         (key (cond
+               ((equal (length keys) 1)
+                (car keys)
+                )
+               ((equal (length keys) 0)
+                (error "No key in %s" title)
+                )
+               (t
+                (completing-read "Key: " keys)
+                )
+               ))
+         )
+    (setq link-text (or link-text title))
+    (when (region-active-p)
+      (delete-active-region)
+      )
+    (insert (format "[[%s][%s]]" key link-text))
+    )
+  )
+
+(defun konix/org-roam-complete-everywhere/custom-syntax-table (orig-fun)
+  (let ((stab  (copy-syntax-table)))
+    (with-syntax-table stab
+      ;; make ' not part of the word
+      (modify-syntax-entry ?' " ")
+      (funcall orig-fun)
+      )
+    )
+  )
+(advice-add 'org-roam-complete-everywhere :around #'konix/org-roam-complete-everywhere/custom-syntax-table)
+
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

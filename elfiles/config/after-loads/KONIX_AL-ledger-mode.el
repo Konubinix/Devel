@@ -36,12 +36,22 @@
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("pending" "ledger -f %(ledger-file) --pending [[ledger-mode-flags]] register ")
+ '("pending" "ledger -f %(ledger-file) [[ledger-mode-flags]] register --limit 'pending'")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("ongoing" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register \\( Receivable or Liabilities \\)")
+ '("wtf_cleared" "ledger -f %(ledger-file) [[ledger-mode-flags]] --cleared register --limit 'account=~/wtf/'")
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("pending-without-org-task" "ledger -f %(ledger-file) [[ledger-mode-flags]] register --limit 'pending' not %org")
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("uncleared-no-justif" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register not %justif")
  )
 
 (konix/push-or-replace-assoc-in-alist
@@ -51,17 +61,31 @@
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("unassigned" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register \\( not %who \\)")
+ ;; not pending because those should be reconciled in the pending report
+ '("reconcile" "ledger -f %(ledger-file) --uncleared  [[ledger-mode-flags]] register --limit 'not pending' \\( ^wtf ^Assets:Receivable ^Liabilities \\)")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("others" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register \\( not %who=me \\)")
+ ;; pending are associated with org entries, so they don't need to be assigned
+ '("unassigned" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register --limit 'not pending' \\( not %who \\)")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("mine" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register \\( %who=me \\)")
+ ;;
+ '("where-no-pending" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register --limit 'not pending' \\( %where \\)")
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("others" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register --limit 'not pending' \\( not %who=me \\)")
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ ;; the pending already are handled in an org entry, so there is no need to track them here
+ '("mine" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register --limit 'date <= today and not pending' \\( not ^Liabilities and not ^Assets:Receivable and %who=me \\)")
  )
 
 (konix/push-or-replace-assoc-in-alist
@@ -72,6 +96,26 @@
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
  '("bal-cleared" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] bal")
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("networth bal" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] balance ^Assets ^Liabilities")
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("networth reg" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] register ^Assets ^Liabilities")
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("cashflow bal" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] balance ^Expense ^Income")
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("cashflow reg" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] register ^Expense ^Income")
  )
 
 (defun konix/ledger-accounts (&optional recompute)
@@ -138,7 +182,7 @@
 
 (defun konix/ledger-in-something-p ()
   (and
-   (ledger-thing-at-point)
+   (konix/ledger-thing-at-point)
    (not (konix/ledger-in-comment-line-p))
    )
   )
@@ -211,32 +255,72 @@
   (konix/ledger-goto (plist-get link :id))
   )
 
+(defun konix/ledger-thing-at-point ()
+  (save-excursion
+    (ledger-thing-at-point)
+    )
+  )
+
 (defun konix/ledger-get-line-at-point ()
   (save-excursion
     (while (konix/ledger-in-comment-line-p)
       (forward-line -1)
       )
     (move-beginning-of-line nil)
-    (save-match-data
-      (re-search-forward "^[ \t]*\\([*] \\)?\\(.+\\)$")
-      (replace-regexp-in-string "  +" " " (match-string-no-properties 2))
+    (let (
+          (xact-line (s-trim
+                      (format "%s %s" (ledger-xact-date) (ledger-xact-payee))
+                      ))
+          )
+      (pcase (konix/ledger-thing-at-point)
+        ('posting
+         (format
+          "%s -> %s"
+          xact-line
+          (save-match-data
+            (re-search-forward "^[ \t]*\\([*] \\)?\\(.+\\)$")
+            (replace-regexp-in-string "  +" " " (match-string-no-properties 2))
+            )
+          )
+         )
+        ('transaction
+         xact-line
+         )
+        (thing
+         (error "%s not supported" thing)
+         )
+        )
       )
     )
   )
 
 (defun konix/ledger-org-store-link ()
-  "Store a link to a man page."
-  (when (eq major-mode 'ledger-mode)
-    (let* (
-           (id )
-           )
-      (org-link-store-props
-       :type "konix/ledger"
-       :link (concat "konix/ledger:" (buffer-file-name) ":" (konix/ledger-get-id-create))
-       :description (konix/ledger-get-line-at-point)
-       )
-      (message "Stored a link to this ledger transaction")
+  "Store a link to a ledger entry."
+  (pcase major-mode
+    ('ledger-mode
+     (org-link-store-props
+      :type "konix/ledger"
+      :link (concat "konix/ledger:" (buffer-file-name) ":" (konix/ledger-get-id-create))
+      :description (konix/ledger-get-line-at-point)
       )
+     (message "Stored a link to this ledger transaction")
+     )
+    ('ledger-reconcile-mode
+     (save-window-excursion
+       (konix/ledger-visit)
+       (konix/ledger-org-store-link)
+       (save-buffer)
+       t
+       )
+     )
+    ('ledger-report-mode
+     (save-window-excursion
+       (konix/ledger-visit)
+       (konix/ledger-org-store-link)
+       (save-buffer)
+       t
+       )
+     )
     )
   )
 
@@ -259,6 +343,22 @@ of the transaction.
       (recenter)
       )))
 (defalias 'ledger-report-visit-source 'konix/ledger-report-visit-source)
+
+(defun konix/ledger-goto-slot (date)
+  (interactive (list (let ((org-read-date-prefer-future nil))
+                       (org-read-date nil t nil "When: "))))
+  (ledger-xact-find-slot date)
+  )
+
+(defun konix/ledger-add-note ()
+  (interactive)
+  (move-end-of-line nil)
+  (insert "\n    ; ")
+  )
+
+(define-key ledger-mode-map (kbd "C-c C-j") #'konix/ledger-goto-slot)
+(define-key ledger-mode-map (kbd "C-c C-,") #'konix/ledger-add-note)
+
 
 (provide 'KONIX_AL-ledger)
 ;;; KONIX_AL-ledger.el ends here

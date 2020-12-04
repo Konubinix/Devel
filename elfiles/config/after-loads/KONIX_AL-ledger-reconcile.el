@@ -26,12 +26,35 @@
 
 (add-to-list 'golden-ratio-exclude-modes 'ledger-reconcile-mode)
 
+(defun konix/ledger-reconcile-update-track ()
+  (interactive)
+  (pcase major-mode
+    ('ledger-reconcile-mode
+     (let (
+           (this-command 'next-line)
+           )
+       (ledger-reconcile-track-xact)
+       )
+     )
+    ('ledger-report-mode
+     (let (
+           (konix/ledger-visit-track-mode t)
+           )
+       (konix/ledger-visit-track)
+       )
+     )
+    )
+  )
+
 (defun konix/ledger-reconcile-toggle-clear ()
   (interactive)
   (save-window-excursion
     (konix/ledger-visit)
     (ledger-toggle-current)
     (save-buffer)
+    )
+  (when (eq major-mode 'ledger-reconcile-mode)
+    (konix/ledger-reconcile-update-track)
     )
   )
 
@@ -59,14 +82,29 @@
     )
   )
 
+(defvar konix/ledger-visit-track-mode t)
+
+(defun konix/ledger-visit-track-mode ()
+  (interactive)
+  (setq konix/ledger-visit-track-mode (not konix/ledger-visit-track-mode))
+  (message "ledger visit track mode: %s" konix/ledger-visit-track-mode)
+  (when (not konix/ledger-visit-track-mode)
+    (delete-other-windows)
+    )
+  )
+
 (defun konix/ledger-visit-track ()
   (interactive)
-  (let* ((cur-win (get-buffer-window (get-buffer (current-buffer)))))
-    (konix/ledger-visit)
-    (hl-line-highlight)
-    (when cur-win
-      (select-window cur-win)
-      ))
+  (when konix/ledger-visit-track-mode
+    (let* ((cur-win (get-buffer-window (get-buffer (current-buffer)))))
+      (konix/ledger-visit)
+      (when (fboundp 'hl-line-highlight)
+        (hl-line-highlight)
+        )
+      (when cur-win
+        (select-window cur-win)
+        ))
+    )
   )
 
 (defun konix/ledger-reconcile-move-to-next-entry (&optional arg)
@@ -75,14 +113,11 @@
   (while (and
           (not (org-get-at-bol 'where))
           (not (org-get-at-bol 'ledger-source))
+          (not (equal (point-at-eol) (point-max)))
           )
     (forward-line arg)
     )
-  (let (
-        (this-command 'next-line)
-        )
-    (ledger-reconcile-track-xact)
-    )
+  (konix/ledger-reconcile-update-track)
   )
 
 (defun konix/ledger-reconcile-move-to-next-entry-and-track (&optional arg)
@@ -129,6 +164,21 @@
     )
   )
 
+(defun konix/ledger-reconcile-add-note-next-account ()
+  (interactive)
+  (save-window-excursion
+    (konix/ledger-visit)
+    (save-excursion
+      (forward-line)
+      (konix/ledger-move-till-something)
+      (move-end-of-line nil)
+      (insert "\n    ; ")
+      (recursive-edit)
+      (save-buffer)
+      )
+    )
+  )
+
 (defun konix/ledger-reconcile-edit (new-account)
   (interactive
    (list
@@ -151,11 +201,12 @@
         (replace-match new-account nil nil nil 3)
         )
       )
+    (save-buffer)
     )
   )
 
 (defvar konix/ledger-reconcile-whos '())
-(defvar konix/ledger-reconcile-last-entry nil)
+(defvar konix/ledger-reconcile-who-last-entry nil)
 
 (defun konix/ledger-reconcile-get-who ()
   (when-let
@@ -168,13 +219,61 @@
          nil
          nil
          nil
-         konix/ledger-reconcile-last-entry
+         konix/ledger-reconcile-who-last-entry
          )
         )
        )
-    (setq konix/ledger-reconcile-last-entry value)
+    (setq konix/ledger-reconcile-who-last-entry value)
     value
     )
+  )
+
+(defvar konix/ledger-reconcile-wheres '())
+(defvar konix/ledger-reconcile-where-last-entry nil)
+
+(defun konix/ledger-reconcile-get-where ()
+  (when-let
+      (
+       (value
+        (completing-read
+         "where: "
+         konix/ledger-reconcile-wheres
+         nil
+         nil
+         nil
+         nil
+         konix/ledger-reconcile-where-last-entry
+         )
+        )
+       )
+    (setq konix/ledger-reconcile-where-last-entry value)
+    value
+    )
+  )
+
+(defun konix/ledger-reconcile-edit-tag (tag-name tag-value)
+  (save-window-excursion
+    (konix/ledger-visit)
+    (forward-line)
+    (save-excursion
+      (while (and
+              (konix/ledger-in-comment-line-p)
+              (not (looking-at (format "^[ \t]*; %s:" tag-name)))
+              )
+        (forward-line)
+        )
+      (when (looking-at (format "^[ \t]*; %s:" tag-name))
+        (kill-line t)
+        )
+      )
+    (save-excursion
+      (forward-line)
+      (konix/ledger-move-till-something)
+      (move-end-of-line nil)
+      (insert (format "\n    ; %s: " tag-name tag-value))
+      )
+    )
+  (call-interactively 'ledger-reconcile-save)
   )
 
 (defun konix/ledger-reconcile-edit-who (who)
@@ -183,28 +282,16 @@
     (konix/ledger-reconcile-get-who)
     )
    )
-  (save-window-excursion
-    (konix/ledger-visit)
-    (forward-line)
-    (save-excursion
-      (while (and
-              (konix/ledger-in-comment-line-p)
-              (not (looking-at "^[ \t]*; who:"))
-              )
-        (forward-line)
-        )
-      (when (looking-at "^[ \t]*; who:")
-        (kill-line t)
-        )
-      )
-    (save-excursion
-      (forward-line)
-      (konix/ledger-move-till-something)
-      (move-end-of-line nil)
-      (insert "\n    ; who: " who)
-      )
+  (konix/ledger-reconcile-edit-tag "who" who)
+  )
+
+(defun konix/ledger-reconcile-edit-where (where)
+  (interactive
+   (list
+    (konix/ledger-reconcile-get-where)
     )
-  (call-interactively 'ledger-reconcile-save)
+   )
+  (konix/ledger-reconcile-edit-tag "where" where)
   )
 
 (defun konix/ledger-reconcile-toggle-up ()
@@ -212,11 +299,7 @@
   (forward-line -1)
   (ledger-reconcile-toggle)
   (forward-line -1)
-  (let (
-        (this-command 'next-line)
-        )
-    (ledger-reconcile-track-xact)
-    )
+  (konix/ledger-reconcile-update-track)
   )
 
 (defun konix/ledger-reconcile-toggle ()
@@ -225,21 +308,22 @@
       (konix/ledger-reconcile-move-to-next-entry)
     (call-interactively 'ledger-reconcile-toggle)
     )
-  (let (
-        (this-command 'next-line)
-        )
-    (ledger-reconcile-track-xact)
-    )
+  (konix/ledger-reconcile-update-track)
   )
 
-(define-key ledger-reconcile-mode-map (kbd ";") 'konix/ledger-report-add-note)
+(define-key ledger-reconcile-mode-map (kbd "*") 'konix/ledger-reconcile-toggle-clear)
+(define-key ledger-reconcile-mode-map (kbd "t") 'konix/ledger-visit-track-mode)
 (define-key ledger-reconcile-mode-map (kbd "s") 'konix/ledger-report-save)
 (define-key ledger-reconcile-mode-map (kbd "w") 'konix/ledger-reconcile-edit-who)
+(define-key ledger-reconcile-mode-map (kbd "W") 'konix/ledger-reconcile-edit-where)
 (define-key ledger-reconcile-mode-map (kbd "E") 'konix/ledger-reconcile-edit)
 (define-key ledger-reconcile-mode-map (kbd "e") 'konix/ledger-reconcile-edit-next-account)
+(define-key ledger-reconcile-mode-map (kbd ";") 'konix/ledger-reconcile-add-note-next-account)
 (define-key ledger-reconcile-mode-map (kbd "<DEL>") 'konix/ledger-reconcile-toggle-up)
 (define-key ledger-reconcile-mode-map (kbd "<SPC>") 'konix/ledger-reconcile-toggle)
 (define-key ledger-reconcile-mode-map (kbd "p") 'konix/ledger-reconcile-move-to-previous-entry)
+(define-key ledger-reconcile-mode-map (kbd "C") 'konix/ledger-report-clean-buffer)
+(define-key ledger-reconcile-mode-map (kbd "u") 'konix/ledger-reconcile-update-track)
 
 (provide 'KONIX_AL-ledger-reconcile)
 ;;; KONIX_AL-ledger-reconcile.el ends here

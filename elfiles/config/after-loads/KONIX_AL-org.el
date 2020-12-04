@@ -3345,6 +3345,7 @@ of the clocksum."
   (setq konix/delete-trailing-whitespace nil)
   (font-lock-add-keywords nil konix/org-mode-font-lock-keywords)
   (setq-local yas-indent-line 'fixed)
+  (goto-address-mode 1)
   (require 'foldout)
   (setq konix/adjust-new-lines-at-end-of-file t)
   (local-set-key (kbd "C-a") 'move-beginning-of-line)

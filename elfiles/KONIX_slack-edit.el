@@ -51,6 +51,7 @@
 
 (defun konix/slack-message-edit-mode-hook ()
   (visual-line-mode)
+  (goto-address-mode 1)
   (defvar electric-pair-pairs)
   (setq-local electric-pair-pairs
               (append

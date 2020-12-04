@@ -127,6 +127,7 @@
   (let* ((file (make-temp-file "clip" nil ".png"))
          (selection-coding-system 'no-conversion)
          (coding-system-for-write 'binary)
+         yes-or-no
          buffer)
 
     (write-region (or (gui-get-selection 'CLIPBOARD 'image/png)
@@ -135,11 +136,12 @@
 
     (save-window-excursion
       (setq buffer (find-file file))
-      (when (yes-or-no-p "Send this image?")
-        (slack-file-upload file "png" "image.png")
-        )
-      (kill-buffer buffer)
+      (setq yes-or-no (yes-or-no-p "Send this image?"))
       )
+    (when yes-or-no
+      (slack-file-upload file "png" "image.png")
+      )
+    (kill-buffer buffer)
     )
   )
 

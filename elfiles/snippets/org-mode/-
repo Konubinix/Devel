@@ -2,7 +2,9 @@
 # name: -
 # key: -
 # --
-- $100 ::
-  $200
-
+- $100
+  ${200:$$(format-time-string "[%Y-%m-%d %a %H:%M]")}
+  #+BEGIN_QUOTE
+  $300
+  #+END_QUOTE
 -$0

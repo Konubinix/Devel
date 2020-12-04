@@ -137,6 +137,7 @@
 (autoload 'golden-ratio-mode "golden-ratio" "" t)
 (autoload 'konix/org-roam-note "org-roam" "" t)
 (autoload 'konix/ledger-run "ledger-mode" "" t)
+(autoload 'konix/ledger-report "ledger-mode" "" t)
 (autoload 'windmove-do-window-select "windmove" "" t)
 (autoload 'ffap-file-at-point "ffap" "" t)
 (autoload 'slack-start "slack" "" t)

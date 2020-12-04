@@ -1,0 +1,10 @@
+#!/bin/bash -eu
+
+COMPLETION_SCRIPT="${HOME}/.mvn_completion.sh"
+
+if ! [ -e "${COMPLETION_SCRIPT}" ]
+then
+    wget -O "${COMPLETION_SCRIPT}" https://raw.githubusercontent.com/juven/maven-bash-completion/master/bash_completion.bash
+fi
+
+source "${COMPLETION_SCRIPT}"

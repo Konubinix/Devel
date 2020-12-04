@@ -4469,12 +4469,15 @@ of the clocksum."
   (require 'org-agenda)
   (require 'org-roam) ; to understand the konix-org-roam links
   (require 'ledger-mode) ; to understand the konix/ledger links
+  (require 'org-roam)
+  (org-roam-mode 1)
   (save-some-buffers)
   (message "Exporting all agenda views")
   (let (
         (konix/org-agenda-tag-filter-context-p nil)
         (cmds (org-agenda-normalize-custom-commands org-agenda-custom-commands))
         thiscmdkey thiscmdcmd bufname cmd cmd-or-set files match
+        (org-export-with-broken-links t)
         )
     (while cmds
       (setq cmd (pop cmds)

@@ -48,11 +48,15 @@ EOF
 		clk log -l info "Creating the local registry volume"
 		docker volume create local_registry
 	fi
-	if ! docker ps --format '{{.Names}}'|grep -q '^registry.localhost$'
+	if ! docker ps -a --format '{{.Names}}'|grep -q '^registry.localhost$'
 	then
-		clk log -l info "Starting localhost docker registry"
+		clk log -l info "Creating localhost docker registry"
 		docker container run -d --name registry.localhost -v local_registry:/var/lib/registry --restart always -p 5000:5000 registry:2
+	else
+		clk log -l info "Starting localhost docker registry"
+		docker start registry.localhost
 	fi
+
 fi
 
 k3d cluster create "${args[@]}"

@@ -72,6 +72,6 @@
 	required = true
 	process = git-lfs filter-process
 [pull]
-	rebase = preserve
+	rebase = merges
 [fetch]
 	prune = true

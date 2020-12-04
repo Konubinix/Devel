@@ -1365,7 +1365,7 @@ items"
 
 (defun konix/org-agenda-prefix-format/ann ()
   (format
-   "%10s:%11s %5s:"
+   "%10s:%12s %5s-"
    (org-get-at-bol 'org-category)
    (or
     (konix/org-agenda-deadline-prefix)

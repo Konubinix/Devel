@@ -40,8 +40,20 @@
   (org-agenda-refile goto rfloc t)
   )
 
+(defun konix/org-agenda-counsel-org-tag ()
+  (interactive)
+  (call-interactively 'counsel-org-tag)
+  (konix/org-agenda-refresh-line)
+  )
+
 (define-key org-agenda-mode-map (kbd "+")
   'konix/org-capture-na-in-heading)
+
+(define-key org-agenda-mode-map (kbd ":")
+  'konix/org-agenda-counsel-org-tag)
+
+(define-key org-agenda-mode-map (kbd "C-.")
+  'org-agenda-set-tags)
 
 (define-key org-agenda-mode-map (kbd "N")
   'konix/org-roam-note)

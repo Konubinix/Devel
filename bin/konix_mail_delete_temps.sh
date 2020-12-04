@@ -49,6 +49,7 @@ notmuch search \
     and not tag:unread \
     and not tag:flagged \
     and not tag:deleted \
+    and not tag:sent \
     and ..$TIMESTAMP \
     | sed -n '/\[\([0-9]\+\)\/\1\]/ { # show only threads matching [A/A] and not [A/B] with A != B
 # display only the thread id part

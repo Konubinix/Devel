@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: python
+# key: python
+# --
+#+BEGIN_SRC python :results verbatim :exports both :session $100
+  $0
+#+END_SRC

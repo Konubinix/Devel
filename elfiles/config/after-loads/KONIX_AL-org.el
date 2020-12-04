@@ -5428,7 +5428,8 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (setq-default
  org-export-global-macros
  '(
-   ("youtube" . "@@html:<div class=\"org-youtube\"><iframe src=\"https://www.youtube-nocookie.com/embed/$1\" allowfullscreen title=\"YouTube Video\"></iframe></div>@@")
+   ("youtube" . "@@html:<div class=\"org-youtube\"><iframe class=\"org-youtube-video\" src=\"https://www.youtube-nocookie.com/embed/$1\" allowfullscreen title=\"YouTube Video\"></iframe></div>@@")
+   ("mp3" . "@@html:<audio controls><source src=\"$1\" type=\"audio/mpeg\">Your browser does not support the audio element.</audio>@@")
    )
  )
 

@@ -34,6 +34,7 @@
 (require 'org-expiry)
 (require 'org-collector)
 (require 'org-protocol)
+(require 'org-roam)
 (require 'holidays)
 (require 'ob-python)
 (require 'ob-shell)
@@ -61,6 +62,7 @@
          (not (string-match-p org-roam-dailies-directory (buffer-file-name)))
          ;; first time saving
          (not (file-exists-p (buffer-file-name)))
+         (not (konix/org-roam-exported-p))
          )
     (let (
           (kind (completing-read

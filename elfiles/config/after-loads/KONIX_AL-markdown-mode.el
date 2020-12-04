@@ -26,6 +26,7 @@
 
 (defun konix/markdown-mode-hook()
   (konix/flyspell-mode t)
+  (org-link-minor-mode 1)
   )
 (add-hook 'markdown-mode-hook 'konix/markdown-mode-hook)
 

@@ -70,9 +70,9 @@
    )
   )
 
-(defun konix/org-roam-export/extract-kind (filename)
+(defun konix/org-roam-export/extract-kind (&optional filename)
   (save-window-excursion
-    (with-current-buffer (find-file filename)
+    (with-current-buffer (if filename (find-file filename) (current-buffer))
       (save-excursion
         (goto-char (point-min))
         (or
@@ -91,6 +91,9 @@
      ((string-match ".*youtube.com/watch\\?v=\\(.+\\)" url)
       (format "{{{youtube(%s)}}}" (match-string 1 url))
       )
+     ((string-match "^\\(http.+mp3\\)$" url)
+      (format "{{{mp3(%s)}}}" (match-string 1 url))
+      )
      (t
       url
       )
@@ -107,14 +110,14 @@
 
 (defun konix/org-roam-export/add-roam-key ()
   (when-let* (
-              (roam-key (cdr (assoc "ROAM_KEY" (org-roam--extract-global-props '("ROAM_KEY")))))
+              (roam-keys (konix/org-roam-extract-keys))
               (language (konix/org-roam-export/get-language))
               (text (cond
                      ((string-equal language "fr")
-                      "Cette note parle de :"
+                      "Référence externe :"
                       )
                      ((string-equal language "en")
-                      "This note is about:"
+                      "External reference:"
                       )
                      (t
                       (error "Unsupported language %s" language)
@@ -124,7 +127,16 @@
               )
     (save-excursion
       (goto-char (point-min))
-      (insert (format "- %s %s\n" text (konix/org-roam-export/url-to-macro roam-key)))
+      (while (looking-at-p "^[:#]")
+        (forward-line)
+        )
+      (mapc
+       (lambda (roam-key)
+         (insert (format "- %s %s\n" text (konix/org-roam-export/url-to-macro
+                                           roam-key)))
+         )
+       roam-keys
+       )
       )
     )
   )
@@ -132,11 +144,16 @@
 (defun konix/org-roam-export/get-url ()
   (format "https://konubinix.eu/%s/posts/%s/"
           (konix/org-roam-export/extract-kind (buffer-file-name))
-          (file-name-sans-extension
-           (file-relative-name
-            (buffer-file-name)
-            org-roam-directory)
-           )
+          (if-let (
+                   (id (save-excursion (goto-char (point-min)) (org-id-get)))
+                   )
+              id
+            (file-name-sans-extension
+             (file-relative-name
+              (buffer-file-name)
+              org-roam-directory)
+             )
+            )
           )
   )
 
@@ -172,7 +189,6 @@
     )
   )
 
-
 (defun konix/org-roam-export/add-roam-alias ()
   (when-let* (
               (aliases (org-roam--extract-titles-alias))
@@ -193,10 +209,22 @@
                      )
                     )
               )
-    (setq aliases (remove-if (lambda (el) (string-equal "" (s-trim el))) aliases))
+    (setq aliases (mapcar
+                   (lambda (alias)
+                     (format "[[https://konubinix.eu/%s/posts/%s][%s]]"
+                             (konix/org-roam-export/extract-kind)
+                             (org-roam--title-to-slug alias)
+                             alias
+                             )
+                     )
+                   (remove-if (lambda (el) (string-equal "" (s-trim el))) aliases)
+                   ))
     (when aliases
       (save-excursion
         (goto-char (point-min))
+        (while (looking-at-p "^[#:]")
+          (forward-line)
+          )
         (insert (format "- %s %s\n" text (combine-and-quote-strings aliases ", ")))
         )
       )
@@ -210,6 +238,94 @@
       (move-end-of-line nil)
       (insert "\n")
       (insert (format "#+HUGO_TAGS:%s" (match-string 1)))
+      )
+    )
+  )
+
+(defun konix/org-roam-export/copy-roam-aliases-into-hugo-aliases ()
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+ROAM_ALIAS:\\(.+\\)$" 3000 t)
+      (let (
+            (aliases (mapconcat
+                      #'identity
+                      (mapcar (lambda (alias)
+                                (org-roam--title-to-slug alias)
+                                )
+                              (org-roam--str-to-list (match-string 1))
+                              )
+                      " "
+                      )
+                     )
+            )
+        (goto-char (point-min))
+        (if (re-search-forward "^#\\+HUGO_ALIASES:" 3000 t)
+            (progn
+              (move-end-of-line nil)
+              (insert " " aliases)
+              )
+          (progn
+            (while (looking-at-p "^:")
+              (forward-line)
+              )
+            (move-end-of-line nil)
+            (insert "\n#+HUGO_ALIASES: " aliases)
+            )
+          )
+        )
+      )
+    )
+  )
+
+(defun konix/org-roam-export/setup-hugo-dates ()
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+CREATED:\\(.+\\)$" 3000 t)
+      (let (
+            (created (match-string 1))
+            )
+        (move-end-of-line nil)
+        (insert "\n#+HUGO_PUBLISHDATE:" created)
+        )
+      )
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+DATE:\\(.+\\)$" 3000 t)
+      (let (
+            (date (match-string 1))
+            )
+        (move-end-of-line nil)
+        (insert "\n#+HUGO_LASTMOD:" date)
+        )
+      )
+    )
+  )
+
+(defun konix/org-roam-export/add-id-as-hugo-aliases ()
+  (when-let (
+             (id (progn (goto-char (point-min)) (org-id-get)))
+             )
+    (save-excursion
+      (goto-char (point-min))
+      (if (re-search-forward "^#\\+HUGO_ALIASES:" 3000 t)
+          (progn
+            (move-end-of-line nil)
+            (insert " " id)
+            )
+        (progn
+          (while (looking-at "^:")
+            (forward-line)
+            )
+          (move-end-of-line nil)
+          (insert "\n#+HUGO_ALIASES: " id)
+          )
+        )
+      (goto-char (point-max))
+      (insert
+       (format "\n* [[https://konubinix.eu/%s/posts/%s][Permalink]]"
+               (konix/org-roam-export/extract-kind)
+               id
+               )
+       )
       )
     )
   )
@@ -261,6 +377,13 @@
     )
   )
 
+(defun konix/org-roam-exported-p ()
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward "#\\+HUGO_BASE_DIR:" nil t)
+    )
+  )
+
 (defun konix/org-roam-export/toggle-publish (&optional kind)
   (interactive)
   (save-excursion
@@ -304,7 +427,7 @@
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "^\n\\(http[^\n\t ]+\\)\n$"
+              "^\n\\(http[^\n\t ]+\\)$"
               nil
               t)
         (replace-match
@@ -339,6 +462,9 @@
     (konix/org-roam-export/add-roam-alias)
     (konix/org-roam-replace-internal-links)
     (konix/org-roam-export/assert-no-konix-org-roam-links)
+    (konix/org-roam-export/setup-hugo-dates)
+    (konix/org-roam-export/add-id-as-hugo-aliases)
+    (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
     )
   )
 

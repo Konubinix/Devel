@@ -5429,6 +5429,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
  org-export-global-macros
  '(
    ("youtube" . "@@html:<div class=\"org-youtube\"><iframe class=\"org-youtube-video\" src=\"https://www.youtube-nocookie.com/embed/$1\" allowfullscreen title=\"YouTube Video\"></iframe></div>@@")
+   ("peertube" . "@@html:<iframe src=\"https://peertube.social/videos/embed/$1\" style=\"min-height: 400px; width: 100%;\" frameborder=\"0\" sandbox=\"allow-same-origin allow-scripts\" allowfullscreen=\"allowfullscreen\"></iframe>@@")
    ("mp3" . "@@html:<audio controls><source src=\"$1\" type=\"audio/mpeg\">Your browser does not support the audio element.</audio>@@")
    )
  )
@@ -5462,6 +5463,20 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
       (insert "\n")
       (org-indent-line)
       )
+    )
+  )
+
+(defun konix/org-goto-after-file-headers ()
+  (goto-char (point-min))
+  (while (and
+          (looking-at-p "^[#:]")
+          (not (equal (point-at-eol) (point-max)))
+          )
+    (forward-line)
+    )
+  (when (looking-at-p "^[#:]")
+    (move-end-of-line nil)
+    (insert "\n")
     )
   )
 

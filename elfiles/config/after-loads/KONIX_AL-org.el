@@ -1436,7 +1436,7 @@ items"
                               (dummy (setq-local org-agenda-todo-keyword-format ""))
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
-                               "Waiting stuff not yet scheduled but that someone might tell you about")
+                               "Waiting scheduled or not but that someone might tell you about")
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(notdeadline))

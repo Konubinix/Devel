@@ -28,13 +28,13 @@
 
 (require 'org-roam)
 
-(defun konix/org-roam-export/exported-files (&optional kind)
+(defun konix/org-roam-export/exported-files (kind)
   (split-string
    (string-trim
     (shell-command-to-string
      (format
-      "grep -r -l '#+HUGO_BASE_DIR: ~/%s/\\?' %s"
-      (or kind "")
+      "grep -r -l '#+KONIX_ORG_PUBLISH_KIND: %s' %s"
+      kind
       org-roam-directory
       )
      )
@@ -42,21 +42,156 @@
    )
   )
 
-(defun konix/org-roam-export/export-all (&optional kind)
+(defun konix/org-roam-export/export-all (&optional kind publish-dir incremental)
   "Re-exports all Org-roam files to Hugo markdown."
   (interactive)
   (setq kind (or kind "blog"))
-  (let (
-        (org-export-babel-evaluate nil)
-        )
+  (assert (not (string= "" kind)))
+  (setq publish-dir (or
+                     publish-dir
+                     (expand-file-name (format "~/org-publish/%s" kind))
+                     ))
+  (when (not
+         (equal
+          0
+          (call-process
+           "konix_org-roam_update_links.sh"
+           nil
+           nil
+           nil
+           org-roam-directory
+           publish-dir
+           org-roam-db-location
+           kind
+           )
+          )
+         )
+    (error "Could not update the links")
+    )
+  (let* (
+         (dates (mapcar
+                 (lambda (line)
+                   (split-string line "|")
+                   )
+                 (split-string
+                  (s-trim
+                   (shell-command-to-string
+                    (format
+                     "konix_org-roam_get-dates.sh %s"
+                     org-roam-directory
+                     )
+                    )
+                   )
+                  "\n"
+                  )
+                 )
+                )
+
+         (org-export-babel-evaluate nil)
+         (roam-links (expand-file-name (format "%s_links.txt" "org-roam") publish-dir))
+         (kind-links (expand-file-name (format "%s_links.txt" kind)
+                                       publish-dir))
+         (roam-links_kind (expand-file-name (format "%s_links_kind.txt" "org-roam") publish-dir))
+         (kind-links_kind (expand-file-name (format "%s_links_kind.txt" kind)
+                                            publish-dir))
+         (roam-exported (expand-file-name (format "%s_exported.txt" "org-roam") publish-dir))
+         (kind-exported (expand-file-name (format "%s_exported.txt" kind)
+                                          publish-dir))
+         (roam-exported_kind (expand-file-name (format "%s_exported_kind.txt" "org-roam") publish-dir))
+         (kind-exported_kind (expand-file-name (format "%s_exported_kind.txt" kind)
+                                               publish-dir))
+         (lost-one
+          (equal (call-process "konix_org-roam_lost_one.sh" nil nil nil
+                               roam-exported_kind
+                               kind-exported_kind
+                               )
+                 0))
+         (exported-files (konix/org-roam-export/exported-files kind))
+         (files-with-updated-links
+          (-intersection
+           exported-files
+           (split-string
+            (s-trim
+             (shell-command-to-string
+              (format
+               "konix_org-roam_get_nodes_to_update.sh %s %s"
+               roam-links
+               kind-links
+               )
+              )
+             )
+            "\n"
+            )
+           )
+          )
+         (files-with-updated-links-kind
+          (-intersection
+           exported-files
+           (split-string
+            (s-trim
+             (shell-command-to-string
+              (format
+               "konix_org-roam_get_nodes_to_update.sh %s %s"
+               roam-links_kind
+               kind-links_kind
+               )
+              )
+             )
+            "\n"
+            )
+           )
+          )
+         (date-file (expand-file-name (format "%s_date.txt" kind) publish-dir))
+         (last-date (save-window-excursion
+                      (find-file date-file)
+                      (s-trim
+                       (buffer-substring-no-properties (point-min) (point-max))
+                       )
+                      )
+                    )
+
+         (files-updated (remove-if
+                         (lambda (path)
+                           (string-lessp (cadr (assoc path dates)) last-date)
+                           )
+                         exported-files
+                         )
+                        )
+         (files-to-consider (-union
+                             files-updated
+                             (-union
+                              files-with-updated-links
+                              files-with-updated-links-kind
+                              )
+                             ))
+         )
+    (setq incremental (and (not lost-one) incremental))
+    (when (not incremental)
+      (delete-directory (expand-file-name (expand-file-name "content" publish-dir)) t)
+      (delete-directory (expand-file-name (expand-file-name "static" publish-dir)) t)
+      (make-directory (expand-file-name (expand-file-name "static" publish-dir)))
+      )
     (save-window-excursion
-      (dolist (f (konix/org-roam-export/exported-files kind))
+      (dolist (f (if incremental files-to-consider exported-files))
         (with-current-buffer (find-file f)
+          (message "Exporting %s" f)
           (org-hugo-export-wim-to-md)
           )
         )
       )
+    ;; record the last date and last links
+    (save-window-excursion
+      (find-file date-file)
+      (delete-region (point-min) (point-max))
+      (insert (format-time-string "[%Y-%m-%d %a %H:%M]"))
+      (save-buffer)
+      (rename-file roam-links kind-links t)
+      (rename-file roam-exported kind-exported t)
+      (rename-file roam-links_kind kind-links_kind t)
+      (rename-file roam-exported_kind kind-exported_kind t)
+      )
     )
+
   (message "Everyting was exported")
   )
 
@@ -71,17 +206,17 @@
   )
 
 (defun konix/org-roam-export/extract-kind (&optional filename)
-  (save-window-excursion
-    (with-current-buffer (if filename (find-file filename) (current-buffer))
-      (save-excursion
-        (goto-char (point-min))
-        (or
-         (re-search-forward "HUGO_BASE_DIR: ~/\\([^/\n]+\\)/?$" nil t)
-         (error "%s is not exported" filename)
-         )
-        (match-string-no-properties 1)
-        )
-      )
+  (or
+   (konix/org-roam-export/extract-kind-unsafe filename)
+   (error "%s is not exported" filename)
+   )
+  )
+
+(defun konix/org-roam-export/extract-kind-unsafe (&optional filename)
+  (with-current-buffer (if filename (find-file filename) (current-buffer))
+    (or
+     (cdar (org-roam--extract-global-props '("KONIX_ORG_PUBLISH_KIND")))
+     )
     )
   )
 
@@ -90,6 +225,9 @@
     (cond
      ((string-match ".*youtube.com/watch\\?v=\\(.+\\)" url)
       (format "{{{youtube(%s)}}}" (match-string 1 url))
+      )
+     ((string-match "https://skeptikon.fr/videos/watch/\\(.+\\)" url)
+      (format "{{{peertube(%s)}}}" (match-string 1 url))
       )
      ((string-match "^\\(http.+mp3\\)$" url)
       (format "{{{mp3(%s)}}}" (match-string 1 url))
@@ -330,12 +468,49 @@
     )
   )
 
+(defun konix/org-roam-export/add-more ()
+  "description."
+  (save-excursion
+    (goto-char (point-min))
+    (unless (re-search-forward "#\\+HUGO: more" 3000 t)
+      (konix/org-goto-after-file-headers)
+      (while (and
+              (looking-at-p "^[ \t]*$")
+              (not (equal (point-at-eol) (point-max)))
+              )
+        (forward-line)
+        )
+
+      (while (and
+              (not (looking-at-p "^[ \t]*$"))
+              (not (equal (point-at-eol) (point-max)))
+              )
+        (forward-line)
+        )
+      (insert "#+HUGO: more")
+      )
+    )
+  )
+
 (defun konix/org-roam-export/add-backlinks ()
   (when-let ((links (konix/org-roam-export/backlinks-list (buffer-file-name))))
     (goto-char (point-max))
-    (let (
-          (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
-          )
+    (let* (
+           (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
+           (language (konix/org-roam-export/get-language))
+           (text (cond
+                  ((string-equal language "fr")
+                   "Notes pointant ici"
+                   )
+                  ((string-equal language "en")
+                   "Notes linking here"
+                   )
+                  (t
+                   (error "Unsupported language %s" language)
+                   )
+                  )
+                 )
+           )
       (unless (save-excursion
                 (goto-char (point-min))
                 (re-search-forward "#\\+HUGO: more" nil t)
@@ -343,7 +518,7 @@
         (insert "#+HUGO: more
 ")
         )
-      (insert "\n* Links to this note\n")
+      (insert (format "\n* %s\n" text))
       (dolist (link links)
         (insert (let (
                       (link-kind (konix/org-roam-export/extract-kind link))
@@ -378,17 +553,14 @@
   )
 
 (defun konix/org-roam-exported-p ()
-  (save-excursion
-    (goto-char (point-min))
-    (re-search-forward "#\\+HUGO_BASE_DIR:" nil t)
-    )
+  (org-roam--extract-global-props '("KONIX_ORG_PUBLISH_KIND"))
   )
 
 (defun konix/org-roam-export/toggle-publish (&optional kind)
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (if (re-search-forward "#\\+HUGO_BASE_DIR:" nil t)
+    (if (re-search-forward "#\\+KONIX_ORG_PUBLISH_KIND:" nil t)
         (progn
           (move-beginning-of-line nil)
           (kill-line)
@@ -401,7 +573,7 @@
           )
         (forward-line -1)
         (move-end-of-line nil)
-        (insert (format "\n#+HUGO_BASE_DIR: ~/%s/"
+        (insert (format "\n#+KONIX_ORG_PUBLISH_KING: %s"
                         (or kind (let (
                                        (kind (completing-read "Kind: " '("blog" "braindump")
                                                               nil t
@@ -452,8 +624,14 @@
     )
   )
 
+(defun konix/org-roam-export/get-publish-dir ()
+  (or (getenv "KONIX_ORG_PUBLISH_DIR")
+      (error "KONIX_ORG_PUBLISH_DIR not set")
+      )
+  )
+
 (defun konix/org-roam-export/org-export-preprocessor (_backend)
-  (when (org-roam--extract-global-props '("HUGO_BASE_DIR"))
+  (when (org-roam--extract-global-props '("KONIX_ORG_PUBLISH_KIND"))
     (konix/org-roam-export/remove-org-backlinks)
     ;; already done in the theme by Jethro
     (konix/org-roam-export/add-backlinks)
@@ -465,6 +643,7 @@
     (konix/org-roam-export/setup-hugo-dates)
     (konix/org-roam-export/add-id-as-hugo-aliases)
     (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
+    (konix/org-roam-export/add-more)
     )
   )
 
@@ -570,6 +749,19 @@ citation key, for Org-ref cite links."
      )
     )
   )
+
+(defun konix/org-export-get-environment/compute-hugo-base-dir (orig-fun &rest args)
+  (let* (
+         (info (apply orig-fun args))
+         (kind (konix/org-roam-export/extract-kind-unsafe))
+         )
+    (when kind
+      (setq info (plist-put info :hugo-base-dir (expand-file-name kind (konix/org-roam-export/get-publish-dir))))
+      )
+    info
+    )
+  )
+(advice-add 'org-export-get-environment :around #'konix/org-export-get-environment/compute-hugo-base-dir)
 
 (provide 'KONIX_org-roam-export)
 ;;; KONIX_org-roam-export.el ends here

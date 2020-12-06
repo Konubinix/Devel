@@ -34,7 +34,7 @@
 
 (defun konix/org-publish-hugo (plist filename pub-dir)
   (when (equal
-         (call-process "grep" nil nil nil "-q" "HUGO_BASE_DIR" filename)
+         (call-process "grep" nil nil nil "-q" "KONIX_ORG_PUBLISH_KIND" filename)
          0
          )
     (message "Exporting %s" filename)

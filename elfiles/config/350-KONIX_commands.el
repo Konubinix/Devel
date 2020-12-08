@@ -1827,7 +1827,13 @@ FExport diary data into iCalendar file: ")
           konix/scroll-last-scroll-time scroll-time)
     (while t
       (sit-for (/ (float scroll-time) 4))
-      (call-interactively 'next-line)
+      (if (and
+           (boundp 'pdf-continuous-scroll-mode)
+           pdf-continuous-scroll-mode
+           )
+          (call-interactively 'pdf-continuous-scroll-forward)
+        (call-interactively 'next-line)
+        )
       (hl-line-highlight)
       (call-interactively 'recenter-top-bottom)
       )

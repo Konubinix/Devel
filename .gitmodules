@@ -141,3 +141,6 @@ ignore=dirty
 [submodule "elfiles/org-link-minor-mode"]
 	path = elfiles/org-link-minor-mode
 	url = https://github.com/seanohalpin/org-link-minor-mode
+[submodule "elfiles/pdf-continuous-scroll-mode.el"]
+	path = elfiles/pdf-continuous-scroll-mode.el
+	url = https://github.com/dalanicolai/pdf-continuous-scroll-mode.el

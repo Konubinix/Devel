@@ -15,6 +15,7 @@
          (expand-file-name "ol-emacs-slack" elfiles)
          (expand-file-name "fence-edit" elfiles)
          (expand-file-name "org-link-minor-mode" elfiles)
+         (expand-file-name "pdf-continuous-scroll-mode.el" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -145,6 +146,7 @@
 (autoload 'konix/org-roam-export/yank-url "KONIX_org-roam-export" "" t)
 (autoload 'konix/fence-edit-dwim "KONIX_fence-edit" "" t)
 (autoload 'org-link-minor-mode "org-link-minor-mode" "" t)
+(autoload 'pdf-continuous-scroll-mode "pdf-continuous-scroll-mode" "" t)
 
 ;; ************************************************************
 ;; Automodes

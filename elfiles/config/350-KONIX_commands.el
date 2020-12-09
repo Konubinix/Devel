@@ -1861,5 +1861,23 @@ FExport diary data into iCalendar file: ")
   (find-file customcommand)
   )
 
+(defun konix/patch-slack ()
+  (interactive)
+  (shell-command
+   (format
+    "cd %s && patch < /ipfs/QmRkaLBxt8sX1rr1PjhF74mtVNfYABbfnx3DH6C3rQS13j &"
+    (file-name-directory (locate-library "slack-block"))
+    )
+   )
+  (byte-compile-file
+   (replace-regexp-in-string
+    "\\.elc" ".el"
+    (locate-library
+     "slack-block")
+    )
+   )
+  (message "Now, restart emacs")
+  )
+
 (provide '350-KONIX_commands)
 ;;; 350-KONIX_commands.el ends here

@@ -102,3 +102,6 @@
 (depends-on "plantuml-mode")
 (depends-on "org-noter")
 (depends-on "typescript-mode")
+(depends-on "org-ref")
+(depends-on "citeproc-org")
+(depends-on "org-roam-bibtex")

@@ -199,6 +199,16 @@ send_tab ( ) {
     } | send_command_multiline
 }
 
+send_down ( ) {
+    local number="${1:-1}"
+    {
+        for _ in $(seq "${number}")
+        do
+            echo "fake-key <down>"
+        done
+    } | send_command_multiline
+}
+
 send_return ( ) {
     local number="${1:-1}"
     {

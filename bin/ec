@@ -7,7 +7,7 @@ then
 fi
 
 # first, find out whether there is a server to connect to
-if test -e "${TMPDIR}/emacs${UID}/server"
+if test -e "${TMPDIR}/${UID}/server" || test -e "/run/user/${UID}/emacs/server"
 then
 	if test -n "${DISPLAY}"
 	then

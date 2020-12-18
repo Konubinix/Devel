@@ -986,10 +986,21 @@ awful.rules.rules = {
          floating = true,
       }
    },
-
    {
       rule = {
-         name = "Slack | mini panel",
+         class = "qutebrowser",
+		 name = "Print",
+      },
+      properties = {
+         floating = true,
+         ontop = true,
+      }
+   },
+
+   {
+      rule_any = {
+         name = {"Slack | mini panel"},
+		 class = {"Impass"}
       },
       properties = {
          floating = true,

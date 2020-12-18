@@ -21,4 +21,4 @@ cat "${BASE}" | sort > "${TMP}/base.txt"
 konix_diff_new_lines.sh "${TMP}/links.txt" "${TMP}/base.txt" > "${TMP}/diff.txt"
 konix_diff_new_lines.sh "${TMP}/base.txt" "${TMP}/links.txt" >> "${TMP}/diff.txt"
 
-cat "${TMP}/diff.txt" | tr '|' '\n' | sed -e 's/^"//' -e 's/"$//'
+cat "${TMP}/diff.txt" | tr '|' '\n' | sed -e 's/^"//' -e 's/"$//' | sort | uniq

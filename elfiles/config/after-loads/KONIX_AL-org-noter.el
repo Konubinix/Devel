@@ -25,6 +25,44 @@
 ;;; Code:
 
 (setq-default org-noter-notes-search-path (list (expand-file-name "roam" perso-dir)))
+(setq-default org-noter-always-create-frame nil)
+(setq-default org-noter-insert-note-no-questions t)
+(setq-default org-noter-doc-split-fraction '(0.7 . 0.5))
+
+(defun konix/org-noter/inhibit-golden-ratio ()
+  "Don't use golden ratio in the org noter session."
+  (or org-noter-doc-mode org-noter-notes-mode)
+  )
+
+(eval-after-load "golden-ratio"
+  '(progn
+     (add-to-list 'golden-ratio-inhibit-functions #'konix/org-noter/inhibit-golden-ratio)
+     )
+  )
+
+(defun konix/org-noter-insert-precise-note (orig-fun &rest args)
+  (save-window-excursion
+    (apply orig-fun args)
+    )
+  )
+(advice-add 'org-noter-insert-precise-note :around #'konix/org-noter-insert-precise-note)
+
+(defun konix/org-noter-doc-mode-hook nil
+  "My custom hook for `org-noter-doc-mode'"
+  (when (require 'pdf-continuous-scroll-mode nil t)
+    (pdf-continuous-scroll-mode 1)
+    )
+  )
+(add-hook 'org-noter-doc-mode-hook
+          'konix/org-noter-doc-mode-hook)
+
+(defun konix/org-noter-notes-mode-hook nil
+  "My custom hook for `org-noter-notes-mode'"
+  (visual-line-mode 1)
+  )
+(add-hook 'org-noter-notes-mode-hook
+          'konix/org-noter-notes-mode-hook)
+
 
 (provide 'KONIX_AL-org-noter)
 ;;; KONIX_AL-org-noter.el ends here

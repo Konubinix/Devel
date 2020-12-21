@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(setq-default bibtex-dialect 'biblatex)
+
 (defun konix/bibtex-mode-hook()
   (konix/prog/config)
   )

@@ -3450,7 +3450,9 @@ of the clocksum."
             )
 
   (setq indent-tabs-mode nil)
-  (konix/flyspell-mode 1)
+  (unless (and (boundp 'org-link-minor-mode) org-link-minor-mode)
+    (konix/flyspell-mode 1)
+    )
   (auto-complete-mode t)
   (konix/org-guess-ispell)
   (abbrev-mode t)

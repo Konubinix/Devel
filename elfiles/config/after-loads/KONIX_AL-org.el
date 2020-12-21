@@ -1414,6 +1414,15 @@ items"
                                  (konix/org-agenda-skip-if-task-of-project)
                                  (konix/org-agenda-keep-if-expired 7 t)
                                  ))
+                              (org-super-agenda-groups
+                               (mapcar
+                                (lambda (ag)
+                                  (list :name (first ag)
+                                        :tag (first ag))
+                                  )
+                                konix/org-gtd-commitments-tags
+                                )
+                               )
                               )
                              )
                   (tags-todo "DELEGATED-maybe|WAIT-maybe|Promise-maybe"
@@ -1421,6 +1430,15 @@ items"
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
                                "Make sure all promises have due dates (me to others or others to me)")
+                              (org-super-agenda-groups
+                               (mapcar
+                                (lambda (ag)
+                                  (list :name (first ag)
+                                        :tag (first ag))
+                                  )
+                                konix/org-gtd-commitments-tags
+                                )
+                               )
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(deadline))
@@ -1437,6 +1455,15 @@ items"
                                )
                               (dummy (setq-local org-agenda-todo-keyword-format ""))
                               (org-agenda-todo-ignore-deadlines nil)
+                              (org-super-agenda-groups
+                               (mapcar
+                                (lambda (ag)
+                                  (list :name (first ag)
+                                        :tag (first ag))
+                                  )
+                                konix/org-gtd-agenda
+                                )
+                               )
                               (org-agenda-overriding-header
                                "Waiting that someone might tell you about (promises to me)")
                               (org-agenda-skip-function
@@ -2441,6 +2468,15 @@ items"
                           '(or
                             (konix/skip-not-todo-file)
                             )
+                          )
+                         (org-super-agenda-groups
+                          (mapcar
+                           (lambda (ag)
+                             (list :name (first ag)
+                                   :tag (first ag))
+                             )
+                           konix/org-gtd-agenda
+                           )
                           )
                          (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                          (org-agenda-prefix-format

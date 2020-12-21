@@ -539,5 +539,12 @@ Return added key."
 
 (setq-default org-ref-completion-library 'org-ref-ivy-cite)
 
+(defun konix/org-roam-get-title (path)
+  (save-window-excursion
+    (find-file path)
+    (car (org-roam--extract-titles-title))
+    )
+  )
+
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

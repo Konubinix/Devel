@@ -1391,6 +1391,8 @@ items"
                  (
                   (tags "+Agenda+todo=\"NEXT\"-maybe-WAIT-DELEGATED"
                         (
+                         (org-agenda-overriding-header
+                          "Next actions about talking with people (no promises)")
                          (org-super-agenda-groups
                           (mapcar
                            (lambda (ag)
@@ -1405,7 +1407,7 @@ items"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
-                               "7 days: Make explicit that those commitments are not forgotten")
+                               "7 days: Make explicit that those commitments are not forgotten (promises to others)")
                               (org-agenda-skip-function
                                '(or
                                  (konix/skip-not-todo-file)
@@ -1418,7 +1420,7 @@ items"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
-                               "Make sure all promises have due dates")
+                               "Make sure all promises have due dates (me to others or others to me)")
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(deadline))
@@ -1436,7 +1438,7 @@ items"
                               (dummy (setq-local org-agenda-todo-keyword-format ""))
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
-                               "Waiting scheduled or not but that someone might tell you about")
+                               "Waiting that someone might tell you about (promises to me)")
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(notdeadline))

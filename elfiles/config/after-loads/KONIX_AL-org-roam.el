@@ -361,25 +361,30 @@ Return added key."
 
 (defun konix/org-roam/open-key (key)
   (interactive
-   (let (
-         (keys (mapcar #'cdr (org-roam--extract-global-props '("ROAM_KEY"))))
-         )
-     (list
-      (pcase (length keys)
-        (0
-         (error "No key if file")
-         )
-        (1
-         (car keys)
-         )
-        (t
-         (completing-read
-          "Key: "
-          keys
+   (save-window-excursion
+     (when (not (org-roam--org-roam-file-p))
+       (call-interactively 'org-roam-find-ref)
+       )
+     (let (
+           (keys (mapcar #'cdr (org-roam--extract-global-props '("ROAM_KEY"))))
+           )
+       (list
+        (pcase (length keys)
+          (0
+           (error "No key if file")
+           )
+          (1
+           (car keys)
+           )
+          (t
+           (completing-read
+            "Key: "
+            keys
+            )
+           )
           )
-         )
         )
-      )
+       )
      )
    )
   (shell-command (format "xdg-open '%s' &" key))

@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: hook
+# key: hook
+# --
+(defun konix/$100-hook nil
+  "My custom hook for `$100'"
+  $0
+  )
+(add-hook '$100-hook
+          'konix/$100-hook)

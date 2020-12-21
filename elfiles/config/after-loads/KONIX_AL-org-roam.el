@@ -259,14 +259,14 @@ ${title}
 
 (setq-default org-roam-tag-sources '(prop))
 
-(defun konix/org-roam-format-link/around (orig-fun target &optional description type)
+(defun konix/org-roam-format-link/around (orig-fun target &optional description &rest args)
   "Replace file: link by konix-org-roam: links
  when linking to org roam from outside of org roam"
   (if (or
        (string-equal org-roam-buffer (buffer-name (current-buffer)))
        (konix/org-roam-is-in-roam-p)
        )
-      (funcall orig-fun target description type)
+      (apply orig-fun target description args)
     (let (
           (id (save-window-excursion (with-current-buffer (find-file target)
                                        (save-excursion

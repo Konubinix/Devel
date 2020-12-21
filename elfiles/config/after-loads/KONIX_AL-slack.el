@@ -57,23 +57,9 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
      )
   )
 
-(konix/slack-with-change-team slack-select-unread-rooms)
-(konix/slack-with-change-team slack-select-rooms)
-(konix/slack-with-change-team slack-select-rooms)
-(konix/slack-with-change-team slack-im-open)
 (konix/slack-with-change-team slack-im-select)
 (konix/slack-with-change-team slack-all-threads)
 
-
-(defun konix/slack-select-rooms ()
-  "Wrapper around `slack-select-rooms' that allow selecting the team with C-u."
-  (interactive)
-  (let (
-        (slack-prefer-current-team (if current-prefix-arg nil slack-prefer-current-team))
-        )
-    (call-interactively 'slack-select-rooms)
-    )
-  )
 
 (define-prefix-command 'konix/slack-global-map)
 (define-key konix/global-fast-key-map (kbd "l") 'konix/slack-global-map)
@@ -91,6 +77,161 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
 (define-key konix/slack-global-map (kbd "M-u") 'slack-file-upload-snippet)
 
 (add-to-list 'tracking-ignored-buffers "\\*Slack - .+ : .+ Thread - [0-9.]+")
+
+(defun konix/slack-select-from-list (alist)
+  (slack-select-from-list (alist "Select Channel: "))
+  )
+
+(defun konix/slack-find-room-all (predicate)
+  (let* (
+         selected-team
+         (team-room-s
+          (cl-loop
+           for team in (hash-table-values slack-teams-by-token)
+           append
+           (cl-loop
+            for room in (cl-remove-if
+                         #'(lambda (room)
+                             (not (funcall predicate room team)))
+                         (append (slack-team-ims team)
+                                 (slack-team-groups team)
+                                 (slack-team-channels team))
+                         )
+            append
+            (list (list team room))
+            )
+           )
+          )
+         (alist (cl-loop
+                 for team-room in team-room-s
+                 append
+                 (slack-room-names
+                  (cdr team-room) (car team-room) #'(lambda (rs) (cl-remove-if #'slack-room-hidden-p
+                                                                               rs)))
+                 ))
+         (room (konix/slack-select-from-list alist))
+         (team
+          (caar
+           (remove-if-not
+            (lambda (team-room)
+              (equal (cadr team-room) room)
+              )
+            team-room-s
+            )
+           )
+          )
+         )
+    (list room team)
+    )
+  )
+
+(defun konix/slack-find-im-all ()
+  (let* (
+         (team-user-s
+          (cl-loop
+           for team in (hash-table-values slack-teams-by-token)
+           append
+           (cl-loop
+            for im in (cl-remove-if #'(lambda (im)
+                                        (not (oref im is-open)))
+                                    (slack-team-ims team))
+            append
+            (list (list team im))
+            )
+           )
+          )
+         (alist (cl-loop
+                 for team-user in team-user-s
+                 append
+                 (slack-room-names
+                  (cdr team-user) (car team-user))
+                 ))
+         (user (konix/slack-select-from-list alist))
+         (team
+          (caar
+           (remove-if-not
+            (lambda (team-user)
+              (equal (cadr team-user) user)
+              )
+            team-user-s
+            )
+           )
+          )
+         )
+    (list user team)
+    )
+  )
+
+(defun konix/slack-find-user-all ()
+  (let* (
+         (team-user-s
+          (apply
+           'append
+           (mapcar
+            (lambda (team)
+              (mapcar
+               (lambda (user)
+                 (list team user)
+                 )
+               (slack-team-users team)
+               )
+              )
+            (hash-table-values slack-teams-by-token)
+            )
+           )
+          )
+         (alist (cl-loop
+                 for team-user in team-user-s
+                 append
+                 (list
+                  (list
+                   (format
+                    "%s - %s"
+                    (slack-team-name (car team-user))
+                    (slack-user-label (cadr team-user) (car team-user))
+                    )
+                   (cadr team-user)
+                   )
+                  )
+                 ))
+         (user (car (konix/slack-select-from-list alist)))
+         (team
+          (caar
+           (remove-if-not
+            (lambda (team-user)
+              (string-equal (slack-user-id (cadr team-user)) (slack-user-id user))
+              )
+            team-user-s
+            )
+           )
+          )
+         )
+    (list user team)
+    )
+  )
+
+(defun konix/slack-select-unread-rooms (room team)
+  (interactive (konix/slack-find-room-all 'slack-room-has-unread-p))
+  (slack-room-display room team)
+  )
+
+(defun konix/slack-select-rooms (room team)
+  (interactive (konix/slack-find-room-all (lambda (room team)
+                                            t
+                                            )))
+  (slack-room-display room team)
+  )
+
+(defun konix/slack-im-select (im team)
+  (interactive (konix/slack-find-im-all))
+  (slack-room-display im team)
+  )
+
+(defun konix/slack-im-open (user team)
+  (interactive (konix/slack-find-user-all))
+  (slack-conversations-open team
+                            :user-ids (list (slack-user-id user)))
+  )
 
 
 (provide 'KONIX_AL-slack)

@@ -5480,5 +5480,18 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org-get-heading (&optional keep-links)
+  (konix/org-with-point-on-heading
+   (let (
+         (heading (org-get-heading t t t t))
+         )
+     (unless keep-links
+       (setq heading (replace-regexp-in-string org-bracket-link-regexp "\\2" heading))
+       )
+     heading
+     )
+   )
+  )
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

@@ -725,6 +725,19 @@ clientkeys = gears.table.join(
    awful.key(
       {
          modkey,
+      },
+      "y",
+      function (c)
+         awful.spawn("impass_gui.sh")
+      end ,
+      {
+         description = "Run the impass",
+         group = "impass"
+      }
+   ),
+   awful.key(
+      {
+         modkey,
 	 "Shift",
       },
       "j",

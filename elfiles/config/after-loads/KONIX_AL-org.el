@@ -5520,6 +5520,29 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org-export-before-processing-hook (_backend)
+  (let* (
+         (language (konix/org-roam-export/get-language))
+         (text (cond
+                ((string-equal language "fr")
+                 "Bibliographie"
+                 )
+                ((string-equal language "en")
+                 "Bibliography"
+                 )
+                (t
+                 (error "Unsupported language %s" language)
+                 )
+                )
+               )
+         )
+    (setq-local citeproc-org-org-bib-header (format "* %s\n" text))
+    )
+  )
+
+(add-hook 'org-export-before-processing-hook
+          'konix/org-export-before-processing-hook)
+
 (defun konix/org-get-heading (&optional keep-links)
   (konix/org-with-point-on-heading
    (let (

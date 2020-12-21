@@ -25,6 +25,11 @@
 ;;; Code:
 
 (require 'org-roam-protocol)
+(require 'org-roam-bibtex)
+(require 'org-ref)
+(require 'org-ref-ivy)
+
+(require 'citeproc-org)
 (require 'KONIX_org-roam-export)
 
 (setq-default org-roam-directory (expand-file-name "roam" perso-dir))
@@ -499,6 +504,16 @@ Return added key."
   )
 (advice-add 'org-roam-complete-everywhere :around #'konix/org-roam-complete-everywhere/custom-syntax-table)
 
+(setq-default
+ citeproc-org-default-style-file
+ (expand-file-name "refs.csl" org-roam-directory)
+ )
+
+(citeproc-org-setup)
+(org-roam-bibtex-mode)
+(setq-default org-ref-default-bibliography (list (expand-file-name "refs.bib" org-roam-directory)))
+
+(setq-default org-ref-completion-library 'org-ref-ivy-cite)
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

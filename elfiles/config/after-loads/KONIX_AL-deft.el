@@ -45,7 +45,7 @@ used as title."
                      (if begin
                          (funcall deft-parse-title-function
                                   (substring contents begin (match-end 0))))))
-                 (org-roam--get-title-or-slug file)))
+                 (org-roam--path-to-slug file)))
 
 (provide 'KONIX_AL-deft)
 ;;; KONIX_AL-deft.el ends here

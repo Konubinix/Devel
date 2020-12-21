@@ -1766,18 +1766,12 @@ X-WR-TIMEZONE:CEST
       (add-to-list 'visited-points (point))
       (recenter-top-bottom 0)
       (when (y-or-n-p (format "Take this one (%s)?"
-                              (konix/org-agenda-get-heading)
+                              (konix/org-get-heading)
                               ))
         (org-agenda-set-tags "maybe" 'off)
         )
       )
     )
-  )
-
-(defun konix/org-agenda-get-heading nil
-  (konix/org-with-point-on-heading
-   (org-get-heading t t t t)
-   )
   )
 
 (provide 'KONIX_AL-org-agenda)

@@ -36,6 +36,7 @@
   :CREATED:  %U
   :END:
 "
+                 :file-name "daily/%<%Y-%m-%d>"
                  :head "#+title: %<%Y-%m-%d>
 #+LANGUAGE: fr
 #+CREATED: %U

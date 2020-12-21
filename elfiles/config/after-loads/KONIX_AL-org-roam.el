@@ -539,6 +539,12 @@ Return added key."
 
 (setq-default org-ref-completion-library 'org-ref-ivy-cite)
 
+(defun konix/org-roam-buffer-prepare-hook ()
+  (visual-line-mode 1)
+  )
+(add-hook 'org-roam-buffer-prepare-hook
+          'konix/org-roam-buffer-prepare-hook)
+
 (defun konix/org-roam-get-title (path)
   (save-window-excursion
     (find-file path)

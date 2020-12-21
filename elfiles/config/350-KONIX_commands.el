@@ -1825,7 +1825,10 @@ FExport diary data into iCalendar file: ")
         )
     (setq current-prefix-arg nil
           konix/scroll-last-scroll-time scroll-time)
-    (while t
+    (while (<
+            (line-number-at-pos (point))
+            (line-number-at-pos (point-max))
+            )
       (sit-for (/ (float scroll-time) 4))
       (if (and
            (boundp 'pdf-continuous-scroll-mode)
@@ -1835,7 +1838,13 @@ FExport diary data into iCalendar file: ")
         (call-interactively 'next-line)
         )
       (hl-line-highlight)
-      (call-interactively 'recenter-top-bottom)
+      (when (not (equal (point-max) (window-end)))
+       (let (
+             (recenter-last-op nil)
+             )
+         (call-interactively 'recenter-top-bottom)
+         )
+       )
       )
     )
   )

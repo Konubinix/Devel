@@ -42,164 +42,167 @@
    )
   )
 
-(defun konix/org-roam-export/export-all (&optional kind publish-dir incremental)
+(defun konix/org-roam-export/export-all (&optional kind incremental)
   "Re-exports all Org-roam files to Hugo markdown."
   (interactive)
   (setq kind (or kind "blog"))
   (assert (not (string= "" kind)))
-  (setq publish-dir (or
-                     publish-dir
-                     (expand-file-name (format "~/org-publish/%s" kind))
-                     ))
-  (when (not
-         (equal
-          0
-          (call-process
-           "konix_org-roam_update_links.sh"
-           nil
-           nil
-           nil
-           org-roam-directory
-           publish-dir
-           org-roam-db-location
-           kind
-           )
-          )
-         )
-    (error "Could not update the links")
-    )
-  (let* (
-         (dates (mapcar
-                 (lambda (line)
-                   (split-string line "|")
-                   )
-                 (split-string
-                  (s-trim
-                   (shell-command-to-string
-                    (format
-                     "konix_org-roam_get-dates.sh %s"
-                     org-roam-directory
-                     )
-                    )
-                   )
-                  "\n"
-                  )
-                 )
-                )
-
-         (org-export-babel-evaluate nil)
-         (roam-links (expand-file-name (format "%s_links.txt" "org-roam") publish-dir))
-         (kind-links (expand-file-name (format "%s_links.txt" kind)
-                                       publish-dir))
-         (roam-links_kind (expand-file-name (format "%s_links_kind.txt" "org-roam") publish-dir))
-         (kind-links_kind (expand-file-name (format "%s_links_kind.txt" kind)
-                                            publish-dir))
-         (roam-exported (expand-file-name (format "%s_exported.txt" "org-roam") publish-dir))
-         (kind-exported (expand-file-name (format "%s_exported.txt" kind)
-                                          publish-dir))
-         (roam-exported_kind (expand-file-name (format "%s_exported_kind.txt" "org-roam") publish-dir))
-         (kind-exported_kind (expand-file-name (format "%s_exported_kind.txt" kind)
-                                               publish-dir))
-         (lost-one
-          (equal (call-process "konix_org-roam_lost_one.sh" nil nil nil
-                               roam-exported_kind
-                               kind-exported_kind
-                               )
-                 0))
-         (exported-files (konix/org-roam-export/exported-files kind))
-         (files-with-updated-links
-          (-intersection
-           exported-files
-           (split-string
-            (s-trim
-             (shell-command-to-string
-              (format
-               "konix_org-roam_get_nodes_to_update.sh %s %s"
-               roam-links
-               kind-links
-               )
-              )
-             )
-            "\n"
-            )
-           )
-          )
-         (files-with-updated-links-kind
-          (-intersection
-           exported-files
-           (split-string
-            (s-trim
-             (shell-command-to-string
-              (format
-               "konix_org-roam_get_nodes_to_update.sh %s %s"
-               roam-links_kind
-               kind-links_kind
-               )
-              )
-             )
-            "\n"
-            )
-           )
-          )
-         (date-file (expand-file-name (format "%s_date.txt" kind) publish-dir))
-         (last-date (save-window-excursion
-                      (find-file date-file)
-                      (s-trim
-                       (buffer-substring-no-properties (point-min) (point-max))
+  (let  (
+         (publish-dir (expand-file-name
+                       kind
+                       (getenv "KONIX_ORG_PUBLISH_DIR")
                        )
                       )
+         )
+    (when (not
+           (equal
+            0
+            (call-process
+             "konix_org-roam_update_links.sh"
+             nil
+             nil
+             nil
+             org-roam-directory
+             publish-dir
+             org-roam-db-location
+             kind
+             )
+            )
+           )
+      (error "Could not update the links")
+      )
+    (let* (
+           (dates (mapcar
+                   (lambda (line)
+                     (split-string line "|")
+                     )
+                   (split-string
+                    (s-trim
+                     (shell-command-to-string
+                      (format
+                       "konix_org-roam_get-dates.sh %s"
+                       org-roam-directory
+                       )
+                      )
+                     )
+                    "\n"
                     )
+                   )
+                  )
 
-         (files-updated (remove-if
-                         (lambda (path)
-                           (string-lessp (cadr (assoc path dates)) last-date)
-                           )
-                         exported-files
+           (org-export-babel-evaluate nil)
+           (roam-links (expand-file-name (format "%s_links.txt" "org-roam") publish-dir))
+           (kind-links (expand-file-name (format "%s_links.txt" kind)
+                                         publish-dir))
+           (roam-links_kind (expand-file-name (format "%s_links_kind.txt" "org-roam") publish-dir))
+           (kind-links_kind (expand-file-name (format "%s_links_kind.txt" kind)
+                                              publish-dir))
+           (roam-exported (expand-file-name (format "%s_exported.txt" "org-roam") publish-dir))
+           (kind-exported (expand-file-name (format "%s_exported.txt" kind)
+                                            publish-dir))
+           (roam-exported_kind (expand-file-name (format "%s_exported_kind.txt" "org-roam") publish-dir))
+           (kind-exported_kind (expand-file-name (format "%s_exported_kind.txt" kind)
+                                                 publish-dir))
+           (lost-one
+            (equal (call-process "konix_org-roam_lost_one.sh" nil nil nil
+                                 roam-exported_kind
+                                 kind-exported_kind
+                                 )
+                   0))
+           (exported-files (konix/org-roam-export/exported-files kind))
+           (files-with-updated-links
+            (-intersection
+             exported-files
+             (split-string
+              (s-trim
+               (shell-command-to-string
+                (format
+                 "konix_org-roam_get_nodes_to_update.sh %s %s"
+                 roam-links
+                 kind-links
+                 )
+                )
+               )
+              "\n"
+              )
+             )
+            )
+           (files-with-updated-links-kind
+            (-intersection
+             exported-files
+             (split-string
+              (s-trim
+               (shell-command-to-string
+                (format
+                 "konix_org-roam_get_nodes_to_update.sh %s %s"
+                 roam-links_kind
+                 kind-links_kind
+                 )
+                )
+               )
+              "\n"
+              )
+             )
+            )
+           (date-file (expand-file-name (format "%s_date.txt" kind) publish-dir))
+           (last-date (save-window-excursion
+                        (find-file date-file)
+                        (s-trim
+                         (buffer-substring-no-properties (point-min) (point-max))
                          )
                         )
-         (files-to-consider (-union
-                             files-updated
-                             (-union
-                              files-with-updated-links
-                              files-with-updated-links-kind
-                              )
-                             ))
-         )
-    (setq incremental (and (not lost-one) incremental))
-    (when (not incremental)
-      (delete-directory (expand-file-name (expand-file-name "content" publish-dir)) t)
-      (delete-directory (expand-file-name (expand-file-name "static" publish-dir)) t)
-      (make-directory (expand-file-name (expand-file-name "static" publish-dir)))
-      )
-    (save-window-excursion
-      (dolist (f (if incremental files-to-consider exported-files))
-        (with-current-buffer (find-file f)
-          (message "Exporting %s" f)
-          (org-hugo-export-wim-to-md)
+                      )
+
+           (files-updated (remove-if
+                           (lambda (path)
+                             (string-lessp (cadr (assoc path dates)) last-date)
+                             )
+                           exported-files
+                           )
+                          )
+           (files-to-consider (-union
+                               files-updated
+                               (-union
+                                files-with-updated-links
+                                files-with-updated-links-kind
+                                )
+                               ))
+           )
+      (setq incremental (and (not lost-one) incremental))
+      (when (not incremental)
+        (delete-directory (expand-file-name (expand-file-name "content" publish-dir)) t)
+        (delete-directory (expand-file-name (expand-file-name "static" publish-dir)) t)
+        (make-directory (expand-file-name (expand-file-name "static" publish-dir)))
+        )
+      (save-window-excursion
+        (dolist (f (if incremental files-to-consider exported-files))
+          (with-current-buffer (find-file f)
+            (message "Exporting %s" f)
+            (org-hugo-export-wim-to-md)
+            )
           )
         )
-      )
-    ;; record the last date and last links
-    (save-window-excursion
-      (find-file date-file)
-      (delete-region (point-min) (point-max))
-      (insert (format-time-string "[%Y-%m-%d %a %H:%M]"))
-      (save-buffer)
-      (rename-file roam-links kind-links t)
-      (rename-file roam-exported kind-exported t)
-      (rename-file roam-links_kind kind-links_kind t)
-      (rename-file roam-exported_kind kind-exported_kind t)
+      ;; record the last date and last links
+      (save-window-excursion
+        (find-file date-file)
+        (delete-region (point-min) (point-max))
+        (insert (format-time-string "[%Y-%m-%d %a %H:%M]"))
+        (save-buffer)
+        (rename-file roam-links kind-links t)
+        (rename-file roam-exported kind-exported t)
+        (rename-file roam-links_kind kind-links_kind t)
+        (rename-file roam-exported_kind kind-exported_kind t)
+        )
       )
     )
-
   (message "Everyting was exported")
   )
 
-(defun konix/org-roam-export/backlinks-list (file &optional kind)
+(defun konix/org-roam-export/backlinks-list (file)
   (remove-duplicates
    (-intersection
     (mapcar #'car (org-roam--get-backlinks file))
-    (konix/org-roam-export/exported-files kind)
+    (konix/org-roam-export/exported-files "")
     )
    :test #'string-equal
    )
@@ -226,11 +229,25 @@
      ((string-match ".*youtube.com/watch\\?v=\\(.+\\)" url)
       (format "{{{youtube(%s)}}}" (match-string 1 url))
       )
-     ((string-match "https://skeptikon.fr/videos/watch/\\(.+\\)" url)
-      (format "{{{peertube(%s)}}}" (match-string 1 url))
+     ((string-match "https://\\(skeptikon.+\\|peertube.+\\)/videos/watch/\\(.+\\)" url)
+      (format "{{{peertube(%s)}}}" (match-string 2 url))
       )
      ((string-match "^\\(http.+mp3\\)$" url)
       (format "{{{mp3(%s)}}}" (match-string 1 url))
+      )
+     ((string-match "^cite:\\(.+\\)$" url)
+      (let* ((results (org-ref-get-bibtex-key-and-file (match-string 1 url)))
+             (key (car results))
+             (bibfile (cdr results)))
+        (save-excursion
+          (with-temp-buffer
+            (insert-file-contents bibfile)
+            (bibtex-set-dialect (parsebib-find-bibtex-dialect) t)
+            (bibtex-search-entry key)
+            (s-trim (bibtex-autokey-get-field "url"))
+            )
+          )
+        )
       )
      (t
       url
@@ -439,27 +456,29 @@
   )
 
 (defun konix/org-roam-export/add-id-as-hugo-aliases ()
-  (when-let (
-             (id (progn (goto-char (point-min)) (org-id-get)))
-             )
+  (when-let*
+      (
+       (legacy-id (progn (goto-char (point-min)) (org-id-get)))
+       (id (format "/%s" legacy-id))
+       )
     (save-excursion
       (goto-char (point-min))
       (if (re-search-forward "^#\\+HUGO_ALIASES:" 3000 t)
           (progn
             (move-end-of-line nil)
-            (insert " " id)
+            (insert " " id " " legacy-id)
             )
         (progn
           (while (looking-at "^:")
             (forward-line)
             )
           (move-end-of-line nil)
-          (insert "\n#+HUGO_ALIASES: " id)
+          (insert "\n#+HUGO_ALIASES: " id " " legacy-id)
           )
         )
       (goto-char (point-max))
       (insert
-       (format "\n* [[https://konubinix.eu/%s/posts/%s][Permalink]]"
+       (format "\n* [[https://konubinix.eu/%s/%s][Permalink]]"
                (konix/org-roam-export/extract-kind)
                id
                )
@@ -526,14 +545,14 @@
                   (if (equal link-kind kind)
                       (format "   - [[file:%s][%s]]\n"
                               (file-relative-name link org-roam-directory)
-                              (org-roam--get-title-or-slug link)
+                              (konix/org-roam-get-title link)
                               )
                     (format "   - [[https://konubinix.eu/%s/posts/%s/][%s]]%s\n"
                             (konix/org-roam-export/extract-kind link)
                             (file-name-sans-extension
                              (file-relative-name link org-roam-directory)
                              )
-                            (org-roam--get-title-or-slug link)
+                            (konix/org-roam-get-title link)
                             (if (not
                                  (equal
                                   kind
@@ -573,7 +592,7 @@
           )
         (forward-line -1)
         (move-end-of-line nil)
-        (insert (format "\n#+KONIX_ORG_PUBLISH_KING: %s"
+        (insert (format "\n#+KONIX_ORG_PUBLISH_KIND: %s"
                         (or kind (let (
                                        (kind (completing-read "Kind: " '("blog" "braindump")
                                                               nil t

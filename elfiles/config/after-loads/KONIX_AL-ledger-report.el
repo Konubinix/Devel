@@ -65,6 +65,8 @@
 
 (defun konix/ledger-report-mode-hook ()
   (add-hook 'post-command-hook 'konix/ledger-visit-track nil t)
+  (hl-line-mode 1)
+  (setq-local ledger-report-buffer-name ledger-report-buffer-name)
   )
 (add-hook 'ledger-report-mode-hook
           'konix/ledger-report-mode-hook)
@@ -81,13 +83,10 @@
 
 (defun konix/ledger-report-add-note ()
   (interactive)
-  (save-window-excursion
-    (konix/ledger-visit)
-    (move-end-of-line nil)
-    (insert "\n    ; ")
-    (recursive-edit)
-    (save-buffer)
-    )
+  (push-tag-mark)
+  (konix/ledger-visit)
+  (move-end-of-line nil)
+  (insert "\n    ; ")
   )
 
 (defun konix/ledger-report-save ()
@@ -115,14 +114,7 @@ This uses `org-read-date', which see."
             (org-time-string-to-time
              (replace-regexp-in-string
               "/" "-"
-              (cond
-               ((looking-at "^.+; *[[]=\\(.+\\)[]]$")
-                (match-string 1)
-                )
-               (t
-                (ledger-xact-date)
-                )
-               )
+              (konix/ledger-get-date)
               )
              )
             )
@@ -139,7 +131,7 @@ This uses `org-read-date', which see."
   )
 
 (defun konix/ledger-add-justif (value)
-  (interactive "sValue: ")
+  (interactive "sJustif value: ")
   (save-window-excursion
     (konix/ledger-visit)
     (konix/ledger-add-note)
@@ -147,9 +139,210 @@ This uses `org-read-date', which see."
     )
   )
 
+(defvar konix/ledger-mode/current-twin nil)
+
+(defun konix/ledger-report-twin-reset nil
+  (interactive)
+  (setq konix/ledger-mode/current-twin nil)
+  (message "Reset the twin")
+  )
+
+(defun konix/ledger-report-twin ()
+  (interactive)
+  (save-window-excursion
+    (konix/ledger-visit)
+    (if konix/ledger-mode/current-twin
+        (let (
+              (id (plist-get konix/ledger-mode/current-twin :id))
+              (account (plist-get konix/ledger-mode/current-twin :account))
+              (date (plist-get konix/ledger-mode/current-twin :date))
+              (file (plist-get konix/ledger-mode/current-twin :file))
+              (justif (plist-get konix/ledger-mode/current-twin :justif))
+              (content (plist-get konix/ledger-mode/current-twin :content))
+              (twin-account (konix/ledger-transaction-at-point))
+              (twin-date (konix/ledger-get-date))
+              (twin-id (konix/ledger-get-id-create))
+              (twin-file (buffer-file-name))
+              (twin-justif (konix/ledger-get-justif))
+              (twin-content (konix/ledger-get-line-at-point))
+              )
+          (when (equal twin-id id)
+            (error "Trying to twin an entry with itself")
+            )
+          (when (and
+                 (string-greaterp date twin-date)
+                 (not (yes-or-no-p
+                       "The first entry generaly should be earlier. Is it ok?")
+                      )
+                 )
+            (konix/ledger-report-twin-reset)
+            (error "Aborted and reset the twin")
+            )
+          (when (not (string-equal twin-account account))
+            (if (string-equal twin-account "wtf")
+                (konix/ledger-replace-transaction-at-point account)
+              (error "Cannot match twins %s vs %s" account twin-account)
+              )
+            )
+          (unless (yes-or-no-p (format "Please check that it is what you want
+The effective date of 1 will be set to the effective date of 2
+1. %s
+2. %s
+" content twin-content))
+            (error "Aborted")
+            )
+          (when (or justif twin-justif)
+            (konix/ledger-clear)
+            )
+          (konix/ledger-add-note)
+          (insert (format
+                   "twin: [[konix/ledger:%s:%s][twin]]"
+                   file
+                   id
+                   )
+                  )
+          (when (and (not twin-justif) justif)
+            (insert "\n    ; justif: see twin")
+            )
+          (save-buffer)
+          (find-file file)
+          (konix/ledger-goto id)
+          (when (not (string-equal twin-date (konix/ledger-get-date)))
+            (ledger-insert-effective-date twin-date)
+            )
+          (when (or justif twin-justif)
+            (konix/ledger-clear)
+            )
+          (konix/ledger-add-note)
+          (insert (format
+                   "twin: [[konix/ledger:%s:%s][twin]]"
+                   twin-file
+                   twin-id
+                   )
+                  )
+          (when (not justif)
+            ;; even if the twin does not have the justif, link to it. So that
+            ;; the day I will add the justif, I will only have to put it in one
+            ;; transaction.
+            (insert "\n    ; justif: see twin")
+            )
+          (setq konix/ledger-mode/current-twin nil)
+          (save-buffer)
+          (message "Connected the twins, cleared them, added justif, setup the accounts and saved the ledgers")
+          )
+      (progn
+        (setq konix/ledger-mode/current-twin
+              (list :id (konix/ledger-get-id-create)
+                    :account (konix/ledger-transaction-at-point)
+                    :file (buffer-file-name)
+                    :date (konix/ledger-get-date)
+                    :justif (konix/ledger-get-justif)
+                    :content (konix/ledger-get-line-at-point)
+                    )
+              )
+        (save-buffer)
+        (message "Saved the twin (and the ledger). Go to the other twin and relaunch me")
+        )
+      )
+    )
+  )
+
+(defun konix/ledger-report-toggle-highlight-similar ()
+  (interactive)
+  (save-excursion
+    (move-beginning-of-line nil)
+    (looking-at "^.+ -?\\([0-9.]+\\) EUR.+$")
+    (let (
+          (regexp (format "^.+\\b\\(%s\\)\\b EUR .+$"
+                          (match-string-no-properties 1)))
+          )
+      (if (get-char-property (match-beginning 1) 'hi-lock-overlay)
+          (hi-lock-unface-buffer regexp)
+        (hi-lock-face-buffer
+         regexp
+         (let (
+               (hi-lock-auto-select-face t)
+               )
+           (hi-lock-read-face-name)
+           )
+         1
+         )
+        )
+      )
+    )
+  )
+
+(defun konix/ledger-report-unhighlight-all ()
+  (interactive)
+  (--> hi-lock-interactive-patterns
+       (-map #'car it)
+       (-map #'hi-lock-unface-buffer it)
+       )
+  )
+
+(defun konix/ledger-report-toggle-highlight-similar-account ()
+  (interactive)
+  (save-excursion
+    (move-beginning-of-line nil)
+    (looking-at "^.+ \\([^ ]+\\) +-?\\([0-9.]+\\) EUR.+$")
+    (let (
+          (regexp (format "^.+ \\(%s\\) +-?\\([0-9.]+\\) EUR.+$"
+                          (match-string-no-properties 1)))
+          )
+      (if (get-char-property (match-beginning 1) 'hi-lock-overlay)
+          (hi-lock-unface-buffer regexp)
+        (hi-lock-face-buffer
+         regexp
+         (let (
+               (hi-lock-auto-select-face t)
+               )
+           (hi-lock-read-face-name)
+           )
+         1
+         )
+        )
+      )
+    )
+  )
+
+(defun konix/ledger-report-no-twin ()
+  (interactive)
+  (save-window-excursion
+    (konix/ledger-visit)
+    (konix/ledger-add-note)
+    (insert "twin: nope")
+    (save-buffer)
+    )
+  )
+
+(defun konix/ledger-open-justif-or-org nil
+  (interactive)
+  (konix/ledger-visit)
+  (when (or (konix/ledger-goto-justif) (konix/ledger-goto-org))
+    (call-interactively 'org-open-at-point)
+    )
+  )
+
+(defun konix/ledger-add-org-task (value)
+  (interactive "sOrg value: ")
+  (save-window-excursion
+    (konix/ledger-visit)
+    (konix/ledger-add-note)
+    (insert (format "org: %s" value))
+    )
+  )
+
 (define-key ledger-report-mode-map (kbd "=") #'konix/ledger-report-set-effective-date)
 (define-key ledger-report-mode-map (kbd "l") #'hl-line-mode)
 (define-key ledger-report-mode-map (kbd "t") #'konix/ledger-visit-track-mode)
+(define-key ledger-report-mode-map (kbd "o") #'konix/ledger-open-justif-or-org)
+(define-key ledger-report-mode-map (kbd "O") #'konix/ledger-add-org-task)
+(define-key ledger-report-mode-map (kbd "h") #'konix/ledger-report-toggle-highlight-similar)
+(define-key ledger-report-mode-map (kbd "H") #'konix/ledger-report-toggle-highlight-similar-account)
+(define-key ledger-report-mode-map (kbd "M-h") #'konix/ledger-report-unhighlight-all)
+(define-key ledger-report-mode-map (kbd "T") #'konix/ledger-report-twin)
+(define-key ledger-report-mode-map (kbd "M-t") #'konix/ledger-report-twin-reset)
+(define-key ledger-report-mode-map "q" #'bury-buffer)
 (define-key ledger-report-mode-map (kbd ";") #'konix/ledger-report-add-note)
 (define-key ledger-report-mode-map (kbd "C") #'konix/ledger-report-clean-buffer)
 (define-key ledger-report-mode-map (kbd "s") #'konix/ledger-report-save)

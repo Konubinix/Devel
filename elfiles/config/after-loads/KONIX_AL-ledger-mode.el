@@ -36,86 +36,70 @@
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("pending" "ledger -f %(ledger-file) [[ledger-mode-flags]] register --limit 'pending'")
+ '("need next action"
+   "ledger -f %(ledger-file) \
+[[ledger-mode-flags]] \
+register \
+--limit 'date > [2020] && date < today' \
+not %org and not %justif and not ^Equity and not ^Assets and not NoJustif")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("wtf_cleared" "ledger -f %(ledger-file) [[ledger-mode-flags]] --cleared register --limit 'account=~/wtf/'")
+ '("needs justif"
+   "ledger -f %(ledger-file) \
+[[ledger-mode-flags]] \
+register \
+--limit 'date > [2020] && date < today' \
+not %justif and not ^Equity and not ^Assets and not NoJustif")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("pending-without-org-task" "ledger -f %(ledger-file) [[ledger-mode-flags]] register --limit 'pending' not %org")
+ '("pending"
+   "ledger -f %(ledger-file) \
+[[ledger-mode-flags]] \
+register \
+%org and not %justif")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("uncleared-no-justif" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register not %justif")
+ '("twinable"
+   "ledger -f %(ledger-file) \
+[[ledger-mode-flags]] \
+register \
+--limit 'date <= today' \
+^wtf or \\( not %twin and ^Virtual and not Lasting \\)")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("bank" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register \\( Assets:Bank \\)")
+ '("wtf"
+   "ledger -f %(ledger-file) \
+[[ledger-mode-flags]] \
+register \
+ wtf")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- ;; not pending because those should be reconciled in the pending report
- '("reconcile" "ledger -f %(ledger-file) --uncleared  [[ledger-mode-flags]] register --limit 'not pending' \\( ^wtf ^Assets:Receivable ^Liabilities \\)")
+ '("wtf with justif"
+   "ledger -f %(ledger-file) \
+[[ledger-mode-flags]] \
+register \
+\\( wtf and %justif \\)"
+   )
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- ;; pending are associated with org entries, so they don't need to be assigned
- '("unassigned" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register --limit 'not pending' \\( not %who \\)")
- )
-
-(konix/push-or-replace-assoc-in-alist
- 'ledger-reports
- ;;
- '("where-no-pending" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register --limit 'not pending' \\( %where \\)")
- )
-
-(konix/push-or-replace-assoc-in-alist
- 'ledger-reports
- '("others" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register --limit 'not pending' \\( not %who=me \\)")
- )
-
-(konix/push-or-replace-assoc-in-alist
- 'ledger-reports
- ;; the pending already are handled in an org entry, so there is no need to track them here
- '("mine" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] register --limit 'date <= today and not pending' \\( not ^Liabilities and not ^Assets:Receivable and %who=me \\)")
- )
-
-(konix/push-or-replace-assoc-in-alist
- 'ledger-reports
- '("bal-uncleared" "ledger -f %(ledger-file) --uncleared [[ledger-mode-flags]] bal")
- )
-
-(konix/push-or-replace-assoc-in-alist
- 'ledger-reports
- '("bal-cleared" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] bal")
- )
-
-(konix/push-or-replace-assoc-in-alist
- 'ledger-reports
- '("networth bal" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] balance ^Assets ^Liabilities")
- )
-
-(konix/push-or-replace-assoc-in-alist
- 'ledger-reports
- '("networth reg" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] register ^Assets ^Liabilities")
- )
-
-(konix/push-or-replace-assoc-in-alist
- 'ledger-reports
- '("cashflow bal" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] balance ^Expense ^Income")
- )
-
-(konix/push-or-replace-assoc-in-alist
- 'ledger-reports
- '("cashflow reg" "ledger -f %(ledger-file) --cleared [[ledger-mode-flags]] register ^Expense ^Income")
+ '("networth bal"
+   "ledger -f %(ledger-file) \
+--limit 'date <= today' \
+[[ledger-mode-flags]] \
+balance \
+^Assets ^Virtual")
  )
 
 (defun konix/ledger-accounts (&optional recompute)
@@ -350,6 +334,137 @@ of the transaction.
   (ledger-xact-find-slot date)
   )
 
+(defun konix/ledger-transaction-at-point nil
+  (save-excursion
+    (move-beginning-of-line nil)
+    (looking-at "^ *[!*]? *\\([^ \n]+\\)[\n ]")
+    (match-string-no-properties 1)
+    )
+  )
+
+(defun konix/ledger-replace-transaction-at-point (new-value)
+  (save-excursion
+    (move-beginning-of-line nil)
+    (looking-at "^ *[!*]? *\\([^ \n]+\\)[\n ]")
+    (replace-match new-value t nil nil 1)
+    )
+  )
+
+(defun konix/ledger-get-date ()
+  (assert (equal (ledger-thing-at-point) 'posting))
+  (save-excursion
+    (move-beginning-of-line nil)
+    (cond
+     ((looking-at "^.+; *[[]=\\(.+\\)[]]$")
+      (match-string-no-properties 1)
+      )
+     (t
+      (ledger-xact-date)
+      )
+     )
+    )
+  )
+
+(defun konix/ledger-goto-justif-internal nil
+  (forward-line)
+  (let (done res)
+    (while (not done)
+      (if (not (konix/ledger-in-comment-line-p))
+          (setq done t)
+        (if (looking-at "^ *; justif: \\(.+\\)$")
+            (progn
+             (setq res (match-string-no-properties 1)
+                   done t)
+             (goto-char (match-beginning 1))
+             )
+          (forward-line)
+          )
+        )
+      )
+    res
+    )
+  )
+
+(defun konix/ledger-goto-justif nil
+  (assert (equal (ledger-thing-at-point) 'posting))
+  (let (
+        (prev-point (point))
+        (justif (konix/ledger-goto-justif-internal))
+        )
+    (unless justif
+      (ledger-navigate-beginning-of-xact)
+      (setq justif (konix/ledger-goto-justif-internal))
+      )
+    (unless justif
+      (goto-char prev-point)
+      )
+    justif
+    )
+  )
+
+(defun konix/ledger-goto-org-internal nil
+  (forward-line)
+  (let (done res)
+    (while (not done)
+      (if (not (konix/ledger-in-comment-line-p))
+          (setq done t)
+        (if (looking-at "^ *; org: \\(.+\\)$")
+            (progn
+             (setq res (match-string-no-properties 1)
+                   done t)
+             (goto-char (match-beginning 1))
+             )
+          (forward-line)
+          )
+        )
+      )
+    res
+    )
+  )
+
+(defun konix/ledger-goto-org nil
+  (assert (equal (ledger-thing-at-point) 'posting))
+  (let (
+        (prev-point (point))
+        (org (konix/ledger-goto-org-internal))
+        )
+    (unless org
+      (ledger-navigate-beginning-of-xact)
+      (setq org (konix/ledger-goto-org-internal))
+      )
+    (unless org
+      (goto-char prev-point)
+      )
+    org
+    )
+  )
+
+(defun konix/ledger-get-justif nil
+  (interactive)
+  (save-excursion
+    (konix/ledger-goto-justif)
+    )
+  )
+
+(defun konix/ledger-clear nil
+  (assert (equal (ledger-thing-at-point) 'posting))
+  (save-excursion
+    (move-beginning-of-line nil)
+    (skip-chars-forward " ")
+    (cond
+     ((looking-at "! ?")
+      (replace-match "* ")
+      )
+     ((looking-at "\\* ?")
+      nil ;; already cleared
+      )
+     (t
+      (insert "* ")
+      )
+     )
+    )
+  )
+
 (defun konix/ledger-add-note ()
   (interactive)
   (move-end-of-line nil)
@@ -357,6 +472,7 @@ of the transaction.
   )
 
 (define-key ledger-mode-map (kbd "C-c C-j") #'konix/ledger-goto-slot)
+(define-key ledger-mode-map (kbd "C-c j") #'konix/ledger-add-justif)
 (define-key ledger-mode-map (kbd "C-c C-,") #'konix/ledger-add-note)
 
 

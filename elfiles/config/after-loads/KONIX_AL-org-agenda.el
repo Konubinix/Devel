@@ -49,10 +49,13 @@
 (define-key org-agenda-mode-map (kbd "+")
   'konix/org-capture-na-in-heading)
 
+(define-key org-agenda-mode-map (kbd "M-s")
+  'konix/scroll)
+
 (define-key org-agenda-mode-map (kbd ":")
   'konix/org-agenda-counsel-org-tag)
 
-(define-key org-agenda-mode-map (kbd "C-.")
+(define-key org-agenda-mode-map (kbd ".")
   'org-agenda-set-tags)
 
 (define-key org-agenda-mode-map (kbd "M-l")

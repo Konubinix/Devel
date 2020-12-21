@@ -165,6 +165,7 @@
   (define-key mode-map (kbd "M-d") 'slack-message-delete)
   (define-key mode-map (kbd "M-u") 'konix/slack-clipboard-image-upload)
   (define-key mode-map (kbd "M-f") 'slack-file-upload)
+  (define-key mode-map (kbd "C-M-e") 'konix/slack-message-write-another-buffer)
   )
 
 

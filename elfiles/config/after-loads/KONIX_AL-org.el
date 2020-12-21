@@ -1442,7 +1442,6 @@ items"
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(deadline))
-                                 (konix/org-agenda-skip-if-task-of-project)
                                  ))
                               )
                              )
@@ -1469,7 +1468,6 @@ items"
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(notdeadline))
-                                 (konix/org-agenda-skip-if-task-of-project)
                                  ))
                               )
                              )
@@ -2241,7 +2239,8 @@ items"
                  )
                 ("agP" "Actions to review and consider maybe-ing during the Weekly review"
                  (
-                  (tags "-maybe+todo=\"NEXT\"-WAIT-DELEGATED|+todo=\"TODO\"-maybe-WAIT-DELEGATED|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\"-WAIT-DELEGATED"
+                  ;; (tags "-maybe+todo=\"NEXT\"-WAIT-DELEGATED|+todo=\"TODO\"-maybe-WAIT-DELEGATED|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\"-WAIT-DELEGATED"
+                  (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
                         (
                          (org-agenda-overriding-header
                           "Projects & NA (things that are or should be committed)")

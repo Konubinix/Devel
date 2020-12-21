@@ -218,7 +218,7 @@
 (add-to-list 'auto-mode-alist (cons "\\.kv$" 'yaml-mode))
 (add-to-list 'auto-mode-alist (cons "Jenkinsfile$" 'groovy-mode))
 (add-to-list 'auto-mode-alist (cons "patch$" 'diff-mode))
-(add-to-list 'auto-mode-alist (cons "gtd_contexts" 'konix/org-gtd-context-edit-mode))
+(add-to-list 'auto-mode-alist (cons "gtd_contexts_" 'konix/org-gtd-context-edit-mode))
 (add-to-list 'auto-mode-alist (cons "\\.pdf$" 'pdf-view-mode))
 
 

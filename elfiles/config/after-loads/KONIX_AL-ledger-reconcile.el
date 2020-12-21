@@ -76,6 +76,9 @@
     ('ledger-report-mode
      (konix/ledger-report-visit-source)
      )
+    ('ledger-mode
+     nil
+     )
     (value
      (error "Not in the good mode %s" value)
      )
@@ -117,19 +120,25 @@
           )
     (forward-line arg)
     )
-  (konix/ledger-reconcile-update-track)
+  (when konix/ledger-visit-track-mode
+    (konix/ledger-reconcile-update-track)
+    )
   )
 
 (defun konix/ledger-reconcile-move-to-next-entry-and-track (&optional arg)
   (interactive)
   (konix/ledger-reconcile-move-to-next-entry arg)
-  (konix/ledger-visit-track)
+  (when konix/ledger-visit-track-mode
+    (konix/ledger-visit-track)
+    )
   )
 
 (defun konix/ledger-reconcile-move-to-previous-entry-and-track ()
   (interactive)
   (konix/ledger-reconcile-move-to-next-entry -1)
-  (konix/ledger-visit-track)
+  (when konix/ledger-visit-track-mode
+    (konix/ledger-visit-track)
+    )
   )
 
 

@@ -223,7 +223,7 @@
     )
   )
 
-(defun konix/org-roam-export/url-to-macro (url)
+(defun konix/org-roam-export/process-url (url)
   (save-match-data
     (cond
      ((string-match ".*youtube.com/watch\\?v=\\(.+\\)" url)
@@ -232,22 +232,14 @@
      ((string-match "https://\\(skeptikon.+\\|peertube.+\\)/videos/watch/\\(.+\\)" url)
       (format "{{{peertube(%s)}}}" (match-string 2 url))
       )
-     ((string-match "^\\(http.+mp3\\)$" url)
+     ((string-match "^\\(http.+\\(mp3\\|m4a\\)\\)$" url)
       (format "{{{mp3(%s)}}}" (match-string 1 url))
       )
+     ((string-match "^/ip[fn]s/.+$" url)
+      (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") url)
+      )
      ((string-match "^cite:\\(.+\\)$" url)
-      (let* ((results (org-ref-get-bibtex-key-and-file (match-string 1 url)))
-             (key (car results))
-             (bibfile (cdr results)))
-        (save-excursion
-          (with-temp-buffer
-            (insert-file-contents bibfile)
-            (bibtex-set-dialect (parsebib-find-bibtex-dialect) t)
-            (bibtex-search-entry key)
-            (s-trim (bibtex-autokey-get-field "url"))
-            )
-          )
-        )
+      (konix/org-roam-export/process-url (konix/org-roam/process-url url))
       )
      (t
       url
@@ -287,7 +279,7 @@
         )
       (mapc
        (lambda (roam-key)
-         (insert (format "- %s %s\n" text (konix/org-roam-export/url-to-macro
+         (insert (format "- %s %s\n" text (konix/org-roam-export/process-url
                                            roam-key)))
          )
        roam-keys
@@ -512,10 +504,25 @@
   )
 
 (defun konix/org-roam-export/add-backlinks ()
-  (when-let ((links (konix/org-roam-export/backlinks-list (buffer-file-name))))
+  (when-let* (
+              (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
+              (links (remove-if-not
+                      (lambda (link)
+                        (let (
+                              (link-kind (konix/org-roam-export/extract-kind link))
+                              )
+                          (or
+                           (member link-kind konix/org/roam-export/public-kinds)
+                           (string-equal link-kind kind)
+                           )
+                          )
+                        )
+                      (konix/org-roam-export/backlinks-list (buffer-file-name))
+                      )
+                     )
+              )
     (goto-char (point-max))
     (let* (
-           (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
            (language (konix/org-roam-export/get-language))
            (text (cond
                   ((string-equal language "fr")
@@ -539,33 +546,36 @@
         )
       (insert (format "\n* %s\n" text))
       (dolist (link links)
-        (insert (let (
-                      (link-kind (konix/org-roam-export/extract-kind link))
+        (let (
+              (link-kind (konix/org-roam-export/extract-kind link))
+              )
+          (insert
+           (if (equal link-kind kind)
+               (format "   - [[file:%s][%s]]\n"
+                       (file-relative-name link org-roam-directory)
+                       (konix/org-roam-get-title link)
+                       )
+             (format "   - [[https://konubinix.eu/%s/posts/%s/][%s]]%s\n"
+                     (konix/org-roam-export/extract-kind link)
+                     (file-name-sans-extension
+                      (file-relative-name link org-roam-directory)
                       )
-                  (if (equal link-kind kind)
-                      (format "   - [[file:%s][%s]]\n"
-                              (file-relative-name link org-roam-directory)
-                              (konix/org-roam-get-title link)
-                              )
-                    (format "   - [[https://konubinix.eu/%s/posts/%s/][%s]]%s\n"
-                            (konix/org-roam-export/extract-kind link)
-                            (file-name-sans-extension
-                             (file-relative-name link org-roam-directory)
-                             )
-                            (konix/org-roam-get-title link)
-                            (if (not
-                                 (equal
-                                  kind
-                                  link-kind
-                                  )
-                                 )
-                                (format " (%s)" link-kind)
-                              ""
-                              )
-                            )
-                    )
-                  )
-                )
+                     (konix/org-roam-get-title link)
+                     (if (not
+                          (equal
+                           kind
+                           link-kind
+                           )
+                          )
+                         (format " (%s)" link-kind)
+                       ""
+                       )
+                     )
+             )
+           )
+
+          )
+
         )
       )
     )
@@ -574,6 +584,8 @@
 (defun konix/org-roam-exported-p ()
   (org-roam--extract-global-props '("KONIX_ORG_PUBLISH_KIND"))
   )
+
+(defvar konix/org/roam-export/kinds '())
 
 (defun konix/org-roam-export/toggle-publish (&optional kind)
   (interactive)
@@ -594,7 +606,7 @@
         (move-end-of-line nil)
         (insert (format "\n#+KONIX_ORG_PUBLISH_KIND: %s"
                         (or kind (let (
-                                       (kind (completing-read "Kind: " '("blog" "braindump")
+                                       (kind (completing-read "Kind: " (append konix/org/roam-export/kinds '("none"))
                                                               nil t
                                                               nil
                                                               nil
@@ -624,7 +636,7 @@
         (replace-match
          (format
           "\n%s\n"
-          (konix/org-roam-export/url-to-macro (match-string 1))
+          (konix/org-roam-export/process-url (match-string 1))
           )
          )
         )

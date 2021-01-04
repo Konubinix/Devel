@@ -66,7 +66,7 @@
          )
     (let (
           (kind (completing-read
-                 (format "Publish %s to " (buffer-name)) '("braindump" "blog" "none")
+                 (format "Publish %s to " (buffer-name)) (append konix/org/roam-export/kinds '("none"))
                  nil
                  t
                  nil

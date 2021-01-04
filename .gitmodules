@@ -144,3 +144,12 @@ ignore=dirty
 [submodule "elfiles/pdf-continuous-scroll-mode.el"]
 	path = elfiles/pdf-continuous-scroll-mode.el
 	url = https://github.com/dalanicolai/pdf-continuous-scroll-mode.el
+[submodule "python/dracula"]
+	path = python/dracula
+	url = https://github.com/dracula/qutebrowser-dracula-theme.git
+[submodule "elfiles/org-capture-ref"]
+	path = elfiles/org-capture-ref
+	url = https://github.com/yantar92/org-capture-ref
+[submodule "elfiles/hypothesis"]
+	path = elfiles/hypothesis
+	url = https://github.com/Kungsgeten/hypothesis

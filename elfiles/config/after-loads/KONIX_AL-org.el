@@ -5556,5 +5556,35 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
    )
   )
 
+(defun konix/org-capture-bibtex (link)
+  (interactive "sLink: ")
+  (setq link (s-trim (org-link-decode link)))
+  (let (
+        (org-store-link-plist (list :link link))
+        (destfile (car org-ref-default-bibliography))
+        )
+    (org-capture-ref-process-capture)
+    (with-current-buffer (find-file-noselect destfile)
+      (let (
+            (key (org-capture-ref-get-bibtex-field :key))
+            )
+        (when (bibtex-find-entry key)
+          (error
+           (format
+            "An entry with key %s already exists"
+            key
+            )
+           )
+          )
+        )
+      (konix/adjust-new-lines-at-end-of-file)
+      (goto-char (point-max))
+      (insert (org-capture-ref-get-bibtex-field :bibtex-string))
+      )
+    (message "Captured inside %s" destfile)
+    )
+  )
+
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

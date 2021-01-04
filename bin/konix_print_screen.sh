@@ -2,5 +2,5 @@
 
 CID="$(konix_screenshot.sh)"
 
-echo -n "${CID}"|xclip -i
+echo -n "${CID}"|konix_xclip_in_all.sh
 xclip -selection clipboard -t image/png -i "${CID}"

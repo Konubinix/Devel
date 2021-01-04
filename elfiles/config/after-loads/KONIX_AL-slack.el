@@ -78,8 +78,8 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
 
 (add-to-list 'tracking-ignored-buffers "\\*Slack - .+ : .+ Thread - [0-9.]+")
 
-(defun konix/slack-select-from-list (alist)
-  (slack-select-from-list (alist "Select Channel: "))
+(defun konix/slack-select-from-list (alist prompt)
+  (slack-select-from-list (alist (format "Select %s: " prompt)))
   )
 
 (defun konix/slack-find-room-all (predicate)
@@ -109,7 +109,7 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
                   (cdr team-room) (car team-room) #'(lambda (rs) (cl-remove-if #'slack-room-hidden-p
                                                                                rs)))
                  ))
-         (room (konix/slack-select-from-list alist))
+         (room (konix/slack-select-from-list alist "room"))
          (team
           (caar
            (remove-if-not
@@ -146,7 +146,7 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
                  (slack-room-names
                   (cdr team-user) (car team-user))
                  ))
-         (user (konix/slack-select-from-list alist))
+         (user (konix/slack-select-from-list alist "user"))
          (team
           (caar
            (remove-if-not
@@ -194,7 +194,7 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
                    )
                   )
                  ))
-         (user (car (konix/slack-select-from-list alist)))
+         (user (car (konix/slack-select-from-list alist "user")))
          (team
           (caar
            (remove-if-not

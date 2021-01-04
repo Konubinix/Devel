@@ -16,6 +16,8 @@
          (expand-file-name "fence-edit" elfiles)
          (expand-file-name "org-link-minor-mode" elfiles)
          (expand-file-name "pdf-continuous-scroll-mode.el" elfiles)
+         (expand-file-name "org-capture-ref" elfiles)
+         (expand-file-name "hypothesis" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path
@@ -147,6 +149,9 @@
 (autoload 'konix/fence-edit-dwim "KONIX_fence-edit" "" t)
 (autoload 'org-link-minor-mode "org-link-minor-mode" "" t)
 (autoload 'pdf-continuous-scroll-mode "pdf-continuous-scroll-mode" "" t)
+(autoload 'org-capture-ref-process-capture "org-capture-ref" "" t)
+(autoload 'org-capture-ref-get-bibtex-field "org-capture-ref" "" t)
+(autoload 'konix/hypothesis-archive "hypothesis" "" t)
 
 ;; ************************************************************
 ;; Automodes

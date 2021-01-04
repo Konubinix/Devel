@@ -26,6 +26,7 @@
 
 (setq-default org-noter-notes-search-path (list (expand-file-name "roam" perso-dir)))
 (setq-default org-noter-always-create-frame nil)
+(setq-default org-noter-kill-frame-at-session-end nil)
 (setq-default org-noter-insert-note-no-questions t)
 (setq-default org-noter-doc-split-fraction '(0.7 . 0.5))
 

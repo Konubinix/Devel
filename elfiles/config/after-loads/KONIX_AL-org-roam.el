@@ -369,20 +369,22 @@ Return added key."
            (keys (mapcar #'cdr (org-roam--extract-global-props '("ROAM_KEY"))))
            )
        (list
-        (pcase (length keys)
-          (0
-           (error "No key if file")
-           )
-          (1
-           (car keys)
-           )
-          (t
-           (completing-read
-            "Key: "
-            keys
+        (konix/org-roam/process-url
+         (pcase (length keys)
+           (0
+            (error "No key if file")
+            )
+           (1
+            (car keys)
+            )
+           (t
+            (completing-read
+             "Key: "
+             keys
+             )
             )
            )
-          )
+         )
         )
        )
      )

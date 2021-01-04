@@ -5407,7 +5407,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
    ("h" . hl-line-mode)
    (" " . org-next-visible-heading)
    ("]" . konix/org-goto-next-open-list-entry)
-   ("l" . konix/org-goto-next-open-list-entry)
+   ("l" . hl-line-mode)
    ("Manipulation")
    ("k" . konix/org-kill)
    ("+" . konix/org-capture-na-in-heading)

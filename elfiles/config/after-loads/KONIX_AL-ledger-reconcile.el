@@ -206,7 +206,7 @@
     (save-excursion
       (move-beginning-of-line nil)
       (save-match-data
-        (looking-at "^\\( *\\)\\([*!] \\)?\\([^ ]+\\)\\(.+\\)$")
+        (looking-at "^\\( *\\)\\([*!] \\)?\\([^ \n]+\\)\\(.*\\)$")
         (replace-match new-account nil nil nil 3)
         )
       )

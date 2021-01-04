@@ -1,3 +1,8 @@
 #!/bin/bash
 
-pip2 install --user -e Flexget
+ME="$(basename "BASH_SOURCE[0]")"
+pushd "Flexget"
+{
+	python3 setup.py develop --user
+}
+popd

@@ -1888,5 +1888,38 @@ FExport diary data into iCalendar file: ")
   (message "Now, restart emacs")
   )
 
+(defun konix/confluence-pretty-print ()
+  "like sgml-pretty-print, but don't pretty print the macros"
+  (interactive)
+  (let (
+        (beg (point-min))
+        (end (point-max))
+        )
+    (save-excursion
+      (if (< beg end)
+          (goto-char beg)
+        (goto-char end)
+        (setq end beg)
+        (setq beg (point)))
+      ;; Don't use narrowing because it screws up auto-indent.
+      (setq end (copy-marker end t))
+      (with-syntax-table sgml-tag-syntax-table
+        (while (re-search-forward "<" end t)
+          (when (not (save-match-data
+                      (looking-at-p "/?ac:")
+                      ))
+            (goto-char (match-beginning 0))
+            (unless (or ;;(looking-at "</")
+                     (progn (skip-chars-backward " \t") (bolp)))
+              (reindent-then-newline-and-indent))
+            )
+          (forward-sexp 1)
+          )
+        )
+      ;; (indent-region beg end)
+      )
+    )
+  )
+
 (provide '350-KONIX_commands)
 ;;; 350-KONIX_commands.el ends here

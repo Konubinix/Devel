@@ -72,7 +72,7 @@ ${title}
           (konix/org-with-point-on-heading
            (and
             (re-search-forward
-             "\\[\\[\\(.+\\)\\]\\[Roam note\\]\\]"
+             "\\[\\[id:\\(.+\\)\\]\\[Roam note\\]\\]"
              (org-entry-end-position)
              t
              )
@@ -82,7 +82,7 @@ ${title}
           )
          )
     (if link
-        (org-link-open-from-string link)
+        (org-roam-id-open link)
       (let* (
              (entry-link (if current-prefix-arg
                              (konix/org-with-point-at-clocked-entry (org-store-link nil))

@@ -1839,12 +1839,12 @@ FExport diary data into iCalendar file: ")
         )
       (hl-line-highlight)
       (when (not (equal (point-max) (window-end)))
-       (let (
-             (recenter-last-op nil)
-             )
-         (call-interactively 'recenter-top-bottom)
-         )
-       )
+        (let (
+              (recenter-last-op nil)
+              )
+          (call-interactively 'recenter-top-bottom)
+          )
+        )
       )
     )
   )
@@ -1888,6 +1888,39 @@ FExport diary data into iCalendar file: ")
   (message "Now, restart emacs")
   )
 
+(defun konix/patch-ob-comint ()
+  (interactive)
+  (shell-command
+   (format
+    "cd %s && patch < /ipfs/QmXBHqFhH5GvmWvPZmj8uTedY2VcJ1Joa7bz93UkQSBHgr &"
+    (file-name-directory (locate-library "ob-comint"))
+    )
+   )
+  (byte-compile-file
+   (replace-regexp-in-string
+    "\\.elc" ".el"
+    (locate-library
+     "ob-comint")
+    )
+   )
+  (let (
+        (org-dir (file-name-directory (locate-library "ob-comint")))
+        )
+    (mapcar
+     (lambda (file)
+       (byte-compile-file (expand-file-name file org-dir))
+       )
+     (remove-if-not
+      (lambda (file)
+        (string-suffix-p ".el" file)
+        )
+      (split-string (shell-command-to-string (format "ls '%s'" org-dir)) "\n")
+      )
+     )
+    )
+  (message "Now, restart emacs")
+  )
+
 (defun konix/confluence-pretty-print ()
   "like sgml-pretty-print, but don't pretty print the macros"
   (interactive)
@@ -1906,8 +1939,8 @@ FExport diary data into iCalendar file: ")
       (with-syntax-table sgml-tag-syntax-table
         (while (re-search-forward "<" end t)
           (when (not (save-match-data
-                      (looking-at-p "/?ac:")
-                      ))
+                       (looking-at-p "/?ac:")
+                       ))
             (goto-char (match-beginning 0))
             (unless (or ;;(looking-at "</")
                      (progn (skip-chars-backward " \t") (bolp)))

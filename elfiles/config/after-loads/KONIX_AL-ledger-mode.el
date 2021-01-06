@@ -51,7 +51,7 @@ not %org and not %justif and not ^Equity and not ^Assets and not NoJustif and no
 [[ledger-mode-flags]] \
 register \
 --limit 'date > [2020] && date < today' \
-not %justif and not ^Equity and not ^Assets and not NoJustif")
+not %justif and not ^Equity and not ^Assets and not NoJustif and not ^Virtual:Temp")
  )
 
 (konix/push-or-replace-assoc-in-alist

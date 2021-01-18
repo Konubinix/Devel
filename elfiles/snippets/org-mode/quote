@@ -2,6 +2,9 @@
 # name: quote
 # key: q
 # --
+${200:$$(format-time-string "[%Y-%m-%d %a %H:%M]")}
 #+BEGIN_QUOTE
-$0
+$100
 #+END_QUOTE
+
+$0

@@ -480,7 +480,7 @@ globalkeys = gears.table.join(
    awful.key({ modkey,           }, ".", naughty.destroy_all_notifications,
       {description = "destroy all notif", group = "notif"}),
 
-   awful.key({         }, "Print",
+   awful.key({ modkey        }, "i",
       function()
          awful.spawn("konix_print_screen.sh")
       end,

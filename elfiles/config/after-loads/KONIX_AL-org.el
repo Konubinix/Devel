@@ -3319,6 +3319,16 @@ of the clocksum."
     )
   )
 
+(defun konix/org-mode/after-save-hook ()
+  (when
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward ":tangle" nil t)
+        )
+    (org-babel-tangle)
+    )
+  )
+
 (defun konix/org-mode-hook()
   "My org mode hook."
   ;; my todo tasks may be very big, with clocks and logs and...  Thus, only
@@ -3361,6 +3371,11 @@ of the clocksum."
             )
   (add-hook 'before-save-hook
             'konix/org-roam-hugo-expose-before-saving-for-the-first-time
+            nil
+            t
+            )
+  (add-hook 'after-save-hook
+            'konix/org-mode/after-save-hook
             nil
             t
             )

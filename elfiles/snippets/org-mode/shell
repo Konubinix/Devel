@@ -2,6 +2,6 @@
 # name: shell
 # key: sh
 # --
-#+BEGIN_SRC sh :results verbatim :exports both :session $100
+#+BEGIN_SRC shell :results verbatim :exports both ${50::session $100}
   $0
 #+END_SRC

@@ -49,6 +49,10 @@
 (define-key org-agenda-mode-map (kbd "+")
   'konix/org-capture-na-in-heading)
 
+(define-key org-agenda-mode-map (kbd "-")
+  #'(lambda () (interactive) (message "Intentionally disable -")))
+
+
 (define-key org-agenda-mode-map (kbd "M-s")
   'konix/scroll)
 

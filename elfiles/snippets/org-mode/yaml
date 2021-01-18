@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: yaml
+# key: y
+# --
+#+BEGIN_SRC yaml :results verbatim :exports both
+  $0
+#+END_SRC

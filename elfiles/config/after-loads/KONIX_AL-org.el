@@ -5468,10 +5468,17 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (setq-default
  org-export-global-macros
- '(
-   ("youtube" . "@@html:<div class=\"org-youtube\"><iframe class=\"org-youtube-video\" src=\"https://www.youtube-nocookie.com/embed/$1\" allowfullscreen title=\"YouTube Video\"></iframe></div>@@")
+ `(
+   ("youtube" . "@@html:<div class=\"iframe-container\"><iframe src=\"https://www.youtube-nocookie.com/embed/$1\" allowfullscreen title=\"YouTube Video\"></iframe></div>@@")
    ("peertube" . "@@html:<iframe src=\"https://peertube.social/videos/embed/$1\" style=\"min-height: 400px; width: 100%;\" frameborder=\"0\" sandbox=\"allow-same-origin allow-scripts\" allowfullscreen=\"allowfullscreen\"></iframe>@@")
-   ("mp3" . "@@html:<audio controls><source src=\"$1\" type=\"audio/mpeg\">Your browser does not support the audio element.</audio>@@")
+   ("audio" . "@@html:<audio controls><source src=\"$1\" type=\"audio/mpeg\">Your browser does not support the audio element.</audio>@@")
+   ("video" . "@@html:<video controls><source src=\"$1\" type=\"video/mp4\">Your browser does not support the video tag.</video>@@")
+   ("icon" . "@@html:<i class=\"$1\"></i>@@")
+   ("embedpdf" . ,(format "@@html:<div class=\"iframe-container-full\"><iframe src=\"%s/pdfviewer/web/viewer.html?file=$1\" title=\"PDFViewer\"></iframe></div>@@"
+                          (getenv "KONIX_PDFVIEWER_GATEWAY")
+                          )
+    )
+   ("embeddir" . ,(format "@@html:<div class=\"iframe-container\"><iframe src=\"$1\" title=\"Embed\"></iframe></div>@@"))
    )
  )
 

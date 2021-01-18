@@ -26,6 +26,7 @@
 
 ;; https://seds.nl/notes/org_roam_export_backlinks_on_hugo/
 
+(require 'url-util)
 (require 'org-roam)
 
 (defun konix/org-roam-export/exported-files (kind)
@@ -223,6 +224,20 @@
     )
   )
 
+(defun konix/org-roam-export/add-cors-anywhere (url)
+  (if (or
+       (string-prefix-p "/" url)
+       (string-prefix-p (getenv "KONIX_IPFS_GATEWAY") url)
+       (string-prefix-p "https://konubinix.eu" url)
+       (string-match-p "http://localhost" url)
+       (string-match-p "http://127.0.0.1" url)
+       (string-match-p "http://192" url)
+       )
+      url
+    (format "%s/%s" (getenv "KONIX_CORSANYWHERE_INSTANCE") url)
+    )
+  )
+
 (defun konix/org-roam-export/process-url (url)
   (save-match-data
     (cond
@@ -233,10 +248,24 @@
       (format "{{{peertube(%s)}}}" (match-string 2 url))
       )
      ((string-match "^\\(http.+\\(mp3\\|m4a\\)\\)$" url)
-      (format "{{{mp3(%s)}}}" (match-string 1 url))
+      (format "{{{audio(%s)}}}" (match-string 1 url))
       )
-     ((string-match "^/ip[fn]s/.+$" url)
-      (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") url)
+     ((string-match "^\\(http.+\\(\\embed\\.pdf\\)\\)$" url)
+      (format "{{{embedpdf(%s)}}}"
+              (url-hexify-string (konix/org-roam-export/add-cors-anywhere url)))
+      )
+     ((string-match "^\\(http.+\\(\\embed\\)\\)$" url)
+      (format "{{{embeddir(%s)}}}" (konix/org-roam-export/add-cors-anywhere url))
+      )
+     ((string-match "^\\(http.+\\(\\.pdf\\)\\)$" url)
+      (format "[[%s/pdfviewer/web/viewer.html?file=%s][%s]] ([[%s][{{{icon(fas fa-download)}}}]])"
+              (getenv "KONIX_PDFVIEWER_GATEWAY") (url-hexify-string (konix/org-roam-export/add-cors-anywhere url)) url url)
+      )
+     ((string-match "^\\(http.+\\(webm\\)\\)$" url)
+      (format "{{{video(%s)}}}" (match-string 1 url))
+      )
+     ((string-match "^\\(file:/*\\)?\\(/ip[fn]s/.+\\)$" url)
+      (konix/org-roam-export/process-url (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") (match-string 2 url)))
       )
      ((string-match "^cite:\\(.+\\)$" url)
       (konix/org-roam-export/process-url (konix/org-roam/process-url url))
@@ -307,6 +336,7 @@
 (defun konix/org-roam-export/yank-url ()
   (interactive)
   (if (and
+       (not current-prefix-arg)
        (equal major-mode 'org-mode)
        (string-prefix-p org-roam-directory (buffer-file-name))
        )
@@ -358,7 +388,7 @@
               )
     (setq aliases (mapcar
                    (lambda (alias)
-                     (format "[[https://konubinix.eu/%s/posts/%s][%s]]"
+                     (format "[[/%s/posts/%s/][%s]]"
                              (konix/org-roam-export/extract-kind)
                              (org-roam--title-to-slug alias)
                              alias
@@ -470,7 +500,7 @@
         )
       (goto-char (point-max))
       (insert
-       (format "\n* [[https://konubinix.eu/%s/%s][Permalink]]"
+       (format "\n* [[/%s%s][Permalink]]"
                (konix/org-roam-export/extract-kind)
                id
                )
@@ -630,7 +660,7 @@
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "^\n\\(http[^\n\t ]+\\)$"
+              "^\n *\\(\\(http\\|/ipfs/\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
               nil
               t)
         (replace-match

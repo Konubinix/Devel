@@ -4,6 +4,10 @@ nomad_list_eligible () {
     nomad node status -json|jq -r '.[] | select(.SchedulingEligibility == "eligible").Name'
 }
 
+nomad_nodes () {
+    nomad node status -json|jq -r '.[].Name'
+}
+
 nomad_list_ineligible () {
     nomad node status -json|jq -r '.[] | select(.SchedulingEligibility == "ineligible").Name'
 }

@@ -84,15 +84,6 @@ Prefix argument ARG makes the entry nonmarking."
   (switch-to-buffer-other-window (find-file-noselect konix/diary-shared))
   )
 
-(eval-after-load "calendar"
-  '(progn
-	 (define-key calendar-mode-map "id" 'konix/diary-insert-entry)
-	 (define-key calendar-mode-map "ia" 'konix/diary-insert-anniversary-entry)
-	 (define-key calendar-mode-map "ie" 'konix/diary-ics-export)
-	 (define-key calendar-mode-map "ii" 'konix/diary-ics-import)
-	 (define-key calendar-mode-map "gs" 'konix/diary-goto-shared)
-	 )
-  )
 
 (provide '400-KONIX_diary)
 ;;; 400-KONIX_diary.el ends here

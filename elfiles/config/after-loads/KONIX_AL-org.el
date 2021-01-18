@@ -38,7 +38,6 @@
 (require 'holidays)
 (require 'ob-python)
 (require 'ob-shell)
-(require 'appt)
 
 (setq-default org--matcher-tags-todo-only nil)
 ;; force the use of scheduling instead of deadline prewarning. They both have the
@@ -244,19 +243,6 @@
     )
   )
 
-(defvar konix/org-agenda-appt-reload-mode t "")
-
-(defun konix/org-agenda-appt-reload ()
-  (interactive)
-  (when konix/org-agenda-appt-reload-mode
-    (require 'appt)
-    (setq appt-time-msg-list nil)
-    (org-agenda-to-appt t 'konix/org-agenda-to-appt-filter)
-    (appt-activate 1)
-    (appt-check)
-    )
-  )
-
 (setq-default org-agenda-files
               (list
                (expand-file-name "wiki" perso-dir)
@@ -283,22 +269,6 @@
   )
 (advice-add 'org-agenda-redo :around #'konix/org-agenda/keep-column)
 (advice-add 'org-agenda-kill :around #'konix/org-agenda/keep-column)
-
-(defun konix/org-agenda/reload-appt-when-needed (&rest args)
-  (when (string= "*Org Agenda(att)*" (buffer-name))
-    (konix/org-agenda-appt-reload)
-    )
-  )
-(defun konix/org-agenda/reload-appt-when-needed-sticky (&rest args)
-  (when (and
-         (not (org-agenda-use-sticky-p))
-         (string= "*Org Agenda(att)*" (buffer-name))
-         )
-    (konix/org-agenda-appt-reload)
-    )
-  )
-(advice-add 'org-agenda-redo :after #'konix/org-agenda/reload-appt-when-needed)
-(advice-add 'org-agenda-prepare :after #'konix/org-agenda/reload-appt-when-needed-sticky)
 
 (defun konix/org-agenda/notify-on-done (orig-fun &rest args)
   (let (
@@ -3466,10 +3436,6 @@ of the clocksum."
   )
 (add-hook 'org-mode-hook 'konix/org-mode-hook)
 
-(defun konix/org-agenda-to-appt-filter (entry)
-  (not (string-match "no_appt" entry))
-  )
-
 (defun konix/org-agenda-mode-hook()
   (hl-line-mode t)
   )
@@ -3598,8 +3564,6 @@ of the clocksum."
          (agenda-code "att")
          (agenda-buffer (format "*Org Agenda(%s)*" agenda-code))
          (window-config (current-window-configuration))
-         ;; temporarily disable the appt reload to avoid the hanging window
-         (konix/org-agenda-appt-reload-mode nil)
          )
     (when (get-buffer agenda-buffer)
       (kill-buffer agenda-buffer)
@@ -4589,7 +4553,6 @@ of the clocksum."
 
 (defvar konix/org-agenda-inactive-timestamp-interval-start "-7m" "")
 (defvar konix/org-agenda-inactive-timestamp-interval-stop "" "")
-
 
 (defun konix/org-agenda-match-inactive-timestamp (match &optional start stop
                                                         buffer-name matches

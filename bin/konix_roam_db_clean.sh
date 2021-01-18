@@ -9,4 +9,5 @@ shopt -s inherit_errexit
 trap "exit 2" SIGINT
 trap "exit 3" SIGQUIT
 
-emacs --eval '(org-roam-db-build-cache t)'
+unset DISPLAY
+emacs --eval '(progn (org-roam-db-build-cache t) (kill-emacs))'

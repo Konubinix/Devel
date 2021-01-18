@@ -4551,6 +4551,12 @@ of the clocksum."
                    (org-agenda-overriding-header
                     (format "## %s, %s - %s" ,match ,start ,stop))
                    (org-agenda-tag-filter-preset nil)
+                   (dummy (setq-local org-agenda-todo-keyword-format ""))
+                   (org-agenda-prefix-format
+                    '(
+                      (tags . "")
+                      )
+                    )
                    (org-agenda-skip-function
                     '(or
                       (konix/skip-not-todo-file)

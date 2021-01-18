@@ -1605,14 +1605,8 @@ items"
                      (konix/skip-not-todo-file)
                      )
                    )
-                  ;; remove the next keyword, obvious info
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-todo-keyword-format)
-                    ""
-                    )
-                   )
+                  ;; need to setq-local, or else updating the entry will put it back
+                  (dummy (setq-local org-agenda-todo-keyword-format ""))
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) t))
                   (org-agenda-tag-filter-preset nil)
                   (org-agenda-todo-ignore-time-comparison-use-seconds t)
@@ -1742,19 +1736,12 @@ items"
                          (org-agenda-overriding-header "Refile those entries")
                          (org-agenda-todo-ignore-deadlines nil)
                          (dummy
-                          (set
-                           (make-variable-buffer-local
-                            'org-agenda-prefix-format)
+                          (setq-local
+                           org-agenda-prefix-format
                            '((tags . ""))
                            )
                           )
-                         (dummy
-                          (set
-                           (make-variable-buffer-local
-                            'org-agenda-todo-keyword-format)
-                           ""
-                           )
-                          )
+                         (dummy (setq-local org-agenda-todo-keyword-format ""))
                          (org-agenda-skip-function
                           '(or
                             (konix/skip-not-todo-file t)
@@ -1810,17 +1797,10 @@ items"
                               (org-agenda-overriding-header
                                "Assign a context to all NEXT (not project) items")
                               (org-agenda-tag-filter-preset nil)
+                              (dummy (setq-local org-agenda-todo-keyword-format ""))
                               (dummy
-                               (set
-                                (make-variable-buffer-local
-                                 'org-agenda-todo-keyword-format)
-                                ""
-                                )
-                               )
-                              (dummy
-                               (set
-                                (make-variable-buffer-local
-                                 'org-agenda-prefix-format)
+                               (setq-local
+                                org-agenda-prefix-format
                                 '((tags . ""))
                                 )
                                )
@@ -1946,19 +1926,12 @@ items"
                    )
                   (dummy (setq konix/org-agenda-type 'tags))
                   (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-prefix-format)
+                   (setq-local
+                    org-agenda-prefix-format
                     '((tags . ""))
                     )
                    )
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-todo-keyword-format)
-                    ""
-                    )
-                   )
+                  (dummy (setq-local org-agenda-todo-keyword-format ""))
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   (org-agenda-todo-ignore-deadlines nil)
@@ -2189,19 +2162,12 @@ items"
                   (org-super-agenda-groups (konix/org-super-agenda-per konix/org-gtd-commitments-tags))
                   (dummy (setq konix/org-agenda-highlight-inactive-with-subtree t))
                   (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-prefix-format)
+                   (setq-local
+                    org-agenda-prefix-format
                     '((tags . ""))
                     )
                    )
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-todo-keyword-format)
-                    ""
-                    )
-                   )
+                  (dummy (setq-local org-agenda-todo-keyword-format ""))
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   ;; projects should not be filtered by default
@@ -2262,19 +2228,12 @@ items"
                    )
                   (dummy (setq konix/org-agenda-highlight-inactive-with-subtree t))
                   (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-prefix-format)
+                   (setq-local
+                    org-agenda-prefix-format
                     '((tags . ""))
                     )
                    )
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-todo-keyword-format)
-                    ""
-                    )
-                   )
+                  (dummy (setq-local org-agenda-todo-keyword-format ""))
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   ;; projects should not be filtered by default
@@ -2305,20 +2264,8 @@ items"
                      )
                    )
                   (dummy (setq konix/org-agenda-type 'tags))
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-prefix-format)
-                    '((tags . ""))
-                    )
-                   )
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-todo-keyword-format)
-                    ""
-                    )
-                   )
+                  (dummy (setq-local org-agenda-prefix-format '((tags . ""))))
+                  (dummy (setq-local org-agenda-todo-keyword-format ""))
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   (org-agenda-tag-filter-preset nil)
@@ -2347,14 +2294,8 @@ items"
                    )
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (dummy (setq konix/org-agenda-type 'tags))
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-prefix-format)
-                    '((tags . "%-11:c"))
-                    )
-                   )
-
+                  (dummy (setq-local org-agenda-todo-keyword-format ""))
+                  (dummy (setq-local org-agenda-prefix-format '((tags . "%-11:c"))))
                   )
                  )
                 ("agr" "RIL"

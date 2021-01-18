@@ -1,3 +1,4 @@
 #!/bin/bash -eu
 
-complete -C vault vault
+ME="$(basename "${BASH_SOURCE[0]}")"
+complete -C "${ME}" "${ME}"

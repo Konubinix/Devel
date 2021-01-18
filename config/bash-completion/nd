@@ -1,5 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 ME="$(basename "${BASH_SOURCE[0]}")"
-
-complete -C "$(which nomad)" "${ME}"
+complete -C nomad "${ME}"

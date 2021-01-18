@@ -1892,7 +1892,7 @@ FExport diary data into iCalendar file: ")
   (interactive)
   (shell-command
    (format
-    "cd %s && patch < /ipfs/QmXBHqFhH5GvmWvPZmj8uTedY2VcJ1Joa7bz93UkQSBHgr &"
+    "cd %s && patch < /ipfs/QmNR4cY6EEj7RqVeb81F2uaC6HbwQaBPtn77fMtgf96NXB &"
     (file-name-directory (locate-library "ob-comint"))
     )
    )

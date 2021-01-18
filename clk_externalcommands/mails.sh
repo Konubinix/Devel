@@ -77,5 +77,5 @@ fi
 
 # konix_mail_tray_daemon_update.py -d || onerror
 
-konix_display.py -o "Mails synchronized"
+konix_display.py -o "Mails synchronized $(notmuch count "(tag:unread and tag:inbox) or tag:flagged") of possible importance"
 exit $EXITVALUE

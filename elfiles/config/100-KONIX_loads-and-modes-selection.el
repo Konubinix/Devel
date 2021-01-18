@@ -232,6 +232,7 @@
 ;; ******************************************************************************************
 ;; COMMIT_MSG -> diff-mode
 (setq magic-mode-alist '(
+                         ("%PDF-" . pdf-view-mode)
 						 ((lambda ()
 							(string-equal (buffer-name) "COMMIT_EDITMSG")
 							) . diff-mode)

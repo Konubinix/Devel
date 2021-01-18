@@ -5528,6 +5528,18 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org/copy-region-without-links ()
+  (interactive)
+  (let (
+        (content (org-link-display-format (buffer-substring-no-properties (region-beginning) (region-end))))
+        )
+    (with-temp-buffer
+      (insert content)
+      (kill-region (point-min) (point-max))
+      )
+    )
+  )
+
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

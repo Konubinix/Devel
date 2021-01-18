@@ -5505,18 +5505,24 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
       (let (
             (key (org-capture-ref-get-bibtex-field :key))
             )
-        (when (bibtex-find-entry key)
-          (error
-           (format
-            "An entry with key %s already exists"
-            key
-            )
-           )
+        (if (bibtex-find-entry key)
+            (message
+             (format
+              "An entry with key %s already exists"
+              key
+              )
+             )
+          )
+        (progn
+          (konix/adjust-new-lines-at-end-of-file)
+          (goto-char (point-max))
+          (insert (org-capture-ref-get-bibtex-field :bibtex-string))
+          )
+        (with-temp-buffer
+          (insert "cite:" key)
+          (clipboard-kill-region (point-min) (point-max))
           )
         )
-      (konix/adjust-new-lines-at-end-of-file)
-      (goto-char (point-max))
-      (insert (org-capture-ref-get-bibtex-field :bibtex-string))
       )
     (message "Captured inside %s" destfile)
     )

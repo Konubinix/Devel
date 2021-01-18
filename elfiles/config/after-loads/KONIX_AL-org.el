@@ -4638,8 +4638,8 @@ of the clocksum."
       (forward-visible-line 1)
       )
     (call-interactively 'org-ctrl-c-ctrl-c)
-    (forward-visible-line 1)
-    (move-to-column column)
+    (forward-line)
+    (konix/org-goto-next-open-list-entry)
     )
   )
 

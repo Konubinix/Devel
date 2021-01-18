@@ -26,3 +26,7 @@ x-scheme-handler/org-protocol=org-protocol.desktop
 application/x-matroska=vlc.desktop;
 text/plain=emacsclient.desktop;
 x-scheme-handler/postman=Postman.desktop
+video/x-flv=vlc.desktop;
+video/mpeg=vlc.desktop;
+video/x-msvideo=vlc.desktop;
+audio/mpeg=vlc.desktop;

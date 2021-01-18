@@ -50,9 +50,9 @@
 
 (defun konix/org-noter-doc-mode-hook nil
   "My custom hook for `org-noter-doc-mode'"
-  (when (require 'pdf-continuous-scroll-mode nil t)
-    (pdf-continuous-scroll-mode 1)
-    )
+  ;; (when (require 'pdf-continuous-scroll-mode nil t)
+  ;;   (pdf-continuous-scroll-mode 1)
+  ;;   )
   )
 (add-hook 'org-noter-doc-mode-hook
           'konix/org-noter-doc-mode-hook)

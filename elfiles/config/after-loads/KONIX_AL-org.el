@@ -4639,8 +4639,10 @@ of the clocksum."
       (forward-visible-line 1)
       )
     (call-interactively 'org-ctrl-c-ctrl-c)
-    (forward-line)
-    (konix/org-goto-next-open-list-entry)
+    (end-of-line)
+    (unless (konix/org-goto-next-open-list-entry)
+      (forward-line)
+      )
     )
   )
 
@@ -5327,7 +5329,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (defun konix/org-goto-next-open-list-entry ()
   (interactive)
-  (re-search-forward " [[] []] " nil t)
+  (re-search-forward " [[] []] " (org-entry-end-position) t)
   )
 
 (setq-default

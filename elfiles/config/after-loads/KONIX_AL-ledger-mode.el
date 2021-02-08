@@ -60,7 +60,7 @@ not %justif and not ^Equity and not ^Assets and not NoJustif and not ^Virtual:Te
    "ledger -f %(ledger-file) \
 [[ledger-mode-flags]] \
 register \
-%org and not %justif")
+%org and not %justif and not NoJustif")
  )
 
 (konix/push-or-replace-assoc-in-alist

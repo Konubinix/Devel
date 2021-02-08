@@ -435,6 +435,7 @@ Return added key."
 (defun konix/org-roam/yank-key ()
   (interactive)
   (if (and
+       (not current-prefix-arg)
        (equal major-mode 'org-mode)
        (string-prefix-p org-roam-directory (buffer-file-name))
        )
@@ -465,7 +466,9 @@ Return added key."
                              )
                             )
            (res (cdr (assoc title-with-tags completions)))
-           (file-path (plist-get res :path)))
+           (file-path (plist-get res :path))
+           (current-prefix-arg nil)
+           )
       (save-window-excursion
         (with-current-buffer (find-file file-path)
           (call-interactively 'konix/org-roam/yank-key)

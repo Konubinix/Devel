@@ -3660,7 +3660,7 @@ of the clocksum."
   (interactive)
   (save-window-excursion
     (save-excursion
-      (org-id-goto "holidays")
+      (org-roam-id-open "holidays")
       (konix/calendar-setup-holidays
        (konix/org-extract-active-times-flattened)
        )

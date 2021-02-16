@@ -5120,6 +5120,30 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org-kill-no-confirm ()
+  (kill-region
+   (save-excursion (beginning-of-line) (point))
+   (save-excursion (1+ (org-end-of-subtree)) (point))
+   )
+  (while (save-excursion
+           (forward-line -1)
+           (looking-at "^$")
+           )
+    (kill-region (match-beginning 0)
+                 (1+
+                  (match-end 0)
+                  )
+                 )
+    )
+  (while (and (looking-at "^$") (not (equal (point) (point-max))))
+    (kill-region (match-beginning 0)
+                 (1+
+                  (match-end 0)
+                  )
+                 )
+    )
+  )
+
 
 (defvar konix/org-kill-confirm nil "")
 (defun konix/org-kill ()
@@ -5139,27 +5163,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
           (konix/org-agenda-kill/confirm-if-clock-info)
           (konix/org-agenda-kill/confirm-if-committed)
           (konix/org-kill/confirm-number-of-lines)
-          (kill-region
-           (save-excursion (beginning-of-line) (point))
-           (1+ (org-end-of-subtree))
-           )
-          (while (save-excursion
-                   (forward-line -1)
-                   (looking-at "^$")
-                   )
-            (kill-region (match-beginning 0)
-                         (1+
-                          (match-end 0)
-                          )
-                         )
-            )
-          (while (looking-at "^$")
-            (kill-region (match-beginning 0)
-                         (1+
-                          (match-end 0)
-                          )
-                         )
-            )
+          (konix/org-kill-no-confirm)
           )
       (call-interactively 'kill-line)
       )

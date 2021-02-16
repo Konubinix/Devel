@@ -30,3 +30,4 @@ video/x-flv=vlc.desktop;
 video/mpeg=vlc.desktop;
 video/x-msvideo=vlc.desktop;
 audio/mpeg=vlc.desktop;
+image/x-canon-cr2=feh.desktop;

@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(require 'outline-magic)
 
 (defun konix/outline-zoom-out ()
   (interactive)
@@ -45,14 +46,26 @@
 	)
   )
 
-(defun konix/outline-mode-hook()
-  (local-set-key (kbd "<f1>") 'konix/outline-zoom-out)
-  (local-set-key (kbd "<f3>") 'konix/outline-show-children-or-entry)
-  (local-set-key (kbd "<f2> <f1>") 'hide-body)
-  (local-set-key (kbd "<f2> <f3>") 'show-all)
-  (local-set-key (kbd "TAB") 'org-cycle)
+(defun konix/outline/global-cycle ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (outline-cycle)
+    )
   )
-(add-hook 'outline-mode-hook 'konix/outline-mode-hook)
+
+(defun konix/outline/setup-keys (map)
+  (define-key map (kbd "<backtab>") 'konix/outline/global-cycle)
+  (define-key map (kbd "<C-tab>") 'hide-sublevels)
+  (define-key map (kbd "<f1>") 'konix/outline-zoom-out)
+  (define-key map (kbd "<f2> <f1>") 'konix/outline/global-cycle)
+  (define-key map (kbd "<f2> <f3>") 'show-all)
+  (define-key map (kbd "<f3>") 'konix/outline-show-children-or-entry)
+  (define-key map (kbd "<tab>") 'outline-cycle)
+  (define-key map (kbd "TAB") 'outline-toggle-children)
+  )
+(konix/outline/setup-keys outline-mode-map)
+
 
 (provide '700-KONIX_outline-mode)
 ;;; 700-KONIX_outline-mode.el ends here

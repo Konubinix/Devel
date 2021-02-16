@@ -619,6 +619,7 @@
   )
 
 (defvar konix/org/roam-export/kinds '())
+(defvar konix/org/roam-export/public-kinds '())
 
 (defun konix/org-roam-export/toggle-publish (&optional kind)
   (interactive)

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: voir
+# key: voir
+# --
+- voir,
+  - $0

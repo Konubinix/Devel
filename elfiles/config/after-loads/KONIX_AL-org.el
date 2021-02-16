@@ -1808,7 +1808,8 @@ items"
                                '(or
                                  (konix/skip-not-todo-file)
                                  (konix/org-agenda-for-today-skip-if-not-the-good-time)
-                                 ))
+                                 )
+                               )
                               )
                              )
                   (tags-todo "DELEGATED-Agenda-maybe|WAIT-Agenda-maybe"
@@ -2243,7 +2244,7 @@ items"
                  )
                 ("agp" "Projects for which to review the status, goal and outcome during the GTD weekly review"
                  (
-                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"-WAITING-DELEGATED"
+                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
                         (
                          (org-agenda-overriding-header
                           "Current projects, all of them (even subprojects), for gtd reviewing")

@@ -153,3 +153,6 @@ ignore=dirty
 [submodule "elfiles/hypothesis"]
 	path = elfiles/hypothesis
 	url = https://github.com/Kungsgeten/hypothesis
+[submodule "elfiles/org-marginalia"]
+	path = elfiles/org-marginalia
+	url = https://github.com/nobiot/org-marginalia

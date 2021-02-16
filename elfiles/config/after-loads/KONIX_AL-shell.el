@@ -179,6 +179,7 @@
 
 (defun konix/shell-mode-hook ()
   (setq completion-at-point-functions '(native-complete-at-point))
+  (setq indent-tabs-mode nil)
   )
 (add-hook 'shell-mode-hook
 		  'konix/shell-mode-hook

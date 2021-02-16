@@ -33,7 +33,7 @@
   )
 
 (defun konix/sh-mode-hook ()
-  (setq indent-tabs-mode t
+  (setq indent-tabs-mode nil
 		tab-width 4
 		sh-basic-offset 4
 		sh-indentation 4)

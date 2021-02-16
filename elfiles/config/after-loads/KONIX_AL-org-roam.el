@@ -589,6 +589,91 @@ Return added key."
    )
   )
 
+(defun konix/org-roam-refile ()
+  (interactive)
+  (org-back-to-heading)
+  (unless (looking-at "\*+ \\[\\[\\([^]]+\\)\\]\\[\\([^]]+\\)\\]\\]")
+    (error "Not in a heading")
+    )
+  (let* (
+         (heading (match-string 2))
+         (url (match-string 1))
+         (url-without-type (save-match-data
+                             (and
+                              (string-match org-link-plain-re url)
+                              (match-string 2 url)
+                              )
+                             ))
+         (beg
+          (save-excursion
+            (forward-line)
+            (while (looking-at-p "^ *:")
+              (forward-line)
+              )
+            (point)
+            )
+          )
+         (end (save-excursion
+                (org-end-of-subtree)
+                (point)
+                )
+              )
+         (content
+          (if (>= beg end)
+              ""
+            (buffer-substring-no-properties beg end)
+            )
+          )
+         (filename (format "%s.org" (expand-file-name (org-roam--title-to-slug heading) org-roam-directory)))
+         (buffer (save-window-excursion
+                   (or
+                    (org-roam--find-ref url-without-type)
+                    (find-file filename)
+                    )
+                   (current-buffer)
+                   ))
+         )
+    (with-current-buffer buffer
+      (save-excursion
+        (goto-char (point-min))
+        (while (looking-at-p "^:")
+          (forward-line)
+          )
+        (save-excursion
+          (unless (re-search-forward (format "^#\\+ROAM_KEY: %s$" url) 3000 t)
+            (insert "#+ROAM_KEY: " url "\n")
+            )
+          )
+        (save-excursion
+          (unless (re-search-forward "^#\\+ROAM_TAGS:" 3000 t)
+            (insert "#+ROAM_TAGS: \"litterature note\" \n")
+            )
+          )
+        (save-excursion
+          (unless (re-search-forward "^#\\+CREATED: " 3000 t)
+            (insert (format-time-string "#+CREATED: [%Y-%m-%d %a %H:%M]") "\n")
+            )
+          )
+        (save-excursion
+          (unless (re-search-forward "^#\\+TITLE: " 3000 t)
+            (insert "#+TITLE: " heading "\n")
+            )
+          )
+        )
+      (goto-char (point-max))
+      (unless (file-exists-p (buffer-file-name buffer))
+        (insert heading "\n")
+        )
+      (save-excursion
+        (insert "\n" content "\n")
+        )
+      )
+    (konix/org-kill-no-confirm)
+    (unless current-prefix-arg
+      (pop-to-buffer buffer)
+      )
+    )
+  )
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

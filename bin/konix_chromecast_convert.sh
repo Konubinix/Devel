@@ -40,6 +40,6 @@ then
 fi
 
 avconv -i "${INPUT}" \
-	   -c:v libvpx -c:a vorbis -ac 2 -f webm -b:v 2000k -c:s webvtt -strict -2 \
+	   -c:v libvpx -c:a vorbis -ac 2 -f webm -b:v 750k -c:s webvtt -strict -2 \
 	   ${ARGS} \
 	   "${OUTPUT}"

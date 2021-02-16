@@ -795,6 +795,11 @@ citation key, for Org-ref cite links."
                 )
                )
               )
+         (assert (or
+                  (string-equal kind source-kind)
+                  (member kind konix/org/roam-export/public-kinds)
+                  )
+          )
          (cond
           ((not (equal kind source-kind))
            (goto-char (point-min))

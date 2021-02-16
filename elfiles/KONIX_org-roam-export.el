@@ -708,6 +708,7 @@
     (konix/org-roam-export/setup-hugo-dates)
     (konix/org-roam-export/add-id-as-hugo-aliases)
     (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
+    (konix/org-roam-export/copy-roam-tags-into-hugo-tags)
     (konix/org-roam-export/add-more)
     )
   )

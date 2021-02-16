@@ -65,21 +65,31 @@ ${title}
 
 (org-roam-mode 1)
 
+(defun konix/org-roam-get-note ()
+  (save-excursion
+    (or
+     (and
+      (re-search-forward
+       "\\[\\[id:\\(.+\\)\\]\\[Roam note\\]\\]"
+       (org-entry-end-position)
+       t
+       )
+      (match-string-no-properties 1)
+      )
+     (and
+      (not current-prefix-arg)
+      (org-up-heading-safe)
+      (konix/org-roam-get-note)
+      )
+     )
+    )
+  )
+
+
 (defun konix/org-roam-note ()
   (interactive)
   (let* (
-         (link
-          (konix/org-with-point-on-heading
-           (and
-            (re-search-forward
-             "\\[\\[id:\\(.+\\)\\]\\[Roam note\\]\\]"
-             (org-entry-end-position)
-             t
-             )
-            (match-string-no-properties 1)
-            )
-           )
-          )
+         (link (konix/org-with-point-on-heading (konix/org-roam-get-note)))
          )
     (if link
         (org-roam-id-open link)

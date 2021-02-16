@@ -70,7 +70,7 @@ register \
 [[ledger-mode-flags]] \
 register \
 --limit 'date <= today' \
-^wtf or \\( not %twin and ^Virtual:Temp and not Lasting \\)")
+^wtf or \\( not %twin and \\( ^Virtual:Temp or ^Virtual:Auto \\) and not Lasting \\)")
  )
 
 (konix/push-or-replace-assoc-in-alist

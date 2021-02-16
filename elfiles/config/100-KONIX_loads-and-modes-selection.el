@@ -18,6 +18,7 @@
          (expand-file-name "pdf-continuous-scroll-mode.el" elfiles)
          (expand-file-name "org-capture-ref" elfiles)
          (expand-file-name "hypothesis" elfiles)
+         (expand-file-name "org-marginalia" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

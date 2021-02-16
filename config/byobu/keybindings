@@ -1,1 +1,1 @@
-source $BYOBU_PREFIX/ /usr/share/byobu/keybindings/common
+source $BYOBU_PREFIX/share/byobu/keybindings/common

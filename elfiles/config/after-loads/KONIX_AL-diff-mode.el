@@ -25,18 +25,55 @@
 ;;; Code:
 
 (require 'outline)
-(setq-default diff-default-read-only nil)
-(setq-default diff-outline-regexp
-			  "\\([*+-][*+-][*+-] [^0-9]\\|@@ ...\\|\\*\\*\\* [0-9].\\|--- [0-9]..\\)")
 
-(define-key diff-mode-map (kbd "<tab>") 'outline-toggle-children)
-(define-key diff-mode-map (kbd "<backtab>") 'hide-body)
-(define-key diff-mode-map (kbd "<C-tab>") 'hide-sublevels)
-(define-key diff-mode-map (kbd "<f2> <f1>") 'hide-body)
-(define-key diff-mode-map (kbd "<f2> <f3>") 'show-all)
-(define-key diff-mode-map (kbd "<f1>") 'konix/outline-zoom-out)
-(define-key diff-mode-map (kbd "<f3>")
-  'konix/outline-show-children-or-entry)
+(konix/outline/setup-keys diff-mode-map)
+(setq-default diff-default-read-only nil)
+(setq-default konix/diff/sha1-regexp "[a-f0-9]")
+;; match the --- in front of a file also, as well as commit and diff lines
+(setq-default
+ diff-outline-regexp
+ "\\(\\(commit\\) [a-f0-9]\\{40,40\\}$\\|\\(diff --\\(git\\|cc\\)\\)\\|\\([*+-][*+-][*+-]\\) [^0-9]\\|\\(@@\\) ...\\|\\*\\*\\* [0-9].\\|--- [0-9]..\\)"
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'diff-font-lock-keywords
+ '("^\\(commit\\) [a-f0-9]\\{40,40\\}$"                        ;context
+  (1 'diff-hunk-header))
+ )
+
+(define-key diff-mode-map (kbd "C-p") 'outline-previous-visible-heading)
+(define-key diff-mode-map (kbd "C-n") 'outline-next-visible-heading)
+
+(defun konix/outline-level/around (orig-fun)
+  (or
+   (and
+    ;; if in diff mode,
+    (eq major-mode 'diff-mode)
+    ;; use the custom assoc
+    (cond
+     ((string-prefix-p "commit" (match-string-no-properties 0))
+      1
+      )
+     ((string-prefix-p "diff" (match-string-no-properties 0))
+      2
+      )
+     ((string-prefix-p "---" (match-string-no-properties 0))
+      3
+      )
+     ((string-prefix-p "+++" (match-string-no-properties 0))
+      3
+      )
+     ((string-prefix-p "@@" (match-string-no-properties 0))
+      4
+      )
+     )
+    )
+   ;; but fall back anyway on the orig
+   (funcall orig-fun)
+   )
+  )
+(advice-add 'outline-level :around #'konix/outline-level/around)
+
 
 (set-face-attribute 'diff-changed
 					nil
@@ -47,6 +84,11 @@
   (setq konix/adjust-new-lines-at-end-of-file nil
 		konix/delete-trailing-whitespace nil
 		)
+  (setq outline-heading-alist
+        '(
+          ("commit" . 1)
+          )
+        )
   (local-set-key (kbd "M-/") 'dabbrev-expand)
   (local-set-key (kbd "C-z") 'diff-undo)
   (auto-fill-mode 1)

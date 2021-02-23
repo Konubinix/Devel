@@ -19,6 +19,8 @@
          (expand-file-name "org-capture-ref" elfiles)
          (expand-file-name "hypothesis" elfiles)
          (expand-file-name "org-marginalia" elfiles)
+         (expand-file-name "org-transclusion" elfiles)
+         (expand-file-name "nroam" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

@@ -156,3 +156,9 @@ ignore=dirty
 [submodule "elfiles/org-marginalia"]
 	path = elfiles/org-marginalia
 	url = https://github.com/nobiot/org-marginalia
+[submodule "elfiles/org-transclusion"]
+	path = elfiles/org-transclusion
+	url = https://github.com/nobiot/org-transclusion
+[submodule "elfiles/nroam"]
+	path = elfiles/nroam
+	url = https://github.com/NicolasPetton/nroam

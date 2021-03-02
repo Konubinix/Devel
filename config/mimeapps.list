@@ -30,5 +30,7 @@ video/mpeg=vlc.desktop;
 video/x-msvideo=vlc.desktop;
 audio/mpeg=vlc.desktop;
 image/x-canon-cr2=feh.desktop;
+application/x-extension-fcstd=freecad.desktop;
+model/stl=cura.desktop;
 application/pdf=org.pwmt.zathura-pdf-poppler.desktop;
 text/x-patch=emacsclient.desktop;

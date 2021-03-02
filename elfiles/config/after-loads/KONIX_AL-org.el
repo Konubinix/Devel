@@ -5412,6 +5412,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
    ("audio" . "@@html:<audio controls><source src=\"$1\" type=\"audio/mpeg\">Your browser does not support the audio element.</audio>@@")
    ("video" . "@@html:<video controls><source src=\"$1\" type=\"video/mp4\">Your browser does not support the video tag.</video>@@")
    ("icon" . "@@html:<i class=\"$1\"></i>@@")
+   ("stlview". "@@html:<script src=\"/ipfs/QmSHeCoD9NnAPW1hbvqXZ9G58VFL2ZUEXesxCdGYqGGhZR/stl_viewer.min.js\"></script><div id=\"stl_cont\"></div><script>var stl_viewer=new StlViewer(document.getElementById(\"stl_cont\"), { models: [ {id:0, filename:\"$1\"} ] });</script>@@")
    ("embedpdf" . ,(format "@@html:<div class=\"iframe-container ratio-full-height\"><iframe src=\"%s/pdfviewer/web/viewer.html?file=$1\" title=\"PDFViewer\"></iframe></div>@@"
                           (getenv "KONIX_PDFVIEWER_GATEWAY")
                           )

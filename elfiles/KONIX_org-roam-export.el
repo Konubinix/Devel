@@ -267,6 +267,11 @@
       (format "[[%s/pdfviewer/web/viewer.html?file=%s][%s]] ([[%s][{{{icon(fas fa-download)}}}]])"
               (getenv "KONIX_PDFVIEWER_GATEWAY") (url-hexify-string (konix/org-roam-export/add-cors-anywhere url)) url url)
       )
+     ((string-match "^\\(http.+\\(\\.stl\\)\\)$" url)
+      (format "{{{stlview(%s)}}}
+([[%s][{{{icon(fas fa-download)}}}]])"
+              url url)
+      )
      ((string-match "^\\(http.+\\(webm\\)\\)$" url)
       (format "{{{video(%s)}}}" (match-string 1 url))
       )

@@ -28,6 +28,7 @@
 
 (require 'url-util)
 (require 'org-roam)
+(require 'org-transclusion)
 
 (defun konix/org-roam-export/exported-files (kind)
   (split-string
@@ -703,6 +704,19 @@
       )
   )
 
+(defun konix/org-roam-export/load-transclusion ()
+  (save-excursion
+    (goto-char (point-min))
+    (when (search-forward "#+transclude: t" nil t)
+      (org-transclusion-mode 1)
+      (save-window-excursion
+        (pop-to-buffer (current-buffer))
+        (org-transclusion-add-all-in-buffer)
+        )
+      )
+    )
+  )
+
 (defun konix/org-roam-export/org-export-preprocessor (_backend)
   (when (org-roam--extract-global-props '("KONIX_ORG_PUBLISH_KIND"))
     (konix/org-roam-export/remove-org-backlinks)
@@ -718,6 +732,7 @@
     (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
     (konix/org-roam-export/copy-roam-tags-into-hugo-tags)
     (konix/org-roam-export/add-more)
+    (konix/org-roam-export/load-transclusion)
     )
   )
 

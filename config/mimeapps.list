@@ -21,7 +21,6 @@ text/html=konix_open_html.desktop;
 image/x-xcf=gimp.desktop;
 video/quicktime=vlc.desktop;
 video/webm=vlc.desktop;
-application/pdf=mupdf.desktop;
 x-scheme-handler/org-protocol=org-protocol.desktop
 application/x-matroska=vlc.desktop;
 text/plain=emacsclient.desktop;
@@ -31,3 +30,5 @@ video/mpeg=vlc.desktop;
 video/x-msvideo=vlc.desktop;
 audio/mpeg=vlc.desktop;
 image/x-canon-cr2=feh.desktop;
+application/pdf=org.pwmt.zathura-pdf-poppler.desktop;
+

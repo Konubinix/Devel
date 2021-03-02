@@ -5602,5 +5602,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (advice-add 'org-display-inline-images :after
             #'konix/org-display-inline-images/remote)
 
+(setq-default org-startup-with-inline-images t)
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

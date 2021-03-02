@@ -375,7 +375,10 @@ Return added key."
 (defun konix/org-roam/open-key (key)
   (interactive
    (save-window-excursion
-     (when (not (org-roam--org-roam-file-p))
+     (when (or
+            (not (org-roam--org-roam-file-p))
+            current-prefix-arg
+            )
        (call-interactively 'org-roam-find-ref)
        )
      (let (

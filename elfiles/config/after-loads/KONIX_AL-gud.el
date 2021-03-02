@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'hydra)
+
 (setq-default gud-tooltip-echo-area nil)
 (setq-default gud-tooltip-mode t)
 (defun konix/gud-mode-hook ()
@@ -60,6 +62,15 @@
   (global-set-key (kbd "<f12>Bs") 'gud-bp-save)
   (global-set-key (kbd "<f12>Br") 'gud-bp-restore)
   (global-set-key (kbd "<f12><f12>") 'konix/gud-recall)
+
+  (defhydra konix/hydra-gud ()
+    "gud"
+    ("n" gud-next "n")
+    ("b" gud-break "b")
+    ("c" gud-cont "c")
+    ("q" nil "quit")
+    )
+  (global-set-key (kbd "<f12>h") 'konix/hydra-gud/body)
   )
 
 (setq konix/gud-last-call-fmt nil)

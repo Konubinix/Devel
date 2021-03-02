@@ -504,8 +504,8 @@ globalkeys = gears.table.join(
    awful.key({ modkey,           },
       "Return",
       open_or_join(
-	 "X-terminal-emulator",
-	 terminal
+		 "X-terminal-emulator",
+		 terminal
       ),
       {description = "open a terminal", group = "launcher"}),
    awful.key({ modkey, "Control"          }, "t", open_or_join("X-terminal-emulator", terminal),
@@ -534,7 +534,7 @@ globalkeys = gears.table.join(
          awful.spawn.easy_async(
             "clk pulse toggle-mute",
             function (stdout, stderr, exitreason, exitcode)
-	       tell_pulse_volume()
+			   tell_pulse_volume()
             end
          )
    end,
@@ -687,7 +687,7 @@ clientkeys = gears.table.join(
       },
       "n",
       function (c)
-	 awful.spawn("konix_org_capture_screenshot.sh")
+		 awful.spawn("konix_org_capture_screenshot.sh")
       end ,
       {
          description = "capture a screenshot",
@@ -706,6 +706,19 @@ clientkeys = gears.table.join(
       end ,
       {
          description = "minimize",
+         group = "client"
+      }
+   ),
+   awful.key(
+      {
+         modkey,
+      },
+      "d",
+	  function(c)
+	  	 awful.spawn("clk x scroll-down")
+      end,
+      {
+         description = "scroll down",
          group = "client"
       }
    ),
@@ -738,7 +751,7 @@ clientkeys = gears.table.join(
    awful.key(
       {
          modkey,
-	 "Shift",
+		 "Shift",
       },
       "j",
       function (c)
@@ -1064,8 +1077,8 @@ awful.rules.rules = {
       },
       properties = {
          tag = "1",
-	 floating = true,
-	 ontop = true,
+		 floating = true,
+		 ontop = true,
       },
    },
 

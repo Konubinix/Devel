@@ -223,6 +223,7 @@ ${title}
 #+LANGUAGE: fr
 #+DATE: %s
 #+ROAM_KEY: %s
+#+ROAM_TAGS: \"litterature note\"
 %s
 "
           decoded-title

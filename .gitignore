@@ -12,3 +12,4 @@ devel_bin
 .pc/*
 !.pc/series
 exaile
+/.cask-backup

@@ -244,7 +244,7 @@
 (defun konix/org-roam-export/process-url (url)
   (save-match-data
     (cond
-     ((string-match ".*youtube.com/watch\\?v=\\(.+\\)" url)
+     ((string-match ".*youtube.com/watch\\?.*v=\\([^&]+\\)" url)
       (format "{{{youtube(%s)}}}" (match-string 1 url))
       )
      ((string-match "https://\\(skeptikon.+\\|peertube.+\\)/videos/watch/\\(.+\\)" url)
@@ -256,14 +256,14 @@
      ((string-match "^\\(http.+\\(mp3\\|m4a\\)\\)$" url)
       (format "{{{audio(%s)}}}" (match-string 1 url))
       )
-     ((string-match "^\\(http.+\\(\\embed\\.pdf\\)\\)$" url)
+     ((string-match "^\\(http.+\\(\\embed\\.\\(pdf\\|PDF\\)\\)\\)$" url)
       (format "{{{embedpdf(%s)}}}"
               (url-hexify-string (konix/org-roam-export/add-cors-anywhere url)))
       )
      ((string-match "^\\(http.+\\(\\embed\\)\\)$" url)
       (format "{{{embeddir(%s)}}}" (konix/org-roam-export/add-cors-anywhere url))
       )
-     ((string-match "^\\(http.+\\(\\.pdf\\)\\)$" url)
+     ((string-match "^\\(http.+\\(\\.\\(pdf\\|PDF\\)\\)\\)$" url)
       (format "[[%s/pdfviewer/web/viewer.html?file=%s][%s]] ([[%s][{{{icon(fas fa-download)}}}]])"
               (getenv "KONIX_PDFVIEWER_GATEWAY") (url-hexify-string (konix/org-roam-export/add-cors-anywhere url)) url url)
       )
@@ -667,7 +667,7 @@
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "^\n *\\(\\(http\\|/ipfs/\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              "^ *\\(\\(http\\|/ipfs/\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
               nil
               t)
         (replace-match

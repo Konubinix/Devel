@@ -202,7 +202,10 @@
 (defun konix/org-roam-export/backlinks-list (file)
   (remove-duplicates
    (-intersection
-    (mapcar #'car (org-roam--get-backlinks file))
+    (-union
+     (mapcar #'car (org-roam--get-backlinks file))
+     (mapcar #'car (mapcan #'org-roam--get-backlinks (mapcar #'cdr (org-roam--extract-refs))))
+     )
     (konix/org-roam-export/exported-files "")
     )
    :test #'string-equal

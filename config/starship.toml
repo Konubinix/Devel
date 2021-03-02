@@ -10,3 +10,5 @@ description = "show date"
 command = "echo graphical"
 when = "test -n \"${DISPLAY}\""
 description = "show graphical"
+[python]
+python_binary = "python3"

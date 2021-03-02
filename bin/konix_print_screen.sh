@@ -1,6 +1,15 @@
 #!/bin/bash -eu
 
 CID="$(konix_screenshot.sh)"
-
+hash="${CID#/*/}"
 echo -n "${CID}?a.png"|konix_xclip_in_all.sh
-xclip -selection clipboard -t image/png -i "${CID}"
+
+TMP="$(mktemp -d)"
+trap "rm -rf '${TMP}'" 0
+
+pushd "${TMP}"
+{
+    ipfs get "${hash}"
+    xclip -selection clipboard -t image/png -i "${hash}"
+}
+popd

@@ -26,6 +26,7 @@
 
 (require 'org-roam-protocol)
 (require 'org-roam-bibtex)
+(require 'nroam)
 (require 'org-ref)
 (require 'org-ref-ivy)
 
@@ -37,6 +38,7 @@
 (setq-default org-roam-completion-everywhere t)
 
 (define-key org-roam-mode-map (kbd "C-c n l") #'org-roam)
+(define-key org-roam-mode-map (kbd "C-c n n") #'nroam-mode)
 (define-key org-roam-mode-map (kbd "C-c n f") #'org-roam-find-file)
 (define-key org-roam-mode-map (kbd "C-c n b") #'org-roam-db-build-cache)
 (define-key org-roam-mode-map (kbd "C-c n j") #'org-roam-switch-to-buffer)

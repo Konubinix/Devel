@@ -106,3 +106,4 @@
 (depends-on "citeproc-org")
 (depends-on "org-roam-bibtex")
 (depends-on "outline-magic")
+(depends-on "scad-mode")

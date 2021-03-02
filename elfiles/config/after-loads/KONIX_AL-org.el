@@ -1413,6 +1413,9 @@ items"
                               (org-agenda-skip-function
                                '(or
                                  (org-agenda-skip-if t '(deadline))
+                                 ;; the engagement is already taken care
+                                 ;; of by the project
+                                 (konix/org-agenda-skip-if-task-of-project)
                                  ))
                               )
                              )

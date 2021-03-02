@@ -763,7 +763,7 @@ to be organized.
 
 (defun konix/org-agenda-keep-if-expired (&optional days subtree)
   (org-back-to-heading t)
-  (setq days (or days (* 30 4)))
+  (setq days (or days 30))
   (let (
         (end (org-entry-end-position))
         )

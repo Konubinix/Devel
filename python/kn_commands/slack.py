@@ -47,7 +47,7 @@ from click_project.lib import (
 from click_project.completion import startswith
 from click_project.config import config
 from click_project.core import cache_disk
-from click_project.commands.passwords import set as password_set_command
+from click_project.commands.password import set as password_set_command
 
 
 LOGGER = get_logger(__name__)

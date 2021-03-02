@@ -665,6 +665,11 @@ Return added key."
             (insert "#+TITLE: " heading "\n")
             )
           )
+        (save-excursion
+          (unless (re-search-forward "^#\\+LANGUAGE: " 3000 t)
+            (insert "#+LANGUAGE: en\n")
+            )
+          )
         )
       (goto-char (point-max))
       (unless (file-exists-p (buffer-file-name buffer))

@@ -30,6 +30,8 @@
   )
 (advice-add 'find-file :around #'konix/find-file/ipfs-ignore-query-parameter)
 (advice-add 'org-link-open-as-file :around #'konix/find-file/ipfs-ignore-query-parameter)
+(advice-add 'file-exists-p :around #'konix/find-file/ipfs-ignore-query-parameter)
+(advice-add 'org--create-inline-image :around #'konix/find-file/ipfs-ignore-query-parameter)
 
 (defun konix/org-display-inline-images/ipfs (&optional include-linked refresh beg end)
   (let ((end (or end (point-max))))

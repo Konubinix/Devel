@@ -107,3 +107,5 @@
 (depends-on "org-roam-bibtex")
 (depends-on "outline-magic")
 (depends-on "scad-mode")
+(depends-on "rust-mode")
+(depends-on "hyperbole")

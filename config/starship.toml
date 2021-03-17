@@ -19,3 +19,17 @@ style = "bold red"
 full_symbol = "🔋"
 charging_symbol = "⚡️"
 discharging_symbol = "💀"
+[directory]
+truncation_length = 7
+truncate_to_repo = false
+[character]
+success_symbol = "[✔](bold green) "
+error_symbol = "[✗](bold red) "
+[kubernetes]
+format = 'on [⛵ $context \($namespace\)](dimmed green) '
+disabled = true
+# disabled = false
+[kubernetes.context_aliases]
+"k3d-k3s-default" = "dev"
+[status]
+disabled = false

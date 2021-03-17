@@ -41,7 +41,7 @@
 [[ledger-mode-flags]] \
 register \
 --limit 'date > [2020] && date < today' \
-not %org and not %justif and not ^Equity and not ^Assets and not NoJustif and not ^Virtual:Temp")
+not %org and not %justif and not ^Equity and not \\( ^Assets and not :Virtual: \\) and not NoJustif and not :Virtual:Temp")
  )
 
 (konix/push-or-replace-assoc-in-alist
@@ -51,7 +51,7 @@ not %org and not %justif and not ^Equity and not ^Assets and not NoJustif and no
 [[ledger-mode-flags]] \
 register \
 --limit 'date > [2020] && date < today' \
-not %justif and not ^Equity and not ^Assets and not NoJustif and not ^Virtual:Temp")
+not %justif and not ^Equity and not \\( ^Assets and not :Virtual: \\) and not NoJustif and not :Virtual:Temp")
  )
 
 (konix/push-or-replace-assoc-in-alist
@@ -70,7 +70,7 @@ register \
 [[ledger-mode-flags]] \
 register \
 --limit 'date <= today' \
-^wtf or \\( not %twin and \\( ^Virtual:Temp or ^Virtual:Auto \\) and not Lasting \\)")
+^wtf or \\( not %twin and \\( :Virtual:Temp or :Virtual:Auto \\) and not Lasting \\)")
  )
 
 (konix/push-or-replace-assoc-in-alist
@@ -99,7 +99,7 @@ register \
 --limit 'date <= today' \
 [[ledger-mode-flags]] \
 balance \
-^Assets ^Virtual")
+^Assets")
  )
 
 (defun konix/ledger-accounts (&optional recompute)

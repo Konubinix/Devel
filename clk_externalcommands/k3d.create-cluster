@@ -6,7 +6,7 @@ $0
 
 Run k3d the way I like it
 --
-F:--metallb/--no-metallb:Also install metallb:True
+F:--metallb/--no-metallb:Also install metallb:False
 F:--registry/--no-registry:Also connect to local registry:True
 F:--debug/--no-debug:Enable set -x
 O:--private-registry-file:str:Location of a private registry file to merge with the default one
@@ -23,11 +23,13 @@ fi
 TMP="$(mktemp -d)"
 trap "rm -rf '${TMP}'" 0
 
-args=(
-	--k3s-server-arg --no-deploy=traefik \
-					 --port 443:443@loadbalancer \
-					 --port 80:80@loadbalancer "$@"
-)
+args=()
+if [ "${CLK___METALLB}" == "True" ]
+then
+    args+=(--no-lb )
+else
+    args+=(--port 443:443@loadbalancer --port 80:80@loadbalancer)
+fi
 
 if [ "${CLK___DEBUG}" == "True" ]
 then
@@ -56,7 +58,7 @@ EOF
 	fi
 
 	args+=(
-		--volume "${HOME}/.k3d/my-registries.yaml:/etc/rancher/k3s/registries.yaml"
+		--registry-config "${HOME}/.k3d/my-registries.yaml"
 	)
 	if ! docker volume ls --format '{{ .Name }}'|grep -q '^local_registry$'
 	then
@@ -74,7 +76,7 @@ EOF
 
 fi
 
-clk exec k3d cluster create "${args[@]}"
+clk exec k3d cluster create "${args[@]}" "$@"
 
 if [ "${CLK___REGISTRY}" == "True" ] && [ "null" == "$(docker inspect k3d-k3s-default|jq '.[].Containers | map(select(.Name=="registry.localhost"))[0]')" ]
 then

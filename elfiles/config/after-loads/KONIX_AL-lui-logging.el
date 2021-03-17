@@ -1,6 +1,6 @@
-;;; KONIX_AL-lui.el ---
+;;; KONIX_AL-lui-logging.el ---                      -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014  konubinix
+;; Copyright (C) 2021  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -16,20 +16,16 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
 ;;
 
 ;;; Code:
-(require 'lui-logging)
 
+(enable-lui-logging-globally)
+(setq-default lui-logging-directory (expand-file-name "lui-logs" user-emacs-directory))
 
-(setq-default lui-fill-column 700)
-(setq-default lui-time-stamp-position 'left)
-(setq-default lui-time-stamp-format "[%Y-%m-%d %a %H:%M] ")
-(setq-default lui-flyspell-p nil)
-
-(provide 'KONIX_AL-lui)
-;;; KONIX_AL-lui.el ends here
+(provide 'KONIX_AL-lui-logging)
+;;; KONIX_AL-lui-logging.el ends here

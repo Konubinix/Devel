@@ -27,6 +27,8 @@ settings:
         zf: spawn -u konix_qutebrowser_open_with_firefox.sh
   content.media_capture:
     https://meet.google.com: true
+  content.notifications:
+    https://meet.google.com: false
   hints.next_regexes:
     global:
     - Bloc suivant >>

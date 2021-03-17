@@ -42,6 +42,17 @@
     )
   )
 
+(defun konix/dired-git-annex-find-next ()
+  (interactive)
+  (let (
+        (find-program "konix_git_annex_find_next.sh")
+        (find-ls-option '("" . ""))
+        )
+    (find-dired "." "")
+    (rename-buffer (generate-new-buffer-name "git annex find next"))
+    )
+  )
+
 (defun konix/dired-remove-annex (arg file-list)
   (interactive
    (let ((files (dired-get-marked-files t current-prefix-arg)))

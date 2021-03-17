@@ -114,6 +114,9 @@
 (define-key org-agenda-mode-map (kbd "x")
   'konix/org-clock-echo)
 
+(define-key org-agenda-mode-map (kbd "E")
+  'konix/org-srs)
+
 (define-key org-agenda-mode-map (kbd "M-c")
   'konix/org-capture-na-in-heading)
 

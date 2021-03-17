@@ -5347,6 +5347,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
    ("G" . org-mark-ring-goto)
    ("h" . hl-line-mode)
    (" " . org-next-visible-heading)
+   ("E" . konix/org-srs)
    ("]" . konix/org-goto-next-open-list-entry)
    ("l" . hl-line-mode)
    ("Manipulation")
@@ -5606,6 +5607,34 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
             #'konix/org-display-inline-images/remote)
 
 (setq-default org-startup-with-inline-images t)
+
+(defvar konix/org-srs-last-value nil)
+
+(defun konix/org-srs ()
+  (interactive)
+  (let* (
+        (id (konix/org-get-id))
+        (value (completing-read
+                "Value: "
+                '("farther" "far" "medium" "close" "closer" "closest")
+                nil
+                nil
+                nil
+                nil
+                konix/org-srs-last-value
+                ))
+        (new-date (s-trim
+                   (shell-command-to-string (format "clk org srs expiry calc %s %s" id value))
+                   ))
+        )
+    (setq konix/org-expiry-srs-last-value value)
+    (konix/org-with-point-on-heading
+     (org-entry-put (point) "REVIEW_IN" new-date)
+     )
+    (message "Moved to %s" new-date)
+    (call-interactively 'konix/org-agenda-filter-for-now)
+    )
+  )
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

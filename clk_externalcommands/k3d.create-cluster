@@ -50,7 +50,7 @@ EOF
 		pushd "${TMP}/registries"
 		{
 			cp "${HOME}/.k3d/my-registries.yaml" "${CLK___PRIVATE_REGISTRY_FILE}" .
-			docker run --rm -i -v "${PWD}":/workdir mikefarah/yq yq m * > "${HOME}/.k3d/my-registries.yaml"
+			clk exec docker run --rm -i -v "${PWD}":/workdir mikefarah/yq yq m * > "${HOME}/.k3d/my-registries.yaml"
 		}
 		popd
 	fi
@@ -61,25 +61,25 @@ EOF
 	if ! docker volume ls --format '{{ .Name }}'|grep -q '^local_registry$'
 	then
 		clk log -l info "Creating the local registry volume"
-		docker volume create local_registry
+		clk exec docker volume create local_registry
 	fi
 	if ! docker ps -a --format '{{.Names}}'|grep -q '^registry.localhost$'
 	then
 		clk log -l info "Creating localhost docker registry"
-		docker container run -d --name registry.localhost -v local_registry:/var/lib/registry --restart always -p 5000:5000 registry:2
+		clk exec docker container run -d --name registry.localhost -v local_registry:/var/lib/registry --restart always -p 5000:5000 registry:2
 	else
 		clk log -l info "Starting localhost docker registry"
-		docker start registry.localhost
+		clk exec docker start registry.localhost
 	fi
 
 fi
 
-k3d cluster create "${args[@]}"
+clk exec k3d cluster create "${args[@]}"
 
 if [ "${CLK___REGISTRY}" == "True" ] && [ "null" == "$(docker inspect k3d-k3s-default|jq '.[].Containers | map(select(.Name=="registry.localhost"))[0]')" ]
 then
 	clk log -l info "Connecting the k3d instance to the local registry"
-	docker network connect k3d-k3s-default registry.localhost
+	clk exec docker network connect k3d-k3s-default registry.localhost
 fi
 
 if [ "${CLK___METALLB}" == "True" ]

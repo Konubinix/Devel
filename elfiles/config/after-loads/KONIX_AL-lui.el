@@ -30,6 +30,7 @@
 (setq-default lui-time-stamp-position 'left)
 (setq-default lui-time-stamp-format "[%Y-%m-%d %a %H:%M] ")
 (setq-default lui-flyspell-p nil)
+(konix/push-or-replace-in-alist 'lui-flyspell-alist ".*" "american")
 
 (provide 'KONIX_AL-lui)
 ;;; KONIX_AL-lui.el ends here

@@ -316,7 +316,13 @@ Rewrite of `ledger-report-visit-source' that does not go back to the beginngig
 of the transaction.
 "
   (interactive)
-  (let* ((prop (get-text-property (point) 'ledger-source))
+  (let* (
+         (prop
+          (save-excursion
+            (forward-line 0)
+            (get-text-property (point) 'ledger-source)
+            )
+          )
          (file (car prop))
          (line (cdr prop)))
     (when (and file line)
@@ -373,10 +379,10 @@ of the transaction.
           (setq done t)
         (if (looking-at "^ *; justif: \\(.+\\)$")
             (progn
-             (setq res (match-string-no-properties 1)
-                   done t)
-             (goto-char (match-beginning 1))
-             )
+              (setq res (match-string-no-properties 1)
+                    done t)
+              (goto-char (match-beginning 1))
+              )
           (forward-line)
           )
         )
@@ -410,10 +416,10 @@ of the transaction.
           (setq done t)
         (if (looking-at "^ *; org: \\(.+\\)$")
             (progn
-             (setq res (match-string-no-properties 1)
-                   done t)
-             (goto-char (match-beginning 1))
-             )
+              (setq res (match-string-no-properties 1)
+                    done t)
+              (goto-char (match-beginning 1))
+              )
           (forward-line)
           )
         )

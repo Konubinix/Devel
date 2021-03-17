@@ -2320,7 +2320,7 @@ items"
                  )
                 ("agb" "Web"
                  (
-                  (tags "@web-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe"
+                  (tags "@web-todo=\"DONE\"-todo=\"TODO\"-todo=\"NOT_DONE\"-maybe"
                         (
                          (org-agenda-overriding-header
                           "Web stuff")

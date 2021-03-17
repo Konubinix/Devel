@@ -598,6 +598,7 @@ Return added key."
 
 (defun konix/org-roam-refile ()
   (interactive)
+  (require 'uuidgen)
   (org-back-to-heading)
   (unless (looking-at "\*+ \\[\\[\\([^]]+\\)\\]\\[\\([^]]+\\)\\]\\]")
     (error "Not in a heading")
@@ -640,6 +641,26 @@ Return added key."
                    (current-buffer)
                    ))
          )
+    ;; rework the content a bit
+    (with-temp-buffer
+      (insert content)
+      (goto-char (point-min))
+      (while (search-forward "#+END_QUOTE" nil t)
+        (save-excursion
+          (forward-line 0)
+          (insert "\n" url "\n")
+          )
+        )
+      (goto-char (point-min))
+      (while (search-forward "#+BEGIN_QUOTE" nil t)
+        (save-excursion
+          (forward-line -1)
+          (kill-line)
+          (insert "#+name: " (uuidgen-4))
+          )
+        )
+      (setq content (buffer-substring (point-min) (point-max)))
+      )
     (with-current-buffer buffer
       (save-excursion
         (goto-char (point-min))

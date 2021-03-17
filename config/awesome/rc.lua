@@ -517,7 +517,7 @@ globalkeys = gears.table.join(
 
    awful.key({ modkey,           }, "p",     function ()
          awful.spawn.easy_async(
-            "clk mpc toggle@sh",
+            "clk mpc toggle",
             function (stdout, stderr, exitreason, exitcode)
                naughty.notify(
                   {

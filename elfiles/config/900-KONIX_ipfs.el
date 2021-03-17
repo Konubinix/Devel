@@ -36,13 +36,13 @@
 (defun konix/org-display-inline-images/ipfs (&optional include-linked refresh beg end)
   (let ((end (or end (point-max))))
     (org-with-point-at (or beg (point-min))
-      (while (re-search-forward "^[ -]*\\(\\(file:\\(//\\)?\\)?\\(/ipfs/[a-zA-Z0-9]+\\)\\?[a-zA-Z0-9=_.]+\\(png\\|jpg\\)\\)" end t)
-        (when (file-exists-p (match-string 4))
+      (while (re-search-forward "^\\([ -]*\\|#\\+ROAM_KEY: \\)\\(\\(file:\\(//\\)?\\)?\\(/ipfs/[a-zA-Z0-9]+\\)\\?[a-zA-Z0-9=_.]+\\(png\\|jpg\\)\\)" end t)
+        (when (file-exists-p (match-string 5))
           (let* (
-                 (image `(image :type png :file ,(konix/org-display-inline-images/scale-down (match-string 4)) :scale 1 :width nil))
+                 (image `(image :type png :file ,(konix/org-display-inline-images/scale-down (match-string 5)) :scale 1 :width nil))
                  (ov (make-overlay
-                      (match-beginning 1)
-                      (match-end 1)))
+                      (match-beginning 2)
+                      (match-end 2)))
                  )
             (overlay-put ov 'display image)
             (overlay-put ov 'face 'default)

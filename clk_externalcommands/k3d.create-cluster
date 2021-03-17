@@ -84,5 +84,5 @@ fi
 
 if [ "${CLK___METALLB}" == "True" ]
 then
-	clk k3d install-metallb@sh
+	clk k3d install-metallb
 fi

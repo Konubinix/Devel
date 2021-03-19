@@ -28,6 +28,7 @@
 	  '((:session . "none")
 		(:results . "replace")
 		(:exports . "both")
+		(:eval . "no-export")
 		(:cache . "no")
 		(:noweb . "no")
 		(:hlines . "no")

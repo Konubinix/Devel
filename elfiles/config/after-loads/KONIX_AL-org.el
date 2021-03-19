@@ -5627,7 +5627,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
                    (shell-command-to-string (format "clk org srs expiry calc %s %s" id value))
                    ))
         )
-    (setq konix/org-expiry-srs-last-value value)
+    (setq konix/org-srs-last-value value)
     (konix/org-with-point-on-heading
      (org-entry-put (point) "REVIEW_IN" new-date)
      )

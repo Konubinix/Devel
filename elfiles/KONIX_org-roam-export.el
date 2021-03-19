@@ -91,8 +91,13 @@
                     )
                    )
                   )
-
-           (org-export-babel-evaluate nil)
+           ;; if set to nil, the :exports results won't be taken into account
+           ;; and all source code blocks will be shown
+           (org-export-use-babel t)
+           ;; taken from https://orgmode.org/list/87sgezdukk.fsf@gmail.com/T/,
+           ;; prevent trying to evaluate the source code blocks
+           (org-babel-default-header-args
+            (cons '(:eval . "never-export") org-babel-default-header-args))
            (roam-links (expand-file-name (format "%s_links.txt" "org-roam") publish-dir))
            (kind-links (expand-file-name (format "%s_links.txt" kind)
                                          publish-dir))
@@ -822,7 +827,7 @@ citation key, for Org-ref cite links."
                   (string-equal kind source-kind)
                   (member kind konix/org/roam-export/public-kinds)
                   )
-          )
+                 )
          (cond
           ((not (equal kind source-kind))
            (goto-char (point-min))

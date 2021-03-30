@@ -61,3 +61,7 @@ config.bind('<ctrl-shift-n>', 'spawn -u konix_qutebrowser_emacs_org_add_quote_at
 config.bind('<ctrl-m>', 'spawn -u konix_qutebrowser_yank_bib.sh')
 config.bind('<alt-n>', """:jseval (function(){window.hypothesisConfig=function(){return{showHighlights:true,appType:'bookmarklet'};};var d=document,s=d.createElement('script');s.setAttribute('src','https://hypothes.is/embed.js');d.body.appendChild(s)})();""")
 config.bind('<alt-shift-n>', """:open https://via.hypothes.is/{url}""")
+
+# I tend to press those by mistake
+config.unbind('<ctrl-a>', mode='normal')
+config.unbind('<ctrl-x>', mode='normal')

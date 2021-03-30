@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: transclude
+# key: tr
+# --
+#+transclude: t
+[[file:$100::$200]]

@@ -674,20 +674,26 @@
 
 (defun konix/org-roam-export/org-export-preprocessor (_backend)
   (when (org-roam--extract-global-props '("KONIX_ORG_PUBLISH_KIND"))
-    (konix/org-roam-export/remove-org-backlinks)
-    ;; already done in the theme by Jethro
-    (konix/org-roam-export/add-backlinks)
-    (konix/org-roam-export/add-roam-key)
-    (konix/org-roam-export/convert-standalone-links)
-    (konix/org-roam-export/add-roam-alias)
-    (konix/org-roam-replace-internal-links)
-    (konix/org-roam-export/assert-no-konix-org-roam-links)
-    (konix/org-roam-export/setup-hugo-dates)
-    (konix/org-roam-export/add-id-as-hugo-aliases)
-    (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
-    (konix/org-roam-export/copy-roam-tags-into-hugo-tags)
-    (konix/org-roam-export/add-more)
-    (konix/org-roam-export/load-transclusion)
+    (let (
+          ;; don't bother messing up a temporary buffer while reformating it for
+          ;; better export
+          (inhibit-read-only t)
+          )
+      (konix/org-roam-export/remove-org-backlinks)
+      ;; already done in the theme by Jethro
+      (konix/org-roam-export/add-backlinks)
+      (konix/org-roam-export/add-roam-key)
+      (konix/org-roam-export/convert-standalone-links)
+      (konix/org-roam-export/add-roam-alias)
+      (konix/org-roam-export/assert-no-konix-org-roam-links)
+      (konix/org-roam-export/setup-hugo-dates)
+      (konix/org-roam-export/add-id-as-hugo-aliases)
+      (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
+      (konix/org-roam-export/copy-roam-tags-into-hugo-tags)
+      (konix/org-roam-export/add-more)
+      (konix/org-roam-export/load-transclusion)
+      (konix/org-roam-replace-internal-links)
+      )
     )
   )
 

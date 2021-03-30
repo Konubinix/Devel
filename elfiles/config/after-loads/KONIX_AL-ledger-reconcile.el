@@ -85,7 +85,7 @@
     )
   )
 
-(defvar konix/ledger-visit-track-mode t)
+(defvar konix/ledger-visit-track-mode nil)
 
 (defun konix/ledger-visit-track-mode ()
   (interactive)

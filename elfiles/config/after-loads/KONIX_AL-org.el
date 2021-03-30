@@ -1376,7 +1376,7 @@ items"
                            )
                           ))
                         )
-                  (tags-todo "-C_me-C_society-maybe"
+                  (tags-todo "-C_me-C_society-maybe-background"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
@@ -1398,7 +1398,7 @@ items"
                                )
                               )
                              )
-                  (tags-todo "DELEGATED-maybe|WAIT-maybe|Promise-maybe"
+                  (tags-todo "DELEGATED-maybe-background|WAIT-maybe-background|Promise-maybe-background"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header

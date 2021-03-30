@@ -1328,10 +1328,12 @@ items"
   )
 
 (defun konix/org-agenda-deadline-in-parent-prefix ()
-  (or
-   (konix/org-agenda-deadline-prefix)
-   (and (org-up-heading-safe) (konix/org-agenda-deadline-in-parent-prefix))
-   )
+  (save-excursion
+    (or
+     (konix/org-agenda-deadline-prefix)
+     (and (org-up-heading-safe) (konix/org-agenda-deadline-in-parent-prefix))
+     )
+    )
   )
 
 (defun konix/org-agenda-prefix-format/ann ()

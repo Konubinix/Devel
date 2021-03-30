@@ -348,7 +348,7 @@ function open_or_join (class, program)
       then
          move_to_client(result)
       else
-         say("Did not find" .. class .. "..., Opening " .. program .. " instead")
+         say("Did not find " .. class .. "..., Opening " .. program .. " instead")
          awful.spawn(program)
       end
    end

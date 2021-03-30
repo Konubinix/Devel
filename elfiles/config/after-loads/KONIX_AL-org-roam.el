@@ -262,7 +262,7 @@ ${title}
   (string-prefix-p org-roam-directory
                    (cond
                     (org-capture-mode
-                     (with-current-buffer (org-capture-get :buffer) (buffer-file-name))
+                     (with-current-buffer (org-capture-get :buffer t) (buffer-file-name))
                      )
                     (t
                      (buffer-file-name)
@@ -291,6 +291,7 @@ ${title}
                                      )
               )
           )
+
       (warn "Using konix-org-roam link")
       (org-link-make-string (format "konix-org-roam:%s" id) description)
       )

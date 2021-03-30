@@ -36,7 +36,7 @@
 (defun konix/org-display-inline-images/ipfs (&optional include-linked refresh beg end)
   (let ((end (or end (point-max))))
     (org-with-point-at (or beg (point-min))
-      (while (re-search-forward "^\\([ -]*\\|#\\+ROAM_KEY: \\)\\(\\(file:\\(//\\)?\\)?\\(/ipfs/[a-zA-Z0-9]+\\)\\?[a-zA-Z0-9=_.]+\\(png\\|jpg\\)\\)" end t)
+      (while (re-search-forward "^\\([ -]*\\|#\\+ROAM_KEY: \\)\\(\\(file:\\(//\\)?\\)?\\(/ipfs/[a-zA-Z0-9]+\\)\\?[a-zA-Z0-9=_.-]+\\(png\\|jpe?g\\)\\)" end t)
         (when (file-exists-p (match-string 5))
           (let* (
                  (image `(image :type png :file ,(konix/org-display-inline-images/scale-down (match-string 5)) :scale 1 :width nil))

@@ -25,7 +25,14 @@ settings:
         ye: spawn -u konix_qutebrowser_edit_emacs.sh -c
         zc: spawn -u konix_qutebrowser_open_with_chromium.sh
         zf: spawn -u konix_qutebrowser_open_with_firefox.sh
-  content.media_capture:
+  content.media.audio_capture:
+    https://coremeet.workadventu.re: true
+    https://meet.google.com: true
+  content.media.audio_video_capture:
+    https://coremeet.workadventu.re: true
+    https://meet.google.com: true
+    https://play.workadventu.re: true
+  content.media.video_capture:
     https://meet.google.com: true
   content.notifications:
     https://meet.google.com: false

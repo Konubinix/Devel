@@ -49,13 +49,23 @@
   (interactive)
   (setq kind (or kind "blog"))
   (assert (not (string= "" kind)))
-  (let  (
-         (publish-dir (expand-file-name
-                       kind
-                       (getenv "KONIX_ORG_PUBLISH_DIR")
+  (let*  (
+          (publish-dir (expand-file-name
+                        kind
+                        (getenv "KONIX_ORG_PUBLISH_DIR")
+                        )
                        )
-                      )
-         )
+          (posts (expand-file-name "content/posts" publish-dir))
+          (new-posts (expand-file-name "content/new-posts" publish-dir))
+          ;; if set to nil, the :exports results won't be taken into account
+          ;; and all source code blocks will be shown
+          (org-export-use-babel t)
+          ;; taken from https://orgmode.org/list/87sgezdukk.fsf@gmail.com/T/,
+          ;; prevent trying to evaluate the source code blocks
+          (org-babel-default-header-args
+           (cons '(:eval . "never-export") org-babel-default-header-args))
+          )
+    (message "Updating links")
     (when (not
            (equal
             0
@@ -74,48 +84,8 @@
       (error "Could not update the links")
       )
     (let* (
-           (dates (mapcar
-                   (lambda (line)
-                     (split-string line "|")
-                     )
-                   (split-string
-                    (s-trim
-                     (shell-command-to-string
-                      (format
-                       "konix_org-roam_get-dates.sh %s"
-                       org-roam-directory
-                       )
-                      )
-                     )
-                    "\n"
-                    )
-                   )
-                  )
-           ;; if set to nil, the :exports results won't be taken into account
-           ;; and all source code blocks will be shown
-           (org-export-use-babel t)
-           ;; taken from https://orgmode.org/list/87sgezdukk.fsf@gmail.com/T/,
-           ;; prevent trying to evaluate the source code blocks
-           (org-babel-default-header-args
-            (cons '(:eval . "never-export") org-babel-default-header-args))
-           (roam-links (expand-file-name (format "%s_links.txt" "org-roam") publish-dir))
-           (kind-links (expand-file-name (format "%s_links.txt" kind)
-                                         publish-dir))
-           (roam-links_kind (expand-file-name (format "%s_links_kind.txt" "org-roam") publish-dir))
-           (kind-links_kind (expand-file-name (format "%s_links_kind.txt" kind)
-                                              publish-dir))
-           (roam-exported (expand-file-name (format "%s_exported.txt" "org-roam") publish-dir))
-           (kind-exported (expand-file-name (format "%s_exported.txt" kind)
-                                            publish-dir))
-           (roam-exported_kind (expand-file-name (format "%s_exported_kind.txt" "org-roam") publish-dir))
-           (kind-exported_kind (expand-file-name (format "%s_exported_kind.txt" kind)
-                                                 publish-dir))
-           (lost-one
-            (equal (call-process "konix_org-roam_lost_one.sh" nil nil nil
-                                 roam-exported_kind
-                                 kind-exported_kind
-                                 )
-                   0))
+           (links (expand-file-name "links.txt" publish-dir))
+           (saved-links (expand-file-name "saved_links.txt" publish-dir))
            (exported-files (konix/org-roam-export/exported-files kind))
            (files-with-updated-links
             (-intersection
@@ -125,8 +95,8 @@
                (shell-command-to-string
                 (format
                  "konix_org-roam_get_nodes_to_update.sh %s %s"
-                 roam-links
-                 kind-links
+                 links
+                 saved-links
                  )
                 )
                )
@@ -134,72 +104,50 @@
               )
              )
             )
-           (files-with-updated-links-kind
-            (-intersection
-             exported-files
-             (split-string
-              (s-trim
-               (shell-command-to-string
-                (format
-                 "konix_org-roam_get_nodes_to_update.sh %s %s"
-                 roam-links_kind
-                 kind-links_kind
-                 )
-                )
-               )
-              "\n"
-              )
-             )
-            )
-           (date-file (expand-file-name (format "%s_date.txt" kind) publish-dir))
-           (last-date (save-window-excursion
-                        (find-file date-file)
-                        (s-trim
-                         (buffer-substring-no-properties (point-min) (point-max))
-                         )
-                        )
-                      )
-
-           (files-updated (remove-if
-                           (lambda (path)
-                             (string-lessp (cadr (assoc path dates)) last-date)
-                             )
-                           exported-files
-                           )
-                          )
-           (files-to-consider (-union
-                               files-updated
-                               (-union
-                                files-with-updated-links
-                                files-with-updated-links-kind
-                                )
-                               ))
            )
-      (setq incremental (and (not lost-one) incremental))
-      (when (not incremental)
-        (delete-directory (expand-file-name (expand-file-name "content" publish-dir)) t)
-        (delete-directory (expand-file-name (expand-file-name "static" publish-dir)) t)
-        (make-directory (expand-file-name (expand-file-name "static" publish-dir)))
+      (message "Let's go")
+      (when (f-directory-p (expand-file-name (expand-file-name "static"
+                                                               publish-dir)))
+        (delete-directory (expand-file-name (expand-file-name "static"
+                                                              publish-dir)) t)
         )
+      (make-directory (expand-file-name (expand-file-name "static" publish-dir)))
+      (when (f-directory-p new-posts)
+        ;; put back the temporarily exported files into posts
+        (dolist (f (f-glob "*" new-posts))
+          (rename-file f (expand-file-name (file-name-nondirectory f) posts))
+          )
+        (delete-directory new-posts t)
+        )
+      (make-directory new-posts)
       (save-window-excursion
-        (dolist (f (if incremental files-to-consider exported-files))
-          (with-current-buffer (find-file f)
-            (message "Exporting %s" f)
-            (org-hugo-export-wim-to-md)
+        (dolist (f exported-files)
+          (let* (
+                 (filename (format "%s.md" (file-name-sans-extension
+                                            (file-name-nondirectory f)
+                                            )))
+                 (outfile (expand-file-name filename posts))
+                 (new-outfile (expand-file-name filename new-posts))
+                 )
+            (when (or
+                   (not (file-exists-p outfile))
+                   (file-newer-than-file-p f outfile)
+                   (member f files-with-updated-links)
+                   (not incremental)
+                   )
+              (with-current-buffer (find-file f)
+                (message "Exporting %s" f)
+                (org-hugo-export-wim-to-md)
+                )
+              )
+            (rename-file outfile new-outfile)
             )
           )
         )
-      ;; record the last date and last links
-      (save-window-excursion
-        (find-file date-file)
-        (delete-region (point-min) (point-max))
-        (insert (format-time-string "[%Y-%m-%d %a %H:%M]"))
-        (save-buffer)
-        (rename-file roam-links kind-links t)
-        (rename-file roam-exported kind-exported t)
-        (rename-file roam-links_kind kind-links_kind t)
-        (rename-file roam-exported_kind kind-exported_kind t)
-        )
+      ;; clean up
+      (delete-directory posts t)
+      (rename-file new-posts posts)
+      (rename-file links saved-links t)
       )
     )
   (message "Everyting was exported")

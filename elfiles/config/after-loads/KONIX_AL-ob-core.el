@@ -35,5 +35,7 @@
 		(:tangle . "no"))
 	  )
 
+(setq org-export-babel-evaluate t)
+
 (provide 'KONIX_AL-ob-core)
 ;;; KONIX_AL-ob-core.el ends here

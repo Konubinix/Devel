@@ -86,7 +86,27 @@
     (let* (
            (links (expand-file-name "links.txt" publish-dir))
            (saved-links (expand-file-name "saved_links.txt" publish-dir))
+           (links-kind (expand-file-name (format "links-%s.txt" kind) publish-dir))
+           (saved-links-kind (expand-file-name (format "saved_links-%s.txt" kind) publish-dir))
            (exported-files (konix/org-roam-export/exported-files kind))
+           ;; use to find out whether a note changed of kind
+           (files-with-updated-links-kind
+            (-intersection
+             exported-files
+             (split-string
+              (s-trim
+               (shell-command-to-string
+                (format
+                 "konix_org-roam_get_nodes_to_update.sh %s %s"
+                 links-kind
+                 saved-links-kind
+                 )
+                )
+               )
+              "\n"
+              )
+             )
+            )
            (files-with-updated-links
             (-intersection
              exported-files
@@ -104,6 +124,10 @@
               )
              )
             )
+           (files-to-consider (-union
+                               files-with-updated-links
+                               files-with-updated-links-kind
+                               ))
            )
       (message "Let's go")
       (when (f-directory-p (expand-file-name (expand-file-name "static"
@@ -132,7 +156,7 @@
             (when (or
                    (not (file-exists-p outfile))
                    (file-newer-than-file-p f outfile)
-                   (member f files-with-updated-links)
+                   (member f files-to-consider)
                    (not incremental)
                    )
               (with-current-buffer (find-file f)
@@ -148,6 +172,7 @@
       (delete-directory posts t)
       (rename-file new-posts posts)
       (rename-file links saved-links t)
+      (rename-file links-kind saved-links-kind t)
       )
     )
   (message "Everyting was exported")

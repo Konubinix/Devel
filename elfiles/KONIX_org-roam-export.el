@@ -283,7 +283,7 @@
   )
 
 (defun konix/org-roam-export/get-url ()
-  (format "https://konubinix.eu/%s/posts/%s/"
+  (format "https://konubinix.eu/%s/posts/%s/?title=%s"
           (konix/org-roam-export/extract-kind (buffer-file-name))
           (if-let (
                    (id (save-excursion (goto-char (point-min)) (org-id-get)))
@@ -295,6 +295,7 @@
               org-roam-directory)
              )
             )
+          (org-roam--title-to-slug (car (org-roam--extract-titles-title)))
           )
   )
 
@@ -465,9 +466,10 @@
         )
       (goto-char (point-max))
       (insert
-       (format "\n* [[/%s%s][Permalink]]"
+       (format "\n* [[/%s%s?title=%s][Permalink]]"
                (konix/org-roam-export/extract-kind)
                id
+               (org-roam--title-to-slug (car (org-roam--extract-titles-title)))
                )
        )
       )

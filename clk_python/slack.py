@@ -201,6 +201,7 @@ class Conversation():
 
     @property
     def members_fmt(self):
+        return ""
         return ", ".join(
             builtins.sorted(
                 config.slack.users[u]["name"] for u in self.members
@@ -279,7 +280,7 @@ class Conversation():
             while (remaining_count is None or remaining_count > 0) and has_more is True:
                 res = self.endpoint.history(
                     self.data["id"],
-                    count=remaining_count,
+                    limit=remaining_count,
                     latest=latest,
                     oldest=oldest,
                 ).body
@@ -364,15 +365,21 @@ class IM(Conversation):
 
 class Conversations():
     cls = Conversation
+    typ = ""
+    list_index = "channels"
 
     def list(self):
         @cache_disk(expire=36000)
         def _list(token, name):
             return [
-                self.cls(self.endpoint, c)
-                for c in self.endpoint.list().body[self.list_index]
+                (self.endpoint, c)
+                for c in self.endpoint.list(types=[self.typ]).body[self.list_index]
             ]
-        return _list(config.slack.token, self.__class__.__name__)
+        return [
+            self.cls(endpoint, c)
+            for (endpoint, c) in _list(config.slack.token,
+                                       self.__class__.__name__)
+        ]
 
     def get(self, id_or_name):
         return [
@@ -383,38 +390,38 @@ class Conversations():
 
 class Groups(Conversations):
     cls = Group
-    list_index = "groups"
+    typ = "private_channel"
 
     @property
     def endpoint(self):
-        return config.slack.client.groups
+        return config.slack.client.conversations
 
 
 class IMS(Conversations):
     cls = IM
-    list_index = "ims"
+    typ = "im"
 
     @property
     def endpoint(self):
-        return config.slack.client.im
+        return config.slack.client.conversations
 
 
 class MPIM(Conversations):
-    list_index = "groups"
     cls = MP
+    typ = "mpim"
 
     @property
     def endpoint(self):
-        return config.slack.client.mpim
+        return config.slack.client.conversations
 
 
 class Channels(Conversations):
-    list_index = "channels"
     cls = Channel
+    typ = "public_channel"
 
     @property
     def endpoint(self):
-        return config.slack.client.channels
+        return config.slack.client.conversations
 
 
 class User():
@@ -549,11 +556,11 @@ class Users:
     def __init__(self, slackconfig):
         @cache_disk(expire=36000)
         def hosted_users(token):
-            return {
-                user["id"]: User(user)
+            return [
+                user
                 for user in slackconfig.client.users.list().body["members"]
-            }
-        self.hosted_users = hosted_users(slackconfig.token)
+            ]
+        self.hosted_users = {user["id"]: User(user) for user in hosted_users(slackconfig.token)}
         self.slackconfig = slackconfig
 
     def formatter(self, match):
@@ -561,7 +568,6 @@ class Users:
         return "@" + user["name"]
 
     def __getitem__(self, key):
-        @cache_disk(expire=36000)
         def get_user(key):
             if key in self.hosted_users:
                 return self.hosted_users[key]
@@ -1015,7 +1021,7 @@ def history(fields, format, conversation, oldest, latest,
 @option("--count", type=int, default=100000, help="How many to record per conversation")
 def record_log(archived, all, count):
     """Dump the records for archiving purpose."""
-    LOGGER.info(f"Dumping the logs for {config.slack.account}")
+    LOGGER.info(f"## Dumping the logs for {config.slack.account}")
     for c in (
             config.slack.archived_conversations if archived else
             config.slack.all_conversations if all else

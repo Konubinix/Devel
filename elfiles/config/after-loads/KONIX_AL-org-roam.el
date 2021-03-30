@@ -709,5 +709,9 @@ Return added key."
     )
   )
 
+;; make sure the transclusion are set when the links are extracted so that the
+;; database show the links in the transcluded parts also
+(advice-add 'org-roam--extract-links :before 'konix/org-roam-export/load-transclusion)
+
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

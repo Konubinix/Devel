@@ -5126,29 +5126,32 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   )
 
 (defun konix/org-kill-no-confirm ()
-  (kill-region
-   (save-excursion (beginning-of-line) (point))
-   (save-excursion (1+ (org-end-of-subtree)) (point))
-   )
-  (while (save-excursion
-           (forward-line -1)
-           (looking-at "^$")
-           )
-    (kill-region (match-beginning 0)
-                 (1+
-                  (match-end 0)
-                  )
-                 )
-    )
-  (while (and (looking-at "^$") (not (equal (point) (point-max))))
-    (kill-region (match-beginning 0)
-                 (1+
-                  (match-end 0)
-                  )
-                 )
+  (let* (
+         (beg (save-excursion (beginning-of-line) (point)))
+         (end (save-excursion (1+ (org-end-of-subtree)) (point)))
+         (content (buffer-substring-no-properties beg end))
+         )
+    (kill-region beg end)
+    (while (save-excursion
+             (forward-line -1)
+             (looking-at "^$")
+             )
+      (kill-region (match-beginning 0)
+                   (1+
+                    (match-end 0)
+                    )
+                   )
+      )
+    (while (and (looking-at "^$") (not (equal (point) (point-max))))
+      (kill-region (match-beginning 0)
+                   (1+
+                    (match-end 0)
+                    )
+                   )
+      )
+    content
     )
   )
-
 
 (defvar konix/org-kill-confirm nil "")
 (defun konix/org-kill ()

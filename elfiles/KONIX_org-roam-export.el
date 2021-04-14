@@ -728,7 +728,7 @@
       (konix/org-roam-export/add-backlinks)
       (konix/org-roam-export/add-roam-key)
       (konix/org-roam-export/convert-standalone-links)
-      (konix/org-roam-export/add-roam-alias)
+      ;; (konix/org-roam-export/add-roam-alias)
       (konix/org-roam-export/assert-no-konix-org-roam-links)
       (konix/org-roam-export/setup-hugo-dates)
       (konix/org-roam-export/add-id-as-hugo-aliases)

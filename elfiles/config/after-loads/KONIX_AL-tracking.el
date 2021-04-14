@@ -48,5 +48,44 @@
   )
 (add-to-list 'kill-emacs-query-functions 'konix/tracking/kill-emacs-query-function)
 
+(defun konix/tracking-buffers-list ()
+  "Clone of tracking-next-buffer, but let the user decide what buffer to go to."
+  (interactive)
+  (cond
+   ((and (not tracking-buffers)
+         tracking-start-buffer)
+    (let ((buf tracking-start-buffer))
+      (setq tracking-start-buffer nil)
+      (if (buffer-live-p buf)
+          (switch-to-buffer buf)
+        (message "Original buffer does not exist anymore")
+        (ding))))
+   ((not tracking-buffers)
+    nil)
+   (t
+    (when (not (eq tracking-last-buffer
+                   (current-buffer)))
+      (setq tracking-start-buffer (current-buffer)))
+    (let ((new (completing-read "Buffer: " tracking-buffers)))
+      (when (buffer-live-p (get-buffer new))
+        (with-current-buffer new
+          (run-hooks 'tracking-buffer-removed-hook)))
+      (setq tracking-buffers (cdr tracking-buffers)
+            tracking-mode-line-buffers (tracking-status))
+      (if (buffer-live-p (get-buffer new))
+          (switch-to-buffer new)
+        (message "Buffer %s does not exist anymore" new)
+        (ding)
+        (setq tracking-mode-line-buffers (tracking-status))))
+    (setq tracking-last-buffer (current-buffer))
+    ;; Update mode line. See `force-mode-line-update' for the idea for
+    ;; this code. Using `sit-for' can be quite inefficient for larger
+    ;; buffers.
+    (dolist (w (window-list))
+      (with-current-buffer (window-buffer w)))
+    )))
+
+(define-key tracking-mode-map (kbd "C-c b") 'konix/tracking-buffers-list)
+
 (provide 'KONIX_AL-tracking)
 ;;; KONIX_AL-tracking.el ends here

@@ -26,7 +26,7 @@ import urllib.parse
 import hashlib
 from dateutil import parser
 
-from konix_time_helper import get_local_timezone
+from konix_time_helper import get_local_timezone, date_to_local
 
 import logging
 logging.basicConfig()
@@ -353,8 +353,8 @@ Attendees:
     self.account,
     self.location,
     self.organizer.get("displayName", self.organizer.get("email", "NA")),
-    parser.parse(self.created).strftime("[%Y-%m-%d %H:%M]"),
-    parser.parse(self.updated).strftime("[%Y-%m-%d %H:%M]"),
+    date_to_local(parser.parse(self.created)).strftime("[%Y-%m-%d %H:%M]"),
+    date_to_local(parser.parse(self.updated)).strftime("[%Y-%m-%d %H:%M]"),
     self.updated,
     "t" if optional else "nil",
     self.org_mode_timestamp,

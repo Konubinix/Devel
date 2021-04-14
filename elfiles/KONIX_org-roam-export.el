@@ -544,18 +544,21 @@
 (defun konix/org-roam-export/add-backlinks ()
   (when-let* (
               (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
-              (links (remove-if-not
-                      (lambda (link)
-                        (let (
-                              (link-kind (konix/org-roam-export/extract-kind link))
-                              )
-                          (or
-                           (member link-kind konix/org/roam-export/public-kinds)
-                           (string-equal link-kind kind)
+              (links (remove-if
+                      (apply-partially #'string-equal (buffer-file-name))
+                      (remove-if-not
+                       (lambda (link)
+                         (let (
+                               (link-kind (konix/org-roam-export/extract-kind link))
+                               )
+                           (or
+                            (member link-kind konix/org/roam-export/public-kinds)
+                            (string-equal link-kind kind)
+                            )
                            )
-                          )
-                        )
-                      (konix/org-roam-export/backlinks-list (buffer-file-name))
+                         )
+                       (konix/org-roam-export/backlinks-list (buffer-file-name))
+                       )
                       )
                      )
               )

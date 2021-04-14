@@ -40,7 +40,7 @@
    "ledger -f %(ledger-file) \
 [[ledger-mode-flags]] \
 register \
---limit 'date > [2020] && date < today' \
+--limit 'date > [2020] && date <= today' \
 not %org and not %justif and not ^Equity and not \\( ^Assets and not :Virtual: \\) and not NoJustif and not :Virtual:Temp")
  )
 
@@ -50,7 +50,7 @@ not %org and not %justif and not ^Equity and not \\( ^Assets and not :Virtual: \
    "ledger -f %(ledger-file) \
 [[ledger-mode-flags]] \
 register \
---limit 'date > [2020] && date < today' \
+--limit 'date > [2020] && date <= today' \
 not %justif and not ^Equity and not \\( ^Assets and not :Virtual: \\) and not NoJustif and not :Virtual:Temp")
  )
 

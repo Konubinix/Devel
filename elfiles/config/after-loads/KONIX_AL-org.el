@@ -5611,27 +5611,27 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (advice-add 'org-display-inline-images :after
             #'konix/org-display-inline-images/remote)
 
-(setq-default org-startup-with-inline-images t)
+(setq-default org-startup-with-inline-images nil)
 
 (defvar konix/org-srs-last-value nil)
 
 (defun konix/org-srs ()
   (interactive)
   (let* (
-        (id (konix/org-get-id))
-        (value (completing-read
-                "Value: "
-                '("farther" "far" "medium" "close" "closer" "closest")
-                nil
-                nil
-                nil
-                nil
-                konix/org-srs-last-value
-                ))
-        (new-date (s-trim
-                   (shell-command-to-string (format "clk org srs expiry calc %s %s" id value))
-                   ))
-        )
+         (id (konix/org-get-id))
+         (value (completing-read
+                 "Value: "
+                 '("farther" "far" "medium" "close" "closer" "closest")
+                 nil
+                 nil
+                 nil
+                 nil
+                 konix/org-srs-last-value
+                 ))
+         (new-date (s-trim
+                    (shell-command-to-string (format "clk org srs expiry calc %s %s" id value))
+                    ))
+         )
     (setq konix/org-srs-last-value value)
     (konix/org-with-point-on-heading
      (org-entry-put (point) "REVIEW_IN" new-date)

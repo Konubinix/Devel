@@ -255,8 +255,23 @@
      ((string-match "^\\(http.+\\(webm\\)\\)$" url)
       (format "{{{video(%s)}}}" (match-string 1 url))
       )
-     ((string-match "^\\(file:/*\\)?\\(/ip[fn]s/.+\\)$" url)
-      (konix/org-roam-export/process-url (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") (match-string 2 url)))
+     ((string-match "^\\(file:/*\\)?\\(/ip[fn]s/.+?\\)\\([?]filename=\\(.+\\)\\)?$" url)
+      (let* (
+             (filename (match-string 4 url))
+             (filename-sans-ext (and filename (file-name-sans-extension filename)))
+             (filename-ext (and filename (file-name-extension filename)))
+             (url (konix/org-roam-export/process-url (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") (match-string 2 url))))
+             )
+        (if filename
+            (format "[[%s?filename=%s.%s][%s]]"
+                    url
+                    (org-roam--title-to-slug filename-sans-ext)
+                    filename-ext
+                    filename
+                    )
+          url
+          )
+        )
       )
      ((string-match "^cite:\\(.+\\)$" url)
       (konix/org-roam-export/process-url (konix/org-roam/process-url url))

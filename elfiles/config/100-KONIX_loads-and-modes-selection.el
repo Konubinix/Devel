@@ -21,6 +21,7 @@
          (expand-file-name "org-marginalia" elfiles)
          (expand-file-name "org-transclusion" elfiles)
          (expand-file-name "nroam" elfiles)
+         (expand-file-name "crdt" elfiles)
 		 )
 		)
   ;; add my personal load path to the load-path

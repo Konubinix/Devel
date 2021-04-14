@@ -628,7 +628,7 @@
 						"log")
 					   )
 					  )
-		 (file_cmd (if file (format "--follow -- %s" file) ""))
+		 (file_cmd (if file (format "--follow -- '%s'" file) ""))
 		 (buffer_name (format "*Git Log%s*" (if file (concat " " file) "")))
 		 )
 	(konix/kill-and-new-buffer buffer_name)

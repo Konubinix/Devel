@@ -25,17 +25,27 @@ settings:
         ye: spawn -u konix_qutebrowser_edit_emacs.sh -c
         zc: spawn -u konix_qutebrowser_open_with_chromium.sh
         zf: spawn -u konix_qutebrowser_open_with_firefox.sh
+  content.geolocation:
+    https://www.myedenred.fr: false
   content.media.audio_capture:
     https://coremeet.workadventu.re: true
     https://meet.google.com: true
+    https://teams.microsoft.com: true
   content.media.audio_video_capture:
     https://coremeet.workadventu.re: true
     https://meet.google.com: true
     https://play.workadventu.re: true
   content.media.video_capture:
+    https://coremeet.workadventu.re: true
     https://meet.google.com: true
+    https://play.workadventu.re: true
+    https://teams.microsoft.com: true
   content.notifications:
+    https://calendar.google.com: false
     https://meet.google.com: false
+    https://www.reddit.com: false
+  content.register_protocol_handler:
+    https://calendar.google.com?cid=%25s: false
   hints.next_regexes:
     global:
     - Bloc suivant >>

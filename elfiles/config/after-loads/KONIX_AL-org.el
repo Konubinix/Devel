@@ -1513,7 +1513,7 @@ items"
                 ("an" . "NEXT Actions")
                 ("ana" "No filtering"
                  (
-                  (tags-todo "-maybe-project-WAIT-DELEGATED//+NEXT")
+                  (tags-todo "-maybe-background-project-WAIT-DELEGATED//+NEXT")
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags-todo))
@@ -2143,7 +2143,7 @@ items"
                 ("ag" . "GTD list views")
                 ("agC" "Commitment promises"
                  (
-                  (tags "-maybe+todo=\"NEXT\"+Promise|+Promise+todo=\"TODO\"-maybe|+Promise+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
+                  (tags "-maybe-background+todo=\"NEXT\"+Promise|+Promise+todo=\"TODO\"-maybe-background|+Promise+project-maybe-background-todo=\"NOT_DONE\"-todo=\"DONE\""
                         (
                          (org-agenda-overriding-header
                           "Committed stuff, not to me")
@@ -2184,7 +2184,7 @@ items"
                 ("agP" "Actions to review and consider maybe-ing during the Weekly review"
                  (
                   ;; (tags "-maybe+todo=\"NEXT\"-WAIT-DELEGATED|+todo=\"TODO\"-maybe-WAIT-DELEGATED|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\"-WAIT-DELEGATED"
-                  (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
+                  (tags "-maybe-background+todo=\"NEXT\"|+todo=\"TODO\"-maybe-background|+project-maybe-background-todo=\"NOT_DONE\"-todo=\"DONE\""
                         (
                          (org-agenda-overriding-header
                           "Projects & NA (things that are or should be committed)")

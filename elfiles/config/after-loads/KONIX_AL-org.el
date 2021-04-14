@@ -5591,7 +5591,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (defun konix/org-display-inline-images/remote (&optional include-linked refresh beg end)
   (let ((end (or end (point-max))))
     (org-with-point-at (or beg (point-min))
-      (while (re-search-forward "^\\([ -]*\\|#\\+ROAM_KEY: \\)\\(http[a-zA-Z0-9/?:_*.-]+\\(jpe?g\\|png\\)\\)" end t)
+      (while (re-search-forward "^\\([ -]*\\|#\\+ROAM_KEY: \\)\\(http[a-zA-Z0-9%/?:_=,*.-]+\\(jpe?g\\|png\\)\\)" end t)
         (let ((image `(image :type png :file ,(konix/org-display-inline-images/scale-down (match-string 2)) :scale 1 :width nil))
               (ov (make-overlay
                    (match-beginning 2)

@@ -539,7 +539,7 @@ globalkeys = gears.table.join(
          )
    end,
       {description = "toggle mute", group = "music"}),
-   awful.key({ modkey, "Control"          }, "p",     function () awful.spawn("pavucontrol") end,
+   awful.key({ modkey, "Control"          }, "p", open_or_join("Pavucontrol", "pavucontrol"),
       {description = "pavucontrol", group = "music"}),
    awful.key({ modkey,  "Shift"         }, "Up",     function () awful.tag.incmwfact( 0.05)          end,
       {description = "increase master width factor", group = "layout"}),

@@ -53,6 +53,17 @@
     )
   )
 
+(defun konix/dired-git-annex-find-todo ()
+  (interactive)
+  (let (
+        (find-program "konix_git_annex_find_todo.sh")
+        (find-ls-option '("" . ""))
+        )
+    (find-dired "." "")
+    (rename-buffer (generate-new-buffer-name "git annex find todo"))
+    )
+  )
+
 (defun konix/dired-remove-annex (arg file-list)
   (interactive
    (let ((files (dired-get-marked-files t current-prefix-arg)))

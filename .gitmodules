@@ -162,3 +162,6 @@ ignore=dirty
 [submodule "elfiles/nroam"]
 	path = elfiles/nroam
 	url = https://github.com/NicolasPetton/nroam
+[submodule "elfiles/crdt"]
+	path = elfiles/crdt
+	url = https://code.librehq.com/qhong/crdt.el

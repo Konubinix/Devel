@@ -9,6 +9,7 @@ Run k3d the way I like it
 F:--metallb/--no-metallb:Also install metallb:False
 F:--registry/--no-registry:Also connect to local registry:True
 F:--debug/--no-debug:Enable set -x
+O:--port:str:Extra port
 O:--private-registry-file:str:Location of a private registry file to merge with the default one
 N:Remaining args to give to k3d cluster create
 EOF
@@ -30,6 +31,12 @@ then
 else
     args+=(--port 443:443@loadbalancer --port 80:80@loadbalancer)
 fi
+
+if [ -n "${CLK___PORT}" ]
+then
+    args+=(--port ${CLK___PORT}:${CLK___PORT}@loadbalancer)
+fi
+
 
 if [ "${CLK___DEBUG}" == "True" ]
 then

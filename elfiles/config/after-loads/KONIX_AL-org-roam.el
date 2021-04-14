@@ -559,6 +559,7 @@ Return added key."
 (citeproc-org-setup)
 (org-roam-bibtex-mode)
 (setq-default org-ref-default-bibliography (list (expand-file-name "refs.bib" org-roam-directory)))
+(setq-default bibtex-completion-bibliography org-ref-default-bibliography)
 
 (setq-default org-ref-completion-library 'org-ref-ivy-cite)
 

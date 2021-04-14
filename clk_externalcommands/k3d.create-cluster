@@ -52,7 +52,7 @@ EOF
 		pushd "${TMP}/registries"
 		{
 			cp "${HOME}/.k3d/my-registries.yaml" "${CLK___PRIVATE_REGISTRY_FILE}" .
-			clk exec docker run --rm -i -v "${PWD}":/workdir mikefarah/yq yq m * > "${HOME}/.k3d/my-registries.yaml"
+			clk exec docker run --rm -i -v "${PWD}":/workdir mikefarah/yq yq eval-all '. as $item ireduce ({}; . * $item )' * > "${HOME}/.k3d/my-registries.yaml"
 		}
 		popd
 	fi

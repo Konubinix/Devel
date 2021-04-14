@@ -143,7 +143,7 @@
           )
         (delete-directory new-posts t)
         )
-      (make-directory new-posts)
+      (make-directory new-posts t)
       (save-window-excursion
         (dolist (f exported-files)
           (let* (

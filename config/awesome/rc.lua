@@ -1081,7 +1081,14 @@ awful.rules.rules = {
 		 ontop = true,
       },
    },
-
+   {
+      rule = {
+         class = "Pavucontrol",
+      },
+      properties = {
+         tag = "2",
+      },
+   },
    {
       rule = {
          class = "Emacs",

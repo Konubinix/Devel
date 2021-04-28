@@ -5639,7 +5639,10 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
          )
     (setq konix/org-srs-last-value value)
     (konix/org-with-point-on-heading
-     (org-entry-put (point) "REVIEW_IN" new-date)
+     (if current-prefix-arg
+         (org-schedule nil new-date)
+       (org-entry-put (point) "REVIEW_IN" new-date)
+       )
      )
     (message "Moved to %s" new-date)
     (call-interactively 'konix/org-agenda-filter-for-now)

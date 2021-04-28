@@ -5649,5 +5649,25 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org--deadline-or-schedule/check-deadline-after-scheduled (&rest arguments)
+  (let (
+        (deadline-time (org-get-deadline-time (point)))
+        (schedule-time (org-get-scheduled-time (point)))
+        )
+    (when (and deadline-time schedule-time)
+      (when (time-less-p deadline-time schedule-time)
+        (warn "Deadline time (%s) before schedule time (%s).
+The entry won't show up until it is too late.
+You should check this is not a mistake."
+              (org-format-time-string "%Y-%m-%d" deadline-time)
+              (org-format-time-string "%Y-%m-%d" schedule-time)
+              )
+        )
+      )
+    )
+  )
+
+(advice-add #'org--deadline-or-schedule :after #'konix/org--deadline-or-schedule/check-deadline-after-scheduled)
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

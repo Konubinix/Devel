@@ -5586,7 +5586,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
       )
     (unless (file-exists-p path)
       (message "Scaling down %s" url)
-      (shell-command (format "convert '%s' -scale 768\\> '%s'" url path))
+      (shell-command (format "convert '%s' -scale 400\\> '%s'" url path))
       )
     path
     )

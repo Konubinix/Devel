@@ -672,7 +672,7 @@
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "^ *\\(\\(http\\|/ipfs/\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              "^[ :]*\\(\\(http\\|/ipfs/\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
               nil
               t)
         (replace-match

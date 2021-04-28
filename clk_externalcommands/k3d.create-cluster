@@ -11,6 +11,7 @@ F:--registry/--no-registry:Also connect to local registry:True
 F:--debug/--no-debug:Enable set -x
 O:--port:str:Extra port
 O:--private-registry-file:str:Location of a private registry file to merge with the default one
+F:--cert-manager:Install the cert-manager:True
 N:Remaining args to give to k3d cluster create
 EOF
 }
@@ -80,7 +81,6 @@ EOF
 		clk log -l info "Starting localhost docker registry"
 		clk exec docker start registry.localhost
 	fi
-
 fi
 
 clk exec k3d cluster create "${args[@]}" "$@"
@@ -94,4 +94,10 @@ fi
 if [ "${CLK___METALLB}" == "True" ]
 then
 	clk k3d install-metallb
+fi
+
+if [ "${CLK___CERT_MANAGER}" == "True" ]
+then
+    helm repo add jetstack https://charts.jetstack.io
+    helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.2.0 --create-namespace --set installCRDs=true
 fi

@@ -109,3 +109,4 @@
 (depends-on "scad-mode")
 (depends-on "rust-mode")
 (depends-on "hyperbole")
+(depends-on "ivy-bibtex")

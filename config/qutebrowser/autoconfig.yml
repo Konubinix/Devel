@@ -26,15 +26,18 @@ settings:
         zc: spawn -u konix_qutebrowser_open_with_chromium.sh
         zf: spawn -u konix_qutebrowser_open_with_firefox.sh
   content.geolocation:
+    https://eu.docusign.net: false
     https://www.myedenred.fr: false
   content.media.audio_capture:
     https://coremeet.workadventu.re: true
     https://meet.google.com: true
+    https://play.workadventu.re: true
     https://teams.microsoft.com: true
   content.media.audio_video_capture:
     https://coremeet.workadventu.re: true
     https://meet.google.com: true
     https://play.workadventu.re: true
+    https://teams.microsoft.com: true
   content.media.video_capture:
     https://coremeet.workadventu.re: true
     https://meet.google.com: true

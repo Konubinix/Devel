@@ -5364,6 +5364,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
    ("+" . konix/org-capture-na-in-heading)
    ("Y" . konix/org-toggle-maybe)
    ("y" . (lambda () (message "Intentionally disable y, too easily triggered to say yes")))
+   ("[" . (lambda () (message "Intentionally disable [")))
    ("m" . konix/org-toggle-me)
    ("S" . konix/org-toggle-society)
    ("s" . org-save-all-org-buffers)

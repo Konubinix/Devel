@@ -85,5 +85,11 @@ scheduled in January if it is triggered in July."
   )
 
 
+(defun konix/org-edna--print-syntax-error/warn-the-user (&rest rest)
+  (warn "Something failed in edna, check the messages")
+  )
+
+(advice-add #'org-edna--print-syntax-error :after #'konix/org-edna--print-syntax-error/warn-the-user)
+
 (provide 'KONIX_AL-org-edna)
 ;;; KONIX_AL-org-edna.el ends here

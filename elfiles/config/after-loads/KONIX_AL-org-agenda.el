@@ -1506,6 +1506,8 @@
  (let (
        (org-export-with-toc nil)
        (org-export-babel-evaluate nil)
+       (outline (org-format-outline-path (org-get-outline-path)))
+       content
        )
    (save-excursion
      (org-back-to-heading)
@@ -1516,9 +1518,12 @@
        )
      )
    (with-current-buffer "*Org ASCII Export*"
-     (buffer-substring-no-properties (point-min) (point-max))
+     (setq content (buffer-substring-no-properties (point-min) (point-max)))
      )
    ;; (org-md-export-as-markdown nil t)
+   (concat outline "
+
+" content)
    )
  )
 )

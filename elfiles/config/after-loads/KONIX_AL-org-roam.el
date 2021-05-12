@@ -67,6 +67,19 @@ ${title}
 
 (org-roam-mode 1)
 
+(defun konix/org-roam/backlinks-list (file)
+  (remove-duplicates
+   (-intersection
+    (-union
+     (mapcar #'car (org-roam--get-backlinks file))
+     (mapcar #'car (mapcan #'org-roam--get-backlinks (mapcar #'cdr (org-roam--extract-refs))))
+     )
+    (konix/org-roam-export/exported-files "")
+    )
+   :test #'string-equal
+   )
+  )
+
 (defun konix/org-roam-get-note ()
   (save-excursion
     (or

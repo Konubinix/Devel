@@ -27,6 +27,7 @@ settings:
         zf: spawn -u konix_qutebrowser_open_with_firefox.sh
   content.geolocation:
     https://eu.docusign.net: false
+    https://www.google.com: false
     https://www.myedenred.fr: false
   content.media.audio_capture:
     https://coremeet.workadventu.re: true

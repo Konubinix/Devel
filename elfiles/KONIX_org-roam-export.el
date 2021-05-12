@@ -178,18 +178,6 @@
   (message "Everyting was exported")
   )
 
-(defun konix/org-roam-export/backlinks-list (file)
-  (remove-duplicates
-   (-intersection
-    (-union
-     (mapcar #'car (org-roam--get-backlinks file))
-     (mapcar #'car (mapcan #'org-roam--get-backlinks (mapcar #'cdr (org-roam--extract-refs))))
-     )
-    (konix/org-roam-export/exported-files "")
-    )
-   :test #'string-equal
-   )
-  )
 
 (defun konix/org-roam-export/extract-kind (&optional filename)
   (or
@@ -557,7 +545,7 @@
                             )
                            )
                          )
-                       (konix/org-roam-export/backlinks-list (buffer-file-name))
+                       (konix/org-roam/backlinks-list (buffer-file-name))
                        )
                       )
                      )

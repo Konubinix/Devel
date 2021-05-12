@@ -11,7 +11,7 @@ F:--registry/--no-registry:Also connect to local registry:True
 F:--debug/--no-debug:Enable set -x
 O:--port:str:Extra port
 O:--private-registry-file:str:Location of a private registry file to merge with the default one
-F:--cert-manager:Install the cert-manager:True
+F:--cert-manager/--no-cert-manager:Install the cert-manager:True
 N:Remaining args to give to k3d cluster create
 EOF
 }

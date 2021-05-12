@@ -36,6 +36,7 @@
 (setq-default org-roam-directory (expand-file-name "roam" perso-dir))
 (setq-default org-roam-prefer-id-links t)
 (setq-default org-roam-completion-everywhere t)
+(setq-default org-roam-db-update-idle-seconds (* 60 10))
 
 (define-key org-roam-mode-map (kbd "C-c n l") #'org-roam)
 (define-key org-roam-mode-map (kbd "C-c n n") #'nroam-mode)

@@ -648,11 +648,10 @@ Return added key."
             (buffer-substring-no-properties beg end)
             )
           )
-         (filename (format "%s.org" (expand-file-name (org-roam--title-to-slug heading) org-roam-directory)))
          (buffer (save-window-excursion
                    (or
                     (org-roam--find-ref url-without-type)
-                    (find-file filename)
+                    (find-file (format "%s.org" (expand-file-name (org-roam--title-to-slug heading) org-roam-directory)))
                     )
                    (current-buffer)
                    ))

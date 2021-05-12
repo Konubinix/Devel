@@ -788,7 +788,7 @@ def slack():
 
 
 def message_handle(message):
-    for user in config.slack.users.values():
+    for user in config.slack.users.hosted_users.values():
         message = message.replace("@" + user.name, "<@{}>".format(user.id))
     return message
 

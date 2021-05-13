@@ -727,5 +727,49 @@ Return added key."
 ;; database show the links in the transcluded parts also
 (advice-add 'org-roam--extract-links :before 'konix/org-roam-export/load-transclusion)
 
+(defun konix/org-roam-force-filename ()
+  (interactive)
+  (when (konix/org-roam-is-in-roam-p)
+    (let (
+          (org-roam-db-update-method 'immediate)
+          )
+      (org-roam-db-update)
+      )
+    (let* (
+           (buffer (current-buffer))
+           (file (buffer-file-name (buffer-base-buffer)))
+           (directory (file-name-directory file))
+           (file-name (file-name-nondirectory file))
+           (backlinks (konix/org-roam/backlinks-list file))
+           (new-title (car (org-roam--extract-titles)))
+           (new-slug (funcall org-roam-title-to-slug-function new-title))
+           (new-file-name (format "%s.org" new-slug))
+           (new-file-path (expand-file-name new-file-name directory))
+           )
+      (if (string= new-file-name file-name)
+          (org-roam-message "File already stable %S" (abbreviate-file-name new-file-name))
+        (progn
+          (rename-file file-name new-file-path)
+          (find-file new-file-path)
+          (mapc (lambda (file)
+                  (save-window-excursion
+                    (find-file file)
+                    (set-buffer-modified-p t)
+                    )
+                  )
+                backlinks
+                )
+          (org-roam-message "File moved to %S" (abbreviate-file-name
+                                                new-file-name))
+          (kill-buffer buffer)
+          )
+        )
+      )
+    )
+  )
+
+;; it breaks the links, prefer using konix/org-roam-force-filename
+(setq-default org-roam-rename-file-on-title-change nil)
+
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

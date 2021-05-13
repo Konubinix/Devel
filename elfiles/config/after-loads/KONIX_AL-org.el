@@ -3338,6 +3338,7 @@ of the clocksum."
         )
     (org-babel-tangle)
     )
+  (konix/org-guess-ispell)
   )
 
 (defun konix/org-mode-hook()

@@ -53,6 +53,17 @@
     )
   )
 
+(defun konix/dired-git-annex-find-done ()
+  (interactive)
+  (let (
+        (find-program "konix_git_annex_find_done.sh")
+        (find-ls-option '("" . ""))
+        )
+    (find-dired "." "")
+    (rename-buffer (generate-new-buffer-name "git annex find done"))
+    )
+  )
+
 (defun konix/dired-git-annex-find-todo ()
   (interactive)
   (let (

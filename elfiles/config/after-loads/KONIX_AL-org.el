@@ -2053,7 +2053,7 @@ items"
                                '(
                                  "no_monthly"
                                  "phantom"
-                                 "habit"
+                                 "C_me"
                                  "maybe"
                                  ))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)

@@ -748,7 +748,10 @@ Return added key."
            )
       (if (string= new-file-name file-name)
           (org-roam-message "File already stable %S" (abbreviate-file-name new-file-name))
-        (progn
+        (when (or
+               (not (file-exists-p new-file-path))
+               (yes-or-no-p "Destination already exist, rename anyway?")
+               )
           (rename-file file-name new-file-path)
           (find-file new-file-path)
           (mapc (lambda (file)

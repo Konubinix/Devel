@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: new-file-tpl-rust
+# key: new
+# --
+#!/usr/bin/env run-cargo-script
+
+${100:!fn main() \{
+   $0
+\}
+}

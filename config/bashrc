@@ -146,6 +146,11 @@ then
     source "$(which virtualenvwrapper_lazy.sh)"
 fi
 
+if [ -e "$HOME/.cargo/env" ]
+then
+    source "$HOME/.cargo/env"
+fi
+
 [[ -s "${HOME}/.autojump/etc/profile.d/autojump.sh" ]] && source "${HOME}/.autojump/etc/profile.d/autojump.sh"
 [[ -s "/usr/share/autojump/autojump.bash" ]] && source "/usr/share/autojump/autojump.bash"
 if which starship > /dev/null

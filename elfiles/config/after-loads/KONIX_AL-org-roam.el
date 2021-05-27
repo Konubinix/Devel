@@ -765,6 +765,11 @@ Return added key."
           (org-roam-message "File moved to %S" (abbreviate-file-name
                                                 new-file-name))
           (kill-buffer buffer)
+          (let (
+                (org-roam-db-update-method 'immediate)
+                )
+            (org-roam-db-update)
+            )
           )
         )
       )

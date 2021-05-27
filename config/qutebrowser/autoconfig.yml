@@ -39,6 +39,7 @@ settings:
     https://meet.google.com: true
     https://play.workadventu.re: true
     https://teams.microsoft.com: true
+    https://zoom.us: true
   content.media.video_capture:
     https://coremeet.workadventu.re: true
     https://meet.google.com: true

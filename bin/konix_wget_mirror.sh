@@ -5,6 +5,7 @@ wget \
     --adjust-extension \
     --reject=*robots.txt \
     --no-iri \
+    --no-parent \
     --restrict-file-names=windows \
     --page-requisites \
     --mirror \

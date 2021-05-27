@@ -42,12 +42,17 @@
       (erase-buffer)
       (let ((coding-system-for-read konix/notmuch-draft-conversion))
         (call-process notmuch-command nil t nil "show" "--format=raw" id))
-      (mime-to-mml)
+      (goto-char (point-min))
+      (let ((mail-parse-charset konix/notmuch-draft-conversion))
+        (mime-to-mml)
+        )
+      ;; I don't know why it is encoded in latin-1
+      (recode-region (point-min) (point-max) 'latin-1 'utf-8)
       (goto-char (point-min))
       (unless (save-excursion (re-search-forward mail-header-separator nil t))
-       (when (re-search-forward "^$" nil t)
-         (replace-match mail-header-separator t t))
-       )
+        (when (re-search-forward "^$" nil t)
+          (replace-match mail-header-separator t t))
+        )
       ;; Remove the Date and Message-ID headers (unless the user has
       ;; explicitly customized emacs to tell us not to) as they will
       ;; be replaced when the message is sent.

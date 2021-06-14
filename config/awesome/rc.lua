@@ -59,6 +59,9 @@ beautiful.init(gears.filesystem.get_configuration_dir() .. "themes/default/theme
 
 -- This is used later as the default terminal and editor to run.
 terminal = "x-terminal-emulator"
+terminal = "terminator"
+terminal_class = "X-terminal-emulator"
+terminal_class = "Terminator"
 browser = os.getenv("BROWSER") or "x-www-browser"
 editor = os.getenv("EDITOR") or "editor"
 editor_cmd = terminal .. " -e " .. editor
@@ -504,11 +507,14 @@ globalkeys = gears.table.join(
    awful.key({ modkey,           },
       "Return",
       open_or_join(
-		 "X-terminal-emulator",
-		 terminal
+	 terminal_class,
+	 terminal
       ),
       {description = "open a terminal", group = "launcher"}),
-   awful.key({ modkey, "Control"          }, "t", open_or_join("X-terminal-emulator", terminal),
+   awful.key({ modkey, "Control"          }, "t", open_or_join(
+	 terminal_class,
+	 terminal
+							      ),
       {description = "open a terminal", group = "launcher"}),
    awful.key({ modkey, "Control" }, "r", awesome.restart,
       {description = "reload awesome", group = "awesome"}),
@@ -1055,7 +1061,7 @@ awful.rules.rules = {
    },
    {
       rule_any = {
-         class = {"x-terminal-emulator", "qutebrowser", "Chromium"}
+         class = {terminal, "qutebrowser", "Chromium"}
       },
       properties = {
          tag = "1"

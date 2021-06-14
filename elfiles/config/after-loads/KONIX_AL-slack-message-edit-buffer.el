@@ -36,6 +36,7 @@
                  )
                electric-pair-pairs)
               )
+  (konix/slack-message-setup-keys slack-message-edit-buffer-mode-map)
   )
 
 (add-hook 'slack-message-edit-buffer-mode-hook

@@ -5350,10 +5350,24 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   (re-search-forward " [[] []] " (org-entry-end-position) t)
   )
 
+(defun konix/org-next-visible-heading-and-center nil
+  (interactive)
+  (call-interactively 'org-next-visible-heading)
+  (recenter-top-bottom 0)
+  )
+
+(defun konix/org-previous-visible-heading-and-center nil
+  (interactive)
+  (call-interactively 'org-previous-visible-heading)
+  (recenter-top-bottom 0)
+  )
+
 (setq-default
  org-speed-commands-user
  '(("Outline Navigation")
    ("P" . konix/org-toggle-project)
+   ("n" . konix/org-next-visible-heading-and-center)
+   ("p" . konix/org-previous-visible-heading-and-center)
    ("G" . org-mark-ring-goto)
    ("h" . hl-line-mode)
    (" " . org-next-visible-heading)

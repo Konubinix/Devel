@@ -111,3 +111,4 @@
 (depends-on "hyperbole")
 (depends-on "ivy-bibtex")
 (depends-on "org-ql")
+(depends-on "lsp-jedi")

@@ -43,8 +43,12 @@
                electric-pair-pairs)
               )
   (when (and
-         (executable-find "pyls")
+         (executable-find "jedi-language-server")
          )
+    (require 'lsp)
+    (require 'lsp-jedi)
+    (add-to-list 'lsp-disabled-clients 'pyls)
+    (add-to-list 'lsp-enabled-clients 'jedi)
     (lsp)
     )
   (setq ac-sources

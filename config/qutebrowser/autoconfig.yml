@@ -25,6 +25,8 @@ settings:
         ye: spawn -u konix_qutebrowser_edit_emacs.sh -c
         zc: spawn -u konix_qutebrowser_open_with_chromium.sh
         zf: spawn -u konix_qutebrowser_open_with_firefox.sh
+  content.desktop_capture:
+    https://teams.microsoft.com: true
   content.geolocation:
     https://eu.docusign.net: false
     https://www.google.com: false

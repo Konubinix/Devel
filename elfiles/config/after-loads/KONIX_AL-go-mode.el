@@ -24,8 +24,11 @@
 
 ;;; Code:
 
+(require 'lsp-go)
+
 (defun konix/go-mode-hook ()
   (hs-minor-mode 1)
+  (lsp)
   )
 
 (add-hook 'go-mode-hook

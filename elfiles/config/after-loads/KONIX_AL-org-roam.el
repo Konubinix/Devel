@@ -650,6 +650,8 @@ Return added key."
           )
          (buffer (save-window-excursion
                    (or
+                    (and current-prefix-arg
+                         (org-roam-find-file))
                     (org-roam--find-ref url-without-type)
                     (find-file (format "%s.org" (expand-file-name (org-roam--title-to-slug heading) org-roam-directory)))
                     )
@@ -778,6 +780,7 @@ Return added key."
 
 ;; it breaks the links, prefer using konix/org-roam-force-filename
 (setq-default org-roam-rename-file-on-title-change nil)
+
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

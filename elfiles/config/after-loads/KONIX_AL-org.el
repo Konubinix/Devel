@@ -2930,7 +2930,7 @@ items"
 ;; DELEGATED: Someone will do this task but I am still responsible for it
 (setq-default org-todo-keywords
               '(
-                (sequence "TODO(t!)" "NEXT(n!)" "|" "DONE(d!)" "NOT_DONE(u@/!)")
+                (sequence "TODO(t!)" "NEXT(n!)" "|" "DONE(d!)" "NOT_DONE(u!)")
                 )
               )
 

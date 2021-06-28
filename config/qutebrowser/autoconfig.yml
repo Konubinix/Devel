@@ -49,8 +49,10 @@ settings:
     https://teams.microsoft.com: true
   content.notifications:
     https://calendar.google.com: false
+    https://fr.aliexpress.com: false
     https://meet.google.com: false
     https://play.workadventu.re: false
+    https://www.infoworld.com: false
     https://www.reddit.com: false
   content.register_protocol_handler:
     https://calendar.google.com?cid=%25s: false

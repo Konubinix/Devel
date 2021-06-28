@@ -48,7 +48,6 @@
     (require 'lsp)
     (require 'lsp-jedi)
     (add-to-list 'lsp-disabled-clients 'pyls)
-    (add-to-list 'lsp-enabled-clients 'jedi)
     (lsp)
     )
   (setq ac-sources

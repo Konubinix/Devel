@@ -179,7 +179,7 @@ This uses `org-read-date', which see."
             (error "Aborted and reset the twin")
             )
           (when (not (string-equal twin-account account))
-            (if (string-equal twin-account "wtf")
+            (if (string-equal twin-account "Unknown")
                 (konix/ledger-replace-transaction-at-point account)
               (error "Cannot match twins %s vs %s" account twin-account)
               )

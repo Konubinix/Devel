@@ -70,25 +70,25 @@ register \
 [[ledger-mode-flags]] \
 register \
 --limit 'date <= today' \
-^wtf or \\( not %twin and \\( :Virtual:Temp or :Virtual:Health or :Virtual:Auto \\) and not Lasting \\)")
+^Unknown or \\( not %twin and \\( :Virtual:Temp or :Virtual:Health or :Virtual:Auto \\) and not Lasting \\)")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("wtf"
+ '("Unknown"
    "ledger -f %(ledger-file) \
 [[ledger-mode-flags]] \
 register \
- wtf")
+ Unknown")
  )
 
 (konix/push-or-replace-assoc-in-alist
  'ledger-reports
- '("wtf with justif"
+ '("Unknown with justif"
    "ledger -f %(ledger-file) \
 [[ledger-mode-flags]] \
 register \
-\\( wtf and %justif \\)"
+\\( Unknown and %justif \\)"
    )
  )
 

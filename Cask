@@ -113,3 +113,4 @@
 (depends-on "org-ql")
 (depends-on "lsp-jedi")
 (depends-on "go-dlv")
+(depends-on "dart-mode")

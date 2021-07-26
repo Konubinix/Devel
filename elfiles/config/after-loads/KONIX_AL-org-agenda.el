@@ -694,7 +694,7 @@
   ""
   )
 
-(defface konix/org-agenda-sundy-face
+(defface konix/org-agenda-sunday-face
   '(
 	(
 	 ((class color)
@@ -749,7 +749,7 @@
 	;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)
 	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
 	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
-    ("^.+Holiday.+$" 0 konix/org-agenda-holiday)
+    ("^.+Holiday.*$" 0 konix/org-agenda-holiday)
     ("^\\(DIARY:\\)" 1 konix/org-agenda-diary-face)
     ("^\\(PAUSE:\\)" 1 konix/org-agenda-pause-face)
     ("^.+\\(:@[a-zA-Z_-]+:\\).*$" 1 konix/org-agenda-context-face)
@@ -761,7 +761,7 @@
     ("^Thursday.+" 0 konix/org-agenda-thursday-face)
     ("^Friday.+" 0 konix/org-agenda-friday-face)
     ("^Saturday.+" 0 konix/org-agenda-saturday-face)
-    ("^Sunday.+" 0 konix/org-agenda-sundy-face)
+    ("^Sunday.+" 0 konix/org-agenda-sunday-face)
     ("^.+:maybe:.*$" 0 konix/org-agenda-maybe-face)
 	)
   "")

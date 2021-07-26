@@ -433,12 +433,22 @@
 	(
 	 ((class color)
 	  (background dark))
-	 (:background "DarkOliveGreen4")
+	 (:background "DarkOliveGreen4"
+                  :foreground "yellow"
+                  :weight bold
+                  :height 1.5
+                  :box (:line-width 2 :color "grey75" :style released-button)
+                  )
 	 )
 	(
 	 ((class color)
 	  (background light))
-	 (:background "DarkOliveGreen4")
+	 (:background "DarkOliveGreen4"
+                  :foreground "yellow"
+                  :weight bold
+                  :height 1.5
+                  :box (:line-width 2 :color "grey75" :style released-button)
+                  )
 	 )
 	)
   ""

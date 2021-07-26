@@ -3778,10 +3778,12 @@ of the clocksum."
       )
     )
   )
+
 (add-hook 'org-trigger-hook 'konix/org-trigger-hook)
 
 (defun konix/org-blocker-hook (change-plist)
-  (let* ((type (plist-get change-plist :type))
+  (let* (
+         (type (plist-get change-plist :type))
          (pos (plist-get change-plist :position))
          (from_value (or (plist-get change-plist :from) ""))
          (to_value (or (plist-get change-plist :to) ""))
@@ -3800,6 +3802,34 @@ of the clocksum."
                )
              )
          )
+    (when (and
+           (eq type 'todo-state-change)
+           (string= to "DONE")
+           )
+      (save-restriction
+        (save-excursion
+          (org-back-to-heading)
+          (org-show-subtree)
+          (mapc
+           (lambda (marker)
+             (save-window-excursion
+              (save-excursion
+                (goto-char (marker-position marker))
+                (pop-to-buffer (current-buffer))
+                (org-todo
+                 (completing-read
+                  (format "What to do with this '%s'?" (konix/org-get-heading))
+                  '("DONE" "NOT_DONE")
+                  )
+                 )
+                )
+              )
+             )
+           (konix/org-get-todo-children-markers-no-recursion)
+           )
+          )
+        )
+      )
     (if (and
          (eq type 'todo-state-change)
          (member to org-done-keywords)

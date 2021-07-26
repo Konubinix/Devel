@@ -30,6 +30,7 @@
   (hs-minor-mode 1)
   (lsp)
   (lsp-headerline-breadcrumb-mode)
+  (setq-default gofmt-command "goimports") ;; see https://pkg.go.dev/golang.org/x/tools/cmd/goimports
   (add-hook 'before-save-hook 'gofmt-before-save nil t)
   (add-hook 'after-save-hook 'konix/go/make-executable t t)
   )

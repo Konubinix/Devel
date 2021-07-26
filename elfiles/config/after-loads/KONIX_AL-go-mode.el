@@ -31,11 +31,21 @@
   (lsp)
   (lsp-headerline-breadcrumb-mode)
   (add-hook 'before-save-hook 'gofmt-before-save nil t)
+  (add-hook 'after-save-hook 'konix/go/make-executable t t)
   )
 
 (add-hook 'go-mode-hook
           'konix/go-mode-hook)
 
+
+(defun konix/go/make-executable ()
+  (when (save-excursion
+		  (goto-char (point-min))
+		  (re-search-forward "//usr/bin/go run $0 $@ ; exit" nil t)
+          )
+    (konix/make-executable)
+    )
+  )
 
 (provide 'KONIX_AL-go-mode)
 ;;; KONIX_AL-go-mode.el ends here

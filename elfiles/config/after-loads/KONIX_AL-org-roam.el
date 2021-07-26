@@ -58,6 +58,7 @@
 #+LANGUAGE: fr
 #+CREATED: %U
 #+DATE: %U
+#+ROAM_TAGS: \"fleeting note\"
 ${title}
 
 "
@@ -237,7 +238,7 @@ ${title}
 #+LANGUAGE: fr
 #+DATE: %s
 #+ROAM_KEY: %s
-#+ROAM_TAGS: \"litterature note\"
+#+ROAM_TAGS: \"fleeting note\"
 %s
 "
           decoded-title
@@ -691,7 +692,7 @@ Return added key."
           )
         (save-excursion
           (unless (re-search-forward "^#\\+ROAM_TAGS:" 3000 t)
-            (insert "#+ROAM_TAGS: \"litterature note\" \n")
+            (insert "#+ROAM_TAGS: \"fleeting note\" \n")
             )
           )
         (save-excursion

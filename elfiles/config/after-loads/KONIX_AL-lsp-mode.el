@@ -28,8 +28,10 @@
   ;; (when (require 'lsp-ui nil t)
   ;;   (lsp-ui-mode 1)
   ;;   )
-
   )
+
+(setq-default lsp-modeline-code-actions-segments '(count icon name))
+
 
 (add-hook 'lsp-mode-hook 'konix/lsp-mode-hook)
 

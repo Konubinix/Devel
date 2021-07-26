@@ -29,6 +29,7 @@
 (defun konix/go-mode-hook ()
   (hs-minor-mode 1)
   (lsp)
+  (lsp-headerline-breadcrumb-mode)
   (add-hook 'before-save-hook 'gofmt-before-save nil t)
   )
 

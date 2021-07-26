@@ -114,3 +114,4 @@
 (depends-on "lsp-jedi")
 (depends-on "go-dlv")
 (depends-on "dart-mode")
+(depends-on "yapfify")

@@ -24,11 +24,14 @@
 
 ;;; Code:
 
+(require 'yapfify)
+
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)
 (defun konix/python-mode-hook ()
   (setq tab-width 4)
   (konix/prog/config)
+  (yapf-mode)
   ;; fed up with auto line breaks
   (setq indent-tabs-mode nil)
   (setq-local yas-indent-line 'fixed)

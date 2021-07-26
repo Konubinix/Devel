@@ -49,7 +49,6 @@ from click_project.config import config
 from click_project.core import cache_disk
 from click_project.commands.password import set as password_set_command
 
-
 LOGGER = get_logger(__name__)
 
 db = redis.StrictRedis(decode_responses=True)
@@ -58,7 +57,9 @@ db = redis.StrictRedis(decode_responses=True)
 def get_slack_token():
     if config.slack.account is None:
         return None
-    values = get_authenticator(config.slack.account + "_slack_token", required=False, askpass=False)
+    values = get_authenticator(config.slack.account + "_slack_token",
+                               required=False,
+                               askpass=False)
     if values is not None:
         return values[1]
     else:
@@ -67,7 +68,8 @@ def get_slack_token():
 
 def parse_text(text):
     text = text.replace("{", "{{").replace("}", "}}")
-    text = re.sub("<@(?P<id>[^>|]+)([|][^>]+)?>", config.slack.users.formatter, text)
+    text = re.sub("<@(?P<id>[^>|]+)([|][^>]+)?>", config.slack.users.formatter,
+                  text)
     return text
 
 
@@ -85,13 +87,14 @@ class Message():
         data["text"] = parse_text(data["text"])
         self.date = datetime.datetime.fromtimestamp(float(data["ts"]))
         data["ts_str"] = "ts: " + data["ts"]
-        data["datetime"] = datetime.datetime.fromtimestamp(
-            float(data["ts"])).strftime("%Y-%m-%d %H:%M:%S")
+        data["datetime"] = datetime.datetime.fromtimestamp(float(
+            data["ts"])).strftime("%Y-%m-%d %H:%M:%S")
         self.data = data
 
     def __repr__(self):
-        return "<{} - {} - {}>".format(
-            self.data["datetime"], self.data["username"], self.data["text"])
+        return "<{} - {} - {}>".format(self.data["datetime"],
+                                       self.data["username"],
+                                       self.data["text"])
 
     def __lt__(self, o):
         return self.date < o.date
@@ -109,60 +112,33 @@ class Conversation():
         self.data["purpose_fmt"] = self.purpose_fmt
         self.data["name_fmt"] = self.name
         self.name_fmt = self.name
-        self.record_logs_dir = (
-            os.path.join(config.slack.records, config.slack.account, self.name)
-            if config.slack.records else None
-        )
-        self.recorded_messages = (
-            os.path.join(self.record_logs_dir, "messages.json")
-            if config.slack.records else None
-        )
-        self.last_record_file = (
-            os.path.join(self.record_logs_dir, ".oldest")
-            if config.slack.records else None
-        )
-        self.archived_file = (
-            os.path.join(self.record_logs_dir, ".archived")
-            if config.slack.records else None
-        )
+        self.record_logs_dir = (os.path.join(config.slack.records,
+                                             config.slack.account, self.name)
+                                if config.slack.records else None)
+        self.recorded_messages = (os.path.join(self.record_logs_dir,
+                                               "messages.json")
+                                  if config.slack.records else None)
+        self.last_record_file = (os.path.join(self.record_logs_dir, ".oldest")
+                                 if config.slack.records else None)
+        self.archived_file = (os.path.join(self.record_logs_dir, ".archived")
+                              if config.slack.records else None)
 
     @property
     def archived(self):
-        return (
-            self.archived_file is not None
-            and
-            os.path.exists(self.archived_file)
-        )
+        return (self.archived_file is not None
+                and os.path.exists(self.archived_file))
 
-    def records(self,
-                oldest=None, latest=None, user=None, count=100000):
-        if (
-                config.slack.records is None
-                or
-                not os.path.exists(self.recorded_messages)
-        ):
+    def records(self, oldest=None, latest=None, user=None, count=100000):
+        if (config.slack.records is None
+                or not os.path.exists(self.recorded_messages)):
             return []
         with open(self.recorded_messages, "r") as recordfile:
-            messages = [
-                Message(json.loads(line))
-                for line in recordfile
-            ]
+            messages = [Message(json.loads(line)) for line in recordfile]
             return [
                 m for m in messages
-                if (
-                        (
-                            oldest is None
-                            or oldest <= m.date
-                        )
-                        and (
-                            latest is None
-                            or m.date <= latest
-                        )
-                        and (
-                            user is None
-                            or m.get("user") == user.id
-                        )
-                )
+                if ((oldest is None or oldest <= m.date) and (
+                    latest is None or m.date <= latest) and (
+                        user is None or m.get("user") == user.id))
             ]
 
     def __eq__(self, other):
@@ -184,7 +160,9 @@ class Conversation():
     def members(self):
         @cache_disk(expire=36000)
         def _conversation_members(id, token):
-            return config.slack.client.conversations.members(id).body["members"]
+            return config.slack.client.conversations.members(
+                id).body["members"]
+
         return _conversation_members(self.id, config.slack.token)
 
     @property
@@ -203,19 +181,16 @@ class Conversation():
     def members_fmt(self):
         return ""
         return ", ".join(
-            builtins.sorted(
-                config.slack.users[u]["name"] for u in self.members
-            )
-        )
+            builtins.sorted(config.slack.users[u]["name"]
+                            for u in self.members))
 
     @property
     def purpose_fmt(self):
         return "'{}' mis par {} le {}".format(
             self.data["purpose"]["value"],
             config.slack.users[self.data["purpose"]["creator"]]["name"],
-            datetime.datetime.fromtimestamp(
-                self.data["purpose"]["last_set"]).strftime(
-                    "%Y-%m-%d %H:%M:%S"),
+            datetime.datetime.fromtimestamp(self.data["purpose"]["last_set"]).
+            strftime("%Y-%m-%d %H:%M:%S"),
         ) if self.data["purpose"]["creator"] else ""
 
     @property
@@ -224,8 +199,7 @@ class Conversation():
             self.data["topic"]["value"],
             config.slack.users[self.data["topic"]["creator"]]["name"],
             datetime.datetime.fromtimestamp(
-                self.data["topic"]["last_set"]).strftime(
-                    "%Y-%m-%d %H:%M:%S"),
+                self.data["topic"]["last_set"]).strftime("%Y-%m-%d %H:%M:%S"),
         ) if self.data["topic"]["creator"] else ""
 
     @property
@@ -243,15 +217,22 @@ class Conversation():
         self.endpoint.set_topic(self.id, topic)
 
     def history(self,
-                oldest=None, latest=None, user=None, count=1000,
-                record=False, combine=True, only_new=False,
+                oldest=None,
+                latest=None,
+                user=None,
+                count=1000,
+                record=False,
+                combine=True,
+                only_new=False,
                 with_subtypes=True):
         if isinstance(oldest, datetime.datetime):
             oldest = oldest.timestamp()
         if isinstance(latest, datetime.datetime):
             latest = latest.timestamp()
-        records = self.records(
-            oldest=oldest, latest=latest, user=user, count=count)
+        records = self.records(oldest=oldest,
+                               latest=latest,
+                               user=user,
+                               count=count)
         if record:
             hist = records
         else:
@@ -262,22 +243,22 @@ class Conversation():
                     oldest = records[-1].data["ts"]
             elif only_new:
                 oldest = records[-1].data["ts"] if records else None
-            hist_ = self._history(
-                oldest=oldest, latest=latest, user=user, count=count)
+            hist_ = self._history(oldest=oldest,
+                                  latest=latest,
+                                  user=user,
+                                  count=count)
             if combine and not only_new:
                 hist = records + hist_
             else:
                 hist = hist_
-        return [
-            m for m in hist
-            if with_subtypes or "subtype" not in m.data
-        ]
+        return [m for m in hist if with_subtypes or "subtype" not in m.data]
 
     def _history(self, oldest=None, latest=None, user=None, count=1000):
         def get_history_unpage(latest, oldest, count):
             remaining_count = count
             has_more = True
-            while (remaining_count is None or remaining_count > 0) and has_more is True:
+            while (remaining_count is None
+                   or remaining_count > 0) and has_more is True:
                 res = self.endpoint.history(
                     self.data["id"],
                     limit=remaining_count,
@@ -291,12 +272,10 @@ class Conversation():
                 has_more = res["has_more"]
                 if has_more:
                     latest = messages[-1]["ts"]
+
         return builtins.sorted([
-            Message(message)
-            for message in get_history_unpage(
-                    oldest=oldest, latest=latest,
-                    count=count
-            )
+            Message(message) for message in get_history_unpage(
+                oldest=oldest, latest=latest, count=count)
             if not user or message.get("user") == user.id
         ])
 
@@ -304,10 +283,11 @@ class Conversation():
         return "<{} - {}>".format(self.data["id"], self.name)
 
     def get_message(self, timestamp):
-        return Message(config.slack.client.reactions.get(
-            channel=self.id,
-            timestamp=timestamp,
-        ).body["message"])
+        return Message(
+            config.slack.client.reactions.get(
+                channel=self.id,
+                timestamp=timestamp,
+            ).body["message"])
 
     def delete_message(self, message):
         config.slack.client.chat.delete(
@@ -371,20 +351,19 @@ class Conversations():
     def list(self):
         @cache_disk(expire=36000)
         def _list(token, name):
-            return [
-                (self.endpoint, c)
-                for c in self.endpoint.list(types=[self.typ]).body[self.list_index]
-            ]
+            return [(self.endpoint, c) for c in self.endpoint.list(
+                types=[self.typ]).body[self.list_index]]
+
         return [
             self.cls(endpoint, c)
-            for (endpoint, c) in _list(config.slack.token,
-                                       self.__class__.__name__)
+            for (endpoint,
+                 c) in _list(config.slack.token, self.__class__.__name__)
         ]
 
     def get(self, id_or_name):
         return [
-            c for c in self.list() if c.id == id_or_name
-            or c.name == id_or_name
+            c for c in self.list()
+            if c.id == id_or_name or c.name == id_or_name
         ][0]
 
 
@@ -428,7 +407,8 @@ class User():
     def __init__(self, data):
         self.data = data
         data["real_name"] = data.get("real_name", data["name"])
-        data["display_name"] = data["profile"].get("display_name", data["name"])
+        data["display_name"] = data["profile"].get("display_name",
+                                                   data["name"])
         self.id = data["id"]
         self.name = data["name"]
         self.email = data["profile"].get("email")
@@ -497,54 +477,32 @@ class RTM():
         return res
 
     async def listen(
-            self,
-            conversations=None,
-            types=None,
-            subtypes=None,
-            user=None,
+        self,
+        conversations=None,
+        types=None,
+        subtypes=None,
+        user=None,
     ):
         while True:
             chunk = await self.read()
-            if (
-                    (
-                        not conversations
-                        or chunk.get("channel") in [
-                            conversation.id
-                            for conversation in conversations
-                        ]
-                        or chunk.get("item", {}).get("channel") in [
-                            conversation.id
-                            for conversation in conversations
-                        ]
-                    )
-                    and
-                    (
-                        not types
-                        or chunk["type"] in types
-                    )
-                    and
-                    (
-                        not subtypes
-                        or chunk.get("subtype") in subtypes
-                    )
-                    and
-                    (
-                        not user
-                        or chunk.get("user") == user.id
-                    )
-            ):
+            if ((not conversations or chunk.get("channel")
+                 in [conversation.id for conversation in conversations]
+                 or chunk.get("item", {}).get("channel")
+                 in [conversation.id for conversation in conversations])
+                    and (not types or chunk["type"] in types)
+                    and (not subtypes or chunk.get("subtype") in subtypes)
+                    and (not user or chunk.get("user") == user.id)):
                 if "user" in chunk:
-                    chunk["username"] = config.slack.users[chunk["user"]]["name"]
+                    chunk["username"] = config.slack.users[
+                        chunk["user"]]["name"]
                 if "item_user" in chunk:
                     chunk["item_username"] = (
-                        config.slack.users[chunk["item_user"]]["name"]
-                    )
+                        config.slack.users[chunk["item_user"]]["name"])
                 if "text" in chunk:
                     chunk["parsed_text"] = parse_text(chunk["text"])
                 if "channel" in chunk:
-                    chunk["channelname"] = (
-                        config.slack.get_conversation(chunk["channel"]).name
-                    )
+                    chunk["channelname"] = (config.slack.get_conversation(
+                        chunk["channel"]).name)
                 yield chunk
 
 
@@ -560,7 +518,11 @@ class Users:
                 user
                 for user in slackconfig.client.users.list().body["members"]
             ]
-        self.hosted_users = {user["id"]: User(user) for user in hosted_users(slackconfig.token)}
+
+        self.hosted_users = {
+            user["id"]: User(user)
+            for user in hosted_users(slackconfig.token)
+        }
         self.slackconfig = slackconfig
 
     def formatter(self, match):
@@ -573,8 +535,8 @@ class Users:
                 return self.hosted_users[key]
             else:
                 return User(
-                    self.slackconfig.client.users.info(key).body["user"]
-                )
+                    self.slackconfig.client.users.info(key).body["user"])
+
         return get_user(key)
 
 
@@ -601,10 +563,10 @@ class SlackConfig():
                     self._rtm = RTM(self.client.rtm)
                 except HTTPError as e:
                     if e.response.status_code == 429:
-                        wait_time = int(e.response.headers["Retry-After"]) * 1.2
-                        LOGGER.info(
-                            "Got a 429 response while getting the RTM."
-                            " Waiting for {}s".format(wait_time))
+                        wait_time = int(
+                            e.response.headers["Retry-After"]) * 1.2
+                        LOGGER.info("Got a 429 response while getting the RTM."
+                                    " Waiting for {}s".format(wait_time))
                         time.sleep(wait_time)
                     else:
                         raise
@@ -627,19 +589,14 @@ class SlackConfig():
         return {
             key: value
             for key, value in self.users.hosted_users.items()
-            if (
-                    not value.data.get("deleted")
-                    and not value.data.get("is_bot")
-                    and not value.data.get("real_name").lower() == "slackbot"
-            )
+            if (not value.data.get("deleted") and not value.data.get("is_bot")
+                and not value.data.get("real_name").lower() == "slackbot")
         }
 
     def get_user(self, name_or_id):
         return [
-            u
-            for u in self.users.values()
-            if u.data["name"] == name_or_id
-            or u.data["id"] == name_or_id
+            u for u in self.users.values()
+            if u.data["name"] == name_or_id or u.data["id"] == name_or_id
         ][0]
 
     def get_conversation(self, id_or_name):
@@ -650,66 +607,47 @@ class SlackConfig():
 
     @property
     def groups(self):
-        return [
-            c for c in self.conversations.values()
-            if isinstance(c, Group)
-        ]
+        return [c for c in self.conversations.values() if isinstance(c, Group)]
 
     @property
     def channels(self):
         return [
-            c for c in self.conversations.values()
-            if isinstance(c, Channel)
+            c for c in self.conversations.values() if isinstance(c, Channel)
         ]
 
     @property
     def ims(self):
-        return [
-            c for c in self.conversations.values()
-            if isinstance(c, IM)
-        ]
+        return [c for c in self.conversations.values() if isinstance(c, IM)]
 
     @property
     def pm(self):
-        return [
-            c for c in self.conversations.values()
-            if isinstance(c, MP)
-        ]
+        return [c for c in self.conversations.values() if isinstance(c, MP)]
 
     @property
     def all_conversations(self):
         return {
             c.id: c
-            for c in Groups().list()
-            + Channels().list()
-            + IMS().list()
-            + MPIM().list()
+            for c in Groups().list() + Channels().list() + IMS().list() +
+            MPIM().list()
         }
 
     @property
     def conversations(self):
         return {
             k: v
-            for k, v in self.all_conversations.items()
-            if not v.archived
+            for k, v in self.all_conversations.items() if not v.archived
         }
 
     @property
     def archived_conversations(self):
-        return {
-            k: v
-            for k, v in self.all_conversations.items()
-            if v.archived
-        }
+        return {k: v for k, v in self.all_conversations.items() if v.archived}
 
 
 def find_user(value):
     return [
         user for user in config.slack.users.values()
-        if user.name == value
-        or (user.email and user.email == value)
-        or user["real_name"] == value
-        or user["display_name"] == value
+        if user.name == value or (user.email and user.email == value)
+        or user["real_name"] == value or user["display_name"] == value
     ][0]
 
 
@@ -717,8 +655,8 @@ class UserType(ParameterType):
     def complete(self, ctx, incomplete):
         return [
             user["name"] for user in config.slack.users.values()
-            if startswith(user.name, incomplete)
-            or (user.email and startswith(user.email, incomplete))
+            if startswith(user.name, incomplete) or (
+                user.email and startswith(user.email, incomplete))
             or startswith(user["real_name"], incomplete)
             or startswith(user["display_name"], incomplete)
         ]
@@ -751,15 +689,14 @@ class ConversationType(ParameterType):
     def convert(self, value, param, ctx):
         def fail():
             self.fail('%s is not a valid group name' % value, param, ctx)
+
         try:
-            return [
-                c for c in self.completer.values()
-                if c.name == value
-            ][0]
+            return [c for c in self.completer.values() if c.name == value][0]
         except IndexError as e:
             try:
                 user = find_user(value)
-                channel_id = config.slack.client.im.open(user.id).body["channel"]["id"]
+                channel_id = config.slack.client.im.open(
+                    user.id).body["channel"]["id"]
                 return IMS().get(channel_id)
             except IndexError:
                 fail()
@@ -768,19 +705,19 @@ class ConversationType(ParameterType):
 
 
 @group()
-@param_config(
-    "slack", "--account",
-    typ=SlackConfig,
-    required=True,
-    help="The authenticator key to use to get the token")
-@param_config(
-    "slack", "--token",
-    typ=SlackConfig,
-    default=get_slack_token,
-    required=True,
-    help="The token provided by slack")
-@param_config(
-    "slack", "--records", help="therecords")
+@param_config("slack",
+              "-a",
+              "--account",
+              typ=SlackConfig,
+              required=True,
+              help="The authenticator key to use to get the token")
+@param_config("slack",
+              "--token",
+              typ=SlackConfig,
+              default=get_slack_token,
+              required=True,
+              help="The token provided by slack")
+@param_config("slack", "--records", help="therecords")
 def slack():
     """Play with slack
 
@@ -811,8 +748,9 @@ def save_token():
 
 
 @slack.command()
-@argument("conversation", type=ConversationType(),
-        help="The conversation of interest")
+@argument("conversation",
+          type=ConversationType(),
+          help="The conversation of interest")
 @option("--reaction",
         multiple=True,
         help="Some reactions to put in it."
@@ -822,11 +760,8 @@ def save_token():
 @argument("message", help="The message to send", type=MessageType())
 def say(conversation, message, reaction, me, thread):
     """Post a message to this conversation"""
-    endpoint = (
-        config.slack.client.chat.me_message
-        if me
-        else config.slack.client.chat.post_message
-    )
+    endpoint = (config.slack.client.chat.me_message
+                if me else config.slack.client.chat.post_message)
     kwargs = {}
     if thread:
         kwargs["thread_ts"] = thread
@@ -843,10 +778,10 @@ slack.add_command(say, "post-message")
 
 
 @slack.command()
-@argument("conversation", type=ConversationType(),
+@argument("conversation",
+          type=ConversationType(),
           help="The conversation of interest")
-@argument("timestamp",
-          help="The timestamp of the message")
+@argument("timestamp", help="The timestamp of the message")
 def delete(conversation, timestamp):
     """Delete a message from this conversation"""
     config.slack.client.chat.delete(
@@ -856,10 +791,10 @@ def delete(conversation, timestamp):
 
 
 @slack.command()
-@argument("conversation", type=ConversationType(),
+@argument("conversation",
+          type=ConversationType(),
           help="The conversation of interest")
-@argument("text",
-          help="The text of the message")
+@argument("text", help="The text of the message")
 def me_message(conversation, text):
     """Delete a message from this conversation"""
     config.slack.client.chat.me_message(
@@ -869,45 +804,44 @@ def me_message(conversation, text):
 
 
 @slack.command()
-@table_fields(
-    choices=[
-        'id',
-        "name",
-        "real_name",
-        "email",
-        "deleted",
-        "is_bot",
-    ],
-    default=(
-        "id",
-        "name",
-        "email",
-    )
-)
+@table_fields(choices=[
+    'id',
+    "name",
+    "real_name",
+    "email",
+    "deleted",
+    "is_bot",
+],
+              default=(
+                  "id",
+                  "name",
+                  "email",
+              ))
 @table_format()
-@option("--missing-in", type=ConversationType(), help="Only those that are not there")
-@option("--in", "ins", type=ConversationType(), help="Only those that are there")
+@option("--missing-in",
+        type=ConversationType(),
+        help="Only those that are not there")
+@option("--in",
+        "ins",
+        type=ConversationType(),
+        help="Only those that are there")
 def users(fields, format, missing_in, ins):
     """Display the users"""
     users = config.slack.active_users
     if missing_in:
         keys = set(users) - set(missing_in.members)
-        users = {
-            key: users[key]
-            for key in keys
-        }
+        users = {key: users[key] for key in keys}
     if ins:
         keys = set(users).intersection(set(ins.members))
-        users = {
-            key: users[key]
-            for key in keys
-        }
+        users = {key: users[key] for key in keys}
     with TablePrinter(fields, format) as tp:
         tp.echo_records(u.data for u in users.values())
 
 
 @slack.command()
-@argument("conversation", type=ConversationType(), help="What conversation to spam")
+@argument("conversation",
+          type=ConversationType(),
+          help="What conversation to spam")
 @option("--but", type=UserType(), help="User not to spam", multiple=True)
 @argument("message", help="The message to send", type=MessageType())
 def spam(conversation, message, but):
@@ -917,10 +851,7 @@ def spam(conversation, message, but):
     but_id = set(user.id for user in but)
     members_id = set(conversation.members)
     keys = (users_id & members_id) - but_id
-    users = [
-        f"@{users[key].name}"
-        for key in keys
-    ]
+    users = [f"@{users[key].name}" for key in keys]
     message = f"""{", ".join(users)}: {message}"""
     message = message_handle(message)
     ctx = click.get_current_context()
@@ -928,78 +859,75 @@ def spam(conversation, message, but):
 
 
 @slack.command()
-@table_fields(
-    choices=[
-        'id',
-        "name_fmt",
-        "topic_fmt",
-        'created_date',
-        'creator_fmt',
-        'members_fmt',
-        'purpose_fmt',
-        'num_members',
-    ],
-    default=(
-        "name_fmt",
-        "creator_fmt",
-        "created_date",
-        "num_members",
-    )
-)
+@table_fields(choices=[
+    'id',
+    "name_fmt",
+    "topic_fmt",
+    'created_date',
+    'creator_fmt',
+    'members_fmt',
+    'purpose_fmt',
+    'num_members',
+],
+              default=(
+                  "name_fmt",
+                  "creator_fmt",
+                  "created_date",
+                  "num_members",
+              ))
 @table_format()
-@option("--type", type=click.Choice(["channels", "groups", "ims", "pmim"]),
+@option("--type",
+        type=click.Choice(["channels", "groups", "ims", "pmim"]),
         help="What kind of conversation to dump")
 @flag("--archived", help="Only archived ones")
 @flag("--all", help="All of them")
 def conversations(fields, format, type, archived, all):
     """Dump all conversations"""
     vs = [
-        v
-        for v in (
-                config.slack.archived_conversations if archived else
-                config.slack.all_conversations if all else
-                config.slack.conversations
-        ).values()
-        if not type or
-        (type == "channels" and isinstance(v, Channel)) or
-        (type == "groups" and isinstance(v, Group)) or
-        (type == "ims" and isinstance(v, IM)) or
-        (type == "pmim" and isinstance(v, MP))
+        v for v in (
+            config.slack.archived_conversations if archived else config.slack.
+            all_conversations if all else config.slack.conversations).values()
+        if not type or (type == "channels" and isinstance(v, Channel)) or (
+            type == "groups" and isinstance(v, Group)) or (
+                type == "ims" and isinstance(v, IM)) or (
+                    type == "pmim" and isinstance(v, MP))
     ]
     with TablePrinter(fields, format) as tp:
         tp.echo_records(vs)
 
 
 @slack.command()
-@table_fields(
-    choices=[
-        'datetime',
-        "username",
-        "text",
-        "type",
-        "ts_str",
-    ],
-    default=(
-        "ts_str",
-        'datetime',
-        "username",
-        "text",
-    )
-)
+@table_fields(choices=[
+    'datetime',
+    "username",
+    "text",
+    "type",
+    "ts_str",
+],
+              default=(
+                  "ts_str",
+                  'datetime',
+                  "username",
+                  "text",
+              ))
 @table_format()
-@argument("conversation", type=ConversationType(all=True),
+@argument("conversation",
+          type=ConversationType(all=True),
           help="The conversation to get the history from")
 @option("--oldest", help="The oldest timestamp to consider")
 @option("--latest", help="The latest timestamp to consider")
 @option("--count", help="The number of messages to show")
 @option("--user", type=UserType(), help="Show only messages from this user")
 @flag("--record", help="Dump records instead of the history")
-@flag("--combine/--no-combine", help="Combine records and history",
+@flag("--combine/--no-combine",
+      help="Combine records and history",
       default=True)
 @flag("--only-new", help="Show only new messages (not in the record)")
-@flag("--with-subtypes/--without-subtypes", help="Show the subtypes also", default=True)
-def history(fields, format, conversation, oldest, latest,
-            count, record, user, combine, only_new, with_subtypes):
+@flag("--with-subtypes/--without-subtypes",
+      help="Show the subtypes also",
+      default=True)
+def history(fields, format, conversation, oldest, latest, count, record, user,
+            combine, only_new, with_subtypes):
     """Show the history of messages from a conversation"""
     if oldest:
         cal = parsedatetime.Calendar()
@@ -1008,25 +936,31 @@ def history(fields, format, conversation, oldest, latest,
         cal = parsedatetime.Calendar()
         latest = cal.parseDT(latest)[0].strftime("%s")
     with TablePrinter(fields, format) as tp:
-        tp.echo_records(message.data for message in conversation.history(
-            oldest=oldest, latest=latest, user=user, count=count,
-            record=record, combine=combine, only_new=only_new,
-            with_subtypes=with_subtypes
-        ))
+        tp.echo_records(
+            message.data
+            for message in conversation.history(oldest=oldest,
+                                                latest=latest,
+                                                user=user,
+                                                count=count,
+                                                record=record,
+                                                combine=combine,
+                                                only_new=only_new,
+                                                with_subtypes=with_subtypes))
 
 
 @slack.command()
 @flag("--archived", help="Only archived ones")
 @flag("--all", help="All of them")
-@option("--count", type=int, default=100000, help="How many to record per conversation")
+@option("--count",
+        type=int,
+        default=100000,
+        help="How many to record per conversation")
 def record_log(archived, all, count):
     """Dump the records for archiving purpose."""
     LOGGER.info(f"## Dumping the logs for {config.slack.account}")
-    for c in (
-            config.slack.archived_conversations if archived else
-            config.slack.all_conversations if all else
-            config.slack.conversations
-    ).values():
+    for c in (config.slack.archived_conversations
+              if archived else config.slack.all_conversations
+              if all else config.slack.conversations).values():
         LOGGER.info("Dumping history of {}".format(c.data["name_fmt"]))
         makedirs(c.record_logs_dir)
         with open(c.recorded_messages, "a", encoding="utf-8") as message_file:
@@ -1041,10 +975,18 @@ def rtm():
 
 
 @rtm.command()
-@argument("conversations", type=ConversationType(), nargs=-1,
+@argument("conversations",
+          type=ConversationType(),
+          nargs=-1,
           help="The conversation to listen to")
-@option("--type", "types", multiple=True, help="The type of message to let through")
-@option("--subtype", "subtypes", multiple=True, help="The sub-type of message to let through")
+@option("--type",
+        "types",
+        multiple=True,
+        help="The type of message to let through")
+@option("--subtype",
+        "subtypes",
+        multiple=True,
+        help="The sub-type of message to let through")
 @option("--user", type=UserType(), help="Show only messages from this user")
 @option("--field", "fields", multiple=True, help="Show only this field")
 def listen(conversations, types, user, fields, subtypes):
@@ -1068,20 +1010,23 @@ def listen(conversations, types, user, fields, subtypes):
             else:
                 pprint.pprint(message)
             sys.stdout.flush()
+
     async_get(do())
 
 
 if botlib is not None:
+
     def mess_encode(mess):
         return botlib.mess_encode(mess)
-
 
     def mess_decode(mess):
         return botlib.mess_decode(mess)
 
-
     @rtm.command()
-    @option("--conversation", "conversations", type=ConversationType(), multiple=True)
+    @option("--conversation",
+            "conversations",
+            type=ConversationType(),
+            multiple=True)
     @option("--type", "types", multiple=True)
     @option("--redis-host", default="localhost")
     @option("--redis-port", type=int, default=6379)
@@ -1092,27 +1037,24 @@ if botlib is not None:
                   channel_from, redis_host, redis_port):
         _listen = config.slack.rtm.listen
 
-        redis_connection = botlib.ChanToRedis(
-            redis_host, redis_port,
-            channel_from, channel_to, channel_control
-        )
+        redis_connection = botlib.ChanToRedis(redis_host, redis_port,
+                                              channel_from, channel_to,
+                                              channel_control)
         el = asyncio.get_event_loop()
 
         async def slack_listen():
-            async for message in _listen(
-                    conversations=conversations,
-                    types=types
-            ):
+            async for message in _listen(conversations=conversations,
+                                         types=types):
+
                 def fixup_message(message):
                     if "channel" in message:
                         message["mucroom"] = config.slack.get_conversation(
-                            message["channel"]
-                        ).name
+                            message["channel"]).name
                     if "user" in message:
                         message["username"] = config.slack.get_user(
-                            message["user"]
-                        ).name
+                            message["user"]).name
                     message["body"] = message.get("text", "")
+
                 try:
                     fixup_message(message)
                 except:
@@ -1127,7 +1069,8 @@ if botlib is not None:
         async def redis_listen():
             async for message in redis_connection.listen():
                 if "channel" not in message and "mucroom" in message:
-                    message["channel"] = config.slack.get_conversation(message["mucroom"]).id
+                    message["channel"] = config.slack.get_conversation(
+                        message["mucroom"]).id
                 if "text" not in message and "body" in message:
                     message["text"] = message["body"]
                 if "type" not in message:
@@ -1141,14 +1084,16 @@ if botlib is not None:
 
 
 @rtm.command()
-@option("--conversation", type=ConversationType(),
+@option("--conversation",
+        type=ConversationType(),
         help="The conversation of interest")
 @option("--reaction",
         multiple=True,
         help="Some reactions to put in it."
         " Implies --wait-server-response")
 @argument("message", help="The message to send", type=MessageType())
-@flag("--wait-server-response/--no-wait-server-response", default=True,
+@flag("--wait-server-response/--no-wait-server-response",
+      default=True,
       help="Wait for the server to acknowledge the message")
 def send(conversation, message, reaction, wait_server_response):
     return _send(conversation, message, reaction, wait_server_response)
@@ -1158,14 +1103,11 @@ def _send(conversation, message, reaction, wait_server_response):
     """Send a message to this conversation"""
     wait_server_response = reaction or wait_server_response
     async_get(
-        config.slack.rtm.write(
-            {
-                "type": "message",
-                "channel": conversation.id,
-                "text": message,
-            }
-        )
-    )
+        config.slack.rtm.write({
+            "type": "message",
+            "channel": conversation.id,
+            "text": message,
+        }))
     response = None
     if wait_server_response:
         LOGGER.info("Message sent, waiting for server response")
@@ -1206,27 +1148,29 @@ def create_group(name):
 
 
 @slack.command()
-@option("--user", "users", type=UserType(), multiple=True,
+@option("--user",
+        "users",
+        type=UserType(),
+        multiple=True,
         help="Invite those users")
-@option("--all-but-user", "all_but_users", type=UserType(), multiple=True,
+@option("--all-but-user",
+        "all_but_users",
+        type=UserType(),
+        multiple=True,
         help="Don't invite those users")
 @flag("--all")
 @flag("--only-active-users/--also-inactive-users",
       default=True,
       help="Invite only the really active users")
 @argument("conversation", type=ConversationType(), help="The conversation")
-def invite_to_conversation(users, all, all_but_users, conversation, only_active_users):
+def invite_to_conversation(users, all, all_but_users, conversation,
+                           only_active_users):
     """Invite those users in the conversation"""
-    assert (
-        all or
-        (users and not all_but_users)
-        or (all_but_users and not users)
-    )
+    assert (all or (users and not all_but_users)
+            or (all_but_users and not users))
     users_to_invite = []
-    all_users = (
-        config.slack.active_users
-        if only_active_users else config.slack.users
-    )
+    all_users = (config.slack.active_users
+                 if only_active_users else config.slack.users)
     if users:
         users_to_invite = list(users)
     if all_but_users:
@@ -1236,8 +1180,7 @@ def invite_to_conversation(users, all, all_but_users, conversation, only_active_
         users_to_invite = all_users.values()
     # don't invite already present users
     users_to_invite = [
-        user
-        for user in users_to_invite
+        user for user in users_to_invite
         if user["id"] not in conversation.members
     ]
     for user in users_to_invite:
@@ -1256,10 +1199,16 @@ def invite_to_conversation(users, all, all_but_users, conversation, only_active_
         help="How much time for a conversation must be inactive"
         " to leave it (xYxMxD)",
         default="4M")
-@flag("--alone/--not-alone", default=True, help="Also leave groups where I am alone")
-@option("--keep", multiple=True, type=ConversationType(),
+@flag("--alone/--not-alone",
+      default=True,
+      help="Also leave groups where I am alone")
+@option("--keep",
+        multiple=True,
+        type=ConversationType(),
         help="Keep this conversation, even if it matches the criteria.")
-@flag("--ask/--dont-ask", default=True, help="Interactively ask for each conversation")
+@flag("--ask/--dont-ask",
+      default=True,
+      help="Interactively ask for each conversation")
 @flag("--with-subtypes/--without-subtypes", help="Show the subtypes also")
 def auto_archive(inactivity, alone, keep, ask, with_subtypes):
     """Leave groups and MPIM where nothing is expected to happen soon."""
@@ -1267,9 +1216,7 @@ def auto_archive(inactivity, alone, keep, ask, with_subtypes):
     time_dict = re.match(
         "^\s*((?P<years>\d+)\s*Y)?"
         "\s*((?P<months>\d+)\s*M?)?"
-        "\s*((?P<days>d\+)\s*D)?\s*$",
-        inactivity
-    ).groupdict()
+        "\s*((?P<days>d\+)\s*D)?\s*$", inactivity).groupdict()
     years = int(time_dict['years'] or "0")
     months = int(time_dict['months'] or "0")
     days = int(time_dict['days'] or "0") + 30 * months + 365 * years
@@ -1283,21 +1230,20 @@ def auto_archive(inactivity, alone, keep, ask, with_subtypes):
                 LOGGER.info(f"Empty conversation {conversation.name}")
                 yield conversation
             elif hist and (hist[-1].date + duration) < now:
-                LOGGER.info(f"Inactive conversation {conversation.name} ({hist[-1].date})")
+                LOGGER.info(
+                    f"Inactive conversation {conversation.name} ({hist[-1].date})"
+                )
                 yield conversation
-            elif not(hist):
+            elif not (hist):
                 LOGGER.info(f"Abandoned conversation {conversation.name}")
                 yield conversation
 
     for conversation in matching_conversations():
         if conversation in keep:
             LOGGER.info(f"Unconditionally keep {conversation.name}")
-        elif (
-                not ask
-                or click.confirm(
-                    f"Really archive {conversation.name} ({len(conversation.members)})\n(use --dont-ask to avoid asking this)?"
-                )
-        ):
+        elif (not ask or click.confirm(
+                f"Really archive {conversation.name} ({len(conversation.members)})\n(use --dont-ask to avoid asking this)?"
+        )):
             conversation.archive()
 
 
@@ -1325,7 +1271,8 @@ def create_im(user):
 
 
 @slack.command()
-@argument("conversation", type=ConversationType(),
+@argument("conversation",
+          type=ConversationType(),
           help="The conversation to scan")
 @argument("url", help="URL of the feed")
 @argument("title", help="Title of the feed")
@@ -1334,48 +1281,38 @@ def create_im(user):
 @argument("author-name", help="The name of the author of the feed")
 @argument("author-email", help="The email of the author")
 @argument("output-path", help="Where to put the RSS feed")
-def rss(conversation,
-        url,
-        author_name,
-        author_email,
-        title,
-        subtitle,
-        language,
-        output_path):
+def rss(conversation, url, author_name, author_email, title, subtitle,
+        language, output_path):
     """Export all the links of the conversation in a simple RSS feed"""
     from feedgen.feed import FeedGenerator
     from konix_time_helper import naive_to_local
     fg = FeedGenerator()
     fg.id(url)
     fg.title(title)
-    fg.author(
-        {
-            'name': author_name,
-            'email': author_email,
-        }
-    )
-    fg.link(
-        href=url,
-        rel='alternate'
-    )
+    fg.author({
+        'name': author_name,
+        'email': author_email,
+    })
+    fg.link(href=url, rel='alternate')
     if subtitle:
         fg.subtitle(subtitle)
     fg.language(language)
     for message in conversation.history():
-        match = re.search(
-            "^.*<(?P<url>[^>|]+)\|?(?P<title>[^>]+)?>.*$",
-            message.data["text"],
-            flags=re.MULTILINE
-        )
+        match = re.search("^.*<(?P<url>[^>|]+)\|?(?P<title>[^>]+)?>.*$",
+                          message.data["text"],
+                          flags=re.MULTILINE)
         if match is not None:
             fe = fg.add_entry()
             link = match.group("url")
             title = match.group("title") or link
-            date = naive_to_local(datetime.datetime.fromtimestamp(float(message.data["ts"])))
+            date = naive_to_local(
+                datetime.datetime.fromtimestamp(float(message.data["ts"])))
             description = message.data["text"]
             if "attachments" in message.data:
-                attachment = [a for a in message.data["attachments"] if
-                              a["title_link"] == link][0]
+                attachment = [
+                    a for a in message.data["attachments"]
+                    if a["title_link"] == link
+                ][0]
                 title += " | " + attachment["title"]
                 description += """
 
@@ -1400,14 +1337,16 @@ class SlackReaction():
 
 @slack.group()
 @param_config(
-    "slack_reaction", "--conversation",
+    "slack_reaction",
+    "--conversation",
     typ=SlackReaction,
     required=True,
     type=ConversationType(),
     help="The conversation with the message to react on",
 )
 @param_config(
-    "slack_reaction", "--timestamp",
+    "slack_reaction",
+    "--timestamp",
     typ=SlackReaction,
     required=True,
     help="The timestamp of the message to react on",
@@ -1430,11 +1369,8 @@ def add(reaction):
 
 def reaction_handle(reaction):
     return {
-        **reaction,
-        "users_txt": [
-            config.slack.users[u]["display_name"]
-            for u in reaction["users"]
-        ]
+        **reaction, "users_txt":
+        [config.slack.users[u]["display_name"] for u in reaction["users"]]
     }
 
 
@@ -1450,23 +1386,19 @@ class MessageReactionType(ParameterType):
         ]
 
     def complete(self, ctx, incomplete):
-        return [
-            reaction["name"]
-            for reaction in self.list()
-        ]
+        return [reaction["name"] for reaction in self.list()]
 
     def convert(self, value, param, ctx):
         try:
-            return [
-                reaction["name"]
-                for reaction in self.list()
-            ][0]
+            return [reaction["name"] for reaction in self.list()][0]
         except (ValueError, UnicodeError):
             self.fail('%s is not a valid user name' % value, param, ctx)
 
 
 @reaction.command()
-@argument("reaction", nargs=-1, help="The reaction to remove",
+@argument("reaction",
+          nargs=-1,
+          help="The reaction to remove",
           type=MessageReactionType())
 def remove(reaction):
     """Remove a reaction from this message"""
@@ -1484,8 +1416,7 @@ def remove(reaction):
         "name",
         "users_txt",
         "count",
-    ],
-)
+    ], )
 @table_format()
 def show(fields, format):
     """Remove a reaction from this message"""
@@ -1498,22 +1429,20 @@ def show(fields, format):
     with TablePrinter(fields, format) as tp:
         tp.echo_records(
             sorted(
-                sorted(
-                    map(reaction_handle, reactions),
-                    key=lambda e: e["name"]
-                ),
+                sorted(map(reaction_handle, reactions),
+                       key=lambda e: e["name"]),
                 key=lambda e: e["count"],
                 reverse=True,
-            )
-        )
+            ))
 
 
 @slack.command()
-@argument("conversation", type=ConversationType(),
+@argument("conversation",
+          type=ConversationType(),
           help="The conversation of interest")
-@argument("timestamp",
-          help="The timestamp of the message")
-@argument("text", required=False,
+@argument("timestamp", help="The timestamp of the message")
+@argument("text",
+          required=False,
           help="The text to use. If not given, an editor will be opened")
 def edit(conversation, timestamp, text):
     """Edit the text of a message"""
@@ -1532,7 +1461,8 @@ def edit(conversation, timestamp, text):
 @option("--result-timestamp",
         help="Where to show the results. "
         "In the original message if left empty.")
-@option("--ignore-reaction", multiple=True,
+@option("--ignore-reaction",
+        multiple=True,
         help="Ignore those reactions in the contest")
 def poll_update(result_timestamp, ignore_reaction):
     """Update the text of the message to indicate the winning emoji"""
@@ -1553,20 +1483,15 @@ def poll_update(result_timestamp, ignore_reaction):
     except ValueError:
         winner = """"no one yet" """
     else:
-        winners = [
-            r for r in reactions
-            if r["count"] == max_count
-        ]
+        winners = [r for r in reactions if r["count"] == max_count]
         if winners:
             if len(winners) > 3:
                 winner = "no clear winner yet. "
             else:
-                winner = " or ".join(
-                    [
-                        ":{}: ({})".format(winner["name"], winner["count"])
-                        for winner in winners
-                    ]
-                )
+                winner = " or ".join([
+                    ":{}: ({})".format(winner["name"], winner["count"])
+                    for winner in winners
+                ])
         else:
             winner = """"no one yet" """
     text = result_message["text"]
@@ -1587,7 +1512,8 @@ def poll_update(result_timestamp, ignore_reaction):
 @option("--result-timestamp",
         help="Where to show the results. "
         "In the original message if left empty.")
-@option("--ignore-reaction", multiple=True,
+@option("--ignore-reaction",
+        multiple=True,
         help="Ignore those reactions in the contest")
 def poll_listen(result_timestamp, ignore_reaction):
     """Update the poll message when a reaction occurs"""
@@ -1599,9 +1525,10 @@ def poll_listen(result_timestamp, ignore_reaction):
                 conversations=[config.slack_reaction.conversation],
                 types=["reaction_added", "reaction_removed"],
                 user=None,
-                ):
+        ):
             if chunk["item"]["ts"] == config.slack_reaction.timestamp:
                 ctx.forward(poll_update)
+
     async_get(do())
 
 
@@ -1611,7 +1538,8 @@ class SlackPoll():
 
 @slack.group()
 @param_config(
-    "slack_poll", "--conversation",
+    "slack_poll",
+    "--conversation",
     typ=SlackPoll,
     required=True,
     type=ConversationType(),
@@ -1623,9 +1551,13 @@ def poll():
 
 @poll.command()
 @argument("question", help="The question to ask in the poll")
-@option("--choice", multiple=True, nargs=2,
+@option("--choice",
+        multiple=True,
+        nargs=2,
         help="The choice and the emoji to use")
-@option("--dummy-choice", multiple=True, nargs=2,
+@option("--dummy-choice",
+        multiple=True,
+        nargs=2,
         help="The dummy choice and the emoji to use"
         " (they won't be part of the poll)")
 def create(question, choice, dummy_choice):
@@ -1653,27 +1585,20 @@ def create(question, choice, dummy_choice):
         )
     db.set(
         "slack.poll.{}".format(config.slack_poll.conversation.id),
-        json.dumps(
-            {
-                "ts": response["ts"],
-                "assoc": {
-                    r: text
-                    for text, r in choice
-                },
-                "dummy_assoc": {
-                    r: text
-                    for text, r in dummy_choice
-                }
-            }
-        )
-    )
+        json.dumps({
+            "ts": response["ts"],
+            "assoc": {r: text
+                      for text, r in choice},
+            "dummy_assoc": {r: text
+                            for text, r in dummy_choice}
+        }))
 
 
 @poll.command()
 def update():
     """Update the poll message"""
-    info = json.loads(db.get("slack.poll.{}".format(
-        config.slack_poll.conversation.id)))
+    info = json.loads(
+        db.get("slack.poll.{}".format(config.slack_poll.conversation.id)))
     message = config.slack.client.reactions.get(
         channel=config.slack_poll.conversation.id,
         timestamp=info["ts"],
@@ -1687,20 +1612,13 @@ def update():
     except ValueError:
         winner = """"no one yet" """
     else:
-        winners = [
-            r for r in reactions
-            if r["count"] == max_count
-        ]
+        winners = [r for r in reactions if r["count"] == max_count]
         if winners:
             if len(winners) > 3:
                 winner = "no clear winner yet. "
             else:
                 winner = " or ".join(
-                    [
-                        info["assoc"][winner["name"]]
-                        for winner in winners
-                    ]
-                )
+                    [info["assoc"][winner["name"]] for winner in winners])
         else:
             winner = """"no one yet" """
     text = message["text"]
@@ -1720,8 +1638,8 @@ def update():
 @poll.command()
 def _listen():
     """Update the poll message when a reaction occurs"""
-    info = json.loads(db.get("slack.poll.{}".format(
-        config.slack_poll.conversation.id)))
+    info = json.loads(
+        db.get("slack.poll.{}".format(config.slack_poll.conversation.id)))
     ctx = click.get_current_context()
     _listen = config.slack.rtm.listen
 
@@ -1730,54 +1648,47 @@ def _listen():
                 conversations=[config.slack_poll.conversation],
                 types=["reaction_added", "reaction_removed"],
                 user=None,
-                ):
+        ):
             if chunk["item"]["ts"] == info["ts"]:
                 ctx.invoke(update)
+
     async_get(do())
 
 
 @poll.command()
 def _clean():
-    info = json.loads(db.get("slack.poll.{}".format(
-        config.slack_poll.conversation.id)))
+    info = json.loads(
+        db.get("slack.poll.{}".format(config.slack_poll.conversation.id)))
     config.slack.client.chat.delete(
         config.slack_poll.conversation.id,
         info["ts"],
     )
-    db.delete("slack.poll.{}".format(
-        config.slack_poll.conversation.id))
+    db.delete("slack.poll.{}".format(config.slack_poll.conversation.id))
 
 
 @poll.command()
 def _exists():
-    has_entry_in_db = db.get(
-        "slack.poll.{}".format(config.slack_poll.conversation.id)
-    )
+    has_entry_in_db = db.get("slack.poll.{}".format(
+        config.slack_poll.conversation.id))
     if has_entry_in_db is not None:
         entry = json.loads(has_entry_in_db)
         try:
-            message = config.slack_poll.conversation.get_message(
-                entry["ts"]
-            )
+            message = config.slack_poll.conversation.get_message(entry["ts"])
         except slacker.Error as e:
             if e.args[0] == "message_not_found":
-                db.delete(
-                    "slack.poll.{}".format(config.slack_poll.conversation.id)
-                )
+                db.delete("slack.poll.{}".format(
+                    config.slack_poll.conversation.id))
                 has_entry_in_db = None
             else:
                 raise
-    exit(
-        1 if (has_entry_in_db is None)
-        else 0
-    )
+    exit(1 if (has_entry_in_db is None) else 0)
 
 
 @poll.command()
 def _get():
     """Get the result of the poll"""
-    info = json.loads(db.get("slack.poll.{}".format(
-        config.slack_poll.conversation.id)))
+    info = json.loads(
+        db.get("slack.poll.{}".format(config.slack_poll.conversation.id)))
     message = config.slack.client.reactions.get(
         channel=config.slack_poll.conversation.id,
         timestamp=info["ts"],
@@ -1791,20 +1702,13 @@ def _get():
     except ValueError:
         winner = None
     else:
-        winners = [
-            r for r in reactions
-            if r["count"] == max_count
-        ]
+        winners = [r for r in reactions if r["count"] == max_count]
         if winners:
             if len(winners) > 3:
                 winner = "no clear winner yet. "
             else:
                 winner = " or ".join(
-                    [
-                        info["assoc"][winner["name"]]
-                        for winner in winners
-                    ]
-                )
+                    [info["assoc"][winner["name"]] for winner in winners])
         else:
             winner = None
     if winner is not None:
@@ -1819,33 +1723,48 @@ def status():
 
 
 @status.command()
-@table_fields(
-    choices=['title', 'phone', 'skype', 'real_name', 'real_name_normalized',
-             'display_name', 'display_name_normalized', 'fields', 'status_text',
-             'status_emoji', 'status_expiration', 'avatar_hash', 'email',
-             'first_name', 'last_name', 'image_24', 'image_32', 'image_48',
-             'image_72', 'image_192', 'image_512', 'status_text_canonical',
-             "presence",
-    ],
-    default=[
-        "real_name", "presence", "status_text", "status_emoji",
-    ]
-)
+@table_fields(choices=[
+    'title',
+    'phone',
+    'skype',
+    'real_name',
+    'real_name_normalized',
+    'display_name',
+    'display_name_normalized',
+    'fields',
+    'status_text',
+    'status_emoji',
+    'status_expiration',
+    'avatar_hash',
+    'email',
+    'first_name',
+    'last_name',
+    'image_24',
+    'image_32',
+    'image_48',
+    'image_72',
+    'image_192',
+    'image_512',
+    'status_text_canonical',
+    "presence",
+],
+              default=[
+                  "real_name",
+                  "presence",
+                  "status_text",
+                  "status_emoji",
+              ])
 @table_format()
 def get(fields, format):
     """Get the status"""
     presence = config.slack.client.users.get_presence(
-        config.slack.me["id"]
-    ).body["presence"]
+        config.slack.me["id"]).body["presence"]
     with TablePrinter(fields, format) as tp:
-        tp.echo_records(
-            [
-                {
-                    "presence": presence,
-                    **config.slack.client.users.profile.get().body["profile"]
-                }
-            ]
-        )
+        tp.echo_records([{
+            "presence":
+            presence,
+            **config.slack.client.users.profile.get().body["profile"]
+        }])
 
 
 @status.command()
@@ -1866,9 +1785,7 @@ def _set(text, emoji):
         profile["status_text"] = text
     if emoji is not None:
         profile["status_emoji"] = emoji
-    config.slack.client.users.profile.set(
-        profile=json.dumps(profile)
-    )
+    config.slack.client.users.profile.set(profile=json.dumps(profile))
 
 
 @status.command()
@@ -1914,13 +1831,10 @@ def pomodoro_status():
 def start(end):
     """Indicate you are in a pomodoro that will spend till end"""
     ctx = click.get_current_context()
-    ctx.invoke(
-        _set,
-        text="In a pomodoro, hopefully till {}".format(
-            end.strftime("%H:%M")
-        ),
-        emoji="tomato"
-    )
+    ctx.invoke(_set,
+               text="In a pomodoro, hopefully till {}".format(
+                   end.strftime("%H:%M")),
+               emoji="tomato")
 
 
 @pomodoro_status.command()
@@ -1928,13 +1842,10 @@ def start(end):
 def _break(end):
     """Indicate you are in a break that will spend till end"""
     ctx = click.get_current_context()
-    ctx.invoke(
-        _set,
-        text="In a break, hopefully till {}".format(
-            end.strftime("%H:%M")
-        ),
-        emoji="zzz"
-    )
+    ctx.invoke(_set,
+               text="In a break, hopefully till {}".format(
+                   end.strftime("%H:%M")),
+               emoji="zzz")
 
 
 @pomodoro_status.command()
@@ -1954,7 +1865,9 @@ def dnd():
 
 
 @dnd.command()
-@argument("user", type=UserType(), required=False,
+@argument("user",
+          type=UserType(),
+          required=False,
           help="the user to take into account, defaulting to myself.")
 def info(user):
     """Show the dnd status of the user"""
@@ -1975,9 +1888,11 @@ def end():
 
 
 @slack.command()
-@argument("enddate",
-          help="The end of the snooze, if prefixed with +, the number of minutes to snooze",
-          default="+30")
+@argument(
+    "enddate",
+    help=
+    "The end of the snooze, if prefixed with +, the number of minutes to snooze",
+    default="+30")
 @option("--text", help="The text of the status")
 @option("--emoji", help="The emoji of the status")
 def snooze(enddate, text, emoji):

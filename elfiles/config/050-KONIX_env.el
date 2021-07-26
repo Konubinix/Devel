@@ -1,6 +1,7 @@
 ;; ####################################################################################################
 ;; Set the custom ENV
 ;; ####################################################################################################
+(setq-default konix/initial-exec-path exec-path)
 (defun konix/initialize-env ()
   (interactive)
 
@@ -11,7 +12,7 @@
   ;; include the PATH values before exec-path
   (setq-default exec-path (append
 						   (split-string (getenv "PATH") path-separator)
-						   exec-path
+						   konix/initial-exec-path
 						   ))
   ;; TODO, remove duplicates from the exec-path
   (message "%s" (with-output-to-string

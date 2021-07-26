@@ -849,6 +849,9 @@
   (konix/org-with-point-set-to-next-visible-line
    (org-agenda-filter-hide-line 'for-now)
    )
+  (when (called-interactively-p)
+    (org-agenda-do-context-action)
+    )
   )
 
 (defun konix/org-agenda-filter-show-all-for-now nil

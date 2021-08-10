@@ -53,33 +53,14 @@
   )
 (ad-activate 'org-attach-commit)
 
-(defun konix/org-roam-hugo-expose-before-saving-for-the-first-time ()
-  ""
-  (when (and
-         (equal major-mode 'org-mode)
-         (string-match-p org-roam-directory (buffer-file-name))
-         (not (string-match-p org-roam-dailies-directory (buffer-file-name)))
-         ;; first time saving
-         (not (file-exists-p (buffer-file-name)))
-         (not (konix/org-roam-exported-p))
-         )
-    (let (
-          (kind (completing-read
-                 (format "Publish %s to " (buffer-name)) (append konix/org/roam-export/kinds '("none"))
-                 nil
-                 t
-                 nil
-                 nil
-                 konix/org-roam-auto-publish-last-value
-                 )
-                )
-          )
-      (setq konix/org-roam-auto-publish-last-value kind)
-      (unless (string-equal kind "none")
-        (konix/org-roam-export/toggle-publish kind)
-        )
-      )
-    )
+(defun konix/org-entry-get-global (key)
+  (org-with-wide-buffer
+   (save-excursion
+     (goto-char (point-min))
+     (assert (not (looking-at "^\*")))
+     (org-entry-get (point) key)
+     )
+   )
   )
 
 (defun konix/org-update-date ()
@@ -3346,7 +3327,7 @@ of the clocksum."
   ;; my todo tasks may be very big, with clocks and logs and...  Thus, only
   ;; delete the trailing whitespaces on org roam notes, meant to be of rghuman
   ;; size.
-  (setq konix/delete-trailing-whitespace (org-roam--org-roam-file-p))
+  (setq konix/delete-trailing-whitespace (org-roam-file-p))
   (font-lock-add-keywords nil konix/org-mode-font-lock-keywords)
   (setq-local yas-indent-line 'fixed)
   (goto-address-mode 1)
@@ -3378,11 +3359,6 @@ of the clocksum."
               )
   (add-hook 'before-save-hook
             'konix/org-update-date
-            nil
-            t
-            )
-  (add-hook 'before-save-hook
-            'konix/org-roam-hugo-expose-before-saving-for-the-first-time
             nil
             t
             )
@@ -3671,7 +3647,7 @@ of the clocksum."
   (interactive)
   (save-window-excursion
     (save-excursion
-      (org-roam-id-open "holidays")
+      (org-id-goto "holidays")
       (konix/calendar-setup-holidays
        (konix/org-extract-active-times-flattened)
        )
@@ -3813,17 +3789,17 @@ of the clocksum."
           (mapc
            (lambda (marker)
              (save-window-excursion
-              (save-excursion
-                (goto-char (marker-position marker))
-                (pop-to-buffer (current-buffer))
-                (org-todo
-                 (completing-read
-                  (format "What to do with this '%s'?" (konix/org-get-heading))
-                  '("DONE" "NOT_DONE")
+               (save-excursion
+                 (goto-char (marker-position marker))
+                 (pop-to-buffer (current-buffer))
+                 (org-todo
+                  (completing-read
+                   (format "What to do with this '%s'?" (konix/org-get-heading))
+                   '("DONE" "NOT_DONE")
+                   )
                   )
                  )
-                )
-              )
+               )
              )
            (konix/org-get-todo-children-markers-no-recursion)
            )
@@ -4473,10 +4449,7 @@ of the clocksum."
 (defun konix/org-store-agenda-views ()
   (interactive)
   (require 'org-agenda)
-  (require 'org-roam) ; to understand the konix-org-roam links
   (require 'ledger-mode) ; to understand the konix/ledger links
-  (require 'org-roam)
-  (org-roam-mode 1)
   (save-some-buffers)
   (message "Exporting all agenda views")
   (let (
@@ -5456,11 +5429,11 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (setq-default org-attach-use-inheritance t)
 (setq-default org-use-property-inheritance nil)
 
-(define-key org-mode-map (kbd "C-c n i") #'org-roam-insert)
-(key-chord-define org-mode-map "ri" 'org-roam-insert)
+(define-key org-mode-map (kbd "C-c n i") #'org-roam-node-insert)
+(key-chord-define org-mode-map "ri" 'org-roam-node-insert)
 (key-chord-define org-mode-map "ry" 'konix/org-roam/insert-key)
-(key-chord-define org-mode-map "rb" 'org-roam-db-build-cache)
-(define-key konix/region-bindings-mode-map "i" 'org-roam-insert)
+(key-chord-define org-mode-map "rb" 'org-roam-db-sync)
+(define-key konix/region-bindings-mode-map "i" 'org-roam-node-insert)
 
 (setq-default
  org-export-global-macros
@@ -5627,7 +5600,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (defun konix/org-display-inline-images/remote (&optional include-linked refresh beg end)
   (let ((end (or end (point-max))))
     (org-with-point-at (or beg (point-min))
-      (while (re-search-forward "^\\([ -]*\\|#\\+ROAM_KEY: \\)\\(http[a-zA-Z0-9%/?:_=,*.-]+\\(jpe?g\\|png\\)\\)" end t)
+      (while (re-search-forward "^\\([ -]*\\)\\(http[a-zA-Z0-9%/?:_=,*.-]+\\(jpe?g\\|png\\)\\)" end t)
         (let ((image `(image :type png :file ,(konix/org-display-inline-images/scale-down (match-string 2)) :scale 1 :width nil))
               (ov (make-overlay
                    (match-beginning 2)

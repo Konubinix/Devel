@@ -29,6 +29,11 @@
 (require 'url-util)
 (require 'org-roam)
 (require 'org-transclusion)
+(require 'org-roam-bibtex)
+(require 'org-ref)
+(require 'org-ref-ivy)
+
+(require 'citeproc-org)
 
 (defun konix/org-roam-export/exported-files (kind)
   (split-string
@@ -178,7 +183,6 @@
   (message "Everyting was exported")
   )
 
-
 (defun konix/org-roam-export/extract-kind (&optional filename)
   (or
    (konix/org-roam-export/extract-kind-unsafe filename)
@@ -186,11 +190,23 @@
    )
   )
 
+(defun konix/org-roam-export/node-extract-kind-unsafe (node)
+  (konix/org-roam-export/extract-kind-unsafe (org-roam-node-file node))
+  )
+
 (defun konix/org-roam-export/extract-kind-unsafe (&optional filename)
-  (with-current-buffer (if filename (find-file filename) (current-buffer))
-    (or
-     (cdar (org-roam--extract-global-props '("KONIX_ORG_PUBLISH_KIND")))
-     )
+  (save-window-excursion
+    (with-current-buffer (if filename (find-file filename) (current-buffer))
+      (or
+       (if-let (
+                (kinds (save-excursion
+                         (org-collect-keywords '("KONIX_ORG_PUBLISH_KIND"))
+                         ))
+                )
+           (car (cdar kinds))
+         )
+       )
+      )
     )
   )
 
@@ -253,7 +269,7 @@
         (if filename
             (format "[[%s?filename=%s.%s][%s]]"
                     url
-                    (org-roam--title-to-slug filename-sans-ext)
+                    (konix/org-roam-compute-slug filename-sans-ext)
                     filename-ext
                     filename
                     )
@@ -273,14 +289,14 @@
 
 (defun konix/org-roam-export/get-language ()
   (or
-   (cdr (assoc "LANGUAGE" (org-roam--extract-global-props '("LANGUAGE"))))
+   (konix/org-entry-get-global "LANGUAGE")
    "fr"
    )
   )
 
-(defun konix/org-roam-export/add-roam-key ()
+(defun konix/org-roam-export/add-refs ()
   (when-let* (
-              (roam-keys (konix/org-roam-extract-keys))
+              (refs (konix/org-roam-get-refs))
               (language (konix/org-roam-export/get-language))
               (text (cond
                      ((string-equal language "fr")
@@ -301,31 +317,26 @@
         (forward-line)
         )
       (mapc
-       (lambda (roam-key)
+       (lambda (ref)
          (insert (format "- %s %s\n" text (konix/org-roam-export/process-url
-                                           roam-key)))
+                                           ref)))
          )
-       roam-keys
+       refs
        )
       )
     )
   )
 
 (defun konix/org-roam-export/get-url ()
-  (format "https://konubinix.eu/%s/posts/%s/?title=%s"
-          (konix/org-roam-export/extract-kind (buffer-file-name))
-          (if-let (
-                   (id (save-excursion (goto-char (point-min)) (org-id-get)))
-                   )
-              id
-            (file-name-sans-extension
-             (file-relative-name
-              (buffer-file-name)
-              org-roam-directory)
-             )
+  (let (
+        (node (save-excursion (goto-char (point-min)) (org-roam-node-at-point)))
+        )
+    (format "https://konubinix.eu/%s/posts/%s/?title=%s"
+            (konix/org-roam-export/extract-kind (buffer-file-name))
+            (org-roam-node-id node)
+            (org-roam-node-slug node)
             )
-          (org-roam--title-to-slug (car (org-roam--extract-titles-title)))
-          )
+    )
   )
 
 (defun konix/org-roam-export/yank-url ()
@@ -385,7 +396,7 @@
                    (lambda (alias)
                      (format "[[/%s/posts/%s/][%s]]"
                              (konix/org-roam-export/extract-kind)
-                             (org-roam--title-to-slug alias)
+                             (konix/org-roam-compute-slug alias)
                              alias
                              )
                      )
@@ -406,10 +417,10 @@
 (defun konix/org-roam-export/copy-roam-tags-into-hugo-tags ()
   (save-excursion
     (goto-char (point-min))
-    (while (re-search-forward "^#\\+ROAM_TAGS:\\(.+\\)$" 3000 t)
+    (while (re-search-forward "^#\\+filetags:\\(.+\\)$" 3000 t)
       (move-end-of-line nil)
       (insert "\n")
-      (insert (format "#+HUGO_TAGS:%s" (match-string 1)))
+      (insert (format "#+HUGO_TAGS:%s" (replace-regexp-in-string ":" " " (match-string 1))))
       )
     )
   )
@@ -417,35 +428,27 @@
 (defun konix/org-roam-export/copy-roam-aliases-into-hugo-aliases ()
   (save-excursion
     (goto-char (point-min))
-    (when (re-search-forward "^#\\+ROAM_ALIAS:\\(.+\\)$" 3000 t)
-      (let (
-            (aliases (mapconcat
-                      #'identity
-                      (mapcar (lambda (alias)
-                                (org-roam--title-to-slug alias)
-                                )
-                              (org-roam--str-to-list (match-string 1))
-                              )
-                      " "
-                      )
-                     )
-            )
-        (goto-char (point-min))
-        (if (re-search-forward "^#\\+HUGO_ALIASES:" 3000 t)
-            (progn
-              (move-end-of-line nil)
-              (insert " " aliases)
-              )
+    (let (
+          (aliases (
+                    (org-roam-node-aliases (konix/org-roam-node-file-node))
+                    ))
+          )
+      (goto-char (point-min))
+      (if (re-search-forward "^#\\+HUGO_ALIASES:" 3000 t)
           (progn
-            (while (looking-at-p "^:")
-              (forward-line)
-              )
             (move-end-of-line nil)
-            (insert "\n#+HUGO_ALIASES: " aliases)
+            (insert " " aliases)
             )
+        (progn
+          (while (looking-at-p "^:")
+            (forward-line)
+            )
+          (move-end-of-line nil)
+          (insert "\n#+HUGO_ALIASES: " aliases)
           )
         )
       )
+
     )
   )
 
@@ -469,6 +472,14 @@
         (insert "\n#+HUGO_LASTMOD:" date)
         )
       )
+    )
+  )
+
+(defun konix/org-roam-node-file-node ()
+  (save-excursion
+    (goto-char (point-min))
+    (assert (not (looking-at "^\*")))
+    (org-roam-node-at-point)
     )
   )
 
@@ -498,7 +509,7 @@
        (format "\n* [[/%s%s?title=%s][Permalink]]"
                (konix/org-roam-export/extract-kind)
                id
-               (org-roam--title-to-slug (car (org-roam--extract-titles-title)))
+               (org-roam-node-slug (konix/org-roam-node-file-node))
                )
        )
       )
@@ -529,25 +540,53 @@
     )
   )
 
+(defun konix/org-roam-nodes-in-file ()
+  (let (
+        (res '())
+        )
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "^.*:ID:" nil t)
+        (setq res (append res (list (org-roam-node-at-point))))
+        )
+      )
+    res
+    )
+  )
+
+(defun konix/org-roam-is-public-or-kind-p (node &optional kind)
+  (let (
+        (nodekind (konix/org-roam-export/extract-kind-unsafe (org-roam-node-file node)))
+        )
+    (or
+     (member
+      nodekind
+      konix/org/roam-export/public-kinds
+      )
+     (and kind (s-equals? kind nodekind))
+     )
+    )
+  )
+
 (defun konix/org-roam-export/add-backlinks ()
   (when-let* (
               (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
-              (links (remove-if
-                      (apply-partially #'string-equal (buffer-file-name))
-                      (remove-if-not
-                       (lambda (link)
-                         (let (
-                               (link-kind (konix/org-roam-export/extract-kind link))
-                               )
-                           (or
-                            (member link-kind konix/org/roam-export/public-kinds)
-                            (string-equal link-kind kind)
-                            )
-                           )
-                         )
-                       (konix/org-roam/backlinks-list (buffer-file-name))
-                       )
-                      )
+              (nodes (konix/org-roam-nodes-in-file))
+              (ids (->> nodes
+                        (-map 'org-roam-node-id)
+                        ))
+              (links (->> nodes
+                          (-map 'org-roam-backlinks-get)
+                          (apply 'append) ;; merge into one single list
+                          (-map 'org-roam-backlink-source-node)
+                          (-filter (lambda (node)
+                                     (konix/org-roam-is-public-or-kind-p node kind)
+                                     ))
+                          (-remove (lambda (node)
+                                     (member (org-roam-node-id node) ids)
+                                     ))
+                          (-uniq)
+                          )
                      )
               )
     (goto-char (point-max))
@@ -576,20 +615,21 @@
       (insert (format "\n* %s\n" text))
       (dolist (link links)
         (let (
-              (link-kind (konix/org-roam-export/extract-kind link))
+              (link-kind (konix/org-roam-export/extract-kind (org-roam-node-file
+                                                              link)))
+              (link-file (org-roam-node-file link))
               )
           (insert
            (if (equal link-kind kind)
-               (format "   - [[file:%s][%s]]\n"
-                       (file-relative-name link org-roam-directory)
-                       (konix/org-roam-get-title link)
+               (format "   - [[id:%s][%s]]\n"
+                       (org-roam-node-id link)
+                       (org-roam-node-title link)
                        )
-             (format "   - [[https://konubinix.eu/%s/posts/%s/][%s]]%s\n"
-                     (konix/org-roam-export/extract-kind link)
-                     (file-name-sans-extension
-                      (file-relative-name link org-roam-directory)
-                      )
-                     (konix/org-roam-get-title link)
+             (format "   - [[https://konubinix.eu/%s/%s?title=%s][%s]]%s\n"
+                     (konix/org-roam-export/extract-kind link-file)
+                     (org-roam-node-id link)
+                     (org-roam-node-slug link)
+                     (org-roam-node-title link)
                      (if (not
                           (equal
                            kind
@@ -611,7 +651,7 @@
   )
 
 (defun konix/org-roam-exported-p ()
-  (org-roam--extract-global-props '("KONIX_ORG_PUBLISH_KIND"))
+  (konix/org-roam-export/extract-kind-unsafe)
   )
 
 (defvar konix/org/roam-export/kinds '())
@@ -704,32 +744,77 @@
     )
   )
 
-(defun konix/org-roam-export/org-export-preprocessor (_backend)
-  (when (org-roam--extract-global-props '("KONIX_ORG_PUBLISH_KIND"))
-    (let (
-          ;; don't bother messing up a temporary buffer while reformating it for
-          ;; better export
-          (inhibit-read-only t)
-          )
-      (konix/org-roam-export/remove-org-backlinks)
-      ;; already done in the theme by Jethro
-      (konix/org-roam-export/add-backlinks)
-      (konix/org-roam-export/add-roam-key)
-      (konix/org-roam-export/convert-standalone-links)
-      ;; (konix/org-roam-export/add-roam-alias)
-      (konix/org-roam-export/assert-no-konix-org-roam-links)
-      (konix/org-roam-export/setup-hugo-dates)
-      (konix/org-roam-export/add-id-as-hugo-aliases)
-      (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
-      (konix/org-roam-export/copy-roam-tags-into-hugo-tags)
-      (konix/org-roam-export/add-more)
-      (konix/org-roam-export/load-transclusion)
-      (konix/org-roam-replace-internal-links)
+(defun konix/org-roam-replace-roam-links-with-hugo-compatible-ones ()
+  (let* (
+         (search-invisible t)
+         (external-ids-to-replace '())
+         (mykind (konix/org-roam-export/extract-kind-unsafe))
+         (internal-ids-to-replace '())
+         (my-directory (file-name-directory (file-truename (buffer-file-name))))
+         )
+    (->>
+     (org-element-map (org-element-parse-buffer)
+         'link
+       'identity
+       )
+     (-map 'cadr)
+     (-filter (lambda (l) (s-equals? "id" (plist-get l :type))))
+     (-map (lambda (l) (plist-get l :path)))
+     (-map (lambda (id)
+             (if-let
+                 (
+                  (link-node (org-roam-node-from-id id))
+                  )
+                 (if (string=
+                      mykind
+                      (konix/org-roam-export/extract-kind-unsafe
+                       (org-roam-node-file link-node))
+                      )
+                     (setq internal-ids-to-replace (append internal-ids-to-replace (list id)))
+                   (setq external-ids-to-replace (append external-ids-to-replace (list id)))
+                   )
+               )
+             )
+           )
+     )
+    (save-excursion
+      (->> external-ids-to-replace
+           (-map (lambda (id)
+                   (let* (
+                          (node (org-roam-node-from-id id))
+                          (slug (org-roam-node-slug node))
+                          (kind (konix/org-roam-export/node-extract-kind-unsafe node))
+                          )
+                     (goto-char (point-min))
+                     (replace-string
+                      (format "id:%s" id)
+                      (format "/%s/%s?%s" kind id slug)
+                      )
+                     )
+                   )
+                 )
+           )
+      )
+    (save-excursion
+      (->> internal-ids-to-replace
+           (-map (lambda (id)
+                   (let* (
+                          (node (org-roam-node-from-id id))
+                          (file (org-roam-node-file node))
+                          (relative-path (file-relative-name file my-directory))
+                          )
+                     (goto-char (point-min))
+                     (replace-string
+                      (format "id:%s" id)
+                      (format "file:%s" relative-path)
+                      )
+                     )
+                   )
+                 )
+           )
       )
     )
   )
-
-(add-hook 'org-export-before-processing-hook #'konix/org-roam-export/org-export-preprocessor)
 
 (defun konix/org-roam-export/assert-no-konix-org-roam-links ()
   (save-excursion
@@ -773,70 +858,6 @@ citation key, for Org-ref cite links."
   )
 
 
-(defun konix/org-roam-replace-internal-links ()
-  (let* (
-         (source (buffer-file-name))
-         (source-kind (konix/org-roam-export/extract-kind source))
-         )
-    (mapc
-     (lambda (el)
-       (let* (
-              (type (second el))
-              (link (first el))
-              (link-key (if (string-equal type "id")
-                            (save-excursion
-                              (with-current-buffer (find-file link)
-                                (goto-char (point-min))
-                                (format "id:%s" (org-id-get))
-                                )
-                              )
-                          (format "file:%s" (file-relative-name link org-roam-directory))
-                          )
-                        )
-              (link-regexp (format "\\[\\[%s\\]\\[" link-key))
-              (kind (konix/org-roam-export/extract-kind link))
-              (new-file-like-link-value
-               (format
-                "[[file:%s]["
-                (file-relative-name link org-roam-directory)
-                )
-               )
-              (new-link-value
-               (format
-                "[[https://konubinix.eu/%s/posts/%s/]["
-                kind
-                (file-name-sans-extension
-                 (file-relative-name link org-roam-directory)
-                 )
-                )
-               )
-              )
-         (assert (or
-                  (string-equal kind source-kind)
-                  (member kind konix/org/roam-export/public-kinds)
-                  )
-                 )
-         (cond
-          ((not (equal kind source-kind))
-           (goto-char (point-min))
-           (while (re-search-forward link-regexp nil t)
-             (replace-match new-link-value)
-             )
-           )
-          ((string-equal type "id")
-           (goto-char (point-min))
-           (while (re-search-forward link-regexp nil t)
-             (replace-match new-file-like-link-value)
-             )
-           )
-          )
-         )
-       )
-     (konix/org-roam-get-internal-links source)
-     )
-    )
-  )
-
 (defun konix/org-export-get-environment/compute-hugo-base-dir (orig-fun &rest args)
   (let* (
          (info (apply orig-fun args))
@@ -849,6 +870,77 @@ citation key, for Org-ref cite links."
     )
   )
 (advice-add 'org-export-get-environment :around #'konix/org-export-get-environment/compute-hugo-base-dir)
+(defvar konix/org-roam-auto-publish-last-value nil)
+
+(defun konix/org-roam-hugo-expose-before-saving-for-the-first-time ()
+  ""
+  (when (and
+         (equal major-mode 'org-mode)
+         (string-match-p org-roam-directory (buffer-file-name))
+         (not (string-match-p org-roam-dailies-directory (buffer-file-name)))
+         ;; first time saving
+         (not (file-exists-p (buffer-file-name)))
+         (not (konix/org-roam-exported-p))
+         )
+    (let (
+          (kind (completing-read
+                 (format "Publish %s to " (buffer-name)) (append konix/org/roam-export/kinds '("none"))
+                 nil
+                 t
+                 nil
+                 nil
+                 konix/org-roam-auto-publish-last-value
+                 )
+                )
+          )
+      (setq konix/org-roam-auto-publish-last-value kind)
+      (unless (string-equal kind "none")
+        (konix/org-roam-export/toggle-publish kind)
+        )
+      )
+    )
+  )
+
+(defun konix/org-mode-hook/org-roam-export ()
+  (add-hook 'before-save-hook
+            'konix/org-roam-hugo-expose-before-saving-for-the-first-time
+            nil
+            t
+            )
+  )
+
+(add-hook 'org-mode-hook
+          'konix/org-mode-hook/org-roam-export)
+
+
+(defun konix/org-roam-export/org-export-preprocessor (_backend)
+  (when (konix/org-roam-export/extract-kind-unsafe)
+    (let (
+          ;; don't bother messing up a temporary buffer while reformating it for
+          ;; better export
+          (inhibit-read-only t)
+          )
+      (konix/org-roam-export/remove-org-backlinks)
+      ;; already done in the theme by Jethro
+      (konix/org-roam-export/add-backlinks)
+      (konix/org-roam-export/add-refs)
+      (konix/org-roam-export/convert-standalone-links)
+      ;; (konix/org-roam-export/add-roam-alias)
+      (konix/org-roam-export/assert-no-konix-org-roam-links)
+      (konix/org-roam-export/setup-hugo-dates)
+      (konix/org-roam-export/add-id-as-hugo-aliases)
+      ;; need to perform a slug function that roam no longer exposes
+      ;; (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
+      (konix/org-roam-export/copy-roam-tags-into-hugo-tags)
+      (konix/org-roam-export/add-more)
+      (konix/org-roam-export/load-transclusion)
+      (konix/org-roam-replace-roam-links-with-hugo-compatible-ones)
+      )
+    )
+  )
+
+(add-hook 'org-export-before-processing-hook #'konix/org-roam-export/org-export-preprocessor)
+
 
 (provide 'KONIX_org-roam-export)
 ;;; KONIX_org-roam-export.el ends here

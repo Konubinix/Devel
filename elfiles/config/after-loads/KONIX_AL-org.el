@@ -5392,6 +5392,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
    ("N" . konix/org-roam-note)
    ("w" . konix/org-refile)
    (":" . counsel-org-tag)
+   ("@" . counsel-org-tag)
    ("." . org-set-tags-command)
    )
  )

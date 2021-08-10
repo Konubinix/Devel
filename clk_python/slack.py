@@ -26,7 +26,7 @@ try:
 except ImportError:
     botlib = None
 
-from click_project.decorators import (
+from clk.decorators import (
     group,
     table_fields,
     table_format,
@@ -35,8 +35,8 @@ from click_project.decorators import (
     option,
     flag,
 )
-from click_project.log import get_logger
-from click_project.lib import (
+from clk.log import get_logger
+from clk.lib import (
     get_authenticator,
     TablePrinter,
     ParameterType,
@@ -44,10 +44,10 @@ from click_project.lib import (
     json_dumps,
     createfile,
 )
-from click_project.completion import startswith
-from click_project.config import config
-from click_project.core import cache_disk
-from click_project.commands.password import set as password_set_command
+from clk.completion import startswith
+from clk.config import config
+from clk.core import cache_disk
+from clk.commands.password import set as password_set_command
 
 LOGGER = get_logger(__name__)
 

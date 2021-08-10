@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import requests
-from click_project.decorators import command, argument, option, flag
+from clk.decorators import command, argument, option, flag
 
 
 @command()

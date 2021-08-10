@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-from click_project.decorators import group, argument
+from clk.decorators import group, argument
 
 
 @group()
@@ -37,7 +37,9 @@ def show():
         for sink in pulse.sink_list():
             if sink.mute:
                 print(f"{sink.description} muted")
-            print(f"{sink.description}:\n\t{sink.volume.values[0]:.2f}, {sink.volume.values[1]:.2f}")
+            print(
+                f"{sink.description}:\n\t{sink.volume.values[0]:.2f}, {sink.volume.values[1]:.2f}"
+            )
 
 
 @pulse.command()

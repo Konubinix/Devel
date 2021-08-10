@@ -4812,7 +4812,7 @@ of the clocksum."
     (beginning-of-line)
     (when (re-search-forward ".+\\(plus\\|minus\\)-\\([^|]+\\)\\(|.+\\)?"
                              (save-excursion (end-of-line) (point)))
-      (find-file (format "/home/sam/perso/perso/gtd_contexts_%s" (match-string 2)))
+      (find-file (format "/home/sam/perso/perso/gtd_contexts/%s" (match-string 2)))
       )
     )
   )

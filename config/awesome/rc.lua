@@ -489,6 +489,12 @@ globalkeys = gears.table.join(
       end,
       {description = "Print screen", group = "screen"}),
 
+   awful.key({ modkey , "Shift"       }, "i",
+      function()
+         awful.spawn("konix_print_screen_n_insert.sh")
+      end,
+      {description = "Print screen", group = "screen"}),
+
    -- Standard program
    awful.key({ modkey,   "Control"        }, "q", open_or_join("qutebrowser", browser),
       {description = "open a browser", group = "launcher"}),

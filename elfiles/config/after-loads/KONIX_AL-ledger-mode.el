@@ -102,6 +102,18 @@ balance \
 ^Assets")
  )
 
+;; the immediate one ignore the lasting debts that might be sold in the future
+;; and focus on what is moving right now
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("immediate networth bal"
+   "ledger -f %(ledger-file) \
+--limit 'date <= today' \
+[[ledger-mode-flags]] \
+balance \
+^Assets and not Lasting")
+ )
+
 (defun konix/ledger-accounts (&optional recompute)
   (setq recompute (or recompute current-prefix-arg))
   (let (

@@ -1,6 +1,6 @@
 ;;; KONIX_AL-org-roam-dailies.el ---                 -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  konubinix
+;; Copyright (C) 2021  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -24,32 +24,29 @@
 
 ;;; Code:
 
-(require 'org-roam)
-
-(setq-default org-roam-dailies-directory "daily/")
-
-(setq-default org-roam-dailies-capture-templates
-              '(("d" "default" entry
-                 #'org-roam-capture--get-point
-                 "* %?
+(setq-default
+ org-roam-dailies-capture-templates
+ '(
+   (
+    "d" "default" entry
+    "* %?
   :PROPERTIES:
   :CREATED:  %U
   :END:
 "
-                 :file-name "daily/%<%Y-%m-%d>"
-                 :head "#+title: %<%Y-%m-%d>
+    :if-new
+    (file+head
+     "%<%Y_%m_%d>.org"
+     "#+title: %<%Y-%m-%d>
 #+LANGUAGE: fr
 #+CREATED: %U
 #+DATE: %U
 
-")))
-
-(add-hook 'calendar-today-visible-hook
-          'org-roam-dailies-calendar-mark-entries)
-
-(defun konix/org-roam-dailies--calendar-date->time (date)
-  "Convert a date as returned from the calendar (MONTH DAY YEAR) to a time."
-  (encode-time 0 0 0 (nth 1 date) (nth 0 date) (nth 2 date)))
+"
+     )
+    )
+   )
+ )
 
 
 (defun konix/org-roam-dailies-display-entry (_arg &optional event)
@@ -61,17 +58,23 @@
     (find-file (expand-file-name (org-format-time-string "daily/%Y-%m-%d.org" time) org-roam-directory))
     (when (equal (point-min) (point-max))
       (insert
+       (format
+        ":PROPERTIES:
+:ID:    %s
+:END:
+" (uuidgen-4))
        (format-time-string "#+title: %Y-%m-%d\n" time)
-(format-time-string "#+LANGUAGE: fr
+       (format-time-string "#+LANGUAGE: fr
 #+CREATED: [%Y-%m-%d %a %H:%M]
 #+DATE: [%Y-%m-%d %a %H:%M]\n\n"
-        ))
+                           ))
       )
     )
   )
 
 
 (define-key calendar-mode-map (kbd "d") 'konix/org-roam-dailies-display-entry)
+
 
 (provide 'KONIX_AL-org-roam-dailies)
 ;;; KONIX_AL-org-roam-dailies.el ends here

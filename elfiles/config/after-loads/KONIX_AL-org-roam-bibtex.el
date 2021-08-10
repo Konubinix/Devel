@@ -26,17 +26,6 @@
 
 (setq-default orb-slug-source 'title)
 
-(setq-default orb-templates
-              '(
-                ("r" "ref" plain #'org-roam-capture--get-point "" :file-name "${slug}" :head "#+TITLE: ${title}
-#+LANGUAGE: fr
-#+CREATED: %U
-#+DATE: %U
-#+ROAM_KEY: ${ref}
-${title}
-" :unnarrowed t)
-                )
-              )
 
 (provide 'KONIX_AL-org-roam-bibtex)
 ;;; KONIX_AL-org-roam-bibtex.el ends here

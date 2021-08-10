@@ -1,6 +1,6 @@
-;;; KONIX_AL-org-roam.el ---
+;;; KONIX_AL-org-roam.el ---                         -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012  konubinix
+;; Copyright (C) 2021  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -16,7 +16,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -24,65 +24,102 @@
 
 ;;; Code:
 
-(require 'org-roam-protocol)
-(require 'org-roam-bibtex)
-(require 'nroam)
-(require 'org-ref)
-(require 'org-ref-ivy)
-
-(require 'citeproc-org)
+(require 'uuidgen)
 (require 'KONIX_org-roam-export)
 
+(define-key org-mode-map (kbd "C-c n l") #'org-roam-buffer-toggle)
+
 (setq-default org-roam-directory (expand-file-name "roam" perso-dir))
-(setq-default org-roam-prefer-id-links t)
+(setq-default org-roam-v2-ack t)
 (setq-default org-roam-completion-everywhere t)
-(setq-default org-roam-db-update-idle-seconds (* 60 10))
 
-(define-key org-roam-mode-map (kbd "C-c n l") #'org-roam)
-(define-key org-roam-mode-map (kbd "C-c n n") #'nroam-mode)
-(define-key org-roam-mode-map (kbd "C-c n f") #'org-roam-find-file)
-(define-key org-roam-mode-map (kbd "C-c n b") #'org-roam-db-build-cache)
-(define-key org-roam-mode-map (kbd "C-c n j") #'org-roam-switch-to-buffer)
-(define-key org-roam-mode-map (kbd "C-c n I") 'konix/org-roam-separate_camelcase_and_insert)
-(define-key org-roam-mode-map (kbd "C-c n t") 'konix/org-roam-export/toggle-publish)
-(key-chord-define org-roam-mode-map " i" 'konix/org-roam-separate_camelcase_and_insert)
-(key-chord-define org-roam-mode-map " y" 'konix/org-roam-separate_camelcase_and_insert-key)
-
-(setq-default org-roam-capture-templates
-              '(
-                ("d" "default" plain
-                 (function org-roam--capture-get-point)
-                 "%?"
-                 :file-name "${slug}"
-                 :head "#+TITLE: ${title}
+(setq-default
+ org-roam-capture-templates
+ '(
+   (
+    "d"
+    "default"
+    plain "%?"
+    :if-new (file+head "${slug}.org" "#+title: ${title}
 #+LANGUAGE: fr
 #+CREATED: %U
 #+DATE: %U
-#+ROAM_TAGS: \"fleeting note\"
+#+filetags: :fleeting_note:
 ${title}
 
-"
-                 :unnarrowed t
-                 )
-                )
-              )
+")
+    :unnarrowed t)
+   )
+ )
 
-(org-roam-mode 1)
+(add-to-list 'golden-ratio-exclude-buffer-names "*org-roam*")
 
-(defun konix/org-roam/backlinks-list (file)
-  (remove-duplicates
-   (-intersection
-    (-union
-     (mapcar #'car (org-roam--get-backlinks file))
-     (mapcar #'car (mapcan #'org-roam--get-backlinks (mapcar #'cdr (org-roam--extract-refs))))
-     )
-    (konix/org-roam-export/exported-files "")
+(defun konix/org-roam-compute-slug (title)
+  (org-roam-node-slug (org-roam-node-create :title title))
+  )
+
+(defun konix/org-roam/process-url (url)
+  (cond
+   ((string-match "^cite:\\(.+\\)$" url)
+    (let* ((results (org-ref-get-bibtex-key-and-file (match-string 1 url)))
+           (key (car results))
+           (bibfile (cdr results)))
+      (save-excursion
+        (with-temp-buffer
+          (insert-file-contents bibfile)
+          (bibtex-set-dialect (parsebib-find-bibtex-dialect) t)
+          (bibtex-search-entry key)
+          (s-trim (bibtex-autokey-get-field "url"))
+          )
+        )
+      )
     )
-   :test #'string-equal
+   ((s-starts-with? "//" url)
+    (concat "https:" url)
+    )
+   (t
+    url
+    )
    )
   )
 
-(defun konix/org-roam-get-note ()
+(defun konix/org-roam/open-key (key)
+  (interactive
+   (save-window-excursion
+     (when (or
+            (not (org-roam-file-p))
+            current-prefix-arg
+            )
+       (call-interactively 'org-roam-node-find)
+       )
+     (let* (
+            (keys (konix/org-roam-get-refs))
+            )
+       (list
+        (konix/org-roam/process-url
+         (pcase (length keys)
+           (0
+            (error "No key if file")
+            )
+           (1
+            (car keys)
+            )
+           (t
+            (completing-read
+             "Key: "
+             keys
+             )
+            )
+           )
+         )
+        )
+       )
+     )
+   )
+  (shell-command (format "xdg-open '%s' &" key))
+  )
+
+(defun konix/org-roam-get-note-id ()
   (save-excursion
     (or
      (and
@@ -96,20 +133,24 @@ ${title}
      (and
       (not current-prefix-arg)
       (org-up-heading-safe)
-      (konix/org-roam-get-note)
+      (konix/org-roam-get-note-id)
       )
      )
     )
   )
 
-
 (defun konix/org-roam-note ()
   (interactive)
   (let* (
-         (link (konix/org-with-point-on-heading (konix/org-roam-get-note)))
+         (link (konix/org-with-point-on-heading (konix/org-roam-get-note-id)))
          )
     (if link
-        (org-roam-id-open link)
+        (progn
+          (org-mark-ring-push)
+          (org-roam-node-visit
+           (org-roam-node-from-id link)
+           )
+          )
       (let* (
              (entry-link (if current-prefix-arg
                              (konix/org-with-point-at-clocked-entry (org-store-link nil))
@@ -118,7 +159,7 @@ ${title}
              (heading (konix/org-get-heading))
              (roam-buffer
               (save-window-excursion
-                (org-roam-find-file heading)
+                (org-roam-node-find heading)
                 (save-excursion
                   (goto-char (point-min))
                   (while (looking-at "#+\\|:")
@@ -151,69 +192,38 @@ ${title}
     )
   )
 
-(defun konix/org-roam-separate_camelcase_and_insert (&optional function)
-  (interactive)
+(defun konix/org-id-find-id-file/try-in-roam-if-miss (orig-func id)
   (let (
-        beg
-        (end (point-marker))
-        (after-end-marker (save-excursion (goto-char (1+ (point))) (point-marker)))
+        (res (funcall orig-func id))
         )
-    (save-excursion
-      (backward-word)
-      (setq beg (point-marker))
-      (replace-regexp "_" "  " nil (point) (marker-position end))
-      (set-mark (marker-position beg))
-      (goto-char (marker-position end))
-      (funcall (or function 'org-roam-insert))
-      )
-    (goto-char (1-
-                (marker-position after-end-marker)
-                ))
+    ;; curiously, `org-id-find-id-file' fallbacks in current buffer even though
+    ;; it does not make sense...
+    (or
+     (and res (org-id-find-id-in-file id res) res)
+     (if-let*
+         (
+          (node (org-roam-node-from-id id))
+          )
+         (org-roam-node-file node)
+       )
+     )
     )
   )
+(advice-add 'org-id-find-id-file :around #'konix/org-id-find-id-file/try-in-roam-if-miss)
 
-(defun konix/org-roam-separate_camelcase_and_insert-key ()
-  (interactive)
-  (konix/org-roam-separate_camelcase_and_insert 'konix/org-roam/insert-key)
+
+(defun konix/org-roam-find-node-by-ref (ref)
+  (alist-get
+   ref
+   (org-roam-ref--completions) nil nil 'string=)
   )
-
-(add-to-list 'golden-ratio-exclude-buffer-names "*org-roam*")
-
-(setq-default org-roam-graph-executable "neato")
-(setq-default org-roam-graph-extra-config
-              '(
-                ("overlap" . "false")
-                )
-              )
-(setq-default org-roam-completion-system 'ivy)
-
-(defvar konix/org-roam-auto-publish-last-value nil)
-
-
-(setq-default
- org-roam-capture-ref-templates
- '(
-   (
-    "r"
-    "ref" plain (function org-roam-capture--get-point)
-    "%?"
-    :file-name "${slug}"
-    :head "#+TITLE: ${title}
-#+CREATED: %U
-#+DATE: %U
-#+ROAM_KEY: ${ref}
-"
-    :unnarrowed t
-    )
-   )
- )
 
 (defun konix/org-add-roam-ref (url title body)
   (let* (
          (decoded-title (s-trim (org-link-decode title)))
          (decoded-url (s-trim (org-link-decode url)))
          (decoded-body (s-trim (org-link-decode body)))
-         (slug (org-roam--title-to-slug decoded-title))
+         (slug (konix/org-roam-compute-slug decoded-title))
          (url-without-type (and
                             (string-match org-link-plain-re decoded-url)
                             (match-string 2 decoded-url)
@@ -222,7 +232,11 @@ ${title}
          (buffer
           (save-window-excursion
             (or
-             (org-roam--find-ref url-without-type)
+             (if-let (
+                      (node (konix/org-roam-find-node-by-ref url-without-type))
+                      )
+                 (find-file (org-roam-node-file node))
+               )
              (find-file (expand-file-name (format "%s.org" slug) org-roam-directory))
              )
             (current-buffer)
@@ -233,18 +247,23 @@ ${title}
       (when (equal (point-max) (point-min))
         (insert
          (format
-          "#+TITLE: %s
+          ":PROPERTIES:
+:ID:       %s
+:ROAM_REFS: %s
+:END:
+#+TITLE: %s
 #+CREATED: %s
 #+LANGUAGE: fr
 #+DATE: %s
-#+ROAM_KEY: %s
-#+ROAM_TAGS: \"fleeting note\"
+#+filetags: :fleeting_note:
 %s
 "
+          (uuidgen-4)
+          decoded-url
           decoded-title
           (format-time-string "[%Y-%m-%d %a %H:%M]")
           (format-time-string "[%Y-%m-%d %a %H:%M]")
-          decoded-url
+
           decoded-title
           )
          )
@@ -260,174 +279,10 @@ ${title}
     )
   )
 
-(defun org-roam--extract-tags-prop-from-hugo-tags (_file)
-  "Extract tags from the current buffer's \"#roam_tags\" global property."
-  (let* ((prop (cdr (assoc "HUGO_TAGS" (org-roam--extract-global-props '("HUGO_TAGS"))))))
-    (condition-case nil
-        (org-roam--str-to-list prop)
-      (error
-       (progn
-         (lwarn '(org-roam) :error
-                "Failed to parse tags for buffer: %s. Skipping"
-                (or org-roam-file-name
-                    (buffer-file-name)))
-         nil)))))
-
-(defun konix/org-roam-is-in-roam-p ()
-  (string-prefix-p org-roam-directory
-                   (cond
-                    (org-capture-mode
-                     (with-current-buffer (org-capture-get :buffer t) (buffer-file-name))
-                     )
-                    (t
-                     (buffer-file-name)
-                     )
-                    )
-                   )
-  )
-
-(setq-default org-roam-tag-sources '(prop))
-
-(defun konix/org-roam-format-link/around (orig-fun target &optional description &rest args)
-  "Replace file: link by konix-org-roam: links
- when linking to org roam from outside of org roam"
-  (if (or
-       (string-equal org-roam-buffer (buffer-name (current-buffer)))
-       (konix/org-roam-is-in-roam-p)
-       )
-      (apply orig-fun target description args)
-    (let (
-          (id (save-window-excursion (with-current-buffer (find-file target)
-                                       (save-excursion
-                                         (goto-char (point-min))
-                                         (org-id-get-create)
-                                         )
-                                       )
-                                     )
-              )
-          )
-
-      (warn "Using konix-org-roam link")
-      (org-link-make-string (format "konix-org-roam:%s" id) description)
-      )
-    )
-  )
-(advice-add 'org-roam-format-link :around #'konix/org-roam-format-link/around)
-
-(org-link-set-parameters "konix-org-roam"
-                         :follow #'konix/org-roam-follow-link
-                         )
-
-(defun konix/org-roam-follow-link (link)
-  "Follow a link of the form konix-org-roam:file.org"
-  (let* (
-         (link-info (org-roam-id-find link))
-         (file (car link-info))
-         (pos (cdr link-info))
-         )
-    (find-file file)
-    (goto-char pos)
-    (when (equal pos 1)
-      (while (and (looking-at-p "^:\\|^#\\|^$")
-                  (not (equal
-                        (line-number-at-pos (point))
-                        (line-number-at-pos (point-max))
-                        )
-                       )
-                  )
-        (forward-line)
-        )
-      )
-    )
-  )
-
-(defun konix/org-roam-publish-brain ()
-  (interactive)
-  (shell-command "clk org publish brain all --flow &")
-  )
-
-(defun konix/org-roam-publish-blog ()
-  (interactive)
-  (shell-command "clk org publish blog all --flow &")
-  )
-
-(defun konix/org-roam-publish-all ()
-  (interactive)
-  (shell-command "clk org publish all --flow &")
-  )
-
-(defun konix/org-roam--add-global-prop (name value)
-  "Add a file property called NAME to VALUE.
-
-If the property is already set, it's value is not replaced."
-  (save-excursion
-    (widen)
-    (goto-char (point-min))
-    (while (and (not (eobp))
-                (looking-at "^[#:]"))
-      (if (save-excursion (end-of-line) (eobp))
-          (progn
-            (end-of-line)
-            (insert "\n"))
-        (forward-line)
-        (beginning-of-line)))
-    (insert "#+" name ": " value "\n")))
-
-(defun konix/org-roam-key-add ()
-  "Add a ROAM_KEY to Org-roam file.
-
-Return added key."
-  (interactive)
-  (unless org-roam-mode (org-roam-mode))
-  (let ((key (read-string "Key: " )))
-    (when (string-empty-p key)
-      (user-error "Key can't be empty"))
-    (konix/org-roam--add-global-prop
-     "ROAM_KEY" key
-     )
-    (org-roam-db--update-file (buffer-file-name (buffer-base-buffer)))
-    key))
-
-
-(defun konix/org-roam/open-key (key)
-  (interactive
-   (save-window-excursion
-     (when (or
-            (not (org-roam--org-roam-file-p))
-            current-prefix-arg
-            )
-       (call-interactively 'org-roam-find-ref)
-       )
-     (let (
-           (keys (mapcar #'cdr (org-roam--extract-global-props '("ROAM_KEY"))))
-           )
-       (list
-        (konix/org-roam/process-url
-         (pcase (length keys)
-           (0
-            (error "No key if file")
-            )
-           (1
-            (car keys)
-            )
-           (t
-            (completing-read
-             "Key: "
-             keys
-             )
-            )
-           )
-         )
-        )
-       )
-     )
-   )
-  (shell-command (format "xdg-open '%s' &" key))
-  )
 
 (defun konix/org-roam-quotes-insert-semicolumns ()
   (interactive)
-  (when (konix/org-roam-is-in-roam-p)
+  (when (org-roam-file-p)
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward "^[ \t]*- \\[\\[\\([^]]+\\|[^]]+\\]\\[[^]]+\\)\\]\\]$" nil t)
@@ -438,10 +293,10 @@ Return added key."
   )
 
 (defun konix/org-roam-make-sure-has-id ()
-  (when (konix/org-roam-is-in-roam-p)
+  (when (org-roam-file-p)
     (save-excursion
       (goto-char (point-min))
-      (org-id-get-create)
+      (save-match-data (org-id-get-create))
       )
     )
   )
@@ -455,14 +310,22 @@ Return added key."
             'konix/org-roam-make-sure-has-id
             nil
             t)
+  (add-hook 'after-save-hook
+            'konix/org-roam-force-filename
+            nil
+            t)
   )
 
 (add-hook #'org-mode-hook
           #'konix/org-mode-hook--for-org-roam)
 
-
-(defun konix/org-roam-extract-keys ()
-  (mapcar #'cdr (reverse (org-roam--extract-global-props '("ROAM_KEY"))))
+(defun konix/org-roam-get-all-refs ()
+  (->> (org-roam-ref--completions)
+       (-map 'car)
+       (-map (lambda (ref)
+               (format "%s:%s" (get-text-property 0 'type ref) ref)
+               ))
+       )
   )
 
 (defun konix/org-roam/yank-key ()
@@ -473,7 +336,7 @@ Return added key."
        (string-prefix-p org-roam-directory (buffer-file-name))
        )
       (let* (
-             (keys (konix/org-roam-extract-keys))
+             (keys (konix/org-roam-get-refs))
              (key (cond
                    ((equal (length keys) 1)
                     (car keys)
@@ -511,50 +374,6 @@ Return added key."
     )
   )
 
-(defun konix/org-roam/insert-key ()
-  (interactive)
-  (let* (
-         (link-text (when (region-active-p)
-                      (buffer-substring-no-properties (region-beginning) (region-end))
-                      ))
-         (completions (org-roam--get-title-path-completions))
-         (title-with-tags (org-roam-completion--completing-read
-                           "File: "
-                           completions
-                           :initial-input link-text
-                           )
-                          )
-         (res (cdr (assoc title-with-tags completions)))
-         (file-path (plist-get res :path))
-         (title (plist-get res :title))
-         (keys (with-current-buffer (save-window-excursion
-                                      (find-file
-                                       file-path
-                                       )
-                                      )
-                 (konix/org-roam-extract-keys)
-                 )
-               )
-         (key (cond
-               ((equal (length keys) 1)
-                (car keys)
-                )
-               ((equal (length keys) 0)
-                (error "No key in %s" title)
-                )
-               (t
-                (completing-read "Key: " keys)
-                )
-               ))
-         )
-    (setq link-text (or link-text title))
-    (when (region-active-p)
-      (delete-active-region)
-      )
-    (insert (format "[[%s][%s]]" key link-text))
-    )
-  )
-
 (defun konix/org-roam-complete-everywhere/custom-syntax-table (orig-fun)
   (let ((stab  (copy-syntax-table)))
     (with-syntax-table stab
@@ -566,52 +385,7 @@ Return added key."
   )
 (advice-add 'org-roam-complete-everywhere :around #'konix/org-roam-complete-everywhere/custom-syntax-table)
 
-(setq-default
- citeproc-org-default-style-file
- (expand-file-name "refs.csl" org-roam-directory)
- )
 
-(citeproc-org-setup)
-(org-roam-bibtex-mode)
-(setq-default org-ref-default-bibliography (list (expand-file-name "refs.bib" org-roam-directory)))
-(setq-default bibtex-completion-bibliography org-ref-default-bibliography)
-
-(setq-default org-ref-completion-library 'org-ref-ivy-cite)
-
-(defun konix/org-roam-buffer-prepare-hook ()
-  (visual-line-mode 1)
-  )
-(add-hook 'org-roam-buffer-prepare-hook
-          'konix/org-roam-buffer-prepare-hook)
-
-(defun konix/org-roam-get-title (path)
-  (save-window-excursion
-    (find-file path)
-    (car (org-roam--extract-titles-title))
-    )
-  )
-
-(defun konix/org-roam/process-url (url)
-  (cond
-   ((string-match "^cite:\\(.+\\)$" url)
-    (let* ((results (org-ref-get-bibtex-key-and-file (match-string 1 url)))
-           (key (car results))
-           (bibfile (cdr results)))
-      (save-excursion
-        (with-temp-buffer
-          (insert-file-contents bibfile)
-          (bibtex-set-dialect (parsebib-find-bibtex-dialect) t)
-          (bibtex-search-entry key)
-          (s-trim (bibtex-autokey-get-field "url"))
-          )
-        )
-      )
-    )
-   (t
-    url
-    )
-   )
-  )
 
 (defun konix/org-roam-refile ()
   (interactive)
@@ -653,8 +427,13 @@ Return added key."
                    (or
                     (and current-prefix-arg
                          (org-roam-find-file))
-                    (org-roam--find-ref url-without-type)
-                    (find-file (format "%s.org" (expand-file-name (org-roam--title-to-slug heading) org-roam-directory)))
+                    (if-let (
+                             (node (konix/org-roam-find-node-by-ref
+                                    url-without-type))
+                             )
+                        (find-file (org-roam-node-file node))
+                      )
+                    (find-file (format "%s.org" (expand-file-name (konix/org-roam-compute-slug heading) org-roam-directory)))
                     )
                    (current-buffer)
                    ))
@@ -682,17 +461,17 @@ Return added key."
     (with-current-buffer buffer
       (save-excursion
         (goto-char (point-min))
+        (save-excursion
+          (unless (re-search-forward (format "^.*:ROAM_REFS:.* %s[ $].*$" url) 3000 t)
+            (org-roam-add-property url "ROAM_REFS")
+            )
+          )
         (while (looking-at-p "^:")
           (forward-line)
           )
         (save-excursion
-          (unless (re-search-forward (format "^#\\+ROAM_KEY: %s$" url) 3000 t)
-            (insert "#+ROAM_KEY: " url "\n")
-            )
-          )
-        (save-excursion
-          (unless (re-search-forward "^#\\+ROAM_TAGS:" 3000 t)
-            (insert "#+ROAM_TAGS: \"fleeting note\" \n")
+          (unless (re-search-forward "^#\\+filetags:" 3000 t)
+            (insert "#+filetags: :fleeting_note: \n")
             )
           )
         (save-excursion
@@ -726,62 +505,100 @@ Return added key."
     )
   )
 
-;; make sure the transclusion are set when the links are extracted so that the
-;; database show the links in the transcluded parts also
-(advice-add 'org-roam--extract-links :before 'konix/org-roam-export/load-transclusion)
-
-(defun konix/org-roam-force-filename ()
-  (interactive)
-  (when (konix/org-roam-is-in-roam-p)
-    (let (
-          (org-roam-db-update-method 'immediate)
-          )
-      (org-roam-db-update)
-      )
-    (let* (
-           (buffer (current-buffer))
-           (file (buffer-file-name (buffer-base-buffer)))
-           (directory (file-name-directory file))
-           (file-name (file-name-nondirectory file))
-           (backlinks (konix/org-roam/backlinks-list file))
-           (new-title (car (org-roam--extract-titles)))
-           (new-slug (funcall org-roam-title-to-slug-function new-title))
-           (new-file-name (format "%s.org" new-slug))
-           (new-file-path (expand-file-name new-file-name directory))
-           )
-      (if (string= new-file-name file-name)
-          (org-roam-message "File already stable %S" (abbreviate-file-name new-file-name))
-        (when (or
-               (not (file-exists-p new-file-path))
-               (yes-or-no-p "Destination already exist, rename anyway?")
-               )
-          (rename-file file-name new-file-path)
-          (find-file new-file-path)
-          (mapc (lambda (file)
-                  (save-window-excursion
-                    (find-file file)
-                    (set-buffer-modified-p t)
+(defun konix/org-roam-enable-transclusion-before-parsing (orig-func &optional file-path)
+  (setq file-path (or file-path (buffer-file-name (buffer-base-buffer))))
+  (let (
+        (old-mode (with-current-buffer (find-file-noselect file-path)
+                    org-transclusion-mode
                     )
                   )
-                backlinks
-                )
-          (org-roam-message "File moved to %S" (abbreviate-file-name
-                                                new-file-name))
-          (kill-buffer buffer)
-          (let (
-                (org-roam-db-update-method 'immediate)
-                )
-            (org-roam-db-update)
-            )
-          )
+        )
+    (unless old-mode
+      (with-current-buffer (find-file-noselect file-path)
+        (konix/org-roam-export/load-transclusion)
+        )
+      )
+    (funcall orig-func file-path)
+    (when (and org-transclusion-mode (not old-mode))
+      (with-current-buffer (find-file-noselect file-path)
+        (org-transclusion-mode -1)
         )
       )
     )
   )
 
-;; it breaks the links, prefer using konix/org-roam-force-filename
-(setq-default org-roam-rename-file-on-title-change nil)
+;; make sure the transclusion are set when the links are extracted so that the
+;; database show the links in the transcluded parts also
+;; (advice-add 'org-roam-db-update-file :around 'konix/org-roam-enable-transclusion-before-parsing)
+;; (advice-add 'org-roam-db-map-links :around
+;; 'konix/org-roam-enable-transclusion-before-parsing)
 
+(defun konix/org-roam-force-filename ()
+  (interactive)
+  (when (org-roam-file-p)
+    (when-let* (
+              (buffer (current-buffer))
+              (position (point))
+              (node (konix/org-roam-node-file-node))
+              (file (org-roam-node-file node))
+              (file-name (file-name-nondirectory file))
+              (slug (org-roam-node-slug node))
+              (directory (file-name-directory file))
+              (new-file-name (format "%s.org" slug))
+              (new-file-path (expand-file-name new-file-name directory))
+              )
+             (when (and
+                    (not (string= new-file-name file-name))
+                    (or
+                     (not (file-exists-p new-file-path))
+                     (yes-or-no-p "Destination already exist, rename anyway?")
+                     )
+                    )
+               (rename-file file new-file-path)
+               (find-file new-file-path)
+               (goto-char position)
+               (org-roam-message "File moved to %S" (abbreviate-file-name
+                                                     new-file-name))
+               (kill-buffer buffer)
+               )
+
+             )
+    )
+  )
+
+(defun konix/org-roam-get-refs ()
+  (if-let
+      (
+       (refs (org-entry-get (point-min) "ROAM_REFS"))
+       )
+      (split-string-and-unquote refs)
+    )
+  )
+
+(setq-default
+ citeproc-org-default-style-file
+ (expand-file-name "refs.csl" org-roam-directory)
+ )
+
+
+(setq-default org-ref-default-bibliography (list (expand-file-name "refs.bib" org-roam-directory)))
+(setq-default bibtex-completion-bibliography org-ref-default-bibliography)
+
+(org-link-set-parameters "konix-org-roam"
+                         :follow #'konix/org-roam-follow-link
+                         )
+
+(defun konix/org-roam-follow-link (link)
+  "Follow a link of the form konix-org-roam:file.org
+
+Deprecated for I can know use normal id:, but needed before I migrated all my
+  konix-org-roam links."
+  (org-id-goto link)
+  )
+
+(org-roam-setup)
+(citeproc-org-setup)
+(org-roam-bibtex-mode)
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

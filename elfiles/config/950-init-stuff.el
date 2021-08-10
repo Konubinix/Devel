@@ -50,3 +50,5 @@
  )
 
 (setenv "INEMACS" "t")
+
+(setq-default org-roam-v2-ack t)

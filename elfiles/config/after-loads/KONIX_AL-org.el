@@ -4716,7 +4716,7 @@ of the clocksum."
     )
   )
 
-(setq-default org-agenda-confirm-kill 6)
+(setq-default org-agenda-confirm-kill 8)
 
 (defun konix/org-gtd-context-edit-toggle-comment ()
   (interactive)

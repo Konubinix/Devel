@@ -1341,38 +1341,37 @@
    )
   )
 
-(defvar konix/org-gtd-choose-situation/history-file (expand-file-name ".gtd_contexts_history" (getenv "KONIX_PERSO_DIR")))
+(defvar konix/org-gtd-choose-situation/history-file (expand-file-name "gtd_contexts/.history" (getenv "KONIX_PERSO_DIR")))
 
 (defun konix/org-gtd-choose-situation nil
   (interactive)
   (let* (
-         (context-file (expand-file-name "gtd_contexts" (getenv "KONIX_PERSO_DIR")))
-         (context-file-readlink (shell-command-to-string (format "readlink -f '%s'" context-file)))
-         (context-files
-          (remove-if
-           (lambda (e) (string= e ""))
-           (split-string
-            (shell-command-to-string
-             (format "ls %s/gtd_contexts_*" (getenv "KONIX_PERSO_DIR"))
-             )
-            "\n"
-            )
-           )
-          )
-         res
+         (contexts-dir (expand-file-name "gtd_contexts" (getenv "KONIX_PERSO_DIR")))
+         (context-file (expand-file-name "current" contexts-dir))
+         (context-file-readlink (file-truename context-file))
+         (context-files (->> (directory-files contexts-dir nil "^[^.].+")
+                             (-remove (-partial 'string= "current"))
+                             )
+                        )
+         (choosen-one (completing-read
+                       "Which one? "
+                       context-files
+                       )
+                      )
+         (choosen-path
+          (expand-file-name
+           choosen-one
+           contexts-dir
+           ))
          )
-    (setq res (completing-read
-               "Which one? "
-               context-files
-               )
-          )
+
     (with-temp-buffer
-      (insert (format "%s;%s" (format-time-string "%Y-%m-%dT%H%M%S" (current-time)) res))
+      (insert (format "%s;%s" (format-time-string "%Y-%m-%dT%H%M%S" (current-time)) choosen-path))
       (insert "\n")
       (append-to-file (point-min) (point-max) konix/org-gtd-choose-situation/history-file)
       )
     (delete-file context-file)
-    (f-symlink res context-file)
+    (f-symlink choosen-path context-file)
     )
   (konix/org-agenda-gtd-open-contexts)
   )

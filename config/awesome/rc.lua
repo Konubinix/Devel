@@ -1033,7 +1033,7 @@ awful.rules.rules = {
 
    {
       rule_any = {
-         name = {"Slack | mini panel"},
+         name = {"Slack | mini panel", "Pick a Font", "Change Foreground Color", "Post Processing Plugin"},
 		 class = {"Impass"}
       },
       properties = {

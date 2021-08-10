@@ -35,3 +35,5 @@ model/stl=cura.desktop;
 application/pdf=org.pwmt.zathura-pdf-poppler.desktop;
 text/x-patch=emacsclient.desktop;
 text/x-gcode=cura.desktop;
+application/x-blender=blender.desktop;
+

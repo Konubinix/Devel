@@ -24,6 +24,19 @@
 
 ;;; Code:
 
+(defface org-transclusion-block
+  '(
+    (
+     ((class color)
+      (background dark))
+     (:foreground "#bfc0c4" :background "gray27" :extend t)
+     )
+    )
+  ""
+  )
+
+
+
 (defun konix/org-tranclusion-activate/remove-meta-advices ()
   (advice-remove 'org-metaup #'org-transclusion-metaup-down)
   (advice-remove 'org-metadown #'org-transclusion-metaup-down)

@@ -24,25 +24,33 @@
 
 ;;; Code:
 
-(defvar konix/org-expiry-insert-created-file-name-regex
-  (expand-file-name perso-dirs)
+(defvar konix/org-expiry-insert-created-file-name-regexs
+  (list (file-truename (expand-file-name perso-dirs))
+        (file-truename
+         (expand-file-name "~/Private")))
   "Regex matched against the file name in which to auto insert created stamp")
 (setq-default org-expiry-inactive-timestamps t)
 (setq-default org-expiry-confirm-flag 'interactive)
 (setq-default org-expiry-wait "+1y")
 
-(defadvice org-expiry-insert-created (around insert-if-personal-entry ())
-  (when (string-match-p
-		 konix/org-expiry-insert-created-file-name-regex
-		 (or
-		  (buffer-file-name)
-		  ""
-		  )
-		 )
-	ad-do-it
+(defun konix/org-expiry-insert-created/only-personnal-files (orig-func &rest args)
+  (unless (->> konix/org-expiry-insert-created-file-name-regexs
+               (-map (lambda (regex)
+                       (string-match-p
+		                regex
+		                (or
+		                 (buffer-file-name)
+		                 ""
+		                 )
+		                )
+                       )
+                     )
+               (-all? #'null)
+               )
+	(apply orig-func args)
 	)
   )
-(ad-activate 'org-expiry-insert-created)
+(advice-add #'org-expiry-insert-created :around #'konix/org-expiry-insert-created/only-personnal-files)
 (org-expiry-insinuate)
 
 (defun konix/org-expiry/update-all ()

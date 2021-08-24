@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'yapfify)
+(require 'py-isort)
 
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)
@@ -32,6 +33,8 @@
   (setq tab-width 4)
   (konix/prog/config)
   (yapf-mode)
+  (add-hook 'before-save-hook
+            'py-isort-before-save)
   ;; fed up with auto line breaks
   (setq indent-tabs-mode nil)
   (setq-local yas-indent-line 'fixed)

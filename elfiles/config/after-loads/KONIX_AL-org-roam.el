@@ -586,5 +586,34 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
   (warn "Could not load org-roam-bibtex")
   )
 
+(defun konix/org-roam-reflinks-get/remove-self-links (orig-func node)
+  (->> (funcall orig-func node)
+       (-remove
+        (lambda (link)
+          (string-equal
+           (org-roam-node-id (org-roam-reflink-source-node link))
+           (org-roam-node-id node)
+           )
+          ))
+       )
+  )
+(advice-add #'org-roam-reflinks-get :around #'konix/org-roam-reflinks-get/remove-self-links)
+(advice-remove #'org-roam-reflinks-get #'konix/org-roam-reflinks-get/remove-self-links)
+
+(defun konix/org-roam-backlinks-get/remove-self-links (orig-func node)
+  (->> (funcall orig-func node)
+       (-remove
+        (lambda (link)
+          (string-equal
+           (org-roam-node-id (org-roam-backlink-source-node link))
+           (org-roam-node-id node)
+           )
+          ))
+       )
+  )
+(advice-add
+ #'org-roam-backlinks-get
+ :around #'konix/org-roam-backlinks-get/remove-self-links)
+
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

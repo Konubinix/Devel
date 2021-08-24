@@ -969,6 +969,9 @@ citation key, for Org-ref cite links."
       (konix/org-roam-export/add-more)
       (konix/org-roam-export/load-transclusion)
       (konix/org-roam-replace-roam-links-with-hugo-compatible-ones)
+      ;; so that hugo won't complain if it finds the id in the current buffer
+      ;; and wants to kill it
+      (set-buffer-modified-p nil)
       )
     )
   )

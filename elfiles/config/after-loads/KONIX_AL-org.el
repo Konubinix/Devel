@@ -3776,68 +3776,83 @@ of the clocksum."
     )
   )
 
+
 (add-hook 'org-trigger-hook 'konix/org-trigger-hook)
 
+(defvar konix/org-todo/in-todo nil)
+
+(defun konix/org-todo/setup-in-todo (orig-func &rest args)
+  (let (
+        (konix/org-todo/in-todo t)
+        )
+    (apply orig-func args)
+    )
+  )
+(advice-add #'org-todo :around #'konix/org-todo/setup-in-todo)
+
+
 (defun konix/org-blocker-hook (change-plist)
-  (let* (
-         (type (plist-get change-plist :type))
-         (pos (plist-get change-plist :position))
-         (from_value (or (plist-get change-plist :from) ""))
-         (to_value (or (plist-get change-plist :to) ""))
-         (from (if (symbolp from_value)
-                   (upcase
-                    (symbol-name from_value)
-                    )
-                 (substring-no-properties from_value)
-                 )
-               )
-         (to (if (symbolp to_value)
-                 (upcase
-                  (symbol-name to_value)
+  (when konix/org-todo/in-todo
+   (let* (
+          (type (plist-get change-plist :type))
+          (pos (plist-get change-plist :position))
+          (from_value (or (plist-get change-plist :from) ""))
+          (to_value (or (plist-get change-plist :to) ""))
+          (from (if (symbolp from_value)
+                    (upcase
+                     (symbol-name from_value)
+                     )
+                  (substring-no-properties from_value)
                   )
-               (substring-no-properties to_value)
-               )
-             )
-         )
-    (when (and
-           (eq type 'todo-state-change)
-           (string= to "DONE")
-           )
-      (save-restriction
-        (save-excursion
-          (org-back-to-heading)
-          (org-show-subtree)
-          (mapc
-           (lambda (marker)
-             (save-window-excursion
-               (save-excursion
-                 (goto-char (marker-position marker))
-                 (pop-to-buffer (current-buffer))
-                 (org-todo
-                  (completing-read
-                   (format "What to do with this '%s'?" (konix/org-get-heading))
-                   '("DONE" "NOT_DONE")
+                )
+          (to (if (symbolp to_value)
+                  (upcase
+                   (symbol-name to_value)
+                   )
+                (substring-no-properties to_value)
+                )
+              )
+          )
+     (when (and
+            (eq type 'todo-state-change)
+            (string= to "DONE")
+            )
+       (save-restriction
+         (save-excursion
+           (org-back-to-heading)
+           (org-show-subtree)
+           (mapc
+            (lambda (marker)
+              (save-window-excursion
+                (save-excursion
+                  (goto-char (marker-position marker))
+                  (pop-to-buffer (current-buffer))
+                  (org-todo
+                   (completing-read
+                    (format "What to do with this '%s'?" (konix/org-get-heading))
+                    '("DONE" "NOT_DONE")
+                    )
                    )
                   )
-                 )
-               )
-             )
-           (konix/org-get-todo-children-markers-no-recursion)
+                )
+              )
+            (konix/org-get-todo-children-markers-no-recursion)
+            )
            )
-          )
-        )
-      )
-    (if (and
-         (eq type 'todo-state-change)
-         (member to org-done-keywords)
-         (member from org-not-done-keywords)
          )
-        (org-with-point-at pos
-          (konix/org-ask-about-committed-parties)
+       )
+     (if (and
+          (eq type 'todo-state-change)
+          (member to org-done-keywords)
+          (member from org-not-done-keywords)
           )
-      t
-      )
-    )
+         (org-with-point-at pos
+           (konix/org-ask-about-committed-parties)
+           )
+       t
+       )
+     )
+   )
   )
 (add-hook 'org-blocker-hook
           'konix/org-blocker-hook)

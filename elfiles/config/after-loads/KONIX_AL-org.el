@@ -5691,19 +5691,33 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
-(defun konix/org--deadline-or-schedule/check-deadline-after-scheduled (&rest arguments)
+(defvar konix/org--deadline-or-schedule/check-deadline-after-scheduled/inhibit nil)
+
+(defun konix/org-edna-process-form/process-warning-only-at-the-end (orig-func &rest args)
   (let (
-        (deadline-time (org-get-deadline-time (point)))
-        (schedule-time (org-get-scheduled-time (point)))
+        (konix/org--deadline-or-schedule/check-deadline-after-scheduled/inhibit t)
         )
-    (when (and deadline-time schedule-time)
-      (when (time-less-p deadline-time schedule-time)
-        (warn "Deadline time (%s) before schedule time (%s).
+    (apply orig-func args)
+    )
+  (konix/org--deadline-or-schedule/check-deadline-after-scheduled)
+  )
+(advice-add #'org-edna-process-form :around #'konix/org-edna-process-form/process-warning-only-at-the-end)
+
+(defun konix/org--deadline-or-schedule/check-deadline-after-scheduled (&rest arguments)
+  (unless konix/org--deadline-or-schedule/check-deadline-after-scheduled/inhibit
+    (let (
+          (deadline-time (org-get-deadline-time (point)))
+          (schedule-time (org-get-scheduled-time (point)))
+          )
+      (when (and deadline-time schedule-time)
+        (when (time-less-p deadline-time schedule-time)
+          (warn "Deadline time (%s) before schedule time (%s).
 The entry won't show up until it is too late.
 You should check this is not a mistake."
-              (org-format-time-string "%Y-%m-%d" deadline-time)
-              (org-format-time-string "%Y-%m-%d" schedule-time)
-              )
+                (org-format-time-string "%Y-%m-%d" deadline-time)
+                (org-format-time-string "%Y-%m-%d" schedule-time)
+                )
+          )
         )
       )
     )

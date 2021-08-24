@@ -26,6 +26,7 @@
 
 (require 'uuidgen)
 (require 'KONIX_org-roam-export)
+(require 'org-roam-dailies)
 
 (define-key org-mode-map (kbd "C-c n l") #'org-roam-buffer-toggle)
 

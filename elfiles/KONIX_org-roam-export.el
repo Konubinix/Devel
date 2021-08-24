@@ -194,7 +194,7 @@
 (defun konix/org-roam-export/extract-kind (&optional filename)
   (or
    (konix/org-roam-export/extract-kind-unsafe filename)
-   (error "%s is not exported" filename)
+   (error "%s is not exported" (or filename (buffer-file-name)))
    )
   )
 

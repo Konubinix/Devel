@@ -10,12 +10,6 @@
 (which-key-mode)
 (electric-pair-mode)
 
-(defun konix/emacs-startup-hooks ()
-  )
-
-(add-hook 'emacs-startup-hook
-          'konix/emacs-startup-hooks)
-
 (setq konix/start-calendar nil)
 
 (defun konix/start-calendar nil

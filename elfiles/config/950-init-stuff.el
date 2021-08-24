@@ -18,7 +18,7 @@
   (setq konix/start-calendar t)
   (setq create-lockfiles nil)
   (eval-after-load "org-clock"
-    (setq org-clock-persist-query-resume nil)
+    (setq org-clock-persist nil)
     )
   (message "Storing")
   (konix/org-store-agenda-views)
@@ -27,20 +27,16 @@
   (message "Killed")
   )
 
-(if (getenv "KONIX_EMACS_BATCH")
-    (progn
-      )
-  (progn
-    (server-start)
-    )
+(unless (getenv "KONIX_EMACS_BATCH")
+  (server-start)
   )
 
 (setq-default global-mode-string
- (remove
-  'display-time-string
-  global-mode-string
-  )
- )
+              (remove
+               'display-time-string
+               global-mode-string
+               )
+              )
 
 (setenv "INEMACS" "t")
 

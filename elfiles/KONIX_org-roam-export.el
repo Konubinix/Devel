@@ -29,7 +29,7 @@
 (require 'url-util)
 (require 'org-roam)
 (require 'org-transclusion)
-(require 'org-roam-bibtex)
+(or (require 'org-roam-bibtex nil t) (message "Could not load org-roam-bibtex"))
 (require 'org-ref)
 (require 'org-ref-ivy)
 

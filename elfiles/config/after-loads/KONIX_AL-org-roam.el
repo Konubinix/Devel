@@ -598,7 +598,10 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
 
 (org-roam-setup)
 (citeproc-org-setup)
-(org-roam-bibtex-mode)
+(if (require 'org-roam-bibtex nil t)
+    (org-roam-bibtex-mode)
+  (warn "Could not load org-roam-bibtex")
+  )
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

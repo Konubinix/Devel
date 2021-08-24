@@ -575,6 +575,10 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
   (org-id-goto link)
   )
 
+;; add sentinel character to ease filter with the exact title. So that |sgx|
+;; matches the note exactly about sgx and note the hundreds of notes about sgx
+(setq-default org-roam-node-display-template "${tags:10}|${title:100}|")
+
 (org-roam-setup)
 (citeproc-org-setup)
 (if (require 'org-roam-bibtex nil t)

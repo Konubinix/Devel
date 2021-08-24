@@ -156,6 +156,8 @@
 (autoload 'org-capture-ref-process-capture "org-capture-ref" "" t)
 (autoload 'org-capture-ref-get-bibtex-field "org-capture-ref" "" t)
 (autoload 'konix/hypothesis-archive "hypothesis" "" t)
+(autoload 'konix/git/status "KONIX_git" "" t)
+(autoload 'konix/git/show/origin-commit-at-pos "KONIX_git" "" t)
 
 ;; ************************************************************
 ;; Automodes

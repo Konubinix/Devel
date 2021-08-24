@@ -11,12 +11,13 @@ from collections import defaultdict
 
 from joblib import Parallel, delayed, Memory
 import click
-from click_project.lib import check_output, progressbar
+from clk.lib import check_output, progressbar
 from walrus import Database
 
-
-cache = Database(host='localhost').cache(name=os.path.basename(__file__), default_timeout=24 * 3600)
-cache2 = Memory("/home/sam/tmp/{}".format(os.path.basename(__file__)), verbose=0)
+cache = Database(host='localhost').cache(name=os.path.basename(__file__),
+                                         default_timeout=24 * 3600)
+cache2 = Memory("/home/sam/tmp/{}".format(os.path.basename(__file__)),
+                verbose=0)
 ls_tree_re = re.compile("^[^ ]+ [^ ]+ (?P<object>[^\t]+)\t(?P<path>.+)$")
 
 
@@ -30,17 +31,14 @@ def empty(l):
 
 @cache2.cache
 def commit_blobs(commit_sha):
-    return check_output(
-        shlex.split("git ls-tree -t -r {}".format(commit_sha))
-    ).splitlines()
+    return check_output(shlex.split(
+        "git ls-tree -t -r {}".format(commit_sha))).splitlines()
 
 
 @cache.cached()
 def commit_matching_path(commit_sha, blob_sha):
-    blobs_matches = (
-         ls_tree_re.match(line)
-         for line in commit_blobs(commit_sha)
-     )
+    blobs_matches = (ls_tree_re.match(line)
+                     for line in commit_blobs(commit_sha))
     for match in blobs_matches:
         if match.group("object").startswith(blob_sha):
             return match.group("path")
@@ -52,8 +50,7 @@ def matching(commit, parents, blob_sha):
     res = commit_matching_path(commit, blob_sha)
     # print("trying {}".format(commit))
     if res and not builtins.any(
-            commit_matching_path(parent, blob_sha) for parent in parents
-    ):
+            commit_matching_path(parent, blob_sha) for parent in parents):
         return res
     else:
         return None
@@ -72,18 +69,18 @@ def find_matching(info):
 @cache.cached()
 def pool(blob_sha):
     lines = [
-        line.split(" ")
-        for line in check_output(
-                shlex.split("git rev-list --parents HEAD")
-        ).splitlines()
+        line.split(" ") for line in check_output(
+            shlex.split("git rev-list --parents HEAD")).splitlines()
     ]
     p = Pool()
     manager = Manager()
     end = manager.Value(bool, False)
-    gen = p.imap(find_matching, [
-        (commit, parents, blob_sha, end)
-        for commit, *parents in lines  # NOQA
-    ])
+    gen = p.imap(
+        find_matching,
+        [
+            (commit, parents, blob_sha, end)
+            for commit, *parents in lines  # NOQA
+        ])
     with progressbar(gen, length=len(lines)) as bar:
         for line, res in zip(lines, bar):
             if res:
@@ -103,20 +100,16 @@ def main(blob_sha):
             print("## {}".format(blob_sha))
             print(
                 check_output(
-                    shlex.split(
-                        "git log --format='%cd %h %s' -n 1 {}".format(commit))
-                )
-            )
+                    shlex.split("git log --format='%cd %h %s' -n 1 {}".format(
+                        commit))))
             print("  {}".format(res))
             print("-------------")
 
     @cache2.cache
     def big_dict():
         lines = [
-            line.split(" ")
-            for line in check_output(
-                    shlex.split("git rev-list --parents HEAD")
-            ).splitlines()
+            line.split(" ") for line in check_output(
+                shlex.split("git rev-list --parents HEAD")).splitlines()
         ]
         blob_to_commit = defaultdict(set)
         parenthood = {}
@@ -129,6 +122,7 @@ def main(blob_sha):
                         blob_to_commit[blob].add(parent)
                 parenthood[commit] = parents
         return blob_to_commit, parenthood
+
     attempt1()
 
 

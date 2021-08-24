@@ -74,6 +74,18 @@
 	)
   )
 
+(defun konix/org-expiry/update-all-roam ()
+  (interactive)
+  (save-window-excursion
+	(save-excursion
+	  (mapc
+	   #'konix/org-expiry-update-file
+       (org-roam-list-files)
+	   )
+	  )
+	)
+  )
+
 (defun konix/org-expiry/process-all ()
   (interactive)
   (save-window-excursion

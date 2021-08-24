@@ -24,8 +24,8 @@
 
 ;;; Code:
 
-(enable-lui-logging-globally)
-(setq-default lui-logging-directory (expand-file-name "lui-logs" user-emacs-directory))
+(setq-default lui-logging-directory (expand-file-name "lui-logs"
+                                                      user-emacs-directory))
 
 (provide 'KONIX_AL-lui-logging)
 ;;; KONIX_AL-lui-logging.el ends here

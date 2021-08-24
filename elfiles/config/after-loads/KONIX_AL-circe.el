@@ -122,6 +122,12 @@
   )
 (advice-add 'irc--handle-line :around #'konix/irc--handle-line/ignore-empty-lines)
 
+(defun konix/circe-mode-hook ()
+  (enable-lui-logging)
+  )
+(add-hook 'circe-mode-hook
+          'konix/circe-mode-hook)
+
 
 (provide 'KONIX_AL-circe)
 ;;; KONIX_AL-circe.el ends here

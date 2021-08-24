@@ -53,15 +53,21 @@
 (advice-add #'org-expiry-insert-created :around #'konix/org-expiry-insert-created/only-personnal-files)
 (org-expiry-insinuate)
 
+(defun konix/org-expiry-update-file (&optional file)
+  (interactive)
+  (setq file (or file (buffer-file-name)))
+  (message "Processing file %s" file)
+  (with-current-buffer (find-file-noselect file)
+    (org-map-entries 'org-expiry-insert-created)
+    )
+  )
+
 (defun konix/org-expiry/update-all ()
   (interactive)
   (save-window-excursion
 	(save-excursion
 	  (mapc
-	   (lambda (file)
-		 (find-file file)
-		 (org-map-entries 'org-expiry-insert-created)
-		 )
+	   #'konix/org-expiry-update-file
 	   (org-agenda-files)
 	   )
 	  )

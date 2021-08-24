@@ -3,7 +3,7 @@
 
 from pathlib import Path
 from sqlalchemy import create_engine
-from click_project.lib import cd, check_output
+from clk.lib import cd, check_output
 import sys
 
 

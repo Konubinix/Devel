@@ -615,5 +615,15 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
  #'org-roam-backlinks-get
  :around #'konix/org-roam-backlinks-get/remove-self-links)
 
+(defun konix/org-roam-goto-random-fleeting-note ()
+  (interactive)
+  (org-id-goto
+   (car (seq-random-elt
+         (org-roam-db-query
+          [:select [node_id]
+                   :from tags
+                   :where (= tag $s1)]
+          "fleeting")))))
+
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

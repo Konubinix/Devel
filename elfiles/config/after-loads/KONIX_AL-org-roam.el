@@ -214,28 +214,17 @@ ${title}
 (advice-add 'org-id-find-id-file :around #'konix/org-id-find-id-file/try-in-roam-if-miss)
 
 
-(defun konix/org-roam-find-node-by-ref (ref)
-  (alist-get
-   ref
-   (org-roam-ref--completions) nil nil 'string=)
-  )
-
 (defun konix/org-add-roam-ref (url title body)
   (let* (
          (decoded-title (s-trim (org-link-decode title)))
-         (decoded-url (s-trim (org-link-decode url)))
+         (decoded-url (substring-no-properties (s-trim (org-link-decode url))))
          (decoded-body (s-trim (org-link-decode body)))
          (slug (konix/org-roam-compute-slug decoded-title))
-         (url-without-type (and
-                            (string-match org-link-plain-re decoded-url)
-                            (match-string 2 decoded-url)
-                            )
-                           )
          (buffer
           (save-window-excursion
             (or
              (if-let (
-                      (node (konix/org-roam-find-node-by-ref url-without-type))
+                      (node (org-roam-node-from-ref decoded-url))
                       )
                  (find-file (org-roam-node-file node))
                )
@@ -322,7 +311,7 @@ ${title}
           #'konix/org-mode-hook--for-org-roam)
 
 (defun konix/org-roam-get-all-refs ()
-  (->> (org-roam-ref--completions)
+  (->> (org-roam-ref-read--completions)
        (-map 'car)
        (-map (lambda (ref)
                (format "%s:%s" (get-text-property 0 'type ref) ref)
@@ -330,7 +319,7 @@ ${title}
        )
   )
 
-(defun konix/org-roam/yank-key ()
+(defun konix/org-roam/yank-ref ()
   (interactive)
   (if (and
        (not current-prefix-arg)
@@ -357,19 +346,14 @@ ${title}
           )
         (message "%s copied into the clipboard" key)
         )
-    (let* ((completions (org-roam--get-title-path-completions))
-           (title-with-tags (org-roam-completion--completing-read
-                             "File: "
-                             completions
-                             )
-                            )
-           (res (cdr (assoc title-with-tags completions)))
-           (file-path (plist-get res :path))
+    ;; else
+    (let* (
+           (node (org-roam-ref-read))
            (current-prefix-arg nil)
            )
       (save-window-excursion
-        (with-current-buffer (find-file file-path)
-          (call-interactively 'konix/org-roam/yank-key)
+        (with-current-buffer (find-file-noselect (org-roam-node-file node))
+          (call-interactively 'konix/org-roam/yank-ref)
           )
         )
       )
@@ -398,13 +382,7 @@ ${title}
     )
   (let* (
          (heading (match-string 2))
-         (url (match-string 1))
-         (url-without-type (save-match-data
-                             (and
-                              (string-match org-link-plain-re url)
-                              (match-string 2 url)
-                              )
-                             ))
+         (url (substring-no-properties (match-string 1)))
          (beg
           (save-excursion
             (forward-line)
@@ -428,10 +406,9 @@ ${title}
          (buffer (save-window-excursion
                    (or
                     (and current-prefix-arg
-                         (org-roam-find-file))
+                         (org-roam-node-find))
                     (if-let (
-                             (node (konix/org-roam-find-node-by-ref
-                                    url-without-type))
+                             (node (org-roam-node-from-ref url))
                              )
                         (find-file (org-roam-node-file node))
                       )
@@ -539,32 +516,32 @@ ${title}
   (interactive)
   (when (org-roam-file-p)
     (when-let* (
-              (buffer (current-buffer))
-              (position (point))
-              (node (konix/org-roam-node-file-node))
-              (file (org-roam-node-file node))
-              (file-name (file-name-nondirectory file))
-              (slug (org-roam-node-slug node))
-              (directory (file-name-directory file))
-              (new-file-name (format "%s.org" slug))
-              (new-file-path (expand-file-name new-file-name directory))
+                (buffer (current-buffer))
+                (position (point))
+                (node (konix/org-roam-node-file-node))
+                (file (org-roam-node-file node))
+                (file-name (file-name-nondirectory file))
+                (slug (org-roam-node-slug node))
+                (directory (file-name-directory file))
+                (new-file-name (format "%s.org" slug))
+                (new-file-path (expand-file-name new-file-name directory))
+                )
+      (when (and
+             (not (string= new-file-name file-name))
+             (or
+              (not (file-exists-p new-file-path))
+              (yes-or-no-p "Destination already exist, rename anyway?")
               )
-             (when (and
-                    (not (string= new-file-name file-name))
-                    (or
-                     (not (file-exists-p new-file-path))
-                     (yes-or-no-p "Destination already exist, rename anyway?")
-                     )
-                    )
-               (rename-file file new-file-path)
-               (find-file new-file-path)
-               (goto-char position)
-               (org-roam-message "File moved to %S" (abbreviate-file-name
-                                                     new-file-name))
-               (kill-buffer buffer)
-               )
-
              )
+        (rename-file file new-file-path)
+        (find-file new-file-path)
+        (goto-char position)
+        (org-roam-message "File moved to %S" (abbreviate-file-name
+                                              new-file-name))
+        (kill-buffer buffer)
+        )
+
+      )
     )
   )
 

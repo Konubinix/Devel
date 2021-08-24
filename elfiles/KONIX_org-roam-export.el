@@ -363,14 +363,8 @@
           )
         (message "%s copied into the clipboard" url)
         )
-    (let* ((completions (org-roam--get-title-path-completions))
-           (title-with-tags (org-roam-completion--completing-read
-                             "File: "
-                             completions
-                             )
-                            )
-           (res (cdr (assoc title-with-tags completions)))
-           (file-path (plist-get res :path)))
+    (let* ((node (org-roam-node-read))
+           (file-path (org-roam-node-file node)))
       (save-window-excursion
         (with-current-buffer (find-file file-path)
           (call-interactively 'konix/org-roam-export/yank-url)
@@ -514,7 +508,7 @@
         )
       (goto-char (point-max))
       (insert
-       (format "\n* [[/%s%s?title=%s][Permalink]]"
+       (format "\n* [[https://konubinix.eu/%s%s?title=%s][Permalink]]"
                (konix/org-roam-export/extract-kind)
                id
                (org-roam-node-slug (konix/org-roam-node-file-node))
@@ -576,83 +570,133 @@
     )
   )
 
-(defun konix/org-roam-export/add-backlinks ()
-  (when-let* (
-              (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
-              (nodes (konix/org-roam-nodes-in-file))
-              (ids (->> nodes
-                        (-map 'org-roam-node-id)
-                        ))
-              (links (->> nodes
-                          (-map 'org-roam-backlinks-get)
-                          (apply 'append) ;; merge into one single list
-                          (-map 'org-roam-backlink-source-node)
-                          (-filter (lambda (node)
-                                     (konix/org-roam-is-public-or-kind-p node kind)
-                                     ))
-                          (-remove (lambda (node)
-                                     (member (org-roam-node-id node) ids)
-                                     ))
-                          (-uniq)
-                          )
-                     )
-              )
-    (goto-char (point-max))
-    (let* (
-           (language (konix/org-roam-export/get-language))
-           (text (cond
-                  ((string-equal language "fr")
-                   "Notes pointant ici"
-                   )
-                  ((string-equal language "en")
-                   "Notes linking here"
-                   )
-                  (t
-                   (error "Unsupported language %s" language)
-                   )
+(defun konix/org-roam-export/format-url (node)
+  (let* (
+         (kind (with-current-buffer (find-file-noselect (org-roam-node-file node))
+                 (save-excursion (goto-char (point-min))
+                                 (konix/org-roam-export/extract-kind))))
+         (file-slug (with-current-buffer (find-file-noselect (org-roam-node-file node))
+                      (save-excursion
+                        (goto-char (point-min))
+                        (org-roam-node-slug (org-roam-node-at-point))
+                        )
+                      )
+                    )
+         (file-id (with-current-buffer (find-file-noselect (org-roam-node-file node))
+                    (save-excursion
+                      (goto-char (point-min))
+                      (org-id-get)
+                      )
+                    )
                   )
-                 )
-           )
-      (unless (save-excursion
-                (goto-char (point-min))
-                (re-search-forward "#\\+HUGO: more" nil t)
-                )
-        (insert "#+HUGO: more
-")
-        )
-      (insert (format "\n* %s\n" text))
-      (dolist (link links)
-        (let (
-              (link-kind (konix/org-roam-export/extract-kind (org-roam-node-file
-                                                              link)))
-              (link-file (org-roam-node-file link))
-              )
-          (insert
-           (if (equal link-kind kind)
-               (format "   - [[id:%s][%s]]\n"
-                       (org-roam-node-id link)
-                       (org-roam-node-title link)
-                       )
-             (format "   - [[https://konubinix.eu/%s/%s?title=%s][%s]]%s\n"
-                     (konix/org-roam-export/extract-kind link-file)
-                     (org-roam-node-id link)
-                     (org-roam-node-slug link)
-                     (org-roam-node-title link)
-                     (if (not
-                          (equal
-                           kind
-                           link-kind
-                           )
-                          )
-                         (format " (%s)" link-kind)
-                       ""
-                       )
+         (node-slug-if-not-file (if (string-equal (org-roam-node-id node)
+                                                  file-id)
+                                    ""
+                                  (org-hugo-slug
+                                   (org-roam-node-title node)
+                                   )
+                                  )
+                                )
+         )
+    (format "https://konubinix.eu/%s/posts/%s/?title=%s#%s"
+            kind
+            file-slug
+            (org-roam-node-slug node)
+            node-slug-if-not-file
+            )
+    )
+  )
+
+(defun konix/org-roam-export/add-backlinks ()
+  (let* (
+         (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
+         (nodes (konix/org-roam-nodes-in-file))
+         (ids (->> nodes
+                   (-map 'org-roam-node-id)
+                   ))
+         (backlinks (->> nodes
+                         (-map 'org-roam-backlinks-get)
+                         (apply 'append) ;; merge into one single list
+                         (-map 'org-roam-backlink-source-node)
+                         (-filter (lambda (node)
+                                    (konix/org-roam-is-public-or-kind-p node kind)
+                                    ))
+                         (-remove (lambda (node)
+                                    (member (org-roam-node-id node) ids)
+                                    ))
+                         (-uniq)
+                         )
+                    )
+         (reflinks (->> nodes
+                        (-map 'org-roam-reflinks-get)
+                        (apply 'append) ;; merge into one single list
+                        (-map 'org-roam-reflink-source-node)
+                        (-filter (lambda (node)
+                                   (konix/org-roam-is-public-or-kind-p node kind)
+                                   ))
+                        (-remove (lambda (node)
+                                   (member (org-roam-node-id node) ids)
+                                   ))
+                        (-uniq)
+                        )
+                   )
+         (links (append backlinks reflinks))
+         )
+    (when links
+      (goto-char (point-max))
+      (let* (
+             (language (konix/org-roam-export/get-language))
+             (text (cond
+                    ((string-equal language "fr")
+                     "Notes pointant ici"
                      )
+                    ((string-equal language "en")
+                     "Notes linking here"
+                     )
+                    (t
+                     (error "Unsupported language %s" language)
+                     )
+                    )
+                   )
              )
-           )
-
+        (unless (save-excursion
+                  (goto-char (point-min))
+                  (re-search-forward "#\\+HUGO: more" nil t)
+                  )
+          (insert "#+HUGO: more
+")
           )
+        (insert (format "\n* %s\n" text))
+        (dolist (link links)
+          (let (
+                (link-kind (konix/org-roam-export/extract-kind (org-roam-node-file
+                                                                link)))
+                (link-file (org-roam-node-file link))
+                )
+            (insert
+             (if (equal link-kind kind)
+                 (format "   - [[id:%s][%s]]\n"
+                         (org-roam-node-id link)
+                         (org-roam-node-title link)
+                         )
+               (format "   - [[%s][%s]]%s\n"
+                       (konix/org-roam-export/format-url link)
+                       (org-roam-node-title link)
+                       (if (not
+                            (equal
+                             kind
+                             link-kind
+                             )
+                            )
+                           (format " (%s)" link-kind)
+                         ""
+                         )
+                       )
+               )
+             )
 
+            )
+          )
         )
       )
     )
@@ -796,25 +840,7 @@
                      (goto-char (point-min))
                      (replace-string
                       (format "id:%s" id)
-                      (format "/%s/%s?%s" kind id slug)
-                      )
-                     )
-                   )
-                 )
-           )
-      )
-    (save-excursion
-      (->> internal-ids-to-replace
-           (-map (lambda (id)
-                   (let* (
-                          (node (org-roam-node-from-id id))
-                          (file (org-roam-node-file node))
-                          (relative-path (file-relative-name file my-directory))
-                          )
-                     (goto-char (point-min))
-                     (replace-string
-                      (format "id:%s" id)
-                      (format "file:%s" relative-path)
+                      (konix/org-roam-export/format-url node)
                       )
                      )
                    )

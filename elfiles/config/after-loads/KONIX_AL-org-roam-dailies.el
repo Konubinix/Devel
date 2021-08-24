@@ -48,6 +48,9 @@
    )
  )
 
+(defun org-roam-dailies-calendar--date-to-time (date)
+  "Convert DATE as returned from then calendar (MONTH DAY YEAR) to a time."
+  (encode-time 0 0 0 (nth 1 date) (nth 0 date) (nth 2 date)))
 
 (defun konix/org-roam-dailies-display-entry (_arg &optional event)
   "Display journal entry for selected date in another window."

@@ -52,6 +52,8 @@
 (defun konix/org-roam-export/export-all (&optional kind incremental)
   "Re-exports all Org-roam files to Hugo markdown."
   (interactive)
+  (toggle-debug-on-error)
+  (global-auto-revert-mode 1)
   (setq kind (or kind "blog"))
   (assert (not (string= "" kind)))
   (let*  (
@@ -144,7 +146,13 @@
       (when (f-directory-p new-posts)
         ;; put back the temporarily exported files into posts
         (dolist (f (f-glob "*" new-posts))
-          (rename-file f (expand-file-name (file-name-nondirectory f) posts))
+          (let (
+                (new-name (expand-file-name (file-name-nondirectory f) posts))
+                )
+            (when (file-exists-p new-name)
+              (delete-file new-name)
+              )
+            (rename-file f new-name))
           )
         (delete-directory new-posts t)
         )

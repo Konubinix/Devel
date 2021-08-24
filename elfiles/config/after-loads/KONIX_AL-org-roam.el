@@ -625,5 +625,20 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
                    :where (= tag $s1)]
           "fleeting")))))
 
+(defun konix/org-roam-refile/org-agenda-to-org (orig-fun &rest args)
+  (save-window-excursion
+    (when (equal major-mode 'org-agenda-mode)
+      (let (
+            (org-agenda-buffer-name (buffer-name (current-buffer)))
+            )
+        (org-agenda-goto)
+        (org-remove-subtree-entries-from-agenda)
+        )
+      )
+    (apply orig-fun args)
+    )
+  )
+(advice-add #'org-roam-refile :around #'konix/org-roam-refile/org-agenda-to-org)
+
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

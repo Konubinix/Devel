@@ -3241,6 +3241,23 @@ items"
     )
   )
 
+(defun konix/org-insert-at-point ()
+  (interactive)
+  (let (
+        (place_to_go (org-refile-get-location "Jump to"))
+        link
+        )
+    (save-window-excursion
+      (find-file (second place_to_go))
+      (save-excursion
+        (goto-char (or (fourth place_to_go) 0))
+        (setq link (org-store-link nil))
+        )
+      )
+    (insert link)
+    )
+  )
+
 (defun konix/org-mark-ring-goto-newest ()
   (interactive)
   (org-mark-ring-goto -1)

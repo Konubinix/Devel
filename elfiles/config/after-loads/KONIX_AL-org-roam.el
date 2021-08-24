@@ -31,7 +31,7 @@
 (define-key org-mode-map (kbd "C-c n l") #'org-roam-buffer-toggle)
 (define-key org-mode-map (kbd "C-c n t") #'konix/org-roam-export/toggle-publish)
 
-(setq-default org-roam-directory (expand-file-name "roam" perso-dir))
+(setq-default org-roam-directory (file-truename (expand-file-name "roam" perso-dir)))
 (setq-default org-roam-v2-ack t)
 (setq-default org-roam-completion-everywhere t)
 
@@ -46,7 +46,7 @@
 #+LANGUAGE: fr
 #+CREATED: %U
 #+DATE: %U
-#+filetags: :fleeting_note:
+#+filetags: :fleeting:
 ${title}
 
 ")
@@ -246,7 +246,7 @@ ${title}
 #+CREATED: %s
 #+LANGUAGE: fr
 #+DATE: %s
-#+filetags: :fleeting_note:
+#+filetags: :fleeting:
 %s
 "
           (uuidgen-4)
@@ -450,7 +450,7 @@ ${title}
           )
         (save-excursion
           (unless (re-search-forward "^#\\+filetags:" 3000 t)
-            (insert "#+filetags: :fleeting_note: \n")
+            (insert "#+filetags: :fleeting: \n")
             )
           )
         (save-excursion

@@ -104,7 +104,7 @@
 (depends-on "typescript-mode")
 (depends-on "org-ref")
 (depends-on "citeproc-org")
-(depends-on "org-roam-bibtex")
+; (depends-on "org-roam-bibtex")
 (depends-on "outline-magic")
 (depends-on "scad-mode")
 (depends-on "rust-mode")

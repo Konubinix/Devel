@@ -5725,5 +5725,73 @@ You should check this is not a mistake."
 
 (advice-add #'org--deadline-or-schedule :after #'konix/org--deadline-or-schedule/check-deadline-after-scheduled)
 
+(defvar konix/org-view-mode nil)
+(make-variable-buffer-local 'konix/org-view-mode)
+
+;; taken from https://github.com/org-roam/org-roam/wiki/Hitchhiker's-Rough-Guide-to-Org-roam-V2
+(defun org-hide-properties ()
+  "Hide all org-mode headline property drawers in buffer. Could be slow if it has a lot of overlays."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward
+            "^ *:properties:\n\\( *:.+?:.*\n\\)+ *:end:\n" nil t)
+      (let ((ov_this (make-overlay (match-beginning 0) (match-end 0))))
+        (overlay-put ov_this 'display "")
+        (overlay-put ov_this 'hidden-prop-drawer t))))
+  )
+
+(defun org-hide-tags ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward
+            "^\*+\\(?:.+?\\)\\( +:[a-zA-Z0-9_:-]+\\)$" nil t)
+      (let ((ov_this (make-overlay (match-beginning 1) (match-end 1))))
+        (overlay-put ov_this 'display "")
+        (overlay-put ov_this 'hidden-prop-drawer t))))
+  )
+
+(defun org-hide-scheduling ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward
+            "^ *\\(SCHEDULED:\\|DEADLINE:\\).+$" nil t)
+      (let ((ov_this (make-overlay (match-beginning 0) (match-end 0))))
+        (overlay-put ov_this 'display "")
+        (overlay-put ov_this 'hidden-prop-drawer t))))
+  )
+
+(defun org-show-properties ()
+  "Show all org-mode property drawers hidden by org-hide-properties."
+  (interactive)
+  (remove-overlays (point-min) (point-max) 'hidden-prop-drawer t)
+  )
+
+(defun konix/org-toggle-view-mode ()
+  (interactive)
+  (if konix/org-view-mode
+      (progn
+        (org-show-properties)
+        (org-transclusion-mode -1)
+        (when org-inline-image-overlays
+          (org-toggle-inline-images)
+          )
+        (setq konix/org-view-mode nil)
+        )
+    (progn
+      (org-transclusion-mode 1)
+      (org-hide-properties)
+      (org-hide-tags)
+      (org-hide-scheduling)
+      (unless org-inline-image-overlays
+        (org-toggle-inline-images)
+        )
+      (setq konix/org-view-mode t)
+      )
+    )
+  )
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

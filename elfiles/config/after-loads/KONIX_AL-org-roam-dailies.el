@@ -55,7 +55,7 @@
    (list current-prefix-arg last-nonmenu-event))
   (let* ((time (org-roam-dailies-calendar--date-to-time
                 (calendar-cursor-to-date t event))))
-    (find-file (expand-file-name (org-format-time-string "daily/%Y-%m-%d.org" time) org-roam-directory))
+    (find-file (expand-file-name (org-format-time-string "daily/%Y_%m_%d.org" time) org-roam-directory))
     (when (equal (point-min) (point-max))
       (insert
        (format

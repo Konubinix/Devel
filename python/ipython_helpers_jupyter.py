@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
+
 
 def jupyter_edit(content, cell_type="code"):
     """
@@ -34,10 +35,10 @@ require(["base/js/events", "base/js/utils"], function (events, utils) {
 });
 - cell_type: "code", "raw" and "markdown"
 """
-    import tempfile
-    import subprocess
     import os
+    import subprocess
     import sys
+    import tempfile
     type_to_extension = {
         "code": "py",
         "raw": "txt",
@@ -52,8 +53,10 @@ require(["base/js/events", "base/js/utils"], function (events, utils) {
     sys.stdout.write(content)
     os.remove(tf.name)
 
+
 def start_kernel_and_console():
     import os
+
     import zmq
 
     pid = os.fork()

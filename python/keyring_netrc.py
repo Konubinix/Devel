@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-import netrc
-import keyring.backend
 import json
+import netrc
 import os
+
+import keyring.backend
 
 
 class NetrcKeyring(keyring.backend.KeyringBackend):
@@ -16,8 +17,7 @@ class NetrcKeyring(keyring.backend.KeyringBackend):
     def get_password(self, servicename, username):
         try:
             authenticator = netrc.netrc(
-                os.path.expanduser("~/.netrc")
-            ).authenticators(username)
+                os.path.expanduser("~/.netrc")).authenticators(username)
             return json.dumps((authenticator[0], authenticator[2]))
         except:
             return None

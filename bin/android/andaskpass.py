@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import os
 os.environ["AP_HOST"]="127.0.0.1"

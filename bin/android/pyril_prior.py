@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 from pyrillib import main, configs, conditions
 configs.get("auto_select").activated = True

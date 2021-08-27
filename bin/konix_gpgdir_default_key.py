@@ -5,4 +5,4 @@ import re
 import os
 import konix_gpg
 
-print konix_gpg.get_default_key()
+print(konix_gpg.get_default_key())

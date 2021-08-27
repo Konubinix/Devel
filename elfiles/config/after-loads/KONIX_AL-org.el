@@ -1285,12 +1285,59 @@ items"
     )
   )
 
+(defun konix/org-days-is-workday-p (days)
+  (let* (
+         (time (konix/org-days-to-time days))
+         (dow (seventh (decode-time time)))
+         (holi-days (->> konix/calendar-job-holidays
+                         (-map #'car)
+                         (-map #'calendar-absolute-from-gregorian)
+                         )
+                    )
+         )
+    (not
+     (or
+      (member dow '(0 6)) ;; weekend
+      (member days holi-days)
+      )
+     ))
+  )
+
+(defun konix/org-days-to-time (days)
+  (let (
+        (gregorian-date (org-date-to-gregorian days))
+        )
+    (encode-time
+     0 0 0
+     (second gregorian-date)
+     (first gregorian-date)
+     (third gregorian-date)
+     )
+    )
+  )
+
+(defun konix/org-count-workdays (start end)
+  (let (
+        (count 0)
+        (cur (1+ start))
+        )
+    (while (<= cur end)
+      (when (konix/org-days-is-workday-p cur)
+        (setq count (1+ count))
+        )
+      (setq cur (1+ cur))
+      )
+    count
+    )
+  )
+
 (defun konix/org-agenda-deadline-prefix ()
   (let (
         (planning-info (konix/org-planning-information))
         diff
         wdays
         deadline-time
+        work-days
         )
     (if-let (
              (deadline-string (plist-get planning-info :deadline))
@@ -1299,10 +1346,11 @@ items"
           (setq deadline-time (org-time-string-to-absolute deadline-string))
           (setq wdays (org-get-wdays deadline-string))
           (setq diff (- deadline-time (konix/org-agenda-current-time)))
+          (setq work-days (konix/org-count-workdays (konix/org-agenda-current-time) deadline-time))
           (format
            (if (< diff 0)
-               "%2d d.ago "
-             "In %3d d."
+             "%2dd. ago"
+             (format "%%3d(%2d)d" work-days)
              )
            (abs diff)
            )
@@ -3011,10 +3059,10 @@ items"
  <=> (konix/org-cmp-deadlines-past-and-due-first a b) == 1
 "
   (let*(
-        (deadline_regexp_past " \\([0-9]+\\) d\\. ago")
-        (deadline_regexp_future " In +\\([0-9]+\\) d\\.")
-        (deadline_parent_regexp_past "P-\\([0-9]+\\) d\\. ago")
-        (deadline_parent_regexp_future "P-In +\\([0-9]+\\) d\\.")
+        (deadline_regexp_past " \\([0-9]+\\)d\\. ago")
+        (deadline_regexp_future " \\([0-9]+\\)[()0-9]+d")
+        (deadline_parent_regexp_past "P- *\\([0-9]+\\)d\\. ago")
+        (deadline_parent_regexp_future "P-\\([0-9]+\\)[()0-9]+d")
         (deadline_regexp_now "Deadline\\| In   0 d\\.")
         (deadline_parent_regexp_now "P-In   0 d\\.")
         (a_now (string-match-p deadline_regexp_now a))
@@ -3793,66 +3841,66 @@ of the clocksum."
 
 (defun konix/org-blocker-hook (change-plist)
   (when konix/org-todo/in-todo
-   (let* (
-          (type (plist-get change-plist :type))
-          (pos (plist-get change-plist :position))
-          (from_value (or (plist-get change-plist :from) ""))
-          (to_value (or (plist-get change-plist :to) ""))
-          (from (if (symbolp from_value)
-                    (upcase
-                     (symbol-name from_value)
-                     )
-                  (substring-no-properties from_value)
-                  )
-                )
-          (to (if (symbolp to_value)
-                  (upcase
-                   (symbol-name to_value)
+    (let* (
+           (type (plist-get change-plist :type))
+           (pos (plist-get change-plist :position))
+           (from_value (or (plist-get change-plist :from) ""))
+           (to_value (or (plist-get change-plist :to) ""))
+           (from (if (symbolp from_value)
+                     (upcase
+                      (symbol-name from_value)
+                      )
+                   (substring-no-properties from_value)
                    )
-                (substring-no-properties to_value)
-                )
-              )
-          )
-     (when (and
-            (eq type 'todo-state-change)
-            (string= to "DONE")
-            )
-       (save-restriction
-         (save-excursion
-           (org-back-to-heading)
-           (org-show-subtree)
-           (mapc
-            (lambda (marker)
-              (save-window-excursion
-                (save-excursion
-                  (goto-char (marker-position marker))
-                  (pop-to-buffer (current-buffer))
-                  (org-todo
-                   (completing-read
-                    (format "What to do with this '%s'?" (konix/org-get-heading))
-                    '("DONE" "NOT_DONE")
+                 )
+           (to (if (symbolp to_value)
+                   (upcase
+                    (symbol-name to_value)
+                    )
+                 (substring-no-properties to_value)
+                 )
+               )
+           )
+      (when (and
+             (eq type 'todo-state-change)
+             (string= to "DONE")
+             )
+        (save-restriction
+          (save-excursion
+            (org-back-to-heading)
+            (org-show-subtree)
+            (mapc
+             (lambda (marker)
+               (save-window-excursion
+                 (save-excursion
+                   (goto-char (marker-position marker))
+                   (pop-to-buffer (current-buffer))
+                   (org-todo
+                    (completing-read
+                     (format "What to do with this '%s'?" (konix/org-get-heading))
+                     '("DONE" "NOT_DONE")
+                     )
                     )
                    )
-                  )
-                )
-              )
-            (konix/org-get-todo-children-markers-no-recursion)
+                 )
+               )
+             (konix/org-get-todo-children-markers-no-recursion)
+             )
             )
-           )
-         )
-       )
-     (if (and
-          (eq type 'todo-state-change)
-          (member to org-done-keywords)
-          (member from org-not-done-keywords)
           )
-         (org-with-point-at pos
-           (konix/org-ask-about-committed-parties)
+        )
+      (if (and
+           (eq type 'todo-state-change)
+           (member to org-done-keywords)
+           (member from org-not-done-keywords)
            )
-       t
-       )
-     )
-   )
+          (org-with-point-at pos
+            (konix/org-ask-about-committed-parties)
+            )
+        t
+        )
+      )
+    )
   )
 (add-hook 'org-blocker-hook
           'konix/org-blocker-hook)

@@ -30,6 +30,7 @@
   (setq indent-tabs-mode nil) ;; https://google.github.io/styleguide/jsguide.html#whitespace-characters
   (setq tab-width 2) ;; https://google.github.io/styleguide/jsguide.html#formatting-block-indentation
   (setq typescript-indent-level tab-width) ;; tab-width appears ignored
+  (prettier-js-mode)
   )
 
 (add-hook 'typescript-mode-hook

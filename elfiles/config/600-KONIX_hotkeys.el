@@ -940,4 +940,8 @@
 ;; ######################################################################
 ;; minibuffer hotkeys
 ;; ######################################################################
+(define-prefix-command 'konix/kubel-map)
+(define-key konix/global-fast-key-map "k" 'konix/kubel-map)
+(define-key konix/kubel-map "k" 'kubel)
+
 (define-key minibuffer-local-map (kbd "C-M-e") 'miniedit)

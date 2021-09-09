@@ -2,8 +2,8 @@
 # name: pushd
 # key: pushd
 # --
-pushd "$1"
+pushd "$1"${100: > /dev/null}
 {
 $>$0
 }
-popd
+popd$100

@@ -4201,9 +4201,11 @@ of the clocksum."
                   updatedraw
                   )
                  )
-      (konix/org-gcal-reset-tags)
-      (org-agenda-set-tags "accepted" 'on)
-      (konix/org-gcal-refresh-line)
+      (unless current-prefix-arg
+        (konix/org-gcal-reset-tags)
+        (org-agenda-set-tags "accepted" 'on)
+        (konix/org-gcal-refresh-line)
+        )
       (message "DONE")
       )
     )

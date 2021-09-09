@@ -118,3 +118,4 @@
 (depends-on "py-isort")
 (depends-on "prettier-js")
 (depends-on "kubel")
+(depends-on "envrc")

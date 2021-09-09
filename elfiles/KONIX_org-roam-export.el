@@ -264,7 +264,7 @@
 ([[%s][{{{icon(fas fa-download)}}}]])"
               url (md5 url) url)
       )
-     ((string-match "^\\(http.+\\(webm\\)\\)$" url)
+     ((string-match "^\\(http.+\\(webm\\|mp4\\)\\)$" url)
       (format "{{{video(%s)}}}" (match-string 1 url))
       )
      ((string-match "^\\(file:/*\\)?\\(/ip[fn]s/.+?\\)\\([?]filename=\\(.+\\)\\)?$" url)

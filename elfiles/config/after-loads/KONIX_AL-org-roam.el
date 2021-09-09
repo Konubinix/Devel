@@ -615,15 +615,28 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
  #'org-roam-backlinks-get
  :around #'konix/org-roam-backlinks-get/remove-self-links)
 
-(defun konix/org-roam-goto-random-fleeting-note ()
+(defun konix/org-roam-goto-random (ids)
   (interactive)
   (org-id-goto
    (car (seq-random-elt
-         (org-roam-db-query
-          [:select [node_id]
-                   :from tags
-                   :where (= tag $s1)]
-          "fleeting")))))
+         ids))))
+
+
+(defun konix/org-roam-goto-random-fleeting-note ()
+  (interactive)
+  (konix/org-roam-goto-random
+   (org-roam-db-query
+    [:select [node_id]
+             :from tags
+             :where (= tag $s1)]
+    "fleeting")))
+
+(defun konix/org-roam-goto-random-untagged-note ()
+  (interactive)
+  (konix/org-roam-goto-random
+   (org-roam-db-query
+    "select id from nodes where nodes.id not in (select tags.node_id from tags)"
+    )))
 
 (defun konix/org-roam-refile/org-agenda-to-org (orig-fun &rest args)
   (save-window-excursion

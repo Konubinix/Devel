@@ -2005,6 +2005,11 @@ items"
                            (org-agenda-use-time-grid nil)
                                         ; it will be already included in the no project view
                            (org-agenda-include-diary nil)
+                           (org-agenda-prefix-format
+                            '(
+                              (agenda . "%(konix/org-agenda-prefix-format/ann)")
+                              )
+                            )
                            (org-agenda-skip-function
                             '(or
                               (konix/skip-not-todo-file)

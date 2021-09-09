@@ -287,11 +287,6 @@
 				 )
   )
 
-(defun konix/change-directory (directory)
-  (interactive "DDirectory:")
-  (setq default-directory directory)
-  )
-
 (defvar konix/mail_follow (expand-file-name "~/mail_follow") "")
 (defun konix/open-mail-follow ()
   (interactive)

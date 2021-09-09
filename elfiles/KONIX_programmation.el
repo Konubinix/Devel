@@ -172,6 +172,7 @@ They can be relative or absolute
       (flycheck-mode t)
     (message "flycheck mode not installed")
     )
+  (ispell-change-dictionary "american")
   (goto-address-prog-mode 1)
   ;; highlight parentheses in prog
   (highlight-parentheses-mode 1)

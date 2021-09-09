@@ -135,6 +135,11 @@ then
 	eval `luarocks path`
 fi
 
+if which direnv > /dev/null 2>&1
+then
+    eval "$(direnv hook bash)"
+fi
+
 NIX_SETUP="${HOME}/.nix-profile/etc/profile.d/nix.sh"
 if [ -e "${NIX_SETUP}" ]
 then

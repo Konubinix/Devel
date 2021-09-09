@@ -640,7 +640,10 @@
                         (-uniq)
                         )
                    )
-         (links (append backlinks reflinks))
+         (links (sort (append backlinks reflinks)
+                      (lambda (node1 node2)
+                        (string< (org-roam-node-title node1)
+                                 (org-roam-node-title node2)))))
          )
     (when links
       (goto-char (point-max))

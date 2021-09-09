@@ -1944,5 +1944,19 @@ FExport diary data into iCalendar file: ")
     )
   )
 
+(defun konix/ledger/common-open ()
+  "Open the common ledger."
+  (interactive)
+  (find-file (s-trim (shell-command-to-string "clk ledger -c where-is")))
+  )
+
+(defun konix/ledger/personal-open ()
+  "Open the personal ledger."
+  (interactive)
+  (find-file (s-trim (shell-command-to-string "clk ledger -p where-is")))
+  )
+
+
+
 (provide '350-KONIX_commands)
 ;;; 350-KONIX_commands.el ends here

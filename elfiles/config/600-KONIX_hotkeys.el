@@ -922,4 +922,9 @@
 (define-key konix/global-fast-key-map "k" 'konix/kubel-map)
 (define-key konix/kubel-map "k" 'kubel)
 
+(define-prefix-command 'konix/ledger-map)
+(define-key konix/global-slow-key-map "l" 'konix/ledger-map)
+(define-key konix/ledger-map "p" 'konix/ledger/personal-open)
+(define-key konix/ledger-map "c" 'konix/ledger/common-open)
+
 (define-key minibuffer-local-map (kbd "C-M-e") 'miniedit)

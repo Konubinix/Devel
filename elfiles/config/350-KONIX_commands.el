@@ -1775,14 +1775,6 @@ FExport diary data into iCalendar file: ")
 	)
   )
 
-;;;;;;;;;
-;; znc ;;
-;;;;;;;;;
-(defun konix/znc/goto ()
-  (interactive)
-  (find-file (getenv "KONIX_ZNC_DATADIR"))
-  )
-
 (defun konix/camelcase-to-snakecase ()
   (interactive)
   (save-excursion

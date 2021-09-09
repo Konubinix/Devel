@@ -39,5 +39,6 @@
               )
 
 (setenv "INEMACS" "t")
+(envrc-global-mode)
 
 (setq-default org-roam-v2-ack t)

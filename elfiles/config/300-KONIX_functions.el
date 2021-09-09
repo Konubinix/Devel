@@ -1376,6 +1376,9 @@ Version 2016-09-02"
                              (format "https://youtube.com/watch?v=%s" id))
                (file-exists-p temp-file-name))
       (insert
+       "|------+------|\n"
+       "| time | text |\n"
+       "|------+------|\n"
        (mapconcat (lambda (o)
                     (format "| [[https://youtube.com/watch?v=%s&t=%ss][%s]] | %s |\n"
                             id

@@ -5826,5 +5826,97 @@ You should check this is not a mistake."
     )
   )
 
+(defun konix/org-agenda-project-workflow ()
+  (interactive)
+  (let (done)
+    (while (and
+            (setq done (konix/org-agenda-project-workflow-item))
+            (< (line-number-at-pos (point))) (line-number-at-pos (point-max))
+            )
+      (konix/org-agenda-filter-for-now)
+      (hl-line-highlight)
+      )
+    (when done
+      (and
+       (or
+        (y-or-n-p "Are there stuff you are doing that are not part of those project? ")
+        (warn "Capture those!")
+        nil
+        )
+       )
+      )
+    )
+  )
+
+(defun konix/org-agenda-project-workflow-item ()
+  (interactive)
+  (let* (
+         (heading (konix/org-get-heading))
+         (deadline-prefix
+          (konix/org-with-point-on-heading
+           (or
+            (konix/org-agenda-deadline-prefix)
+            (if-let
+                (
+                 (parent-prefix(konix/org-agenda-deadline-in-parent-prefix))
+                 )
+                (format "P-%s" parent-prefix)
+              )
+            )
+           )
+          )
+         )
+    (defun konix/org-agenda-project-workflow-item/ask (message)
+      (y-or-n-p (format "%s\n%s" heading message))
+      )
+    (defun konix/org-agenda-project-workflow-item/fail (message)
+      (warn message)
+      nil
+      )
+    (konix/org-agenda-focus-next)
+    (and
+     (or
+      (progn
+        (save-window-excursion
+          (find-file (org-roam-node-file (org-roam-node-from-id "aof")))
+          (konix/org-agenda-project-workflow-item/ask
+           "HORIZON: Say out loud the relevant higher horizons that are linked to
+  this project. Did you manage? ")
+          )
+        )
+      (konix/org-agenda-project-workflow-item/fail "Get rid of it and ruuuun!")
+      )
+     (or
+      (konix/org-agenda-project-workflow-item/ask "OUTCOME: Say out loud or visualize what done means and what doing looks like/the expected outcome.  Did you manage? ")
+      (konix/org-agenda-project-workflow-item/fail "Clarify !")
+      )
+     (or
+      (or
+       (konix/org-agenda-project-workflow-item/ask (format "DEADLINE: Current deadline is %s. Is this ok? "
+                                                           deadline-prefix)
+                                                   )
+       (and
+        (konix/org-agenda-project-workflow-item/ask "Want to define one now? ")
+        (call-interactively 'org-agenda-deadline)
+        )
+       )
+      (konix/org-agenda-project-workflow-item/fail "Be clear about the deadline !")
+      )
+     (or
+      (progn
+        (or
+         (konix/org-agenda-project-workflow-item/ask "ACTIONS: Are there correct next actions set for it to go forward? ")
+         (and
+          (konix/org-agenda-project-workflow-item/ask "Want to create one now ?")
+          (konix/org-capture-na-in-heading)
+          )
+         )
+        )
+      (konix/org-agenda-project-workflow-item/fail "Deal with its next actions !")
+      )
+     )
+    )
+  )
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

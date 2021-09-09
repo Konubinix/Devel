@@ -35,4 +35,4 @@ if __name__ == '__main__':
             args = [".*"+arg+".*" for arg in args]
         files = get_files(args, ALL, options.env_variable)
         for fil in files:
-                print fil
+                print(fil)

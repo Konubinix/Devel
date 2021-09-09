@@ -60,8 +60,8 @@
   (konix/notmuch-draft-resume (notmuch-show-get-message-id))
   )
 
-(define-key 'notmuch-show-mode-map "v" 'notmuch-show-view-part)
-(define-key 'notmuch-show-mode-map (kbd "M-r") 'konix/notmuch-draft-resume-this)
+(define-key notmuch-show-mode-map "v" 'notmuch-show-view-part)
+(define-key notmuch-show-mode-map (kbd "M-r") 'konix/notmuch-draft-resume-this)
 
 (provide 'KONIX_AL-notmuch-show)
 ;;; KONIX_AL-notmuch-show.el ends here

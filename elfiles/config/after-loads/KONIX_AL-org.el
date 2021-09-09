@@ -3804,28 +3804,6 @@ of the clocksum."
       (konix/org-inform-about-expecting-parties)
       (konix/org-inform-about-informable-parties)
       )
-    (when (and
-           (eq type 'todo-state-change)
-           (string= to "NOT_DONE")
-           )
-      (save-restriction
-        (save-excursion
-          (org-back-to-heading)
-          (org-show-subtree)
-          (mapc
-           (lambda (marker)
-             (save-excursion
-               (goto-char (marker-position marker))
-               (konix/notify (format "%s is automatically set to NOT_DONE"
-                                     (org-get-heading t t)) 1)
-               (org-todo "NOT_DONE")
-               )
-             )
-           (konix/org-get-todo-children-markers-no-recursion)
-           )
-          )
-        )
-      )
     )
   )
 
@@ -3868,7 +3846,7 @@ of the clocksum."
            )
       (when (and
              (eq type 'todo-state-change)
-             (string= to "DONE")
+             (member to org-done-keywords)
              )
         (save-restriction
           (save-excursion
@@ -3883,7 +3861,7 @@ of the clocksum."
                    (org-todo
                     (completing-read
                      (format "What to do with this '%s'?" (konix/org-get-heading))
-                     '("DONE" "NOT_DONE")
+                     org-done-keywords
                      )
                     )
                    )

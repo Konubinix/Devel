@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: new-file-tpl-go
+# key: new-file-tpl-go
+# --
+//usr/bin/env go run \$0 $@ ; exit
+package $100
+
+$0

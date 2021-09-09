@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: erp
+# key: erp
+# --
+if err != nil {
+    panic(err)
+}
+$0

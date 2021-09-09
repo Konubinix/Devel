@@ -3,6 +3,6 @@
 # key: err
 # --
 if err != nil {
-   ${100:panic(err)}
+    return ${100:${130:nil}, }fmt.Errorf(${150:"$200: %v"}, err)
 }
 $0

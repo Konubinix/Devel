@@ -295,9 +295,18 @@
     )
   )
 
+(defun konix/org-roam-get-keyword-global (keyword)
+  (org-with-wide-buffer
+   (save-excursion
+     (goto-char (point-min))
+     (org-roam-get-keyword keyword)
+     )
+   )
+  )
+
 (defun konix/org-roam-export/get-language ()
   (or
-   (konix/org-entry-get-global "LANGUAGE")
+   (konix/org-roam-get-keyword-global "LANGUAGE")
    "fr"
    )
   )

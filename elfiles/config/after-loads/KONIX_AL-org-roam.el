@@ -212,6 +212,12 @@ ${title}
     )
   )
 (advice-add 'org-id-find-id-file :around #'konix/org-id-find-id-file/try-in-roam-if-miss)
+;; To make org-open-at-point follow roam notes, I could have used the following snippet
+
+;; (add-hook 'org-open-at-point-functions
+;;            'org-roam-open-id-at-point)
+
+;; but that would not make (org-id-find SOMEID) find roam notes.
 
 
 (defun konix/org-add-roam-ref (url title body)

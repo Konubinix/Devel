@@ -47,7 +47,7 @@ settings:
     https://meet.google.com: true
     https://play.workadventu.re: true
     https://teams.microsoft.com: true
-  content.notifications:
+  content.notifications.enabled:
     https://calendar.google.com: false
     https://fr.aliexpress.com: false
     https://gitlab.com: false

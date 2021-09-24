@@ -1391,3 +1391,10 @@ Version 2016-09-02"
                   (dom-by-tag (xml-parse-file temp-file-name) 'text)
                   ""))
       (delete-file temp-file-name))))
+
+(defun konix/substring-capped (string from to)
+  (when (<= (length string) to)
+      (setq to nil)
+      )
+  (substring string from to)
+  )

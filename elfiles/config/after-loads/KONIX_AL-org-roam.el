@@ -604,7 +604,6 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
        )
   )
 (advice-add #'org-roam-reflinks-get :around #'konix/org-roam-reflinks-get/remove-self-links)
-(advice-remove #'org-roam-reflinks-get #'konix/org-roam-reflinks-get/remove-self-links)
 
 (defun konix/org-roam-backlinks-get/remove-self-links (orig-func node)
   (->> (funcall orig-func node)

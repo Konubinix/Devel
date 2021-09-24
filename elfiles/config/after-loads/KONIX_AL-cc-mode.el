@@ -51,6 +51,12 @@
 (add-hook 'awk-mode-hook
           'konix/awk-mode-hook)
 
+(defun konix/java-mode-hook ()
+  (lsp)
+  )
+(add-hook 'java-mode-hook #'konix/java-mode-hook)
+
+
 
 (provide 'KONIX_AL-c++-mode)
 ;;; KONIX_AL-c++-mode.el ends here

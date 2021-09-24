@@ -570,8 +570,6 @@
 (global-set-key (kbd "<f4>") 'repeat)
 ;; Macro
 (global-set-key (kbd "C-<f4>") 'kmacro-end-or-call-macro)
-;; Magit
-(global-set-key (kbd "<f9>") 'magit-status)
 ;; Header
 (global-set-key (kbd "<f8>") 'konix/header)
 (global-set-key (kbd "<C-f8>")
@@ -686,31 +684,6 @@
 ;; Semantic
 ;; ####################################################################################################
 (global-set-key (kbd "M-§") 'semantic-ia-fast-jump)
-
-;; ####################################################################################################
-;; wikipedia
-;; ####################################################################################################
-(defun konix/wikipedia-mode-set-keywords-hook ()
-  (define-key wikipedia-mode-map (kbd "<M-right>") 'wikipedia-simple-outline-demote)
-  (define-key wikipedia-mode-map (kbd "<M-left>") 'wikipedia-simple-outline-promote)
-  (define-key wikipedia-mode-map (kbd "TAB") 'outline-toggle-children)
-  (local-set-key (kbd "<C-left>") 'backward-word)
-  (local-set-key (kbd "<C-right>") 'forward-word)
-  )
-(add-hook 'wikipedia-mode-hook
-		  'konix/wikipedia-mode-set-keywords-hook)
-
-;; ####################################################################################################
-;; outline
-;; ####################################################################################################
-(defun konix/outline-mode-set-keywords-hook()
-  (local-set-key (kbd "<f1>") 'konix/outline-zoom-out)
-  (local-set-key (kbd "<f3>") 'konix/outline-show-children-or-entry)
-  (local-set-key (kbd "<f2> <f1>") 'hide-body)
-  (local-set-key (kbd "<f2> <f3>") 'show-all)
-  (local-set-key (kbd "TAB") 'outline-toggle-children)
-  )
-(add-hook 'outline-mode-hook 'konix/outline-mode-set-keywords-hook)
 
 ;; ####################################################################################################
 ;; font lock

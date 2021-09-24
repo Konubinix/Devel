@@ -37,6 +37,11 @@ export COLOR_WHITE=""
 
 SSH_AGENT_SOURCE=/tmp/ssh-agent-source
 
+function uniq_no_sort {
+    # https://stackoverflow.com/questions/11532157/remove-duplicate-lines-without-sorting
+    awk '!x[$0]++'
+}
+
 function is_on_linux {
     uname -a|grep -i "linux">/dev/null
 }

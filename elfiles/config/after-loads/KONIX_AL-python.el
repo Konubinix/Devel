@@ -141,5 +141,24 @@
   (message "White-d it!")
   )
 
+(defun konix/python/autoflake-it ()
+  (interactive)
+  (when (buffer-modified-p)
+    (user-error "Save the file before it is too late")
+    )
+  (message
+   (shell-command-to-string
+    (format
+     "autoflake --ignore-init-module-imports --remove-duplicate-keys --remove-unused-variables --in-place --remove-all-unused-imports --expand-star-imports  79 '%s'" (buffer-file-name))))
+  (revert-buffer nil t)
+  (message "Autoflake-d it!")
+  )
+
+(defun konix/python/reformat-it ()
+  (interactive)
+  (call-interactively 'konix/python/autoflake-it)
+  (call-interactively 'konix/python/white-it)
+  )
+
 (provide '700-KONIX_python-mode)
 ;;; 700-KONIX_python-mode.el ends here

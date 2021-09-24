@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: ipython_kernel
-# key: ipython_kernel
-# binding: direct-keybinding
-# --
-$>from IPython import embed_kernel
-$>dict_ = globals()
-$>dict_.update(locals())
-$>embed_kernel(local_ns=dict_)

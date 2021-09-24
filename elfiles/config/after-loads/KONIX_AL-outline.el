@@ -23,7 +23,6 @@
 ;;
 
 ;;; Code:
-(require 'outline-magic)
 
 (defun konix/outline-zoom-out ()
   (interactive)
@@ -55,14 +54,16 @@
   )
 
 (defun konix/outline/setup-keys (map)
-  (define-key map (kbd "<backtab>") 'konix/outline/global-cycle)
-  (define-key map (kbd "<C-tab>") 'hide-sublevels)
-  (define-key map (kbd "<f1>") 'konix/outline-zoom-out)
-  (define-key map (kbd "<f2> <f1>") 'konix/outline/global-cycle)
-  (define-key map (kbd "<f2> <f3>") 'show-all)
-  (define-key map (kbd "<f3>") 'konix/outline-show-children-or-entry)
-  (define-key map (kbd "<tab>") 'outline-cycle)
-  (define-key map (kbd "TAB") 'outline-toggle-children)
+  (unless (equal major-mode 'org-mode)
+    (define-key map (kbd "<backtab>") 'konix/outline/global-cycle)
+    (define-key map (kbd "<C-tab>") 'hide-sublevels)
+    (define-key map (kbd "<f1>") 'konix/outline-zoom-out)
+    (define-key map (kbd "<f2> <f1>") 'konix/outline/global-cycle)
+    (define-key map (kbd "<f2> <f3>") 'show-all)
+    (define-key map (kbd "<f3>") 'konix/outline-show-children-or-entry)
+    ;; (define-key map (kbd "<tab>") 'outline-cycle)
+    (define-key map (kbd "TAB") 'outline-toggle-children)
+    )
   )
 (konix/outline/setup-keys outline-mode-map)
 

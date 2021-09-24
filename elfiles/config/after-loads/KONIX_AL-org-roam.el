@@ -225,7 +225,7 @@ ${title}
          (decoded-title (s-trim (org-link-decode title)))
          (decoded-url (substring-no-properties (s-trim (org-link-decode url))))
          (decoded-body (s-trim (org-link-decode body)))
-         (slug (konix/org-roam-compute-slug decoded-title))
+         (slug (konix/substring-capped (konix/org-roam-compute-slug decoded-title) 0 100))
          (buffer
           (save-window-excursion
             (or

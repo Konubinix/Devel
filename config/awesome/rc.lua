@@ -489,6 +489,12 @@ globalkeys = gears.table.join(
       end,
       {description = "Print screen", group = "screen"}),
 
+   awful.key({ modkey        }, "e",
+      function()
+         awful.spawn("emacsclient --eval '(emacs-everywhere)'")
+      end,
+      {description = "Modify the current content in emacs", group = "emacs"}),
+
    awful.key({ modkey , "Shift"       }, "i",
       function()
          awful.spawn("konix_print_screen_n_insert.sh")
@@ -1105,6 +1111,15 @@ awful.rules.rules = {
       rule = {
          class = "Emacs",
          name = "konix_emacs.+",
+      },
+      properties = {
+         tag = "1",
+      },
+   },
+   {
+      rule = {
+         class = "Emacs",
+         name = "emacs-everywhere",
       },
       properties = {
          tag = "1",

@@ -27,6 +27,7 @@
 (defun konix/markdown-mode-hook()
   (konix/flyspell-mode t)
   (org-link-minor-mode 1)
+  (ispell-change-dictionary "american")
   )
 (add-hook 'markdown-mode-hook 'konix/markdown-mode-hook)
 

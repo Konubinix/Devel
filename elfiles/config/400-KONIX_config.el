@@ -638,22 +638,10 @@
 ;; ######################################################################
 (setq-default save-interprogram-paste-before-kill t)
 (setq-default yank-pop-change-selection t)
-(when (and
-	   (>= emacs-major-version 24)
-	   (not
-		konix/on-windows-p
-		)
-	   )
-  ;; use the primary selection instead of the clipboard
-
-  ;; Note that MS-Windows does not support selection types other than the
-  ;; clipboard.  (The primary selection that is set by Emacs is not
-  ;; accessible to other programs on MS-Windows.)
-  ;; [[info:emacs#Clipboard]]
-  (setq-default x-select-enable-clipboard nil)
-  (setq-default x-select-enable-primary t)
-  (setq-default mouse-drag-copy-region t)
-  )
+(setq-default select-enable-primary t)
+;; I want to be able to access both primary and clipboard with emacs
+;; I still have (cua-paste) to access the clipboard anyway
+(setq-default select-enable-clipboard nil)
 
 ;; ######################################################################
 ;; Package

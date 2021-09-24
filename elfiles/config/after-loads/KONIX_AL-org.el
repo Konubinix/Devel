@@ -5892,9 +5892,11 @@ You should check this is not a mistake."
       )
      (or
       (or
-       (konix/org-agenda-project-workflow-item/ask (format "DEADLINE: Current deadline is %s. Is this ok? "
-                                                           deadline-prefix)
-                                                   )
+       (konix/org-agenda-project-workflow-item/ask
+        (format "DEADLINE: Current deadline is %s %s. Is this ok? "
+                (konix/org-get-deadline)
+                deadline-prefix)
+        )
        (and
         (konix/org-agenda-project-workflow-item/ask "Want to define one now? ")
         (call-interactively 'org-agenda-deadline)
@@ -5918,6 +5920,27 @@ You should check this is not a mistake."
     )
   )
 
+(defun konix/org-get-deadline ()
+  (if (equal major-mode 'org-agenda-mode)
+      (save-window-excursion
+        (org-agenda-switch-to)
+        (konix/org-get-deadline)
+        )
+    (save-excursion
+      (org-back-to-heading t)
+      (save-match-data
+        (and
+         (re-search-forward
+          (format "%s \\(%s\\)" org-deadline-regexp org-ts-regexp)
+          (org-entry-end-position)
+          t
+          )
+         (match-string 1)
+         )
+        )
+      )
+    )
+  )
 
 (defun konix/org-pop-to-interrutions ()
   (let* (

@@ -1349,7 +1349,7 @@ items"
           (setq work-days (konix/org-count-workdays (konix/org-agenda-current-time) deadline-time))
           (format
            (if (< diff 0)
-             "%2dd. ago"
+               "%2dd. ago"
              (format "%%3d(%2d)d" work-days)
              )
            (abs diff)
@@ -2764,7 +2764,7 @@ items"
   )
 
 (setq-default org-capture-templates
-              '(
+              `(
                 ("t" "Todo Item" entry (file+headline konix/org-todo_file
                                                       "Refile")
                  #'konix/org-capture-template-todo
@@ -2844,7 +2844,7 @@ items"
                  :clock-in t
                  :clock-resume t
                  )
-                ("J" "External interruption" entry (file+headline konix/org-todo_file "Refile")
+                ("J" "External interruption" entry (file+headline ,(car (org-id-find "interruptions")) "Refile")
                  "* NEXT [#G] %T %? :INTERRUPTION:external:
   :PROPERTIES:
   :CREATED:  %U
@@ -5915,6 +5915,28 @@ You should check this is not a mistake."
       (konix/org-agenda-project-workflow-item/fail "Deal with its next actions !")
       )
      )
+    )
+  )
+
+
+(defun konix/org-pop-to-interrutions ()
+  (let* (
+         (interruptions-file (car (org-id-find "interruptions")))
+         (interruptions-buffer (find-file-noselect interruptions-file))
+         linenumber
+         )
+    (with-current-buffer interruptions-buffer
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "^\*+ \\(TODO\\|NEXT\\)" nil t)
+          (setq linenumber (line-number-at-pos))
+          )
+        )
+      )
+    (when linenumber
+      (pop-to-buffer interruptions-buffer)
+      (goto-line linenumber)
+      )
     )
   )
 

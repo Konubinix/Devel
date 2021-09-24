@@ -131,7 +131,11 @@ This uses `org-read-date', which see."
   )
 
 (defun konix/ledger-add-justif (value)
-  (interactive "sJustif value: ")
+  (interactive
+   (list
+    (read-from-minibuffer "Justif: " "file:")
+    )
+   )
   (save-window-excursion
     (konix/ledger-visit)
     (konix/ledger-add-note)

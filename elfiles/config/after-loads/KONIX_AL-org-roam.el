@@ -536,7 +536,7 @@ ${title}
              (not (string= new-file-name file-name))
              (or
               (not (file-exists-p new-file-path))
-              (yes-or-no-p "Destination already exist, rename anyway?")
+              (yes-or-no-p (format "Destination already exist (%s), rename anyway?" new-file-path))
               )
              )
         (rename-file file new-file-path)

@@ -117,3 +117,4 @@
 (depends-on "prettier-js")
 (depends-on "kubel")
 (depends-on "envrc")
+(depends-on "emacs-everywhere")

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: soup
+# key: soup
+# --
+from bs4 import BeautifulSoup as soup
+s = soup($100, features="lxml")

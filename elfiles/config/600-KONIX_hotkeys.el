@@ -570,20 +570,6 @@
 (global-set-key (kbd "<f4>") 'repeat)
 ;; Macro
 (global-set-key (kbd "C-<f4>") 'kmacro-end-or-call-macro)
-;; Header
-(global-set-key (kbd "<f8>") 'konix/header)
-(global-set-key (kbd "<C-f8>")
-				(lambda()
-				  (interactive)
-				  (konix/header konix/header-marker-2)
-				  )
-				)
-(global-set-key (kbd "<S-f8>")
-				(lambda()
-				  (interactive)
-				  (konix/header konix/header-marker-3)
-				  )
-				)
 ;; Lance gitk et git gui
 (global-set-key (kbd "<S-f9>") 'konix/gitk)
 (global-set-key (kbd "<C-f9>") 'konix/git-gui)

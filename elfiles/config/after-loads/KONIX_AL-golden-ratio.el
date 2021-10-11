@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(setq-default golden-ratio-exclude-buffer-names '())
+(setq-default golden-ratio-exclude-buffer-names '("*gud-attach*"))
 
 (provide 'KONIX_AL-golden-ratio)
 ;;; KONIX_AL-golden-ratio.el ends here

@@ -489,9 +489,17 @@ of the transaction.
   (insert "\n    ; ")
   )
 
+(defun konix/ledger-report-account nil
+  (interactive)
+  (ledger-report "account" nil)
+  )
+
 (define-key ledger-mode-map (kbd "C-c C-j") #'konix/ledger-goto-slot)
 (define-key ledger-mode-map (kbd "C-c j") #'konix/ledger-add-justif)
 (define-key ledger-mode-map (kbd "C-c C-,") #'konix/ledger-add-note)
+(define-key ledger-mode-map (kbd "C-c C-s") #'konix/ledger-report-account)
+(define-key ledger-mode-map (kbd "C-c C-r") #'ledger-report)
+(define-key ledger-mode-map (kbd "C-c c") #'ledger-mode-clean-buffer)
 
 
 (provide 'KONIX_AL-ledger)

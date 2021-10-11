@@ -660,5 +660,31 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
   )
 (advice-add #'org-roam-refile :around #'konix/org-roam-refile/org-agenda-to-org)
 
+(defun konix/org-roam-node-find-noselect/increase-visit-number (orig-fun &rest args)
+  (let* (
+         (buf (apply orig-fun args))
+         (property "NUMBER_OF_VISITS")
+         value
+         modified
+         )
+    (with-current-buffer buf
+      (setq modified (buffer-modified-p))
+      (setq value (string-to-number (or (org-entry-get (point) property) "0")))
+      (org-entry-put (point) property (number-to-string (1+ value)))
+      (unless modified
+        (let (
+              (konix/org-inhibit-update-date t)
+              )
+          (save-buffer)
+          )
+        )
+      )
+    buf
+    )
+  )
+(advice-add #'org-roam-node-find-noselect :around #'konix/org-roam-node-find-noselect/increase-visit-number)
+;; (advice-remove #'org-roam-node-find-noselect #'konix/org-roam-node-find-noselect/increase-visit-number)
+
+
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

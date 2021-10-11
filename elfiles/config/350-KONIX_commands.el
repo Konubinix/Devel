@@ -1736,7 +1736,23 @@ FExport diary data into iCalendar file: ")
   (find-file (s-trim (shell-command-to-string "clk ledger -p where-is")))
   )
 
-
+(defun konix/ipfa-buffer ()
+  (interactive)
+  (let (
+        (orig-buffer (current-buffer))
+        )
+   (with-temp-buffer
+     (let (
+           (temp-buffer (current-buffer))
+           )
+       (with-current-buffer orig-buffer
+           (call-process-region (point-min) (point-max) "ipfa" nil temp-buffer)
+         )
+       (message (string-trim (buffer-substring-no-properties (point-min) (point-max))))
+       )
+     )
+   )
+  )
 
 (provide '350-KONIX_commands)
 ;;; 350-KONIX_commands.el ends here

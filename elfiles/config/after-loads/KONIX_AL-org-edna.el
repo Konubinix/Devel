@@ -91,5 +91,50 @@ scheduled in January if it is triggered in July."
 
 (advice-add #'org-edna--print-syntax-error :after #'konix/org-edna--print-syntax-error/warn-the-user)
 
+(defun konix/org-edna--handle-repeater (args)
+  (let* ((arg (nth 0 args))
+         (this-ts (org-entry-get (point) "REPEAT"))
+         (this-time (and this-ts (org-time-string-to-time this-ts)))
+         (current (org-current-time))
+         (type-map '(("y" . year)
+                     ("m" . month)
+                     ("d" . day)
+                     ("h" . hour)
+                     ("M" . minute))))
+    (cond
+     ((member arg '(rm remove "rm" "remove"))
+      (org-entry-delete (point) "REPEAT")
+      )
+     ((string-match-p "\\`[+-]" arg)
+      ;; Starts with a + or -, so assume we're incrementing a timestamp
+      ;; We support hours and minutes, so this must be supported separately,
+      ;; since org-read-date-analyze doesn't
+      (pcase-let* ((`(,n ,what-string ,def) (org-edna--read-date-get-relative arg this-time current))
+                   (what (cdr (assoc-string what-string type-map)))
+                   (ts-format (org-edna--determine-timestamp-format what this-ts))
+                   (current-ts (format-time-string (org-time-stamp-format ts-format) current))
+                   (ts (if def current-ts this-ts)))
+        ;; Ensure that the source timestamp exists
+        (unless ts
+          (error "Tried to increment a non-existent timestamp"))
+        (org-entry-put (point) "REPEAT" (org-edna--mod-timestamp ts n what))))
+     (t
+      ;; For everything else, assume `org-read-date-analyze' can handle it
+
+      ;; The third argument to `org-read-date-analyze' specifies the defaults to
+      ;; use if that time component isn't specified.  Since there's no way to
+      ;; tell if a time was specified, tell `org-read-date-analyze' to use nil
+      ;; if no time is found.
+      (let* ((case-fold-search t)
+             (parsed-time (org-read-date-analyze arg this-time '(nil nil nil nil nil nil)))
+             (have-time (nth 2 parsed-time))
+             (final-time (apply #'encode-time (mapcar (lambda (e) (or e 0)) parsed-time)))
+             (new-ts (format-time-string (concat "<"(if have-time "%F %R" "%F") ">") final-time)))
+        (org-entry-put (point) "REPEAT" new-ts))))))
+
+(defun org-edna-action/repeater! (last-entry &rest args)
+  (konix/org-edna--handle-repeater args))
+
+
 (provide 'KONIX_AL-org-edna)
 ;;; KONIX_AL-org-edna.el ends here

@@ -269,7 +269,13 @@
       )
      ((string-match "^\\(file:/*\\)?\\(/ip[fn]s/.+?\\)\\([?]filename=\\(.+\\)\\)?$" url)
       (let* (
-             (filename (match-string 4 url))
+             (filename (and (match-string 4 url)
+                            (decode-coding-string
+                             (url-unhex-string (match-string 4 url))
+                             'utf-8
+                             )
+                            )
+                       )
              (filename-sans-ext (and filename (file-name-sans-extension filename)))
              (filename-ext (and filename (file-name-extension filename)))
              (url (konix/org-roam-export/process-url (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") (match-string 2 url))))

@@ -20,7 +20,7 @@ def ask_for_mdp_file(mdp_files, filters=[]):
     if len(mdp_files) == 1:
         return mdp_files[0]
     elif len(mdp_files) == 0:
-        print "No mdp found"
+        print("No mdp found")
         return None
     else:
         sys.stdout.write("List of MDP files\n")
@@ -28,28 +28,28 @@ def ask_for_mdp_file(mdp_files, filters=[]):
             sys.stdout.write(" "+fil+"\n")
         sys.stdout.write("What mdp file to see ? ")
         sys.stdout.flush()
-        filter_ = raw_input("")
+        filter_ = input("")
         mdp_files = [fil for fil in mdp_files if filter_ in fil]
         return ask_for_mdp_file(mdp_files)
 
 if len(MDP_FILES) == 1:
-    print "There is only one mdp file : "+MDP_FILES[0]+", it will be used"
+    print("There is only one mdp file : "+MDP_FILES[0]+", it will be used")
     mdp_file_name = MDP_FILES[0]
 else:
     mdp_file_name = ask_for_mdp_file(MDP_FILES, sys.argv[1:])
 
 if mdp_file_name is None:
-    print "No mdp file found"
+    print("No mdp file found")
     exit(1)
 
-print "Looking for mdp file : "+mdp_file_name
+print("Looking for mdp file : "+mdp_file_name)
 
 mdp_file_name_abs = os.path.join(MDP_DIR, mdp_file_name)
 # ####################################################################################################
 # Decrypt the mdp file
 # ####################################################################################################
 if mdp_file_name_abs.endswith(".gpg"):
-    print "Decrypt file"
+    print("Decrypt file")
     mdp_file = tempfile.TemporaryFile()
     p = subprocess.Popen(["gpg", "-d", mdp_file_name_abs],stdout=mdp_file)
     p.wait()
@@ -62,7 +62,7 @@ mdp_file.seek(0)
 for line in mdp_file.readlines():
     login_match = re.match("^[Ll][Oo][Gg][Ii][Nn] *: *(.+)$",line)
     if login_match:
-        print "Login :",login_match.group(1)
+        print("Login :",login_match.group(1))
         continue
     mdp_match = re.match("^[Mm][dD][pP] *: *(.+)$", line)
     if mdp_match:

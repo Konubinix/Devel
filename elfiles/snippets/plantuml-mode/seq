@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: seq
+# key: seq
+# --
+@startuml
+autonumber
+hide footbox
+title ${100:title}
+actor "${200:friendly name}" as ${300:id}
+
+$0
+
+@enduml

@@ -1,0 +1,5 @@
+# key: ac
+# name: ac
+# --
+actor "${100:friendly name}" as ${200:id}
+$0

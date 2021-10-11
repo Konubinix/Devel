@@ -29,10 +29,19 @@
 
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)
+(defvar konix/python-mode/yapf t "Enable yapf")
+(add-to-list 'safe-local-variable-values '(konix/python-mode/yapf))
+(make-variable-buffer-local 'konix/python-mode/yapf)
+(defvar konix/python-mode/flycheck t "Enable flycheck")
+(add-to-list 'safe-local-variable-values '(konix/python-mode/flycheck))
+(make-variable-buffer-local 'konix/python-mode/flycheck)
+
 (defun konix/python-mode-hook ()
   (setq tab-width 4)
   (konix/prog/config)
-  (yapf-mode)
+  (when konix/python-mode/yapf
+      (yapf-mode)
+    )
   (add-hook 'before-save-hook
             'py-isort-before-save)
   ;; fed up with auto line breaks
@@ -68,6 +77,12 @@
   ;; the flycheck-select-checker part must be run last, for it might fail and
   ;; prevent he following lines to be run
   (flycheck-select-checker 'python-flake8)
+  (when (and
+         flycheck-mode
+         (not konix/python-mode/flycheck)
+         )
+    (flycheck-mode -1)
+    )
   )
 (add-hook 'python-mode-hook
 		  'konix/python-mode-hook)

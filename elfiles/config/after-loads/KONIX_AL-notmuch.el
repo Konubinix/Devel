@@ -425,6 +425,26 @@ Message-Id: <%s>" id)
    )
   )
 
+(defun konix/notmuch-show/ipfa ()
+  (interactive)
+  (let (
+        (id (notmuch-show-get-message-id))
+        )
+    (with-temp-buffer
+      (call-process
+       "clk"
+       nil
+       t
+       nil
+       "notmuch"
+       "ipfa"
+       id
+       )
+      (message (string-trim (buffer-substring-no-properties (point-min) (point-max))))
+      )
+    )
+  )
+
 (defun konix/notmuch-show-open-in-explorer ()
   (interactive)
   (notmuch-show-pipe-message nil "konix_view_html.sh t")
@@ -564,6 +584,8 @@ inspired from `notmuch-show-archive-thread-internal'"
 (define-key notmuch-search-mode-map (kbd "r") 'konix/notmuch-search-add-noreply)
 (define-key notmuch-show-mode-map (kbd "M")
   'konix/notmuch-show-open-in-external-browser)
+(define-key notmuch-show-mode-map (kbd "I")
+  'konix/notmuch-show/ipfa)
 (define-key notmuch-show-mode-map (kbd "C-r") 'konix/notmuch-show-add-noreply)
 (define-key notmuch-show-mode-map (kbd "r") 'konix/notmuch-show-reply-sender)
 (define-key notmuch-show-mode-map (kbd "R") 'konix/notmuch-show-reply)

@@ -5983,5 +5983,35 @@ You should check this is not a mistake."
     )
   )
 
+(defun konix/org-deadline/warn-interested-partie (orig-func &rest args)
+  (let (
+        (before (org-get-deadline-time (point)))
+        (res (apply orig-func args))
+        (after (org-get-deadline-time (point)))
+        (tags)
+        )
+    (unless (equal before after)
+      (konix/org-inform-about-informable-parties)
+      )
+    res
+    )
+  )
+(advice-add #'org-deadline :around #'konix/org-deadline/warn-interested-partie)
+
+(defun konix/org-todo/warn-interested-partie (orig-func &rest args)
+  (let (
+        (before (org-get-todo-state))
+        (res (apply orig-func args))
+        (after (org-get-todo-state))
+        (tags)
+        )
+    (unless (equal before after)
+      (konix/org-inform-about-informable-parties)
+      )
+    res
+    )
+  )
+(advice-add #'org-todo :around #'konix/org-todo/warn-interested-partie)
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

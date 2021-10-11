@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: -
+# key: -
+# --
+${100:id1} -> ${200:id2}${300:$$(yas-choose-value '(" ++" " !!" " !!"))}: ${400:message}
+$0

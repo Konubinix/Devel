@@ -1814,7 +1814,7 @@ items"
                           )
                          )
                         )
-                  (tags-todo "-project-maybe+todo=\"TODO\"-refile"
+                  (tags-todo "-maybe+todo=\"TODO\"-refile"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-skip-function
@@ -1826,7 +1826,7 @@ items"
                                )
                               (org-agenda-tag-filter-preset nil)
                               (org-agenda-overriding-header
-                               "Organize orphan TODOs items (become project or refile to project or set to NEXT)")
+                               "Organize orphan TODOs items (refile to project or set to NEXT)")
                               )
                              )
                   (tags-todo "-Context-project-maybe+todo=\"NEXT\"-refile-WAIT-DELEGATED"
@@ -2222,7 +2222,7 @@ items"
                 ("agP" "Actions to review and consider maybe-ing during the Weekly review"
                  (
                   ;; (tags "-maybe+todo=\"NEXT\"-WAIT-DELEGATED|+todo=\"TODO\"-maybe-WAIT-DELEGATED|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\"-WAIT-DELEGATED"
-                  (tags "-maybe-background+todo=\"NEXT\"|+todo=\"TODO\"-maybe-background|+project-maybe-background-todo=\"NOT_DONE\"-todo=\"DONE\""
+                  (tags "-maybe-background+todo=\"NEXT\"|+todo=\"TODO\"-maybe-background|+project-maybe-background-todo=\"NOT_DONE\"-todo=\"DONE\"-todo=\"TODO\""
                         (
                          (org-agenda-overriding-header
                           "Projects & NA (things that are or should be committed)")
@@ -2287,7 +2287,7 @@ items"
                  )
                 ("agp" "Projects for which to review the status, goal and outcome during the GTD weekly review"
                  (
-                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
+                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"-todo=\"TODO\""
                         (
                          (org-agenda-overriding-header
                           "Current projects, all of them (even subprojects), for gtd reviewing")

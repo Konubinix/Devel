@@ -3266,13 +3266,33 @@ items"
   (find-file (konix/org-bookmarks_file))
   )
 
+(defvar konix/org-add-note/window-configuration nil)
+(make-variable-buffer-local 'konix/org-add-note/window-configuration)
+
 (defun konix/org-add-note ()
   (interactive)
-  (save-window-excursion
+  (let (
+        (window-configuration (current-window-configuration))
+        )
     (org-clock-goto)
     (org-add-note)
+    (setq konix/org-add-note/window-configuration window-configuration)
     )
   )
+
+(defun konix/org-org-store-log-note/restore-window-configuration (orig-func
+                                                                  &rest args)
+  (let (
+        (window-configuration konix/org-add-note/window-configuration)
+        )
+    (apply orig-func args)
+    (when window-configuration
+      (set-window-configuration window-configuration)
+      )
+    )
+  )
+
+(advice-add #'org-store-log-note :around #'konix/org-org-store-log-note/restore-window-configuration)
 
 (defun konix/org-change-tag ()
   (interactive)

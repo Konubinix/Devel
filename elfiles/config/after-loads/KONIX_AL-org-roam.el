@@ -110,6 +110,8 @@ ${title}
             (completing-read
              "Key: "
              keys
+             nil
+             t
              )
             )
            )

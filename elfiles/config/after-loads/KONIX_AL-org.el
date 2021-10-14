@@ -6013,5 +6013,36 @@ You should check this is not a mistake."
   )
 (advice-add #'org-todo :around #'konix/org-todo/warn-interested-partie)
 
+(when (s-equals? (s-trim (shell-command-to-string "redis-cli ping")) "PONG")
+  (defun konix/org-clock-update-mode-line/dump-value (&rest args)
+    (call-process
+     "redis-cli"
+     nil
+     nil
+     nil
+     "set"
+     "org-modeline"
+     (org-duration-from-minutes (org-clock-get-clocked-time))
+     )
+    )
+
+  (advice-add #'org-clock-update-mode-line :after #'konix/org-clock-update-mode-line/dump-value)
+
+  (defun konix/org-clock-out/remove-dump ()
+    (call-process
+     "redis-cli"
+     nil
+     nil
+     nil
+     "set"
+     "org-modeline"
+     "NA"
+     )
+    )
+
+  (add-hook #'org-clock-out
+            #'konix/org-clock-out/remove-dump)
+  )
+
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

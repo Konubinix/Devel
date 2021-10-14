@@ -154,6 +154,8 @@ mykeyboardlayout = awful.widget.keyboardlayout()
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()
 
+myorgmodeline = awful.widget.watch('bash -c "echo Org clock: $(redis-cli get org-modeline)"', 1)
+
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
    awful.button({ }, 1, function(t) t:view_only() end),
@@ -258,6 +260,7 @@ awful.screen.connect_for_each_screen(function(s)
             mykeyboardlayout,
             -- wibox.widget.systray(),
             mytextclock,
+			myorgmodeline,
             s.mylayoutbox,
          },
       }
@@ -472,7 +475,6 @@ globalkeys = gears.table.join(
          tell_pulse_volume()
    end,
       {description = "change volume", group = "client"}),
-
    awful.key({ modkey, "Mod1" }, "Right", function () awful.screen.focus_relative( 1) end,
       {description = "focus the next screen", group = "screen"}),
    awful.key({ modkey, "Mod1" }, "Left", function () awful.screen.focus_relative(-1) end,
@@ -514,6 +516,8 @@ globalkeys = gears.table.join(
       {description = "open firefox", group = "launcher"}),
    awful.key({ modkey,   "Control"        }, "i", open_or_join("Firefox", "firefox"),
       {description = "open firefox", group = "launcher"}),
+   awful.key({ modkey, "Control"   }, "m", open_or_join("Gmpc", "gmpc"),
+      {description = "Open the music controler", group = "musique"}),
    awful.key({ modkey,   "Control"        }, "s", open_or_join("Slack", "slack --no-sandbox"),
       {description = "open emacs", group = "launcher"}),
    awful.key({ modkey,           },
@@ -552,7 +556,7 @@ globalkeys = gears.table.join(
          awful.spawn.easy_async(
             "clk pulse toggle-mute",
             function (stdout, stderr, exitreason, exitcode)
-			   tell_pulse_volume()
+	       tell_pulse_volume()
             end
          )
    end,
@@ -705,7 +709,7 @@ clientkeys = gears.table.join(
       },
       "n",
       function (c)
-		 awful.spawn("konix_org_capture_screenshot.sh")
+	 awful.spawn("konix_org_capture_screenshot.sh")
       end ,
       {
          description = "capture a screenshot",
@@ -732,8 +736,8 @@ clientkeys = gears.table.join(
          modkey,
       },
       "d",
-	  function(c)
-	  	 awful.spawn("clk x scroll-down")
+      function(c)
+	 awful.spawn("clk x scroll-down")
       end,
       {
          description = "scroll down",
@@ -769,7 +773,7 @@ clientkeys = gears.table.join(
    awful.key(
       {
          modkey,
-		 "Shift",
+	 "Shift",
       },
       "j",
       function (c)
@@ -1019,8 +1023,8 @@ awful.rules.rules = {
          -- and the name shown there might not match defined rules here.
          name = {
             "Event Tester",  -- xev.
-			"Terminator Preferences",
-			"Choose A Terminal Font",
+	    "Terminator Preferences",
+	    "Choose A Terminal Font",
          },
          role = {
             "AlarmWindow",  -- Thunderbird's calendar.
@@ -1035,7 +1039,7 @@ awful.rules.rules = {
    {
       rule = {
          class = "qutebrowser",
-		 name = "Print",
+	 name = "Print",
       },
       properties = {
          floating = true,
@@ -1046,7 +1050,7 @@ awful.rules.rules = {
    {
       rule_any = {
          name = {"Slack | mini panel", "Pick a Font", "Change Foreground Color", "Post Processing Plugin"},
-		 class = {"Impass"}
+	 class = {"Impass"}
       },
       properties = {
          floating = true,
@@ -1095,8 +1099,8 @@ awful.rules.rules = {
       },
       properties = {
          tag = "1",
-		 floating = true,
-		 ontop = true,
+	 floating = true,
+	 ontop = true,
       },
    },
    {

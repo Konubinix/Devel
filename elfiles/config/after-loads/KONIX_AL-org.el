@@ -6022,7 +6022,16 @@ You should check this is not a mistake."
      nil
      "set"
      "org-modeline"
-     (org-duration-from-minutes (org-clock-get-clocked-time))
+     org-mode-line-string
+     )
+    (call-process
+     "redis-cli"
+     nil
+     nil
+     nil
+     "expire"
+     "org-modeline"
+     (number-to-string org-clock-update-period)
      )
     )
 

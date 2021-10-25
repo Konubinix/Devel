@@ -148,13 +148,10 @@ mylauncher = awful.widget.launcher(
 
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 
--- Keyboard map indicator and switcher
-mykeyboardlayout = awful.widget.keyboardlayout()
-
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()
 
-myorgmodeline = awful.widget.watch('bash -c "echo Org clock: $(redis-cli get org-modeline)"', 1)
+myorgmodeline = awful.widget.watch('bash -c "echo \\"Org: $(redis-cli get org-modeline|sed \'s/^$/NA/\')\\""', 1)
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -251,16 +248,15 @@ awful.screen.connect_for_each_screen(function(s)
          { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
             mylauncher,
+	    myorgmodeline,
             s.mytaglist,
             s.mypromptbox,
          },
          s.mytasklist, -- Middle widget
          { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
-            mykeyboardlayout,
             -- wibox.widget.systray(),
             mytextclock,
-			myorgmodeline,
             s.mylayoutbox,
          },
       }

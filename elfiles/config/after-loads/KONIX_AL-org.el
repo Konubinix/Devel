@@ -2709,12 +2709,11 @@ items"
     )
   )
 
-(defun konix/org-read-date-analyze/empty-ans-means-current-time (orig-fun ans def defdecode)
+(defun konix/org-read-date-analyze/empty-ans-means-current-time (orig-fun ans &rest args)
   (if (string-match-p "^n *$" ans)
       (setq ans (format-time-string "%H:%M" (current-time)))
-    (setq ans (replace-regexp-in-string "^n *" "" ans))
     )
-  (apply orig-fun ans def defdecode '())
+  (apply orig-fun ans args)
   )
 
 (advice-add

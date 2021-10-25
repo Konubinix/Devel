@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: toc
+# key: toc
+# --
+#+options: toc:t

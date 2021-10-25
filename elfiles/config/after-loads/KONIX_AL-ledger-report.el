@@ -363,6 +363,8 @@ The effective date of 1 will be set to the effective date of 2
 (define-key ledger-report-mode-map (kbd "u") #'konix/ledger-reconcile-update-track)
 (define-key ledger-report-mode-map (kbd "C-r") #'ledger-report)
 (define-key ledger-report-mode-map (kbd "C-c C-r") #'ledger-report)
+(define-key ledger-report-mode-map (kbd "r") #'ledger-report)
+(define-key ledger-report-mode-map (kbd "g") #'ledger-report-redo)
 
 (provide 'KONIX_AL-ledger-report)
 ;;; KONIX_AL-ledger-report.el ends here

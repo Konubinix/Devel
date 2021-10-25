@@ -607,7 +607,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'mic-paren)
 (setq-default paren-bind-modified-sexp-functions nil)
-(setq-default paren-display-message nil)
+(setq-default paren-display-message 'only)
 (paren-activate)
 
 (when (string-match

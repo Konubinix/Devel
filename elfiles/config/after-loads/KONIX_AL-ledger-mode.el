@@ -500,6 +500,7 @@ of the transaction.
 (define-key ledger-mode-map (kbd "C-c C-s") #'konix/ledger-report-account)
 (define-key ledger-mode-map (kbd "C-c C-r") #'ledger-report)
 (define-key ledger-mode-map (kbd "C-c c") #'ledger-mode-clean-buffer)
+(define-key ledger-mode-map (kbd "C-c C-o") #'org-open-at-point-global)
 
 
 (provide 'KONIX_AL-ledger)

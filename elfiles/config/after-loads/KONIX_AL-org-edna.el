@@ -124,9 +124,22 @@ scheduled in January if it is triggered in July."
       ;; The third argument to `org-read-date-analyze' specifies the defaults to
       ;; use if that time component isn't specified.  Since there's no way to
       ;; tell if a time was specified, tell `org-read-date-analyze' to use nil
-      ;; if no time is found.
+      ;; if no time is found. But fall back on the actual day to be changed or
+      ;; the current day if no day information is specified
       (let* ((case-fold-search t)
-             (parsed-time (org-read-date-analyze arg this-time '(nil nil nil nil nil nil)))
+             (decoded-current-time (decode-time (current-time)))
+             (decoded-this-time (decode-time this-time))
+             (parsed-time (org-read-date-analyze
+                           arg this-time
+                           `(nil
+                             nil
+                             nil
+                             ,(or (nth 3 decoded-this-time) (nth 3 decoded-current-time))
+                             ,(or (nth 4 decoded-this-time) (nth 4 decoded-current-time))
+                             ,(or (nth 5 decoded-this-time) (nth 5 decoded-current-time))
+                             )
+                           )
+                          )
              (have-time (nth 2 parsed-time))
              (final-time (apply #'encode-time (mapcar (lambda (e) (or e 0)) parsed-time)))
              (new-ts (format-time-string (concat "<"(if have-time "%F %a %R" "%F %a") ">") final-time)))

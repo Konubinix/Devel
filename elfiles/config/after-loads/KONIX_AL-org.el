@@ -5898,6 +5898,10 @@ You should check this is not a mistake."
     (konix/org-agenda-focus-next)
     (and
      (or
+      (konix/org-agenda-project-workflow-item/ask "OUTCOME: Say out loud or visualize what done means and what doing looks like/the expected outcome.  Did you manage? ")
+      (konix/org-agenda-project-workflow-item/fail "Clarify !")
+      )
+     (or
       (progn
         (save-window-excursion
           (find-file (org-roam-node-file (org-roam-node-from-id "aof")))
@@ -5907,10 +5911,6 @@ You should check this is not a mistake."
           )
         )
       (konix/org-agenda-project-workflow-item/fail "Get rid of it and ruuuun!")
-      )
-     (or
-      (konix/org-agenda-project-workflow-item/ask "OUTCOME: Say out loud or visualize what done means and what doing looks like/the expected outcome.  Did you manage? ")
-      (konix/org-agenda-project-workflow-item/fail "Clarify !")
       )
      (or
       (or

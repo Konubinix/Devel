@@ -129,7 +129,7 @@ scheduled in January if it is triggered in July."
              (parsed-time (org-read-date-analyze arg this-time '(nil nil nil nil nil nil)))
              (have-time (nth 2 parsed-time))
              (final-time (apply #'encode-time (mapcar (lambda (e) (or e 0)) parsed-time)))
-             (new-ts (format-time-string (concat "<"(if have-time "%F %R" "%F") ">") final-time)))
+             (new-ts (format-time-string (concat "<"(if have-time "%F %a %R" "%F %a") ">") final-time)))
         (org-entry-put (point) "REPEAT" new-ts))))))
 
 (defun org-edna-action/repeater! (last-entry &rest args)

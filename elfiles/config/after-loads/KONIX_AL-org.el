@@ -5525,6 +5525,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (key-chord-define org-mode-map "ri" 'org-roam-node-insert)
 (key-chord-define org-mode-map "ry" 'konix/org-roam/insert-key)
 (key-chord-define org-mode-map "rb" 'org-roam-db-sync)
+
 (define-key konix/region-bindings-mode-map "i" 'org-roam-node-insert)
 
 (setq-default
@@ -5618,7 +5619,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   (setq link (s-trim (org-link-decode link)))
   (let (
         (org-store-link-plist (list :link link))
-        (destfile (car org-ref-default-bibliography))
+        (destfile (car bibtex-completion-bibliography))
         )
     (org-capture-ref-process-capture)
     (with-current-buffer (find-file-noselect destfile)

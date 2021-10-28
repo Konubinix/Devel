@@ -693,6 +693,31 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
 (advice-add #'org-roam-node-find-noselect :around #'konix/org-roam-node-find-noselect/increase-visit-number)
 ;; (advice-remove #'org-roam-node-find-noselect #'konix/org-roam-node-find-noselect/increase-visit-number)
 
+(defvar konix/org-roam-node-read--completions/cache nil "Memory cache of the list of nodes")
+(defvar konix/org-roam-node-read--completions/cache-time nil "The time when the cache was last taken")
+(defun konix/org-roam-node-read--completions/cache (orig-fun &rest args)
+  (when (or
+         (not konix/org-roam-node-read--completions/cache)
+         (not konix/org-roam-node-read--completions/cache-time)
+         (time-less-p
+          konix/org-roam-node-read--completions/cache-time
+          (file-attribute-modification-time (file-attributes org-roam-db-location))
+          )
+         )
+    (message "Computing the org-roam-node-read--completions")
+    (setq konix/org-roam-node-read--completions/cache-time (current-time))
+    (setq konix/org-roam-node-read--completions/cache (apply orig-fun args))
+    )
+  konix/org-roam-node-read--completions/cache
+  )
+(advice-add #'org-roam-node-read--completions :around #'konix/org-roam-node-read--completions/cache)
+;; (advice-remove #'org-roam-node-read--completions #'konix/org-roam-node-read--completions/cache)
+
+(defun konix/org-roam-node-read--completions/cache/invalidate ()
+  (interactive)
+  (message "Cleaning the org-roam-node-read--completions cache")
+  (setq konix/org-roam-node-read--completions/cache nil)
+  )
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

@@ -660,6 +660,14 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
   )
 (advice-add #'org-roam-refile :around #'konix/org-roam-refile/org-agenda-to-org)
 
+(defun konix/org-redis-get-property (name)
+  (konix/redis-hget (org-id-get) name)
+  )
+
+(defun konix/org-redis-set-property (name value)
+  (konix/redis-hset (org-id-get) name value)
+  )
+
 (defun konix/org-roam-node-find-noselect/increase-visit-number (orig-fun &rest args)
   (let* (
          (buf (apply orig-fun args))
@@ -669,8 +677,8 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
          )
     (with-current-buffer buf
       (setq modified (buffer-modified-p))
-      (setq value (string-to-number (or (org-entry-get (point) property) "0")))
-      (org-entry-put (point) property (number-to-string (1+ value)))
+      (setq value (string-to-number (or (konix/org-redis-get-property property) "0")))
+      (konix/org-redis-set-property property (number-to-string (1+ value)))
       (unless modified
         (let (
               (konix/org-inhibit-update-date t)

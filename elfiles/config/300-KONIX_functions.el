@@ -1398,3 +1398,23 @@ Version 2016-09-02"
       )
   (substring string from to)
   )
+
+(defun konix/redis-hexists (key name)
+  (with-temp-buffer
+    (call-process "redis-cli" nil (current-buffer) nil "hexists" key name)
+    (string-equal (s-trim (buffer-substring-no-properties (point-min) (point-max))) "1")
+    )
+  )
+
+(defun konix/redis-hget (key name)
+  (and (konix/redis-hexists key name)
+   (with-temp-buffer
+     (call-process "redis-cli" nil (current-buffer) nil "hget" key name)
+     (s-trim (buffer-substring-no-properties (point-min) (point-max)))
+     )
+   )
+  )
+
+(defun konix/redis-hset (key name value)
+  (call-process "redis-cli" nil nil nil "hset" key name value)
+  )

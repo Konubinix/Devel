@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+
 (require 'KONIX_org-meta-context)
 (require 'org-archive)
 (require 'org-element)
@@ -6055,5 +6056,16 @@ You should check this is not a mistake."
             #'konix/org-clock-out/remove-dump)
   )
 
-(provide 'KONIX_AL-org)
+(assert (equal nil
+               (->> (buffer-list)
+                    (-map 'buffer-file-name)
+                    (-non-nil)
+                    (-filter (lambda (name) (string-suffix-p ".org" name)))
+                    )
+               )
+        nil
+        "Why are some org files files already loaded before the org customization is done?"
+        )
+
+ (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

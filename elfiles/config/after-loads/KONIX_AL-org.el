@@ -2710,17 +2710,24 @@ items"
     )
   )
 
-(defun konix/org-read-date-analyze/empty-ans-means-current-time (orig-fun ans &rest args)
-  (if (string-match-p "^n *$" ans)
-      (setq ans (format-time-string "%H:%M" (current-time)))
+(defun konix/org-read-date-analyze/custom-interpretation (orig-fun ans &rest args)
+  ;; only n -> now
+  (when (string-match-p "^n *$" ans)
+    (setq ans (format-time-string "%H:%M" (current-time)))
     )
+  ;; nothing -> now
+  (when (string-match-p "^ *$" ans)
+    (setq ans (format-time-string "%H:%M" (current-time)))
+    )
+  ;; start with n and something afterward -> drop the n
+  (setq ans (replace-regexp-in-string "^\\(n *\\)\\([^ ].*\\)" "\\2" ans))
   (apply orig-fun ans args)
   )
 
 (advice-add
- 'org-read-date-analyze
+ #'org-read-date-analyze
  :around
- #'konix/org-read-date-analyze/empty-ans-means-current-time)
+ #'konix/org-read-date-analyze/custom-interpretation)
 
 (defun konix/org-capture-template-iso-9001 nil
   (format

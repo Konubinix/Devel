@@ -3402,14 +3402,16 @@ of the clocksum."
 
 (defun konix/org-guess-ispell ()
   (interactive)
-  (save-excursion
-    (goto-char 0)
-    (save-match-data
-      (when (re-search-forward "^#\\+LANGUAGE: *\\(.+\\)$" 1000 t)
-        (ispell-change-dictionary (match-string-no-properties 1))
-        )
-      )
-    )
+  (org-with-wide-buffer
+   (save-excursion
+     (goto-char 0)
+     (save-match-data
+       (when (re-search-forward "^#\\+LANGUAGE: *\\(.+\\)$" 1000 t)
+         (ispell-change-dictionary (match-string-no-properties 1))
+         )
+       )
+     )
+   )
   )
 
 (defun konix/org-mode/after-save-hook ()

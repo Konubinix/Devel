@@ -687,12 +687,16 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
   )
 (advice-add #'org-roam-refile :around #'konix/org-roam-refile/org-agenda-to-org)
 
+(defun konix/org-redis-format-key ()
+  (format "org-id-%s" (org-id-get (point) t))
+  )
+
 (defun konix/org-redis-get-property (name)
-  (konix/redis-hget (org-id-get) name)
+  (konix/redis-hget (konix/org-redis-format-key) name)
   )
 
 (defun konix/org-redis-set-property (name value)
-  (konix/redis-hset (org-id-get) name value)
+  (konix/redis-hset (konix/org-redis-format-key) name value)
   )
 
 (defun konix/org-roam-node-find-noselect/increase-visit-number (orig-fun &rest args)

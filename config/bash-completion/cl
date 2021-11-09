@@ -1,0 +1,4 @@
+#!/bin/bash -eu
+
+ME="$(basename "${BASH_SOURCE[0]}")"
+complete -C consul "${ME}"

@@ -553,14 +553,41 @@ ${title}
     )
   )
 
-(defun konix/org-roam-get-refs ()
+(defun konix/org-roam-goto-node-heading ()
+  (let (found)
+    (setq found (org-entry-get (point) "ID"))
+    (while (and (not found) (org-up-heading-safe))
+      (setq found (org-entry-get (point) "ID"))
+      )
+    (unless found
+      (goto-char (point-min))
+      )
+    )
+  )
+
+(defmacro konix/org-roam/with-point-on-node-heading (body)
+  `(save-excursion
+     (konix/org-roam-goto-node-heading)
+     ,body
+     )
+  )
+
+(defun konix/org-roam-get-refs-at-point ()
   (if-let
       (
-       (refs (org-entry-get (point-min) "ROAM_REFS"))
+       (refs (org-entry-get (point) "ROAM_REFS"))
        )
       (split-string-and-unquote refs)
     )
   )
+
+(defun konix/org-roam-get-refs ()
+  (konix/org-roam/with-point-on-node-heading
+   (konix/org-roam-get-refs-at-point)
+   )
+  )
+
+(defun ko)
 
 (setq-default
  citeproc-org-default-style-file

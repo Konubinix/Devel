@@ -5923,6 +5923,10 @@ You should check this is not a mistake."
       (konix/org-agenda-project-workflow-item/fail "Get rid of it and ruuuun!")
       )
      (or
+      (konix/org-agenda-project-workflow-item/ask "SCHEDULE: Is it relevant now (I may schedule it in the future)? ")
+      (call-interactively 'org-agenda-schedule)
+      )
+     (or
       (or
        (konix/org-agenda-project-workflow-item/ask
         (format "DEADLINE: Current deadline is %s %s. Is this ok? "
@@ -6076,5 +6080,5 @@ You should check this is not a mistake."
         "Why are some org files files already loaded before the org customization is done?"
         )
 
- (provide 'KONIX_AL-org)
+(provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

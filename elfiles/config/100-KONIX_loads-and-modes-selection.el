@@ -165,6 +165,7 @@
 ;; ************************************************************
 ;; Automodes
 ;; ************************************************************
+(add-to-list 'auto-mode-alist (cons "\\.argdown$" 'argdown-mode))
 ;; .h -> cpp-mode
 (add-to-list 'auto-mode-alist (cons "\\.h$" 'c-mode))
 ;; Assembleur

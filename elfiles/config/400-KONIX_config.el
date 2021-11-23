@@ -116,7 +116,7 @@
 ;; ******************************************************************************************
 ;; kill ring
 ;; ******************************************************************************************
-(setq-default kill-ring-max 300)
+(setq-default kill-ring-max 3000)
 ;; ******************************************************************************************
 ;; Automagically killing unused buffers
 ;; ******************************************************************************************
@@ -202,7 +202,7 @@
 
 ;; Dired in human readable format
 (setq-default dired-listing-switches "-alh")
-(setq-default history-length 300)
+(setq-default history-length 3000)
 ;; Sometimes, display-warning may fail because this is not set
 (setq-default warning-suppress-types '())
 

@@ -2,39 +2,42 @@
 # -*- coding:utf-8 -*-
 
 import cmd
-import urllib.request
-import markdown
-import json
-import os
-import re
-import sys
-import pprint
-import html2text
-import redis
-import functools
-import shlex
-import datetime
-import time
 import collections
-import pytz
-import parsedatetime
-import dateutil.parser
-import dateutil
-import requests
-import konix_collections
-import urllib.parse
+import datetime
+import functools
 import hashlib
+import json
+import logging
+import os
+import pprint
+import re
+import shlex
+import sys
+import time
+import urllib.parse
+import urllib.request
+
+import dateutil
+import dateutil.parser
+import html2text
+import hvac
+import markdown
+import parsedatetime
+import pytz
+import redis
+import requests
 from dateutil import parser
 
-from konix_time_helper import get_local_timezone, date_to_local
+import konix_collections
+from konix_time_helper import date_to_local, get_local_timezone
 
-import logging
 logging.basicConfig()
 LOGGER = logging.getLogger(__file__)
 LOGGER.setLevel(logging.DEBUG)
 pp = pprint.PrettyPrinter(indent=4, width=200)
 
 import readline
+
 # handle the history
 histfile = os.environ.get("KONIX_GCAL_HISTORY",
                           os.path.expanduser("~/.konix_gcal_history"))
@@ -43,20 +46,19 @@ try:
 except IOError:
     pass
 import atexit
+
 atexit.register(readline.write_history_file, histfile)
 del histfile
 
-readline.set_completer_delims(
-    readline.get_completer_delims().replace("/", "").replace("-", "")
-)
+readline.set_completer_delims(readline.get_completer_delims().replace(
+    "/", "").replace("-", ""))
 
 DISCOVERY_URI = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}/rest'.format(
-                     api="calendar",
-                     apiVersion="v3")
+    api="calendar", apiVersion="v3")
 
-EVENT_STRFTIME="%Y-%m-%dT%H:%M:%S.000%z"
-EVENT_URL_STRFTIME="%Y-%m-%dT%H:%M:%SZ"
-EVENT_STRFTIME_ALL_DAY="%Y-%m-%d"
+EVENT_STRFTIME = "%Y-%m-%dT%H:%M:%S.000%z"
+EVENT_URL_STRFTIME = "%Y-%m-%dT%H:%M:%SZ"
+EVENT_STRFTIME_ALL_DAY = "%Y-%m-%d"
 
 
 class OutOfDateError(Exception):
@@ -68,12 +70,17 @@ def lazy(expire_key):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if self.db.get(self.db_name_transform(expire_key)):
-                LOGGER.debug("{} up to date".format(self.db_name_transform(expire_key)))
+                LOGGER.debug("{} up to date".format(
+                    self.db_name_transform(expire_key)))
             else:
-                LOGGER.debug("{} out of date (reeval)".format(self.db_name_transform(expire_key)))
+                LOGGER.debug("{} out of date (reeval)".format(
+                    self.db_name_transform(expire_key)))
                 return func(self, *args, **kwargs)
+
         return wrapper
+
     return real_decorator
+
 
 PROVIDERS_KEYS = {}
 
@@ -86,11 +93,11 @@ def needs(expire_key):
     def real_decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            if not (
-                    self.db.get(self.db_name_transform(expire_key))
-                    and expire_key in PROVIDERS_KEYS
-            ):
-                LOGGER.debug("Calling the provider of the needed key {}".format(self.db_name_transform(expire_key)))
+            if not (self.db.get(self.db_name_transform(expire_key))
+                    and expire_key in PROVIDERS_KEYS):
+                LOGGER.debug(
+                    "Calling the provider of the needed key {}".format(
+                        self.db_name_transform(expire_key)))
                 provider, interactive = PROVIDERS_KEYS[expire_key]
                 if interactive:
                     LOGGER.error("You must call {}".format(provider))
@@ -100,30 +107,43 @@ def needs(expire_key):
                 return func(self, *args, **kwargs)
             else:
                 LOGGER.error("{} is needed".format())
+
         return wrapper
+
     return real_decorator
+
 
 def provides(key, interactive=False):
     def real_decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             return func(self, *args, **kwargs)
+
         global PROVIDERS_KEYS
-        PROVIDERS_KEYS[key] = (wrapper, interactive,)
+        PROVIDERS_KEYS[key] = (
+            wrapper,
+            interactive,
+        )
         return wrapper
+
     return real_decorator
 
-PROMPT="GCal({calendar_id}, {event_list_extra_query}, {time_min}, {time_max})\n> "
+
+PROMPT = "GCal({calendar_id}, {event_list_extra_query}, {time_min}, {time_max})\n> "
+
 
 class GCall(cmd.Cmd, object):
     def __init__(self, make_place=False, account=""):
         cmd.Cmd.__init__(self)
         self.account = account
         self.db = redis.StrictRedis(decode_responses=True)
-        self.client_id = self.db.get("client_id")
-        self.client_secret = self.db.get("client_secret")
-        assert self.client_id, "redis-cli set client_id <yourid> (https://console.developers.google.com/project/<yourapp>/apiui/credential). Use a native application type."
-        assert self.client_secret, "redis-cli set client_secret <yoursecret> (https://console.developers.google.com/project/<yourapp>/apiui/credential). Use a native application type."
+        data = hvac.Client().secrets.kv.v2.read_secret(
+            "/google/konubinix/oauth")["data"]["data"]
+        self.client_id = data["client_id"]
+        self.client_secret = data["client_secret"]
+        message = "vault kv put secret/google/konubinix/oauth client_id=<yourid> client_secret=<yoursecret> (https://console.developers.google.com/project/<yourapp>/apiui/credential). Use a native application type."
+        assert self.client_id, message
+        assert self.client_secret, message
         self.calendar_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.event_filter = "'{search_term}'.lower() in x.summary.lower()"
         self.calendar_formatter = "str([x.id, x.summary])"
@@ -131,12 +151,7 @@ class GCall(cmd.Cmd, object):
         self.get_api()
         self.setup_types()
         self.updatable_data = [
-            "summary",
-            "start",
-            "end",
-            "status",
-            "attendees",
-            "description"
+            "summary", "start", "end", "status", "attendees", "description"
         ]
         self._make_place = make_place
         self.set_prompt()
@@ -208,14 +223,10 @@ class GCall(cmd.Cmd, object):
         calendars_string = self.db.get(self.calendars_name)
         if calendars_string:
             data = json.loads(calendars_string)
-            calendars = [
-                CalendarListEntry(**item)
-                for item in data["items"]
-            ]
+            calendars = [CalendarListEntry(**item) for item in data["items"]]
         else:
             calendars = []
         return calendars
-
 
     def format(self, object_):
         object_formatters = {
@@ -232,35 +243,30 @@ class GCall(cmd.Cmd, object):
     def setup_types(self):
         global Calendar, CalendarListEntry, Event
         self.types = {
-            "CalendarListEntry" : {
-                "keys": self.api["schemas"]["CalendarListEntry"]["properties"].keys()
+            "CalendarListEntry": {
+                "keys":
+                self.api["schemas"]["CalendarListEntry"]["properties"].keys()
             },
-            "Event" : {
+            "Event": {
                 "keys": self.api["schemas"]["Event"]["properties"].keys()
             }
         }
         CalendarListEntry = konix_collections.namedtuples_default_values(
-            "CalendarListEntry",
-            self.types["CalendarListEntry"]["keys"],
-            {k: "" for k in self.types["CalendarListEntry"]["keys"]}
-        )
+            "CalendarListEntry", self.types["CalendarListEntry"]["keys"],
+            {k: ""
+             for k in self.types["CalendarListEntry"]["keys"]})
 
         Event = konix_collections.namedtuples_default_values(
             "Event",
             sorted(list(self.types["Event"]["keys"]) + ["calendar_id"]),
-            {k: "" for k in self.types["Event"]["keys"]}
-        )
+            {k: ""
+             for k in self.types["Event"]["keys"]})
 
         def print_diary(self):
-            print("{}-{} {} ({}) [{}]".
-                  format(
-                      self.startdate.strftime("%Y-%m-%d %H:%M"),
-                      self.enddate.strftime("%H:%M"),
-                      self.summary,
-                      self.htmlLink,
-                      self.id
-                  )
-            )
+            print("{}-{} {} ({}) [{}]".format(
+                self.startdate.strftime("%Y-%m-%d %H:%M"),
+                self.enddate.strftime("%H:%M"), self.summary, self.htmlLink,
+                self.id))
 
         @property
         def org_mode_timestamp(self):
@@ -269,13 +275,15 @@ class GCall(cmd.Cmd, object):
                 self.enddate.strftime("%H:%M"),
             )
             if self.recurrence:
-                weekly = re.compile("RRULE:FREQ=WEEKLY(;COUNT=[0-9]+)?(;INTERVAL=(?P<interval>[0-9]+))?(;UNTIL=[^;]+)?(;WKST=[^;]+)?;BYDAY=(.+)")
-                assert len(self.recurrence) == 1, "Cannot handle several recurrences yet"
+                weekly = re.compile(
+                    "RRULE:FREQ=WEEKLY(;COUNT=[0-9]+)?(;INTERVAL=(?P<interval>[0-9]+))?(;UNTIL=[^;]+)?(;WKST=[^;]+)?;BYDAY=(.+)"
+                )
+                assert len(self.recurrence
+                           ) == 1, "Cannot handle several recurrences yet"
                 rule = self.recurrence[0]
                 if weekly.match(rule):
                     stamp += " ++{}w".format(
-                        weekly.match(rule).group("interval") or 1
-                    )
+                        weekly.match(rule).group("interval") or 1)
                 else:
                     raise NotImplementedError(str(self.recurrence))
             stamp += ">"
@@ -284,8 +292,7 @@ class GCall(cmd.Cmd, object):
         @property
         def my_response_status(self):
             me_as_attendee = [
-                attendee
-                for attendee in self.attendees
+                attendee for attendee in self.attendees
                 if attendee.get("email") == self.calendar_id
             ]
             if me_as_attendee:
@@ -344,42 +351,47 @@ Attendees:
 {}
 #+END_EXAMPLE
 """.format(
-    self.htmlLink,
-    self.summary.replace("[", "{").replace("]", "}") or "NoSummary",
-    (f" ([[{self.hangoutLink}][Hangout link]])" if self.hangoutLink else ""),
-    ("    :{}:".format(":".join(self.tags)) if self.tags else ""),
-    self.id,
-    self.calendar_id,
-    self.account,
-    self.location,
-    self.organizer.get("displayName", self.organizer.get("email", "NA")),
-    date_to_local(parser.parse(self.created)).strftime("[%Y-%m-%d %H:%M]"),
-    date_to_local(parser.parse(self.updated)).strftime("[%Y-%m-%d %H:%M]"),
-    self.updated,
-    "t" if optional else "nil",
-    self.org_mode_timestamp,
-    self.organizer.get("displayName", self.organizer.get("email", "NA")),
-    "\n".join(
-        map(
-            lambda a: " - {} ({}) ({})".format(
-                a.get("email", "NA"),
-                a.get("responseStatus"),
-                a.get("comment", "no comment"),
-            ),
-            self.attendees)),
-    re.sub("^\*", ",*", self.text_description.strip(), flags=re.MULTILINE),
-    re.sub("^\*", ",*", str(self).strip(), flags=re.MULTILINE),
-)
+                self.htmlLink,
+                self.summary.replace("[", "{").replace("]", "}")
+                or "NoSummary",
+                (f" ([[{self.hangoutLink}][Hangout link]])"
+                 if self.hangoutLink else ""),
+                ("    :{}:".format(":".join(self.tags)) if self.tags else ""),
+                self.id,
+                self.calendar_id,
+                self.account,
+                self.location,
+                self.organizer.get("displayName",
+                                   self.organizer.get("email", "NA")),
+                date_to_local(parser.parse(
+                    self.created)).strftime("[%Y-%m-%d %H:%M]"),
+                date_to_local(parser.parse(
+                    self.updated)).strftime("[%Y-%m-%d %H:%M]"),
+                self.updated,
+                "t" if optional else "nil",
+                self.org_mode_timestamp,
+                self.organizer.get("displayName",
+                                   self.organizer.get("email", "NA")),
+                "\n".join(
+                    map(
+                        lambda a: " - {} ({}) ({})".format(
+                            a.get("email", "NA"),
+                            a.get("responseStatus"),
+                            a.get("comment", "no comment"),
+                        ), self.attendees)),
+                re.sub("^\*",
+                       ",*",
+                       self.text_description.strip(),
+                       flags=re.MULTILINE),
+                re.sub("^\*", ",*", str(self).strip(), flags=re.MULTILINE),
+            )
 
         @property
         def startdate(self):
             if self.start.get("dateTime"):
-                date = dateutil.parser.parse(self.start.get("dateTime")
-                )
+                date = dateutil.parser.parse(self.start.get("dateTime"))
             else:
-                date = dateutil.parser.parse(
-                    self.start.get("date")
-                )
+                date = dateutil.parser.parse(self.start.get("date"))
             if date.tzinfo is None:
                 date = date.replace(tzinfo=get_local_timezone())
             return date
@@ -387,12 +399,9 @@ Attendees:
         @property
         def enddate(self):
             if self.end.get("dateTime"):
-                date = dateutil.parser.parse(self.end.get("dateTime")
-                )
+                date = dateutil.parser.parse(self.end.get("dateTime"))
             else:
-                date = dateutil.parser.parse(
-                    self.end.get("date")
-                )
+                date = dateutil.parser.parse(self.end.get("date"))
             if date.tzinfo is None:
                 date = date.replace(tzinfo=get_local_timezone())
             return date
@@ -400,12 +409,11 @@ Attendees:
         @property
         def uid(self):
             """Id that is uniq between recurring events"""
-            return re.match(
-                "^(?P<id>.+?)(_.{16})?$", self.id).group("id")
+            return re.match("^(?P<id>.+?)(_.{16})?$", self.id).group("id")
 
         @property
         def duration(self):
-            return self.enddate-self.startdate
+            return self.enddate - self.startdate
 
         def event_hash(self):
             return int(hashlib.sha1(self.id.encode("utf-8")).hexdigest(), 16)
@@ -446,16 +454,14 @@ Attendees:
         added = {
             key: self.get_attr(key)
             for key in [
-                    "calendar_id",
-                    "event_list_extra_query",
-                    "time_min",
-                    "time_max",
+                "calendar_id",
+                "event_list_extra_query",
+                "time_min",
+                "time_max",
             ]
         }
         dict_.update(added)
-        self.prompt = PROMPT.format(
-            **added
-        )
+        self.prompt = PROMPT.format(**added)
 
     @property
     def event_list_extra_query(self):
@@ -476,16 +482,17 @@ Attendees:
         self.db.delete(self.refresh_token_name)
 
     def db_name_transform(self, name):
-        if name in ["access_token",
-                    "refresh_token",
-                    "user_code",
-                    "device_code",
-                    "all_events",
-                    "calendar_id",
-                    "calendars",
-                    "time_min",
-                    "time_max",
-                ]:
+        if name in [
+                "access_token",
+                "refresh_token",
+                "user_code",
+                "device_code",
+                "all_events",
+                "calendar_id",
+                "calendars",
+                "time_min",
+                "time_max",
+        ]:
             return "{}_{}".format(self.account, name)
         else:
             return name
@@ -531,16 +538,15 @@ Attendees:
         LOGGER.debug("Refreshing access token")
         req = urllib.request.Request(
             url='https://www.googleapis.com/oauth2/v4/token',
-            data='client_id={}&client_secret={}&refresh_token={}&grant_type=refresh_token'.format(
-                self.client_id,
-                self.client_secret,
-                self.db.get(self.refresh_token_name)
-            ).encode("utf-8"))
+            data=
+            'client_id={}&client_secret={}&refresh_token={}&grant_type=refresh_token'
+            .format(self.client_id, self.client_secret,
+                    self.db.get(self.refresh_token_name)).encode("utf-8"))
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
         self.db.set(self.access_token_name, data["access_token"])
-        self.db.expire(self.access_token_name, 5) # int(data["expires_in"]))
+        self.db.expire(self.access_token_name, 5)  # int(data["expires_in"]))
         self.db.set("token_type", data["token_type"])
         assert self.db.get("token_type") == "Bearer"
 
@@ -552,28 +558,26 @@ Attendees:
     def all_calendars(self):
         req = urllib.request.Request(
             url='https://www.googleapis.com/calendar/v3/users/me/calendarList',
-            headers={"Authorization": "{} {}".format(
-                self.db.get("token_type"),
-                self.db.get(self.access_token_name))}
-        )
+            headers={
+                "Authorization":
+                "{} {}".format(self.db.get("token_type"),
+                               self.db.get(self.access_token_name))
+            })
         f = urllib.request.urlopen(req)
         assert f.code == 200
         calendars_string = f.read().decode("utf-8")
         self.db.set(self.calendars_name, calendars_string)
         data = json.loads(calendars_string)
-        calendars = [
-            CalendarListEntry(**item)
-            for item in data["items"]
-        ]
+        calendars = [CalendarListEntry(**item) for item in data["items"]]
         return calendars
 
     @needs("access_token")
     def list_calendars(self, search_term=None):
         if search_term:
-            filter_ = eval("lambda x:" + self.calendar_filter.format(search_term=search_term))
+            filter_ = eval("lambda x:" + self.calendar_filter.format(
+                search_term=search_term))
         calendars = [
-            cal
-            for cal in self.all_calendars()
+            cal for cal in self.all_calendars()
             if not search_term or filter_(cal)
         ]
         return calendars
@@ -583,8 +587,8 @@ Attendees:
         import pandas
         return pandas.DataFrame(
             [ce._asdict().values() for ce in self.list_calendars(search_term)],
-            columns=self.api["schemas"]["CalendarListEntry"]["properties"].keys()
-        )
+            columns=self.api["schemas"]["CalendarListEntry"]
+            ["properties"].keys())
 
     @needs("access_token")
     def do_list_calendars(self, search_term=None):
@@ -596,7 +600,10 @@ Attendees:
         if not self.calendars:
             print("Run list_calendars first")
             return
-        pp.pprint(*[calendar for calendar in self.calendars if calendar.id == calendar_id])
+        pp.pprint(*[
+            calendar for calendar in self.calendars
+            if calendar.id == calendar_id
+        ])
 
     def complete_show_calendar(self, text, line, begidx, endidx):
         return [
@@ -612,24 +619,15 @@ Attendees:
             print("Run list_calendars first")
             return
         keys = shlex.split(keys)
-        pp.pprint(
-            [
-                {
-                    key:calendar.__getattribute__(key)
-                    for key in keys
-                }
-                for calendar in self.calendars
-            ]
-        )
+        pp.pprint([{key: calendar.__getattribute__(key)
+                    for key in keys} for calendar in self.calendars])
 
     def help_map_show_calendar(self):
         print("{}".format(calendar_keys))
 
     def get_calendar(self, id_):
-        return [calendar
-                for calendar in self.calendars
-                if calendar.id == id_
-        ][0]
+        return [calendar for calendar in self.calendars
+                if calendar.id == id_][0]
 
     def do_calendar_filter(self, line):
         if line:
@@ -676,13 +674,7 @@ Attendees:
             print("Run list_calendars first")
             return
         fil = eval("lambda x:" + line)
-        pp.pprint(
-            [
-                calendar
-                for calendar in self.calendars
-                if fil(calendar)
-            ]
-        )
+        pp.pprint([calendar for calendar in self.calendars if fil(calendar)])
 
     def do_ipython(self, line=None):
         import IPython
@@ -713,25 +705,25 @@ Attendees:
     def do_describe_calendar(self, line):
         calendar_id = self.db.get(self.calendar_id_name)
         formatter = eval("lambda x:" + self.calendar_formatter)
-        print(formatter([cal
-               for cal in self.list_calendars()
-               if cal.id == calendar_id
-           ][0]))
+        print(
+            formatter([
+                cal for cal in self.list_calendars() if cal.id == calendar_id
+            ][0]))
 
     @needs("calendar_id")
     @needs("access_token")
     def get_event(self, event_id):
         calendar_id = self.db.get(self.calendar_id_name)
         req = urllib.request.Request(
-            url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
-                calendar_id,
-                event_id
-            ),
-            headers={"Content-Type": "application/json",
-                     "Authorization": "{} {}".format(
-                self.db.get("token_type"),
-                self.db.get(self.access_token_name))}
-        )
+            url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'
+            .format(calendar_id, event_id),
+            headers={
+                "Content-Type":
+                "application/json",
+                "Authorization":
+                "{} {}".format(self.db.get("token_type"),
+                               self.db.get(self.access_token_name))
+            })
         try:
             f = urllib.request.urlopen(req)
         except urllib.error.HTTPError:
@@ -745,16 +737,16 @@ Attendees:
     def del_event(self, event_id):
         calendar_id = self.db.get(self.calendar_id_name)
         req = urllib.request.Request(
-            url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
-                calendar_id,
-                event_id
-            ),
-            headers={"Content-Type": "application/json",
-                     "Authorization": "{} {}".format(
-                         self.db.get("token_type"),
-                         self.db.get(self.access_token_name))},
-            method="DELETE"
-        )
+            url='https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'
+            .format(calendar_id, event_id),
+            headers={
+                "Content-Type":
+                "application/json",
+                "Authorization":
+                "{} {}".format(self.db.get("token_type"),
+                               self.db.get(self.access_token_name))
+            },
+            method="DELETE")
         f = urllib.request.urlopen(req)
         assert f.code == 204
         self.db.delete(self.all_events_name)
@@ -765,32 +757,32 @@ Attendees:
     @needs("access_token")
     def get_events(self, calendar_id, extra_query=None):
         def get_events(page_token=None):
-            url='https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=2500&singleEvents=True'.format(
-                urllib.parse.quote(calendar_id)
-            )
+            url = 'https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=2500&singleEvents=True'.format(
+                urllib.parse.quote(calendar_id))
             if page_token:
                 url += "&pageToken={}".format(page_token)
             if extra_query:
                 url += extra_query
             if self.time_min:
                 url += "&timeMin={}T00:00:00Z".format(
-                    self.time_min.strftime("%Y-%m-%d")
-                )
+                    self.time_min.strftime("%Y-%m-%d"))
             if self.time_max:
                 url += "&timeMax={}T00:00:00Z".format(
-                    self.time_max.strftime("%Y-%m-%d")
-                )
+                    self.time_max.strftime("%Y-%m-%d"))
             req = urllib.request.Request(
                 url=url,
-                headers={"Content-Type": "application/json",
-                         "Authorization": "{} {}".format(
-                             self.db.get("token_type"),
-                             self.db.get(self.access_token_name))}
-            )
+                headers={
+                    "Content-Type":
+                    "application/json",
+                    "Authorization":
+                    "{} {}".format(self.db.get("token_type"),
+                                   self.db.get(self.access_token_name))
+                })
             f = urllib.request.urlopen(req)
             assert f.code == 200
             data = json.loads(f.read().decode("utf-8"))
             return data
+
         data = get_events()
         items = data["items"]
         while data.get("nextPageToken", None):
@@ -812,14 +804,12 @@ Attendees:
     @needs("all_events")
     def list_events(self, search_terms=""):
         items = json.loads(self.db.get(self.all_events_name))
-        events = sorted([
-            Event(**i)
-            for i in items
-            ], key=lambda e: e.startdate)
+        events = sorted([Event(**i) for i in items], key=lambda e: e.startdate)
         search_terms = shlex.split(search_terms)
 
         for search_term in search_terms:
-            filter_ = eval("lambda x: " + self.event_filter.format(search_term=search_term))
+            filter_ = eval("lambda x: " +
+                           self.event_filter.format(search_term=search_term))
             events = [e for e in events if filter_(e)]
 
         return events
@@ -831,16 +821,14 @@ Attendees:
                     event.startdate,
                     event.enddate,
                     event.duration,
-                ]
-                for event in self.list_events(search_terms)
+                ] for event in self.list_events(search_terms)
             ],
             columns=list(self.api["schemas"]["Event"]["properties"].keys()) + [
                 "calendarid",
                 "startdate",
                 "enddate",
                 "duration",
-            ]
-        )
+            ])
         res.startdate = pandas.to_datetime(res.startdate, utc=True)
         res.enddate = pandas.to_datetime(res.enddate, utc=True)
         res.duration = res.duration
@@ -856,6 +844,7 @@ Attendees:
             "duration",
         ]
         calendar_id = self.db.get(self.calendar_id_name)
+
         @discover.register(self.Event)
         def discover_events(event, **kwargs):
             df = pandas.DataFrame(
@@ -864,16 +853,18 @@ Attendees:
                         event.startdate,
                         event.enddate,
                         event.duration,
+                    ] for event in [
+                        event,
                     ]
-                    for event in [event,]
                 ],
                 columns=columns,
             )
-            shape = (len(df),)
+            shape = (len(df), )
             dtype = df.values.dtype
             return from_numpy(shape, dtype)
 
         from odo import convert
+
         @convert.register(pandas.DataFrame, self.Event)
         def event_to_dataframe(event, **kwargs):
             df = pandas.DataFrame(
@@ -882,8 +873,9 @@ Attendees:
                         event.startdate,
                         event.enddate,
                         event.duration,
+                    ] for event in [
+                        event,
                     ]
-                    for event in [event,]
                 ],
                 columns=columns,
             )
@@ -899,17 +891,18 @@ Attendees:
         pp.pprint([formatter(event) for event in events])
 
     @needs("access_token")
-    def add_event(self,
-                  title,
-                  where,
-                  when,
-                  duration,
-                  description="",
-                  attendees_emails=None,
-                  make_place=None,
-                  sendNotifications=False,
-                  reminders=None,
-              ):
+    def add_event(
+        self,
+        title,
+        where,
+        when,
+        duration,
+        description="",
+        attendees_emails=None,
+        make_place=None,
+        sendNotifications=False,
+        reminders=None,
+    ):
         if make_place is None:
             make_place = self._make_place
         calendar_id = self.db.get(self.calendar_id_name)
@@ -920,11 +913,12 @@ Attendees:
             print("Use the command select_calendar first")
             return
         start, flag = self.parse_time(when)
-        time_dict = re.match('^\s*((?P<hours>\d+)\s*h)?\s*((?P<minutes>\d+)\s*m?)?\s*((?P<seconds>\d+)\s*s)?\s*$',
-                             duration).groupdict()
+        time_dict = re.match(
+            '^\s*((?P<hours>\d+)\s*h)?\s*((?P<minutes>\d+)\s*m?)?\s*((?P<seconds>\d+)\s*s)?\s*$',
+            duration).groupdict()
         duration = datetime.timedelta(seconds=int(time_dict['seconds'] or "0"),
-                             minutes=int(time_dict['minutes'] or "0"),
-                             hours=int(time_dict['hours'] or "0"))
+                                      minutes=int(time_dict['minutes'] or "0"),
+                                      hours=int(time_dict['hours'] or "0"))
         end = start + duration
         if make_place:
             self.make_place(calendar_id, start, end)
@@ -942,38 +936,42 @@ Attendees:
             end = {
                 "dateTime": end.strftime(EVENT_STRFTIME),
             }
-        attendees = [{"email": attendee_email} for attendee_email in attendees_emails]
+        attendees = [{
+            "email": attendee_email
+        } for attendee_email in attendees_emails]
         event = {
-            "summary" : title,
-            "location" : where,
+            "summary": title,
+            "location": where,
             "description": markdown.markdown(description),
-            "start" : start,
-            "end" : end,
+            "start": start,
+            "end": end,
             "attendees": attendees,
         }
         if not reminders is None:
             event["reminders"] = {
-                "useDefault": False,
-                "overrides": [
-                    {
-                        "method": "email",
-                        "minutes": reminder
-                    }
-                    for reminder in reminders
-                ]
+                "useDefault":
+                False,
+                "overrides": [{
+                    "method": "email",
+                    "minutes": reminder
+                } for reminder in reminders]
             }
 
         req = urllib.request.Request(
-            url='https://www.googleapis.com/calendar/v3/calendars/{}/events?sendNotifications={}'.format(
+            url=
+            'https://www.googleapis.com/calendar/v3/calendars/{}/events?sendNotifications={}'
+            .format(
                 calendar_id,
                 sendNotifications,
             ),
             data=json.dumps(event).encode("utf-8"),
-            headers={"Content-Type": "application/json",
-                     "Authorization": "{} {}".format(
-                self.db.get("token_type"),
-                self.db.get(self.access_token_name))}
-        )
+            headers={
+                "Content-Type":
+                "application/json",
+                "Authorization":
+                "{} {}".format(self.db.get("token_type"),
+                               self.db.get(self.access_token_name))
+            })
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
@@ -987,16 +985,13 @@ Attendees:
             end.strftime("%Y-%m-%d"),
         )
         items = json.loads(self.get_events(calendar_id, extra_query))
-        events = [
-            Event(**i)
-            for i in items
-            ]
+        events = [Event(**i) for i in items]
 
         # an event to move start before the end and end after the start
-        events = [event for event in events
-                  if event.startdate <= end
-                  and event.enddate >= start
-                  ]
+        events = [
+            event for event in events
+            if event.startdate <= end and event.enddate >= start
+        ]
         for event in events:
             # there are 4 cases
             # the event is around start, end. I need to split it in two
@@ -1004,15 +999,16 @@ Attendees:
                 new_start = end
                 new_end = event.enddate
                 new_duration = new_end - new_start
-                self.add_event(event.summary, event.location,
+                self.add_event(event.summary,
+                               event.location,
                                new_start.strftime("%m/%d/%YT%H:%M:%S"),
                                "{}s".format(int(new_duration.total_seconds())),
                                event.description,
                                make_place=False)
-                new_values = { "end" :
-                             {
-                                 'dateTime' : start.strftime(EVENT_STRFTIME)
-                             }
+                new_values = {
+                    "end": {
+                        'dateTime': start.strftime(EVENT_STRFTIME)
+                    }
                 }
                 self._update_event(calendar_id, event, new_values)
             # the event is inside start, end, it must be removed
@@ -1021,47 +1017,43 @@ Attendees:
             # the event overlap not entirely with the start, end
             # if the event is after
             elif event.startdate >= start:
-                new_values = { "start" :
-                               {
-                                   'dateTime' : end.strftime(EVENT_STRFTIME)
-                               }
-                           }
+                new_values = {
+                    "start": {
+                        'dateTime': end.strftime(EVENT_STRFTIME)
+                    }
+                }
                 self._update_event(calendar_id, event, new_values)
             # if the event is before
             elif event.enddate <= end:
-                new_values = { "end" :
-                               {
-                                   'dateTime' : start.strftime(EVENT_STRFTIME)
-                               }
-                           }
+                new_values = {
+                    "end": {
+                        'dateTime': start.strftime(EVENT_STRFTIME)
+                    }
+                }
                 self._update_event(calendar_id, event, new_values)
 
     def accept(self, event, comment="", updated=None):
         data = {
-            "attendees": (event.attendees or []) + [
-                {
-                    "email": self.calendar_id,
-                    "responseStatus": "accepted",
-                    "comment": comment,
-                }
-            ]
+            "attendees": (event.attendees or []) + [{
+                "email": self.calendar_id,
+                "responseStatus": "accepted",
+                "comment": comment,
+            }]
         }
-        return self._update_insist(
-            event, data, send_notif=True if comment else False,
-            updated=updated
-        )
+        return self._update_insist(event,
+                                   data,
+                                   send_notif=True if comment else False,
+                                   updated=updated)
 
     def decline(self, event, why="", updated=None):
         self._update_insist(
             event,
             {
-                "attendees": (event.attendees or []) + [
-                    {
-                        "email": self.calendar_id,
-                        "responseStatus": "declined",
-                        "comment": why,
-                    }
-                ]
+                "attendees": (event.attendees or []) + [{
+                    "email": self.calendar_id,
+                    "responseStatus": "declined",
+                    "comment": why,
+                }]
             },
             send_notif=True if why else False,
             updated=updated,
@@ -1071,13 +1063,11 @@ Attendees:
         self._update_insist(
             event,
             {
-                "attendees": (event.attendees or []) + [
-                    {
-                        "email": self.calendar_id,
-                        "responseStatus": "tentative",
-                        "comment": comment,
-                    }
-                ]
+                "attendees": (event.attendees or []) + [{
+                    "email": self.calendar_id,
+                    "responseStatus": "tentative",
+                    "comment": comment,
+                }]
             },
             send_notif=True if comment else False,
             updated=updated,
@@ -1123,34 +1113,32 @@ Attendees:
                 updated=updated,
             )
 
-    def _update_event(self, calendar_id, event, new_values,
-                      send_notif=False, updated=None):
+    def _update_event(self,
+                      calendar_id,
+                      event,
+                      new_values,
+                      send_notif=False,
+                      updated=None):
         if updated is not None and event.updated != updated:
             raise OutOfDateError()
         dict_ = dict(event._asdict())
-        dict_ = {
-            k: dict_[k]
-            for k in dict_
-            if k in self.updatable_data
-        }
+        dict_ = {k: dict_[k] for k in dict_ if k in self.updatable_data}
         dict_.update(new_values)
         url = 'https://www.googleapis.com/calendar/v3/calendars/{}/events/{}'.format(
-            calendar_id,
-            event.id
-        )
+            calendar_id, event.id)
         if send_notif:
             url += "?sendNotifications=true"
         req = urllib.request.Request(
             url=url,
-            data=json.dumps(
-                dict_
-            ).encode("utf-8"),
-            headers={"Content-Type": "application/json",
-                     "Authorization": "{} {}".format(
-                         self.db.get("token_type"),
-                         self.db.get(self.access_token_name))},
-            method='PATCH'
-        )
+            data=json.dumps(dict_).encode("utf-8"),
+            headers={
+                "Content-Type":
+                "application/json",
+                "Authorization":
+                "{} {}".format(self.db.get("token_type"),
+                               self.db.get(self.access_token_name))
+            },
+            method='PATCH')
         f = urllib.request.urlopen(req)
         assert f.code == 200
         data = json.loads(f.read().decode("utf-8"))
@@ -1162,7 +1150,7 @@ Attendees:
     def update_event(self, event_id, new_summary):
         calendar_id = self.db.get(self.calendar_id_name)
         event = self.get_event(event_id)
-        new_values = {"summary" : new_summary}
+        new_values = {"summary": new_summary}
         return self._update_event(calendar_id, event, new_values)
 
     def do_update_event(self, line):
@@ -1176,11 +1164,9 @@ Attendees:
         for event in events:
             new_summary = re.sub(regexp, replace, event.summary)
             if new_summary != event.summary:
-                LOGGER.info("Replacing summary of event {} from '{}' to '{}'".format(
-                    event.id,
-                    event.summary,
-                    new_summary
-                ))
+                LOGGER.info(
+                    "Replacing summary of event {} from '{}' to '{}'".format(
+                        event.id, event.summary, new_summary))
                 new_events.append(self.update_event(event.id, new_summary))
         return new_events
 

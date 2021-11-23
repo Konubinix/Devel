@@ -237,8 +237,6 @@
                (expand-file-name "wiki" perso-dir)
                ))
 
-(org-clock-persistence-insinuate)
-
 (defun konix/org-agenda/keep-column (orig-fun &rest args)
   (let* (
          (line (line-number-at-pos (point)))
@@ -6122,6 +6120,9 @@ You should check this is not a mistake."
        (-map #'kill-buffer)
        )
   )
+
+(org-clock-persistence-insinuate)
+(org-clock-load)
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

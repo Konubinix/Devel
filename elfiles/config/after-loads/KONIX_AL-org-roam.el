@@ -587,8 +587,6 @@ ${title}
    )
   )
 
-(defun ko)
-
 (setq-default
  citeproc-org-default-style-file
  (expand-file-name "refs.csl" org-roam-directory)

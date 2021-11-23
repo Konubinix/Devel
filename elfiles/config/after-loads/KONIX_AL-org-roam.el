@@ -612,7 +612,6 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
 ;; matches the note exactly about sgx and note the hundreds of notes about sgx
 (setq-default org-roam-node-display-template "${tags:10}|${title:100}|")
 
-(org-roam-setup)
 (citeproc-org-setup)
 (if (require 'org-roam-bibtex nil t)
     (org-roam-bibtex-mode)
@@ -747,6 +746,8 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
   (message "Cleaning the org-roam-node-read--completions cache")
   (setq konix/org-roam-node-read--completions/cache nil)
   )
+
+(org-roam-setup)
 
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

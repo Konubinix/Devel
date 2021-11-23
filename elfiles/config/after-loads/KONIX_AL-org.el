@@ -6093,7 +6093,17 @@ You should check this is not a mistake."
       )
     )
   )
+
+(org-link-set-parameters "gitlab" :follow #'konix/org-link-gitlab)
+
+(defun konix/org-link-gitlab (path)
+  (let (
+        (stripped-path (replace-regexp-in-string "^@?" "" path))
         )
+    (browse-url (concat "https://gitlab.com/" stripped-path))
+    )
+  )
+
 (when-let (
            (already-loaded-org-files
             (->> (buffer-list)

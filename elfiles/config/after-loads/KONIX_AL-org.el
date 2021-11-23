@@ -6072,6 +6072,27 @@ You should check this is not a mistake."
             #'konix/org-clock-out/remove-dump)
   )
 
+(org-link-set-parameters "ipfs" :follow #'konix/org-link-ipfs)
+
+(defun konix/org-link-ipfs (path)
+  (let* (
+         (stripped-path (replace-regexp-in-string "^\\(/+\\)?\\(.+?\\)\\([?].+\\)" "\\2" path))
+         (filepath (concat "/ipfs/" stripped-path))
+         )
+    (if (equal current-prefix-arg '(16) )
+      (browse-url (concat (getenv "KONIX_IPFS_GATEWAY") "/ipfs/" path))
+        (if current-prefix-arg
+            (start-process
+             "open ipfs file"
+             nil
+             "mimeopen"
+             filepath
+             )
+          (find-file filepath)
+          )
+      )
+    )
+  )
         )
 (when-let (
            (already-loaded-org-files

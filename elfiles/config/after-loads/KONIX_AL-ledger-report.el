@@ -367,6 +367,14 @@ The effective date of 1 will be set to the effective date of 2
     )
   )
 
+(defun konix/ledger-report/switch-report ()
+  (interactive)
+  (save-window-excursion
+    (find-file ledger-master-file)
+    (call-interactively 'ledger-report)
+    )
+  )
+
 (define-key ledger-report-mode-map (kbd "=") #'konix/ledger-report-set-effective-date)
 (define-key ledger-report-mode-map (kbd "l") #'hl-line-mode)
 (define-key ledger-report-mode-map (kbd "t") #'konix/ledger-visit-track-mode)
@@ -392,9 +400,9 @@ The effective date of 1 will be set to the effective date of 2
 (define-key ledger-report-mode-map (kbd "<SPC>") #'konix/ledger-reconcile-move-to-next-entry-and-track)
 (define-key ledger-report-mode-map (kbd "<DEL>") #'konix/ledger-reconcile-move-to-previous-entry-and-track)
 (define-key ledger-report-mode-map (kbd "u") #'konix/ledger-reconcile-update-track)
-(define-key ledger-report-mode-map (kbd "C-r") #'ledger-report)
-(define-key ledger-report-mode-map (kbd "C-c C-r") #'ledger-report)
-(define-key ledger-report-mode-map (kbd "r") #'ledger-report)
+(define-key ledger-report-mode-map (kbd "C-r") #'konix/ledger-report/switch-report)
+(define-key ledger-report-mode-map (kbd "C-c C-r") #'konix/ledger-report/switch-report)
+(define-key ledger-report-mode-map (kbd "r") #'konix/ledger-report/switch-report)
 (define-key ledger-report-mode-map (kbd "g") #'ledger-report-redo)
 (define-key ledger-report-mode-map (kbd "N") #'konix/ledger-report-toggle-narrow-similar)
 

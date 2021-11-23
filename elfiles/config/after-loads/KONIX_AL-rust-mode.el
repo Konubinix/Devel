@@ -35,6 +35,10 @@
 
   )
 
+(defun konix/rust-fmt-buffer ()
+  (lsp-format-buffer)
+  )
+
 ;; try to use rust-analyzer install from rustup
 ;; see https://github.com/rust-lang/rustup/issues/2411
 ;; and rustup +nightly component add rust-analyzer-preview
@@ -47,6 +51,7 @@
     (lsp)
     )
   (add-hook 'after-save-hook 'konix/rust/make-executable nil t)
+  (add-hook 'before-save-hook #'konix/rust-fmt-buffer nil t)
   )
 
 (add-hook 'rust-mode-hook

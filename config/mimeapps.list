@@ -40,3 +40,4 @@ application/x-blender=blender.desktop;
 application/mbox=emacsclient.desktop;
 image/gif=org.gnome.eog.desktop;
 message/rfc822=rfc822.desktop;
+audio/x-wav=vlc.desktop;

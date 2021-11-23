@@ -2718,10 +2718,10 @@ items"
   (when (string-match-p "^n *$" ans)
     (setq ans (format-time-string "%H:%M" (current-time)))
     )
-  ;; nothing -> now
-  (when (string-match-p "^ *$" ans)
-    (setq ans (format-time-string "%H:%M" (current-time)))
-    )
+  ;; ;; nothing -> now
+  ;; (when (string-match-p "^ *$" ans)
+  ;;   (setq ans (format-time-string "%H:%M" (current-time)))
+  ;;   )
   ;; start with n and something afterward -> drop the n
   (setq ans (replace-regexp-in-string "^\\(n *\\)\\([^ ].*\\)" "\\2" ans))
   (apply orig-fun ans args)

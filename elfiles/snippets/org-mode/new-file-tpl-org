@@ -3,7 +3,5 @@
 # --
 #+AUTHOR: Konubinix
 
-* Diary :diary:NOEXPIRY:structure:
-* Recurrent :recurrent:NOEXPIRY:structure:
-* Notes  :NOEXPIRY:iso9001:structure:
-* Refile :refile:structure:
+* Diary :diary:structure:
+* Recurrent :recurrent:structure:

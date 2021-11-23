@@ -267,29 +267,8 @@
      ((string-match "^\\(http.+\\(webm\\|mp4\\)\\)$" url)
       (format "{{{video(%s)}}}" (match-string 1 url))
       )
-     ((string-match "^\\(file:/*\\)?\\(/ip[fn]s/.+?\\)\\([?]filename=\\(.+\\)\\)?$" url)
-      (let* (
-             (filename (and (match-string 4 url)
-                            (decode-coding-string
-                             (url-unhex-string (match-string 4 url))
-                             'utf-8
-                             )
-                            )
-                       )
-             (filename-sans-ext (and filename (file-name-sans-extension filename)))
-             (filename-ext (and filename (file-name-extension filename)))
-             (url (konix/org-roam-export/process-url (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") (match-string 2 url))))
-             )
-        (if filename
-            (format "[[%s?filename=%s.%s][%s]]"
-                    url
-                    (konix/org-roam-compute-slug filename-sans-ext)
-                    filename-ext
-                    filename
-                    )
-          url
-          )
-        )
+     ((string-match (concat "^" konix/org-ipfs-link "\\([?]filename=\\([a-zA-Z0-9=_%.-]+\\)\\)?$") url)
+      (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 2 url))
       )
      ((string-match "^cite:\\(.+\\)$" url)
       (konix/org-roam-export/process-url (konix/org-roam/process-url url))
@@ -301,6 +280,30 @@
     )
   )
 
+(defun konix/org-export/process-ipfs-link (path filename)
+  (let* (
+         (filename (and filename
+                        (decode-coding-string
+                         (url-unhex-string filename)
+                         'utf-8
+                         )
+                        )
+                   )
+         (filename-sans-ext (and filename (file-name-sans-extension filename)))
+         (filename-ext (and filename (file-name-extension filename)))
+         (url (konix/org-roam-export/process-url (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") path)))
+         )
+    (if filename
+        (format "[[%s?filename=%s.%s][%s]]"
+                url
+                (konix/org-roam-compute-slug filename-sans-ext)
+                filename-ext
+                filename
+                )
+      url
+      )
+    )
+  )
 (defun konix/org-roam-get-keyword-global (keyword)
   (org-with-wide-buffer
    (save-excursion
@@ -770,13 +773,13 @@
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "^[ :]*\\(\\(http\\|/ipfs/\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              "^[ :]*\\(\\(http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
               nil
               t)
         (replace-match
          (format
           "\n%s\n"
-          (konix/org-roam-export/process-url (match-string 1))
+          (konix/org-roam-export/process-url (match-string-no-properties 1))
           )
          )
         )

@@ -9,7 +9,7 @@ shopt -s inherit_errexit
 trap "exit 2" SIGINT
 trap "exit 3" SIGQUIT
 
-sed -r 's|/ipfs|\n/ipfs|g' \
+sed -r 's%(/ipfs/|ipfs:/*)%\n/ipfs/%g' \
 	| grep -v konixnostore \
 	| sed -r 's|^.*(/ipfs/[a-zA-Z0-9]+).*$|\1|' \
 	| grep '/ipfs/[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]' \

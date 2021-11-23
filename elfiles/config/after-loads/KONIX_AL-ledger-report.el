@@ -276,6 +276,37 @@ The effective date of 1 will be set to the effective date of 2
     )
   )
 
+(defvar konix/ledger-report-toggle-narrow-similar/narrowed nil "Whether some narrowing has already occurred.")
+(make-variable-buffer-local 'konix/ledger-report-toggle-narrow-similar/narrowed)
+
+(defun konix/ledger-report-toggle-narrow-similar ()
+  (interactive)
+  (save-excursion
+    (if konix/ledger-report-toggle-narrow-similar/narrowed
+        (progn
+          (org-agenda-remove-filter 'for-now)
+          )
+      (progn
+        (move-beginning-of-line nil)
+        (looking-at "^.+ -?\\([0-9.]+\\) EUR.+$")
+        (let (
+              (regexp (format "^.+\\b\\(%s\\)\\b EUR .+$"
+                              (match-string-no-properties 1)))
+              )
+          (goto-char (point-min))
+          (konix/ledger-reconcile-move-to-next-entry-and-track)
+          (while (not (equal (point) (point-max)))
+            (unless (looking-at regexp)
+              (org-agenda-filter-hide-line 'for-now)
+              )
+            (konix/ledger-reconcile-move-to-next-entry-and-track)
+            )
+          ))
+      )
+    )
+  (setq konix/ledger-report-toggle-narrow-similar/narrowed (not konix/ledger-report-toggle-narrow-similar/narrowed))
+  )
+
 (defun konix/ledger-report-unhighlight-all ()
   (interactive)
   (--> hi-lock-interactive-patterns
@@ -365,6 +396,7 @@ The effective date of 1 will be set to the effective date of 2
 (define-key ledger-report-mode-map (kbd "C-c C-r") #'ledger-report)
 (define-key ledger-report-mode-map (kbd "r") #'ledger-report)
 (define-key ledger-report-mode-map (kbd "g") #'ledger-report-redo)
+(define-key ledger-report-mode-map (kbd "N") #'konix/ledger-report-toggle-narrow-similar)
 
 (provide 'KONIX_AL-ledger-report)
 ;;; KONIX_AL-ledger-report.el ends here

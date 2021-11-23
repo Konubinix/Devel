@@ -35,15 +35,22 @@
 
   )
 
+;; try to use rust-analyzer install from rustup
+;; see https://github.com/rust-lang/rustup/issues/2411
+;; and rustup +nightly component add rust-analyzer-preview
+(setq-default lsp-rust-analyzer-server-command '("rustup" "run" "nightly" "rust-analyzer"))
+
 (defun konix/rust-mode-hook ()
   "Custom hook around rust mode."
   (konix/prog/config)
-  (add-hook 'after-save-hook 'konix/rust/make-executable t t)
+  (when (require 'lsp nil t)
+    (lsp)
+    )
+  (add-hook 'after-save-hook 'konix/rust/make-executable nil t)
   )
 
 (add-hook 'rust-mode-hook
           'konix/rust-mode-hook)
-
 
 (provide 'KONIX_AL-rust-mode)
 ;;; KONIX_AL-rust-mode.el ends here

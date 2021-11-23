@@ -6072,16 +6072,25 @@ You should check this is not a mistake."
             #'konix/org-clock-out/remove-dump)
   )
 
-(assert (equal nil
-               (->> (buffer-list)
-                    (-map 'buffer-file-name)
-                    (-non-nil)
-                    (-filter (lambda (name) (string-suffix-p ".org" name)))
-                    )
-               )
-        nil
-        "Why are some org files files already loaded before the org customization is done?"
         )
+(when-let (
+           (already-loaded-org-files
+            (->> (buffer-list)
+                 (-map 'buffer-file-name)
+                 (-non-nil)
+                 (-filter (lambda (name) (string-suffix-p ".org" name)))
+                 )
+            )
+           )
+  (warn
+   "Those files where already loaded before the customization ended. I made sure of killing them: %s"
+   already-loaded-org-files
+   )
+  (->> already-loaded-org-files
+       (-map #'find-file-noselect)
+       (-map #'kill-buffer)
+       )
+  )
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

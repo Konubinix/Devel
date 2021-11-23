@@ -979,7 +979,6 @@ citation key, for Org-ref cite links."
       ;; already done in the theme by Jethro
       (konix/org-roam-export/add-backlinks)
       (konix/org-roam-export/add-refs)
-      (konix/org-roam-export/convert-standalone-links)
       ;; (konix/org-roam-export/add-roam-alias)
       (konix/org-roam-export/assert-no-konix-org-roam-links)
       (konix/org-roam-export/setup-hugo-dates)
@@ -989,6 +988,9 @@ citation key, for Org-ref cite links."
       (konix/org-roam-export/copy-roam-tags-into-hugo-tags)
       (konix/org-roam-export/add-more)
       (konix/org-roam-export/load-transclusion)
+      ;; I need to put stuff that modify the buffer after loading the
+      ;; transclusion
+      (konix/org-roam-export/convert-standalone-links)
       (konix/org-roam-replace-roam-links-with-hugo-compatible-ones)
       ;; so that hugo won't complain if it finds the id in the current buffer
       ;; and wants to kill it

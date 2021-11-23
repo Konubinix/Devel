@@ -123,7 +123,10 @@
       )
      ;; On a paragraph, find a link on the current line after point.
      ((memq type '(paragraph item nil))
-      (if (re-search-forward org-any-link-re (line-end-position) t)
+      (if (or
+           (org-in-regexp org-any-link-re)
+           (re-search-forward org-any-link-re (line-end-position) t)
+           )
           (progn
             (left-char)
             (setq temp_point (point))

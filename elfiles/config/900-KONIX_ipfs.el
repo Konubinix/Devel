@@ -26,23 +26,37 @@
 
 
 (defun konix/find-file/ipfs-ignore-query-parameter (orig-fun filename &rest args)
-  (apply orig-fun (replace-regexp-in-string "\\(/ipfs/.+\\)\\?.+" "\\1" filename) args)
+  (apply orig-fun (replace-regexp-in-string konix/org-ipfs-link-with-query "/ipfs/\\1" filename) args)
   )
 (advice-add 'find-file :around #'konix/find-file/ipfs-ignore-query-parameter)
 (advice-add 'org-link-open-as-file :around #'konix/find-file/ipfs-ignore-query-parameter)
 (advice-add 'file-exists-p :around #'konix/find-file/ipfs-ignore-query-parameter)
 (advice-add 'org--create-inline-image :around #'konix/find-file/ipfs-ignore-query-parameter)
 
+(defvar konix/org-ipfs-protocol-regexp "\\(?:file:/+ip[fn]s/\\|ip[nf]s:/*\\|/ip[fn]s/\\)")
+(defvar konix/org-ipfs-link (concat konix/org-ipfs-protocol-regexp "\\([a-zA-Z0-9]+\\)"))
+(defvar konix/org-ipfs-link-with-query (concat konix/org-ipfs-link "[?]\\([a-zA-Z0-9=_%.-]+\\)\\([.][a-zA-Z0-9]+\\)?"))
+
 (defun konix/org-display-inline-images/ipfs (&optional include-linked refresh beg end)
-  (let ((end (or end (point-max))))
+  (let (
+        (end (or end (point-max)))
+        ipfs-path
+        )
     (org-with-point-at (or beg (point-min))
-      (while (re-search-forward "^\\([ -]*\\)\\(\\(file:\\(//\\)?\\)?\\(/ipfs/[a-zA-Z0-9]+\\)\\?[a-zA-Z0-9=_.-]+\\(png\\|jpe?g\\)\\)" end t)
-        (when (file-exists-p (match-string 5))
+      (while (re-search-forward
+              (concat
+               "^\\(?:[ -]*\\)\\(" konix/org-ipfs-link "\\?[a-zA-Z0-9=_.-]+\\(?:png\\|jpe?g\\)\\)"
+               )
+              end
+              t
+              )
+        (setq ipfs-path (concat "/ipfs/" (match-string 2)))
+        (when (file-exists-p ipfs-path)
           (let* (
-                 (image `(image :type png :file ,(konix/org-display-inline-images/scale-down (match-string 5)) :scale 1 :width nil))
+                 (image `(image :type png :file ,(konix/org-display-inline-images/scale-down ipfs-path) :scale 1 :width nil))
                  (ov (make-overlay
-                      (match-beginning 2)
-                      (match-end 2)))
+                      (match-beginning 1)
+                      (match-end 1)))
                  )
             (overlay-put ov 'display image)
             (overlay-put ov 'face 'default)

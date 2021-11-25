@@ -1662,19 +1662,21 @@ END:VALARM"
                   (if (null (org-get-at-bol 'time-of-day))
                       (if (null date)
                           (format "
-UID:%s_%s
+UID:%s_%s_%s
 "
                                   id
+                                  (sha1 summary)
                                   type
                                   )
                         (format "
 DTSTART;VALUE=DATE:%02d%02d%02d
-UID:%s_%02d%02d%02d_%s
+UID:%s_%s_%02d%02d%02d_%s
 "
                                 (third date)
                                 (first date)
                                 (second date)
                                 id
+                                (sha1 summary)
                                 (third date)
                                 (first date)
                                 (second date)

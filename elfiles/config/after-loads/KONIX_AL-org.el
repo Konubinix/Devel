@@ -3757,7 +3757,6 @@ of the clocksum."
       )
     )
   )
-(konix/org-setup-holidays)
 
 (setq-default org-yank-adjusted-subtrees t)
 (setq-default org-return-follows-link t)
@@ -6075,16 +6074,16 @@ You should check this is not a mistake."
          (filepath (concat "/ipfs/" stripped-path))
          )
     (if (equal current-prefix-arg '(16) )
-      (browse-url (concat (getenv "KONIX_IPFS_GATEWAY") "/ipfs/" path))
-        (if current-prefix-arg
-            (start-process
-             "open ipfs file"
-             nil
-             "mimeopen"
-             filepath
-             )
-          (find-file filepath)
-          )
+        (browse-url (concat (getenv "KONIX_IPFS_GATEWAY") "/ipfs/" path))
+      (if current-prefix-arg
+          (start-process
+           "open ipfs file"
+           nil
+           "mimeopen"
+           filepath
+           )
+        (find-file filepath)
+        )
       )
     )
   )
@@ -6126,6 +6125,9 @@ You should check this is not a mistake."
   (org-clock-persistence-insinuate)
   (org-clock-load)
   )
+
+(konix/org-setup-holidays)
+(konix/school-holidays-get)
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

@@ -524,6 +524,23 @@
   ""
   )
 
+(defface konix/org-agenda-auto-face
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "blue"
+                  )
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "blue")
+	 )
+	)
+  ""
+  )
+
 (defface konix/org-agenda-context-face
   '(
 	(
@@ -754,6 +771,7 @@
 	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
     ("^.+Holiday.*$" 0 konix/org-agenda-holiday)
     ("^\\(DIARY:\\)" 1 konix/org-agenda-diary-face)
+    ("^\\(AUTO:\\)" 1 konix/org-agenda-auto-face)
     ("^\\(PAUSE:\\)" 1 konix/org-agenda-pause-face)
     ("^.+\\(:@[a-zA-Z_-]+:\\).*$" 1 konix/org-agenda-context-face)
     ("^.+\\(:C_[a-zA-Z_-]+:\\).*$" 1 konix/org-agenda-committed-face)

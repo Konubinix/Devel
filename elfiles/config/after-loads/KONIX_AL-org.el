@@ -2560,9 +2560,6 @@ items"
 (setq-default org-archive-location "%s_archive::")
 (setq-default org-clock-in-resume (not (getenv "KONIX_EMACS_BATCH")))
 (setq-default org-clock-out-remove-zero-time-clocks t)
-(setq-default org-clock-persist (quote clock))
-(setq-default org-clock-persist-file (expand-file-name "org-clock-save.el" user-emacs-directory))
-(setq-default org-clock-persist-query-save t)
 (setq-default org-clock-clocked-in-display 'both)
 (setq-default org-clock-report-include-clocking-task t)
 (setq-default org-columns-default-format "%CATEGORY %TODO %90ITEM %1PRIORITY
@@ -6121,8 +6118,14 @@ You should check this is not a mistake."
        )
   )
 
-(org-clock-persistence-insinuate)
-(org-clock-load)
+(defvar konix/org-clock-persist t "Whether to persist the clock")
+(when konix/org-clock-persist
+  (setq-default org-clock-persist (quote clock))
+  (setq-default org-clock-persist-file (expand-file-name "org-clock-save.el" user-emacs-directory))
+  (setq-default org-clock-persist-query-save t)
+  (org-clock-persistence-insinuate)
+  (org-clock-load)
+  )
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

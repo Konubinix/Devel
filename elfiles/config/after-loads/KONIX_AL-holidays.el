@@ -115,5 +115,65 @@
    )
   )
 
+(defvar konix/school-holidays nil "The holidays to take into account")
+
+(defun konix/school-holidays-get ()
+  (interactive)
+  (with-temp-buffer
+    (call-process "clk" nil (current-buffer) nil "holidays" "export-emacs")
+    (goto-char (point-max))
+    (eval-last-sexp nil)
+    )
+  )
+
+(defface konix/school-holiday-face
+  '(
+    (
+     ((class color)
+      (background dark))
+     (:inherit org-todo :foreground "deep sky blue")
+     )
+    (
+     ((class color)
+      (background light))
+     (:inherit org-todo :foreground "RoyalBlue4")
+     )
+    )
+  ""
+  )
+
+
+(defun konix/school-holidays-mark ()
+  (unless konix/school-holidays
+    (konix/school-holidays-get)
+    )
+  (dolist (holiday konix/school-holidays)
+    (when (calendar-date-is-visible-p (car holiday))
+      (calendar-mark-visible-date (car holiday) 'konix/school-holiday-face))
+    )
+  )
+
+(advice-add #'calendar-mark-holidays :after #'konix/school-holidays-mark)
+
+(defun konix/school-holidays-check-holidays (date)
+  "Check the list of holidays for any that occur on DATE.
+DATE is a list (month day year).  This function considers the
+holidays from the list `calendar-holidays', and returns a list of
+strings describing those holidays that apply on DATE, or nil if none do."
+  (let ((displayed-month (calendar-extract-month date))
+        (displayed-year (calendar-extract-year date))
+        holiday-list)
+    (dolist (h konix/school-holidays holiday-list)
+      (if (calendar-date-equal date (car h))
+          (setq holiday-list (append holiday-list (cdr h)))))))
+
+
+(defun konix/calendar/check-holidays/append-school-holidays (orig-func date)
+  (append (funcall orig-func date) (konix/school-holidays-check-holidays date))
+  )
+
+(advice-add #'calendar-check-holidays :around #'konix/calendar/check-holidays/append-school-holidays)
+
+
 (provide 'KONIX_AL-holidays)
 ;;; KONIX_AL-holidays.el ends here

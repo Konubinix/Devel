@@ -1568,13 +1568,19 @@
          (res "")
          (date (org-get-at-bol 'date))
          (day (org-get-at-bol 'day))
-         (summary (konix/org-with-point-on-heading
-                   (konix/org-trim-active-timestamp
-                    (konix/org-trim-link
-                     (org-get-heading t t t t)
+         (rowtype (org-get-at-bol 'type))
+         (summary (if (string-equal rowtype "sexp")
+                      (org-link-display-format
+                       (substring-no-properties (org-get-at-bol 'txt))
+                       )
+                    (konix/org-with-point-on-heading
+                     (konix/org-trim-active-timestamp
+                      (konix/org-trim-link
+                       (org-get-heading t t t t)
+                       )
+                      )
                      )
-                    )
-                   ))
+                    ))
          (duration (org-get-at-bol 'duration))
          (stamp (format-time-string "%Y%m%dT%H%M%SZ"))
          (id (konix/org-get-id))
@@ -1745,6 +1751,7 @@ X-WR-TIMEZONE:CEST
                  (string-prefix-p "timestamp" (org-get-at-bol 'type))
                  ;; not sure what "block" means, but a simple * <date> is a block
                  (string-prefix-p "block" (org-get-at-bol 'type))
+                 (string-prefix-p "sexp" (org-get-at-bol 'type))
                  )
             (setq res (concat res (konix/org-agenda-to-ics/format-item "EVENT")))
             )

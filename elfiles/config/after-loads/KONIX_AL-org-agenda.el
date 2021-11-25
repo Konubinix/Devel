@@ -33,7 +33,7 @@
 (setq-default org-agenda-inhibit-startup nil)
 (setq-default org-agenda-dim-blocked-tasks nil)
 (setq-default org-agenda-use-tag-inheritance t)
-(setq-default org-agenda-include-diary t)
+(setq-default org-agenda-include-diary nil)
 
 (defun konix/org-agenda-refile-noupdate (&optional goto rfloc no-update)
   (interactive)

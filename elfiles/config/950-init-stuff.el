@@ -17,9 +17,7 @@
 
   (setq konix/start-calendar t)
   (setq create-lockfiles nil)
-  (eval-after-load "org-clock"
-    (setq org-clock-persist nil)
-    )
+  (setq konix/org-clock-persist nil)
   (message "Storing")
   (konix/org-store-agenda-views)
   (message "Killing")

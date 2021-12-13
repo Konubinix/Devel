@@ -263,7 +263,7 @@
       (format "{{{video(%s)}}}" (match-string 1 url))
       )
      ((string-match (concat "^" konix/org-ipfs-link "\\([?]filename=\\([a-zA-Z0-9=_%.-]+\\)\\)?$") url)
-      (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 2 url))
+      (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 3 url))
       )
      ((string-match (concat "^" konix/org-ipfs-link "\\([?][a-zA-Z0-9=_%.-]+\\)?$") url)
       (konix/org-export/process-ipfs-link (format "/ipfs/%s%s" (match-string 1 url) (match-string 2 url)) nil)

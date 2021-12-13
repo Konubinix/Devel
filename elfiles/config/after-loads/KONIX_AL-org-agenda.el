@@ -1263,13 +1263,6 @@
   (konix/org-agenda-goto-clock)
   )
 
-(defun konix/org-agenda-goto-today-now ()
-  (interactive)
-  (org-agenda nil "att")
-  (konix/org-agenda-refresh-buffer)
-  (konix/org-agenda-goto-now)
-  )
-
 (defvar konix/org-agenda-toggle-filter-calendar-commitment nil "")
 (make-variable-buffer-local 'konix/org-agenda-toggle-filter-calendar-commitment)
 (defun konix/org-agenda-toggle-filter-calendar-commitment nil

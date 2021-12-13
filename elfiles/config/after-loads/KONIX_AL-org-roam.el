@@ -231,25 +231,30 @@ ${title}
          (decoded-url (substring-no-properties (s-trim (org-link-decode url))))
          (decoded-body (s-trim (org-link-decode body)))
          (slug (konix/substring-capped (konix/org-roam-compute-slug decoded-title) 0 100))
+         (node (org-roam-node-from-ref decoded-url))
          (buffer
           (save-window-excursion
-            (or
-             (if-let (
-                      (node (org-roam-node-from-ref decoded-url))
-                      )
-                 (find-file (org-roam-node-file node))
+            (find-file
+             (if node (org-roam-node-file node)
+               (expand-file-name (format "%s.org" slug)
+                                 org-roam-directory)
                )
-             (find-file (expand-file-name (format "%s.org" slug) org-roam-directory))
              )
             (current-buffer)
             )
           )
+         (position (if node
+                       (org-roam-node-point node)
+                     0
+                     )
+                   )
          )
     (with-current-buffer buffer
-      (when (equal (point-max) (point-min))
-        (insert
-         (format
-          ":PROPERTIES:
+      (save-restriction
+        (when (equal (point-max) (point-min))
+          (insert
+           (format
+            ":PROPERTIES:
 :ID:       %s
 :ROAM_REFS: %s
 :END:
@@ -257,25 +262,34 @@ ${title}
 #+CREATED: %s
 #+LANGUAGE: fr
 #+DATE: %s
-#+filetags: :fleeting:
-%s
-"
-          (uuidgen-4)
-          decoded-url
-          decoded-title
-          (format-time-string "[%Y-%m-%d %a %H:%M]")
-          (format-time-string "[%Y-%m-%d %a %H:%M]")
-
-          decoded-title
+#+filetags: :fleeting:"
+            (uuidgen-4)
+            decoded-url
+            decoded-title
+            (format-time-string "[%Y-%m-%d %a %H:%M]")
+            (format-time-string "[%Y-%m-%d %a %H:%M]")
+            )
+           )
           )
-         )
+        ;; finally, insert the body(when (not (string-equal "" (s-trim
+        ;; decoded-body)))
+
+        (unless (string-equal "" decoded-body)
+          (delete-trailing-whitespace)
+          (goto-char position)
+          (if (looking-at-p "^\*+")
+              (progn
+                (org-narrow-to-subtree)
+                (goto-char (point-max))
+                )
+            (if (re-search-forward "^\*+" nil t)
+                (forward-line -1)
+              (goto-char (point-max))
+              )
+            )
+          (require 'uuidgen)
+          (insert "\n\n#+name: " (uuidgen-4) "\n#+BEGIN_QUOTE\n" decoded-body "\n\n" decoded-url "\n#+END_QUOTE\n"))
         )
-      ;; finally, insert the body(when (not (string-equal "" (s-trim decoded-body)))
-      (unless (string-equal "" decoded-body)
-        (delete-trailing-whitespace)
-        (goto-char (point-max))
-        (require 'uuidgen)
-        (insert "\n#+name: " (uuidgen-4) "\n#+BEGIN_QUOTE\n" decoded-body "\n\n" decoded-url "\n#+END_QUOTE\n"))
       )
     (pop-to-buffer buffer)
     )

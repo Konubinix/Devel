@@ -114,6 +114,51 @@ balance \
 ^Assets and not Lasting")
  )
 
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("amount"
+   "ledger -f %(ledger-file) \
+[[ledger-mode-flags]] \
+--limit '(amount <= %(amount) and amount >= %(sameamount)) or (-amount <= %(sameamount) and -amount >= %(sameamount))' \
+reg")
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("ongoing"
+   "ledger -f %(ledger-file) \
+[[ledger-mode-flags]] \
+-d 'date > [last week]' \
+reg \\( Temp or Auto \\) and not %twin ")
+ )
+
+
+(defvar konix/ledger-report-amount-format-specifier/saved-amount
+  nil
+  "The previously given amount.")
+
+(defun konix/ledger-report-amount-format-specifier ()
+  (setq konix/ledger-report-amount-format-specifier/saved-amount (read-string "Amount: "))
+  )
+
+(defun konix/ledger-report-sameamount-format-specifier ()
+  konix/ledger-report-amount-format-specifier/saved-amount
+  )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-report-format-specifiers
+ '(
+   "amount" . konix/ledger-report-amount-format-specifier
+   )
+ )
+
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-report-format-specifiers
+ '(
+   "sameamount" . konix/ledger-report-sameamount-format-specifier
+   )
+ )
+
 (defun konix/ledger-accounts (&optional recompute)
   (setq recompute (or recompute current-prefix-arg))
   (let (

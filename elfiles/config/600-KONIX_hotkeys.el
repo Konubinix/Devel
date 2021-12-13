@@ -591,7 +591,7 @@
 (define-key 'konix/org-global-map (kbd "M-c") 'konix/org-capture-na-in-heading)
 (define-key 'konix/org-global-map (kbd "M-d") 'konix/org-capture-diary-in-heading)
 (define-key 'konix/org-global-map (kbd "C-e") 'org-clock-modify-effort-estimate)
-(define-key 'konix/org-global-map "n" 'konix/org-agenda-goto-today-now)
+(define-key 'konix/org-global-map "n" 'konix/org-insert-at-point)
 (define-key 'konix/org-global-map "x" 'konix/org-link-toggle-cross)
 (define-key 'konix/org-global-map (kbd "<up>") 'org-mark-ring-push)
 (define-key 'konix/org-global-map (kbd "<left>") 'org-mark-ring-goto)

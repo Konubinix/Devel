@@ -120,9 +120,14 @@
 (defun konix/school-holidays-get ()
   (interactive)
   (with-temp-buffer
-    (call-process "clk" nil (current-buffer) nil "holidays" "export-emacs")
-    (goto-char (point-max))
-    (eval-last-sexp nil)
+    (if (equal 0 (call-process "clk" nil (current-buffer) nil "holidays"
+                               "export-emacs"))
+        (progn
+        (goto-char (point-max))
+        (eval-last-sexp nil)
+        )
+      (warn "Could not load the holidays: %s" (buffer-substring-no-properties (point-min) (point-max)))
+      )
     )
   )
 

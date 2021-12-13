@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(custom-set-variables '(org-clock-ask-before-exiting nil))
+
 (setq-default org-clocktable-defaults
 			  (list
 			   :maxlevel 2

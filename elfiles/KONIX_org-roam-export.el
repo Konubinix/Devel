@@ -799,6 +799,26 @@
     )
   )
 
+(defun konix/org-roam-export/convert-remaining-ipfs-links ()
+  (save-excursion
+    (goto-char (point-min))
+    (save-match-data
+      (while (re-search-forward
+              "\\(?:ipfs:\\|[[ \n]/ipfs/\\)\\([a-zA-Z0-9.=%?+-]+\\)"
+              nil
+              t)
+        (replace-match
+         (format
+          "%s/ipfs/%s"
+          (getenv "KONIX_IPFS_GATEWAY")
+          (match-string-no-properties 1)
+          )
+         )
+        )
+      )
+    )
+  )
+
 (defun konix/org-roam-export/remove-org-backlinks ()
   (save-excursion
     (goto-char 0)
@@ -1003,6 +1023,7 @@ citation key, for Org-ref cite links."
       ;; I need to put stuff that modify the buffer after loading the
       ;; transclusion
       (konix/org-roam-export/convert-standalone-links)
+      (konix/org-roam-export/convert-remaining-ipfs-links)
       (konix/org-roam-replace-roam-links-with-hugo-compatible-ones)
       ;; so that hugo won't complain if it finds the id in the current buffer
       ;; and wants to kill it

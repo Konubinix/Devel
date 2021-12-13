@@ -127,17 +127,6 @@
 (global-set-key (kbd "C-S-L") 'konix/horizontal-recenter)
 ;; Kill emacs
 (global-set-key (kbd "C-x M-k") 'konix/really-kill-emacs)
-;; speedbar
-(global-set-key (kbd "<pause>") 'speedbar)
-;; speedbar
-(global-set-key (kbd "<C-pause>") 'konix/toggle-ecb)
-(global-set-key (kbd "M-<pause>") 'speedbar)
-;; Window resize
-(global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
-(global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
-(global-set-key (kbd "S-C-<down>") 'shrink-window)
-(global-set-key (kbd "S-C-<up>") 'enlarge-window)
-
 ;; Auto complete
 (global-set-key (kbd "C-j") 'hippie-expand)
 (global-set-key (kbd "C-S-j") 'ac-stop)

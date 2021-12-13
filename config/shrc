@@ -41,8 +41,6 @@ fi
 # Import my custom functions
 # ################################################################################
 source "${KONIX_LIB_DIR}/lib_bash.sh"
-# In interactive mode, I also want colors
-source "${KONIX_LIB_DIR}/colors.sh"
 
 # Log sur l'agent SSH
 if is_on_linux

@@ -1,10 +1,7 @@
 #!/bin/bash
 
 ( [ -z "$PS1" ] || [ "${TERM}" == "dumb" ] || [ -n "$INEMACS" ]) && return
-echo "Initializing interactive bash configuration"
-echo "Sourcing shrc configuration"
 source "$KONIX_CONFIG_DIR/shrc"
-echo "$PPID" > ~/.bash_ppid
 source "$KONIX_LIB_DIR/soblib.sh"
 # Use emacs key bindings
 set -o emacs
@@ -28,19 +25,16 @@ esac
 # Bash Comp
 # ************************************************************
 if [ -f /etc/bash_completion ]; then
-    echo "Loading bash completion from etc"
     . /etc/bash_completion
 fi
 
 if [ -f /etc/profile.d/bash-completion.sh ]; then
-    echo "Loading bash completion from etc/profile.d"
     . /etc/profile.d/bash-completion.sh
 fi
 
 # source custom bash completions
 OLD_IFS=$IFS
 IFS=$'\n'
-echo "Loading personal bash completions"
 source "$KONIX_CONFIG_DIR/bash_completion"
 
 # special case for notmuch completion
@@ -65,70 +59,9 @@ shopt -s globstar
 # ######################################################################
 if [ -e "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/git" ]
 then
-    echo "Loading sjoubert git config"
     source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/git"
     KONIX_GIT_PROMPT_SOURCED=1
 fi
-
-# Source the smartcd package if available
-if [ -e "$HOME/.smartcd_config" ]
-then
-    echo "Loading smartcd"
-    source "$HOME/.smartcd_config"
-fi
-
-# ************************************************************
-# Variables
-# ************************************************************
-# Le prompt, joli et en couleur
-#set -x
-konix_string_to_color_index "$HOSTNAME"
-konix_int_to_color "$RES" 0
-HOST_COLOR="$RES"
-konix_string_to_color_index "$LOGNAME"
-konix_int_to_color "$RES" 0
-LOGNAME_COLOR="$RES"
-konix_int_to_color "$((COLOR_GREEN + 8))" "$COLOR_BLACK"
-GIT_COLOR="$RES"
-konix_int_to_color -1 -1
-DEFAULT_COLOR="$RES"
-konix_int_to_color $((COLOR_RED+8)) -1
-BAD_PROMPT_COLOR="$RES"
-konix_int_to_color $((COLOR_GREEN+8)) -1
-GOOD_PROMPT_COLOR="$RES"
-konix_git_prompt_maybe ( ) {
-    if [ -n "$KONIX_GIT_PROMPT_SOURCED" \
-			-a -n "$KONIX_GIT_PROMPT" ]
-    then
-        git_prompt
-    fi
-}
-
-konix_prompt_pre ( ) {
-	echo -n
-}
-konix_prompt_post ( ) {
-	echo -n
-}
-
-NORMAL_PATH_COLOR="${COLOR_FG_CYAN}${COLOR_BOLD}${COLOR_BG_BLACK}"
-PLAY_PATH_COLOR="${COLOR_FG_MAGENTA}${COLOR_BOLD}${COLOR_BG_BLACK}"
-if [ -n "${KONIX_BASH_PRIVATE_NAV}" ]
-then
-	echo "Private navigation"
-	unset HISTFILE
-	NORMAL_PATH_COLOR="${COLOR_FG_RED}${COLOR_BOLD}${COLOR_BG_BLACK}"
-fi
-
-path_color ( ) {
-    if pwd | grep -q play_
-    then
-        printf "${PLAY_PATH_COLOR}"
-    else
-        printf "${NORMAL_PATH_COLOR}"
-    fi
-
-}
 
 if which luarocks > /dev/null 2>&1
 then
@@ -146,11 +79,6 @@ then
     source "${NIX_SETUP}"
 fi
 
-if which virtualenvwrapper_lazy.sh > /dev/null 2>&1
-then
-    source "$(which virtualenvwrapper_lazy.sh)"
-fi
-
 if [ -e "$HOME/.cargo/env" ]
 then
     source "$HOME/.cargo/env"
@@ -161,7 +89,4 @@ fi
 if which starship > /dev/null
 then
 	eval "$(starship init bash)"
-else
-	unset PROMPT_COMMAND
-	export PS1="\${PS1_PREFIX}\$(rc=\$? ; konix_prompt_pre; [ \$rc -ne 0 ] && printf \"\[$BAD_PROMPT_COLOR\]\" || printf \"\[$GOOD_PROMPT_COLOR\]\" ; printf \"%03d$DEFAULT_COLOR\" \$rc ;)\[$LOGNAME_COLOR\]\u\[\033[01;33;40m\]@\[$HOST_COLOR\]\h\[\033[00m\]\$(path_color)|path=\w|\[\033[00m\]${GIT_COLOR}\$(konix_git_prompt_maybe)${DEFAULT_COLOR} \$(date \"+%H:%M:%S - %d/%m/%y\")\$(konix_prompt_post)\n\$ "
 fi

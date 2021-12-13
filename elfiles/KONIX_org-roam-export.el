@@ -355,6 +355,16 @@
     )
   )
 
+(defun konix/org-roam-export/add-refs ()
+  (save-excursion
+    ;; the main note one
+    (goto-char (point-min))
+    (while (re-search-forward "^ *:ID:" nil t)
+      (konix/org-roam-export/add-refs-1)
+      )
+    )
+  )
+
 (defun konix/org-roam-export/get-url ()
   (let (
         (node (save-excursion (goto-char (point-min)) (org-roam-node-at-point)))

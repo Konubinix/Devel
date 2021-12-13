@@ -44,6 +44,7 @@
 ;; force the use of scheduling instead of deadline prewarning. They both have the
 ;; same purpose : hidding the task till I want it to appear.
 (setq-default org-deadline-warning-days -10000)
+(setq-default org-adapt-indentation t)
 
 ;; ####################################################################################################
 ;; Init hook
@@ -1463,7 +1464,7 @@ items"
                                  (tags . "%(konix/org-agenda-prefix-format/ann)")
                                  )
                                )
-                              (dummy (setq-local org-agenda-todo-keyword-format ""))
+                              (org-agenda-todo-keyword-format "")
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-super-agenda-groups
                                (mapcar
@@ -1559,13 +1560,7 @@ items"
                    )
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   ;; remove the next keyword, obvious info
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-todo-keyword-format)
-                    ""
-                    )
-                   )
+                  (org-agenda-todo-keyword-format "")
                   (org-agenda-todo-ignore-scheduled nil)
                   (org-agenda-todo-ignore-with-date nil)
                   (org-agenda-todo-ignore-deadlines nil)
@@ -1584,13 +1579,7 @@ items"
                      )
                    )
                   ;; remove the next keyword, obvious info
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-todo-keyword-format)
-                    ""
-                    )
-                   )
+                  (org-agenda-todo-keyword-format "")
                   (org-agenda-tag-filter-preset nil)
                   (org-agenda-todo-ignore-time-comparison-use-seconds t)
                   (org-agenda-todo-ignore-scheduled 'future)
@@ -1614,13 +1603,7 @@ items"
                      )
                    )
                   ;; remove the next keyword, obvious info
-                  (dummy
-                   (set
-                    (make-variable-buffer-local
-                     'org-agenda-todo-keyword-format)
-                    ""
-                    )
-                   )
+                  (org-agenda-todo-keyword-format "")
                   (org-agenda-tag-filter-preset nil)
                   (org-agenda-todo-ignore-time-comparison-use-seconds t)
                   (org-agenda-todo-ignore-scheduled 'future)
@@ -1646,7 +1629,7 @@ items"
                      )
                    )
                   ;; need to setq-local, or else updating the entry will put it back
-                  (dummy (setq-local org-agenda-todo-keyword-format ""))
+                  (org-agenda-todo-keyword-format "")
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) t))
                   (org-agenda-tag-filter-preset nil)
                   (org-agenda-todo-ignore-time-comparison-use-seconds t)
@@ -1781,7 +1764,7 @@ items"
                            '((tags . ""))
                            )
                           )
-                         (dummy (setq-local org-agenda-todo-keyword-format ""))
+                         (org-agenda-todo-keyword-format "")
                          (org-agenda-skip-function
                           '(or
                             (konix/skip-not-todo-file t)
@@ -1837,7 +1820,7 @@ items"
                               (org-agenda-overriding-header
                                "Assign a context to all NEXT (not project) items")
                               (org-agenda-tag-filter-preset nil)
-                              (dummy (setq-local org-agenda-todo-keyword-format ""))
+                              (org-agenda-todo-keyword-format "")
                               (dummy
                                (setq-local
                                 org-agenda-prefix-format
@@ -1973,7 +1956,7 @@ items"
                     '((tags . ""))
                     )
                    )
-                  (dummy (setq-local org-agenda-todo-keyword-format ""))
+                  (org-agenda-todo-keyword-format "")
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   (org-agenda-todo-ignore-deadlines nil)
@@ -2032,7 +2015,7 @@ items"
                             (tags . "%(konix/org-agenda-prefix-format/ann)")
                             )
                           )
-                         (dummy (setq-local org-agenda-todo-keyword-format ""))
+                         (org-agenda-todo-keyword-format "")
                          (org-agenda-skip-function
                           '(or
                             (konix/org-agenda-skip-if-tags
@@ -2214,7 +2197,7 @@ items"
                     '((tags . ""))
                     )
                    )
-                  (dummy (setq-local org-agenda-todo-keyword-format ""))
+                  (org-agenda-todo-keyword-format "")
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   ;; projects should not be filtered by default
@@ -2280,7 +2263,7 @@ items"
                     '((tags . ""))
                     )
                    )
-                  (dummy (setq-local org-agenda-todo-keyword-format ""))
+                  (org-agenda-todo-keyword-format "")
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   ;; projects should not be filtered by default
@@ -2312,7 +2295,7 @@ items"
                    )
                   (dummy (setq konix/org-agenda-type 'tags))
                   (dummy (setq-local org-agenda-prefix-format '((tags . ""))))
-                  (dummy (setq-local org-agenda-todo-keyword-format ""))
+                  (org-agenda-todo-keyword-format "")
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   (org-agenda-tag-filter-preset nil)
@@ -2345,7 +2328,7 @@ items"
                   (org-agenda-todo-ignore-with-date nil)
                   (org-agenda-todo-ignore-deadlines nil)
                   (org-agenda-todo-ignore-timestamp nil)
-                  (dummy (setq-local org-agenda-todo-keyword-format ""))
+                  (org-agenda-todo-keyword-format "")
                   (dummy (setq-local org-agenda-prefix-format '((tags . "%-11:c"))))
                   )
                  )
@@ -2446,7 +2429,7 @@ items"
                             (tags . "%(konix/org-agenda-prefix-format/ann)")
                             )
                           )
-                         (dummy (setq-local org-agenda-todo-keyword-format ""))
+                         (org-agenda-todo-keyword-format "")
                          (org-agenda-todo-ignore-scheduled 'future)
                          (org-agenda-todo-ignore-with-date nil)
                          (org-agenda-todo-ignore-deadlines nil)
@@ -4663,7 +4646,7 @@ of the clocksum."
                    (org-agenda-overriding-header
                     (format "## %s, %s - %s" ,match ,start ,stop))
                    (org-agenda-tag-filter-preset nil)
-                   (dummy (setq-local org-agenda-todo-keyword-format ""))
+                   (org-agenda-todo-keyword-format "")
                    (org-agenda-prefix-format
                     '(
                       (tags . "")
@@ -5462,38 +5445,32 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   (recenter-top-bottom 0)
   )
 
-(setq-default
- org-speed-commands-user
- '(("Outline Navigation")
-   ("P" . konix/org-toggle-project)
-   ("n" . konix/org-next-visible-heading-and-center)
-   ("p" . konix/org-previous-visible-heading-and-center)
-   ("G" . org-mark-ring-goto)
-   ("h" . hl-line-mode)
-   (" " . org-next-visible-heading)
-   ("E" . konix/org-srs)
-   ("]" . konix/org-goto-next-open-list-entry)
-   ("l" . hl-line-mode)
-   ("Manipulation")
-   ("k" . konix/org-kill)
-   ("+" . konix/org-capture-na-in-heading)
-   ("Y" . konix/org-toggle-maybe)
-   ("y" . (lambda () (message "Intentionally disable y, too easily triggered to say yes")))
-   ("[" . (lambda () (message "Intentionally disable [")))
-   ("!" . (lambda () (message "Intentionally disable !")))
-   ("m" . konix/org-toggle-me)
-   ("S" . konix/org-toggle-society)
-   ("s" . org-save-all-org-buffers)
-   ("W" . org-toggle-narrow-to-subtree)
-   ("z" . org-add-note)
-   ("Z" . konix/org-add-timestamp)
-   ("N" . konix/org-roam-note)
-   ("w" . konix/org-refile)
-   (":" . counsel-org-tag)
-   ("@" . counsel-org-tag)
-   ("." . org-set-tags-command)
-   )
- )
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("P" . konix/org-toggle-project))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("n" . konix/org-next-visible-heading-and-center))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("p" . konix/org-previous-visible-heading-and-center))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("G" . org-mark-ring-goto))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("h" . hl-line-mode))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '(" " . org-next-visible-heading))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("E" . konix/org-srs))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("]" . konix/org-goto-next-open-list-entry))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("l" . hl-line-mode))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("k" . konix/org-kill))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("+" . konix/org-capture-na-in-heading))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("Y" . konix/org-toggle-maybe))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("y" . (lambda () (message "Intentionally disable y, too easily triggered to say yes"))))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("[" . (lambda () (message "Intentionally disable ["))))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("!" . (lambda () (message "Intentionally disable !"))))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("m" . konix/org-toggle-me))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("S" . konix/org-toggle-society))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("s" . org-save-all-org-buffers))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("W" . org-toggle-narrow-to-subtree))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("z" . org-add-note))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("Z" . konix/org-add-timestamp))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("N" . konix/org-roam-note))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("w" . konix/org-refile))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '(":" . counsel-org-tag))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("@" . counsel-org-tag))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("." . org-set-tags-command))
 
 (setq-default org-habit-show-habits nil)
 

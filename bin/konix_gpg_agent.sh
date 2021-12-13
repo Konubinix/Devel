@@ -22,9 +22,23 @@ while getopts ":hr" opt; do
 done
 shift $((OPTIND-1))
 
-if ! gpg-agent
+TMP="$(mktemp -d)"
+trap "rm -rf '${TMP}'" 0
+
+on_fail () {
+    echo "gpg-agent failed:"
+    cat "${TMP}/log"
+    exit 1
+}
+
+run_agent () {
+    gpg-agent "$@" > "${TMP}/log" 2>&1
+}
+
+
+if ! run_agent
 then
-    gpg-agent \
+    run_agent \
 	    --daemon \
 	    --enable-ssh-support \
 	    --default-cache-ttl "${KONIX_GPG_CACHE_TTL}" \

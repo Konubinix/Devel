@@ -318,7 +318,14 @@
    )
   )
 
-(defun konix/org-roam-export/add-refs ()
+(defun konix/org-move-past-properties ()
+  (forward-line 0)
+  (while (looking-at-p "^ *[:#]")
+    (forward-line)
+    )
+  )
+
+(defun konix/org-roam-export/add-refs-1 ()
   (when-let* (
               (refs (konix/org-roam-get-refs))
               (language (konix/org-roam-export/get-language))
@@ -336,10 +343,7 @@
                     )
               )
     (save-excursion
-      (goto-char (point-min))
-      (while (looking-at-p "^[:#]")
-        (forward-line)
-        )
+      (konix/org-move-past-properties)
       (mapc
        (lambda (ref)
          (insert (format "- %s %s\n" text (konix/org-roam-export/process-url

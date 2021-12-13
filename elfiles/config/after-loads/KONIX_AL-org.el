@@ -4573,13 +4573,6 @@ of the clocksum."
         )
       )
     )
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/calendar.ics")
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/ril.ics")
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/agenda.ics")
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/web.ics")
-  (shell-command "konix_gcal_split.py /home/sam/perso/perso/radicale/sms_n_calls.ics")
-  (shell-command "konix_ical_radicalize_dir.sh /home/sam/perso/perso/radicale/ /home/sam/perso/perso/radicale/collection-root/sam/")
-  (konix/notify "Exported" 2)
   )
 
 (defun konix/org-focus-next ()

@@ -25,5 +25,34 @@
 ;;; Code:
 (setq-default org-attach-store-link-p 'attached)
 
+(defun konix/org-attach-ipfa (file)
+  (interactive
+   (list
+    (read-file-name "File to keep as an attachment: "
+                    (or (progn
+                          (require 'dired-aux)
+                          (dired-dwim-target-directory))
+                        default-directory))
+    ))
+  (let (
+        (cid
+         (with-temp-buffer
+           (call-process "ipfa" nil (current-buffer) nil file)
+           (replace-regexp-in-string "^/ipfs/" "ipfs:" (s-trim (buffer-substring-no-properties (point-min) (point-max))))
+           )
+         )
+        )
+    (save-excursion
+      (forward-line)
+      (konix/org-move-past-properties)
+      (insert cid "\n")
+      )
+    )
+  )
+
+(konix/push-or-replace-assoc-in-alist 'org-attach-commands '((?i)
+                                                             konix/org-attach-ipfa
+                                                             "IPFA the file"))
+
 (provide 'KONIX_AL-org-attach)
 ;;; KONIX_AL-org-attach.el ends here

@@ -1,6 +1,6 @@
 (source gnu)
+(source nongnu)
 (source melpa)
-(source org)
 
 (depends-on "cask")
 (depends-on "flycheck")
@@ -87,7 +87,7 @@
 (depends-on "phi-search-dired")
 (depends-on "notmuch")
 (depends-on "org")
-(depends-on "org-plus-contrib")
+(depends-on "org-contrib")
 (depends-on "rg")
 (depends-on "ox-hugo")
 (depends-on "jupyter")

@@ -28,6 +28,7 @@
 (require 'KONIX_org-roam-export)
 (require 'org-roam-dailies)
 
+
 (define-key org-mode-map (kbd "C-c n l") #'org-roam-buffer-toggle)
 (define-key org-mode-map (kbd "C-c n t") #'konix/org-roam-export/toggle-publish)
 
@@ -63,18 +64,20 @@ ${title}
 (defun konix/org-roam/process-url (url)
   (cond
    ((string-match "^cite:\\(.+\\)$" url)
-    (let* ((results (org-ref-get-bibtex-key-and-file (match-string 1 url)))
-           (key (car results))
-           (bibfile (cdr results)))
-      (save-excursion
-        (with-temp-buffer
-          (insert-file-contents bibfile)
-          (bibtex-set-dialect (parsebib-find-bibtex-dialect) t)
-          (bibtex-search-entry key)
-          (s-trim (bibtex-autokey-get-field "url"))
-          )
-        )
-      )
+    (warn "%s not handled until I use the new oc stuff" url)
+    ""
+    ;; (let* ((results (org-ref-get-bibtex-key-and-file (match-string 1 url)))
+    ;;        (key (car results))
+    ;;        (bibfile (cdr results)))
+    ;;   (save-excursion
+    ;;     (with-temp-buffer
+    ;;       (insert-file-contents bibfile)
+    ;;       (bibtex-set-dialect (parsebib-find-bibtex-dialect) t)
+    ;;       (bibtex-search-entry key)
+    ;;       (s-trim (bibtex-autokey-get-field "url"))
+    ;;       )
+    ;;     )
+    ;;   )
     )
    ((s-starts-with? "//" url)
     (concat "https:" url)

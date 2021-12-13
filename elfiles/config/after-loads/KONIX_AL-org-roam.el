@@ -627,7 +627,7 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
 
 ;; add sentinel character to ease filter with the exact title. So that |sgx|
 ;; matches the note exactly about sgx and note the hundreds of notes about sgx
-(setq-default org-roam-node-display-template "${tags:10}|${title:100}|")
+(setq-default org-roam-node-display-template "${title}")
 
 (if (require 'org-roam-bibtex nil t)
     (org-roam-bibtex-mode)

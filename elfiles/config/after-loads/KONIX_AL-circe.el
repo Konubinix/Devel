@@ -128,6 +128,13 @@
 (add-hook 'circe-mode-hook
           'konix/circe-mode-hook)
 
+(defun konix/circe-hide-line ()
+  (interactive)
+  (org-agenda-filter-hide-line 'for-now)
+  (forward-line -1)
+  )
+
+(define-key circe-mode-map (kbd "M-h") #'konix/circe-hide-line)
 
 (provide 'KONIX_AL-circe)
 ;;; KONIX_AL-circe.el ends here

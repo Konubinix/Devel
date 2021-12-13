@@ -26,9 +26,13 @@
 
 (setq-default gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
+;; (add-to-list 'package-archives
+;;              '("org" . "https://orgmode.org/elpa/")
+;;              )
 (add-to-list 'package-archives
-             '("org" . "https://orgmode.org/elpa/")
+             '("nongnu" . "https://elpa.nongnu.org/nongnu/")
              )
+
 
 (provide 'KONIX_AL-package)
 ;;; KONIX_AL-package.el ends here

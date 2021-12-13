@@ -29,11 +29,6 @@
 (require 'url-util)
 (require 'org-roam)
 (require 'org-transclusion)
-(or (require 'org-roam-bibtex nil t) (message "Could not load org-roam-bibtex"))
-(require 'org-ref)
-(require 'org-ref-ivy)
-
-(require 'citeproc-org)
 
 (defun konix/org-roam-export/exported-files (kind)
   (split-string

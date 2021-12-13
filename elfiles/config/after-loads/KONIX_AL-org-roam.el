@@ -612,7 +612,6 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
 ;; matches the note exactly about sgx and note the hundreds of notes about sgx
 (setq-default org-roam-node-display-template "${tags:10}|${title:100}|")
 
-(citeproc-org-setup)
 (if (require 'org-roam-bibtex nil t)
     (org-roam-bibtex-mode)
   (warn "Could not load org-roam-bibtex")

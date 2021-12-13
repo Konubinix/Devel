@@ -371,6 +371,21 @@ function tell_pulse_volume()
    )
 end
 
+function tell_brightness()
+   awful.spawn.easy_async (
+      "clk brightness show",
+      function (stdout, stderr, exitreason, exitcode)
+         naughty.notify(
+            {
+               preset = naughty.config.presets.normal,
+               title = "Brightness",
+               text = stdout
+            }
+         )
+      end
+   )
+end
+
 
 function say(message)
    naughty.notify({text = message})
@@ -460,7 +475,6 @@ globalkeys = gears.table.join(
    ),
 
 
-   -- Layout manipulation
    awful.key({ modkey, "Mod1"   }, "Down", function ()
          awful.spawn("clk pulse down")
          tell_pulse_volume()
@@ -468,6 +482,16 @@ globalkeys = gears.table.join(
       {description = "change volume", group = "client"}),
    awful.key({ modkey, "Mod1"   }, "Up", function ()
          awful.spawn("clk pulse up")
+         tell_pulse_volume()
+   end,
+      {description = "change volume", group = "client"}),
+   awful.key({}, "XF86AudioRaiseVolume", function ()
+         awful.spawn("clk pulse up")
+         tell_pulse_volume()
+   end,
+      {description = "change volume", group = "client"}),
+   awful.key({}, "XF86AudioLowerVolume", function ()
+         awful.spawn("clk pulse down")
          tell_pulse_volume()
    end,
       {description = "change volume", group = "client"}),
@@ -498,6 +522,17 @@ globalkeys = gears.table.join(
          awful.spawn("konix_print_screen_n_insert.sh")
       end,
       {description = "Print screen", group = "screen"}),
+
+   awful.key({ modkey , "Mod1"       }, "i",
+      function()
+         awful.spawn("clk x capture-screen ocr")
+      end,
+      {description = "Captured OCR-ed content from printed screen", group = "screen"}),
+   awful.key({ modkey , "Mod1",}, "j",
+      function()
+         awful.spawn("clk x capture-screen ocr --insert")
+      end,
+      {description = "Captured OCR-ed content from printed screen", group = "screen"}),
 
    -- Standard program
    awful.key({ modkey,   "Control"        }, "q", open_or_join("qutebrowser", browser),
@@ -548,6 +583,36 @@ globalkeys = gears.table.join(
          )
    end,
       {description = "toggle play", group = "music"}),
+   awful.key({}, "Pause",     function ()
+         awful.spawn.easy_async(
+            "clk mpc toggle",
+            function (stdout, stderr, exitreason, exitcode)
+               naughty.notify(
+                  {
+                     preset = naughty.config.presets.normal,
+                     title = "MPD",
+                     text = stdout
+                  }
+               )
+            end
+         )
+   end,
+      {description = "toggle play", group = "music"}),
+   awful.key({}, "XF86AudioPlay",     function ()
+         awful.spawn.easy_async(
+            "clk mpc toggle",
+            function (stdout, stderr, exitreason, exitcode)
+               naughty.notify(
+                  {
+                     preset = naughty.config.presets.normal,
+                     title = "MPD",
+                     text = stdout
+                  }
+               )
+            end
+         )
+   end,
+      {description = "toggle play", group = "music"}),
    awful.key({ modkey, "Shift"          }, "p",     function ()
          awful.spawn.easy_async(
             "clk pulse toggle-mute",
@@ -557,8 +622,48 @@ globalkeys = gears.table.join(
          )
    end,
       {description = "toggle mute", group = "music"}),
+   awful.key({}, "XF86AudioMute",     function ()
+         awful.spawn.easy_async(
+            "clk pulse toggle-mute",
+            function (stdout, stderr, exitreason, exitcode)
+	       tell_pulse_volume()
+            end
+         )
+   end,
+      {description = "toggle mute", group = "music"}),
+   awful.key({}, "XF86AudioNext",     function ()
+         awful.spawn.easy_async(
+            "mpc next",
+            function (stdout, stderr, exitreason, exitcode)
+               naughty.notify(
+                  {
+                     preset = naughty.config.presets.normal,
+                     title = "MPD",
+                     text = stdout
+                  }
+               )
+            end
+         )
+   end,
+      {description = "play next song", group = "music"}),
+   awful.key({}, "XF86AudioPrev",     function ()
+         awful.spawn.easy_async(
+            "mpc prev",
+            function (stdout, stderr, exitreason, exitcode)
+               naughty.notify(
+                  {
+                     preset = naughty.config.presets.normal,
+                     title = "MPD",
+                     text = stdout
+                  }
+               )
+            end
+         )
+   end,
+      {description = "play previous song", group = "music"}),
    awful.key({ modkey, "Control"          }, "p", open_or_join("Pavucontrol", "pavucontrol"),
       {description = "pavucontrol", group = "music"}),
+
    awful.key({ modkey,  "Shift"         }, "Up",     function () awful.tag.incmwfact( 0.05)          end,
       {description = "increase master width factor", group = "layout"}),
    awful.key({ modkey,   "Shift"        }, "Down",     function () awful.tag.incmwfact(-0.05)          end,
@@ -575,7 +680,6 @@ globalkeys = gears.table.join(
       {description = "select next", group = "layout"}),
    awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(-1)                end,
       {description = "select previous", group = "layout"}),
-
    awful.key({ modkey, "Control" }, "n",
       function ()
          local c = awful.client.restore()
@@ -845,6 +949,18 @@ clientkeys = gears.table.join(
          description = "(un)maximize horizontally",
          group = "client"
       }
+   ),
+   awful.key({}, "XF86MonBrightnessUp", function ()
+         awful.spawn("clk brightness up")
+         tell_brightness()
+   end,
+      {description = "increase brightness by 10%", group = "brightness"}
+   ),
+   awful.key({}, "XF86MonBrightnessDown", function ()
+         awful.spawn("clk brightness down")
+         tell_brightness()
+   end,
+      {description = "decrease brightness by 10%", group = "brightness"}
    )
 )
 

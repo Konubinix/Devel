@@ -3305,7 +3305,7 @@ items"
 (defun konix/org-insert-at-point ()
   (interactive)
   (let (
-        (place_to_go (org-refile-get-location "Jump to"))
+        (place_to_go (org-refile-get-location "Insert what heading at point?"))
         link
         )
     (save-window-excursion

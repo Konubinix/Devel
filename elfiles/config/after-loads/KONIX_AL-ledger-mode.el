@@ -549,5 +549,12 @@ of the transaction.
 (define-key ledger-mode-map (kbd "C-c C-l") #'org-insert-link-global)
 
 
+(defun konix/ledger/completion-at-point/ensure-has-id ()
+  (when (equal major-mode 'ledger-mode)
+    (konix/ledger-get-id-create)
+    )
+  )
+(advice-add 'completion-at-point :after 'konix/ledger/completion-at-point/ensure-has-id)
+
 (provide 'KONIX_AL-ledger)
 ;;; KONIX_AL-ledger.el ends here

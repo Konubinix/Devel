@@ -610,8 +610,8 @@ ${title}
  )
 
 
-(setq-default org-ref-default-bibliography (list (expand-file-name "refs.bib" org-roam-directory)))
-(setq-default bibtex-completion-bibliography org-ref-default-bibliography)
+(setq-default org-cite-global-bibliography (list (expand-file-name "refs.bib" org-roam-directory)))
+(setq-default bibtex-completion-bibliography org-cite-global-bibliography)
 
 (org-link-set-parameters "konix-org-roam"
                          :follow #'konix/org-roam-follow-link

@@ -38,7 +38,7 @@ done
 # http://techedemic.com/2014/09/18/creating-a-timelapse-clip-with-avconv/
 #       -vf "tblend=average,framestep=2,setpts=0.50*PTS" \
 
-avconv -y \
+ffmpeg -y \
        -r "${fps}" \
        -i "${TMPTL}/%4d.${ext}" \
        -r "${fps}" \

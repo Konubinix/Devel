@@ -238,6 +238,7 @@
 (add-to-list 'auto-mode-alist (cons "\\.pdf$" 'pdf-view-mode))
 (add-to-list 'auto-mode-alist (cons "_helpers.tpl" 'go-mode))
 (add-to-list 'auto-mode-alist (cons "\\.puml$" 'plantuml-mode))
+(add-to-list 'auto-mode-alist (cons "Tiltfile" 'python-mode))
 
 
 ;; ******************************************************************************************

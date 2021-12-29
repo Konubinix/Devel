@@ -38,6 +38,9 @@
 
 (defun konix/python-mode-hook ()
   (setq tab-width 4)
+  (when (string-match-p "^.*Tiltfile.*$" (buffer-file-name))
+    (setq konix/python-mode/flycheck nil)
+    )
   (konix/prog/config)
   (when konix/python-mode/yapf
       (yapf-mode)

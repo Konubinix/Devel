@@ -44,6 +44,30 @@
    )
   )
 
+(defun konix/org-roam-export/org-transclusion-before-kill/prevent-it (orig-fun
+                                                                      &rest
+                                                                      args)
+  ;; noop
+  )
+
+(defun konix/org-roam-export/org-hugo-export-wim-to-md/prevent-org-transclusion-kill-behavior
+    (orig-fun &rest args)
+  ;; the before kill advice of org-transclusion saves the buffer, persisting all
+  ;; the temporary stuff we put in the buffer during export
+  (advice-add #'org-transclusion-before-kill :around
+              #'konix/org-roam-export/org-transclusion-before-kill/prevent-it)
+  (let (
+        (res (apply orig-fun args))
+        )
+    ;; now, I can remove the advice that prevented the org-transclusion behavior
+    ;; that persisted the temporary stuff
+    (advice-remove #'org-transclusion-before-kill
+                   #'konix/org-roam-export/org-transclusion-before-kill/prevent-it)
+    res
+    )
+  )
+(advice-add #'org-hugo-export-wim-to-md :around #'konix/org-roam-export/org-hugo-export-wim-to-md/prevent-org-transclusion-kill-behavior)
+
 (defun konix/org-roam-export/export-all (&optional kind incremental)
   "Re-exports all Org-roam files to Hugo markdown."
   (interactive)
@@ -850,11 +874,10 @@
 (defun konix/org-roam-export/load-transclusion ()
   (save-excursion
     (goto-char (point-min))
-    (when (search-forward "#+transclude: t" nil t)
-      (org-transclusion-mode 1)
+    (when (search-forward "#+transclude:" nil t)
       (save-window-excursion
         (pop-to-buffer (current-buffer))
-        (org-transclusion-add-all-in-buffer)
+        (org-transclusion-add-all)
         )
       )
     )

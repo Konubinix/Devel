@@ -24,22 +24,9 @@
 
 ;;; Code:
 
-(set-face-foreground 'org-transclusion-block "#bfc0c4")
-(set-face-background 'org-transclusion-block "gray27")
-
-
-(defun konix/org-tranclusion-activate/remove-meta-advices ()
-  (advice-remove 'org-metaup #'org-transclusion-metaup-down)
-  (advice-remove 'org-metadown #'org-transclusion-metaup-down)
-  (advice-remove 'org-shiftmetaup #'org-transclusion-shiftmetaup)
-  (advice-remove 'org-shiftmetadown #'org-transclusion-shiftmetadown)
-  (advice-remove 'org-metaleft #'org-transclusion-metaleft)
-  (advice-remove 'org-metaright #'org-transclusion-metaright)
-  (advice-remove 'org-shiftmetaleft #'org-transclusion-metaleft)
-  (advice-remove 'org-shiftmetaright #'org-transclusion-metaright)
-  )
-
-(advice-add 'org-transclusion-activate :after #'konix/org-tranclusion-activate/remove-meta-advices)
-
+(define-key org-transclusion-map (kbd "C-c C-o") 'org-open-at-point)
+(define-key org-transclusion-map (kbd "o") 'org-open-at-point)
+(define-key org-transclusion-map (kbd "RET") 'org-open-at-point)
+(define-key org-transclusion-map (kbd "j") 'org-transclusion-open-source)
 (provide 'KONIX_AL-org-transclusion)
 ;;; KONIX_AL-org-transclusion.el ends here

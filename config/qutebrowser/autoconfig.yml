@@ -31,6 +31,8 @@ settings:
     https://eu.docusign.net: false
     https://www.google.com: false
     https://www.myedenred.fr: false
+  content.javascript.enabled:
+    global: true
   content.media.audio_capture:
     https://coremeet.workadventu.re: true
     https://meet.google.com: true

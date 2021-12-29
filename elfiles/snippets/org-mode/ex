@@ -2,6 +2,6 @@
 # name: ex
 # key: ex
 # --
-$>#+BEGIN_EXAMPLE
-$>$0
-$>#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+$0
+#+END_EXAMPLE

@@ -161,6 +161,7 @@
 (autoload 'konix/git/show/origin-commit-at-pos "KONIX_git" "" t)
 (autoload 'konix/git/pull "KONIX_git" "" t)
 (autoload 'kubel "kubel" "" t)
+(autoload 'argdown-mode "argdown" "" t)
 
 ;; ************************************************************
 ;; Automodes

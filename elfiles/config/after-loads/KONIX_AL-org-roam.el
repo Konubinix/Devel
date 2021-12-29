@@ -229,25 +229,43 @@ ${title}
   (let* (
          (decoded-title (s-trim (org-link-decode title)))
          (decoded-url (substring-no-properties (s-trim (org-link-decode url))))
+         (decoded-url-no-hash (replace-regexp-in-string "^\\(.+\\)#.+$" "\\1" decoded-url))
          (decoded-body (s-trim (org-link-decode body)))
          (slug (konix/substring-capped (konix/org-roam-compute-slug decoded-title) 0 100))
          (node (org-roam-node-from-ref decoded-url))
+         (node-no-hash (org-roam-node-from-ref decoded-url-no-hash))
          (buffer
           (save-window-excursion
             (find-file
-             (if node (org-roam-node-file node)
+             (cond
+              (node
+               (org-roam-node-file node)
+               )
+              (node-no-hash
+               (org-roam-node-file node-no-hash)
+               )
+              (t
                (expand-file-name (format "%s.org" slug)
                                  org-roam-directory)
                )
+              )
              )
             (current-buffer)
             )
           )
-         (position (if node
-                       (org-roam-node-point node)
-                     0
-                     )
-                   )
+         (position
+          (cond
+           (node
+            (org-roam-node-point node)
+            )
+           (node-no-hash
+            (org-roam-node-point node-no-hash)
+            )
+           (t
+            0
+            )
+           )
+          )
          )
     (with-current-buffer buffer
       (save-restriction
@@ -273,7 +291,9 @@ ${title}
           )
         ;; finally, insert the body(when (not (string-equal "" (s-trim
         ;; decoded-body)))
-
+        (when (and (not node) node-no-hash)
+          (org-roam-ref-add decoded-url)
+          )
         (unless (string-equal "" decoded-body)
           (delete-trailing-whitespace)
           (goto-char position)
@@ -283,7 +303,11 @@ ${title}
                 (goto-char (point-max))
                 )
             (if (re-search-forward "^\*+" nil t)
-                (forward-line -1)
+                (progn
+                  (forward-line 0)
+                  (insert "\n")
+                  (forward-line -1)
+                 )
               (goto-char (point-max))
               )
             )

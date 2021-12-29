@@ -43,3 +43,5 @@ message/rfc822=rfc822.desktop;
 audio/x-wav=vlc.desktop;
 audio/x-opus+ogg=vlc.desktop;
 application/vnd.sqlite3=sqlitebrowser.desktop;
+audio/flac=vlc.desktop;
+audio/mp4=vlc.desktop;

@@ -265,7 +265,7 @@
      ((string-match (concat "^" konix/org-ipfs-link "\\([?]filename=\\([a-zA-Z0-9=_%.-]+\\)\\)?$") url)
       (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 3 url))
       )
-     ((string-match (concat "^" konix/org-ipfs-link "\\([?][a-zA-Z0-9=_%.-]+\\)?$") url)
+     ((string-match (concat "^" konix/org-ipfs-link "\\([?][a-zA-Z0-9=_%./-]+\\)?$") url)
       (konix/org-export/process-ipfs-link (format "/ipfs/%s%s" (match-string 1 url) (match-string 2 url)) nil)
       )
      ((string-match "^cite:\\(.+\\)$" url)
@@ -803,16 +803,27 @@
   (save-excursion
     (goto-char (point-min))
     (save-match-data
-      (while (re-search-forward
-              "\\(?:ipfs:\\|[[ \n]/ipfs/\\)\\([a-zA-Z0-9.=%?+-]+\\)"
-              nil
-              t)
+      (while (or
+              (re-search-forward
+               "\\(ipfs:/*\\([a-zA-Z0-9.=%?+-]+\\)\\)"
+               nil
+               t)
+              ;; ipfs alone
+              (re-search-forward
+               "[[ \n]\\(/ipfs/\\([a-zA-Z0-9.=%?+-]+\\)\\)"
+               nil
+               t)
+              )
         (replace-match
          (format
           "%s/ipfs/%s"
           (getenv "KONIX_IPFS_GATEWAY")
-          (match-string-no-properties 1)
+          (match-string-no-properties 2)
           )
+         nil
+         nil
+         nil
+         1
          )
         )
       )

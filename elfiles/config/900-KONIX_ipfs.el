@@ -34,7 +34,7 @@
 (advice-add 'org--create-inline-image :around #'konix/find-file/ipfs-ignore-query-parameter)
 
 (defvar konix/org-ipfs-protocol-regexp "\\(?:file:/+ip[fn]s/\\|ip[nf]s:/*\\|/ip[fn]s/\\)")
-(defvar konix/org-ipfs-link (concat konix/org-ipfs-protocol-regexp "\\([a-zA-Z0-9]+\\)"))
+(defvar konix/org-ipfs-link (concat konix/org-ipfs-protocol-regexp "\\([a-zA-Z0-9/%.~_-]+\\)"))
 (defvar konix/org-ipfs-link-with-query (concat konix/org-ipfs-link "[?]\\([a-zA-Z0-9=_%.-]+\\)\\([.][a-zA-Z0-9]+\\)?"))
 
 (defun konix/org-display-inline-images/ipfs (&optional include-linked refresh beg end)

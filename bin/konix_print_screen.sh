@@ -1,5 +1,6 @@
 #!/bin/bash -eu
 
+echo -n "not yet"|konix_xclip_in_all.sh
 CID="$(konix_screenshot.sh)"
 hash="${CID#/*/}"
 echo -n "${CID}?a.png"|konix_xclip_in_all.sh

@@ -1740,18 +1740,20 @@ FExport diary data into iCalendar file: ")
   (interactive)
   (let (
         (orig-buffer (current-buffer))
+        result
         )
-   (with-temp-buffer
-     (let (
-           (temp-buffer (current-buffer))
-           )
-       (with-current-buffer orig-buffer
-           (call-process-region (point-min) (point-max) "ipfa" nil temp-buffer)
-         )
-       (message (string-trim (buffer-substring-no-properties (point-min) (point-max))))
-       )
-     )
-   )
+    (with-temp-buffer
+      (let (
+            (temp-buffer (current-buffer))
+            )
+        (with-current-buffer orig-buffer
+          (call-process-region (point-min) (point-max) "ipfa" nil temp-buffer)
+          )
+        (message (setq result (string-trim (buffer-substring-no-properties (point-min) (point-max)))))
+        )
+      )
+    result
+    )
   )
 
 (provide '350-KONIX_commands)

@@ -2147,6 +2147,7 @@ items"
                                '(
                                  "no_monthly"
                                  "phantom"
+                                 "no_planning"
                                  ))
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               )

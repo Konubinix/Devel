@@ -1865,7 +1865,7 @@ items"
                             ))
                          )
                         )
-                  (tags "+Expectation-Commitment-maybe"
+                  (tags "+Expectation-Commitment-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
                         (
                          (org-agenda-overriding-header
                           "Be clear about the expectations -> make commitment out of them")

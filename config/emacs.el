@@ -1,3 +1,11 @@
+(mapc (lambda (file)
+        (when (string-prefix-p "ECRYPT" file)
+          (call-process "konix_display.py" nil nil nil "-o" "-t" "boring" (format "%s is ecrytfs encrypted and should be decrypted before running emacs" user-emacs-directory))
+          (kill-emacs)
+          )
+        )
+      (directory-files user-emacs-directory))
+
 (require 'cl)
 
 (defvar *emacs-load-start* (current-time))
@@ -11,10 +19,10 @@
 (setq-default
  perso-elfiles (expand-file-name "elfiles" perso-dir)
  perso-host-elfiles (expand-file-name "elfiles"
-									   (expand-file-name
-										(getenv "HOSTNAME")
-										perso-dir
-										)
+									  (expand-file-name
+									   (getenv "HOSTNAME")
+									   perso-dir
+									   )
 									  )
  home-elfiles (expand-file-name "~/.elfiles")
  )
@@ -42,8 +50,8 @@
          (when (load-history-filename-element (load-history-regexp file-to-load))
            (warn "%s was already loaded before configuring its after load\
  -> configuring an after-load is useless in that case."
-		 file-to-load
-		 )
+		         file-to-load
+		         )
            )
          (eval-after-load file-to-load
            `(progn

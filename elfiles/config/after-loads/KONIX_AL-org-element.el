@@ -24,10 +24,13 @@
 
 ;;; Code:
 
-(defun konix/org-extract-active-times ()
+(defun konix/org-extract-active-times (&optional no-subtree)
   (save-excursion
 	(save-restriction
-	  (org-narrow-to-subtree)
+	  (if no-subtree
+          (konix/org-narrow-to-entry-no-subtree)
+        (org-narrow-to-subtree)
+        )
 	  (goto-char (point-min))
 	  ;; extract all the dates
 	  (org-element-map
@@ -65,9 +68,9 @@
 	)
   )
 
-(defun konix/org-extract-active-times-flattened ()
+(defun konix/org-extract-active-times-flattened (&optional no-subtree)
   (konix/flatten-time-ranges
-   (konix/org-extract-active-times)
+   (konix/org-extract-active-times no-subtree)
    )
   )
 

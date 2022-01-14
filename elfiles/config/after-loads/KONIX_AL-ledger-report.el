@@ -405,6 +405,7 @@ The effective date of 1 will be set to the effective date of 2
 (define-key ledger-report-mode-map (kbd "r") #'konix/ledger-report/switch-report)
 (define-key ledger-report-mode-map (kbd "g") #'ledger-report-redo)
 (define-key ledger-report-mode-map (kbd "N") #'konix/ledger-report-toggle-narrow-similar)
+(define-key ledger-report-mode-map (kbd "S") #'konix/ledger-report-account)
 
 (provide 'KONIX_AL-ledger-report)
 ;;; KONIX_AL-ledger-report.el ends here

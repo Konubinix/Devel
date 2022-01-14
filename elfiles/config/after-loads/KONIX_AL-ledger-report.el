@@ -281,31 +281,43 @@ The effective date of 1 will be set to the effective date of 2
 
 (defun konix/ledger-report-toggle-narrow-similar ()
   (interactive)
+  (setq konix/ledger-report-toggle-narrow-similar/narrowed (not konix/ledger-report-toggle-narrow-similar/narrowed))
+  (konix/ledger-report-apply-narrowing)
+  )
+
+(defun konix/ledger-report-apply-narrowing ()
   (save-excursion
     (if konix/ledger-report-toggle-narrow-similar/narrowed
         (progn
-          (org-agenda-remove-filter 'for-now)
-          )
-      (progn
-        (move-beginning-of-line nil)
-        (looking-at "^.+ -?\\([0-9.]+\\) EUR.+$")
-        (let (
-              (regexp (format "^.+\\b\\(%s\\)\\b EUR .+$"
-                              (match-string-no-properties 1)))
-              )
-          (goto-char (point-min))
-          (konix/ledger-reconcile-move-to-next-entry-and-track)
-          (while (not (equal (point) (point-max)))
-            (unless (looking-at regexp)
-              (org-agenda-filter-hide-line 'for-now)
-              )
+          (move-beginning-of-line nil)
+          (looking-at "^.+ -?\\([0-9.]+\\) EUR.+$")
+          (let (
+                (regexp (format "^.+\\b\\(%s\\)\\b EUR .+$"
+                                (match-string-no-properties 1)))
+                )
+            (goto-char (point-min))
             (konix/ledger-reconcile-move-to-next-entry-and-track)
-            )
-          ))
+            (while (not (equal (point) (point-max)))
+              (unless (looking-at regexp)
+                (org-agenda-filter-hide-line 'for-now)
+                )
+              (konix/ledger-reconcile-move-to-next-entry-and-track)
+              )
+            ))
+      (progn
+        (org-agenda-remove-filter 'for-now)
+        )
       )
     )
-  (setq konix/ledger-report-toggle-narrow-similar/narrowed (not konix/ledger-report-toggle-narrow-similar/narrowed))
   )
+
+(defun konix/ledger-report-after-report-hook ()
+  (konix/ledger-report-apply-narrowing)
+  )
+
+(add-hook #'ledger-report-after-report-hook
+          #'konix/ledger-report-after-report-hook)
+
 
 (defun konix/ledger-report-unhighlight-all ()
   (interactive)

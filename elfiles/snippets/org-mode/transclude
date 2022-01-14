@@ -2,5 +2,4 @@
 # name: transclude
 # key: tr
 # --
-#+transclude: t
-[[file:$100::$200]]
+#+transclude: [[file:$100::$200]]

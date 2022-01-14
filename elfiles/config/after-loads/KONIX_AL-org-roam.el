@@ -307,7 +307,7 @@ ${title}
                   (forward-line 0)
                   (insert "\n")
                   (forward-line -1)
-                 )
+                  )
               (goto-char (point-max))
               )
             )
@@ -799,6 +799,18 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
     )
   )
 (advice-add #'org-roam-db-update-file :around #'konix/org-roam-db-update-file/profile)
+
+(defun konix/org-roam-visit-node-at-point ()
+  (interactive)
+  (if-let
+      (
+       (word (word-at-point t))
+       (node (org-roam-node-from-title-or-alias word))
+       )
+      (org-roam-node-visit node)
+    (message "I could not find a node that corresponds to the word %s" word)
+    )
+  )
 
 (org-roam-setup)
 

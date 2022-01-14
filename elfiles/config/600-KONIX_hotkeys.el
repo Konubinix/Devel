@@ -198,10 +198,6 @@
 ;; yank current buffer name
 (define-key 'konix/global-slow-key-map (kbd "M-b") 'konix/yank-current-buffer-name)
 (define-key 'konix/global-slow-key-map (kbd "M-B") 'konix/yank-current-buffer-file-name)
-;; **********************************************************************
-;; ebib
-;; **********************************************************************
-(define-key 'konix/global-slow-key-map (kbd "e") 'ebib)
 
 ;; **********************************************************************
 ;; bbdb
@@ -211,6 +207,13 @@
 
 (define-key 'konix/bbdb/map (kbd "s") 'bbdb)
 (define-key 'konix/bbdb/map (kbd "c") 'bbdb-create)
+
+; eval
+(define-prefix-command 'konix/eval/map)
+(define-key 'konix/global-slow-key-map (kbd "e") 'konix/eval/map)
+
+(define-key 'konix/eval/map (kbd "d") 'eval-defun)
+(define-key 'konix/eval/map (kbd "e") 'eval-expression)
 
 ;; **********************************************************************
 ;; EIN

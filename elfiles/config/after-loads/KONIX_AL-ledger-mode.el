@@ -376,6 +376,9 @@ of the transaction.
   (let* (
          (prop
           (save-excursion
+            (when (equal (point) (point-max))
+              (backward-char)
+              )
             (forward-line 0)
             (get-text-property (point) 'ledger-source)
             )

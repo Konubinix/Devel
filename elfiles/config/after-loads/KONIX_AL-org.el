@@ -5724,31 +5724,53 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
-(defvar konix/org--deadline-or-schedule/check-deadline-after-scheduled/inhibit nil)
+(defvar konix/org--deadline-or-schedule/check-schedule-hides-timestamps/inhibit nil)
 
 (defun konix/org-edna-process-form/process-warning-only-at-the-end (orig-func &rest args)
   (let (
-        (konix/org--deadline-or-schedule/check-deadline-after-scheduled/inhibit t)
+        (konix/org--deadline-or-schedule/check-schedule-hides-timestamps/inhibit t)
         )
     (apply orig-func args)
     )
-  (konix/org--deadline-or-schedule/check-deadline-after-scheduled)
+  (konix/org--deadline-or-schedule/check-schedule-hides-timestamps)
   )
 (advice-add #'org-edna-process-form :around #'konix/org-edna-process-form/process-warning-only-at-the-end)
 
-(defun konix/org--deadline-or-schedule/check-deadline-after-scheduled (&rest arguments)
-  (unless konix/org--deadline-or-schedule/check-deadline-after-scheduled/inhibit
-    (let (
-          (deadline-time (org-get-deadline-time (point)))
-          (schedule-time (org-get-scheduled-time (point)))
-          )
-      (when (and deadline-time schedule-time)
+(defun konix/org--deadline-or-schedule/check-schedule-hides-timestamps (&rest args)
+  (unless konix/org--deadline-or-schedule/check-schedule-hides-timestamps/inhibit
+    (when-let (
+               (schedule-time (org-get-scheduled-time (point)))
+               )
+      (when-let (
+                 (timestamps (konix/org-extract-active-timestamps t))
+                 )
+        (->> timestamps
+             (-filter (lambda (ts)
+                        (and
+                         (time-less-p nil ts)
+                         (time-less-p ts schedule-time)
+                         )
+                        )
+                      )
+             (-map
+              (lambda (ts)
+                (warn "Future time %s will be hidden by schedule %s"
+                      (format-time-string "<%Y-%m-%d %H:%M>" ts)
+                      (format-time-string "<%Y-%m-%d %H:%M>" schedule-time)
+                      )
+                )
+              )
+             )
+        )
+      (when-let (
+                 (deadline-time (org-get-deadline-time (point)))
+                 )
         (when (time-less-p deadline-time schedule-time)
           (warn "Deadline time (%s) before schedule time (%s).
 The entry won't show up until it is too late.
 You should check this is not a mistake."
-                (org-format-time-string "%Y-%m-%d" deadline-time)
-                (org-format-time-string "%Y-%m-%d" schedule-time)
+                (org-format-time-string "%Y-%m-%d %H:%M" deadline-time)
+                (org-format-time-string "%Y-%m-%d %H:%M" schedule-time)
                 )
           )
         )
@@ -5756,7 +5778,46 @@ You should check this is not a mistake."
     )
   )
 
-(advice-add #'org--deadline-or-schedule :after #'konix/org--deadline-or-schedule/check-deadline-after-scheduled)
+(advice-add #'org--deadline-or-schedule :after #'konix/org--deadline-or-schedule/check-schedule-hides-timestamps)
+
+(defun konix/org-insert-time-stamp/check-if-hidden (time &optional with-hm inactive pre post extra)
+  (when (and
+         (not inactive)
+         )
+    (when-let (
+               (schedule-time (org-get-scheduled-time (point)))
+               )
+      (when (not with-hm)
+        (let (
+              (decoded (decode-time time))
+              )
+          (setq time
+                (encode-time
+                 0
+                 0
+                 0
+                 (fourth decoded)
+                 (fifth decoded)
+                 (sixth decoded)
+                 )
+                )
+          )
+        )
+      (when (and
+             (time-less-p nil time)
+             (time-less-p time schedule-time)
+             )
+        (warn
+         "Future time %s will be hidden by the schedule %s"
+         (format-time-string "<%Y-%m-%d %H:%M>" time)
+         (format-time-string "<%Y-%m-%d %H:%M>" schedule-time)
+         )
+        )
+      )
+    )
+  )
+
+(advice-add #'org-insert-time-stamp :after #'konix/org-insert-time-stamp/check-if-hidden)
 
 (defvar konix/org-view-mode nil)
 (make-variable-buffer-local 'konix/org-view-mode)

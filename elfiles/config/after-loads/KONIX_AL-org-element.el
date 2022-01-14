@@ -59,8 +59,41 @@
 				(org-element-property :year-end timestamp)
 				)
 			   )
+			)
+		  )
+		)
+	  )
+	)
+  )
 
-
+(defun konix/org-extract-active-timestamps (&optional no-subtree)
+  (save-excursion
+	(save-restriction
+	  (if no-subtree
+          (konix/org-narrow-to-entry-no-subtree)
+        (org-narrow-to-subtree)
+        )
+	  (goto-char (point-min))
+	  ;; extract all the dates
+	  (org-element-map
+		  (org-element-parse-buffer)
+		  '(timestamp)
+		(lambda (timestamp)
+		  (if (and
+               timestamp
+               (member
+			    (org-element-property :type timestamp)
+			    '(active active-range)
+			    )
+               )
+			  (encode-time
+			   0
+			   (or (org-element-property :minute-start timestamp) 0)
+			   (or (org-element-property :hour-start timestamp) 0)
+			   (org-element-property :day-start timestamp)
+			   (org-element-property :month-start timestamp)
+			   (org-element-property :year-start timestamp)
+			   )
 			)
 		  )
 		)

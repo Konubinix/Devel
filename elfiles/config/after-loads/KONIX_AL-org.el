@@ -190,24 +190,15 @@
 (defun konix/org-add-timestamp ()
   (interactive)
   (let* (
-         (time (if current-prefix-arg
-                   (konix/org-with-point-at-clocked-entry (konix/org-get-time))
-                 (konix/org-with-point-on-heading (konix/org-get-time))
-                 ))
+         (time (org-read-date t t))
          (konix/org-log-into-drawer "TIMESTAMP")
          (cmd (lambda nil
                 (progn
                   (goto-char (org-log-beginning t))
                   (save-excursion (insert "\n"))
                   (org-indent-line)
-                  (insert (format
-                           "- On %s: <%s>"
-                           (format-time-string
-			                (org-time-stamp-format 'long 'inactive)
-                            (current-time)
-                            )
-                           time)
-                          )
+                  (insert (format-time-string "- On [%Y-%m-%d %a %H:%M]: " (current-time)))
+                  (org-insert-time-stamp time t)
                   )
                 ))
          )

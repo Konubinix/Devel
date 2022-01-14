@@ -696,8 +696,8 @@
                    )
          (links (sort (append backlinks reflinks)
                       (lambda (node1 node2)
-                        (string< (org-roam-node-title node1)
-                                 (org-roam-node-title node2)))))
+                        (string< (downcase (org-roam-node-title node1))
+                                 (downcase (org-roam-node-title node2))))))
          )
     (when links
       (goto-char (point-max))

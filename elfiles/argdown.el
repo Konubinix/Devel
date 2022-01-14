@@ -30,6 +30,8 @@
    ("^\\[\\([^]]+\\)\\]:" (1 font-lock-function-name-face))
    (" \\+ <\\([^>]+\\)>:" (1 font-lock-function-name-face))
    (" \\- <\\([^>]+\\)>:" (1 font-lock-function-name-face))
+   (" \\+ \\[\\([^]]+\\)\\]:" (1 font-lock-function-name-face))
+   (" \\- \\[\\([^]]+\\)\\]:" (1 font-lock-function-name-face))
    )
  "Specific argdown construct to highlight."
  )

@@ -6130,6 +6130,14 @@ You should check this is not a mistake."
     )
   )
 
+(defun konix/org-narrow-to-entry-no-subtree ()
+  (interactive)
+  (save-excursion
+    (org-back-to-heading)
+    (narrow-to-region (point) (org-entry-end-position))
+    )
+  )
+
 (when-let (
            (already-loaded-org-files
             (->> (buffer-list)

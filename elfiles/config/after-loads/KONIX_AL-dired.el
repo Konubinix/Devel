@@ -263,6 +263,24 @@
   (image-dired-dired-display-image)
   (call-interactively 'dired-mark)
   )
+
+(defun konix/dired-ipfa ()
+  (interactive)
+  (let (
+        (current-directory (file-name-directory (dired-get-file-for-visit)))
+        (current-file (file-name-nondirectory (dired-get-file-for-visit)))
+        result
+        )
+    (with-temp-buffer
+      (cd current-directory)
+      (call-process "ipfa" nil (current-buffer) nil current-file)
+      (kill-new (setq result (s-trim (buffer-substring-no-properties (point-min) (point-max)))))
+      )
+    (message "Put %s in the kill ring" result)
+    )
+  )
+
+(define-key dired-mode-map (kbd "I") 'konix/dired-ipfa)
 (define-key dired-mode-map (kbd "v") 'konix/image-dired-dired-display-image-mark-and-next)
 (define-key dired-mode-map (kbd "V") 'image-dired-mark-and-display-next)
 (define-key dired-mode-map (kbd "M-v") 'image-dired-display-thumb)

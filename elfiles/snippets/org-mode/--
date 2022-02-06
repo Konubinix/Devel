@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: --
+# key: --
+# --
+- [ ] `(format-time-string "[%Y-%m-%d %a %H:%M]")` Moi :: $300
+-$0

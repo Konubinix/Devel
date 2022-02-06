@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: is-sourced
+# key: is-sourced
+# --
+! [ "$BASH_SOURCE" == "$0" ] && $100

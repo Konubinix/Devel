@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# no argument means ooen the current directory
+# no argument means on the current directory
 if test -z "$*"
 then
 	set "."
 fi
+
+# when run from ssh, I don't want emacs to be run in the graphical user
+# interface
+source _tmux_unset_display_maybe.sh
 
 # first, find out whether there is a server to connect to
 if test -e "${TMPDIR}/${UID}/server" || test -e "/run/user/${UID}/emacs/server"

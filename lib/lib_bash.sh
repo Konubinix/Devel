@@ -1,3 +1,14 @@
+td ( ) {
+    if [ "${DISPLAY}" == "" ]
+    then
+        echo "Setting display" >&2
+        sd
+    else
+        echo "Unseting display" >&2
+        ud
+    fi
+}
+
 function uniq_no_sort {
     # https://stackoverflow.com/questions/11532157/remove-duplicate-lines-without-sorting
     awk '!x[$0]++'

@@ -274,8 +274,12 @@
     (with-temp-buffer
       (cd current-directory)
       (call-process "ipfa" nil (current-buffer) nil current-file)
-      (kill-new (setq result (s-trim (buffer-substring-no-properties (point-min) (point-max)))))
+      (setq result (s-trim (buffer-substring-no-properties (point-min) (point-max))))
       )
+    (when current-prefix-arg
+      (setq result (s-replace "filename=" "" result))
+      )
+    (kill-new result)
     (message "Put %s in the kill ring" result)
     )
   )

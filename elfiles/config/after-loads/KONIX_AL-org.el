@@ -3365,16 +3365,6 @@ of the clocksum."
     )
   )
 
-(defcustom konix/org-mode-font-lock-keywords
-  '(
-    )
-  "Font lock keywords used in org-mode"
-  :type '(repeat
-          (cons (string :tag "Regexp")
-                (sexp :tag "Face") )
-          )
-  )
-
 (defun konix/org-guess-ispell ()
   (interactive)
   (org-with-wide-buffer
@@ -3400,13 +3390,47 @@ of the clocksum."
   (konix/org-guess-ispell)
   )
 
+(defface konix/org-checkbox-done '((t :foreground "forest green" :inherit bold))
+  "Face for checkboxes."
+  :group 'konix/org-faces)
+
+(defface konix/org-checkbox-doing '((t :foreground "orange" :inherit bold))
+  "Face for checkboxes."
+  :group 'konix/org-faces)
+
+(defface konix/org-checkbox-todo '((t :inherit (bold konix/org-next-face)))
+  "Face for checkboxes."
+  :group 'konix/org-faces)
+
+
 (defun konix/org-mode-hook()
   "My org mode hook."
   ;; my todo tasks may be very big, with clocks and logs and...  Thus, only
   ;; delete the trailing whitespaces on org roam notes, meant to be of rghuman
   ;; size.
   (setq konix/delete-trailing-whitespace (org-roam-file-p))
-  (font-lock-add-keywords nil konix/org-mode-font-lock-keywords)
+  ;; somehow, I cannot set this hook outiside of from the org-mode hook
+  (defun konix/org-font-lock-set-keywords-hook ()
+    (add-to-list
+     'org-font-lock-extra-keywords
+     '("\\(\\[X\\]\\)"
+       1 'konix/org-checkbox-done prepend)
+     t
+     )
+    (add-to-list
+     'org-font-lock-extra-keywords
+     '("\\(\\[ \\]\\)"
+       1 'konix/org-checkbox-todo prepend)
+     t
+     )
+    (add-to-list
+     'org-font-lock-extra-keywords
+     '("\\(\\[-\\]\\)"
+       1 'konix/org-checkbox-doing prepend)
+     t
+     )
+    )
+  (add-hook 'org-font-lock-set-keywords-hook #'konix/org-font-lock-set-keywords-hook)
   (setq-local yas-indent-line 'fixed)
   (goto-address-mode 1)
   (require 'foldout)

@@ -2350,6 +2350,7 @@ items"
                         )
                   )
                  (
+                  (org-agenda-todo-ignore-scheduled 'future)
                   (org-agenda-skip-function
                    '(or
                      (konix/org-agenda-for-today-skip-if-not-the-good-time)

@@ -257,7 +257,7 @@
      ((string-match ".*youtube.com/watch\\?.*v=\\([^&]+\\)" url)
       (format "{{{youtube(%s)}}}" (match-string 1 url))
       )
-     ((string-match "https://\\(skeptikon.+\\|peertube.+\\|video.antopie.+\\)/videos/watch/\\(.+\\)" url)
+     ((string-match "https://\\(skeptikon.+\\|peertube.+\\|video.antopie.+\\)/\\(?:videos/watch\\|w\\)/\\(.+\\)" url)
       (format "{{{peertube(%s,%s)}}}" (match-string 1 url) (match-string 2 url))
       )
      ((string-match "https://\\(skeptikon.+\\|peertube.+\\|video.antopie.+\\)/static/torrents/\\(.+\\)-[0-9]+.torrent" url)

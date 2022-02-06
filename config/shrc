@@ -41,11 +41,3 @@ fi
 # Import my custom functions
 # ################################################################################
 source "${KONIX_LIB_DIR}/lib_bash.sh"
-
-# Log sur l'agent SSH
-if is_on_linux
-then
-	konix_gpg_use
-	GPG_TTY=$(tty)
-    export GPG_TTY
-fi

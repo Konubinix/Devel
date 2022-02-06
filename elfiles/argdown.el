@@ -24,23 +24,33 @@
 
 ;;; Code:
 
+(defface argdown-supportive-claim-face '((t :foreground "green"))
+  "Face for argdown supportive claims."
+  :group 'argdown)
+
+(defface argdown-unsupportive-claim-face '((t :foreground "red"))
+  "Face for argdown unsupportive claims."
+  :group 'argdown)
+
+(defface argdown-countradict-claim-face '((t :foreground "red"))
+  "Face for argdown countradict claims."
+  :group 'argdown)
+
 (defvar
- argdown-highlights
- '(
-   ("^\\[\\([^]]+\\)\\]:" (1 font-lock-function-name-face))
-   (" \\+ <\\([^>]+\\)>:" (1 font-lock-function-name-face))
-   (" \\- <\\([^>]+\\)>:" (1 font-lock-function-name-face))
-   (" \\+ \\[\\([^]]+\\)\\]:" (1 font-lock-function-name-face))
-   (" \\- \\[\\([^]]+\\)\\]:" (1 font-lock-function-name-face))
-   )
- "Specific argdown construct to highlight."
- )
+  argdown-highlights
+  '(
+    ("\\[\\([^]]+\\)\\]:?" (1 font-lock-function-name-face))
+    ("<\\([^>]+\\)>:?" (1 font-lock-function-name-face))
+    ("^ +\\(\\+\\) " (1 'argdown-supportive-claim-face))
+    ("^ +\\(\\-\\) " (1 'argdown-unsupportive-claim-face))
+    ("^ +\\(><\\) " (1 'argdown-countradict-claim-face))
+    )
+  "Specific argdown construct to highlight."
+  )
 
 (define-derived-mode argdown-mode markdown-mode "argdown"
   "Major mode for editing argdown document."
-  (setq
-   font-lock-defaults '(argdown-highlights)
-   )
+  (setq font-lock-defaults '(argdown-highlights))
   (setq-local
    markdown-asymmetric-header t
    markdown-unordered-list-item-prefix "  + "

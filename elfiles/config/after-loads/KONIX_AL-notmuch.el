@@ -430,6 +430,7 @@ Message-Id: <%s>" id)
   (let (
         (id (notmuch-show-get-message-id))
         (subject (notmuch-show-get-subject))
+        res
         )
     (with-temp-buffer
       (call-process
@@ -441,13 +442,15 @@ Message-Id: <%s>" id)
        "ipfa"
        id
        )
-      (message
-       "%s?filename=%s.rfc822"
-       (string-trim (buffer-substring-no-properties (point-min)
-                                                    (point-max)))
-       (url-hexify-string subject)
-       )
+      (setq res (format
+                 "%s?filename=%s.rfc822"
+                 (string-trim (buffer-substring-no-properties (point-min)
+                                                              (point-max)))
+                 (url-hexify-string subject)
+                 )
+            )
       )
+    (kill-new res)
     )
   )
 

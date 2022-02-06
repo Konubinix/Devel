@@ -18,17 +18,17 @@ then
 		# if a window already exists, simply reach it
 		if wmctrl -l -x|grep -q '.Emacs'
 		then
-			emacsclient "$@"
+			exec emacsclient "$@"
 		else
 			# in case a window does not exist (the server must have been opened
 			# in the tty somewhere, create a new frame)
-			emacsclient --create-frame "$@"
+			exec emacsclient --create-frame "$@"
 		fi
 	else
 		# on a terminal, make sure to make it run on not in window mode
-		emacsclient -nw "$@"
+		exec emacsclient -nw "$@"
 	fi
 else
 	# no running emacs yet, simply run emacs then
-	emacs "$@"
+	exec emacs "$@"
 fi

@@ -57,6 +57,83 @@
    )
   )
 
+(defun argdown/org-babel-execute:argdown/html-handler (dir argdown-file)
+  (let* (
+         (argdown-html (expand-file-name "html" dir))
+         (argdown-component (expand-file-name "test.component.html" argdown-html))
+         )
+    (org-babel-eval (format "argdown web-component %s %s" argdown-file
+                            argdown-html) "")
+    (with-temp-buffer
+      (insert-file-contents argdown-component)
+      (buffer-string)
+      )
+    )
+  )
+
+(defun argdown/org-babel-execute:argdown/png-handler (dir argdown-file)
+  (let* (
+         (argdown-images (expand-file-name "images" dir))
+         (argdown-component (expand-file-name "test.png" argdown-images))
+         )
+    (org-babel-eval (format "argdown map --format png %s %s" argdown-file
+                            argdown-images) "")
+    ()
+    (with-temp-buffer
+      (insert-file-contents argdown-component)
+      (concat (konix/ipfa-buffer) "?a.png")
+      )
+    )
+  )
+
+(defun argdown/org-babel-execute:argdown/pdf-handler (dir argdown-file)
+  (let* (
+         (argdown-pdf (expand-file-name "pdf" dir))
+         (argdown-component (expand-file-name "test.pdf" argdown-pdf))
+         )
+    (org-babel-eval (format "argdown map --format pdf %s %s" argdown-file
+                            argdown-pdf) "")
+    ()
+    (with-temp-buffer
+      (insert-file-contents argdown-component)
+      (concat (konix/ipfa-buffer) "?a.pdf")
+      )
+    )
+  )
+
+(defun org-babel-execute:argdown (body params)
+  (let* (
+         (results-params (cdr (assq :result-params params)))
+         (handler (cond
+                   ((member "html" results-params)
+                    #'argdown/org-babel-execute:argdown/html-handler
+                    )
+                   ((member "png" results-params)
+                    #'argdown/org-babel-execute:argdown/png-handler
+                    )
+                   ((member "pdf" results-params)
+                    #'argdown/org-babel-execute:argdown/pdf-handler
+                    )
+                   (t
+                    (error "Invalid results: %s" results-params)
+                    )
+                   )
+                  )
+         (dir (make-temp-file "argdown" t))
+         (argdown-file (expand-file-name "test.argdown" dir))
+         )
+    (unwind-protect
+        (progn
+          (with-temp-file argdown-file
+            (insert (org-babel-expand-body:generic body params))
+            )
+          (funcall handler dir argdown-file)
+          )
+      (delete-directory dir t)
+      )
+    )
+  )
+
 
 (provide 'argdown)
 ;;; argdown.el ends here

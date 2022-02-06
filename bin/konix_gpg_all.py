@@ -95,7 +95,7 @@ def process_file(abs_file, decrypt):
             LOGGER.info("encrypt " + abs_file + " to " + encrypted_file_name)
             retcode = subprocess.call([
                 gpg_path, "-o", encrypted_file_name, "-r", DEFAULT_RECIPIENT,
-                "-e", abs_file
+                "--sign", "-e", abs_file
             ])
             if retcode == 0:
                 LOGGER.info("removing old file " + abs_file)

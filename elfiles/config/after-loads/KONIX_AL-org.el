@@ -1402,7 +1402,13 @@ items"
                              )
                            konix/org-gtd-agenda
                            )
-                          ))
+                          )
+                         (org-agenda-skip-function
+                          '(or
+                            (konix/org-agenda-for-today-skip-if-not-the-good-time)
+                            )
+                          )
+                         )
                         )
                   (tags-todo "-C_me-C_society-maybe-background"
                              (
@@ -1482,11 +1488,6 @@ items"
                   (org-agenda-todo-ignore-with-date nil)
                   (org-agenda-todo-ignore-deadlines nil)
                   (org-agenda-todo-ignore-timestamp nil)
-                  (org-agenda-skip-function
-                   '(or
-                     (konix/org-agenda-for-today-skip-if-not-the-good-time)
-                     )
-                   )
                   )
                  )
                 ("apA" "All (no filtering, no promises)"

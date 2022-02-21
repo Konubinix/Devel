@@ -45,12 +45,9 @@
 	)
   )
 
-(defun konix/outline/global-cycle ()
+(defun konix/outline/global-hide ()
   (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (outline-cycle)
-    )
+  (outline-hide-sublevels 1)
   )
 
 (defun konix/outline/setup-keys (map)
@@ -58,7 +55,7 @@
     (define-key map (kbd "<backtab>") 'konix/outline/global-cycle)
     (define-key map (kbd "<C-tab>") 'hide-sublevels)
     (define-key map (kbd "<f1>") 'konix/outline-zoom-out)
-    (define-key map (kbd "<f2> <f1>") 'konix/outline/global-cycle)
+    (define-key map (kbd "<f2> <f1>") 'konix/outline/global-hide)
     (define-key map (kbd "<f2> <f3>") 'show-all)
     (define-key map (kbd "<f3>") 'konix/outline-show-children-or-entry)
     ;; (define-key map (kbd "<tab>") 'outline-cycle)

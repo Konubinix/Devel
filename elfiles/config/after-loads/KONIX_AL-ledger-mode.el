@@ -70,7 +70,19 @@ register \
 [[ledger-mode-flags]] \
 register \
 --limit 'date <= today' \
-^Unknown or \\( not %twin and \\( :Virtual:Temp or :Virtual:Health or :Virtual:Auto \\) and not Lasting \\)")
+^Unknown or \\( not %twin and \\( :Virtual:Temp or :Virtual:Auto \\) and not Lasting \\)")
+ )
+
+;; health reimbursement need a separate analysis because they are almost always
+;; uncertain
+(konix/push-or-replace-assoc-in-alist
+ 'ledger-reports
+ '("health twinable"
+   "ledger -f %(ledger-file) \
+[[ledger-mode-flags]] \
+register \
+--limit 'date <= today' \
+\\( not %twin and Health:Lasting \\) Unknown")
  )
 
 (konix/push-or-replace-assoc-in-alist

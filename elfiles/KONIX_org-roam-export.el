@@ -102,7 +102,7 @@
              nil
              org-roam-directory
              publish-dir
-             org-roam-db-location
+             (expand-file-name org-roam-db-location)
              kind
              )
             )

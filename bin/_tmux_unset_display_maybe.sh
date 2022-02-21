@@ -5,7 +5,7 @@
     exit 1
 }
 
-if tmux_run_from_ssh.sh 
+if konix_run_from_tmux.sh && tmux_run_from_ssh.sh
 then
-            unset DISPLAY
+    unset DISPLAY
 fi

@@ -451,6 +451,7 @@ Message-Id: <%s>" id)
             )
       )
     (kill-new res)
+    (message "Saved %s" res)
     )
   )
 

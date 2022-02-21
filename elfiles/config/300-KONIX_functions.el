@@ -1371,7 +1371,8 @@ Version 2016-09-02"
          (temp-file-name (concat temp-file ".en.srv1"))
          data)
     (when (and (call-process "youtube-dl" nil nil nil
-                             "--write-sub" "--write-auto-sub"  "--no-warnings" "--sub-lang" "en" "--skip-download" "--sub-format" "srv1"
+                             "--write-sub" "--write-auto-sub"  "--no-warnings"
+                             "--sub-lang" (if current-prefix-arg "fr" "en") "--skip-download" "--sub-format" "srv1"
                              "-o" temp-file
                              (format "https://youtube.com/watch?v=%s" id))
                (file-exists-p temp-file-name))

@@ -14,12 +14,12 @@ def get_utc_timezone():
 
 def naive_to_local(naive, tz=None):
     tz = tz or get_local_timezone()
-    return tz.localize(naive, is_dst=None)
+    return tz.localize(naive, is_dst=False)
 
 
 def naive_to_utc(naive):
     tz = get_utc_timezone()
-    return tz.localize(naive, is_dst=None)
+    return tz.localize(naive, is_dst=False)
 
 
 def date_to_tz(dt, tz=None):
@@ -38,29 +38,20 @@ def date_to_naive(dt):
 
 def naive_to_local_to_utc_to_naive(naive, tz=None):
     tz = tz or get_local_timezone()
-    return date_to_naive(
-        date_to_utc(
-            naive_to_local(naive, tz)
-        )
-    )
+    return date_to_naive(date_to_utc(naive_to_local(naive, tz)))
 
 
 def naive_to_utc_to_local_to_naive(naive, tz=None):
     tz = tz or get_local_timezone()
-    return date_to_naive(
-        date_to_tz(
-            naive_to_utc(naive),
-            tz,
-        )
-    )
+    return date_to_naive(date_to_tz(
+        naive_to_utc(naive),
+        tz,
+    ))
 
 
 def date_to_local(date, tz=None):
     tz = tz or get_local_timezone()
-    return date_to_tz(
-        date,
-        tz
-    )
+    return date_to_tz(date, tz)
 
 
 # cf http://stackoverflow.com/questions/4563272/how-to-convert-a-python-utc-datetime-to-a-local-datetime-using-only-python-stand/13287083#13287083

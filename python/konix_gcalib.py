@@ -66,7 +66,9 @@ class OutOfDateError(Exception):
 
 
 def lazy(expire_key):
+
     def real_decorator(func):
+
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if self.db.get(self.db_name_transform(expire_key)):
@@ -90,7 +92,9 @@ class EventNotFound(BaseException):
 
 
 def needs(expire_key):
+
     def real_decorator(func):
+
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if not (self.db.get(self.db_name_transform(expire_key))
@@ -114,7 +118,9 @@ def needs(expire_key):
 
 
 def provides(key, interactive=False):
+
     def real_decorator(func):
+
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             return func(self, *args, **kwargs)
@@ -133,6 +139,7 @@ PROMPT = "GCal({calendar_id}, {event_list_extra_query}, {time_min}, {time_max})\
 
 
 class GCall(cmd.Cmd, object):
+
     def __init__(self, make_place=False, account=""):
         cmd.Cmd.__init__(self)
         self.account = account
@@ -374,11 +381,18 @@ Attendees:
                                    self.organizer.get("email", "NA")),
                 "\n".join(
                     map(
-                        lambda a: " - {} ({}) ({})".format(
+                        lambda a: " - [{}] {} ({}) ({})".format(
+                            {
+                                "accepted": "X",
+                                "needsAction": "-",
+                                "declined": " "
+                            }.get(a.get("responseStatus"), "-"),
                             a.get("email", "NA"),
                             a.get("responseStatus"),
                             a.get("comment", "no comment"),
-                        ), self.attendees)),
+                        ),
+                        self.attendees,
+                    ), ),
                 re.sub("^\*",
                        ",*",
                        self.text_description.strip(),
@@ -756,6 +770,7 @@ Attendees:
 
     @needs("access_token")
     def get_events(self, calendar_id, extra_query=None):
+
         def get_events(page_token=None):
             url = 'https://www.googleapis.com/calendar/v3/calendars/{}/events?maxResults=2500&singleEvents=True'.format(
                 urllib.parse.quote(calendar_id))

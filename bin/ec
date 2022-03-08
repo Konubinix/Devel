@@ -8,6 +8,7 @@ fi
 
 # when run from ssh, I don't want emacs to be run in the graphical user
 # interface
+export DISPLAY=:0
 source _tmux_unset_display_maybe.sh
 
 # first, find out whether there is a server to connect to

@@ -36,14 +36,19 @@
 (add-to-list 'safe-local-variable-values '(konix/python-mode/flycheck))
 (make-variable-buffer-local 'konix/python-mode/flycheck)
 
+(defun konix/python-is-tiltfile ()
+  (and (buffer-file-name) (string-match-p "^.*Tiltfile.*$"
+                                          (buffer-file-name)))
+  )
+
 (defun konix/python-mode-hook ()
   (setq tab-width 4)
-  (when (and (buffer-file-name) (string-match-p "^.*Tiltfile.*$" (buffer-file-name)))
+  (when (konix/python-is-tiltfile)
     (setq konix/python-mode/flycheck nil)
     )
   (konix/prog/config)
   (when konix/python-mode/yapf
-      (yapf-mode)
+    (yapf-mode)
     )
   (add-hook 'before-save-hook
             'py-isort-before-save)
@@ -62,6 +67,7 @@
               )
   (when (and
          (executable-find "jedi-language-server")
+         (not (konix/python-is-tiltfile))
          )
     (require 'lsp)
     (require 'lsp-jedi)

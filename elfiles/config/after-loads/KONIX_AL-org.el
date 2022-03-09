@@ -66,6 +66,18 @@
    )
   )
 
+(defun konix/org-agenda-gtd-get-clear ()
+  (org-ql-search
+    (org-agenda-files)
+    '(and
+      (ts :from -7 :to today)
+      (not (tags "structure" "habit" "temp"))
+      )
+    :title "Recent Items"
+    :sort '(date)
+    )
+  )
+
 (defvar konix/org-inhibit-update-date nil)
 
 (defun konix/org-update-date ()

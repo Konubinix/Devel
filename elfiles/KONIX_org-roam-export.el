@@ -603,7 +603,8 @@
               )
         (forward-line)
         )
-      (insert "#+HUGO: more")
+      (insert "#+HUGO: more
+")
       )
     )
   )

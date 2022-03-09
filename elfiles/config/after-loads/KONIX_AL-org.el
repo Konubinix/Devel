@@ -5569,7 +5569,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
         )
       (insert "\n")
       (org-indent-line)
-      (insert "\n#+name: " (uuidgen-4) "\n#+BEGIN_QUOTE\n" decoded-body "\n\n" decoded-url "\n#+END_QUOTE\n"))
+      (insert "\n#+name: " (uuidgen-4) "\n#+BEGIN_QUOTE\n" decoded-body "\n\n-- " decoded-url "\n#+END_QUOTE\n"))
     )
   )
 

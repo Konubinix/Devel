@@ -313,7 +313,8 @@ ${title}
               )
             )
           (require 'uuidgen)
-          (insert "\n\n#+name: " (uuidgen-4) "\n#+BEGIN_QUOTE\n" decoded-body "\n\n" decoded-url "\n#+END_QUOTE\n"))
+          (insert "\n\n#+name: " (uuidgen-4) "\n#+BEGIN_QUOTE\n" decoded-body
+                  "\n\n-- " decoded-url "\n#+END_QUOTE\n"))
         )
       )
     (pop-to-buffer buffer)

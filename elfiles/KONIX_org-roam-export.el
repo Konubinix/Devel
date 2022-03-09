@@ -44,30 +44,6 @@
    )
   )
 
-(defun konix/org-roam-export/org-transclusion-before-kill/prevent-it (orig-fun
-                                                                      &rest
-                                                                      args)
-  ;; noop
-  )
-
-(defun konix/org-roam-export/org-hugo-export-wim-to-md/prevent-org-transclusion-kill-behavior
-    (orig-fun &rest args)
-  ;; the before kill advice of org-transclusion saves the buffer, persisting all
-  ;; the temporary stuff we put in the buffer during export
-  (advice-add #'org-transclusion-before-kill :around
-              #'konix/org-roam-export/org-transclusion-before-kill/prevent-it)
-  (let (
-        (res (apply orig-fun args))
-        )
-    ;; now, I can remove the advice that prevented the org-transclusion behavior
-    ;; that persisted the temporary stuff
-    (advice-remove #'org-transclusion-before-kill
-                   #'konix/org-roam-export/org-transclusion-before-kill/prevent-it)
-    res
-    )
-  )
-(advice-add #'org-hugo-export-wim-to-md :around #'konix/org-roam-export/org-hugo-export-wim-to-md/prevent-org-transclusion-kill-behavior)
-
 (defun konix/org-roam-export/export-all (&optional kind incremental)
   "Re-exports all Org-roam files to Hugo markdown."
   (interactive)
@@ -191,7 +167,7 @@
                    )
               (with-current-buffer (find-file f)
                 (message "Exporting %s" f)
-                (org-hugo-export-wim-to-md)
+                (konix/org-roam-export/export-buffer)
                 )
               )
             (rename-file outfile new-outfile)
@@ -208,10 +184,56 @@
   (message "Everyting was exported")
   )
 
+(defvar-local konix/org-roam-export/buffer-file-name nil)
+
+(defun konix/org-roam-export/get-buffer-file-name ()
+  (file-truename
+   (or
+    konix/org-roam-export/buffer-file-name
+    (buffer-file-name)
+    )
+   )
+  )
+
+(defun konix/org-roam-export/export-buffer ()
+  (interactive)
+  (let* (
+         (content (org-with-wide-buffer
+                   (buffer-substring-no-properties (point-min) (point-max))
+                   )
+                  )
+         (buffer (generate-new-buffer (buffer-name)))
+         (konix/org-roam-export/buffer-file-name-to-save (file-truename
+                                                          (buffer-file-name)))
+         (directory (file-name-directory konix/org-roam-export/buffer-file-name-to-save))
+         )
+    (save-window-excursion
+      (unwind-protect
+          (with-current-buffer buffer
+            (cd directory)
+            (insert content)
+            (org-mode)
+            (let (
+                  ;; don't bother messing up a temporary buffer while reformating it for
+                  ;; better export
+                  (inhibit-read-only t)
+                  (org-export-with-tags nil)
+                  )
+              (setq konix/org-roam-export/buffer-file-name konix/org-roam-export/buffer-file-name-to-save)
+              (konix/org-roam-export/apply-transformations)
+              (org-hugo-export-wim-to-md)
+              )
+            )
+        (kill-buffer buffer)
+        )
+      )
+    )
+  )
+
 (defun konix/org-roam-export/extract-kind (&optional filename)
   (or
    (konix/org-roam-export/extract-kind-unsafe filename)
-   (error "%s is not exported" (or filename (buffer-file-name)))
+   (error "%s is not exported" (or filename (konix/org-roam-export/get-buffer-file-name)))
    )
   )
 
@@ -392,7 +414,7 @@
         (node (save-excursion (goto-char (point-min)) (org-roam-node-at-point)))
         )
     (format "https://konubinix.eu/%s/posts/%s/?title=%s"
-            (konix/org-roam-export/extract-kind (buffer-file-name))
+            (konix/org-roam-export/extract-kind (konix/org-roam-export/get-buffer-file-name))
             (org-roam-node-id node)
             (org-roam-node-slug node)
             )
@@ -404,7 +426,7 @@
   (if (and
        (not current-prefix-arg)
        (equal major-mode 'org-mode)
-       (string-prefix-p org-roam-directory (buffer-file-name))
+       (string-prefix-p org-roam-directory (konix/org-roam-export/get-buffer-file-name))
        )
       (let (
             (url (konix/org-roam-export/get-url))
@@ -558,14 +580,6 @@
           (insert "\n#+HUGO_ALIASES: " id " " legacy-id)
           )
         )
-      (goto-char (point-max))
-      (insert
-       (format "\n* [[https://konubinix.eu/%s%s?title=%s][Permalink]]"
-               (konix/org-roam-export/extract-kind)
-               id
-               (org-roam-node-slug (konix/org-roam-node-file-node))
-               )
-       )
       )
     )
   )
@@ -661,7 +675,7 @@
 
 (defun konix/org-roam-export/add-backlinks ()
   (let* (
-         (kind (konix/org-roam-export/extract-kind (buffer-file-name)))
+         (kind (konix/org-roam-export/extract-kind (konix/org-roam-export/get-buffer-file-name)))
          (nodes (konix/org-roam-nodes-in-file))
          (ids (->> nodes
                    (-map 'org-roam-node-id)
@@ -887,7 +901,7 @@
          (external-ids-to-replace '())
          (mykind (konix/org-roam-export/extract-kind-unsafe))
          (internal-ids-to-replace '())
-         (my-directory (file-name-directory (file-truename (buffer-file-name))))
+         (my-directory (file-name-directory (file-truename (konix/org-roam-export/get-buffer-file-name))))
          )
     (->>
      (org-element-map (org-element-parse-buffer)
@@ -995,10 +1009,10 @@ citation key, for Org-ref cite links."
   ""
   (when (and
          (equal major-mode 'org-mode)
-         (string-match-p org-roam-directory (buffer-file-name))
-         (not (string-match-p org-roam-dailies-directory (buffer-file-name)))
+         (string-match-p org-roam-directory (konix/org-roam-export/get-buffer-file-name))
+         (not (string-match-p org-roam-dailies-directory (konix/org-roam-export/get-buffer-file-name)))
          ;; first time saving
-         (not (file-exists-p (buffer-file-name)))
+         (not (file-exists-p (konix/org-roam-export/get-buffer-file-name)))
          (not (konix/org-roam-exported-p))
          )
     (let (
@@ -1032,39 +1046,91 @@ citation key, for Org-ref cite links."
           'konix/org-mode-hook/org-roam-export)
 
 
-(defun konix/org-roam-export/org-export-preprocessor (_backend)
-  (when (konix/org-roam-export/extract-kind-unsafe)
-    (let (
-          ;; don't bother messing up a temporary buffer while reformating it for
-          ;; better export
-          (inhibit-read-only t)
-          )
-      (konix/org-roam-export/remove-org-backlinks)
-      ;; already done in the theme by Jethro
-      (konix/org-roam-export/add-backlinks)
-      (konix/org-roam-export/add-refs)
-      ;; (konix/org-roam-export/add-roam-alias)
-      (konix/org-roam-export/assert-no-konix-org-roam-links)
-      (konix/org-roam-export/setup-hugo-dates)
-      (konix/org-roam-export/add-id-as-hugo-aliases)
-      ;; need to perform a slug function that roam no longer exposes
-      ;; (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
-      (konix/org-roam-export/copy-roam-tags-into-hugo-tags)
-      (konix/org-roam-export/add-more)
-      (konix/org-roam-export/load-transclusion)
-      ;; I need to put stuff that modify the buffer after loading the
-      ;; transclusion
-      (konix/org-roam-export/convert-standalone-links)
-      (konix/org-roam-export/convert-remaining-ipfs-links)
-      (konix/org-roam-replace-roam-links-with-hugo-compatible-ones)
-      ;; so that hugo won't complain if it finds the id in the current buffer
-      ;; and wants to kill it
-      (set-buffer-modified-p nil)
+(defun konix/org-roam-export/set-export-file-name ()
+  (save-excursion
+    (goto-char (point-min))
+    (while (looking-at "^:")
+      (forward-line)
+      )
+    (insert "#+EXPORT_FILE_NAME: " (konix/org-roam-export/get-buffer-file-name) "\n")
+    )
+  )
+
+(defun konix/org-roam-export/add-bibliography ()
+  (when
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward "cite:" nil t)
+        )
+    (save-excursion
+      (goto-char (point-max))
+      (let* (
+             (language (konix/org-roam-export/get-language))
+             (text (cond
+                    ((string-equal language "fr")
+                     "Bibliographie"
+                     )
+                    ((string-equal language "en")
+                     "Bibliography"
+                     )
+                    (t
+                     (error "Unsupported language %s" language)
+                     )
+                    )
+                   )
+             )
+        (insert (format "* %s\n" text))
+        )
+      (insert "#+print_bibliography:")
       )
     )
   )
 
-(add-hook 'org-export-before-processing-hook #'konix/org-roam-export/org-export-preprocessor)
+(defun konix/org-roam-export/add-permalinks ()
+  (when-let*
+      (
+       (legacy-id (progn (goto-char (point-min)) (org-id-get)))
+       (id (format "/%s" legacy-id))
+       )
+    (save-excursion
+      (goto-char (point-max))
+      (insert
+       (format "\n* [[https://konubinix.eu/%s%s?title=%s][Permalink]]"
+               (konix/org-roam-export/extract-kind)
+               id
+               (org-roam-node-slug (konix/org-roam-node-file-node))
+               )
+       "\n"
+       )
+      )
+    )
+  )
+
+(defun konix/org-roam-export/apply-transformations ()
+  (when (konix/org-roam-export/extract-kind-unsafe)
+    (konix/org-roam-export/set-export-file-name)
+    (konix/org-roam-export/remove-org-backlinks)
+    ;; already done in the theme by Jethro
+    (konix/org-roam-export/add-backlinks)
+    (konix/org-roam-export/add-refs)
+    ;; (konix/org-roam-export/add-roam-alias)
+    (konix/org-roam-export/assert-no-konix-org-roam-links)
+    (konix/org-roam-export/setup-hugo-dates)
+    (konix/org-roam-export/add-id-as-hugo-aliases)
+    ;; need to perform a slug function that roam no longer exposes
+    ;; (konix/org-roam-export/copy-roam-aliases-into-hugo-aliases)
+    (konix/org-roam-export/copy-roam-tags-into-hugo-tags)
+    (konix/org-roam-export/add-more)
+    (konix/org-roam-export/add-bibliography)
+    (konix/org-roam-export/add-permalinks)
+    (konix/org-roam-export/load-transclusion)
+    ;; I need to put stuff that modify the buffer after loading the
+    ;; transclusion
+    (konix/org-roam-export/convert-standalone-links)
+    (konix/org-roam-export/convert-remaining-ipfs-links)
+    (konix/org-roam-replace-roam-links-with-hugo-compatible-ones)
+    )
+  )
 
 
 (provide 'KONIX_org-roam-export)

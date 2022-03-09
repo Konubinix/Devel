@@ -3457,6 +3457,7 @@ of the clocksum."
   (local-set-key (kbd "C-c e") 'org-table-edit-field)
   (local-set-key (kbd "C-c <down>") 'konix/org-checkbox-toggle-and-down)
   (local-set-key (kbd "C-c <up>") 'konix/org-checkbox-toggle-and-up)
+  (define-key org-mode-map (kbd "M-o") 'org-open-at-point)
   (define-key org-mode-map (kbd "M-n") 'org-next-link)
   (define-key org-mode-map (kbd "M-p") 'org-previous-link)
   (define-key org-mode-map (kbd "C-k") 'konix/org-kill)

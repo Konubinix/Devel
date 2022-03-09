@@ -4880,6 +4880,7 @@ of the clocksum."
     (define-key map (kbd "<SPC>") 'konix/org-gtd-context-edit-toggle-comment-forward)
     (define-key map (kbd "<DEL>") 'konix/org-gtd-context-edit-toggle-comment-backward)
     (define-key map (kbd "k") '(lambda () (interactive) (save-buffer) (bury-buffer)))
+    (define-key map (kbd "C") '(lambda () (interactive) (save-buffer) (bury-buffer)))
     (define-key map (kbd "i") '(lambda () (interactive) (save-buffer) (bury-buffer)))
     (define-key map (kbd "o") 'konix/org-gtd-context-open-ref)
     map))

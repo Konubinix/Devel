@@ -30,6 +30,8 @@
 (depends-on "envrc")
 (depends-on "feature-mode")
 (depends-on "flycheck")
+(depends-on "git-timemachine")
+(depends-on "git-wip-timemachine")
 (depends-on "gited")
 (depends-on "gnus-alias")
 (depends-on "go-dlv")

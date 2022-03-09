@@ -117,7 +117,9 @@
 (defun konix/dired-mode-hook()
   ;; copy and paste in dired
   (auto-revert-mode 1)
-  (dired-omit-mode t)
+  (unless (string= (file-truename default-directory) (file-truename (file-name-directory auto-save-list-file-prefix)))
+      (dired-omit-mode t)
+    )
   (turn-on-tempbuf-mode)
   (setq tempbuf-timeout 3600) ; time before next grace
   (setq-local tempbuf-minimum-timeout tempbuf-timeout) ; base time after next grace

@@ -457,7 +457,12 @@ ${title}
          (buffer (save-window-excursion
                    (or
                     (and current-prefix-arg
-                         (org-roam-node-find))
+                         (progn
+                           (org-roam-node-find)
+                           (current-buffer)
+                           )
+
+                         )
                     (if-let (
                              (node (org-roam-node-from-ref url))
                              )

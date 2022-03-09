@@ -12,6 +12,7 @@
 (depends-on "cask")
 (depends-on "cheat-sh")
 (depends-on "circe")
+(depends-on "citeproc-org") ; to use oc-csl.el
 (depends-on "cmake-mode")
 (depends-on "counsel")
 (depends-on "cquery")

@@ -27,7 +27,8 @@
 (require 'uuidgen)
 (require 'KONIX_org-roam-export)
 (require 'org-roam-dailies)
-
+(require 'oc)
+(require 'oc-csl)
 
 (define-key org-mode-map (kbd "C-c n l") #'org-roam-buffer-toggle)
 (define-key org-mode-map (kbd "C-c n t") #'konix/org-roam-export/toggle-publish)
@@ -635,6 +636,9 @@ ${title}
 
 
 (setq-default org-cite-global-bibliography (list (expand-file-name "refs.bib" org-roam-directory)))
+(setq-default org-cite-export-processors (list
+                                          (cons t `(csl ,(expand-file-name "refs.csl" org-roam-directory)))
+                                          ))
 (setq-default bibtex-completion-bibliography org-cite-global-bibliography)
 
 (org-link-set-parameters "konix-org-roam"

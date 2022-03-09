@@ -105,7 +105,7 @@
           ;; the closest one.
           (org-element-lineage
            (org-element-context)
-           '(comment paragraph item link)
+           '(comment paragraph item link citation-reference)
            t))
          (type (org-element-type context))
          (value (org-element-property :value context))

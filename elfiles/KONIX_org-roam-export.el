@@ -35,7 +35,7 @@
    (string-trim
     (shell-command-to-string
      (format
-      "grep -r -l '#+KONIX_ORG_PUBLISH_KIND: %s' %s"
+      "grep -r -l '#+KONIX_ORG_PUBLISH_KIND: %s' %s|grep -v '#$'"
       kind
       org-roam-directory
       )
@@ -71,8 +71,6 @@
 (defun konix/org-roam-export/export-all (&optional kind incremental)
   "Re-exports all Org-roam files to Hugo markdown."
   (interactive)
-  (toggle-debug-on-error)
-  (global-auto-revert-mode 1)
   (setq kind (or kind "blog"))
   (assert (not (string= "" kind)))
   (let*  (

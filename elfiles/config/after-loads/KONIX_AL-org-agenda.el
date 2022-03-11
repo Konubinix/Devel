@@ -1444,7 +1444,7 @@
    )
   )
 
-(setq-default konix/org-agenda-highlight-inactive-with-subtree nil)
+(setq-default konix/org-agenda-highlight-inactive-with-subtree t)
 (make-variable-buffer-local 'konix/org-agenda-highlight-inactive-with-subtree)
 (setq-default konix/org-agenda-highlight-inactive-day 10)
 (make-variable-buffer-local 'konix/org-agenda-highlight-inactive-day)

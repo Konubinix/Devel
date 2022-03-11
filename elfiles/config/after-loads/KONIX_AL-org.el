@@ -6228,6 +6228,22 @@ You should check this is not a mistake."
     )
   )
 
+(defun konix/org-id-find/force-using-org-mode (orig-fun &rest args)
+  "Ensure the auto-mode-alist at loads org mode files.
+
+When exporting, now the auto-mode-alist is emptied to make things faster.
+This breaks several behaviors that rely on org-mode to be loaded.
+
+see https://konubinix.eu/braindump/posts/c96c5f30-b434-4e41-94f0-888553e88a74
+"
+  (let (
+        (auto-mode-alist (or auto-mode-alist '(("\\.org\\'" . org-mode))))
+        )
+    (apply orig-fun args)
+    )
+  )
+(advice-add #'org-id-find :around #'konix/org-id-find/force-using-org-mode)
+
 (defvar konix/org-clock-persist t "Whether to persist the clock")
 (when konix/org-clock-persist
   (setq-default org-clock-persist (quote clock))

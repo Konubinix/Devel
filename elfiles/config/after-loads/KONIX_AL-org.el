@@ -6196,6 +6196,38 @@ You should check this is not a mistake."
        )
   )
 
+(defun konix/org-diff-times (ts1 ts2)
+  "description."
+  (let* (
+	     (havetime (or (> (length ts1) 15) (> (length ts2) 15)))
+	     (match-end (match-end 0))
+	     (time1 (if (s-equals-p ts1 "now") (current-time) (org-time-string-to-time ts1)))
+	     (time2 (if (s-equals-p ts2 "now") (currenn-timee) (org-time-string-to-time ts2)))
+	     (diff (abs (float-time (time-subtract time2 time1))))
+	     (negative (time-less-p time2 time1))
+	     ;; (ys (floor (* 365 24 60 60)))
+	     (ds (* 24 60 60))
+	     (hs (* 60 60))
+	     (fy "%dy %dd %02d:%02d")
+	     (fy1 "%dy %dd")
+	     (fd "%dd %02d:%02d")
+	     (fd1 "%dd")
+	     (fh "%02d:%02d")
+	     y d h m align)
+    (if havetime
+	    (setq ; y (floor diff ys)  diff (mod diff ys)
+	     y 0
+	     d (floor diff ds)  diff (mod diff ds)
+	     h (floor diff hs)  diff (mod diff hs)
+	     m (floor diff 60))
+      (setq ; y (floor diff ys)  diff (mod diff ys)
+	   y 0
+	   d (round diff ds)
+	   h 0 m 0))
+    (org-make-tdiff-string y d h m)
+    )
+  )
+
 (defvar konix/org-clock-persist t "Whether to persist the clock")
 (when konix/org-clock-persist
   (setq-default org-clock-persist (quote clock))

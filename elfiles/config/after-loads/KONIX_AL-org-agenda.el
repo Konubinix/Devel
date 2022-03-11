@@ -196,7 +196,7 @@
 (define-key org-agenda-mode-map (kbd "#") 'konix/org-agenda-count-entries)
 (define-key org-agenda-mode-map (kbd "U") 'konix/org-agenda-unhighlight)
 (define-key org-agenda-mode-map (kbd "D") 'konix/org-agenda-hide-done)
-
+(define-key org-agenda-mode-map (kbd "]") 'konix/org-goto-first-open-list-entry)
 
 (defun konix/org-agenda-edit-headline ()
   (interactive)

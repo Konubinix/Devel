@@ -582,6 +582,7 @@
 
 (define-key 'konix/org-global-map (kbd "M-e") 'konix/org-adjust-effort)
 (define-key 'konix/org-global-map "j" 'konix/org-jump-to)
+(define-key 'konix/org-global-map "]" 'konix/org-goto-first-open-list-entry)
 (define-key 'konix/org-global-map "e" 'konix/org-clock-echo)
 (define-key 'konix/org-global-map (kbd "C-i") 'konix/org-clock-back-previous-task)
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)

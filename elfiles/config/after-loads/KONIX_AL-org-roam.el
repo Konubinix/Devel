@@ -313,8 +313,8 @@ ${title}
               )
             )
           (require 'uuidgen)
-          (insert "\n\n#+name: " (uuidgen-4) "\n#+BEGIN_QUOTE\n" decoded-body
-                  "\n\n-- " decoded-url "\n#+END_QUOTE\n"))
+          (insert "\n#+name: " (uuidgen-4) "\n#+BEGIN_QUOTE\n" decoded-body
+                  "\n\n--- " decoded-url "\n#+END_QUOTE\n"))
         )
       )
     (pop-to-buffer buffer)
@@ -480,7 +480,7 @@ ${title}
       (while (search-forward "#+END_QUOTE" nil t)
         (save-excursion
           (forward-line 0)
-          (insert "\n" url "\n")
+          (insert "\n--- " url "\n")
           )
         )
       (goto-char (point-min))

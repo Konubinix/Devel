@@ -582,7 +582,7 @@
 
 (define-key 'konix/org-global-map (kbd "M-e") 'konix/org-adjust-effort)
 (define-key 'konix/org-global-map "j" 'konix/org-jump-to)
-(define-key 'konix/org-global-map "]" 'konix/org-goto-first-open-list-entry)
+(define-key 'konix/org-global-map "]" 'konix/org-goto-first-open-list-entry-in-clocked-entry)
 (define-key 'konix/org-global-map "e" 'konix/org-clock-echo)
 (define-key 'konix/org-global-map (kbd "C-i") 'konix/org-clock-back-previous-task)
 (define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
@@ -591,7 +591,6 @@
 (define-key 'konix/org-global-map "O" 'org-clock-out)
 (define-key 'konix/org-global-map "I" 'org-clock-in-last)
 (define-key 'konix/org-global-map "c" 'org-capture)
-(define-key 'konix/org-global-map "]" 'konix/org-goto-next-open-list-entry)
 (define-key 'konix/org-global-map (kbd "M-c") 'konix/org-capture-na-in-heading)
 (define-key 'konix/org-global-map (kbd "M-d") 'konix/org-capture-diary-in-heading)
 (define-key 'konix/org-global-map (kbd "C-e") 'org-clock-modify-effort-estimate)

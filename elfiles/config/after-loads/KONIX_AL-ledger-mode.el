@@ -562,6 +562,7 @@ of the transaction.
 (define-key ledger-mode-map (kbd "C-c c") #'ledger-mode-clean-buffer)
 (define-key ledger-mode-map (kbd "C-c C-o") #'org-open-at-point-global)
 (define-key ledger-mode-map (kbd "C-c C-l") #'org-insert-link-global)
+(define-key ledger-mode-map (kbd "M-o") 'org-open-at-point)
 
 
 (defun konix/ledger/completion-at-point/ensure-has-id ()

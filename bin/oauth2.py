@@ -239,6 +239,8 @@ def RefreshToken(client_id, client_secret, refresh_token):
     params['grant_type'] = 'refresh_token'
     request_url = AccountsUrl('o/oauth2/token')
     resp = requests.post(request_url, json=params)
+    if resp.status_code // 100 != 2:
+        raise Exception(resp.text)
     return resp.json()
 
 

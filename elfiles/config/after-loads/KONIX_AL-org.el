@@ -46,7 +46,7 @@
 (setq-default org-deadline-warning-days -10000)
 (setq-default org-adapt-indentation t)
 (setq-default org-fontify-quote-and-verse-blocks t)
-
+(setq-default org-duration-format '(("h") (special . h:mm)))
 ;; ####################################################################################################
 ;; Init hook
 ;; ####################################################################################################

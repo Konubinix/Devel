@@ -5466,6 +5466,12 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   (konix/org-goto-next-open-list-entry)
   )
 
+(defun konix/org-goto-first-open-list-entry-in-clocked-entry ()
+  (interactive)
+  (org-clock-goto)
+  (konix/org-goto-first-open-list-entry)
+  )
+
 (defun konix/org-next-visible-heading-and-center nil
   (interactive)
   (call-interactively 'org-next-visible-heading)

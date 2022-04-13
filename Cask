@@ -28,6 +28,7 @@
 (depends-on "elnode")
 (depends-on "emacs-everywhere")
 (depends-on "envrc")
+(depends-on "earthfile-mode")
 (depends-on "feature-mode")
 (depends-on "flycheck")
 (depends-on "git-timemachine")

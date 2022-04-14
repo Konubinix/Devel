@@ -11,4 +11,4 @@ trap "exit 3" SIGQUIT
 
 ROAM="$1"
 KIND="$2"
-grep -r -l "#+KONIX_ORG_PUBLISH_KIND: ${KIND}" "${ROAM}"
+grep -r -l "^#+KONIX_ORG_PUBLISH_KIND: ${KIND}" "${ROAM}"

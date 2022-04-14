@@ -35,7 +35,7 @@
    (string-trim
     (shell-command-to-string
      (format
-      "grep -r -l '#+KONIX_ORG_PUBLISH_KIND: %s' %s|grep -v '#$'"
+      "grep -r -l '^#+KONIX_ORG_PUBLISH_KIND: %s' %s|grep -v '#$'"
       kind
       org-roam-directory
       )

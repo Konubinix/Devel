@@ -10,4 +10,4 @@ trap "exit 2" SIGINT
 trap "exit 3" SIGQUIT
 
 ROAM="$1"
-grep -r -l '#+KONIX_ORG_PUBLISH_KIND:' "${ROAM}"
+grep -r -l '^#+KONIX_ORG_PUBLISH_KIND:' "${ROAM}"

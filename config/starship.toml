@@ -1,20 +1,31 @@
-[custom.hostname]
-command = "echo ${HOSTNAME}"
+add_newline = false
+format = "$username$custom$git_branch$git_status$git_metrics$directory$kubernetes$gcloud$all$line_break$character"
+[git_metrics]
+disabled = false
+[hostname]
+disabled = true
+[username]
+disabled = true
+[custom.userhost]
+command = 'echo "$USER@$(tput setaf ${HOSTNAME_COLOR:-7})${HOSTNAME}"'
 when = "true"
-description = "show hostname"
+description = "show user and host names"
+style = "bold yellow"
 [custom.date]
 command = "date +%H:%M:%S"
 when = "true"
 description = "show date"
+style = 'bold blue'
+format = '[$symbol($output )]($style)'
 [python]
 python_binary = "python3"
-[[battery.display]]
-threshold = 30
-style = "bold red"
 [battery]
 full_symbol = "🔋"
 charging_symbol = "⚡️"
 discharging_symbol = "💀"
+[[battery.display]]
+threshold = 30
+style = "bold red"
 [directory]
 truncation_length = 7
 truncate_to_repo = false
@@ -22,8 +33,8 @@ truncate_to_repo = false
 success_symbol = "[✔](bold green) "
 error_symbol = "[✗](bold red) "
 [kubernetes]
-format = 'on [⛵ $context \($namespace\)](dimmed green) '
-disabled = true
+format = '[⛵ $context \($namespace\)](dimmed green) '
+disabled = false
 # disabled = false
 [kubernetes.context_aliases]
 "k3d-k3s-default" = "dev"

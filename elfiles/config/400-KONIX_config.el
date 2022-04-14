@@ -699,7 +699,7 @@
 (setq-default
  custom-safe-themes
  '(
-   "9e3ea605c15dc6eb88c5ff33a82aed6a4d4e2b1126b251197ba55d6b86c610a1"
+   "b77a00d5be78f21e46c80ce450e5821bdc4368abf4ffe2b77c5a66de1b648f10"
    default)
  )
 

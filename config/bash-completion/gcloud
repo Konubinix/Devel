@@ -1,5 +1,5 @@
 #!/bin/bash -eu
 
-COMPLETION_SCRIPT="$(dirname "$(readlink -f "$(which gcloud)")")/../../share/bash-completion/completions/gcloud.inc"
+COMPLETION_SCRIPT="$(dirname "$(readlink -f "$(which gcloud)")")/../../share/bash-completion/completions/gcloud"
 
 source "${COMPLETION_SCRIPT}"

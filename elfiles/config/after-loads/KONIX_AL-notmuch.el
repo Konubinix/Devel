@@ -415,13 +415,12 @@ Message-Id: <%s>" id)
   (interactive)
   (konix/notmuch-add-tag "noreply")
   )
-(defun konix/notmuch-show-open-in-external-browser ()
+(defun konix/notmuch-show-unpack-ipfs ()
   (interactive)
-  (start-process
-   "open_external_browser"
-   nil
-   "konix_notmuch_view_html.sh"
-   (notmuch-show-get-message-id)
+  (shell-command
+   (format
+    "konix_notmuch_unpack_ipfs.sh %s &"
+    (notmuch-show-get-message-id))
    )
   )
 
@@ -455,10 +454,6 @@ Message-Id: <%s>" id)
     )
   )
 
-(defun konix/notmuch-show-open-in-explorer ()
-  (interactive)
-  (notmuch-show-pipe-message nil "konix_view_html.sh t")
-  )
 
 (defun konix/notmuch-message-completion-toggle ()
   (interactive)
@@ -590,10 +585,9 @@ inspired from `notmuch-show-archive-thread-internal'"
 (konix/notmuch-define-key-search-show (kbd "a") 'konix/notmuch-archive)
 (konix/notmuch-define-key-search-show (kbd "") 'konix/notmuch-archive)
 (define-key notmuch-search-mode-map (kbd "F") 'konix/notmuch-search-unflag-remove-read-and-next)
-(define-key notmuch-search-mode-map (kbd "F") 'konix/notmuch-search-unflag-remove-read-and-next)
 (define-key notmuch-search-mode-map (kbd "r") 'konix/notmuch-search-add-noreply)
 (define-key notmuch-show-mode-map (kbd "M")
-  'konix/notmuch-show-open-in-external-browser)
+  'konix/notmuch-show-unpack-ipfs)
 (define-key notmuch-show-mode-map (kbd "I")
   'konix/notmuch-show/ipfa)
 (define-key notmuch-show-mode-map (kbd "C-r") 'konix/notmuch-show-add-noreply)

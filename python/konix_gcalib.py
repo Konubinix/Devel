@@ -271,14 +271,14 @@ class GCall(cmd.Cmd, object):
 
         def print_diary(self):
             print("{}-{} {} ({}) [{}]".format(
-                self.startdate.strftime("%Y-%m-%d %H:%M"),
+                self.startdate.strftime("%Y-%m-%d %a %H:%M"),
                 self.enddate.strftime("%H:%M"), self.summary, self.htmlLink,
                 self.id))
 
         @property
         def org_mode_timestamp(self):
             stamp = "<{}-{}".format(
-                self.startdate.strftime("%Y-%m-%d %H:%M"),
+                self.startdate.strftime("%Y-%m-%d %a %H:%M"),
                 self.enddate.strftime("%H:%M"),
             )
             if self.recurrence:
@@ -371,9 +371,9 @@ Attendees:
                 self.organizer.get("displayName",
                                    self.organizer.get("email", "NA")),
                 date_to_local(parser.parse(
-                    self.created)).strftime("[%Y-%m-%d %H:%M]"),
+                    self.created)).strftime("[%Y-%m-%d %a %H:%M]"),
                 date_to_local(parser.parse(
-                    self.updated)).strftime("[%Y-%m-%d %H:%M]"),
+                    self.updated)).strftime("[%Y-%m-%d %a %H:%M]"),
                 self.updated,
                 "t" if optional else "nil",
                 self.org_mode_timestamp,

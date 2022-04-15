@@ -4297,6 +4297,46 @@ of the clocksum."
 (advice-add 'org-set-tags :before
             #'konix/org-set-tags/check-maybe-commitment)
 
+(defun konix/org-set-tags/link-maybe-and-dream (orig-func tags)
+  (let* ((tags (pcase tags
+		         ((pred listp) tags)
+		         ((pred stringp) (split-string (org-trim tags) ":" t))
+		         (_ (error "Invalid tag specification: %S" tags))))
+         (old-tags (org-get-tags nil t))
+         (tags-change? (not (equal tags old-tags)))
+         )
+    (when (and
+           tags-change?
+           (and
+            ;; added dream
+            (not (member "dream" old-tags))
+            (member "dream" tags)
+            )
+           ;; but no maybe
+           (not (member "maybe" tags))
+           )
+      ;; then add maybe
+      (setq tags (append tags '("maybe")))
+      )
+    (when (and
+           tags-change?
+           (and
+            ;; removed maybe
+            (member "maybe" old-tags)
+            (not (member "maybe" tags))
+            )
+           ;; and still is a dream
+           (member "dream" tags)
+           )
+      ;; then remove dream as well
+      (setq tags (remove-if (-partial #'string-equal "dream") tags))
+      )
+    (apply orig-func tags nil)
+    )
+  )
+(advice-add 'org-set-tags :around
+            #'konix/org-set-tags/link-maybe-and-dream)
+
 (defun konix/org-gcal-reset-tags ()
   (org-agenda-set-tags "needsAction" 'off)
   (org-agenda-set-tags "declined" 'off)

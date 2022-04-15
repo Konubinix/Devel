@@ -46,3 +46,4 @@ application/vnd.sqlite3=sqlitebrowser.desktop;
 audio/flac=vlc.desktop;
 audio/mp4=vlc.desktop;
 text/vtt=emacsclient.desktop;
+application/vnd.ms-3mfdocument=cura.desktop;

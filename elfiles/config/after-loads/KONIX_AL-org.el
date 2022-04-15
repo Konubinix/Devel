@@ -2491,6 +2491,135 @@ items"
                 )
               )
 
+(defun konix/org-gtd-triage ()
+  (interactive)
+  (defun konix/org-gtd-triage/ask (message)
+    (y-or-n-p (format "%s\n%s" (konix/org-get-heading) message))
+    )
+  (catch 'exit
+    (konix/org-agenda-edit-headline)
+    (when (string-equal (konix/org-get-heading) "")
+      (org-agenda-kill)
+      (throw 'exit nil)
+      )
+    (when (konix/org-gtd-triage/ask (format "Change todo state (%s)"
+                                            (konix/org-with-point-on-heading
+                                             (org-get-todo-state))))
+      (org-agenda-todo)
+      )
+    (when (and
+           (konix/org-with-point-on-heading (org-entry-is-todo-p))
+           (and
+            (not (or
+                  (member "project" (konix/org-get-tags))
+                  (->> (konix/org-get-tags)
+                       (-filter (-partial #'string-prefix-p "@"))
+                       )
+                  ))
+            )
+           )
+      (cond
+       ((konix/org-gtd-triage/ask "Add project?")
+        (konix/org-with-point-on-heading
+         (org-toggle-tag "project" 'on)
+         )
+        (konix/org-agenda-refresh-line)
+        )
+       ((konix/org-gtd-triage/ask "Add context/agenda?")
+        (org-agenda-set-tags
+         (completing-read
+          "Contexts/agenda: "
+          (->> (konix/org-all-tags) (-filter (-partial #'string-prefix-p "@")))
+          )
+         )
+        )
+       )
+      )
+    (when (and
+           (member "project" (konix/org-get-tags))
+           (not (konix/org-with-point-on-heading (konix/org-project-has-next-action)))
+           (konix/org-gtd-triage/ask "Add next action")
+           )
+      (call-interactively 'konix/org-capture-na-in-heading)
+      (throw 'exit nil)
+      )
+    (when (and
+           (konix/org-with-point-on-heading (org-entry-is-todo-p))
+           (not (konix/org-with-point-on-heading (org-get-scheduled-time (point))))
+           (konix/org-gtd-triage/ask "Schedule")
+           )
+      (call-interactively 'org-agenda-schedule)
+      )
+    (when (and
+           (konix/org-with-point-on-heading (org-entry-is-todo-p))
+           (not (konix/org-with-point-on-heading (org-get-deadline-time (point))))
+           (konix/org-gtd-triage/ask "Deadline")
+           )
+      (call-interactively 'org-agenda-deadline)
+      )
+    (when (and
+           (not
+            (konix/org-with-point-on-heading (org-entry-is-done-p))
+            )
+           (konix/org-gtd-triage/ask "Add timestamp")
+           )
+      (konix/org-add-timestamp)
+      )
+    (when (and
+           (not
+            (->> (konix/org-get-tags)
+                 (-filter (-partial #'string-prefix-p "c_"))
+                 )
+            )
+           (konix/org-gtd-triage/ask "Add commitment")
+           )
+      (org-agenda-set-tags (completing-read "Commitment: " (konix/org-gtd-all-commitments)) 'on)
+      )
+    (when (and
+           (konix/org-with-point-on-heading (org-entry-is-todo-p))
+           (not (member "maybe" (konix/org-get-tags)))
+           (not (member "DELEGATED" (konix/org-get-tags)))
+           (not (member "WAITING" (konix/org-get-tags)))
+           (konix/org-gtd-triage/ask "Add a maybe/DELEGATED/WAITING stuff")
+           )
+      (org-agenda-set-tags)
+      )
+    (when (and
+           (member "interruption" (konix/org-get-tags))
+           (not (member "goodtime" (konix/org-get-tags)))
+           (not (member "badtime" (konix/org-get-tags)))
+           (not (member "neutraltime" (konix/org-get-tags)))
+           )
+      (let (
+            (tag (completing-read "Time judgment" '("neutraltime" "goodtime" "badtime")))
+            )
+        (org-agenda-set-tags tag 'on)
+        )
+      )
+    (if (member "refile" (konix/org-get-tags))
+        (konix/org-agenda-refile-noupdate)
+      (konix/org-agenda-filter-for-now)
+      )
+    )
+  )
+
+(defun konix/org-gtd-triage-all ()
+  (interactive)
+  (unless
+      (equal (save-excursion
+               (beginning-of-line)
+               (point)
+               )
+             (point-min))
+    (forward-line -1)
+    )
+  (while (konix/org-agenda-next-entry)
+    (konix/org-gtd-triage)
+    ;; it makes the line disapear
+    (forward-line -1)
+    )
+  )
+
 (setq-default org-agenda-diary-file (concat org-directory "/diary.org"))
 (setq-default org-agenda-insert-diary-strategy 'top-level)
 ;; to have entries of type * 9pm stuff to timed entry

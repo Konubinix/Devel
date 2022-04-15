@@ -49,6 +49,9 @@
 (define-key org-agenda-mode-map (kbd "+")
   'konix/org-capture-na-in-heading)
 
+(define-key org-agenda-mode-map (kbd "M-t")
+  'konix/org-gtd-triage-all)
+
 (define-key org-agenda-mode-map (kbd "-")
   #'(lambda () (interactive) (message "Intentionally disable -")))
 

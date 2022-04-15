@@ -1535,9 +1535,6 @@ items"
                      )
                    )
                   )
-                 (
-                  ,(format "%s/radicale/agenda.ics" (getenv "KONIX_PERSO_DIR"))
-                  )
                  )
                 ("apw" "Work (no filtering)"
                  (
@@ -1597,9 +1594,6 @@ items"
                   (org-agenda-todo-ignore-deadlines nil)
                   (org-agenda-todo-ignore-timestamp nil)
                   )
-                 ;; (
-                 ;;  ,(format "%s/radicale/collection-root/sam/todos.ics" (getenv "KONIX_PERSO_DIR"))
-                 ;;  )
                  )
                 ("anr" "With filters, empty context also"
                  (
@@ -2100,9 +2094,6 @@ items"
                  (
                   (dummy (setq konix/org-agenda-type 'agenda))
                   )
-                 (
-                  ;;,(format "%s/radicale/collection-root/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
-                  )
                  )
                 ("atm" "Agenda of the next month"
                  (
@@ -2133,9 +2124,6 @@ items"
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'agenda))
-                  )
-                 (
-                  ;;,(format "%s/radicale/collection-root/sam/calendar.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("atM" "Agenda of the past and next months"
@@ -2169,9 +2157,6 @@ items"
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'agenda))
-                  )
-                 (
-                  ,(format "%s/radicale/calendar.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("ag" . "GTD list views")
@@ -2354,9 +2339,6 @@ items"
                   )
                  (
                   )
-                 (
-                  ,(format "%s/radicale/ril.ics" (getenv "KONIX_PERSO_DIR"))
-                  )
                  )
                 ("agb" "Web"
                  (
@@ -2375,25 +2357,6 @@ items"
                      )
                    )
                   )
-                 (
-                  ,(format "%s/radicale/web.ics" (getenv "KONIX_PERSO_DIR"))
-                  )
-                 )
-                ("agg" "Garden"
-                 (
-                  (tags-todo "@garden-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe|@car-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe"
-                             (
-                              (org-agenda-overriding-header
-                               "Garden")
-                              )
-                             )
-                  )
-                 (
-                  (org-agenda-todo-ignore-scheduled 'future)
-                  )
-                 (
-                  ,(format "%s/radicale/garden.ics" (getenv "KONIX_PERSO_DIR"))
-                  )
                  )
                 ("ags" "SMS & Calls"
                  (
@@ -2411,9 +2374,6 @@ items"
                      (konix/org-agenda-for-today-skip-if-not-the-good-time)
                      )
                    )
-                  )
-                 (
-                  ,(format "%s/radicale/sms_n_calls.ics" (getenv "KONIX_PERSO_DIR"))
                   )
                  )
                 ("agw" "Waiting for list (no filter context)"
@@ -4563,54 +4523,49 @@ of the clocksum."
  org-edna-finder-cache-timeout 300
  )
 
-(defun konix/org-store-agenda-views ()
-  (interactive)
-  (require 'org-agenda)
-  (require 'ledger-mode) ; to understand the konix/ledger links
-  (save-some-buffers)
-  (message "Exporting all agenda views")
-  (let (
-        (konix/org-agenda-tag-filter-context-p nil)
-        (cmds (org-agenda-normalize-custom-commands org-agenda-custom-commands))
-        thiscmdkey thiscmdcmd bufname cmd cmd-or-set files match
-        (org-export-with-broken-links t)
-        )
-    (while cmds
-      (setq cmd (pop cmds)
-            thiscmdkey (car cmd)
-            thiscmdcmd (cdr cmd)
-            match (nth 2 thiscmdcmd)
-            bufname (if org-agenda-sticky
-                        (or (and (stringp match)
-                                 (format "*Org Agenda(%s:%s)*" thiscmdkey match))
-                            (format "*Org Agenda(%s)*" thiscmdkey))
-                      org-agenda-buffer-name)
-            cmd-or-set (nth 2 cmd)
-            files (nth (if (listp cmd-or-set) 4 5) cmd)
-            )
-      (when files
-        (when (and (not current-prefix-arg) (get-buffer bufname))
-          (message "Killing %s to prevent old content to be exported"
-                   bufname)
-          (kill-buffer bufname)
+(defun konix/org-agenda-export-this (
+                                     thiscmdkey
+                                     files
+                                     &optional keep context filter
+                                     )
+  "FILTER : e.g: '(\"+C_me\")"
+  (save-window-excursion
+    (let (
+          (org-export-with-broken-links t)
+          (konix/org-agenda-tag-filter-context-p nil)
+          (bufname (if org-agenda-sticky
+                       (format "*Org Agenda(%s)*" thiscmdkey)
+                     org-agenda-buffer-name)
+                   )
           )
-        (org-agenda nil thiscmdkey)
-        (with-current-buffer bufname
-          (message "Exporting %s" thiscmdkey)
-          (let (
-                (content (konix/org-agenda-to-ics))
-                )
-            (with-temp-buffer
-              (insert content)
-              (mapc 'write-file files)
+      (when (and (not keep) (not current-prefix-arg) (get-buffer bufname))
+        (message "Killing %s to prevent old content to be exported"
+                 bufname)
+        (kill-buffer bufname)
+        )
+      (org-agenda nil thiscmdkey)
+      (with-current-buffer bufname
+        (when context
+          (konix/org-agenda-reapply-filter-for-context context)
+          )
+        (when filter
+          (org-agenda-filter-apply filter 'tag 'expand)
+          )
+        (message "Exporting %s" thiscmdkey)
+        (let (
+              (content (konix/org-agenda-to-ics))
               )
+          (with-temp-buffer
+            (insert content)
+            (mapc 'write-file files)
             )
           )
-        (bury-buffer)
         )
+      (bury-buffer)
       )
     )
   )
+
 
 (defun konix/org-focus-next ()
   (interactive)

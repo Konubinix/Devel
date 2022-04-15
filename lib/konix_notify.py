@@ -7,11 +7,12 @@ from functools import partial
 from six.moves.xmlrpc_client import ServerProxy
 import os
 import sys
+
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
 
-def by_pynotify(message):
+def by_pynotify(message, urgency):
     import notify2
     if not notify2.init("Message"):
         sys.exit(1)
@@ -20,8 +21,13 @@ def by_pynotify(message):
     n.show()
 
 
-def by_notify_send(message):
-    subprocess.check_call(["notify-send", message])
+def by_notify_send(message, urgency):
+    urgency = {
+        "normal": "normal",
+        "annoying": "normal",
+        "boring": "critical",
+    }[urgency]
+    subprocess.check_call(["notify-send", "--urgency", urgency, message])
 
 
 def by_sl4a(message, type_):
@@ -65,12 +71,12 @@ def local_display(message, unique=False, duration=3000, type_="normal"):
     candidates = [
         by_notify_send,
         by_pynotify,
-        partial(by_sl4a, type_=type_),
+        by_sl4a,
     ]
 
     for candidate in candidates:
         try:
-            candidate(message)
+            candidate(message, type_)
         except Exception as e:
             LOGGER.exception(e)
         else:

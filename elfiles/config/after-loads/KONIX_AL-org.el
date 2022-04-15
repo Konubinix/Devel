@@ -2310,11 +2310,14 @@ items"
                  (
                   (org-super-agenda-groups
                    '(
-                     (:name "No dream"
-                            :not (:tag "dream")
+                     (:name "On hold"
+                            :not (:tag "dream" :tag "ril")
                             )
                      (:name "Dream"
                             :tag "dream"
+                            )
+                     (:name "RIL"
+                            :tag "ril"
                             )
                      )
                    )

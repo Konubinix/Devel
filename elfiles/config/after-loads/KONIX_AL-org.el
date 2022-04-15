@@ -970,29 +970,33 @@ items"
        (and (string= "TODO" (org-get-todo-state))
             (konix/org-is-task-of-project-p)
             )
-       (save-excursion
-         (catch 'found-next-entry
-           (when (org-goto-first-child)
-             (when (and
-                    (string= "NEXT" (org-get-todo-state))
-                    (not (member "maybe" (org-get-tags nil t)))
-                    )
-               (throw 'found-next-entry t)
-               )
-             (while (org-get-next-sibling)
-               (when (and
-                      (string= "NEXT" (org-get-todo-state))
-                      (not (member "maybe" (org-get-tags nil t)))
-                      )
-                 (throw 'found-next-entry t)
-                 )
-               )
-             )
-           )
-         )
+       (konix/org-project-has-next-action)
        )
       (save-excursion (outline-next-heading) (1- (point)))
     nil
+    )
+  )
+
+(defun konix/org-project-has-next-action ()
+  (save-excursion
+    (catch 'found-next-entry
+      (when (org-goto-first-child)
+        (when (and
+               (string= "NEXT" (org-get-todo-state))
+               (not (member "maybe" (org-get-tags nil t)))
+               )
+          (throw 'found-next-entry t)
+          )
+        (while (org-get-next-sibling)
+          (when (and
+                 (string= "NEXT" (org-get-todo-state))
+                 (not (member "maybe" (org-get-tags nil t)))
+                 )
+            (throw 'found-next-entry t)
+            )
+          )
+        )
+      )
     )
   )
 

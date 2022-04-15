@@ -12,19 +12,6 @@
 
 (setq konix/start-calendar nil)
 
-(defun konix/start-calendar nil
-  (toggle-debug-on-error)
-
-  (setq konix/start-calendar t)
-  (setq create-lockfiles nil)
-  (setq konix/org-clock-persist nil)
-  (message "Storing")
-  (konix/org-store-agenda-views)
-  (message "Killing")
-  (kill-emacs)
-  (message "Killed")
-  )
-
 (unless (getenv "KONIX_EMACS_BATCH")
   (server-start)
   )

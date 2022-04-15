@@ -967,6 +967,11 @@
    )
   )
 
+(defun konix/org-agenda-reapply-filter-for-context (context)
+  (org-agenda-filter-show-all-tag)
+  (konix/org-agenda-filter-context_1 (konix/org-agenda-get-context-tags context))
+  )
+
 (defun konix/org-agenda-set-header-line-format nil
   (setq header-line-format '())
   (add-to-list

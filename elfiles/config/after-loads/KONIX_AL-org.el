@@ -3290,6 +3290,25 @@ items"
     )
   )
 
+(defun konix/org-agenda-get-context-tags (context)
+  (list
+   (mapcar
+    (lambda (elem)
+      (concat "@" elem)
+      )
+    (split-string
+     (replace-regexp-in-string
+      "\n"
+      ""
+      (shell-command-to-string
+       (format "konix_gtd_contexts.sh -c %s" context))
+      )
+     " "
+     )
+    )
+   )
+  )
+
 (defun konix/org-agenda-tag-filter-context-initialize-from-context ()
   (setq-default
    konix/org-agenda-tag-filter-contexts

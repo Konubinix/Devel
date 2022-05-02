@@ -92,6 +92,7 @@
   (local-set-key (kbd "M-/") 'dabbrev-expand)
   (local-set-key (kbd "C-z") 'diff-undo)
   (auto-fill-mode 1)
+  (konix/outline/setup-keys diff-mode-map)
   (font-lock-add-keywords
    nil
    '(

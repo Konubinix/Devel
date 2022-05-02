@@ -25,6 +25,11 @@
 ;;; Code:
 
 (defun konix/nix-mode-hook ()
+  (lsp)
+  (add-hook 'before-save-hook
+            #'nix-format-before-save
+            nil
+            t)
   (hs-minor-mode 1)
   )
 

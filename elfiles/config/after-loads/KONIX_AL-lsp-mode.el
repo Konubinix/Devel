@@ -35,5 +35,15 @@
 
 (add-hook 'lsp-mode-hook 'konix/lsp-mode-hook)
 
+(defun konix/lsp-edit-sessions ()
+  (interactive)
+  (find-file lsp-session-file)
+  )
+
+(defun konix/lsp-reload ()
+  (interactive)
+  (lsp--load-default-session)
+  )
+
 (provide 'KONIX_AL-lsp-mode)
 ;;; KONIX_AL-lsp-mode.el ends here

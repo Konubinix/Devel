@@ -138,6 +138,9 @@ This uses `org-read-date', which see."
    )
   (save-window-excursion
     (konix/ledger-visit)
+    (when (buffer-modified-p)
+      (error "Need to save the buffer before doing this")
+      )
     (konix/ledger-add-note)
     (insert (format "justif: %s" value))
     )

@@ -1,1 +1,1 @@
-../../nix-bash-completions/_nix
+../../../../.nix-profile/share/bash-completion/completions/nix-shell

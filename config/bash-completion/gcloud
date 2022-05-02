@@ -1,5 +1,6 @@
 #!/bin/bash -eu
 
-COMPLETION_SCRIPT="$(dirname "$(readlink -f "$(which gcloud)")")/../../share/bash-completion/completions/gcloud"
+ME="$(basename "${BASH_SOURCE[0]}")"
+COMPLETION_SCRIPT="${HOME}/.nix-profile/share/bash-completion/completions/${ME}"
 
 source "${COMPLETION_SCRIPT}"

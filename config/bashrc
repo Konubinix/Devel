@@ -78,6 +78,9 @@ if [ -e "${NIX_SETUP}" ]
 then
     source "${NIX_SETUP}"
 fi
+# run import_env again to avoid nix from putting its binary dir in front of my
+# path
+import_env
 
 if [ -e "$HOME/.cargo/env" ]
 then

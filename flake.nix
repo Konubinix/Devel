@@ -10,7 +10,7 @@
     in {
       packages.x86_64-linux.mysetup = pkgs.buildEnv {
         name = "mysetup";
-        paths = with pkgs; [ nixfmt rnix-lsp nix-bash-completions ];
+        paths = with pkgs; [ nixfmt rnix-lsp ];
       };
     };
 }

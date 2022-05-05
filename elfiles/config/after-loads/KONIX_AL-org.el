@@ -2995,7 +2995,7 @@ items"
     ("neutraltime" . ?n)
     (:endgroup)
     ("maybe" . ?y)
-    ("dream" . ?d)
+    ("dream" . ?D)
     (:startgroup)
     ("effortjudgment")
     (:grouptags)

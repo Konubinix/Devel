@@ -3539,7 +3539,7 @@ of the clocksum."
   ;; delete the trailing whitespaces on org roam notes, meant to be of rghuman
   ;; size.
   (require 'org-roam)
-  (setq konix/delete-trailing-whitespace (org-roam-file-p))
+  (setq konix/delete-trailing-whitespace (and (buffer-file-name) (org-roam-file-p)))
   ;; somehow, I cannot set this hook outiside of from the org-mode hook
   (defun konix/org-font-lock-set-keywords-hook ()
     (add-to-list

@@ -10,7 +10,7 @@
     in {
       packages.x86_64-linux.mysetup = pkgs.buildEnv {
         name = "mysetup";
-        paths = with pkgs; [ kubie ];
+        paths = with pkgs; [ kubie (callPackage ./nix/kubecolor { }) ];
       };
     };
 }

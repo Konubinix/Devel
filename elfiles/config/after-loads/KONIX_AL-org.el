@@ -35,7 +35,6 @@
 (require 'org-expiry)
 (require 'org-collector)
 (require 'org-protocol)
-(require 'org-roam)
 (require 'holidays)
 (require 'ob-python)
 (require 'ob-shell)
@@ -112,6 +111,7 @@
   )
 
 (defun konix/org-open-at-point-move-to-link (orig-fun &rest args)
+  (require 'org-roam)
   (let* ((context
           ;; Only consider supported types, even if they are not
           ;; the closest one.
@@ -3538,6 +3538,7 @@ of the clocksum."
   ;; my todo tasks may be very big, with clocks and logs and...  Thus, only
   ;; delete the trailing whitespaces on org roam notes, meant to be of rghuman
   ;; size.
+  (require 'org-roam)
   (setq konix/delete-trailing-whitespace (org-roam-file-p))
   ;; somehow, I cannot set this hook outiside of from the org-mode hook
   (defun konix/org-font-lock-set-keywords-hook ()
@@ -6107,6 +6108,7 @@ You should check this is not a mistake."
 
 (defun konix/org-agenda-project-workflow-item ()
   (interactive)
+  (require 'org-roam)
   (let* (
          (heading (konix/org-get-heading))
          (deadline-prefix

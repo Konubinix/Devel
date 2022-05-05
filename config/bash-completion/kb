@@ -1,0 +1,7 @@
+#!/bin/bash
+
+COMPLETION_SCRIPT="${HOME}/.nix-profile/share/bash-completion/completions/kubie.bash"
+
+source "${COMPLETION_SCRIPT}"
+
+complete -F _kubiecomplete kb

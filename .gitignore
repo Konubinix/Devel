@@ -13,3 +13,4 @@ devel_bin
 !.pc/series
 exaile
 /.cask-backup
+/result

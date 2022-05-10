@@ -8,9 +8,17 @@
   outputs = { self, nixpkgs }:
     let pkgs = nixpkgs.legacyPackages.x86_64-linux;
     in {
-      packages.x86_64-linux.mysetup = pkgs.buildEnv {
-        name = "mysetup";
-        paths = with pkgs; [ nixfmt rnix-lsp ];
+      packages.x86_64-linux.devel = pkgs.buildEnv {
+        name = "devel";
+        paths = with pkgs; [ nixfmt rnix-lsp direnv ];
+      };
+      packages.x86_64-linux.k8s = pkgs.buildEnv {
+        name = "k8s";
+        paths = with pkgs; [ kubie (callPackage ./nix/kubecolor { }) ];
+      };
+      packages.x86_64-linux.hashicorp = pkgs.buildEnv {
+        name = "hashicorp";
+        paths = with pkgs; [ terraform-ls ];
       };
     };
 }

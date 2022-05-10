@@ -2548,7 +2548,7 @@ items"
     (when (and
            (member "project" (konix/org-get-tags))
            (not (konix/org-with-point-on-heading (konix/org-project-has-next-action)))
-           (konix/org-gtd-triage/ask "Add next action")
+           ;(konix/org-gtd-triage/ask "No need for next action")
            )
       (call-interactively 'konix/org-capture-na-in-heading)
       (throw 'exit nil)
@@ -2556,14 +2556,14 @@ items"
     (when (and
            (konix/org-with-point-on-heading (org-entry-is-todo-p))
            (not (konix/org-with-point-on-heading (org-get-scheduled-time (point))))
-           (konix/org-gtd-triage/ask "Schedule")
+           (konix/org-gtd-triage/ask "Relevant now")
            )
       (call-interactively 'org-agenda-schedule)
       )
     (when (and
            (konix/org-with-point-on-heading (org-entry-is-todo-p))
            (not (konix/org-with-point-on-heading (org-get-deadline-time (point))))
-           (konix/org-gtd-triage/ask "Deadline")
+           (konix/org-gtd-triage/ask "No deadline")
            )
       (call-interactively 'org-agenda-deadline)
       )
@@ -2571,7 +2571,7 @@ items"
            (not
             (konix/org-with-point-on-heading (org-entry-is-done-p))
             )
-           (konix/org-gtd-triage/ask "Add timestamp")
+           (konix/org-gtd-triage/ask "No need to timestamp")
            )
       (konix/org-add-timestamp)
       )
@@ -2581,7 +2581,7 @@ items"
                  (-filter (-partial #'string-prefix-p "c_"))
                  )
             )
-           (konix/org-gtd-triage/ask "Add commitment")
+           ;(konix/org-gtd-triage/ask "Appropriately committed")
            )
       (org-agenda-set-tags
        (completing-read
@@ -2598,7 +2598,7 @@ items"
            (not (member "maybe" (konix/org-get-tags)))
            (not (member "DELEGATED" (konix/org-get-tags)))
            (not (member "WAITING" (konix/org-get-tags)))
-           (konix/org-gtd-triage/ask "Add a maybe/DELEGATED/WAITING stuff")
+           (konix/org-gtd-triage/ask "Still active (maybe/DELEGATED/WAITING)")
            )
       (org-agenda-set-tags)
       )

@@ -188,6 +188,8 @@
     )
   )
 
+(defvar konix/ledger-reconcile-edit/history nil)
+
 (defun konix/ledger-reconcile-edit (new-account)
   (interactive
    (list
@@ -197,7 +199,8 @@
      nil
      nil
      nil
-     'ledger-minibuffer-history
+     'konix/ledger-reconcile-edit/history
+     (and konix/ledger-reconcile-edit/history (car konix/ledger-reconcile-edit/history))
      )
     )
    )

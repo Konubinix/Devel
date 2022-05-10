@@ -73,6 +73,7 @@
 (depends-on "notmuch")
 (depends-on "org")
 (depends-on "org-contrib")
+(depends-on "org-drill")
 (depends-on "org-edna")
 (depends-on "org-mime")
 (depends-on "org-noter")

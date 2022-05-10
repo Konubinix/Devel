@@ -2491,10 +2491,13 @@ items"
                 )
               )
 
+(defvar konix/org-gtd-agenda/history nil)
+(defvar konix/org-gtd-context/history nil)
+
 (defun konix/org-gtd-triage ()
   (interactive)
   (defun konix/org-gtd-triage/ask (message)
-    (y-or-n-p (format "%s\n%s" (konix/org-get-heading) message))
+    (not (y-or-n-p (format "%s\n%s" (konix/org-get-heading) message)))
     )
   (catch 'exit
     (konix/org-agenda-edit-headline)
@@ -2502,9 +2505,11 @@ items"
       (org-agenda-kill)
       (throw 'exit nil)
       )
-    (when (konix/org-gtd-triage/ask (format "Change todo state (%s)"
-                                            (konix/org-with-point-on-heading
-                                             (org-get-todo-state))))
+    (when (and (konix/org-with-point-on-heading (org-entry-is-todo-p))
+               (konix/org-gtd-triage/ask (format "Correct todo state (%s)"
+                                                 (konix/org-with-point-on-heading
+                                                  (org-get-todo-state))))
+               )
       (org-agenda-todo)
       )
     (when (and
@@ -2519,17 +2524,22 @@ items"
             )
            )
       (cond
-       ((konix/org-gtd-triage/ask "Add project?")
+       ((konix/org-gtd-triage/ask "Is a single task?")
         (konix/org-with-point-on-heading
          (org-toggle-tag "project" 'on)
          )
         (konix/org-agenda-refresh-line)
         )
-       ((konix/org-gtd-triage/ask "Add context/agenda?")
+       (t ;(konix/org-gtd-triage/ask "Already correct context/agenda?")
         (org-agenda-set-tags
          (completing-read
           "Contexts/agenda: "
           (->> (konix/org-all-tags) (-filter (-partial #'string-prefix-p "@")))
+          nil
+          nil
+          nil
+          'konix/org-gtd-agenda/history
+          (or (car konix/org-gtd-agenda/history) nil)
           )
          )
         )
@@ -2573,7 +2583,15 @@ items"
             )
            (konix/org-gtd-triage/ask "Add commitment")
            )
-      (org-agenda-set-tags (completing-read "Commitment: " (konix/org-gtd-all-commitments)) 'on)
+      (org-agenda-set-tags
+       (completing-read
+        "Commitment: "
+        (konix/org-gtd-all-commitments) nil nil nil
+        'konix/org-gtd-context/history
+        (or (car konix/org-gtd-context/history) nil)
+        )
+       'on
+       )
       )
     (when (and
            (konix/org-with-point-on-heading (org-entry-is-todo-p))

@@ -38,5 +38,12 @@
     )
   )
 
+(defun konix/org-drill--show-latex-fragments/prevent (orig-fun &rest args))
+
+(advice-add #'org-drill--show-latex-fragments :around
+            #'konix/org-drill--show-latex-fragments/prevent)
+(advice-add #'org--latex-preview-region :around #'konix/org-drill--show-latex-fragments/prevent)
+
+
 (provide 'KONIX_AL-org-drill)
 ;;; KONIX_AL-org-drill.el ends here

@@ -35,7 +35,7 @@
    (string-trim
     (shell-command-to-string
      (format
-      "grep -r -l '^#+KONIX_ORG_PUBLISH_KIND: %s' %s|grep -v '#$'"
+      "grep -r -l '^#+KONIX_ORG_PUBLISH_KIND: %s' %s|grep -v '#$'|grep -v none"
       kind
       org-roam-directory
       )
@@ -1028,9 +1028,7 @@ citation key, for Org-ref cite links."
                 )
           )
       (setq konix/org-roam-auto-publish-last-value kind)
-      (unless (string-equal kind "none")
-        (konix/org-roam-export/toggle-publish kind)
-        )
+      (konix/org-roam-export/toggle-publish kind)
       )
     )
   )

@@ -32,38 +32,6 @@
 (defvar konix/org-wiki-include-list '("bookmarks.org") "")
 (defvar konix/org-wiki-author "Konubinix" nil)
 
-(defun konix/org-publish-hugo (plist filename pub-dir)
-  (when (equal
-         (call-process "grep" nil nil nil "-q" "KONIX_ORG_PUBLISH_KIND" filename)
-         0
-         )
-    (message "Exporting %s" filename)
-    (find-file filename)
-    (org-hugo-export-wim-to-md)
-    )
-  )
-
-(konix/push-or-replace-in-alist
- 'org-publish-project-alist
- "public"
- :base-directory (expand-file-name "wiki/public" perso-dir)
- :publishing-function 'konix/org-publish-hugo
- :publishing-directory "~/hugo/content"
- :exclude-tags '("draft" "noexport" "phantom")
- :exclude "draft_"
- :with-tags nil
- :recursive t
- )
-
-(konix/push-or-replace-in-alist
- 'org-publish-project-alist
- "public_data"
- :base-directory (expand-file-name "wiki/public/data" perso-dir)
- :base-extension 'any
- :recursive t
- :publishing-directory "~/public_html/data"
- :publishing-function 'org-publish-attachment
- )
 
 (provide 'KONIX_AL-org-publish)
 ;;; KONIX_AL-org-publish.el ends here

@@ -20,5 +20,13 @@
         name = "hashicorp";
         paths = with pkgs; [ terraform-ls ];
       };
+      packages.x86_64-linux.threed-print = pkgs.buildEnv {
+        name = "3dprint";
+        paths = with pkgs; [ slic3r ];
+      };
+      packages.x86_64-linux.nodejs = pkgs.buildEnv {
+        name = "nodejs";
+        paths = with pkgs; [ node2nix ];
+      };
     };
 }

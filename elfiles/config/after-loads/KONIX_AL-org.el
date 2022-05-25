@@ -5969,7 +5969,8 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
                       )
              (-map
               (lambda (ts)
-                (warn "Future time %s will be hidden by schedule %s"
+                (warn "%s: Future time %s will be hidden by schedule %s"
+                      (konix/org-get-heading)
                       (format-time-string "<%Y-%m-%d %H:%M>" ts)
                       (format-time-string "<%Y-%m-%d %H:%M>" schedule-time)
                       )

@@ -163,6 +163,7 @@
 (autoload 'konix/git/log/file "KONIX_git" "" t)
 (autoload 'kubel "kubel" "" t)
 (autoload 'argdown-mode "argdown" "" t)
+(autoload 'konix/org-drill-key-map "org-drill" "" t)
 
 ;; ************************************************************
 ;; Automodes

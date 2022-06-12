@@ -71,6 +71,7 @@
 (depends-on "multiple-cursors")
 (depends-on "nix-mode")
 (depends-on "notmuch")
+(depends-on "ol-notmuch")
 (depends-on "org")
 (depends-on "org-contrib")
 (depends-on "org-drill")

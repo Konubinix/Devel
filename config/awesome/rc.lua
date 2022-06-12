@@ -537,7 +537,7 @@ globalkeys = gears.table.join(
    -- Standard program
    awful.key({ modkey,   "Control"        }, "q", open_or_join("qutebrowser", browser),
       {description = "open a browser", group = "launcher"}),
-   awful.key({ modkey,   "Control"        }, "e", open_or_join("Emacs", "ec"),
+   awful.key({ modkey,   "Control"        }, "e", open_or_join("Emacs", "e"),
       {description = "open emacs", group = "launcher"}),
    awful.key({ modkey,   "Control"        }, "f", open_or_join("Firefox", "firefox"),
       {description = "open firefox", group = "launcher"}),
@@ -850,7 +850,7 @@ clientkeys = gears.table.join(
       },
       "j",
       function (c)
-         awful.spawn("ec --eval '(konix/org-capture-interruption)'")
+         awful.spawn("e --eval '(konix/org-capture-interruption)'")
       end ,
       {
          description = "interruption",
@@ -877,7 +877,7 @@ clientkeys = gears.table.join(
       },
       "j",
       function (c)
-         awful.spawn("ec --eval '(konix/org-capture-external-interruption)'")
+         awful.spawn("e --eval '(konix/org-capture-external-interruption)'")
       end ,
       {
          description = "interruption",

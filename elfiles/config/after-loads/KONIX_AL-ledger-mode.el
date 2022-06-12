@@ -82,7 +82,7 @@ register \
 [[ledger-mode-flags]] \
 register \
 --limit 'date <= today' \
-\\( not %twin and Health:Lasting \\) Unknown")
+\\( not %twin and Lasting:Health \\) Unknown")
  )
 
 (konix/push-or-replace-assoc-in-alist

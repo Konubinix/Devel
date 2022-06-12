@@ -149,6 +149,8 @@
 (global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
 (global-set-key (kbd "C-f") 'konix/global-slow-key-map) ;for hacker's keyboard
 
+(define-key 'konix/global-slow-key-map (kbd "D") 'konix/org-drill-key-map)
+
 (define-key 'konix/global-slow-key-map (kbd "%") 'query-replace)
 (define-key 'konix/global-slow-key-map (kbd "*") 'query-replace-regexp)
 

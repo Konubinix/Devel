@@ -38,6 +38,11 @@
     )
   )
 
+(define-prefix-command 'konix/org-drill-key-map)
+(define-key 'konix/org-drill-key-map (kbd "d") 'org-drill)
+(define-key 'konix/org-drill-key-map (kbd "r") 'org-drill-resume)
+(define-key 'konix/org-drill-key-map (kbd "h") 'konix/org-drill-heading)
+
 (defun konix/org-drill--show-latex-fragments/prevent (orig-fun &rest args))
 
 (advice-add #'org-drill--show-latex-fragments :around

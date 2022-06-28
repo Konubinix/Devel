@@ -3,8 +3,9 @@
 
 from datetime import timedelta
 
+import click
 from clk.core import cache_disk
-from clk.decorators import argument, group
+from clk.decorators import argument, group, option
 from clk.lib import echo_json
 from clk.log import get_logger
 from dateutil.parser import parse as parsedate
@@ -33,13 +34,18 @@ def cat():
 
 @holidays.command()
 @argument("location", help="Location of interest")
-def export_emacs(location):
+@option("--population",
+        help="Why kind of people are you interested in",
+        type=click.Choice(["Élèves", "Enseignants"]),
+        default="Élèves")
+def export_emacs(location, population):
     "Export the holidays in a sexp emacs friendly format."
     data = fetch_holidays()
     print("(setq konix/school-holidays '(")
     for holiday in data:
         fields = holiday["fields"]
-        if fields["location"] == location:
+        if fields["location"] == location and fields[
+                "population"] == population:
             oneday = timedelta(days=1)
             start_date = parsedate(fields["start_date"])
             end_date = parsedate(fields["end_date"])

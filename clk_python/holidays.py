@@ -5,6 +5,7 @@ from datetime import timedelta
 
 from clk.core import cache_disk
 from clk.decorators import argument, group
+from clk.lib import echo_json
 from clk.log import get_logger
 from dateutil.parser import parse as parsedate
 
@@ -22,6 +23,12 @@ def fetch_holidays():
 @group()
 def holidays():
     "Fetch and export holidays automatically"
+
+
+@holidays.command()
+def cat():
+    """Dump the file as-is"""
+    echo_json(fetch_holidays())
 
 
 @holidays.command()

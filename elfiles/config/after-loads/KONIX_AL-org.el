@@ -2610,7 +2610,7 @@ items"
            (not (member "neutraltime" (konix/org-get-tags)))
            )
       (let (
-            (tag (completing-read "Time judgment" '("neutraltime" "goodtime" "badtime")))
+            (tag (completing-read "Time judgment: " '("neutraltime" "goodtime" "badtime")))
             )
         (org-agenda-set-tags tag 'on)
         )

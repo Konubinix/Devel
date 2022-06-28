@@ -2546,6 +2546,7 @@ items"
        )
       )
     (when (and
+           (konix/org-with-point-on-heading (org-entry-is-todo-p))
            (member "project" (konix/org-get-tags))
            (not (konix/org-with-point-on-heading (konix/org-project-has-next-action)))
            ;(konix/org-gtd-triage/ask "No need for next action")

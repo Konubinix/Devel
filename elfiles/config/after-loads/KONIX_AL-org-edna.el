@@ -117,7 +117,9 @@ scheduled in January if it is triggered in July."
         ;; Ensure that the source timestamp exists
         (unless ts
           (error "Tried to increment a non-existent timestamp"))
-        (org-entry-put (point) "REPEAT" (org-edna--mod-timestamp ts n what))))
+        (when (or n what)
+          (org-entry-put (point) "REPEAT" (org-edna--mod-timestamp ts n what))
+          )))
      (t
       ;; For everything else, assume `org-read-date-analyze' can handle it
 

@@ -147,10 +147,24 @@ ${title}
     )
   )
 
+(defun konix/org-roam-node-find-goto ()
+  (interactive)
+  (let* (
+         (node (org-roam-node-read nil nil nil t))
+         (file (org-roam-node-file node))
+         (id (org-roam-node-id node))
+         )
+    (find-file file)
+    (goto-char (point-min))
+    (org-id-goto id)
+    )
+  )
+
 (defun konix/org-roam-note ()
   (interactive)
   (let* (
          (link (konix/org-with-point-on-heading (konix/org-roam-get-note-id)))
+         org-node-id
          )
     (if link
         (progn
@@ -164,36 +178,33 @@ ${title}
                              (konix/org-with-point-at-clocked-entry (org-store-link nil))
                            (konix/org-with-point-on-heading (org-store-link nil))
                            ))
-             (heading (konix/org-get-heading))
              (roam-buffer
               (save-window-excursion
-                (org-roam-node-find heading)
-                (save-excursion
-                  (goto-char (point-min))
-                  (while (looking-at "#+\\|:")
-                    (forward-line)
-                    )
-                  (unless (looking-at "$")
-                    (beginning-of-line)
-                    (unless (looking-at "- Org entry ::")
-                      (insert "\n")
-                      (forward-line -1)
+                (konix/org-roam-node-find-goto)
+                (setq org-node-id (org-id-get))
+                (org-back-to-heading-or-point-min)
+                (if (equal (point-min) (point))
+                    (save-excursion
+                      (while (looking-at "#+\\|:")
+                        (forward-line)
+                        )
+                      (unless (looking-at "$")
+                        (beginning-of-line)
+                        (unless (looking-at "- Org entry ::")
+                          (insert "\n")
+                          (forward-line -1)
+                          )
+                        )
+                      (insert (format "- Org entry :: %s\n" entry-link))
                       )
-                    )
-                  (insert (format "- Org entry :: %s\n" entry-link))
+                  (konix/org-add-note-no-interaction (format "Org entry :: %s\n" entry-link))
                   )
                 (current-buffer)
                 )
               )
              )
         (konix/org-add-note-no-interaction
-         (format "[[id:%s][Roam note]]"
-                 (with-current-buffer roam-buffer
-                   (save-excursion
-                     (goto-char (point-min))
-                     (org-id-get-create)
-                     )
-                   )))
+         (format "[[id:%s][Roam note]]" org-node-id))
         (pop-to-buffer roam-buffer)
         )
       )

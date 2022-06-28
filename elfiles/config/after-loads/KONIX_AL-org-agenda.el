@@ -194,7 +194,7 @@
 (define-key org-agenda-mode-map (kbd "o") 'org-agenda-open-link)
 (define-key org-agenda-mode-map (kbd "C") 'konix/org-toggle-org-agenda-tag-filter-context)
 (define-key org-agenda-mode-map (kbd "*") 'konix/org-agenda-refresh-buffer)
-(define-key org-agenda-mode-map (kbd "d") 'konix/org-agenda-toggle-filter-calendar-commitment)
+(define-key org-agenda-mode-map (kbd "d") 'konix/org-agenda-toggle-filter-calendar-discret)
 (define-key org-agenda-mode-map (kbd "k") 'konix/org-gtd-choose-situation)
 (define-key org-agenda-mode-map (kbd "M-b") 'konix/org-agenda-highlight-same-contexts-as-clocked-in)
 (define-key org-agenda-mode-map (kbd "M-p") 'konix/org-agenda-highlight-inactive)
@@ -999,7 +999,7 @@
    )
   (add-to-list
    'header-line-format
-   (format ", d: %s" konix/org-agenda-toggle-filter-calendar-commitment)
+   (format ", d: %s" konix/org-agenda-toggle-filter-calendar-discret)
    t)
   )
 
@@ -1274,14 +1274,14 @@
   (konix/org-agenda-goto-clock)
   )
 
-(defvar konix/org-agenda-toggle-filter-calendar-commitment nil "")
-(make-variable-buffer-local 'konix/org-agenda-toggle-filter-calendar-commitment)
-(defun konix/org-agenda-toggle-filter-calendar-commitment nil
+(defvar konix/org-agenda-toggle-filter-calendar-discret nil "")
+(make-variable-buffer-local 'konix/org-agenda-toggle-filter-calendar-discret)
+(defun konix/org-agenda-toggle-filter-calendar-discret nil
   (interactive)
-  (setq konix/org-agenda-toggle-filter-calendar-commitment (not konix/org-agenda-toggle-filter-calendar-commitment))
-  (if konix/org-agenda-toggle-filter-calendar-commitment
-      (konix/org-agenda-filter-calendar-commitment)
-    (konix/org-agenda-filter-calendar-commitment/remove)
+  (setq konix/org-agenda-toggle-filter-calendar-discret (not konix/org-agenda-toggle-filter-calendar-discret))
+  (if konix/org-agenda-toggle-filter-calendar-discret
+      (konix/org-agenda-filter-calendar-discret)
+    (konix/org-agenda-filter-calendar-discret/remove)
     )
   (konix/org-agenda-set-header-line-format)
   )
@@ -1310,7 +1310,7 @@
    )
   )
 
-(defun konix/org-agenda-filter-calendar-commitment ()
+(defun konix/org-agenda-filter-calendar-discret ()
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -1319,15 +1319,14 @@
              (pos (org-get-at-bol 'org-hd-marker))
              )
         (when (and pos
-                   (not (konix/org-agenda-in-deadline))
-                   (not (member "accepted" (org-get-at-bol 'tags)))
+                   (member "discret" (org-get-at-bol 'tags))
                    )
-          (org-agenda-filter-hide-line 'not-in-calenda-commitment)))
+          (org-agenda-filter-hide-line 'not-in-calendar-discret)))
       (beginning-of-line 2)))
   )
 
-(defun konix/org-agenda-filter-calendar-commitment/remove nil
-  (org-agenda-remove-filter 'not-in-calenda-commitment)
+(defun konix/org-agenda-filter-calendar-discret/remove nil
+  (org-agenda-remove-filter 'not-in-calendar-discret)
   )
 
 (defun konix/org-agenda-reset-apply-filter (filters)

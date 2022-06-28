@@ -143,6 +143,7 @@ This uses `org-read-date', which see."
       )
     (konix/ledger-add-note)
     (insert (format "justif: %s" value))
+    (save-buffer)
     )
   )
 

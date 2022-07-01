@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: vcf
+# key: vcf
+# --
+BEGIN:VCARD
+VERSION:3.0
+UID:`(uuidgen-4)`
+FN:$200
+TEL;TYPE=cell:$300
+END:VCARD

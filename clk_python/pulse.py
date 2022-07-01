@@ -81,6 +81,7 @@ def record(application, output, mute):
 
         def clean_sink(proxy_id):
             with pulsectl.Pulse("clk") as p:
+                p.sink_input_move(application.index, sink.index)
                 p.module_unload(proxy_id)
 
         register(clean_sink, proxy_id=proxy_id)

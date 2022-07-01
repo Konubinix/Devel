@@ -14,19 +14,25 @@ def pulse():
     """Manipulate the sound"""
 
 
+def find_sink(index):
+    import pulsectl
+    with pulsectl.Pulse("clk") as p:
+        return [sink for sink in p.sink_list() if sink.index == index][0]
+
+
 class PlayingApplicationsTypes(DynamicChoice):
 
     def choices(self):
         import pulsectl
         with pulsectl.Pulse("type") as p:
             return [
-                f'{sink_input.proplist["application.process.binary"]}-{sink_input.client}'
+                f'{sink_input.proplist["application.process.binary"]}/{find_sink(sink_input.sink).name}/{sink_input.client}'
                 for sink_input in p.sink_input_list()
                 if "application.process.binary" in sink_input.proplist
             ]
 
     def converter(self, value):
-        binary, client = value.split("-")
+        binary, sink_name, client = value.split("/")
         import pulsectl
         with pulsectl.Pulse("type") as p:
             return [
@@ -34,12 +40,6 @@ class PlayingApplicationsTypes(DynamicChoice):
                 if sink_input.proplist.get("application.process.binary") ==
                 binary and str(sink_input.client) == client
             ][0]
-
-
-def find_sink(index):
-    import pulsectl
-    with pulsectl.Pulse("clk") as p:
-        return [sink for sink in p.sink_list() if sink.index == index][0]
 
 
 def find_sink_by_name(name):
@@ -65,7 +65,7 @@ def record(application, output, mute):
     """Record the application sound"""
     import pulsectl
     sink = find_sink(application.sink)
-    proxy_name = f"proxy-{application.proplist['application.process.binary']}"
+    proxy_name = f"proxy-{application.proplist['application.process.binary']}-{application.client}-{sink.name}"
     proxy_sink = find_sink_by_name_safe(proxy_name)
     if proxy_sink is None:
         with pulsectl.Pulse("clk") as p:

@@ -82,19 +82,6 @@
 (global-set-key (kbd "<C-kp-add>") 'konix/increase-at-point)
 (global-set-key (kbd "<C-kp-subtract>") 'konix/decrease-at-point)
 
-;; incr & decr font size
-;; (global-set-key (kbd "C-M-+") 'text-scale-increase)
-;; (global-set-key (kbd "C-M--") 'text-scale-decrease)
-;; (global-set-key (kbd "C-M--") 'text-scale-decrease)
-;; (global-set-key (kbd "C-M-=") 'text-scale-adjust)
-;; (global-set-key (kbd "<C-M-kp-add>") 'text-scale-increase)
-;; (global-set-key (kbd "<C-M-kp-subtract>") 'text-scale-decrease)
-;; (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-;; (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-;; (global-set-key (kbd "<C-kp-0>") 'text-scale-adjust)
-;; (global-set-key (kbd "C-M-*")
-;;                 'konix/text-scale-propagate-current-scale-to-all-buffer)
-
 (defun konix/text-scale-init nil
   (interactive)
   (setq text-scale-mode nil)
@@ -324,9 +311,6 @@
 
 (define-key 'konix/global-fast-key-map (kbd "m") 'man)
 
-;; speedbar
-(define-key 'konix/global-fast-key-map (kbd "p") 'speedbar)
-
 ;; for terminal mode
 (define-key 'konix/global-fast-key-map (kbd "C-k") 'bury-buffer)
 (define-key 'konix/global-fast-key-map (kbd "C-c") 'calc)
@@ -345,16 +329,6 @@
 (define-key 'konix/global-fast-key-map (kbd "<backtab>") 'konix/switch-buffer-other-frame)
 ;; sort lines
 (define-key 'konix/global-fast-key-map (kbd "C-s") 'sort-lines)
-;; SHELL
-(define-key 'konix/global-fast-key-map (kbd "C-e") 'konix/term)
-
-;; ******************************************************************************************
-;; Occur
-;; ******************************************************************************************
-(define-prefix-command 'konix/occur/map)
-(define-key 'konix/global-fast-key-map (kbd "o") 'konix/occur/map)
-
-(define-key 'konix/occur/map "s" 'konix/occur-symbol-at-point)
 
 ;; **********************************************************************
 ;; frame configuration manipulation
@@ -366,95 +340,6 @@
 (define-key 'konix/frame-configuration/map "*" 'konix/frame-configuration-pop)
 (define-key 'konix/frame-configuration/map "h" 'konix/frame-configuration-top)
 
-;; ************************************************************
-;; semantic
-;; ************************************************************
-(define-prefix-command 'konix/semantic-key-map)
-(define-key 'konix/global-fast-key-map (kbd "s") 'konix/semantic-key-map)
-
-(define-key 'konix/semantic-key-map "m" 'konix/semantic-mode)
-(define-key 'konix/semantic-key-map "r" 'senator-force-refresh)
-(define-key 'konix/semantic-key-map "s" 'semantic-ia-show-summary)
-(define-key 'konix/semantic-key-map "n" 'senator-next-tag)
-(define-key 'konix/semantic-key-map "j" 'semantic-ia-fast-jump)
-(define-key 'konix/semantic-key-map (kbd "C-j") 'senator-jump)
-(define-key 'konix/semantic-key-map "d" 'semantic-ia-show-doc)
-(define-key 'konix/semantic-key-map "f" 'semantic-symref-symbol)
-(define-key 'konix/semantic-key-map "a" 'semantic-speedbar-analysis)
-(define-key 'konix/semantic-key-map "t" 'konix/semantic-analyze-proto-impl-toggle)
-(define-key 'konix/semantic-key-map "l" 'konix/semantic-add-lex-c-preprocessor-symbol-map)
-(define-key 'konix/semantic-key-map "D" 'semantic-analyze-debug-assist)
-(define-key 'konix/semantic-key-map (kbd "TAB") 'semantic-complete-analyze-inline)
-(define-key 'konix/semantic-key-map (kbd "V") 'konix/prog/semantic-toggle-verbose)
-(define-key 'konix/semantic-key-map (kbd "A") 'konix/global-semantic-ac-sources)
-(define-key 'konix/semantic-key-map (kbd "C-a") 'semantic-analyze-current-context)
-
-(define-prefix-command 'konix/semantic-include-key-map)
-(define-key 'konix/semantic-key-map (kbd "i") 'konix/semantic-include-key-map)
-(define-key 'konix/semantic-include-key-map (kbd "d") 'semantic-decoration-include-describe)
-(define-key 'konix/semantic-include-key-map (kbd "v") 'semantic-decoration-include-visit)
-(define-key 'konix/semantic-include-key-map "p" 'semantic-decoration-unparsed-include-parse-include)
-(define-key 'konix/semantic-include-key-map "P" 'semantic-decoration-unparsed-include-parse-all-includes)
-(define-key 'konix/semantic-include-key-map "I" 'konix/semantic-add-custom-include-path)
-(define-key 'konix/semantic-include-key-map "R" 'konix/semantic-remove-custom-include-path)
-
-;; --------------------------------------------------------------------------------
-;; Semantic modes
-;; --------------------------------------------------------------------------------
-(define-prefix-command 'konix/semantic-global-modes-map)
-(define-key 'konix/semantic-key-map (kbd "g") 'konix/semantic-global-modes-map)
-
-(defmacro konix/semantic-toggle-global-mode (semantic-global-mode)
-  (list 'message "%s turned %s" (symbol-name semantic-global-mode) (list semantic-global-mode))
-  )
-;; (macroexpand '(konix/semantic-toggle-global-mode global-semantic-idle-summary-mode))
-(defun konix/semantic-toggle-scheduler ()
-  (interactive)
-  (require 'KONIX_semantic)
-  (konix/semantic-toggle-global-mode global-semantic-idle-scheduler-mode)
-  )
-(defun konix/semantic-toggle-decoration ()
-  (interactive)
-  (require 'KONIX_semantic)
-  (konix/semantic-toggle-global-mode global-semantic-decoration-mode)
-  )
-(defun konix/semantic-toggle-sticky-function ()
-  (interactive)
-  (require 'KONIX_semantic)
-  (konix/semantic-toggle-global-mode global-semantic-stickyfunc-mode)
-  )
-(defun konix/semantic-toggle-semanticdb-function ()
-  (interactive)
-  (require 'KONIX_semantic)
-  (semanticdb-toggle-global-mode)
-  (message "%s turned %s" (symbol-name 'semanticdb-global-mode) semanticdb-global-mode)
-  )
-(defun konix/semantic-toggle-edit-mode ()
-  (interactive)
-  (require 'KONIX_semantic)
-  (konix/semantic-toggle-global-mode global-semantic-highlight-edits-mode)
-  )
-(defun konix/semantic-toggle-show-parser-state-mode ()
-  (interactive)
-  (require 'KONIX_semantic)
-  (konix/semantic-toggle-global-mode global-semantic-show-parser-state-mode)
-  )
-(defun konix/semantic-toggle-show-unmatched-mode ()
-  (interactive)
-  (require 'KONIX_semantic)
-  (konix/semantic-toggle-global-mode global-semantic-show-unmatched-syntax-mode)
-  )
-
-(define-key 'konix/semantic-global-modes-map "S" 'konix/semantic-toggle-scheduler)
-(define-key 'konix/semantic-global-modes-map "d" 'konix/semantic-toggle-decoration)
-(define-key 'konix/semantic-global-modes-map "D" 'konix/semantic-toggle-semanticdb-function)
-(define-key 'konix/semantic-global-modes-map "u" 'konix/semantic-toggle-show-unmatched-mode)
-(define-key 'konix/semantic-global-modes-map "s" 'konix/semantic-toggle-sticky-function)
-(define-key 'konix/semantic-global-modes-map "p" 'konix/semantic-toggle-show-parser-state-mode)
-(define-key 'konix/semantic-global-modes-map "e" 'konix/semantic-toggle-edit-mode)
-
-;; konix/wm-mode
-(define-key 'konix/global-fast-key-map (kbd "v t") 'konix/wm-mode)
 ;; ************************************************************
 ;; Customize
 ;; ************************************************************
@@ -562,14 +447,6 @@
 (global-set-key (kbd "C-<f4>") 'kmacro-end-or-call-macro)
 ;; Lance gitk et git gui
 (global-set-key (kbd "<S-f9>") 'konix/gitk)
-(global-set-key (kbd "<C-f9>") 'konix/git-gui)
-(global-set-key (kbd "<C-S-f9>") 'konix/meld)
-;; register & point
-(global-set-key (kbd "<S-f10>") 'window-configuration-to-register)
-(global-set-key (kbd "<C-f10>") 'point-to-register)
-(global-set-key (kbd "<f10>") 'jump-to-register)
-
-(define-key 'konix/global-slow-key-map (kbd "SPC") 'cua-set-mark)
 
 ;; ####################################################################################################
 ;; Org Mode

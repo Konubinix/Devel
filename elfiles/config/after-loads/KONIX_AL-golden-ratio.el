@@ -26,5 +26,7 @@
 
 (setq-default golden-ratio-exclude-buffer-regexp '("\\*gud-.+\\*"))
 
+(golden-ratio-mode 1)
+
 (provide 'KONIX_AL-golden-ratio)
 ;;; KONIX_AL-golden-ratio.el ends here

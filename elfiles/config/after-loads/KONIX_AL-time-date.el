@@ -24,42 +24,6 @@
 
 ;;; Code:
 
-(defun konix/time-range-to-list (range)
-  (let* (
-		 (start (car range))
-		 (current start)
-		 (end (cdr range))
-		 (res nil)
-		 )
-	(add-to-list 'res current t)
-	(while (time-less-p current end)
-	  (setq current
-			(time-add current (seconds-to-time (* 60 60 24)))
-			)
-	  (add-to-list 'res current t)
-	  )
-	res
-	)
-  )
-
-(defun konix/flatten-time-ranges (time_ranges)
-  (let (
-		(res nil)
-		)
-	(mapc
-	 (lambda (time_range)
-	   (setq res
-			 (append
-			  res
-			  (konix/time-range-to-list time_range)
-			  )
-			 )
-	   )
-	 time_ranges
-	 )
-	res
-	)
-  )
 
 (defun konix/time-substract-days (time days)
   (time-subtract time (apply 'encode-time `(0 0 0 ,(1+ days) 1 1970)))

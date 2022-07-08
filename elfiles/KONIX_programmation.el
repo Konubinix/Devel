@@ -161,6 +161,7 @@ They can be relative or absolute
 (defun konix/prog/config ()
   "Mes configuration communes à tous les mode de programmation."
   (interactive)
+  (require 'mic-paren)
   ;; in a prog buffer, showing trailing whitespaces may be relevant
   (setq show-trailing-whitespace t)
   ;; making tabs show up is also relevant

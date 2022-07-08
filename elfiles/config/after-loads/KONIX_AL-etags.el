@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(setq-default tags-table-list nil)
+
 (defun konix/tag-find-file-of-tag (file)
   "Reimplement `tag-find-file-of-tag' using `pop-to-buffer' instead of `switch-to-buffer'."
   (let ((buf (tag-find-file-of-tag-noselect file)))

@@ -1,8 +1,8 @@
-;;; KONIX_AL-elec-pair.el ---                        -*- lexical-binding: t; -*-
+;;; KONIX_AL-calendar.el ---                         -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  konubinix
+;; Copyright (C) 2022  sam
 
-;; Author: konubinix <konubinixweb@gmail.com>
+;; Author: sam <sam@konixwork>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,17 +24,22 @@
 
 ;;; Code:
 
-(setq-default
- electric-pair-pairs
- (append
-  '(
-    (?\« . ?\»)
-    )
-  (konix/custom-get-default-value 'electric-pair-pairs)
-  )
- )
+(setq calendar-week-start-day 1
+	  calendar-intermonth-text
+	  '(propertize
+		(format "%2d"
+				(car
+				 (calendar-iso-from-absolute
+				  (calendar-absolute-from-gregorian (list month day year)))))
+		'font-lock-face 'font-lock-function-name-face))
 
-(electric-pair-mode)
+(setq-default calendar-mark-diary-entries-flag t)
+(setq-default calendar-view-diary-initially-flag t)
 
-(provide 'KONIX_AL-elec-pair)
-;;; KONIX_AL-elec-pair.el ends here
+;; Pour avoir le calendar en français
+(setq-default calendar-date-style 'iso)
+(setq-default calendar-week-start-day 1)
+
+
+(provide 'KONIX_AL-calendar)
+;;; KONIX_AL-calendar.el ends here

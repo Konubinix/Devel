@@ -92,5 +92,8 @@
    '(counsel-M-x . "")
    )
   )
+
+(ivy-mode)
+
 (provide 'KONIX_AL-ivy)
 ;;; KONIX_AL-ivy.el ends here

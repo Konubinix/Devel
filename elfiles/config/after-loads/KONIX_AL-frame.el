@@ -1,8 +1,8 @@
-;;; KONIX_AL-recentf.el ---                          -*- lexical-binding: t; -*-
+;;; KONIX_AL-frame.el ---                            -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2016  konubinix
+;; Copyright (C) 2022  sam
 
-;; Author: konubinix <konubinixweb@gmail.com>
+;; Author: sam <sam@konixwork>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -24,15 +24,10 @@
 
 ;;; Code:
 
-(setq-default recentf-save-file
-			  (expand-file-name
-			   "recentf"
-			   (expand-file-name
-				(getenv "HOSTNAME")
-				perso-dir)))
+(when blink-cursor-mode
+  (blink-cursor-mode 0)
+  )
 
-(setq-default recentf-max-saved-items 5000)
-(setq-default recentf-max-menu-items nil)
 
-(provide 'KONIX_AL-recentf)
-;;; KONIX_AL-recentf.el ends here
+(provide 'KONIX_AL-frame)
+;;; KONIX_AL-frame.el ends here

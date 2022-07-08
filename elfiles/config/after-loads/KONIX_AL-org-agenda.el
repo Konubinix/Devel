@@ -24,7 +24,11 @@
 
 ;;; Code:
 
-(require 'org-super-agenda)
+(use-package org-super-agenda
+  :commands (org-super-agenda-mode)
+  :ensure t
+  :defer t
+  )
 (org-super-agenda-mode 1)
 
 ;; make sure the agendas are sticky

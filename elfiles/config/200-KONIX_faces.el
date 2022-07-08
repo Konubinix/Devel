@@ -1,8 +1,8 @@
-;;; KONIX_AL-elec-pair.el ---                        -*- lexical-binding: t; -*-
+;;; 200-KONIX_faces.el ---                           -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  konubinix
+;; Copyright (C) 2022  sam
 
-;; Author: konubinix <konubinixweb@gmail.com>
+;; Author: sam <sam@konixwork>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,17 +24,30 @@
 
 ;;; Code:
 
-(setq-default
- electric-pair-pairs
- (append
-  '(
-    (?\« . ?\»)
-    )
-  (konix/custom-get-default-value 'electric-pair-pairs)
+(defface konix/face-normal-message
+  '((((class color)) (:foreground "dark green")))
+  ""
   )
+
+(defface message-cited-text
+  '((((class color)) (:foreground "dark green")))
+  ""
+  )
+
+(custom-set-faces
+ '(highlight
+   (
+    (
+     ((class color)
+      (background dark))
+     (:background "#222222"
+                  )
+     )
+    )
+   ""
+   )
  )
 
-(electric-pair-mode)
 
-(provide 'KONIX_AL-elec-pair)
-;;; KONIX_AL-elec-pair.el ends here
+(provide '200-KONIX_faces)
+;;; 200-KONIX_faces.el ends here

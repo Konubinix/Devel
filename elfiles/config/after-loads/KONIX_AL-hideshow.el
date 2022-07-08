@@ -24,6 +24,11 @@
 
 ;;; Code:
 
+(setq-default hs-hide-comments-when-hiding-all nil)
+(setq-default hs-allow-nesting t)
+(setq-default hs-isearch-open t)
+
+
 (defvar konix/hs-zoom-in-hide-level nil)
 (defun konix/hs-zoom-in ()
   (interactive)

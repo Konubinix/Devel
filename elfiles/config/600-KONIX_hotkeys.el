@@ -1,8 +1,6 @@
-;; ####################################################################################################
-;; Unset the keys I want to free
-;; ####################################################################################################
-(require 'key-chord)
-(require 'region-bindings-mode)
+;; package that are needed for my config
+(use-package key-chord :ensure t)
+(use-package region-bindings-mode :ensure t)
 
 (region-bindings-mode-enable)
 (define-prefix-command 'konix/region-bindings-mode-map)
@@ -148,8 +146,6 @@
 (global-set-key (kbd "C-<") 'konix/global-slow-key-map)
 (global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
 (global-set-key (kbd "C-f") 'konix/global-slow-key-map) ;for hacker's keyboard
-
-(define-key 'konix/global-slow-key-map (kbd "D") 'konix/org-drill-key-map)
 
 (define-key 'konix/global-slow-key-map (kbd "%") 'query-replace)
 (define-key 'konix/global-slow-key-map (kbd "*") 'query-replace-regexp)

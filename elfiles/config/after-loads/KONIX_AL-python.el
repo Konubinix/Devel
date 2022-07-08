@@ -24,8 +24,8 @@
 
 ;;; Code:
 
-(require 'yapfify)
-(require 'py-isort)
+(use-package yapfify :ensure t :defer t)
+(use-package py-isort :ensure t :defer t)
 
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)

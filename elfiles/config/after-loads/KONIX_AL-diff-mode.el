@@ -26,7 +26,7 @@
 
 (require 'outline)
 
-(konix/outline/setup-keys diff-mode-map)
+;(konix/outline/setup-keys diff-mode-map)
 (setq-default diff-default-read-only nil)
 (setq-default konix/diff/sha1-regexp "[a-f0-9]")
 ;; match the --- in front of a file also, as well as commit and diff lines
@@ -92,7 +92,7 @@
   (local-set-key (kbd "M-/") 'dabbrev-expand)
   (local-set-key (kbd "C-z") 'diff-undo)
   (auto-fill-mode 1)
-  (konix/outline/setup-keys diff-mode-map)
+  ;(konix/outline/setup-keys diff-mode-map)
   (font-lock-add-keywords
    nil
    '(

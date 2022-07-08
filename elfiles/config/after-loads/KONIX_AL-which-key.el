@@ -27,6 +27,7 @@
 (setq-default which-key-show-early-on-C-h t)
 (setq-default which-key-idle-delay 3.0)
 (setq-default which-key-idle-secondary-delay 0.05)
+(which-key-mode)
 
 (provide 'KONIX_AL-which-key)
 ;;; KONIX_AL-which-key.el ends here

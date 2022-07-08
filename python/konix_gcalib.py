@@ -342,13 +342,14 @@ class GCall(cmd.Cmd, object):
 :ACCOUNT_NAME: {}
 :LOCATION: {}
 :ORGANIZER: {}
+:CREATOR: {}
 :CREATION_DATE: {}
 :UPDATED: {}
 :UPDATEDRAW: {}
 :OPTIONAL: {}
 :END:
 {}
-By: {}
+By: {} (creator: {})
 Attendees:
 {}
 
@@ -367,9 +368,11 @@ Attendees:
                 self.id,
                 self.calendar_id,
                 self.account,
-                self.location,
+                self.location or "NA",
                 self.organizer.get("displayName",
                                    self.organizer.get("email", "NA")),
+                self.creator.get("displayName",
+                                 self.creator.get("email", "NA")),
                 date_to_local(parser.parse(
                     self.created)).strftime("[%Y-%m-%d %a %H:%M]"),
                 date_to_local(parser.parse(
@@ -379,6 +382,8 @@ Attendees:
                 self.org_mode_timestamp,
                 self.organizer.get("displayName",
                                    self.organizer.get("email", "NA")),
+                self.creator.get("displayName",
+                                 self.creator.get("email", "NA")),
                 "\n".join(
                     map(
                         lambda a: " - [{}] {} ({}) ({})".format(

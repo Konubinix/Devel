@@ -1,8 +1,8 @@
-;;; KONIX_AL-elec-pair.el ---                        -*- lexical-binding: t; -*-
+;;; KONIX_AL-keep-buffers.el ---                     -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  konubinix
+;; Copyright (C) 2022  sam
 
-;; Author: konubinix <konubinixweb@gmail.com>
+;; Author: sam <sam@konixwork>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,17 +24,24 @@
 
 ;;; Code:
 
-(setq-default
- electric-pair-pairs
- (append
-  '(
-    (?\« . ?\»)
-    )
-  (konix/custom-get-default-value 'electric-pair-pairs)
-  )
- )
+(keep-buffers-mode 1)
 
-(electric-pair-mode)
+;; protect all buffers starting with "*scratch"
+(setq keep-buffers-protected-alist
+	  '(
+		("\\`*scratch")
+		("\\`\\*Messages\\*\\'")
+		(".*jabber-groupchat.*")
+		;; minbif buffers
+		("^#.+@.+:.+$")
+		;; minbif control buffers
+		("^&[a-zA-Z]+$")
+		;; irc buffers
+		("^#[a-zA-Z-]+$")
+		;; irc control buffers
+		("^[^/]+:[0-9]+$")
+		)
+	  )
 
-(provide 'KONIX_AL-elec-pair)
-;;; KONIX_AL-elec-pair.el ends here
+(provide 'KONIX_AL-keep-buffers)
+;;; KONIX_AL-keep-buffers.el ends here

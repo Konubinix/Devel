@@ -25,6 +25,9 @@
 ;;; Code:
 
 
+(setq-default ispell-dictionary "francais")
+
+
 (let (
       (flags
        (getenv "KONIX_ASPELL_EXTRA_FLAGS")

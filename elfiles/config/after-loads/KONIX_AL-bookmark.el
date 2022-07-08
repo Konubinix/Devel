@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(setq-default bookmark-search-size 40)
+
 (setq bookmark-default-file
 	  (expand-file-name (format "%s/emacs.bmk" (getenv "HOSTNAME"))
 						(getenv "KONIX_PERSO_DIR")

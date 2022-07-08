@@ -165,3 +165,6 @@ ignore=dirty
 [submodule "elfiles/crdt"]
 	path = elfiles/crdt
 	url = https://code.librehq.com/qhong/crdt.el
+[submodule "elfiles/use-package"]
+	path = elfiles/use-package
+	url = https://github.com/jwiegley/use-package

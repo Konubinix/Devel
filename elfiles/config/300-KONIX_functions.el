@@ -533,6 +533,43 @@ current buffer still has clients"
 	)
   )
 
+(defun konix/time-range-to-list (range)
+  (let* (
+		 (start (car range))
+		 (current start)
+		 (end (cdr range))
+		 (res nil)
+		 )
+	(add-to-list 'res current t)
+	(while (time-less-p current end)
+	  (setq current
+			(time-add current (seconds-to-time (* 60 60 24)))
+			)
+	  (add-to-list 'res current t)
+	  )
+	res
+	)
+  )
+
+(defun konix/flatten-time-ranges (time_ranges)
+  (let (
+		(res nil)
+		)
+	(mapc
+	 (lambda (time_range)
+	   (setq res
+			 (append
+			  res
+			  (konix/time-range-to-list time_range)
+			  )
+			 )
+	   )
+	 time_ranges
+	 )
+	res
+	)
+  )
+
 (defun konix/_get-string (&optional prompt collection type_of_thing)
   (unless type_of_thing
 	(setq type_of_thing 'sexp)

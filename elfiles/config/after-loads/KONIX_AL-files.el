@@ -24,6 +24,12 @@
 
 ;;; Code:
 
+(setq-default version-control t)
+;; Backup config
+(setq-default kept-old-versions 50)
+(setq-default kept-new-versions 50)
+(setq-default delete-old-versions t)
+
 (setq-default konix/old-insert-directory-program insert-directory-program)
 (setq-default konix/insert-directory-program "gatls_dired.py")
 

@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(use-package org-mime :ensure t :defer t)
+(use-package bbdb :ensure t :defer t)
 (require 'org-mime)
 (require 'bbdb-com)
 ;; Configuration of mail sending

@@ -1,8 +1,8 @@
-;;; KONIX_AL-elec-pair.el ---                        -*- lexical-binding: t; -*-
+;;; KONIX_AL-yasnippet.el ---                        -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  konubinix
+;; Copyright (C) 2022  sam
 
-;; Author: konubinix <konubinixweb@gmail.com>
+;; Author: sam <sam@konixwork>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,17 +24,30 @@
 
 ;;; Code:
 
+(yas-global-mode 1)
 (setq-default
- electric-pair-pairs
- (append
-  '(
-    (?\« . ?\»)
-    )
-  (konix/custom-get-default-value 'electric-pair-pairs)
+ yas-snippet-dirs
+ (apply
+  'append
+  (mapcar
+   (lambda (dir)
+     (list
+      (expand-file-name "snippets" dir)
+      (expand-file-name "yasnippet/snippets" dir)
+      )
+     )
+   (list
+    home-elfiles
+    perso-host-elfiles
+    perso-elfiles
+    elfiles)
+   )
   )
  )
 
-(electric-pair-mode)
+(mapc '(lambda(elt) (if (not (file-exists-p elt)) (make-directory elt t))) yas-snippet-dirs)
+(mapc 'yas-load-directory yas-snippet-dirs)
+(setq-default yas-fallback-behavior 'call-other-command)
 
-(provide 'KONIX_AL-elec-pair)
-;;; KONIX_AL-elec-pair.el ends here
+(provide 'KONIX_AL-yasnippet)
+;;; KONIX_AL-yasnippet.el ends here

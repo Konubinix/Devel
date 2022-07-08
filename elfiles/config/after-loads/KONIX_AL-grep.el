@@ -26,6 +26,11 @@
 
 (require 'wgrep nil t)
 
+(setq-default grep-command "grep -nH -r -e ")
+(setq-default grep-find-command "find . -type f -print0 | xargs -0 -e grep -nH -e ")
+(setq-default grep-template "grep <C> -nH -r -e  <R> <F>")
+(add-to-list 'revert-without-query "TAGS")
+
 (define-key grep-mode-map (kbd "o") 'konix/compile-goto-error-other-window)
 (konix/push-or-replace-in-alist
  'grep-host-defaults-alist

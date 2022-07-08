@@ -29,5 +29,48 @@
   )
 (add-hook 'bs-mode-hook 'konix/bs-mode-hook)
 
+(progn
+  (konix/push-or-replace-in-alist 'bs-configurations "same-mode-files"
+								  nil 'konix/buffer-same-mode-p
+								  ".*" nil
+								  'bs-sort-buffer-interns-are-last
+								  )
+  (konix/push-or-replace-in-alist 'bs-configurations "may-be-killed"
+								  nil nil nil
+								  'konix/may-not-be-killed-p
+								  'bs-sort-buffer-interns-are-last
+								  )
+  (konix/push-or-replace-in-alist 'bs-configurations "erc-buffer"
+								  nil nil nil
+								  'konix/not-erc-buffer-p
+								  'bs-sort-buffer-interns-are-last
+								  )
+  (konix/push-or-replace-in-alist 'bs-configurations "circe-buffer"
+								  nil nil nil
+								  'konix/not-circe-buffer-p
+								  'bs-sort-buffer-interns-are-last
+								  )
+  (konix/push-or-replace-in-alist 'bs-configurations "circe-query-buffer"
+								  nil nil nil
+								  'konix/not-circe-query-buffer-p
+								  'bs-sort-buffer-interns-are-last
+								  )
+  (konix/push-or-replace-in-alist 'bs-configurations "trac-pages"
+								  nil nil nil
+								  'konix/not-trac-p
+								  'bs-sort-buffer-interns-are-last
+								  )
+  (konix/push-or-replace-in-alist 'bs-configurations "clients"
+								  nil nil nil
+								  'konix/not-client-p
+								  'bs-sort-buffer-interns-are-last
+								  )
+  (konix/push-or-replace-in-alist 'bs-configurations "circe-dead-buffers"
+								  nil nil nil
+								  'konix/not-circe-dead-p
+								  'bs-sort-buffer-interns-are-last
+								  )
+  )
+
 (provide 'KONIX_AL-bs)
 ;;; KONIX_AL-bs.el ends here

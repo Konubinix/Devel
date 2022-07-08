@@ -28,8 +28,10 @@
 (require 'find-dired)
 (require 'wuxch-dired-copy-paste)
 (require 'dired-sort)
-(require 'diredful)
-(require 'phi-search-dired)
+(use-package diredful :ensure t :defer t)
+(use-package phi-search-dired :ensure t :defer t)
+
+(setq-default dired-listing-switches "-alh")
 
 (defun konix/dired-git-annex-find-restored ()
   (interactive)

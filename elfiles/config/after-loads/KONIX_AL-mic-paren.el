@@ -1,8 +1,8 @@
-;;; KONIX_AL-elec-pair.el ---                        -*- lexical-binding: t; -*-
+;;; KONIX_AL-mic-paren.el ---                        -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  konubinix
+;; Copyright (C) 2022  sam
 
-;; Author: konubinix <konubinixweb@gmail.com>
+;; Author: sam <sam@konixwork>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,17 +24,33 @@
 
 ;;; Code:
 
-(setq-default
- electric-pair-pairs
- (append
-  '(
-    (?\« . ?\»)
-    )
-  (konix/custom-get-default-value 'electric-pair-pairs)
+
+(setq-default paren-bind-modified-sexp-functions nil)
+(setq-default paren-display-message 'only)
+(paren-activate)
+
+(when (string-match
+	   "linux"
+	   (getenv "KONIX_PLATFORM")
+	   )
+  (setq-default browse-url-browser-function 'konix/browse-url-browser)
   )
- )
 
-(electric-pair-mode)
+(defface region
+  '(
+	(
+	 ((class color)
+	  (background dark))
+	 (:background "blue")
+	 )
+	(
+	 ((class color)
+	  (background light))
+	 (:background "khaki")
+	 )
+	)
+  ""
+  )
 
-(provide 'KONIX_AL-elec-pair)
-;;; KONIX_AL-elec-pair.el ends here
+(provide 'KONIX_AL-mic-paren)
+;;; KONIX_AL-mic-paren.el ends here

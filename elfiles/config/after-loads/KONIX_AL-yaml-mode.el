@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'rx)
+(require 'outline)
 
 ;; taken from https://github.com/yoshiki/yaml-mode/issues/25
 (defun konix/yaml-outline-level ()

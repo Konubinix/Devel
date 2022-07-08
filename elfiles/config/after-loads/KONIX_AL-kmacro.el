@@ -1,4 +1,4 @@
-;;; 700-KONIX_kmacro-mode.el ---
+;;; KONIX_AL-kmacro.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -24,7 +24,11 @@
 
 ;;; Code:
 
-(require 'KONIX_macros)
+(require 'savehist)
 
-(provide '700-KONIX_kmacro-mode)
-;;; 700-KONIX_kmacro-mode.el ends here
+(add-to-list 'savehist-additional-variables 'kmacro-ring)
+(add-to-list 'savehist-additional-variables 'last-kbd-macro)
+(add-to-list 'savehist-additional-variables 'kmacro-counter)
+
+(provide 'KONIX_AL-kmacro)
+;;; KONIX_AL-kmacro.el ends here

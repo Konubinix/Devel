@@ -28,11 +28,14 @@
 (require 'KONIX_org-meta-context)
 (require 'org-archive)
 (require 'org-element)
-(require 'ol-notmuch)
+(use-package ol-notmuch :ensure t :defer t)
 (require 'org-protocol)
 (require 'ol-man)
 (require 'org-clock)
-(require 'org-expiry)
+(use-package org-contrib :ensure t
+  :config
+  (require 'org-expiry)
+  )
 (require 'org-collector)
 (require 'org-protocol)
 (require 'holidays)
@@ -3558,6 +3561,7 @@ of the clocksum."
   ;; delete the trailing whitespaces on org roam notes, meant to be of rghuman
   ;; size.
   (require 'org-roam)
+  (require 'elec-pair)
   (setq konix/delete-trailing-whitespace (and (buffer-file-name) (org-roam-file-p)))
   ;; somehow, I cannot set this hook outiside of from the org-mode hook
   (defun konix/org-font-lock-set-keywords-hook ()
@@ -4728,7 +4732,9 @@ of the clocksum."
    )
   )
 
-(require 'org-edna)
+(use-package org-edna :ensure t
+  :commands (org-edna-load)
+  )
 (org-edna-load)
 (setq-default
  org-edna-finder-use-cache t
@@ -5672,7 +5678,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("!" . (lambda () (message "Intentionally disable !"))))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("m" . konix/org-toggle-me))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("S" . konix/org-toggle-society))
-(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("s" . org-save-all-org-buffers))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("s" . konix/scroll))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("W" . org-toggle-narrow-to-subtree))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("z" . org-add-note))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("Z" . konix/org-add-timestamp))

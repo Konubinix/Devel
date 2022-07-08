@@ -10,8 +10,11 @@
 
 (defvar *emacs-load-start* (current-time))
 
-(require 'cask (expand-file-name ".cask/cask.el" (getenv "HOME")))
-(cask-initialize (getenv "KONIX_DEVEL_DIR"))
+;; (require 'cask (expand-file-name ".cask/cask.el" (getenv "HOME")))
+;; (cask-initialize (getenv "KONIX_DEVEL_DIR"))
+
+(add-to-list 'load-path (expand-file-name "elfiles/use-package" devel-dir))
+(require 'use-package)
 
 ;; ####################################################################################################
 ;; Needed library paths

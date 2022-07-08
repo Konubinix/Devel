@@ -1,6 +1,6 @@
-;;; KONIX_AL-elec-pair.el ---                        -*- lexical-binding: t; -*-
+;;; 025-KONIX_package-setup.el ---                      -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  konubinix
+;; Copyright (C) 2022  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -24,17 +24,21 @@
 
 ;;; Code:
 
-(setq-default
- electric-pair-pairs
- (append
-  '(
-    (?\« . ?\»)
-    )
-  (konix/custom-get-default-value 'electric-pair-pairs)
-  )
- )
+(require 'package)
+(setq-default package-user-dir (expand-file-name "elfiles/elpa" perso-dir))
+(setq-default gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(add-to-list 'package-archives
+             '("nongnu" . "https://elpa.nongnu.org/nongnu/")
+	         t
+             )
+(add-to-list 'package-archives
+	         '("melpa" . "https://melpa.org/packages/")
+	         t
+	         )
 
-(electric-pair-mode)
+(package-initialize) ; or else packages will be reinstalled at startup
+(setq use-package-verbose t)
 
-(provide 'KONIX_AL-elec-pair)
-;;; KONIX_AL-elec-pair.el ends here
+
+(provide '025-KONIX_package-setup)
+;;; 025-KONIX_package-setup.el ends here

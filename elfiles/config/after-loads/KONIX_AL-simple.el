@@ -24,6 +24,9 @@
 
 ;;; Code:
 
+(setq-default kill-ring-max 3000)
+
+
 (defun konix/shell/rename-async-shell-buffer (&optional output-buffer)
   (unless output-buffer
 	(setq output-buffer "*Async Shell Command*")
@@ -51,6 +54,10 @@
     (dotimes (i 10)
       (when (= p (point)) ad-do-it))))
 (ad-activate 'pop-to-mark-command)
+
+(column-number-mode t)
+(line-number-mode t)
+
 
 (provide 'KONIX_AL-simple)
 ;;; KONIX_AL-simple.el ends here

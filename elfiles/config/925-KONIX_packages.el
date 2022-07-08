@@ -163,17 +163,15 @@
 ;; (use-package which-key :ensure nil :defer t)
 ;; (use-package yaml-mode :ensure nil :defer t)
 ;; (use-package yapfify :ensure nil :defer t)
-;; (use-package zenburn-theme :ensure nil :defer t)
 
-;; (use-package quelpa-use-package
-;;   :ensure t
-;;   )
+(use-package quelpa-use-package
+  :ensure t
+  )
 
-;;  (use-package ement
-;;   :quelpa (ement :fetcher github :repo "alphapapa/ement.el")
-;;  :ensure nil
-;;
-;;  )
+(use-package ement
+  :quelpa (ement :fetcher github :repo "alphapapa/ement.el")
+  :ensure t
+  )
 
 
 (provide '925-required-package)

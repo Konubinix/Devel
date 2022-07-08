@@ -2,5 +2,5 @@
 # name: -
 # key: -
 # --
-- `(format-time-string "[%Y-%m-%d %a %H:%M]")` $100 :: $300
+- `(format-time-string "[%Y-%m-%d %a %H:%M]")` $100 : $300
 -$0

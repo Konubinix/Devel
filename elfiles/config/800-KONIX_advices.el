@@ -90,13 +90,14 @@
 ;; ******************************************************************************************
 ;; TAGS
 ;; ******************************************************************************************
-(defadvice tags-loop-continue (after recontinue-if-on-comment)
+(defvar konix/tags/avoid-comments t)
+(defadvice fileloop-continue (after recontinue-if-on-comment)
   (when (and konix/tags/avoid-comments (hs-inside-comment-p))
 	(message "Avoiding comment")
-	(tags-loop-continue)
+	(fileloop-continue)
 	)
   )
-(ad-activate 'tags-loop-continue)
+(ad-activate 'fileloop-continue)
 ;; ******************************************************************************************
 ;; Shell
 ;; ******************************************************************************************

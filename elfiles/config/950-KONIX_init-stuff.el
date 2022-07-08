@@ -14,4 +14,7 @@
 (setenv "INEMACS" "t")
 (envrc-global-mode)
 
+;; this is the long part, as it loads my org files
+(require 'KONIX_org-meta-context)
+
 (setq-default org-roam-v2-ack t)

@@ -5,6 +5,7 @@
           )
         )
       (directory-files user-emacs-directory))
+(setq konix/initial-loaded-files (mapcar 'car load-history))
 
 (require 'cl)
 
@@ -51,24 +52,78 @@
 (konix/setup-elfiles perso-elfiles)
 (konix/setup-elfiles perso-host-elfiles)
 (konix/setup-elfiles home-elfiles)
-
 ;; ################################################################################
 ;; Load config files
 ;; ################################################################################
+(setq konix/loaded-in-init-files
+      '(
+        "backup-dir"
+        "bibtex"
+        "calendar"
+        "comint"
+        "dired"
+        "etags"
+        "KONIX_org-meta-context"
+        "KONIX_org-roam-export"
+        "org"
+        "org-agenda"
+        "outline"
+        "ox"
+        "ox-latex"
+        "ox-publish"
+        "package"
+        "key-chord"
+        "kmacro"
+        "ob-comint"
+        "ob-core"
+        "page"
+        "paren"
+        "password-cache"
+        "popup"
+        "python"
+        "replace"
+        "savehist"
+        "saveplace"
+        "shell"
+        "simple"
+        "swiper"
+        "tempbuf"
+        "thingatpt"
+        "time-date"
+        "vc-hooks"
+        "framemove"
+        "golden-ratio"
+        "keep-buffers"
+        "window"
+        "winner"
+        ))
+(defvar konix/load-config-file_after-loads/debug t)
 (defun konix/load-config-files_after-loads (directory)
   ;; for each file in after-loads with the pattern .*KONIX_AL_\(.+\).el directory, make sure it will be loaded after
   ;; the file with the exact name \1 will be loaded
   (mapc
    #'(lambda(elt)
        (string-match "KONIX_AL-\\(.+\\).el" elt)
-       (let (
-             (file-to-load (match-string-no-properties 1 elt))
-             )
-         (when (load-history-filename-element (load-history-regexp file-to-load))
+       (let* (
+              (file-to-load (match-string-no-properties 1 elt))
+              (loaded-file (load-history-filename-element (load-history-regexp file-to-load)))
+              )
+         (when (and
+                loaded-file
+                (not (member file-to-load konix/loaded-in-init-files))
+                (not (member (car loaded-file) konix/initial-loaded-files))
+                )
            (warn "%s was already loaded before configuring its after load\
  -> configuring an after-load is useless in that case."
 		         file-to-load
 		         )
+           (message "%s was already loaded before configuring its after load\
+ -> configuring an after-load is useless in that case."
+		            file-to-load)
+           (when konix/load-config-file_after-loads/debug
+             (view-echo-area-messages)
+             (debug)
+             )
            )
          (eval-after-load file-to-load
            `(progn
@@ -109,7 +164,6 @@
 
 (defun konix/load-config-files (directory)
   (mapc
-   ;; Load every .el file in my config
    #'konix/load-file
    (sort
 	(file-expand-wildcards (concat directory "/*.el"))
@@ -129,6 +183,7 @@
 (when konix/on-windows-p
   (setq vc-handled-backends nil)
   )
+
 
 (konix/load-config-files (expand-file-name "config" elfiles))
 (konix/load-config-files (expand-file-name "config" perso-elfiles))

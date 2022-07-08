@@ -33,10 +33,10 @@
     (save-excursion
       (goto-char (point-min))
       (re-search-forward "--text follows this line--\\|<#[^>]+>")
-      (next-line)
+      (forward-line)
       (beginning-of-line)
       (while (looking-at-p "<#secure[^>]+>")
-        (next-line)
+        (forward-line)
         )
       (setq beg (point))
       (if (re-search-forward "<#[^>]+>" nil t)

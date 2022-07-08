@@ -41,6 +41,9 @@
 (use-package mic-paren :ensure t :defer t)
 (use-package zenburn-theme :ensure t :defer t)
 (use-package slack :ensure t :commands (slack-start))
+(use-package dash :ensure t :defer t)
+(use-package multiple-cursors :ensure t :defer t)
+(use-package wgrep :ensure t :defer t)
 
 (require 'framemove)
 (require 'qutebrowser)
@@ -53,6 +56,13 @@
 (load-theme 'zenburn)
 (use-package highlight-parentheses :ensure t :defer t)
 
+(straight-use-package
+ '(ement :type git :host github :repo "alphapapa/ement.el")
+  )
+
+(use-package highlight-symbol :ensure t
+  :commands (highlight-symbol)
+  )
 
 (use-package org-drill
   :ensure nil
@@ -99,7 +109,6 @@
 ;; (use-package groovy-mode :ensure nil :defer t)
 ;; (use-package hcl-mode :ensure nil :defer t)
 ;; (use-package highlight-parentheses :ensure nil :defer t)
-;; (use-package highlight-symbol :ensure nil :defer t)
 ;; (use-package hl-indent :ensure nil :defer t)
 ;; (use-package htmlize :ensure nil :defer t)
 ;; (use-package hydra :ensure nil :defer t)
@@ -163,15 +172,6 @@
 ;; (use-package which-key :ensure nil :defer t)
 ;; (use-package yaml-mode :ensure nil :defer t)
 ;; (use-package yapfify :ensure nil :defer t)
-
-(use-package quelpa-use-package
-  :ensure t
-  )
-
-(use-package ement
-  :quelpa (ement :fetcher github :repo "alphapapa/ement.el")
-  :ensure t
-  )
 
 
 (provide '925-required-package)

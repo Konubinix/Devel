@@ -35,7 +35,7 @@
 (defun konix/w3m-mode-hook()
   (turn-on-tempbuf-mode)
   (local-set-key (kbd "<up>") 'previous-line)
-  (local-set-key (kbd "<down>") 'next-line)
+  (local-set-key (kbd "<down>") 'forward-line)
   (local-set-key (kbd "<C-right>") 'w3m-view-next-page)
   (local-set-key (kbd "<C-left>") 'w3m-view-previous-page)
   (local-set-key (kbd "<C-down>") 'w3m-next-buffer)
@@ -45,6 +45,7 @@
   (local-set-key (kbd "F") 'konix/w3m-goto-url-new-session)
   )
 (add-hook 'w3m-mode-hook 'konix/w3m-mode-hook)
+(setq-default w3m-key-binding 'info)
 
 (provide '700-KONIX_w3m)
 ;;; 700-KONIX_w3m.el ends here

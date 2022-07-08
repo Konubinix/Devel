@@ -1,4 +1,4 @@
-;;; 700-KONIX_nxml.el ---
+;;; 700-KONIX_help-mode.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -24,16 +24,18 @@
 
 ;;; Code:
 
-(defvar konix/nxml-indent-line-functions '()
-  "Functions called in a xml file line to perform the indentation.
 
-There are some cases when some semantic into the xml file cause a need to indent
-specifically. For instance, some code put in programlisting tags should not be
-indented as xml. This is a list given to `run-hook-with-args-until-success'. It
-should return t if it has successfully indented the line, else nil. The
-functions are tested till one succeed in indenting the line.
-"
-  )
 
-(provide '700-KONIX_nxml)
-;;; 700-KONIX_nxml.el ends here
+;; (defun konix/help-mode-hook()
+;;   (local-set-key "q" 'quit-window)
+;;   (local-set-key (kbd "C-f") 'find-function-at-point)
+;;   )
+;; (add-hook 'help-mode-hook 'konix/help-mode-hook)
+
+;; (define-key help-map "b" 'konix/describe-bindings)
+;; (define-key help-map "T" 'describe-text-properties)
+;; (define-key help-map (kbd "M-c") 'describe-char)
+;; (define-key help-map (kbd "A") 'apropos-value)
+
+(provide '700-KONIX_help-mode)
+;;; 700-KONIX_help-mode.el ends here

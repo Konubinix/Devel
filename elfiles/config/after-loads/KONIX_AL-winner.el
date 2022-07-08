@@ -1,6 +1,6 @@
-;;; 700-KONIX_bitlbee.el ---
+;;; KONIX_AL-winner.el ---                           -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012  konubinix
+;; Copyright (C) 2022  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -16,7 +16,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(defcustom konix/bitlbee-password "" "")
+(winner-mode t)
 
-(provide '700-KONIX_bitlbee)
-;;; 700-KONIX_bitlbee.el ends here
+(provide 'KONIX_AL-winner)
+;;; KONIX_AL-winner.el ends here

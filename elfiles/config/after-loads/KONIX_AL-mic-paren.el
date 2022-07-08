@@ -29,13 +29,6 @@
 (setq-default paren-display-message 'only)
 (paren-activate)
 
-(when (string-match
-	   "linux"
-	   (getenv "KONIX_PLATFORM")
-	   )
-  (setq-default browse-url-browser-function 'konix/browse-url-browser)
-  )
-
 (defface region
   '(
 	(

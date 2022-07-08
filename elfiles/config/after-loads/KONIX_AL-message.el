@@ -71,7 +71,7 @@ make sure to insert any mml content after the secure tag
 "
   (while (looking-at "<#")
 	(search-forward ">")
-	(next-line)
+	(forward-line)
 	(beginning-of-line)
 	)
   )

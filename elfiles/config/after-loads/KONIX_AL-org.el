@@ -32,6 +32,7 @@
 (require 'org-protocol)
 (require 'ol-man)
 (require 'org-clock)
+(use-package dash :ensure t :commands (->>))
 (use-package org-contrib :ensure t
   :config
   (require 'org-expiry)
@@ -1051,7 +1052,7 @@ items"
                        0
                        )
                       ))
-        (next-line)
+        (forward-line)
         )
       )
     result
@@ -1107,7 +1108,7 @@ items"
               (or (get-text-property (point) 'duration) 0)
               )
         )
-      (next-line)
+      (forward-line)
       )
     (goto-char biggest_duration_point)
     )
@@ -6282,7 +6283,7 @@ You should check this is not a mistake."
   )
 (advice-add #'org-todo :around #'konix/org-todo/warn-interested-partie)
 
-(when (s-equals? (s-trim (shell-command-to-string "redis-cli ping")) "PONG")
+(when (string-equal (string-trim (shell-command-to-string "redis-cli ping")) "PONG")
   (defun konix/org-clock-update-mode-line/dump-value (&rest args)
     (call-process
      "redis-cli"

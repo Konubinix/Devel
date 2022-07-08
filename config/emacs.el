@@ -10,11 +10,25 @@
 
 (defvar *emacs-load-start* (current-time))
 
-;; (require 'cask (expand-file-name ".cask/cask.el" (getenv "HOME")))
-;; (cask-initialize (getenv "KONIX_DEVEL_DIR"))
+;; To use straight
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(add-to-list 'load-path (expand-file-name "elfiles/use-package" devel-dir))
-(require 'use-package)
+;; now, use use-package
+(straight-use-package 'use-package)
+
+;; (use-package straight
+;;   :custom (straight-use-package-by-default t))
 
 ;; ####################################################################################################
 ;; Needed library paths

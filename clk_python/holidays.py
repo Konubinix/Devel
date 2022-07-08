@@ -44,8 +44,8 @@ def export_emacs(location, population):
     print("(setq konix/school-holidays '(")
     for holiday in data:
         fields = holiday["fields"]
-        if fields["location"] == location and fields[
-                "population"] == population:
+        if fields["location"] == location and fields["population"] in (
+                "-", population):
             oneday = timedelta(days=1)
             start_date = parsedate(fields["start_date"])
             end_date = parsedate(fields["end_date"])

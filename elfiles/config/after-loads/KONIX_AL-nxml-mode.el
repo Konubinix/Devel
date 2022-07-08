@@ -224,7 +224,7 @@
 	 (nxml-show-direct-subheadings)
 	 )
 	)
-  (next-line)
+  (forward-line)
   (beginning-of-line)
   )
 

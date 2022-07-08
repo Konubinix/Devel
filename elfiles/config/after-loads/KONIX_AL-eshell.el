@@ -32,7 +32,7 @@
 					 ac-source-filename
 					 ))
   (define-key eshell-mode-map (kbd "<up>") 'previous-line)
-  (define-key eshell-mode-map (kbd "<down>") 'next-line)
+  (define-key eshell-mode-map (kbd "<down>") 'forward-line)
   )
 (add-hook 'eshell-mode-hook 'konix/eshell-mode-hook)
 

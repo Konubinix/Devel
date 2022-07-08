@@ -1,6 +1,6 @@
-;;; 700-KONIX_help-mode.el ---
+;;; KONIX_AL-browse-url.el ---                       -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012  konubinix
+;; Copyright (C) 2022  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -16,7 +16,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -24,22 +24,16 @@
 
 ;;; Code:
 
-
-
-(defun konix/help-mode-hook()
-  (local-set-key "q" 'quit-window)
-  (local-set-key (kbd "C-f") 'find-function-at-point)
-  )
-(add-hook 'help-mode-hook 'konix/help-mode-hook)
-
-(eval-after-load "help-mode"
-  '(progn
-	 (define-key help-map "b" 'konix/describe-bindings)
-	 (define-key help-map "T" 'describe-text-properties)
-	 (define-key help-map (kbd "M-c") 'describe-char)
-	 (define-key help-map (kbd "A") 'apropos-value)
-	 )
+(when (string-match
+	   "linux"
+	   (getenv "KONIX_PLATFORM")
+	   )
+  (setq-default browse-url-browser-function 'konix/browse-url-browser)
   )
 
-(provide '700-KONIX_help-mode)
-;;; 700-KONIX_help-mode.el ends here
+;; ement uses use-package browse-url-handlers, from latest emacs
+(setq browse-url-handlers (list browse-url-browser-function))
+
+
+(provide 'KONIX_AL-browse-url)
+;;; KONIX_AL-browse-url.el ends here

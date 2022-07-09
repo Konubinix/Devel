@@ -11,7 +11,7 @@ then
 fi
 
 FILE="$(echo "${FILE}"|sed 's/%/%25/g'|sed 's/&/%26/g'|sed 's/=/%3D/g'|sed 's/@/%40/g'|sed 's/+/%2B/g')"
-am start \
+/system/bin/am start \
         --user 0 \
         -a android.intent.action.VIEW \
         -t text/html \

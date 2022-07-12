@@ -11,10 +11,12 @@
 
 (defvar *emacs-load-start* (current-time))
 
+(setq-default straight-base-dir (expand-file-name "elfiles/deps/straight" perso-dir))
+
 ;; To use straight
 (defvar bootstrap-version)
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" straight-base-dir))
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
@@ -24,9 +26,6 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
-
-;; now, use use-package
-(straight-use-package 'use-package)
 
 ;; (use-package straight
 ;;   :custom (straight-use-package-by-default t))

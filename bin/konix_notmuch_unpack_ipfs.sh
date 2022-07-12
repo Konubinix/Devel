@@ -16,5 +16,8 @@ then
 fi
 
 url="${KONIX_IPFS_GATEWAY}$(ipfa "${dir}"|sed -r 's/^(.+)\?.+/\1/')${suffix}"
-echo -n "${url}" | konix_xclip_in_all.sh
+if [ -n "$DISPLAY" ]
+then
+    echo -n "${url}" | konix_xclip_in_all.sh
+fi
 echo "${url}"

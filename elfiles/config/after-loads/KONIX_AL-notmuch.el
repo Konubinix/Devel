@@ -420,7 +420,7 @@ Message-Id: <%s>" id)
   (interactive)
   (let ((url (string-trim (shell-command-to-string
                            (format
-                            "konix_notmuch_unpack_ipfs.sh %s"
+                            "konix_notmuch_unpack_ipfs.sh '%s'"
                             (notmuch-show-get-message-id))
                            )))
         )

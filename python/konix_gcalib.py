@@ -277,6 +277,22 @@ class GCall(cmd.Cmd, object):
 
         @property
         def org_mode_timestamp(self):
+            if self.startdate and self.enddate and self.enddate.day > self.startdate.day:
+                current = self.startdate
+                stamp = ""
+                if "dateTime" in self.start:
+                    fmt = "<%Y-%m-%d %a %H:%M>\n"
+                else:
+                    fmt = "<%Y-%m-%d %a>\n"
+                while current < self.enddate:
+                    stamp += current.strftime(fmt)
+                    current += datetime.timedelta(days=1)
+                # if "dateTime" in self.end:
+                #     stamp += f"<{self.enddate:%Y-%m-%d %a %H:%M}>\n"
+                # else:
+                #     stamp += f"<{self.enddate:%Y-%m-%d %a}>\n"
+                return stamp
+
             stamp = "<{}-{}".format(
                 self.startdate.strftime("%Y-%m-%d %a %H:%M"),
                 self.enddate.strftime("%H:%M"),

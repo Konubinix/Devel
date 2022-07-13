@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(use-package lsp-mode :ensure t :commands (lsp))
 
 (defun konix/terraform-mode-hook ()
   (lsp)

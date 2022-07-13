@@ -354,10 +354,6 @@
 	)
   )
 
-(defun konix/gnus-alias-determine-identity ()
-  (interactive)
-  (gnus-alias-determine-identity)
-  )
 
 (defun konix/kill-all-dired-buffers()
   "Kill all dired buffers. (took from http://www.emacswiki.org/emacs/KillingBuffers#toc3)"
@@ -1151,18 +1147,6 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 ;; ################################################################################
 ;; Org
 ;; ################################################################################
-(defun konix/todo-org ()
-  (interactive)
-  (switch-to-buffer (find-file-noselect (concat perso-dir "/wiki/todo.org")))
-  (org-mode)
-  )
-
-(defun konix/diary-org ()
-  (interactive)
-  (switch-to-buffer (find-file-noselect (concat perso-dir "/wiki/diary.org")))
-  (org-mode)
-  )
-
 ;; Make appt aware of appointments from the agenda
 (defun konix/org-agenda-to-appt ()
   "Activate appointments found in `org-agenda-files'."

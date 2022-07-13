@@ -24,27 +24,47 @@
 
 ;;; Code:
 
+;; dist
 (require 'savehist)
-(require 'etags)
 (require 'winner)
 (require 'saveplace)
-(require 'paren)
 
-(use-package region-bindings-mode :ensure t :defer t)
-(use-package popwin :ensure t :defer t)
-(use-package mic-paren :ensure t :defer t)
-(use-package uuidgen :ensure t :defer t)
-(use-package golden-ratio :ensure t)
+;; elpa/melpa/etc
+(use-package auto-complete :ensure t :defer t)
 (use-package counsel :ensure t :defer t)
-(use-package miniedit :ensure t :defer t :commands (miniedit))
-(use-package yasnippet :ensure t :defer t)
-(use-package mic-paren :ensure t :defer t)
-(use-package zenburn-theme :ensure t :defer t)
-(use-package slack :ensure t :commands (slack-start))
 (use-package dash :ensure t :defer t)
+(use-package envrc :ensure t :defer t)
+(use-package f :ensure t :defer t)
+(use-package golden-ratio :ensure t)
+(use-package highlight-parentheses :ensure t :defer t)
+(use-package highlight-symbol :ensure t :commands (highlight-symbol))
+(use-package ledger-mode :ensure t :defer t)
+(use-package lua-mode :ensure t :commands (lua-mode))
+(use-package mic-paren :ensure t :defer t)
+(use-package mic-paren :ensure t :defer t)
+(use-package miniedit :ensure t :defer t :commands (miniedit))
 (use-package multiple-cursors :ensure t :defer t)
+(use-package org-drill :ensure t
+  :bind-keymap  (
+         ("C-f D" . konix/org-drill-key-map)
+         )
+  )
+(use-package org-roam :ensure t :defer t)
+(use-package org-roam-bibtex :ensure t :defer t)
+(use-package pdf-tools :ensure t :defer t)
+(use-package popwin :ensure t :defer t)
+(use-package region-bindings-mode :ensure t :defer t)
+(use-package slack :ensure t :commands (slack-start))
+(use-package uuidgen :ensure t :defer t)
 (use-package wgrep :ensure t :defer t)
+(use-package yasnippet :ensure t :defer t)
+(use-package zenburn-theme :ensure t :defer t)
 
+;; straight
+(straight-use-package '(ement :type git :host github :repo "alphapapa/ement.el"))
+(straight-use-package '(michelson :type git :host github :repo "MiloDavis/michelson-mode"))
+
+;; vendor
 (require 'framemove)
 (require 'qutebrowser)
 (require 'backup-dir)
@@ -53,25 +73,6 @@
 (require 'keep-buffers)
 (require 'git-wip-mode nil t)
 
-(load-theme 'zenburn)
-(use-package highlight-parentheses :ensure t :defer t)
-
-(straight-use-package
- '(ement :type git :host github :repo "alphapapa/ement.el")
-  )
-
-(use-package highlight-symbol :ensure t
-  :commands (highlight-symbol)
-  )
-
-(use-package org-drill
-  :ensure nil
-  :bind (
-         ("C-f D d" . org-drill)
-         ("C-f D r" . org-drill-resume)
-         ("C-f D h" . konix/org-drill-heading)
-         )
-  )
 
 ;; (use-package alert :ensure nil :defer t)
 ;; (use-package arduino-mode :ensure nil :defer t)
@@ -102,7 +103,6 @@
 ;; (use-package git-timemachine :ensure nil :defer t)
 ;; (use-package git-wip-timemachine :ensure nil :defer t)
 ;; (use-package gited :ensure nil :defer t)
-;; (use-package gnus-alias :ensure nil :defer t)
 ;; (use-package go-dlv :ensure nil :defer t)
 ;; (use-package go-mode :ensure nil :defer t)
 ;; (use-package graphviz-dot-mode :ensure nil :defer t)
@@ -123,11 +123,9 @@
 ;; (use-package jupyter :ensure nil :defer t)
 ;; (use-package kubel :ensure nil :defer t)
 ;; (use-package langtool :ensure nil :defer t)
-;; (use-package ledger-mode :ensure nil :defer t)
 ;; (use-package lsp-java :ensure nil :defer t)
 ;; (use-package lsp-jedi :ensure nil :defer t)
 ;; (use-package lsp-mode :ensure nil :defer t)
-;; (use-package lua-mode :ensure nil :defer t)
 ;; (use-package markdown-mode :ensure nil :defer t)
 ;; (use-package maxframe :ensure nil :defer t)
 ;; (use-package mediawiki :ensure nil :defer t)
@@ -145,7 +143,6 @@
 ;; (use-package orgalist :ensure nil :defer t)
 ;; (use-package orgalist :ensure nil :defer t)
 ;; (use-package ox-hugo :ensure nil :defer t)
-;; (use-package pdf-tools :ensure nil :defer t)
 ;; (use-package phi-search :ensure nil :defer t)
 ;; (use-package phi-search-dired :ensure nil :defer t)
 ;; (use-package phi-search-mc :ensure nil :defer t)

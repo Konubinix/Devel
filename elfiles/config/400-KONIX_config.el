@@ -116,19 +116,26 @@
 (setq-default query-replace-interactive nil)
 ;; C-u C-Space C-space ...
 (setq-default set-mark-command-repeat-pop t)
+;; replace the mark by what I type
+(delete-selection-mode 1)
 
-;; ************************************************************
-;; Encoding
-;; ************************************************************
-(set-language-environment 'utf-8)
-(set-terminal-coding-system 'utf-8-unix)
-(set-keyboard-coding-system 'utf-8-unix)
-(set-default-coding-systems 'utf-8-unix)
-(prefer-coding-system 'utf-8-unix)
+(progn
+  ;; ************************************************************
+  ;; Encoding
+  ;; ************************************************************
+  (set-language-environment 'utf-8)
+  (set-terminal-coding-system 'utf-8-unix)
+  (set-keyboard-coding-system 'utf-8-unix)
+  (set-default-coding-systems 'utf-8-unix)
+  (prefer-coding-system 'utf-8-unix)
+  )
 
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
-(put 'narrow-to-region 'disabled nil)
+(progn
+  ;; enable some command considered advanced
+  (put 'upcase-region 'disabled nil)
+  (put 'downcase-region 'disabled nil)
+  (put 'narrow-to-region 'disabled nil)
+  )
 
 (setq-default enable-recursive-minibuffers t)
 
@@ -141,27 +148,26 @@
 
 (setq-default ps-font-size '(7 . 6))
 
-(add-hook 'before-save-hook 'konix/force-backup-of-buffer-if-sensible t)
-
-(setq-default konix/display-table (make-display-table))
-;; ZERO WIDTH characters made visible
-(require 'subr-x)
-(mapc
- (lambda (key)
-   (aset
-    konix/display-table
-    (char-from-name key)
-    (make-vector 1 (char-from-name "ENCLOSING SQUARE"))
+(progn
+  ;; replace the display table to make the ZERO WIDTH characters visible
+  (setq-default konix/display-table (make-display-table))
+  (require 'subr-x)
+  (mapc
+   (lambda (key)
+     (aset
+      konix/display-table
+      (char-from-name key)
+      (make-vector 1 (char-from-name "ENCLOSING SQUARE"))
+      )
+     )
+   (delete-if-not
+    (lambda (key) (string/starts-with key "ZERO WIDTH"))
+    (hash-table-keys (ucs-names))
     )
    )
- (delete-if-not
-  (lambda (key) (string/starts-with key "ZERO WIDTH"))
-  (hash-table-keys (ucs-names))
+
+  (setq-default buffer-display-table konix/display-table)
   )
- )
-
-(setq-default buffer-display-table konix/display-table)
-
 ;; Local Variables:
 ;; coding: utf-8-unix
 ;; End:

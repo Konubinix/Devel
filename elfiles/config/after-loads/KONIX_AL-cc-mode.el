@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(use-package lsp-mode :ensure t :commands (lsp))
+
 (defun konix/c++-mode-hook ()
   (when (and
          (require 'cquery  nil t)

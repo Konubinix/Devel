@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'lsp-go)
+(use-package lsp-mode :ensure t :commands (lsp lsp-go))
 
 (defun konix/go-mode-hook ()
   (hs-minor-mode 1)

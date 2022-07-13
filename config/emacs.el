@@ -51,50 +51,59 @@
 (konix/setup-elfiles perso-elfiles)
 (konix/setup-elfiles perso-host-elfiles)
 (konix/setup-elfiles home-elfiles)
+
+(defmacro konix/require-debug-setup (feature-to-debug)
+  `(progn
+    (defun konix/require-debug (feature &rest args)
+    (if (equal feature ,feature-to-debug)
+        (debug)
+      )
+    )
+    (advice-add 'require :before 'konix/require-debug)
+    )
+  )
+
+;; (konix/require-debug-setup 'mypackage)
+
 ;; ################################################################################
 ;; Load config files
 ;; ################################################################################
+(defun konix/loaded-file (file-to-load)
+  (load-history-filename-element (load-history-regexp
+                                  file-to-load))
+  )
 (setq konix/loaded-in-init-files
       '(
-        "backup-dir"
-        "bibtex"
-        "calendar"
-        "comint"
-        "dired"
-        "etags"
-        "KONIX_org-meta-context"
-        "KONIX_org-roam-export"
-        "org"
-        "org-agenda"
-        "outline"
-        "ox"
-        "ox-latex"
-        "ox-publish"
-        "package"
-        "key-chord"
-        "kmacro"
-        "ob-comint"
-        "ob-core"
-        "page"
-        "paren"
-        "password-cache"
-        "popup"
-        "python"
-        "replace"
-        "savehist"
-        "saveplace"
-        "shell"
-        "simple"
-        "swiper"
-        "tempbuf"
-        "thingatpt"
-        "time-date"
-        "vc-hooks"
-        "framemove"
-        "golden-ratio"
-        "keep-buffers"
-        "window"
-        "winner"
+        "backup-dir" ;; init
+        "bibtex" ;; loaded by org -> oc-basic
+        "calendar" ;; init
+        "comint" ;; loaded by org -> org-pcomplete
+        "dired" ;; init
+        "KONIX_org-meta-context" ;; init
+        "KONIX_org-roam-export" ;; init
+        "outline" ;; loaded by org
+        "package" ;; init
+        "key-chord" ;; init
+        "kmacro" ;; loaded by (kbd)
+        "org" ;; init
+        "ob-comint" ;; loaded by org
+        "ob-core" ;; loaded by org
+        "popup" ;; loaded by autocomplete -> konix/org-mode -> konix/org-setup-holidays -> org
+        "python" ;; loaded by org (to be able to use python in babel)
+        "replace" ;; loaded by kmacro
+        "savehist" ;; init
+        "saveplace" ;; init
+        "shell" ;; loaded by org (to be able to use python in babel)
+        "swiper" ;; init
+        "tempbuf" ;; init
+        "thingatpt" ;; init
+        "time-date" ;; loaded by org
+        "vc-hooks" ;; loaded by vc -> git-wip-mode
+        "framemove" ;; init
+        "golden-ratio" ;; init
+        "keep-buffers" ;; init
+        "winner" ;; init
+        "yasnippet" ;; init
         ))
 (defvar konix/load-config-file_after-loads/debug t)
 (defun konix/load-config-files_after-loads (directory)
@@ -105,20 +114,18 @@
        (string-match "KONIX_AL-\\(.+\\).el" elt)
        (let* (
               (file-to-load (match-string-no-properties 1 elt))
-              (loaded-file (load-history-filename-element (load-history-regexp file-to-load)))
+              (loaded-file (konix/loaded-file file-to-load))
+              (message (format "%s was already loaded before configuring its after load\
+ (in %s) -> configuring an after-load is useless in that case."
+		                       file-to-load directory))
               )
          (when (and
                 loaded-file
                 (not (member file-to-load konix/loaded-in-init-files))
                 (not (member (car loaded-file) konix/initial-loaded-files))
                 )
-           (warn "%s was already loaded before configuring its after load\
- -> configuring an after-load is useless in that case."
-		         file-to-load
-		         )
-           (message "%s was already loaded before configuring its after load\
- -> configuring an after-load is useless in that case."
-		            file-to-load)
+           (warn message)
+           (message message)
            (when konix/load-config-file_after-loads/debug
              (view-echo-area-messages)
              (debug)

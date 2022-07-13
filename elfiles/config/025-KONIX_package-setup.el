@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'package)
-(setq-default package-user-dir (expand-file-name "elfiles/elpa" perso-dir))
+(setq-default package-user-dir (expand-file-name "elfiles/deps/elpa" perso-dir))
 (setq-default gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (add-to-list 'package-archives
              '("nongnu" . "https://elpa.nongnu.org/nongnu/")

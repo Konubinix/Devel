@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(setq-default flyspell-use-meta-tab nil)
+(custom-set-variables '(flyspell-use-meta-tab nil))
 
 
 (provide 'KONIX_AL-flyspell)

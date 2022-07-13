@@ -31,5 +31,11 @@
    )
  )
 
+(defun konix/gnus-alias-determine-identity ()
+  (interactive)
+  (gnus-alias-determine-identity)
+  )
+
+
 (provide 'KONIX_AL-gnus-alias)
 ;;; KONIX_AL-gnus-alias.el ends here

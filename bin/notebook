@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -eu
-echo "Running in virtual env ${KONIX_NOTEBOOK_VIRTUALENV}"
-set +u
-source ~/.virtualenvs/${KONIX_NOTEBOOK_VIRTUALENV}/bin/activate
-python -m notebook --ip 127.0.0.1 --browser ${KONIX_NOTEBOOK_BROWSER} --NotebookApp.iopub_data_rate_limit=10000000000 "$@"

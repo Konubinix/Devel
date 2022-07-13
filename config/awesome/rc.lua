@@ -569,7 +569,15 @@ globalkeys = gears.table.join(
       {description = "quit awesome", group = "awesome"}),
 
    awful.key({ modkey,           }, "p",     function ()
-         awful.spawn.easy_async(
+	 naughty.notify(
+	    {
+	       preset = naughty.config.presets.normal,
+	       title = "MPD",
+	       text = "Toggling mpc",
+	       timeout = 0.2,
+	    }
+	 )
+	 awful.spawn.easy_async(
             "clk mpc toggle",
             function (stdout, stderr, exitreason, exitcode)
                naughty.notify(

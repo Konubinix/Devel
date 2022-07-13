@@ -33,6 +33,8 @@
 (setq-default konix/old-insert-directory-program insert-directory-program)
 (setq-default konix/insert-directory-program "gatls_dired.py")
 
+(add-hook 'before-save-hook 'konix/force-backup-of-buffer-if-sensible t)
+
 (defun konix/gatls-dired-toggle (&optional force)
   (interactive)
   (if (or

@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(use-package lsp-mode :ensure t :commands (lsp))
 
 (defun konix/nix-mode-hook ()
   (lsp)

@@ -1,6 +1,7 @@
 ;; package that are needed for my config
-(use-package key-chord :ensure t)
-(use-package region-bindings-mode :ensure t)
+(use-package key-chord :ensure t :defer t)
+(use-package region-bindings-mode :ensure t :commands (region-bindings-mode-enable))
+(use-package hydra :ensure t :defer t)
 
 (region-bindings-mode-enable)
 (define-prefix-command 'konix/region-bindings-mode-map)
@@ -215,7 +216,6 @@
 (define-key 'konix/global-slow-key-map (kbd "d") 'konix/delete/map)
 
 (define-key 'konix/delete/map (kbd "m") 'delete-matching-lines)
-(define-key 'konix/delete/map (kbd "M") 'delete-selection-mode)
 
 ;; ####################################################################################################
 ;; Normal keymap keys

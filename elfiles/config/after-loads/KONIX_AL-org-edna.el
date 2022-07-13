@@ -23,6 +23,8 @@
 ;;
 
 ;;; Code:
+(use-package org :ensure t :defer t)
+
 
 (defun org-edna-action/toggle-tag! (_last-entry tag)
   "Action to change the tags of a target heading to TAGS.

@@ -26,6 +26,8 @@
 
 (use-package yapfify :ensure t :defer t)
 (use-package py-isort :ensure t :defer t)
+(use-package lsp-mode :ensure t :commands (lsp))
+(use-package lsp-jedi :ensure t :commands (lsp-jedi))
 
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)

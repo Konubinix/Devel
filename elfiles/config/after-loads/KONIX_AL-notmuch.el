@@ -28,6 +28,7 @@
 (require 'notmuch-tree)
 (require 'thingatpt)
 (require 'uuidgen)
+(use-package gnus-alias :ensure t :commands (gnus-alias-determine-identity))
 
 (defun konix/notmuch/record-url-to-ril-unflag-and-next (url)
   (interactive
@@ -417,11 +418,21 @@ Message-Id: <%s>" id)
   )
 (defun konix/notmuch-show-unpack-ipfs ()
   (interactive)
-  (shell-command
-   (format
-    "konix_notmuch_unpack_ipfs.sh %s &"
-    (notmuch-show-get-message-id))
-   )
+  (let ((url (string-trim (shell-command-to-string
+                           (format
+                            "konix_notmuch_unpack_ipfs.sh %s"
+                            (notmuch-show-get-message-id))
+                           )))
+        )
+    (when current-prefix-arg
+      (shell-command (format "$BROWSER %s &" url))
+      )
+    (message url)
+    (with-temp-buffer
+      (insert url)
+      (copy-region-as-kill (point-min) (point-max))
+      )
+    )
   )
 
 (defun konix/notmuch-show/ipfa ()

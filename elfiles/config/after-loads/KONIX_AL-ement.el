@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(define-key ement-room-mode-map (kbd "e") 'ement-room-edit-message)
+
 (defun color-dark-p (something)
   nil
   )

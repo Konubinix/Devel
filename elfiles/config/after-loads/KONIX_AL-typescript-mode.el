@@ -23,7 +23,7 @@
 ;;
 
 ;;; Code:
-
+(use-package lsp-mode :ensure t :commands (lsp))
 (defun konix/typescript-mode-hook ()
   (lsp)
   (konix/prog/config)

@@ -344,7 +344,7 @@ ${title}
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward "^[ \t]*- \\[\\[\\([^]]+\\|[^]]+\\]\\[[^]]+\\)\\]\\]$" nil t)
-        (insert " ::")
+        (insert " :")
         )
       )
     )

@@ -24,7 +24,6 @@
 
 ;;; Code:
 
-(yas-global-mode 1)
 (setq-default
  yas-snippet-dirs
  (apply

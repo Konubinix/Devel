@@ -54,14 +54,6 @@ IFS=$OLD_IFS
 shopt -s autocd
 # I like recursive globbing
 shopt -s globstar
-# ######################################################################
-# For a nice git prompt
-# ######################################################################
-if [ -e "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/git" ]
-then
-    source "${KONIX_DEVEL_DIR}/sjoubert_dot_rc/.config/bash/git"
-    KONIX_GIT_PROMPT_SOURCED=1
-fi
 
 if which luarocks > /dev/null 2>&1
 then

@@ -1,143 +1,24 @@
-[submodule "config/elfiles/w3m"]
-ignore=dirty
-	path = config/elfiles/w3m
-	url = https://github.com/emacsmirror/w3m.git
-[submodule "config/elfiles/readline-complete"]
-ignore=dirty
-	path = config/elfiles/readline-complete
-	url = https://github.com/monsanto/readline-complete.el.git
-[submodule "config/elfiles/langtool"]
-ignore=dirty
-	path = config/elfiles/langtool
-	url = https://github.com/mhayashi1120/Emacs-langtool.git
-[submodule "config/elfiles/popup"]
-ignore=dirty
-	path = config/elfiles/popup
-	url = https://github.com/auto-complete/popup-el.git
-[submodule "config/elfiles/loc-changes"]
-ignore=dirty
-	path = config/elfiles/loc-changes
-	url = https://github.com/rocky/emacs-loc-changes.git
-[submodule "config/elfiles/popwin"]
-ignore=dirty
-	path = config/elfiles/popwin
-	url = https://github.com/m2ym/popwin-el.git
-[submodule "config/elfiles/miniedit"]
-ignore=dirty
-	path = config/elfiles/miniedit
-	url = https://github.com/emacsmirror/miniedit.git
-[submodule "config/elfiles/jinja2-mode"]
-ignore=dirty
-	path = config/elfiles/jinja2-mode
-	url = https://github.com/paradoxxxzero/jinja2-mode.git
-[submodule "config/elfiles/graphviz-dot-mode"]
-ignore=dirty
-	path = config/elfiles/graphviz-dot-mode
-	url = https://github.com/ppareit/graphviz-dot-mode.git
-[submodule "seeks"]
-ignore=dirty
-	path = seeks
-	url = git://seeks.git.sourceforge.net/gitroot/seeks/seeks
-[submodule "sjoubert_dot_rc"]
-ignore=dirty
-	path = sjoubert_dot_rc
-	url = https://github.com/sjoubert/dotrcfiles.git
-[submodule "config/elfiles/highlight-indentation"]
-ignore=dirty
-	path = config/elfiles/highlight-indentation
-	url = https://github.com/antonj/Highlight-Indentation-for-Emacs.git
-[submodule "smartcd"]
-ignore=dirty
-	path = smartcd
-	url = https://github.com/cxreg/smartcd.git
 [submodule "git-wip"]
-ignore=dirty
+	ignore=dirty
 	path = git-wip
 	url = https://github.com/bartman/git-wip.git
-[submodule "config/elfiles/org-ehtml"]
-ignore=dirty
-	path = config/elfiles/org-ehtml
-	url = https://github.com/eschulte/org-ehtml
-[submodule "ledger-autosync"]
-ignore=dirty
-	path = ledger-autosync
-	#url = https://gitlab.com/egh/ledger-autosync.git
-	url = https://github.com/Konubinix/ledger-autosync
-[submodule "config/elfiles/epc"]
-ignore=dirty
-	path = config/elfiles/epc
-	url = https://github.com/kiwanami/emacs-epc.git
-[submodule "config/elfiles/zenburn"]
-ignore=dirty
-	path = config/elfiles/zenburn
-	url = https://github.com/bbatsov/zenburn-emacs
-[submodule "config/elfiles/rainbow-mode"]
-ignore=dirty
-	path = config/elfiles/rainbow-mode
-	url = https://github.com/emacsmirror/rainbow-mode
-[submodule "config/elfiles/swiper"]
-ignore=dirty
-	path = config/elfiles/swiper
-	url = https://github.com/abo-abo/swiper
-[submodule "config/elfiles/skewer-mode"]
-ignore=dirty
-	path = config/elfiles/skewer-mode
-	url = https://github.com/skeeto/skewer-mode
-[submodule "config/elfiles/ycmd"]
-ignore=dirty
-	path = config/elfiles/ycmd
-	url = https://github.com/abingham/emacs-ycmd
 [submodule "pymsmtpq"]
-ignore=dirty
+	ignore=dirty
 	path = pymsmtpq
 	url = https://github.com/darkfeline/pymsmtpq
-[submodule "config/elfiles/highlight-symbol.el"]
-ignore=dirty
-	path = config/elfiles/highlight-symbol.el
-	url = https://github.com/nschum/highlight-symbol.el
-[submodule "Flexget"]
-ignore=dirty
-	path = Flexget
-	url = https://github.com/Flexget/Flexget.git
-[submodule "Pipe"]
-ignore=dirty
-	path = Pipe
-	url = https://github.com/Konubinix/Pipe
-[submodule "config/elfiles/wgrep"]
-ignore=dirty
-	path = config/elfiles/wgrep
-	url = https://github.com/mhayashi1120/Emacs-wgrep.git
 [submodule "pymimedetacher"]
 	path = pymimedetacher
 	url = https://github.com/Konubinix/pymimedetacher.git
-        ignore=dirty
-[submodule "weboob"]
-	path = weboob
-	url = https://git.weboob.org/weboob/devel.git
-[submodule "an2linuxserver"]
-	path = an2linuxserver
-	url = https://github.com/rootkiwi/an2linuxserver
+	ignore=dirty
 [submodule "elfiles/ini"]
 	path = elfiles/ini
 	url = https://github.com/daniel-ness/ini.el.git
-[submodule "elfiles/emacs-native-shell-complete"]
-	path = elfiles/emacs-native-shell-complete
-	url = https://github.com/CeleritasCelery/emacs-native-shell-complete
-[submodule "nix-bash-completions"]
-	path = nix-bash-completions
-	url = https://github.com/hedning/nix-bash-completions
-[submodule "config/pip-bash-completion"]
-	path = config/pip-bash-completion
-	url = https://github.com/ekalinin/pip-bash-completion.git
 [submodule "config/awesome/awesome-cyclefocus"]
 	path = config/awesome/awesome-cyclefocus
 	url = https://github.com/blueyed/awesome-cyclefocus
 [submodule "elfiles/ol-emacs-slack"]
 	path = elfiles/ol-emacs-slack
 	url = https://github.com/ag91/ol-emacs-slack
-[submodule "elfiles/fence-edit"]
-	path = elfiles/fence-edit
-	url = https://github.com/aaronbieber/fence-edit.el
 [submodule "elfiles/org-link-minor-mode"]
 	path = elfiles/org-link-minor-mode
 	url = https://github.com/seanohalpin/org-link-minor-mode
@@ -147,21 +28,9 @@ ignore=dirty
 [submodule "python/dracula"]
 	path = python/dracula
 	url = https://github.com/dracula/qutebrowser-dracula-theme.git
-[submodule "elfiles/org-capture-ref"]
-	path = elfiles/org-capture-ref
-	url = https://github.com/yantar92/org-capture-ref
 [submodule "elfiles/hypothesis"]
 	path = elfiles/hypothesis
 	url = https://github.com/Kungsgeten/hypothesis
-[submodule "elfiles/org-marginalia"]
-	path = elfiles/org-marginalia
-	url = https://github.com/nobiot/org-marginalia
 [submodule "elfiles/org-transclusion"]
 	path = elfiles/org-transclusion
 	url = https://github.com/nobiot/org-transclusion
-[submodule "elfiles/nroam"]
-	path = elfiles/nroam
-	url = https://github.com/NicolasPetton/nroam
-[submodule "elfiles/crdt"]
-	path = elfiles/crdt
-	url = https://code.librehq.com/qhong/crdt.el

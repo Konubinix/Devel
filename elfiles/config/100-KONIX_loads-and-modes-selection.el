@@ -70,6 +70,7 @@
   (load-file generated-autoload-file)
   )
 
+(autoload 'cua-rectangle-mark-mode "cua-rect" "Cua rectangle" t)
 (autoload 'maxima-mode "maxima" "Mode maxima" t)
 (autoload 'lua-mode "lua-mode")
 (autoload 'doc-mode "doc-mode" "Loading doc mode" t nil)
@@ -94,6 +95,7 @@
 (autoload 'konix/org-meta-context/goto-root "KONIX_org-meta-context")
 (autoload 'konix/org-meta-context/return-restricted-agenda-files "KONIX_org-meta-context")
 (autoload 'konix/org-meta-context/toggle-restrict "KONIX_org-meta-context")
+(autoload 'dired-sort-toggle-reverse "dired-sort")
 (autoload 'org-timer-stop "org-timer")
 (autoload 'notmuch "notmuch")
 (autoload 'notmuch-search "notmuch")

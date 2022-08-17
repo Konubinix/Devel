@@ -641,7 +641,7 @@ globalkeys = gears.table.join(
       {description = "toggle mute", group = "music"}),
    awful.key({}, "XF86AudioNext",     function ()
          awful.spawn.easy_async(
-            "mpc next",
+            "clk mpc next",
             function (stdout, stderr, exitreason, exitcode)
                naughty.notify(
                   {
@@ -656,7 +656,7 @@ globalkeys = gears.table.join(
       {description = "play next song", group = "music"}),
    awful.key({}, "XF86AudioPrev",     function ()
          awful.spawn.easy_async(
-            "mpc prev",
+            "clk mpc prev",
             function (stdout, stderr, exitreason, exitcode)
                naughty.notify(
                   {

@@ -8,6 +8,7 @@
 	fontdiff = -family Courier -size 12 -weight normal -slant roman -underline 0 -overstrike 0
 	encoding = utf-8
 [alias]
+    up = pull --rebase --autostash --recurse-submodules
     dangling = branch --all --no-merged
     orphans = branch --all --merged
 	ci = commit

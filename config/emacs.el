@@ -111,6 +111,9 @@
         "yasnippet" ;; init
         ))
 (defvar konix/load-config-file_after-loads/debug t)
+(when (getenv "KONIX_DEVEL_INSTALL_EMACS")
+  (setq-default konix/load-config-file_after-loads/debug nil)
+  )
 (defun konix/load-config-files_after-loads (directory)
   ;; for each file in after-loads with the pattern .*KONIX_AL_\(.+\).el directory, make sure it will be loaded after
   ;; the file with the exact name \1 will be loaded

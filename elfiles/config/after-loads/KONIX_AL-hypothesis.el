@@ -26,8 +26,6 @@
 
 (require 'org-roam)
 
-(setq-default hypothesis-archive (expand-file-name "hypothesis.org" org-roam-directory))
-
 (defun konix/hypothesis-archive ()
   (interactive)
   (let (

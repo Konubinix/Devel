@@ -24,9 +24,7 @@
 
 ;;; Code:
 
-(setq-default cua-rectangle-mark-key (kbd "C-x r T"))
 (cua-selection-mode 1)
-
 
 (provide 'KONIX_AL-cua-base)
 ;;; KONIX_AL-cua-base.el ends here

@@ -15,6 +15,8 @@
 (load-theme 'zenburn)
 (envrc-global-mode 1)
 (yas-global-mode 1)
+(tracking-mode 1)
+(save-place-mode 1)
 
 ;; this is the long part, as it loads my org files
 (require 'KONIX_org-meta-context)

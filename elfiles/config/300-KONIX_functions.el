@@ -1396,38 +1396,20 @@ Version 2016-09-02"
 (defun konix/org-insert-youtube-video-transcript (url)
   "Copied the code from https://sachachua.com/blog/2021/04/org-mode-insert-youtube-video-with-separate-captions/"
   (interactive "MURL: ")
-  (require 'dom)
-  (let* ((id (if (string-match "v=\\([^&]+\\)" url) (match-string 1 url) url))
-         (temp-file (make-temp-name "org-youtube-"))
-         (temp-file-name (concat temp-file ".en.srv1"))
-         data)
-    (when (and (call-process "youtube-dl" nil nil nil
-                             "--write-sub" "--write-auto-sub"  "--no-warnings"
-                             "--sub-lang" (if current-prefix-arg "fr" "en") "--skip-download" "--sub-format" "srv1"
-                             "-o" temp-file
-                             (format "https://youtube.com/watch?v=%s" id))
-               (file-exists-p temp-file-name))
-      (insert
-       "|------+------|\n"
-       "| time | text |\n"
-       "|------+------|\n"
-       (mapconcat (lambda (o)
-                    (format "| [[https://youtube.com/watch?v=%s&t=%ss][%s]] | %s |\n"
-                            id
-                            (dom-attr o 'start)
-                            (konix/msecs-to-timestamp (* 1000 (string-to-number (dom-attr o 'start))))
-                            (->> (dom-text o)
-                                 (replace-regexp-in-string "[ \n]+" " ")
-                                 (replace-regexp-in-string "&#39;" "'")
-                                 (replace-regexp-in-string "&quot;" "\""))))
-                  (dom-by-tag (xml-parse-file temp-file-name) 'text)
-                  ""))
-      (delete-file temp-file-name))))
+  (insert (shell-command-to-string
+           (format
+            "clk podcast transcript dump --orgmode --lang %s '%s'"
+            (if current-prefix-arg "fr" "en")
+            url
+            )
+           )
+          )
+  )
 
 (defun konix/substring-capped (string from to)
   (when (<= (length string) to)
-      (setq to nil)
-      )
+    (setq to nil)
+    )
   (substring string from to)
   )
 
@@ -1440,11 +1422,11 @@ Version 2016-09-02"
 
 (defun konix/redis-hget (key name)
   (and (konix/redis-hexists key name)
-   (with-temp-buffer
-     (call-process "redis-cli" nil (current-buffer) nil "hget" key name)
-     (s-trim (buffer-substring-no-properties (point-min) (point-max)))
-     )
-   )
+       (with-temp-buffer
+         (call-process "redis-cli" nil (current-buffer) nil "hget" key name)
+         (s-trim (buffer-substring-no-properties (point-min) (point-max)))
+         )
+       )
   )
 
 (defun konix/redis-hset (key name value)

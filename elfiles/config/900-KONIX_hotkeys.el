@@ -7,6 +7,10 @@
 (define-prefix-command 'konix/region-bindings-mode-map)
 (define-key region-bindings-mode-map "r" 'konix/region-bindings-mode-map)
 
+(define-key konix/region-bindings-mode-map "t" 'string-rectangle)
+
+(define-key konix/region-bindings-mode-map "n" 'cua-rectangle-mark-mode)
+
 (setq-default
  region-bindings-mode-disable-predicates
  '((lambda () buffer-read-only))

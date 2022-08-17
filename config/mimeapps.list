@@ -29,6 +29,7 @@ application/x-matroska=vlc.desktop;
 x-scheme-handler/postman=Postman.desktop
 video/x-flv=vlc.desktop;
 video/mpeg=vlc.desktop;
+audio/ogg=vlc.desktop;
 video/x-msvideo=vlc.desktop;
 audio/mpeg=vlc.desktop;
 image/x-canon-cr2=feh.desktop;

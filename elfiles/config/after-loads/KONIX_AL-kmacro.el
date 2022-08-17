@@ -26,6 +26,7 @@
 
 (require 'savehist)
 
+(setq-default kmacro-ring-max 100)
 (add-to-list 'savehist-additional-variables 'kmacro-ring)
 (add-to-list 'savehist-additional-variables 'last-kbd-macro)
 (add-to-list 'savehist-additional-variables 'kmacro-counter)

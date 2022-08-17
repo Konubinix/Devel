@@ -147,8 +147,6 @@
 (define-key 'konix/global-slow-key-map (kbd ">") 'end-of-buffer)
 ;; 0bin paste
 (define-key 'konix/global-slow-key-map (kbd "p") 'konix/0binpaste)
-;; open recent file
-(define-key 'konix/global-slow-key-map (kbd "f") 'recentf-open-files)
 (define-key 'konix/global-slow-key-map (kbd "C-o") 'konix/mimeopen)
 ;; toggle gatls_dired
 (define-key 'konix/global-slow-key-map (kbd "C-l") 'konix/gatls-dired-toggle)

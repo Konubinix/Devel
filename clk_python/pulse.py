@@ -13,9 +13,31 @@ from clk.types import DynamicChoice
 LOGGER = get_logger(__name__)
 
 
+class Pulse:
+    pass
+
+
+class Applications:
+
+    @property
+    def sinks_input(self):
+        return [
+            application for application in self.applications
+            if application.__class__.__name__ == "PulseSinkInputInfo"
+        ]
+
+    @property
+    def sources_output(self):
+        return [
+            application for application in self.applications
+            if application.__class__.__name__ == "PulseSourceOutputInfo"
+        ]
+
+
 @group()
 def pulse():
     """Manipulate the sound"""
+    config.pulse = Pulse()
 
 
 def find_sink(index):
@@ -50,15 +72,32 @@ class PlayingApplicationsTypes(DynamicChoice):
             ][0]
 
 
+sink_aliases = {
+    "headset": "casque",
+    "casque":
+    "alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo",
+    "speaker": "alsa_output.usb-GeneralPlus_USB_Audio_Device-00.analog-stereo",
+    "laptop": "alsa_output.pci-0000_00_1f.3.analog-stereo",
+}
+
+source_aliases = {
+    "casque":
+    "alsa_input.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.mono-fallback",
+}
+
+
 class SinkType(DynamicChoice):
 
     def choices(self):
         import pulsectl
         with pulsectl.Pulse("type") as p:
-            return [sink.name for sink in p.sink_list()]
+            return [sink.name
+                    for sink in p.sink_list()] + list(sink_aliases.keys())
 
     def converter(self, value):
         import pulsectl
+        while value in sink_aliases:
+            value = sink_aliases[value]
         with pulsectl.Pulse("type") as p:
             return [sink for sink in p.sink_list() if sink.name == value][0]
 
@@ -68,10 +107,13 @@ class SourceType(DynamicChoice):
     def choices(self):
         import pulsectl
         with pulsectl.Pulse("type") as p:
-            return [source.name for source in p.source_list()]
+            return [source.name for source in p.source_list()] + list(
+                source_aliases.keys())
 
     def converter(self, value):
         import pulsectl
+        while value in source_aliases:
+            value = source_aliases[value]
         with pulsectl.Pulse("type") as p:
             return [
                 source for source in p.source_list() if source.name == value
@@ -93,20 +135,87 @@ def find_sink_by_name_safe(name):
 
 @pulse.command()
 @argument(
-    "application",
-    help="What application to switch",
-    type=PlayingApplicationsTypes(),
-)
-@argument(
     "sink",
     help="What sink to use instead",
     type=SinkType(),
+)
+@argument(
+    "application",
+    help="What application to switch",
+    type=PlayingApplicationsTypes(),
 )
 def change_sink(application, sink):
     """Move the application to another sink"""
     import pulsectl
     with pulsectl.Pulse("clk") as p:
         p.sink_input_move(application.index, sink.index)
+
+
+@pulse.group(default_command="show")
+@flag("--all", help="All the applications")
+@option("--name-prefix", help="With name starting with")
+def application(all, name_prefix):
+    "Manage applications"
+    config.pulse.applications = Applications()
+    import pulsectl
+    applications = []
+    with pulsectl.Pulse("clk") as p:
+
+        def all_applications():
+            return [
+                application for application in p.sink_input_list() +
+                p.source_output_list()
+                if application.proplist["application.process.binary"] !=
+                "pavucontrol"
+            ]
+
+        if all:
+            applications = all_applications()
+        elif name_prefix:
+            applications = [
+                application for application in all_applications()
+                if application.proplist["application.process.binary"].lower().
+                startswith(name_prefix.lower())
+            ]
+
+    config.pulse.applications.applications = applications
+
+
+@application.command()
+def show():
+    "Show the matching applications"
+    for application in config.pulse.applications.applications:
+        print(
+            f'{application.__class__.__name__} : {application.proplist["application.process.binary"]} : {application}'
+        )
+
+
+@application.command()
+@argument(
+    "sink",
+    help="What sink to use instead",
+    type=SinkType(),
+)
+def move_to_sink(sink):
+    "Move the matching application to this sink"
+    import pulsectl
+    with pulsectl.Pulse("clk") as p:
+        for application in config.pulse.applications.sinks_input:
+            p.sink_input_move(application.index, sink.index)
+
+
+@application.command()
+@argument(
+    "source",
+    help="What source to use instead",
+    type=SourceType(),
+)
+def move_to_source(source):
+    "Move the matching application to this source"
+    import pulsectl
+    with pulsectl.Pulse("clk") as p:
+        for application in config.pulse.applications.sources_output:
+            p.source_output_move(application.index, source.index)
 
 
 @pulse.command()
@@ -224,7 +333,7 @@ def toggle_mute():
 def source(source):
     """Manipulate the sources"""
     import pulsectl
-    with pulsectl.Pulse('volume-setter') as pulse:
+    with pulsectl.Pulse() as pulse:
         config.source = source or pulse.source_list()
 
 
@@ -233,6 +342,6 @@ def source(source):
 def __set(value):
     """Put the volume"""
     import pulsectl
-    with pulsectl.Pulse('volume-setter') as pulse:
+    with pulsectl.Pulse() as pulse:
         for source in config.source:
             pulse.volume_set_all_chans(source, value)

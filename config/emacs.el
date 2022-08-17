@@ -54,13 +54,13 @@
 
 (defmacro konix/require-debug-setup (feature-to-debug)
   `(progn
-    (defun konix/require-debug (feature &rest args)
-    (if (equal feature ,feature-to-debug)
-        (debug)
-      )
-    )
-    (advice-add 'require :before 'konix/require-debug)
-    )
+     (defun konix/require-debug (feature &rest args)
+       (if (equal feature ,feature-to-debug)
+           (debug)
+         )
+       )
+     (advice-add 'require :before 'konix/require-debug)
+     )
   )
 
 ;; (konix/require-debug-setup 'mypackage)
@@ -78,7 +78,9 @@
         "bibtex" ;; loaded by org -> oc-basic
         "calendar" ;; init
         "comint" ;; loaded by org -> org-pcomplete
+        "delight" ;; init
         "dired" ;; init
+        "envrc" ;; init
         "KONIX_org-meta-context" ;; init
         "KONIX_org-roam-export" ;; init
         "outline" ;; loaded by org
@@ -90,14 +92,17 @@
         "ob-core" ;; loaded by org
         "popup" ;; loaded by autocomplete -> konix/org-mode -> konix/org-setup-holidays -> org
         "python" ;; loaded by org (to be able to use python in babel)
+        "region-bindings-mode" ;; init
         "replace" ;; loaded by kmacro
         "savehist" ;; init
         "saveplace" ;; init
         "shell" ;; loaded by org (to be able to use python in babel)
+        "smerge-mode" ;; loaded when an org mode file needs merging
         "swiper" ;; init
         "tempbuf" ;; init
         "thingatpt" ;; init
         "time-date" ;; loaded by org
+        "tracking" ;; init
         "vc-hooks" ;; loaded by vc -> git-wip-mode
         "framemove" ;; init
         "golden-ratio" ;; init

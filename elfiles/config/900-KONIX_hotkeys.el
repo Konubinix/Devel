@@ -29,6 +29,11 @@
 (global-unset-key (kbd "<f1>"))
 (global-unset-key (kbd "<f3>"))
 (global-unset-key (kbd "<f4>"))
+;; remove keys that I type too much by mistake
+(global-set-key (kbd "C-x <")
+  #'(lambda () (interactive) (message "Intentionally disable C-x <")))
+(global-set-key (kbd "C-x >")
+  #'(lambda () (interactive) (message "Intentionally disable C-x >")))
 
 ;; some vim keys
 (global-set-key (kbd "C-n") 'dabbrev-completion)

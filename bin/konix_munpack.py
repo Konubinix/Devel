@@ -85,17 +85,22 @@ def munpack(message, directory, rel_path=False):
             # If it does happen, turn the string into bytes in a way
             # guaranteed not to fail.
             text = bcontent
-        content_type = part.get_content_type()
+
         main_type = part.get_content_maintype()
         prefix = main_type
         extension = sub_type
-        file_ = tempfile.NamedTemporaryFile(mode="bw",
-                                            dir=directory,
-                                            suffix=".{}".format(extension),
-                                            prefix=prefix,
-                                            delete=False)
-        file_name = os.path.relpath(file_.name,
-                                    directory) if rel_path else file_.name
+        name = part.get_filename()
+        if name:
+            file_name = os.path.join(directory, name)
+            file_ = open(file_name, "bw")
+        else:
+            file_ = tempfile.NamedTemporaryFile(mode="bw",
+                                                dir=directory,
+                                                suffix=".{}".format(extension),
+                                                prefix=prefix,
+                                                delete=False)
+            file_name = os.path.relpath(file_.name,
+                                        directory) if rel_path else file_.name
         if text is not None:
             for cid, name in CID_TO_NAME.items():
                 text = text.replace(

@@ -574,7 +574,7 @@ globalkeys = gears.table.join(
 	       preset = naughty.config.presets.normal,
 	       title = "MPD",
 	       text = "Toggling mpc",
-	       timeout = 0.2,
+	       timeout = 0.5,
 	    }
 	 )
 	 awful.spawn.easy_async(

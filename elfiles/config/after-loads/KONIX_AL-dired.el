@@ -125,10 +125,12 @@
   (turn-on-tempbuf-mode)
   (setq tempbuf-timeout 3600) ; time before next grace
   (setq-local tempbuf-minimum-timeout tempbuf-timeout) ; base time after next grace
-  (local-set-key (kbd "<C-return>") 'konix/dired-mimeopen)
   (call-process "konix_autojump.sh" nil nil nil "-a" (expand-file-name dired-directory))
   )
 (add-hook 'dired-mode-hook 'konix/dired-mode-hook)
+
+(define-key dired-mode-map (kbd "<C-return>") 'konix/dired-mimeopen)
+
 
 (setq-default dired-backup-overwrite nil)
 (setq-default dired-omit-verbose nil)

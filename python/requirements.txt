@@ -1,0 +1,8 @@
+html2text
+xdg
+hvac
+notmuch
+python-mpd2
+supermemo2
+vobject
+icalendar

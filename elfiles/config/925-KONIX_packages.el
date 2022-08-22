@@ -33,6 +33,7 @@
 ;; elpa/melpa/etc
 (use-package auto-complete :ensure t :defer t)
 (use-package counsel :ensure t :defer t)
+(use-package dap-mode :ensure t :defer t)
 (use-package dash :ensure t :defer t)
 (use-package default-text-scale :ensure t :defer t)
 (use-package delight :ensure t)
@@ -41,6 +42,7 @@
 (use-package earthfile-mode :ensure t :defer t)
 (use-package f :ensure t :defer t)
 (use-package flycheck :ensure t :defer t)
+(use-package git-timemachine :ensure t :commands (git-timemachine))
 (use-package golden-ratio :ensure t)
 (use-package go-mode :ensure t :defer t)
 (use-package hcl-mode :ensure t :commands (hcl-mode))
@@ -116,7 +118,6 @@
 ;; (use-package emacs-everywhere :ensure nil :defer t)
 ;; (use-package envrc :ensure nil :defer t)
 ;; (use-package feature-mode :ensure nil :defer t)
-;; (use-package git-timemachine :ensure nil :defer t)
 ;; (use-package git-wip-timemachine :ensure nil :defer t)
 ;; (use-package gited :ensure nil :defer t)
 ;; (use-package go-dlv :ensure nil :defer t)

@@ -5970,9 +5970,11 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
                  (deadline-time (org-get-deadline-time (point)))
                  )
         (when (time-less-p deadline-time schedule-time)
-          (warn "Deadline time (%s) before schedule time (%s).
+          (warn "About '%s'
+Deadline time (%s) before schedule time (%s).
 The entry won't show up until it is too late.
 You should check this is not a mistake."
+                (konix/org-get-heading)
                 (org-format-time-string "%Y-%m-%d %H:%M" deadline-time)
                 (org-format-time-string "%Y-%m-%d %H:%M" schedule-time)
                 )

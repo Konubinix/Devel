@@ -2497,6 +2497,12 @@ items"
 
 (defvar konix/org-gtd-agenda/history nil)
 (defvar konix/org-gtd-context/history nil)
+(eval-after-load "savehist.el"
+  (progn
+    (add-to-list 'savehist-additional-variables 'konix/org-gtd-context/history)
+    (add-to-list 'savehist-additional-variables 'konix/org-gtd-agenda/history)
+    )
+  )
 
 (defun konix/org-gtd-triage ()
   (interactive)

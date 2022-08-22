@@ -3,7 +3,4 @@
 # key: ip
 # binding: direct-keybinding
 # --
-import IPython
-dict_ = globals()
-dict_.update(locals())
-IPython.start_ipython(argv=[], user_ns=dict_)
+import IPython ; IPython.start_ipython(argv=[], user_ns=(globals() | locals()))

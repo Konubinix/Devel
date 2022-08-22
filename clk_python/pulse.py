@@ -4,6 +4,7 @@
 import subprocess
 from shlex import split
 
+import click
 from clk import call, check_output, run
 from clk.config import config
 from clk.decorators import argument, flag, group, option
@@ -277,6 +278,16 @@ def sink(sink):
 
 
 @sink.command()
+def set_as_default():
+    """Set this sink is the default one"""
+    if len(config.sink) > 1:
+        raise click.UsageError("You must select at most one sink")
+    import pulsectl
+    with pulsectl.Pulse() as pulse:
+        pulse.default_set(config.sink[0])
+
+
+@sink.command()
 @argument("value", type=float, help="The value to use")
 def _set(sink, value):
     """Put the volume"""
@@ -335,6 +346,16 @@ def source(source):
     import pulsectl
     with pulsectl.Pulse() as pulse:
         config.source = source or pulse.source_list()
+
+
+@source.command()
+def _set_as_default():
+    """Set this source is the default one"""
+    if len(config.source) > 1:
+        raise click.UsageError("You must select at most one source")
+    import pulsectl
+    with pulsectl.Pulse() as pulse:
+        pulse.default_set(config.source[0])
 
 
 @source.command()

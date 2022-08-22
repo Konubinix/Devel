@@ -32,31 +32,32 @@
   (s-count-matches "[ ]\\{2\\}" (match-string 0)))
 
 (defun konix/yaml-mode-outline-hook ()
-  (outline-minor-mode)
-  (setq outline-regexp
-        (rx
-         (seq
-	      bol
-	      (group (zero-or-more "  ")
-	             (or (group
-		              (seq (or (seq "\"" (*? (not (in "\"" "\n"))) "\"")
-			                   (seq "'" (*? (not (in "'" "\n"))) "'")
-			                   (*? (not (in ":" "\n"))))
-			               ":"
-			               (?? (seq
-			                    (*? " ")
-			                    (or (seq "&" (one-or-more nonl))
-				                    (seq ">-")
-				                    (seq "|"))
-			                    eol))))
-		             (group (seq
-			                 "- "
-			                 (+ (not (in ":" "\n")))
-			                 ":"
-			                 (+ nonl)
-			                 eol)))))))
-  (setq outline-level 'konix/yaml-outline-level)
-  (konix/outline/setup-keys yaml-mode-map)
+  ;; (outline-minor-mode)
+  ;; (setq outline-regexp
+  ;;       (rx
+  ;;        (seq
+  ;;         bol
+  ;;         (group (zero-or-more "  ")
+  ;;                (or (group
+  ;;   	              (seq (or (seq "\"" (*? (not (in "\"" "\n"))) "\"")
+  ;;   		                   (seq "'" (*? (not (in "'" "\n"))) "'")
+  ;;   		                   (*? (not (in ":" "\n"))))
+  ;;   		               ":"
+  ;;   		               (?? (seq
+  ;;   		                    (*? " ")
+  ;;   		                    (or (seq "&" (one-or-more nonl))
+  ;;   			                    (seq ">-")
+  ;;   			                    (seq "|"))
+  ;;   		                    eol))))
+  ;;   	             (group (seq
+  ;;   		                 "- "
+  ;;   		                 (+ (not (in ":" "\n")))
+  ;;   		                 ":"
+  ;;   		                 (+ nonl)
+  ;;   		                 eol)))))))
+  ;; (setq outline-level 'konix/yaml-outline-level)
+  ;; (konix/outline/setup-keys yaml-mode-map)
+  (origami-mode 1)
   )
 
 (add-hook #'yaml-mode-hook

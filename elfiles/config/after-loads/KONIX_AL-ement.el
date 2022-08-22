@@ -26,12 +26,81 @@
 
 (define-key ement-room-mode-map (kbd "e") 'ement-room-edit-message)
 
+(setq-default
+ ement-room-message-format-spec "[%t] %S> %B%r"
+ ement-room-left-margin-width 0
+ ement-room-right-margin-width 0
+ ement-room-sender-headers nil
+ ement-room-sender-in-headers nil
+ ement-room-sender-in-left-margin nil
+ )
+
+(setq-default ement-room-retro-messages-number 100)
+
+(define-prefix-command 'konix/global-ement-key-map)
+(define-key konix/global-slow-key-map (kbd "M-e") 'konix/global-ement-key-map)
+
+(define-key konix/global-ement-key-map (kbd "l") 'ement-room-list)
+
+(defun konix/flatten (nested)
+  (let (
+        (res '())
+        )
+    (mapc (lambda (elem)
+            (lambda (subelem)
+              (add-to-list 'res subelem t)
+              )
+            elem
+            )
+          nested
+          )
+    res
+    )
+  )
+
+(defun konix/ement-update-tracking (&rest args)
+  (->>
+   (konix/ement-unread-local-rooms)
+   (-map 'konix/ement-room-buffer)
+   (-map 'tracking-add-buffer)
+   )
+  )
+
+(defun konix/ement-room-buffer (room)
+  (map-elt (ement-room-local room) 'buffer)
+  )
+
+(defun konix/ement-unread-local-rooms ()
+  (->>
+   ement-sessions
+   (-map 'cdr)
+   (-map (lambda (session)
+           (->>
+            (ement-session-rooms session)
+            (-filter
+             (lambda (room)
+               (buffer-live-p (konix/ement-room-buffer room))
+               )
+             )
+            (-filter
+             (lambda (room)
+               (ement--room-unread-p room session)
+               )
+             )
+            )
+           )
+         )
+   (-flatten)
+   ;; (-map 'ement-room-display-name)
+   )
+  )
+
 (defun color-dark-p (something)
   nil
   )
 
 (cl-defun konix/ement-notify--log-to-buffer/add-tracking (event room session &key (buffer-name "*Ement Notifications*") )
-  (tracking-add-buffer (get-buffer buffer-name))
+  (konix/ement-update-tracking)
   )
 (advice-add 'ement-notify--log-to-buffer :after 'konix/ement-notify--log-to-buffer/add-tracking)
 
@@ -59,6 +128,35 @@
       )
     )
   )
+
+(defun konix/ement-room-buffers ()
+  (->> (buffer-list)
+       (-filter (lambda (buffer) (string-equal "ement-room-mode"
+                                               (with-current-buffer buffer major-mode))))
+       )
+  )
+
+(add-hook
+ 'ement-after-initial-sync-hook
+ #'konix/ement-update-tracking
+ 100
+ )
+
+(defun konix/ement-room-list--entry/update-tracking (&rest args)
+  (konix/ement-update-tracking)
+  )
+
+(advice-add 'ement-room-list--entry :after #'konix/ement-room-list--entry/update-tracking)
+
+(setq-default
+ ement-notify-notification-predicates
+ '(
+   ement-notify--event-mentions-session-user-p
+   ement-notify--event-mentions-room-p
+   ement-notify--room-unread-p
+   )
+ )
+
 
 (provide 'KONIX_AL-ement)
 ;;; KONIX_AL-ement.el ends here

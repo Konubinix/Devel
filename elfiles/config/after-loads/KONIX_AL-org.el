@@ -5444,6 +5444,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
           (konix/org-agenda-kill/confirm-if-clock-info)
           (konix/org-agenda-kill/confirm-if-committed)
           (konix/org-kill/confirm-number-of-lines)
+          (konix/org-kill/confirm-dates-in-the-future)
           (konix/org-kill-no-confirm)
           )
       (call-interactively 'kill-line)
@@ -5985,6 +5986,20 @@ You should check this is not a mistake."
   )
 
 (advice-add #'org--deadline-or-schedule :after #'konix/org--deadline-or-schedule/check-schedule-hides-timestamps)
+
+(defun konix/org-kill/confirm-dates-in-the-future ()
+  (when-let (
+             (timestamps (konix/org-extract-active-timestamps t))
+             )
+    (when (->> timestamps
+               (-filter (-partial 'time-less-p nil))
+               )
+      (unless (yes-or-no-p (format "%s: Kill even though there are stuff in the future for it? " (konix/org-get-heading)))
+        (user-error "Prevent killing the heading")
+        )
+      )
+    )
+  )
 
 (defun konix/org-insert-time-stamp/check-if-hidden (time &optional with-hm inactive pre post extra)
   (when (and

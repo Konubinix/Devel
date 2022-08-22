@@ -108,6 +108,7 @@
         "golden-ratio" ;; init
         "keep-buffers" ;; init
         "winner" ;; init
+        "xml" ;; when showing notification at startup
         "yasnippet" ;; init
         ))
 (defvar konix/load-config-file_after-loads/debug t)

@@ -2792,14 +2792,6 @@ items"
 (setq-default org-export-with-drawers '("LOGBOOK"))
 (defun konix/org-todo_file ()
   (expand-file-name "todo.org" org-directory))
-(defun konix/org-notes_file ()
-  (expand-file-name "notes.org" org-directory))
-(defun konix/org-iso9001_file ()
-  (expand-file-name "wiki/iso9001.org" (getenv "KONIX_PERSO_DIR")))
-(defun konix/org-diary_file ()
-  (expand-file-name "diary.org" org-directory))
-(defun konix/org-bookmarks_file ()
-  (expand-file-name "bookmarks.org" org-directory))
 
 (defun konix/org-get-time nil
   (let* (
@@ -2989,17 +2981,7 @@ items"
 "
                  :clock-in t
                  )
-                ("n" "Note" entry (file konix/org-notes_file)
-                 "* %?
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-"
-                 )
-                ("s" "ISO9001" entry (file konix/org-iso9001_file)
-                 #'konix/org-capture-template-iso-9001
-                 )
-                ("d" "Diary" entry (file+headline konix/org-diary_file "Refile")
+                ("d" "Diary" entry (file+headline konix/org-todo_file "Refile")
                  #'konix/org-capture-template-diary
                  )
                 )
@@ -3400,11 +3382,6 @@ items"
 (defun konix/org-goto-notes ()
   (interactive)
   (find-file (expand-file-name "notes.org" org-directory))
-  )
-
-(defun konix/org-goto-bookmarks ()
-  (interactive)
-  (find-file (konix/org-bookmarks_file))
   )
 
 (defvar konix/org-add-note/window-configuration nil)

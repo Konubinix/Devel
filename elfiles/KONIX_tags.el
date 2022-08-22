@@ -279,11 +279,6 @@ TAGS_FILE_NAMETHE"
 	)
   )
 
-(defun konix/push-tags-mark ()
-  (interactive)
-  (ring-insert find-tag-marker-ring (point-marker))
-  )
-
 (defun konix/tags/next-head ()
   (interactive)
   (setq tags-table-list

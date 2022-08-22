@@ -1106,9 +1106,6 @@ http://www.emacswiki.org/emacs/ToggleWindowSplit
 	)
   )
 
-;; semantic uses it
-(defalias 'push-tag-mark 'konix/push-tags-mark)
-
 ;; ####################################################################################################
 ;; Uniquify, taken from http://www.emacswiki.org/emacs/DuplicateLines
 ;; ####################################################################################################

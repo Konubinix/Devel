@@ -31,6 +31,3 @@
 [submodule "elfiles/hypothesis"]
 	path = elfiles/hypothesis
 	url = https://github.com/Kungsgeten/hypothesis
-[submodule "elfiles/org-transclusion"]
-	path = elfiles/org-transclusion
-	url = https://github.com/nobiot/org-transclusion

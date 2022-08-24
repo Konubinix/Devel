@@ -66,6 +66,7 @@
 (use-package org-ql :ensure t :commands (org-ql-search))
 (use-package org-roam :ensure t :defer t)
 (use-package org-roam-bibtex :ensure t :defer t)
+(use-package org-transclusion :ensure t :defer t)
 (use-package origami :ensure t :commands (origami-mode))
 (use-package pdf-tools :ensure t :defer t)
 (use-package popwin :ensure t :defer t)

@@ -81,40 +81,43 @@ Message-Id: <%s>" id)
 ;; for notmuch to sort mails like I want
 (setq-default notmuch-search-oldest-first nil)
 (require 'ini)
-(setq-default notmuch-saved-searches
-			  (remove-if
-			   'null
-			   (mapcar
-				(lambda (entry)
-				  (if (assoc "search" (cdr entry))
-					  (cons
-					   (car entry)
-					   (cdr (assoc "search" (cdr entry)))
-					   )
-					nil
-					)
-				  )
-				(reverse
-				 (ini-decode
-				  (with-temp-buffer
-					(insert-file-contents
-					 (first
-					  (remove-if-not
-					   'file-exists-p
-					   (split-string
-						(getenv "KONIX_NOTMUCH_SAVED_SEARCHES")
-						path-separator
-						)
-					   )
+(defun konix/notmuch/initialize-saved-searches ()
+  (setq-default notmuch-saved-searches
+			    (remove-if
+			     'null
+			     (mapcar
+				  (lambda (entry)
+				    (if (assoc "search" (cdr entry))
+					    (cons
+					     (car entry)
+					     (cdr (assoc "search" (cdr entry)))
+					     )
+					  nil
 					  )
-					 )
-					(buffer-substring-no-properties (point-min) (point-max))
-					)
+				    )
+				  (reverse
+				   (ini-decode
+				    (with-temp-buffer
+					  (insert-file-contents
+					   (first
+					    (remove-if-not
+					     'file-exists-p
+					     (split-string
+						  (getenv "KONIX_NOTMUCH_SAVED_SEARCHES")
+						  path-separator
+						  )
+					     )
+					    )
+					   )
+					  (buffer-substring-no-properties (point-min) (point-max))
+					  )
+				    )
+				   )
 				  )
-				 )
-				)
-			   )
-			  )
+			     )
+			    )
+  )
+(konix/notmuch/initialize-saved-searches)
 (setq-default mailcap-download-directory
 			  (format "%s/" (getenv "KONIX_DOWNLOAD_DIR")))
 (setq-default mm-default-directory mailcap-download-directory)

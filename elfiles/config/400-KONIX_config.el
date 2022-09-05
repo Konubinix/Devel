@@ -69,11 +69,19 @@
 (setq-default read-file-name-completion-ignore-case t)
 (setq-default read-buffer-completion-ignore-case t)
 
-(setq-default scroll-margin 0)
+;; when the point is near 10 lines of a border, smoothly scroll line by line
+(setq-default scroll-margin 10
+              scroll-step 1
+              maximum-scroll-margin 0.4
+              )
+;; don't use this until I actually find a real use of it
+(setq-default scroll-down-aggressively 0
+			  scroll-up-aggressively 0)
+
+;; always recenter point if it moves off screen
 (setq-default scroll-conservatively 0)
-(setq-default scroll-down-aggressively 10
-			  scroll-up-aggressively 10)
-(setq-default scroll-step 5)
+;; when using C-v/M-v, leave 10 lines behind to understand where I am
+(setq-default next-screen-context-lines 10)
 
 ;; remove useless graphical stuff
 (when (fboundp 'tool-bar-mode)

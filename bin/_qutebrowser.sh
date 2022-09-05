@@ -97,11 +97,11 @@ send_command_multiline_fast ( ) {
 }
 
 send_command ( ) {
-    echo "$*"|send_command_multiline
+    echo "$@"|send_command_multiline
 }
 
 send_command_fast ( ) {
-    echo "$*"|send_command_multiline_fast
+    echo "$@"|send_command_multiline_fast
 }
 
 remove_text ( ) {

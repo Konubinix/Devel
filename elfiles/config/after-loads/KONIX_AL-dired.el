@@ -120,7 +120,7 @@
   ;; copy and paste in dired
   (auto-revert-mode 1)
   (unless (string= (file-truename default-directory) (file-truename (file-name-directory auto-save-list-file-prefix)))
-      (dired-omit-mode t)
+    (dired-omit-mode t)
     )
   (turn-on-tempbuf-mode)
   (setq tempbuf-timeout 3600) ; time before next grace
@@ -270,7 +270,7 @@
   (call-interactively 'dired-mark)
   )
 
-(defun konix/dired-ipfa ()
+(defun konix/dired-ipfa-at-point ()
   (interactive)
   (let (
         (current-directory (file-name-directory (dired-get-file-for-visit)))
@@ -285,10 +285,20 @@
     (when current-prefix-arg
       (setq result (s-replace "filename=" "" result))
       )
+    result
+    )
+  )
+
+(defun konix/dired-ipfa ()
+  (interactive)
+  (let (
+        (result (konix/dired-ipfa-at-point))
+        )
     (kill-new result)
     (message "Put %s in the kill ring" result)
     )
   )
+
 
 (define-key dired-mode-map (kbd "I") 'konix/dired-ipfa)
 (define-key dired-mode-map (kbd "v") 'konix/image-dired-dired-display-image-mark-and-next)

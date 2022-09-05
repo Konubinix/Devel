@@ -28,7 +28,6 @@
 (require 'savehist)
 (require 'winner)
 (require 'saveplace)
-(require 'KONIX_mark-mode)
 
 ;; elpa/melpa/etc
 (use-package auto-complete :ensure t :defer t)

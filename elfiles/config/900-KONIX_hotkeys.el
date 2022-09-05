@@ -754,6 +754,7 @@
 (define-prefix-command 'konix/kubel-map)
 (define-key konix/global-fast-key-map "k" 'konix/kubel-map)
 (define-key konix/kubel-map "k" 'kubel)
+(define-key konix/kubel-map "K" 'kubernetes-overview)
 
 (define-prefix-command 'konix/ledger-map)
 (define-key konix/global-slow-key-map "l" 'konix/ledger-map)

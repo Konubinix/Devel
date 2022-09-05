@@ -50,6 +50,7 @@
 (use-package highlight-symbol :ensure t :commands (highlight-symbol))
 (use-package js2-mode :ensure t :commands (js2-mode))
 (use-package kubel :ensure t :commands (kubel))
+(use-package kubernetes :ensure t :defer t)
 (use-package ledger-mode :ensure t :defer t)
 (use-package lsp-mode :ensure t :commands (lsp))
 (use-package lua-mode :ensure t :commands (lua-mode))

@@ -2549,7 +2549,7 @@ items"
            (konix/org-with-point-on-heading (org-entry-is-todo-p))
            (member "project" (konix/org-get-tags))
            (not (konix/org-with-point-on-heading (konix/org-project-has-next-action)))
-           ;(konix/org-gtd-triage/ask "No need for next action")
+                                        ;(konix/org-gtd-triage/ask "No need for next action")
            )
       (call-interactively 'konix/org-capture-na-in-heading)
       (throw 'exit nil)
@@ -2582,7 +2582,7 @@ items"
                  (-filter (-partial #'string-prefix-p "c_"))
                  )
             )
-           ;(konix/org-gtd-triage/ask "Appropriately committed")
+                                        ;(konix/org-gtd-triage/ask "Appropriately committed")
            )
       (org-agenda-set-tags
        (completing-read
@@ -2764,6 +2764,12 @@ items"
     )
   )
 
+(defun konix/org-capture/ipfa ()
+  (with-current-buffer (org-capture-get :original-buffer)
+    (konix/dired-ipfa-at-point)
+    )
+  )
+
 (defun konix/org-capture/git-annex ()
   (let* (
          (info (konix/org-capture/git-annex-info))
@@ -2893,6 +2899,15 @@ items"
 "
                  :clock-in t
                  :clock-keep t
+                 )
+                ("D" "Todo Item for current stuff (ipfa in dired)" entry (file+headline konix/org-todo_file "Refile")
+                 "* NEXT %? %(konix/org-capture/ipfa)
+  :PROPERTIES:
+  :CREATED:  %U
+  :END:
+  :CLOCK:
+  :END:
+"
                  )
                 ("l" "Todo Item for current stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %? %a

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec nix run "nixpkgs#$(basename "${0}")" -- "$@"

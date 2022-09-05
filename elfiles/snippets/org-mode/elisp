@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: elisp
+# key: el
+# --
+#+BEGIN_SRC elisp ${200::results ${300:verbatim}} ${400::exports ${500:both}} ${600::session $700}
+$0
+#+END_SRC

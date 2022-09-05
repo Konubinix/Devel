@@ -1,4 +1,4 @@
-;; package that are needed for my config
+;; package that are needed for my config and cannot wait for the whole package stuff
 (use-package key-chord :ensure t :defer t)
 (use-package region-bindings-mode :ensure t :commands (region-bindings-mode-enable))
 (use-package hydra :ensure t :defer t)

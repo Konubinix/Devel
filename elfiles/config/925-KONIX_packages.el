@@ -70,7 +70,6 @@
 (use-package origami :ensure t :commands (origami-mode))
 (use-package pdf-tools :ensure t :defer t)
 (use-package popwin :ensure t :defer t)
-(use-package region-bindings-mode :ensure t :defer t)
 (use-package slack :ensure t :commands (slack-start))
 (use-package tree-mode :ensure t :commands (tree-mode))
 (use-package uuidgen :ensure t :defer t)

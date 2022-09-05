@@ -70,6 +70,7 @@
   )
 
 (defun konix/org-agenda-gtd-get-clear ()
+  (interactive)
   (org-ql-search
     (org-agenda-files)
     '(and
@@ -78,6 +79,28 @@
       )
     :title "Recent Items"
     :sort '(date)
+    )
+  )
+
+(defun konix/org-agenda-gtd-get-maybe-list ()
+  (interactive)
+  (org-ql-search
+    (org-agenda-files)
+    '(and
+      (tags "maybe")
+      (todo)
+      )
+    :title "Maybe items"
+    ;;:sort 'konix/org-sql-search/</timestamp
+    :sort '(date)
+    :super-groups '(
+                    (:name "Maybe items"
+                           :not (:tag "ril")
+                           )
+                    (:name "RIL"
+                           :tag "ril"
+                           )
+                    )
     )
   )
 
@@ -609,6 +632,7 @@
      )
     )
   )
+
 
 (defun konix/org-is-task-of-project-p ()
   "Find out if entry at point is a task of a project.
@@ -2299,40 +2323,6 @@ items"
                   (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   (org-agenda-tag-filter-preset nil)
-                  )
-                 )
-                ("agy" "Maybe list"
-                 (
-                  (tags-todo "+maybe"
-                             (
-                              (org-agenda-overriding-header
-                               "Maybe actions")
-                              (org-tags-exclude-from-inheritance '("maybe"))
-                              )
-                             )
-                  )
-                 (
-                  (org-super-agenda-groups
-                   '(
-                     (:name "On hold"
-                            :not (:tag "dream" :tag "ril")
-                            )
-                     (:name "Dream"
-                            :tag "dream"
-                            )
-                     (:name "RIL"
-                            :tag "ril"
-                            )
-                     )
-                   )
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-                  (dummy (setq konix/org-agenda-type 'tags))
-                  (org-agenda-todo-ignore-scheduled 'future)
-                  (org-agenda-todo-ignore-with-date nil)
-                  (org-agenda-todo-ignore-deadlines nil)
-                  (org-agenda-todo-ignore-timestamp nil)
-                  (org-agenda-todo-keyword-format "")
-                  (dummy (setq-local org-agenda-prefix-format '((tags . "%-11:c"))))
                   )
                  )
                 ("agr" "RIL"

@@ -888,7 +888,6 @@ force recomputation"
 		  )
 		 (display_buffer_hook
 		  `(progn
-			 (push-tag-mark)
 			 (with-current-buffer ,show_buffer
 			   (diff-mode)
 			   (let (

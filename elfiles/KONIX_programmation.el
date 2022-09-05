@@ -365,7 +365,6 @@ They can be relative or absolute
 		(error "No corresponding file found")
 		)
 	;; HERE, a buffer for the new file has been found
-	(push-tag-mark)
 	(pop-to-buffer new-file-buffer)
 	;; try to find the relative string
 	(when (and konix/prog/toggle-source-header-search-relative

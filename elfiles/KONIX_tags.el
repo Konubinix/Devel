@@ -237,7 +237,6 @@ TAGS_FILE_NAMETHE"
 	   (konix/compile-command-wrap "%s")
 	   (default-directory (file-name-directory(first tags-table-list)))
 	   )
-	(push-tag-mark)
 	(konix/compile (format "konix_etags_find_references.sh -r -i -t \"%s\" \"%s\""
 						   (mapconcat
 							'identity
@@ -264,7 +263,6 @@ TAGS_FILE_NAMETHE"
 	   (konix/compile-command-wrap "%s")
 	   (default-directory (file-name-directory(first tags-table-list)))
 	   )
-	(push-tag-mark)
 	(konix/compile (format "konix_etags_grep.sh -r -i -t \"%s\" \"%s\""
 						   (mapconcat
 							'identity
@@ -427,7 +425,6 @@ INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
   (unless filename
 	(error "Could not find a filename to search for")
 	)
-  (push-tag-mark)
   (let* (
 		 (found-files
 		  (split-string

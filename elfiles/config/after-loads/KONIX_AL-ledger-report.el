@@ -83,7 +83,6 @@
 
 (defun konix/ledger-report-add-note ()
   (interactive)
-  (push-tag-mark)
   (konix/ledger-visit)
   (move-end-of-line nil)
   (insert "\n    ; ")

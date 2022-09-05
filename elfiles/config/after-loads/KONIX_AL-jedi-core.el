@@ -24,11 +24,6 @@
 
 ;;; Code:
 
-(defun konix/jedi:goto-definition/push-tag-mark (&rest args)
-  (push-tag-mark)
-  )
-(advice-add 'jedi:goto-definition :before #'konix/jedi:goto-definition/push-tag-mark)
-
 (setq-default jedi:complete-on-dot t)
 
 (provide 'KONIX_AL-jedi-core)

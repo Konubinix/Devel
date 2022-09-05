@@ -61,7 +61,7 @@
 
 
 (define-key org-agenda-mode-map (kbd "M-s")
-  'konix/scroll)
+  'auto-scroll-mode)
 
 (define-key org-agenda-mode-map (kbd ":")
   'konix/org-agenda-counsel-org-tag)

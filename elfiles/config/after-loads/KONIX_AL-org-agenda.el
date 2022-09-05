@@ -1110,7 +1110,7 @@
       (forward-visible-line step)
       )
     ;; return nil if not in an entry
-    (setq res (get-text-property (point) 'org-category))
+    (setq res (konix/org-agenda-next-entry/is-todo-p))
     (unless res
       (goto-char starting-point)
       )

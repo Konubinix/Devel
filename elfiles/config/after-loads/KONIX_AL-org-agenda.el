@@ -1082,10 +1082,17 @@
               )
 
 (defun konix/org-agenda-next-entry/is-todo-p ()
-  (and (get-text-property (point) 'org-category)
-       (not (string= (get-text-property (point) 'org-category) ""))
-       (not (string= (get-text-property (point) 'type) "diary"))
-       )
+  (or
+   (when-let (
+              (todo-type (get-text-property (point) 'todo-type))
+              )
+     (equal todo-type 'todo)
+     )
+   (and (get-text-property (point) 'org-category)
+        (not (string= (get-text-property (point) 'org-category) ""))
+        (not (string= (get-text-property (point) 'type) "diary"))
+        )
+   )
   )
 
 (defvar konix/org-agenda-move-entry-recenter nil "")

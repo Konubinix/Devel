@@ -166,6 +166,7 @@
 (autoload 'kubel "kubel" "" t)
 (autoload 'argdown-mode "argdown" "" t)
 (autoload 'konix/org-drill-key-map "org-drill" "" t)
+(autoload 'auto-scroll-mode "auto-scroll" "" t)
 
 ;; ************************************************************
 ;; Automodes

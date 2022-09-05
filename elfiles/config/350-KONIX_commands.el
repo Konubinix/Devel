@@ -71,6 +71,18 @@
    )
   )
 
+(defun konix/async-shellbuffer/clean ()
+  (interactive)
+  (mapc
+   (lambda (buf)
+	 (unless (process-live-p (get-buffer-process buf))
+       (kill-buffer buf))
+	 )
+   (konix/async-shellbuffer/get-all)
+   )
+  (konix/async-shellbuffer/show-all)
+  )
+
 (defun konix/ps-print-toggle-landscape ()
   (interactive)
   (require 'ps-print)

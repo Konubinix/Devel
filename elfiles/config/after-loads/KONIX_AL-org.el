@@ -6153,20 +6153,20 @@ You should check this is not a mistake."
         (save-window-excursion
           (find-file (org-roam-node-file (org-roam-node-from-id "aof")))
           (konix/org-agenda-project-workflow-item/ask
-           "ROLE/GOAL/VISION/VALUE: Say out loud the relevant higher horizons that are linked to
+           "WHY? (role/goal/vision/value): Say out loud the relevant higher horizons that are linked to
   this project. Did you manage? ")
           )
         )
       (konix/org-agenda-project-workflow-item/fail "Get rid of it and ruuuun!")
       )
      (or
-      (konix/org-agenda-project-workflow-item/ask "OUTCOME: Say out loud or visualize what done means and what doing looks like/the expected outcome.  Did you manage? ")
+      (konix/org-agenda-project-workflow-item/ask "WHAT? (outcome): Say out loud or visualize what done means and what doing looks like/the expected outcome.  Did you manage? ")
       (konix/org-agenda-project-workflow-item/fail "Clarify !")
       )
      (or
       (or
        (konix/org-agenda-project-workflow-item/ask
-        (format "DEADLINE: Current deadline is %s %s. Is this ok? "
+        (format "WHEN? (deadline): Current deadline is %s %s. Is this ok? "
                 (konix/org-get-deadline)
                 deadline-prefix)
         )
@@ -6178,13 +6178,13 @@ You should check this is not a mistake."
       (konix/org-agenda-project-workflow-item/fail "Be clear about the deadline !")
       )
      (or
-      (konix/org-agenda-project-workflow-item/ask "SCHEDULE: Is it relevant now (I may schedule it in the future)? ")
+      (konix/org-agenda-project-workflow-item/ask "NOW? (schedule): Is it relevant now (I may schedule it in the future)? ")
       (call-interactively 'org-agenda-schedule)
       )
      (or
       (progn
         (or
-         (konix/org-agenda-project-workflow-item/ask "ACTIONS: Are there correct next actions set for it to go forward? ")
+         (konix/org-agenda-project-workflow-item/ask "HOW? (actions): Are there correct next actions set for it to go forward? ")
          (and
           (konix/org-agenda-project-workflow-item/ask "Want to create one now ?")
           (konix/org-capture-na-in-heading)

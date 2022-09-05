@@ -48,7 +48,6 @@
 (use-package highlight-parentheses :ensure t :defer t)
 (use-package highlight-symbol :ensure t :commands (highlight-symbol))
 (use-package js2-mode :ensure t :commands (js2-mode))
-(use-package kubel :ensure t :commands (kubel))
 (use-package kubernetes :ensure t :defer t)
 (use-package ledger-mode :ensure t :defer t)
 (use-package lsp-mode :ensure t :commands (lsp))
@@ -84,6 +83,8 @@
 ;; straight
 (straight-use-package '(ement :type git :host github :repo "alphapapa/ement.el"))
 (straight-use-package '(michelson :type git :host github :repo "MiloDavis/michelson-mode"))
+;;(use-package kubel :ensure t :commands (kubel))
+(straight-use-package '(kubel :fork "Konubinix/kubel"))
 
 ;; vendor
 (require 'framemove)

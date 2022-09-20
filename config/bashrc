@@ -85,3 +85,24 @@ if which starship > /dev/null
 then
 	eval "$(starship init bash)"
 fi
+
+function konix_warn_if_took_too_long(){
+    if test -n "${STARSHIP_DURATION}" && test ${STARSHIP_DURATION} -gt 3000
+    then
+        if test -n "${TMUX_PANE}"
+        then
+            local current_index="$(tmux display-message -p '#{window_index}')"
+            if ( test "${KONIX_TMUX_WINDOW}" != "${current_index}" ) \
+                   || ! test -e ~/.here
+            then
+                konix_display.py -o -t boring "'$(HISTTIMEFORMAT="" history|tail -1|sed -r 's/^[^ ]+ *(.+)$/\1/')' took $(( STARSHIP_DURATION / 1000 ))s"
+            fi
+        fi
+    fi
+}
+konix_starship_precmd () {
+    starship_precmd "$@"
+    konix_warn_if_took_too_long
+}
+
+PROMPT_COMMAND="konix_starship_precmd"

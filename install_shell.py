@@ -36,6 +36,11 @@ import_env
 [ -z "$PS1" ] && return
 
 konix_load_init () {
+    # mist be done asap to increase chances the started shell is still in the active window
+    if test -n "${TMUX_PANE}"
+    then
+        export KONIX_TMUX_WINDOW="$(tmux display-message -p '#{window_index}')"
+    fi
     source "${HOME}/.shrc_var"
     source "${KONIX_CONFIG_DIR}/bashrc"
     source "${KONIX_SH_CUSTOM_FILE}"
@@ -55,6 +60,11 @@ konix_load_init
 [ -z "$PS1" ] && return
 
 konix_load_init () {
+    # mist be done asap to increase chances the started shell is still in the active window
+    if test -n "${TMUX_PANE}"
+    then
+        export KONIX_TMUX_WINDOW="$(tmux display-message -p '#{window_index}')"
+    fi
     source "${HOME}/.shrc_var"
     source "${KONIX_CONFIG_DIR}/bashrc"
     source "${KONIX_SH_CUSTOM_FILE}"

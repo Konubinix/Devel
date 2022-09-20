@@ -30,4 +30,4 @@
 	url = https://github.com/dracula/qutebrowser-dracula-theme.git
 [submodule "elfiles/hypothesis"]
 	path = elfiles/hypothesis
-	url = https://github.com/Kungsgeten/hypothesis
+	url = https://github.com/Konubinix/hypothesis

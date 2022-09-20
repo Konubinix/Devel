@@ -291,7 +291,7 @@
          (column (current-column))
          (res (apply orig-fun args))
          )
-    (goto-line line)
+    (konix/goto-line-prog line)
     (when (and
            (eq (get-text-property (point) 'invisible) t)
            (not (eq (point-at-eol) (point-max)))
@@ -6296,7 +6296,7 @@ You should check this is not a mistake."
       )
     (when linenumber
       (pop-to-buffer interruptions-buffer)
-      (goto-line linenumber)
+      (konix/goto-line-prog linenumber)
       )
     )
   )

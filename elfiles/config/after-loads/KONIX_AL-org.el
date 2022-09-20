@@ -3759,7 +3759,36 @@ of the clocksum."
           (when (< point (point))
             (incf res_after_point)
             )
+          (when (and
+                 (or
+                  (and
+                   (string= (buffer-name) "*Org Agenda(ann)*")
+                   konix/org-agenda-tag-filter-context-p
+                   )
+                  (string= (buffer-name) "*Org Agenda(agp)*")
+                  )
+                 (< 25 res)
+                 )
+            (let (
+				  (ov (make-overlay (line-beginning-position) (line-end-position)))
+				  )
+			  (overlay-put ov 'face 'shadow)
+              (overlay-put ov 'konix/org-agenda-added-text-property t)
+			  )
+            )
           )
+        )
+      (when (and
+             (or
+              (and
+               (string= (buffer-name) "*Org Agenda(ann)*")
+               konix/org-agenda-tag-filter-context-p
+               )
+              (string= (buffer-name) "*Org Agenda(agp)*")
+              )
+             (< 25 res)
+             )
+        (warn (format "Too many tasks (%s)" res))
         )
       (message "%s entries (%s after)" res res_after_point)
       )

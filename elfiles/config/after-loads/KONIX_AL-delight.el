@@ -46,6 +46,7 @@
            (tempbuf-mode nil "tempbuf")
            (org-mode "O" :major)
            (org-agenda "OA" :major)
+           (auto-scroll-mode (:propertize " S" face envrc-mode-line-on-face) "auto-scroll")
            )
          )
 

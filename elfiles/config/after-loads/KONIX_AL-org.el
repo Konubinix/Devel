@@ -6370,9 +6370,9 @@ You should check this is not a mistake."
             #'konix/org-clock-out/remove-dump)
   )
 
-(org-link-set-parameters "ipfs" :follow #'konix/org-link-ipfs)
+(org-link-set-parameters "ipfs" :follow #'konix/org-link-ipfs/follow)
 
-(defun konix/org-link-ipfs (path)
+(defun konix/org-link-ipfs/follow (path)
   (let* (
          (stripped-path (replace-regexp-in-string "^\\(/+\\)?\\(.+?\\)\\([?].+\\)" "\\2" path))
          (filepath (concat "/ipfs/" stripped-path))

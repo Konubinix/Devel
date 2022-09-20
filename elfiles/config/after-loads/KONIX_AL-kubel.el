@@ -81,14 +81,8 @@
     )
   )
 
-(defun konix/kubel-persist-point-all-windows ()
-  (konix/persist-point-all-windows)
-  (kubel--save-line)
-  )
-
 (add-hook 'kubel-mode-hook
-          #'konix/kubel-persist-point-all-windows 100)
-;; (remove-hook 'kubel-mode-hook #'konix/kubel-persist-point-all-windows)
+          #'konix/persist-point-all-windows 100)
 
 (defvar konix/kubel-auto-refresh-timer nil)
 (defvar konix/kubel-auto-refresh-time 5)

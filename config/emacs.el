@@ -52,6 +52,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+
 ;; (use-package straight
 ;;   :custom (straight-use-package-by-default t))
 
@@ -103,6 +104,8 @@
         "bibtex" ;; loaded by org -> oc-basic
         "calendar" ;; init
         "comint" ;; loaded by org -> org-pcomplete
+        "compile" ;; KONIX_org-roam-export -> citeproc -> citeproc-cite -> citeproc-number -> rst -> compile
+        "cus-edit" ;; when accepting the theme for future use
         "delight" ;; init
         "dired" ;; init
         "envrc" ;; init
@@ -113,6 +116,7 @@
         "key-chord" ;; init
         "kmacro" ;; loaded by (kbd)
         "org" ;; init
+        "org-agenda" ;; init
         "ob-comint" ;; loaded by org
         "ob-core" ;; loaded by org
         "popup" ;; loaded by autocomplete -> konix/org-mode -> konix/org-setup-holidays -> org

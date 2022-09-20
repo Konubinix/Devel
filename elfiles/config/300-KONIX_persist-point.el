@@ -68,7 +68,6 @@
      )
    (frame-list)
    )
-  (message "done")
   )
 
 (defmacro konix/with-current-buffer-persisted-point (buffer body)

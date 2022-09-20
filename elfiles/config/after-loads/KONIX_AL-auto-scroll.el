@@ -26,23 +26,29 @@
 
 (setq-default auto-scroll-amount 200)
 
-(defvar konix/auto-scroll-idle-time 2)
+(defvar konix/auto-scroll-idle-time 5)
+(defvar konix/auto-scrool-first-time t)
 
 (defun konix/auto-scroll-forward-line (number)
   "description."
-  (when (and (current-idle-time)
+  (when (or konix/auto-scrool-first-time
+            (and
+             (current-idle-time)
              (> (time-to-seconds (current-idle-time)) konix/auto-scroll-idle-time)
              )
-   (if (equal major-mode 'org-agenda-mode)
-       (call-interactively 'konix/org-agenda-next-entry)
-     (call-interactively 'next-line)
-     )
-   (recenter-top-bottom 0)
-   (hl-line-highlight)
-   (when (equal major-mode 'org-agenda-mode)
-     (org-agenda-do-context-action)
-     )
-   )
+            )
+    ;; this ignores the DONE items, this is bad for the last week review
+    ;; (if (equal major-mode 'org-agenda-mode)
+    ;;     (call-interactively 'konix/org-agenda-next-entry)
+    (call-interactively 'next-line)
+    ;; )
+    (recenter-top-bottom 0)
+    (hl-line-highlight)
+    (when (equal major-mode 'org-agenda-mode)
+      (org-agenda-do-context-action)
+      )
+    )
+  (setq konix/auto-scrool-first-time nil)
   )
 
 (defun konix/auto-scroll-get-function/rewrite (orig_func &rest args)
@@ -50,6 +56,14 @@
   )
 
 (advice-add 'auto-scroll-get-function :around 'konix/auto-scroll-get-function/rewrite)
+
+(defun konix/auto-scroll-mode-hook ()
+  (setq konix/auto-scrool-first-time t)
+  )
+
+(add-hook 'auto-scroll-mode-hook
+          #'konix/auto-scroll-mode-hook)
+
 
 
 (provide 'KONIX_AL-auto-scroll)

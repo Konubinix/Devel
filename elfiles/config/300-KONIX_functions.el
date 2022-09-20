@@ -291,10 +291,10 @@
 (defun konix/diff/_compute-delta-line (start end)
   (let (
 		(delta_line (- end start))
-		(end_point (save-excursion (goto-line end) (point)))
+		(end_point (save-excursion (konix/goto-line-prog end) (point)))
 		)
 	(save-excursion
-	  (goto-line start)
+	  (konix/goto-line-prog start)
 	  (while (re-search-forward "^\\+.*$" end_point t)
 		(setq delta_line (- delta_line 1))
 		)
@@ -1432,3 +1432,13 @@ Version 2016-09-02"
 (defun konix/redis-hset (key name value)
   (call-process "redis-cli" nil nil nil "hset" key name value)
   )
+
+
+(defun konix/goto-line-prog (line)
+  "Use the right way of going to line.
+
+According to the documentation of 'goto-line.
+
+LINE is given to 'forward-line."
+  (goto-char (point-min))
+  (forward-line (1- line)))

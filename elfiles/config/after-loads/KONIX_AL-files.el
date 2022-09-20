@@ -67,7 +67,7 @@
 			  (progn
 				(message "Opening %s" file_name)
 				(find-file file_name)
-				(goto-line (string-to-number line))
+				(konix/goto-line-prog (string-to-number line))
 				(let (
 					  ;; make sure the buffer is killed even if the
 					  ;; keep-buffers-protected-alist says otherwise

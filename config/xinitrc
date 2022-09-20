@@ -1,6 +1,7 @@
 {
 xset r rate 170 150
 /home/sam/init_bin/konix_do_cron_job.sh clk x init
-/home/sam/init_bin/konix_do_cron_job.sh awesome
+mkdir -p "${HOME}/awesome.log/"
+/home/sam/init_bin/konix_do_cron_job.sh awesome > "${HOME}/awesome.log/out" 2> "${HOME}/awesome.log/err"
 #dbus-launch gnome-session
 } >> ~/.xinit_log 2>&1

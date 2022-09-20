@@ -5711,6 +5711,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("m" . konix/org-toggle-me))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("S" . konix/org-toggle-society))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("r" . auto-scroll-mode))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("s" . save-some-buffers))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("W" . org-toggle-narrow-to-subtree))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("z" . org-add-note))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("Z" . konix/org-add-timestamp))

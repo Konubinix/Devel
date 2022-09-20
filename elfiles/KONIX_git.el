@@ -780,7 +780,7 @@
 
 (defun konix/git/pull ()
   (interactive)
-  (konix/git/command-with-completion "pull ")
+  (konix/git/command-with-completion "up ")
   )
 
 (defun konix/git/checkout ()

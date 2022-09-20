@@ -97,6 +97,22 @@
                     (:name "Maybe items"
                            :not (:tag "ril")
                            )
+                    )
+    )
+  )
+
+(defun konix/org-agenda-gtd-get-maybe-ril ()
+  (interactive)
+  (org-ql-search
+    (org-agenda-files)
+    '(and
+      (tags "maybe")
+      (todo)
+      )
+    :title "Maybe items"
+    ;;:sort 'konix/org-sql-search/</timestamp
+    :sort '(date)
+    :super-groups '(
                     (:name "RIL"
                            :tag "ril"
                            )

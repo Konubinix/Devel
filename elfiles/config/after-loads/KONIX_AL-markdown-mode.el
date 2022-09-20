@@ -31,6 +31,12 @@
   )
 (add-hook 'markdown-mode-hook 'konix/markdown-mode-hook)
 
+(define-key markdown-mode-map (kbd "C-c C-c") 'markdown-toggle-gfm-checkbox)
+(define-key markdown-mode-map (kbd "M-<down>") 'markdown-move-down)
+(define-key markdown-mode-map (kbd "M-<up>") 'markdown-move-up)
+(define-key markdown-mode-map (kbd "M-<right>") 'markdown-demote)
+(define-key markdown-mode-map (kbd "M-<left>") 'markdown-promote)
+(define-key markdown-mode-map (kbd "M-o") 'markdown-follow-thing-at-point)
 
 (provide 'KONIX_AL-markdown-mode)
 ;;; KONIX_AL-markdown-mode.el ends here

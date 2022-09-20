@@ -6357,6 +6357,25 @@ You should check this is not a mistake."
     )
   )
 
+(org-link-set-parameters "youtube" :follow #'konix/org-link-youtube/follow :export #'konix/org-link-youtube/export)
+
+(defun konix/org-link-youtube-process (url)
+  (let (
+        (id (replace-regexp-in-string "^youtube:" "" url))
+        )
+    (concat "https://www.youtube.com/watch?v=" id)
+    )
+  )
+
+(defun konix/org-link-youtube/follow (path)
+  (browse-url (konix/org-link-youtube-process path))
+  )
+
+(defun konix/org-link-youtube/export (path desc format)
+  (konix/org-link-youtube-process path)
+  )
+
+
 (defun konix/org-narrow-to-entry-no-subtree ()
   (interactive)
   (save-excursion

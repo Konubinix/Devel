@@ -313,6 +313,9 @@
      ((string-match (concat "^" konix/org-ipfs-link "\\([?]filename=\\([a-zA-Z0-9=_%.-]+\\)\\)?$") url)
       (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 3 url))
       )
+     ((string-match "^youtube:\\(.+\\)$" url)
+      (konix/org-roam-export/process-url (konix/org-link-youtube-process url))
+      )
      ((string-match (concat "^" konix/org-ipfs-link "\\([?][a-zA-Z0-9=_%./-]+\\)?$") url)
       (konix/org-export/process-ipfs-link (format "/ipfs/%s%s" (match-string 1 url) (match-string 2 url)) nil)
       )
@@ -826,7 +829,7 @@
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "^[ :]*\\(\\(http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              "^[ :]*\\(\\(youtube:\\|http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
               nil
               t)
         (replace-match

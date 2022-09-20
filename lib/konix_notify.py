@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 import logging
-import subprocess
-import shlex
-from functools import partial
-from six.moves.xmlrpc_client import ServerProxy
 import os
+import shlex
+import subprocess
 import sys
+from functools import partial
+
+from six.moves.xmlrpc_client import ServerProxy
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
@@ -31,8 +32,8 @@ def by_notify_send(message, urgency):
 
 
 def by_sl4a(message, type_):
-    from konix_android import droid
     import andlib
+    from konix_android import droid
     if type_ == "normal":
         droid.makeToast(message)
     if type_ == "annoying":
@@ -52,7 +53,9 @@ def send_to_phone(message, type_):
         "annoying": 4,
         "boring": 8,
     }[type_]
-    os.system("clk gotify 'Notify' '{}' -p '{}'".format(message, priority))
+    subprocess.check_call(
+        ["clk", "gotify", "Notify", "-p",
+         str(priority), message])
 
 
 # type_ is normal or annoying or boring

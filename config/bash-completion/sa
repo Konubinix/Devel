@@ -1,0 +1,14 @@
+#!/bin/bash
+
+ME="$(basename "${BASH_SOURCE[0]}")"
+source /usr/share/bash-completion/completions/apt
+
+_sa () {
+    COMP_WORDS=(sudo apt "${COMP_WORDS[@]:1}")
+    COMP_CWORD=$((COMP_CWORD + 1))
+    COMP_LINE=${COMP_LINE/sa /sudo apt }
+    COMP_POINT=$((COMP_POINT + 6))
+    _apt
+}
+
+complete -F _sa "${ME}"

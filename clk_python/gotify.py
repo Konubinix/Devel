@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import requests
-from clk.decorators import command, argument, option, flag
+from clk.decorators import argument, command, flag, option
 
 
 @command()
@@ -13,6 +13,10 @@ from clk.decorators import command, argument, option, flag
 @argument("body", help="The body")
 def gotify(url, priority, title, body, verify):
     "Push some notifications to gotify"
+    if not verify:
+        # I know what I am doing
+        import urllib3
+        urllib3.disable_warnings()
     requests.post(
         url,
         json={

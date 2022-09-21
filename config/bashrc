@@ -86,16 +86,56 @@ then
 	eval "$(starship init bash)"
 fi
 
+konix_is_in_tmux () {
+    test -n "${TMUX_PANE}"
+}
+
+konix_starship_command_took_too_long () {
+    test -n "${STARSHIP_DURATION}" && test ${STARSHIP_DURATION} -gt 3000
+}
+
+konix_tmux_shows_current_window () {
+    local current_index="$(tmux display-message -p '#{window_index}')"
+    test "${KONIX_TMUX_WINDOW}" == "${current_index}"
+}
+
+konix_is_screen_on ( ) {
+    test -e ~/.here
+}
+
+konix_wm_shows_byobu ( ) {
+    konix_wmctrl_active_window.sh | grep -q byobu
+}
+
+konix_warn_it_took_too_long ( ) {
+    konix_display.py -o -t boring "'$(HISTTIMEFORMAT="" history|tail -1|sed -r 's/^[^ ]+ *(.+)$/\1/')' took $(( STARSHIP_DURATION / 1000 ))s"
+}
+
+konix_was_active_not_long_ago ( ) {
+    local last_activity="$(tmux display-message -p '#{client_activity}')"
+    local now="$(date +%s)"
+    test $(( now - last_activity )) -le 3
+}
+
 function konix_warn_if_took_too_long(){
-    if test -n "${STARSHIP_DURATION}" && test ${STARSHIP_DURATION} -gt 3000
+    if konix_starship_command_took_too_long
     then
-        if test -n "${TMUX_PANE}"
+        if konix_is_in_tmux
         then
-            local current_index="$(tmux display-message -p '#{window_index}')"
-            if ( test "${KONIX_TMUX_WINDOW}" != "${current_index}" ) \
-                   || ! test -e ~/.here
+            if konix_is_screen_on
+               # in front of desktop
             then
-                konix_display.py -o -t boring "'$(HISTTIMEFORMAT="" history|tail -1|sed -r 's/^[^ ]+ *(.+)$/\1/')' took $(( STARSHIP_DURATION / 1000 ))s"
+                if ! ( konix_wm_shows_byobu && konix_tmux_shows_current_window )
+                   # could not see it
+                then
+                    konix_warn_it_took_too_long
+                fi
+            else
+                # maybe using my phone
+                if ! ( konix_tmux_shows_current_window && konix_was_active_not_long_ago )
+                then
+                    konix_warn_it_took_too_long
+                fi
             fi
         fi
     fi

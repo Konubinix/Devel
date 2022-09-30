@@ -118,6 +118,10 @@ konix_was_active_not_long_ago ( ) {
 }
 
 function konix_warn_if_took_too_long(){
+    if test -z "${KONIX_BASH_WARN_IF_TOO_LONG}"
+    then
+        return
+    fi
     if konix_starship_command_took_too_long
     then
         if konix_is_in_tmux

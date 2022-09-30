@@ -10,7 +10,7 @@
     in {
       packages.x86_64-linux.devel = pkgs.buildEnv {
         name = "devel";
-        paths = with pkgs; [ nixfmt rnix-lsp direnv xh ];
+        paths = with pkgs; [ nixfmt rnix-lsp direnv xh hugo nix-direnv ];
       };
       packages.x86_64-linux.k8s = pkgs.buildEnv {
         name = "k8s";

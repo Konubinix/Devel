@@ -39,6 +39,7 @@
   (lsp-format-buffer)
   )
 
+(setq-default lsp-rust-server 'rust-analyzer)
 ;; try to use rust-analyzer install from rustup
 ;; see https://github.com/rust-lang/rustup/issues/2411
 ;; and rustup +nightly component add rust-analyzer-preview

@@ -1,1 +1,4 @@
-map <C-n> exec 'konix_zathura_roam_capture.sh "%"'
+map <C-n> exec 'konix_zathura_roam_capture.sh "$FILE"'
+map i exec 'konix_zathura_ipfa.sh "$FILE"'
+map <C-d> exec 'konix_zathura_rm.sh "$FILE"'
+map s exec 'clk x scroll-down'

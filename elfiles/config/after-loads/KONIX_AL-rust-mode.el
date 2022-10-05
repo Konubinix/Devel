@@ -45,7 +45,9 @@
   "Custom hook around rust mode."
   (konix/prog/config)
   (when (require 'lsp nil t)
-    (lsp)
+    ;; envrc sets the exec-path before this, but if we don't wait the root loop
+    ;; to make one iteration, it is not taken into account
+    (run-at-time nil nil 'lsp)
     )
   (add-hook 'after-save-hook 'konix/rust/make-executable nil t)
   (add-hook 'before-save-hook #'konix/rust-fmt-buffer nil t)

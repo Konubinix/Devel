@@ -50,9 +50,6 @@
 (setq-default org-adapt-indentation t)
 (setq-default org-fontify-quote-and-verse-blocks t)
 (setq-default org-duration-format '(("h") (special . h:mm)))
-;; ####################################################################################################
-;; Init hook
-;; ####################################################################################################
 (defadvice org-attach-commit (around prevent ())
   "prevent org-attach-commit from doing anything."
   (message "Org attach commit bypassed")

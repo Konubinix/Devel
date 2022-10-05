@@ -2922,6 +2922,15 @@ items"
   :END:
 "
                  )
+                ("r" "Routine" entry (file+headline konix/org-todo_file "Refile")
+                 "* <%(konix/org-get-time) +1d> %?                :discret:noglance:
+  :PROPERTIES:
+  :CREATED:  %U
+  :END:
+  :CLOCK:
+  :END:
+"
+                 )
                 ("l" "Todo Item for current stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %? %a
   :PROPERTIES:

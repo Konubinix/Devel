@@ -188,6 +188,7 @@ They can be relative or absolute
   (paren-toggle-matching-paired-delimiter 1)
   (paren-toggle-open-paren-context 1)
   (electric-pair-mode t)
+  (electric-indent-local-mode 1)
   ;; use flyspell only for comments and strings
   (flyspell-prog-mode)
   (set (make-local-variable 'konix/adjust-new-lines-at-end-of-file) t)

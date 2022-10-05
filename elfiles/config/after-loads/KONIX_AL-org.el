@@ -85,6 +85,7 @@
     (org-agenda-files)
     '(and
       (tags "maybe")
+      (not (tags "ril"))
       (todo)
       )
     :title "Maybe items"
@@ -104,15 +105,14 @@
     (org-agenda-files)
     '(and
       (tags "maybe")
+      (tags "ril")
       (todo)
       )
-    :title "Maybe items"
+    :title "Maybe RIL items"
     ;;:sort 'konix/org-sql-search/</timestamp
     :sort '(date)
     :super-groups '(
-                    (:name "RIL"
-                           :tag "ril"
-                           )
+                    (:name "RIL")
                     )
     )
   )

@@ -25,9 +25,9 @@
 ;;; Code:
 
 (defun konix/lsp-mode-hook ()
-  ;; (when (require 'lsp-ui nil t)
-  ;;   (lsp-ui-mode 1)
-  ;;   )
+  (when (featurep 'lsp-ui)
+    (lsp-ui-mode -1)
+    )
   )
 
 (setq-default lsp-modeline-code-actions-segments '(count icon name))

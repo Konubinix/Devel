@@ -110,7 +110,7 @@ konix_is_screen_on ( ) {
 }
 
 konix_wm_shows_byobu ( ) {
-    konix_wmctrl_active_window.sh | grep -q byobu
+    DISPLAY="${DISPLAY:-:0}" konix_wmctrl_active_window.sh | grep -q byobu
 }
 
 konix_warn_it_took_too_long ( ) {

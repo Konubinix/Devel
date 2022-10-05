@@ -6,13 +6,11 @@ file="${dir}/msg"
 
 notmuch show --format=raw "${ID}" > "${file}"
 trap "rm -r $dir" EXIT
-konix_munpack.py -i "${file}" -o "${dir}"
+clk mail unpack-rfc822 "${file}" --output "${dir}"
 suffix=""
 if [ "$(ls "${dir}"|grep .html|wc -l)" = "1" ]
 then
-    html_index="$(ls "${dir}"|grep .html)"
-    mv "${dir}/${html_index}" "${dir}/content.html"
-    suffix="/content.html"
+    suffix="/$(ls "${dir}"|grep .html)"
 fi
 
 url="${KONIX_IPFS_GATEWAY}$(ipfa "${dir}"|sed -r 's/^(.+)\?.+/\1/')${suffix}"

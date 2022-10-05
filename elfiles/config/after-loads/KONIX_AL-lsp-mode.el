@@ -31,7 +31,8 @@
   )
 
 (setq-default lsp-modeline-code-actions-segments '(count icon name))
-
+;; the only alternative is company, that I don't use
+(setq-default lsp-completion-provider :none)
 
 (add-hook 'lsp-mode-hook 'konix/lsp-mode-hook)
 

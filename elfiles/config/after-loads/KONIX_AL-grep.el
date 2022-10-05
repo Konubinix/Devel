@@ -45,6 +45,7 @@
 --exclude-dir __pycache__ \
 --exclude-dir .mypy_cache \
 --exclude-dir node_modules \
+--exclude-dir target \
 --exclude-dir coverage \
 --exclude-dir .cquery_cached_index \
 -i -nH \

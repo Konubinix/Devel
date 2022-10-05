@@ -428,7 +428,8 @@ Message-Id: <%s>" id)
                            )))
         )
     (when current-prefix-arg
-      (shell-command (format "$BROWSER %s &" url))
+      (message "Opening in browser")
+      (browse-url url)
       )
     (message url)
     (with-temp-buffer

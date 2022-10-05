@@ -6077,7 +6077,8 @@ You should check this is not a mistake."
              (time-less-p time schedule-time)
              )
         (warn
-         "Future time %s will be hidden by the schedule %s"
+         "%s: Future time %s will be hidden by the schedule %s"
+         (konix/org-get-heading)
          (format-time-string "<%Y-%m-%d %H:%M>" time)
          (format-time-string "<%Y-%m-%d %H:%M>" schedule-time)
          )

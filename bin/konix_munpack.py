@@ -5,10 +5,11 @@ import argparse
 import email
 import logging
 import os
-import re
 import tempfile
 from collections import namedtuple
+from email.header import decode_header
 
+from konix_file_helper import sanitize_filename
 from konix_mail import make_part_harmless, use_relative_links
 
 logger = logging.getLogger("munpack")
@@ -65,7 +66,27 @@ def get_parts(message):
 
 
 def munpack(message, directory, rel_path=False):
+    plain_filename = None
+    html_filename = None
+
+    decoded_subject = ", ".join([
+        (b.decode(encoding) if encoding else b)
+        for b, encoding in decode_header(message["Subject"])
+    ])
+    sanitized_subject = sanitize_filename(decoded_subject)
+    if len([
+            part for part in get_parts(message)
+            if part.get_content_subtype() == "html"
+    ]) == 1:
+        html_filename = sanitized_subject
+    if len([
+            part for part in get_parts(message)
+            if part.get_content_subtype() == "plain"
+    ]) == 1:
+        plain_filename = sanitized_subject
+
     for part in get_parts(message):
+        text = None
         content = part.get_payload(decode=True)
         bcontent = part.get_payload()
         if content is None:
@@ -76,20 +97,25 @@ def munpack(message, directory, rel_path=False):
         sub_type = part.get_content_subtype()
         if charset is None and sub_type == "html":
             charset = "utf-8"
-        try:
-            text = content.decode(charset) if charset else None
-        except UnicodeDecodeError:
-            # taken from the code of email/message.py:get_payload:
-            # This won't happen for RFC compliant messages (messages
-            # containing only ASCII code points in the unicode input).
-            # If it does happen, turn the string into bytes in a way
-            # guaranteed not to fail.
-            text = bcontent
-
         main_type = part.get_content_maintype()
+        if main_type == "text":
+            try:
+                text = content.decode(charset) if charset else None
+            except UnicodeDecodeError:
+                # taken from the code of email/message.py:get_payload:
+                # This won't happen for RFC compliant messages (messages
+                # containing only ASCII code points in the unicode input).
+                # If it does happen, turn the string into bytes in a way
+                # guaranteed not to fail.
+                text = bcontent
+
         prefix = main_type
         extension = sub_type
         name = part.get_filename()
+        if name is None and sub_type == "html" and html_filename:
+            name = html_filename + ".html"
+        if name is None and sub_type == "plain" and plain_filename:
+            name = plain_filename + ".plain"
         if name:
             file_name = os.path.join(directory, name)
             file_ = open(file_name, "bw")

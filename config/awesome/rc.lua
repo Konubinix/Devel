@@ -328,17 +328,17 @@ function open_or_join (class, program)
          else
             result = nil
          end
-         if result
-         then
-            say("Found " .. class .. " (in " .. result.first_tag.name .. ")")
-         end
+         -- if result
+         -- then
+         --    say("Found " .. class .. " (in " .. result.first_tag.name .. ")")
+         -- end
          return result
       end
 
       local result = nil
       if client.focus and client.focus.class == class
       then
-         say("Nothing to do, already on a window with class " .. class)
+         -- say("Nothing to do, already on a window with class " .. class)
          -- moving anyway to focus on the correct screen and have a coherent
          -- behavior about the tags
          result = client.focus

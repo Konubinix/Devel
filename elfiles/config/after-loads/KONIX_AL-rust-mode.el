@@ -40,10 +40,6 @@
   )
 
 (setq-default lsp-rust-server 'rust-analyzer)
-;; try to use rust-analyzer install from rustup
-;; see https://github.com/rust-lang/rustup/issues/2411
-;; and rustup +nightly component add rust-analyzer-preview
-(setq-default lsp-rust-analyzer-server-command '("rustup" "run" "nightly" "rust-analyzer"))
 
 (defun konix/rust-mode-hook ()
   "Custom hook around rust mode."

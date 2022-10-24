@@ -3616,6 +3616,7 @@ of the clocksum."
   (define-key org-mode-map (kbd "<C-M-S-up>") 'konix/windmove-bring-buffer-up)
   (define-key org-mode-map (kbd "C-c C-x C-p") 'org-set-property)
   (define-key org-mode-map (kbd "C-c ]") 'konix/org-goto-next-open-list-entry)
+  (define-key org-mode-map (kbd "M-s") 'auto-scroll-mode)
   (defvar electric-pair-pairs)
   (setq-local electric-pair-pairs
               (append

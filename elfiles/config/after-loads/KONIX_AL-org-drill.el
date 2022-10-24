@@ -28,6 +28,7 @@
 (setq-default org-drill-add-random-noise-to-intervals-p t)
 (setq-default org-drill-adjust-intervals-for-early-and-late-repetitions-p t)
 (setq-default org-drill-spaced-repetition-algorithm 'simple8)
+(setq-default org-drill-save-buffers-after-drill-sessions-p nil)
 
 (defun konix/org-drill-heading ()
   "Drill only in that folder."

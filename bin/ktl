@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+args=()
+if test -n "${KTL_NS}"
+then
+    args+=(-n "${KTL_NS}")
+fi
+set -u
+
+exec kubectl "${args[@]}" "$@"

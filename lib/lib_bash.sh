@@ -240,3 +240,12 @@ konix_assert_var () {
     local VAR_VALUE="$(eval "echo \${$(echo $1)}")"
     source konix_assert_var.sh "${VAR_VALUE}"
 }
+
+ktns () {
+    if test -n "${1}"
+    then
+        export KTL_NS="$1"
+    else
+        unset KTL_NS
+    fi
+}

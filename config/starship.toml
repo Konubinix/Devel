@@ -11,6 +11,11 @@ command = 'echo "$USER@$(tput setaf ${HOSTNAME_COLOR:-7})${HOSTNAME}"'
 when = "true"
 description = "show user and host names"
 style = "bold yellow"
+[custom.ktl]
+command = 'echo "ktns:(${KTL_NS})"'
+when = 'test -n "${KTL_NS}"'
+description = "show ktl namespace"
+style = "bold yellow"
 [custom.date]
 command = "date +%H:%M:%S"
 when = "true"
@@ -32,10 +37,6 @@ truncate_to_repo = false
 [character]
 success_symbol = "[✔](bold green) "
 error_symbol = "[✗](bold red) "
-[kubernetes]
-format = '[⛵ $context \($namespace\)](dimmed green) '
-disabled = false
-# disabled = false
 [kubernetes.context_aliases]
 "k3d-k3s-default" = "dev"
 [status]

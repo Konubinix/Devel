@@ -153,6 +153,8 @@ mytextclock = wibox.widget.textclock()
 
 myorgmodeline = awful.widget.watch('bash -c "echo \\"Org: $(redis-cli get org-modeline|sed \'s/^$/NA/\')\\""', 1)
 
+acpiwidget = awful.widget.watch('acpi', 10)
+
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
    awful.button({ }, 1, function(t) t:view_only() end),
@@ -249,6 +251,7 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             mylauncher,
 			myorgmodeline,
+			-- acpiwidget,
             s.mytaglist,
             s.mypromptbox,
          },
@@ -823,7 +826,7 @@ clientkeys = gears.table.join(
       },
       "n",
       function (c)
-	 awful.spawn("konix_org_capture_screenshot.sh")
+		 awful.spawn("konix_org_capture_screenshot.sh")
       end ,
       {
          description = "capture a screenshot",
@@ -851,7 +854,7 @@ clientkeys = gears.table.join(
       },
       "d",
       function(c)
-	 awful.spawn("clk x scroll-down")
+		 awful.spawn("clk x scroll-down")
       end,
       {
          description = "scroll down",
@@ -887,7 +890,7 @@ clientkeys = gears.table.join(
    awful.key(
       {
          modkey,
-	 "Shift",
+		 "Shift",
       },
       "j",
       function (c)
@@ -1149,8 +1152,8 @@ awful.rules.rules = {
          -- and the name shown there might not match defined rules here.
          name = {
             "Event Tester",  -- xev.
-	    "Terminator Preferences",
-	    "Choose A Terminal Font",
+			"Terminator Preferences",
+			"Choose A Terminal Font",
          },
          role = {
             "AlarmWindow",  -- Thunderbird's calendar.
@@ -1165,7 +1168,7 @@ awful.rules.rules = {
    {
       rule = {
          class = "qutebrowser",
-	 name = "Print",
+		 name = "Print",
       },
       properties = {
          floating = true,
@@ -1176,7 +1179,7 @@ awful.rules.rules = {
    {
       rule_any = {
          name = {"Slack | mini panel", "Pick a Font", "Change Foreground Color", "Post Processing Plugin"},
-	 class = {"Impass"}
+		 class = {"Impass"}
       },
       properties = {
          floating = true,
@@ -1225,8 +1228,8 @@ awful.rules.rules = {
       },
       properties = {
          tag = "1",
-	 floating = true,
-	 ontop = true,
+		 floating = true,
+		 ontop = true,
       },
    },
    {

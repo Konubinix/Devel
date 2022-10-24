@@ -41,7 +41,27 @@
     )
   )
 
+(defun konix/image-mode/ipfa ()
+  (interactive)
+  (let (
+        (result (konix/ipfa-file (buffer-file-name)))
+        )
+    (kill-new result)
+    (message "Put %s in the kill ring" result)
+    )
+  )
+
+
+(defun konix/image-mode/mimeopen ()
+  "Open the currectly selected file with mimeopen."
+  (interactive)
+  (konix/mimeopen (buffer-file-name))
+  )
+
+
 (define-key image-mode-map (kbd "d") #'konix/image-mode/delete)
+(define-key image-mode-map (kbd "i") #'konix/image-mode/ipfa)
+(define-key image-mode-map (kbd "o") #'konix/image-mode/mimeopen)
 
 (provide 'KONIX_AL-image-mode)
 ;;; KONIX_AL-image-mode.el ends here

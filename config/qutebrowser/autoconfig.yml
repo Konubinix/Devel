@@ -16,6 +16,7 @@ settings:
           Firefox/45.0"
         d: null
         dd: tab-close
+        do: tab-only
         dsD: spawn -u konix_qutebrowser_web_search.sh -d
         dsS: spawn -u konix_qutebrowser_web_search.sh
         dsd: spawn -u konix_qutebrowser_web_search.sh -dc

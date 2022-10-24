@@ -1,0 +1,17 @@
+#!/bin/bash -eu
+
+source <(kubectl completion bash)
+ME="$(basename "${BASH_SOURCE[0]}")"
+
+_ktns () {
+    COMP_WORDS=(ktl -n "${COMP_WORDS[@]:1}")
+    # then, add 1 to cword because I added two words (actually removed 1 and
+    # added 2, but who cares?)
+    COMP_CWORD=$((COMP_CWORD + 1))
+    # then, update the line and the point,
+    COMP_LINE=${COMP_LINE/ktns/ktl -n}
+    COMP_POINT=$((COMP_POINT + 2)) # ktl -n contains 2 characters more than ktns
+    __start_kubectl
+}
+
+complete -F _ktns "${ME}"

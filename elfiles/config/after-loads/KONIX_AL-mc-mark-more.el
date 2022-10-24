@@ -36,7 +36,6 @@
   ("q" nil "quit")
   )
 (define-key konix/region-bindings-mode-map "m" 'konix/mc-hydra/body)
-(define-key konix/region-bindings-mode-map "l" 'mc/edit-lines)
 
 (provide 'KONIX_AL-mc-mark-more)
 ;;; KONIX_AL-mc-mark-more.el ends here

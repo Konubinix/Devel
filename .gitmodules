@@ -10,24 +10,9 @@
 	path = pymimedetacher
 	url = https://github.com/Konubinix/pymimedetacher.git
 	ignore=dirty
-[submodule "elfiles/ini"]
-	path = elfiles/ini
-	url = https://github.com/daniel-ness/ini.el.git
 [submodule "config/awesome/awesome-cyclefocus"]
 	path = config/awesome/awesome-cyclefocus
 	url = https://github.com/blueyed/awesome-cyclefocus
-[submodule "elfiles/ol-emacs-slack"]
-	path = elfiles/ol-emacs-slack
-	url = https://github.com/ag91/ol-emacs-slack
-[submodule "elfiles/org-link-minor-mode"]
-	path = elfiles/org-link-minor-mode
-	url = https://github.com/seanohalpin/org-link-minor-mode
-[submodule "elfiles/pdf-continuous-scroll-mode.el"]
-	path = elfiles/pdf-continuous-scroll-mode.el
-	url = https://github.com/dalanicolai/pdf-continuous-scroll-mode.el
 [submodule "python/dracula"]
 	path = python/dracula
 	url = https://github.com/dracula/qutebrowser-dracula-theme.git
-[submodule "elfiles/hypothesis"]
-	path = elfiles/hypothesis
-	url = https://github.com/Konubinix/hypothesis

@@ -19,7 +19,6 @@
 (save-place-mode 1)
 ;; I don't like it by default, but like enabling it in some modes
 (electric-indent-mode -1)
-
 ;; this is the long part, as it loads my org files
 (require 'KONIX_org-meta-context)
 

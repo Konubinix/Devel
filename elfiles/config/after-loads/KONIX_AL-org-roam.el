@@ -658,10 +658,6 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
   (org-id-goto link)
   )
 
-;; add sentinel character to ease filter with the exact title. So that |sgx|
-;; matches the note exactly about sgx and note the hundreds of notes about sgx
-(setq-default org-roam-node-display-template "${title}")
-
 (if (require 'org-roam-bibtex nil t)
     (org-roam-bibtex-mode)
   (warn "Could not load org-roam-bibtex")
@@ -820,6 +816,17 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
     (message "I could not find a node that corresponds to the word %s" word)
     )
   )
+
+(cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
+  (let ((level (org-roam-node-level node)))
+    (concat
+     (when (> level 0) (concat (org-roam-node-file-title node) " > "))
+     (when (> level 1) (concat (string-join (org-roam-node-olp node) " > ") " > "))
+     (org-roam-node-title node)
+     "|")))
+
+
+(setq-default org-roam-node-display-template "${hierarchy:*}${tags:20}")
 
 (org-roam-setup)
 

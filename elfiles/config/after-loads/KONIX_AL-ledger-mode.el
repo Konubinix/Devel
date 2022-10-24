@@ -213,6 +213,7 @@ reg \\( Temp or Auto \\) and not %twin ")
 (define-key ledger-mode-map (kbd "M-TAB") 'completion-at-point)
 (define-key ledger-mode-map (kbd "C-j") 'completion-at-point)
 (define-key ledger-mode-map (kbd "C-f o i") 'konix/ledger-copy-id)
+(define-key ledger-mode-map (kbd "C-c n i") 'org-roam-node-insert)
 
 (defun konix/ledger-copy-id ()
   (interactive)

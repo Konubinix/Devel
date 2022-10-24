@@ -11,5 +11,6 @@ trap "exit 3" SIGQUIT
 
 FILE="$1"
 NAME="$(basename "${FILE}")"
-ipfa "${FILE}"
+cd "$(dirname "${FILE}")"
+ipfa "${NAME}"
 konix_display.py "Done ipfa for ${NAME}"

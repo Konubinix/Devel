@@ -48,14 +48,6 @@
   )
 (advice-add 'org-noter-insert-precise-note :around #'konix/org-noter-insert-precise-note)
 
-(defun konix/org-noter-doc-mode-hook nil
-  "My custom hook for `org-noter-doc-mode'"
-  ;; (when (require 'pdf-continuous-scroll-mode nil t)
-  ;;   (pdf-continuous-scroll-mode 1)
-  ;;   )
-  )
-(add-hook 'org-noter-doc-mode-hook
-          'konix/org-noter-doc-mode-hook)
 
 (defun konix/org-noter-notes-mode-hook nil
   "My custom hook for `org-noter-notes-mode'"

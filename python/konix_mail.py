@@ -107,7 +107,7 @@ def make_part_harmless(html):
         img.attrs["style"] = "border: solid 3px blue;" + img.attrs["oldstyle"]
         alt = img.attrs.get("alt")
         if alt is None:
-            alt = "CLICKTOLOAD"
+            alt = f"CLICKTOLOAD ({src})"
         elif alt == "":
             alt = "EmptyAlt CLICKTOLOAD"
         img.attrs["alt"] = alt

@@ -74,7 +74,7 @@
       (ts :from -7 :to today)
       (not (tags "structure" "habit" "temp"))
       )
-    :title "Recent Items"
+    :title "Clear recent Items"
     :sort '(date)
     )
   )
@@ -6166,11 +6166,11 @@ You should check this is not a mistake."
     )
   )
 
-(defun konix/org-agenda-project-workflow ()
+(defun konix/org-agenda-project-gtd-workflow ()
   (interactive)
   (let (done)
     (while (and
-            (setq done (konix/org-agenda-project-workflow-item))
+            (setq done (konix/org-agenda-project-gtd-workflow-item))
             (< (line-number-at-pos (point))) (line-number-at-pos (point-max))
             )
       (konix/org-agenda-filter-for-now)
@@ -6188,7 +6188,7 @@ You should check this is not a mistake."
     )
   )
 
-(defun konix/org-agenda-project-workflow-item ()
+(defun konix/org-agenda-project-gtd-workflow-item ()
   (interactive)
   (require 'org-roam)
   (let* (
@@ -6207,10 +6207,10 @@ You should check this is not a mistake."
            )
           )
          )
-    (defun konix/org-agenda-project-workflow-item/ask (message)
+    (defun konix/org-agenda-project-gtd-workflow-item/ask (message)
       (y-or-n-p (format "%s\n%s" heading message))
       )
-    (defun konix/org-agenda-project-workflow-item/fail (message)
+    (defun konix/org-agenda-project-gtd-workflow-item/fail (message)
       (warn message)
       nil
       )
@@ -6220,46 +6220,46 @@ You should check this is not a mistake."
       (progn
         (save-window-excursion
           (find-file (org-roam-node-file (org-roam-node-from-id "aof")))
-          (konix/org-agenda-project-workflow-item/ask
+          (konix/org-agenda-project-gtd-workflow-item/ask
            "WHY? (role/goal/vision/value): Say out loud the relevant higher horizons that are linked to
   this project. Did you manage? ")
           )
         )
-      (konix/org-agenda-project-workflow-item/fail "Get rid of it and ruuuun!")
+      (konix/org-agenda-project-gtd-workflow-item/fail "Get rid of it and ruuuun!")
       )
      (or
-      (konix/org-agenda-project-workflow-item/ask "WHAT? (outcome): Say out loud or visualize what done means and what doing looks like/the expected outcome.  Did you manage? ")
-      (konix/org-agenda-project-workflow-item/fail "Clarify !")
+      (konix/org-agenda-project-gtd-workflow-item/ask "WHAT? (outcome): Say out loud or visualize what done means and what doing looks like/the expected outcome.  Did you manage? ")
+      (konix/org-agenda-project-gtd-workflow-item/fail "Clarify !")
       )
      (or
       (or
-       (konix/org-agenda-project-workflow-item/ask
+       (konix/org-agenda-project-gtd-workflow-item/ask
         (format "WHEN? (deadline): Current deadline is %s %s. Is this ok? "
                 (konix/org-get-deadline)
                 deadline-prefix)
         )
        (and
-        (konix/org-agenda-project-workflow-item/ask "Want to define one now? ")
+        (konix/org-agenda-project-gtd-workflow-item/ask "Want to define one now? ")
         (call-interactively 'org-agenda-deadline)
         )
        )
-      (konix/org-agenda-project-workflow-item/fail "Be clear about the deadline !")
+      (konix/org-agenda-project-gtd-workflow-item/fail "Be clear about the deadline !")
       )
      (or
-      (konix/org-agenda-project-workflow-item/ask "NOW? (schedule): Is it relevant now (I may schedule it in the future)? ")
+      (konix/org-agenda-project-gtd-workflow-item/ask "NOW? (schedule): Is it relevant now (I may schedule it in the future)? ")
       (call-interactively 'org-agenda-schedule)
       )
      (or
       (progn
         (or
-         (konix/org-agenda-project-workflow-item/ask "HOW? (actions): Are there correct next actions set for it to go forward? ")
+         (konix/org-agenda-project-gtd-workflow-item/ask "HOW? (actions): Are there correct next actions set for it to go forward? ")
          (and
-          (konix/org-agenda-project-workflow-item/ask "Want to create one now ?")
+          (konix/org-agenda-project-gtd-workflow-item/ask "Want to create one now ?")
           (konix/org-capture-na-in-heading)
           )
          )
         )
-      (konix/org-agenda-project-workflow-item/fail "Deal with its next actions !")
+      (konix/org-agenda-project-gtd-workflow-item/fail "Deal with its next actions !")
       )
      )
     )

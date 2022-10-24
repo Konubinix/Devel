@@ -1568,7 +1568,7 @@ FExport diary data into iCalendar file: ")
 (defun konix/goto-random-line ()
   "Go to a random line in this buffer."
   (interactive)
-  (konix/goto-line-prog (random (konix/buffer-line-count)))
+  (konix/goto-line-prog (1+ (random (konix/buffer-line-count))))
   (konix/go-to-next-visible-line)
   )
 

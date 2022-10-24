@@ -270,22 +270,31 @@
   (call-interactively 'dired-mark)
   )
 
-(defun konix/dired-ipfa-at-point ()
-  (interactive)
+(defun konix/ipfa-file (filename)
   (let (
-        (current-directory (file-name-directory (dired-get-file-for-visit)))
-        (current-file (file-name-nondirectory (dired-get-file-for-visit)))
-        result
+        (result
+         (with-temp-buffer
+           (cd (file-name-directory filename))
+           (call-process "ipfa" nil (current-buffer) nil (file-name-nondirectory filename))
+           (s-trim (buffer-substring-no-properties (point-min) (point-max)))
+           )
+         )
         )
-    (with-temp-buffer
-      (cd current-directory)
-      (call-process "ipfa" nil (current-buffer) nil current-file)
-      (setq result (s-trim (buffer-substring-no-properties (point-min) (point-max))))
-      )
     (when current-prefix-arg
       (setq result (s-replace "filename=" "" result))
       )
     result
+    )
+  )
+
+(defun konix/dired-ipfa-at-point ()
+  (interactive)
+  (let* (
+         (current-directory (file-name-directory (dired-get-file-for-visit)))
+         (current-file (file-name-nondirectory (dired-get-file-for-visit)))
+         (filename (expand-file-name current-file current-directory))
+         )
+    (konix/ipfa-file filename)
     )
   )
 

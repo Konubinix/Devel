@@ -254,8 +254,6 @@
 		 (and (bufferp output_buffer) (buffer-name output_buffer))
 		 "*GIT Async Shell Command*"))
   (or no_kill_output_buffer (ignore-errors (kill-buffer output_buffer)))
-  ;; recreate the buffer if it does not exist
-  (get-buffer-create output_buffer)
   (let (
 		(top-level (konix/git/_get-toplevel))
 		)

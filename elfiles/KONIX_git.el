@@ -281,9 +281,14 @@
   )
 
 (defun konix/git/_get-toplevel ()
-  (replace-regexp-in-string
-   "[\n\r]" ""
-   (shell-command-to-string "git rev-parse --show-toplevel")
+  (cond
+   ((and (buffer-file-name) (string-match "^\\(.+\\)/\.git" (buffer-file-name)))
+    (match-string-no-properties 1 (buffer-file-name))
+    )
+   (t (replace-regexp-in-string
+       "[\n\r]" ""
+       (shell-command-to-string "git rev-parse --show-toplevel")
+       ))
    )
   )
 

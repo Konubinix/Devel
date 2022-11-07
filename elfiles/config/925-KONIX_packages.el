@@ -60,12 +60,13 @@
 (use-package miniedit :defer t :commands (miniedit))
 (use-package multiple-cursors :defer t)
 (use-package nix-mode :commands (nix-mode))
+;; overriden by straight below
+;; (use-package org :defer t)
 (use-package org-drill
   :bind-keymap  (
-         ("C-f D" . konix/org-drill-key-map)
-         )
+                 ("C-f D" . konix/org-drill-key-map)
+                 )
   )
-(use-package org :defer)
 (use-package org-ql :commands (org-ql-search))
 (use-package org-roam :defer t)
 (use-package org-roam-bibtex :defer t)
@@ -87,6 +88,20 @@
 (use-package undo-tree :commands (undo-tree-mode))
 (use-package windata :defer t) ;; needed by imenu-tree
 
+;; make sure I use this version of org when it is pulled as dependency for
+;; hypothesis
+;;
+;; it would be better to have straight understand that the package is already
+;; dealt with by use-package.
+(setq-default
+ straight-recipe-overrides
+ '(
+   (nil . (
+         (org . (:branch "release_9.5.5"))
+         )
+        )
+   )
+ )
 ;; straight
 (straight-use-package '(ement :type git :host github :repo "alphapapa/ement.el"))
 (straight-use-package '(michelson :type git :host github :repo "MiloDavis/michelson-mode"))
@@ -98,7 +113,23 @@
 (straight-use-package '(org-link-minor-mode :type git :host github :repo "seanohalpin/org-link-minor-mode"))
 (straight-use-package '(ini :type git :host github :repo "daniel-ness/ini.el"))
 (straight-use-package '(hypothesis :type git :host github :repo "Konubinix/hypothesis"))
-
+;; (progn
+;;   ;; make sure to go back to the pinned versions I decided to use
+;;   (save-window-excursion
+;;     (with-current-buffer (find-file-noselect (straight--versions-file
+;;                                               "default.el"))
+;;       (delete-region (point-min) (point-max))
+;;       (insert "(
+;;  (\"org\" . \"release_9.5.5\") ;; hypothesis will ask org as dependency
+;;  )
+;; :gamma
+;; ")
+;;       (save-buffer)
+;;       )
+;;     )
+;;   (straight-thaw-versions)
+;;   ;; (straight-rebuild-package "org")
+;;   )
 ;; vendor
 (require 'framemove)
 (require 'qutebrowser)

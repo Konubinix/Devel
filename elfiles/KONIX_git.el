@@ -40,83 +40,7 @@
 		("^tag" . (konix/git/command-to-string . nil))
 		("^show" . (konix/git/command-to-string . nil))
 		("^checkout" . (konix/git/command-to-string . nil))
-		(".*" . (konix/git/command .nil))
-		)
-	  )
-
-(setq konix/git/completions
-	  '(
-		"commit"
-		"rebase"
-		"reset"
-		"cherry-pick"
-		"revert"
-		"cherry-pick"
-		"revert"
-		"checkout"
-		"tag"
-		"push"
-		"svn"
-		"show"
-		)
-	  )
-
-(setq konix/git/context-completion
-	  '(
-		("^rebase" konix/git/completion/rebase konix/git/branch/list konix/git/tag/list)
-		("^checkout" konix/git/branch/list konix/git/tag/list)
-		("^cherry-pick" konix/git/branch/list konix/git/tag/list)
-		("^reset" konix/git/completion/reset konix/git/branch/list konix/git/tag/list)
-		("^revert" konix/git/branch/list konix/git/tag/list)
-		("^tag .*-d" konix/git/completion/tag konix/git/tag/list)
-		("^tag .*-m" nil)
-		("^tag" konix/git/completion/tag)
-		("^push" konix/git/remote/list konix/git/completion/push)
-		("^pull" konix/git/remote/list konix/git/completion/push)
-		("^fetch*" konix/git/remote/list)
-		("^branch" konix/git/branch/list)
-		("^show" konix/git/completion/show konix/git/branch/list konix/git/tag/list)
-		("^svn" konix/git/svn/list)
-		("^ *$" konix/git/completions)
-		)
-	  )
-
-(setq konix/git/completion/rebase
-	  '(
-		"--abort"
-		"--interactive"
-		"-i"
-		)
-	  )
-
-(setq konix/git/completion/show
-	  '(
-		"--stat"
-		)
-	  )
-
-(setq konix/git/completion/reset
-	  '(
-		"--hard"
-		)
-	  )
-
-(setq konix/git/completion/branch
-	  '(
-		"-m"
-		)
-	  )
-
-(setq konix/git/completion/push
-	  '(
-		"--force"
-		)
-	  )
-
-(setq konix/git/completion/tag
-	  '(
-		"-d"
-		"-m"
+		(".*" . (konix/git/command . nil))
 		)
 	  )
 
@@ -172,45 +96,6 @@
 	)
   )
 
-(defun konix/git/complete (string filter flag)
-  (let (pos_word before_word word completion compl)
-	(setq pos_word (string-match " [^ ]*$" string))
-	(setq before_word
-		  (if pos_word
-			  (substring string 0 pos_word)
-			""
-			)
-		  )
-	(setq word
-		  (if pos_word
-			  (substring string (+ 1 pos_word))
-			string
-			)
-		  )
-	(setq completion (konix/git/get-completion-list-from-context before_word))
-	;; If no word exists, I can complete with a space
-	(if (not (all-completions word completion))
-		(setq completion (list (concat word " ")))
-	  )
-	(setq compl
-		  (cond
-		   ((not flag)
-			;; try completion
-			(setq try_comp (try-completion word completion))
-			(if (and pos_word (stringp try_comp))
-				(setq try_comp (concat before_word " " try_comp))
-			  )
-			try_comp
-			)
-		   (flag
-			;; all completionq
-			(all-completions word completion)
-			)
-		   )
-		  )
-	)
-  )
-
 (defun konix/git/completing-read-refs (prefix &optional no_branch no_tag )
   (let ((branches "") (tags ""))
 	(if (not no_branch)
@@ -227,17 +112,19 @@
   "According to the cmd, decides wich kind of git command to call."
   (let (command)
 	(setq command
-		  (block 'command
-			(mapcar
-			 '(lambda(e)
-				(if (string-match e cmd)
-					(return-from 'command (assoc e konix/git/regexp-command))
+		  (first
+           (remove-if
+            (-partial 'equal nil)
+            (mapcar
+		     '(lambda(e)
+			    (if (string-match e cmd)
+				    (assoc e konix/git/regexp-command)
 				  )
-				)
-			 (keys konix/git/regexp-command)
-			 )
-			nil
-			)
+			    )
+		     (keys konix/git/regexp-command)
+		     )
+            )
+           )
 		  )
 	(if command
 		(funcall (car (cdr command)) cmd (cdr (cdr command)))
@@ -292,84 +179,14 @@
    )
   )
 
-(defun konix/git/command-with-completion (&optional cmd)
+(defun konix/git/command-with-prompt (&optional cmd)
   (interactive)
   (if (not cmd)
 	  (setq cmd "")
 	)
-  (setq konix/git/cache-completion nil)
   (let (command)
-	(setq command (completing-read "git " 'konix/git/complete nil nil cmd))
+	(setq command (read-string "git " cmd))
 	(konix/git/launch/command command)
-	)
-  )
-
-(defun konix/git/get-completion-list-from-context (context)
-  (let (completion_assoc)
-	(setq completion_list
-		  (block nil
-			(mapcar
-			 '(lambda(e)
-				(if (string-match (car e) context)
-					(return  (cdr e))
-				  )
-				)
-			 konix/git/context-completion
-			 )
-			nil
-			)
-		  )
-	(if completion_list
-		(let (comp_list)
-		  (setq comp_list ())
-		  (mapcar
-		   '(lambda(e)
-			  (setq
-			   comp_list
-			   (concatenate
-				'list
-				(konix/git/get-completion-list-from-symbol e)
-				comp_list)
-			   )
-			  )
-		   completion_list
-		   )
-		  comp_list
-		  )
-	  )
-	)
-  )
-
-(defun konix/git/get-completion-list-from-symbol (symbol)
-  (if (not (hash-table-p konix/git/cache-completion))
-	  (setq konix/git/cache-completion (make-hash-table :test 'equal))
-	)
-
-  (let (res)
-	(setq res (gethash symbol konix/git/cache-completion -1))
-	(if (equal res -1)
-		(block nil
-		  (setq res
-				(mapcar
-				 '(lambda (e)
-					;; addition of a trailing space in all elements
-					(concat e " ")
-					)
-				 ;; result list without trailing space
-				 (cond
-				  ((functionp e)
-				   (funcall e)
-				   )
-				  ((listp (eval e))
-				   (eval e)
-				   )
-				  )
-				 )
-				)
-		  (puthash symbol res konix/git/cache-completion)
-		  )
-	  )
-	res
 	)
   )
 
@@ -535,7 +352,7 @@
 
 (defun konix/git/branch/rename ()
   (interactive)
-  (konix/git/command-with-completion "branch -m ")
+  (konix/git/command-with-prompt "branch -m ")
   )
 
 (defun konix/git/reflog ()
@@ -691,17 +508,17 @@
 
 (defun konix/git/cherry-pick ()
   (interactive)
-  (konix/git/command-with-completion "cherry-pick ")
+  (konix/git/command-with-prompt "cherry-pick ")
   )
 
 (defun konix/git/cherry-pick-continue ()
   (interactive)
-  (konix/git/command-with-completion "cherry-pick --continue")
+  (konix/git/command-with-prompt "cherry-pick --continue")
   )
 
 (defun konix/git/cherry-pick-abort ()
   (interactive)
-  (konix/git/command-with-completion "cherry-pick --abort")
+  (konix/git/command-with-prompt "cherry-pick --abort")
   )
 
 (defun konix/git/stash/save (msg &optional args)
@@ -766,12 +583,12 @@
 
 (defun konix/git/push ()
   (interactive)
-  (konix/git/command-with-completion "push ")
+  (konix/git/command-with-prompt "push ")
   )
 
 (defun konix/git/fetch (&optional remote)
   (interactive)
-  (konix/git/command-with-completion
+  (konix/git/command-with-prompt
    (format
     "fetch %s"
     (if (not (null remote))
@@ -783,13 +600,13 @@
 
 (defun konix/git/pull ()
   (interactive)
-  (konix/git/command-with-completion "up ")
+  (konix/git/command-with-prompt "up ")
   )
 
 (defun konix/git/checkout ()
   "Lance git checkout."
   (interactive)
-  (konix/git/command-with-completion "checkout ")
+  (konix/git/command-with-prompt "checkout ")
   )
 
 (defun konix/git/checkout/parent (arg)
@@ -830,13 +647,13 @@
 (defun konix/git/rebase ()
   "Lance un rebase."
   (interactive)
-  (konix/git/command-with-completion "rebase ")
+  (konix/git/command-with-prompt "rebase ")
   )
 
 (defun konix/git/irebase ()
   "Rebase interactif sur ref."
   (interactive)
-  (konix/git/command-with-completion "rebase -i ")
+  (konix/git/command-with-prompt "rebase -i ")
   )
 
 (defun konix/git/rebase/continue ()
@@ -1249,7 +1066,7 @@ fallbacking to HEAD")
 
 (defun konix/git/reset ()
   (interactive)
-  (konix/git/command-with-completion "reset ")
+  (konix/git/command-with-prompt "reset ")
   )
 
 (defun konix/git/reset-file (file)
@@ -1277,7 +1094,7 @@ fallbacking to HEAD")
 
 (defun konix/git/reset/hard ()
   (interactive)
-  (konix/git/command-with-completion "reset --hard " )
+  (konix/git/command-with-prompt "reset --hard " )
   )
 
 (defun konix/git/revert (commit)
@@ -1798,7 +1615,7 @@ Uses the macro konix/git/status-buffer/next-or-previous
 
 (defun konix/git/tag ()
   (interactive)
-  (konix/git/command-with-completion "tag ")
+  (konix/git/command-with-prompt "tag ")
   )
 
 (defun konix/git/tag/list ()
@@ -1818,7 +1635,7 @@ Uses the macro konix/git/status-buffer/next-or-previous
 
 (defun konix/git/tag/delete ()
   (interactive)
-  (konix/git/command-with-completion "tag -d ")
+  (konix/git/command-with-prompt "tag -d ")
   )
 
 (defun konix/git/modified-files ()

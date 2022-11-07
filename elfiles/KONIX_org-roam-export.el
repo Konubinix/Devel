@@ -51,6 +51,7 @@
 (defun konix/org-roam-export/export-all (&optional kind incremental)
   "Re-exports all Org-roam files to Hugo markdown."
   (interactive)
+  (require 'ledger-mode)
   (setq kind (or kind "blog"))
   (assert (not (string= "" kind)))
   (let*  (

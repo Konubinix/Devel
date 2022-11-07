@@ -58,10 +58,18 @@
   (konix/mimeopen (buffer-file-name))
   )
 
+(defun konix/image-mode/async-shell-command (command)
+  (interactive
+   (list
+    (dired-read-shell-command "& on %s: " nil (list (buffer-file-name))) ))
+  (unless (string-match-p "&[ \t]*\\'" command)
+    (setq command (concat command " &")))
+  (dired-do-shell-command command nil (list (buffer-file-name))))
 
 (define-key image-mode-map (kbd "d") #'konix/image-mode/delete)
 (define-key image-mode-map (kbd "i") #'konix/image-mode/ipfa)
 (define-key image-mode-map (kbd "o") #'konix/image-mode/mimeopen)
+(define-key image-mode-map (kbd "&") #'konix/image-mode/async-shell-command)
 
 (provide 'KONIX_AL-image-mode)
 ;;; KONIX_AL-image-mode.el ends here

@@ -78,6 +78,7 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
 (define-key konix/slack-global-map (kbd "s") 'konix/slack-im-select)
 (define-key konix/slack-global-map (kbd "S") 'slack-room-user-select)
 (define-key konix/slack-global-map (kbd "M-u") 'slack-file-upload-snippet)
+(define-key konix/slack-global-map (kbd "m") 'slack-search-from-messages)
 
 (add-to-list 'tracking-ignored-buffers "\\*Slack - .+ : .+ Thread - [0-9.]+")
 

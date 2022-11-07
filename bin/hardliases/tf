@@ -9,4 +9,4 @@ shopt -s inherit_errexit
 trap "exit 2" SIGINT
 trap "exit 3" SIGQUIT
 
-kb ctx && kb ns
+exec terraform "$@"

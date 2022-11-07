@@ -1,0 +1,20 @@
+#!/bin/bash
+set -o errexit # -e
+set -o errtrace # -E
+set -o pipefail
+shopt -s inherit_errexit
+
+# ctrl-c
+trap "exit 2" SIGINT
+trap "exit 3" SIGQUIT
+
+source "${KONIX_LIB_DIR}/lib_bash.sh"
+
+args=()
+if test -n "${KTL_NS}"
+then
+    args+=(-n "${KTL_NS}")
+fi
+set -u
+
+exec_second_like_me "${args[@]}" "$@"

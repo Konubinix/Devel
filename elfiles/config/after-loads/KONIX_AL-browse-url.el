@@ -31,9 +31,6 @@
   (setq-default browse-url-browser-function 'konix/browse-url-browser)
   )
 
-;; ement uses use-package browse-url-handlers, from latest emacs
-(setq browse-url-handlers (list browse-url-browser-function))
-
 
 (provide 'KONIX_AL-browse-url)
 ;;; KONIX_AL-browse-url.el ends here

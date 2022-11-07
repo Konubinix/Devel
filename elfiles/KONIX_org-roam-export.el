@@ -218,6 +218,10 @@
             (cd directory)
             (insert content)
             (org-mode)
+            ;; so that org-export-with-tags if defcustom defined,
+            ;; hence dynamically and that the let-binding below won't trigger
+            ;; some error
+            (require 'ox)
             (let (
                   ;; don't bother messing up a temporary buffer while reformating it for
                   ;; better export

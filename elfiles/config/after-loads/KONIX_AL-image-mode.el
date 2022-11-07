@@ -34,7 +34,7 @@
            (images (directory-files dir nil (image-file-name-regexp) t))
            )
       (if images
-          (image-next-file)
+          (image-next-file 1)
         (kill-buffer)
         )
       )

@@ -871,7 +871,7 @@
 	)
   )
 
-(defun konix/git/show (commit &optional file when_done_hook)
+(defun konix/git/show (commit &optional file when_done_hook no-pop)
   "Launch a simple diff and view it in some buffer. Give prefix argument to
 force recomputation"
   (interactive
@@ -922,7 +922,10 @@ force recomputation"
 				 (funcall ,when_done_hook)
 				 )
 			   )
-			 (pop-to-buffer ,show_buffer)
+			 (if ,no-pop
+                 (display-buffer ,show_buffer)
+               (pop-to-buffer ,show_buffer nil t)
+               )
 			 )
 		  )
 		 )

@@ -89,7 +89,7 @@ ${title}
    )
   )
 
-(defun konix/org-roam/open-key (key)
+(defun konix/org-roam/open-ref (key)
   (interactive
    (save-window-excursion
      (when (or

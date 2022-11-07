@@ -1,0 +1,4 @@
+#!/bin/bash -x
+
+
+exec nix shell "nixpkgs#httpie" -c "$(basename "${0}")" "$@"

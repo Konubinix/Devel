@@ -107,6 +107,7 @@
         "compile" ;; KONIX_org-roam-export -> citeproc -> citeproc-cite -> citeproc-number -> rst -> compile
         "cus-edit" ;; when accepting the theme for future use
         "delight" ;; init
+        "diff-mode" ;; loaded by straight when thawing the packages
         "dired" ;; init
         "envrc" ;; init
         "KONIX_org-meta-context" ;; init

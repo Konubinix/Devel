@@ -292,9 +292,16 @@ reg \\( Temp or Auto \\) and not %twin ")
     )
   )
 
-(org-link-set-parameters "konix/ledger"
-                         :follow #'konix/ledger-org-follow-link
-                         :store #'konix/ledger-org-store-link)
+(defun konix/ledger-org-export (path description back-end comm)
+  description
+  )
+
+(org-link-set-parameters
+ "konix/ledger"
+ :follow #'konix/ledger-org-follow-link
+ :store #'konix/ledger-org-store-link
+ :export #'konix/ledger-org-export
+ )
 
 (defun konix/ledger-org-parse-link (link)
   ""

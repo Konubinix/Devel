@@ -153,6 +153,7 @@
 (autoload 'argdown-mode "argdown" "" t)
 (autoload 'konix/org-drill-key-map "org-drill" "" t)
 (autoload 'auto-scroll-mode "auto-scroll" "" t)
+(autoload 'gitri "KONIX_gitri" "" t)
 
 ;; ************************************************************
 ;; Automodes
@@ -231,6 +232,7 @@
 (add-to-list 'auto-mode-alist (cons "\\.puml$" 'plantuml-mode))
 (add-to-list 'auto-mode-alist (cons "Tiltfile" 'python-mode))
 (add-to-list 'auto-mode-alist (cons "flake.lock" 'js2-mode))
+(add-to-list 'auto-mode-alist (cons "git-rebase-todo" 'gitri-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

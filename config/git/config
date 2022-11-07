@@ -1,3 +1,6 @@
+[rerere]
+	enabled = true
+
 [user]
     useConfigOnly = true
 	email = konubinixweb@gmail.com

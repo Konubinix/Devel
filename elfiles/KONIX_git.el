@@ -1501,6 +1501,15 @@ fallbacking to HEAD")
 						  )
 						"^	added by us:     \\(.+\\)$"
 						compilation-info-face)
+    (decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "r" 'konix/git/status-buffer/rm-file)
+						  (define-key map "a" 'konix/git/status-buffer/add-file)
+						  map
+						  )
+						"^\\(?:# \\)?[	 ]+deleted\\(?: by them\\)?:[	 ]+\\(.+\\)$"
+						compilation-error-face)
 	(widen)
  	)
   (when (narrow_to_block "\\(?:# \\)?Changes to be committed:")
@@ -1543,7 +1552,7 @@ fallbacking to HEAD")
 						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
 						  map
 						  )
-						"^\\(?:# \\)?	deleted:    \\(.+\\)$"
+						"^\\(?:# \\)?[	 ]+deleted\\(?: by them\\)?:[	 ]+\\(.+\\)$"
 						compilation-error-face)
 	(widen)
  	)
@@ -1561,6 +1570,26 @@ fallbacking to HEAD")
 						  map
 						  )
 						"^\\(?:# \\)?	modified:   \\(.+?\\)\\( (.*\\(tracked\\|new commits\\|modified content\\).*)\\)?$"
+						compilation-info-face)
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "a" 'konix/git/status-buffer/add-file)
+						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+						  map
+						  )
+						"^\\(?:# \\)?	renamed:    .+ -> \\(.+\\)$"
+						compilation-info-face)
+   	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "a" 'konix/git/status-buffer/add-file)
+						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+						  map
+						  )
+						"^\\(?:# \\)?	new file:   \\(.+\\)$"
 						compilation-info-face)
 	(decorate_file_type (let (
 							  (map (make-sparse-keymap))

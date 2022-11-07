@@ -233,6 +233,7 @@
 (add-to-list 'auto-mode-alist (cons "Tiltfile" 'python-mode))
 (add-to-list 'auto-mode-alist (cons "flake.lock" 'js2-mode))
 (add-to-list 'auto-mode-alist (cons "git-rebase-todo" 'gitri-mode))
+(add-to-list 'auto-mode-alist (cons "netrc.gpg" 'authinfo-mode))
 
 ;; ******************************************************************************************
 ;; Magic modes

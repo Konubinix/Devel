@@ -69,8 +69,16 @@ def munpack(message, directory, rel_path=False):
     plain_filename = None
     html_filename = None
 
+    def decode_part(message, encoding):
+        if isinstance(message, str):
+            return message
+        elif encoding is None:
+            return message.decode()
+        else:
+            return message.decode(encoding)
+
     decoded_subject = ", ".join([
-        (b.decode(encoding) if encoding else b)
+        decode_part(b, encoding)
         for b, encoding in decode_header(message["Subject"])
     ])
     sanitized_subject = sanitize_filename(decoded_subject)

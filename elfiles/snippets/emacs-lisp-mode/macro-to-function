@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: macro-to-function
+# key: macro-to-function
+# --
+(defun konix/$100 ()
+	(interactive)
+	(konix/macro/execute-from-human-format "
+`(konix/macro/dump-human-format last-kbd-macro)`
+")
+)

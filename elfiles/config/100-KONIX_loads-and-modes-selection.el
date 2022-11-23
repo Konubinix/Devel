@@ -154,6 +154,8 @@
 (autoload 'konix/org-drill-key-map "org-drill" "" t)
 (autoload 'auto-scroll-mode "auto-scroll" "" t)
 (autoload 'gitri-mode "KONIX_gitri-mode" "" t)
+(autoload 'konix/macro/execute-from-human-format "KONIX_macro" "" t)
+(autoload 'konix/macro/dump-human-format "KONIX_macro" "" t)
 
 ;; ************************************************************
 ;; Automodes

@@ -25,7 +25,12 @@
 ;;; Code:
 
 
-(defvar gitri/commit-line-regexp "^\\([a-z]+\\) +\\([a-z0-9]+\\)")
+(defvar gitri/commit-line-regexp "^\\(?:#-\\)?\\([a-z]+\\) +\\([a-z0-9]+\\)")
+
+(defface gitri/killed-face
+  '((t (:strike-through t :foreground "saddle brown")))
+  "Killed line.")
+(defvar gitri/killed-face 'gitri/killed-face)
 
 (defvar gitri/font-lock-keywords
   (list
@@ -34,6 +39,7 @@
    (list "^fixup" . (0 '(list 'face compilation-warning-face)))
    (list "^squash" . (0 '(list 'face font-lock-string-face)))
    (list "^reword" . (0 '(list 'face 'org-drawer)))
+   (list "^#-[^ ]+" . (0 '(list 'face gitri/killed-face)))
    )
   )
 
@@ -52,11 +58,11 @@
   (let (
         (current-buffer (current-buffer))
         )
-   (gitri/in-commit-line
-    (konix/git/show (match-string-no-properties 2) nil nil t)
+    (gitri/in-commit-line
+     (konix/git/show (match-string-no-properties 2) nil nil t)
+     )
+    (pop-to-buffer current-buffer)
     )
-   (pop-to-buffer current-buffer)
-   )
   )
 
 (defmacro gitri/inhibit-readonly (body)
@@ -100,23 +106,54 @@
     (transpose-lines 1)
     )
    )
-  (forward-line -1)
+  (gitri/up)
   )
 
 (defun gitri/meta-down ()
   (interactive)
-  (forward-line 1)
+  (gitri/down)
   (gitri/meta-up)
+  (gitri/down)
+  )
+
+(defun gitri/up ()
+  (interactive)
+  (forward-line -1)
+  )
+
+(defun gitri/down ()
+  (interactive)
   (forward-line 1)
+  )
+
+(defun gitri/toggle-kill-internal ()
+  (beginning-of-line)
+  (if (looking-at "#-")
+      (replace-match "")
+    (insert "#-")
+    )
+  )
+
+(defun gitri/toggle-kill ()
+  (interactive)
+  (gitri/in-commit-line
+   (gitri/inhibit-readonly
+    (gitri/toggle-kill-internal)
+    )
+   )
   )
 
 (defvar gitri-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "o") 'gitri/show)
+    (define-key map (kbd "d") 'gitri/show)
     (define-key map (kbd "f") 'gitri/fixup)
     (define-key map (kbd "s") 'gitri/squash)
     (define-key map (kbd "p") 'gitri/pick)
     (define-key map (kbd "r") 'gitri/reword)
+    (define-key map (kbd "C-k") 'gitri/toggle-kill)
+    (define-key map (kbd "SPC") 'gitri/down)
+    (define-key map (kbd "DEL") 'gitri/up)
     (define-key map (kbd "M-<up>") 'gitri/meta-up)
     (define-key map (kbd "M-<down>") 'gitri/meta-down)
     map)

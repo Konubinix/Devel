@@ -153,7 +153,7 @@
 (autoload 'argdown-mode "argdown" "" t)
 (autoload 'konix/org-drill-key-map "org-drill" "" t)
 (autoload 'auto-scroll-mode "auto-scroll" "" t)
-(autoload 'gitri "KONIX_gitri" "" t)
+(autoload 'gitri-mode "KONIX_gitri-mode" "" t)
 
 ;; ************************************************************
 ;; Automodes

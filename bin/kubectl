@@ -17,4 +17,8 @@ then
 fi
 set -u
 
-exec_second_like_me "${args[@]}" "$@"
+source _ko_nix.sh
+
+bin=$(nix_install_binary kubectl)
+
+exec "${bin}" "${args[@]}" "${@}"

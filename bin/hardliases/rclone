@@ -1,3 +1,8 @@
 #!/bin/bash
 
-exec nix run "nixpkgs#$(basename "${0}")" -- "$@"
+source _ko_nix.sh
+
+ME="$(basename "${0}")"
+BIN="$(nix_install_binary "${ME}")"
+
+exec "${BIN}" "${@}"

@@ -36,6 +36,7 @@ config.set("content.user_stylesheets", [
 
 config.unbind('d', mode='normal')
 config.bind('dd', 'tab-close')
+config.bind('dg', 'tab-give')
 config.bind('pi', 'spawn -u konix_qutebrowser_print_ipfa.sh')
 config.bind('dsD', 'spawn -u konix_qutebrowser_web_search.sh -d')
 config.bind('dsS', 'spawn -u konix_qutebrowser_web_search.sh')

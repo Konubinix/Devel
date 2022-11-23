@@ -366,3 +366,11 @@ def __set(value):
     with pulsectl.Pulse() as pulse:
         for source in config.source:
             pulse.volume_set_all_chans(source, value)
+
+
+@application.command()
+def ipython():
+    "Run ipython, to ease debugging"
+    a = config.pulse.applications
+    import IPython
+    IPython.start_ipython(argv=[], user_ns=(globals() | locals()))

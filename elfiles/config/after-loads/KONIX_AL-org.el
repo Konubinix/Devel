@@ -56,6 +56,19 @@
   )
 (ad-activate 'org-attach-commit)
 
+(defun konix/org-entry-after-properties ()
+  (goto-char (org-entry-end-position))
+  (search-backward ":END:")
+  (forward-line)
+  )
+
+(defun konix/org-entry-after-properties-position ()
+  (save-excursion
+    (konix/org-entry-after-properties)
+    (point)
+    )
+  )
+
 (defun konix/org-entry-get-global (key)
   (org-with-wide-buffer
    (save-excursion

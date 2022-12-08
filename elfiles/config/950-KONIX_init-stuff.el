@@ -13,6 +13,7 @@
 
 (setenv "INEMACS" "t")
 (load-theme 'zenburn)
+
 (envrc-global-mode 1)
 (yas-global-mode 1)
 (tracking-mode 1)
@@ -20,6 +21,7 @@
 ;; I don't like it by default, but like enabling it in some modes
 (electric-indent-mode -1)
 ;; this is the long part, as it loads my org files
+(which-key-mode 1)
 (require 'KONIX_org-meta-context)
 
 (setq-default org-roam-v2-ack t)

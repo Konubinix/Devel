@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+
+ME="$(basename "${BASH_SOURCE[0]}")"
+source <("${ME}" completion -s bash)
+
+complete -o default -F __start_${ME} ${ME}

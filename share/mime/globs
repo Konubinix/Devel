@@ -2,3 +2,4 @@
 # update-mime-database command. DO NOT EDIT!
 application/x-gui2py:*.rsrc.py
 application/x-notebook:*.ipynb
+application/vnd.jgraph.mxfile:*.drawio

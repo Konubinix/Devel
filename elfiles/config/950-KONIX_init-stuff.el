@@ -4,6 +4,9 @@
   (server-start)
   )
 
+;; needs to be set before lsp is saved
+(setq-default lsp-keymap-prefix "M-g M-l")
+
 (setq-default global-mode-string
               (remove
                'display-time-string

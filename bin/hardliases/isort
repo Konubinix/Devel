@@ -1,1 +1,8 @@
-rclone
+#!/bin/bash
+
+source _ko_nix.sh
+
+ME="$(basename "${0}")"
+BIN="$(nix_install_binary "${ME}" "python3Packages.isort")"
+
+exec "${BIN}" "${@}"

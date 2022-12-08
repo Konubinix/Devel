@@ -101,9 +101,11 @@
     )
   )
 
-;; don't record the dired buffers, or else after next start C-x b will fail with
-;; tramp-error: Method ‘kubectl’ is not known.
-(add-to-list 'recentf-exclude "^/kubectl:")
+(with-eval-after-load 'recentf
+  ;; don't record the dired buffers, or else after next start C-x b will fail with
+  ;; tramp-error: Method ‘kubectl’ is not known.
+  (add-to-list 'recentf-exclude "^/kubectl:")
+  )
 
 (provide 'KONIX_AL-kubel)
 ;;; KONIX_AL-kubel.el ends here

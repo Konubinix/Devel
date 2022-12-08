@@ -1406,6 +1406,14 @@ fallbacking to HEAD")
 						  )
 						"^\\(?:# \\)?	renamed:    .+ -> \\(.+\\)$"
 						compilation-info-face)
+	(decorate_file_type (let (
+							  (map (make-sparse-keymap))
+							  )
+						  (define-key map "a" 'konix/git/status-buffer/add-file)
+						  map
+						  )
+						"^\\(?:# \\)?.+typechange: \\(.+\\)$"
+						compilation-info-face)
    	(decorate_file_type (let (
 							  (map (make-sparse-keymap))
 							  )

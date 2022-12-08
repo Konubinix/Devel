@@ -136,5 +136,12 @@ make sure to insert any mml content after the secure tag
 
 (add-hook 'message-send-hook 'konix/message-send-hook)
 
+(defun konix/mml-secure-is-encrypted-p/accept-argument (orig-fun &rest args)
+  ;; because message-send calls (mml-secure-is-encrypted-p 'anywhere)
+  (funcall orig-fun)
+  )
+(advice-add 'mml-secure-is-encrypted-p :around
+  'konix/mml-secure-is-encrypted-p/accept-argument)
+
 (provide '400-KONIX_message)
 ;;; 400-KONIX_message.el ends here

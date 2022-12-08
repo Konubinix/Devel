@@ -3,7 +3,7 @@
 
   inputs = {
     konubinix-golang.url = "/home/sam/Prog/devel/flakes/golang";
-    nixpkgs.url = "github:NixOS/nixpkgs/22.05";
+    nixpkgs.url = "nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
   };
 

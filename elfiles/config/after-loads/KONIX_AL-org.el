@@ -2936,7 +2936,7 @@ items"
 "
                  )
                 ("r" "Routine" entry (file+headline konix/org-todo_file "Refile")
-                 "* <%(konix/org-get-time) +1d> %?                :discret:noglance:
+                 "* <%(konix/org-get-time) +1d> %?                :habit:noglance:
   :PROPERTIES:
   :CREATED:  %U
   :END:

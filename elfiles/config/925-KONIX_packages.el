@@ -48,43 +48,57 @@
 (use-package default-text-scale :defer t)
 (use-package delight)
 (use-package dockerfile-mode :defer t)
+(straight-use-package '(ement :type git :host github :repo "alphapapa/ement.el"))
 (use-package envrc :defer t)
 (use-package earthfile-mode :defer t)
 (use-package f :defer t)
 (use-package flycheck :defer t)
+(use-package gherkin-mode :defer t)
 (use-package git-timemachine :commands (git-timemachine))
 (use-package golden-ratio)
 (use-package go-mode :defer t)
 (use-package hcl-mode :commands (hcl-mode))
 (use-package highlight-parentheses :defer t)
 (use-package highlight-symbol :commands (highlight-symbol))
+(straight-use-package '(image-roll :type git :host github :repo "dalanicolai/image-roll.el"))
+(straight-use-package '(ini :type git :host github :repo "daniel-ness/ini.el"))
 (use-package js2-mode :commands (js2-mode))
 (use-package kubel :commands (kubel))
+;; (straight-use-package '(kubel :type git :host github :repo "abrochard/kubel" :fork t))
 (use-package kubernetes :defer t)
 (use-package ledger-mode :defer t)
 (use-package lsp-mode :commands (lsp))
 (use-package lua-mode :commands (lua-mode))
 (use-package mic-paren :defer t)
 (use-package mic-paren :defer t)
+(straight-use-package '(michelson :type git :host github :repo "MiloDavis/michelson-mode"))
 (use-package miniedit :defer t :commands (miniedit))
 (use-package multiple-cursors :defer t)
 (use-package nix-mode :commands (nix-mode))
-;; overriden by straight below
+(straight-use-package '(ol-emacs-slack :type git :host github :repo "ag91/ol-emacs-slack"))
+;; explicitly use org in a stable version because otherwise it would be
+;; automatically pulled by hypothesis on master
+(straight-use-package '(org :type git :url "https://git.savannah.gnu.org/git/emacs/org-mode.git" :branch "release_9.5.5"))
 ;; (use-package org :defer t)
 (use-package org-drill
   :bind-keymap  (
                  ("C-f D" . konix/org-drill-key-map)
                  )
   )
+(straight-use-package '(org-link-minor-mode :type git :host github :repo "seanohalpin/org-link-minor-mode"))
 (use-package org-ql :commands (org-ql-search))
 (use-package org-roam :defer t)
 (use-package org-roam-bibtex :defer t)
 (use-package org-transclusion :defer t)
 (use-package origami :commands (origami-mode))
+;; version of pdf-tools that has continuous scrolling
+(straight-use-package '(pdf-tools :type git :host github :repo "dalanicolai/pdf-tools" :branch "pdf-roll"))
 (use-package popwin :defer t)
 (use-package prettier-js :defer t)
 (use-package rust-mode :defer t)
-(use-package slack :commands (slack-start))
+;; (use-package slack :commands (slack-start))
+(straight-use-package '(slack :type git :host github :repo "yuya373/emacs-slack"
+                              :fork t))
 (use-package terraform-mode :defer t)
 (use-package tree-mode :commands (tree-mode))
 (use-package typescript-mode :defer t)
@@ -97,49 +111,9 @@
 (use-package undo-tree :commands (undo-tree-mode))
 (use-package which-key :defer t)
 (use-package windata :defer t) ;; needed by imenu-tree
-
-;; make sure I use this version of org when it is pulled as dependency for
-;; hypothesis
-;;
-;; it would be better to have straight understand that the package is already
-;; dealt with by use-package.
-(setq-default
- straight-recipe-overrides
- '(
-   (nil . (
-         (org . (:branch "release_9.5.5"))
-         )
-        )
-   )
- )
-;; straight
-(straight-use-package '(ement :type git :host github :repo "alphapapa/ement.el"))
-(straight-use-package '(michelson :type git :host github :repo "MiloDavis/michelson-mode"))
-;; (use-package pdf-tools :defer t)
-(straight-use-package '(pdf-tools :type git :host github :repo
-                                  "dalanicolai/pdf-tools" :branch "pdf-roll"))
-(straight-use-package '(image-roll :type git :host github :repo "dalanicolai/image-roll.el"))
-(straight-use-package '(ol-emacs-slack :type git :host github :repo "ag91/ol-emacs-slack"))
-(straight-use-package '(org-link-minor-mode :type git :host github :repo "seanohalpin/org-link-minor-mode"))
-(straight-use-package '(ini :type git :host github :repo "daniel-ness/ini.el"))
+;; need to be used after using org
 (straight-use-package '(hypothesis :type git :host github :repo "Konubinix/hypothesis"))
-;; (progn
-;;   ;; make sure to go back to the pinned versions I decided to use
-;;   (save-window-excursion
-;;     (with-current-buffer (find-file-noselect (straight--versions-file
-;;                                               "default.el"))
-;;       (delete-region (point-min) (point-max))
-;;       (insert "(
-;;  (\"org\" . \"release_9.5.5\") ;; hypothesis will ask org as dependency
-;;  )
-;; :gamma
-;; ")
-;;       (save-buffer)
-;;       )
-;;     )
-;;   (straight-thaw-versions)
-;;   ;; (straight-rebuild-package "org")
-;;   )
+
 ;; vendor
 (require 'framemove)
 (require 'qutebrowser)

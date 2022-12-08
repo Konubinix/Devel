@@ -157,6 +157,14 @@
    )
  )
 
+(defun konix/ement-show-ids ()
+  (->> ement-sessions
+     cdar
+     ement-session-rooms
+     (-map (lambda (r) (list (ement-room-id r) (ement-room-display-name r))))
+     pp
+     )
+ )
 
 (provide 'KONIX_AL-ement)
 ;;; KONIX_AL-ement.el ends here

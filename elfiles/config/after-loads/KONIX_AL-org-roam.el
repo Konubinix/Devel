@@ -823,11 +823,10 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
     (concat
      (when (> level 0) (concat (org-roam-node-file-title node) " > "))
      (when (> level 1) (concat (string-join (org-roam-node-olp node) " > ") " > "))
-     (org-roam-node-title node)
-     "|")))
+     (org-roam-node-title node))))
 
 
-(setq-default org-roam-node-display-template "${hierarchy:*}${tags:20}")
+(setq-default org-roam-node-display-template "${hierarchy}")
 
 (org-roam-setup)
 

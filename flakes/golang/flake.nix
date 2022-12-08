@@ -2,16 +2,22 @@
   description = "golang env";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/22.05";
+    nixpkgs.url = "nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = { self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = import nixpkgs { inherit system; };
+      let
+        pkgs = import nixpkgs { inherit system; };
+        deps = [ pkgs.go pkgs.gopls ];
       in {
+        packages.default = pkgs.buildEnv {
+          name = "go";
+          paths = with pkgs; deps;
+        };
         devShell = pkgs.mkShell {
-          buildInputs = [ pkgs.go pkgs.gopls ];
+          buildInputs = deps;
           shellHook = ''
             export LIBCLANG_PATH="${pkgs.llvmPackages.libclang.lib}/lib";
           '';

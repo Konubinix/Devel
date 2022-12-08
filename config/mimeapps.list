@@ -50,4 +50,5 @@ text/vtt=emacsclient.desktop;
 application/vnd.ms-3mfdocument=cura.desktop;
 application/pgp-encrypted=konix_gpg_mimeopen.desktop;
 application/vnd.jgraph.mxfile=drawio.desktop;
+application/msword=libreoffice.desktop;
 

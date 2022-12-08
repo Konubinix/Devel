@@ -32,6 +32,7 @@
 
 (define-key org-mode-map (kbd "C-c n l") #'org-roam-buffer-toggle)
 (define-key org-mode-map (kbd "C-c n t") #'konix/org-roam-export/toggle-publish)
+(define-key org-mode-map (kbd "C-j") #'completion-at-point)
 
 (setq-default org-roam-directory (file-truename (expand-file-name "roam" perso-dir)))
 (setq-default org-roam-v2-ack t)

@@ -4427,7 +4427,7 @@ of the clocksum."
 (defun konix/org-gcal-get-info ()
   (konix/org-with-point-on-heading
    `(
-     :id ,(org-entry-get (point) "ID")
+     :id ,(or (org-entry-get (point) "REFILE_ID") (org-entry-get (point) "ID"))
      :account ,(org-entry-get (point) "ACCOUNT_NAME")
      :calendar_id ,(org-entry-get (point) "CALENDAR_ID")
      :updatedraw ,(org-entry-get (point) "UPDATEDRAW")
@@ -5281,8 +5281,22 @@ of the clocksum."
 (defun konix/org-force-refile-before-clocking-in/advice (orig_func &rest args)
   (save-window-excursion
     (when (member "temp" (org-get-tags))
-      (org-refile nil nil nil "Refile before clocking in")
-      (bookmark-jump (plist-get org-bookmark-names-plist :last-refile) 'set-buffer)
+      (if-let* (
+                (id (org-entry-get (point) "REFILE_ID"))
+                (entry (org-id-find id))
+                (answer (yes-or-no-p "Already an entry with this id, go there?"))
+                )
+          (org-id-goto id)
+        (progn
+          (org-refile nil nil nil "Refile before clocking in")
+          (bookmark-jump (plist-get org-bookmark-names-plist :last-refile) 'set-buffer)
+          )
+        )
+      (unless (org-entry-get (point) "ID")
+        (org-entry-put (point) "ID" (or (org-entry-get (point) "REFILE_ID")
+                                        (uuidgen-4)))
+        (org-entry-delete (point) "REFILE_ID")
+        )
       )
     (apply orig_func args)
     )

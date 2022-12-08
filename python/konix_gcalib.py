@@ -353,7 +353,7 @@ class GCall(cmd.Cmd, object):
                 optional = False
             return """* [[{}][{}]]{}{}
 :PROPERTIES:
-:ID: {}
+:REFILE_ID: {}
 :CALENDAR_ID: {}
 :ACCOUNT_NAME: {}
 :LOCATION: {}

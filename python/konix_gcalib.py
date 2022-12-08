@@ -283,7 +283,8 @@ class GCall(cmd.Cmd, object):
                 if "dateTime" in self.start:
                     fmt = "<%Y-%m-%d %a %H:%M>\n"
                 else:
-                    fmt = "<%Y-%m-%d %a>\n"
+                    # so that it appears at # the beginning of the calendar
+                    fmt = "<%Y-%m-%d %a 00:00-23:59>\n"
                 while current < self.enddate:
                     stamp += current.strftime(fmt)
                     current += datetime.timedelta(days=1)

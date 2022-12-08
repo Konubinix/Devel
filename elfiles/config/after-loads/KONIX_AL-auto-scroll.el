@@ -29,7 +29,7 @@
 (defvar konix/auto-scroll-idle-time 5)
 (defvar konix/auto-scrool-first-time t)
 
-(defun konix/auto-scroll-forward-line (number)
+(defun konix/auto-scroll-forward-line ()
   "description."
   (when (or konix/auto-scrool-first-time
             (and
@@ -51,20 +51,25 @@
   (setq konix/auto-scrool-first-time nil)
   )
 
-(defun konix/auto-scroll-get-function/rewrite (orig_func &rest args)
-  'konix/auto-scroll-forward-line
-  )
-
-(advice-add 'auto-scroll-get-function :around 'konix/auto-scroll-get-function/rewrite)
-
 (defun konix/auto-scroll-mode-hook ()
   (setq konix/auto-scrool-first-time t)
   )
 
+;; rewrite to also make sure I'm looking at emacs
+(defun auto-scroll-scroll (buf)
+  "Scroll if `auto-scroll-mode' is active."
+  (when (and
+         (eq (current-buffer) buf)
+         (string-match-p "konix_emacs" (shell-command-to-string "konix_wmctrl_active_window.sh"))
+         (file-exists-p (expand-file-name "~/.here"))
+         )
+    (condition-case nil
+        (konix/auto-scroll-forward-line)
+      (error (auto-scroll-mode -1)))))
+
+
 (add-hook 'auto-scroll-mode-hook
           #'konix/auto-scroll-mode-hook)
-
-
 
 (provide 'KONIX_AL-auto-scroll)
 ;;; KONIX_AL-auto-scroll.el ends here

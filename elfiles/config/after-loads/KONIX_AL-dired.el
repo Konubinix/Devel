@@ -282,6 +282,12 @@
         )
     (when current-prefix-arg
       (setq result (s-replace "filename=" "" result))
+      (when (member current-prefix-arg '((64 )(16)))
+        (setq result (concat (getenv "KONIX_IPFS_GATEWAY") result))
+        )
+      (when (equal current-prefix-arg '(64))
+        (browse-url result)
+        )
       )
     result
     )

@@ -29,6 +29,15 @@
 (require 'winner)
 (require 'saveplace)
 
+(setq-default
+ straight-host-usernames
+ '(
+   (github    . "konubinix")
+   (gitlab    . "konubinix")
+   (bitbucket . "konubinix")
+   )
+ )
+
 (setq-default use-package-always-ensure t)
 
 ;; elpa/melpa/etc

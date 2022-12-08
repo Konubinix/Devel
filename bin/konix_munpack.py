@@ -77,10 +77,11 @@ def munpack(message, directory, rel_path=False):
         else:
             return message.decode(encoding)
 
-    decoded_subject = ", ".join([
-        decode_part(b, encoding)
-        for b, encoding in decode_header(message["Subject"])
-    ])
+    def decode_value(value):
+        return ", ".join(
+            [decode_part(b, encoding) for b, encoding in decode_header(value)])
+
+    decoded_subject = decode_value(message["Subject"])
     sanitized_subject = sanitize_filename(decoded_subject)
     if len([
             part for part in get_parts(message)
@@ -92,7 +93,6 @@ def munpack(message, directory, rel_path=False):
             if part.get_content_subtype() == "plain"
     ]) == 1:
         plain_filename = sanitized_subject
-
     for part in get_parts(message):
         text = None
         content = part.get_payload(decode=True)
@@ -120,6 +120,7 @@ def munpack(message, directory, rel_path=False):
         prefix = main_type
         extension = sub_type
         name = part.get_filename()
+        name = name and decode_value(name)
         if name is None and sub_type == "html" and html_filename:
             name = html_filename + ".html"
         if name is None and sub_type == "plain" and plain_filename:

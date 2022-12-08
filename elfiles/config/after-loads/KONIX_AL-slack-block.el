@@ -29,7 +29,7 @@
   (let* ((team (plist-get option :team))
          (id (oref this channel-id))
          (room (slack-room-find id team))
-         (room-name (if room (slack-room-find id team) "<NA>")))
+         (room-name (if room (slack-room-name (slack-room-find id team) team) "<NA>")))
     (unless team
       (error "`slack-rich-text-channel-element' need team as option"))
 

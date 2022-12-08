@@ -1,18 +1,14 @@
 #!/bin/bash -eu
 
-COMMAND="send"
-while getopts "hl" opt; do
-    case $opt in
-        h)
-            usage
-            exit 0
-            ;;
-        l)
-            COMMAND="list"
-            ;;
-    esac
-done
-shift $((OPTIND-1))
-msmtpq --manage "${COMMAND}"
-echo OK
-notmuch new
+if test 0 = $(msmtpq --manage list | wc -l)
+then
+    echo "Nothing to send"
+else
+    TIMETOWAIT=10
+    echo "Waiting ${TIMETOWAIT}s before sending, just in case"
+    sleep ${TIMETOWAIT}
+    echo "Sending now!!"
+    msmtpq --manage send
+    echo OK
+    notmuch new
+fi

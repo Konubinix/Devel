@@ -18,6 +18,7 @@ function nix_install_binary {
 
     if ! test -e "${bin}"
     then
+        nix flake update "${flake}"
         nix profile install "${flake}#${derivation_name}"
     fi
     echo "${bin}"

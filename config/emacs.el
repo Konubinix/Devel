@@ -137,6 +137,7 @@
         "framemove" ;; init
         "golden-ratio" ;; init
         "keep-buffers" ;; init
+        "which-key" ;; init
         "winner" ;; init
         "xml" ;; when showing notification at startup
         "yasnippet" ;; init

@@ -86,6 +86,7 @@
 (use-package zenburn-theme :defer t)
 (use-package visible-mark :commands (visible-mark-mode))
 (use-package undo-tree :commands (undo-tree-mode))
+(use-package which-key :defer t)
 (use-package windata :defer t) ;; needed by imenu-tree
 
 ;; make sure I use this version of org when it is pulled as dependency for

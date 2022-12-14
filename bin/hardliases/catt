@@ -1,1 +1,8 @@
-rclone
+#!/bin/bash
+
+source _ko_nix.sh
+
+ME="$(basename "${0}")"
+BIN="$(nix_install_binary "${ME}" "${ME}" github:NixOS/nixpkgs/ececb1504b27c8baa749d2c24cd7bc1aa251a633)"
+
+exec "${BIN}" "${@}"

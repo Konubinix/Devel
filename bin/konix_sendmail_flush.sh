@@ -11,4 +11,5 @@ else
     msmtpq --manage send
     echo OK
     notmuch new
+    konix_display.py -o -t boring "Mail sent"
 fi

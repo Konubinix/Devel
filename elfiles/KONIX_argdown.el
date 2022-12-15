@@ -135,5 +135,5 @@
   )
 
 
-(provide 'argdown)
+(provide 'KONIX_argdown)
 ;;; argdown.el ends here

@@ -215,5 +215,5 @@
 (define-key qutebrowser/map (kbd "q") 'qutebrowser/hydra-map/body)
 
 
-(provide 'qutebrowser)
+(provide 'KONIX_qutebrowser)
 ;;; qutebrowser.el ends here

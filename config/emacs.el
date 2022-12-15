@@ -11,31 +11,6 @@
 
 (defvar *emacs-load-start* (current-time))
 
-;; ####################################################################################################
-;; Load the needed stuff to install packages
-;; ####################################################################################################
-(require 'package)
-(setq-default package-user-dir (expand-file-name "elfiles/deps/elpa" perso-dir))
-(setq-default gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-(add-to-list 'package-archives
-             '("nongnu" . "https://elpa.nongnu.org/nongnu/")
-	         t
-             )
-(add-to-list 'package-archives
-	         '("melpa" . "https://melpa.org/packages/")
-	         t
-	         )
-
-(package-initialize) ; or else packages will be reinstalled at startup
-(setq use-package-verbose t)
-
-(unless (require 'use-package nil t)
-  (package-refresh-contents)
-  (package-read-all-archive-contents)
-  (package-install (cadr (assq 'use-package package-archive-contents)))
-  (require 'use-package)
-  )
-
 (setq-default straight-base-dir (expand-file-name "elfiles/deps/straight" perso-dir))
 
 ;; To use straight
@@ -52,9 +27,8 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-
-;; (use-package straight
-;;   :custom (straight-use-package-by-default t))
+(straight-use-package 'use-package)
+(setq-default straight-use-package-by-default t)
 
 ;; ####################################################################################################
 ;; Needed library paths

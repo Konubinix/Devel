@@ -141,7 +141,6 @@
 (autoload 'slack-start "slack" "" t)
 (autoload 'konix/org-roam-export/toggle-publish "KONIX_org-roam-export" "" t)
 (autoload 'konix/org-roam-export/yank-url "KONIX_org-roam-export" "" t)
-(autoload 'konix/fence-edit-dwim "KONIX_fence-edit" "" t)
 (autoload 'org-link-minor-mode "org-link-minor-mode" "" t)
 (autoload 'konix/hypothesis-archive "hypothesis" "" t)
 (autoload 'konix/git/status "KONIX_git" "" t)
@@ -150,12 +149,13 @@
 (autoload 'konix/git/pull "KONIX_git" "" t)
 (autoload 'konix/git/log/file "KONIX_git" "" t)
 (autoload 'kubel "kubel" "" t)
-(autoload 'argdown-mode "argdown" "" t)
+(autoload 'argdown-mode "KONIX_argdown" "" t)
 (autoload 'konix/org-drill-key-map "org-drill" "" t)
 (autoload 'auto-scroll-mode "auto-scroll" "" t)
 (autoload 'gitri-mode "KONIX_gitri-mode" "" t)
 (autoload 'konix/macro/execute-from-human-format "KONIX_macro" "" t)
 (autoload 'konix/macro/dump-human-format "KONIX_macro" "" t)
+
 
 ;; ************************************************************
 ;; Automodes

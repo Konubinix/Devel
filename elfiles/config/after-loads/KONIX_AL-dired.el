@@ -26,8 +26,8 @@
 
 (require 'dired-x)
 (require 'find-dired)
-(require 'wuxch-dired-copy-paste)
-(require 'dired-sort)
+(require 'dired-quick-sort)
+(require 'dired-copy-paste)
 (use-package diredful :ensure t :defer t)
 (use-package phi-search-dired :ensure t :defer t)
 
@@ -130,7 +130,9 @@
 (add-hook 'dired-mode-hook 'konix/dired-mode-hook)
 
 (define-key dired-mode-map (kbd "<C-return>") 'konix/dired-mimeopen)
-
+(define-key dired-mode-map "\C-c\C-x" 'dired-copy-paste-do-cut)
+(define-key dired-mode-map "\C-c\C-c" 'dired-copy-paste-do-copy)
+(define-key dired-mode-map "\C-c\C-v" 'dired-copy-paste-do-paste)
 
 (setq-default dired-backup-overwrite nil)
 (setq-default dired-omit-verbose nil)
@@ -218,11 +220,6 @@
 	)
   )
 
-(defun konix/dired-sort-directory-first ()
-  "Dired sort by create time."
-  (interactive)
-  (dired-sort-other (concat dired-listing-switches " --group-directories-first")))
-
 (defun konix/dired-sort-random ()
   "Dired sort by create time."
   (interactive)
@@ -233,22 +230,10 @@
 	)
   )
 
-(dired-visit-history-enable)
-
 ;; with "a", replace existing buffer
 (put 'dired-find-alternate-file 'disabled nil)
 
-(defvar dired-sort-map (make-sparse-keymap))
-(define-key dired-mode-map "s" dired-sort-map)
-(define-key dired-sort-map "s" 'dired-sort-size)
-(define-key dired-sort-map "x" 'dired-sort-extension)
-(define-key dired-sort-map "t" 'dired-sort-time)
-(define-key dired-sort-map "c" 'dired-sort-ctime)
-(define-key dired-sort-map "u" 'dired-sort-utime)
-(define-key dired-sort-map "n" 'dired-sort-name)
-(define-key dired-sort-map "r" 'dired-sort-toggle-reverse)
-(define-key dired-sort-map "R" 'konix/dired-sort-random)
-(define-key dired-sort-map "d" 'konix/dired-sort-directory-first)
+(dired-quick-sort-setup)
 
 ;; Hotkeys
 (define-key dired-mode-map "o" 'konix/dired-find-file-other-windows)

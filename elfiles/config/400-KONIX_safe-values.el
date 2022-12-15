@@ -27,7 +27,7 @@
 (setq-default
  custom-safe-themes
  '(
-   "2dc03dfb67fbcb7d9c487522c29b7582da20766c9998aaad5e5b63b5c27eec3f"
+   "28a34dd458a554d34de989e251dc965e3dc72bace7d096cdc29249d60f395a82"
    default)
  )
 

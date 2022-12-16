@@ -24,7 +24,10 @@
 
 ;;; Code:
 
-(setq-default org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar")
+(setq-default org-plantuml-exec-mode 'plantuml)
+
+;; used only if (eq org-plantuml-exec-mode 'jar)
+;; (setq-default org-plantuml-jar-path plantuml-jar-path)
 
 (provide 'KONIX_AL-ob-plantuml)
 ;;; KONIX_AL-ob-plantuml.el ends here

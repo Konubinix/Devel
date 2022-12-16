@@ -26,8 +26,7 @@
 (require 'golden-ratio)
 
 (setq-default plantuml-exec-mode 'executable)
-;; on debian
-(setq-default plantuml-jar-path "/usr/share/plantuml/plantuml.jar")
+(setq-default plantuml-jar-path "/home/sam/.nix-profile/lib/plantuml.jar")
 
 
 (defun konix/plantuml-mode-hook ()
@@ -36,5 +35,6 @@
 (add-hook 'plantuml-mode-hook
           'konix/plantuml-mode-hook)
 
+(require 'ob-plantuml)
 (provide 'KONIX_AL-plantuml-mode)
 ;;; KONIX_AL-plantuml-mode.el ends here

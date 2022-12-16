@@ -890,8 +890,6 @@
   (org-agenda-remove-filter 'for-now))
 
 
-(defvar konix/org-agenda-filter-context-show-appt t "")
-(defvar konix/org-agenda-filter-context-show-empty-context t "")
 (defun konix/org-agenda-filter-context_1 (tags)
   ;; Deactivate `org-agenda-entry-text-mode' when filtering
   (if org-agenda-entry-text-mode (org-agenda-entry-text-mode))
@@ -925,12 +923,6 @@
 				   cat (get-text-property (point) 'org-category))
 			 (if (and
 				  (not (eval konix/org-entry-predicate))
-				  ;; show empty context entries if the associated setting is set
-				  (or (not konix/org-agenda-filter-context-show-empty-context)
-					  (not
-					   (konix/org-agenda-no-context-p)
-					   )
-					  )
 				  )
 				 (org-agenda-filter-hide-line 'tag))
 			 (beginning-of-line 2))
@@ -993,17 +985,19 @@
    )
   (add-to-list
    'header-line-format
-   (format ", appt: %s" konix/org-agenda-filter-context-show-appt)
-   t
-   )
-  (add-to-list
-   'header-line-format
-   (format ", no context: %s" konix/org-agenda-filter-context-show-empty-context)
-   t
-   )
-  (add-to-list
-   'header-line-format
    (format ", d: %s" konix/org-agenda-toggle-filter-calendar-discret)
+   t)
+  (add-to-list
+   'header-line-format
+   (format ", c: %s"
+           (let* (
+                  (contexts-dir (expand-file-name "gtd_contexts" (getenv "KONIX_PERSO_DIR")))
+                  (context-file (expand-file-name "current" contexts-dir))
+                  (context-file-readlink (file-truename context-file))
+                  )
+             (file-name-base context-file-readlink)
+             )
+           )
    t)
   )
 

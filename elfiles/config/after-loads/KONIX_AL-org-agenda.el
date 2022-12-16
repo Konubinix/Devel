@@ -1618,6 +1618,7 @@
           )
          )
     (when (string-prefix-p "deadline" (org-get-at-bol 'type))
+      (error "Nope")
       (setq summary (concat "DL: " summary))
       )
     (when (and (not (null date)) (not (null day)))
@@ -1751,13 +1752,13 @@ X-WR-TIMEZONE:CEST
                (not (string-match-p ".+ago" (or (org-get-at-bol 'extra) "")))
                )
           (when (or
-                 (string-prefix-p "deadline" (org-get-at-bol 'type))
+                 ;; (string-prefix-p "deadline" (org-get-at-bol 'type))
                  (string-prefix-p "tag" (org-get-at-bol 'type))
                  )
             (setq res (concat res (konix/org-agenda-to-ics/format-item "TODO")))
             )
           (when (or
-                 (string-prefix-p "deadline" (org-get-at-bol 'type))
+                 ;; (string-prefix-p "deadline" (org-get-at-bol 'type))
                  (string-prefix-p "timestamp" (org-get-at-bol 'type))
                  ;; not sure what "block" means, but a simple * <date> is a block
                  (string-prefix-p "block" (org-get-at-bol 'type))

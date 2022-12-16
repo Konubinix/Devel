@@ -828,7 +828,25 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
 
 (setq-default org-roam-node-display-template "${hierarchy}")
 
-(org-roam-setup)
-
+(let (
+      time_before_load
+      time_after_load
+      diff_time
+      diff_abs_time
+      )
+  (setq time_before_load (current-time))
+  (org-roam-setup)
+  (setq time_after_load (current-time))
+  (setq diff_time (time-subtract time_after_load time_before_load))
+  (setq diff_abs_time (time-subtract time_after_load *emacs-load-start*))
+  (message "%ss, %sms, %sµs: Org roam setup in %ss, %sms and %sµs"
+           (second diff_abs_time)
+           (/ (third diff_abs_time) 1000)
+           (mod (third diff_abs_time) 1000)
+           (second diff_time)
+           (/ (third diff_time) 1000)
+           (mod (third diff_time) 1000)
+           )
+  )
 (provide 'KONIX_AL-org-roam)
 ;;; KONIX_AL-org-roam.el ends here

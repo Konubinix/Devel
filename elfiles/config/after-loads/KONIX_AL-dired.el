@@ -26,10 +26,9 @@
 
 (require 'dired-x)
 (require 'find-dired)
+(require 'dired-filetype-face)
 (require 'dired-quick-sort)
 (require 'dired-copy-paste)
-(use-package diredful :ensure t :defer t)
-(use-package phi-search-dired :ensure t :defer t)
 
 (setq-default dired-listing-switches "-alh")
 

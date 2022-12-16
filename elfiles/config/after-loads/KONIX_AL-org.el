@@ -3579,11 +3579,33 @@ of the clocksum."
   :group 'konix/org-faces)
 
 
-(defun konix/org-mode-hook()
-  "My org mode hook."
-  ;; my todo tasks may be very big, with clocks and logs and...  Thus, only
-  ;; delete the trailing whitespaces on org roam notes, meant to be of rghuman
-  ;; size.
+(defun konix/org-mode/time-it (orig-func &rest args)
+  (let (
+        time_before_load
+        time_after_load
+        diff_time
+        diff_abs_time
+        )
+    (setq time_before_load (current-time))
+    (apply orig-func args)
+    (setq time_after_load (current-time))
+    (setq diff_time (time-subtract time_after_load time_before_load))
+    (setq diff_abs_time (time-subtract time_after_load *emacs-load-start*))
+    (message "%ss, %sms, %sµs: Org file %s loaded in %ss, %sms and %sµs"
+             (second diff_abs_time)
+             (/ (third diff_abs_time) 1000)
+             (mod (third diff_abs_time) 1000)
+             (or (buffer-file-name) (buffer-name))
+             (second diff_time)
+             (/ (third diff_time) 1000)
+             (mod (third diff_time) 1000)
+             )
+    )
+  )
+(advice-add 'org-mode :around 'konix/org-mode/time-it)
+
+(defun konix/org-mode-hook ()
+  (message "Starting konix/org-mode-hook hook for %s" (or (buffer-file-name) (buffer-name)))
   (require 'org-roam)
   (require 'elec-pair)
   (setq konix/delete-trailing-whitespace (and (buffer-file-name) (org-roam-file-p)))
@@ -3663,6 +3685,7 @@ of the clocksum."
                              ac-source-filename
                              )))
   )
+
 (add-hook 'org-mode-hook 'konix/org-mode-hook)
 
 (defun konix/org-agenda-mode-hook()

@@ -22,6 +22,8 @@
 (tracking-mode 1)
 (save-place-mode 1)
 (golden-ratio-mode 1)
+(require 'backup-dir)
+(require 'framemove)
 ;; I don't like it by default, but like enabling it in some modes
 (electric-indent-mode -1)
 ;; this is the long part, as it loads my org files

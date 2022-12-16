@@ -1554,7 +1554,6 @@ items"
                              )
                   )
                  (
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (dummy (setq konix/org-agenda-type 'tags))
                   (org-agenda-todo-ignore-with-date nil)
                   (org-agenda-todo-ignore-deadlines nil)
@@ -1578,7 +1577,6 @@ items"
                         )
                   )
                  (
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (dummy (setq konix/org-agenda-type 'tags))
                   (org-agenda-todo-ignore-with-date nil)
                   (org-agenda-todo-ignore-deadlines nil)
@@ -1595,7 +1593,6 @@ items"
                   (tags "AgendaWork+todo=\"NEXT\"-maybe")
                   )
                  (
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (dummy (setq konix/org-agenda-type 'tags))
                   (org-agenda-todo-ignore-with-date nil)
                   (org-agenda-todo-ignore-deadlines nil)
@@ -1619,7 +1616,6 @@ items"
                      (konix/org-agenda-for-today-skip-if-not-the-good-time)
                      )
                    )
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   ;; remove the next keyword, obvious info
                   (org-agenda-todo-keyword-format "")
                   (org-agenda-todo-ignore-scheduled nil)
@@ -1688,7 +1684,6 @@ items"
                    )
                   ;; need to setq-local, or else updating the entry will put it back
                   (org-agenda-todo-keyword-format "")
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) t))
                   (org-agenda-tag-filter-preset nil)
                   (org-agenda-todo-ignore-time-comparison-use-seconds t)
                   (org-agenda-todo-ignore-scheduled 'future)
@@ -1704,7 +1699,6 @@ items"
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'agenda))
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (org-agenda-start-with-log-mode t)
                   (org-agenda-log-mode-items '(closed state))
                   (org-agenda-start-with-clockreport-mode t)
@@ -1720,7 +1714,6 @@ items"
                   (org-agenda-start-with-log-mode t)
                   ;; (org-agenda-start-with-clockreport-mode t)
                   (org-agenda-show-log 'clockcheck)
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   )
                  )
                 ("all" "List"
@@ -1743,7 +1736,6 @@ items"
                   (org-agenda-show-log 'clockcheck)
                   (org-agenda-include-diary nil)
                   (org-super-agenda-groups nil)
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   )
                  )
@@ -1766,7 +1758,6 @@ items"
                   (org-agenda-archives-mode t)
                   (org-agenda-include-diary nil)
                   (org-agenda-show-log 'clockcheck)
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   )
                  )
@@ -1937,8 +1928,6 @@ items"
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags))
-                  (dummy (set (make-variable-buffer-local
-                               'konix/org-agenda-tag-filter-context-p) nil))
                   (org-super-agenda-groups nil)
                   (org-agenda-todo-ignore-deadlines nil)
                   (org-agenda-todo-ignore-timestamp nil)
@@ -1976,7 +1965,6 @@ items"
                         )
                   )
                  (
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (dummy (setq konix/org-agenda-type 'tags))
                   (org-agenda-todo-ignore-deadlines nil)
                   (org-agenda-todo-ignore-timestamp nil)
@@ -2015,8 +2003,6 @@ items"
                     )
                    )
                   (org-agenda-todo-keyword-format "")
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-
                   (org-agenda-todo-ignore-deadlines nil)
                   (org-agenda-todo-ignore-timestamp nil)
                   (org-agenda-todo-ignore-scheduled nil)
@@ -2089,7 +2075,6 @@ items"
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'agenda))
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (org-super-agenda-groups nil)
                   )
                  )
@@ -2113,7 +2098,6 @@ items"
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'agenda))
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                   (org-super-agenda-groups nil)
                   )
                  )
@@ -2140,8 +2124,6 @@ items"
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               )
                             )
-                           (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-                                        ; (dummy (konix/org-agenda-check-buffer/agenda t))
                            )
                           )
                   )
@@ -2171,8 +2153,6 @@ items"
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               )
                             )
-                           (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-                                        ; (dummy (konix/org-agenda-check-buffer/agenda t))
                            )
                           )
                   )
@@ -2204,8 +2184,6 @@ items"
                               (konix/org-agenda-for-today-skip-if-not-the-good-time t)
                               )
                             )
-                           (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-                                        ; (dummy (konix/org-agenda-check-buffer/agenda t))
                            )
                           )
                   )
@@ -2248,15 +2226,12 @@ items"
                     )
                    )
                   (org-agenda-todo-keyword-format "")
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-
                   ;; projects should not be filtered by default
                   (org-agenda-tag-filter-preset nil)
                   )
                  )
                 ("agP" "Actions to review and consider maybe-ing during the Weekly review"
                  (
-                  ;; (tags "-maybe+todo=\"NEXT\"-WAIT-DELEGATED|+todo=\"TODO\"-maybe-WAIT-DELEGATED|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\"-WAIT-DELEGATED"
                   (tags "-maybe-background+todo=\"NEXT\"|+todo=\"TODO\"-maybe-background|+project-maybe-background-todo=\"NOT_DONE\"-todo=\"DONE\"-todo=\"TODO\""
                         (
                          (org-agenda-overriding-header
@@ -2272,21 +2247,6 @@ items"
                           )
                          )
                         )
-                  ;; (tags "-maybe+todo=\"NEXT\"|+todo=\"TODO\"-maybe|+project-maybe-todo=\"NOT_DONE\"-todo=\"DONE\""
-                  ;;       (
-                  ;;        (org-agenda-overriding-header
-                  ;;         "Future projects & NA (things that are or should be committed)")
-                  ;;        (org-agenda-skip-function
-                  ;;         '(or
-                  ;;           (konix/org-agenda-skip-if-tags
-                  ;;            '("phantom"))
-                  ;;           (konix/skip-not-todo-file)
-                  ;;           (konix/org-agenda-skip-if-task-of-project)
-                  ;;           (konix/org-agenda-keep-if-scheduled-and-scheduled-in-the-future)
-                  ;;           )
-                  ;;         )
-                  ;;        )
-                  ;;       )
                   )
                  (
                   (org-agenda-prefix-format
@@ -2314,7 +2274,6 @@ items"
                     )
                    )
                   (org-agenda-todo-keyword-format "")
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
 
                   ;; projects should not be filtered by default
                   (org-agenda-tag-filter-preset nil)
@@ -2346,8 +2305,6 @@ items"
                   (dummy (setq konix/org-agenda-type 'tags))
                   (dummy (setq-local org-agenda-prefix-format '((tags . ""))))
                   (org-agenda-todo-keyword-format "")
-                  (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-
                   (org-agenda-tag-filter-preset nil)
                   )
                  )
@@ -2418,7 +2375,6 @@ items"
                            konix/org-gtd-agenda
                            )
                           )
-                         (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                          (org-agenda-prefix-format
                           '(
                             (tags . "%(konix/org-agenda-prefix-format/ann)")
@@ -2448,7 +2404,6 @@ items"
                             (konix/org-agenda-for-today-skip-if-not-the-good-time)
                             )
                           )
-                         (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
                          (org-agenda-todo-ignore-with-date nil)
                          (org-agenda-todo-ignore-deadlines nil)
                          (org-agenda-todo-ignore-timestamp nil)
@@ -5046,10 +5001,6 @@ of the clocksum."
          "|"
          )
        )
-      )
-     (
-      (dummy (set (make-variable-buffer-local 'konix/org-agenda-tag-filter-context-p) nil))
-
       )
      )
    )

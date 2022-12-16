@@ -32,5 +32,10 @@
 (setq-default lui-flyspell-p nil)
 (konix/push-or-replace-in-alist 'lui-flyspell-alist ".*" "american")
 
+(set-face-foreground
+ 'lui-button-face
+ "cyan"
+ )
+
 (provide 'KONIX_AL-lui)
 ;;; KONIX_AL-lui.el ends here

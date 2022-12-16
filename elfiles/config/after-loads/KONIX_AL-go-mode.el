@@ -33,6 +33,7 @@
     ;; to make one iteration, it is not taken into account
     (run-at-time nil nil 'lsp)
     )
+  (require 'dap-dlv-go)
   (lsp-headerline-breadcrumb-mode)
   (setq-default gofmt-command "goimports") ;; see https://pkg.go.dev/golang.org/x/tools/cmd/goimports
   (add-hook 'before-save-hook 'gofmt-before-save nil t)

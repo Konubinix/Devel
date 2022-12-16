@@ -213,6 +213,9 @@ deadlined in January if it is triggered in July."
   (let (
         (countdown (or (org-entry-get (point) "REPEAT_COUNTDOWN")))
         )
+    (when (time-less-p (org-get-deadline-time (point)) (current-time))
+      (warn "You should make it actual and start over")
+      )
     (if (null countdown)
         (setq countdown number)
       (setq countdown (string-to-number countdown))

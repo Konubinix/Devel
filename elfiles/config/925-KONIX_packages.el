@@ -58,6 +58,9 @@
 (setq-default use-package-always-defer t)
 (setq-default use-package-always-ensure t) ;; only relevant when using package.el
 
+(setq-default straight-recipe-overrides nil)
+(straight-override-recipe '(org :branch "release_9.5.5"))
+
 (let (time_before_load time_after_load diff_time diff_abs_time)
   (setq time_before_load (current-time))
 
@@ -107,7 +110,7 @@
   (use-package multiple-cursors)
   (use-package nix-mode :commands (nix-mode))
   (use-package ol-emacs-slack :straight (:type git :host github :repo "ag91/ol-emacs-slack"))
-  (use-package org :straight (:branch "release_9.5.5"))
+  (use-package org)
   (use-package org-drill :bind-keymap  (("C-f D" . konix/org-drill-key-map)))
   (use-package org-link-minor-mode :straight (:type git :host github :repo "seanohalpin/org-link-minor-mode"))
   (use-package org-ql :commands (org-ql-search))

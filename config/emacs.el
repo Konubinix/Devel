@@ -11,25 +11,6 @@
 
 (defvar *emacs-load-start* (current-time))
 
-(setq-default straight-base-dir (expand-file-name "elfiles/deps/straight" perso-dir))
-
-;; To use straight
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" straight-base-dir))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(straight-use-package 'use-package)
-(setq-default straight-use-package-by-default t)
-
 ;; ####################################################################################################
 ;; Needed library paths
 ;; ####################################################################################################

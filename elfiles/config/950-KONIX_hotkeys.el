@@ -1,7 +1,4 @@
 ;; package that are needed for my config and cannot wait for the whole package stuff
-(use-package key-chord :ensure t :defer t)
-(use-package region-bindings-mode :ensure t :commands (region-bindings-mode-enable))
-(use-package hydra :ensure t :defer t)
 
 (region-bindings-mode-enable)
 (define-prefix-command 'konix/region-bindings-mode-map)
@@ -34,9 +31,9 @@
 (global-unset-key (kbd "<f4>"))
 ;; remove keys that I type too much by mistake
 (global-set-key (kbd "C-x <")
-  #'(lambda () (interactive) (message "Intentionally disable C-x <")))
+                #'(lambda () (interactive) (message "Intentionally disable C-x <")))
 (global-set-key (kbd "C-x >")
-  #'(lambda () (interactive) (message "Intentionally disable C-x >")))
+                #'(lambda () (interactive) (message "Intentionally disable C-x >")))
 
 ;; some vim keys
 (global-set-key (kbd "C-n") 'dabbrev-completion)
@@ -91,6 +88,12 @@
 (global-set-key (kbd "<C-kp-add>") 'konix/increase-at-point)
 (global-set-key (kbd "<C-kp-subtract>") 'konix/decrease-at-point)
 
+;; only useful when not in golden ratio mode, like in dap many window
+(global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "S-C-<down>") 'shrink-window)
+(global-set-key (kbd "S-C-<up>") 'enlarge-window)
+
 (defun konix/text-scale-init nil
   (interactive)
   (setq text-scale-mode nil)
@@ -138,11 +141,6 @@
 ;; ####################################################################################################
 ;; Slow keymap keys
 ;; ####################################################################################################
-(define-prefix-command 'konix/global-slow-key-map)
-(global-set-key (kbd "C-<") 'konix/global-slow-key-map)
-(global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
-(global-set-key (kbd "C-f") 'konix/global-slow-key-map) ;for hacker's keyboard
-
 (define-key 'konix/global-slow-key-map (kbd "%") 'query-replace)
 (define-key 'konix/global-slow-key-map (kbd "*") 'query-replace-regexp)
 
@@ -200,7 +198,7 @@
 (define-key 'konix/bbdb/map (kbd "s") 'bbdb)
 (define-key 'konix/bbdb/map (kbd "c") 'bbdb-create)
 
-; eval
+                                        ; eval
 (define-prefix-command 'konix/eval/map)
 (define-key 'konix/global-slow-key-map (kbd "e") 'konix/eval/map)
 
@@ -226,10 +224,6 @@
 ;; ####################################################################################################
 ;; Normal keymap keys
 ;; ####################################################################################################
-(define-prefix-command 'konix/global-key-map)
-(global-set-key (kbd "M-g") 'konix/global-key-map)
-
-
 (define-key 'konix/global-key-map "|" 'piper)
 ;; Goto emacs config
 (define-key 'konix/global-key-map "h" 'konix/hack-on-emacs)
@@ -312,10 +306,6 @@
 ;; ####################################################################################################
 ;; Fast keymap keys
 ;; ####################################################################################################
-(define-prefix-command 'konix/global-fast-key-map)
-(global-set-key (kbd "<f2>") 'konix/global-fast-key-map)
-(global-set-key (kbd "²") 'konix/global-fast-key-map) ; hacker's keyboard
-
 (define-key 'konix/global-fast-key-map (kbd "m") 'man)
 
 ;; for terminal mode

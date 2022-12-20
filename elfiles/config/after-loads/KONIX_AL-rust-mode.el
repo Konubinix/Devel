@@ -23,7 +23,7 @@
 ;;
 
 ;;; Code:
-(use-package lsp-mode :ensure t :commands (lsp))
+(require 'lsp-mode)
 (defun konix/rust/make-executable ()
   "Make the rust file executable if need be."
   (when (save-excursion

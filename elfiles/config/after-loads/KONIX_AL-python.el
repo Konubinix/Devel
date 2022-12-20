@@ -24,10 +24,10 @@
 
 ;;; Code:
 
-(use-package yapfify :ensure t :defer t)
-(use-package py-isort :ensure t :defer t)
-(use-package lsp-mode :ensure t :commands (lsp))
-(use-package lsp-jedi :ensure t :commands (lsp-jedi))
+(require 'yapfify)
+(require 'py-isort)
+(require 'lsp-mode)
+(require 'lsp-jedi)
 
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)
@@ -37,6 +37,8 @@
 (defvar konix/python-mode/flycheck t "Enable flycheck")
 (add-to-list 'safe-local-variable-values '(konix/python-mode/flycheck))
 (make-variable-buffer-local 'konix/python-mode/flycheck)
+
+(konix/auto-insert-use-yasnippet-template "\\.py\\'" "py")
 
 (defun konix/python-is-tiltfile ()
   (and (buffer-file-name) (string-match-p "^.*Tiltfile.*$"

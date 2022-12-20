@@ -24,9 +24,7 @@
 
 ;;; Code:
 
-(use-package org-mime :ensure t :defer t)
-(use-package bbdb :ensure t :defer t)
-(require 'org-mime)
+(require 'bbdb)
 (require 'bbdb-com)
 ;; Configuration of mail sending
 (setq message-send-mail-function 'message-send-mail-with-sendmail)

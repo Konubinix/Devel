@@ -25,6 +25,8 @@
 ;;; Code:
 
 (add-to-list 'golden-ratio-exclude-modes 'undo-tree-visualizer-mode)
+(setq-default undo-tree-history-directory-alist `(("." . ,(expand-file-name
+                                                          "undo-tree" user-emacs-directory))))
 
 (provide 'KONIX_AL-undo-tree)
 ;;; KONIX_AL-undo-tree.el ends here

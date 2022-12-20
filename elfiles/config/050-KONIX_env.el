@@ -1,6 +1,7 @@
 ;; ####################################################################################################
 ;; Set the custom ENV
 ;; ####################################################################################################
+
 (setq-default konix/initial-exec-path exec-path)
 (defun konix/initialize-env ()
   (interactive)
@@ -70,3 +71,9 @@
     )
   )
 (konix/initialize-env)
+(defun konix/load-default-env-file ()
+  (interactive)
+  (konix/load-env-file)
+  (konix/initialize-env)
+  (message "Environment loaded and initialized")
+  )

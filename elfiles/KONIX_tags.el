@@ -102,6 +102,7 @@ TAGS_FILE_NAMETHE"
   (or tags-table-list (error "At least one tags file must be in use"))
   )
 
+;;;###autoload
 (defun konix/tags/create (&optional tags_dir output_buffer recursive)
   (interactive)
   (let (
@@ -374,6 +375,7 @@ mostly INSPIRED from http://www.emacswiki.org/emacs/EtagsSelect#toc2
 	)
   )
 
+;;;###autoload
 (defun konix/tags/visit-tags-file ()
   "calls `konix/find-tags-file' to recursively search up the
 directory tree to find a file named 'TAGS'. It then asks the user

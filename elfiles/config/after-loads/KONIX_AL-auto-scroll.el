@@ -37,16 +37,21 @@
              (> (time-to-seconds (current-idle-time)) konix/auto-scroll-idle-time)
              )
             )
-    ;; this ignores the DONE items, this is bad for the last week review
-    ;; (if (equal major-mode 'org-agenda-mode)
-    ;;     (call-interactively 'konix/org-agenda-next-entry)
-    (call-interactively 'next-line)
-    ;; )
+    (cond
+     ((member 'pdf-view-roll-minor-mode minor-mode-list)
+      (image-roll-scroll-forward)
+      )
+     (t
+      (call-interactively 'next-line)
+      )
+     )
+
     (recenter-top-bottom 0)
     (hl-line-highlight)
-    (when (equal major-mode 'org-agenda-mode)
-      (org-agenda-do-context-action)
-      )
+    (cond
+     ((equal major-mode 'org-agenda-mode)
+      (org-agenda-do-context-action))
+     )
     )
   (setq konix/auto-scrool-first-time nil)
   )

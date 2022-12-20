@@ -433,6 +433,7 @@
     )
   )
 
+;;;###autoload
 (defun konix/org-roam-export/yank-url ()
   (interactive)
   (if (and
@@ -791,6 +792,7 @@
 (defvar konix/org/roam-export/kinds '())
 (defvar konix/org/roam-export/public-kinds '())
 
+;;;###autoload
 (defun konix/org-roam-export/toggle-publish (&optional kind)
   (interactive)
   (save-excursion

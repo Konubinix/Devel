@@ -22,13 +22,6 @@
 (key-chord-define-global "$v" 'visual-line-mode)
 (key-chord-define-global "$u" 'linum-mode)
 
-(global-unset-key (kbd "C-<"))
-(global-unset-key (kbd "C-à"))			;for bépo keyboards
-(global-unset-key (kbd "<f2>"))
-(global-unset-key (kbd "<f10>"))
-(global-unset-key (kbd "<f1>"))
-(global-unset-key (kbd "<f3>"))
-(global-unset-key (kbd "<f4>"))
 ;; remove keys that I type too much by mistake
 (global-set-key (kbd "C-x <")
                 #'(lambda () (interactive) (message "Intentionally disable C-x <")))
@@ -198,7 +191,6 @@
 (define-key 'konix/bbdb/map (kbd "s") 'bbdb)
 (define-key 'konix/bbdb/map (kbd "c") 'bbdb-create)
 
-                                        ; eval
 (define-prefix-command 'konix/eval/map)
 (define-key 'konix/global-slow-key-map (kbd "e") 'konix/eval/map)
 
@@ -276,15 +268,6 @@
 (define-key 'konix/langtool-key-map (kbd "L") 'langtool-switch-default-language)
 (define-key 'konix/langtool-key-map (kbd "e") 'langtool-show-message-at-point)
 (define-key 'konix/langtool-key-map (kbd "?") 'langtool-correct-buffer)
-
-;; ************************************************************
-;; diff-mode
-;; ************************************************************
-(eval-after-load "diff-mode"
-  '(progn
-     (define-key diff-mode-map (kbd "C-M-q") 'konix/kill-current-buffer-and-delete-window)
-     )
-  )
 
 ;; ************************************************************
 ;; Backup
@@ -569,23 +552,6 @@
 (global-set-key (kbd "<C-S-f3>") 'highlight-symbol-prev)
 
 ;; ####################################################################################################
-;; special bs custo
-;; ####################################################################################################
-(eval-after-load "bs"
-  '(progn
-     (define-key bs-mode-map (kbd "D D") 'konix/kill-all-dired-buffers)
-     )
-  )
-;; ####################################################################################################
-;; bbdb
-;; ####################################################################################################
-(eval-after-load "bbdb"
-  '(progn
-     (define-key bbdb-mode-map (kbd "A") 'konix/bbdb-add-aka)
-     )
-  )
-
-;; ####################################################################################################
 ;; git hotkeys
 ;; ####################################################################################################
 (define-prefix-command 'konix/git-global-map)
@@ -742,7 +708,7 @@
 (define-key konix/global-slow-key-map (kbd "q") 'qutebrowser/map)
 
 (define-prefix-command 'konix/kubel-map)
-(define-key konix/global-fast-key-map "k" 'konix/kubel-map)
+(define-key 'konix/global-fast-key-map "k" 'konix/kubel-map)
 (define-key konix/kubel-map "k" 'kubel)
 (define-key konix/kubel-map "K" 'kubernetes-overview)
 

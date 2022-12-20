@@ -26,6 +26,8 @@
 
 (require 'auto-complete)
 
+(konix/auto-insert-use-yasnippet-template ".sh$" "sh")
+
 (defun konix/shell/find-command-completions (prefix)
   (let* (
          (filenondir     (file-name-nondirectory prefix))
@@ -184,6 +186,14 @@
 (add-hook 'shell-mode-hook
 		  'konix/shell-mode-hook
 		  )
+
+(defadvice shell-command (before kill_async_shell_buffer ())
+  (when (string-match ".+[ \r\n&]+$" command)
+	(konix/shell/rename-async-shell-buffer output-buffer)
+	)
+  )
+(ad-activate 'shell-command)
+
 
 (provide '700-KONIX_shell-mode)
 ;;; 700-KONIX_shell-mode.el ends here

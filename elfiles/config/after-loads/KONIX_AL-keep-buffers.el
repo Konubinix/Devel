@@ -24,8 +24,6 @@
 
 ;;; Code:
 
-(keep-buffers-mode 1)
-
 ;; protect all buffers starting with "*scratch"
 (setq keep-buffers-protected-alist
 	  '(

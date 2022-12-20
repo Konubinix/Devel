@@ -304,5 +304,10 @@
 (define-key dired-mode-map (kbd "V") 'image-dired-mark-and-display-next)
 (define-key dired-mode-map (kbd "M-v") 'image-dired-display-thumb)
 
+(defadvice dired-do-async-shell-command (before kill_async_shell_buffer ())
+  (konix/shell/rename-async-shell-buffer)
+  )
+(ad-activate 'dired-do-async-shell-command)
+
 (provide '700-KONIX_dired-mode)
 ;;; 700-KONIX_dired-mode.el ends here

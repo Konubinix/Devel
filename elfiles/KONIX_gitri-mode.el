@@ -164,6 +164,7 @@
   (setq-local font-lock-defaults '(gitri/font-lock-keywords))
   )
 
+;;;###autoload
 (define-derived-mode gitri-mode special-mode "gitri"
   "
 \\{gitri-mode-map}

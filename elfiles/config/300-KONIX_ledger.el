@@ -1,6 +1,6 @@
-;;; 400-KONIX_smerge.el ---                          -*- lexical-binding: t; -*-
+;;; 300-KONIX_ledger.el ---                          -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017  konubinix
+;; Copyright (C) 2022  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -16,7 +16,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -24,7 +24,18 @@
 
 ;;; Code:
 
-(setq-default smerge-command-prefix (kbd "C-c v"))
+(defun konix/ledger/common-open ()
+  "Open the common ledger."
+  (interactive)
+  (find-file (s-trim (shell-command-to-string "clk ledger -c where-is")))
+  )
 
-(provide '400-KONIX_smerge)
-;;; 400-KONIX_smerge.el ends here
+(defun konix/ledger/personal-open ()
+  "Open the personal ledger."
+  (interactive)
+  (find-file (s-trim (shell-command-to-string "clk ledger -p where-is")))
+  )
+
+
+(provide '300-KONIX_ledger)
+;;; 300-KONIX_ledger.el ends here

@@ -30,19 +30,19 @@
 ;; Variables
 ;; ####################################################################################################
 (setq konix/git/regexp-command
-	  '(
-		("^.?rebase" . (konix/git/command . nil))
-		("^reset" . (konix/git/command-to-string . nil))
-		("^cherry-pick" . (konix/git/command-to-string . nil))
-		("^revert" . (konix/git/command . nil))
-		("^cherry-pick" . (konix/git/command-to-string . nil))
-		("^revert" . (konix/git/command . nil))
-		("^tag" . (konix/git/command-to-string . nil))
-		("^show" . (konix/git/command-to-string . nil))
-		("^checkout" . (konix/git/command-to-string . nil))
-		(".*" . (konix/git/command . nil))
-		)
-	  )
+      '(
+	("^.?rebase" . (konix/git/command . nil))
+	("^reset" . (konix/git/command-to-string . nil))
+	("^cherry-pick" . (konix/git/command-to-string . nil))
+	("^revert" . (konix/git/command . nil))
+	("^cherry-pick" . (konix/git/command-to-string . nil))
+	("^revert" . (konix/git/command . nil))
+	("^tag" . (konix/git/command-to-string . nil))
+	("^show" . (konix/git/command-to-string . nil))
+	("^checkout" . (konix/git/command-to-string . nil))
+	(".*" . (konix/git/command . nil))
+	)
+      )
 
 (defvar konix/git/relative-path nil)
 
@@ -59,112 +59,102 @@
 ;; ####################################################################################################
 (defun konix/git/_get-file-name (prompt &optional must_exist)
   (let (
-		(file_name (konix/_get-file-name (format "Git %s"prompt) must_exist))
-		)
-	(when file_name
-	  (if (and (file-exists-p file_name) must_exist)
-		  (if konix/git/relative-path
-			  (file-relative-name file_name)
-			(expand-file-name file_name)
-			)
-		file_name
-		)
-	  )
+	(file_name (konix/_get-file-name (format "Git %s"prompt) must_exist))
 	)
+    (when file_name
+      (if (and (file-exists-p file_name) must_exist)
+	  (if konix/git/relative-path
+	      (file-relative-name file_name)
+	    (expand-file-name file_name)
+	    )
+	file_name
+	)
+      )
+    )
   )
 
 (defun konix/git/_read-message (&optional prompt)
   (unless prompt
-	(setq prompt "Message: ")
-	)
+    (setq prompt "Message: ")
+    )
   (read-string prompt
-			   (when konix/git/commit/message-initial-input-function
-				 `(
-				   ,(apply konix/git/commit/message-initial-input-function nil)
-				   . 0
-				   )
-				 )
-			   )
+	       (when konix/git/commit/message-initial-input-function
+		 `(
+		   ,(apply konix/git/commit/message-initial-input-function nil)
+		   . 0
+		   )
+		 )
+	       )
   )
 
 (defun konix/git/adjust-command (cmd cdup)
   (let ((pre_command ""))
-	(if cdup
-		(setq pre_command "cd \"$(git rev-parse --show-toplevel)\" && ")
-	  )
-	(concat pre_command "git " cmd)
-	)
+    (if cdup
+	(setq pre_command "cd \"$(git rev-parse --show-toplevel)\" && ")
+      )
+    (concat pre_command "git " cmd)
+    )
   )
 
 (defun konix/git/completing-read-refs (prefix &optional no_branch no_tag )
   (let ((branches "") (tags ""))
-	(if (not no_branch)
-		(setq branches (konix/git/branch/list))
-	  )
-	(if (not no_tag)
-		(setq tags (konix/git/tag/list))
-	  )
-	(list (completing-read prefix (concatenate 'list branches tags) nil nil))
-	)
+    (if (not no_branch)
+	(setq branches (konix/git/branch/list))
+      )
+    (if (not no_tag)
+	(setq tags (konix/git/tag/list))
+      )
+    (list (completing-read prefix (concatenate 'list branches tags) nil nil))
+    )
   )
 
 (defun konix/git/launch/command (cmd)
   "According to the cmd, decides wich kind of git command to call."
-  (let (command)
-	(setq command
-		  (first
-           (remove-if
-            (-partial 'equal nil)
-            (mapcar
-		     '(lambda(e)
-			    (if (string-match e cmd)
-				    (assoc e konix/git/regexp-command)
-				  )
-			    )
-		     (keys konix/git/regexp-command)
-		     )
-            )
-           )
-		  )
-	(if command
-		(funcall (car (cdr command)) cmd (cdr (cdr command)))
-	  )
-	)
+
+  (let (
+        (command (->> konix/git/regexp-command
+       (-filter (lambda (pair) (string-match-p (first pair) "rebase")))
+       first
+       second
+       ))
+        )
+    (funcall command cmd)
+    )
   )
 
 (defun konix/git/command (command &optional cdup output_buffer no_kill_output_buffer)
   "Lance une commande git."
   (interactive "sgit ")
   (setq output_buffer
-		(or
-		 (and (stringp output_buffer) output_buffer)
-		 (and (bufferp output_buffer) (buffer-name output_buffer))
-		 "*GIT Async Shell Command*"))
+	(or
+	 (and (stringp output_buffer) output_buffer)
+	 (and (bufferp output_buffer) (buffer-name output_buffer))
+	 "*GIT Async Shell Command*"))
   (or no_kill_output_buffer (ignore-errors (kill-buffer output_buffer)))
   (let (
-		(top-level (konix/git/_get-toplevel))
-		)
-	(shell-command (concat (konix/git/adjust-command command cdup) "&")
-				   output_buffer)
-	(when cdup
-	  (with-current-buffer output_buffer
-		(setq default-directory top-level)
-		)
-	  )
+	(top-level (konix/git/_get-toplevel))
 	)
+    (shell-command (concat (konix/git/adjust-command command cdup) "&")
+		   output_buffer)
+    (when cdup
+      (with-current-buffer output_buffer
+	(setq default-directory top-level)
+	)
+      )
+    )
   )
 
 (defun konix/git/command-to-string (command &optional cdup)
   "Lance une commande git."
   (interactive "sCommande : ")
   (let (res git_command)
-	(setq git_command (konix/git/adjust-command command cdup))
-	(setq res
-		  (concat
-		   "Commande : " git_command "\n"
-		   (shell-command-to-string (concat git_command " && echo OK || echo PB"))))
-	(konix/disp-window res)
-	)
+    (setq git_command (konix/git/adjust-command command cdup))
+    (setq res
+	  (concat
+	   "Commande : " git_command "\n"
+	   (shell-command-to-string (concat git_command " && echo OK || echo PB"))))
+    (konix/disp-window res)
+    )
   )
 
 (defun konix/git/_get-toplevel ()
@@ -182,12 +172,12 @@
 (defun konix/git/command-with-prompt (&optional cmd)
   (interactive)
   (if (not cmd)
-	  (setq cmd "")
-	)
+      (setq cmd "")
+    )
   (let (command)
-	(setq command (read-string "git " cmd))
-	(konix/git/launch/command command)
-	)
+    (setq command (read-string "git " cmd))
+    (konix/git/launch/command command)
+    )
   )
 
 (defun konix/git/init (dir)
@@ -199,8 +189,8 @@
   "Stage le fichier courant"
   (interactive
    (list
-	(konix/git/_get-file-name "add file" t)
-	)
+    (konix/git/_get-file-name "add file" t)
+    )
    )
   (konix/git/command-to-string (concat "add '"file"'"))
   )
@@ -208,17 +198,17 @@
 (defun konix/git/add/edit ()
   (interactive)
   (let (
-		(process-environment (append '("EDITOR=emacsclient") process-environment))
-		)
-	(konix/git/command "add -e ")
+	(process-environment (append '("EDITOR=emacsclient") process-environment))
 	)
+    (konix/git/command "add -e ")
+    )
   )
 
 (defun konix/git/add/edit/file (file)
   (interactive
    (list
-	(konix/git/_get-file-name "add edit file" t)
-	)
+    (konix/git/_get-file-name "add edit file" t)
+    )
    )
   (konix/git/command (format "add -e \"%s\"" file))
   )
@@ -226,52 +216,52 @@
 (defun konix/git/rm/file (file)
   (interactive
    (list
-	(konix/git/_get-file-name "rm file")
-	)
+    (konix/git/_get-file-name "rm file")
+    )
    )
   (konix/git/command-to-string (format "rm %s '%s'"
-									   (if (file-directory-p file)
-										   "-r"
-										 ""
-										 )
-									   file
-									   ))
+				       (if (file-directory-p file)
+					   "-r"
+					 ""
+					 )
+				       file
+				       ))
   )
 
 (defun konix/git/commit (&optional amend message file no_edit)
   "Lance un git commit."
   (interactive)
   (when konix/git/precommit-hook
-	(mapc
-	 (lambda (hook)
-	   (apply
-		hook
-		(list
-		 amend
-		 message
-		 file
-		 )
-		)
-	   )
-	 konix/git/precommit-hook
+    (mapc
+     (lambda (hook)
+       (apply
+	hook
+	(list
+	 amend
+	 message
+	 file
 	 )
 	)
+       )
+     konix/git/precommit-hook
+     )
+    )
   (konix/git/command (concat "commit -v"
-							 (if amend " --amend" "")
-							 (if message (concat " -m \""message"\"") "")
+			     (if amend " --amend" "")
+			     (if message (concat " -m \""message"\"") "")
                              (if no_edit " --no-edit" "")
-							 (if file (concat "  \""file"\"") "")
-							 )
-					 (null file)
-					 )
+			     (if file (concat "  \""file"\"") "")
+			     )
+		     (null file)
+		     )
   )
 
 (defun konix/git/commit/message (message)
   "Lance un git commit -m ."
   (interactive
    (list
-	(konix/git/_read-message)
-	)
+    (konix/git/_read-message)
+    )
    )
   (konix/git/commit nil message)
   )
@@ -296,10 +286,10 @@
 (defun konix/git/commit/file (file message amend)
   (interactive
    (list
-	(konix/git/_get-file-name "commit file" t)
-	(konix/git/_read-message)
-	(y-or-n-p-with-timeout "Amend ? " 5 nil)
-	)
+    (konix/git/_get-file-name "commit file" t)
+    (konix/git/_read-message)
+    (y-or-n-p-with-timeout "Amend ? " 5 nil)
+    )
    )
   (konix/git/commit amend message file)
   )
@@ -312,25 +302,25 @@
 
 (defun konix/git/branch/list (&rest args)
   (let (branches)
-	(setq branches
-		  (shell-command-to-string "git branch -l -a 2> /dev/null")
-		  )
-	(if (not (equal 0 (length branches)))
-		(setq branches
-			  (split-string (substring branches 0 -1)
-							"\n"
-							)
-			  )
+    (setq branches
+	  (shell-command-to-string "git branch -l -a 2> /dev/null")
 	  )
-	(add-to-list 'branches "  HEAD")
-	(setq branches (remove "* (no branch)" branches))
-	(mapcar
-	 '(lambda(e)
-		(replace-regexp-in-string " .*$" "" (substring e 2))
-		)
-	 branches
-	 )
+    (if (not (equal 0 (length branches)))
+	(setq branches
+	      (split-string (substring branches 0 -1)
+			    "\n"
+			    )
+	      )
+      )
+    (add-to-list 'branches "  HEAD")
+    (setq branches (remove "* (no branch)" branches))
+    (mapcar
+     '(lambda(e)
+	(replace-regexp-in-string " .*$" "" (substring e 2))
 	)
+     branches
+     )
+    )
   )
 
 (defun konix/git/branch (cmd)
@@ -362,49 +352,49 @@
 
 (defun konix/git/log/get/commit ()
   (save-excursion
-	;; to match the commit at current line if the cursor is on a commit line
-	(goto-char (line-end-position))
-	(re-search-backward "commit \\([a-h0-9]+\\)")
-	(match-string 1)
-	)
+    ;; to match the commit at current line if the cursor is on a commit line
+    (goto-char (line-end-position))
+    (re-search-backward "commit \\([a-h0-9]+\\)")
+    (match-string 1)
+    )
   )
 
 (defun konix/git/log/show ()
   (interactive)
   (let (
-		(commit (konix/git/log/get/commit))
-		)
-	(konix/git/show/commit commit nil commit)
+	(commit (konix/git/log/get/commit))
 	)
+    (konix/git/show/commit commit nil commit)
+    )
   )
 
 (defun konix/git/log/commit-kill ()
   (interactive)
   (let (
-		(beg (if (looking-at "^commit \\([a-h0-9]+\\)")
-				 (prog1
-					 (point)
-				   (right-char)
-				   )
-			   (save-excursion
-				 (re-search-backward "^commit \\([a-h0-9]+\\)")
-				 (match-beginning 0)
-				 )
-			   )
-			 )
-		(end (save-excursion
-			   (or
-				(and
-				 (re-search-forward "^commit \\([a-h0-9]+\\)" nil t)
-				 (match-beginning 0)
-				 )
-				(point-max)
-				)
-			   )
-			 )
+	(beg (if (looking-at "^commit \\([a-h0-9]+\\)")
+		 (prog1
+		     (point)
+		   (right-char)
+		   )
+	       (save-excursion
+		 (re-search-backward "^commit \\([a-h0-9]+\\)")
+		 (match-beginning 0)
+		 )
+	       )
+	     )
+	(end (save-excursion
+	       (or
+		(and
+		 (re-search-forward "^commit \\([a-h0-9]+\\)" nil t)
+		 (match-beginning 0)
+		 )
+		(point-max)
 		)
-	(kill-region beg end)
+	       )
+	     )
 	)
+    (kill-region beg end)
+    )
   )
 
 (defun konix/git/log/commit-prev ()
@@ -423,7 +413,7 @@
   (interactive)
   (when (looking-at "^commit \\([a-h0-9]+\\)")
     (right-char)
-	)
+    )
   (re-search-forward "^commit \\([a-h0-9]+\\)")
   (beginning-of-line)
   (recenter-top-bottom '(4))
@@ -432,41 +422,41 @@
 (defun konix/git/log (&optional history_size alog file custom_cmd custom_log_cmd)
   (interactive)
   (when current-prefix-arg
-	(setq custom_cmd (read-string "Custom args: "))
-	)
+    (setq custom_cmd (read-string "Custom args: "))
+    )
   (let* (
-		 (history_cmd
-		  (if history_size (concat "-" (format "%s" history_size))
-			""))
-		 (log_command (cond
-					   (custom_log_cmd
-						custom_log_cmd
-						)
-					   (alog
-						"alog")
-					   (t
-						"log")
-					   )
-					  )
-		 (file_cmd (if file (format "--follow -- '%s'" file) ""))
-		 (buffer_name (format "*Git Log%s*" (if file (concat " " file) "")))
-		 )
-	(konix/kill-and-new-buffer buffer_name)
-	(konix/git/command
-	 (format "%s %s %s %s"
-			 log_command history_cmd
-			 (if custom_cmd
-				 custom_cmd "--name-status")
-			 file_cmd
-			 )
-	 nil
-	 buffer_name
+	 (history_cmd
+	  (if history_size (concat "-" (format "%s" history_size))
+	    ""))
+	 (log_command (cond
+		       (custom_log_cmd
+			custom_log_cmd
+			)
+		       (alog
+			"alog")
+		       (t
+			"log")
+		       )
+		      )
+	 (file_cmd (if file (format "--follow -- '%s'" file) ""))
+	 (buffer_name (format "*Git Log%s*" (if file (concat " " file) "")))
 	 )
-	;; set up the log buffer
+    (konix/kill-and-new-buffer buffer_name)
+    (konix/git/command
+     (format "%s %s %s %s"
+	     log_command history_cmd
+	     (if custom_cmd
+		 custom_cmd "--name-status")
+	     file_cmd
+	     )
+     nil
+     buffer_name
+     )
+    ;; set up the log buffer
     (with-current-buffer buffer_name
       (konix/git/log/setup-buffer)
       )
-	)
+    )
   )
 
 (defun konix/git/log/setup-buffer ()
@@ -490,15 +480,16 @@
   (konix/git/log history_size t)
   )
 
+;;;###autoload
 (defun konix/git/log/file (file)
   (interactive
    (list (konix/_get-file-name "git log file : "))
    )
   (let (
-		(output_buffer (konix/kill-and-new-buffer "*GIT log file*"))
-		)
-	(konix/git/log nil nil file)
+	(output_buffer (konix/kill-and-new-buffer "*GIT log file*"))
 	)
+    (konix/git/log nil nil file)
+    )
   )
 
 (defun konix/git/log/pick-axe (string)
@@ -525,13 +516,13 @@
   "Lance git stash."
   (interactive "sStash save message: ")
   (unless args
-	(setq args "")
-	)
+    (setq args "")
+    )
   (shell-command (format
-				  "git stash save %s '%s'"
-				  args
-				  msg
-				  ))
+		  "git stash save %s '%s'"
+		  args
+		  msg
+		  ))
   )
 
 (defun konix/git/stash/save/keep_index (msg)
@@ -598,6 +589,7 @@
     ))
   )
 
+;;;###autoload
 (defun konix/git/pull ()
   (interactive)
   (konix/git/command-with-prompt "up ")
@@ -612,8 +604,8 @@
 (defun konix/git/checkout/parent (arg)
   (interactive "P")
   (if (not arg)
-	  (setq arg 1)
-	)
+      (setq arg 1)
+    )
   (konix/git/command-to-string (concat "checkout HEAD~"(format "%s" arg)))
   )
 
@@ -675,17 +667,17 @@
 
 (defun konix/git/_get-origin-commit (file line commit)
   (let* (
-		 (blame_output (shell-command-to-string
+	 (blame_output (shell-command-to-string
                         (format
                          "git blame %s -w -p -L%s,+1 %s -- %s"
                          (if current-prefix-arg "" "-C -C -C")
                          line
                          commit
                          file)))
-		 )
-	(string-match "^\\([^ \t\n]+\\) [0-9]+ [0-9]+ [0-9]+$" blame_output)
-	(match-string-no-properties 1 blame_output)
-	)
+	 )
+    (string-match "^\\([^ \t\n]+\\) [0-9]+ [0-9]+ [0-9]+$" blame_output)
+    (match-string-no-properties 1 blame_output)
+    )
   )
 
 (defun konix/git/show (commit &optional file when_done_hook no-pop)
@@ -693,121 +685,121 @@
 force recomputation"
   (interactive
    (list
-	(konix/_get-string "git show object")
-	)
+    (konix/_get-string "git show object")
+    )
    )
   (let* (
-		 (show_buffer (format "*GIT Show Buffer %s*" commit))
-		 (command
-		  (format "show %s \"%s\""
-				  (if konix/git/diff/ignore-all-space
-					  " -w"
-					""
-					)
-				  commit)
-		  )
-		 (display_buffer_hook
-		  `(progn
-			 (with-current-buffer ,show_buffer
-			   (diff-mode)
-			   (let (
-					 ;; copy the local keymap to avoid altering the diff-mode
-					 ;; keymap
-					 (keymap (copy-keymap (current-local-map)))
-					 )
-				 (define-key keymap
-				   "q"
-				   'konix/bury-buffer-and-delete-window
-				   )
-				 (define-key keymap
-				   "k"
-				   'kill-buffer-and-window
-				   )
-				 (define-key keymap
-				   (kbd "C-k")
-				   'kill-this-buffer
-				   )
-				 ;; use this local map instead of the diff-mode one to get
-				 ;; access to the additional keys
-				 (use-local-map keymap)
-				 )
-			   (setq default-directory ,(concat
-										 (konix/git/_get-toplevel)
-										 "/"
-										 ))
-			   (when ,when_done_hook
-				 (funcall ,when_done_hook)
-				 )
-			   )
-			 (if ,no-pop
+	 (show_buffer (format "*GIT Show Buffer %s*" commit))
+	 (command
+	  (format "show %s \"%s\""
+		  (if konix/git/diff/ignore-all-space
+		      " -w"
+		    ""
+		    )
+		  commit)
+	  )
+	 (display_buffer_hook
+	  `(progn
+	     (with-current-buffer ,show_buffer
+	       (diff-mode)
+	       (let (
+		     ;; copy the local keymap to avoid altering the diff-mode
+		     ;; keymap
+		     (keymap (copy-keymap (current-local-map)))
+		     )
+		 (define-key keymap
+		   "q"
+		   'konix/bury-buffer-and-delete-window
+		   )
+		 (define-key keymap
+		   "k"
+		   'kill-buffer-and-window
+		   )
+		 (define-key keymap
+		   (kbd "C-k")
+		   'kill-this-buffer
+		   )
+		 ;; use this local map instead of the diff-mode one to get
+		 ;; access to the additional keys
+		 (use-local-map keymap)
+		 )
+	       (setq default-directory ,(concat
+					 (konix/git/_get-toplevel)
+					 "/"
+					 ))
+	       (when ,when_done_hook
+		 (funcall ,when_done_hook)
+		 )
+	       )
+	     (if ,no-pop
                  (display-buffer ,show_buffer)
                (pop-to-buffer ,show_buffer nil t)
                )
-			 )
-		  )
-		 )
-	(if (and
-		 (get-buffer show_buffer)
-		 (not current-prefix-arg)
-		 )
-		(if (get-buffer-window show_buffer)
-			;; do not mess with windows layout
-			(select-window (get-buffer-window show_buffer))
-		  (pop-to-buffer show_buffer)
-		  )
-	  ;; else recompute
-	  (progn
-		(when (get-buffer show_buffer)
-		  (kill-buffer show_buffer)
-		  )
-		(when file
-		  (setq command (concat command " -- '" file "'"))
-		  )
-		(save-window-excursion
-		  (konix/git/command command nil show_buffer t)
-		  )
-		(set-process-sentinel (get-buffer-process show_buffer)
-							  `(lambda (process string)
-								 (if (string-equal "finished\n" string)
-									 ,display_buffer_hook
-								   (display-warning 'show-warning
-													(format
-													 "Show exited abnormaly : '%s'"
-													 (substring-no-properties string
-																			  0 -1)
-													 )
-													)
-								   )
-								 )
-							  )
-		)
+	     )
 	  )
+	 )
+    (if (and
+	 (get-buffer show_buffer)
+	 (not current-prefix-arg)
+	 )
+	(if (get-buffer-window show_buffer)
+	    ;; do not mess with windows layout
+	    (select-window (get-buffer-window show_buffer))
+	  (pop-to-buffer show_buffer)
+	  )
+      ;; else recompute
+      (progn
+	(when (get-buffer show_buffer)
+	  (kill-buffer show_buffer)
+	  )
+	(when file
+	  (setq command (concat command " -- '" file "'"))
+	  )
+	(save-window-excursion
+	  (konix/git/command command nil show_buffer t)
+	  )
+	(set-process-sentinel (get-buffer-process show_buffer)
+			      `(lambda (process string)
+				 (if (string-equal "finished\n" string)
+				     ,display_buffer_hook
+				   (display-warning 'show-warning
+						    (format
+						     "Show exited abnormaly : '%s'"
+						     (substring-no-properties string
+									      0 -1)
+						     )
+						    )
+				   )
+				 )
+			      )
 	)
+      )
+    )
   )
 
 (defun konix/git/show/commit (commit file line_to_search)
   ;; strip the beginning and end blanks out of the line to search
   (setq line_to_search
-		;;		(konix/strip-blank-line-regexp
-		(regexp-quote line_to_search)
-		;;		 )
-		)
+	;;		(konix/strip-blank-line-regexp
+	(regexp-quote line_to_search)
+	;;		 )
+	)
   (message "Showing commit %s" commit)
   (konix/git/show commit
-				  file
-				  `(lambda ()
-					 (goto-char 0)
-					 (or
-					  (re-search-forward
-					   (format "^\\+%s$" ,line_to_search)
-					   nil
-					   t
-					   )
-					  (message "Unable to find '%s' in commit" ,line_to_search)
-					  )
-					 (beginning-of-line)
-					 )
-				  )
+		  file
+		  `(lambda ()
+		     (goto-char 0)
+		     (or
+		      (re-search-forward
+		       (format "^\\+%s$" ,line_to_search)
+		       nil
+		       t
+		       )
+		      (message "Unable to find '%s' in commit" ,line_to_search)
+		      )
+		     (beginning-of-line)
+		     )
+		  )
   )
 
 (defun konix/git/show/head ()
@@ -815,115 +807,116 @@ force recomputation"
   (konix/git/show "HEAD")
   )
 
+;;;###autoload
 (defun konix/git/show/origin-commit-at-pos ()
   (interactive)
   (when current-prefix-arg
-	(message "Limiting to selected file")
-	)
+    (message "Limiting to selected file")
+    )
   (if (eq major-mode 'diff-mode)
-	  (konix/git/diff/show-origin-commit)
-	(let (
-		  (origin_commit (konix/git/_get-origin-commit
-						  (buffer-file-name)
-						  (konix/line-number-at-pos-widen)
-						  "HEAD"
-						  ))
-		  )
-	  (konix/git/show/commit
-	   origin_commit
-	   (and current-prefix-arg (buffer-file-name))
-	   (buffer-substring-no-properties
-		(save-excursion (beginning-of-line) (point))
-		(save-excursion (end-of-line) (point))
-		)
-	   )
+      (konix/git/diff/show-origin-commit)
+    (let (
+	  (origin_commit (konix/git/_get-origin-commit
+			  (buffer-file-name)
+			  (konix/line-number-at-pos-widen)
+			  "HEAD"
+			  ))
 	  )
+      (konix/git/show/commit
+       origin_commit
+       (and current-prefix-arg (buffer-file-name))
+       (buffer-substring-no-properties
+	(save-excursion (beginning-of-line) (point))
+	(save-excursion (end-of-line) (point))
 	)
+       )
+      )
+    )
   )
 
 (defmacro konix/diff/finished-hook (diff_buffer top_level)
   `(progn
-	 (with-current-buffer ,diff_buffer
-	   (diff-mode)
-	   (setq default-directory ,top_level)
+     (with-current-buffer ,diff_buffer
+       (diff-mode)
+       (setq default-directory ,top_level)
+       )
+     (let (
+	   (previous_window (selected-window))
 	   )
-	 (let (
-		   (previous_window (selected-window))
-		   )
-	   (pop-to-buffer ,diff_buffer)
-	   (goto-char (point-min))
-	   (select-window previous_window)
-	   )
-	 )
+       (pop-to-buffer ,diff_buffer)
+       (goto-char (point-min))
+       (select-window previous_window)
+       )
+     )
   )
 
 (defun konix/git/diff (&optional file cached)
   "Launch a simple diff and view it in some buffer."
   (interactive)
   (let (
-		(diff_buffer ;;(generate-new-buffer
-		 (format
-		  "*GIT Diff Buffer%s*"
-		  (if cached
-			  " cached"
-			""
-			)
-		  )
-		 )
-		(top_level (concat
-					(konix/git/_get-toplevel)
-					"/"
-					)
-				   )
-		;;)
-		)
-	(when (get-buffer diff_buffer)
-	  (kill-buffer diff_buffer)
+	(diff_buffer ;;(generate-new-buffer
+	 (format
+	  "*GIT Diff Buffer%s*"
+	  (if cached
+	      " cached"
+	    ""
+	    )
 	  )
-	(save-window-excursion
-	  (konix/git/command (format "diff%s%s%s"
-								 (if (and
-									  konix/git/diff/ignore-all-space
-									  (null current-prefix-arg)
-									  )
-									 " -w"
-								   ""
-								   )
-								 (if cached
-									 " --cached"
-								   ""
-								   )
-								 (if file
-									 (concat " '"file"'")
-								   ""
-								   )
-								 )
-						 nil
-						 diff_buffer
-						 t
-						 )
-	  )
-	(if (get-buffer-process diff_buffer)
-		(set-process-sentinel (get-buffer-process diff_buffer)
-							  `(lambda (process string)
-								 (if (string-equal "finished\n" string)
-									 (progn
-									   (konix/diff/finished-hook ,diff_buffer
-																 ,top_level)
-									   )
-								   (display-warning 'diff-warning
-													(format
-													 "Diff exited abnormaly : '%s'"
-													 (substring-no-properties string
-																			  0 -1)
-													 )
-													)
-								   )
-								 )
-							  )
-	  (konix/diff/finished-hook diff_buffer top_level)
-	  )
+	 )
+	(top_level (concat
+		    (konix/git/_get-toplevel)
+		    "/"
+		    )
+		   )
+	;;)
 	)
+    (when (get-buffer diff_buffer)
+      (kill-buffer diff_buffer)
+      )
+    (save-window-excursion
+      (konix/git/command (format "diff%s%s%s"
+				 (if (and
+				      konix/git/diff/ignore-all-space
+				      (null current-prefix-arg)
+				      )
+				     " -w"
+				   ""
+				   )
+				 (if cached
+				     " --cached"
+				   ""
+				   )
+				 (if file
+				     (concat " '"file"'")
+				   ""
+				   )
+				 )
+			 nil
+			 diff_buffer
+			 t
+			 )
+      )
+    (if (get-buffer-process diff_buffer)
+	(set-process-sentinel (get-buffer-process diff_buffer)
+			      `(lambda (process string)
+				 (if (string-equal "finished\n" string)
+				     (progn
+				       (konix/diff/finished-hook ,diff_buffer
+								 ,top_level)
+				       )
+				   (display-warning 'diff-warning
+						    (format
+						     "Diff exited abnormaly : '%s'"
+						     (substring-no-properties string
+									      0 -1)
+						     )
+						    )
+				   )
+				 )
+			      )
+      (konix/diff/finished-hook diff_buffer top_level)
+      )
+    )
   )
 
 (defun konix/git/diff-cached ()
@@ -934,12 +927,13 @@ force recomputation"
 (defun konix/git/diff-file-cached (file)
   (interactive
    (list
-	(konix/git/_get-file-name "diff cached file")
-	)
+    (konix/git/_get-file-name "diff cached file")
+    )
    )
   (konix/git/diff file t)
   )
 
+;;;###autoload
 (defun konix/git/diff-file (filename)
   (interactive
    (list (konix/git/_get-file-name "diff file" t))
@@ -961,41 +955,41 @@ force recomputation"
 
 (defun konix/git/diff/_get-commit ()
   (save-excursion
-	(goto-char 0)
-	(if (re-search-forward "^commit \\([a-z0-9]+\\)" nil t)
-		(match-string-no-properties 1)
-	  (progn
-		(message "Could not find a commit for this diff,
+    (goto-char 0)
+    (if (re-search-forward "^commit \\([a-z0-9]+\\)" nil t)
+	(match-string-no-properties 1)
+      (progn
+	(message "Could not find a commit for this diff,
 fallbacking to HEAD")
-		"HEAD"
-		)
-	  )
+	"HEAD"
 	)
+      )
+    )
   )
 
 (defun konix/git/diff/show-origin-commit ()
   (interactive)
   (when current-prefix-arg
-	(message "Limiting to selected file")
-	)
+    (message "Limiting to selected file")
+    )
   (let* (
-		 (line_start (save-excursion (beginning-of-line) (forward-char) (point)))
-		 (line_end (save-excursion (end-of-line) (point)))
-		 (line_to_search (buffer-substring-no-properties line_start line_end))
-		 (file (konix/diff/_get-old-file-name))
-		 (line (konix/diff/_get-old-line))
-		 (commit (konix/git/diff/_get-commit))
-		 )
-	(konix/git/show/commit
-	 (konix/git/_get-origin-commit
-	  file
-	  line
-	  (format "%s~" commit)
-	  )
-	 (and current-prefix-arg
-		  file)
-	 line_to_search)
-	)
+	 (line_start (save-excursion (beginning-of-line) (forward-char) (point)))
+	 (line_end (save-excursion (end-of-line) (point)))
+	 (line_to_search (buffer-substring-no-properties line_start line_end))
+	 (file (konix/diff/_get-old-file-name))
+	 (line (konix/diff/_get-old-line))
+	 (commit (konix/git/diff/_get-commit))
+	 )
+    (konix/git/show/commit
+     (konix/git/_get-origin-commit
+      file
+      line
+      (format "%s~" commit)
+      )
+     (and current-prefix-arg
+	  file)
+     line_to_search)
+    )
   )
 
 (defun konix/git/mergetool ()
@@ -1007,33 +1001,33 @@ fallbacking to HEAD")
 (defun konix/git/blame/file (file)
   (interactive
    (list
-	(konix/_get-file-name "Blame file" t)
-	)
+    (konix/_get-file-name "Blame file" t)
+    )
    )
   (let (
-		(blame_buffer (konix/kill-and-new-buffer "*GIT blame*"))
-		)
-	(konix/git/command (concat "blame -w '"file"'") nil blame_buffer t)
-	(set-process-sentinel (get-buffer-process blame_buffer)
-						  `(lambda (process string)
-							 (if (string-equal "finished\n" string)
-								 (progn
-								   (pop-to-buffer ,blame_buffer)
-								   (with-current-buffer ,blame_buffer
-									 (goto-line ,(konix/line-number-at-pos-widen))
-									 )
-								   )
-							   (display-warning 'show-warning
-												(format
-												 "Show exited abnormaly : '%s'"
-												 (substring-no-properties string
-																		  0 -1)
-												 )
-												)
-							   )
-							 )
-						  )
+	(blame_buffer (konix/kill-and-new-buffer "*GIT blame*"))
 	)
+    (konix/git/command (concat "blame -w '"file"'") nil blame_buffer t)
+    (set-process-sentinel (get-buffer-process blame_buffer)
+			  `(lambda (process string)
+			     (if (string-equal "finished\n" string)
+				 (progn
+				   (pop-to-buffer ,blame_buffer)
+				   (with-current-buffer ,blame_buffer
+				     (goto-line ,(konix/line-number-at-pos-widen))
+				     )
+				   )
+			       (display-warning 'show-warning
+						(format
+						 "Show exited abnormaly : '%s'"
+						 (substring-no-properties string
+									  0 -1)
+						 )
+						)
+			       )
+			     )
+			  )
+    )
   )
 
 (defun konix/git/svn/fetch ()
@@ -1072,8 +1066,8 @@ fallbacking to HEAD")
 (defun konix/git/reset-file (file)
   (interactive
    (list
-	(konix/git/_get-file-name "reset file")
-	)
+    (konix/git/_get-file-name "reset file")
+    )
    )
   (konix/git/command-to-string (format "reset \"%s\"" file))
   )
@@ -1086,8 +1080,8 @@ fallbacking to HEAD")
 (defun konix/git/reset/HEAD/file (filename)
   (interactive
    (list
-	(konix/git/_get-file-name "reset HEAD file")
-	)
+    (konix/git/_get-file-name "reset HEAD file")
+    )
    )
   (konix/git/command-to-string (format "reset HEAD \"%s\"" filename))
   )
@@ -1100,8 +1094,8 @@ fallbacking to HEAD")
 (defun konix/git/revert (commit)
   (interactive
    (list
-	(konix/_get-string "git revert object")
-	)
+    (konix/_get-string "git revert object")
+    )
    )
   (konix/git/command (format "revert \"%s\"" commit))
   )
@@ -1109,100 +1103,100 @@ fallbacking to HEAD")
 (defun konix/git/status-buffer/diff-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(konix/git/diff-file file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (konix/git/diff-file file-name)
+    )
   )
 
 (defun konix/git/status-buffer/diff-file-cached ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(konix/git/diff-file-cached file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (konix/git/diff-file-cached file-name)
+    )
   )
 
 (defun konix/git/status-buffer/reset-head-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(konix/git/reset/HEAD/file file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (konix/git/reset/HEAD/file file-name)
+    )
   )
 
 (defun konix/git/status-buffer/add-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(konix/git/add/file file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (konix/git/add/file file-name)
+    )
   )
 
 (defun konix/git/status-buffer/add-edit-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(konix/git/add/edit/file file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (konix/git/add/edit/file file-name)
+    )
   )
 
 (defun konix/git/status-buffer/delete-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(konix/delete-file-or-directory file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (konix/delete-file-or-directory file-name)
+    )
   )
 
 (defun konix/git/status-buffer/rm-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(konix/git/rm/file file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (konix/git/rm/file file-name)
+    )
   )
 
 (defun konix/git/status-buffer/find-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(find-file file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (find-file file-name)
+    )
   )
 
 (defun konix/git/status-buffer/view-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(view-file file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (view-file file-name)
+    )
   )
 
 (defun konix/git/status-buffer/commit-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(konix/git/commit/file file-name (konix/git/_read-message "File commit: ") nil)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (konix/git/commit/file file-name (konix/git/_read-message "File commit: ") nil)
+    )
   )
 
 (defun konix/git/status-buffer/checkout-file ()
   (interactive)
   (let (
-		(file-name (get-text-property (point) 'konix/git/status/filename))
-		)
-	(konix/git/checkout/file file-name)
+	(file-name (get-text-property (point) 'konix/git/status/filename))
 	)
+    (konix/git/checkout/file file-name)
+    )
   )
 
 (defun konix/git/status-buffer/stash/drop ()
@@ -1227,60 +1221,60 @@ fallbacking to HEAD")
 
 (defun konix/git/status-decorate-buffer ()
   (defun decorate_file_type (keymap regexp face)
-	(goto-char 0)
-	(font-lock-add-keywords nil
-							`(
-							  (,regexp 1 ,face)
-							  )
-							)
-	(while (re-search-forward regexp nil t)
-	  (set-text-properties
-	   (match-beginning 1)
-	   (match-end 1)
-	   `(konix/git/status/filename
-		 ,(match-string 1)
-		 keymap ,keymap
-		 face ,face
-		 custom_elem t
-		 )
-	   )
-	  )
-	)
+    (goto-char 0)
+    (font-lock-add-keywords nil
+			    `(
+			      (,regexp 1 ,face)
+			      )
+			    )
+    (while (re-search-forward regexp nil t)
+      (set-text-properties
+       (match-beginning 1)
+       (match-end 1)
+       `(konix/git/status/filename
+	 ,(match-string 1)
+	 keymap ,keymap
+	 face ,face
+	 custom_elem t
+	 )
+       )
+      )
+    )
   (defun narrow_to_block (start_block_string)
-	(goto-char 0)
-	(if (re-search-forward start_block_string nil t)
-		(let (
-			  (narrow_end (or
-						   (save-excursion (re-search-forward "^\\(?:# \\)?[^ \t\n\r]" nil t))
-						   (point-max)
-						   )
-						  )
+    (goto-char 0)
+    (if (re-search-forward start_block_string nil t)
+	(let (
+	      (narrow_end (or
+			   (save-excursion (re-search-forward "^\\(?:# \\)?[^ \t\n\r]" nil t))
+			   (point-max)
+			   )
 			  )
-		  (narrow-to-region (point) narrow_end)
-		  t
-		  )
-	  nil
+	      )
+	  (narrow-to-region (point) narrow_end)
+	  t
 	  )
-	)
+      nil
+      )
+    )
   (goto-char 0)
   (when (re-search-forward "^\\(?:# \\)?On branch \\(.+\\)$" nil t)
-	(set-text-properties
-	 (match-beginning 1)
-	 (match-end 1)
-	 (list
-	  'face
-	  `(:foreground
-		,(concat "#" (substring (md5 (match-string-no-properties 1)) 0 6))
-		)
-	  )
-	 )
+    (set-text-properties
+     (match-beginning 1)
+     (match-end 1)
+     (list
+      'face
+      `(:foreground
+	,(concat "#" (substring (md5 (match-string-no-properties 1)) 0 6))
 	)
+      )
+     )
+    )
   (goto-char 0)
   (while (re-search-forward "new commit" nil t)
-	(let (
-		  (beg (match-beginning 0))
-		  (end (match-end 0))
-		  )
+    (let (
+	  (beg (match-beginning 0))
+	  (end (match-end 0))
+	  )
       (set-text-properties
        beg end
        (list
@@ -1289,187 +1283,187 @@ fallbacking to HEAD")
         )
        )
       )
-	)
+    )
   (goto-char 0)
   (when (narrow_to_block "\\(?:# \\)?Unmerged paths:")
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "d" 'konix/git/status-buffer/diff-file)
-						  (define-key map "r" 'konix/git/status-buffer/rm-file)
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  map
-						  )
-						"^[ 	]+both modified: +\\(.+\\)"
-						compilation-info-face)
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "r" 'konix/git/status-buffer/rm-file)
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  map
-						  )
-						"^\\(?:# \\)?	both added:         \\(.+\\)$"
-						compilation-info-face)
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "r" 'konix/git/status-buffer/rm-file)
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  map
-						  )
-						"^	added by us:     \\(.+\\)$"
-						compilation-info-face)
     (decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "r" 'konix/git/status-buffer/rm-file)
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  map
-						  )
-						"^\\(?:# \\)?[	 ]+deleted\\(?: by them\\)?:[	 ]+\\(.+\\)$"
-						compilation-error-face)
-	(widen)
- 	)
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "d" 'konix/git/status-buffer/diff-file)
+			  (define-key map "r" 'konix/git/status-buffer/rm-file)
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  map
+			  )
+			"^[ 	]+both modified: +\\(.+\\)"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "r" 'konix/git/status-buffer/rm-file)
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  map
+			  )
+			"^\\(?:# \\)?	both added:         \\(.+\\)$"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "r" 'konix/git/status-buffer/rm-file)
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  map
+			  )
+			"^	added by us:     \\(.+\\)$"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "r" 'konix/git/status-buffer/rm-file)
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  map
+			  )
+			"^\\(?:# \\)?[	 ]+deleted\\(?: by them\\)?:[	 ]+\\(.+\\)$"
+			compilation-error-face)
+    (widen)
+    )
   (when (narrow_to_block "\\(?:# \\)?Changes to be committed:")
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-						  (define-key map "d" 'konix/git/status-buffer/diff-file-cached)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  map
-						  )
-						"^\\(?:# \\)?	modified:   \\(.+\\)$"
-						compilation-info-face)
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-						  (define-key map "df" 'konix/git/status-buffer/diff-file)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  map
-						  )
-						"^\\(?:# \\)?	new file:   \\(.+\\)$"
-						compilation-info-face)
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-						  (define-key map "df" 'konix/git/status-buffer/diff-file)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  map
-						  )
-						"^\\(?:# \\)?	renamed:    .+ -> \\(.+\\)$"
-						compilation-info-face)
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-						  map
-						  )
-						"^\\(?:# \\)?[	 ]+deleted\\(?: by them\\)?:[	 ]+\\(.+\\)$"
-						compilation-error-face)
-	(widen)
- 	)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
+			  (define-key map "d" 'konix/git/status-buffer/diff-file-cached)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  map
+			  )
+			"^\\(?:# \\)?	modified:   \\(.+\\)$"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
+			  (define-key map "df" 'konix/git/status-buffer/diff-file)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  map
+			  )
+			"^\\(?:# \\)?	new file:   \\(.+\\)$"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
+			  (define-key map "df" 'konix/git/status-buffer/diff-file)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  map
+			  )
+			"^\\(?:# \\)?	renamed:    .+ -> \\(.+\\)$"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "r" 'konix/git/status-buffer/reset-head-file)
+			  map
+			  )
+			"^\\(?:# \\)?[	 ]+deleted\\(?: by them\\)?:[	 ]+\\(.+\\)$"
+			compilation-error-face)
+    (widen)
+    )
   (when (narrow_to_block "\\(?:# \\)?Changes not staged for commit:")
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  (define-key map "e" 'konix/git/status-buffer/add-edit-file)
-						  (define-key map "d" 'konix/git/status-buffer/diff-file)
-						  (define-key map "cf" 'konix/git/status-buffer/commit-file)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  (define-key map "C" 'konix/git/status-buffer/checkout-file)
-						  map
-						  )
-						"^\\(?:# \\)?	modified:   \\(.+?\\)\\( (.*\\(tracked\\|new commits\\|modified content\\).*)\\)?$"
-						compilation-info-face)
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  map
-						  )
-						"^\\(?:# \\)?	renamed:    .+ -> \\(.+\\)$"
-						compilation-info-face)
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  map
-						  )
-						"^\\(?:# \\)?.+typechange: \\(.+\\)$"
-						compilation-info-face)
-   	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  map
-						  )
-						"^\\(?:# \\)?	new file:   \\(.+\\)$"
-						compilation-info-face)
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "D" 'konix/git/status-buffer/delete-file)
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  (define-key map "C" 'konix/git/status-buffer/checkout-file)
-						  (define-key map "r" 'konix/git/status-buffer/rm-file)
-						  map
-						  )
-						"^\\(?:# \\)?	deleted:    \\(.+\\)$"
-						compilation-error-face)
-	(widen)
-	)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  (define-key map "e" 'konix/git/status-buffer/add-edit-file)
+			  (define-key map "d" 'konix/git/status-buffer/diff-file)
+			  (define-key map "cf" 'konix/git/status-buffer/commit-file)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  (define-key map "C" 'konix/git/status-buffer/checkout-file)
+			  map
+			  )
+			"^\\(?:# \\)?	modified:   \\(.+?\\)\\( (.*\\(tracked\\|new commits\\|modified content\\).*)\\)?$"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  map
+			  )
+			"^\\(?:# \\)?	renamed:    .+ -> \\(.+\\)$"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  map
+			  )
+			"^\\(?:# \\)?.+typechange: \\(.+\\)$"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  map
+			  )
+			"^\\(?:# \\)?	new file:   \\(.+\\)$"
+			compilation-info-face)
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "D" 'konix/git/status-buffer/delete-file)
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  (define-key map "C" 'konix/git/status-buffer/checkout-file)
+			  (define-key map "r" 'konix/git/status-buffer/rm-file)
+			  map
+			  )
+			"^\\(?:# \\)?	deleted:    \\(.+\\)$"
+			compilation-error-face)
+    (widen)
+    )
   (when (narrow_to_block "\\(?:# \\)?Untracked files:")
-	;; untracked decoration
-	(decorate_file_type (let (
-							  (map (make-sparse-keymap))
-							  )
-						  (define-key map "D" 'konix/git/status-buffer/delete-file)
-						  (define-key map "a" 'konix/git/status-buffer/add-file)
-						  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-						  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-						  map
-						  )
-						"^\\(?:# \\)?	\\(.+\\)$"
-						compilation-warning-face
-						)
-	(widen)
-	)
+    ;; untracked decoration
+    (decorate_file_type (let (
+			      (map (make-sparse-keymap))
+			      )
+			  (define-key map "D" 'konix/git/status-buffer/delete-file)
+			  (define-key map "a" 'konix/git/status-buffer/add-file)
+			  (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
+			  (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+			  map
+			  )
+			"^\\(?:# \\)?	\\(.+\\)$"
+			compilation-warning-face
+			)
+    (widen)
+    )
   ;; handle the stash list
   (decorate_file_type (let (
-							(map (make-sparse-keymap))
-							)
-						(define-key map "D" 'konix/git/status-buffer/stash/drop)
-						(define-key map "a" 'konix/git/status-buffer/stash/apply)
-						(define-key map "s" 'konix/git/status-buffer/stash/show)
-						(define-key map "d" 'konix/git/status-buffer/stash/show)
-						(define-key map "p" 'konix/git/status-buffer/stash/pop)
-						map
-						)
-					  "^stash@{\\([0-9]+\\)}: .+$"
-					  compilation-info-face)
+			    (map (make-sparse-keymap))
+			    )
+			(define-key map "D" 'konix/git/status-buffer/stash/drop)
+			(define-key map "a" 'konix/git/status-buffer/stash/apply)
+			(define-key map "s" 'konix/git/status-buffer/stash/show)
+			(define-key map "d" 'konix/git/status-buffer/stash/show)
+			(define-key map "p" 'konix/git/status-buffer/stash/pop)
+			map
+			)
+		      "^stash@{\\([0-9]+\\)}: .+$"
+		      compilation-info-face)
   ;; WIP on... kinda stuff are generally useless information
   (decorate_file_type nil
-					  "^stash.+\\(WIP on .+\\)$"
-					  'shadow)
+		      "^stash.+\\(WIP on .+\\)$"
+		      'shadow)
   (goto-char 0)
   )
 
@@ -1477,49 +1471,49 @@ fallbacking to HEAD")
 
 (defun konix/git/status-buffer/after-process/prepare-buffer ()
   (let (
-		(inhibit-read-only 1)
-		(local_map (make-sparse-keymap))
-		)
-	(define-key local_map "g" 'konix/git/status-buffer/redo)
-	(define-key local_map "?" 'konix/keymap/help)
-	(define-key local_map "q" 'bury-buffer)
-	(define-key local_map (kbd "C-d") 'konix/git/diff)
-	(define-key local_map "k" 'kill-buffer)
-	(define-key local_map "P" 'konix/git/push)
-	(define-key local_map (kbd"<SPC>") 'konix/git/status-buffer/next)
-	(define-key local_map (kbd"<DEL>") 'konix/git/status-buffer/prev)
-
-	(define-prefix-command 'konix/git/status/buffer/stash-prefix-map)
-	(define-key local_map (kbd "s") 'konix/git-global-map-stash)
-
-	(define-prefix-command 'konix/git/status/buffer/rebase-prefix-map)
-	(define-key local_map (kbd "R") 'konix/git/status/buffer/rebase-prefix-map)
-	(define-key konix/git/status/buffer/rebase-prefix-map "i" 'konix/git/irebase)
-
-	(define-prefix-command 'konix/git/status/diff-map)
-	(define-key local_map "d" 'konix/git/status/diff-map)
-	(define-key konix/git/status/diff-map "c" 'konix/git/diff-cached)
-	(define-key konix/git/status/diff-map "d" 'konix/git/diff)
-
-	(define-key local_map "p" 'konix/git-global-map-push)
-
-	(define-key local_map "c" 'konix/git-global-map-commit)
-
-	(define-key local_map "a" 'konix/git-global-map-add)
-
-	(use-local-map local_map)
-	(konix/git/status-decorate-buffer)
+	(inhibit-read-only 1)
+	(local_map (make-sparse-keymap))
 	)
+    (define-key local_map "g" 'konix/git/status-buffer/redo)
+    (define-key local_map "?" 'konix/keymap/help)
+    (define-key local_map "q" 'bury-buffer)
+    (define-key local_map (kbd "C-d") 'konix/git/diff)
+    (define-key local_map "k" 'kill-buffer)
+    (define-key local_map "P" 'konix/git/push)
+    (define-key local_map (kbd"<SPC>") 'konix/git/status-buffer/next)
+    (define-key local_map (kbd"<DEL>") 'konix/git/status-buffer/prev)
+
+    (define-prefix-command 'konix/git/status/buffer/stash-prefix-map)
+    (define-key local_map (kbd "s") 'konix/git-global-map-stash)
+
+    (define-prefix-command 'konix/git/status/buffer/rebase-prefix-map)
+    (define-key local_map (kbd "R") 'konix/git/status/buffer/rebase-prefix-map)
+    (define-key konix/git/status/buffer/rebase-prefix-map "i" 'konix/git/irebase)
+
+    (define-prefix-command 'konix/git/status/diff-map)
+    (define-key local_map "d" 'konix/git/status/diff-map)
+    (define-key konix/git/status/diff-map "c" 'konix/git/diff-cached)
+    (define-key konix/git/status/diff-map "d" 'konix/git/diff)
+
+    (define-key local_map "p" 'konix/git-global-map-push)
+
+    (define-key local_map "c" 'konix/git-global-map-commit)
+
+    (define-key local_map "a" 'konix/git-global-map-add)
+
+    (use-local-map local_map)
+    (konix/git/status-decorate-buffer)
+    )
   )
 
 (defun konix/git/status-buffer/redo ()
   "Relaunch the git status."
   (interactive)
   (let (
-		(buffer_name (buffer-name))
-		)
-	(konix/git/status buffer_name)
+	(buffer_name (buffer-name))
 	)
+    (konix/git/status buffer_name)
+    )
   )
 
 (defun konix/git/status-sentinel(process)
@@ -1532,9 +1526,9 @@ fallbacking to HEAD")
 
 (defun konix/git/status-sentinel_final(process)
   (if (get-buffer-window (current-buffer))
-	  (pop-to-buffer (current-buffer))
-	(switch-to-buffer (current-buffer))
-	)
+      (pop-to-buffer (current-buffer))
+    (switch-to-buffer (current-buffer))
+    )
   )
 
 (defmacro konix/git/status-buffer/next-or-previous (moving_function text_prop)
@@ -1542,18 +1536,18 @@ fallbacking to HEAD")
   ;; one again to go to next), I need to do it only once If I was not already on
   ;; a custom elem
   `(let (
-		 (prev_point (point))
-		 )
-	 (condition-case nil
-		 (progn
-		   (goto-char (,moving_function (point) (quote ,text_prop)))
-		   (unless (get-text-property (point) (quote ,text_prop))
-			 (goto-char (,moving_function (point) (quote ,text_prop)))
-			 )
-		   )
-	   (error (goto-char prev_point))
-	   )
+	 (prev_point (point))
 	 )
+     (condition-case nil
+	 (progn
+	   (goto-char (,moving_function (point) (quote ,text_prop)))
+	   (unless (get-text-property (point) (quote ,text_prop))
+	     (goto-char (,moving_function (point) (quote ,text_prop)))
+	     )
+	   )
+       (error (goto-char prev_point))
+       )
+     )
   )
 
 (defun konix/git/status-buffer/next ()
@@ -1572,52 +1566,53 @@ Uses the macro konix/git/status-buffer/next-or-previous
    previous-single-property-change custom_elem)
   )
 
+;;;###autoload
 (defun konix/git/status (&optional buffer_or_name)
   (interactive)
   (let* (
-		 (konix/git/status-process nil)
-		 (current-default-directory default-directory)
-		 (git_top_level (konix/git/_get-toplevel))
-		 (git_status_buffer_name
-		  (or
-		   buffer_or_name
-		   (format "*git status %s*"
-				   git_top_level
-				   )
+	 (konix/git/status-process nil)
+	 (current-default-directory default-directory)
+	 (git_top_level (konix/git/_get-toplevel))
+	 (git_status_buffer_name
+	  (or
+	   buffer_or_name
+	   (format "*git status %s*"
+		   git_top_level
 		   )
-		  )
-		 )
-	;; first, tries to erase the buffer content
-	(when (buffer-name (get-buffer git_status_buffer_name))
-	  (unless (ignore-errors
-				(with-current-buffer git_status_buffer_name
-				  (toggle-read-only -1)
-				  (erase-buffer)
-				  )
-				t
-				)
-		(ignore-errors(kill-buffer git_status_buffer_name))
-		)
+	   )
 	  )
-	;; here, the buffer is erased of killed, I want it to be alive
-	(setq git_status_buffer_name (get-buffer-create git_status_buffer_name))
-	;; Addition of a trace in the buffer in order to communicate with the sentinel
-	(with-current-buffer git_status_buffer_name
-	  (setq default-directory current-default-directory)
-	  )
-	(setq konix/git/status-process (start-process "git status"
-												  git_status_buffer_name
-												  "sh"
-												  "-c"
-												  "LC_ALL=C git status && git stash list"
-												  ))
-	(konix/set-process-sentinel-exit-hook
-	 konix/git/status-process
-	 'konix/git/status-sentinel
-	 'konix/git/status-sentinel_fail
-	 'konix/git/status-sentinel_final
 	 )
+    ;; first, tries to erase the buffer content
+    (when (buffer-name (get-buffer git_status_buffer_name))
+      (unless (ignore-errors
+		(with-current-buffer git_status_buffer_name
+		  (toggle-read-only -1)
+		  (erase-buffer)
+		  )
+		t
+		)
+	(ignore-errors(kill-buffer git_status_buffer_name))
 	)
+      )
+    ;; here, the buffer is erased of killed, I want it to be alive
+    (setq git_status_buffer_name (get-buffer-create git_status_buffer_name))
+    ;; Addition of a trace in the buffer in order to communicate with the sentinel
+    (with-current-buffer git_status_buffer_name
+      (setq default-directory current-default-directory)
+      )
+    (setq konix/git/status-process (start-process "git status"
+						  git_status_buffer_name
+						  "sh"
+						  "-c"
+						  "LC_ALL=C git status && git stash list"
+						  ))
+    (konix/set-process-sentinel-exit-hook
+     konix/git/status-process
+     'konix/git/status-sentinel
+     'konix/git/status-sentinel_fail
+     'konix/git/status-sentinel_final
+     )
+    )
   (message "Git status command launched")
   )
 
@@ -1628,17 +1623,17 @@ Uses the macro konix/git/status-buffer/next-or-previous
 
 (defun konix/git/tag/list ()
   (let (tags)
-	(setq tags
-		  (shell-command-to-string "git tag -l 2> /dev/null")
-		  )
-	(if (not (equal 0 (length tags)))
-		(setq tags
-			  (split-string (substring tags 0 -1)
-							"\n"
-							)
-			  )
+    (setq tags
+	  (shell-command-to-string "git tag -l 2> /dev/null")
 	  )
-	)
+    (if (not (equal 0 (length tags)))
+	(setq tags
+	      (split-string (substring tags 0 -1)
+			    "\n"
+			    )
+	      )
+      )
+    )
   )
 
 (defun konix/git/tag/delete ()

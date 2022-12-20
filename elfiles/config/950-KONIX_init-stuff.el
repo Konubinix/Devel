@@ -22,8 +22,18 @@
 (tracking-mode 1)
 (save-place-mode 1)
 (golden-ratio-mode 1)
+(auto-insert-mode 1)
+
+(require 'keep-buffers)
 (require 'backup-dir)
 (require 'framemove)
+(require 'delight)
+(require 'savehist)
+(require 'winner)
+(require 'saveplace)
+(require 'git-wip-mode nil t)
+(require 'sticky-windows)
+
 ;; I don't like it by default, but like enabling it in some modes
 (electric-indent-mode -1)
 ;; this is the long part, as it loads my org files

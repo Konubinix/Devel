@@ -154,6 +154,34 @@ They can be relative or absolute
     )
   )
 
+
+(defun konix/tab-size (size)
+  "change la taille du tab pour le buffer courant."
+  (interactive
+   (list
+       (read-number "Tab Size : " tab-width)
+       )
+   )
+  (let (indice list)
+       (setq indice 0)
+       (setq list ())
+       (while (< indice (* size 15))
+         (setq indice (+ indice size))
+         (setq list (append list (list indice)))
+         )
+       (set (make-local-variable 'tab-width) size)
+       (set (make-local-variable 'c-basic-offset) size)
+       (set (make-local-variable 'tab-stop-list) list)
+       (when (eq major-mode 'python-mode)
+         (set (make-local-variable 'python-indent-offset) size)
+         )
+       (when (eq major-mode 'sh-mode)
+         (set (make-local-variable 'sh-basic-offset) size)
+         )
+       )
+  )
+
+
 ;; ####################################################################################################
 ;; FUNCTIONS
 ;; ####################################################################################################
@@ -212,7 +240,7 @@ They can be relative or absolute
 
 (defun konix/prog/get-file-buffer (filename)
   "Does the same thing than `get-file-buffer` but allows the filename to use wildcards."
-  (block nil
+  (cl-block nil
     (let* (
 		   (case-fold-search t)
 		   (regexp_file (wildcard-to-regexp (expand-file-name filename)))
@@ -229,7 +257,7 @@ They can be relative or absolute
 			   buffer_file_name
 			   )
 			  )
-			 (return buffer)
+			 (cl-return buffer)
 		   )
 		 )
        (buffer-list)

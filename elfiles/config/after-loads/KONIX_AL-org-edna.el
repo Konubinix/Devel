@@ -23,7 +23,7 @@
 ;;
 
 ;;; Code:
-(use-package org :ensure t :defer t)
+(require 'org)
 
 
 (defun org-edna-action/toggle-tag! (_last-entry tag)

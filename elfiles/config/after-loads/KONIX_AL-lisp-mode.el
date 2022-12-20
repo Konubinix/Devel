@@ -27,7 +27,6 @@
 (defun konix/lisp-mode-hook ()
   (setq indent-tabs-mode nil)
   (konix/prog/config)
-  (konix/tab-size 4)
   (setq ac-sources (append
 					'(
 					  ac-source-yasnippet
@@ -56,6 +55,12 @@
   (run-hooks 'lisp-mode-hook)
   (local-set-key (kbd"C-j") 'hippie-expand)
   (local-set-key (kbd "C-x e") 'eval-print-last-sexp)
+  (add-hook 'before-save-hook
+             #'whitespace-cleanup
+             nil
+             t
+             )
+
   )
 
 (add-hook 'emacs-lisp-mode-hook 'konix/emacs-lisp-mode-hook)

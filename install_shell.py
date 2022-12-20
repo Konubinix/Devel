@@ -34,6 +34,7 @@ import_env
         os.path.join(environ["HOME"], ".bashrc"), """#!/bin/bash
 [ -n "${IN_NIX_SHELL}" ] && return
 [ -z "$PS1" ] && return
+test "${TERM}" = "dumb" && return
 
 konix_load_init () {
     # mist be done asap to increase chances the started shell is still in the active window
@@ -58,6 +59,7 @@ konix_load_init
         os.path.join(environ["HOME"], ".shrc"), """#!/bin/bash
 [ -n "${IN_NIX_SHELL}" ] && return
 [ -z "$PS1" ] && return
+test "${TERM}" = "dumb" && return
 
 konix_load_init () {
     # mist be done asap to increase chances the started shell is still in the active window

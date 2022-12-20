@@ -10,7 +10,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        deps = [ pkgs.go pkgs.gopls ];
+        deps = [ pkgs.go pkgs.gopls pkgs.gotools ];
       in {
         packages.default = pkgs.buildEnv {
           name = "go";

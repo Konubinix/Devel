@@ -114,7 +114,7 @@ konix_wm_shows_byobu ( ) {
 }
 
 konix_warn_it_took_too_long ( ) {
-    konix_display.py -o -t boring "'$(HISTTIMEFORMAT="" history|tail -1|sed -r 's/^[^ ]+ *(.+)$/\1/')' took $(( STARSHIP_DURATION / 1000 ))s"
+    konix_display.py -o -t boring "'$(HISTTIMEFORMAT=":" history|tail -1|sed -r 's/^[^:]+:(.+)$/\1/')' took $(( STARSHIP_DURATION / 1000 ))s"
 }
 
 konix_was_active_not_long_ago ( ) {

@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(setq-default smerge-command-prefix (kbd "C-c v"))
 
 (provide 'KONIX_AL-smerge-mode)
 ;;; KONIX_AL-smerge-mode.el ends here

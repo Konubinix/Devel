@@ -33,6 +33,22 @@
 (setq-default konix/old-insert-directory-program insert-directory-program)
 (setq-default konix/insert-directory-program "gatls_dired.py")
 
+(defun konix/force-backup-of-buffer-if-sensible ()
+  (let (
+		(buffer-backed-up nil)
+		(file_name (f-canonical (buffer-file-name)))
+		)
+	(unless (or
+             (string= (vc-backend file_name) "Git")
+             (string-prefix-p "/run/user/1000" file_name)
+             )
+	  (backup-buffer)
+	  (message "Wrote and backup-ed file '%s'"
+			   file_name)
+	  )
+	)
+  )
+
 (add-hook 'before-save-hook 'konix/force-backup-of-buffer-if-sensible t)
 
 (defun konix/gatls-dired-toggle (&optional force)

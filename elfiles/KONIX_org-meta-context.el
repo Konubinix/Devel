@@ -99,6 +99,7 @@ contexts list"
 	)
   )
 
+;;;###autoload
 (defun konix/org-meta-context/initialize ()
   (interactive)
   (unless (member (expand-file-name org-directory) konix/org-meta-contexts)
@@ -122,6 +123,7 @@ contexts list"
 	)
   )
 
+;;;###autoload
 (defun konix/org-meta-context/switch-to-context (name &optional force)
   (interactive
    (list
@@ -149,6 +151,7 @@ contexts list"
   (message "Initialized %s context" name)
   )
 
+;;;###autoload
 (defun konix/org-meta-context/next-context ()
   (interactive)
   ;; find the element after org-directory in the konix/org-meta-contexts
@@ -178,17 +181,20 @@ contexts list"
 	)
   )
 
+;;;###autoload
 (defun konix/org-meta-context/goto-root ()
   (interactive)
   (find-file org-directory)
   )
 
+;;;###autoload
 (defun konix/org-meta-context/echo-current-context ()
   (interactive)
   (message "Current context is %s, restricted is %s" org-directory konix/org-meta-context/restricted)
   )
 
 (setq konix/org-meta-context/restricted -1)
+;;;###autoload
 (defun konix/org-meta-context/toggle-restrict (&optional on)
   (interactive)
   (setq konix/org-meta-context/restricted

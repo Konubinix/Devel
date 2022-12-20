@@ -1,4 +1,4 @@
-;;; 300-KONIX_persist-point.el ---                   -*- lexical-binding: t; -*-
+;;; KONIX_persist-point.el ---                   -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  konubinix
 
@@ -59,7 +59,7 @@
    )
   )
 
-
+;;;###autoload
 (defun konix/persist-point-all-windows ()
   (mapc
    (lambda (f)
@@ -80,7 +80,5 @@
      )
   )
 
-
-
-(provide '300-KONIX_persist-point)
-;;; 300-KONIX_persist-point.el ends here
+(provide 'KONIX_persist-point)
+;;; KONIX_persist-point.el ends here

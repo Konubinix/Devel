@@ -28,21 +28,21 @@
 (require 'KONIX_org-meta-context)
 (require 'org-archive)
 (require 'org-element)
-(use-package ol-notmuch :ensure t :defer t)
 (require 'org-protocol)
 (require 'ol-man)
 (require 'org-clock)
-(use-package dash :ensure t :commands (->>))
-(use-package org-contrib :ensure t
-  :config
-  (require 'org-expiry)
-  )
-(require 'org-collector)
-(require 'org-protocol)
+(require 'dash)
 (require 'holidays)
 (require 'ob-python)
 (require 'ob-shell)
+(require 'org-edna)
+(require 'org-checklist)
+(require 'org-expiry)
+(org-edna-load)
 
+(konix/auto-insert-use-yasnippet-template "/wiki/.+\\.org\\'" "org")
+
+(setq-default org-empty-line-terminates-plain-lists t)
 (setq-default org--matcher-tags-todo-only nil)
 ;; force the use of scheduling instead of deadline prewarning. They both have the
 ;; same purpose : hidding the task till I want it to appear.
@@ -50,34 +50,7 @@
 (setq-default org-adapt-indentation t)
 (setq-default org-fontify-quote-and-verse-blocks t)
 (setq-default org-duration-format '(("h") (special . h:mm)))
-(defadvice org-attach-commit (around prevent ())
-  "prevent org-attach-commit from doing anything."
-  (message "Org attach commit bypassed")
-  )
-(ad-activate 'org-attach-commit)
-
-(defun konix/org-entry-after-properties ()
-  (goto-char (org-entry-end-position))
-  (search-backward ":END:")
-  (forward-line)
-  )
-
-(defun konix/org-entry-after-properties-position ()
-  (save-excursion
-    (konix/org-entry-after-properties)
-    (point)
-    )
-  )
-
-(defun konix/org-entry-get-global (key)
-  (org-with-wide-buffer
-   (save-excursion
-     (goto-char (point-min))
-     (assert (not (looking-at "^\*")))
-     (org-entry-get (point) key)
-     )
-   )
-  )
+(setq-default org-hide-block-startup nil)
 
 (defun konix/org-agenda-gtd-get-clear ()
   (interactive)
@@ -275,21 +248,6 @@
     )
   )
 
-(defun konix/org-add-outcome ()
-  (interactive)
-  (let* (
-         (cmd (lambda nil
-                (org-add-log-setup 'note nil nil nil "- Outcome :: ")
-                )
-              )
-         )
-    (if current-prefix-arg
-        (konix/org-with-point-at-clocked-entry (funcall cmd))
-      (konix/org-with-point-on-heading (funcall cmd))
-      )
-    )
-  )
-
 (setq-default org-agenda-files
               (list
                (expand-file-name "wiki" perso-dir)
@@ -351,8 +309,8 @@
                        :fileskip0
                        :stepskip0
                        :link t
-			           :timestamp nil
-			           :tags nil
+                                   :timestamp nil
+                                   :tags nil
                        :maxlevel 5
                        :emphasize t
                        )
@@ -658,7 +616,6 @@
      )
     )
   )
-
 
 (defun konix/org-is-task-of-project-p ()
   "Find out if entry at point is a task of a project.
@@ -2671,7 +2628,6 @@ items"
                 ("DONE_POMODORO_ALL". "0 1 2 3 4 5 6 7 8 9 0")
                 ("ORDERED_ALL". "t")
                 ))
-(setq-default org-hide-block-startup t)
 (setq-default org-hide-leading-stars t)
 (setq-default org-hierarchical-todo-statistics nil)
 (setq-default org-insert-labeled-timestamps-at-point nil)
@@ -2718,44 +2674,9 @@ items"
                 (org-agenda-files . (:maxlevel . 5))
                 )
               )
-(defun konix/org-capture/git-annex-info ()
-  (with-current-buffer orig-buf
-    (let* (
-           (file_path (cond ((eq major-mode 'dired-mode)
-                             (dired-file-name-at-point)
-                             )
-                            (t
-                             (buffer-file-name)
-
-                             )
-
-                            ))
-           (file_name (file-name-nondirectory file_path))
-           (key (shell-command-to-string
-                 (format "git annex find \"%s\" --format='${key}'"
-                         file_name
-                         ))
-                )
-           )
-      (unless key
-        (user-error "Not in an annexed file")
-        )
-      (cons file_path key)
-      )
-    )
-  )
-
 (defun konix/org-capture/ipfa ()
   (with-current-buffer (org-capture-get :original-buffer)
     (konix/dired-ipfa-at-point)
-    )
-  )
-
-(defun konix/org-capture/git-annex ()
-  (let* (
-         (info (konix/org-capture/git-annex-info))
-         )
-    (format "[[file:%s][%s]]" (car info) (cdr info))
     )
   )
 (setq-default org-refile-use-outline-path 'full-file-path)
@@ -2786,8 +2707,8 @@ items"
          )
     (with-temp-buffer
       (org-insert-time-stamp
-	   time (or org-time-was-given nil) nil nil nil
-	   (list org-end-time-was-given))
+           time (or org-time-was-given nil) nil nil nil
+           (list org-end-time-was-given))
       (buffer-substring-no-properties (+ 1 (point-min)) (- (point-max) 1))
       )
     )
@@ -2981,13 +2902,7 @@ items"
                  )
                 )
               )
-(setq-default org-combined-agenda-icalendar-file (expand-file-name "org.ics" perso-dir))
 (setq-default org-todo-repeat-to-state "NEXT")
-;; If a project contains WAITing event, it is not stuck because something is
-;; already going on. We won't loose track of the waiting item because it lies in
-;; the "WAITING items" section
-(setq-default org-stuck-projects
-              '("+project-maybe/-DONE-NOT_DONE" ("NEXT") ("") ""))
 (setq-default org-timer-default-timer 25)
 (setq-default org-time-clocksum-format "%d:%02d")
 
@@ -3374,11 +3289,6 @@ items"
 (def-edebug-spec konix/org-with-point-at-clocked-entry (form body))
 (put 'konix/org-with-point-at-clocked-entry 'lisp-indent-function 1)
 
-(defun konix/org-goto-notes ()
-  (interactive)
-  (find-file (expand-file-name "notes.org" org-directory))
-  )
-
 (defvar konix/org-add-note/window-configuration nil)
 (make-variable-buffer-local 'konix/org-add-note/window-configuration)
 
@@ -3448,6 +3358,7 @@ items"
   (interactive)
   (org-mark-ring-goto -1)
   )
+
 (defun konix/org-publish-attachment-dia-thumbs (plist filename pub-dir)
   "Publish a thumbnail of a dia file."
   (if (locate-file "dia" exec-path exec-suffixes)
@@ -3532,7 +3443,6 @@ of the clocksum."
 (defface konix/org-checkbox-todo '((t :inherit (bold konix/org-next-face)))
   "Face for checkboxes."
   :group 'konix/org-faces)
-
 
 (defun konix/org-mode/time-it (orig-func &rest args)
   (let (
@@ -3768,11 +3678,11 @@ of the clocksum."
                  (< 25 res)
                  )
             (let (
-				  (ov (make-overlay (line-beginning-position) (line-end-position)))
-				  )
-			  (overlay-put ov 'face 'shadow)
+                                  (ov (make-overlay (line-beginning-position) (line-end-position)))
+                                  )
+                          (overlay-put ov 'face 'shadow)
               (overlay-put ov 'konix/org-agenda-added-text-property t)
-			  )
+                          )
             )
           )
         )
@@ -4352,9 +4262,9 @@ of the clocksum."
 
 (defun konix/org-set-tags/link-maybe-and-dream (orig-func tags)
   (let* ((tags (pcase tags
-		         ((pred listp) tags)
-		         ((pred stringp) (split-string (org-trim tags) ":" t))
-		         (_ (error "Invalid tag specification: %S" tags))))
+                         ((pred listp) tags)
+                         ((pred stringp) (split-string (org-trim tags) ":" t))
+                         (_ (error "Invalid tag specification: %S" tags))))
          (old-tags (org-get-tags nil t))
          (tags-change? (not (equal tags old-tags)))
          )
@@ -4763,10 +4673,6 @@ of the clocksum."
    )
   )
 
-(use-package org-edna :ensure t
-  :commands (org-edna-load)
-  )
-(org-edna-load)
 (setq-default
  org-edna-finder-use-cache t
  org-edna-finder-cache-timeout 300
@@ -5277,6 +5183,11 @@ of the clocksum."
   )
 (advice-add #'org-clock-in :around #'konix/org-force-refile-before-clocking-in/advice)
 
+(defadvice org-open-at-point (before push-ring ())
+  (org-mark-ring-push)
+  )
+(ad-activate 'org-open-at-point)
+
 (defun konix/org-next-sibbling nil
   (let (
         (start-point (point))
@@ -5421,9 +5332,9 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   (add-to-list
    'org-font-lock-extra-keywords
    (list (concat
-		  org-outline-regexp-bol
-		  "\\(.*:maybe:.*\\)")
-		 '(1 'konix/org-maybe-face prepend))
+                  org-outline-regexp-bol
+                  "\\(.*:maybe:.*\\)")
+                 '(1 'konix/org-maybe-face prepend))
    )
   )
 (add-hook 'org-font-lock-set-keywords-hook
@@ -5448,9 +5359,9 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
         )
       )
     (unless (or
-		     (< n org-agenda-confirm-kill)
+                     (< n org-agenda-confirm-kill)
              (y-or-n-p
-			  (format "Delete entry with %d lines" n)
+                          (format "Delete entry with %d lines" n)
               )
              )
       (user-error "Not removing the subtree containing too many lines")
@@ -5904,8 +5815,6 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
       )
     )
   )
-
-
 
 (defun konix/org-display-inline-images/scale-down (url)
   (let* (
@@ -6432,7 +6341,6 @@ You should check this is not a mistake."
   (konix/org-link-youtube-process path)
   )
 
-
 (defun konix/org-narrow-to-entry-no-subtree ()
   (interactive)
   (save-excursion
@@ -6463,31 +6371,31 @@ You should check this is not a mistake."
 (defun konix/org-diff-times (ts1 ts2)
   "description."
   (let* (
-	     (havetime (or (> (length ts1) 15) (> (length ts2) 15)))
-	     (match-end (match-end 0))
-	     (time1 (if (s-equals-p ts1 "now") (current-time) (org-time-string-to-time ts1)))
-	     (time2 (if (s-equals-p ts2 "now") (currenn-timee) (org-time-string-to-time ts2)))
-	     (diff (abs (float-time (time-subtract time2 time1))))
-	     (negative (time-less-p time2 time1))
-	     ;; (ys (floor (* 365 24 60 60)))
-	     (ds (* 24 60 60))
-	     (hs (* 60 60))
-	     (fy "%dy %dd %02d:%02d")
-	     (fy1 "%dy %dd")
-	     (fd "%dd %02d:%02d")
-	     (fd1 "%dd")
-	     (fh "%02d:%02d")
-	     y d h m align)
+             (havetime (or (> (length ts1) 15) (> (length ts2) 15)))
+             (match-end (match-end 0))
+             (time1 (if (s-equals-p ts1 "now") (current-time) (org-time-string-to-time ts1)))
+             (time2 (if (s-equals-p ts2 "now") (currenn-timee) (org-time-string-to-time ts2)))
+             (diff (abs (float-time (time-subtract time2 time1))))
+             (negative (time-less-p time2 time1))
+             ;; (ys (floor (* 365 24 60 60)))
+             (ds (* 24 60 60))
+             (hs (* 60 60))
+             (fy "%dy %dd %02d:%02d")
+             (fy1 "%dy %dd")
+             (fd "%dd %02d:%02d")
+             (fd1 "%dd")
+             (fh "%02d:%02d")
+             y d h m align)
     (if havetime
-	    (setq ; y (floor diff ys)  diff (mod diff ys)
-	     y 0
-	     d (floor diff ds)  diff (mod diff ds)
-	     h (floor diff hs)  diff (mod diff hs)
-	     m (floor diff 60))
+            (setq ; y (floor diff ys)  diff (mod diff ys)
+             y 0
+             d (floor diff ds)  diff (mod diff ds)
+             h (floor diff hs)  diff (mod diff hs)
+             m (floor diff 60))
       (setq ; y (floor diff ys)  diff (mod diff ys)
-	   y 0
-	   d (round diff ds)
-	   h 0 m 0))
+           y 0
+           d (round diff ds)
+           h 0 m 0))
     (org-make-tdiff-string y d h m)
     )
   )

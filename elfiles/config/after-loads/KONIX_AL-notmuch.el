@@ -25,10 +25,11 @@
 ;;; Code:
 
 (require 'notmuch-address)
+(require 'ol-notmuch)
 (require 'notmuch-tree)
 (require 'thingatpt)
 (require 'uuidgen)
-(use-package gnus-alias :ensure t :commands (gnus-alias-determine-identity))
+(require 'gnus-alias)
 
 (defun konix/notmuch/record-url-to-ril-unflag-and-next (url)
   (interactive
@@ -80,6 +81,7 @@ Message-Id: <%s>" id)
 (add-hook 'message-setup-hook 'konix/message-setup-hook)
 ;; for notmuch to sort mails like I want
 (setq-default notmuch-search-oldest-first nil)
+
 (require 'ini)
 (defun konix/notmuch/initialize-saved-searches ()
   (setq-default notmuch-saved-searches
@@ -88,17 +90,18 @@ Message-Id: <%s>" id)
 			     (mapcar
 				  (lambda (entry)
 				    (if (assoc "search" (cdr entry))
-					    (cons
-					     (car entry)
-					     (cdr (assoc "search" (cdr entry)))
+					    (list
+                         :name (car entry)
+					     :query (cdr (assoc "search" (cdr entry)))
 					     )
 					  nil
 					  )
 				    )
-				  (reverse
-				   (ini-decode
-				    (with-temp-buffer
-					  (insert-file-contents
+				  (let (
+                        (file (make-temp-file "notmuch-saved-searches-"))
+                        )
+                    (with-temp-file file
+                      (insert-file-contents
 					   (first
 					    (remove-if-not
 					     'file-exists-p
@@ -109,15 +112,18 @@ Message-Id: <%s>" id)
 					     )
 					    )
 					   )
-					  (buffer-substring-no-properties (point-min) (point-max))
-					  )
-				    )
-				   )
+				      )
+                    (prog1
+                        (ini-decode file)
+                      (delete-file file)
+                      )
+                    )
 				  )
 			     )
 			    )
   )
 (konix/notmuch/initialize-saved-searches)
+
 (setq-default mailcap-download-directory
 			  (format "%s/" (getenv "KONIX_DOWNLOAD_DIR")))
 (setq-default mm-default-directory mailcap-download-directory)

@@ -55,6 +55,7 @@
   )
 (setq konix/loaded-in-init-files
       '(
+        "autoinsert" ;; init
         "backup-dir" ;; init
         "bibtex" ;; loaded by org -> oc-basic
         "calendar" ;; init

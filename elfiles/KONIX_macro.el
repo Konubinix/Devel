@@ -24,10 +24,12 @@
 
 ;;; Code:
 
+;;;###autoload
 (defun konix/macro/execute-from-human-format (human-rep)
   (execute-kbd-macro (edmacro-parse-keys human-rep))
   )
 
+;;;###autoload
 (defun konix/macro/dump-human-format (macro &optional no-verbose)
   (edmacro-format-keys macro (not no-verbose))
   )

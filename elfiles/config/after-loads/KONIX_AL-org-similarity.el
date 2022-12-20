@@ -1,6 +1,6 @@
-;;; KONIX_AL-hypothesis.el ---                       -*- lexical-binding: t; -*-
+;;; KONIX_AL-org-similarity.el ---                   -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020  konubinix
+;; Copyright (C) 2022  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -24,15 +24,15 @@
 
 ;;; Code:
 
-(require 'org-roam)
+;; directory to scan for possibly similar documents.
+;; org-roam users might want to change it to org-roam-directory
+(setq org-similarity-directory org-roam-directory)
+;; the language passed to nltk's Snowball stemmer
+(setq org-similarity-language "english")
+;; how many similar entries to list at the end of the buffer
+(setq org-similarity-number-of-documents 10)
+;; whether to prepend the list entries with their cosine similarity score
+(setq org-similarity-show-scores nil)
 
-;;;###autoload
-(defun konix/hypothesis-archive ()
-  (interactive)
-  (setq hypothesis-token (shell-command-to-string "impass_dump_clear_password.sh token@hypothes.is"))
-  (setq hypothesis-username (shell-command-to-string "impass_dump_clear_password.sh username@hypothes.is"))
-  (hypothesis-to-archive)
-  )
-
-(provide 'KONIX_AL-hypothesis)
-;;; KONIX_AL-hypothesis.el ends here
+(provide 'KONIX_AL-org-similarity)
+;;; KONIX_AL-org-similarity.el ends here

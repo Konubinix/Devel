@@ -7,6 +7,7 @@
 ;; ####################################################################################################
 ;; Default font, simple, nice!!
 (setq-default konix/default-font "Monospace 10")
+(setq-default read-file-name-completion-ignore-case t)
 
 (setq-default default-frame-alist
 			  `(
@@ -169,7 +170,7 @@
       )
      )
    (delete-if-not
-    (lambda (key) (string/starts-with key "ZERO WIDTH"))
+    (lambda (key) (string-prefix-p "ZERO WIDTH" key))
     (hash-table-keys (ucs-names))
     )
    )

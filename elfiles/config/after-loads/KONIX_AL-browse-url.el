@@ -24,6 +24,16 @@
 
 ;;; Code:
 
+(defun konix/browse-url-browser (url &optional new-window)
+  (interactive (browse-url-interactive-arg "URL: "))
+  (start-process (format "%s '%s'" (getenv "BROWSER") url)
+				 nil
+				 (getenv "BROWSER")
+				 url
+				 )
+  )
+
+
 (when (string-match
 	   "linux"
 	   (getenv "KONIX_PLATFORM")

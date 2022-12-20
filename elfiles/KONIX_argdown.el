@@ -48,6 +48,7 @@
   "Specific argdown construct to highlight."
   )
 
+;;;###autoload
 (define-derived-mode argdown-mode markdown-mode "argdown"
   "Major mode for editing argdown document."
   (setq font-lock-defaults '(argdown-highlights))

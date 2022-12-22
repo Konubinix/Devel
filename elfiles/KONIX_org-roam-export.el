@@ -310,19 +310,21 @@
       (format "
 {{{stlview(%s,%s)}}}
 ([[%s][{{{icon(fas fa-download)}}}]])"
-              url (md5 url) url)
+              url (md5 url)
+              url
+              )
       )
      ((string-match "^\\(http.+\\(webm\\|mp4\\)\\)$" url)
       (format "{{{video(%s)}}}" (match-string 1 url))
       )
-     ((string-match (concat "^" konix/org-ipfs-link "\\([?]filename=\\([a-zA-Z0-9=_%.-]+\\)\\)?$") url)
-      (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 3 url))
+     ((string-match (concat "^" konix/org-ipfs-link "\\([?]filename=\\([a-zA-Z0-9=_%.-]+\\)\\)$") url)
+      (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 3 url) t)
       )
      ((string-match "^youtube:\\(.+\\)$" url)
       (konix/org-roam-export/process-url (konix/org-link-youtube-process url))
       )
-     ((string-match (concat "^" konix/org-ipfs-link "\\([?][a-zA-Z0-9=_%./-]+\\)?$") url)
-      (konix/org-export/process-ipfs-link (format "/ipfs/%s%s" (match-string 1 url) (match-string 2 url)) nil)
+     ((string-match (concat "^" konix/org-ipfs-link "[?]\\([a-zA-Z0-9=_%./-]+\\)?$") url)
+      (konix/org-roam-export/process-url (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 2 url) nil))
       )
      ((string-match "^cite:\\(.+\\)$" url)
       (konix/org-roam-export/process-url (konix/org-roam/process-url url))
@@ -334,7 +336,7 @@
     )
   )
 
-(defun konix/org-export/process-ipfs-link (path filename)
+(defun konix/org-export/process-ipfs-link (path filename explicit)
   (let* (
          (filename (and filename
                         (decode-coding-string
@@ -348,12 +350,19 @@
          (url (konix/org-roam-export/process-url (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") path)))
          )
     (if filename
-        (format "[[%s?filename=%s.%s][%s]]"
+        (if explicit
+            (format "[[%s?filename=%s.%s][%s]]"
                 url
                 (konix/org-roam-compute-slug filename-sans-ext)
                 filename-ext
                 filename
                 )
+            (format "%s?filename=%s.%s"
+                url
+                (konix/org-roam-compute-slug filename-sans-ext)
+                filename-ext
+                )
+          )
       url
       )
     )

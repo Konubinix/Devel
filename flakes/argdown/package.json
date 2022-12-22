@@ -1,0 +1,11 @@
+{
+    "name": "argdown",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@argdown/cli": "^1.7.5"
+    }
+}

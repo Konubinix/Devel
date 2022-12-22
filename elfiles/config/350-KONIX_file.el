@@ -1,119 +1,118 @@
-
 (defun konix/yank-current-buffer-file-name (full_path)
   (interactive "P")
   (let (
-		(buffer_file_name (buffer-file-name))
-		)
-	(with-temp-buffer
-	  (if full_path
-		  (insert (file-name-nondirectory buffer_file_name))
-		(insert buffer_file_name)
-		)
-	  (copy-region-as-kill (point-min) (point-max))
-	  )
-	)
+                (buffer_file_name (buffer-file-name))
+                )
+        (with-temp-buffer
+          (if full_path
+                  (insert (file-name-nondirectory buffer_file_name))
+                (insert buffer_file_name)
+                )
+          (copy-region-as-kill (point-min) (point-max))
+          )
+        )
   )
 
 (defun konix/yank-current-buffer-name ()
   (interactive)
   (let (
-		(buffer_name (buffer-name))
-		)
-	(with-temp-buffer
-	  (insert buffer_name)
-	  (copy-region-as-kill (point-min) (point-max))
-	  (message "Copied '%s'" buffer_name)
-	  )
-	)
+                (buffer_name (buffer-name))
+                )
+        (with-temp-buffer
+          (insert buffer_name)
+          (copy-region-as-kill (point-min) (point-max))
+          (message "Copied '%s'" buffer_name)
+          )
+        )
   )
 
 (defun konix/explorer ()
   "Lance un explorer."
   (interactive )
   (if (eq system-type 'windows-nt)
-	  (start-process "explorer" nil "c:/WINDOWS/explorer.exe"
-					 (replace-regexp-in-string
-					  "/"
-					  "\\\\"
-					  (replace-regexp-in-string
-					   "/$"
-					   ""
-					   (expand-file-name default-directory)
-					   )
-					  )
-					 )
-	(start-process konix/explorer nil konix/explorer ".")
-	)
+          (start-process "explorer" nil "c:/WINDOWS/explorer.exe"
+                                         (replace-regexp-in-string
+                                          "/"
+                                          "\\\\"
+                                          (replace-regexp-in-string
+                                           "/$"
+                                           ""
+                                           (expand-file-name default-directory)
+                                           )
+                                          )
+                                         )
+        (start-process konix/explorer nil konix/explorer ".")
+        )
   )
 
 (defun konix/reload-file ()
   (interactive)
   (let (
-		(file_name (buffer-file-name))
-		)
-	(if (and file_name (file-exists-p file_name))
-		(progn
-		  (kill-buffer (current-buffer))
-		  (find-file file_name)
-		  )
-	  (error "Unable to reload this file")
-	  )
-	)
+                (file_name (buffer-file-name))
+                )
+        (if (and file_name (file-exists-p file_name))
+                (progn
+                  (kill-buffer (current-buffer))
+                  (find-file file_name)
+                  )
+          (error "Unable to reload this file")
+          )
+        )
   )
 
 (defun konix/delete-file-or-directory (file_or_directory)
   (interactive
    (list
-	(konix/_get-file-name "file or directory to delete" t)
-	)
+        (konix/_get-file-name "file or directory to delete" t)
+        )
    )
   (when (y-or-n-p (format "Delete %s ? "file_or_directory))
-	(cond
-	 ((file-directory-p file_or_directory)
-	  (delete-directory file_or_directory t)
-	  )
-	 (t
-	  (delete-file file_or_directory)
-	  )
-	 )
-	)
+        (cond
+         ((file-directory-p file_or_directory)
+          (delete-directory file_or_directory t)
+          )
+         (t
+          (delete-file file_or_directory)
+          )
+         )
+        )
   )
 
 
 (defun konix/add-file-name-in-kill-ring (&optional windows_slashes)
   (interactive "P")
   (let (
-		(file_name (konix/_get-file-name "File name to copy : " t t))
-		)
-	(when windows_slashes
-	  (setq file_name (replace-regexp-in-string "/" "\\\\" file_name))
-	  )
-	(kill-new file_name)
-	)
+                (file_name (konix/_get-file-name "File name to copy : " t t))
+                )
+        (when windows_slashes
+          (setq file_name (replace-regexp-in-string "/" "\\\\" file_name))
+          )
+        (kill-new file_name)
+        )
   )
 
 (defun konix/find (name)
   (interactive "sName : ")
   (let (
-		(find-name-arg
-		 (if current-prefix-arg
-			 (read-string "find arg: " find-name-arg nil find-name-arg)
-		   find-name-arg
-		   )
-		 )
-		)
-	(find-dired
-	 default-directory
-	 (concat find-name-arg" \"*"name"*\"")
-	 )
-	)
+                (find-name-arg
+                 (if current-prefix-arg
+                         (read-string "find arg: " find-name-arg nil find-name-arg)
+                   find-name-arg
+                   )
+                 )
+                )
+        (find-dired
+         default-directory
+         (concat find-name-arg" \"*"name"*\"")
+         )
+        )
   )
 
 (defun konix/make-executable (&optional file)
   (interactive)
   (unless file
-	(setq file (buffer-file-name))
-	)
+        (setq file (buffer-file-name))
+        )
   (message (shell-command-to-string (format "chmod +x \"%s\"" file)))
   )
 
@@ -241,3 +240,30 @@
        )
   )
 
+
+(defun konix/find-file-in-parents (filename &optional from_where)
+  (unless from_where
+       (setq from_where default-directory)
+       )
+  (let (
+               (tested_dir from_where)
+               )
+       (while (and
+                       (not (file-exists-p (expand-file-name filename tested_dir)))
+                       (not (konix/filename-is-root-p tested_dir))
+                       )
+         (setq tested_dir (expand-file-name "../" tested_dir))
+         )
+       (if (or
+                (not (konix/filename-is-root-p tested_dir))
+                (file-exists-p (expand-file-name filename tested_dir))
+                )
+               (expand-file-name filename tested_dir)
+         nil
+         )
+       )
+  )
+
+(defun konix/filename-is-root-p (filename)
+  (string-match "^/$" filename)
+  )

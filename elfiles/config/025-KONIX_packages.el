@@ -132,7 +132,6 @@
   (use-package org-roam :commands (konix/org-roam-note))
   (use-package org-roam-bibtex)
   (use-package org-search-goto)
-  (use-package org-similarity :straight (:type git :host github :repo "brunoarine/org-similarity" :files ("assets")))
   (use-package org-super-agenda)
   (use-package org-transclusion)
   (use-package origami :commands (origami-mode))

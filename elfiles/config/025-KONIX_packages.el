@@ -144,6 +144,7 @@
   (use-package py-isort)
   (use-package region-bindings-mode :commands (region-bindings-mode-enable))
   (use-package rust-mode)
+  (use-package scad-mode)
   (use-package slack :commands (slack-start) :straight (:fork t) :bind-keymap ("<f2> l" . konix/slack-global-map))
   (use-package tempbuf)
   (use-package terraform-mode)

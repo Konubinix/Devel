@@ -15,7 +15,7 @@ gaps_launch_freeze_pre_hook ( ) {
     if [ -f "${hook}" ]
     then
         gaps_log "Launching the freeze prehook (${hook}) for $message"
-        bash -x "${hook}" \
+        bash "${hook}" \
             || die "Failed to launch the freeze prehook for ${message}"
     fi
 }
@@ -26,7 +26,7 @@ gaps_launch_freeze_post_hook ( ) {
     if [ -f "${hook}" ]
     then
         gaps_log "Launching the freeze posthook (${hook}) for $message"
-        bash -x "${hook}" \
+        bash "${hook}" \
             || die "Failed to launch the freeze posthook for ${message}"
     fi
 }

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: note
+# key: note
+# --
+note ${100:$(yas-choose-value '("right of" "over" "left of"))} $200
+        $300
+end note
+$0

@@ -6341,6 +6341,19 @@ You should check this is not a mistake."
   (konix/org-link-youtube-process path)
   )
 
+(defun konix/org-insert-youtube-video-transcript (url)
+  (interactive "MURL: ")
+  (insert (shell-command-to-string
+           (format
+            "clk podcast transcript dump --orgmode --lang %s '%s'"
+            (if current-prefix-arg "fr" "en")
+            url
+            )
+           )
+          )
+  )
+
+
 (defun konix/org-narrow-to-entry-no-subtree ()
   (interactive)
   (save-excursion

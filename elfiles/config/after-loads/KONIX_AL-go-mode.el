@@ -26,6 +26,14 @@
 
 (require 'lsp-mode)
 
+(defface konix/go-font-lock-public-function-name-face '((t :background "gray21" :inherit font-lock-function-name-face))
+  "Face for public stuff."
+  :group 'konix/go-faces)
+
+(defvar konix/go-font-lock-public-function-name-face 'konix/go-font-lock-public-function-name-face
+  "Face name to use for go public functions.")
+
+
 (defun konix/go-mode-hook ()
   (hs-minor-mode 1)
   (when (require 'lsp nil t)
@@ -38,6 +46,21 @@
   (setq-default gofmt-command "goimports") ;; see https://pkg.go.dev/golang.org/x/tools/cmd/goimports
   (add-hook 'before-save-hook 'gofmt-before-save nil t)
   (add-hook 'after-save-hook 'konix/go/make-executable t t)
+  (font-lock-add-keywords
+   nil
+   `(
+     (
+      "func *\\(?:([a-zA-Z0-9 _*]+)\\)? *\\([A-Z][a-zA-Z0-9_]+\\)"
+      .
+      (1 konix/go-font-lock-public-function-name-face)
+      )
+     (
+      "type *\\([A-Z][a-zA-Z0-9_]+\\)"
+      .
+      (1 konix/go-font-lock-public-function-name-face)
+      )
+     )
+   )
   )
 
 (add-hook 'go-mode-hook

@@ -2373,7 +2373,7 @@ items"
                  )
                 ("age" "Expiry helper"
                  (
-                  (tags "-structure-NOEXPIRY-NOEXPIRYRECURSIVE-TODO=\"NEXT\"-TODO=\"TODO\""
+                  (tags "-structure-gcalinbox-NOEXPIRY-NOEXPIRYRECURSIVE-TODO=\"NEXT\"-TODO=\"TODO\""
                         (
                          (org-agenda-overriding-header
                           "Expired entries (no subtask, archive them)")
@@ -2385,7 +2385,7 @@ items"
                           )
                          )
                         )
-                  (tags "-structure-NOEXPIRY-NOEXPIRYRECURSIVE-TODO=\"NEXT\"-TODO=\"TODO\""
+                  (tags "-structure-gcalinbox-NOEXPIRY-NOEXPIRYRECURSIVE-TODO=\"NEXT\"-TODO=\"TODO\""
                         (
                          (org-agenda-overriding-header
                           "Expired entries (subtask, soft)")
@@ -2397,7 +2397,7 @@ items"
                           )
                          )
                         )
-                  (tags-todo "-structure-NOEXPIRY-NOEXPIRYRECURSIVE+TODO=\"NEXT\"|-NOEXPIRY-NOEXPIRYRECURSIVE+TODO=\"TODO\""
+                  (tags-todo "-structure-gcalinbox-NOEXPIRY-NOEXPIRYRECURSIVE+TODO=\"NEXT\"|-NOEXPIRY-NOEXPIRYRECURSIVE+TODO=\"TODO\""
                              (
                               (org-agenda-overriding-header
                                "Expired undone stuff (check them)")

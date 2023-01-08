@@ -31,29 +31,21 @@
 
 (defun konix/auto-scroll-forward-line ()
   "description."
-  (when (or konix/auto-scrool-first-time
-            (and
-             (current-idle-time)
-             (> (time-to-seconds (current-idle-time)) konix/auto-scroll-idle-time)
-             )
-            )
-    (cond
-     ((member 'pdf-view-roll-minor-mode minor-mode-list)
-      (image-roll-scroll-forward)
-      )
-     (t
-      (call-interactively 'next-line)
-      )
-     )
-
-    (recenter-top-bottom 0)
-    (hl-line-highlight)
-    (cond
-     ((equal major-mode 'org-agenda-mode)
-      (org-agenda-do-context-action))
-     )
+  (cond
+   ((and (boundp 'pdf-view-roll-minor-mode) pdf-view-roll-minor-mode)
+    (image-roll-scroll-forward)
     )
-  (setq konix/auto-scrool-first-time nil)
+   (t
+    (call-interactively 'next-line)
+    )
+   )
+
+  (recenter-top-bottom 0)
+  (hl-line-highlight)
+  (cond
+   ((equal major-mode 'org-agenda-mode)
+    (org-agenda-do-context-action))
+   )
   )
 
 (defun konix/auto-scroll-mode-hook ()
@@ -69,7 +61,16 @@
          (file-exists-p (expand-file-name "~/.here"))
          )
     (condition-case nil
-        (konix/auto-scroll-forward-line)
+        (when (or konix/auto-scrool-first-time
+                  (and
+                   (current-idle-time)
+                   (> (time-to-seconds (current-idle-time)) konix/auto-scroll-idle-time)
+                   )
+                  )
+
+          (konix/auto-scroll-forward-line)
+          (setq konix/auto-scrool-first-time nil)
+          )
       (error (auto-scroll-mode -1)))))
 
 

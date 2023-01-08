@@ -6329,7 +6329,7 @@ You should check this is not a mistake."
   (let (
         (id (replace-regexp-in-string "^youtube:" "" url))
         )
-    (concat "https://www.youtube.com/watch?v=" id)
+    (concat "https://youtu.be/" id)
     )
   )
 

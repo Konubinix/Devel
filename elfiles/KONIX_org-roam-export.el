@@ -218,6 +218,7 @@
             (cd directory)
             (insert content)
             (org-mode)
+            (org-element-cache-reset)
             ;; so that org-export-with-tags if defcustom defined,
             ;; hence dynamically and that the let-binding below won't trigger
             ;; some error
@@ -256,7 +257,18 @@
       (or
        (if-let (
                 (kinds (save-excursion
-                         (org-collect-keywords '("KONIX_ORG_PUBLISH_KIND"))
+                         (progn
+                           ;; to make sure the following is not nil, I need to
+                           ;; be in org-mode. But I need to avoid setting it if
+                           ;; already done because it would erase local
+                           ;; variavles, like konix/org-roam-export/buffer-file-name
+                           (or (equalp major-mode 'org-mode)
+                               (progn
+                                 (org-mode)
+                                 )
+                               )
+                           (org-element-cache-reset)
+                           (org-collect-keywords '("KONIX_ORG_PUBLISH_KIND")))
                          ))
                 )
            (car (cdar kinds))

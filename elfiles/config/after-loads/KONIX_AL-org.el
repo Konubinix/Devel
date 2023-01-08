@@ -58,7 +58,7 @@
     (org-agenda-files)
     '(and
       (ts :from -7 :to today)
-      (not (tags "structure" "habit" "temp"))
+      (not (tags "structure" "habit" "temp" "ril"))
       )
     :title "Clear recent Items"
     :sort '(date)

@@ -44,10 +44,12 @@
           'konix/go-mode-hook)
 
 
+(define-key go-mode-map (kbd "<RET>") 'newline-and-indent)
+
 (defun konix/go/make-executable ()
   (when (save-excursion
-		  (goto-char (point-min))
-		  (re-search-forward "//usr/bin/env go run $0 $@ ; exit" nil t)
+          (goto-char (point-min))
+          (re-search-forward "//usr/bin/env go run $0 $@ ; exit" nil t)
           )
     (konix/make-executable)
     )

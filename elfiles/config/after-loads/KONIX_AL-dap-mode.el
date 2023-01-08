@@ -84,23 +84,24 @@
   )
 
 (defun konix/dap-breakpoint-dump ()
-    (interactive)
-    (message "%s" (pp-to-string (dap--debug-session-breakpoints (dap--cur-session) )))
-    )
+  (interactive)
+  (message "%s" (pp-to-string (dap--debug-session-breakpoints (dap--cur-session) )))
+  )
 
 (define-prefix-command 'konix/dap-mode-map)
 (global-set-key (kbd "<f12>") 'konix/dap-mode-map)
-(define-key konix/dap-mode-map (kbd "<f12>") 'dap-hydra)
 
 (define-prefix-command 'konix/dap-debug-mode-map)
 (define-key konix/dap-mode-map (kbd "d") 'konix/dap-debug-mode-map)
 (define-key konix/dap-debug-mode-map (kbd "d") 'dap-debug)
 (define-key konix/dap-debug-mode-map (kbd "l") 'dap-debug-last)
+(define-key konix/dap-debug-mode-map (kbd "e") 'dap-debug-edit-template)
 
 (define-prefix-command 'konix/dap-breakpoint-mode-map)
 (define-key konix/dap-mode-map (kbd "b") 'konix/dap-breakpoint-mode-map)
-(define-key konix/dap-breakpoint-mode-map (kbd "l") 'dap-ui-breakpoints-list)
+(define-key konix/dap-breakpoint-mode-map (kbd "l") 'dap-ui-breakpoints)
 (define-key konix/dap-breakpoint-mode-map (kbd "a") 'dap-breakpoint-add)
+(define-key konix/dap-breakpoint-mode-map (kbd "b") 'dap-breakpoint-toggle)
 (define-key konix/dap-breakpoint-mode-map (kbd "d") 'dap-breakpoint-delete)
 (define-key konix/dap-breakpoint-mode-map (kbd "D") 'dap-breakpoint-delete-all)
 
@@ -109,14 +110,24 @@
 (define-key konix/dap-point-mode-map (kbd "t") 'dap-tooltip-at-point)
 (define-key konix/dap-point-mode-map (kbd "e") 'dap-eval-thing-at-point)
 
+(define-prefix-command 'konix/dap-eval-mode-map)
+(define-key konix/dap-mode-map (kbd "e") 'konix/dap-eval-mode-map)
+(define-key konix/dap-eval-mode-map (kbd "e") 'dap-eval)
+(define-key konix/dap-eval-mode-map (kbd "p") 'dap-eval-thing-at-point)
+(define-key konix/dap-eval-mode-map (kbd "r") 'dap-eval-region)
+
+(define-key konix/dap-mode-map (kbd "<f12>") 'dap-hydra)
 (define-key konix/dap-mode-map (kbd "w") 'konix/dap-where)
 (define-key konix/dap-mode-map (kbd "c") 'dap-continue)
 (define-key konix/dap-mode-map (kbd "g") 'dap-continue)
 (define-key konix/dap-mode-map (kbd "<up>") 'dap-up-stack-frame)
 (define-key konix/dap-mode-map (kbd "<down>") 'dap-down-stack-frame)
 (define-key konix/dap-mode-map (kbd "q") 'dap-disconnect)
+(define-key konix/dap-mode-map (kbd "n") 'dap-next)
+
+(define-key konix/region-bindings-mode-map "e" 'dap-eval-region)
 
 (dap-auto-configure-mode 1)
-(setq-default dap-auto-configure-features '(breakpoints tooltip controls repl))
+(setq-default dap-auto-configure-features '( tooltip controls repl breakpoints))
 
 (provide 'KONIX_AL-dap-mode)

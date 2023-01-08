@@ -3,11 +3,20 @@
 # key: seq
 # --
 @startuml
+skinparam monochrome reverse
 autonumber
 hide footbox
 title ${100:title}
+
 actor "${200:friendly name}" as ${300:id}
 
 $0
+a -> d ++: something
+return something
+
+note left of a
+        some note
+end note
+
 
 @enduml

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: ret
+# key: ret
+# --
+return $100
+$0

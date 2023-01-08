@@ -92,6 +92,7 @@
   (use-package flycheck)
   (use-package framemove)
   (use-package git-timemachine :commands (git-timemachine))
+  (use-package git-wip-timemachine)
   (use-package gnus-alias)
   (use-package gitri :straight (:type built-in) :mode ("git-rebase-todo" . gitri-mode))
   (use-package go-dlv)

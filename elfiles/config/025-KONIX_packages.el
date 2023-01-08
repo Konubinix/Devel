@@ -123,7 +123,7 @@
   (use-package nix-mode :commands (nix-mode))
   (use-package ol-emacs-slack :straight (:type git :host github :repo "ag91/ol-emacs-slack"))
   (use-package ol-notmuch)
-  (use-package org)
+  (use-package org :mode ("\\.org_archive" . org-mode))
   (use-package org-checklist :straight org-contrib)
   (use-package org-edna)
   (use-package org-drill :bind-keymap  ("C-f D" . konix/org-drill-key-map))

@@ -3,30 +3,4 @@
 source <(kubectl completion bash)
 ME="$(basename "${BASH_SOURCE[0]}")"
 
-_ktns () {
-    COMP_WORDS=(ktl -n "${COMP_WORDS[@]:2}")
-    COMP_CWORD=$((COMP_CWORD))
-    COMP_LINE=${COMP_LINE/k ns/ktl -n}
-    COMP_POINT=$((COMP_POINT + 1))
-    __start_kubectl
-}
-
-_k ( ) {
-    path=()
-    for i in "${COMP_WORDS[@]}"
-    do
-        if ! test "$i" = "-*"
-        then
-            path+=($i)
-        fi
-    done
-
-    if test "${path[1]}" = "ns"
-    then
-        _ktns
-    else
-        __start_kubectl
-    fi
-}
-
-complete -F _k "${ME}"
+complete -o default -F __start_kubectl "${ME}"

@@ -1,6 +1,0 @@
-#!/bin/bash -eu
-
-source <(kubectl completion bash)
-ME="$(basename "${BASH_SOURCE[0]}")"
-
-complete -o default -F __start_kubectl "${ME}"

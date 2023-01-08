@@ -1,0 +1,1 @@
+(require 'ob-scad)

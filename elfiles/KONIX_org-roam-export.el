@@ -855,6 +855,16 @@
     )
   )
 
+(defun konix/org-roam-export/unify-ipfs-links ()
+  (replace-string
+   "file:/ipfs/"
+   "ipfs:"
+   nil
+   (point-min)
+   (point-max)
+   )
+  )
+
 (defun konix/org-roam-export/convert-standalone-links ()
   (save-excursion
     (goto-char (point-min))
@@ -1163,6 +1173,7 @@ citation key, for Org-ref cite links."
     (konix/org-roam-export/load-transclusion)
     ;; I need to put stuff that modify the buffer after loading the
     ;; transclusion
+    (konix/org-roam-export/unify-ipfs-links)
     (konix/org-roam-export/convert-standalone-links)
     (konix/org-roam-export/convert-remaining-ipfs-links)
     (konix/org-roam-replace-roam-links-with-hugo-compatible-ones)

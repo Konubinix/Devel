@@ -94,32 +94,32 @@ They can be relative or absolute
 
 (defface konix/prog/tabs
   '(
-	(
-	 ((class color)
-	  (background light))
-	 (:background "gray95")
-	 )
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "gray26")
-	 )
-	)
+    (
+     ((class color)
+      (background light))
+     (:background "gray95")
+     )
+    (
+     ((class color)
+      (background dark))
+     (:background "gray50")
+     )
+    )
   ""
   )
 
 (setq konix/prog/ac-sources
       '(
-		;; ac-source-gtags
-		;; ac-source-imenu
-		;; ac-source-abbrev
-		ac-source-yasnippet
-		;; ac-source-files-in-current-dir
-		ac-source-dictionary
-		ac-source-words-in-same-mode-buffers
-		;; ac-source-words-in-all-buffer
-		ac-source-konix/etags
-		)
+        ;; ac-source-gtags
+        ;; ac-source-imenu
+        ;; ac-source-abbrev
+        ac-source-yasnippet
+        ;; ac-source-files-in-current-dir
+        ac-source-dictionary
+        ac-source-words-in-same-mode-buffers
+        ;; ac-source-words-in-all-buffer
+        ac-source-konix/etags
+        )
       )
 
 ;; ####################################################################################################
@@ -127,29 +127,29 @@ They can be relative or absolute
 ;; ####################################################################################################
 (defun konix/etags/find-tag-default ()
   (let (
-		(no_token_regexp "[^a-zA-Z/_:]")
-		beg
-		end
-		)
+        (no_token_regexp "[^a-zA-Z/_:]")
+        beg
+        end
+        )
     (cond
      ((region-active-p)
       (buffer-substring-no-properties (region-beginning) (region-end))
       )
      (t
       (save-excursion
-		(condition-case	nil
-			(progn
-			  (re-search-backward no_token_regexp)
-			  (forward-char)
-			  (setq beg (point))
-			  (re-search-forward no_token_regexp)
-			  (backward-char)
-			  (setq end (point))
-			  (buffer-substring-no-properties beg end)
-			  )
-		  (error (thing-at-point 'word))
-		  )
-		)
+        (condition-case	nil
+            (progn
+              (re-search-backward no_token_regexp)
+              (forward-char)
+              (setq beg (point))
+              (re-search-forward no_token_regexp)
+              (backward-char)
+              (setq end (point))
+              (buffer-substring-no-properties beg end)
+              )
+          (error (thing-at-point 'word))
+          )
+        )
       )
      )
     )

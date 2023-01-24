@@ -86,6 +86,7 @@
     (use-package dockerfile-mode)
     (use-package earthfile-mode)
     (use-package editorconfig)
+    (use-package edit-indirect)
     (use-package ement)
     (use-package envrc)
     (use-package f)

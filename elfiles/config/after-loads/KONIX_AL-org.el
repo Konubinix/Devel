@@ -52,6 +52,15 @@
 (setq-default org-duration-format '(("h") (special . h:mm)))
 (setq-default org-hide-block-startup nil)
 
+(defun konix/org-get-priority-as-char ()
+  (save-excursion
+    (org-back-to-heading)
+    (when (looking-at org-priority-regexp)
+      (string-to-char (match-string 2))
+      )
+    )
+  )
+
 (defun konix/org-agenda-gtd-get-clear ()
   (interactive)
   (org-ql-search
@@ -309,8 +318,8 @@
                        :fileskip0
                        :stepskip0
                        :link t
-                                   :timestamp nil
-                                   :tags nil
+                       :timestamp nil
+                       :tags nil
                        :maxlevel 5
                        :emphasize t
                        )
@@ -2707,8 +2716,8 @@ items"
          )
     (with-temp-buffer
       (org-insert-time-stamp
-           time (or org-time-was-given nil) nil nil nil
-           (list org-end-time-was-given))
+       time (or org-time-was-given nil) nil nil nil
+       (list org-end-time-was-given))
       (buffer-substring-no-properties (+ 1 (point-min)) (- (point-max) 1))
       )
     )
@@ -3678,11 +3687,11 @@ of the clocksum."
                  (< 25 res)
                  )
             (let (
-                                  (ov (make-overlay (line-beginning-position) (line-end-position)))
-                                  )
-                          (overlay-put ov 'face 'shadow)
+                  (ov (make-overlay (line-beginning-position) (line-end-position)))
+                  )
+              (overlay-put ov 'face 'shadow)
               (overlay-put ov 'konix/org-agenda-added-text-property t)
-                          )
+              )
             )
           )
         )
@@ -4262,9 +4271,9 @@ of the clocksum."
 
 (defun konix/org-set-tags/link-maybe-and-dream (orig-func tags)
   (let* ((tags (pcase tags
-                         ((pred listp) tags)
-                         ((pred stringp) (split-string (org-trim tags) ":" t))
-                         (_ (error "Invalid tag specification: %S" tags))))
+                 ((pred listp) tags)
+                 ((pred stringp) (split-string (org-trim tags) ":" t))
+                 (_ (error "Invalid tag specification: %S" tags))))
          (old-tags (org-get-tags nil t))
          (tags-change? (not (equal tags old-tags)))
          )
@@ -5332,9 +5341,9 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   (add-to-list
    'org-font-lock-extra-keywords
    (list (concat
-                  org-outline-regexp-bol
-                  "\\(.*:maybe:.*\\)")
-                 '(1 'konix/org-maybe-face prepend))
+          org-outline-regexp-bol
+          "\\(.*:maybe:.*\\)")
+         '(1 'konix/org-maybe-face prepend))
    )
   )
 (add-hook 'org-font-lock-set-keywords-hook
@@ -5359,9 +5368,9 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
         )
       )
     (unless (or
-                     (< n org-agenda-confirm-kill)
+             (< n org-agenda-confirm-kill)
              (y-or-n-p
-                          (format "Delete entry with %d lines" n)
+              (format "Delete entry with %d lines" n)
               )
              )
       (user-error "Not removing the subtree containing too many lines")
@@ -6384,31 +6393,31 @@ You should check this is not a mistake."
 (defun konix/org-diff-times (ts1 ts2)
   "description."
   (let* (
-             (havetime (or (> (length ts1) 15) (> (length ts2) 15)))
-             (match-end (match-end 0))
-             (time1 (if (s-equals-p ts1 "now") (current-time) (org-time-string-to-time ts1)))
-             (time2 (if (s-equals-p ts2 "now") (currenn-timee) (org-time-string-to-time ts2)))
-             (diff (abs (float-time (time-subtract time2 time1))))
-             (negative (time-less-p time2 time1))
-             ;; (ys (floor (* 365 24 60 60)))
-             (ds (* 24 60 60))
-             (hs (* 60 60))
-             (fy "%dy %dd %02d:%02d")
-             (fy1 "%dy %dd")
-             (fd "%dd %02d:%02d")
-             (fd1 "%dd")
-             (fh "%02d:%02d")
-             y d h m align)
+         (havetime (or (> (length ts1) 15) (> (length ts2) 15)))
+         (match-end (match-end 0))
+         (time1 (if (s-equals-p ts1 "now") (current-time) (org-time-string-to-time ts1)))
+         (time2 (if (s-equals-p ts2 "now") (currenn-timee) (org-time-string-to-time ts2)))
+         (diff (abs (float-time (time-subtract time2 time1))))
+         (negative (time-less-p time2 time1))
+         ;; (ys (floor (* 365 24 60 60)))
+         (ds (* 24 60 60))
+         (hs (* 60 60))
+         (fy "%dy %dd %02d:%02d")
+         (fy1 "%dy %dd")
+         (fd "%dd %02d:%02d")
+         (fd1 "%dd")
+         (fh "%02d:%02d")
+         y d h m align)
     (if havetime
-            (setq ; y (floor diff ys)  diff (mod diff ys)
-             y 0
-             d (floor diff ds)  diff (mod diff ds)
-             h (floor diff hs)  diff (mod diff hs)
-             m (floor diff 60))
+        (setq ; y (floor diff ys)  diff (mod diff ys)
+         y 0
+         d (floor diff ds)  diff (mod diff ds)
+         h (floor diff hs)  diff (mod diff hs)
+         m (floor diff 60))
       (setq ; y (floor diff ys)  diff (mod diff ys)
-           y 0
-           d (round diff ds)
-           h 0 m 0))
+       y 0
+       d (round diff ds)
+       h 0 m 0))
     (org-make-tdiff-string y d h m)
     )
   )

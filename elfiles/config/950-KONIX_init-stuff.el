@@ -38,6 +38,8 @@
 (electric-indent-mode -1)
 ;; this is the long part, as it loads my org files
 (which-key-mode 1)
+(editorconfig-mode 1)
+
 (require 'KONIX_org-meta-context)
 
 (setq-default org-roam-v2-ack t)

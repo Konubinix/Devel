@@ -17,11 +17,11 @@
 (setq-default
  perso-elfiles (expand-file-name "elfiles" perso-dir)
  perso-host-elfiles (expand-file-name "elfiles"
-									  (expand-file-name
-									   (getenv "HOSTNAME")
-									   perso-dir
-									   )
-									  )
+                                      (expand-file-name
+                                       (getenv "HOSTNAME")
+                                       perso-dir
+                                       )
+                                      )
  home-elfiles (expand-file-name "~/.elfiles")
  )
 (defun konix/setup-elfiles (elfiles)
@@ -65,6 +65,7 @@
         "delight" ;; init
         "diff-mode" ;; loaded by straight when thawing the packages
         "dired" ;; init
+        "editorconfig"
         "envrc" ;; init
         "KONIX_org-meta-context" ;; init
         "KONIX_org-roam-export" ;; init
@@ -113,7 +114,7 @@
               (loaded-file (konix/loaded-file file-to-load))
               (message (format "%s was already loaded before configuring its after load\
  (in %s) -> configuring an after-load is useless in that case."
-		                       file-to-load directory))
+                               file-to-load directory))
               )
          (when (and
                 loaded-file
@@ -139,9 +140,9 @@
          )
        )
    (sort
-	(file-expand-wildcards (concat directory "/after-loads/*KONIX_AL-*.el"))
-	'string<
-	)
+    (file-expand-wildcards (concat directory "/after-loads/*KONIX_AL-*.el"))
+    'string<
+    )
    )
   )
 
@@ -174,9 +175,9 @@
   (mapc
    #'konix/load-file
    (sort
-	(file-expand-wildcards (concat directory "/*.el"))
-	'string<
-	)
+    (file-expand-wildcards (concat directory "/*.el"))
+    'string<
+    )
    )
   (konix/load-config-files_after-loads directory)
   )
@@ -184,9 +185,9 @@
 ;; on windows, disable vc because it is too long
 (setq konix/on-windows-p
       (if (eq system-type 'windows-nt)
-		  t
-		nil
-		)
+          t
+        nil
+        )
       )
 (when konix/on-windows-p
   (setq vc-handled-backends nil)
@@ -206,15 +207,15 @@
 ;; rest of your .emacs goes here
 
 (message "My emacs configuration loaded in %ds"
-		 (let*(
-			   (current_time (current-time))
-			   (hi (first current_time))
-			   (lo (second current_time))
-			   )
-		   (- (+ hi lo) (+ (first *emacs-load-start*) (second
-													   *emacs-load-start*)
-						   )
-			  )
-		   )
-		 )
+         (let*(
+               (current_time (current-time))
+               (hi (first current_time))
+               (lo (second current_time))
+               )
+           (- (+ hi lo) (+ (first *emacs-load-start*) (second
+                                                       *emacs-load-start*)
+                           )
+              )
+           )
+         )
 ;;(find-file "~/.emacs")

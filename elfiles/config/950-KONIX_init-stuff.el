@@ -43,3 +43,4 @@
 (require 'KONIX_org-meta-context)
 
 (setq-default org-roam-v2-ack t)
+(setq debug-on-quit nil) ;; explicitly set to t in .emacs

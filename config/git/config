@@ -1,85 +1,86 @@
 [rerere]
-	enabled = true
+    enabled = true
 
 [user]
     useConfigOnly = true
-	email = konubinixweb@gmail.com
-	name = "Samuel Loury"
-	signingKey = konubinix
+    email = konubinixweb@gmail.com
+    name = "Samuel Loury"
+    signingKey = konubinix
 [gui]
-	fontui = -family helvetica -size 12 -weight bold -slant roman -underline 0 -overstrike 0
-	fontdiff = -family Courier -size 12 -weight normal -slant roman -underline 0 -overstrike 0
-	encoding = utf-8
+    fontui = -family helvetica -size 12 -weight bold -slant roman -underline 0 -overstrike 0
+    fontdiff = -family Courier -size 12 -weight normal -slant roman -underline 0 -overstrike 0
+    encoding = utf-8
 [alias]
     up = pull --rebase --autostash --recurse-submodules
     dangling = branch --all --no-merged
     orphans = branch --all --merged
-	ci = commit
-	st = status
-	cl = clone
-	co = checkout
-	cp = cherry-pick
-	k = !gitk --all
-	t = !git tag | sort -V
-	ka = !gitk --all `git reflog | cut -c1-7`
- 	kaa = !gitk --all `git fsck --no-reflog | awk '/dangling commit/ {print $3}'`
-	wu = log --stat origin..@{0}
-	wup = log -p origin..@{0}
-	diffc = diff --cached
-	civ = commit -v
-	sm = submodule
-	alog = log --graph --decorate=full --all --full-history -m
-	glog = log --decorate=full --full-history --graph -m
- 	ri = rebase --interactive --autosquash
-	resup = reset HEAD~
-	# fetch = fetch --upload-pack="git upload-pack"
-	amu = !curl ${1} | git am -
-	rv = remote -v
-	fri = fixup-ri.sh
-	diffpr = git diff --cc -w "$@"
+    ci = commit
+    st = status
+    cl = clone
+    co = checkout
+    cp = cherry-pick
+    k = !gitk --all
+    t = !git tag | sort -V
+    ka = !gitk --all `git reflog | cut -c1-7`
+     kaa = !gitk --all `git fsck --no-reflog | awk '/dangling commit/ {print $3}'`
+    wu = log --stat origin..@{0}
+    wup = log -p origin..@{0}
+    diffc = diff --cached
+    civ = commit -v
+    sm = submodule
+    alog = log --graph --decorate=full --all --full-history -m
+    glog = log --decorate=full --full-history --graph -m
+     ri = rebase --interactive --autosquash
+    resup = reset HEAD~
+    # fetch = fetch --upload-pack="git upload-pack"
+    amu = !curl ${1} | git am -
+    rv = remote -v
+    fri = fixup-ri.sh
+    diffpr = git diff --cc -w "$@"
 [diff]
-  	tool = meld #konix_emacs_diff
-	renamelimit = 888
+      tool = meld #konix_emacs_diff
+    renamelimit = 888
 [difftool]
-	prompt =
+    prompt =
 [difftool "konix_emacs_diff"]
-	cmd = python \"$(which konix_emacs_diff.py)\" \"$LOCAL\" \"$REMOTE\"
+    cmd = python \"$(which konix_emacs_diff.py)\" \"$LOCAL\" \"$REMOTE\"
 [apply]
-	whitespace = fix
-	ignorewhitespace = change
+    whitespace = fix
+    ignorewhitespace = change
 [color]
-	ui = true
-	status = auto
-	diff = auto
-	branch = auto
+    ui = true
+    status = auto
+    diff = auto
+    branch = auto
 [core]
-	safecrlf = warn
-	autocrlf = input
-	whitespace = -space-before-tab,-indent-with-non-tab,-tab-in-indent,trailing-space,cr-at-eol
+    safecrlf = warn
+    autocrlf = input
+    whitespace = -space-before-tab,-indent-with-non-tab,-tab-in-indent,trailing-space,cr-at-eol
 [merge]
-	summary = true
-	tool = konix_emacs_merge
+    summary = true
+    tool = konix_emacs_merge
 [mergetool "konix_emacs_merge"]
         cmd = python \"$(which konix_emacs_merge.py)\" \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
 [diff "gpg"]
-	textconv = gpg -d
+    textconv = gpg -d
 [sendemail]
-	chainreplyto = yes
-	smtpserver = /home/sam/Prog/devel/bin/konix_msmtp.sh
+    chainreplyto = yes
+    smtpserver = /home/sam/Prog/devel/bin/konix_msmtp.sh
 [svn]
     rmdir = true
 [push]
-	default = simple
+    default = simple
+    autoSetupRemote = true
 [commit]
-	gpgSign = true
+    gpgSign = true
 [filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	required = true
-	process = git-lfs filter-process
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    required = true
+    process = git-lfs filter-process
 [pull]
-	rebase = merges
+    rebase = merges
 [fetch]
-	prune = true
+    prune = true
 [url "ssh://git@github.com/"]
     insteadOf = https://github.com/

@@ -209,9 +209,10 @@ deadlined in January if it is triggered in July."
 (defun org-edna-action/repeater! (last-entry &rest args)
   (konix/org-edna--handle-repeater args))
 
-(defun org-edna-action/repeat-until! (last-entry number scheduled_repeater deadline_repeater)
+(defun _org-edna-action/repeat-until-internal (last-entry number scheduled_repeater deadline_repeater)
   (let (
         (countdown (or (org-entry-get (point) "REPEAT_COUNTDOWN")))
+        res
         )
     (when (time-less-p (org-get-deadline-time (point)) (current-time))
       (warn "You should make it actual and start over")
@@ -223,16 +224,50 @@ deadlined in January if it is triggered in July."
     (setq countdown (1- countdown))
     (when (equal countdown 0)
       (setq countdown number)
-      (org-edna-action/deadline! last-entry deadline_repeater)
-      (org-edna-action/scheduled! last-entry scheduled_repeater)
+      (setq res t)
       )
-    (org-edna-action/todo! last-entry "NEXT")
     (org-entry-put (point) "REPEAT_COUNTDOWN" (number-to-string countdown))
     (if (equal countdown number)
         (message "Done for today")
       (message "Still %s to do for today" countdown)
       )
     (sit-for 1)
+    res
+    )
+  )
+
+
+(defun org-edna-action/repeat-until! (last-entry number &optional scheduled_repeater deadline_repeater)
+  (when (_org-edna-action/repeat-until-internal number scheduled_repeater
+                                                deadline_repeater)
+    (when deadline_repeater (org-edna-action/deadline! last-entry deadline_repeater))
+    (when scheduled_repeater (org-edna-action/scheduled! last-entry scheduled_repeater))
+    )
+  (org-edna-action/todo! last-entry "NEXT")
+  )
+
+(defun org-edna-action/repeat-until-and-next-random-sibling! (last-entry number &optional scheduled_repeater deadline_repeater)
+  (if (_org-edna-action/repeat-until-internal last-entry number scheduled_repeater deadline_repeater)
+      (save-excursion
+        (let (
+              (next-one (first (org-edna-finder/relatives 'from-top
+                                                          'random-sort)))
+              (current-trigger (org-entry-get (point) "TRIGGER"))
+              (current-tags (org-get-tags (point) t))
+              (current-priority (konix/org-get-priority-as-char))
+              )
+          (goto-char (marker-position next-one))
+          (org-edna-action/todo! last-entry "NEXT")
+          (when deadline_repeater (org-edna-action/deadline! last-entry deadline_repeater))
+          (when scheduled_repeater (org-edna-action/scheduled! last-entry
+                                                               scheduled_repeater))
+          (org-entry-put (point) "REPEAT_COUNTDOWN" (number-to-string number))
+          (org-entry-put (point) "TRIGGER" current-trigger)
+          (org-set-tags current-tags)
+          (org-priority current-priority)
+          )
+        )
+    (org-edna-action/todo! last-entry "NEXT")
     )
   )
 

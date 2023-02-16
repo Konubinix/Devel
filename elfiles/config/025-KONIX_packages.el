@@ -86,7 +86,7 @@
     (use-package dired-filetype-face)
     (use-package dired-quick-sort)
     (use-package dockerfile-mode)
-    (use-package earthfile-mode)
+    (use-package earthfile-mode :straight (:fork t))
     (use-package editorconfig)
     (use-package edit-indirect)
     (use-package ement :straight (:repo "alphapapa/ement.el"))

@@ -88,7 +88,7 @@
     (use-package earthfile-mode)
     (use-package editorconfig)
     (use-package edit-indirect)
-    (use-package ement)
+    (use-package ement :straight (:repo "alphapapa/ement.el"))
     (use-package envrc)
     (use-package f)
     (use-package feature-mode)

@@ -3,20 +3,15 @@
 
 import json
 import os
+import sqlite3
 import sys
 from pathlib import Path
 
 from clk.lib import cd, check_output
-from sqlalchemy import create_engine
-
-
-def get_db(db_location, path):
-    with cd(db_location.parent):
-        return create_engine(f'sqlite:///{path}.db')
 
 
 def main(db_location, exported_path, kind):
-    roam = get_db(db_location, "org-roam")
+    roam = sqlite3.connect(db_location)
     exported = [
         f'"{file}"' for file in exported_path.read_text().strip().splitlines()
     ]
@@ -39,20 +34,19 @@ def main(db_location, exported_path, kind):
                 "group": 1
             })
 
-    with roam.connect() as con:
-        for src_title, dest_title, src, dest in con.execute(
-                "select sources.title, destinations.title, sources.file, destinations.file from links inner join nodes as sources on sources.id = links.source inner join nodes as destinations on destinations.id = links.dest"
-        ):
-            src_title = src_title.replace('"', '')
-            dest_title = dest_title.replace('"', '')
-            if src in exported and dest in exported:
-                add_node(src_title, src)
-                add_node(dest_title, dest)
-                links.append({
-                    "source": src_title,
-                    "target": dest_title,
-                    "type": "file",
-                })
+    for src_title, dest_title, src, dest in roam.execute(
+            "select sources.title, destinations.title, sources.file, destinations.file from links inner join nodes as sources on sources.id = links.source inner join nodes as destinations on destinations.id = links.dest"
+    ):
+        src_title = src_title.replace('"', '')
+        dest_title = dest_title.replace('"', '')
+        if src in exported and dest in exported:
+            add_node(src_title, src)
+            add_node(dest_title, dest)
+            links.append({
+                "source": src_title,
+                "target": dest_title,
+                "type": "file",
+            })
     print(json.dumps({
         "links": links,
         "nodes": nodes,

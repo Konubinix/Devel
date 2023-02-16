@@ -1,28 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-from pathlib import Path
-from sqlalchemy import create_engine
-from clk.lib import cd, check_output
+import sqlite3
 import sys
+from pathlib import Path
 
-
-def get_db(db_location, path):
-    with cd(db_location.parent):
-        return create_engine(f'sqlite:///{path}.db')
+from clk.lib import cd, check_output
 
 
 def main(db_location, roam_dir, exported_path):
-    roam = get_db(db_location, "org-roam")
+    roam = sqlite3.connect(db_location)
     exported = [
         f'"{file}"' for file in exported_path.read_text().strip().splitlines()
     ]
-    with roam.connect() as con:
-        for src, dest in con.execute(
-                "select srcnode.file, dstnode.file from links join nodes as srcnode on links.source = srcnode.id join nodes as dstnode on links.dest = dstnode.id"
-        ):
-            if src in exported and dest in exported:
-                print(f"{src}|{dest}")
+    for src, dest in roam.execute(
+            "select srcnode.file, dstnode.file from links join nodes as srcnode on links.source = srcnode.id join nodes as dstnode on links.dest = dstnode.id"
+    ):
+        if src in exported and dest in exported:
+            print(f"{src}|{dest}")
 
 
 if __name__ == "__main__":

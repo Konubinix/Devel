@@ -1,1 +1,1 @@
-source <(rustup completions bash)
+starship

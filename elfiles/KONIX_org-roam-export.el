@@ -30,9 +30,6 @@
 (require 'org-roam)
 (require 'org-transclusion)
 (require 'f)
-(use-package ox-hugo :ensure t :defer t)
-(use-package citeproc :ensure t)
-(use-package citeproc :ensure t)
 
 (defun konix/org-roam-export/exported-files (kind)
   (split-string

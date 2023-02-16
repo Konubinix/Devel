@@ -74,6 +74,7 @@
     (use-package backup-walker)
     (use-package bbdb)
     (use-package citeproc)
+    (use-package copilot :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")))
     (use-package counsel)
     (use-package dap-mode)
     (use-package dash)

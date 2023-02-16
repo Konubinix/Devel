@@ -40,7 +40,6 @@
   )
 
 (defun konix/kubel-get-selectors-at-point ()
-  (interactive)
   (let (
         (indentation (current-indentation))
         (res '())

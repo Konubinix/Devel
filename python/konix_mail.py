@@ -96,7 +96,8 @@ def make_part_harmless(html):
     for img in s.find_all("img", src=True):
         if img.attrs["src"].startswith("data:"):
             continue
-        if img.attrs["src"].startswith("file:"):
+        if img.attrs["src"].startswith("file:") or img.attrs["src"].startswith(
+                "./"):
             continue
         src = img.attrs.pop("src")
         id = img.attrs.get("id", str(uuid.uuid1()))

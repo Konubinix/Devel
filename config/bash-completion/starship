@@ -1,3 +1,4 @@
 #!/bin/bash -eu
 
-source <(starship completions bash)
+ME="$(basename "${BASH_SOURCE[0]}")"
+source <(${ME} completions bash)

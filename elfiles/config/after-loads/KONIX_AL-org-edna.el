@@ -214,7 +214,7 @@ deadlined in January if it is triggered in July."
         (countdown (or (org-entry-get (point) "REPEAT_COUNTDOWN")))
         res
         )
-    (when (time-less-p (org-get-deadline-time (point)) (current-time))
+    (when (and (not current-prefix-arg) (time-less-p (org-get-deadline-time (point)) (current-time)))
       (warn "You should make it actual and start over")
       )
     (if (null countdown)
@@ -222,7 +222,7 @@ deadlined in January if it is triggered in July."
       (setq countdown (string-to-number countdown))
       )
     (setq countdown (1- countdown))
-    (when (equal countdown 0)
+    (when (or current-prefix-arg (equal countdown 0))
       (setq countdown number)
       (setq res t)
       )
@@ -258,9 +258,14 @@ deadlined in January if it is triggered in July."
               )
           (goto-char (marker-position next-one))
           (org-edna-action/todo! last-entry "NEXT")
-          (when deadline_repeater (org-edna-action/deadline! last-entry deadline_repeater))
-          (when scheduled_repeater (org-edna-action/scheduled! last-entry
-                                                               scheduled_repeater))
+            (when deadline_repeater (org-edna-action/deadline! last-entry
+                                        (or (and current-prefix-arg "++1d" ) deadline_repeater)))
+            (when scheduled_repeater
+                (org-edna-action/scheduled!
+                    last-entry
+                    (or (and current-prefix-arg "++0d")
+                        scheduled_repeater)
+                    ))
           (org-entry-put (point) "REPEAT_COUNTDOWN" (number-to-string number))
           (org-entry-put (point) "TRIGGER" current-trigger)
           (org-set-tags current-tags)

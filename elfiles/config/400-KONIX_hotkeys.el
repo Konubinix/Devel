@@ -154,7 +154,6 @@
 (define-key 'konix/global-slow-key-map (kbd "R") 'auto-revert-tail-mode)
 (define-key 'konix/global-slow-key-map (kbd "M-r") 'konix/reload-file)
 ;; quit windows
-(define-key 'konix/global-slow-key-map (kbd "C-k") 'konix/quit-and-delete-window)
 (define-key 'konix/global-slow-key-map "k" 'bury-buffer)
 ;; grep
 (define-key 'konix/global-slow-key-map (kbd "C-s") 'grep)

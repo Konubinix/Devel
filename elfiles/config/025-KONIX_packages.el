@@ -76,6 +76,8 @@
     (use-package citeproc)
     (use-package copilot :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")))
     (use-package counsel)
+    ;; lsp needs to be setup before dap
+    (use-package lsp-mode :commands (lsp))
     (use-package dap-mode)
     (use-package dash)
     (use-package dedicated)
@@ -118,7 +120,6 @@
     (use-package kubernetes)
     (use-package ledger-mode :commands (konix/ledger-run konix/ledger-report))
     (use-package lsp-jedi)
-    (use-package lsp-mode :commands (lsp))
     (use-package lua-mode :commands (lua-mode) :mode "\\.lua$")
     (use-package mic-paren)
     (use-package michelson :straight (:type git :host github :repo "MiloDavis/michelson-mode"))

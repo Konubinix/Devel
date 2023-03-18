@@ -114,13 +114,24 @@ konix_wm_shows_byobu ( ) {
 }
 
 konix_warn_it_took_too_long ( ) {
-    konix_display.py -o -t boring "'$(HISTTIMEFORMAT=":" history|tail -1|sed -r 's/^[^:]+:(.+)$/\1/')' took $(( STARSHIP_DURATION / 1000 ))s"
+    local args=()
+    if konix_was_inactive_for_a_very_long_time
+    then
+        args+=(-t boring)
+    fi
+    konix_display.py "${args[@]}" -o "'$(HISTTIMEFORMAT=":" history|tail -1|sed -r 's/^[^:]+:(.+)$/\1/')' took $(( STARSHIP_DURATION / 1000 ))s"
 }
 
 konix_was_active_not_long_ago ( ) {
     local last_activity="$(tmux display-message -p '#{client_activity}')"
     local now="$(date +%s)"
     test $(( now - last_activity )) -le 3
+}
+
+konix_was_inactive_for_a_very_long_time ( ) {
+    local last_activity="$(tmux display-message -p '#{client_activity}')"
+    local now="$(date +%s)"
+    test $(( now - last_activity )) -gt 10
 }
 
 function konix_warn_if_took_too_long(){

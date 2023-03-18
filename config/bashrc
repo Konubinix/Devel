@@ -69,10 +69,10 @@ NIX_SETUP="${HOME}/.nix-profile/etc/profile.d/nix.sh"
 if [ -e "${NIX_SETUP}" ]
 then
     source "${NIX_SETUP}"
-fi
-
-if test -e "$HOME/.nix-profile/share/nix-direnv/direnvrc"
-then
+    if ! test -e "$HOME/.nix-profile/share/nix-direnv/direnvrc"
+    then
+        nix profile install nixpkgs#nix-direnv
+    fi
     source "$HOME/.nix-profile/share/nix-direnv/direnvrc"
 fi
 

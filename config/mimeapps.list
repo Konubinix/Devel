@@ -52,3 +52,4 @@ application/pgp-encrypted=konix_gpg_mimeopen.desktop;
 application/vnd.jgraph.mxfile=drawio.desktop;
 application/msword=libreoffice.desktop;
 application/vnd.ms-excel.sheet.binary.macroEnabled.12=libreoffice.desktop;
+application/gzip=gramps.desktop;

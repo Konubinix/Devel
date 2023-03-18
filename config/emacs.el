@@ -1,3 +1,4 @@
+(setq-default load-prefer-newer t)
 (mapc (lambda (file)
           (when (string-prefix-p "ECRYPT" file)
               (call-process "konix_display.py" nil nil nil "-o" "-t" "boring" (format "%s is ecrytfs encrypted and should be decrypted before running emacs" user-emacs-directory))

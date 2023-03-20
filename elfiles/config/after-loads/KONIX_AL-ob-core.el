@@ -32,6 +32,8 @@
                 (:cache . "no")
                 (:noweb . "no")
                 (:hlines . "no")
+                (:comments . "both")
+                (:padline . "yes")
                 (:tangle . "no"))
               )
 

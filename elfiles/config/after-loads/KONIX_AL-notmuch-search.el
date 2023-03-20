@@ -33,5 +33,7 @@
                 ("tags" . "(%s)"))
               )
 
+(define-key notmuch-search-mode-map (kbd "M-s") 'auto-scroll-mode)
+
 (provide 'KONIX_AL-notmuch-search)
 ;;; KONIX_AL-notmuch-search.el ends here

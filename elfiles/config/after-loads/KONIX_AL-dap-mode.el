@@ -120,6 +120,8 @@
 (define-key konix/dap-mode-map (kbd "w") 'konix/dap-where)
 (define-key konix/dap-mode-map (kbd "c") 'dap-continue)
 (define-key konix/dap-mode-map (kbd "g") 'dap-continue)
+(define-key konix/dap-mode-map (kbd "s") 'dap-step-in)
+(define-key konix/dap-mode-map (kbd "o") 'dap-step-out)
 (define-key konix/dap-mode-map (kbd "<up>") 'dap-up-stack-frame)
 (define-key konix/dap-mode-map (kbd "<down>") 'dap-down-stack-frame)
 (define-key konix/dap-mode-map (kbd "q") 'dap-disconnect)

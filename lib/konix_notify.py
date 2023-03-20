@@ -49,12 +49,12 @@ def by_sl4a(message, type_):
 def send_to_phone(message, type_):
     here = os.path.exists(os.path.expanduser("~/.here"))
     priority = {
-        "normal": 0 if here else 2,
-        "annoying": 4,
-        "boring": 8,
+        "normal": 1,
+        "annoying": 2,
+        "boring": 3,
     }[type_]
     subprocess.check_call(
-        ["clk", "gotify", "Notify", "-p",
+        ["clk", "ntfy", "--priority",
          str(priority), message])
 
 

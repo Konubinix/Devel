@@ -2304,24 +2304,6 @@ items"
                    )
                   )
                  )
-                ("ags" "SMS & Calls"
-                 (
-                  (tags "@sms+todo=\"NEXT\"-maybe|@call+todo=\"NEXT\"-maybe"
-                        (
-                         (org-agenda-overriding-header
-                          "SMS & Calls")
-                         )
-                        )
-                  )
-                 (
-                  (dummy (setq konix/org-agenda-type 'tags))
-                  (org-agenda-skip-function
-                   '(or
-                     (konix/org-agenda-for-today-skip-if-not-the-good-time)
-                     )
-                   )
-                  )
-                 )
                 ("agw" "Waiting for list (no filter context)"
                  (
                   (tags "WAIT-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"|DELEGATED-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""

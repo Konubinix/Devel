@@ -29,6 +29,52 @@
 (setq-default plantuml-jar-path "/home/sam/.nix-profile/lib/plantuml.jar")
 
 
+(defun konix/plantuml-preview-buffer ()
+  (plantuml-preview-buffer 1)
+  )
+
+(defvar konix/plantuml-auto-refresh-mode-timer nil)
+(defvar konix/plantuml-auto-refresh-mode-time 0.5)
+(defvar konix/plantuml-auto-refresh-mode-cache nil)
+(make-variable-buffer-local 'konix/plantuml-auto-refresh-mode-timer)
+(make-variable-buffer-local 'konix/plantuml-auto-refresh-mode-cache)
+
+(defun konix/plantuml-auto-refresh-mode-callback (buffer)
+  (when (equal (current-buffer) buffer)
+    (let (
+          (new-cache (md5 buffer))
+          )
+      (when (not (equal new-cache konix/plantuml-auto-refresh-mode-cache))
+        (konix/plantuml-preview-buffer)
+        (setq konix/plantuml-auto-refresh-mode-cache new-cache)
+        )
+      )
+    )
+  )
+
+(define-minor-mode konix/plantuml-auto-refresh-mode
+  "Mode to automate preview on save."
+  :lighter " autorefresh"
+  (if konix/plantuml-auto-refresh-mode
+      (progn
+        (setq
+         konix/plantuml-auto-refresh-mode-timer
+         (run-with-idle-timer
+          konix/plantuml-auto-refresh-mode-time
+          t
+          #'konix/plantuml-auto-refresh-mode-callback
+          (current-buffer)
+          )
+         )
+        (konix/plantuml-auto-refresh-mode-callback (current-buffer))
+        )
+    (progn
+      (cancel-timer konix/plantuml-auto-refresh-mode-timer)
+      (setq konix/plantuml-auto-refresh-mode-cache nil)
+      )
+    )
+  )
+
 (defun konix/plantuml-mode-hook ()
   )
 

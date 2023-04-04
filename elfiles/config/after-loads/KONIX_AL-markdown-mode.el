@@ -49,6 +49,7 @@
 (define-key markdown-mode-map (kbd "M-<left>") 'markdown-promote)
 (define-key markdown-mode-map (kbd "M-o") 'konix/markdown-follow-link)
 (define-key markdown-mode-map (kbd "C-c C-m") 'markdown-toggle-markup-hiding)
+(define-key markdown-mode-map (kbd "M-s") 'auto-scroll-mode)
 
 (defun konix/markdown-follow-link ()
     (interactive)

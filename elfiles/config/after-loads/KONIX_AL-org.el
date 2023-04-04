@@ -3690,6 +3690,7 @@ of the clocksum."
         (warn (format "Too many tasks (%s)" res))
         )
       (message "%s entries (%s after)" res res_after_point)
+      res
       )
     )
   )
@@ -4672,9 +4673,10 @@ of the clocksum."
 (defun konix/org-agenda-export-this (
                                      thiscmdkey
                                      files
-                                     &optional keep context filter
+                                     &optional keep context filter threshold
                                      )
   "FILTER : e.g: '(\"+C_me\")"
+  (setq threshold (or threshold 25))
   (save-window-excursion
     (let (
           (org-export-with-broken-links t)
@@ -4693,6 +4695,20 @@ of the clocksum."
       (with-current-buffer bufname
         (when context
           (konix/org-agenda-reapply-filter-for-context context)
+          (let (
+                (count (konix/org-agenda-count-entries))
+                )
+           (when (> count threshold)
+             (shell-command
+              (format
+               "konix_display.py -o -t boring '%s has %s entries (> %s)'"
+               context
+               count
+               threshold
+               )
+              )
+             )
+           )
           )
         (when filter
           (org-agenda-filter-apply filter 'tag 'expand)

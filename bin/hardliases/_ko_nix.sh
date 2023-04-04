@@ -19,8 +19,16 @@ function nix_install_binary {
     if ! test -e "${bin}"
     then
         nix flake update "${flake}"
-        konix_display.py "Installing ${flake}#${derivation_name} to use ${bin}"
-        nix profile install "${flake}#${derivation_name}"
+        local path="${flake}#${derivation_name}"
+        konix_display.py "Installing ${path} to use ${bin}"
+        local before="$(date +%s)"
+        nix profile install "${path}"
+        local after="$(date +%s)"
+        local elapsed="$((after - before))"
+        if test ${elapsed} -ge 5
+        then
+            konix_display.py "Done installing ${path} in ${elapsed}s"
+        fi
     fi
     echo "${bin}"
 }

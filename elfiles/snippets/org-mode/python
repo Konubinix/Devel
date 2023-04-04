@@ -2,6 +2,7 @@
 # name: python
 # key: py
 # --
-#+BEGIN_SRC python ${200::results ${300:verbatim}} ${400::exports ${500:both}} ${600::session $700}
+${100:#+NAME: $150
+}#+BEGIN_SRC python ${200::results ${300:verbatim}} ${400::exports ${500:both}} ${600::session $700}
 $0
 #+END_SRC

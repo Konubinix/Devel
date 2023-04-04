@@ -98,7 +98,7 @@ Return nil if ELEMENT cannot be read."
               )
             )
            )
-      (setq result cid)
+      (setq result ipfa)
       (setcdr (nth 2 info) (append `((:file-desc . ,name-to-use)) (cdr (nth 2 info)))))
     )
   (apply orig-func result result-params info args)

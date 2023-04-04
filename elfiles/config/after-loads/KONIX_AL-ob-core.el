@@ -32,7 +32,7 @@
                 (:cache . "no")
                 (:noweb . "no")
                 (:hlines . "no")
-                (:comments . "both")
+                (:comments . "yes")
                 (:padline . "yes")
                 (:tangle . "no"))
               )

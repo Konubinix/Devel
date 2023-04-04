@@ -209,12 +209,16 @@ deadlined in January if it is triggered in July."
 (defun org-edna-action/repeater! (last-entry &rest args)
   (konix/org-edna--handle-repeater args))
 
+(defun _org-edna-action/repeat-until-internal/prefix-given ()
+  (equal current-prefix-arg '(4))
+  )
+
 (defun _org-edna-action/repeat-until-internal (last-entry number scheduled_repeater deadline_repeater)
   (let (
         (countdown (or (org-entry-get (point) "REPEAT_COUNTDOWN")))
         res
         )
-    (when (and (not current-prefix-arg) (time-less-p (org-get-deadline-time (point)) (current-time)))
+    (when (and (not (_org-edna-action/repeat-until-internal/prefix-given)) (time-less-p (org-get-deadline-time (point)) (current-time)))
       (warn "You should make it actual and start over")
       )
     (if (null countdown)
@@ -222,7 +226,7 @@ deadlined in January if it is triggered in July."
       (setq countdown (string-to-number countdown))
       )
     (setq countdown (1- countdown))
-    (when (or current-prefix-arg (equal countdown 0))
+    (when (or (_org-edna-action/repeat-until-internal/prefix-given) (equal countdown 0))
       (setq countdown number)
       (setq res t)
       )
@@ -247,7 +251,8 @@ deadlined in January if it is triggered in July."
   )
 
 (defun org-edna-action/repeat-until-and-next-random-sibling! (last-entry number &optional scheduled_repeater deadline_repeater)
-  (if (_org-edna-action/repeat-until-internal last-entry number scheduled_repeater deadline_repeater)
+  (if (_org-edna-action/repeat-until-internal last-entry number
+                                              scheduled_repeater deadline_repeater)
       (save-excursion
         (let (
               (next-one (first (org-edna-finder/relatives 'from-top
@@ -258,14 +263,14 @@ deadlined in January if it is triggered in July."
               )
           (goto-char (marker-position next-one))
           (org-edna-action/todo! last-entry "NEXT")
-            (when deadline_repeater (org-edna-action/deadline! last-entry
-                                        (or (and current-prefix-arg "++1d" ) deadline_repeater)))
-            (when scheduled_repeater
-                (org-edna-action/scheduled!
-                    last-entry
-                    (or (and current-prefix-arg "++0d")
-                        scheduled_repeater)
-                    ))
+          (when deadline_repeater (org-edna-action/deadline! last-entry
+                                                             (or (and (_org-edna-action/repeat-until-internal/prefix-given) "++1d" ) deadline_repeater)))
+          (when scheduled_repeater
+            (org-edna-action/scheduled!
+             last-entry
+             (or (and (_org-edna-action/repeat-until-internal/prefix-given) "++0d")
+                 scheduled_repeater)
+             ))
           (org-entry-put (point) "REPEAT_COUNTDOWN" (number-to-string number))
           (org-entry-put (point) "TRIGGER" current-trigger)
           (org-set-tags current-tags)

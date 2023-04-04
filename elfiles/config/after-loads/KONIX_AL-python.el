@@ -79,12 +79,12 @@
     (lsp)
     )
   (setq ac-sources
-		(append '(
+        (append '(
                   ac-source-konix/lsp
                   ac-source-yasnippet
                   )
                 )
-		)
+        )
   (auto-complete-mode 1)
   (setq-local yas-indent-line 'fixed)
   ;; the flycheck-select-checker part must be run last, for it might fail and
@@ -98,12 +98,12 @@
     )
   )
 (add-hook 'python-mode-hook
-		  'konix/python-mode-hook)
+          'konix/python-mode-hook)
 
 (defun konix/python/make-executable ()
   (when (save-excursion
-		  (goto-char (point-min))
-		  (re-search-forward "__name__.+==.+__main__." nil t)
+          (goto-char (point-min))
+          (re-search-forward "__name__.+==.+__main__." nil t)
           )
     (konix/make-executable)
     )
@@ -112,13 +112,13 @@
 (defun konix/inferior-python-mode-hook ()
   (auto-complete-mode t)
   (setq ac-sources
-		'(
-		  ;;ac-source-konix/python/dir
-		  )
-		)
+        '(
+          ;;ac-source-konix/python/dir
+          )
+        )
   )
 (add-hook 'inferior-python-mode-hook
-		  'konix/inferior-python-mode-hook)
+          'konix/inferior-python-mode-hook)
 
 (defun konix/python/explicit-unicode ()
   (interactive)
@@ -164,9 +164,29 @@
   (when (buffer-modified-p)
     (user-error "Save the file before it is too late")
     )
-  (message (shell-command-to-string (format "black --line-length 79 '%s'" (buffer-file-name))))
-  (revert-buffer nil t)
-  (message "White-d it!")
+  (let (
+        (result "")
+        )
+    (setq result (shell-command-to-string (format "black --line-length 79 '%s'" (buffer-file-name))))
+    (when current-prefix-arg
+      (setq result
+            (concat
+             result
+             "\n"
+             (shell-command-to-string
+              (format
+               "autoflake --in-place --remove-unused-variables --remove-all-unused-imports '%s'"
+               (buffer-file-name)
+               )
+              )
+             )
+            )
+      )
+    (revert-buffer nil t)
+    (setq result (concat result "\nWhite-d it!"))
+    (message result)
+
+    )
   )
 
 (defun konix/python/autoflake-it ()

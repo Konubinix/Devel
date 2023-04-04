@@ -144,7 +144,7 @@
     (use-package ox-hugo)
     (use-package pdf-tools :straight (:repo "dalanicolai/pdf-tools" :branch "pdf-roll") :magic ("%PDF" . pdf-view-mode))
     (use-package phi-search-dired)
-    (use-package plantuml-mode)
+    (use-package plantuml-mode :straight (:fork t))
     (use-package popwin)
     (use-package python :straight (:type built-in) :mode (("\\.py\\'" . python-mode)))
     (use-package prettier-js)

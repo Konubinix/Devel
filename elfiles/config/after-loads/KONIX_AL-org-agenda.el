@@ -194,7 +194,7 @@
 (define-key org-agenda-mode-map (kbd "o") 'org-agenda-open-link)
 (define-key org-agenda-mode-map (kbd "C") 'konix/org-toggle-org-agenda-tag-filter-context)
 (define-key org-agenda-mode-map (kbd "*") 'konix/org-agenda-refresh-buffer)
-(define-key org-agenda-mode-map (kbd "d") 'konix/org-agenda-toggle-filter-calendar-discret)
+(define-key org-agenda-mode-map (kbd "C-d") 'konix/org-agenda-toggle-filter-calendar-discret)
 (define-key org-agenda-mode-map (kbd "k") 'konix/org-gtd-choose-situation)
 (define-key org-agenda-mode-map (kbd "M-b") 'konix/org-agenda-highlight-same-contexts-as-clocked-in)
 (define-key org-agenda-mode-map (kbd "M-p") 'konix/org-agenda-highlight-inactive)
@@ -229,89 +229,89 @@
 
 (defface konix/org-agenda-perso-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:slant italic :weight light)
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:slant italic :weight light)
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:slant italic :weight light)
+         )
+        (
+         ((class color)
+          (background light))
+         (:slant italic :weight light)
+         )
+        )
   ""
   )
 (defface konix/org-agenda-maybe-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:slant italic :weight light)
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:slant italic :weight light)
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:slant italic :weight light)
+         )
+        (
+         ((class color)
+          (background light))
+         (:slant italic :weight light)
+         )
+        )
   ""
   )
 (defface konix/org-agenda-urgent-items-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "light coral" :weight bold)
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "light coral" :weight bold)
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "light coral" :weight bold)
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "light coral" :weight bold)
+         )
+        )
   ""
   )
 (defface konix/org-agenda-non-urgent-items-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "khaki" :slant italic)
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "khaki" :slant italic)
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "khaki" :slant italic)
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "khaki" :slant italic)
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-interruption-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "chocolate4")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "orange")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "chocolate4")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "orange")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-highlight/face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:inherit 'highlight)
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:inherit 'highlight)
+         )
+        )
   ""
   )
 
@@ -359,272 +359,272 @@
 
 (defface konix/org-agenda-discret-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "grey50")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "grey90")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:foreground "grey50")
+         )
+        (
+         ((class color)
+          (background light))
+         (:foreground "grey90")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-less-discret-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "grey50")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "grey70")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:foreground "grey50")
+         )
+        (
+         ((class color)
+          (background light))
+         (:foreground "grey70")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-dimmed-deadline-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "hot pink")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "hot pink")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:foreground "hot pink")
+         )
+        (
+         ((class color)
+          (background light))
+         (:foreground "hot pink")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-needs-action
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "OrangeRed4")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "OrangeRed4")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "OrangeRed4")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "OrangeRed4")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-tentative
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "DeepSkyBlue4")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "DeepSkyBlue4")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "DeepSkyBlue4")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "DeepSkyBlue4")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-holiday
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "DarkOliveGreen4"
+        (
+         ((class color)
+          (background dark))
+         (:background "DarkOliveGreen4"
                   :foreground "yellow"
                   :weight bold
                   :height 1.5
                   :box (:line-width 2 :color "grey75" :style released-button)
                   )
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "DarkOliveGreen4"
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "DarkOliveGreen4"
                   :foreground "yellow"
                   :weight bold
                   :height 1.5
                   :box (:line-width 2 :color "grey75" :style released-button)
                   )
-	 )
-	)
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-pause-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "dark cyan")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "blue4")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "dark cyan")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "blue4")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-waiting-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "MediumPurple4")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "MediumPurple4")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "MediumPurple4")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "MediumPurple4")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-milestone
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "dark violet"
+        (
+         ((class color)
+          (background dark))
+         (:background "dark violet"
                   :weight bold
                   )
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "saddle brown")
-	 )
-	)
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "saddle brown")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-diary-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "OrangeRed4"
+        (
+         ((class color)
+          (background dark))
+         (:background "OrangeRed4"
                   )
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "red")
-	 )
-	)
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "red")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-auto-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "blue"
+        (
+         ((class color)
+          (background dark))
+         (:background "blue"
                   )
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "blue")
-	 )
-	)
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "blue")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-context-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "blue4")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "blue4")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "blue4")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "blue4")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-committed-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "yellow4")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "yellow4")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "yellow4")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "yellow4")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-aof-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "#005f00")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "yellow4")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "#005f00")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "yellow4")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-info-face
   '(
-	(
-	 ((class color)
-	  (background dark))
+        (
+         ((class color)
+          (background dark))
      (:background "darkgreen")
-	 )
-	)
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-warning-face
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "Goldenrod4")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "Goldenrod4")
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-issue-face
   '(
-	(
-	 ((class color)
-	  (background dark))
+        (
+         ((class color)
+          (background dark))
      (:background "DarkRed")
-	 )
-	)
+         )
+        )
   ""
   )
 
@@ -632,106 +632,106 @@
 
 (defface konix/org-agenda-monday-face
   '(
-	(
-	 ((class color)
-	  (background dark))
+        (
+         ((class color)
+          (background dark))
      (:foreground "yellow"
                   :weight bold
                   :height 1.5
                   :box (:line-width 2 :color "grey75" :style released-button)
                   )
-	 )
-	)
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-tuesday-face
   '(
-	(
-	 ((class color)
-	  (background dark))
+        (
+         ((class color)
+          (background dark))
      (:foreground "pink"
                   :weight bold
                   :height 1.5
                   :box (:line-width 2 :color "grey75" :style released-button)
                   )
-	 )
-	)
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-wednesday-face
   '(
-	(
-	 ((class color)
-	  (background dark))
+        (
+         ((class color)
+          (background dark))
      (:foreground "green"
                   :weight bold
                   :height 1.5
                   :box (:line-width 2 :color "grey75" :style released-button)
                   )
-	 )
-	)
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-thursday-face
   '(
-	(
-	 ((class color)
-	  (background dark))
+        (
+         ((class color)
+          (background dark))
      (:foreground "orange"
                   :weight bold
                   :height 1.5
                   :box (:line-width 2 :color "grey75" :style released-button)
                   )
-	 )
-	)
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-friday-face
   '(
-	(
-	 ((class color)
-	  (background dark))
+        (
+         ((class color)
+          (background dark))
      (:foreground "light blue"
                   :weight bold
                   :height 1.5
                   :box (:line-width 2 :color "grey75" :style released-button)
                   )
-	 )
-	)
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-saturday-face
   '(
-	(
-	 ((class color)
-	  (background dark))
+        (
+         ((class color)
+          (background dark))
      (:foreground "purple"
                   :weight bold
                   :height 1.5
                   :box (:line-width 2 :color "grey75" :style released-button)
                   )
-	 )
-	)
+         )
+        )
   ""
   )
 
 (defface konix/org-agenda-sunday-face
   '(
-	(
-	 ((class color)
-	  (background dark))
+        (
+         ((class color)
+          (background dark))
      (:foreground "red"
                   :weight bold
                   :height 1.5
                   :box (:line-width 2 :color "grey75" :style released-button)
                   )
-	 )
-	)
+         )
+        )
   ""
   )
 
@@ -751,7 +751,7 @@
 
 (defvar konix/org-agenda-tag-face-common
   '(
-	("interruption" . konix/org-agenda-interruption-face)
+        ("interruption" . konix/org-agenda-interruption-face)
     ("needsaction" . konix/org-agenda-needs-action)
     ("tentative" . konix/org-agenda-tentative)
     ("declined" . konix/org-agenda-discret-face)
@@ -761,20 +761,20 @@
     ("pause" . konix/org-agenda-pause-face)
     ("wait" . konix/org-agenda-waiting-face)
     ("delegated" . konix/org-agenda-waiting-face)
-	)
+        )
   "")
 
 (defvar konix/org-agenda-tag-face-custom
   '(
-	)
+        )
   "")
 
 (defvar konix/org-agenda-text-properties-common
   '(
-	("^.+\bIn +.+ d\..*$" 0 konix/org-agenda-dimmed-deadline-face (not (konix/org-is-in-schedule-p)))
-	;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)
-	("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
-	("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
+        ("^.+\bIn +.+ d\..*$" 0 konix/org-agenda-dimmed-deadline-face (not (konix/org-is-in-schedule-p)))
+        ;;("^\\(.+\\bnow\\b.+\\)$" 1 konix/org-agenda-now-line)
+        ("^.+\\(#\\(A\\|B\\|C\\|D\\|E\\|F\\|G\\|H\\|I\\|J\\)\\).+$" 1 konix/org-agenda-urgent-items-face)
+        ("^.+\\(#\\(S\\|T\\|U\\|V\\|W\\|X\\|Y\\|Z\\)\\).+$" 1 konix/org-agenda-non-urgent-items-face)
     ("^.+Holiday.*$" 0 konix/org-agenda-holiday)
     ("^\\(DIARY:\\)" 1 konix/org-agenda-diary-face)
     ("^\\(AUTO:\\)" 1 konix/org-agenda-auto-face)
@@ -790,49 +790,49 @@
     ("^Saturday.+" 0 konix/org-agenda-saturday-face)
     ("^Sunday.+" 0 konix/org-agenda-sunday-face)
     ("^.+:maybe:.*$" 0 konix/org-agenda-maybe-face)
-	)
+        )
   "")
 (defun konix/org-agenda-set-text-properties ()
   (interactive)
   (konix/org-agenda-remove-text-properties)
   (setq buffer-read-only nil)
   (save-excursion
-	(mapc
-	 (lambda (property)
-	   (goto-char (point-min))
-	   (let (
-			 (regexp (first property))
-			 (match (second property))
-			 (match_beg nil)
-			 (match_end nil)
-			 (prop (third property))
-			 (predicate (and (>
-							  (length property)
-							  3
-							  )
-							 (fourth property)
-							 ))
-			 )
-		 (while (re-search-forward regexp nil t)
-		   (setq match_beg (match-beginning match))
-		   (setq match_end (match-end match))
-		   (when (or
-				  (not predicate)
-				  (eval predicate)
-				  )
-			 (let (
-				   (ov (make-overlay match_beg match_end))
-				   )
-			   (overlay-put ov 'face prop)
+        (mapc
+         (lambda (property)
+           (goto-char (point-min))
+           (let (
+                         (regexp (first property))
+                         (match (second property))
+                         (match_beg nil)
+                         (match_end nil)
+                         (prop (third property))
+                         (predicate (and (>
+                                                          (length property)
+                                                          3
+                                                          )
+                                                         (fourth property)
+                                                         ))
+                         )
+                 (while (re-search-forward regexp nil t)
+                   (setq match_beg (match-beginning match))
+                   (setq match_end (match-end match))
+                   (when (or
+                                  (not predicate)
+                                  (eval predicate)
+                                  )
+                         (let (
+                                   (ov (make-overlay match_beg match_end))
+                                   )
+                           (overlay-put ov 'face prop)
                (overlay-put ov 'konix/org-agenda-added-text-property t)
-			   )
-			 )
-		   )
-		 )
-	   )
-	 (append konix/org-agenda-text-properties konix/org-agenda-text-properties-common)
-	 )
-	)
+                           )
+                         )
+                   )
+                 )
+           )
+         (append konix/org-agenda-text-properties konix/org-agenda-text-properties-common)
+         )
+        )
   (let (
         (next-step)
         start end
@@ -890,39 +890,39 @@
   ;; Deactivate `org-agenda-entry-text-mode' when filtering
   (if org-agenda-entry-text-mode (org-agenda-entry-text-mode))
   (let (tags
-		cat
-		(konix/org-entry-predicate
-		 (append
-		  '(and)
-		  (mapcar
-		   (lambda (disjunction)
-			 (append
-			  '(or)
-			  (mapcar
-			   (lambda (elem)
-				 `(member ,elem tags)
-				 )
-			   disjunction
-			   )
-			  )
-			 )
-		   tags
-		   )
-		  ))
-		)
-	(konix/org-with-point-set-to-next-visible-line
-	 (goto-char (point-min))
-	 (while (not (eobp))
-	   (if (org-get-at-bol 'org-marker)
-		   (progn
-			 (setq tags (org-get-at-bol 'tags) ; used in eval
-				   cat (get-text-property (point) 'org-category))
-			 (if (and
-				  (not (eval konix/org-entry-predicate))
-				  )
-				 (org-agenda-filter-hide-line 'tag))
-			 (beginning-of-line 2))
-		 (beginning-of-line 2))))
+                cat
+                (konix/org-entry-predicate
+                 (append
+                  '(and)
+                  (mapcar
+                   (lambda (disjunction)
+                         (append
+                          '(or)
+                          (mapcar
+                           (lambda (elem)
+                                 `(member ,elem tags)
+                                 )
+                           disjunction
+                           )
+                          )
+                         )
+                   tags
+                   )
+                  ))
+                )
+        (konix/org-with-point-set-to-next-visible-line
+         (goto-char (point-min))
+         (while (not (eobp))
+           (if (org-get-at-bol 'org-marker)
+                   (progn
+                         (setq tags (org-get-at-bol 'tags) ; used in eval
+                                   cat (get-text-property (point) 'org-category))
+                         (if (and
+                                  (not (eval konix/org-entry-predicate))
+                                  )
+                                 (org-agenda-filter-hide-line 'tag))
+                         (beginning-of-line 2))
+                 (beginning-of-line 2))))
     )
   )
 
@@ -1335,22 +1335,22 @@
   (setq raw_filters filters)
   (setq filters '())
   (while (and
-		  (not
-		   (string-equal raw_filters "")
-		   )
-		  (not (null raw_filters))
-		  )
-	(if (string-match "^\\([+-][^+-]+\\)\\(.*\\)$" raw_filters)
-		(add-to-list 'filters (match-string 1 raw_filters))
-	  (add-to-list 'filters (format "+%s" raw_filters))
-	  )
-	(setq raw_filters (match-string 2 raw_filters))
-	)
+                  (not
+                   (string-equal raw_filters "")
+                   )
+                  (not (null raw_filters))
+                  )
+        (if (string-match "^\\([+-][^+-]+\\)\\(.*\\)$" raw_filters)
+                (add-to-list 'filters (match-string 1 raw_filters))
+          (add-to-list 'filters (format "+%s" raw_filters))
+          )
+        (setq raw_filters (match-string 2 raw_filters))
+        )
 
   (with-current-buffer org-agenda-buffer
-	(org-agenda-filter-show-all-tag)
-	(org-agenda-filter-apply filters 'tag)
-	)
+        (org-agenda-filter-show-all-tag)
+        (org-agenda-filter-apply filters 'tag)
+        )
   )
 
 (defun konix/org-agenda-unhighlight nil

@@ -12,7 +12,6 @@ trap "exit 3" SIGQUIT
 
 warn () {
     echo "$*" >&2
-    konix_display.py -o -t boring "$*"
 }
 
 function nix_install_binary {

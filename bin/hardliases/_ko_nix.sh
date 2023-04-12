@@ -10,11 +10,22 @@ shopt -s inherit_errexit
 trap "exit 2" SIGINT
 trap "exit 3" SIGQUIT
 
+warn () {
+    echo "$*" >&2
+    konix_display.py -o -t boring "$*"
+}
+
 function nix_install_binary {
     local bin_name="$1"
     local bin="${HOME}/.nix-profile/bin/${bin_name}"
     local derivation_name="${2:-${bin_name}}"
     local flake="${3:-nixpkgs}"
+
+    if ! command -v nix > /dev/null
+    then
+        warn "nix not installed, won't be able to run ${bin_name}"
+        exit 1
+    fi
 
     if ! test -e "${bin}"
     then

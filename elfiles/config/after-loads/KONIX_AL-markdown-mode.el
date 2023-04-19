@@ -37,6 +37,12 @@
         )
     (markdown-toggle-markup-hiding 1)
     (markdown-toggle-fontify-code-blocks-natively 1)
+    (add-hook
+     'before-save-hook
+     #'markdown-cleanup-list-numbers
+     nil
+     t
+     )
     (visual-line-mode 1)
     (auto-fill-mode 1)
     )

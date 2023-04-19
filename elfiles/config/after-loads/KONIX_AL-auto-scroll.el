@@ -41,11 +41,17 @@
    )
 
   (recenter-top-bottom 0)
-  (hl-line-highlight)
   (cond
-   ((equal major-mode 'org-agenda-mode)
-    (org-agenda-do-context-action))
+   (
+    (equal major-mode 'org-agenda-mode)
+    (org-agenda-do-context-action)
+    )
+   (
+    (equal major-mode 'notmuch-search-mode)
+    (notmuch-search-archive-thread nil (point-at-bol) (point-at-eol))
+    )
    )
+  (hl-line-highlight)
   )
 
 (defun konix/auto-scroll-mode-hook ()

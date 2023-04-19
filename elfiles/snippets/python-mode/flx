@@ -1,0 +1,32 @@
+# -*- mode: snippet -*-
+# name: flx
+# key: flx
+# --
+from flexx import config, flx
+
+config.hostname = "0.0.0.0"
+config.port = $100
+config.tornado_debug = True
+
+
+def serve(app):
+    flx.App(app).serve()
+    return app
+
+
+@serve
+class App(flx.Widget):
+
+    def init(self):
+        self.button = flx.Button(text="Button")
+
+    @flx.reaction("button.pointer_click")
+    def _claim(self, *evs):
+        alert("clicked")
+
+def main():
+    flx.start()
+
+
+if __name__ == "__main__":
+    main()

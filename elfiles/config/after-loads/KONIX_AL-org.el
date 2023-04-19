@@ -3420,6 +3420,14 @@ of the clocksum."
         )
     (org-babel-tangle)
     )
+  (when
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward "^#\\+EXPORT_FILE_NAME: .+\\.md$" nil t)
+        )
+    (require 'ox-gfm)
+    (org-gfm-export-to-markdown)
+    )
   (konix/org-guess-ispell)
   )
 

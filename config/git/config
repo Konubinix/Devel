@@ -1,6 +1,5 @@
 [rerere]
     enabled = true
-
 [user]
     useConfigOnly = true
     email = konubinixweb@gmail.com
@@ -52,6 +51,8 @@
     status = auto
     diff = auto
     branch = auto
+[branch]
+    autoSetupMerge = simple
 [core]
     safecrlf = warn
     autocrlf = input

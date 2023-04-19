@@ -3548,6 +3548,21 @@ of the clocksum."
                              ac-source-files-in-current-dir
                              ac-source-filename
                              )))
+  (when
+      (and
+       (save-excursion
+         (goto-char (point-min))
+         (re-search-forward "#\\+CALL:.+lp\\.org" nil t)
+         )
+       (yes-or-no-p "This document contains lp stuff, load them?")
+       )
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "#\\+CALL:.+lp\\.org" nil t)
+        (call-interactively 'org-ctrl-c-ctrl-c)
+        )
+      )
+    )
   )
 
 (add-hook 'org-mode-hook 'konix/org-mode-hook)
@@ -4706,17 +4721,17 @@ of the clocksum."
           (let (
                 (count (konix/org-agenda-count-entries))
                 )
-           (when (> count threshold)
-             (shell-command
-              (format
-               "konix_display.py -o -t boring '%s has %s entries (> %s)'"
-               context
-               count
-               threshold
+            (when (> count threshold)
+              (shell-command
+               (format
+                "konix_display.py -o -t boring '%s has %s entries (> %s)'"
+                context
+                count
+                threshold
+                )
                )
               )
-             )
-           )
+            )
           )
         (when filter
           (org-agenda-filter-apply filter 'tag 'expand)

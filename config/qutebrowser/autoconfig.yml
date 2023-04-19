@@ -35,6 +35,7 @@ settings:
   content.javascript.enabled:
     global: true
   content.media.audio_capture:
+    https://app.slack.com: true
     https://coremeet.workadventu.re: true
     https://meet.google.com: true
     https://play.workadventu.re: true

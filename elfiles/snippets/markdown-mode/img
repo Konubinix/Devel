@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: image
+# key: i
+# --
+![${100:name}](${200:link})
+
+$0

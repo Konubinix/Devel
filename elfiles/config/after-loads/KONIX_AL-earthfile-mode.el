@@ -70,7 +70,7 @@
       (2 konix/earthfile-mode-plus-face)
       )
      (
-      "\\([a-zA-Z0-9_/.-]+\\)?\\(\\+\\)\\([a-zA-Z0-9_-]+\\)/\\([^ ]+\\)"
+      "\\([a-zA-Z0-9_/.-]+\\)?\\(\\+\\)\\([a-zA-Z0-9_-]+\\)/\\([^ \n]+\\)"
       .
       (4 konix/earthfile-mode-artifact-face)
       )

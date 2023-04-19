@@ -94,6 +94,7 @@
 (define-prefix-command 'konix/dap-debug-mode-map)
 (define-key konix/dap-mode-map (kbd "d") 'konix/dap-debug-mode-map)
 (define-key konix/dap-debug-mode-map (kbd "d") 'dap-debug)
+(define-key konix/dap-debug-mode-map (kbd "r") 'dap-debug-restart)
 (define-key konix/dap-debug-mode-map (kbd "l") 'dap-debug-last)
 (define-key konix/dap-debug-mode-map (kbd "e") 'dap-debug-edit-template)
 

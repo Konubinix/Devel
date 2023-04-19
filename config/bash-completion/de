@@ -1,0 +1,19 @@
+#!/bin/bash
+
+source /usr/share/bash-completion/completions/docker
+
+ME="$(basename "${BASH_SOURCE[0]}")"
+
+_de () {
+    # take the words without the initial de and substitute it with "docker run -ti --rm"
+    COMP_WORDS=(docker exec -ti "${COMP_WORDS[@]:1}")
+    # then, add 2 to cword because I added 3 words (actually removed 1 and
+    # added 3, but who cares?)
+    COMP_CWORD=$((COMP_CWORD + 2))
+    # then, update the line and the point,
+    COMP_LINE=${COMP_LINE/de/docker exec -ti}
+    COMP_POINT=$((COMP_POINT + 17)) # "docker exec -it" contains 13 characters more than "de"
+    _docker
+}
+
+complete -F _de "${ME}"

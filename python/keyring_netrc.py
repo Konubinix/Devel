@@ -18,7 +18,7 @@ class NetrcKeyring(keyring.backend.KeyringBackend):
         try:
             authenticator = netrc.netrc(
                 os.path.expanduser("~/.netrc")).authenticators(username)
-            return json.dumps((authenticator[0], authenticator[2]))
+            return authenticator[2]
         except:
             return None
 

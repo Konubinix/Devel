@@ -2,6 +2,6 @@
 
 source _ko_nix.sh
 me="$(basename "${0}")"
-bin="$(nix_install_binary "${me}" google-cloud-sdk)"
+bin="$(nix_install_binary "${me}" "default" "${KONIX_DEVEL_DIR}/flakes/gcloud")"
 
 exec "${bin}" "$@"

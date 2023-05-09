@@ -1,1 +1,10 @@
-rclone
+#!/bin/bash
+
+source _ko_nix.sh
+
+ME="$(basename "${0}")"
+# using a version compatible with ipfs 0.12.0 until
+# https://github.com/ipfs/kubo/issues/9044 is done
+BIN="$(nix_install_binary "${ME}" "" "github:NixOS/nixpkgs/639d80dd828a5dda21fe84c044e877d7059e4be2")"
+
+exec "${BIN}" "${@}"

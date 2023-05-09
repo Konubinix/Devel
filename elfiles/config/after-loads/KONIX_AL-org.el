@@ -2705,8 +2705,29 @@ items"
   )
 
 (defun konix/org-read-date-analyze/custom-interpretation (orig-fun ans &rest args)
-  ;; only n -> now
-  (when (string-match-p "^n *$" ans)
+  ;; n -> now (today)
+  (when (string-match-p "^\\(n \\)?m *$" ans) ;; m for morning
+    (setq ans "09:00")
+    )
+  (when (string-match-p "^\\(n \\)?mm *$" ans) ;; m for morning
+    (setq ans "10:00")
+    )
+  (when (string-match-p "^\\(n \\)?n *$" ans) ;; n for noon
+    (setq ans "12:00")
+    )
+  (when (string-match-p "^\\(n \\)?nn *$" ans) ;; n for noon
+    (setq ans "13:30")
+    )
+  (when (string-match-p "^\\(n \\)?e *$" ans) ;; e for evening
+    (setq ans "20:30")
+    )
+  (when (string-match-p "^\\(n \\)?ee *$" ans) ;; e for evening
+    (setq ans "20:00")
+    )
+  (when (string-match-p "^\\(n \\)?eee *$" ans) ;; e for evening
+    (setq ans "22:00")
+    )
+  (when (string-match-p "^n *$" ans) ;; only n -> now
     (setq ans (format-time-string "%H:%M" (current-time)))
     )
   ;; ;; nothing -> now

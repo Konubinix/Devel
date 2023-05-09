@@ -26,6 +26,8 @@
 
 (define-key ement-room-mode-map (kbd "e") 'ement-room-edit-message)
 
+(setq-default ement-room-list-avatars nil)
+
 (setq-default
  ement-room-message-format-spec "[%t] %S> %B%r"
  ement-room-left-margin-width 0

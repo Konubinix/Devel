@@ -13,7 +13,8 @@ from dateutil.parser import parse as parsedate
 LOGGER = get_logger(__name__)
 
 
-@cache_disk(expire=3600 * 24 * 300)  # about one year of validity
+@cache_disk(expire=3600 * 24 * 150
+            )  # about 1/2 year of validity, one year was too big
 def fetch_holidays():
     url = "https://www.data.gouv.fr/fr/datasets/r/000ae493-9fa8-4088-9f53-76d375204036"
     LOGGER.info(f"Getting the data from {url}")

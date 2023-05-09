@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+
+ME="$(basename "${BASH_SOURCE[0]}")"
+source <(${ME} completion bash)
+complete -o default -o nospace -F __start_ory orye2e

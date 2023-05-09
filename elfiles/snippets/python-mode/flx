@@ -2,7 +2,100 @@
 # name: flx
 # key: flx
 # --
+import tornado.web
 from flexx import config, flx
+
+config.hostname = "0.0.0.0"
+config.port = ${100:9999}
+config.tornado_debug = True
+
+
+def serve(app):
+    flx.App(app).serve()
+    return app
+
+
+class Frontend(flx.Widget):
+
+    def init(self):
+        self.button = flx.Button(text="click me")
+
+    @flx.reaction("button.pointer_click")
+    def button_clicked(self, *evs):
+        self.root.jssays.someevent()
+
+    @flx.reaction("root.pysays.someevent")
+    def pythonsaidsomething(self, *evs):
+        alert(f'some event from python {evs[-1]["count"]}')
+
+
+class JsEmitters(flx.JsComponent):
+
+    @flx.emitter
+    def someevent(self):
+        return {}
+
+
+class Backend(flx.PyComponent):
+
+    def init(self):
+        pass
+
+    @flx.reaction("root.jssays.someevent")
+    def _(self, *evs):
+        print("someevent")
+        self.root.pysays.someevent(1, 2, 3)
+
+
+class PyEmitters(flx.PyComponent):
+
+    @flx.emitter
+    def someevent(self, key, value, count):
+        return {"key": key, "value": value, "count": count}
+
+
+class State(flx.JsComponent):
+    somedata = flx.IntProp(0, settable=True)
+
+
+@serve
+class App(flx.PyComponent):
+    frontend = flx.ComponentProp()
+    backend = flx.ComponentProp()
+    pysays = flx.ComponentProp()
+    jssays = flx.ComponentProp()
+    state = flx.ComponentProp()
+
+    def init(self):
+        self._mutate_state(State())
+        self._mutate_pysays(PyEmitters())
+        self._mutate_jssays(JsEmitters())
+        self.session.call_after_roundtrip(self.init_widgets)
+
+    def init_widgets(self):
+        with self:
+            self._mutate_frontend(Frontend())
+            self._mutate_backend(Backend())
+
+
+class SomeRequestHandler(tornado.web.RequestHandler):
+
+    async def get(self, arg):
+        print(arg)
+
+
+def main():
+    tornado_app = flx.current_server().app
+    tornado_app.add_handlers(r".*", [
+        (r"/something/(.+)", SomeRequestHandler),
+    ])
+    flx.start()
+
+
+if __name__ == "__main__":
+    main()
+from flexx import config, flx
+import tornado.web
 
 config.hostname = "0.0.0.0"
 config.port = $100
@@ -14,17 +107,63 @@ def serve(app):
     return app
 
 
+class Frontend(flx.JsComponent):
+    def init(self):
+        pass
+
+
+class JsEmitters(flx.JsComponent):
+    @flx.emitter
+    def someevent(self):
+        return {}
+
+
+class Backend(flx.PyComponent):
+    def init(self):
+        pass
+
+
+class PyEmitters(flx.PyComponent):
+    @flx.emitter
+    def someevent(self, key, value, count):
+        return {"key": key, "value": value, "count": count}
+
+
+class State(flx.JsComponent):
+    somedata = flx.IntProp(0, settable=True)
+
+
 @serve
-class App(flx.Widget):
+class App(flx.PyComponent):
+    front = flx.ComponentProp()
+    back = flx.ComponentProp()
+    pysays = flx.ComponentProp()
+    jssays = flx.ComponentProp()
+    state = flx.ComponentProp()
 
     def init(self):
-        self.button = flx.Button(text="Button")
+        self._mutate_state(State())
+        self._mutate_pysays(PyEmitters())
+        self._mutate_jssays(JsEmitters())
+        self.session.call_after_roundtrip(self.init_widgets)
 
-    @flx.reaction("button.pointer_click")
-    def _claim(self, *evs):
-        alert("clicked")
+    def init_widgets(self):
+        with self:
+            self._mutate_frontend(Frontend())
+            self._mutate_backend(Backend())
+
+
+class SomeRequestHandler(tornado.web.RequestHandler):
+
+    async def get(self, arg):
+        print(arg)
+
 
 def main():
+    tornado_app = flx.current_server().app
+    tornado_app.add_handlers(r".*", [
+        (r"/something/(.+)", SomeRequestHandler),
+    ])
     flx.start()
 
 

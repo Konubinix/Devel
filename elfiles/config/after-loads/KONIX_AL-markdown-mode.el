@@ -24,6 +24,26 @@
 
 ;;; Code:
 
+(custom-set-variables '(markdown-header-scaling t))
+
+(custom-set-faces
+ '(markdown-code-face
+   (
+    (
+     ((class color)
+      (background dark))
+     (:background "gray15")
+     )
+    (
+     ((class color)
+      (background light))
+     (:background "gray15")
+     )
+    )
+   )
+)
+
+
 (defun konix/markdown-mode-hook()
     (konix/flyspell-mode t)
     ;;(org-link-minor-mode 1)
@@ -45,6 +65,8 @@
      )
     (visual-line-mode 1)
     (auto-fill-mode 1)
+    ;; somehow it gets to 0 otherwise
+    (setq tab-width 4)
     )
 (add-hook 'markdown-mode-hook 'konix/markdown-mode-hook)
 

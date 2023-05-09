@@ -1702,7 +1702,6 @@ items"
                   (org-agenda-show-log 'clockcheck)
                   (org-agenda-include-diary nil)
                   (org-super-agenda-groups nil)
-
                   )
                  )
                 ("alW" "Last few weeks"
@@ -1724,7 +1723,6 @@ items"
                   (org-agenda-archives-mode t)
                   (org-agenda-include-diary nil)
                   (org-agenda-show-log 'clockcheck)
-
                   )
                  )
                 ("alw" "Last week"
@@ -1746,6 +1744,7 @@ items"
                   (org-agenda-archives-mode t)
                   (org-agenda-include-diary nil)
                   (org-agenda-show-log 'clockcheck)
+                  (org-agenda-start-with-clockreport-mode t)
                   (konix/org-agenda-tag-filter-context-p nil)
 
                   )

@@ -99,6 +99,11 @@
   (gitri/set-keyword "reword")
   )
 
+(defun gitri/edit ()
+  (interactive)
+  (gitri/set-keyword "edit")
+  )
+
 (defun gitri/meta-up ()
   (interactive)
   (gitri/in-commit-line
@@ -151,6 +156,7 @@
     (define-key map (kbd "s") 'gitri/squash)
     (define-key map (kbd "p") 'gitri/pick)
     (define-key map (kbd "r") 'gitri/reword)
+    (define-key map (kbd "e") 'gitri/edit)
     (define-key map (kbd "C-k") 'gitri/toggle-kill)
     (define-key map (kbd "SPC") 'gitri/down)
     (define-key map (kbd "DEL") 'gitri/up)

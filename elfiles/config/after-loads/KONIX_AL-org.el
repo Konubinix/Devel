@@ -5861,9 +5861,16 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (defun konix/org/copy-region-without-links ()
   (interactive)
-  (let (
-        (content (org-link-display-format (buffer-substring-no-properties (region-beginning) (region-end))))
-        )
+  (let* (
+         (raw-content (org-link-display-format (buffer-substring-no-properties (region-beginning) (region-end))))
+         (content
+          (with-temp-buffer
+            (insert raw-content)
+            (org-mode)
+            (save-restriction (org-export-as 'ascii nil t t))
+            )
+          )
+         )
     (deactivate-mark)
     (with-temp-buffer
       (insert content)

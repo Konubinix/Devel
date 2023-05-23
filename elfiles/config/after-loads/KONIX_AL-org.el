@@ -2712,11 +2712,17 @@ items"
   (when (string-match-p "^\\(n \\)?mm *$" ans) ;; m for morning
     (setq ans "10:00")
     )
+  (when (string-match-p "^\\(n \\)?mmm *$" ans) ;; m for morning
+    (setq ans "11:00")
+    )
   (when (string-match-p "^\\(n \\)?n *$" ans) ;; n for noon
     (setq ans "12:00")
     )
   (when (string-match-p "^\\(n \\)?nn *$" ans) ;; n for noon
     (setq ans "13:30")
+    )
+  (when (string-match-p "^\\(n \\)?nnn *$" ans) ;; n for noon
+    (setq ans "14:00")
     )
   (when (string-match-p "^\\(n \\)?e *$" ans) ;; e for evening
     (setq ans "20:30")

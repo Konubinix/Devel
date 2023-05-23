@@ -1697,7 +1697,7 @@ items"
                  (
                   (dummy (setq konix/org-agenda-type 'agenda))
                   (org-agenda-start-day (konix/org-yesterworkday))
-                  ;;(org-agenda-start-with-clockreport-mode t)
+                  (org-agenda-start-with-clockreport-mode t)
                   (org-agenda-start-with-log-mode t)
                   (org-agenda-show-log 'clockcheck)
                   (org-agenda-include-diary nil)

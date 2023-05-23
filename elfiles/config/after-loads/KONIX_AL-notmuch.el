@@ -34,15 +34,15 @@
 (defun konix/notmuch/record-url-to-ril-unflag-and-next (url)
   (interactive
    (list
-	(thing-at-point 'url)
-	)
+        (thing-at-point 'url)
+        )
    )
   (async-shell-command
    (format
-	"konix_ril_save_url.sh '%s' && konix_display.py 'Saved %s'"
-	url
-	url
-	)
+        "konix_ril_save_url.sh '%s' && konix_display.py 'Saved %s'"
+        url
+        url
+        )
    )
   (konix/notmuch-show-unflag-and-next)
   )
@@ -50,9 +50,9 @@
 (defun konix/message-setup-hook ()
   (mml-secure-message-sign-pgpmime)
   (save-excursion
-	(goto-char (point-max))
-	(newline)
-	)
+        (goto-char (point-max))
+        (newline)
+        )
   (gnus-alias-determine-identity)
   (when (getenv "KONIX_CUSTOM_SIGNATURE_SERVER")
     (save-excursion
@@ -85,227 +85,227 @@ Message-Id: <%s>" id)
 (require 'ini)
 (defun konix/notmuch/initialize-saved-searches ()
   (setq-default notmuch-saved-searches
-			    (remove-if
-			     'null
-			     (mapcar
-				  (lambda (entry)
-				    (if (assoc "search" (cdr entry))
-					    (list
+                            (remove-if
+                             'null
+                             (mapcar
+                                  (lambda (entry)
+                                    (if (assoc "search" (cdr entry))
+                                            (list
                          :name (car entry)
-					     :query (cdr (assoc "search" (cdr entry)))
-					     )
-					  nil
-					  )
-				    )
-				  (let (
+                                             :query (cdr (assoc "search" (cdr entry)))
+                                             )
+                                          nil
+                                          )
+                                    )
+                                  (let (
                         (file (make-temp-file "notmuch-saved-searches-"))
                         )
                     (with-temp-file file
                       (insert-file-contents
-					   (first
-					    (remove-if-not
-					     'file-exists-p
-					     (split-string
-						  (getenv "KONIX_NOTMUCH_SAVED_SEARCHES")
-						  path-separator
-						  )
-					     )
-					    )
-					   )
-				      )
+                                           (first
+                                            (remove-if-not
+                                             'file-exists-p
+                                             (split-string
+                                                  (getenv "KONIX_NOTMUCH_SAVED_SEARCHES")
+                                                  path-separator
+                                                  )
+                                             )
+                                            )
+                                           )
+                                      )
                     (prog1
                         (ini-decode file)
                       (delete-file file)
                       )
                     )
-				  )
-			     )
-			    )
+                                  )
+                             )
+                            )
   )
 (konix/notmuch/initialize-saved-searches)
 
 (setq-default mailcap-download-directory
-			  (format "%s/" (getenv "KONIX_DOWNLOAD_DIR")))
+                          (format "%s/" (getenv "KONIX_DOWNLOAD_DIR")))
 (setq-default mm-default-directory mailcap-download-directory)
 (setq-default notmuch-crypto-process-mime t)
-(setq-default notmuch-archive-tags '("-inbox" "-unread"))
+(setq-default notmuch-archive-tags '("-inbox" "-unread" "-later"))
 (setq-default notmuch-address-command 'internal)
 
 (defface konix/notmuch-search-flagged
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:weight bold)
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:weight bold)
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:weight bold)
+         )
+        (
+         ((class color)
+          (background light))
+         (:weight bold)
+         )
+        )
   ""
   )
 
 (defface konix/notmuch-search-unread
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "cyan")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "dark blue")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:foreground "cyan")
+         )
+        (
+         ((class color)
+          (background light))
+         (:foreground "dark blue")
+         )
+        )
   ""
   )
 (defface konix/notmuch-search-replied
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "DarkSlateBlue")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "aquamarine")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "DarkSlateBlue")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "aquamarine")
+         )
+        )
   ""
   )
 (defface konix/notmuch-search-temp
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "dim grey")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "gainsboro")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "dim grey")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "gainsboro")
+         )
+        )
   ""
   )
 (defface konix/notmuch-search-perso
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:background "blue violet")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:background "peach puff")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:background "blue violet")
+         )
+        (
+         ((class color)
+          (background light))
+         (:background "peach puff")
+         )
+        )
   ""
   )
 (defface konix/notmuch-search-sent
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "cyan3")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "royal blue")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:foreground "cyan3")
+         )
+        (
+         ((class color)
+          (background light))
+         (:foreground "royal blue")
+         )
+        )
   ""
   )
 (defface konix/notmuch-search-answer
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:slant italic)
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:slant italic)
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:slant italic)
+         )
+        (
+         ((class color)
+          (background light))
+         (:slant italic)
+         )
+        )
   ""
   )
 (setq notmuch-search-line-faces '(
-								  ("temp" . konix/notmuch-search-temp)
-								  ("answer" . konix/notmuch-search-answer)
-								  ("perso" . konix/notmuch-search-perso)
-								  ("deleted" . (:foreground "red"))
-								  ("flagged" . konix/notmuch-search-flagged)
-								  ("unread" . konix/notmuch-search-unread)
-								  ("replied" . konix/notmuch-search-replied)
- 								  ("sent" . konix/notmuch-search-sent)
-								  )
-	  )
+                                                                  ("temp" . konix/notmuch-search-temp)
+                                                                  ("answer" . konix/notmuch-search-answer)
+                                                                  ("perso" . konix/notmuch-search-perso)
+                                                                  ("deleted" . (:foreground "red"))
+                                                                  ("flagged" . konix/notmuch-search-flagged)
+                                                                  ("unread" . konix/notmuch-search-unread)
+                                                                  ("replied" . konix/notmuch-search-replied)
+                                                                  ("sent" . konix/notmuch-search-sent)
+                                                                  )
+          )
 (defface notmuch-search-count
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "green")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:inherit default)
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:foreground "green")
+         )
+        (
+         ((class color)
+          (background light))
+         (:inherit default)
+         )
+        )
   ""
   )
 (defface notmuch-search-date
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "cyan")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "blue")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:foreground "cyan")
+         )
+        (
+         ((class color)
+          (background light))
+         (:foreground "blue")
+         )
+        )
   ""
   )
 (defface notmuch-search-matching-authors
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "white")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "blue")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:foreground "white")
+         )
+        (
+         ((class color)
+          (background light))
+         (:foreground "blue")
+         )
+        )
   ""
   )
 (defface notmuch-search-subject
   '(
-	(
-	 ((class color)
-	  (background dark))
-	 (:foreground "light green")
-	 )
-	(
-	 ((class color)
-	  (background light))
-	 (:foreground "sienna")
-	 )
-	)
+        (
+         ((class color)
+          (background dark))
+         (:foreground "light green")
+         )
+        (
+         ((class color)
+          (background light))
+         (:foreground "sienna")
+         )
+        )
   ""
   )
 
@@ -318,72 +318,72 @@ Message-Id: <%s>" id)
   )
 (defun konix/notmuch-remove-tag (tag)
   (let (
-		(tag_change (format "-%s" tag))
-		)
-	(cond
-	 ((eq major-mode 'notmuch-search-mode)
-	  (konix/notmuch-search-tag-change tag_change)
-	  )
-	 ((eq major-mode 'notmuch-show-mode)
-	  (notmuch-show-tag-message tag_change)
-	  )
-	 (t
-	  (error "Could not found a suitable tag function for mode %s"
-			 (symbol-name major-mode)
-			 )
-	  )
-	 )
-	)
+                (tag_change (format "-%s" tag))
+                )
+        (cond
+         ((eq major-mode 'notmuch-search-mode)
+          (konix/notmuch-search-tag-change tag_change)
+          )
+         ((eq major-mode 'notmuch-show-mode)
+          (notmuch-show-tag-message tag_change)
+          )
+         (t
+          (error "Could not found a suitable tag function for mode %s"
+                         (symbol-name major-mode)
+                         )
+          )
+         )
+        )
   )
 (defun konix/notmuch-add-tag (tag)
   (let (
-		(tag_change (format "+%s" tag))
-		)
-	(cond
-	 ((eq major-mode 'notmuch-search-mode)
-	  (konix/notmuch-search-tag-change tag_change)
-	  )
-	 ((eq major-mode 'notmuch-show-mode)
-	  (notmuch-show-tag-message tag_change)
-	  )
-	 (t
-	  (error "Could not found a suitable tag function for mode %s"
-			 (symbol-name major-mode)
-			 )
-	  )
-	 )
-	)
+                (tag_change (format "+%s" tag))
+                )
+        (cond
+         ((eq major-mode 'notmuch-search-mode)
+          (konix/notmuch-search-tag-change tag_change)
+          )
+         ((eq major-mode 'notmuch-show-mode)
+          (notmuch-show-tag-message tag_change)
+          )
+         (t
+          (error "Could not found a suitable tag function for mode %s"
+                         (symbol-name major-mode)
+                         )
+          )
+         )
+        )
   )
 (defun konix/notmuch-get-tags ()
   (cond
    ((eq major-mode 'notmuch-search-mode)
-	(notmuch-search-get-tags)
-	)
+        (notmuch-search-get-tags)
+        )
    ((eq major-mode 'notmuch-show-mode)
-	(notmuch-show-get-tags)
-	)
+        (notmuch-show-get-tags)
+        )
    (t
-	(error "Could not found a tags function for mode %s"
-		   (symbol-name major-mode)
-		   )
-	)
+        (error "Could not found a tags function for mode %s"
+                   (symbol-name major-mode)
+                   )
+        )
    )
   )
 (defun konix/notmuch-toggle-tag (tag &optional toggle_tag)
   (if (member tag (konix/notmuch-get-tags))
-	  (progn
-		(konix/notmuch-remove-tag tag)
-		(when toggle_tag
-		  (konix/notmuch-add-tag toggle_tag)
-		  )
-		)
-	(progn
-	  (konix/notmuch-add-tag tag)
-	  (when toggle_tag
-		(konix/notmuch-remove-tag toggle_tag)
-		)
-	  )
-	)
+          (progn
+                (konix/notmuch-remove-tag tag)
+                (when toggle_tag
+                  (konix/notmuch-add-tag toggle_tag)
+                  )
+                )
+        (progn
+          (konix/notmuch-add-tag tag)
+          (when toggle_tag
+                (konix/notmuch-remove-tag toggle_tag)
+                )
+          )
+        )
   )
 (defun konix/notmuch-toggle-deleted-tag ()
   (interactive)
@@ -398,9 +398,9 @@ Message-Id: <%s>" id)
   (konix/notmuch-toggle-tag
    "unread"
    (if (or no_wontread
-		   (eq major-mode 'notmuch-show-mode))
-	   nil
-	 "wontread")
+                   (eq major-mode 'notmuch-show-mode))
+           nil
+         "wontread")
    )
   )
 (defun konix/notmuch-unread-and-hide-tag ()
@@ -488,15 +488,15 @@ Message-Id: <%s>" id)
                                            message-completion-alist))))
          (msg (if need_to_remove "Disable" "Enable"))
          )
-	(if need_to_remove
-		(setq message-completion-alist (remove
-										notmuch-address-message-alist-member
-										message-completion-alist))
-	  (add-to-list 'message-completion-alist
-				   notmuch-address-message-alist-member)
-	  )
-	(message "%s of notmuch completion" msg)
-	)
+        (if need_to_remove
+                (setq message-completion-alist (remove
+                                                                                notmuch-address-message-alist-member
+                                                                                message-completion-alist))
+          (add-to-list 'message-completion-alist
+                                   notmuch-address-message-alist-member)
+          )
+        (message "%s of notmuch completion" msg)
+        )
   )
 (defun konix/notmuch-define-key-search-show (key function)
   (define-key notmuch-show-mode-map key function)
@@ -507,16 +507,16 @@ Message-Id: <%s>" id)
 inspired from `notmuch-show-archive-thread-internal'"
   (goto-char (point-min))
   (loop do (notmuch-show-tag-message (format "-%s"tag))
-		until (not (notmuch-show-goto-message-next)))
+                until (not (notmuch-show-goto-message-next)))
   ;; Move to the next item in the search results, if any.
   (let ((parent-buffer notmuch-show-parent-buffer))
-	(notmuch-bury-or-kill-this-buffer)
-	(if parent-buffer
-		(progn
-		  (switch-to-buffer parent-buffer)
-		  (forward-line)
-		  (if show-next
-			  (notmuch-search-show-thread))))))
+        (notmuch-bury-or-kill-this-buffer)
+        (if parent-buffer
+                (progn
+                  (switch-to-buffer parent-buffer)
+                  (forward-line)
+                  (if show-next
+                          (notmuch-search-show-thread))))))
 
 (defun konix/notmuch-show-unflag-and-next ()
   (interactive)
@@ -531,37 +531,37 @@ inspired from `notmuch-show-archive-thread-internal'"
   (interactive)
   (cond
    ((eq major-mode 'notmuch-search-mode)
-	(notmuch-search-archive-thread)
-	)
+        (notmuch-search-archive-thread)
+        )
    ((eq major-mode 'notmuch-show-mode)
-	(notmuch-show-archive-thread-then-next)
-	)
+        (notmuch-show-archive-thread-then-next)
+        )
    (t
-	(error "Could not found a suitable tag function for mode %s"
-		   (symbol-name major-mode)
-		   )
-	)
+        (error "Could not found a suitable tag function for mode %s"
+                   (symbol-name major-mode)
+                   )
+        )
    )
   )
 
 (defun konix/notmuch-search-no-tag ()
   (interactive)
   (let (
-		(search_string
-		 (shell-command-to-string "konix_notmuch_no_tag_search.sh")
-		 )
-		)
-	(notmuch-search search_string)
-	(rename-buffer "*notmuch-search-no-tag*")
-	)
+                (search_string
+                 (shell-command-to-string "konix_notmuch_no_tag_search.sh")
+                 )
+                )
+        (notmuch-search search_string)
+        (rename-buffer "*notmuch-search-no-tag*")
+        )
   )
 (defun konix/notmuch-search-unflag-remove-read-and-next ()
   (interactive)
   (let (
-		(notmuch-archive-tags '("-unread" "-flagged"))
-		)
-	(notmuch-search-archive-thread)
-	)
+                (notmuch-archive-tags '("-unread" "-flagged"))
+                )
+        (notmuch-search-archive-thread)
+        )
   )
 
 (defun konix/notmuch-hello-refresh-hook ()
@@ -569,7 +569,7 @@ inspired from `notmuch-show-archive-thread-internal'"
   ;; (shell-command "konix_mail_tray_daemon_update.py")
   )
 (add-hook 'notmuch-hello-refresh-hook
-		  'konix/notmuch-hello-refresh-hook)
+                  'konix/notmuch-hello-refresh-hook)
 
 (defun konix/notmuch-show-mark-read ()
   "Mark the current message as read. (edited to remove also wontread)"
@@ -580,19 +580,19 @@ inspired from `notmuch-show-archive-thread-internal'"
 (defun konix/notmuch-show-reply-sender ()
   (interactive)
   (let (
-		(mm-inline-text-html-with-w3m-keymap nil)
-		)
-	(notmuch-show-reply-sender)
-	)
+                (mm-inline-text-html-with-w3m-keymap nil)
+                )
+        (notmuch-show-reply-sender)
+        )
   )
 
 (defun konix/notmuch-show-reply ()
   (interactive)
   (let (
-		(mm-inline-text-html-with-w3m-keymap nil)
-		)
-	(notmuch-show-reply)
-	)
+                (mm-inline-text-html-with-w3m-keymap nil)
+                )
+        (notmuch-show-reply)
+        )
   )
 
 (konix/notmuch-define-key-search-show "d" 'konix/notmuch-toggle-deleted-tag)

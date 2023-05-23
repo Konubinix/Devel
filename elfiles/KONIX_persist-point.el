@@ -35,9 +35,11 @@
          (let (
                (prev-buffers (window-prev-buffers w))
                )
-           (save-window-excursion
-             (set-window-buffer-start-and-point w buffer nil point)
-             )
+           (unless (window-dedicated-p w)
+            (save-window-excursion
+              (set-window-buffer-start-and-point w buffer nil point)
+              )
+            )
            (set-window-prev-buffers w prev-buffers)
            )
          )

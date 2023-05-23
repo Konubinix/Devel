@@ -25,6 +25,8 @@
 ;;; Code:
 
 (define-key ement-room-mode-map (kbd "e") 'ement-room-edit-message)
+(define-key ement-room-mode-map (kbd "M-o") 'org-open-at-point)
+
 
 (setq-default ement-room-list-avatars nil)
 

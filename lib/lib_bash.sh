@@ -190,6 +190,8 @@ story () {
     fi
 }
 
+
+
 popline ( ) {
     local file="$1"
     local variable="$2"
@@ -198,10 +200,12 @@ popline ( ) {
         return 1
     fi
     local thehead="$(head -1 "${file}")"
-    TMPDIR="$(mktemp -d)"
-    trap "rm -rf '${TMPDIR}'" 0
-    tail +2 "${file}" > "${TMPDIR}/temp"
-    mv "${TMPDIR}/temp" "${file}"
+    (
+        TMPDIRPOP="$(mktemp -d)"
+        trap "rm -rf '${TMPDIRPOP}'" 0
+        tail +2 "${file}" > "${TMPDIRPOP}/temp"
+        mv "${TMPDIRPOP}/temp" "${file}"
+    )
     read "$2" < <(echo "${thehead}")
 }
 

@@ -55,3 +55,5 @@ application/gzip=gramps.desktop;
 application/vnd.ms-excel.sheet.binary.macroEnabled.12=libreoffice.desktop;
 application/vnd.oasis.opendocument.spreadsheet=libreoffice.desktop;
 application/vnd.oasis.opendocument.text=libreoffice.desktop;
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=libreoffice.desktop;
+application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice.desktop;

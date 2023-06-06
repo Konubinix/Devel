@@ -3,7 +3,6 @@
 source _ko_nix.sh
 
 ME="$(basename "${0}")"
-# until https://github.com/NixOS/nixpkgs/pull/218803 is merged
-BIN="$(nix_install_binary "${ME}" "" "github:MangoIV/nixpkgs/mangoiv/add-bkt")"
+BIN="$(nix_install_binary "${ME}")"
 
 exec "${BIN}" "${@}"

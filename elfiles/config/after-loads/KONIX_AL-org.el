@@ -4343,6 +4343,39 @@ of the clocksum."
 (advice-add 'org-set-tags :around
             #'konix/org-set-tags/link-maybe-and-dream)
 
+(defun konix/org-set-tags/waiting-add-note (orig-func tags &rest args)
+  "When the wait tag is set, it is useful to add a note to remember how long I will have waited before calling again"
+  (let* ((tags (pcase tags
+                 ((pred listp) tags)
+                 ((pred stringp) (split-string (org-trim tags) ":" t))
+                 (_ (error "Invalid tag specification: %S" tags))))
+         (old-tags (org-get-tags nil t))
+         (tags-change? (not (equal tags old-tags)))
+         )
+    (apply orig-func tags args)
+    (when (and
+           tags-change?
+           (or
+            (and
+             ;; added wait
+             (not (member "WAIT" old-tags))
+             (member "WAIT" tags)
+             )
+            (and
+             ;; added delegated
+             (not (member "DELEGATED" old-tags))
+             (member "DELEGATED" tags)
+             )
+            )
+           )
+      ;; then add a note
+      (konix/org-add-note-no-interaction "Started to wait for this task")
+      )
+    )
+  )
+(advice-add 'org-set-tags :around
+            #'konix/org-set-tags/waiting-add-note)
+
 (defun konix/org-gcal-reset-tags ()
   (org-agenda-set-tags "needsAction" 'off)
   (org-agenda-set-tags "declined" 'off)

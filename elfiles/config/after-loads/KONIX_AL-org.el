@@ -3548,6 +3548,7 @@ of the clocksum."
               (append
                '(
                  (?\` . ?\`)
+                 (?\~ . ?\~)
                  )
                electric-pair-pairs)
               )

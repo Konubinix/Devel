@@ -102,7 +102,7 @@ They can be relative or absolute
     (
      ((class color)
       (background dark))
-     (:background "gray50")
+     (:background "gray30")
      )
     )
   ""

@@ -464,7 +464,7 @@ ${title}
 
                          )
                     (if-let (
-                             (node (org-roam-node-from-ref url))
+                             (node (org-roam-node-from-ref (org-link-decode url)))
                              )
                         (find-file (org-roam-node-file node))
                       )

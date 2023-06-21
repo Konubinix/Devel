@@ -1,0 +1,19 @@
+#!/bin/bash
+
+source "${KONIX_DEVEL_DIR}/config/bash-completion/kubectl"
+
+ME="$(basename "${BASH_SOURCE[0]}")"
+
+_ke () {
+    # take the words without the initial ke and substitute it with "docker run -ti --rm"
+    COMP_WORDS=(kubectl exec -i -t "${COMP_WORDS[@]:1}")
+    # then, add 3 to cword because I added 4 words (actually removed 1 and
+    # added 4, but who cares?)
+    COMP_CWORD=$((COMP_CWORD + 3))
+    # then, update the line and the point,
+    COMP_LINE=${COMP_LINE/ke/kubectl exec -i -t}
+    COMP_POINT=$((COMP_POINT + 16)) # "kubectl exec -i -t" contains 16 characters more than "ke"
+    __start_kubectl
+}
+
+complete -F _ke "${ME}"

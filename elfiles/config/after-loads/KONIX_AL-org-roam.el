@@ -220,11 +220,18 @@ ${title}
 
 ;; but that would not make (org-id-find SOMEID) find roam notes.
 
+(defun konix/org-add-roam-ref/canonicalize-url (url)
+  (replace-regexp-in-string
+   "https://www.youtube.com/watch?.*v=\\([^&]+\\).*" "youtube:\\1"
+   url)
+  )
 
 (defun konix/org-add-roam-ref (url title body)
   (let* (
          (decoded-title (s-trim (org-link-decode title)))
-         (decoded-url (substring-no-properties (s-trim (org-link-decode url))))
+         (decoded-url (konix/org-add-roam-ref/canonicalize-url
+                       (substring-no-properties (s-trim (org-link-decode url)))
+                       ))
          (decoded-url-no-hash (replace-regexp-in-string "^\\(.+\\)#.+$" "\\1" decoded-url))
          (decoded-body (s-trim (org-link-decode body)))
          (slug (konix/substring-capped (konix/org-roam-compute-slug decoded-title) 0 100))

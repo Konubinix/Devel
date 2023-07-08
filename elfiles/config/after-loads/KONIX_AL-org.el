@@ -2622,7 +2622,6 @@ items"
 (setq-default org-hide-leading-stars t)
 (setq-default org-hierarchical-todo-statistics nil)
 (setq-default org-insert-labeled-timestamps-at-point nil)
-(setq-default org-mark-ring-length 30)
 (setq org-infojs-options '((path . "http://orgmode.org/org-info.js")
                            (view . "info")
                            (toc . t)

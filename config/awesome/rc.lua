@@ -153,6 +153,8 @@ mytextclock = wibox.widget.textclock()
 
 myorgmodeline = awful.widget.watch('bash -c "echo \\"Org: $(redis-cli get org-modeline|sed \'s/^$/NA/\')\\""', 1)
 
+mytemperature = awful.widget.watch('clk temperature current', 60)
+
 acpiwidget = awful.widget.watch('acpi', 10)
 
 -- Create a wibox for each screen and add it
@@ -249,11 +251,9 @@ awful.screen.connect_for_each_screen(function(s)
          layout = wibox.layout.align.horizontal,
          { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
-            mylauncher,
-			myorgmodeline,
-			-- acpiwidget,
-            s.mytaglist,
-            s.mypromptbox,
+            mylauncher, myorgmodeline, wibox.widget.textbox('  |  '),
+	    mytemperature,
+            s.mytaglist, s.mypromptbox,
          },
          s.mytasklist, -- Middle widget
          { -- Right widgets
@@ -557,14 +557,14 @@ globalkeys = gears.table.join(
    awful.key({ modkey,           },
       "Return",
       open_or_join(
-		 terminal_class,
-		 terminal
+	 terminal_class,
+	 terminal
       ),
       {description = "open a terminal", group = "launcher"}),
    awful.key({ modkey, "Control"          }, "t", open_or_join(
-		 terminal_class,
-		 terminal
-															  ),
+	 terminal_class,
+	 terminal
+							      ),
       {description = "open a terminal", group = "launcher"}),
    awful.key({ modkey, "Control" }, "r", awesome.restart,
       {description = "reload awesome", group = "awesome"}),
@@ -572,15 +572,15 @@ globalkeys = gears.table.join(
       {description = "quit awesome", group = "awesome"}),
 
    awful.key({ modkey,           }, "p",     function ()
-		 naughty.notify(
-			{
-			   preset = naughty.config.presets.normal,
-			   title = "MPD",
-			   text = "Toggling mpc",
-			   timeout = 0.5,
-			}
-		 )
-		 awful.spawn.easy_async(
+	 naughty.notify(
+	    {
+	       preset = naughty.config.presets.normal,
+	       title = "MPD",
+	       text = "Toggling mpc",
+	       timeout = 0.5,
+	    }
+	 )
+	 awful.spawn.easy_async(
             "clk mpc toggle",
             function (stdout, stderr, exitreason, exitcode)
                naughty.notify(
@@ -643,7 +643,7 @@ globalkeys = gears.table.join(
          awful.spawn.easy_async(
             "clk pulse sink toggle-mute",
             function (stdout, stderr, exitreason, exitcode)
-			   tell_pulse_volume()
+	       tell_pulse_volume()
             end
          )
    end,
@@ -826,7 +826,7 @@ clientkeys = gears.table.join(
       },
       "n",
       function (c)
-		 awful.spawn("konix_org_capture_screenshot.sh")
+	 awful.spawn("konix_org_capture_screenshot.sh")
       end ,
       {
          description = "capture a screenshot",
@@ -854,7 +854,7 @@ clientkeys = gears.table.join(
       },
       "d",
       function(c)
-		 awful.spawn("clk x scroll-down")
+	 awful.spawn("clk x scroll-down")
       end,
       {
          description = "scroll down",
@@ -890,7 +890,7 @@ clientkeys = gears.table.join(
    awful.key(
       {
          modkey,
-		 "Shift",
+	 "Shift",
       },
       "j",
       function (c)
@@ -1152,8 +1152,8 @@ awful.rules.rules = {
          -- and the name shown there might not match defined rules here.
          name = {
             "Event Tester",  -- xev.
-			"Terminator Preferences",
-			"Choose A Terminal Font",
+	    "Terminator Preferences",
+	    "Choose A Terminal Font",
          },
          role = {
             "AlarmWindow",  -- Thunderbird's calendar.
@@ -1168,7 +1168,7 @@ awful.rules.rules = {
    {
       rule = {
          class = "qutebrowser",
-		 name = "Print",
+	 name = "Print",
       },
       properties = {
          floating = true,
@@ -1179,7 +1179,7 @@ awful.rules.rules = {
    {
       rule_any = {
          name = {"Slack | mini panel", "Pick a Font", "Change Foreground Color", "Post Processing Plugin"},
-		 class = {"Impass"}
+	 class = {"Impass"}
       },
       properties = {
          floating = true,
@@ -1228,8 +1228,8 @@ awful.rules.rules = {
       },
       properties = {
          tag = "1",
-		 floating = true,
-		 ontop = true,
+	 floating = true,
+	 ontop = true,
       },
    },
    {

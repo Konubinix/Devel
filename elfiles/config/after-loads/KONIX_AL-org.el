@@ -3599,6 +3599,19 @@ of the clocksum."
   )
 (add-hook 'org-agenda-mode-hook 'konix/org-agenda-mode-hook)
 
+(defun konix/org-generate-custom-ids-in-buffer ()
+    "Generate a custom id for each heading in the buffer."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^\\*+" nil t)
+      (unless (org-entry-get (point) "CUSTOM_ID")
+        (org-entry-put (point) "CUSTOM_ID" (uuidgen-4))
+        )
+      )
+    )
+  )
+
 (defun konix/org-store-link-at-point ()
   (interactive)
   (save-excursion

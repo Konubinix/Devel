@@ -6,10 +6,6 @@
 	ignore=dirty
 	path = pymsmtpq
 	url = https://github.com/darkfeline/pymsmtpq
-[submodule "pymimedetacher"]
-	path = pymimedetacher
-	url = https://github.com/Konubinix/pymimedetacher.git
-	ignore=dirty
 [submodule "config/awesome/awesome-cyclefocus"]
 	path = config/awesome/awesome-cyclefocus
 	url = https://github.com/blueyed/awesome-cyclefocus

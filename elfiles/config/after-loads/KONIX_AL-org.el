@@ -3556,6 +3556,11 @@ of the clocksum."
             nil
             t
             )
+  (add-hook 'before-save-hook
+            'konix/delete-trailing-whitespace
+            nil
+            t
+            )
   (add-hook 'after-save-hook
             'konix/org-mode/after-save-hook
             nil

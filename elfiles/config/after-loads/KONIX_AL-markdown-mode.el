@@ -41,33 +41,107 @@
      )
     )
    )
-)
+ )
+(progn
+  (custom-set-faces
+   '(markdown-header-face-1
+     (
+      (
+       ((class color)
+        (background dark))
+       (:foreground "#FE2712"
+                    :height 2.2)
+       )
+      )
+     )
+   )
 
+  (custom-set-faces
+   '(markdown-header-face-2
+     (
+      (
+       ((class color)
+        (background dark))
+       (:foreground "#FC600A"
+                    :height 2.0)
+       )
+      )
+     )
+   )
+  (custom-set-faces
+   '(markdown-header-face-3
+     (
+      (
+       ((class color)
+        (background dark))
+       (:foreground "#FB9902"
+                    :height 1.8)
+       )
+      )
+     )
+   )
+  (custom-set-faces
+   '(markdown-header-face-4
+     (
+      (
+       ((class color)
+        (background dark))
+       (:foreground "#FCCC1A"
+                    :height 1.6)
+       )
+      )
+     )
+   )
+  (custom-set-faces
+   '(markdown-header-face-5
+     (
+      (
+       ((class color)
+        (background dark))
+       (:foreground "#FEFE33"
+                    :height 1.4)
+       )
+      )
+     )
+   )
+  (custom-set-faces
+   '(markdown-header-face-6
+     (
+      (
+       ((class color)
+        (background dark))
+       (:foreground "#B2D732"
+                    :height 1.2)
+       )
+      )
+     )
+   )
+  )
 
 (defun konix/markdown-mode-hook()
-    (konix/flyspell-mode t)
-    ;;(org-link-minor-mode 1)
-    (ispell-change-dictionary "american")
-    (setq-local electric-pair-pairs
-        (append
-            '(
+  (konix/flyspell-mode t)
+  ;;(org-link-minor-mode 1)
+  (ispell-change-dictionary "american")
+  (setq-local electric-pair-pairs
+              (append
+               '(
                  (?\` . ?\`)
                  )
-            electric-pair-pairs)
-        )
-    (markdown-toggle-markup-hiding 1)
-    (markdown-toggle-fontify-code-blocks-natively 1)
-    (add-hook
-     'before-save-hook
-     #'markdown-cleanup-list-numbers
-     nil
-     t
-     )
-    (visual-line-mode 1)
-    (auto-fill-mode 1)
-    ;; somehow it gets to 0 otherwise
-    (setq tab-width 4)
-    )
+               electric-pair-pairs)
+              )
+  (markdown-toggle-markup-hiding 1)
+  (markdown-toggle-fontify-code-blocks-natively 1)
+  (add-hook
+   'before-save-hook
+   #'markdown-cleanup-list-numbers
+   nil
+   t
+   )
+  (visual-line-mode 1)
+  (auto-fill-mode 1)
+  ;; somehow it gets to 0 otherwise
+  (setq tab-width 4)
+  )
 (add-hook 'markdown-mode-hook 'konix/markdown-mode-hook)
 
 (define-key markdown-mode-map (kbd "C-c C-c") 'konix/markdwon/ctrl-c-ctrl-c)
@@ -80,102 +154,102 @@
 (define-key markdown-mode-map (kbd "M-s") 'auto-scroll-mode)
 
 (defun konix/markdown-follow-link ()
-    (interactive)
-    (save-excursion
-        (unless (markdown-link-p)
-            (re-search-forward markdown-regex-link-inline (point-at-eol))
-            )
-        (xref-push-marker-stack)
-        (call-interactively 'markdown-follow-thing-at-point)
-        )
+  (interactive)
+  (save-excursion
+    (unless (markdown-link-p)
+      (re-search-forward markdown-regex-link-inline (point-at-eol))
+      )
+    (xref-push-marker-stack)
+    (call-interactively 'markdown-follow-thing-at-point)
     )
+  )
 
 (defun konix/markdwon/ctrl-c-ctrl-c ()
-    (interactive)
-    (cond
-        ((markdown-cur-list-item-bounds)
-            ;; in a list
-            (markdown-toggle-gfm-checkbox)
-            )
-        (t
-            (konix/markdown-eval-current-code-block)
-            )
-        )
+  (interactive)
+  (cond
+   ((markdown-cur-list-item-bounds)
+    ;; in a list
+    (markdown-toggle-gfm-checkbox)
     )
+   (t
+    (konix/markdown-eval-current-code-block)
+    )
+   )
+  )
 
 (defun konix/impatient/markdown-html (buffer)
-    (princ (with-current-buffer buffer
-               (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
-        (current-buffer)))
+  (princ (with-current-buffer buffer
+           (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
+         (current-buffer)))
 
 (defun konix/markdown/impatient ()
-    (interactive)
-    (httpd-start)
-    (impatient-mode)
-    (imp-set-user-filter 'konix/impatient/markdown-html)
-    (browse-url (format "http://localhost:8080/imp/live/%s/" (buffer-name)))
-    )
+  (interactive)
+  (httpd-start)
+  (impatient-mode)
+  (imp-set-user-filter 'konix/impatient/markdown-html)
+  (browse-url (format "http://localhost:8080/imp/live/%s/" (buffer-name)))
+  )
 
 (defun konix/markdown-kill-result-region-maybe ()
-    (when (looking-at-p "~~~")
-        ;; remove the old value
-        (let (
-                 (beg (point-at-bol))
-                 (end (save-excursion
-                          (forward-line 1)
-                          (re-search-forward "^~~~")
-                          (point-at-eol)
-                          )
-                     )
+  (when (looking-at-p "~~~")
+    ;; remove the old value
+    (let (
+          (beg (point-at-bol))
+          (end (save-excursion
+                 (forward-line 1)
+                 (re-search-forward "^~~~")
+                 (point-at-eol)
                  )
-            (kill-region beg end)
-            )
-        )
+               )
+          )
+      (kill-region beg end)
+      )
     )
+  )
 
 
 (defun konix/markdown-eval-current-code-block ()
-    "Inspired from https://emacs.stackexchange.com/questions/62286/library-for-code-execution-for-markdown-via-org-babel"
-    (interactive)
-    (when-let* (
-                   (code (get-text-property (point) 'markdown-gfm-code))
-                   (code-body (buffer-substring-no-properties (first code) (second code)))
-                   (language (save-excursion
-                                 (goto-char (first code))
-                                 (forward-line -1)
-                                 (buffer-substring-no-properties
-                                     (+ 3 (point-at-bol))
-                                     (point-at-eol)
-                                     )
-                                 )
-                       )
-                   )
-        (save-excursion
-            (goto-char (second code))
-            (forward-line 1)
+  "Inspired from https://emacs.stackexchange.com/questions/62286/library-for-code-execution-for-markdown-via-org-babel"
+  (interactive)
+  (when-let* (
+              (code (get-text-property (point) 'markdown-gfm-code))
+              (code-body (buffer-substring-no-properties (first code) (second code)))
+              (language (save-excursion
+                          (goto-char (first code))
+                          (forward-line -1)
+                          (buffer-substring-no-properties
+                           (+ 3 (point-at-bol))
+                           (point-at-eol)
+                           )
+                          )
+                        )
+              )
+    (save-excursion
+      (goto-char (second code))
+      (forward-line 1)
 
-            (cond ((string= language "sh")
-                      (konix/markdown-kill-result-region-maybe)
-                      (insert
-                          (format "~~~\n%s\n~~~"
-                              (s-trim
-                                  (org-babel-sh-evaluate
-                                      nil ;; session
-                                      code-body
-                                      ;; params
-                                      '((:colname-names)
-                                           (:rowname-names)
-                                           (:result-params . ("replace" "output"))
-                                           (:result-type . "output")
-                                           (:exports . code)
-                                           (:session . none)
-                                           (:cache . no)
-                                           (:noweb . no)
-                                           (:hlines . no)
-                                           (:tangle . no)))
-                                  ))))
-                (t (progn
-                       (message "I can only process sh blocks now. Improve me please.")))))))
+      (cond ((string= language "sh")
+             (konix/markdown-kill-result-region-maybe)
+             (insert
+              (format "~~~\n%s\n~~~"
+                      (s-trim
+                       (org-babel-sh-evaluate
+                        nil ;; session
+                        code-body
+                        ;; params
+                        '((:colname-names)
+                          (:rowname-names)
+                          (:result-params . ("replace" "output"))
+                          (:result-type . "output")
+                          (:exports . code)
+                          (:session . none)
+                          (:cache . no)
+                          (:noweb . no)
+                          (:hlines . no)
+                          (:tangle . no)))
+                       ))))
+            (t (progn
+                 (message "I can only process sh blocks now. Improve me please.")))))))
 
 
 (provide 'KONIX_AL-markdown-mode)

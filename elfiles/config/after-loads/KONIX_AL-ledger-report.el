@@ -289,6 +289,7 @@ The effective date of 1 will be set to the effective date of 2
   )
 
 (defun konix/ledger-report-apply-narrowing ()
+  (require 'org-agenda)
   (save-excursion
     (if konix/ledger-report-toggle-narrow-similar/narrowed
         (progn

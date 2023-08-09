@@ -887,6 +887,21 @@
          )
         )
       )
+    (goto-char (point-min))
+    (save-match-data
+      (while (re-search-forward
+              "\\( +\\)\\(\\(youtube:\\|http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              nil
+              t)
+        (replace-match
+         (format
+          "%s%s"
+          (match-string-no-properties 1)
+          (konix/org-roam-export/process-url (match-string-no-properties 2))
+          )
+         )
+        )
+      )
     )
   )
 

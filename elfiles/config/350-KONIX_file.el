@@ -166,6 +166,15 @@
     )
   )
 
+(defun konix/ipfa-region ()
+  (interactive)
+  (save-restriction
+    (narrow-to-region (region-beginning) (region-end))
+    (konix/ipfa-buffer)
+    )
+  (deactivate-mark)
+  )
+
 (defun konix/_get-file-name_propositions (&optional must_exist)
   (interactive)
   (let*(

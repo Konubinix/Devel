@@ -24,7 +24,6 @@
 
 ;; mapping = ((src dst) (src dst) ...)
 ;; src = local, dst = remote
-
 (defun konix/dap-mode/local-to-remote-path-fn (mapping path)
   (if-let* (
             (pair (->> mapping
@@ -131,6 +130,6 @@
 (define-key konix/region-bindings-mode-map "e" 'dap-eval-region)
 
 (dap-auto-configure-mode 1)
-(setq-default dap-auto-configure-features '( tooltip controls repl breakpoints))
+(setq-default dap-auto-configure-features '( sessions tooltip controls repl breakpoints))
 
 (provide 'KONIX_AL-dap-mode)

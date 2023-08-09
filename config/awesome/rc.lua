@@ -251,14 +251,17 @@ awful.screen.connect_for_each_screen(function(s)
          layout = wibox.layout.align.horizontal,
          { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
-            mylauncher, myorgmodeline, wibox.widget.textbox('  |  '),
-	    mytemperature,
-            s.mytaglist, s.mypromptbox,
+            mylauncher,
+	    myorgmodeline,
+            s.mytaglist,
+	    s.mypromptbox,
          },
          s.mytasklist, -- Middle widget
          { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
             -- wibox.widget.systray(),
+	    mytemperature,
+	    wibox.widget.textbox('  |  '),
             mytextclock,
             s.mylayoutbox,
          },

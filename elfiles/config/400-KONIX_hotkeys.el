@@ -5,6 +5,7 @@
 (define-key region-bindings-mode-map "r" 'konix/region-bindings-mode-map)
 
 (define-key konix/region-bindings-mode-map "t" 'string-rectangle)
+(define-key konix/region-bindings-mode-map "d" 'delete-rectangle)
 (define-key konix/region-bindings-mode-map "l" 'mc/edit-lines)
 (define-key konix/region-bindings-mode-map "n" 'cua-rectangle-mark-mode)
 

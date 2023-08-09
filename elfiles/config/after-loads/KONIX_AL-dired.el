@@ -137,96 +137,96 @@
 (setq-default dired-omit-verbose nil)
 (setq-default dired-omit-files "^\.?#\|^\.$")
 (setq-default dired-omit-extensions
-			  '("~"
-				".lbin"
-				".ln"
-				".blg"
-				".bbl"
-				".elc"
-				".lof"
-				".glo"
-				".idx"
-				".lot"
-				".svn/"
-				".hg/"
-				".git/"
-				".bzr/"
-				"CVS/"
-				"_darcs/"
-				"_MTN/"
-				".fmt"
-				".tfm"
-				".fas"
-				".lib"
-				".mem"
-				".x86f"
-				".sparcf"
-				".fasl"
-				".ufsl"
-				".fsl"
-				".dxl"
-				".pfsl"
-				".dfsl"
-				".p64fsl"
-				".d64fsl"
-				".dx64fsl"
-				".lo"
-				".la"
-				".gmo"
-				".mo"
-				".toc"
-				".aux"
-				".cp"
-				".fn"
-				".ky"
-				".pg"
-				".tp"
-				".vr"
-				".cps"
-				".fns"
-				".kys"
-				".pgs"
-				".tps"
-				".vrs"
-				".pyc"
-				".pyo"
-				".idx"
-				".lof"
-				".lot"
-				".glo"
-				".blg"
-				".bbl"
-				".cp"
-				".cps"
-				".fn"
-				".fns"
-				".ky"
-				".kys"
-				".pg"
-				".pgs"
-				".tp"
-				".tps"
-				".vr"
-				".vrs"))
+              '("~"
+                ".lbin"
+                ".ln"
+                ".blg"
+                ".bbl"
+                ".elc"
+                ".lof"
+                ".glo"
+                ".idx"
+                ".lot"
+                ".svn/"
+                ".hg/"
+                ".git/"
+                ".bzr/"
+                "CVS/"
+                "_darcs/"
+                "_MTN/"
+                ".fmt"
+                ".tfm"
+                ".fas"
+                ".lib"
+                ".mem"
+                ".x86f"
+                ".sparcf"
+                ".fasl"
+                ".ufsl"
+                ".fsl"
+                ".dxl"
+                ".pfsl"
+                ".dfsl"
+                ".p64fsl"
+                ".d64fsl"
+                ".dx64fsl"
+                ".lo"
+                ".la"
+                ".gmo"
+                ".mo"
+                ".toc"
+                ".aux"
+                ".cp"
+                ".fn"
+                ".ky"
+                ".pg"
+                ".tp"
+                ".vr"
+                ".cps"
+                ".fns"
+                ".kys"
+                ".pgs"
+                ".tps"
+                ".vrs"
+                ".pyc"
+                ".pyo"
+                ".idx"
+                ".lof"
+                ".lot"
+                ".glo"
+                ".blg"
+                ".bbl"
+                ".cp"
+                ".cps"
+                ".fn"
+                ".fns"
+                ".ky"
+                ".kys"
+                ".pg"
+                ".pgs"
+                ".tp"
+                ".tps"
+                ".vr"
+                ".vrs"))
 
 (defun konix/dired-find-file-other-windows ()
   (interactive)
   (let (
-		(previous_window (selected-window))
-		)
-	(dired-find-file-other-window)
-	(select-window previous_window)
-	)
+        (previous_window (selected-window))
+        )
+    (dired-find-file-other-window)
+    (select-window previous_window)
+    )
   )
 
 (defun konix/dired-sort-random ()
   "Dired sort by create time."
   (interactive)
   (let (
-		(insert-directory-program "ls_dired_random.sh")
-		)
-	(revert-buffer)
-	)
+        (insert-directory-program "ls_dired_random.sh")
+        )
+    (revert-buffer)
+    )
   )
 
 ;; with "a", replace existing buffer
@@ -264,14 +264,14 @@
            )
          )
         )
-    (when current-prefix-arg
+    (when (member current-prefix-arg '((4)))
       (setq result (s-replace "filename=" "" result))
-      (when (member current-prefix-arg '((64 )(16)))
-        (setq result (concat (getenv "KONIX_IPFS_GATEWAY") result))
-        )
-      (when (equal current-prefix-arg '(64))
-        (browse-url result)
-        )
+      )
+    (when (member current-prefix-arg '((64)(16)))
+      (setq result (concat (getenv "KONIX_IPFS_GATEWAY") result))
+      )
+    (when (equal current-prefix-arg '(64))
+      (browse-url result)
       )
     result
     )

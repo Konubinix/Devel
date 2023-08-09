@@ -3,4 +3,4 @@
 set -eu
 
 TTYNAME="$1"
-who|grep "$TTYNAME"|grep -q -e "ssh\|mosh\|192.168"
+who|grep "\b${TTYNAME}\b"|grep -q -e "ssh\|mosh\|192.168"

@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 import requests
-from clk.lib import temporary_file
+from clk.lib import call, temporary_file
 from moviepy.editor import VideoFileClip
 from PIL import Image, ImageOps
 
@@ -54,7 +54,10 @@ class Patchwork():
                     print(f"Getting {path}")
                     Path(f.name).write_bytes(requests.get(path).content)
                     path = f.name
-
+                elif path.startswith("/ipfs/"):
+                    print(f"ipfs getting {path}")
+                    call(["ipfs", "get", path, "-o", f.name])
+                    path = f.name
                 type = type or mimetypes.guess_type(path)[0].split("/")[0]
                 if type == "image":
                     i = ImageOps.expand(

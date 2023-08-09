@@ -36,36 +36,36 @@
 (defun konix/decorate-buffer (regexp keymap face &optional match-number)
   """On all strings matching the rexexp, add the keymap and the face"""
   (font-lock-add-keywords nil
-                                                  `(
-                                                        (,regexp (if match-number match-number 0) ,face)
-                                                        )
-                                                  )
+                          `(
+                            (,regexp (if match-number match-number 0) ,face)
+                            )
+                          )
   (save-excursion
-        (goto-char 0)
-        (while (re-search-forward regexp nil t)
-          (set-text-properties
-           (match-beginning (if match-number match-number 0))
-           (match-end (if match-number match-number 0))
-           `(konix-matched-string
-                 ,(match-string (if match-number match-number 0))
-                 keymap ,keymap
-                 face ,face
-                 custom_elem t
-                 )
-           )
-          )
-        )
+    (goto-char 0)
+    (while (re-search-forward regexp nil t)
+      (set-text-properties
+       (match-beginning (if match-number match-number 0))
+       (match-end (if match-number match-number 0))
+       `(konix-matched-string
+         ,(match-string (if match-number match-number 0))
+         keymap ,keymap
+         face ,face
+         custom_elem t
+         )
+       )
+      )
+    )
   )
 
 (defun konix/confirm (msg)
   "Demande confirmation."
   (let (confirm)
-        (setq confirm (read-char (concat "Sur de "msg" (o/n) ? ") "n"))
-        (if (equal confirm 111) ;  111 = ascii("o")
-                t
-          nil
-          )
-        )
+    (setq confirm (read-char (concat "Sur de "msg" (o/n) ? ") "n"))
+    (if (equal confirm 111) ;  111 = ascii("o")
+        t
+      nil
+      )
+    )
   )
 
 (defun konix/goto-line-prog (line)
@@ -96,5 +96,25 @@ LINE is given to 'forward-line."
       )
     (delete-region (region-beginning) (region-end))
     (insert result)
+    )
+  )
+
+(defun konix/url-unhex-region ()
+  (interactive)
+  (let (
+        (content (url-unhex-string (buffer-substring-no-properties (region-beginning) (region-end))))
+        )
+    (kill-region (region-beginning) (region-end))
+    (insert content)
+    )
+  )
+
+(defun konix/url-hexify-region ()
+  (interactive)
+  (let (
+        (content (url-hexify-string (buffer-substring-no-properties (region-beginning) (region-end))))
+        )
+    (kill-region (region-beginning) (region-end))
+    (insert content)
     )
   )

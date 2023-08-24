@@ -68,12 +68,14 @@
          "dired" ;; init
          "editorconfig"
          "envrc" ;; init
+         "gnus" ;; gnus-sum - org
          "KONIX_org-meta-context" ;; init
          "KONIX_org-roam-export" ;; init
          "outline" ;; loaded by org
          "package" ;; init
          "key-chord" ;; init
          "kmacro" ;; loaded by (kbd)
+	 "message" ;; gnus-int - gnus-start - gnu-group - gnus-sum - org
          "org" ;; init
          "org-agenda" ;; init
          "ob-comint" ;; loaded by org
@@ -85,6 +87,7 @@
          "replace" ;; loaded by kmacro
          "savehist" ;; init
          "saveplace" ;; init
+         "sh-script" ;; org-src - org
          "shell" ;; loaded by org (to be able to use python in babel)
          "smerge-mode" ;; loaded when an org mode file needs merging
          "swiper" ;; init

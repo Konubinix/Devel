@@ -102,6 +102,7 @@
 (define-key konix/dap-breakpoint-mode-map (kbd "l") 'dap-ui-breakpoints)
 (define-key konix/dap-breakpoint-mode-map (kbd "a") 'dap-breakpoint-add)
 (define-key konix/dap-breakpoint-mode-map (kbd "b") 'dap-breakpoint-toggle)
+(define-key konix/dap-breakpoint-mode-map (kbd "c") 'dap-breakpoint-condition)
 (define-key konix/dap-breakpoint-mode-map (kbd "d") 'dap-breakpoint-delete)
 (define-key konix/dap-breakpoint-mode-map (kbd "D") 'dap-breakpoint-delete-all)
 
@@ -116,11 +117,22 @@
 (define-key konix/dap-eval-mode-map (kbd "p") 'dap-eval-thing-at-point)
 (define-key konix/dap-eval-mode-map (kbd "r") 'dap-eval-region)
 
+(define-prefix-command 'konix/dap-session-map)
+(define-key konix/dap-mode-map (kbd "s") 'konix/dap-session-map)
+(define-key konix/dap-session-map (kbd "D") 'dap-delete-all-sessions)
+(define-key konix/dap-session-map (kbd "s") 'dap-switch-session)
+(define-key konix/dap-session-map (kbd "h") 'dap-ui-sessions)
+
+(define-prefix-command 'konix/dap-stack-frame-map)
+(define-key konix/dap-mode-map (kbd "f") 'konix/dap-stack-frame-map)
+(define-key konix/dap-stack-frame-map (kbd "s") 'dap-switch-stack-frame)
+
+
 (define-key konix/dap-mode-map (kbd "<f12>") 'dap-hydra)
 (define-key konix/dap-mode-map (kbd "w") 'konix/dap-where)
 (define-key konix/dap-mode-map (kbd "c") 'dap-continue)
 (define-key konix/dap-mode-map (kbd "g") 'dap-continue)
-(define-key konix/dap-mode-map (kbd "s") 'dap-step-in)
+(define-key konix/dap-mode-map (kbd "i") 'dap-step-in)
 (define-key konix/dap-mode-map (kbd "o") 'dap-step-out)
 (define-key konix/dap-mode-map (kbd "<up>") 'dap-up-stack-frame)
 (define-key konix/dap-mode-map (kbd "<down>") 'dap-down-stack-frame)

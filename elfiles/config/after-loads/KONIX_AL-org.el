@@ -31,6 +31,7 @@
 (require 'org-protocol)
 (require 'ol-man)
 (require 'org-clock)
+(require 'org-crypt)
 (require 'dash)
 (require 'holidays)
 (require 'ob-python)
@@ -2201,7 +2202,7 @@ items"
                   (tags "-maybe&-background&+todo=\"NEXT\"|&+todo=\"TODO\"&-maybe&-background|&+project&-maybe&-background&-todo=\"NOT_DONE\"&-todo=\"DONE\"&-todo=\"TODO\""
                         (
                          (org-agenda-overriding-header
-                          "Projects & NA (things that are or should be committed)")
+                          "Projects&NA (things that are or should be committed)")
                          (org-agenda-skip-function
                           '(or
                             (konix/org-agenda-skip-if-tags

@@ -46,7 +46,7 @@
     "default"
     plain "%?"
     :if-new (file+head "${slug}.org" "#+title: ${title}
-#+LANGUAGE: fr
+#+LANGUAGE: en
 #+CREATED: %U
 #+DATE: %U
 #+filetags: :fleeting:
@@ -281,7 +281,7 @@ ${title}
 :END:
 #+TITLE: %s
 #+CREATED: %s
-#+LANGUAGE: fr
+#+LANGUAGE: en
 #+DATE: %s
 #+filetags: :fleeting:"
             (uuidgen-4)

@@ -29,7 +29,7 @@
 (setq-default org-journal-date-format "%Y-%m-%d, %A")
 (setq-default org-journal-file-format "%Y%m%d.org")
 (setq-default org-journal-file-header "#+title: %Y-%m-%d, %A
-#+LANGUAGE: fr
+#+LANGUAGE: en
 #+CREATED: [%Y-%m-%d %a %H:%M]
 ")
 (setq-default org-journal-carryover-items "TODO=\"TODO\"|TODO=\"NEXT\"")

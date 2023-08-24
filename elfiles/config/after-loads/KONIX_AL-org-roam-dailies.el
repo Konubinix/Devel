@@ -38,7 +38,7 @@
     (file+head
      "%<%Y_%m_%d>.org"
      "#+title: %<%Y-%m-%d>
-#+LANGUAGE: fr
+#+LANGUAGE: en
 #+CREATED: %U
 #+DATE: %U
 
@@ -67,7 +67,7 @@
 :END:
 " (uuidgen-4))
        (format-time-string "#+title: %Y-%m-%d\n" time)
-       (format-time-string "#+LANGUAGE: fr
+       (format-time-string "#+LANGUAGE: en
 #+CREATED: [%Y-%m-%d %a %H:%M]
 #+DATE: [%Y-%m-%d %a %H:%M]\n\n"
                            ))

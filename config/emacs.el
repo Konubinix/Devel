@@ -118,8 +118,10 @@
                         (file-to-load (match-string-no-properties 1 elt))
                         (loaded-file (konix/loaded-file file-to-load))
                         (message (format "%s was already loaded before configuring its after load\
- (in %s) -> configuring an after-load is useless in that case."
-                                     file-to-load directory))
+ (in %s) -> configuring an after-load is useless in that case.\
+add (konix/require-debug-setup '%s) in %s/config/emacs.el \
+to find out why it is loaded"
+                                     file-to-load directory file-to-load devel-dir))
                         )
                   (when (and
                             loaded-file

@@ -24,32 +24,24 @@
 
 ;;; Code:
 
-(setq-default
- custom-safe-themes
- '(
-   "28a34dd458a554d34de989e251dc965e3dc72bace7d096cdc29249d60f395a82"
-   default)
- )
-
-
 (add-to-list 'safe-local-variable-values
-			 '(konix/delete-trailing-whitespace . t))
+                         '(konix/delete-trailing-whitespace . t))
 (add-to-list 'safe-local-variable-values
-			 '(konix/delete-trailing-whitespace . nil))
+                         '(konix/delete-trailing-whitespace . nil))
 (add-to-list 'safe-local-variable-values
-			 '(auto-revert-mode . t))
+                         '(auto-revert-mode . t))
 (add-to-list 'safe-local-variable-values
-			 '(eval hl-line-mode t))
+                         '(eval hl-line-mode t))
 (add-to-list 'safe-local-variable-values
-			 '(ispell-dictionary . "francais"))
+                         '(ispell-dictionary . "francais"))
 (add-to-list 'safe-local-variable-values
-			 '(ispell-dictionary . "british"))
+                         '(ispell-dictionary . "british"))
 (add-to-list 'safe-local-variable-values
-			 '(ispell-dictionary . "americain"))
+                         '(ispell-dictionary . "americain"))
 (add-to-list 'safe-local-variable-values
-			 '(eval org-hugo-auto-export-mode))
+                         '(eval org-hugo-auto-export-mode))
 (add-to-list 'safe-local-variable-values
-			 '(eval visual-line-mode -1))
+                         '(eval visual-line-mode -1))
 (add-to-list 'safe-local-variable-values '(python-indent . 4))
 (add-to-list 'safe-local-variable-values '(ispell-dictionary . "american"))
 (add-to-list 'safe-local-variable-values '(eval visual-line-mode -1))

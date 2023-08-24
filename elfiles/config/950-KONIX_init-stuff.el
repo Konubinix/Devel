@@ -15,6 +15,12 @@
               )
 
 (setenv "INEMACS" "t")
+(setq-default
+ custom-safe-themes
+ '(
+   "f366d4bc6d14dcac2963d45df51956b2409a15b770ec2f6d730e73ce0ca5c8a7"
+   default)
+ )
 (load-theme 'zenburn)
 
 (envrc-global-mode 1)

@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(setq-default org-crypt-key "konubinix")
 (org-crypt-use-before-save-magic)
 
 (provide 'KONIX_AL-org-crypt)

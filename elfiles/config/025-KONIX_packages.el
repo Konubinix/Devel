@@ -111,7 +111,7 @@
   (use-package image-roll :straight '(:type git :host github :repo "dalanicolai/image-roll.el"))
   (use-package imenu-tree)
   (use-package ini)
-  (use-package js2-mode :commands (js2-mode))
+  (use-package js2-mode :commands (js2-mode) :mode ("\\.mjs$" . js2-mode))
   (use-package keep-buffers)
   (use-package key-chord)
   (use-package lisp :straight (:type built-in) :mode ("emacs$" . list-mode))

@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+;; grep for savehist-additional-variables to find the added values
+
 (savehist-mode 1)
 
 

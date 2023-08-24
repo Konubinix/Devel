@@ -25,25 +25,27 @@
 ;;; Code:
 
 (setq-default kill-ring-max 3000)
+(require 'savehist)
 
+(add-to-list 'savehist-additional-variables 'kill-ring)
 
 (defun konix/shell/rename-async-shell-buffer (&optional output-buffer)
   (unless output-buffer
-	(setq output-buffer "*Async Shell Command*")
-	)
+    (setq output-buffer "*Async Shell Command*")
+    )
   (when (and output-buffer
-			 (stringp output-buffer)
-			 (get-buffer output-buffer)
-			 (save-window-excursion
-			   (switch-to-buffer output-buffer)
-			   (y-or-n-p
-				(format "%s buffer already exists, rename it ?"
-						output-buffer)
-				)
-			   (rename-uniquely)
-			   )
-			 )
-	)
+             (stringp output-buffer)
+             (get-buffer output-buffer)
+             (save-window-excursion
+               (switch-to-buffer output-buffer)
+               (y-or-n-p
+                (format "%s buffer already exists, rename it ?"
+                        output-buffer)
+                )
+               (rename-uniquely)
+               )
+             )
+    )
   )
 
 ;; When popping the mark, continue popping until the cursor

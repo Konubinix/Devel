@@ -29,6 +29,9 @@
 ;; [17:18:43] alphapapa​> I have ement-room-unread-only-counts-notifications set to t, which is the default, and which means that it should behave the same as Element. Setting it to nil is really just a fallback to old behavior that tries to use non-spec heuristics to determine whether a room is "unread".
 (setq-default ement-room-unread-only-counts-notifications t)
 
+;; to avoid having to log in everytime I open emacs
+(custom-set-variables '(ement-save-sessions t))
+
 ;; I don't like being disturbed by ement
 (setq-default ement-after-initial-sync-hook
       (remove 'ement-room-list--after-initial-sync

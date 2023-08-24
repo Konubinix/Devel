@@ -1428,7 +1428,7 @@ items"
                 ("ap" . "Agendas with people")
                 ("apa" "All (no filtering)"
                  (
-                  (tags "+Agenda+todo=\"NEXT\"-maybe-WAIT-DELEGATED"
+                  (tags "+Agenda&+todo=\"NEXT\"&-maybe&-WAIT&-DELEGATED"
                         (
                          (org-agenda-overriding-header
                           "Next actions about talking with people (no promises)")
@@ -1448,7 +1448,7 @@ items"
                           )
                          )
                         )
-                  (tags-todo "-C_me-C_society-maybe-background"
+                  (tags-todo "-C_me&-C_society&-maybe&-background"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
@@ -1470,7 +1470,7 @@ items"
                                )
                               )
                              )
-                  (tags-todo "DELEGATED-maybe-background|WAIT-maybe-background|Promise-maybe-background"
+                  (tags-todo "+DELEGATED&-maybe&-background|WAIT&-maybe&-background|+Promise&-maybe&-background"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
@@ -1493,7 +1493,7 @@ items"
                                  ))
                               )
                              )
-                  (tags-todo "DELEGATED-maybe|WAIT-maybe"
+                  (tags-todo "+DELEGATED&-maybe|+WAIT&-maybe"
                              (
                               (org-agenda-prefix-format
                                '(
@@ -1529,7 +1529,7 @@ items"
                  )
                 ("apA" "All (no filtering, no promises)"
                  (
-                  (tags "+Agenda+todo=\"NEXT\"-maybe-WAIT-DELEGATED"
+                  (tags "+Agenda&+todo=\"NEXT\"&-maybe&-WAIT&-DELEGATED"
                         (
                          (org-super-agenda-groups
                           (mapcar
@@ -1557,7 +1557,7 @@ items"
                  )
                 ("apw" "Work (no filtering)"
                  (
-                  (tags "AgendaWork+todo=\"NEXT\"-maybe")
+                  (tags "AgendaWork&+todo=\"NEXT\"&-maybe")
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags))
@@ -1574,7 +1574,7 @@ items"
                 ("an" . "NEXT Actions")
                 ("ana" "No filtering"
                  (
-                  (tags-todo "-maybe-background-project-WAIT-DELEGATED//+NEXT")
+                  (tags-todo "-maybe&-background&-project&-WAIT&-DELEGATED//&+NEXT")
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags-todo))
@@ -1593,7 +1593,7 @@ items"
                  )
                 ("anf" "All not maybe tasks, not scheduled in the future"
                  (
-                  (tags-todo "-maybe-project-WAIT-DELEGATED//+NEXT")
+                  (tags-todo "-maybe&-project&-WAIT&-DELEGATED//&+NEXT")
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags-todo))
@@ -1614,7 +1614,7 @@ items"
                  )
                 ("anr" "With filters, empty context also"
                  (
-                  (tags-todo "-maybe-project-WAIT-DELEGATED//+NEXT")
+                  (tags-todo "-maybe&-project&-WAIT&-DELEGATED//&+NEXT")
                   )
                  (
                   (dummy (setq konix/org-agenda-type 'tags-todo))
@@ -1635,7 +1635,7 @@ items"
                  )
                 ("ann" "With filters, only actions with context"
                  (
-                  (tags-todo "-maybe-project-WAIT-DELEGATED+Context//+NEXT")
+                  (tags-todo "-maybe&-project&-WAIT&-DELEGATED&+Context//&+NEXT")
                   )
                  (
                   (org-agenda-prefix-format
@@ -1756,7 +1756,7 @@ items"
                 ("ad" . "Doctor views")
                 ("ada" "Actions levels, errors (HOF < 2)"
                  (
-                  (tags-todo "ARCHIVE+TODO=\"NEXT\"|ARCHIVE+TODO=\"TODO\""
+                  (tags-todo "ARCHIVE&+TODO=\"NEXT\"|ARCHIVE&+TODO=\"TODO\""
                              (
                               (org-agenda-overriding-header
                                "Close a TODO before archiving it")
@@ -1769,7 +1769,7 @@ items"
                                  ))
                               )
                              )
-                  (tags "refile-structure"
+                  (tags "refile&-structure"
                         (
                          (org-agenda-overriding-header "Refile those entries")
                          (org-agenda-todo-ignore-deadlines nil)
@@ -1787,7 +1787,7 @@ items"
                          (org-agenda-tag-filter-preset nil)
                          )
                         )
-                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"-refile"
+                  (tags "+project&-maybe&-todo=\"DONE\"&-todo=\"NOT_DONE\"&-refile"
                         (
                          (org-agenda-overriding-header
                           "A NEXT project MUST either be WAITING or have at least either a NEXT entry or a future diary (and not a maybe one)")
@@ -1802,7 +1802,7 @@ items"
                           )
                          )
                         )
-                  (tags "-refile+project+NoAgenda-todo=\"DONE\"-todo=\"NOT_DONE\"|-refile-todo=\"NEXT\"-todo=\"TODO\"-todo=\"DONE\"-todo=\"NOT_DONE\"+NoAgenda"
+                  (tags "-refile&+project&+NoAgenda&-todo=\"DONE\"&-todo=\"NOT_DONE\"|-refile&-todo=\"NEXT\"&-todo=\"TODO\"&-todo=\"DONE\"&-todo=\"NOT_DONE\"&+NoAgenda"
                         (
                          (org-agenda-overriding-header
                           "A project or a non action MUST not have a context other than US agenda")
@@ -1814,7 +1814,7 @@ items"
                           )
                          )
                         )
-                  (tags-todo "-maybe+todo=\"TODO\"-refile"
+                  (tags-todo "-maybe&+todo=\"TODO\"&-refile"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-skip-function
@@ -1829,7 +1829,7 @@ items"
                                "Organize orphan TODOs items (refile to project or set to NEXT)")
                               )
                              )
-                  (tags-todo "-Context-project-maybe+todo=\"NEXT\"-refile-WAIT-DELEGATED"
+                  (tags-todo "-Context&-project&-maybe&+todo=\"NEXT\"&-refile&-WAIT&-DELEGATED"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
@@ -1850,7 +1850,7 @@ items"
                                )
                               )
                              )
-                  (tags-todo "DELEGATED-Agenda-maybe|WAIT-Agenda-maybe"
+                  (tags-todo "DELEGATED&-Agenda&-maybe|WAIT&-Agenda&-maybe"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
@@ -1861,13 +1861,13 @@ items"
                                  ))
                               )
                              )
-                  (tags "+INTERRUPTION-timejudgment-structure"
+                  (tags "+INTERRUPTION&-timejudgment&-structure"
                         (
                          (org-agenda-overriding-header
                           "Give a time judgment to the Interruption")
                          )
                         )
-                  (tags "-refile-Commitment-Expectation-maybe"
+                  (tags "-refile&-Commitment&-Expectation&-maybe"
                         (
                          (org-agenda-todo-ignore-deadlines nil)
                          (org-agenda-overriding-header
@@ -1880,7 +1880,7 @@ items"
                             ))
                          )
                         )
-                  (tags "+Expectation-Commitment-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
+                  (tags "+Expectation&-Commitment&-maybe&-todo=\"DONE\"&-todo=\"NOT_DONE\""
                         (
                          (org-agenda-overriding-header
                           "Be clear about the expectations -> make commitment out of them")
@@ -1903,7 +1903,7 @@ items"
                  )
                 ("adw" "Warnings (HOF < 2)"
                  (
-                  (tags-todo "+Agenda-NoAgenda"
+                  (tags-todo "+Agenda&-NoAgenda"
                              (
                               (org-agenda-todo-ignore-deadlines nil)
                               (org-agenda-overriding-header
@@ -1916,7 +1916,7 @@ items"
                                )
                               )
                              )
-                  (tags "+project-maybe//-DONE-NOT_DONE"
+                  (tags "+project&-maybe//&-DONE&-NOT_DONE"
                         (
                          (org-agenda-todo-ignore-deadlines nil)
                          (org-agenda-overriding-header
@@ -2016,7 +2016,7 @@ items"
                             )
                            )
                           )
-                  (tags "WAIT-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"|DELEGATED-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
+                  (tags "WAIT&-maybe&-todo=\"DONE\"&-todo=\"NOT_DONE\"|DELEGATED&-maybe&-todo=\"DONE\"&-todo=\"NOT_DONE\""
                         (
                          (org-agenda-include-deadlines t)
                          (org-agenda-overriding-header "Waiting stuff")
@@ -2160,7 +2160,7 @@ items"
                 ("ag" . "GTD list views")
                 ("agC" "Commitment promises"
                  (
-                  (tags "-maybe-background+todo=\"NEXT\"+Promise|+Promise+todo=\"TODO\"-maybe-background|+Promise+project-maybe-background-todo=\"NOT_DONE\"-todo=\"DONE\""
+                  (tags "-maybe&-background&+todo=\"NEXT\"&+Promise|&+Promise&+todo=\"TODO\"&-maybe&-background|&+Promise&+project&-maybe&-background&-todo=\"NOT_DONE\"&-todo=\"DONE\""
                         (
                          (org-agenda-overriding-header
                           "Committed stuff, not to me")
@@ -2198,7 +2198,7 @@ items"
                  )
                 ("agP" "Actions to review and consider maybe-ing during the Weekly review"
                  (
-                  (tags "-maybe-background+todo=\"NEXT\"|+todo=\"TODO\"-maybe-background|+project-maybe-background-todo=\"NOT_DONE\"-todo=\"DONE\"-todo=\"TODO\""
+                  (tags "-maybe&-background&+todo=\"NEXT\"|&+todo=\"TODO\"&-maybe&-background|&+project&-maybe&-background&-todo=\"NOT_DONE\"&-todo=\"DONE\"&-todo=\"TODO\""
                         (
                          (org-agenda-overriding-header
                           "Projects & NA (things that are or should be committed)")
@@ -2247,7 +2247,7 @@ items"
                  )
                 ("agp" "Projects for which to review the status, goal and outcome during the GTD weekly review"
                  (
-                  (tags "+project-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"-todo=\"TODO\""
+                  (tags "+project&-maybe&-todo=\"DONE\"&-todo=\"NOT_DONE\"&-todo=\"TODO\""
                         (
                          (org-agenda-overriding-header
                           "Current projects, all of them (even subprojects), for gtd reviewing")
@@ -2276,7 +2276,7 @@ items"
                  )
                 ("agr" "RIL"
                  (
-                  (tags "@ril-todo=\"DONE\"-todo=\"NOT_DONE\"-maybe"
+                  (tags "@ril&-todo=\"DONE\"&-todo=\"NOT_DONE\"&-maybe"
                         (
                          (org-agenda-overriding-header
                           "To Read Later")
@@ -2288,7 +2288,7 @@ items"
                  )
                 ("agb" "Web"
                  (
-                  (tags "@web-todo=\"DONE\"-todo=\"TODO\"-todo=\"NOT_DONE\"-maybe"
+                  (tags "@web&-todo=\"DONE\"&-todo=\"TODO\"&-todo=\"NOT_DONE\"&-maybe"
                         (
                          (org-agenda-overriding-header
                           "Web stuff")
@@ -2306,7 +2306,7 @@ items"
                  )
                 ("agw" "Waiting for list (no filter context)"
                  (
-                  (tags "WAIT-maybe-todo=\"DONE\"-todo=\"NOT_DONE\"|DELEGATED-maybe-todo=\"DONE\"-todo=\"NOT_DONE\""
+                  (tags "WAIT&-maybe&-todo=\"DONE\"&-todo=\"NOT_DONE\"|DELEGATED&-maybe&-todo=\"DONE\"&-todo=\"NOT_DONE\""
                         (
                          (org-agenda-overriding-header "WAITING items")
                          (org-agenda-skip-function
@@ -2343,7 +2343,7 @@ items"
                 ("agW" "All waiting for list (even maybe and future)"
                  ;; useful when something new appears while the heading it still hidden
                  (
-                  (tags "WAIT-todo=\"DONE\"-todo=\"NOT_DONE\"|DELEGATED-todo=\"DONE\"-todo=\"NOT_DONE\""
+                  (tags "WAIT&-todo=\"DONE\"&-todo=\"NOT_DONE\"|DELEGATED&-todo=\"DONE\"&-todo=\"NOT_DONE\""
                         (
                          (org-agenda-overriding-header "WAITING items")
                          (org-agenda-skip-function
@@ -2364,7 +2364,7 @@ items"
                  )
                 ("age" "Expiry helper"
                  (
-                  (tags "-structure-gcalinbox-NOEXPIRY-NOEXPIRYRECURSIVE-TODO=\"NEXT\"-TODO=\"TODO\""
+                  (tags "-structure&-gcalinbox&-NOEXPIRY&-NOEXPIRYRECURSIVE&-TODO=\"NEXT\"&-TODO=\"TODO\""
                         (
                          (org-agenda-overriding-header
                           "Expired entries (no subtask, archive them)")
@@ -2376,7 +2376,7 @@ items"
                           )
                          )
                         )
-                  (tags "-structure-gcalinbox-NOEXPIRY-NOEXPIRYRECURSIVE-TODO=\"NEXT\"-TODO=\"TODO\""
+                  (tags "-structure&-gcalinbox&-NOEXPIRY&-NOEXPIRYRECURSIVE&-TODO=\"NEXT\"&-TODO=\"TODO\""
                         (
                          (org-agenda-overriding-header
                           "Expired entries (subtask, soft)")
@@ -2388,7 +2388,7 @@ items"
                           )
                          )
                         )
-                  (tags-todo "-structure-gcalinbox-NOEXPIRY-NOEXPIRYRECURSIVE+TODO=\"NEXT\"|-NOEXPIRY-NOEXPIRYRECURSIVE+TODO=\"TODO\""
+                  (tags-todo "-structure&-gcalinbox&-NOEXPIRY&-NOEXPIRYRECURSIVE&+TODO=\"NEXT\"|&-NOEXPIRY&-NOEXPIRYRECURSIVE&+TODO=\"TODO\""
                              (
                               (org-agenda-overriding-header
                                "Expired undone stuff (check them)")

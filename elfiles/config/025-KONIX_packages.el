@@ -86,6 +86,7 @@
   (use-package dired-filetype-face)
   (use-package dired-quick-sort)
   (use-package dockerfile-mode)
+  ;; not ready yet
   (use-package earthfile-mode :straight (:fork t))
   (use-package editorconfig)
   (use-package edit-indirect)
@@ -145,6 +146,7 @@
   (use-package ox-gfm)
   (use-package pdf-tools :straight (:repo "dalanicolai/pdf-tools" :branch "pdf-roll") :magic ("%PDF" . pdf-view-mode))
   (use-package phi-search-dired)
+  ;; https://github.com/skuro/plantuml-mode/pull/173
   (use-package plantuml-mode :straight (:fork t))
   (use-package popwin)
   (use-package python :straight (:type built-in) :mode (("\\.py\\'" . python-mode)))
@@ -153,6 +155,7 @@
   (use-package region-bindings-mode :commands (region-bindings-mode-enable))
   (use-package rust-mode)
   (use-package scad-mode)
+  ;; https://github.com/yuya373/emacs-slack/pull/576
   (use-package slack :commands (slack-start) :straight (:fork t) :bind-keymap ("<f2> l" . konix/slack-global-map))
   (use-package tempbuf)
   (use-package terraform-mode)

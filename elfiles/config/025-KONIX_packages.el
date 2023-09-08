@@ -108,7 +108,7 @@
   (use-package highlight-symbol :commands (highlight-symbol))
   (use-package konix/org-gtd-context-edit-mode :straight (:type built-in) :mode "gtd_contexts/")
   (use-package hydra)
-  (use-package hypothesis :commands (konix/hypothesis-archive) :straight (:type git :host github :repo "Konubinix/hypothesis"))
+  (use-package hypothesis :commands (konix/hypothesis-archive) :straight (:type git :host github :repo "Kungsgeten/hypothesis"))
   (use-package image-roll :straight '(:type git :host github :repo "dalanicolai/image-roll.el"))
   (use-package imenu-tree)
   (use-package ini)

@@ -32,27 +32,33 @@
         level
         (pomodoro (string-trim (shell-command-to-string "redis-cli get pomodoro")))
         )
-    (unless (member room-name slack-mute/muted)
+    (when (and
+           (not (member room-name slack-mute/muted))
+           (not (equal (oref team self-id) (slack-message-sender-id message)))
+           )
       (setq level
-       (cond
-        (
-         (slack-message-mentioned-p message team)
-         4
-         )
-        (
-         pomodoro
-         0
-         )
-        (
-         t
-         0
-         )
-        )
-       )
-      (let (
-            (msg (format "%s: %s: %s" room-name sender-name message-body)))
-        (message msg)
-        (konix/notify msg level)
+            (cond
+             (
+              (slack-message-mentioned-p message team)
+              4
+              )
+             (
+              pomodoro
+              nil
+              )
+             (
+              t
+              0
+              )
+             )
+            )
+      (when level
+        (let (
+              (msg (format "%s: %s: %s" room-name sender-name message-body))
+              )
+          (message msg)
+          (konix/notify msg level)
+          )
         )
       )
     )

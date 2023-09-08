@@ -110,7 +110,11 @@
 
 (defun konix/ement-room-buffer (session room)
   ;; ensure the buffer is open
-  (save-window-excursion (ement-room-view room session))
+  (pcase-let* (((cl-struct ement-room (local (map buffer))) room))
+    (unless (buffer-live-p buffer)
+      (save-window-excursion (ement-room-view room session))
+      )
+    )
   (map-elt (ement-room-local room) 'buffer)
   )
 

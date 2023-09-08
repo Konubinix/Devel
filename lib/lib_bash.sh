@@ -76,8 +76,13 @@ m () {
 }
 
 private_nav () {
-	export KONIX_BASH_PRIVATE_NAV=1
-	bash -i
+    history -c
+    trap "history -c" EXIT
+}
+
+private_nav_from_now () {
+    history -a
+    trap "history -c" EXIT
 }
 
 is_sourced () {

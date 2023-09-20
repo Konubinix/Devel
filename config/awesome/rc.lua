@@ -58,10 +58,8 @@ end
 beautiful.init(gears.filesystem.get_configuration_dir() .. "themes/default/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "x-terminal-emulator"
 terminal = "terminator"
-terminal_class = "X-terminal-emulator"
-terminal_class = "Terminator"
+terminal_instance = "terminator"
 browser = os.getenv("BROWSER") or "x-www-browser"
 editor = os.getenv("EDITOR") or "editor"
 editor_cmd = terminal .. " -e " .. editor
@@ -592,12 +590,12 @@ globalkeys = gears.table.join(
    awful.key({ modkey,           },
       "Return",
       open_or_join(
-		 terminal_class,
+		 terminal_instance,
 		 terminal
       ),
       {description = "open a terminal", group = "launcher"}),
    awful.key({ modkey, "Control"          }, "t", open_or_join(
-		 terminal_class,
+		 terminal_instance,
 		 terminal
 															  ),
       {description = "open a terminal", group = "launcher"}),
@@ -729,7 +727,7 @@ globalkeys = gears.table.join(
          )
    end,
       {description = "play previous song", group = "music"}),
-   awful.key({ modkey, "Control"          }, "p", open_or_join("Pavucontrol", "pavucontrol"),
+   awful.key({ modkey, "Control"          }, "p", open_or_join("pavucontrol", "pavucontrol"),
       {description = "pavucontrol", group = "music"}),
 
    awful.key({ modkey,  "Shift"         }, "Up",     function () awful.tag.incmwfact( 0.05)          end,

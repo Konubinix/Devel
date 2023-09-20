@@ -293,7 +293,7 @@ root.buttons(gears.table.join(
 ))
 -- }}}
 
-function open_or_join (class, program)
+function open_or_join (instance, program)
    return function(c)
       function move_to_client(c_)
          awful.screen.focus(c_.screen)
@@ -303,12 +303,12 @@ function open_or_join (class, program)
          c_:swap(awful.client.getmaster())
       end
 
-      function find_candidate(class)
+      function find_candidate(instance)
          local tag = awful.screen.focused().selected_tag
          local candidates = {}
          local local_candidates = {}
          for _, c_ in ipairs(client.get()) do
-            if c_.class == class then
+            if c_.instance == instance then
                table.insert(candidates, c_)
                if c_.first_tag == tag
                then
@@ -336,27 +336,27 @@ function open_or_join (class, program)
          end
          -- if result
          -- then
-         --    say("Found " .. class .. " (in " .. result.first_tag.name .. ")")
+         --    say("Found " .. instance .. " (in " .. result.first_tag.name .. ")")
          -- end
          return result
       end
 
       local result = nil
-      if client.focus and client.focus.class == class
+      if client.focus and client.focus.instance == instance
       then
-         -- say("Nothing to do, already on a window with class " .. class)
+         -- say("Nothing to do, already on a window with instance " .. instance)
          -- moving anyway to focus on the correct screen and have a coherent
          -- behavior about the tags
          result = client.focus
       else
-         result = find_candidate(class)
+         result = find_candidate(instance)
       end
 
       if result
       then
          move_to_client(result)
       else
-         say("Did not find " .. class .. "..., Opening " .. program .. " instead")
+         say("Did not find " .. instance .. "..., Opening " .. program .. " instead")
          awful.spawn(program)
       end
    end
@@ -575,19 +575,19 @@ globalkeys = gears.table.join(
    -- Standard program
    awful.key({ modkey,   "Control"        }, "q", open_or_join("qutebrowser", browser),
       {description = "open a browser", group = "launcher"}),
-   awful.key({ modkey,   "Control"        }, "e", open_or_join("Emacs", "e"),
+   awful.key({ modkey,   "Control"        }, "e", open_or_join("emacs", "e"),
       {description = "open emacs", group = "launcher"}),
-   awful.key({ modkey,   "Control"        }, "f", open_or_join("Firefox", "firefox"),
+   awful.key({ modkey,   "Control"        }, "f", open_or_join("firefox", "firefox"),
       {description = "open firefox", group = "launcher"}),
-   awful.key({ modkey,   "Control"        }, "c", open_or_join("Chromium", "chromium"),
+   awful.key({ modkey,   "Control"        }, "c", open_or_join("chromium", "chromium"),
       {description = "open firefox", group = "launcher"}),
    awful.key({ modkey,   "Control"        }, "v", open_or_join("vlc", "vlc"),
       {description = "open firefox", group = "launcher"}),
-   awful.key({ modkey,   "Control"        }, "i", open_or_join("Firefox", "firefox"),
+   awful.key({ modkey,   "Control"        }, "i", open_or_join("firefox", "firefox"),
       {description = "open firefox", group = "launcher"}),
-   awful.key({ modkey, "Control"   }, "m", open_or_join("Gmpc", "gmpc"),
+   awful.key({ modkey, "Control"   }, "m", open_or_join("gmpc", "gmpc"),
       {description = "Open the music controler", group = "musique"}),
-   awful.key({ modkey,   "Control"        }, "s", open_or_join("Slack", "slack --no-sandbox"),
+   awful.key({ modkey,   "Control"        }, "s", open_or_join("slack", "slack"),
       {description = "open emacs", group = "launcher"}),
    awful.key({ modkey,           },
       "Return",
@@ -653,6 +653,14 @@ globalkeys = gears.table.join(
    end,
       {description = "toggle play", group = "music"}),
    awful.key({}, "XF86AudioPlay",     function ()
+		 naughty.notify(
+			{
+			   preset = naughty.config.presets.normal,
+			   title = "MPD",
+			   text = "Toggling mpc",
+			   timeout = 0.5,
+			}
+		 )
          awful.spawn.easy_async(
             "clk mpc toggle",
             function (stdout, stderr, exitreason, exitcode)
@@ -1222,7 +1230,7 @@ awful.rules.rules = {
    {
       rule_any = {
          name = {"Slack | mini panel", "Pick a Font", "Change Foreground Color", "Post Processing Plugin"},
-		 class = {"Impass"}
+		 class = {"Impass", "Konix_impass.py"}
       },
       properties = {
          floating = true,

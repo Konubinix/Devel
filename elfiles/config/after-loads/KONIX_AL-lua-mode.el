@@ -24,10 +24,32 @@
 
 ;;; Code:
 
+(require 'lsp)
+
+
+(defun konix/lua/stylua ()
+  (interactive)
+  (when (buffer-modified-p)
+    (user-error "Save the file before it is too late")
+    )
+  (message
+   (shell-command-to-string
+    (format
+     "stylua '%s'" (buffer-file-name))))
+  (revert-buffer nil t)
+  )
+
+
 (defun konix/lua-mode-hook()
   (konix/prog/config)
   (auto-complete-mode t)
   (add-hook 'after-save-hook 'konix/make-executable t t)
+  (lsp)
+  (add-hook 'after-save-hook
+            #'konix/lua/stylua
+            nil
+            t
+            )
   )
 (add-hook 'lua-mode-hook 'konix/lua-mode-hook)
 

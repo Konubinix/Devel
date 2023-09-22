@@ -48,6 +48,7 @@
 --exclude-dir target \
 --exclude-dir coverage \
 --exclude-dir .cquery_cached_index \
+--exclude-dir .angular \
 -i -nH \
 -R -e ")
  '(grep-template "grep <C> -nH -R -e  <R> <F>")

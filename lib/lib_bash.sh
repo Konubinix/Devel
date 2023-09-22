@@ -75,12 +75,20 @@ m () {
 	mkdir -p "$1" && c "$1"
 }
 
-private_nav () {
+private_nav_clean_n_stop () {
     history -c
+    history -r
+    unset KONIX_PRIVATE_NAV
+    trap "" EXIT
+}
+
+private_nav () {
+    export "KONIX_PRIVATE_NAV=1"
     trap "history -c" EXIT
 }
 
 private_nav_from_now () {
+    export "KONIX_PRIVATE_NAV=1"
     history -a
     trap "history -c" EXIT
 }

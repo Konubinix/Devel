@@ -9,4 +9,4 @@ shopt -s inherit_errexit
 trap "exit 2" SIGINT
 trap "exit 3" SIGQUIT
 
-exec qutebrowser --desktop-file-name slack --qt-arg name slack --basedir "${XDG_DATA_HOME}/slack" https://app.slack.com
+exec qutebrowser --desktop-file-name slack --qt-arg name slack --basedir "${XDG_DATA_HOME}/slack" "${KONIX_SLACK_START_URL:-https://app.slack.com}"

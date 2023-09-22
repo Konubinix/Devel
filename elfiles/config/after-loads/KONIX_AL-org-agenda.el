@@ -1677,13 +1677,7 @@ TRIGGER:-PT%sM
 END:VALARM"
                               summary
                               categories
-                              (concat
-                               description
-                               (format "\\\\n%s:%s"
-                                       (current-buffer)
-                                       (line-number-at-pos (point))
-                                       )
-                               )
+                              description
                               (if location (format "
 LOCATION:%s" location) "")
                               stamp

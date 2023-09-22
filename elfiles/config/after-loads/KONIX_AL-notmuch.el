@@ -192,6 +192,16 @@ Message-Id: <%s>" id)
         )
   ""
   )
+(defface konix/notmuch-search-spam
+  '(
+        (
+         ((class color)
+          (background dark))
+         (:strike-through "red")
+         )
+        )
+  ""
+  )
 (defface konix/notmuch-search-perso
   '(
         (
@@ -239,6 +249,7 @@ Message-Id: <%s>" id)
   )
 (setq notmuch-search-line-faces '(
                                                                   ("temp" . konix/notmuch-search-temp)
+                                                                  ("spam" . konix/notmuch-search-spam)
                                                                   ("answer" . konix/notmuch-search-answer)
                                                                   ("perso" . konix/notmuch-search-perso)
                                                                   ("deleted" . (:foreground "red"))

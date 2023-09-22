@@ -65,6 +65,8 @@
 (let (time_before_load time_after_load diff_time diff_abs_time)
   (setq time_before_load (current-time))
 
+  (use-package org :mode ("\\.org_archive" . org-mode))
+
   (use-package arduino-mode)
   (use-package argdown :straight (:type built-in) :mode ("\\.argdown\\'" . argdown-mode))
   (use-package authinfo :straight (:type built-in) :mode ("netrc.gpg" . authinfo-mode))
@@ -129,7 +131,6 @@
   (use-package nix-mode :commands (nix-mode))
   (use-package ol-emacs-slack :straight (:type git :host github :repo "ag91/ol-emacs-slack"))
   (use-package ol-notmuch)
-  (use-package org :mode ("\\.org_archive" . org-mode))
   (use-package org-checklist :straight org-contrib)
   (use-package org-edna)
   (use-package org-drill :bind-keymap  ("C-f D" . konix/org-drill-key-map))

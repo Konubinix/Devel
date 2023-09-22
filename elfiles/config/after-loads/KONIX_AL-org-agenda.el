@@ -1611,10 +1611,18 @@
          (stamp (format-time-string "%Y%m%dT%H%M%SZ"))
          (id (konix/org-get-id))
          (categories (mapconcat 'identity (konix/org-get-tags) ","))
-         (description (konix/org-agenda-export-description))
+         (description (konix/org-with-point-on-heading
+                       (format
+                        "%s\\\\n%s:%s"
+                        (konix/org-agenda-export-description)
+                        (current-buffer)
+                        (line-number-at-pos (point))
+                        )
+                       )
+                      )
          (location
           (konix/org-with-point-on-heading
-           (or (org-entry-get (point) "LOCATION") "NA")
+           (or (org-entry-get (point) "LOCATION") nil)
            )
           )
          (warn-time (konix/org-with-point-on-heading
@@ -1660,8 +1668,7 @@ DUE" (if duration
                       (format "
 SUMMARY:%s
 CATEGORIES:%s
-DESCRIPTION:%s
-LOCATION:%s
+DESCRIPTION:%s%s
 DTSTAMP:%s
 BEGIN:VALARM
 ACTION:DISPLAY
@@ -1677,7 +1684,8 @@ END:VALARM"
                                        (line-number-at-pos (point))
                                        )
                                )
-                              location
+                              (if location (format "
+LOCATION:%s" location) "")
                               stamp
                               summary
                               warn-time
@@ -1746,16 +1754,6 @@ X-WR-CALDESC:
 X-WR-CALNAME:OrgMode
 X-WR-TIMEZONE:CEST
 ")
-          date
-          day
-          time-of-day
-          duration
-          summary
-          stamp
-          id
-          categories
-          description
-          warn-time
           )
       (while (konix/org-agenda-next-entry-1)
         (when (and

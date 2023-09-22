@@ -360,6 +360,8 @@
          (if current-prefix-arg '(".*.org") revert-without-query)
          )
         )
+    (message "Also removing the org persist directory, just to be sure")
+    (delete-directory org-persist-directory t)
     (mapc
      (lambda (file)
        (save-window-excursion

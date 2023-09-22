@@ -3608,7 +3608,7 @@ of the clocksum."
 (add-hook 'org-agenda-mode-hook 'konix/org-agenda-mode-hook)
 
 (defun konix/org-generate-custom-ids-in-buffer ()
-    "Generate a custom id for each heading in the buffer."
+  "Generate a custom id for each heading in the buffer."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -4363,7 +4363,7 @@ of the clocksum."
 (advice-add 'org-set-tags :around
             #'konix/org-set-tags/link-maybe-and-dream)
 
-(defun konix/org-set-tags/waiting-add-note (orig-func tags &rest args)
+(defun konix/org-set-tags/deal-with-waiting (orig-func tags &rest args)
   "When the wait tag is set, it is useful to add a note to remember how long I will have waited before calling again"
   (let* ((tags (pcase tags
                  ((pred listp) tags)
@@ -4371,6 +4371,7 @@ of the clocksum."
                  (_ (error "Invalid tag specification: %S" tags))))
          (old-tags (org-get-tags nil t))
          (tags-change? (not (equal tags old-tags)))
+         message
          )
     (apply orig-func tags args)
     (when (and
@@ -4388,13 +4389,31 @@ of the clocksum."
              )
             )
            )
-      ;; then add a note
-      (konix/org-add-note-no-interaction "Started to wait for this task")
+      (setq message
+            (format "Started to wait for this task (%s)"
+                    (if (member "DELEGATED" tags)
+                        "delegated"
+                      "waiting"
+                      )
+                    ))
+      (when (yes-or-no-p "Schedule it later to avoid thinking of it for now?")
+        (setq message
+              (concat
+               message ". "
+               (string-replace ">" "]"
+                               (string-replace "<" "["
+                                               (call-interactively 'org-schedule)
+                                               )
+                               )
+               )
+              )
+        )
+      (konix/org-add-note-no-interaction message)
       )
     )
   )
 (advice-add 'org-set-tags :around
-            #'konix/org-set-tags/waiting-add-note)
+            #'konix/org-set-tags/deal-with-waiting)
 
 (defun konix/org-gcal-reset-tags ()
   (org-agenda-set-tags "needsAction" 'off)

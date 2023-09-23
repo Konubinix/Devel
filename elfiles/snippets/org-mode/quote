@@ -5,6 +5,7 @@
 ${50:#+NAME: `(uuidgen-4)`
 }#+BEGIN_QUOTE
 $100${200:
+
 --- $300}
 #+END_QUOTE
 

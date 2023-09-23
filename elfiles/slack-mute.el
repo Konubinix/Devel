@@ -30,9 +30,10 @@
   :type '(repeat string)
   )
 
-(defun konix/slack-buffer-insert/mute-some (orig this message &rest args)
+(defun konix/slack-buffer-insert/mute-some (orig this &rest args)
   (let* (
          (team (slack-buffer-team this))
+         (message (and args (first args)))
          (room (and (cl-typep message 'slack-message) (slack-room-find message team)))
          (room-name (and room (slack-room-name room team)))
          )
@@ -47,9 +48,11 @@
           ;; set the value of no-tracked-p to t and remove it from the args
           ;; I cannot get no-tracked-p as optional argument because it may not
           ;; be accepted in orig
-          (apply orig this message t (cdr args))
+          (apply orig this
+                 message t
+                 (cddr args))
           )
-      (apply orig this message args)
+      (apply orig this args)
       )
     )
   )

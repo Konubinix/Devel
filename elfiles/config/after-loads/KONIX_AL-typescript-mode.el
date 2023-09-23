@@ -26,20 +26,32 @@
 (require 'lsp-mode)
 (require 'dap-node)
 (require 'dap-js-debug)
+(require 'lsp-angular)
 (dap-node-setup)
 (dap-js-debug-setup)
 
 (defun konix/typescript-mode-hook ()
-    (lsp)
-    (konix/prog/config)
-    (setq indent-tabs-mode nil) ;; https://google.github.io/styleguide/jsguide.html#whitespace-characters
-    (setq tab-width 2) ;; https://google.github.io/styleguide/jsguide.html#formatting-block-indentation
-    (setq typescript-indent-level tab-width) ;; tab-width appears ignored
-    (prettier-js-mode)
-    )
+  (lsp)
+  (konix/prog/config)
+  (setq indent-tabs-mode nil) ;; https://google.github.io/styleguide/jsguide.html#whitespace-characters
+  (setq tab-width 2) ;; https://google.github.io/styleguide/jsguide.html#formatting-block-indentation
+  (setq typescript-indent-level tab-width) ;; tab-width appears ignored
+  (add-hook
+   'before-save-hook
+   #'lsp-organize-imports
+   nil
+   t
+   )
+  (add-hook
+   'before-save-hook
+   #'lsp-format-buffer
+   nil
+   t
+   )
+  )
 
 (add-hook 'typescript-mode-hook
-    'konix/typescript-mode-hook)
+          'konix/typescript-mode-hook)
 
 
 (provide 'KONIX_AL-typescript-mode)

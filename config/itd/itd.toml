@@ -1,0 +1,53 @@
+[bluetooth]
+    adapter = "hci0"
+
+[socket]
+    path = "/tmp/itd/socket"
+
+[metrics]
+    enabled = false
+
+    [metrics.heartRate]
+        enabled = true
+
+    [metrics.stepCount]
+        enabled = true
+
+    [metrics.battLevel]
+        enabled = true
+
+    [metrics.motion]
+        # This may lower the battery life of the PineTime
+        enabled = false
+
+[conn]
+    reconnect = true
+
+[conn.whitelist]
+    enabled = false
+    devices = []
+
+[on.connect]
+    notify = true
+
+[on.reconnect]
+    notify = true
+    setTime = true
+
+[notifs.translit]
+    use = ["eASCII", "Russian", "Emoji"]
+
+[notifs.ignore]
+    sender = []
+    summary = ["InfiniTime"]
+    body = []
+
+[music]
+    vol.interval = 5
+
+[weather]
+    enabled = true
+    location = "Los Angeles, CA"
+
+[logging]
+    level = "debug"

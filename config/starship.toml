@@ -46,3 +46,4 @@ error_symbol = "[✗](bold red) "
 "k3d-k3s-default" = "dev"
 [status]
 disabled = false
+pipestatus = true

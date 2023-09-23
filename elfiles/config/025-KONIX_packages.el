@@ -158,6 +158,7 @@
   (use-package scad-mode)
   ;; https://github.com/yuya373/emacs-slack/pull/576
   (use-package slack :commands (slack-start) :straight (:fork t) :bind-keymap ("<f2> l" . konix/slack-global-map))
+  (use-package solidity-mode)
   (use-package tempbuf)
   (use-package terraform-mode)
   (use-package tilt-mode :straight (:repo "Konubinix/tilt-mode" :type git :host github))

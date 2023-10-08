@@ -26,22 +26,21 @@
 
 (defun konix/html-mode-hook ()
   (auto-complete-mode t)
-  (konix/flyspell-mode t)
   (hs-minor-mode t)
   )
 (setq konix/hs-html-mode-info
-	  '(html-mode "<[^/\\?!][^>]*[^/]>"
-				  "</[^>]>"
-				  nil
-				  konix/hs-nxml-forward-sexp-func)
-	  )
+      '(html-mode "<[^/\\?!][^>]*[^/]>"
+                  "</[^>]>"
+                  nil
+                  konix/hs-nxml-forward-sexp-func)
+      )
 
 (eval-after-load "hideshow"
   '(progn
-	 (konix/push-or-replace-assoc-in-alist
-	  'hs-special-modes-alist
-	  konix/hs-html-mode-info)
-	 )
+     (konix/push-or-replace-assoc-in-alist
+      'hs-special-modes-alist
+      konix/hs-html-mode-info)
+     )
   )
 (add-hook 'html-mode-hook 'konix/html-mode-hook)
 

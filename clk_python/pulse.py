@@ -165,9 +165,8 @@ def application(all, name_prefix):
         def all_applications():
             return [
                 application for application in p.sink_input_list() +
-                p.source_output_list()
-                if application.proplist["application.process.binary"] !=
-                "pavucontrol"
+                p.source_output_list() if application.proplist.get(
+                    "application.process.binary") != "pavucontrol"
             ]
 
         if all:
@@ -175,8 +174,8 @@ def application(all, name_prefix):
         elif name_prefix:
             applications = [
                 application for application in all_applications()
-                if application.proplist["application.process.binary"].lower().
-                startswith(name_prefix.lower())
+                if application.proplist.get("application.process.binary", "").
+                lower().startswith(name_prefix.lower())
             ]
 
     config.pulse.applications.applications = applications
@@ -187,7 +186,7 @@ def show():
     "Show the matching applications"
     for application in config.pulse.applications.applications:
         print(
-            f'{application.__class__.__name__} : {application.proplist["application.process.binary"]} : {application}'
+            f'{application.__class__.__name__} : {application.proplist.get("application.process.binary")} : {application}'
         )
 
 

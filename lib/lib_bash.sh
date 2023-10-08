@@ -82,6 +82,11 @@ private_nav_clean_n_stop () {
     trap "" EXIT
 }
 
+private_nav_abort () {
+    unset KONIX_PRIVATE_NAV
+    trap "" EXIT
+}
+
 private_nav () {
     export "KONIX_PRIVATE_NAV=1"
     trap "history -c" EXIT

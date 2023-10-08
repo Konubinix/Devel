@@ -24,18 +24,17 @@
 
 ;;; Code:
 
-(defhydra konix/mc-hydra ()
-  "zoom"
-  ("a" mc/mark-all-like-this "all" :exit t)
-  ("p" mc/mark-previous-like-this "prev")
-  ("n" mc/mark-next-like-this "next")
-  ("m" mc/mark-more-like-this-extended "more")
-  ("l" mc/edit-lines "lines" :exit t)
-  ("C-a" mc/edit-beginnings-of-lines "beginning of lines" :exit t)
-  ("C-e" mc/edit-ends-of-lines "end of lines" :exit t)
-  ("q" nil "quit")
-  )
-(define-key konix/region-bindings-mode-map "m" 'konix/mc-hydra/body)
+(define-prefix-command 'konix/mc-region-map)
+(define-key konix/region-bindings-mode-map "m" 'konix/mc-region-map)
+
+(define-key konix/mc-region-map (kbd "a") 'mc/mark-all-like-this)
+(define-key konix/mc-region-map (kbd "a") 'mc/mark-all-like-this)
+(define-key konix/mc-region-map (kbd "p") 'mc/mark-previous-like-this)
+(define-key konix/mc-region-map (kbd "n") 'mc/mark-next-like-this)
+(define-key konix/mc-region-map (kbd "m") 'mc/mark-more-like-this-extended)
+(define-key konix/mc-region-map (kbd "l") 'mc/edit-lines)
+(define-key konix/mc-region-map (kbd "C-a") 'mc/edit-beginnings-of-lines)
+(define-key konix/mc-region-map (kbd "C-e") 'mc/edit-ends-of-lines)
 
 (provide 'KONIX_AL-mc-mark-more)
 ;;; KONIX_AL-mc-mark-more.el ends here

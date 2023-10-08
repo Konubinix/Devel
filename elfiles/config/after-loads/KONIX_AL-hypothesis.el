@@ -29,8 +29,8 @@
 ;;;###autoload
 (defun konix/hypothesis-archive ()
   (interactive)
-  (setq hypothesis-token (shell-command-to-string "impass_dump_clear_password.sh token@hypothes.is"))
-  (setq hypothesis-username (shell-command-to-string "impass_dump_clear_password.sh username@hypothes.is"))
+  (setq hypothesis-token (shell-command-to-string "impass_dump_clear_password.sh token@hypothes.is 2>/dev/null"))
+  (setq hypothesis-username (shell-command-to-string "impass_dump_clear_password.sh username@hypothes.is 2>/dev/null"))
   (hypothesis-to-archive)
   )
 

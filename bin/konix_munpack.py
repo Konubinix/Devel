@@ -175,7 +175,9 @@ def munpack(message, directory, rel_path=False):
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 </head>
 <body>
+<a href="./">Folder</a>
 {}
+<a href="./">Folder</a>
 </body>
 </html>
 """.format("Mail", text)

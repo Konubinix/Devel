@@ -1,0 +1,5 @@
+# key: tsignore
+# name: tsignore
+# --
+// @ts-ignore
+window.$100 = $100

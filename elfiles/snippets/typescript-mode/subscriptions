@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: subscriptions
+# key: subscriptions
+# --
+subscriptions: Subscription[] = [];
+
+ngOnInit() {
+  this.subscriptions = [
+	$200
+  ];
+}
+
+ngOnDestroy(){
+  for(let subscription of this.subscriptions){
+    subscription.unsubscribe()
+  }
+}

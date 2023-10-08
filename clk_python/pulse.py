@@ -370,6 +370,9 @@ def __set(value):
 @application.command()
 def ipython():
     "Run ipython, to ease debugging"
+    p = config.pulse
+    import pulsectl
+    pctl = pulsectl.Pulse("clk")
     a = config.pulse.applications
     import IPython
     IPython.start_ipython(argv=[], user_ns=(globals() | locals()))

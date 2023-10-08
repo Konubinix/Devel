@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: cleantrap
+# key: cleantrap
+# --
+(
+    $50
+    trap "clean" 0
+    clean () {
+        $100
+    }
+    $200
+)
+$0

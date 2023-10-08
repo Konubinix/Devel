@@ -42,12 +42,13 @@
    nil
    t
    )
-  (add-hook
-   'before-save-hook
-   #'lsp-format-buffer
-   nil
-   t
-   )
+  ;; (add-hook
+  ;;  'before-save-hook
+  ;;  #'lsp-format-buffer
+  ;;  nil
+  ;;  t
+  ;;  )
+  (prettier-js-mode)
   )
 
 (add-hook 'typescript-mode-hook

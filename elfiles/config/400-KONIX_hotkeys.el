@@ -21,7 +21,7 @@
 (key-chord-define-global "$s" 'auto-scroll-mode)
 (key-chord-define-global "$p" 'poporg-dwim)
 (key-chord-define-global "$v" 'visual-line-mode)
-(key-chord-define-global "$u" 'linum-mode)
+(key-chord-define-global "$u" 'display-line-numbers-mode)
 
 ;; remove keys that I type too much by mistake
 (global-set-key (kbd "C-x <")

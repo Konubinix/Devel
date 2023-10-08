@@ -655,8 +655,10 @@ Attendees:
             print("Run list_calendars first")
             return
         keys = shlex.split(keys)
-        pp.pprint([{key: calendar.__getattribute__(key)
-                    for key in keys} for calendar in self.calendars])
+        pp.pprint([{
+            key: calendar.__getattribute__(key)
+            for key in keys
+        } for calendar in self.calendars])
 
     def help_map_show_calendar(self):
         print("{}".format(calendar_keys))
@@ -945,7 +947,7 @@ Attendees:
         calendar_id = self.db.get(self.calendar_id_name)
 
         attendees_emails = attendees_emails or []
-        sendNotifications = "true" if sendNotifications else "false"
+        sendNotifications = "all" if sendNotifications else "none"  # there is # also the value externalOnly
         if not calendar_id:
             print("Use the command select_calendar first")
             return
@@ -984,7 +986,7 @@ Attendees:
             "end": end,
             "attendees": attendees,
         }
-        if not reminders is None:
+        if reminders:
             event["reminders"] = {
                 "useDefault":
                 False,
@@ -993,10 +995,12 @@ Attendees:
                     "minutes": reminder
                 } for reminder in reminders]
             }
+        if reminders is False:
+            event["reminders"] = {"useDefault": False, "overrides": []}
 
         req = urllib.request.Request(
             url=
-            'https://www.googleapis.com/calendar/v3/calendars/{}/events?sendNotifications={}'
+            'https://www.googleapis.com/calendar/v3/calendars/{}/events?sendUpdates={}'
             .format(
                 calendar_id,
                 sendNotifications,
@@ -1214,10 +1218,17 @@ Attendees:
 
     @needs("access_token")
     def do_add_event(self, line):
-        """title, where, when, duration, description (optional)"""
+        """title, where, when, duration, [description]
+        Hardcoded the fact that no reminder should be set
+        """
         (title, where, when, duration, *description) = shlex.split(line)
         description = description[0] if description else ""
-        event = self.add_event(title, where, when, duration, description)
+        event = self.add_event(title,
+                               where,
+                               when,
+                               duration,
+                               description,
+                               reminders=False)
         print(event)
 
     def do_EOF(self, line):

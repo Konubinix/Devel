@@ -595,11 +595,13 @@
   )
 
 (defun konix/org-roam-node-file-node ()
-  (save-excursion
-    (goto-char (point-min))
-    (assert (not (looking-at "^\*")))
-    (org-roam-node-at-point)
-    )
+  (org-with-wide-buffer
+   (save-excursion
+     (goto-char (point-min))
+     (assert (not (looking-at "^\*")))
+     (org-roam-node-at-point)
+     )
+   )
   )
 
 (defun konix/org-roam-export/add-id-as-hugo-aliases ()

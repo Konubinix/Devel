@@ -26,4 +26,4 @@ else
 	# local date
 	result="${creation_date}"
 fi
-echo "${creation_date}"
+echo "${result}"

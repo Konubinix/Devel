@@ -78,6 +78,8 @@
   (use-package citeproc)
   (use-package copilot :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")))
   (use-package counsel)
+  ;; https://github.com/emacs-lsp/lsp-mode/pull/4208
+  (use-package lsp-mode :commands (lsp) :straight (:fork t))
   (use-package dap-mode :after (lsp-mode) :straight (:repo "jeff-phil/dap-mode-PR" :branch "vscode-js-debug-feature"))
   (use-package dash)
   (use-package dedicated)
@@ -118,7 +120,6 @@
   (use-package keep-buffers)
   (use-package key-chord)
   (use-package lisp :straight (:type built-in) :mode ("emacs$" . list-mode))
-  (use-package lsp-mode :commands (lsp))
   (use-package kubel :commands (kubel))
   (use-package kubernetes)
   (use-package ledger-mode :commands (konix/ledger-run konix/ledger-report))

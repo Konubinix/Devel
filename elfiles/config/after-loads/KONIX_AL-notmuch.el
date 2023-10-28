@@ -84,6 +84,7 @@ Message-Id: <%s>" id)
 
 (require 'ini)
 (defun konix/notmuch/initialize-saved-searches ()
+  (interactive)
   (setq-default notmuch-saved-searches
                             (remove-if
                              'null

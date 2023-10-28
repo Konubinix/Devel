@@ -2736,6 +2736,18 @@ items"
   (when (string-match-p "^\\(n \\)?eee *$" ans) ;; e for evening
     (setq ans "22:00")
     )
+  (when (string-match-p "^\\(n \\)?a *$" ans) ;; a for afternoon
+    (setq ans "16:30")
+    )
+  (when (string-match-p "^\\(n \\)?aa *$" ans) ;; a for afternoon
+    (setq ans "18:00")
+    )
+  (when (string-match-p "^\\(n \\)?aaa *$" ans) ;; a for afternoon
+    (setq ans "18:30")
+    )
+  (when (string-match-p "^\\(n \\)?aaaa *$" ans) ;; a for afternoon
+    (setq ans "19:00")
+    )
   (when (string-match-p "^n *$" ans) ;; only n -> now
     (setq ans (format-time-string "%H:%M" (current-time)))
     )

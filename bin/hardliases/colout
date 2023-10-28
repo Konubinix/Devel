@@ -1,0 +1,9 @@
+#!/bin/bash
+
+source _ko_nix.sh
+
+ME="$(basename "${0}")"
+DIR="$(dirname "${0}")"
+BIN="$(nix_install_binary "${ME}" "default" "${KONIX_DEVEL_DIR}/flakes/${ME}")"
+
+exec "${BIN}" "${@}"

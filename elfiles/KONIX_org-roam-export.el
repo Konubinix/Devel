@@ -877,8 +877,10 @@
   (save-excursion
     (goto-char (point-min))
     (save-match-data
+      ;; don't match ^ +: because this is generally associated with variables,
+      ;; like #+NAME\n: /ipfssomething and this will transformation will break it
       (while (re-search-forward
-              "^[ :]*\\(\\(youtube:\\|http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              "^[ ]*\\(\\(youtube:\\|http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
               nil
               t)
         (replace-match

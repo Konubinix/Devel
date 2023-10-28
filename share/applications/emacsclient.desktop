@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Name=EmacsClient
 Comment=Open the file with emacs client
-Exec=ec %f
+Exec=e %f
 StartupNotify=true
 Terminal=false
 Type=Application

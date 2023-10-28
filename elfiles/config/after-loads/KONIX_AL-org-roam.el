@@ -356,6 +356,10 @@ ${title}
             nil
             t)
   (add-hook 'before-save-hook
+            'konix/org-generate-custom-ids-in-buffer
+            nil
+            t)
+  (add-hook 'before-save-hook
             'konix/org-roam-make-sure-has-id
             nil
             t)

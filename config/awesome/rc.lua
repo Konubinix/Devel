@@ -545,7 +545,17 @@ globalkeys = gears.table.join(
 		open_or_join("qutebrowser", browser),
 		{ description = "open a browser", group = "launcher" }
 	),
+	awful.key(
+		{},
+		"XF86HomePage",
+		open_or_join("qutebrowser", browser),
+		{ description = "open a browser", group = "launcher" }
+	),
 	awful.key({ modkey, "Control" }, "e", open_or_join("emacs", "e"), {
+		description = "open emacs",
+		group = "launcher",
+	}),
+	awful.key({}, "XF86Mail", open_or_join("emacs", "e"), {
 		description = "open emacs",
 		group = "launcher",
 	}),
@@ -560,6 +570,10 @@ globalkeys = gears.table.join(
 	awful.key({ modkey, "Control" }, "s", open_or_join("slack", "slack"), {}),
 	awful.key({ modkey, "Control" }, "w", open_or_join("whatsapp", "whatsapp"), {}),
 	awful.key({ modkey }, "Return", open_or_join(terminal_instance, terminal), {
+		description = "open a terminal",
+		group = "launcher",
+	}),
+	awful.key({}, "XF86Calculator", open_or_join(terminal_instance, terminal), {
 		description = "open a terminal",
 		group = "launcher",
 	}),

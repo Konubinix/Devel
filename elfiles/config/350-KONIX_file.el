@@ -113,7 +113,7 @@
   (unless file
         (setq file (buffer-file-name))
         )
-  (message (shell-command-to-string (format "chmod +x \"%s\"" file)))
+  (chmod file (file-modes-symbolic-to-number "+x" (file-modes file)))
   )
 
 (defun konix/mimeopen (&optional file)

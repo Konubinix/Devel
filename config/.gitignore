@@ -98,3 +98,6 @@
 /hardhat-nodejs
 /pagraphcontrol
 /.semgrep
+/go
+/io.datasette.llm
+/netlify

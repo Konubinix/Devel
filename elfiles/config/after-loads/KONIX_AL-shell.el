@@ -56,26 +56,26 @@
           (setq completions  (cons file completions)))
         (setq comps-in-dir  (cdr comps-in-dir)))
       (setq path-dirs  (cdr path-dirs)))
-	completions
+    completions
     )
   )
 
 (defun konix/shell/delete-async-shell-buffer ()
   (let (
-		(async_shell_buffer (get-buffer "*Async Shell Command*"))
-		)
-	(when (and async_shell_buffer
-			   (save-window-excursion
-				 (switch-to-buffer async_shell_buffer)
-				 (y-or-n-p
-				  (format "%s buffer already exists, kill it ?"
-						  async_shell_buffer)
-				  )
-				 )
-			   )
-	  (kill-buffer async_shell_buffer)
-	  )
-	)
+        (async_shell_buffer (get-buffer "*Async Shell Command*"))
+        )
+    (when (and async_shell_buffer
+               (save-window-excursion
+                 (switch-to-buffer async_shell_buffer)
+                 (y-or-n-p
+                  (format "%s buffer already exists, kill it ?"
+                          async_shell_buffer)
+                  )
+                 )
+               )
+      (kill-buffer async_shell_buffer)
+      )
+    )
   )
 
 (defcustom konix/shell-font-lock-keywords '() "")
@@ -93,104 +93,105 @@
 
 (defun konix/shell/get-env (name &optional command_template regexp match_string)
   (unless command_template
-	(setq command_template
-		  (if (konix/shell/is-cmd)
-			  "echo %%%s%%"
-			"echo ${%s}"
-			)
-		  )
-	)
+    (setq command_template
+          (if (konix/shell/is-cmd)
+              "echo %%%s%%"
+            "echo ${%s}"
+            )
+          )
+    )
   (unless regexp
-	(setq regexp "^\\(.*\\)$")
-	)
+    (setq regexp "^\\(.*\\)$")
+    )
   (unless match_string
-	(setq match_string 1)
-	)
+    (setq match_string 1)
+    )
   (let (
-		(get_env_handler (if (konix/shell/is-cmd)
-							 (lambda ()
-							   (if (re-search-forward (concat "%" name "%") nil t)
-								   ""
-								 (when (re-search-forward regexp nil t)
-								   (match-string match_string)
-								   )
-								 )
-							   )
-						   (lambda ()
-							 (when (re-search-forward regexp nil t)
-							   (match-string match_string)
-							   )
-							 )
-						   )
-						 )
-		)
-	(konix/comint/send-command-redirect
-	 (format command_template name)
-	 get_env_handler
-	 )
-	)
+        (get_env_handler (if (konix/shell/is-cmd)
+                             (lambda ()
+                               (if (re-search-forward (concat "%" name "%") nil t)
+                                   ""
+                                 (when (re-search-forward regexp nil t)
+                                   (match-string match_string)
+                                   )
+                                 )
+                               )
+                           (lambda ()
+                             (when (re-search-forward regexp nil t)
+                               (match-string match_string)
+                               )
+                             )
+                           )
+                         )
+        )
+    (konix/comint/send-command-redirect
+     (format command_template name)
+     get_env_handler
+     )
+    )
   )
 
 (defun konix/shell/import-path ()
   (interactive)
   (message "Getting path of current shell")
   (let (
-		(import_path (konix/shell/get-env "PATH"))
-		)
-	(set (make-variable-buffer-local 'exec-path)
-		 (split-string import_path path-separator)
-		 )
-	(message "exec-path set to '%s' in the buffer '%s'" exec-path (current-buffer))
-	)
+        (import_path (konix/shell/get-env "PATH"))
+        )
+    (set (make-variable-buffer-local 'exec-path)
+         (split-string import_path path-separator)
+         )
+    (message "exec-path set to '%s' in the buffer '%s'" exec-path (current-buffer))
+    )
   )
 
 (defun konix/shell-complete-rlc ()
   (interactive)
   (let* (
-		 (completion (rlc-candidates))
-		 (word-before
-		  (if
-			  (looking-back "[ \t\n]+\\(.+\\)")
-			  (match-string-no-properties 1)
-			(error "Cannot match the word before point")
-			)
-		  )
-		 (beginning-of-word-before (match-beginning 1))
-		 (completion (and
-					  completion
-					  (completing-read "Completion: " (all-completions word-before completion))
-					  )
-					 )
-		 )
-	(if completion
-		(progn
-		  (delete-region beginning-of-word-before (point))
-		  (insert completion)
-		  t
-		  )
-	  nil
-	  )
-	)
+         (completion (rlc-candidates))
+         (word-before
+          (if
+              (looking-back "[ \t\n]+\\(.+\\)")
+              (match-string-no-properties 1)
+            (error "Cannot match the word before point")
+            )
+          )
+         (beginning-of-word-before (match-beginning 1))
+         (completion (and
+                      completion
+                      (completing-read "Completion: " (all-completions word-before completion))
+                      )
+                     )
+         )
+    (if completion
+        (progn
+          (delete-region beginning-of-word-before (point))
+          (insert completion)
+          t
+          )
+      nil
+      )
+    )
   )
 
 (defun konix/shell-complete-rlc-no-error (&rest args)
   (interactive)
   (and (ignore-errors (konix/shell-complete-rlc))
-	   t)
+       t)
   )
 
 (defun konix/shell-mode-hook ()
   (setq completion-at-point-functions '(native-complete-at-point))
   (setq indent-tabs-mode nil)
+  (lsp)
   )
 (add-hook 'shell-mode-hook
-		  'konix/shell-mode-hook
-		  )
+          'konix/shell-mode-hook
+          )
 
 (defadvice shell-command (before kill_async_shell_buffer ())
   (when (string-match ".+[ \r\n&]+$" command)
-	(konix/shell/rename-async-shell-buffer output-buffer)
-	)
+    (konix/shell/rename-async-shell-buffer output-buffer)
+    )
   )
 (ad-activate 'shell-command)
 

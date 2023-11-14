@@ -24,7 +24,7 @@
 
 ;;; Code:
 (setq-default sh-basic-offset 4
-	          sh-indentation 4)
+              sh-indentation 4)
 
 (defun konix/sh-script/make-executable nil
   (unless (string-prefix-p "_" (buffer-name))
@@ -34,9 +34,9 @@
 
 (defun konix/sh-mode-hook ()
   (setq indent-tabs-mode nil
-		tab-width 4
-		sh-basic-offset 4
-		sh-indentation 4)
+        tab-width 4
+        sh-basic-offset 4
+        sh-indentation 4)
   (konix/prog/config)
   (defvar electric-pair-pairs)
   (setq-local electric-pair-pairs
@@ -47,14 +47,15 @@
                electric-pair-pairs)
               )
   (setq ac-sources
-		'(
-		  ac-source-yasnippet
-		  ac-source-dictionary
-		  ac-source-words-in-same-mode-buffers
-		  ac-source-files-in-current-dir
-		  )
-		)
+        '(
+          ac-source-yasnippet
+          ac-source-dictionary
+          ac-source-words-in-same-mode-buffers
+          ac-source-files-in-current-dir
+          )
+        )
   (add-hook 'after-save-hook 'konix/sh-script/make-executable t t)
+  (lsp)
   )
 (add-hook 'sh-mode-hook 'konix/sh-mode-hook)
 

@@ -128,6 +128,7 @@
 (defun konix/goto-random-line ()
   "Go to a random line in this buffer."
   (interactive)
+  (push-mark)
   (konix/goto-line-prog (1+ (random (konix/buffer-line-count))))
   (konix/go-to-next-visible-line)
   )

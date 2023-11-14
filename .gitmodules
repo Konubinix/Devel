@@ -2,10 +2,6 @@
 	ignore=dirty
 	path = git-wip
 	url = https://github.com/bartman/git-wip.git
-[submodule "pymsmtpq"]
-	ignore=dirty
-	path = pymsmtpq
-	url = https://github.com/darkfeline/pymsmtpq
 [submodule "config/awesome/awesome-cyclefocus"]
 	path = config/awesome/awesome-cyclefocus
 	url = https://github.com/blueyed/awesome-cyclefocus

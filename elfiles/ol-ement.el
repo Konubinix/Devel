@@ -91,13 +91,21 @@
   (when (eq major-mode 'ement-room-mode)
     (let* (
            (event (ewoc-data (ewoc-locate ement-ewoc)))
-           (event-content (ement-room--format-message-body event))
+           (event-content
+            (org-link-escape
+             (string-replace "\n" "\\n"
+                             (ement-room--format-message-body
+                              event))
+             )
+
+
+            )
            (event-sender (ement-event-sender event))
            (event-sender-name (or
-                          (ement-user-displayname event-sender)
-                          (ement-user-username event-sender)
-                          (ement-user-id event-sender)
-                          ))
+                               (ement-user-displayname event-sender)
+                               (ement-user-username event-sender)
+                               (ement-user-id event-sender)
+                               ))
            (event-time (format-time-string "%Y-%m-%d %H:%M:%S"
                                            (/ (ement-event-origin-server-ts event) 1000)))
            (event-id (ement-event-id event))

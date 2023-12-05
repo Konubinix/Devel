@@ -68,6 +68,26 @@
   (konix/org-with-point-on-heading (konix/_org-github-browse))
   )
 
+(defun konix/org-github-comment (body)
+  (interactive "sBody: ")
+  (konix/org-with-point-on-heading
+   (let (
+         (code (konix/org-github-get-code))
+         (repo (org-entry-get (point) "KONIX_GH_REPO" t))
+         (args '())
+         )
+     (when repo
+       (setq args (append args (list "--repo" repo)))
+       )
+     (setq args (append args (list "issue" "comment" code "--body" body)))
+     (if (equal 0 (apply 'call-process "gh" nil nil nil args))
+         (message "Done")
+       (message "Something went wrong")
+       )
+     )
+   )
+  )
+
 
 (provide 'KONIX_org-github)
 ;;; KONIX_org-github.el ends here

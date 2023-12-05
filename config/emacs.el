@@ -75,7 +75,7 @@
          "package" ;; init
          "key-chord" ;; init
          "kmacro" ;; loaded by (kbd)
-	 "message" ;; gnus-int - gnus-start - gnu-group - gnus-sum - org
+         "message" ;; gnus-int - gnus-start - gnu-group - gnus-sum - org
          "org" ;; init
          "org-agenda" ;; init
          "ob-comint" ;; loaded by org
@@ -99,6 +99,7 @@
          "framemove" ;; init
          "golden-ratio" ;; init
          "keep-buffers" ;; init
+         "shorten" ;; init
          "which-key" ;; init
          "winner" ;; init
          "xml" ;; when showing notification at startup

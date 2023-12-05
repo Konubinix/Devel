@@ -39,6 +39,7 @@
 (require 'saveplace)
 (require 'git-wip-mode nil t)
 (require 'sticky-windows)
+(require 'KONIX_minibuffer_edit)
 
 ;; I don't like it by default, but like enabling it in some modes
 (electric-indent-mode -1)

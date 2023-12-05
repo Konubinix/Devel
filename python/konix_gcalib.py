@@ -265,9 +265,13 @@ class GCall(cmd.Cmd, object):
 
         Event = konix_collections.namedtuples_default_values(
             "Event",
-            sorted(list(self.types["Event"]["keys"]) + ["calendar_id"]),
-            {k: ""
-             for k in self.types["Event"]["keys"]})
+            sorted(
+                list(
+                    set(self.types["Event"]["keys"]) | {
+                        "calendar_id", "outOfOfficeProperties",
+                        "focusTimeProperties"
+                    })), {k: ""
+                          for k in self.types["Event"]["keys"]})
 
         def print_diary(self):
             print("{}-{} {} ({}) [{}]".format(
@@ -844,6 +848,7 @@ Attendees:
     def list_events(self, search_terms=""):
         items = json.loads(self.db.get(self.all_events_name))
         events = sorted([Event(**i) for i in items], key=lambda e: e.startdate)
+
         search_terms = shlex.split(search_terms)
 
         for search_term in search_terms:

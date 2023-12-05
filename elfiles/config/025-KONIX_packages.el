@@ -93,7 +93,8 @@
   (use-package earthfile-mode :straight (:fork t))
   (use-package editorconfig)
   (use-package edit-indirect)
-  (use-package ement :straight (:repo "alphapapa/ement.el"))
+  ;; several issues yet to be reported
+  (use-package ement :straight (:repo "alphapapa/ement.el" :fork (:repo "konubinix/ement.el")))
   (use-package envrc)
   (use-package f)
   (use-package feature-mode)

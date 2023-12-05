@@ -16,7 +16,7 @@ then
 else
     TIMETOWAIT=10
     echo "Waiting ${TIMETOWAIT}s before sending, just in case"
-    # sleep ${TIMETOWAIT}
+    sleep ${TIMETOWAIT}
     echo "Sending now!!"
     msmtpq-flush
     if grep -q auth=off "${LOG}"

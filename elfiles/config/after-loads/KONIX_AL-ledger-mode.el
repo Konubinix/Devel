@@ -532,25 +532,6 @@ of the transaction.
     )
   )
 
-(defun konix/ledger-clear nil
-  (assert (equal (ledger-thing-at-point) 'posting))
-  (save-excursion
-    (move-beginning-of-line nil)
-    (skip-chars-forward " ")
-    (cond
-     ((looking-at "! ?")
-      (replace-match "* ")
-      )
-     ((looking-at "\\* ?")
-      nil ;; already cleared
-      )
-     (t
-      (insert "* ")
-      )
-     )
-    )
-  )
-
 (defun konix/ledger-add-note ()
   (interactive)
   (move-end-of-line nil)

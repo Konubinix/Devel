@@ -198,9 +198,6 @@ The effective date of 1 will be set to the effective date of 2
 " content twin-content))
             (error "Aborted")
             )
-          (when (or justif twin-justif)
-            (konix/ledger-clear)
-            )
           (konix/ledger-add-note)
           (insert (format
                    "twin: [[konix/ledger:%s:%s][twin]]"
@@ -216,9 +213,6 @@ The effective date of 1 will be set to the effective date of 2
           (konix/ledger-goto id)
           (when (not (string-equal twin-date (konix/ledger-get-date)))
             (ledger-insert-effective-date twin-date)
-            )
-          (when (or justif twin-justif)
-            (konix/ledger-clear)
             )
           (konix/ledger-add-note)
           (insert (format

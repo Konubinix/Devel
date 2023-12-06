@@ -134,7 +134,7 @@
   (forward-line -1)
   )
 
-(define-key circe-mode-map (kbd "M-h") #'konix/circe-hide-line)
+(keymap-set circe-mode-map "M-h" #'konix/circe-hide-line)
 
 (provide 'KONIX_AL-circe)
 ;;; KONIX_AL-circe.el ends here

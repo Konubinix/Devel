@@ -1,4 +1,0 @@
-# -*- mode: snippet -*-
-# name: lsk
-# --
-(local-set-key (kbd "${100:KEY}") '${200:FUNCTION})

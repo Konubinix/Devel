@@ -30,8 +30,8 @@
           'konix/slack-message-edit-mode-hook)
 
 (konix/slack-message-setup-keys slack-message-buffer-mode-map)
-(define-key slack-message-buffer-mode-map (kbd "M-s") 'auto-scroll-mode)
-(define-key slack-message-buffer-mode-map (kbd "M-o") 'org-open-at-point)
+(keymap-set slack-message-buffer-mode-map "M-s" 'auto-scroll-mode)
+(keymap-set slack-message-buffer-mode-map "M-o" 'org-open-at-point)
 
 
 (defun konix/slack-message-go-to-thread-context ()

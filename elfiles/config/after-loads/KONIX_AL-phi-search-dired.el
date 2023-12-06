@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(define-key dired-mode-map (kbd "/") 'konix/phi-search-dired)
+(keymap-set dired-mode-map "/" 'konix/phi-search-dired)
 
 (defun konix/phi-search-dired ()
   "Filter files in dired buffer with phi-search interface."

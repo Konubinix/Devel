@@ -34,10 +34,10 @@
 		  ac-source-dabbrev
 		  )
 		)
-  (define-key gnuplot-mode-map "\C-xp" 'konix/gnuplot-mode-map)
+  (keymap-set gnuplot-mode-map "C-x p" 'konix/gnuplot-mode-map)
   (define-prefix-command 'konix/gnuplot-mode-map)
-  (define-key konix/gnuplot-mode-map "l" 'konix/gnuplot/load-current-file)
-  (define-key konix/gnuplot-mode-map "g" 'konix/gnuplot)
+  (keymap-set konix/gnuplot-mode-map "l" 'konix/gnuplot/load-current-file)
+  (keymap-set konix/gnuplot-mode-map "g" 'konix/gnuplot)
   )
 (add-hook 'gnuplot-mode-hook
 		  'konix/gnuplot-mode-hook)

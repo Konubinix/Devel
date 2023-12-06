@@ -26,7 +26,7 @@
 
 (setq-default magit-process-popup-time 4)
 (defun konix/magit-mode-hook()
-  (local-set-key (kbd "V") 'konix/magit-visit-item-view)
+  (keymap-local-set "V" 'konix/magit-visit-item-view)
   )
 (add-hook 'magit-mode-hook 'konix/magit-mode-hook)
 

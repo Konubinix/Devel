@@ -40,9 +40,9 @@
   )
 
 (define-prefix-command 'konix/org-drill-key-map)
-(define-key 'konix/org-drill-key-map (kbd "d") 'org-drill)
-(define-key 'konix/org-drill-key-map (kbd "r") 'org-drill-resume)
-(define-key 'konix/org-drill-key-map (kbd "h") 'konix/org-drill-heading)
+(keymap-set 'konix/org-drill-key-map "d" 'org-drill)
+(keymap-set 'konix/org-drill-key-map "r" 'org-drill-resume)
+(keymap-set 'konix/org-drill-key-map "h" 'konix/org-drill-heading)
 
 (defun konix/org-drill--show-latex-fragments/prevent (orig-fun &rest args))
 

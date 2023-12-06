@@ -33,7 +33,7 @@
 (setq-default kubernetes-commands-display-buffer-select nil)
 (setq-default kubernetes-commands-display-buffer-function 'display-buffer)
 
-(define-key kubernetes-overview-mode-map (kbd "s") 'kubernetes-set-namespace)
+(keymap-set kubernetes-overview-mode-map "s" 'kubernetes-set-namespace)
 
 (provide 'KONIX_AL-kubernetes)
 ;;; KONIX_AL-kubernetes.el ends here

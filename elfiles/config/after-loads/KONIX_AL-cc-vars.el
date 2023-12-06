@@ -82,7 +82,7 @@
 	(hide-ifdef-mode t)
 	)
   (konix/prog/config)
-  (local-set-key (kbd "M-RET") 'c-context-line-break)
+  (keymap-local-set "M-<return>" 'c-context-line-break)
   (font-lock-add-keywords
    nil
    konix/c-mode-font-lock-keywords-default

@@ -27,15 +27,15 @@
 
 
 (defun konix/help-mode-hook()
-  (local-set-key "q" 'quit-window)
-  (local-set-key (kbd "C-f") 'find-function-at-point)
+  (keymap-local-set "q" 'quit-window)
+  (keymap-local-set "C-f" 'find-function-at-point)
   )
 (add-hook 'help-mode-hook 'konix/help-mode-hook)
 
-(define-key help-map "b" 'konix/describe-bindings)
-(define-key help-map "t" 'describe-text-properties) ;; instead of the tutorial
-(define-key help-map (kbd "M-c") 'describe-char)
-(define-key help-map (kbd "A") 'apropos-value)
+(keymap-set help-map "b" 'konix/describe-bindings)
+(keymap-set help-map "t" 'describe-text-properties) ;; instead of the tutorial
+(keymap-set help-map "M-c" 'describe-char)
+(keymap-set help-map "A" 'apropos-value)
 
 (provide '700-KONIX_help-mode)
 ;;; 700-KONIX_help-mode.el ends here

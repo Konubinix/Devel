@@ -34,9 +34,9 @@
 	 )
   )
 
-(define-key ebib-multiline-mode-map "\C-c\C-c" 'ebib-quit-multiline-edit-and-save)
-(define-key ebib-multiline-mode-map "\C-c\C-q" 'ebib-cancel-multiline-edit)
-(define-key ebib-multiline-mode-map "\C-x\C-s" 'ebib-save-from-multiline-edit)
+(keymap-set ebib-multiline-mode-map "C-c C-c" 'ebib-quit-multiline-edit-and-save)
+(keymap-set ebib-multiline-mode-map "C-c C-q" 'ebib-cancel-multiline-edit)
+(keymap-set ebib-multiline-mode-map "C-x C-s" 'ebib-save-from-multiline-edit)
 
 (setq-default
  ebib-file-associations
@@ -53,7 +53,7 @@
   (ebib-edit-multiline-field)
   )
 
-(define-key ebib-index-mode-map "\C-a" 'konix/ebib-edit-annote)
+(keymap-set ebib-index-mode-map "C-a" 'konix/ebib-edit-annote)
 
 
 (provide 'KONIX_AL-ebib)

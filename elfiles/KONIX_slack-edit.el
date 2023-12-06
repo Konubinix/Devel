@@ -60,7 +60,7 @@
                  )
                electric-pair-pairs)
               )
-  (local-set-key (kbd "`") 'konix/slack-message-wrap-quote)
+  (keymap-local-set "`" 'konix/slack-message-wrap-quote)
   (abbrev-mode 1)
   )
 
@@ -160,12 +160,12 @@
   (key-chord-define mode-map "ec" 'konix/slack-message-write-another-buffer)
   (key-chord-define mode-map "es" 'slack-message-share)
 
-  (define-key mode-map (kbd "M-e") 'slack-message-edit)
-  (define-key mode-map (kbd "M-r") 'konix/slack-message-buffer-go-to-new-message-marker)
-  (define-key mode-map (kbd "M-d") 'slack-message-delete)
-  (define-key mode-map (kbd "M-u") 'konix/slack-clipboard-image-upload)
-  (define-key mode-map (kbd "M-f") 'slack-file-upload)
-  (define-key mode-map (kbd "C-M-e") 'konix/slack-message-write-another-buffer)
+  (keymap-set mode-map "M-e" 'slack-message-edit)
+  (keymap-set mode-map "M-r" 'konix/slack-message-buffer-go-to-new-message-marker)
+  (keymap-set mode-map "M-d" 'slack-message-delete)
+  (keymap-set mode-map "M-u" 'konix/slack-clipboard-image-upload)
+  (keymap-set mode-map "M-f" 'slack-file-upload)
+  (keymap-set mode-map "C-M-e" 'konix/slack-message-write-another-buffer)
   )
 
 

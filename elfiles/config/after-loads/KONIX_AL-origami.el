@@ -24,8 +24,8 @@
 
 ;;; Code:
 
-(define-key origami-mode-map (kbd "<tab>") 'origami-toggle-node)
-(define-key origami-mode-map (kbd "<backtab>") 'origami-toggle-all-nodes)
+(keymap-set origami-mode-map "<tab>" 'origami-toggle-node)
+(keymap-set origami-mode-map "<backtab>" 'origami-toggle-all-nodes)
 
 
 (provide 'KONIX_AL-origami)

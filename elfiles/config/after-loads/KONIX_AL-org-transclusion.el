@@ -24,9 +24,9 @@
 
 ;;; Code:
 
-(define-key org-transclusion-map (kbd "C-c C-o") 'org-open-at-point)
-(define-key org-transclusion-map (kbd "o") 'org-open-at-point)
-(define-key org-transclusion-map (kbd "RET") 'org-open-at-point)
-(define-key org-transclusion-map (kbd "j") 'org-transclusion-open-source)
+(keymap-set org-transclusion-map "C-c C-o" 'org-open-at-point)
+(keymap-set org-transclusion-map "o" 'org-open-at-point)
+(keymap-set org-transclusion-map "RET" 'org-open-at-point)
+(keymap-set org-transclusion-map "j" 'org-transclusion-open-source)
 (provide 'KONIX_AL-org-transclusion)
 ;;; KONIX_AL-org-transclusion.el ends here

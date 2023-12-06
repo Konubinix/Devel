@@ -66,10 +66,10 @@
     (setq command (concat command " &")))
   (dired-do-shell-command command nil (list (buffer-file-name))))
 
-(define-key image-mode-map (kbd "d") #'konix/image-mode/delete)
-(define-key image-mode-map (kbd "i") #'konix/image-mode/ipfa)
-(define-key image-mode-map (kbd "o") #'konix/image-mode/mimeopen)
-(define-key image-mode-map (kbd "&") #'konix/image-mode/async-shell-command)
+(keymap-set image-mode-map "d" #'konix/image-mode/delete)
+(keymap-set image-mode-map "i" #'konix/image-mode/ipfa)
+(keymap-set image-mode-map "o" #'konix/image-mode/mimeopen)
+(keymap-set image-mode-map "&" #'konix/image-mode/async-shell-command)
 
 (provide 'KONIX_AL-image-mode)
 ;;; KONIX_AL-image-mode.el ends here

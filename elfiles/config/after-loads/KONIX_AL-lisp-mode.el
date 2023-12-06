@@ -28,33 +28,33 @@
   (setq indent-tabs-mode nil)
   (konix/prog/config)
   (setq ac-sources (append
-					'(
-					  ac-source-yasnippet
-					  ac-source-functions
-					  ac-source-symbols
-					  ac-source-variables
-					  )
-					ac-sources
-					)
-		)
+                    '(
+                      ac-source-yasnippet
+                      ac-source-functions
+                      ac-source-symbols
+                      ac-source-variables
+                      )
+                    ac-sources
+                    )
+        )
   (auto-complete-mode t)
-  (local-set-key (kbd "C-h C-f") 'find-function)
-  (local-set-key (kbd "C-h C-v") 'find-variable)
+  (keymap-local-set "C-h C-f" 'find-function)
+  (keymap-local-set "C-h C-v" 'find-variable)
   (turn-on-eldoc-mode)
   ;; (require 'button-lock)
   ;; (button-lock-mode 1)
   ;; (button-lock-set-button "(def[^(]+(" 'hs-toggle-hiding )
   )
 (add-hook 'lisp-mode-hook
-		  'konix/lisp-mode-hook)
+          'konix/lisp-mode-hook)
 ;; ######################################################################
 ;; Emacs lisp mode
 ;; ######################################################################
 
 (defun konix/emacs-lisp-mode-hook()
   (run-hooks 'lisp-mode-hook)
-  (local-set-key (kbd"C-j") 'hippie-expand)
-  (local-set-key (kbd "C-x e") 'eval-print-last-sexp)
+  (keymap-local-set "C-j" 'hippie-expand)
+  (keymap-local-set "C-x e" 'eval-print-last-sexp)
   (add-hook 'before-save-hook
              #'whitespace-cleanup
              nil

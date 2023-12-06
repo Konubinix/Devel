@@ -102,8 +102,8 @@
     (let (
           (local_map (make-sparse-keymap))
           )
-      (define-key local_map (kbd "d") 'konix/appt-delete)
-      (define-key local_map (kbd "q") 'konix/kill-current-buffer)
+      (keymap-set local_map "d" 'konix/appt-delete)
+      (keymap-set local_map "q" 'konix/kill-current-buffer)
       (use-local-map local_map)
       )
     )

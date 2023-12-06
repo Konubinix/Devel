@@ -25,7 +25,7 @@
 ;;; Code:
 
 (defun konix/scilab-mode-hook()
-  (local-set-key (kbd "C-c C-v") 'ferme_ouvre_scilab)
+  (keymap-local-set "C-c C-v" 'ferme_ouvre_scilab)
   )
 (add-hook 'scilab-mode-hook 'konix/scilab-mode-hook)
 

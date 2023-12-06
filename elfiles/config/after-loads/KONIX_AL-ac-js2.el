@@ -24,8 +24,8 @@
 
 ;;; Code:
 
-(define-key js2-mode-map (kbd "C-M-x") 'skewer-eval-last-expression)
-(define-key js2-mode-map (kbd "C-x C-e") 'skewer-eval-last-expression)
+(keymap-set js2-mode-map "C-M-x" 'skewer-eval-last-expression)
+(keymap-set js2-mode-map "C-x C-e" 'skewer-eval-last-expression)
 
 (provide 'KONIX_AL-ac-js2)
 ;;; KONIX_AL-ac-js2.el ends here

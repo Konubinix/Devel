@@ -85,7 +85,7 @@
       (with-current-buffer (window-buffer w)))
     )))
 
-(define-key tracking-mode-map (kbd "C-c b") 'konix/tracking-buffers-list)
+(keymap-set tracking-mode-map "C-c b" 'konix/tracking-buffers-list)
 
 (provide 'KONIX_AL-tracking)
 ;;; KONIX_AL-tracking.el ends here

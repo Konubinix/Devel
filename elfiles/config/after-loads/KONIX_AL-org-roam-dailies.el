@@ -76,7 +76,7 @@
   )
 
 
-(define-key calendar-mode-map (kbd "d") 'konix/org-roam-dailies-display-entry)
+(keymap-set calendar-mode-map "d" 'konix/org-roam-dailies-display-entry)
 
 
 (provide 'KONIX_AL-org-roam-dailies)

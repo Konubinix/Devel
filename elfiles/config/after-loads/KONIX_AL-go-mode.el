@@ -67,7 +67,7 @@
     'konix/go-mode-hook)
 
 
-(define-key go-mode-map (kbd "<RET>") 'newline-and-indent)
+(keymap-set go-mode-map "<RET>" 'newline-and-indent)
 
 (defun konix/go/make-executable ()
     (when (save-excursion

@@ -25,7 +25,7 @@
 ;;; Code:
 (defun konix/tcl-mode-hook ()
   (konix/prog/config)
-  (local-set-key (kbd "C-c C-c") 'run-tcl)
+  (keymap-local-set "C-c C-c" 'run-tcl)
   )
 (add-hook 'tcl-mode-hook 'konix/tcl-mode-hook)
 

@@ -101,8 +101,8 @@
    )
   )
 
-(define-key bibtex-mode-map (kbd "C-c C-j") 'konix/org-bibtex-toggle)
-(define-key org-mode-map (kbd "C-c C-j") 'konix/org-bibtex-toggle)
+(keymap-set bibtex-mode-map "C-c C-j" 'konix/org-bibtex-toggle)
+(keymap-set org-mode-map "C-c C-j" 'konix/org-bibtex-toggle)
 
 (konix/push-or-replace-assoc-in-alist
  'org-link-abbrev-alist

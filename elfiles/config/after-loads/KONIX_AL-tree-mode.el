@@ -24,8 +24,8 @@
 
 ;;; Code:
 
-(define-key tree-mode-map (kbd "SPC") 'widget-forward)
-(define-key tree-mode-map (kbd "DEL") 'widget-backward)
+(keymap-set tree-mode-map "SPC" 'widget-forward)
+(keymap-set tree-mode-map "DEL" 'widget-backward)
 
 (provide 'KONIX_AL-tree-mode)
 ;;; KONIX_AL-tree-mode.el ends here

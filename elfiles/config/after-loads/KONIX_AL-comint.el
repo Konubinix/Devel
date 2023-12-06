@@ -119,10 +119,10 @@
   )
 
 (defun konix/comint-mode-hook()
-  (local-set-key (kbd "C-w") 'comint-kill-region)
-  (local-set-key (kbd "C-c C-w") 'konix/comint-kill-last-output)
-  (local-set-key (kbd "C-c C-M-w") 'konix/comint-hide-or-delete-before-last-output)
-  (local-set-key (kbd "<tab>") 'konix/comint-dynamic-complete)
+  (keymap-local-set "C-w" 'comint-kill-region)
+  (keymap-local-set "C-c C-w" 'konix/comint-kill-last-output)
+  (keymap-local-set "C-c C-M-w" 'konix/comint-hide-or-delete-before-last-output)
+  (keymap-local-set "<tab>" 'konix/comint-dynamic-complete)
   (setq ac-sources
 		'(
 		  ac-source-dictionary

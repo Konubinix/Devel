@@ -41,8 +41,8 @@
   (1 'diff-hunk-header))
  )
 
-(define-key diff-mode-map (kbd "C-p") 'outline-previous-visible-heading)
-(define-key diff-mode-map (kbd "C-n") 'outline-next-visible-heading)
+(keymap-set diff-mode-map "C-p" 'outline-previous-visible-heading)
+(keymap-set diff-mode-map "C-n" 'outline-next-visible-heading)
 
 (defun konix/outline-level/around (orig-fun)
   (or
@@ -76,28 +76,28 @@
 
 
 (set-face-attribute 'diff-changed
-					nil
-					:background "light pink"
-					)
+                                        nil
+                                        :background "light pink"
+                                        )
 
 (defun konix/diff-mode-hook()
   (setq konix/adjust-new-lines-at-end-of-file nil
-		konix/delete-trailing-whitespace nil
-		)
+                konix/delete-trailing-whitespace nil
+                )
   (setq outline-heading-alist
         '(
           ("commit" . 1)
           )
         )
-  (local-set-key (kbd "M-/") 'dabbrev-expand)
-  (local-set-key (kbd "C-z") 'diff-undo)
+  (keymap-local-set "M-/" 'dabbrev-expand)
+  (keymap-local-set "C-z" 'diff-undo)
   (auto-fill-mode 1)
   ;(konix/outline/setup-keys diff-mode-map)
   (font-lock-add-keywords
    nil
    '(
-	 ("^[-+]\\{3\\} /dev/null$" . compilation-error-face)
-	 )
+         ("^[-+]\\{3\\} /dev/null$" . compilation-error-face)
+         )
    )
   )
 

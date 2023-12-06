@@ -26,7 +26,7 @@
 
 (setq-default bbdb-file (expand-file-name "bbdb" perso-dir))
 (setq-default bbdb-completion-type nil)
-(define-key bbdb-mode-map (kbd "A") 'konix/bbdb-add-aka)
+(keymap-set bbdb-mode-map "A" 'konix/bbdb-add-aka)
 
 (provide 'KONIX_AL-bbdb)
 ;;; KONIX_AL-bbdb.el ends here

@@ -27,7 +27,7 @@
 (defun konix/hide-ifdef-mode-hook()
   (substitute-key-definition 'hide-ifdef-define 'konix/hide-ifdef-define hide-ifdef-mode-map)
   (substitute-key-definition 'hide-ifdef-undef 'konix/hide-ifdef-undef hide-ifdef-mode-map)
-  (define-key hide-ifdef-mode-submap "t" 'konix/hide-ifdef-toggle-block)
+  (keymap-set hide-ifdef-mode-submap "t" 'konix/hide-ifdef-toggle-block)
   )
 (add-hook 'hide-ifdef-mode-hook 'konix/hide-ifdef-mode-hook)
 

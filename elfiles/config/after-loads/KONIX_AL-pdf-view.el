@@ -35,7 +35,7 @@
 (add-hook 'pdf-view-mode-hook 'pdf-tools-enable-minor-modes)
 (setq-default pdf-view-continuous nil)
 
-(define-key pdf-view-mode-map (kbd "M-s") 'auto-scroll-mode)
+(keymap-set pdf-view-mode-map "M-s" 'auto-scroll-mode)
 
 (provide 'KONIX_AL-pdf-view)
 ;;; KONIX_AL-pdf-view.el ends here

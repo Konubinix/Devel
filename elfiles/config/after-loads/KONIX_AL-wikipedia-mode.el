@@ -25,8 +25,8 @@
 ;;; Code:
 
 (defun konix/wikipedia-mode-hook()
-  (local-set-key (kbd "<C-left>") 'backward-word)
-  (local-set-key (kbd "<C-right>") 'forward-word)
+  (keymap-local-set "C-<left>" 'backward-word)
+  (keymap-local-set "C-<right>" 'forward-word)
   (konix/flyspell-mode t)
   (visual-line-mode t)
   (setq ac-sources

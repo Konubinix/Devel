@@ -156,11 +156,11 @@
   )
 
 (defun konix/hs-minor-mode-hook()
-  (local-set-key (kbd "<f2> <f1>") 'hs-hide-all)
-  (local-set-key (kbd "<f2> <f3>") 'hs-show-all)
-  (local-set-key (kbd "<f3>") 'konix/hs-zoom-in)
-  (local-set-key (kbd "<f1>") 'konix/hs-zoom-out)
-  (define-key narrow-map (kbd "<f3>") 'konix/hs-narrow-to-block)
+  (keymap-local-set "<f2> <f1>" 'hs-hide-all)
+  (keymap-local-set "<f2> <f3>" 'hs-show-all)
+  (keymap-local-set "<f3>" 'konix/hs-zoom-in)
+  (keymap-local-set "<f1>" 'konix/hs-zoom-out)
+  (keymap-set narrow-map "<f3>" 'konix/hs-narrow-to-block)
   )
 (add-hook 'hs-minor-mode-hook 'konix/hs-minor-mode-hook)
 

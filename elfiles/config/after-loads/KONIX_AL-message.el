@@ -35,14 +35,14 @@
 (setq-default message-forward-before-signature t)
 (setq-default message-sendmail-extra-arguments nil)
 (setq-default mm-text-html-renderer 'w3m
-			  gnus-inhibit-images t)
+                          gnus-inhibit-images t)
 ;; let notmuch decide which identity is the default
 (setq-default gnus-alias-default-identity nil)
 
-(define-key message-mode-map (kbd "<C-tab>") 'konix/notmuch-message-completion-toggle)
-(define-key message-mode-map (kbd "C-c I") 'gnus-alias-select-identity)
-(define-key message-mode-map (kbd "C-c i") 'konix/gnus-alias-determine-identity)
-(define-key message-mode-map (kbd "C-c o m") 'konix/org-mime-htmlize-current)
+(keymap-set message-mode-map "C-<tab>" 'konix/notmuch-message-completion-toggle)
+(keymap-set message-mode-map "C-c I" 'gnus-alias-select-identity)
+(keymap-set message-mode-map "C-c i" 'konix/gnus-alias-determine-identity)
+(keymap-set message-mode-map "C-c o m" 'konix/org-mime-htmlize-current)
 
 (defun konix/message-mode-hook ()
   (visual-line-mode 1)
@@ -53,7 +53,7 @@
   ;(orgalist-mode 1)
   )
 (add-hook 'message-mode-hook
-		  'konix/message-mode-hook)
+                  'konix/message-mode-hook)
 
 (defadvice message-forward-make-body-mml (before go_after_mml_stuff ())
   "with a new message like
@@ -68,10 +68,10 @@ put the message content before the secure tag, making it not used. This advice
 make sure to insert any mml content after the secure tag
 "
   (while (looking-at "<#")
-	(search-forward ">")
-	(forward-line)
-	(beginning-of-line)
-	)
+        (search-forward ">")
+        (forward-line)
+        (beginning-of-line)
+        )
   )
 (ad-activate 'message-forward-make-body-mml)
 
@@ -128,7 +128,7 @@ make sure to insert any mml content after the secure tag
               )
              )
       (error "Aborting message sending")
-	  )
+          )
     )
   )
 

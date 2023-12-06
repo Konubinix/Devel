@@ -535,13 +535,13 @@
   (let (
         (local_map (make-sparse-keymap))
         )
-    (define-key local_map (kbd "=") 'konix/git/log/show)
-    (define-key local_map (kbd "C-k") 'konix/git/log/commit-kill)
-    (define-key local_map (kbd "M-n") 'konix/git/log/commit-next)
-    (define-key local_map (kbd "M-p") 'konix/git/log/commit-prev)
-    (define-key local_map (kbd "M-P") 'konix/git/log/commit-kill-n-prev)
-    (define-key local_map (kbd "C-c C-b") 'diff-refine-hunk)
-    (define-key local_map (kbd "C-c C-c") 'diff-goto-source)
+    (keymap-set local_map "=" 'konix/git/log/show)
+    (keymap-set local_map "C-k" 'konix/git/log/commit-kill)
+    (keymap-set local_map "M-n" 'konix/git/log/commit-next)
+    (keymap-set local_map "M-p" 'konix/git/log/commit-prev)
+    (keymap-set local_map "M-P" 'konix/git/log/commit-kill-n-prev)
+    (keymap-set local_map "C-c C-b" 'diff-refine-hunk)
+    (keymap-set local_map "C-c C-c" 'diff-goto-source)
     (use-local-map local_map)
     )
   )
@@ -778,16 +778,16 @@ force recomputation"
                      ;; keymap
                      (keymap (copy-keymap (current-local-map)))
                      )
-                 (define-key keymap
+                 (keymap-set keymap
                              "q"
                              'konix/bury-buffer-and-delete-window
                              )
-                 (define-key keymap
+                 (keymap-set keymap
                              "k"
                              'kill-buffer-and-window
                              )
-                 (define-key keymap
-                             (kbd "C-k")
+                 (keymap-set keymap
+                             "C-k"
                              'kill-this-buffer
                              )
                  ;; use this local map instead of the diff-mode one to get
@@ -1290,6 +1290,11 @@ fallbacking to HEAD")
   (konix/git/stash/show (get-text-property (point) 'konix/git/status/filename))
   )
 
+(defun konix/git/status-buffer/stash/diff ()
+  (interactive)
+  (konix/git/show (format "stash@{%s}" (get-text-property (point) 'konix/git/status/filename)))
+  )
+
 (defun konix/git/status-decorate-buffer ()
   (defun decorate_file_type (keymap regexp face)
     (goto-char 0)
@@ -1360,11 +1365,11 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "d" 'konix/git/status-buffer/diff-file)
-                          (define-key map "r" 'konix/git/status-buffer/rm-file)
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+                          (keymap-set map "d" 'konix/git/status-buffer/diff-file)
+                          (keymap-set map "r" 'konix/git/status-buffer/rm-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
                         "^[     ]+both modified: +\\(.+\\)"
@@ -1372,10 +1377,10 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "r" 'konix/git/status-buffer/rm-file)
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+                          (keymap-set map "r" 'konix/git/status-buffer/rm-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
                         "^\\(?:# \\)?	both added:         \\(.+\\)$"
@@ -1383,10 +1388,10 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "r" 'konix/git/status-buffer/rm-file)
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+                          (keymap-set map "r" 'konix/git/status-buffer/rm-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
                         "^	added by us:     \\(.+\\)$"
@@ -1394,8 +1399,8 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "r" 'konix/git/status-buffer/rm-file)
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "r" 'konix/git/status-buffer/rm-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
                           map
                           )
                         "^\\(?:# \\)?[	 ]+deleted\\(?: by them\\)?:[	 ]+\\(.+\\)$"
@@ -1406,10 +1411,10 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-                          (define-key map "d" 'konix/git/status-buffer/diff-file-cached)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+                          (keymap-set map "r" 'konix/git/status-buffer/reset-head-file)
+                          (keymap-set map "d" 'konix/git/status-buffer/diff-file-cached)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
                         "^\\(?:# \\)?	modified:   \\(.+\\)$"
@@ -1417,10 +1422,10 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-                          (define-key map "df" 'konix/git/status-buffer/diff-file)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+                          (keymap-set map "r" 'konix/git/status-buffer/reset-head-file)
+                          (keymap-set map "d f" 'konix/git/status-buffer/diff-file)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
                         "^\\(?:# \\)?	new file:   \\(.+\\)$"
@@ -1428,10 +1433,10 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "r" 'konix/git/status-buffer/reset-head-file)
-                          (define-key map "df" 'konix/git/status-buffer/diff-file)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+                          (keymap-set map "r" 'konix/git/status-buffer/reset-head-file)
+                          (keymap-set map "d f" 'konix/git/status-buffer/diff-file)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
                         "^\\(?:# \\)?	renamed:    .+ -> \\(.+\\)$"
@@ -1439,7 +1444,7 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "r" 'konix/git/status-buffer/reset-head-file)
+                          (keymap-set map "r" 'konix/git/status-buffer/reset-head-file)
                           map
                           )
                         "^\\(?:# \\)?[	 ]+deleted\\(?: by them\\)?:[	 ]+\\(.+\\)$"
@@ -1450,13 +1455,13 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
-                          (define-key map "e" 'konix/git/status-buffer/add-edit-file)
-                          (define-key map "d" 'konix/git/status-buffer/diff-file)
-                          (define-key map "cf" 'konix/git/status-buffer/commit-file)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
-                          (define-key map "C" 'konix/git/status-buffer/checkout-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "e" 'konix/git/status-buffer/add-edit-file)
+                          (keymap-set map "d" 'konix/git/status-buffer/diff-file)
+                          (keymap-set map "c f" 'konix/git/status-buffer/commit-file)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
+                          (keymap-set map "C" 'konix/git/status-buffer/checkout-file)
                           map
                           )
                         "^\\(?:# \\)?	modified:   \\(.+?\\)\\( (.*\\(tracked\\|new commits\\|modified content\\).*)\\)?$"
@@ -1464,9 +1469,9 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
                         "^\\(?:# \\)?	renamed:    .+ -> \\(.+\\)$"
@@ -1474,7 +1479,7 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
                           map
                           )
                         "^\\(?:# \\)?.+typechange: \\(.+\\)$"
@@ -1482,9 +1487,9 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
                         "^\\(?:# \\)?	new file:   \\(.+\\)$"
@@ -1492,10 +1497,10 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "D" 'konix/git/status-buffer/delete-file)
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
-                          (define-key map "C" 'konix/git/status-buffer/checkout-file)
-                          (define-key map "r" 'konix/git/status-buffer/rm-file)
+                          (keymap-set map "D" 'konix/git/status-buffer/delete-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "C" 'konix/git/status-buffer/checkout-file)
+                          (keymap-set map "r" 'konix/git/status-buffer/rm-file)
                           map
                           )
                         "^\\(?:# \\)?	deleted:    \\(.+\\)$"
@@ -1507,10 +1512,10 @@ fallbacking to HEAD")
     (decorate_file_type (let (
                               (map (make-sparse-keymap))
                               )
-                          (define-key map "D" 'konix/git/status-buffer/delete-file)
-                          (define-key map "a" 'konix/git/status-buffer/add-file)
-                          (define-key map (kbd "<RET>") 'konix/git/status-buffer/find-file)
-                          (define-key map (kbd "v") 'konix/git/status-buffer/view-file)
+                          (keymap-set map "D" 'konix/git/status-buffer/delete-file)
+                          (keymap-set map "a" 'konix/git/status-buffer/add-file)
+                          (keymap-set map "<RET>" 'konix/git/status-buffer/find-file)
+                          (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
                         "^\\(?:# \\)?	\\(.+\\)$"
@@ -1522,11 +1527,11 @@ fallbacking to HEAD")
   (decorate_file_type (let (
                             (map (make-sparse-keymap))
                             )
-                        (define-key map "D" 'konix/git/status-buffer/stash/drop)
-                        (define-key map "a" 'konix/git/status-buffer/stash/apply)
-                        (define-key map "s" 'konix/git/status-buffer/stash/show)
-                        (define-key map "d" 'konix/git/status-buffer/stash/show)
-                        (define-key map "p" 'konix/git/status-buffer/stash/pop)
+                        (keymap-set map "D" 'konix/git/status-buffer/stash/drop)
+                        (keymap-set map "a" 'konix/git/status-buffer/stash/apply)
+                        (keymap-set map "s" 'konix/git/status-buffer/stash/show)
+                        (keymap-set map "d" 'konix/git/status-buffer/stash/diff)
+                        (keymap-set map "p" 'konix/git/status-buffer/stash/pop)
                         map
                         )
                       "^stash@{\\([0-9]+\\)}: .+$"
@@ -1545,32 +1550,32 @@ fallbacking to HEAD")
         (inhibit-read-only 1)
         (local_map (make-sparse-keymap))
         )
-    (define-key local_map "g" 'konix/git/status-buffer/redo)
-    (define-key local_map "?" 'konix/keymap/help)
-    (define-key local_map "q" 'bury-buffer)
-    (define-key local_map (kbd "C-d") 'konix/git/diff)
-    (define-key local_map "k" 'kill-buffer)
-    (define-key local_map "P" 'konix/git/push)
-    (define-key local_map (kbd"<SPC>") 'konix/git/status-buffer/next)
-    (define-key local_map (kbd"<DEL>") 'konix/git/status-buffer/prev)
+    (keymap-set local_map "g" 'konix/git/status-buffer/redo)
+    (keymap-set local_map "?" 'konix/keymap/help)
+    (keymap-set local_map "q" 'bury-buffer)
+    (keymap-set local_map "C-d" 'konix/git/diff)
+    (keymap-set local_map "k" 'kill-buffer)
+    (keymap-set local_map "P" 'konix/git/push)
+    (keymap-set local_map "<SPC>" 'konix/git/status-buffer/next)
+    (keymap-set local_map "<DEL>" 'konix/git/status-buffer/prev)
 
     (define-prefix-command 'konix/git/status/buffer/stash-prefix-map)
-    (define-key local_map (kbd "s") 'konix/git-global-map-stash)
+    (keymap-set local_map "s" 'konix/git-global-map-stash)
 
     (define-prefix-command 'konix/git/status/buffer/rebase-prefix-map)
-    (define-key local_map (kbd "R") 'konix/git/status/buffer/rebase-prefix-map)
-    (define-key konix/git/status/buffer/rebase-prefix-map "i" 'konix/git/irebase)
+    (keymap-set local_map "R" 'konix/git/status/buffer/rebase-prefix-map)
+    (keymap-set konix/git/status/buffer/rebase-prefix-map "i" 'konix/git/irebase)
 
     (define-prefix-command 'konix/git/status/diff-map)
-    (define-key local_map "d" 'konix/git/status/diff-map)
-    (define-key konix/git/status/diff-map "c" 'konix/git/diff-cached)
-    (define-key konix/git/status/diff-map "d" 'konix/git/diff)
+    (keymap-set local_map "d" 'konix/git/status/diff-map)
+    (keymap-set konix/git/status/diff-map "c" 'konix/git/diff-cached)
+    (keymap-set konix/git/status/diff-map "d" 'konix/git/diff)
 
-    (define-key local_map "p" 'konix/git-global-map-push)
+    (keymap-set local_map "p" 'konix/git-global-map-push)
 
-    (define-key local_map "c" 'konix/git-global-map-commit)
+    (keymap-set local_map "c" 'konix/git-global-map-commit)
 
-    (define-key local_map "a" 'konix/git-global-map-add)
+    (keymap-set local_map "a" 'konix/git-global-map-add)
 
     (use-local-map local_map)
     (konix/git/status-decorate-buffer)

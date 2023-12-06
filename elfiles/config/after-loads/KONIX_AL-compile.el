@@ -38,8 +38,8 @@
   ;;(hl-line-mode t)
   (setq show-trailing-whitespace nil)
   (font-lock-add-keywords nil konix/compilation-font-lock-keywords)
-  (local-set-key (kbd "SPC") 'compilation-next-error)
-  (local-set-key (kbd "<backspace>") 'compilation-previous-error)
+  (keymap-local-set "<space>" 'compilation-next-error)
+  (keymap-local-set "<backspace>" 'compilation-previous-error)
   (setq header-line-format
 		'(:eval
 		  (list
@@ -60,7 +60,7 @@
 		)
 	)
   (font-lock-add-keywords nil konix/compilation-font-lock-keywords)
-  (local-set-key (kbd "C-c C-f") 'next-error-follow-minor-mode)
+  (keymap-local-set "C-c C-f" 'next-error-follow-minor-mode)
 
   )
 (add-hook 'compilation-shell-minor-mode-hook

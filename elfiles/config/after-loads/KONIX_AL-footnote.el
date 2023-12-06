@@ -30,8 +30,8 @@
 (setq-default footnote-style 'unicode)
 (setq-default footnote-spaced-footnotes nil)
 
-(define-key footnote-mode-map (kbd "C-c C-b") 'Footnote-back-to-message)
-(define-key footnote-mode-map (kbd "C-c C-f") 'Footnote-add-footnote)
+(keymap-set footnote-mode-map "C-c C-b" 'Footnote-back-to-message)
+(keymap-set footnote-mode-map "C-c C-f" 'Footnote-add-footnote)
 
 (defun konix/footnote-reset ()
   (interactive)

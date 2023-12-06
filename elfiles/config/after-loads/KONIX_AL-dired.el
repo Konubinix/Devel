@@ -128,10 +128,10 @@
   )
 (add-hook 'dired-mode-hook 'konix/dired-mode-hook)
 
-(define-key dired-mode-map (kbd "<C-return>") 'konix/dired-mimeopen)
-(define-key dired-mode-map "\C-c\C-x" 'dired-copy-paste-do-cut)
-(define-key dired-mode-map "\C-c\C-c" 'dired-copy-paste-do-copy)
-(define-key dired-mode-map "\C-c\C-v" 'dired-copy-paste-do-paste)
+(keymap-set dired-mode-map "C-<return>" 'konix/dired-mimeopen)
+(keymap-set dired-mode-map "C-c C-x" 'dired-copy-paste-do-cut)
+(keymap-set dired-mode-map "C-c C-c" 'dired-copy-paste-do-copy)
+(keymap-set dired-mode-map "C-c C-v" 'dired-copy-paste-do-paste)
 
 (setq-default dired-backup-overwrite nil)
 (setq-default dired-omit-verbose nil)
@@ -235,18 +235,18 @@
 (dired-quick-sort-setup)
 
 ;; Hotkeys
-(define-key dired-mode-map "o" 'konix/dired-find-file-other-windows)
+(keymap-set dired-mode-map "o" 'konix/dired-find-file-other-windows)
 ;; epa-dired maps
 (define-prefix-command 'konix/dired/epa-dired-map)
-(define-key dired-mode-map "c" 'konix/dired/epa-dired-map)
-(define-key konix/dired/epa-dired-map "e" 'epa-dired-do-encrypt)
-(define-key konix/dired/epa-dired-map "d" 'epa-dired-do-decrypt)
-(define-key konix/dired/epa-dired-map "s" 'epa-dired-do-sign)
-(define-key konix/dired/epa-dired-map "v" 'epa-dired-do-verify)
+(keymap-set dired-mode-map "c" 'konix/dired/epa-dired-map)
+(keymap-set konix/dired/epa-dired-map "e" 'epa-dired-do-encrypt)
+(keymap-set konix/dired/epa-dired-map "d" 'epa-dired-do-decrypt)
+(keymap-set konix/dired/epa-dired-map "s" 'epa-dired-do-sign)
+(keymap-set konix/dired/epa-dired-map "v" 'epa-dired-do-verify)
 
-(define-key dired-mode-map (kbd "C-S-D") 'konix/dired-remove-annex)
-(define-key dired-mode-map (kbd "C-S-A") 'konix/dired-ok-annex)
-(define-key dired-mode-map (kbd "C-c C-a") 'konix/dired-ok-cut)
+(keymap-set dired-mode-map "C-S-D" 'konix/dired-remove-annex)
+(keymap-set dired-mode-map "C-S-A" 'konix/dired-ok-annex)
+(keymap-set dired-mode-map "C-c C-a" 'konix/dired-ok-cut)
 
 (defun konix/image-dired-dired-display-image-mark-and-next ()
   (interactive)
@@ -299,10 +299,10 @@
   )
 
 
-(define-key dired-mode-map (kbd "I") 'konix/dired-ipfa)
-(define-key dired-mode-map (kbd "v") 'konix/image-dired-dired-display-image-mark-and-next)
-(define-key dired-mode-map (kbd "V") 'image-dired-mark-and-display-next)
-(define-key dired-mode-map (kbd "M-v") 'image-dired-display-thumb)
+(keymap-set dired-mode-map "I" 'konix/dired-ipfa)
+(keymap-set dired-mode-map "v" 'konix/image-dired-dired-display-image-mark-and-next)
+(keymap-set dired-mode-map "V" 'image-dired-mark-and-display-next)
+(keymap-set dired-mode-map "M-v" 'image-dired-display-thumb)
 
 (defadvice dired-do-async-shell-command (before kill_async_shell_buffer ())
   (konix/shell/rename-async-shell-buffer)

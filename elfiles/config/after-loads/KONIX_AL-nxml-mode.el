@@ -37,12 +37,12 @@
   "qnames to be highlighted differently")
 
 (add-to-list 'safe-local-variable-values
-			 '(nxml-section-element-name-regexp . t))
+                         '(nxml-section-element-name-regexp . t))
 (eval-after-load "rng-loc"
   '(progn
-	 (add-to-list 'rng-schema-locating-files (expand-file-name "xml/schemas.xml"
-															   perso-dir))
-	 )
+         (add-to-list 'rng-schema-locating-files (expand-file-name "xml/schemas.xml"
+                                                                                                                           perso-dir))
+         )
   )
 
 (defun konix/hs-nxml-forward-sexp-func (&rest args)
@@ -50,16 +50,16 @@
   )
 
 (setq konix/hs-xml-mode-info
-	  '(nxml-mode "<[^/\\?!][^>]*[^/]>"
-				  "</[^>]>"
-				  nil
-				  konix/hs-nxml-forward-sexp-func)
-	  )
+          '(nxml-mode "<[^/\\?!][^>]*[^/]>"
+                                  "</[^>]>"
+                                  nil
+                                  konix/hs-nxml-forward-sexp-func)
+          )
 (eval-after-load "hideshow"
   '(progn
-	 (konix/push-or-replace-assoc-in-alist
-	  'hs-special-modes-alist
-	  konix/hs-xml-mode-info))
+         (konix/push-or-replace-assoc-in-alist
+          'hs-special-modes-alist
+          konix/hs-xml-mode-info))
   )
 
 (defun konix/nxml-in-cdata-p ()
@@ -70,46 +70,46 @@
 (defun konix/nxml/indirect-buffer-cdata ()
   (interactive)
   (unless (konix/nxml-in-cdata-p)
-	(error "This works only in cdata section")
-	)
+        (error "This works only in cdata section")
+        )
   (let (
-		beg
-		end
-		)
-	(save-excursion
-	  (nxml-move-outside-backwards)
-	  (setq beg (+ 9 (point)))			;moves just after <![CDATA[
-	  (xmltok-forward)
-	  (setq end (-
-				 (point)
-				 3						;moves just before ]]>
-				 ))
-	  )
-	(konix/indirect-region beg end)
-	(delete-other-windows)
-	)
+                beg
+                end
+                )
+        (save-excursion
+          (nxml-move-outside-backwards)
+          (setq beg (+ 9 (point)))			;moves just after <![CDATA[
+          (xmltok-forward)
+          (setq end (-
+                                 (point)
+                                 3						;moves just before ]]>
+                                 ))
+          )
+        (konix/indirect-region beg end)
+        (delete-other-windows)
+        )
   )
 
 (defun konix/nxml/pop-buffer-cdata ()
   (interactive)
   (unless (konix/nxml-in-cdata-p)
-	(error "This works only in cdata section")
-	)
+        (error "This works only in cdata section")
+        )
   (let (
-		beg
-		end
-		)
-	(save-excursion
-	  (nxml-move-outside-backwards)
-	  (setq beg (+ 9 (point)))			;moves just after <![CDATA[
-	  (xmltok-forward)
-	  (setq end (-
-				 (point)
-				 3						;moves just before ]]>
-				 ))
-	  )
+                beg
+                end
+                )
+        (save-excursion
+          (nxml-move-outside-backwards)
+          (setq beg (+ 9 (point)))			;moves just after <![CDATA[
+          (xmltok-forward)
+          (setq end (-
+                                 (point)
+                                 3						;moves just before ]]>
+                                 ))
+          )
     (konix/new-buffer-region beg end)
-	)
+        )
   )
 
 (defun konix/nxml-indent-line ()
@@ -120,30 +120,30 @@
   (or
    ;; cases where special indentation or no indentation will be performed
    (case xmltok-type
-	 ('cdata-section
-	  t
-	  )
-	 )
+         ('cdata-section
+          t
+          )
+         )
    (let* (
-		  (rng-open-elements_tmp rng-open-elements)
-		  (my_elem (pop rng-open-elements_tmp))
-		  (found nil)
-		  )
-	 (while (and my_elem (not found))
-	   (when (and
-			  (string-equal (cdr my_elem) "screen")
-			  (not (save-excursion
-					 (beginning-of-line)
-					 (looking-at " *</screen")
-					 )
-				   )
-			  )
-		 (setq found t)
-		 )
-	   (setq my_elem (pop rng-open-elements_tmp))
-	   )
-	 found
-	 )
+                  (rng-open-elements_tmp rng-open-elements)
+                  (my_elem (pop rng-open-elements_tmp))
+                  (found nil)
+                  )
+         (while (and my_elem (not found))
+           (when (and
+                          (string-equal (cdr my_elem) "screen")
+                          (not (save-excursion
+                                         (beginning-of-line)
+                                         (looking-at " *</screen")
+                                         )
+                                   )
+                          )
+                 (setq found t)
+                 )
+           (setq my_elem (pop rng-open-elements_tmp))
+           )
+         found
+         )
    ;; try a list of user defined functions
    (run-hook-with-args-until-success 'konix/nxml-indent-line-functions)
    ;; else, perform the default nxml indentation function
@@ -155,21 +155,21 @@
   (interactive)
   (cond
    ((and (looking-at-p "<") (looking-back ">"))
-	(newline)
-	(save-excursion
-	  (newline-and-indent)
-	  )
-	(indent-for-tab-command)
-	)
+        (newline)
+        (save-excursion
+          (newline-and-indent)
+          )
+        (indent-for-tab-command)
+        )
    ((or
-	 (looking-at-p "[\n\r]")
-	 (looking-at-p "<")
-	 )
-	(newline-and-indent)
-	)
+         (looking-at-p "[\n\r]")
+         (looking-at-p "<")
+         )
+        (newline-and-indent)
+        )
    (t
-	(newline)
-	)
+        (newline)
+        )
    )
   )
 
@@ -177,53 +177,53 @@
   (interactive)
   (skip-chars-backward "[:blank:]")
   (let (
-		(beg (point))
-		(end (save-excursion (nxml-forward-element) (point)))
-		)
-	(narrow-to-region beg end)
-	)
+                (beg (point))
+                (end (save-excursion (nxml-forward-element) (point)))
+                )
+        (narrow-to-region beg end)
+        )
   )
 
 (defun konix/nxml-kill-element ()
   (interactive)
   (let (
-		(beg (point))
-		(end (save-excursion (nxml-forward-element) (point)))
-		)
-	(kill-region beg end)
-	)
+                (beg (point))
+                (end (save-excursion (nxml-forward-element) (point)))
+                )
+        (kill-region beg end)
+        )
   )
 
 (defun konix/nxml-show-context ()
   (interactive)
   (nxml-token-before)
   (unless rng-validate-mode
-	(rng-validate-mode 1)
-	)
+        (rng-validate-mode 1)
+        )
   (rng-set-state-after (point))
   (let* (
-		 (rng-open-elements_tmp rng-open-elements)
-		 (my_elem (pop rng-open-elements_tmp))
-		 (message_ "")
-		 )
-	(while my_elem
-	  (setq message_ (concat message_ " in " (car my_elem) ":" (cdr my_elem)))
-	  (setq my_elem (pop rng-open-elements_tmp))
-	  )
-	(message message_)
-	)
+                 (rng-open-elements_tmp rng-open-elements)
+                 (my_elem (pop rng-open-elements_tmp))
+                 (message_ "")
+                 )
+        (while my_elem
+          (setq message_ (concat message_ " in " (car my_elem) ":" (cdr my_elem)))
+          (setq my_elem (pop rng-open-elements_tmp))
+          )
+        (message message_)
+        )
   )
 
 (defun konix/nxml-zoom-in ()
   (interactive)
   (condition-case nil
-	  (nxml-show-direct-subheadings)
-	(error
-	 (nxml-forward-element)
-	 (nxml-backward-element)
-	 (nxml-show-direct-subheadings)
-	 )
-	)
+          (nxml-show-direct-subheadings)
+        (error
+         (nxml-forward-element)
+         (nxml-backward-element)
+         (nxml-show-direct-subheadings)
+         )
+        )
   (forward-line)
   (beginning-of-line)
   )
@@ -237,12 +237,12 @@
 (defun konix/nxml-hide-all ()
   (interactive)
   (if (not current-prefix-arg)
-	  (nxml-hide-all-text-content)
-	(save-excursion
-	  (goto-char (point-min))
-	  (nxml-hide-other)
-	  )
-	)
+          (nxml-hide-all-text-content)
+        (save-excursion
+          (goto-char (point-min))
+          (nxml-hide-other)
+          )
+        )
   )
 
 (defun konix/nxml-mark-element ()
@@ -262,50 +262,50 @@
   (interactive "P")
   (nxml-forward-element)
   (when (not not_to_next)
-	(skip-chars-forward " \t\n\r")
-	)
+        (skip-chars-forward " \t\n\r")
+        )
   )
 
 (defun konix/nxml-heading-start-position_get-attribute (&optional bound)
   (interactive)
   (progn
-	(when (re-search-backward " \\([^ ]+\\)=.+" bound t)
-	  (cons
-	   (match-string-no-properties 1)
-	   (match-beginning 1)
-	   )
-	  )
-	)
+        (when (re-search-backward " \\([^ ]+\\)=.+" bound t)
+          (cons
+           (match-string-no-properties 1)
+           (match-beginning 1)
+           )
+          )
+        )
   )
 
 (defun konix/nxml-goto-next-error ()
   "Go to the next validation error in the buffer."
   (interactive)
   (let (
-		(prop_pos (point))
-		(old_prop_pos (point))
-		(max (point-max))
-		)
-	(while (and
-			(not
-			 (equal
-			  (setq prop_pos
-					(next-single-char-property-change
-					 old_prop_pos
-					 'category))
-			  max
-			  )
-			 )
-			(not (equal
-				  (get-char-property old_prop_pos 'category)
-				  'rng-error
-				  ))
-			)
-	  (setq old_prop_pos prop_pos)
+                (prop_pos (point))
+                (old_prop_pos (point))
+                (max (point-max))
+                )
+        (while (and
+                        (not
+                         (equal
+                          (setq prop_pos
+                                        (next-single-char-property-change
+                                         old_prop_pos
+                                         'category))
+                          max
+                          )
+                         )
+                        (not (equal
+                                  (get-char-property old_prop_pos 'category)
+                                  'rng-error
+                                  ))
+                        )
+          (setq old_prop_pos prop_pos)
       )
-	(unless (equal old_prop_pos max)
-	  (goto-char old_prop_pos)
-	  )
+        (unless (equal old_prop_pos max)
+          (goto-char old_prop_pos)
+          )
     )
   )
 
@@ -315,63 +315,63 @@ Adjust the position to be after initial leading whitespace.
 Return nil if no heading element is found.  Requires point to be
 immediately after the section's start-tag."
   (let ((depth 0)
-		(heading-regexp (concat "\\`\\("
-								nxml-heading-element-name-regexp
-								"\\)\\'"))
+                (heading-regexp (concat "\\`\\("
+                                                                nxml-heading-element-name-regexp
+                                                                "\\)\\'"))
 
-		(section-regexp (concat "\\`\\("
-								nxml-section-element-name-regexp
-								"\\)\\'"))
-		(start (point))
-		found
-		(start-current-section (save-excursion
-								 (search-backward "<")
-								 (point)
-								 ))
-		attribute
-		)
+                (section-regexp (concat "\\`\\("
+                                                                nxml-section-element-name-regexp
+                                                                "\\)\\'"))
+                (start (point))
+                found
+                (start-current-section (save-excursion
+                                                                 (search-backward "<")
+                                                                 (point)
+                                                                 ))
+                attribute
+                )
 
-	;; check the header in the current attributes="truc"
-	(save-excursion
-	  (while (and
-			  (not found)
-			  (setq attribute (konix/nxml-heading-start-position_get-attribute start-current-section))
-			  )
-		(when (string-match-p
-			   heading-regexp
-			   (car attribute)
-			   )
-		  (setq found (cdr attribute))
-		  )
-		)
-	  )
-	(save-excursion
+        ;; check the header in the current attributes="truc"
+        (save-excursion
+          (while (and
+                          (not found)
+                          (setq attribute (konix/nxml-heading-start-position_get-attribute start-current-section))
+                          )
+                (when (string-match-p
+                           heading-regexp
+                           (car attribute)
+                           )
+                  (setq found (cdr attribute))
+                  )
+                )
+          )
+        (save-excursion
       (while (and (not found) (xmltok-forward)
-				  (cond
-				   ((memq xmltok-type '(end-tag partial-end-tag))
-					(and (not (string-match section-regexp
-											(xmltok-end-tag-local-name)))
-						 (> depth 0)
-						 (setq depth (1- depth))))
-				   ;; XXX Not sure whether this is a good idea
-				   ;;((eq xmltok-type 'empty-element)
-				   ;; nil)
-				   ((not (memq xmltok-type
-							   '(start-tag partial-start-tag)))
-					t)
-				   ((string-match section-regexp
-								  (xmltok-start-tag-local-name))
-					nil)
-				   ((string-match heading-regexp
-								  (xmltok-start-tag-local-name))
-					(skip-chars-forward " \t\r\n")
-					(setq found (point))
-					nil)
-				   (t
-					(setq depth (1+ depth))
-					t))
-				  (<= (- (point) start) nxml-heading-scan-distance)))
-	  )
+                                  (cond
+                                   ((memq xmltok-type '(end-tag partial-end-tag))
+                                        (and (not (string-match section-regexp
+                                                                                        (xmltok-end-tag-local-name)))
+                                                 (> depth 0)
+                                                 (setq depth (1- depth))))
+                                   ;; XXX Not sure whether this is a good idea
+                                   ;;((eq xmltok-type 'empty-element)
+                                   ;; nil)
+                                   ((not (memq xmltok-type
+                                                           '(start-tag partial-start-tag)))
+                                        t)
+                                   ((string-match section-regexp
+                                                                  (xmltok-start-tag-local-name))
+                                        nil)
+                                   ((string-match heading-regexp
+                                                                  (xmltok-start-tag-local-name))
+                                        (skip-chars-forward " \t\r\n")
+                                        (setq found (point))
+                                        nil)
+                                   (t
+                                        (setq depth (1+ depth))
+                                        t))
+                                  (<= (- (point) start) nxml-heading-scan-distance)))
+          )
     found)
   )
 (byte-compile 'konix/nxml-heading-start-position_get-attribute)
@@ -380,88 +380,88 @@ immediately after the section's start-tag."
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
   (when konix/nxml-qname-keywords
-	(font-lock-add-keywords
-	 nil
-	 `(
-	   (
-		,(format "</?\\([^>:]+?:\\)?\\(%s\\)[ >]"
-				 (mapconcat
-				  'identity
-				  konix/nxml-qname-keywords
-				  "\\|")
-				 )
-		.
-		(2 font-lock-function-name-face)
-		)
-	   )
-	 )
-	)
+        (font-lock-add-keywords
+         nil
+         `(
+           (
+                ,(format "</?\\([^>:]+?:\\)?\\(%s\\)[ >]"
+                                 (mapconcat
+                                  'identity
+                                  konix/nxml-qname-keywords
+                                  "\\|")
+                                 )
+                .
+                (2 font-lock-function-name-face)
+                )
+           )
+         )
+        )
   (auto-fill-mode t)
   (setq show-trailing-whitespace t)
   (setq indent-line-function 'konix/nxml-indent-line)
   ;; (ac-flyspell-workaround)
   ;; (flyspell-prog-mode)
-  (local-set-key (kbd "<C-return>") 'konix/nxml-newline-dwim)
-  (local-set-key (kbd "C-c C-d") 'konix/nxml/indirect-buffer-cdata)
+  (keymap-local-set "C-<return>" 'konix/nxml-newline-dwim)
+  (keymap-local-set "C-c C-d" 'konix/nxml/indirect-buffer-cdata)
   (setq hs-c-start-regexp "\<\!\-\-")
   (setq ac-sources
-		'(
-		  ac-source-konix/rng
-		  ac-source-yasnippet
-		  ac-source-dictionary
-		  ac-source-files-in-current-dir
-		  ac-source-words-in-same-mode-buffers
-		  )
-		)
-  (local-set-key (kbd "<f1>") 'konix/nxml-zoom-out)
-  (local-set-key (kbd "<f3>") 'konix/nxml-zoom-in)
-  (local-set-key (kbd "<f2> <f3>") 'nxml-show-all)
-  (local-set-key (kbd "<f2> <f1>") 'konix/nxml-hide-all)
-  (local-set-key (kbd "C-x n e") 'konix/nxml-narrow-to-element)
-  (local-set-key (kbd "C-M-k") 'konix/nxml-kill-element)
-  (local-set-key (kbd "C-M-h") 'konix/nxml-mark-element)
-  (local-set-key (kbd "C-M-d") 'konix/nxml-down-element)
-  (local-set-key (kbd "C-M-n") 'konix/nxml-forward-element)
-  (local-set-key (kbd "C-c C-c") 'konix/nxml-show-context)
+                '(
+                  ac-source-konix/rng
+                  ac-source-yasnippet
+                  ac-source-dictionary
+                  ac-source-files-in-current-dir
+                  ac-source-words-in-same-mode-buffers
+                  )
+                )
+  (keymap-local-set "<f1>" 'konix/nxml-zoom-out)
+  (keymap-local-set "<f3>" 'konix/nxml-zoom-in)
+  (keymap-local-set "<f2> <f3>" 'nxml-show-all)
+  (keymap-local-set "<f2> <f1>" 'konix/nxml-hide-all)
+  (keymap-local-set "C-x n e" 'konix/nxml-narrow-to-element)
+  (keymap-local-set "C-M-k" 'konix/nxml-kill-element)
+  (keymap-local-set "C-M-h" 'konix/nxml-mark-element)
+  (keymap-local-set "C-M-d" 'konix/nxml-down-element)
+  (keymap-local-set "C-M-n" 'konix/nxml-forward-element)
+  (keymap-local-set "C-c C-c" 'konix/nxml-show-context)
   (set (make-local-variable 'comment-region-function) 'konix/nxml-comment-region)
   (set (make-local-variable 'uncomment-region-function) 'konix/nxml-uncomment-region)
   (auto-complete-mode 1)
   (setq header-line-format '(:eval (format "Schema : %s"
-										   (or rng-current-schema-file-name "Vacuous")
-										   )))
+                                                                                   (or rng-current-schema-file-name "Vacuous")
+                                                                                   )))
   )
 (add-hook 'nxml-mode-hook
-		  'konix/nxml-mode-hook)
+                  'konix/nxml-mode-hook)
 
 (set-face-attribute 'nxml-text nil
-					:weight 'bold
-					)
+                                        :weight 'bold
+                                        )
 (set-face-attribute 'nxml-cdata-section-content nil
-					:inherit nil)
+                                        :inherit nil)
 (set-face-foreground 'nxml-element-local-name
-					 "dodger blue"
-					 )
-(define-key nxml-outline-showing-tag-map (kbd "<C-tab>") 'nxml-hide-subheadings)
-(define-key nxml-outline-hiding-tag-map (kbd "<C-tab>") 'nxml-show-direct-subheadings)
+                                         "dodger blue"
+                                         )
+(keymap-set nxml-outline-showing-tag-map "C-<tab>" 'nxml-hide-subheadings)
+(keymap-set nxml-outline-hiding-tag-map "C-<tab>" 'nxml-show-direct-subheadings)
 
 (setq-default nxml-section-element-name-regexp
-			  (concat
-			   nxml-section-element-name-regexp
-			   "\\|glossentry\\|table"
-			   )
-			  )
+                          (concat
+                           nxml-section-element-name-regexp
+                           "\\|glossentry\\|table"
+                           )
+                          )
 (setq-default nxml-heading-element-name-regexp
-			  (concat
-			   nxml-heading-element-name-regexp
-			   "\\|glossterm"
-			   )
-			  )
+                          (concat
+                           nxml-heading-element-name-regexp
+                           "\\|glossterm"
+                           )
+                          )
 
 (eval-after-load "flyspell"
   '(progn
-	 ;; make flyspell work well with nxml
-	 (add-to-list 'flyspell-prog-text-faces 'nxml-text-face)
-	 )
+         ;; make flyspell work well with nxml
+         (add-to-list 'flyspell-prog-text-faces 'nxml-text-face)
+         )
   )
 ;; advices
 (defadvice nxml-backward-up-element (before push_mark ())

@@ -25,7 +25,7 @@
 ;;; Code:
 
 (setq-default proced-tree-flag t)
-(define-key proced-mode-map (kbd "q") 'delete-window)
+(keymap-set proced-mode-map "q" 'delete-window)
 
 (provide '700-KONIX_proced)
 ;;; 700-KONIX_proced.el ends here

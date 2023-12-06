@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(define-key goto-address-highlight-keymap (kbd "<C-return>") 'goto-address-at-point)
+(keymap-set goto-address-highlight-keymap "C-<return>" 'goto-address-at-point)
 
 (provide 'KONIX_AL-goto-addr)
 ;;; KONIX_AL-goto-addr.el ends here

@@ -65,20 +65,20 @@ Defined with the help of `konix/slack-with-change-team'" (symbol-name wrapped))
 
 
 (define-prefix-command 'konix/slack-global-map)
-(define-key konix/global-fast-key-map (kbd "l") 'konix/slack-global-map)
+(keymap-set konix/global-fast-key-map "l" 'konix/slack-global-map)
 
-(define-key konix/slack-global-map (kbd "t") 'slack-change-current-team)
+(keymap-set konix/slack-global-map "t" 'slack-change-current-team)
 
 ;; team based commands
-(define-key konix/slack-global-map (kbd "u") 'konix/slack-select-unread-rooms)
-(define-key konix/slack-global-map (kbd "r") 'konix/slack-select-rooms)
-(define-key konix/slack-global-map (kbd "U") 'konix/slack-all-threads)
-(define-key konix/slack-global-map (kbd "o") 'konix/slack-im-open)
-(define-key konix/slack-global-map (kbd "g") 'slack-group-select)
-(define-key konix/slack-global-map (kbd "s") 'konix/slack-im-select)
-(define-key konix/slack-global-map (kbd "S") 'slack-room-user-select)
-(define-key konix/slack-global-map (kbd "M-u") 'slack-file-upload-snippet)
-(define-key konix/slack-global-map (kbd "m") 'slack-search-from-messages)
+(keymap-set konix/slack-global-map "u" 'konix/slack-select-unread-rooms)
+(keymap-set konix/slack-global-map "r" 'konix/slack-select-rooms)
+(keymap-set konix/slack-global-map "U" 'konix/slack-all-threads)
+(keymap-set konix/slack-global-map "o" 'konix/slack-im-open)
+(keymap-set konix/slack-global-map "g" 'slack-group-select)
+(keymap-set konix/slack-global-map "s" 'konix/slack-im-select)
+(keymap-set konix/slack-global-map "S" 'slack-room-user-select)
+(keymap-set konix/slack-global-map "M-u" 'slack-file-upload-snippet)
+(keymap-set konix/slack-global-map "m" 'slack-search-from-messages)
 
 (add-to-list 'tracking-ignored-buffers "\\*Slack - .+ : .+ Thread - [0-9.]+")
 

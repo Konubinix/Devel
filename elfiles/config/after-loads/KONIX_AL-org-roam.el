@@ -30,9 +30,9 @@
 (require 'oc)
 (require 'oc-csl)
 
-(define-key org-mode-map (kbd "C-c n l") #'org-roam-buffer-toggle)
-(define-key org-mode-map (kbd "C-c n t") #'konix/org-roam-export/toggle-publish)
-(define-key org-mode-map (kbd "C-j") #'completion-at-point)
+(keymap-set org-mode-map "C-c n l" #'org-roam-buffer-toggle)
+(keymap-set org-mode-map "C-c n t" #'konix/org-roam-export/toggle-publish)
+(keymap-set org-mode-map "C-j" #'completion-at-point)
 
 (setq-default org-roam-directory (file-truename (expand-file-name "roam" perso-dir)))
 (setq-default org-roam-v2-ack t)

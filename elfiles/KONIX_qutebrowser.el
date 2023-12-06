@@ -186,14 +186,14 @@
 
 (define-prefix-command 'qutebrowser/map)
 
-(define-key qutebrowser/map "o" 'qutebrowser/open)
-(define-key qutebrowser/map (kbd "/") 'qutebrowser/search)
-(define-key qutebrowser/map (kbd "w") 'qutebrowser/close-tab)
-(define-key qutebrowser/map (kbd "C-q") 'qutebrowser/quit)
-(define-key qutebrowser/map (kbd "y") 'qutebrowser/yank-url)
-(define-key qutebrowser/map (kbd "s") 'qutebrowser/toggle-scroll)
-(define-key qutebrowser/map (kbd "<next>") 'qutebrowser/page-down)
-(define-key qutebrowser/map (kbd "<prior>") 'qutebrowser/page-up)
+(keymap-set qutebrowser/map "o" 'qutebrowser/open)
+(keymap-set qutebrowser/map "/" 'qutebrowser/search)
+(keymap-set qutebrowser/map "w" 'qutebrowser/close-tab)
+(keymap-set qutebrowser/map "C-q" 'qutebrowser/quit)
+(keymap-set qutebrowser/map "y" 'qutebrowser/yank-url)
+(keymap-set qutebrowser/map "s" 'qutebrowser/toggle-scroll)
+(keymap-set qutebrowser/map "<next>" 'qutebrowser/page-down)
+(keymap-set qutebrowser/map "<prior>" 'qutebrowser/page-up)
 
 (defhydra qutebrowser/hydra-map ()
   "zoom"
@@ -212,7 +212,7 @@
   ("ss" qutebrowser/toggle-scroll "scroll")
   ("q" nil "quit")
   )
-(define-key qutebrowser/map (kbd "q") 'qutebrowser/hydra-map/body)
+(keymap-set qutebrowser/map "q" 'qutebrowser/hydra-map/body)
 
 
 (provide 'KONIX_qutebrowser)

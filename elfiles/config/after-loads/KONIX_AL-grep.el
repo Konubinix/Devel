@@ -31,7 +31,9 @@
 (setq-default grep-template "grep <C> -nH -r -e  <R> <F>")
 (add-to-list 'revert-without-query "TAGS")
 
-(define-key grep-mode-map (kbd "o") 'konix/compile-goto-error-other-window)
+(keymap-set grep-mode-map "DEL" #'compilation-previous-file)
+(keymap-set grep-mode-map "SPC" #'compilation-next-file)
+
 (konix/push-or-replace-in-alist
  'grep-host-defaults-alist
  'localhost

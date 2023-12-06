@@ -1,0 +1,4 @@
+# -*- mode: snippet -*-
+# name: kls
+# --
+(keymap-local-set "${100:KEY}" '${200:FUNCTION})

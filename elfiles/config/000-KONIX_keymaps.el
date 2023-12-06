@@ -7,13 +7,13 @@
 (global-unset-key (kbd "<f4>"))
 
 (define-prefix-command 'konix/global-slow-key-map)
-(global-set-key (kbd "C-<") 'konix/global-slow-key-map)
-(global-set-key (kbd "C-à") 'konix/global-slow-key-map) ;for bépo keyboards
-(global-set-key (kbd "C-f") 'konix/global-slow-key-map) ;for hacker's keyboard
+(keymap-global-set "C-<" 'konix/global-slow-key-map)
+(keymap-global-set "C-à" 'konix/global-slow-key-map) ;for bépo keyboards
+(keymap-global-set "C-f" 'konix/global-slow-key-map) ;for hacker's keyboard
 
 (define-prefix-command 'konix/global-fast-key-map)
-(global-set-key (kbd "<f2>") 'konix/global-fast-key-map)
-(global-set-key (kbd "²") 'konix/global-fast-key-map) ; hacker's keyboard
+(keymap-global-set "<f2>" 'konix/global-fast-key-map)
+(keymap-global-set "²" 'konix/global-fast-key-map) ; hacker's keyboard
 
 (define-prefix-command 'konix/global-key-map)
-(global-set-key (kbd "M-g") 'konix/global-key-map)
+(keymap-global-set "M-g" 'konix/global-key-map)

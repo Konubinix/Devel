@@ -24,8 +24,8 @@
 
 ;;; Code:
 
-(define-key tabulated-list-mode-map (kbd "SPC") 'next-line)
-(define-key tabulated-list-mode-map (kbd "DEL") 'previous-line)
+(keymap-set tabulated-list-mode-map "SPC" 'next-line)
+(keymap-set tabulated-list-mode-map "DEL" 'previous-line)
 
 (provide 'KONIX_AL-tabulated-list)
 ;;; KONIX_AL-tabulated-list.el ends here

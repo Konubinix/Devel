@@ -135,10 +135,10 @@
 			  'konix/jabber-muc-alert
 			  )
 
-(define-key jabber-global-keymap (kbd "j") 'jabber-muc-autojoin)
-(define-key jabber-global-keymap (kbd "c") 'jabber-connect)
-(define-key jabber-global-keymap (kbd "d") 'jabber-disconnect-one)
-(define-key jabber-roster-mode-map (kbd "V") 'jabber-vcard-get)
+(keymap-set jabber-global-keymap "j" 'jabber-muc-autojoin)
+(keymap-set jabber-global-keymap "c" 'jabber-connect)
+(keymap-set jabber-global-keymap "d" 'jabber-disconnect-one)
+(keymap-set jabber-roster-mode-map "V" 'jabber-vcard-get)
 (jabber-activity-mode 1)
 
 (provide '400-KONIX_jabber)

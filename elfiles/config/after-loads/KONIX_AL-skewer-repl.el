@@ -26,7 +26,7 @@
 
 (defun konix/skewer-repl-mode-hook ()
   (company-mode 1)
-  (local-set-key (kbd "TAB") 'company-complete)
+  (keymap-local-set "TAB" 'company-complete)
   )
 
 (add-hook 'skewer-repl-mode-hook 'konix/skewer-repl-mode-hook)

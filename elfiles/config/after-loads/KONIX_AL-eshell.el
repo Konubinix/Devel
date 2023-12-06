@@ -31,8 +31,8 @@
 					 ac-source-files-in-current-dir
 					 ac-source-filename
 					 ))
-  (define-key eshell-mode-map (kbd "<up>") 'previous-line)
-  (define-key eshell-mode-map (kbd "<down>") 'forward-line)
+  (keymap-set eshell-mode-map "<up>" 'previous-line)
+  (keymap-set eshell-mode-map "<down>" 'forward-line)
   )
 (add-hook 'eshell-mode-hook 'konix/eshell-mode-hook)
 

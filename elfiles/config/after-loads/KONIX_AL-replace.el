@@ -35,7 +35,7 @@
   )
 
 (defun konix/occur-mode-hook()
-  (define-key occur-mode-map "O"
+  (keymap-set occur-mode-map "O"
 	'konix/occur-mode-goto-occurrence-other-window-and-come-back)
   )
 (add-hook 'occur-mode-hook 'konix/occur-mode-hook)

@@ -2,12 +2,12 @@
 
 (region-bindings-mode-enable)
 (define-prefix-command 'konix/region-bindings-mode-map)
-(define-key region-bindings-mode-map "r" 'konix/region-bindings-mode-map)
+(keymap-set region-bindings-mode-map "r" 'konix/region-bindings-mode-map)
 
-(define-key konix/region-bindings-mode-map "t" 'string-rectangle)
-(define-key konix/region-bindings-mode-map "d" 'delete-rectangle)
-(define-key konix/region-bindings-mode-map "l" 'mc/edit-lines)
-(define-key konix/region-bindings-mode-map "n" 'cua-rectangle-mark-mode)
+(keymap-set konix/region-bindings-mode-map "t" 'string-rectangle)
+(keymap-set konix/region-bindings-mode-map "d" 'delete-rectangle)
+(keymap-set konix/region-bindings-mode-map "l" 'mc/edit-lines)
+(keymap-set konix/region-bindings-mode-map "n" 'cua-rectangle-mark-mode)
 
 (setq-default
  region-bindings-mode-disable-predicates
@@ -24,69 +24,69 @@
 (key-chord-define-global "$u" 'display-line-numbers-mode)
 
 ;; remove keys that I type too much by mistake
-(global-set-key (kbd "C-x <")
+(keymap-global-set "C-x <"
                 #'(lambda () (interactive) (message "Intentionally disable C-x <")))
-(global-set-key (kbd "C-x >")
+(keymap-global-set "C-x >"
                 #'(lambda () (interactive) (message "Intentionally disable C-x >")))
 
 ;; some vim keys
-(global-set-key (kbd "C-n") 'dabbrev-completion)
+(keymap-global-set "C-n" 'dabbrev-completion)
 
 ;; custom prefix key
 (define-prefix-command 'konix/global-custom-key-map)
-(global-set-key (kbd "<f11>") 'konix/global-custom-key-map)
+(keymap-global-set "<f11>" 'konix/global-custom-key-map)
 
 ;; ################################################################################
 ;; global hotkeys
 ;; ################################################################################
 ;; ioccur
-(define-key global-map (kbd "M-s O") 'ioccur)
+(keymap-set global-map "M-s O" 'ioccur)
 ;; yank and kill commands
-(define-key global-map (kbd "M-Y") 'konix/yank-pop-more-recent)
-(define-key global-map (kbd "C-M-y") 'konix/kill-ring-insert)
-(define-key global-map (kbd "C-S-W") 'konix/kill-ring-to-clipboard)
-(define-key global-map (kbd "C-S-Y") 'clipboard-yank)
+(keymap-set global-map "M-Y" 'konix/yank-pop-more-recent)
+(keymap-set global-map "C-M-y" 'konix/kill-ring-insert)
+(keymap-set global-map "C-S-W" 'konix/kill-ring-to-clipboard)
+(keymap-set global-map "C-S-Y" 'clipboard-yank)
 
 ;; multi occur
-(global-set-key (kbd "M-s M-o") 'multi-occur-in-matching-buffers)
+(keymap-global-set "M-s M-o" 'multi-occur-in-matching-buffers)
 
 ;; handle interruption quickly
-(global-set-key (kbd "C-M-S-J") 'konix/org-capture-interruption)
+(keymap-global-set "C-M-S-J" 'konix/org-capture-interruption)
 
 ;;to move easily between windows with C-M-Arrows
-(global-set-key (kbd "<C-M-left>") 'windmove-left)
-(global-set-key (kbd "<C-M-right>") 'windmove-right)
-(global-set-key (kbd "<C-M-up>") 'windmove-up)
-(global-set-key (kbd "<C-M-down>") 'windmove-down)
-(global-set-key (kbd "<C-M-S-right>") 'konix/windmove-bring-buffer-right)
-(global-set-key (kbd "<C-M-S-left>") 'konix/windmove-bring-buffer-left)
-(global-set-key (kbd "<C-M-S-up>") 'konix/windmove-bring-buffer-up)
-(global-set-key (kbd "<C-M-S-down>") 'konix/windmove-bring-buffer-down)
+(keymap-global-set "C-M-<left>" 'windmove-left)
+(keymap-global-set "C-M-<right>" 'windmove-right)
+(keymap-global-set "C-M-<up>" 'windmove-up)
+(keymap-global-set "C-M-<down>" 'windmove-down)
+(keymap-global-set "C-M-S-<right>" 'konix/windmove-bring-buffer-right)
+(keymap-global-set "C-M-S-<left>" 'konix/windmove-bring-buffer-left)
+(keymap-global-set "C-M-S-<up>" 'konix/windmove-bring-buffer-up)
+(keymap-global-set "C-M-S-<down>" 'konix/windmove-bring-buffer-down)
 ;; wrap sexp at point
-(global-set-key (kbd "C-M-m") 'konix/wrap-sexp-at-point)
-(global-set-key (kbd "C-M-S-m") 'konix/delete-paren-at-point)
+(keymap-global-set "C-M-m" 'konix/wrap-sexp-at-point)
+(keymap-global-set "C-M-S-m" 'konix/delete-paren-at-point)
 ;; Other frame
-(global-set-key (kbd "<C-M-tab>") 'other-frame)
+(keymap-global-set "C-M-<tab>" 'other-frame)
 ;; Move buffer to other frame
-(global-set-key (kbd "<S-C-M-tab>") 'konix/switch-buffer-other-frame)
-(global-set-key (kbd "<C-M-S-iso-lefttab>") 'konix/switch-buffer-other-frame)
+(keymap-global-set "C-M-S-<tab>" 'konix/switch-buffer-other-frame)
+(keymap-global-set "C-M-S-<iso-lefttab>" 'konix/switch-buffer-other-frame)
 ;; list buffers with bs-show instead of list-buffer
-(global-set-key (kbd "C-x C-b") 'bs-show)
+(keymap-global-set "C-x C-b" 'bs-show)
 ;; Undo sur CTRL-Z (habitude...)
-(global-set-key (kbd "C-z") 'undo)
+(keymap-global-set "C-z" 'undo)
 ;; transpose
-(global-set-key (kbd "M-T") 'konix/transpose-split-word)
+(keymap-global-set "M-T" 'konix/transpose-split-word)
 ;; incr and decr integer at point
-(global-set-key (kbd "C-+") 'konix/increase-at-point)
-(global-set-key (kbd "C--") 'konix/decrease-at-point)
-(global-set-key (kbd "<C-kp-add>") 'konix/increase-at-point)
-(global-set-key (kbd "<C-kp-subtract>") 'konix/decrease-at-point)
+(keymap-global-set "C-+" 'konix/increase-at-point)
+(keymap-global-set "C--" 'konix/decrease-at-point)
+(keymap-global-set "C-<kp-add>" 'konix/increase-at-point)
+(keymap-global-set "C-<kp-subtract>" 'konix/decrease-at-point)
 
 ;; only useful when not in golden ratio mode, like in dap many window
-(global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
-(global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
-(global-set-key (kbd "S-C-<down>") 'shrink-window)
-(global-set-key (kbd "S-C-<up>") 'enlarge-window)
+(keymap-global-set "C-S-<left>" 'shrink-window-horizontally)
+(keymap-global-set "C-S-<right>" 'enlarge-window-horizontally)
+(keymap-global-set "C-S-<down>" 'shrink-window)
+(keymap-global-set "C-S-<up>" 'enlarge-window)
 
 (defun konix/text-scale-init nil
   (interactive)
@@ -115,605 +115,606 @@
 (key-chord-define-global "-=" 'konix/hydra-global-zoom/body)
 
 ;; Recentrage horizontal
-(global-set-key (kbd "C-S-L") 'konix/horizontal-recenter)
+(keymap-global-set "C-S-L" 'konix/horizontal-recenter)
 ;; Kill emacs
-(global-set-key (kbd "C-x M-k") 'konix/really-kill-emacs)
+(keymap-global-set "C-x M-k" 'konix/really-kill-emacs)
 ;; Auto complete
-(global-set-key (kbd "C-j") 'hippie-expand)
-(global-set-key (kbd "C-S-j") 'ac-stop)
+(keymap-global-set "C-j" 'hippie-expand)
+(keymap-global-set "C-S-j" 'ac-stop)
 ;; ISPELL
-(global-set-key (kbd "C-$") 'konix/ispell-region-or-buffer)
-(global-set-key (kbd "C-?") 'konix/flyspell-region-or-buffer)
-(global-set-key (kbd "C-M-$") 'ispell-change-dictionary)
+(keymap-global-set "C-$" 'konix/ispell-region-or-buffer)
+(keymap-global-set "C-?" 'konix/flyspell-region-or-buffer)
+(keymap-global-set "C-M-$" 'ispell-change-dictionary)
 ;; redefining C-x 0 and C-x 1 in order to use sticky windows
-(global-set-key (kbd "C-x 0") 'sticky-window-delete-window)
-(global-set-key (kbd "C-x 1") 'sticky-window-delete-other-windows)
-(global-set-key (kbd "C-x 9") 'sticky-window-toggle-dedicated)
-(global-set-key (kbd "C-x 7") 'konix/toggle-window-resizable)
-(define-key ctl-x-4-map "t" 'toggle-window-split)
+(keymap-global-set "C-x 0" 'sticky-window-delete-window)
+(keymap-global-set "C-x 1" 'sticky-window-delete-other-windows)
+(keymap-global-set "C-x 9" 'sticky-window-toggle-dedicated)
+(keymap-global-set "C-x 7" 'konix/toggle-window-resizable)
+(keymap-set ctl-x-4-map "t" 'toggle-window-split)
 
 ;; ####################################################################################################
 ;; Slow keymap keys
 ;; ####################################################################################################
-(define-key 'konix/global-slow-key-map (kbd "%") 'query-replace)
-(define-key 'konix/global-slow-key-map (kbd "*") 'query-replace-regexp)
+(keymap-set 'konix/global-slow-key-map "%" 'query-replace)
+(keymap-set 'konix/global-slow-key-map "*" 'query-replace-regexp)
 
-(define-key 'konix/global-slow-key-map (kbd "<") 'beginning-of-buffer)
-(define-key 'konix/global-slow-key-map (kbd ">") 'end-of-buffer)
+(keymap-set 'konix/global-slow-key-map "<" 'beginning-of-buffer)
+(keymap-set 'konix/global-slow-key-map ">" 'end-of-buffer)
 ;; 0bin paste
-(define-key 'konix/global-slow-key-map (kbd "p") 'konix/0binpaste)
-(define-key 'konix/global-slow-key-map (kbd "C-o") 'konix/mimeopen)
+(keymap-set 'konix/global-slow-key-map "p" 'konix/0binpaste)
+(keymap-set 'konix/global-slow-key-map "C-o" 'konix/mimeopen)
 ;; toggle gatls_dired
-(define-key 'konix/global-slow-key-map (kbd "C-l") 'konix/gatls-dired-toggle)
+(keymap-set 'konix/global-slow-key-map "C-l" 'konix/gatls-dired-toggle)
 ;; toggle undo-tree mode
-(define-key 'konix/global-slow-key-map (kbd "C-u") 'undo-tree-mode)
+(keymap-set 'konix/global-slow-key-map "C-u" 'undo-tree-mode)
 ;; calc
-(define-key 'konix/global-slow-key-map (kbd "C-c") 'calc)
+(keymap-set 'konix/global-slow-key-map "C-c" 'calc)
 ;; revert buffer
-(define-key 'konix/global-slow-key-map (kbd "C-r") 'revert-buffer)
-(define-key 'konix/global-slow-key-map (kbd "r") 'auto-revert-mode)
-(define-key 'konix/global-slow-key-map (kbd "R") 'auto-revert-tail-mode)
-(define-key 'konix/global-slow-key-map (kbd "M-r") 'konix/reload-file)
+(keymap-set 'konix/global-slow-key-map "C-r" 'revert-buffer)
+(keymap-set 'konix/global-slow-key-map "r" 'auto-revert-mode)
+(keymap-set 'konix/global-slow-key-map "R" 'auto-revert-tail-mode)
+(keymap-set 'konix/global-slow-key-map "M-r" 'konix/reload-file)
 ;; quit windows
-(define-key 'konix/global-slow-key-map "k" 'bury-buffer)
+(keymap-set 'konix/global-slow-key-map "k" 'bury-buffer)
 ;; grep
-(define-key 'konix/global-slow-key-map (kbd "C-s") 'grep)
+(keymap-set 'konix/global-slow-key-map "C-s" 'grep)
 ;; insert the date
-(define-key 'konix/global-slow-key-map (kbd "C-t") 'konix/insert-iso-time-string)
+(keymap-set 'konix/global-slow-key-map "C-t" 'konix/insert-iso-time-string)
 ;; insert the number of seconds since the epoch to the past month
-(define-key 'konix/global-slow-key-map (kbd "C-M") 'konix/insert-past-month-string)
+(keymap-set 'konix/global-slow-key-map "C-M" 'konix/insert-past-month-string)
 ;; insert the number of second since the 00:00 1/1/1970
-(define-key 'konix/global-slow-key-map (kbd "C-d") 'konix/insert-seconds-since-1970)
+(keymap-set 'konix/global-slow-key-map "C-d" 'konix/insert-seconds-since-1970)
 ;; Lance l'explorer
-(define-key 'konix/global-slow-key-map (kbd "C-e") 'konix/explorer)
+(keymap-set 'konix/global-slow-key-map "C-e" 'konix/explorer)
 ;; compte les mots de la region
-(define-key 'konix/global-slow-key-map (kbd "C-w") 'konix/count-words-region)
+(keymap-set 'konix/global-slow-key-map "C-w" 'konix/count-words-region)
 ;; calendar
-(define-key 'konix/global-slow-key-map (kbd "c") 'calendar)
+(keymap-set 'konix/global-slow-key-map "c" 'calendar)
 ;; org agenda
-(define-key 'konix/global-slow-key-map (kbd "a") 'org-agenda)
+(keymap-set 'konix/global-slow-key-map "a" 'org-agenda)
 ;; ffap
-(define-key 'konix/global-slow-key-map (kbd "C-f") 'ffap)
+(keymap-set 'konix/global-slow-key-map "C-f" 'ffap)
 ;; auto-fill-mode
-(define-key 'konix/global-slow-key-map (kbd "M-f") 'auto-fill-mode)
+(keymap-set 'konix/global-slow-key-map "M-f" 'auto-fill-mode)
 ;; Prog toggle c/h files
-(define-key 'konix/global-slow-key-map (kbd "t") 'konix/prog/toggle-source-header)
+(keymap-set 'konix/global-slow-key-map "t" 'konix/prog/toggle-source-header)
 ;; yank current buffer name
-(define-key 'konix/global-slow-key-map (kbd "M-b") 'konix/yank-current-buffer-name)
-(define-key 'konix/global-slow-key-map (kbd "M-B") 'konix/yank-current-buffer-file-name)
+(keymap-set 'konix/global-slow-key-map "M-b" 'konix/yank-current-buffer-name)
+(keymap-set 'konix/global-slow-key-map "M-B" 'konix/yank-current-buffer-file-name)
 
 ;; **********************************************************************
 ;; bbdb
 ;; **********************************************************************
 (define-prefix-command 'konix/bbdb/map)
-(define-key 'konix/global-slow-key-map (kbd "b") 'konix/bbdb/map)
+(keymap-set 'konix/global-slow-key-map "b" 'konix/bbdb/map)
 
-(define-key 'konix/bbdb/map (kbd "s") 'bbdb)
-(define-key 'konix/bbdb/map (kbd "c") 'bbdb-create)
+(keymap-set 'konix/bbdb/map "s" 'bbdb)
+(keymap-set 'konix/bbdb/map "c" 'bbdb-create)
 
 (define-prefix-command 'konix/eval/map)
-(define-key 'konix/global-slow-key-map (kbd "e") 'konix/eval/map)
+(keymap-set 'konix/global-slow-key-map "e" 'konix/eval/map)
 
-(define-key 'konix/eval/map (kbd "d") 'eval-defun)
-(define-key 'konix/eval/map (kbd "e") 'eval-expression)
+(keymap-set 'konix/eval/map "d" 'eval-defun)
+(keymap-set 'konix/eval/map "e" 'eval-expression)
 
 ;; **********************************************************************
 ;; EIN
 ;; **********************************************************************
 (define-prefix-command 'konix/ein/map)
-(define-key 'konix/global-slow-key-map (kbd "n") 'konix/ein/map)
+(keymap-set 'konix/global-slow-key-map "n" 'konix/ein/map)
 
-(define-key 'konix/ein/map (kbd "l") 'ein:notebooklist-open)
+(keymap-set 'konix/ein/map "l" 'ein:notebooklist-open)
 
 ;; ******************************************************************************************
 ;; Delete lines
 ;; ******************************************************************************************
 (define-prefix-command 'konix/delete/map)
-(define-key 'konix/global-slow-key-map (kbd "d") 'konix/delete/map)
+(keymap-set 'konix/global-slow-key-map "d" 'konix/delete/map)
 
-(define-key 'konix/delete/map (kbd "m") 'delete-matching-lines)
+(keymap-set 'konix/delete/map "m" 'delete-matching-lines)
 
 ;; ####################################################################################################
 ;; Normal keymap keys
 ;; ####################################################################################################
-(define-key 'konix/global-key-map "|" 'piper)
+(keymap-set 'konix/global-key-map "|" 'piper)
 ;; Goto emacs config
-(define-key 'konix/global-key-map "h" 'konix/hack-on-emacs)
+(keymap-set 'konix/global-key-map "h" 'konix/hack-on-emacs)
 ;; Update the env
-(define-key 'konix/global-key-map (kbd "M-e") 'konix/load-default-env-file)
+(keymap-set 'konix/global-key-map "M-e" 'konix/load-default-env-file)
 ;;Indentation
-(define-key 'konix/global-key-map (kbd "i") 'konix/indent-region-or-buffer)
+(keymap-set 'konix/global-key-map "i" 'konix/indent-region-or-buffer)
 ;; goto
-(define-key 'konix/global-key-map (kbd "M-g") 'goto-line)
-(define-key 'konix/global-key-map (kbd "M-r") 'konix/goto-random-line)
+(keymap-set 'konix/global-key-map "M-g" 'goto-line)
+(keymap-set 'konix/global-key-map "M-r" 'konix/goto-random-line)
 ;; flyspell
-(define-key 'konix/global-key-map (kbd "f") 'konix/flyspell-mode)
+(keymap-set 'konix/global-key-map "f" 'konix/flyspell-mode)
 ;; add file name in kill ring
-(define-key 'konix/global-key-map (kbd "M-y") 'konix/add-file-name-in-kill-ring)
+(keymap-set 'konix/global-key-map "M-y" 'konix/add-file-name-in-kill-ring)
 ;; commentaires
-(define-key 'konix/global-key-map "c" 'comment-region)
-(define-key 'konix/global-key-map "u" 'uncomment-region)
+(keymap-set 'konix/global-key-map "c" 'comment-region)
+(keymap-set 'konix/global-key-map "u" 'uncomment-region)
 ;; find
-(define-key 'konix/global-key-map (kbd "M-f") 'konix/find)
+(keymap-set 'konix/global-key-map "M-f" 'konix/find)
 
 ;; ******************************************************************************************
 ;; dictionary lookup
 ;; ******************************************************************************************
 (define-prefix-command 'konix/dictionary-key-map)
-(define-key konix/global-key-map (kbd "d") 'konix/dictionary-key-map)
-(define-key 'konix/dictionary-key-map (kbd "d") 'dictionary)
-(define-key 'konix/dictionary-key-map (kbd "s") 'dictionary-search)
+(keymap-set konix/global-key-map "d" 'konix/dictionary-key-map)
+(keymap-set 'konix/dictionary-key-map "d" 'dictionary)
+(keymap-set 'konix/dictionary-key-map "s" 'dictionary-search)
 
 ;; ************************************************************
 ;; Ediff
 ;; ************************************************************
 (define-prefix-command 'konix/ediff-key-map)
-(define-key konix/global-key-map (kbd "e") 'konix/ediff-key-map)
-(define-key 'konix/ediff-key-map (kbd "b") 'ediff-buffers)
-(define-key 'konix/ediff-key-map (kbd "p") 'ediff-patch-file)
-(define-key 'konix/ediff-key-map (kbd "B") 'ediff-buffers3)
-(define-key 'konix/ediff-key-map (kbd "c") 'ediff-current-file)
-(define-key 'konix/ediff-key-map (kbd "f") 'ediff-files)
-(define-key 'konix/ediff-key-map (kbd "F") 'ediff-files3)
-(define-key 'konix/ediff-key-map (kbd "d") 'ediff-directories)
-(define-key 'konix/ediff-key-map (kbd "D") 'ediff-directories3)
-(define-key 'konix/ediff-key-map (kbd "m") 'ediff-merge)
-(define-key 'konix/ediff-key-map (kbd "M") 'ediff-merge-with-ancestor)
+(keymap-set konix/global-key-map "e" 'konix/ediff-key-map)
+(keymap-set 'konix/ediff-key-map "b" 'ediff-buffers)
+(keymap-set 'konix/ediff-key-map "p" 'ediff-patch-file)
+(keymap-set 'konix/ediff-key-map "B" 'ediff-buffers3)
+(keymap-set 'konix/ediff-key-map "c" 'ediff-current-file)
+(keymap-set 'konix/ediff-key-map "f" 'ediff-files)
+(keymap-set 'konix/ediff-key-map "F" 'ediff-files3)
+(keymap-set 'konix/ediff-key-map "d" 'ediff-directories)
+(keymap-set 'konix/ediff-key-map "D" 'ediff-directories3)
+(keymap-set 'konix/ediff-key-map "m" 'ediff-merge)
+(keymap-set 'konix/ediff-key-map "M" 'ediff-merge-with-ancestor)
 
 ;; Language tool
 (define-prefix-command 'konix/langtool-key-map)
-(define-key konix/global-key-map (kbd "l") 'konix/langtool-key-map)
-(define-key 'konix/langtool-key-map (kbd "l") 'langtool-check)
-(define-key 'konix/langtool-key-map (kbd "d") 'langtool-check-done)
-(define-key 'konix/langtool-key-map (kbd "L") 'langtool-switch-default-language)
-(define-key 'konix/langtool-key-map (kbd "e") 'langtool-show-message-at-point)
-(define-key 'konix/langtool-key-map (kbd "?") 'langtool-correct-buffer)
+(keymap-set konix/global-key-map "l" 'konix/langtool-key-map)
+(keymap-set 'konix/langtool-key-map "l" 'langtool-check)
+(keymap-set 'konix/langtool-key-map "d" 'langtool-check-done)
+(keymap-set 'konix/langtool-key-map "L" 'langtool-switch-default-language)
+(keymap-set 'konix/langtool-key-map "e" 'langtool-show-message-at-point)
+(keymap-set 'konix/langtool-key-map "?" 'langtool-correct-buffer)
 
 ;; ************************************************************
 ;; Backup
 ;; ************************************************************
 (define-prefix-command 'konix/backup-key-map)
-(define-key konix/global-key-map (kbd "b") 'backup-walker-start)
+(keymap-set konix/global-key-map "b" 'backup-walker-start)
 
 ;; ************************************************************
 
 ;; find global file
-(define-key 'konix/global-key-map (kbd "C-f") 'icicle-locate)
+(keymap-set 'konix/global-key-map "C-f" 'icicle-locate)
 ;; delete file
-(define-key 'konix/global-key-map (kbd "C-x C-f") 'konix/delete-file-or-directory)
+(keymap-set 'konix/global-key-map "C-x C-f" 'konix/delete-file-or-directory)
 ;; proced
-(define-key 'konix/global-key-map (kbd "M-p") 'proced)
+(keymap-set 'konix/global-key-map "M-p" 'proced)
 ;; rename-uniquely
-(define-key 'konix/global-key-map (kbd "r") 'rename-uniquely)
+(keymap-set 'konix/global-key-map "r" 'rename-uniquely)
 
 ;; ####################################################################################################
 ;; Fast keymap keys
 ;; ####################################################################################################
-(define-key 'konix/global-fast-key-map (kbd "m") 'man)
+(keymap-set 'konix/global-fast-key-map "m" 'man)
 
 ;; for terminal mode
-(define-key 'konix/global-fast-key-map (kbd "C-k") 'bury-buffer)
-(define-key 'konix/global-fast-key-map (kbd "C-c") 'calc)
-(define-key 'konix/global-fast-key-map (kbd "<") 'beginning-of-buffer)
-(define-key 'konix/global-fast-key-map (kbd ">") 'end-of-buffer)
-(define-key 'konix/global-fast-key-map (kbd "C-f") 'ffap)
+(keymap-set 'konix/global-fast-key-map "C-k" 'bury-buffer)
+(keymap-set 'konix/global-fast-key-map "C-c" 'calc)
+(keymap-set 'konix/global-fast-key-map "<" 'beginning-of-buffer)
+(keymap-set 'konix/global-fast-key-map ">" 'end-of-buffer)
+(keymap-set 'konix/global-fast-key-map "C-f" 'ffap)
 
 ;; In case the previous keywords are already taken by the mode (like in org-mode)
-(define-key 'konix/global-fast-key-map (kbd "<left>") 'windmove-left)
-(define-key 'konix/global-fast-key-map (kbd "<up>") 'windmove-up)
-(define-key 'konix/global-fast-key-map (kbd "<right>") 'windmove-right)
-(define-key 'konix/global-fast-key-map (kbd "<down>") 'windmove-down)
+(keymap-set 'konix/global-fast-key-map "<left>" 'windmove-left)
+(keymap-set 'konix/global-fast-key-map "<up>" 'windmove-up)
+(keymap-set 'konix/global-fast-key-map "<right>" 'windmove-right)
+(keymap-set 'konix/global-fast-key-map "<down>" 'windmove-down)
 ;; Other frame
-(define-key 'konix/global-fast-key-map (kbd "<tab>") 'other-frame)
+(keymap-set 'konix/global-fast-key-map "<tab>" 'other-frame)
 ;; Other frame
-(define-key 'konix/global-fast-key-map (kbd "<backtab>") 'konix/switch-buffer-other-frame)
+(keymap-set 'konix/global-fast-key-map "<backtab>" 'konix/switch-buffer-other-frame)
 ;; sort lines
-(define-key 'konix/global-fast-key-map (kbd "C-s") 'sort-lines)
+(keymap-set 'konix/global-fast-key-map "C-s" 'sort-lines)
 
 ;; **********************************************************************
 ;; frame configuration manipulation
 ;; **********************************************************************
 (define-prefix-command 'konix/frame-configuration/map)
-(define-key 'konix/global-fast-key-map (kbd "f") 'konix/frame-configuration/map)
+(keymap-set 'konix/global-fast-key-map "f" 'konix/frame-configuration/map)
 
-(define-key 'konix/frame-configuration/map "p" 'konix/frame-configuration-push)
-(define-key 'konix/frame-configuration/map "*" 'konix/frame-configuration-pop)
-(define-key 'konix/frame-configuration/map "h" 'konix/frame-configuration-top)
+(keymap-set 'konix/frame-configuration/map "p" 'konix/frame-configuration-push)
+(keymap-set 'konix/frame-configuration/map "*" 'konix/frame-configuration-pop)
+(keymap-set 'konix/frame-configuration/map "h" 'konix/frame-configuration-top)
 
 ;; ************************************************************
 ;; Customize
 ;; ************************************************************
 (define-prefix-command 'konix/customize-map)
-(define-key 'konix/global-fast-key-map "c" 'konix/customize-map)
+(keymap-set 'konix/global-fast-key-map "c" 'konix/customize-map)
 
-(define-key 'konix/customize-map "v" 'customize-variable)
-(define-key 'konix/customize-map "g" 'customize-group)
-(define-key 'konix/customize-map "f" 'customize-face)
-(define-key 'konix/customize-map "m" 'customize-mode)
-(define-key 'konix/customize-map "r" 'customize-rogue)
-(define-key 'konix/customize-map "t" 'customize-browse)
-(define-key 'konix/customize-map "c" 'customize-changed)
-(define-key 'konix/customize-map "u" 'customize-unsaved)
-(define-key 'konix/customize-map "o" 'customize-option)
-(define-key 'konix/customize-map "C" 'customize-customized)
-(define-key 'konix/customize-map "a" 'customize-apropos)
-(define-key 'konix/customize-map "s" 'customize-set-variable)
-(define-key 'konix/customize-map "S" 'customize-saved)
-(define-key 'konix/customize-map (kbd "C-s") 'customize-save-variable)
-(define-key 'konix/customize-map (kbd "C-M-s") 'customize-save-customized)
+(keymap-set 'konix/customize-map "v" 'customize-variable)
+(keymap-set 'konix/customize-map "g" 'customize-group)
+(keymap-set 'konix/customize-map "f" 'customize-face)
+(keymap-set 'konix/customize-map "m" 'customize-mode)
+(keymap-set 'konix/customize-map "r" 'customize-rogue)
+(keymap-set 'konix/customize-map "t" 'customize-browse)
+(keymap-set 'konix/customize-map "c" 'customize-changed)
+(keymap-set 'konix/customize-map "u" 'customize-unsaved)
+(keymap-set 'konix/customize-map "o" 'customize-option)
+(keymap-set 'konix/customize-map "C" 'customize-customized)
+(keymap-set 'konix/customize-map "a" 'customize-apropos)
+(keymap-set 'konix/customize-map "s" 'customize-set-variable)
+(keymap-set 'konix/customize-map "S" 'customize-saved)
+(keymap-set 'konix/customize-map "C-s" 'customize-save-variable)
+(keymap-set 'konix/customize-map "C-M-s" 'customize-save-customized)
 
 ;; ************************************************************
 ;; TAGS
 ;; ************************************************************
 (define-prefix-command 'konix/tags/map)
-(define-key 'konix/global-fast-key-map (kbd "t") 'konix/tags/map)
+(keymap-set 'konix/global-fast-key-map "t" 'konix/tags/map)
 
-(define-key 'konix/tags/map (kbd "s") 'konix/tags/search)
-(define-key 'konix/tags/map (kbd "p") 'pop-tag-mark)
-(define-key 'konix/tags/map (kbd "w") 'konix/tags/restore-window-configuration)
-(define-key 'konix/tags/map (kbd "i") 'konix/tags/add-include-current-head)
-(define-key 'konix/tags/map (kbd "I") 'konix/tags/init)
-(define-key 'konix/tags/map (kbd "d") 'konix/tags/add-tags-dirs-current-head)
-(define-key 'konix/tags/map (kbd "R") 'konix/tags/find-references)
-(define-key 'konix/tags/map (kbd "G") 'konix/tags/grep)
-(define-key 'konix/tags/map (kbd "n") 'konix/tags/next-head)
-(define-key 'konix/tags/map (kbd "g") 'konix/tags/goto-dir)
-(define-key 'konix/tags/map (kbd "c") 'konix/tags/create)
-(define-key 'konix/tags/map (kbd "v") 'konix/tags/visit-tags-file)
-(define-key 'konix/tags/map (kbd "r") 'konix/tags/reset)
-(define-key 'konix/tags/map (kbd "e") 'konix/tags/echo-tags-table-list)
-(define-key 'konix/tags/map (kbd "M-%") 'tags-query-replace)
-(define-key 'konix/tags/map (kbd "%") 'konix/tags/query-replace-at-point)
-(define-key 'konix/tags/map (kbd "a") 'konix/tags/apropos)
-(define-key 'konix/tags/map (kbd "U") 'konix/tags/update-current-head)
-(define-key 'konix/tags/map (kbd "u") 'konix/tags/update-tags-visit)
-(define-key 'konix/tags/map (kbd ".") 'find-tag)
-(define-key 'konix/tags/map (kbd "l") 'fileloop-continue)
-(define-key 'konix/tags/map (kbd "f") 'konix/tags/find-file)
+(keymap-set 'konix/tags/map "s" 'konix/tags/search)
+(keymap-set 'konix/tags/map "p" 'pop-tag-mark)
+(keymap-set 'konix/tags/map "w" 'konix/tags/restore-window-configuration)
+(keymap-set 'konix/tags/map "i" 'konix/tags/add-include-current-head)
+(keymap-set 'konix/tags/map "I" 'konix/tags/init)
+(keymap-set 'konix/tags/map "d" 'konix/tags/add-tags-dirs-current-head)
+(keymap-set 'konix/tags/map "R" 'konix/tags/find-references)
+(keymap-set 'konix/tags/map "G" 'konix/tags/grep)
+(keymap-set 'konix/tags/map "n" 'konix/tags/next-head)
+(keymap-set 'konix/tags/map "g" 'konix/tags/goto-dir)
+(keymap-set 'konix/tags/map "c" 'konix/tags/create)
+(keymap-set 'konix/tags/map "v" 'konix/tags/visit-tags-file)
+(keymap-set 'konix/tags/map "r" 'konix/tags/reset)
+(keymap-set 'konix/tags/map "e" 'konix/tags/echo-tags-table-list)
+(keymap-set 'konix/tags/map "M-%" 'tags-query-replace)
+(keymap-set 'konix/tags/map "%" 'konix/tags/query-replace-at-point)
+(keymap-set 'konix/tags/map "a" 'konix/tags/apropos)
+(keymap-set 'konix/tags/map "U" 'konix/tags/update-current-head)
+(keymap-set 'konix/tags/map "u" 'konix/tags/update-tags-visit)
+(keymap-set 'konix/tags/map "." 'find-tag)
+(keymap-set 'konix/tags/map "l" 'fileloop-continue)
+(keymap-set 'konix/tags/map "f" 'konix/tags/find-file)
 
 ;; ************************************************************
 ;; Imenu
 ;; ************************************************************
 (define-prefix-command 'konix/imenu/map)
-(define-key 'konix/global-fast-key-map (kbd "i") 'konix/imenu/map)
-(define-key 'konix/imenu/map (kbd "t") 'imenu-tree)
-(define-key 'konix/imenu/map (kbd "i") 'imenu)
-(define-key 'konix/imenu/map (kbd "g") 'konix/imenu-tree-goto)
-(define-key 'konix/imenu/map (kbd "s") 'konix/imenu-tree-show)
-(define-key 'konix/imenu/map (kbd ".") 'counsel-imenu)
+(keymap-set 'konix/global-fast-key-map "i" 'konix/imenu/map)
+(keymap-set 'konix/imenu/map "t" 'imenu-tree)
+(keymap-set 'konix/imenu/map "i" 'imenu)
+(keymap-set 'konix/imenu/map "g" 'konix/imenu-tree-goto)
+(keymap-set 'konix/imenu/map "s" 'konix/imenu-tree-show)
+(keymap-set 'konix/imenu/map "." 'counsel-imenu)
 
 ;; ************************************************************
 ;; Uniquify
 ;; ************************************************************
 (define-prefix-command 'konix/uniquify/map)
-(define-key 'konix/global-fast-key-map (kbd "u") 'konix/uniquify/map)
+(keymap-set 'konix/global-fast-key-map "u" 'konix/uniquify/map)
 
-(define-key 'konix/uniquify/map (kbd "b") 'uniquify-buffer-lines)
-(define-key 'konix/uniquify/map (kbd "r") 'uniquify-region-lines)
+(keymap-set 'konix/uniquify/map "b" 'uniquify-buffer-lines)
+(keymap-set 'konix/uniquify/map "r" 'uniquify-region-lines)
 
 ;; ******************************************************************************************
 ;; WWW
 ;; ******************************************************************************************
 (define-prefix-command 'konix/www/map)
-(define-key 'konix/global-fast-key-map (kbd "w") 'konix/www/map)
+(keymap-set 'konix/global-fast-key-map "w" 'konix/www/map)
 
-(define-key 'konix/www/map (kbd "w") 'w3m)
-(define-key 'konix/www/map (kbd "B") 'w3m-buffer)
-(define-key 'konix/www/map (kbd "b") 'konix/www/goto-bookmarks)
-(define-key 'konix/www/map (kbd "h") 'konix/www/goto-history)
-(define-key 'konix/www/map (kbd "f") 'konix/www/browse-url-of-file-at-point)
-(define-key 'konix/www/map (kbd "l") 'konix/www/browse-link-at-point)
+(keymap-set 'konix/www/map "w" 'w3m)
+(keymap-set 'konix/www/map "B" 'w3m-buffer)
+(keymap-set 'konix/www/map "b" 'konix/www/goto-bookmarks)
+(keymap-set 'konix/www/map "h" 'konix/www/goto-history)
+(keymap-set 'konix/www/map "f" 'konix/www/browse-url-of-file-at-point)
+(keymap-set 'konix/www/map "l" 'konix/www/browse-link-at-point)
 
 (define-prefix-command 'konix/www-search/map)
-(define-key 'konix/www/map (kbd "s") 'konix/www-search/map)
-(define-key 'konix/www-search/map (kbd "s") 'konix/www/web-search)
-(define-key 'konix/www-search/map (kbd "d") 'konix/www/web-search-default)
+(keymap-set 'konix/www/map "s" 'konix/www-search/map)
+(keymap-set 'konix/www-search/map "s" 'konix/www/web-search)
+(keymap-set 'konix/www-search/map "d" 'konix/www/web-search-default)
 
 ;; ******************************************************************************************
 ;; helm
 ;; ******************************************************************************************
 (define-prefix-command 'konix/helm/map)
-(define-key 'konix/global-fast-key-map (kbd "a") 'konix/helm/map)
+(keymap-set 'konix/global-fast-key-map "a" 'konix/helm/map)
 
-(define-key 'konix/helm/map (kbd "a") 'helm-mini)
-(define-key 'konix/helm/map (kbd "f") 'helm-recentf)
+(keymap-set 'konix/helm/map "a" 'helm-mini)
+(keymap-set 'konix/helm/map "f" 'helm-recentf)
 
 ;; ####################################################################################################
 ;; F1-F12 keys
 ;; ####################################################################################################
 ;; repeat last command
-(global-set-key (kbd "<f4>") 'repeat)
+(keymap-global-set "<f4>" 'repeat)
 ;; Macro
-(global-set-key (kbd "C-<f4>") 'kmacro-end-or-call-macro)
+(keymap-global-set "C-<f4>" 'kmacro-end-or-call-macro)
 ;; Lance gitk et git gui
-(global-set-key (kbd "<S-f9>") 'konix/gitk)
+(keymap-global-set "S-<f9>" 'konix/gitk)
 
 ;; ####################################################################################################
 ;; Org Mode
 ;; ####################################################################################################
 (define-prefix-command  'konix/org-global-map)
-(define-key 'konix/global-slow-key-map (kbd "o") 'konix/org-global-map)
-(define-key 'konix/global-key-map (kbd "o") 'konix/org-global-map)
+(keymap-set 'konix/global-slow-key-map "o" 'konix/org-global-map)
+(keymap-set 'konix/global-key-map "o" 'konix/org-global-map)
 
-(define-key 'konix/org-global-map (kbd "M-e") 'konix/org-adjust-effort)
-(define-key 'konix/org-global-map "j" 'konix/org-jump-to)
-(define-key 'konix/org-global-map "]" 'konix/org-goto-first-open-list-entry-in-clocked-entry)
-(define-key 'konix/org-global-map "e" 'konix/org-clock-echo)
-(define-key 'konix/org-global-map (kbd "C-i") 'konix/org-clock-back-previous-task)
-(define-key 'konix/org-global-map "g" 'konix/org-clock-goto)
-(define-key 'konix/org-global-map "G" 'konix/org-agenda-goto-today-clock)
-(define-key 'konix/org-global-map "b" 'konix/org-goto-bookmarks)
-(define-key 'konix/org-global-map "O" 'org-clock-out)
-(define-key 'konix/org-global-map "I" 'org-clock-in-last)
-(define-key 'konix/org-global-map "c" 'org-capture)
-(define-key 'konix/org-global-map (kbd "M-c") 'konix/org-capture-na-in-heading)
-(define-key 'konix/org-global-map (kbd "M-d") 'konix/org-capture-diary-in-heading)
-(define-key 'konix/org-global-map (kbd "C-e") 'org-clock-modify-effort-estimate)
-(define-key 'konix/org-global-map "n" 'konix/org-insert-at-point)
-(define-key 'konix/org-global-map "x" 'konix/org-link-toggle-cross)
-(define-key 'konix/org-global-map (kbd "<up>") 'org-mark-ring-push)
-(define-key 'konix/org-global-map (kbd "<left>") 'org-mark-ring-goto)
-(define-key 'konix/org-global-map (kbd "<right>") 'konix/org-mark-ring-goto-newest)
-(define-key 'konix/org-global-map "a" 'org-annotate-file)
-(define-key 'konix/org-global-map "s" 'org-sort)
-(define-key 'konix/org-global-map "l" 'org-store-link)
-(define-key 'konix/org-global-map "p" 'konix/org-focus-next)
-(define-key 'konix/org-global-map "z" 'konix/org-add-note)
-(define-key 'konix/org-global-map "Z" 'konix/org-add-timestamp)
-(define-key 'konix/org-global-map ":" 'konix/org-change-tag)
-(define-key 'konix/org-global-map (kbd "RET") 'org-open-at-point)
-(define-key 'konix/org-global-map "u" 'org-id-update-id-locations)
-(define-key 'konix/org-global-map "L" 'konix/org-store-link-at-point)
-(define-key 'konix/org-global-map "T" 'konix/org-goto-todo)
-(define-key 'konix/org-global-map "D" 'konix/org-done-and-next)
-(define-key 'konix/org-global-map "P" 'konix/org-project-and-next)
-(define-key 'konix/org-global-map (kbd "C-n") 'konix/org-create-next-sibbling)
-(define-key 'konix/org-global-map "i" 'org-id-copy)
-(define-key 'konix/org-global-map "/" 'org-sparse-tree)
-(define-key 'konix/org-global-map "-" 'konix/org-sparse-next-actions)
-(define-key 'konix/org-global-map (kbd "C-l") 'org-toggle-link-display)
-(define-key 'konix/org-global-map (kbd "M-l") 'org-insert-link-global)
-(define-key 'konix/org-global-map (kbd "C-s") 'konix/org-store-agenda-views)
-(define-key 'konix/org-global-map (kbd "C-r") 'konix/org-element-cache-reset-all)
-(define-key 'konix/org-global-map (kbd "t") 'konix/org-clock-todo)
-(define-key 'konix/org-global-map (kbd "f") 'org-roam-node-find)
-(define-key 'konix/org-global-map (kbd "r") 'org-roam-ref-find)
-(define-key 'konix/org-global-map (kbd "C-f") 'konix/org-roam/open-key)
-(define-key 'konix/org-global-map (kbd "d") 'org-roam-dailies-capture-date)
-(define-key 'konix/org-global-map "N" 'konix/org-roam-note)
+(keymap-set 'konix/org-global-map "M-e" 'konix/org-adjust-effort)
+(keymap-set 'konix/org-global-map "j" 'konix/org-jump-to)
+(keymap-set 'konix/org-global-map "]" 'konix/org-goto-first-open-list-entry-in-clocked-entry)
+(keymap-set 'konix/org-global-map "e" 'konix/org-clock-echo)
+(keymap-set 'konix/org-global-map "C-i" 'konix/org-clock-back-previous-task)
+(keymap-set 'konix/org-global-map "g" 'konix/org-clock-goto)
+(keymap-set 'konix/org-global-map "G" 'konix/org-agenda-goto-today-clock)
+(keymap-set 'konix/org-global-map "b" 'konix/org-goto-bookmarks)
+(keymap-set 'konix/org-global-map "O" 'org-clock-out)
+(keymap-set 'konix/org-global-map "I" 'org-clock-in-last)
+(keymap-set 'konix/org-global-map "c" 'org-capture)
+(keymap-set 'konix/org-global-map "M-c" 'konix/org-capture-na-in-heading)
+(keymap-set 'konix/org-global-map "M-d" 'konix/org-capture-diary-in-heading)
+(keymap-set 'konix/org-global-map "C-e" 'org-clock-modify-effort-estimate)
+(keymap-set 'konix/org-global-map "n" 'konix/org-insert-at-point)
+(keymap-set 'konix/org-global-map "x" 'konix/org-link-toggle-cross)
+(keymap-set 'konix/org-global-map "<up>" 'org-mark-ring-push)
+(keymap-set 'konix/org-global-map "<left>" 'org-mark-ring-goto)
+(keymap-set 'konix/org-global-map "<right>" 'konix/org-mark-ring-goto-newest)
+(keymap-set 'konix/org-global-map "a" 'org-annotate-file)
+(keymap-set 'konix/org-global-map "s" 'org-sort)
+(keymap-set 'konix/org-global-map "l" 'org-store-link)
+(keymap-set 'konix/org-global-map "p" 'konix/org-focus-next)
+(keymap-set 'konix/org-global-map "z" 'konix/org-add-note)
+(keymap-set 'konix/org-global-map "Z" 'konix/org-add-timestamp)
+(keymap-set 'konix/org-global-map ":" 'konix/org-change-tag)
+(keymap-set 'konix/org-global-map "RET" 'org-open-at-point)
+(keymap-set 'konix/org-global-map "u" 'org-id-update-id-locations)
+(keymap-set 'konix/org-global-map "L" 'konix/org-store-link-at-point)
+(keymap-set 'konix/org-global-map "T" 'konix/org-goto-todo)
+(keymap-set 'konix/org-global-map "D" 'konix/org-done-and-next)
+(keymap-set 'konix/org-global-map "P" 'konix/org-project-and-next)
+(keymap-set 'konix/org-global-map "C-n" 'konix/org-create-next-sibbling)
+(keymap-set 'konix/org-global-map "i" 'org-id-copy)
+(keymap-set 'konix/org-global-map "/" 'org-sparse-tree)
+(keymap-set 'konix/org-global-map "-" 'konix/org-sparse-next-actions)
+(keymap-set 'konix/org-global-map "C-l" 'org-toggle-link-display)
+(keymap-set 'konix/org-global-map "M-l" 'org-insert-link-global)
+(keymap-set 'konix/org-global-map "C-s" 'konix/org-store-agenda-views)
+(keymap-set 'konix/org-global-map "C-r" 'konix/org-element-cache-reset-all)
+(keymap-set 'konix/org-global-map "t" 'konix/org-clock-todo)
+(keymap-set 'konix/org-global-map "f" 'org-roam-node-find)
+(keymap-set 'konix/org-global-map "r" 'org-roam-ref-find)
+(keymap-set 'konix/org-global-map "C-f" 'konix/org-roam/open-key)
+(keymap-set 'konix/org-global-map "d" 'org-roam-dailies-capture-date)
+(keymap-set 'konix/org-global-map "N" 'konix/org-roam-note)
 
 
 (define-prefix-command 'konix/org-meta-context-map)
-(define-key 'konix/org-global-map (kbd "m") 'konix/org-meta-context-map)
-(define-key 'konix/org-meta-context-map "n" 'konix/org-meta-context/next-context)
-(define-key 'konix/org-meta-context-map "s" 'konix/org-meta-context/switch-to-context)
-(define-key 'konix/org-meta-context-map "e" 'konix/org-meta-context/echo-current-context)
-(define-key 'konix/org-meta-context-map "i" 'konix/org-meta-context/initialize)
-(define-key 'konix/org-meta-context-map "g" 'konix/org-meta-context/goto-root)
-(define-key 'konix/org-meta-context-map "t" 'konix/org-meta-context/toggle-restrict)
+(keymap-set 'konix/org-global-map "m" 'konix/org-meta-context-map)
+(keymap-set 'konix/org-meta-context-map "n" 'konix/org-meta-context/next-context)
+(keymap-set 'konix/org-meta-context-map "s" 'konix/org-meta-context/switch-to-context)
+(keymap-set 'konix/org-meta-context-map "e" 'konix/org-meta-context/echo-current-context)
+(keymap-set 'konix/org-meta-context-map "i" 'konix/org-meta-context/initialize)
+(keymap-set 'konix/org-meta-context-map "g" 'konix/org-meta-context/goto-root)
+(keymap-set 'konix/org-meta-context-map "t" 'konix/org-meta-context/toggle-restrict)
 
 
 ;; ####################################################################################################
 ;; Compilation
 ;; ####################################################################################################
 (define-prefix-command 'konix/compile/map)
-(define-key global-map (kbd "<f5>") 'konix/compile/map)
+(keymap-set global-map "<f5>" 'konix/compile/map)
 
 (define-prefix-command 'konix/compile/buffer/map)
-(define-key konix/compile/map (kbd "b") 'konix/compile/buffer/map)
+(keymap-set konix/compile/map "b" 'konix/compile/buffer/map)
 
-(define-key 'konix/compile/buffer/map "S" 'konix/compile/buffer/show-all)
-(define-key 'konix/compile/buffer/map "C" 'konix/compile/buffer/clean-all)
+(keymap-set 'konix/compile/buffer/map "S" 'konix/compile/buffer/show-all)
+(keymap-set 'konix/compile/buffer/map "C" 'konix/compile/buffer/clean-all)
 
-(define-key 'konix/compile/map (kbd "<f5>") 'konix/compile/make-fast)
-(define-key 'konix/compile/map (kbd "<f7>") 'konix/compile/make-run)
-(define-key 'konix/compile/map (kbd "K") 'konix/compile/make-clean)
-(define-key 'konix/compile/map (kbd "t") 'konix/compile/make-test)
-(define-key 'konix/compile/map (kbd "c") 'konix/compile)
-(define-key 'konix/compile/map (kbd "D") 'konix/compile/make-goto-dir)
+(keymap-set 'konix/compile/map "<f5>" 'konix/compile/make-fast)
+(keymap-set 'konix/compile/map "<f7>" 'konix/compile/make-run)
+(keymap-set 'konix/compile/map "K" 'konix/compile/make-clean)
+(keymap-set 'konix/compile/map "t" 'konix/compile/make-test)
+(keymap-set 'konix/compile/map "c" 'konix/compile)
+(keymap-set 'konix/compile/map "D" 'konix/compile/make-goto-dir)
 
 ;; ####################################################################################################
 ;; Semantic
 ;; ####################################################################################################
-(global-set-key (kbd "M-§") 'semantic-ia-fast-jump)
+(keymap-global-set "M-§" 'semantic-ia-fast-jump)
 
 ;; ####################################################################################################
 ;; font lock
 ;; ####################################################################################################
-(global-set-key (kbd "M-o M-b") 'font-lock-fontify-buffer)
-(global-set-key (kbd "M-o b") 'font-lock-fontify-block)
+(keymap-global-set "M-o M-b" 'font-lock-fontify-buffer)
+(keymap-global-set "M-o b" 'font-lock-fontify-block)
 
 ;; ####################################################################################################
 ;; news hotkeys
 ;; ####################################################################################################
 (define-prefix-command 'konix/global-fast-notmuch-key-map)
 (define-prefix-command 'konix/global-slow-notmuch-key-map)
-(define-key 'konix/global-fast-key-map "n" 'konix/global-fast-notmuch-key-map)
-(define-key 'konix/global-slow-key-map "n" 'konix/global-slow-notmuch-key-map)
+(keymap-set 'konix/global-fast-key-map "n" 'konix/global-fast-notmuch-key-map)
+(keymap-set 'konix/global-slow-key-map "n" 'konix/global-slow-notmuch-key-map)
 
-(define-key 'konix/global-fast-notmuch-key-map "m" 'notmuch)
-(define-key 'konix/global-fast-notmuch-key-map "s" 'notmuch-search)
-(define-key 'konix/global-fast-notmuch-key-map "M" 'konix/notmuch-search-no-tag)
-(define-key 'konix/global-fast-notmuch-key-map "t" 'notmuchticker-treeview)
-(define-key 'konix/global-fast-notmuch-key-map "f" 'konix/open-mail-follow)
+(keymap-set 'konix/global-fast-notmuch-key-map "m" 'notmuch)
+(keymap-set 'konix/global-fast-notmuch-key-map "s" 'notmuch-search)
+(keymap-set 'konix/global-fast-notmuch-key-map "M" 'konix/notmuch-search-no-tag)
+(keymap-set 'konix/global-fast-notmuch-key-map "t" 'notmuchticker-treeview)
+(keymap-set 'konix/global-fast-notmuch-key-map "f" 'konix/open-mail-follow)
 
-(define-key 'konix/global-slow-notmuch-key-map "m" 'notmuch)
-(define-key 'konix/global-slow-notmuch-key-map "s" 'notmuch-search)
-(define-key 'konix/global-slow-notmuch-key-map "M" 'konix/notmuch-search-no-tag)
-(define-key 'konix/global-slow-notmuch-key-map "t" 'notmuchticker-treeview)
-(define-key 'konix/global-slow-notmuch-key-map "f" 'konix/open-mail-follow)
+(keymap-set 'konix/global-slow-notmuch-key-map "m" 'notmuch)
+(keymap-set 'konix/global-slow-notmuch-key-map "s" 'notmuch-search)
+(keymap-set 'konix/global-slow-notmuch-key-map "M" 'konix/notmuch-search-no-tag)
+(keymap-set 'konix/global-slow-notmuch-key-map "t" 'notmuchticker-treeview)
+(keymap-set 'konix/global-slow-notmuch-key-map "f" 'konix/open-mail-follow)
 
 ;; ####################################################################################################
 ;; highlight-symbol
 ;; ####################################################################################################
-(global-set-key (kbd "<C-f3>") 'highlight-symbol)
-(global-set-key (kbd "<S-f3>") 'highlight-symbol-next)
-(global-set-key (kbd "<C-S-f3>") 'highlight-symbol-prev)
+(keymap-global-set "C-<f3>" 'highlight-symbol)
+(keymap-global-set "S-<f3>" 'highlight-symbol-next)
+(keymap-global-set "C-S-<f3>" 'highlight-symbol-prev)
 
 ;; ####################################################################################################
 ;; git hotkeys
 ;; ####################################################################################################
 (define-prefix-command 'konix/git-global-map)
-(define-key global-map "\C-xv" 'konix/git-global-map)
-(define-key konix/git-global-map "m" 'konix/git-modified-files)
-(define-key konix/git-global-map "i" 'konix/git/init)
+(keymap-set global-map "C-x v" 'konix/git-global-map)
+(keymap-set konix/git-global-map "m" 'konix/git-modified-files)
+(keymap-set konix/git-global-map "i" 'konix/git/init)
 
 (define-prefix-command 'konix/git-global-map-tag)
-(define-key konix/git-global-map "t" 'konix/git-global-map-tag)
-(define-key konix/git-global-map-tag "t" 'konix/git/tag)
-(define-key konix/git-global-map-tag "d" 'konix/git/tag/delete)
+(keymap-set konix/git-global-map "t" 'konix/git-global-map-tag)
+(keymap-set konix/git-global-map-tag "t" 'konix/git/tag)
+(keymap-set konix/git-global-map-tag "d" 'konix/git/tag/delete)
 
 (define-prefix-command 'konix/git-global-map-svn)
-(define-key konix/git-global-map "v" 'konix/git-global-map-svn)
-(define-key konix/git-global-map-svn "d" 'konix/git/svn/dcommit)
-(define-key konix/git-global-map-svn "r" 'konix/git/svn/rebase)
-(define-key konix/git-global-map-svn "u" 'konix/git/svn/up)
-(define-key konix/git-global-map-svn "f" 'konix/git/svn/fetch)
+(keymap-set konix/git-global-map "v" 'konix/git-global-map-svn)
+(keymap-set konix/git-global-map-svn "d" 'konix/git/svn/dcommit)
+(keymap-set konix/git-global-map-svn "r" 'konix/git/svn/rebase)
+(keymap-set konix/git-global-map-svn "u" 'konix/git/svn/up)
+(keymap-set konix/git-global-map-svn "f" 'konix/git/svn/fetch)
 
 (define-prefix-command 'konix/git-global-map-log)
-(define-key konix/git-global-map "l" 'konix/git-global-map-log)
-(define-key konix/git-global-map-log "r" 'konix/git/reflog)
-(define-key konix/git-global-map-log "l" 'konix/git/log)
-(define-key konix/git-global-map-log "p" 'konix/git/log/pick-axe)
-(define-key konix/git-global-map-log "f" 'konix/git/log/file)
-(define-key konix/git-global-map-log "b" 'konix/git/blame/file)
-(define-key konix/git-global-map-log "a" 'konix/git/alog)
+(keymap-set konix/git-global-map "l" 'konix/git-global-map-log)
+(keymap-set konix/git-global-map-log "r" 'konix/git/reflog)
+(keymap-set konix/git-global-map-log "l" 'konix/git/log)
+(keymap-set konix/git-global-map-log "p" 'konix/git/log/pick-axe)
+(keymap-set konix/git-global-map-log "f" 'konix/git/log/file)
+(keymap-set konix/git-global-map-log "b" 'konix/git/blame/file)
+(keymap-set konix/git-global-map-log "a" 'konix/git/alog)
 
 (define-prefix-command 'konix/git-global-map-log-standup)
-(define-key konix/git-global-map-log "s" 'konix/git-global-map-log-standup)
-(define-key konix/git-global-map-log-standup "i" 'konix/git/standup/log/incremental)
-(define-key konix/git-global-map-log-standup "v" 'konix/git/standup/log/incremental/validate)
-(define-key konix/git-global-map-log-standup "R" 'konix/git/standup/log/incremental/reset)
+(keymap-set konix/git-global-map-log "s" 'konix/git-global-map-log-standup)
+(keymap-set konix/git-global-map-log-standup "i" 'konix/git/standup/log/incremental)
+(keymap-set konix/git-global-map-log-standup "v" 'konix/git/standup/log/incremental/validate)
+(keymap-set konix/git-global-map-log-standup "R" 'konix/git/standup/log/incremental/reset)
 
 (define-prefix-command 'konix/git-global-map-cherry)
-(define-key konix/git-global-map "C" 'konix/git-global-map-cherry)
+(keymap-set konix/git-global-map "C" 'konix/git-global-map-cherry)
 (define-prefix-command 'konix/git-global-map-cherry-pick)
-(define-key konix/git-global-map-cherry "p" 'konix/git-global-map-cherry-pick)
-(define-key konix/git-global-map-cherry-pick "p" 'konix/git/cherry-pick)
-(define-key konix/git-global-map-cherry-pick "a" 'konix/git/cherry-pick-abort)
-(define-key konix/git-global-map-cherry-pick "c" 'konix/git/cherry-pick-continue)
+(keymap-set konix/git-global-map-cherry "p" 'konix/git-global-map-cherry-pick)
+(keymap-set konix/git-global-map-cherry-pick "p" 'konix/git/cherry-pick)
+(keymap-set konix/git-global-map-cherry-pick "a" 'konix/git/cherry-pick-abort)
+(keymap-set konix/git-global-map-cherry-pick "c" 'konix/git/cherry-pick-continue)
 
 (define-prefix-command 'konix/git-global-map-bisect)
-(define-key konix/git-global-map "B" 'konix/git-global-map-bisect)
-(define-key konix/git-global-map-bisect "s" 'konix/git/bisect/start)
-(define-key konix/git-global-map-bisect "r" 'konix/git/bisect/reset)
-(define-key konix/git-global-map-bisect "b" 'konix/git/bisect/bad)
-(define-key konix/git-global-map-bisect "g" 'konix/git/bisect/good)
+(keymap-set konix/git-global-map "B" 'konix/git-global-map-bisect)
+(keymap-set konix/git-global-map-bisect "s" 'konix/git/bisect/start)
+(keymap-set konix/git-global-map-bisect "r" 'konix/git/bisect/reset)
+(keymap-set konix/git-global-map-bisect "b" 'konix/git/bisect/bad)
+(keymap-set konix/git-global-map-bisect "g" 'konix/git/bisect/good)
 
 (define-prefix-command 'konix/git-global-map-push)
-(define-key konix/git-global-map "p" 'konix/git-global-map-push)
-(define-key konix/git-global-map-push "P" 'konix/git/push)
-(define-key konix/git-global-map-push "p" 'konix/git/pull)
-(define-key konix/git-global-map-push "f" 'konix/git/fetch)
+(keymap-set konix/git-global-map "p" 'konix/git-global-map-push)
+(keymap-set konix/git-global-map-push "P" 'konix/git/push)
+(keymap-set konix/git-global-map-push "p" 'konix/git/pull)
+(keymap-set konix/git-global-map-push "f" 'konix/git/fetch)
 
 (define-prefix-command 'konix/git-global-map-commit)
-(define-key konix/git-global-map "c" 'konix/git-global-map-commit)
-(define-key konix/git-global-map-commit "c" 'konix/git/commit)
-(define-key konix/git-global-map-commit "m" 'konix/git/commit/message)
-(define-key konix/git-global-map-commit "a" 'konix/git/commit/amend)
-(define-key konix/git-global-map-commit "A" 'konix/git/commit/amend-no-edit)
-(define-key konix/git-global-map-commit "u" 'konix/git/commit/untracked)
-(define-key konix/git-global-map-commit "f" 'konix/git/commit/file)
+(keymap-set konix/git-global-map "c" 'konix/git-global-map-commit)
+(keymap-set konix/git-global-map-commit "c" 'konix/git/commit)
+(keymap-set konix/git-global-map-commit "m" 'konix/git/commit/message)
+(keymap-set konix/git-global-map-commit "a" 'konix/git/commit/amend)
+(keymap-set konix/git-global-map-commit "A" 'konix/git/commit/amend-no-edit)
+(keymap-set konix/git-global-map-commit "u" 'konix/git/commit/untracked)
+(keymap-set konix/git-global-map-commit "f" 'konix/git/commit/file)
 
 (define-prefix-command 'konix/git-global-map-diff)
-(define-key konix/git-global-map "d" 'konix/git-global-map-diff)
-(define-key konix/git-global-map-diff "d" 'konix/git/diff)
-(define-key konix/git-global-map-diff "c" 'konix/git/diff-cached)
-(define-key konix/git-global-map-diff "f" 'konix/git/diff-file)
-(define-key konix/git-global-map-diff "t" 'konix/git/difftool)
-(define-key konix/git-global-map-diff "T" 'konix/git/difftool-file)
-(define-key konix/git-global-map-diff "m" 'konix/git/mergetool)
-(define-key konix/git-global-map-diff "o" 'konix/git/diff/show-origin-commit)
+(keymap-set konix/git-global-map "d" 'konix/git-global-map-diff)
+(keymap-set konix/git-global-map-diff "d" 'konix/git/diff)
+(keymap-set konix/git-global-map-diff "c" 'konix/git/diff-cached)
+(keymap-set konix/git-global-map-diff "f" 'konix/git/diff-file)
+(keymap-set konix/git-global-map-diff "t" 'konix/git/difftool)
+(keymap-set konix/git-global-map-diff "T" 'konix/git/difftool-file)
+(keymap-set konix/git-global-map-diff "m" 'konix/git/mergetool)
+(keymap-set konix/git-global-map-diff "o" 'konix/git/diff/show-origin-commit)
 
 (define-prefix-command 'konix/git-global-map-stash)
-(define-key konix/git-global-map "S" 'konix/git-global-map-stash)
-(define-key konix/git-global-map-stash "p" 'konix/git/stash/pop)
-(define-key konix/git-global-map-stash "s" 'konix/git/stash/save)
-(define-key konix/git-global-map-stash "k" 'konix/git/stash/save/keep_index)
-(define-key konix/git-global-map-stash "S" 'konix/git/stash/show)
-(define-key konix/git-global-map-stash "a" 'konix/git/stash/apply)
-(define-key konix/git-global-map-stash "c" 'konix/git/stash/clear)
-(define-key konix/git-global-map-stash "d" 'konix/git/stash/drop)
-(define-key konix/git-global-map-stash "l" 'konix/git/stash/list)
+(keymap-set konix/git-global-map "S" 'konix/git-global-map-stash)
+(keymap-set konix/git-global-map-stash "p" 'konix/git/stash/pop)
+(keymap-set konix/git-global-map-stash "s" 'konix/git/stash/save)
+(keymap-set konix/git-global-map-stash "k" 'konix/git/stash/save/keep_index)
+(keymap-set konix/git-global-map-stash "S" 'konix/git/stash/show)
+(keymap-set konix/git-global-map-stash "a" 'konix/git/stash/apply)
+(keymap-set konix/git-global-map-stash "c" 'konix/git/stash/clear)
+(keymap-set konix/git-global-map-stash "d" 'konix/git/stash/drop)
+(keymap-set konix/git-global-map-stash "l" 'konix/git/stash/list)
 
 (define-prefix-command 'konix/git-global-map-add)
-(define-key konix/git-global-map "a" 'konix/git-global-map-add)
-(define-key konix/git-global-map-add "f" 'konix/git/add/file)
-(define-key konix/git-global-map-add "u" 'konix/git/add/update-tracked-files)
-(define-key konix/git-global-map-add "E" 'konix/git/add/edit)
-(define-key konix/git-global-map-add "e" 'konix/git/add/edit/file)
-(define-key konix/git-global-map-add "r" 'konix/git/rm/file)
+(keymap-set konix/git-global-map "a" 'konix/git-global-map-add)
+(keymap-set konix/git-global-map-add "f" 'konix/git/add/file)
+(keymap-set konix/git-global-map-add "u" 'konix/git/add/update-tracked-files)
+(keymap-set konix/git-global-map-add "E" 'konix/git/add/edit)
+(keymap-set konix/git-global-map-add "e" 'konix/git/add/edit/file)
+(keymap-set konix/git-global-map-add "r" 'konix/git/rm/file)
 
 (define-prefix-command 'konix/git-global-map-rebase)
-(define-key konix/git-global-map "r" 'konix/git-global-map-rebase)
-(define-key konix/git-global-map-rebase "r" 'konix/git/rebase)
-(define-key konix/git-global-map-rebase "i" 'konix/git/irebase)
-(define-key konix/git-global-map-rebase "c" 'konix/git/rebase/continue)
-(define-key konix/git-global-map-rebase "a" 'konix/git/rebase/abort)
-(define-key konix/git-global-map-rebase "s" 'konix/git/rebase/skip)
+(keymap-set konix/git-global-map "r" 'konix/git-global-map-rebase)
+(keymap-set konix/git-global-map-rebase "r" 'konix/git/rebase)
+(keymap-set konix/git-global-map-rebase "i" 'konix/git/irebase)
+(keymap-set konix/git-global-map-rebase "c" 'konix/git/rebase/continue)
+(keymap-set konix/git-global-map-rebase "a" 'konix/git/rebase/abort)
+(keymap-set konix/git-global-map-rebase "s" 'konix/git/rebase/skip)
 
 (define-prefix-command 'konix/git-global-map-status)
-(define-key konix/git-global-map "s" 'konix/git-global-map-status)
-(define-key konix/git-global-map-status "s" 'konix/git/status)
+(keymap-set konix/git-global-map "s" 'konix/git-global-map-status)
+(keymap-set konix/git-global-map-status "s" 'konix/git/status)
 
 (define-prefix-command 'konix/git-global-map-reset)
-(define-key konix/git-global-map "R" 'konix/git-global-map-reset)
-(define-key konix/git-global-map-reset "r" 'konix/git/reset)
-(define-key konix/git-global-map-reset "h" 'konix/git/reset/HEAD)
-(define-key konix/git-global-map-reset "H" 'konix/git/reset/hard)
-(define-key konix/git-global-map-reset "f" 'konix/git/reset-file)
+(keymap-set konix/git-global-map "R" 'konix/git-global-map-reset)
+(keymap-set konix/git-global-map-reset "r" 'konix/git/reset)
+(keymap-set konix/git-global-map-reset "h" 'konix/git/reset/HEAD)
+(keymap-set konix/git-global-map-reset "H" 'konix/git/reset/hard)
+(keymap-set konix/git-global-map-reset "f" 'konix/git/reset-file)
 
 (define-prefix-command 'konix/git-global-map-revert)
-(define-key konix/git-global-map (kbd "C-r") 'konix/git-global-map-revert)
-(define-key konix/git-global-map-revert "c" 'konix/git/revert)
+(keymap-set konix/git-global-map "C-r" 'konix/git-global-map-revert)
+(keymap-set konix/git-global-map-revert "c" 'konix/git/revert)
 
 (define-prefix-command 'konix/git-global-map-branch)
-(define-key konix/git-global-map "b" 'konix/git-global-map-branch)
-(define-key konix/git-global-map-branch "b" 'konix/git/branch)
-(define-key konix/git-global-map-branch "d" 'konix/git/branch/delete)
-(define-key konix/git-global-map-branch "a" 'konix/git/branch/add)
-(define-key konix/git-global-map-branch "r" 'konix/git/branch/rename)
+(keymap-set konix/git-global-map "b" 'konix/git-global-map-branch)
+(keymap-set konix/git-global-map-branch "b" 'konix/git/branch)
+(keymap-set konix/git-global-map-branch "d" 'konix/git/branch/delete)
+(keymap-set konix/git-global-map-branch "a" 'konix/git/branch/add)
+(keymap-set konix/git-global-map-branch "r" 'konix/git/branch/rename)
 
 (define-prefix-command 'konix/git-global-map-show)
-(define-key konix/git-global-map (kbd "h") 'konix/git-global-map-show)
-(define-key konix/git-global-map-show "c" 'konix/git/show)
-(define-key konix/git-global-map-show "o" 'konix/git/show/origin-commit-at-pos)
-(define-key konix/git-global-map-show "h" 'konix/git/show/head)
+(keymap-set konix/git-global-map "h" 'konix/git-global-map-show)
+(keymap-set konix/git-global-map-show "c" 'konix/git/show)
+(keymap-set konix/git-global-map-show "o" 'konix/git/show/origin-commit-at-pos)
+(keymap-set konix/git-global-map-show "h" 'konix/git/show/head)
 
 (define-prefix-command 'konix/git-global-map-checkout)
-(define-key konix/git-global-map-branch "c" 'konix/git-global-map-checkout)
-(define-key konix/git-global-map-checkout "f" 'konix/git/checkout/file)
-(define-key konix/git-global-map-checkout "c" 'konix/git/checkout)
-(define-key konix/git-global-map-checkout (kbd "<down>") 'konix/git/checkout/parent)
-(define-key konix/git-global-map-checkout "g" 'gited-list-branches)
+(keymap-set konix/git-global-map-branch "c" 'konix/git-global-map-checkout)
+(keymap-set konix/git-global-map-checkout "f" 'konix/git/checkout/file)
+(keymap-set konix/git-global-map-checkout "c" 'konix/git/checkout)
+(keymap-set konix/git-global-map-checkout "<down>" 'konix/git/checkout/parent)
+(keymap-set konix/git-global-map-checkout "g" 'gited-list-branches)
 
-(global-set-key (kbd "C-< g") 'konix/git/command-with-completion)
+(keymap-global-set "C-< g" 'konix/git/command-with-completion)
 
 ;; Multi cursor
 (define-prefix-command 'konix/multi-cursor-map)
-(define-key konix/global-slow-key-map "m" 'konix/multi-cursor-map)
-(define-key konix/multi-cursor-map "m" 'mc/mark-more-like-this-extended)
-(define-key konix/multi-cursor-map "d" 'mc/mark-all-dwim)
-(define-key konix/multi-cursor-map "l" 'mc/edit-lines)
-(define-key konix/multi-cursor-map "n" 'mc/mark-next-like-this)
-(define-key konix/multi-cursor-map "a" 'mc/mark-all-like-this)
-(define-key konix/multi-cursor-map "p" 'mc/mark-previous-like-this)
-(define-key konix/multi-cursor-map "w" 'mc/mark-next-like-this-word)
-(define-key konix/multi-cursor-map (kbd "C-a") 'mc/edit-beginnings-of-lines)
-(define-key konix/multi-cursor-map (kbd "C-e") 'mc/edit-ends-of-lines)
-(define-key konix/multi-cursor-map (kbd "<mouse-1>") 'mc/add-cursor-on-click)
+(keymap-set konix/global-slow-key-map "m" 'konix/multi-cursor-map)
+(keymap-set konix/multi-cursor-map "m" 'mc/mark-more-like-this-extended)
+(keymap-set konix/multi-cursor-map "d" 'mc/mark-all-dwim)
+(keymap-set konix/multi-cursor-map "l" 'mc/edit-lines)
+(keymap-set konix/multi-cursor-map "n" 'mc/mark-next-like-this)
+(keymap-set konix/multi-cursor-map "a" 'mc/mark-all-like-this)
+(keymap-set konix/multi-cursor-map "p" 'mc/mark-previous-like-this)
+(keymap-set konix/multi-cursor-map "w" 'mc/mark-next-like-this-word)
+(keymap-set konix/multi-cursor-map "C-a" 'mc/edit-beginnings-of-lines)
+(keymap-set konix/multi-cursor-map "C-e" 'mc/edit-ends-of-lines)
+(keymap-set konix/multi-cursor-map "<mouse-1>" 'mc/add-cursor-on-click)
 
 
-(define-key konix/global-slow-key-map (kbd "q") 'qutebrowser/map)
+(keymap-set konix/global-slow-key-map "q" 'qutebrowser/map)
 
 (define-prefix-command 'konix/kubel-map)
-(define-key 'konix/global-fast-key-map "k" 'konix/kubel-map)
-(define-key konix/kubel-map "k" 'kubel)
-(define-key konix/kubel-map "K" 'kubernetes-overview)
+(keymap-set 'konix/global-fast-key-map "k" 'konix/kubel-map)
+(keymap-set konix/kubel-map "k" 'kubel)
+(keymap-set konix/kubel-map "K" 'kubernetes-overview)
 
 (define-prefix-command 'konix/ledger-map)
-(define-key konix/global-slow-key-map "l" 'konix/ledger-map)
-(define-key konix/ledger-map "p" 'konix/ledger/personal-open)
-(define-key konix/ledger-map "c" 'konix/ledger/common-open)
+(keymap-set konix/global-slow-key-map "l" 'konix/ledger-map)
+(keymap-set konix/ledger-map "p" 'konix/ledger/personal-open)
+(keymap-set konix/ledger-map "c" 'konix/ledger/common-open)
 
-(define-key minibuffer-local-map (kbd "C-M-e") 'miniedit)
+(keymap-set minibuffer-local-map "C-c i" 'konix/minibuffer/edit-to-buffer)
+(keymap-set minibuffer-local-map "C-M-e" 'miniedit)

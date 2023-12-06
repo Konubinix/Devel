@@ -46,5 +46,15 @@
   (lsp--load-default-session)
   )
 
+(lsp-register-client
+ (make-lsp-client :new-connection
+                  ;; (lsp-stdio-connection '("test.sh"))
+                  (lsp-stdio-connection '("helm_ls" "serve"))
+                  :activation-fn (lsp-activate-on "yaml")
+                  :server-id 'helm
+                  :multi-root t
+                  )
+ )
+
 (provide 'KONIX_AL-lsp-mode)
 ;;; KONIX_AL-lsp-mode.el ends here

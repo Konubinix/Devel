@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(setq-default tracking-sort-faces-first t)
+
 (defun konix/tracking/kill-emacs-query-function ()
   (with-temp-buffer
     (insert

@@ -53,6 +53,7 @@
          )
     (ement-view-room room session)
     (ement-room-find-event event-id)
+    (konix/persist-point-all-windows)
     )
   )
 

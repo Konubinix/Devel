@@ -24,8 +24,8 @@
 
 ;;; Code:
 
-(setq-default key-chord-two-keys-delay 0.02
-              key-chord-one-key-delay 0.05
+(setq-default key-chord-two-keys-delay 0.05
+              key-chord-one-key-delay 0.09
               )
 
 (provide 'KONIX_AL-key-chord)

@@ -39,7 +39,7 @@
 (require 'org-edna)
 (require 'org-checklist)
 (require 'org-expiry)
-(require 'KONIX_org-jira)
+(require 'KONIX_org-github)
 (org-edna-load)
 
 (konix/auto-insert-use-yasnippet-template "/wiki/.+\\.org\\'" "org")

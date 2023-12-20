@@ -5825,9 +5825,17 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (keymap-set konix/region-bindings-mode-map "i" 'org-roam-node-insert)
 
+(defun konix/org-export-macro/result (name)
+  (save-excursion
+    (goto-char (org-babel-find-named-block name))
+    (org-babel-execute-src-block nil nil '((:result-params "none")))
+    )
+  )
+
 (setq-default
  org-export-global-macros
  `(
+   ("result" . "(eval (konix/org-export-macro/result $1))")
    ("youtube" . "@@html:<div class=\"iframe-container ratio169\"><iframe src=\"https://www.youtube-nocookie.com/embed/$1\" allowfullscreen title=\"YouTube Video\"></iframe></div>@@")
    ("peertube"
     . "@@html:<iframe src=\"https://$1/videos/embed/$2\" style=\"min-height: 400px; width: 100%;\" frameborder=\"0\" sandbox=\"allow-same-origin allow-scripts\" allowfullscreen=\"allowfullscreen\"></iframe>@@")

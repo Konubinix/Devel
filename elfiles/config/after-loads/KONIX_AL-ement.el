@@ -860,6 +860,18 @@ event before rendering the event.
   (delete-file (persist--file-location 'ement-room-list-visibility-cache))
   )
 
+(defun konix/ement-save-image (path)
+  (interactive "FPath: ")
+  (let (
+        (image (copy-sequence (get-text-property (point) 'display)))
+        )
+    (with-temp-buffer
+      (insert (plist-get (cdr image) :data))
+      (write-file path)
+      )
+    )
+  )
+
 (defun konix/ement-room-send-filter (content room)
   (when-let* (
               (body (alist-get "body" content nil nil #'string-equal))

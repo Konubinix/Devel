@@ -45,7 +45,7 @@
   "")
 
 (custom-set-faces
- '(ement-room-fully-read-marker ((t (:background "black"))))
+ '(ement-room-fully-read-marker ((t (:background "cyan"))))
  '(ement-room-read-receipt-marker ((t (:background "yellow"))))
  '(ement-room-mention ((t (:background "sienna"))))
  )

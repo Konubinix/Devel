@@ -16,7 +16,9 @@
   (let ((content (minibuffer-contents)))
     (with-current-buffer (get-buffer-create "*MinibufferContent*")
       (org-mode)
-      (erase-buffer)
+      (unless current-prefix-arg
+        (erase-buffer)
+        )
       (insert content)
       (switch-to-buffer-other-window (current-buffer))
       (local-set-key (kbd "C-c i") 'konix/minibuffer/edit-to-minibuffer))))

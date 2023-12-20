@@ -872,6 +872,42 @@ event before rendering the event.
     )
   )
 
+(defun konix/ement-show-reaction ()
+  (interactive)
+  (message (string-join
+            (->> (ement-event-local (konix/ement-event-at-point))
+                 (alist-get 'reactions)
+                 (-map (lambda (event)
+                         (format
+                          "%s:%s"
+                          (ement--format-user (ement-event-sender event))
+                          (alist-get 'key (alist-get 'm.relates_to (ement-event-content event)))
+                          )
+                         )
+                       )
+                 )
+            ", "
+            )
+           )
+  )
+
+(defun konix/ement-show-reaction-maybe ()
+  (let (
+        (event (konix/ement-event-at-point))
+        )
+    (when (and (equal (type-of event) 'ement-event) (alist-get 'reactions (ement-event-local event)))
+      (konix/ement-show-reaction)
+      )
+    )
+  )
+
+(defun konix/ement-room-mode-hook ()
+  (interactive)
+  (add-hook 'post-command-hook #'konix/ement-show-reaction-maybe nil t)
+  )
+
+(add-hook 'ement-room-mode-hook #'konix/ement-room-mode-hook)
+
 (defun konix/ement-room-send-filter (content room)
   (when-let* (
               (body (alist-get "body" content nil nil #'string-equal))

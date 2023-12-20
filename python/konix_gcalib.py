@@ -576,19 +576,23 @@ Attendees:
     @provides("access_token")
     def refresh_token(self):
         LOGGER.debug("Refreshing access token")
-        req = urllib.request.Request(
-            url='https://www.googleapis.com/oauth2/v4/token',
-            data=
-            'client_id={}&client_secret={}&refresh_token={}&grant_type=refresh_token'
-            .format(self.client_id, self.client_secret,
-                    self.db.get(self.refresh_token_name)).encode("utf-8"))
-        f = urllib.request.urlopen(req)
-        assert f.code == 200
-        data = json.loads(f.read().decode("utf-8"))
-        self.db.set(self.access_token_name, data["access_token"])
-        self.db.expire(self.access_token_name, 5)  # int(data["expires_in"]))
+        resp = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "grant_type": "refresh_token",
+                "scope":
+                "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events",
+                "refresh_token": self.db.get(self.refresh_token_name),
+            })
+        assert resp.status_code == 200
+
+        data = resp.json()
         self.db.set("token_type", data["token_type"])
         assert self.db.get("token_type") == "Bearer"
+        self.db.set(self.access_token_name, data["access_token"])
+        self.db.expire(self.access_token_name, 5)  # int(data["expires_in"]))
 
     def do_refresh_token(self, line=""):
         self.refresh_token()

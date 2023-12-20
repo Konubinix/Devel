@@ -67,6 +67,7 @@
 
   (use-package org :mode ("\\.org_archive" . org-mode))
 
+  (use-package aggressive-indent-mode)
   (use-package arduino-mode)
   (use-package argdown :straight (:type built-in) :mode ("\\.argdown\\'" . argdown-mode))
   (use-package authinfo :straight (:type built-in) :mode ("netrc.gpg" . authinfo-mode))
@@ -121,6 +122,7 @@
   (use-package keep-buffers)
   (use-package key-chord)
   (use-package lisp :straight (:type built-in) :mode ("emacs$" . list-mode))
+  (use-package lispy)
   (use-package kubel :commands (kubel))
   (use-package kubernetes)
   (use-package ledger-mode :commands (konix/ledger-run konix/ledger-report))
@@ -152,6 +154,7 @@
   ;; https://github.com/skuro/plantuml-mode/pull/173
   (use-package plantuml-mode :straight (:fork t))
   (use-package popwin)
+  (use-package prism)
   (use-package python :straight (:type built-in) :mode (("\\.py\\'" . python-mode)))
   (use-package prettier-js)
   (use-package py-isort)

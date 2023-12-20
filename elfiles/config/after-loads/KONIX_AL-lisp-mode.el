@@ -1,4 +1,4 @@
-;;; 700-KONIX_emacs-lisp-mode.el ---
+;;; KONIX_AL-lisp-mode.el ---
 
 ;; Copyright (C) 2012  konubinix
 
@@ -24,9 +24,21 @@
 
 ;;; Code:
 
+
+(require 'hideshow)
+
+(konix/push-or-replace-in-alist
+ 'hs-special-modes-alist
+ 'lisp-mode
+ "(" ")" ";;?" nil nil
+ )
+
 (defun konix/lisp-mode-hook ()
   (setq indent-tabs-mode nil)
   (konix/prog/config)
+  (lispy-mode)
+  (highlight-parentheses-mode)
+  (aggressive-indent-mode)
   (setq ac-sources (append
                     '(
                       ac-source-yasnippet
@@ -41,12 +53,10 @@
   (keymap-local-set "C-h C-f" 'find-function)
   (keymap-local-set "C-h C-v" 'find-variable)
   (turn-on-eldoc-mode)
-  ;; (require 'button-lock)
-  ;; (button-lock-mode 1)
-  ;; (button-lock-set-button "(def[^(]+(" 'hs-toggle-hiding )
   )
-(add-hook 'lisp-mode-hook
-          'konix/lisp-mode-hook)
+
+(add-hook 'lisp-mode-hook 'konix/lisp-mode-hook)
+
 ;; ######################################################################
 ;; Emacs lisp mode
 ;; ######################################################################
@@ -56,14 +66,14 @@
   (keymap-local-set "C-j" 'hippie-expand)
   (keymap-local-set "C-x e" 'eval-print-last-sexp)
   (add-hook 'before-save-hook
-             #'whitespace-cleanup
-             nil
-             t
-             )
+            #'whitespace-cleanup
+            nil
+            t
+            )
 
   )
 
 (add-hook 'emacs-lisp-mode-hook 'konix/emacs-lisp-mode-hook)
 
-(provide '700-KONIX_emacs-lisp-mode)
-;;; 700-KONIX_emacs-lisp-mode.el ends here
+(provide 'KONIX_AL-lisp-mode)
+;;; KONIX_AL-lisp-mode.el ends here

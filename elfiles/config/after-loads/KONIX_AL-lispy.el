@@ -1,6 +1,6 @@
-;;; KONIX_AL-highlight-parentheses.el ---
+;;; KONIX_AL-lispy.el ---                            -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2013  konubinix
+;; Copyright (C) 2023  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -16,7 +16,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -24,15 +24,20 @@
 
 ;;; Code:
 
-(setq-default
- highlight-parentheses-background-colors
- '("lawn green" "orange1" "light pink" "maroon" "light sea green" "red" "blue" "linen" "brown4")
- )
+(defun konix/lispy-new-sexp ()
+  (interactive)
+  (if (looking-at-p "(")
+	  (forward-sexp)
+	(progn
+	  (call-interactively 'lispy-backward)
+	  (forward-sexp)))
+  (lispy-newline-and-indent-plain)
+  (call-interactively 'lispy-parens))
 
-(setq-default
- highlight-parentheses-colors
- '("firebrick1" "IndianRed1" "IndianRed3" "lawn green" "IndianRed4" "dark violet" "khaki" "black")
- )
+(lispy-define-key lispy-mode-map-special "n" 'konix/lispy-new-sexp)
+(lispy-define-key lispy-mode-map-special "k" 'lispy-delete)
+(keymap-set lispy-mode-map "M-n" 'konix/lispy-new-sexp)
 
-(provide 'KONIX_AL-highlight-parentheses)
-;;; KONIX_AL-highlight-parentheses.el ends here
+
+(provide 'KONIX_AL-lispy)
+;;; KONIX_AL-lispy.el ends here

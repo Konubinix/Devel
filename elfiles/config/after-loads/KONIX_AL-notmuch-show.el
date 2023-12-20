@@ -27,17 +27,17 @@
 (defadvice notmuch-hello-widget-search (around reverse_order ())
   "`current-prefix-arg' inverse the default reverse order"
   (let (
-		(notmuch-search-oldest-first
-		 (not
-		  (equalp
-		   notmuch-search-oldest-first
-		   current-prefix-arg
-		   )
-		  )
-		 )
-		)
-	ad-do-it
-	)
+                (notmuch-search-oldest-first
+                 (not
+                  (equalp
+                   notmuch-search-oldest-first
+                   current-prefix-arg
+                   )
+                  )
+                 )
+                )
+        ad-do-it
+        )
   )
 (ad-activate 'notmuch-hello-widget-search)
 
@@ -62,6 +62,7 @@
 
 (keymap-set notmuch-show-mode-map "v" 'notmuch-show-view-part)
 (keymap-set notmuch-show-mode-map "M-r" 'konix/notmuch-draft-resume-this)
+(keymap-set notmuch-show-mode-map "M-s" 'auto-scroll-mode)
 
 (provide 'KONIX_AL-notmuch-show)
 ;;; KONIX_AL-notmuch-show.el ends here

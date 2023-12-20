@@ -18,7 +18,11 @@ else
     echo "Waiting ${TIMETOWAIT}s before sending, just in case"
     sleep ${TIMETOWAIT}
     echo "Sending now!!"
-    msmtpq-flush
+    trap "test -e ${LOG} && cat ${LOG}" 0
+    msmtpq-flush || {
+        clk ntfy --priority 5 "Something went wrong"
+        exit 2
+    }
     if grep -q auth=off "${LOG}"
     then
         msg "Mail most likely not sent, because using some unknown account, check the logs at ${LOG}"

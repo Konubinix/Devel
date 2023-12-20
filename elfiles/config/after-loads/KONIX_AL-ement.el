@@ -351,17 +351,13 @@
 (defvar konix/ement-room-mention-group-tags '("body" "here" "room"))
 
 (defun konix/ement--event-mentions-room-p/add-my-groups (orig event &rest rest)
-  (let* (
-         (content (ement-event-content event))
-         (body (alist-get 'body content))
-         )
+  (when-let* ((content (ement-event-content event))
+              (body (alist-get 'body content)))
     (or
      (apply orig event rest)
      (string-match-p
       (format "@\\(%s\\)\\b" (string-join konix/ement-room-mention-group-tags "\\|"))
-      body
-      ))
-    )
+      body)))
   )
 
 (advice-add #'ement--event-mentions-room-p :around #'konix/ement--event-mentions-room-p/add-my-groups)

@@ -74,7 +74,7 @@
 
 (custom-set-variables
  '(ement-save-sessions t)
- '(ement-room-send-message-filter 'ement-room-send-org-filter)
+ '(ement-room-send-message-filter 'konix/ement-room-send-filter)
  )
 
 (defun konix/ement-room-view-hook (room session)
@@ -125,7 +125,6 @@
 
 ;; an open buffer is not for me a sign that I want to follow its content
 (remove-hook 'ement-notify-notification-predicates 'ement-notify--room-buffer-live-p)
-
 
 (add-to-list 'tracking-faces-priorities 'ement-room-mention)
 (add-to-list 'tracking-faces-priorities 'ement-room-direct)
@@ -883,6 +882,16 @@ event before rendering the event.
   (interactive)
   (persist-reset 'ement-room-list-visibility-cache)
   (delete-file (persist--file-location 'ement-room-list-visibility-cache))
+  )
+
+(defun konix/ement-room-send-filter (content room)
+  (when-let* (
+              (body (alist-get "body" content nil nil #'string-equal))
+              (_ (string-match ":-)" body))
+              )
+    (setf (alist-get "body" content nil nil #'string-equal) (replace-match "🙂" nil nil body))
+    )
+  (ement-room-send-org-filter content room)
   )
 
 (provide 'KONIX_AL-ement)

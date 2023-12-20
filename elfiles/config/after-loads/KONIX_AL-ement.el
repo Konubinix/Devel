@@ -107,6 +107,8 @@
 (keymap-set ement-room-minibuffer-map "<tab>" 'completion-at-point)
 (keymap-set ement-room-mode-map "M-r" 'ement-room-goto-fully-read-marker)
 (keymap-set ement-room-mode-map "T" 'konix/ement-show-in-thread-buffer)
+(keymap-set ement-room-mode-map "DEL" 'ement-room-scroll-down-command)
+(keymap-set ement-room-mode-map "M-s" 'auto-scroll-mode)
 
 (define-prefix-command 'konix/global-ement-key-map)
 (keymap-set konix/global-fast-key-map "e" 'konix/global-ement-key-map)
@@ -222,6 +224,24 @@
  #'konix/ement-update-tracking-unread-all
  100
  )
+
+(defun konix/ement-room-scroll-up-mark-read/tracking-next-buffer (orig)
+  (let (
+        (buffer (current-buffer))
+        )
+    (funcall orig)
+    (when (not (equal buffer (current-buffer)))
+      (unless (and
+               (equal major-mode 'ement-room-mode)
+               (konix/ement-tracked-room-p ement-session ement-room)
+               )
+        (tracking-next-buffer)
+        )
+      )
+    )
+  )
+
+(advice-add #'ement-room-scroll-up-mark-read :around #'konix/ement-room-scroll-up-mark-read/tracking-next-buffer)
 
 (defun konix/ement-notifications-jump/go-to-body (&rest args)
   (konix/ement-goto-body)

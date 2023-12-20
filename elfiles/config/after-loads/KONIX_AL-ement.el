@@ -202,7 +202,10 @@
       (let (
             (ement-room-unread-only-counts-notifications (if current-prefix-arg nil ement-room-unread-only-counts-notifications))
             )
-        (ement--room-unread-p room session)
+        (and
+         (not (equal 'leave (ement-room-status room)))
+         (ement--room-unread-p room session)
+         )
         )
       )
     )

@@ -1,0 +1,13 @@
+#!/bin/bash
+set -o errexit # -e
+set -o errtrace # -E
+set -o nounset # -u
+set -o pipefail
+shopt -s inherit_errexit
+
+# ctrl-c
+trap "exit 2" SIGINT
+trap "exit 3" SIGQUIT
+
+# see https://stackoverflow.com/questions/19296667/remove-ansi-color-codes-from-a-text-file-using-bash
+sed $'s/\e\\[[0-9;:]*[a-zA-Z]//g'

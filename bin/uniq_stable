@@ -1,0 +1,13 @@
+#!/bin/bash
+set -o errexit # -e
+set -o errtrace # -E
+set -o nounset # -u
+set -o pipefail
+shopt -s inherit_errexit
+
+# ctrl-c
+trap "exit 2" SIGINT
+trap "exit 3" SIGQUIT
+
+# https://unix.stackexchange.com/questions/194780/remove-duplicate-lines-while-keeping-the-order-of-the-lines
+cat -n | sort -k2 -k1n  | uniq -f1 | sort -nk1,1 | cut -f2-

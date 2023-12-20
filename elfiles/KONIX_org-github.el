@@ -68,6 +68,29 @@
   (konix/org-with-point-on-heading (konix/_org-github-browse))
   )
 
+(defmacro konix/org-with-point-on-github-heading (body)
+  `(konix/org-with-point-on-heading
+    (let (
+          (code (konix/org-github-get-code))
+          (repo (org-entry-get (point) "KONIX_GH_REPO" t))
+          )
+      ,body
+      )
+    )
+  )
+
+(defun konix/org-github-list-comments ()
+  (interactive)
+  (let (
+        (buffer (get-buffer-create "*gh issue view*"))
+        )
+   (konix/org-with-point-on-github-heading
+    (async-shell-command (format "gh issue view --repo %s --comments %s" repo code) buffer buffer)
+    )
+   (pop-to-buffer buffer)
+   )
+  )
+
 (defun konix/org-github-comment (body)
   (interactive "sBody: ")
   (konix/org-with-point-on-heading

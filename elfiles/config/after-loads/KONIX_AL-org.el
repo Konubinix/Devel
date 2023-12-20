@@ -2724,9 +2724,6 @@ items"
   (when (string-match-p "^\\(n \\)?nn *$" ans) ;; n for noon
     (setq ans "13:30")
     )
-  (when (string-match-p "^\\(n \\)?nnn *$" ans) ;; n for noon
-    (setq ans "14:00")
-    )
   (when (string-match-p "^\\(n \\)?e *$" ans) ;; e for evening
     (setq ans "20:30")
     )
@@ -2736,16 +2733,19 @@ items"
   (when (string-match-p "^\\(n \\)?eee *$" ans) ;; e for evening
     (setq ans "22:00")
     )
-  (when (string-match-p "^\\(n \\)?a *$" ans) ;; a for afternoon
-    (setq ans "16:30")
+  (when (string-match-p "^\\(n \\)?a *$" ans) ;; n for afternoon
+    (setq ans "14:00")
     )
   (when (string-match-p "^\\(n \\)?aa *$" ans) ;; a for afternoon
-    (setq ans "18:00")
+    (setq ans "16:30")
     )
   (when (string-match-p "^\\(n \\)?aaa *$" ans) ;; a for afternoon
-    (setq ans "18:30")
+    (setq ans "18:00")
     )
   (when (string-match-p "^\\(n \\)?aaaa *$" ans) ;; a for afternoon
+    (setq ans "18:30")
+    )
+  (when (string-match-p "^\\(n \\)?aaaaa *$" ans) ;; a for afternoon
     (setq ans "19:00")
     )
   (when (string-match-p "^n *$" ans) ;; only n -> now

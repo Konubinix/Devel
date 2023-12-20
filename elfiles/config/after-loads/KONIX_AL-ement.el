@@ -716,58 +716,35 @@ event before rendering the event.
 (advice-add #'ement-room--render-html :around #'konix/ement-room--render-html/strip-fallback)
 
 (cl-defun konix/ement-room--format-message-body/prepend-replied-content (orig event &key (formatted-p t))
-  (let (
-        (res (funcall orig event :formatted-p formatted-p))
-        )
+  (let ((res (funcall orig event :formatted-p formatted-p)))
     (if konix/ement-in-thread
         res
-      (let* (
-             (content (ement-event-content (ement--original-event-for event ement-session)))
+      (let* ((content (ement-event-content (ement--original-event-for event ement-session)))
              (relates-to (alist-get 'm.relates_to content))
              (reply-to (and relates-to (alist-get 'm.in_reply_to relates-to)))
              (reply-id (and reply-to (alist-get 'event_id reply-to)))
              (replied-id (and reply-id (konix/ement-replace/find-newest ement-session ement-room reply-id)))
              (replied (and replied-id (konix/ement-find-event-by-id ement-session ement-room replied-id)))
              (replied-content (and replied (ement-event-content replied)))
-             (replied-body (and replied-content
-                                (or
-                                 (when-let ((new-content (alist-get 'm.new_content
-                                                                    replied-content)))
-                                   (or
-                                    (alist-get 'formatted_body new-content)
-                                    (alist-get 'body new-content)
-                                    )
-                                   )
-                                 (or
-                                  (alist-get 'formatted_body replied-content)
-                                  (alist-get 'body replied-content)
-                                  )
-                                 ))
-                           )
-             (replied-html (and replied-body (ement-room--render-html
-                                              replied-body)))
+             (replied-body (and replied-content (or (when-let ((new-content (alist-get 'm.new_content
+                                                                                       replied-content)))
+                                                      (or
+                                                       (alist-get 'formatted_body new-content)
+                                                       (alist-get 'body new-content)))
+                                                    (or
+                                                     (alist-get 'formatted_body replied-content)
+                                                     (alist-get 'body replied-content)))))
+             (replied-html (and replied-body (ement-room--render-html replied-body)))
              (sender (and replied (ement-event-sender replied)))
-             (sender-displayname (and sender (ement--format-user sender)))
-             )
-        (when reply-id
+             (sender-displayname (and sender (ement--format-user sender))))
+        (when replied-html
           (setq res (format "%s:
 %s
 %s"
-                            (propertize sender-displayname
-                                        'face 'ement-room-quote
-                                        )
-                            (propertize (replace-regexp-in-string "^" "> " replied-html)
-                                        'face 'ement-room-quote
-                                        )
-                            res
-                            ))
-          )
-        res
-        )
-      )
-    )
-
-  )
+                            (propertize sender-displayname 'face 'ement-room-quote)
+                            (propertize (replace-regexp-in-string "^" "> " replied-html) 'face 'ement-room-quote)
+                            res)))
+        res))))
 
 (advice-add #'ement-room--format-message-body :around #'konix/ement-room--format-message-body/prepend-replied-content)
 

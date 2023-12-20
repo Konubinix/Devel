@@ -159,6 +159,7 @@
   (use-package python :straight (:type built-in) :mode (("\\.py\\'" . python-mode)))
   (use-package prettier-js)
   (use-package py-isort)
+  (use-package rainbow-mode) ;; to ease reading logs with ANSI ASCII color codes
   (use-package region-bindings-mode :commands (region-bindings-mode-enable))
   (use-package rust-mode)
   (use-package scad-mode)

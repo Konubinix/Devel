@@ -5762,7 +5762,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("G" . org-mark-ring-goto))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("h" . hl-line-mode))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '(" " . org-next-visible-heading))
-(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("E" . konix/org-srs))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("e" . konix/org-srs))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("]" . konix/org-goto-next-open-list-entry))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("l" . hl-line-mode))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("k" . konix/org-kill))

@@ -123,7 +123,7 @@
 (keymap-set org-agenda-mode-map "x"
   'konix/org-clock-echo)
 
-(keymap-set org-agenda-mode-map "E"
+(keymap-set org-agenda-mode-map "e"
   'konix/org-srs)
 
 (keymap-set org-agenda-mode-map "M-c"

@@ -100,6 +100,7 @@
   (use-package f)
   (use-package feature-mode)
   (use-package flycheck)
+  (use-package flycheck-languagetool)
   (use-package framemove)
   (use-package git-timemachine :commands (git-timemachine))
   (use-package git-wip-timemachine)

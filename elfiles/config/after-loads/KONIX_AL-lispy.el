@@ -27,16 +27,18 @@
 (defun konix/lispy-new-sexp ()
   (interactive)
   (if (looking-at-p "(")
-	  (forward-sexp)
-	(progn
-	  (call-interactively 'lispy-backward)
-	  (forward-sexp)))
+      (forward-sexp)
+    (progn
+      (call-interactively 'lispy-backward)
+      (forward-sexp)))
   (lispy-newline-and-indent-plain)
   (call-interactively 'lispy-parens))
 
 (lispy-define-key lispy-mode-map-special "n" 'konix/lispy-new-sexp)
 (lispy-define-key lispy-mode-map-special "k" 'lispy-delete)
+(lispy-define-key lispy-mode-map-special "K" 'konix/delete-paren-at-point)
 (keymap-set lispy-mode-map "M-n" 'konix/lispy-new-sexp)
+(keymap-set lispy-mode-map "M-(" 'lispy-wrap-round)
 
 
 (provide 'KONIX_AL-lispy)

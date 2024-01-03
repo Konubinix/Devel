@@ -948,5 +948,12 @@ event before rendering the event.
   (ement-room-send-org-filter content room)
   )
 
+(defun konix/ement-room-goto-fully-read-marker/indicate-missing-fully-read-marker (&rest args)
+  (message (if ement-room-fully-read-marker
+               "ement-room-fully-read-marker found"
+             "Could not find the ement-room-fully-read-marker...")))
+
+(advice-add #'ement-room-goto-fully-read-marker :after #'konix/ement-room-goto-fully-read-marker/indicate-missing-fully-read-marker)
+
 (provide 'KONIX_AL-ement)
 ;;; KONIX_AL-ement.el ends here

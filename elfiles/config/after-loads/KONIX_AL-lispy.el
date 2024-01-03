@@ -40,6 +40,10 @@
 (keymap-set lispy-mode-map "M-n" 'konix/lispy-new-sexp)
 (keymap-set lispy-mode-map "M-(" 'lispy-wrap-round)
 
+(defun konix/lispy-backward/push-mark (arg)
+  (push-mark)
+  )
+(advice-add #'lispy-backward :before #'konix/lispy-backward/push-mark)
 
 (provide 'KONIX_AL-lispy)
 ;;; KONIX_AL-lispy.el ends here

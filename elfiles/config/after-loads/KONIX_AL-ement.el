@@ -415,6 +415,12 @@
 
 (add-hook 'ement-event-hook #'konix/ement-event-hook/track-replaces)
 
+(defun konix/ement-event-hook/notify-invitations (event room session)
+  (when (ement-room-invite-state room)
+    (konix/ement-update-tracking session room event))
+  )
+(add-hook 'ement-event-hook #'konix/ement-event-hook/notify-invitations)
+
                                         ; deal with replies
 
 (defvar konix/ement-event-reply-map (make-hash-table :test 'equal))

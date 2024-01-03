@@ -36,6 +36,10 @@
   '((t (:background "yellow")))
   "")
 
+(defface ement-room-invitation
+  '((t (:background "turquoise4")))
+  "")
+
 (defface ement-room-favourite
   '((t (:background "magenta")))
   "")
@@ -43,6 +47,17 @@
 (defface ement-room-followed
   '((t (:background "cyan")))
   "")
+
+(defface ement-room-room-mention
+  '((t (:background "spring green")))
+  "")
+
+(add-to-list 'tracking-faces-priorities 'ement-room-mention)
+(add-to-list 'tracking-faces-priorities 'ement-room-room-mention)
+(add-to-list 'tracking-faces-priorities 'ement-room-direct)
+(add-to-list 'tracking-faces-priorities 'ement-room-favourite)
+(add-to-list 'tracking-faces-priorities 'ement-room-followed)
+(add-to-list 'tracking-faces-priorities 'ement-room-invitation)
 
 (custom-set-faces
  '(ement-room-fully-read-marker ((t (:background "cyan"))))
@@ -126,10 +141,6 @@
 ;; an open buffer is not for me a sign that I want to follow its content
 (remove-hook 'ement-notify-notification-predicates 'ement-notify--room-buffer-live-p)
 
-(add-to-list 'tracking-faces-priorities 'ement-room-mention)
-(add-to-list 'tracking-faces-priorities 'ement-room-direct)
-(add-to-list 'tracking-faces-priorities 'ement-room-favourite)
-(add-to-list 'tracking-faces-priorities 'ement-room-followed)
 
 (defun konix/ement-update-tracking-unread-all (&rest args)
   (interactive)
@@ -166,13 +177,32 @@
    )
   )
 
+(defun konix/ement-events-not-fully-read (session room)
+  (let* ((timeline (ement-room-timeline room))
+         (fully-read-event (konix/ement-fully-read-event session room)))
+    (-take-while (lambda (event) (not (equal event fully-read-event))) timeline))
+  )
+
 (defun konix/ement-update-tracking (session room &optional event)
   (let (
         (faces (cond
-                ((and
-                  event
-                  (run-hook-with-args-until-success
-                   'ement-notify-mention-predicates event room session)
+                ((ement-room-invite-state room)
+                 '(ement-room-invitation))
+                ((-any
+                  (lambda (event)
+                    (ement-notify--event-mentions-room-p event room session))
+                  (if event (list event)
+                    (konix/ement-events-not-fully-read session room)
+                    )
+                  )
+                 '(ement-room-room-mention))
+                ((-any
+                  (lambda (event)
+                    (run-hook-with-args-until-success
+                     'ement-notify-mention-predicates event room session))
+                  (if event (list event)
+                    (konix/ement-events-not-fully-read session room)
+                    )
                   )
                  '(ement-room-mention)
                  )

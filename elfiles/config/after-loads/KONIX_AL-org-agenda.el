@@ -53,11 +53,14 @@
   'konix/org-gtd-triage-all)
 
 (keymap-set org-agenda-mode-map "-"
-  #'(lambda () (interactive) (message "Intentionally disable -")))
+            #'(lambda () (interactive) (message "Intentionally disable -")))
+
+(keymap-set org-agenda-mode-map "E"
+            #'(lambda () (interactive) (message "Intentionally disable E")))
 
 
 (keymap-set org-agenda-mode-map "M-s"
-  'auto-scroll-mode)
+            'auto-scroll-mode)
 
 (keymap-set org-agenda-mode-map ":"
   'konix/org-agenda-counsel-org-tag)

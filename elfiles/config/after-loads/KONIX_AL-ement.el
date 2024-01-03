@@ -138,6 +138,7 @@
    (-map 'cdr)
    (-map 'konix/ement-update-tracking-session-unread)
    )
+  (message "Done updating all tracked unread rooms")
   )
 
 (defun konix/ement-tracked-room-p (session room &optional event)

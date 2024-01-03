@@ -199,18 +199,41 @@
    (ement-session-rooms session)
    (-filter
     (lambda (room)
-      (let (
-            (ement-room-unread-only-counts-notifications (if current-prefix-arg nil ement-room-unread-only-counts-notifications))
-            )
-        (and
-         (not (equal 'leave (ement-room-status room)))
-         (ement--room-unread-p room session)
-         )
-        )
+      (and
+       (not (equal 'leave (ement-room-status room)))
+       (or (and current-prefix-arg (konix/ement-room-unread-p session room))
+           (ement--room-unread-p room session))
+       )
       )
     )
    )
   )
+
+(defun konix/ement-fully-read-event (session room)
+  (let* ((fully-read-marker (alist-get "m.fully_read"
+                                       (ement-room-account-data room) nil nil #'equal))
+         (fully-read-event-content (alist-get 'content fully-read-marker))
+         (fully-read-event-id (alist-get 'event_id fully-read-event-content))
+         (fully-read-event (and fully-read-event-id
+                                (konix/ement-find-event-by-id session room fully-read-event-id))))
+    fully-read-event)
+  )
+
+(defun konix/ement-room-unread-p (session room)
+  (let* ((timeline (ement-room-timeline room))
+         (state (ement-room-state room))
+         (fully-read-event (konix/ement-fully-read-event session room)))
+    (if (or (not timeline) (not fully-read-event))
+        t
+      (->> (append timeline state)
+           (-take-while (lambda (event)
+                          (> (ement-event-origin-server-ts event)
+                             (ement-event-origin-server-ts
+                              fully-read-event))
+                          ))
+           (-any (lambda (event)
+                   (not (member (ement-event-type event)
+                                '("m.bridge" "uk.half-shot.bridge" "m.room.member")))))))))
 
 (cl-defun konix/ement-notify--log-to-buffer/add-tracking (orig event room session &key (buffer-name "*Ement Notifications*") )
   (when (konix/ement-tracked-room-p session room event)

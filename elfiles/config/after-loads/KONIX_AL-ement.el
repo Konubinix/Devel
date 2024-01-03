@@ -814,7 +814,7 @@ event before rendering the event.
      (let* (
 
             (room-id (ement-room-id room))
-            (event-data (ement-api ement-session (format "rooms/%s/event/%s" (url-hexify-string room-id) (url-hexify-string event-id)) :timeout 30
+            (event-data (ement-api session (format "rooms/%s/event/%s" (url-hexify-string room-id) (url-hexify-string event-id)) :timeout 30
                           :then 'sync
                           :else (lambda (plz-error)
                                   (signal 'ement-api-error (list (format "Loading event %s from room %s failed" event-id room-id)

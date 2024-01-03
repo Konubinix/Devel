@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(setq-default auto-scroll-interval 800)
 (setq-default auto-scroll-amount 200)
 
 (defvar konix/auto-scroll-idle-time 5)

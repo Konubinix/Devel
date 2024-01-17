@@ -118,7 +118,6 @@ They can be relative or absolute
         ac-source-dictionary
         ac-source-words-in-same-mode-buffers
         ;; ac-source-words-in-all-buffer
-        ac-source-konix/etags
         )
       )
 

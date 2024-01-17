@@ -28,6 +28,7 @@ settings:
         zf: spawn -u konix_qutebrowser_open_with_firefox.sh
   content.desktop_capture:
     https://teams.microsoft.com: true
+    https://webrtc.github.io: true
   content.geolocation:
     https://eu.docusign.net: false
     https://www.google.com: false
@@ -37,21 +38,29 @@ settings:
   content.media.audio_capture:
     https://app.slack.com: true
     https://coremeet.workadventu.re: true
+    https://konubinix.eu: true
     https://meet.google.com: true
     https://play.workadventu.re: true
     https://teams.microsoft.com: true
+    https://vdo.ninja: true
   content.media.audio_video_capture:
     https://coremeet.workadventu.re: true
+    https://localhost:8080: true
     https://meet.google.com: true
     https://play.workadventu.re: true
     https://teams.microsoft.com: true
     https://zoom.us: true
   content.media.video_capture:
+    http://localhost:8080: true
     https://coremeet.workadventu.re: true
+    https://konubinix.eu: true
     https://meet.google.com: true
     https://play.workadventu.re: true
     https://teams.microsoft.com: true
+    https://vdo.ninja: true
   content.notifications.enabled:
+    https://app.element.io: true
+    https://assure.generation.fr: false
     https://calendar.google.com: false
     https://fr.aliexpress.com: false
     https://gitlab.com: false

@@ -1005,14 +1005,16 @@ event before rendering the event.
 (add-hook 'ement-room-mode-hook #'konix/ement-room-mode-hook)
 
 (defun konix/ement-room-send-filter (content room)
-  (when-let* (
-              (body (alist-get "body" content nil nil #'string-equal))
-              (_ (string-match ":-)" body))
-              )
-    (setf (alist-get "body" content nil nil #'string-equal) (replace-match "🙂" nil nil body))
-    )
-  (ement-room-send-org-filter content room)
-  )
+  (when-let (
+             (body (alist-get "body" content nil nil #'string-equal))
+             )
+    (cond
+     ((string-match ":-)" body)
+      (setf (alist-get "body" content nil nil #'string-equal) (replace-match "🙂" nil nil body)))
+     ((string-match ":-D" body)
+      (setf (alist-get "body" content nil nil #'string-equal) (replace-match
+                                                               "😁" nil nil body)))))
+  (ement-room-send-org-filter content room))
 
 (defun konix/ement-room-goto-fully-read-marker/indicate-missing-fully-read-marker (&rest args)
   (message (if ement-room-fully-read-marker

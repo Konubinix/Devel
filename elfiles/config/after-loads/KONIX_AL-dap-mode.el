@@ -82,6 +82,12 @@
   (call-interactively 'dap-down-stack-frame)
   )
 
+(defun konix/dap-delete-all-sessions ()
+  (interactive)
+  (message "Before deleting the the sessions %s" (length (dap--get-sessions)))
+  (call-interactively 'dap-delete-all-sessions)
+  (message "Deleted all the sessions %s" (length (dap--get-sessions))))
+
 (defun konix/dap-breakpoint-dump ()
   (interactive)
   (message "%s" (pp-to-string (dap--debug-session-breakpoints (dap--cur-session) )))
@@ -119,7 +125,7 @@
 
 (define-prefix-command 'konix/dap-session-map)
 (keymap-set konix/dap-mode-map "s" 'konix/dap-session-map)
-(keymap-set konix/dap-session-map "D" 'dap-delete-all-sessions)
+(keymap-set konix/dap-session-map "D" 'konix/dap-delete-all-sessions)
 (keymap-set konix/dap-session-map "s" 'dap-switch-session)
 (keymap-set konix/dap-session-map "h" 'dap-ui-sessions)
 

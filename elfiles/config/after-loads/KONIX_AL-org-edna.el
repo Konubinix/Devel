@@ -39,6 +39,10 @@ TAGS is a single tag name."
   (org-set-property "LAST_REPEAT" (konix/org-time-stamp-now))
   )
 
+(defun org-edna-action/srs! (_last_entry)
+  (konix/org-srs t))
+
+
 (defun org-edna-action/scheduled-lower-of! (_last_entry &rest dates)
   "Action to take the closer occurrence of several DATES.
 

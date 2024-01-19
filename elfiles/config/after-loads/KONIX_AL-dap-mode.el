@@ -152,7 +152,7 @@
 
 (keymap-set konix/region-bindings-mode-map "e" 'dap-eval-region)
 
+(setq-default dap-auto-configure-features '(tooltip))
 (dap-auto-configure-mode 1)
-(setq-default dap-auto-configure-features '( sessions tooltip controls repl breakpoints))
 
 (provide 'KONIX_AL-dap-mode)

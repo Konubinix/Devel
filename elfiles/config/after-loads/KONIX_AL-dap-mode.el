@@ -155,4 +155,10 @@
 (setq-default dap-auto-configure-features '(tooltip))
 (dap-auto-configure-mode 1)
 
+(defun konix/dap-stopped-hook (debug-session)
+  (dap--set-cur-session debug-session))
+
+(add-hook 'dap-stopped-hook
+          #'konix/dap-stopped-hook)
+
 (provide 'KONIX_AL-dap-mode)

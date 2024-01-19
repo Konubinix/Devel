@@ -1,0 +1,11 @@
+{
+    "name": "workbox",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "workbox-cli": "^7.0.0"
+    }
+}

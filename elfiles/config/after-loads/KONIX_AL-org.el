@@ -6026,34 +6026,38 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (defvar konix/org-srs-last-value nil)
 
-(defun konix/org-srs ()
-  (interactive)
+(setq-default konix/org-srs-values '("perfect response"
+                                     "correct response after a hesitation"
+                                     "correct response recalled with serious difficulty"
+                                     "incorrect response; where the correct one seemed easy to recall"
+                                     "incorrect response; the correct one remembered"
+                                     "complete blackout"))
+
+(defun konix/org-srs (&optional schedule)
+  (interactive "P")
   (let* (
          (id (konix/org-get-id))
          (value (completing-read
                  "Value: "
-                 '("farther" "far" "medium" "close" "closer" "closest")
+                 konix/org-srs-values
                  nil
                  nil
                  nil
                  nil
-                 konix/org-srs-last-value
-                 ))
+                 konix/org-srs-last-value))
+         (position (- (length konix/org-srs-values) 1 (cl-position value konix/org-srs-values :test 'equal)))
          (new-date (s-trim
-                    (shell-command-to-string (format "clk org srs expiry calc %s %s" id value))
-                    ))
-         )
+                    (shell-command-to-string (format "clk org srs expiry calc %s %s" id position))
+                    )))
     (setq konix/org-srs-last-value value)
     (konix/org-with-point-on-heading
-     (if current-prefix-arg
+     (if schedule
          (org-schedule nil new-date)
        (org-entry-put (point) "REVIEW_IN" new-date)
        )
      )
     (message "Moved to %s" new-date)
-    (konix/org-agenda-filter-for-now)
-    )
-  )
+    (konix/org-agenda-filter-for-now)))
 
 (defvar konix/org--deadline-or-schedule/check-schedule-hides-timestamps/inhibit nil)
 

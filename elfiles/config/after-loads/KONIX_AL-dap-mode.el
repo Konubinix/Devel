@@ -127,7 +127,7 @@
 (keymap-set konix/dap-mode-map "s" 'konix/dap-session-map)
 (keymap-set konix/dap-session-map "D" 'konix/dap-delete-all-sessions)
 (keymap-set konix/dap-session-map "s" 'dap-switch-session)
-(keymap-set konix/dap-session-map "h" 'dap-ui-sessions)
+(keymap-set konix/dap-session-map "l" 'dap-ui-sessions)
 
 (define-prefix-command 'konix/dap-stack-frame-map)
 (keymap-set konix/dap-mode-map "f" 'konix/dap-stack-frame-map)

@@ -22,6 +22,11 @@
 
 ;;; Code:
 
+(progn (setq dap-print-io t)
+       (setq dap-inhibit-io nil))
+(progn (setq dap-print-io nil)
+       (setq dap-inhibit-io t))
+(setq-default dap-auto-show-output nil)
 ;; mapping = ((src dst) (src dst) ...)
 ;; src = local, dst = remote
 (defun konix/dap-mode/local-to-remote-path-fn (mapping path)

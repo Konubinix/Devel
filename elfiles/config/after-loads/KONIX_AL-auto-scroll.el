@@ -80,9 +80,13 @@
           )
       (error (auto-scroll-mode -1)))))
 
-
 (add-hook 'auto-scroll-mode-hook
           #'konix/auto-scroll-mode-hook)
+
+(defun konix/auto-scrool-faster/maybe-start-auto-scroll (&rest args)
+  (unless auto-scroll-mode
+    (auto-scroll-mode 1)))
+(advice-add #'auto-scroll-faster :before #'konix/auto-scrool-faster/maybe-start-auto-scroll)
 
 (provide 'KONIX_AL-auto-scroll)
 ;;; KONIX_AL-auto-scroll.el ends here

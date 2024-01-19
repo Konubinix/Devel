@@ -48,6 +48,14 @@
   '((t (:background "cyan")))
   "")
 
+(defface ement-room-bot-mention
+  '((t (:background "light salmon")))
+  "")
+
+(defface ement-room-bot-no-mention
+  '((t (:background "dim gray")))
+  "")
+
 (defface ement-room-room-mention
   '((t (:background "spring green")))
   "")
@@ -58,6 +66,8 @@
 (add-to-list 'tracking-faces-priorities 'ement-room-favourite)
 (add-to-list 'tracking-faces-priorities 'ement-room-followed)
 (add-to-list 'tracking-faces-priorities 'ement-room-invitation)
+(add-to-list 'tracking-faces-priorities 'ement-room-bot-mention)
+(add-to-list 'tracking-faces-priorities 'ement-room-bot-no-mention)
 
 (custom-set-faces
  '(ement-room-fully-read-marker ((t (:background "cyan"))))
@@ -183,29 +193,60 @@
     (-take-while (lambda (event) (not (equal event fully-read-event))) timeline))
   )
 
+(defvar konix/ement-notify-bots '())
+(defvar konix/ement-spammy-bots '())
+
 (defun konix/ement-update-tracking (session room &optional event)
   (let (
         (faces (cond
                 ((ement-room-invite-state room)
                  '(ement-room-invitation))
-                ((-any
-                  (lambda (event)
-                    (ement-notify--event-mentions-room-p event room session))
-                  (if event (list event)
-                    (konix/ement-events-not-fully-read session room)
-                    )
-                  )
-                 '(ement-room-room-mention))
-                ((-any
-                  (lambda (event)
-                    (run-hook-with-args-until-success
-                     'ement-notify-mention-predicates event room session))
-                  (if event (list event)
-                    (konix/ement-events-not-fully-read session room)
-                    )
-                  )
-                 '(ement-room-mention)
-                 )
+                ((let ((events (if event
+                                   (list event)
+                                 (konix/ement-events-not-fully-read session
+                                                                    room)))
+                       event
+                       (level 0))
+                   (while (and events (not (equal level 4)))
+                     (setq event (car events))
+                     (setq events (cdr events))
+                     (setq level (max level
+                                      (cond
+                                       ((ement-notify--event-mentions-session-user-p event
+                                                                                     room
+                                                                                     session)
+                                        4)
+                                       ((ement-notify--event-mentions-room-p event
+                                                                             room
+                                                                             session)
+                                        (cond
+                                         ((member (ement-user-id
+                                                   (ement-event-sender event))
+                                                  konix/ement-spammy-bots)
+                                          1)
+                                         ((member (ement-user-id
+                                                   (ement-event-sender event))
+                                                  konix/ement-notify-bots)
+                                          2)
+                                         (t
+                                          3)))
+                                       ((member (ement-user-id
+                                                 (ement-event-sender event))
+                                                konix/ement-notify-bots)
+                                        1)
+                                       (t
+                                        0)))))
+                   (cl-case level
+                     ((4)
+                      '(ement-room-mention))
+                     ((3)
+                      '(ement-room-room-mention))
+                     ((2)
+                      '(ement-room-bot-mention))
+                     ((1)
+                      '(ement-room-bot-no-mention))
+                     (t
+                      nil))))
                 ((konix/ement-room-direct-p session room)
                  '(ement-room-direct)
                  )
@@ -217,13 +258,8 @@
                  )
                 (t
                  '()
-                 )
-                )
-               )
-        )
-    (tracking-add-buffer (konix/ement-room-buffer session room) faces)
-    )
-  )
+                 ))))
+    (tracking-add-buffer (konix/ement-room-buffer session room) faces)))
 
 (defun konix/ement-unread-rooms (session)
   (->>

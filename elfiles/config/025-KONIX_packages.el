@@ -123,6 +123,7 @@
   (use-package js2-mode :commands (js2-mode) :mode ("\\.mjs$" . js2-mode))
   (use-package keep-buffers)
   (use-package key-chord)
+  (use-package kivy-mode)
   (use-package lisp :straight (:type built-in) :mode ("emacs$" . list-mode))
   (use-package lispy)
   (use-package kubel :commands (kubel))

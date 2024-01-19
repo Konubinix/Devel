@@ -6057,6 +6057,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
        )
      )
     (message "Moved to %s" new-date)
+    (sit-for 1)
     (konix/org-agenda-filter-for-now)))
 
 (defvar konix/org--deadline-or-schedule/check-schedule-hides-timestamps/inhibit nil)

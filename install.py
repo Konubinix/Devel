@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
+import logging
 import os
-import sys
 import re
 import shutil
-import tarfile
 import subprocess
-import logging
+import sys
+import tarfile
+from pathlib import Path
 
 logging.basicConfig(level=logging.DEBUG)
 import tempfile
@@ -41,17 +42,18 @@ replace_file_content(DEFAULT_ENV_FILE_NAME, DEFAULT_ENV_FILE_CONTENT)
 substitute(os.path.join(environ["KONIX_PWD"], "init_bin"),
            os.path.join(environ["HOME"], "init_bin"))
 
-os.makedirs(os.path.expanduser("~/bin"))
+if not (bindir := Path("~/bin").expanduser()).exists():
+    os.makedirs(bindir)
 
+from install_bin import install_bin
 # ####################################################################################################
 # Install shell and emacs
 # ####################################################################################################
 from install_emacs import install_emacs
-from install_vim import install_vim
-from install_shell import install_shell
-from install_git import install_git
-from install_bin import install_bin
 from install_gdbinit import install_gdbinit
+from install_git import install_git
+from install_shell import install_shell
+from install_vim import install_vim
 
 install_shell()
 install_emacs()
@@ -60,6 +62,10 @@ install_bin()
 install_gdbinit()
 install_vim()
 
+config_dir = Path(environ["KONIX_CONFIG_DIR"])
+
+substitute(config_dir / "byobu", "~/.byobu")
+substitute(config_dir / "ledgerrc", "~/.ledgerrc")
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "mailcap"),
            os.path.join(environ["HOME"], ".mailcap"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "xscreensaver"),

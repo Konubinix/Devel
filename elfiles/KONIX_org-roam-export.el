@@ -308,7 +308,7 @@
      ((string-match "https://\\(skeptikon.+\\|peertube.+\\|video.antopie.+\\)/static/torrents/\\(.+\\)-[0-9]+.torrent" url)
       (format "{{{peertube(%s,%s)}}}" (match-string 1 url) (match-string 2 url))
       )
-     ((string-match "^\\(http.+\\(ogg\\|mp3\\|m4a\\)\\)$" url)
+     ((string-match "^\\(http.+\\.\\(ogg\\|mp3\\|m4a\\)\\)$" url)
       (format "{{{audio(%s)}}}" (match-string 1 url))
       )
      ((string-match "^\\(http.+\\(\\embed\\.\\(pdf\\|PDF\\)\\)\\)$" url)

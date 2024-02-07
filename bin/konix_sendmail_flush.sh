@@ -4,6 +4,7 @@ LOG="${TMPDIR}/logs/msmtp.log"
 rm -f "${LOG}"
 
 QUEUE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/mail.queue"
+mkdir -p "${QUEUE_DIR}"
 
 msg () {
     echo "$*"

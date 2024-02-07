@@ -63,6 +63,7 @@
 (keymap-set notmuch-show-mode-map "v" 'notmuch-show-view-part)
 (keymap-set notmuch-show-mode-map "M-r" 'konix/notmuch-draft-resume-this)
 (keymap-set notmuch-show-mode-map "M-s" 'auto-scroll-mode)
+(keymap-set notmuch-show-mode-map "M-o" 'org-open-at-point)
 
 (provide 'KONIX_AL-notmuch-show)
 ;;; KONIX_AL-notmuch-show.el ends here

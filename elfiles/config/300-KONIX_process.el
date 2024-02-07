@@ -3,7 +3,7 @@
 ;; Copyright (C) 2022  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
-;; Keywords: 
+;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 
@@ -106,6 +106,8 @@
         process
         res
         )
+    (with-current-buffer buffer
+      (insert (format "%s %s\n" program (string-join program-args " "))))
     (setq res
           (apply
            'call-process

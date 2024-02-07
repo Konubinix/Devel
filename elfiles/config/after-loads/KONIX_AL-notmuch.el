@@ -249,17 +249,18 @@ Message-Id: <%s>" id)
   ""
   )
 (setq notmuch-search-line-faces '(
-                                                                  ("temp" . konix/notmuch-search-temp)
-                                                                  ("spam" . konix/notmuch-search-spam)
-                                                                  ("answer" . konix/notmuch-search-answer)
-                                                                  ("perso" . konix/notmuch-search-perso)
-                                                                  ("deleted" . (:foreground "red"))
-                                                                  ("flagged" . konix/notmuch-search-flagged)
-                                                                  ("unread" . konix/notmuch-search-unread)
-                                                                  ("replied" . konix/notmuch-search-replied)
-                                                                  ("sent" . konix/notmuch-search-sent)
-                                                                  )
-          )
+                                  ;;; the order matters. The first one takes precedence
+                                  ("spam" . konix/notmuch-search-spam)
+                                  ("temp" . konix/notmuch-search-temp)
+                                  ("answer" . konix/notmuch-search-answer)
+                                  ("perso" . konix/notmuch-search-perso)
+                                  ("deleted" . (:foreground "red"))
+                                  ("flagged" . konix/notmuch-search-flagged)
+                                  ("unread" . konix/notmuch-search-unread)
+                                  ("replied" . konix/notmuch-search-replied)
+                                  ("sent" . konix/notmuch-search-sent)
+                                  )
+      )
 (defface notmuch-search-count
   '(
         (

@@ -586,7 +586,9 @@ Attendees:
                 "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events",
                 "refresh_token": self.db.get(self.refresh_token_name),
             })
-        assert resp.status_code == 200
+        if resp.status_code != 200:
+            LOGGER.critical(resp.text)
+            exit(5)
 
         data = resp.json()
         self.db.set("token_type", data["token_type"])

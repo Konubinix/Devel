@@ -31,5 +31,6 @@ then
 fi
 #echo "$@"
 #xmessage "$*"
-mkdir -p "${HOME}/cryptoff/.pymsmtpq.queue"
-msmtpq -t --read-envelope-from -oi -C "${KONIX_PERSO_DIR}/msmtprc/config" --aliases="${KONIX_MSMTP_ALIASES}" --logfile "${KONIX_MSMTP_LOG}" "$@"
+clk gpg decrypt dir "${KONIX_PERSO_DIR}/msmtprc_nd" msmtprc
+msmtpq -t --read-envelope-from -oi -C "/run/user/$(id -u)/msmtprc/config" --aliases="${KONIX_MSMTP_ALIASES}" --logfile "${KONIX_MSMTP_LOG}" "$@"
+# the queue will be in /home/sam/perso/perso/konixwork/share/mail.queue

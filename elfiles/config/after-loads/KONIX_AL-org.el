@@ -38,7 +38,6 @@
 (require 'ob-shell)
 (require 'org-edna)
 (require 'org-checklist)
-(require 'org-expiry)
 (require 'KONIX_org-github)
 (org-edna-load)
 
@@ -6591,6 +6590,13 @@ see https://konubinix.eu/braindump/posts/c96c5f30-b434-4e41-94f0-888553e88a74
     )
   )
 (advice-add #'org-id-find :around #'konix/org-id-find/force-using-org-mode)
+
+(defun konix/org-insert-heading-hook ()
+  (unless (org-entry-get (point) "CREATED")
+    (org-entry-put (point) "CREATED" (format-time-string "[%Y-%m-%d %H:%M]"))))
+
+(add-hook 'org-insert-heading-hook 'konix/org-insert-heading-hook)
+
 
 (defvar konix/org-clock-persist t "Whether to persist the clock")
 (when konix/org-clock-persist

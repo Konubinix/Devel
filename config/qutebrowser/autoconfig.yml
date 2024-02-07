@@ -44,6 +44,7 @@ settings:
     https://teams.microsoft.com: true
     https://vdo.ninja: true
   content.media.audio_video_capture:
+    http://localhost:9904: true
     https://coremeet.workadventu.re: true
     https://localhost:8080: true
     https://meet.google.com: true
@@ -52,12 +53,14 @@ settings:
     https://zoom.us: true
   content.media.video_capture:
     http://localhost:8080: true
+    http://localhost:9904: true
     https://coremeet.workadventu.re: true
     https://konubinix.eu: true
     https://meet.google.com: true
     https://play.workadventu.re: true
     https://teams.microsoft.com: true
     https://vdo.ninja: true
+    https://webrtc.github.io: true
   content.notifications.enabled:
     https://app.element.io: true
     https://assure.generation.fr: false

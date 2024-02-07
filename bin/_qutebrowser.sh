@@ -136,6 +136,10 @@ replace_text ( ) {
     echo "$*" | replace_text_multiline
 }
 
+click_on_submit_button () {
+    click_on "document.querySelector(\"button[type='submit']\")"
+}
+
 replace_text_on ( ) {
     local elem="$1"
     local content="$2"

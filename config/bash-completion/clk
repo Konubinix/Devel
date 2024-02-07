@@ -1,10 +1,28 @@
 _clk_completion() {
-    local IFS=$'\t'
-    COMPREPLY=( $( env COMP_WORDS="${COMP_WORDS[*]}" \
-                   COMP_CWORD=$COMP_CWORD \
-                   _CLK_CASE_INSENSITIVE_COMPLETION=ON \
-                   _CLK_COMPLETE=complete-bash $1 ) )
+    local IFS=$'\n'
+    local response
+
+    response=$(env _CLK_CASE_INSENSITIVE_COMPLETION=ON COMP_WORDS="${COMP_WORDS[*]}" COMP_CWORD=$COMP_CWORD _CLK_COMPLETE=bash_complete $1)
+
+    for completion in $response; do
+        IFS=',' read type value <<< "$completion"
+
+        if [[ $type == 'dir' ]]; then
+            COMPREPLY=()
+            compopt -o dirnames
+        elif [[ $type == 'file' ]]; then
+            COMPREPLY=()
+            compopt -o default
+        elif [[ $type == 'plain' ]]; then
+            COMPREPLY+=($value)
+        fi
+    done
+
     return 0
 }
 
-complete -F _clk_completion -o default clk
+_clk_completion_setup() {
+    complete -o nosort -F _clk_completion clk
+}
+
+_clk_completion_setup;

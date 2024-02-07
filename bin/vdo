@@ -1,0 +1,12 @@
+#!/bin/bash
+set -o errexit # -e
+set -o errtrace # -E
+set -o nounset # -u
+set -o pipefail
+shopt -s inherit_errexit
+
+# ctrl-c
+trap "exit 2" SIGINT
+trap "exit 3" SIGQUIT
+
+exec qutebrowser --desktop-file-name vdo --qt-arg name vdo --basedir "${XDG_DATA_HOME}/vdo" "${KONIX_VDO_START_URL:-https://vdo.ninja/?view=yiagUndoths5&autorecord=1000}"

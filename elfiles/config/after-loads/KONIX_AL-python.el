@@ -28,6 +28,7 @@
 (require 'py-isort)
 (require 'lsp-mode)
 (require 'lsp-jedi)
+(require 'dap-python)
 
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)

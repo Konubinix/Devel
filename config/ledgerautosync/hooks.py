@@ -1,1 +1,0 @@
-../../../../perso/perso/python/konix_ledgerautosync_hooks.py

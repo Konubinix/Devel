@@ -64,8 +64,6 @@ substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "mailcap"),
            os.path.join(environ["HOME"], ".mailcap"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "xscreensaver"),
            os.path.join(environ["HOME"], ".xscreensaver"))
-substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "Makefile"),
-           os.path.join(environ["HOME"], "Makefile"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "gitk"),
            os.path.join(environ["HOME"], ".gitk"))
 substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "inputrc"),

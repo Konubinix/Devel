@@ -904,13 +904,13 @@ awful.rules.rules = {
 				"veromix",
 				"xtightvncviewer",
 			},
-
 			-- Note that the name property shown in xprop might be set slightly after creation of the client
 			-- and the name shown there might not match defined rules here.
 			name = {
 				"Event Tester", -- xev.
 				"Terminator Preferences",
 				"Choose A Terminal Font",
+				"Emulator", -- android emulator
 			},
 			role = {
 				"AlarmWindow", -- Thunderbird's calendar.
@@ -951,6 +951,7 @@ awful.rules.rules = {
 		properties = { tag = "1", floating = true, ontop = true },
 	},
 	{ rule = { class = "Pavucontrol" }, properties = { tag = "2" } },
+	{ rule = { class = "Emulator" }, properties = { tag = "2" } },
 	{ rule = { class = "Emacs", name = "konix_emacs.+" }, properties = { tag = "1" } },
 	{
 		rule = { class = "Emacs", name = "emacs-everywhere" },

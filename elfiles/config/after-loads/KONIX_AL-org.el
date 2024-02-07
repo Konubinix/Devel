@@ -4474,14 +4474,14 @@ With `ID', set the ID instead of the CUSTOM_ID."
          )
     (shell-command
      (format
-      "konix_gcal.py -a \"%s\" select_calendar %s"
+      "clk gcal -a \"%s\" select-calendar %s"
       account
       calendar_id
       )
      )
     (when (equal 0
                  (konix/call-process-show-error
-                  "konix_gcal.py"
+                  "clk" "gcal"
                   "-a"
                   account
                   "accept"
@@ -4524,14 +4524,14 @@ With `ID', set the ID instead of the CUSTOM_ID."
                ))
     (shell-command
      (format
-      "konix_gcal.py -a \"%s\" select_calendar %s"
+      "clk gcal -a \"%s\" select-calendar %s"
       account
       calendar_id
       )
      )
     (when
         (equal 0 (konix/call-process-show-error
-                  "konix_gcal.py"
+                  "clk" "gcal"
                   "-a"
                   account
                   "decline"
@@ -4568,7 +4568,7 @@ With `ID', set the ID instead of the CUSTOM_ID."
       )
     (shell-command
      (format
-      "konix_gcal.py -a \"%s\" select_calendar %s"
+      "clk gcal -a \"%s\" select-calendar %s"
       account
       calendar_id
       )
@@ -4576,10 +4576,11 @@ With `ID', set the ID instead of the CUSTOM_ID."
     (when (and (yes-or-no-p "Sure ?")
                (equal 0
                       (konix/call-process-show-error
-                       "konix_gcal.py"
+                       "clk"
+                       "gcal"
                        "-a"
                        account
-                       "del_event"
+                       "del-event"
                        id
                        )
                       )
@@ -4606,14 +4607,14 @@ With `ID', set the ID instead of the CUSTOM_ID."
          )
     (shell-command
      (format
-      "konix_gcal.py -a \"%s\" select_calendar %s"
+      "clk gcal -a \"%s\" select-calendar %s"
       account
       calendar_id
       )
      )
     (when (equal 0
                  (konix/call-process-show-error
-                  "konix_gcal.py"
+                  "clk" "gcal"
                   "-a"
                   account
                   "tentative"
@@ -4643,17 +4644,17 @@ With `ID', set the ID instead of the CUSTOM_ID."
          )
     (shell-command
      (format
-      "konix_gcal.py -a \"%s\" select_calendar %s"
+      "clk gcal -a \"%s\" select-calendar %s"
       account
       calendar_id
       )
      )
     (when (equal 0
                  (konix/call-process-show-error
-                  "konix_gcal.py"
+                  "clk" "gcal"
                   "-a"
                   account
-                  "del_event"
+                  "del-event"
                   id
                   )
                  )

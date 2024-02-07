@@ -101,12 +101,12 @@
 (define-prefix-command 'konix/dap-mode-map)
 (keymap-global-set "<f12>" 'konix/dap-mode-map)
 
+(keymap-set konix/dap-mode-map "E" 'dap-debug-edit-template)
+
 (define-prefix-command 'konix/dap-debug-mode-map)
 (keymap-set konix/dap-mode-map "d" 'konix/dap-debug-mode-map)
 (keymap-set konix/dap-debug-mode-map "d" 'dap-debug)
-(keymap-set konix/dap-debug-mode-map "r" 'dap-debug-restart)
 (keymap-set konix/dap-debug-mode-map "l" 'dap-debug-last)
-(keymap-set konix/dap-debug-mode-map "e" 'dap-debug-edit-template)
 
 (define-prefix-command 'konix/dap-breakpoint-mode-map)
 (keymap-set konix/dap-mode-map "b" 'konix/dap-breakpoint-mode-map)
@@ -133,6 +133,7 @@
 (keymap-set konix/dap-session-map "D" 'konix/dap-delete-all-sessions)
 (keymap-set konix/dap-session-map "s" 'dap-switch-session)
 (keymap-set konix/dap-session-map "l" 'dap-ui-sessions)
+(keymap-set konix/dap-session-map "r" 'dap-ui-repl)
 
 (define-prefix-command 'konix/dap-stack-frame-map)
 (keymap-set konix/dap-mode-map "f" 'konix/dap-stack-frame-map)
@@ -148,6 +149,7 @@
 (keymap-set konix/dap-mode-map "<up>" 'dap-up-stack-frame)
 (keymap-set konix/dap-mode-map "<down>" 'dap-down-stack-frame)
 (keymap-set konix/dap-mode-map "q" 'dap-disconnect)
+(keymap-set konix/dap-mode-map "r" 'dap-debug-restart)
 (keymap-set konix/dap-mode-map "n" 'dap-next)
 
 (keymap-set konix/region-bindings-mode-map "e" 'dap-eval-region)

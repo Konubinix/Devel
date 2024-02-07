@@ -195,12 +195,12 @@ Message-Id: <%s>" id)
   )
 (defface konix/notmuch-search-spam
   '(
-        (
-         ((class color)
-          (background dark))
-         (:strike-through "red")
-         )
-        )
+    (
+     ((class color)
+      (background dark))
+     (:strike-through "white")
+     )
+    )
   ""
   )
 (defface konix/notmuch-search-perso

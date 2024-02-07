@@ -165,8 +165,6 @@
   (use-package region-bindings-mode :commands (region-bindings-mode-enable))
   (use-package rust-mode)
   (use-package scad-mode)
-  ;; https://github.com/yuya373/emacs-slack/pull/576
-  (use-package slack :commands (slack-start) :straight (:fork t) :bind-keymap ("<f2> l" . konix/slack-global-map))
   (use-package solidity-mode)
   (use-package tempbuf)
   (use-package terraform-mode)
@@ -195,9 +193,7 @@
            (mod (third diff_abs_time) 1000)
            (second diff_time)
            (/ (third diff_time) 1000)
-           (mod (third diff_time) 1000)
-           )
-  )
+           (mod (third diff_time) 1000)))
 
 
 (provide '925-required-package)

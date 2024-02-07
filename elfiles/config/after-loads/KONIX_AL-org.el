@@ -2046,6 +2046,76 @@ items"
                   (org-super-agenda-groups nil)
                   )
                  )
+                ("atn" "Agenda for tomorrow (no filter context)"
+                 (
+                  (agenda nil
+                          (
+                           (org-agenda-include-deadlines t)
+                           (org-agenda-overriding-header "Calendar")
+                           (org-agenda-skip-function
+                            '(or
+                              (konix/org-agenda-skip-if-tags
+                               '("project" "goal" "aofs"))
+                              (konix/org-agenda-skip-if-tags '("maybe" "discret" "habit" ))
+                              (konix/org-agenda-for-today-skip-if-not-the-good-time t)
+                              ;;(org-agenda-skip-entry-if 'scheduled)
+                              )
+                            )
+                           )
+                          )
+                  (agenda nil
+                          (
+                           (org-agenda-include-deadlines t)
+                           (org-agenda-overriding-header
+                            "HOF > 0")
+                           (org-agenda-use-time-grid nil)
+                                        ; it will be already included in the no project view
+                           (org-agenda-include-diary nil)
+                           (org-agenda-prefix-format
+                            '(
+                              (agenda . "%(konix/org-agenda-prefix-format/ann)")
+                              )
+                            )
+                           (org-agenda-skip-function
+                            '(or
+                              (konix/skip-not-todo-file)
+                              (konix/org-agenda-for-today-skip-if-not-the-good-time t)
+                              (konix/org-agenda-skip-if-tags '("maybe"))
+                              (konix/org-agenda-keep-if-tags
+                               '("project" "goal" "aofs"))
+                              )
+                            )
+                           )
+                          )
+                  (tags "WAIT&-maybe&-todo=\"DONE\"&-todo=\"NOT_DONE\"|DELEGATED&-maybe&-todo=\"DONE\"&-todo=\"NOT_DONE\""
+                        (
+                         (org-agenda-include-deadlines t)
+                         (org-agenda-overriding-header "Waiting stuff")
+                         (org-agenda-prefix-format
+                          '(
+                            (tags . "%(konix/org-agenda-prefix-format/ann)")
+                            )
+                          )
+                         (org-agenda-todo-keyword-format "")
+                         (org-agenda-skip-function
+                          '(or
+                            (konix/org-agenda-skip-if-tags
+                             '("goal" "aofs" "maybe"))
+                            (konix/org-agenda-for-today-skip-if-not-the-good-time
+                             t)
+                            ;; (konix/org-agenda-keep-if-tags '("WAIT" "DELEGATED"))
+                            ;;(org-agenda-skip-entry-if 'scheduled)
+                            )
+                          )
+                         )
+                        )
+                  )
+                 (
+                  (dummy (setq konix/org-agenda-type 'agenda))
+                  (org-super-agenda-groups nil)
+                  (org-agenda-start-day "+1d")
+                  )
+                 )
                 ("atT" "Agenda for today (no filter context)"
                  (
                   (agenda nil

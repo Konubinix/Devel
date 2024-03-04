@@ -15,7 +15,10 @@ keep_color flexget execute | tee "${TMPDIR}/log"
 popd
 
 
-keep_color grep "ERROR\|CRITICAL\|WARNING" "${TMPDIR}/log" | tee "${TMPDIR}/errors"
+keep_color grep "ERROR\|CRITICAL\|WARNING" "${TMPDIR}/log" \
+    | grep -v 'failed to import dependencies'   \
+    | grep -v 'Skipped %s RSS-entries without required information'  \
+    | tee "${TMPDIR}/errors"
 konix_display.py -o "Ended getting rss feeds $(wc -l < "${TMPDIR}/errors") problems"
 
 # init the tags for the new mails

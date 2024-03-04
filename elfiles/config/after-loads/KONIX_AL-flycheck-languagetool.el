@@ -24,7 +24,12 @@
 
 ;;; Code:
 
-(setq-default flycheck-languagetool-server-jar (expand-file-name "~/.nix-profile/share/languagetool-server.jar"))
+
+(if (equal 0 (shell-command "languagetool --help"))
+    (setq-default flycheck-languagetool-server-jar (expand-file-name
+                                                    "~/.nix-profile/share/languagetool-server.jar"))
+  (warn "Languagetool not installed")
+  )
 
 
 (provide 'KONIX_AL-flycheck-languagetool)

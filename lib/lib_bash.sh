@@ -162,13 +162,6 @@ urlencode() {
     LC_COLLATE=$old_lc_collate
 }
 
-urldecode() {
-    # urldecode <string>
-
-    local url_encoded="${1//+/ }"
-    printf '%b' "${url_encoded//%/\\x}"
-}
-
 call_history ( ) {
     HISTTIMEFORMAT="" history "$@"
 }

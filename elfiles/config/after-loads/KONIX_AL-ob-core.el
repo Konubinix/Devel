@@ -24,6 +24,9 @@
 
 ;;; Code:
 
+(add-to-list 'safe-local-variable-values '(org-babel-noweb-wrap-end . "]]"))
+(add-to-list 'safe-local-variable-values '(org-babel-noweb-wrap-start . "[["))
+
 (setq-default org-babel-default-header-args
               '((:session . "none")
                 (:results . "replace")

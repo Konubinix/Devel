@@ -1010,12 +1010,14 @@ event before rendering the event.
   (when-let (
              (body (alist-get "body" content nil nil #'string-equal))
              )
-    (cond
-     ((string-match ":-)" body)
-      (setf (alist-get "body" content nil nil #'string-equal) (replace-match "🙂" nil nil body)))
-     ((string-match ":-D" body)
-      (setf (alist-get "body" content nil nil #'string-equal) (replace-match
-                                                               "😁" nil nil body)))))
+    (while (string-match ":-)" body)
+      (setq body (replace-match
+                  "🙂" nil nil body)))
+    (while (string-match ":-D" body)
+      (setq body (replace-match
+                  "😁" nil nil
+                  body)))
+    (setf (alist-get "body" content nil nil #'string-equal) body))
   (ement-room-send-org-filter content room))
 
 (defun konix/ement-room-goto-fully-read-marker/indicate-missing-fully-read-marker (&rest args)

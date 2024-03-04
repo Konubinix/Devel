@@ -235,6 +235,7 @@
 (keymap-set 'konix/global-key-map "u" 'uncomment-region)
 ;; find
 (keymap-set 'konix/global-key-map "M-f" 'konix/find)
+(keymap-set 'konix/global-key-map "M-i" 'konix/ipfa-buffer)
 
 ;; ******************************************************************************************
 ;; dictionary lookup

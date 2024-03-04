@@ -146,8 +146,8 @@
   (find-file executable)
   )
 
-(defun konix/ipfa-buffer ()
-  (interactive)
+(defun konix/ipfa-buffer (browse)
+  (interactive "P")
   (let (
         (orig-buffer (current-buffer))
         result
@@ -162,6 +162,8 @@
         (message (setq result (string-trim (buffer-substring-no-properties (point-min) (point-max)))))
         )
       )
+    (when browse
+      (browse-url (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") result)))
     result
     )
   )

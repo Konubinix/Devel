@@ -117,6 +117,8 @@
 
 (remove-hook 'ement-after-initial-sync-hook 'ement-room-list--after-initial-sync)
 
+(keymap-set ement-room-mode-map ">" #'end-of-buffer)
+(keymap-set ement-room-mode-map "<" #'beginning-of-buffer)
 (keymap-set ement-room-mode-map "M-b" #'konix/ement-move-backward-thread)
 (keymap-set ement-room-mode-map "M-f" #'konix/ement-move-forward-thread)
 (keymap-set ement-room-mode-map "M-p" #'konix/ement-move-backward-thread)

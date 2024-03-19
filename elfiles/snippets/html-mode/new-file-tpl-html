@@ -23,7 +23,6 @@
     </script>
 
   </head>
-  <body>
   <body x-data="app">
     <div x-text="message"></div>
   </body>

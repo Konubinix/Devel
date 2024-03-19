@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: alpinemodule
+# key: alpinemodule
+# --
+<script defer type="module">
+import alpinejs from 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/+esm'
+window.Alpine = alpinejs
+alpinejs.start();
+</script>

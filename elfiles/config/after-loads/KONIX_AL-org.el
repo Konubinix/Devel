@@ -36,6 +36,7 @@
 (require 'holidays)
 (require 'ob-python)
 (require 'ob-shell)
+(require 'ob-org)
 (require 'org-edna)
 (require 'org-checklist)
 (require 'KONIX_org-github)

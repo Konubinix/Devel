@@ -113,6 +113,29 @@
    )
   )
 
+(defun konix/org-github-close (body)
+  (interactive "sBody: ")
+  (konix/org-with-point-on-heading
+   (let (
+         (code (konix/org-github-get-code))
+         (repo (org-entry-get (point) "KONIX_GH_REPO" t))
+         (args '())
+         )
+     (when repo
+       (setq args (append args (list "--repo" repo)))
+       )
+     (setq args (append args (list "issue" "close" code)))
+     (when body
+       (setq args (append args (list "--comment" body)))
+       )
+     (if (equal 0 (apply 'call-process "gh" nil nil nil args))
+         (message "Done")
+       (message "Something went wrong")
+       )
+     )
+   )
+  )
+
 
 (provide 'KONIX_org-github)
 ;;; KONIX_org-github.el ends here

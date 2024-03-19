@@ -33,26 +33,25 @@
 (defun konix/auto-scroll-forward-line ()
   "description."
   (cond
-   ((and (boundp 'pdf-view-roll-minor-mode) pdf-view-roll-minor-mode)
-    (image-roll-scroll-forward)
+   ((eq major-mode 'pdf-view-mode)
+    (call-interactively 'pdf-view-next-line-or-next-page)
     )
    (t
     (call-interactively 'next-line)
+    (recenter-top-bottom 0)
+    (cond
+     (
+      (equal major-mode 'org-agenda-mode)
+      (org-agenda-do-context-action)
+      )
+     (
+      (equal major-mode 'notmuch-search-mode)
+      (notmuch-search-archive-thread nil (point-at-bol) (point-at-eol))
+      )
+     )
+    (hl-line-highlight)
     )
    )
-
-  (recenter-top-bottom 0)
-  (cond
-   (
-    (equal major-mode 'org-agenda-mode)
-    (org-agenda-do-context-action)
-    )
-   (
-    (equal major-mode 'notmuch-search-mode)
-    (notmuch-search-archive-thread nil (point-at-bol) (point-at-eol))
-    )
-   )
-  (hl-line-highlight)
   )
 
 (defun konix/auto-scroll-mode-hook ()

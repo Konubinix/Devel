@@ -21,7 +21,7 @@ else
     echo "Sending now!!"
     trap "test -e ${LOG} && cat ${LOG}" 0
     msmtpq-flush || {
-        clk ntfy --priority 5 "Something went wrong"
+        clk ntfy --priority 5 "Could not send a mail. This is important!!"
         exit 2
     }
     if grep -q auth=off "${LOG}"

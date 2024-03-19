@@ -68,6 +68,8 @@
   (konix/org-with-point-on-heading (konix/_org-github-browse))
   )
 
+(defalias 'konix/org-github-open 'konix/org-github-browse)
+
 (defmacro konix/org-with-point-on-github-heading (body)
   `(konix/org-with-point-on-heading
     (let (

@@ -19,6 +19,7 @@ function nix_install_binary {
     local bin="${HOME}/.nix-profile/bin/${bin_name}"
     local derivation_name="${2:-${bin_name}}"
     local flake="${3:-nixpkgs}"
+    local extra="${4-}"
 
     if ! test -e "${bin}"
     then
@@ -31,7 +32,7 @@ function nix_install_binary {
         local path="${flake}#${derivation_name}"
         konix_display.py "Installing ${path} to use ${bin}"
         local before="$(date +%s)"
-        nix profile install "${path}"
+        nix profile install ${extra} "${path}"
         local after="$(date +%s)"
         local elapsed="$((after - before))"
         if test ${elapsed} -ge 5

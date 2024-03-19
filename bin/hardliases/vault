@@ -1,1 +1,9 @@
-scrot
+#!/bin/bash
+
+source _ko_nix.sh
+
+ME="$(basename "${0}")"
+export NIXPKGS_ALLOW_UNFREE=1
+BIN="$(nix_install_binary "${ME}" "" "" "--impure")"
+
+exec "${BIN}" "${@}"

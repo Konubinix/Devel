@@ -894,7 +894,7 @@
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "\\( +\\)\\(\\(youtube:\\|http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              "\\( +\\)\\(\\(youtube:\\|http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t) ]+\\)$"
               nil
               t)
         (replace-match

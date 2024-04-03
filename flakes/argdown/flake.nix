@@ -29,7 +29,6 @@
               runHook preInstall
 
               mkdir -p $out/bin
-              echo "#! ${pkgs.stdenv.shell}" >> "$out/bin/hello"
               echo 'exec ${argdown}/node_modules/.bin/argdown "$@"' >> "$out/bin/argdown"
               chmod +x $out/bin/*
 

@@ -88,7 +88,7 @@ Return nil if ELEMENT cannot be read."
   (when (assq :ipfa (third info))
     (shell-command "sleep 1 && sync")
     (let* (
-           (ipfa (konix/ipfa-file result))
+           (ipfa (konix/ipfa-file (string-trim result)))
            (split (s-split "\\?filename=" ipfa))
            (cid (first split))
            (name (second split))

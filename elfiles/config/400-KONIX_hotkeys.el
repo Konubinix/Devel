@@ -9,6 +9,18 @@
 (keymap-set konix/region-bindings-mode-map "l" 'mc/edit-lines)
 (keymap-set konix/region-bindings-mode-map "n" 'cua-rectangle-mark-mode)
 
+(define-prefix-command 'konix/mc-region-map)
+(keymap-set konix/region-bindings-mode-map "m" 'konix/mc-region-map)
+
+(keymap-set konix/mc-region-map "a" 'mc/mark-all-like-this)
+(keymap-set konix/mc-region-map "a" 'mc/mark-all-like-this)
+(keymap-set konix/mc-region-map "p" 'mc/mark-previous-like-this)
+(keymap-set konix/mc-region-map "n" 'mc/mark-next-like-this)
+(keymap-set konix/mc-region-map "m" 'mc/mark-more-like-this-extended)
+(keymap-set konix/mc-region-map "l" 'mc/edit-lines)
+(keymap-set konix/mc-region-map "C-a" 'mc/edit-beginnings-of-lines)
+(keymap-set konix/mc-region-map "C-e" 'mc/edit-ends-of-lines)
+
 (setq-default
  region-bindings-mode-disable-predicates
  '((lambda () buffer-read-only))

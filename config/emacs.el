@@ -82,6 +82,7 @@
         "ob-comint" ;; loaded by org
         "ob-core" ;; loaded by org
         "ob-tangle" ;; org -> ob
+        "ob-sql" ;; org -> ob-sql -> in my customization
         "popup" ;; loaded by autocomplete -> konix/org-mode -> konix/org-setup-holidays -> org
         "python" ;; loaded by org (to be able to use python in babel)
         "region-bindings-mode" ;; init

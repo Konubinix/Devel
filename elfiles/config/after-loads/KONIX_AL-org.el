@@ -37,6 +37,7 @@
 (require 'ob-python)
 (require 'ob-shell)
 (require 'ob-org)
+(require 'ob-sql)
 (require 'org-edna)
 (require 'org-checklist)
 (require 'KONIX_org-github)

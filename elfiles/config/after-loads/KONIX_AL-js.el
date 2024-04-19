@@ -37,21 +37,25 @@
 
 
 (add-hook 'js-mode-hook
-		  'konix/js-mode-hook)
+          'konix/js-mode-hook)
 
 
 (defun konix/js/make-executable ()
   (when
-      (string=
-       "bin"
-       (file-name-base
-        (directory-file-name
-         (file-name-directory
-          (buffer-file-name)
-          )
-         )
-        )
-       )
+      (or(save-excursion
+           (goto-char (point-min))
+           (re-search-forward "#! /usr/bin/env node" nil t)
+           )
+         (string=
+          "bin"
+          (file-name-base
+           (directory-file-name
+            (file-name-directory
+             (buffer-file-name)
+             )
+            )
+           )
+          ))
     (konix/make-executable)
     )
   )

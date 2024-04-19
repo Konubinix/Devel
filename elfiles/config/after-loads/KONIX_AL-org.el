@@ -3527,6 +3527,14 @@ of the clocksum."
    )
   )
 
+(defvar konix/roam-compute-idle-timer nil)
+
+(defun konix/roam-compute-idle-timer ()
+  (message "computing the roam cache")
+  (setq konix/org-roam-node-read--completions/cache-time (current-time))
+  (setq konix/org-roam-node-read--completions/cache (org-roam-node-read--completions))
+  (setq konix/roam-compute-idle-timer nil))
+
 (defun konix/org-mode/after-save-hook ()
   (when
       (save-excursion
@@ -3544,7 +3552,14 @@ of the clocksum."
     (org-gfm-export-to-markdown)
     )
   (konix/org-guess-ispell)
+  (when (and (not konix/roam-compute-idle-timer) (string-match-p "/roam/" (buffer-file-name (current-buffer))))
+    (message "setting the compute timer")
+    (setq konix/roam-compute-idle-timer (run-with-idle-timer 30 nil 'konix/roam-compute-idle-timer)))
   )
+
+;; do it at startup
+(setq konix/roam-compute-idle-timer (run-with-idle-timer 30 nil
+                                                         'konix/roam-compute-idle-timer))
 
 (defface konix/org-checkbox-done '((t :foreground "forest green" :inherit bold))
   "Face for checkboxes."

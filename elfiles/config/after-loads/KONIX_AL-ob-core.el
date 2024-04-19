@@ -84,7 +84,15 @@ Return nil if ELEMENT cannot be read."
         (org-element-property :contents-end element))))
      (_ nil))))
 
-(defun konix/org-babel-insert-result/ipfa (orig-func result &optional result-params info &rest args)
+(defun konix/org-babel-insert-result/ipfa (orig-func result &optional
+                                                     result-params info &rest
+                                                     args)
+  ":ipfa -> uses the result of ipfa
+with :results file -> use the name of the file as link description
+with :results file and :ipfa stuff -> use stuff as link description
+with :ipfa cid -> the result is the cid only
+with :ipfa no-filename -> the result is cid?filename, without the filename= part
+"
   (when (assq :ipfa (third info))
     (shell-command "sleep 1 && sync")
     (let* (
@@ -100,8 +108,13 @@ Return nil if ELEMENT cannot be read."
               (_ "bug")
               )
             )
+           (use-cid (string-equal "cid" (cdr (assq :ipfa (third info)))))
+           (use-no-filename (string-equal "no-filename" (cdr (assq :ipfa (third info)))))
            )
-      (setq result ipfa)
+      (setq result (cond
+                    (use-no-filename (format "%s?%s" cid name))
+                    (use-cid cid)
+                    (t ipfa)))
       (setcdr (nth 2 info) (append `((:file-desc . ,name-to-use)) (cdr (nth 2 info)))))
     )
   (apply orig-func result result-params info args)

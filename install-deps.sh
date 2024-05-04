@@ -9,7 +9,7 @@ shopt -s inherit_errexit
 trap "exit 2" SIGINT
 trap "exit 3" SIGQUIT
 
-cat<<EOF > sudo tee /etc/apt/apt.conf.d/01norecommend
+cat<<EOF | sudo tee /etc/apt/apt.conf.d/01norecommend
 APT::Install-Recommends "0";
 APT::Install-Suggests "0";
 EOF

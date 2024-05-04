@@ -92,7 +92,7 @@
   (use-package dired-quick-sort)
   (use-package dockerfile-mode)
   ;; not ready yet
-  (use-package earthfile-mode :straight (:fork t))
+  (use-package earthfile-mode :straight (:fork (:repo "konubinix/earthly-emacs")))
   (use-package editorconfig)
   (use-package edit-indirect)
   ;; several issues yet to be reported

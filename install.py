@@ -94,12 +94,6 @@ if confirm(prompt="Fetch submodules?"):
     subprocess.call(["git", "submodule", "update"])
 
 if is_on_linux():
-    substitute(os.path.join(environ["KONIX_DEVEL_DIR"], "bin"),
-               os.path.join(environ["HOME"], ".fluxbox/devel_bin"))
-    substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "ideskrc"),
-               os.path.join(environ["HOME"], ".ideskrc"))
-    substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "idesktop"),
-               os.path.join(environ["HOME"], ".idesktop"))
     substitute(
         os.path.join(environ["KONIX_CONFIG_DIR"], "Xdefaults"),
         os.path.join(environ["HOME"], ".Xdefaults-" + environ["HOSTNAME"]))
@@ -115,8 +109,8 @@ if is_on_linux():
                os.path.join(environ["HOME"], ".config", "starship.toml"))
 
     subprocess.call([
-        "chmod", "+x", "-Rv",
+        "chmod",
+        "+x",
+        "-Rv",
         os.path.join(environ["HOME"], "bin"),
-        os.path.join(environ["HOME"], ".fluxbox/startup"),
-        os.path.join(environ["HOME"], ".fluxbox/bin")
     ])

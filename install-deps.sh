@@ -24,4 +24,4 @@ packages=(
     xinit xdm
 )
 
-sudo apt update && sudo apt install "${packages[@]}"
+sudo apt update && sudo apt install --assume-yes "${packages[@]}"

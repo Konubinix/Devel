@@ -94,9 +94,6 @@ if confirm(prompt="Fetch submodules?"):
     subprocess.call(["git", "submodule", "update"])
 
 if is_on_linux():
-    substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "fluxbox"),
-               os.path.join(environ["HOME"], ".fluxbox"))
-
     substitute(os.path.join(environ["KONIX_DEVEL_DIR"], "bin"),
                os.path.join(environ["HOME"], ".fluxbox/devel_bin"))
     substitute(os.path.join(environ["KONIX_CONFIG_DIR"], "ideskrc"),

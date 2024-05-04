@@ -1,6 +1,0 @@
-[begin] (MyMenu)
-[encoding] {ISO-8859-15}
-      [exec] (Quitter X) {pkill X} 
-      [exec] (Eteindre) {poweroff} 
-      [exec] (Reboot) {reboot} 
-[end]

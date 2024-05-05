@@ -29,6 +29,7 @@
   (error "Org should not be loaded now")
   )
 (setq-default org-mark-ring-length 30)
+(setq-default org-modules '())
 
 (provide '000-org-custom)
 ;;; 000-org-custom.el ends here

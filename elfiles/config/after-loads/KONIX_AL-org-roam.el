@@ -26,7 +26,6 @@
 
 (require 'uuidgen)
 (require 'KONIX_org-roam-export)
-(require 'org-roam-dailies)
 (require 'oc)
 (require 'oc-csl)
 

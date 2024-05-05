@@ -429,14 +429,10 @@
     (when body
       (or
        (funcall orig-func event user room)
-       (string-match-p
-        (format "\\b\\(%s\\)\\b" (string-join konix/ement-room--event-mentions-user-p/puppets "\\|"))
-        body
-        )
-       )
-      )
-    )
-  )
+       (and konix/ement-room--event-mentions-user-p/puppets
+            (string-match-p
+             (format "\\b\\(%s\\)\\b" (string-join konix/ement-room--event-mentions-user-p/puppets "\\|"))
+             body))))))
 
 (advice-add #'ement-room--event-mentions-user-p :around #'konix/ement-room--event-mentions-user-p/add-my-puppets)
 

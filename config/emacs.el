@@ -58,54 +58,55 @@
       '(
         "autoinsert" ;; init
         "backup-dir" ;; init
-        "bibtex" ;; loaded by org -> oc-basic
-        "calendar" ;; init
-        "comint" ;; loaded by org -> org-pcomplete
+        "bibtex"     ;; loaded by org -> oc-basic
+        "calendar"   ;; init
+        "comint"     ;; loaded by org -> org-pcomplete
         "compile" ;; KONIX_org-roam-export -> citeproc -> citeproc-cite -> citeproc-number -> rst -> compile
-        "cus-edit" ;; when accepting the theme for future use
-        "delight" ;; init
+        "cus-edit"  ;; when accepting the theme for future use
+        "delight"   ;; init
         "diff-mode" ;; loaded by straight when thawing the packages
-        "dired" ;; init
+        "dired"     ;; init
         "editorconfig"
-        "envrc" ;; init
-        "etags" ;; lispy
-        "gnus" ;; gnus-sum - org
+        "envrc"                  ;; init
+        "etags"                  ;; lispy
+        "gnus"                   ;; gnus-sum - org
         "KONIX_org-meta-context" ;; init
-        "KONIX_org-roam-export" ;; init
-        "outline" ;; loaded by org
-        "package" ;; init
-        "key-chord" ;; init
-        "kmacro" ;; loaded by (kbd)
-        "message" ;; gnus-int - gnus-start - gnu-group - gnus-sum - org
-        "org" ;; init
+        "KONIX_org-roam-export"  ;; init
+        "outline"                ;; loaded by org
+        "package"                ;; init
+        "key-chord"              ;; init
+        "kmacro"                 ;; loaded by (kbd)
+        "message"    ;; gnus-int - gnus-start - gnu-group - gnus-sum - org
+        "org"        ;; init
         "org-agenda" ;; init
-        "ob-comint" ;; loaded by org
-        "ob-core" ;; loaded by org
-        "ob-tangle" ;; org -> ob
-        "ob-sql" ;; org -> ob-sql -> in my customization
+        "ob-comint"  ;; loaded by org
+        "ob-core"    ;; loaded by org
+        "ob-tangle"  ;; org -> ob
+        "ob-sql"     ;; org -> ob-sql -> in my customization
+        "password-cache" ;; orm-roam - org-roam-db - urlparse - authsource
         "popup" ;; loaded by autocomplete -> konix/org-mode -> konix/org-setup-holidays -> org
         "python" ;; loaded by org (to be able to use python in babel)
         "region-bindings-mode" ;; init
-        "replace" ;; loaded by kmacro
-        "savehist" ;; init
-        "saveplace" ;; init
-        "sh-script" ;; org-src - org
-        "shell" ;; loaded by org (to be able to use python in babel)
-        "smerge-mode" ;; loaded when an org mode file needs merging
-        "swiper" ;; init
-        "tempbuf" ;; init
-        "thingatpt" ;; init
-        "time-date" ;; loaded by org
-        "tracking" ;; init
-        "vc-hooks" ;; loaded by vc -> git-wip-mode
-        "framemove" ;; init
+        "replace"              ;; loaded by kmacro
+        "savehist"             ;; init
+        "saveplace"            ;; init
+        "sh-script"            ;; org-src - org
+        "shell"        ;; loaded by org (to be able to use python in babel)
+        "smerge-mode"  ;; loaded when an org mode file needs merging
+        "swiper"       ;; init
+        "tempbuf"      ;; init
+        "thingatpt"    ;; init
+        "time-date"    ;; loaded by org
+        "tracking"     ;; init
+        "vc-hooks"     ;; loaded by vc -> git-wip-mode
+        "framemove"    ;; init
         "golden-ratio" ;; init
         "keep-buffers" ;; init
-        "shorten" ;; init
-        "which-key" ;; init
-        "winner" ;; init
-        "xml" ;; when showing notification at startup
-        "yasnippet" ;; init
+        "shorten"      ;; init
+        "which-key"    ;; init
+        "winner"       ;; init
+        "xml"          ;; when showing notification at startup
+        "yasnippet"    ;; init
         ))
 (defvar konix/load-config-file_after-loads/debug t)
 (when (getenv "KONIX_DEVEL_INSTALL_EMACS")

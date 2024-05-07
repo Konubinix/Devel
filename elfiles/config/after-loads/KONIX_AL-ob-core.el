@@ -90,13 +90,16 @@ Return nil if ELEMENT cannot be read."
   ":ipfa -> uses the result of ipfa
 with :results file -> use the name of the file as link description
 with :results file and :ipfa stuff -> use stuff as link description
-with :ipfa cid -> the result is the cid only
-with :ipfa no-filename -> the result is cid?filename, without the filename= part
+with :ipfa cid -> the result is the cid only (override the :results file setting)
+with :ipfa t -> the result is cid?filename (override the :results file setting), without the filename= part
 "
   (when (assq :ipfa (third info))
     (shell-command "sleep 1 && sync")
+    (when (not (or (alist-get :file (third info)) (file-exists-p result)))
+      (error "ipfa expects either a :file parameter or that the result points to an existing file"))
     (let* (
-           (ipfa (konix/ipfa-file (string-trim result)))
+           (file (or (alist-get :file (third info)) result))
+           (ipfa (konix/ipfa-file (string-trim file)))
            (split (s-split "\\?filename=" ipfa))
            (cid (first split))
            (name (second split))
@@ -105,20 +108,16 @@ with :ipfa no-filename -> the result is cid?filename, without the filename= part
               (`(:ipfa) name)
               (`(:ipfa . ,(and (pred stringp) val)) val)
               (`(:ipfa ,(and (pred stringp) val)) val)
-              (_ "bug")
-              )
-            )
+              (_ "bug")))
            (use-cid (string-equal "cid" (cdr (assq :ipfa (third info)))))
-           (use-no-filename (string-equal "no-filename" (cdr (assq :ipfa (third info)))))
-           )
+           (use-no-filename (string-equal "t" (cdr (assq :ipfa (third info))))))
       (setq result (cond
                     (use-no-filename (format "%s?%s" cid name))
                     (use-cid cid)
                     (t ipfa)))
-      (setcdr (nth 2 info) (append `((:file-desc . ,name-to-use)) (cdr (nth 2 info)))))
-    )
-  (apply orig-func result result-params info args)
-  )
+      (when (or use-cid use-no-filename) (setq result-params (delete "file" result-params)))
+      (setcdr (nth 2 info) (append `((:file-desc . ,name-to-use)) (cdr (nth 2 info))))))
+  (apply orig-func result result-params info args))
 
 (advice-add 'org-babel-insert-result :around 'konix/org-babel-insert-result/ipfa)
 

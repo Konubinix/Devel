@@ -1,4 +1,0 @@
-#!/bin/bash
-
-source ~/.virtualenvs/maths3/bin/activate
-jupyter nbconvert "$@"

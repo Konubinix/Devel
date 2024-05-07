@@ -15,10 +15,6 @@ Package: *
 Pin: release a=testing
 Pin-Priority: 900
 
-Package: notification-daemon
-Pin: version 0.7.3-1 0
-Pin-Priority: -1
-
 # Installée si rien d'autre
 Package: *
 Pin: release a=unstable

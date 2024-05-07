@@ -95,7 +95,7 @@
  ement-room-sender-in-left-margin nil
  )
 
-(setq-default ement-room-retro-messages-number 1000)
+(setq-default ement-room-retro-messages-number 100)
 
 (custom-set-variables
  '(ement-save-sessions t)

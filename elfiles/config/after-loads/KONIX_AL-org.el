@@ -398,7 +398,9 @@
         (file_name (buffer-file-name))
         )
     (if (or
-         (s-ends-with-p ".com.org" file_name)
+         ;; diaries taken from
+         ;; google accounts
+         (member "google" (file-name-split file_name))
          (s-ends-with-p "notes.org" file_name)
          (and
           (not keep-inbox)

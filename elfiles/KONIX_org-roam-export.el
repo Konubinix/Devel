@@ -1084,7 +1084,7 @@ citation key, for Org-ref cite links."
   (when (and
          (equal major-mode 'org-mode)
          (string-match-p org-roam-directory (konix/org-roam-export/get-buffer-file-name))
-         (not (string-match-p org-roam-dailies-directory (konix/org-roam-export/get-buffer-file-name)))
+         (not (string-match-p "/daily/" (konix/org-roam-export/get-buffer-file-name)))
          ;; first time saving
          (not (file-exists-p (konix/org-roam-export/get-buffer-file-name)))
          (not (konix/org-roam-exported-p))

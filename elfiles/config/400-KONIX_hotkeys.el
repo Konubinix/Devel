@@ -492,7 +492,6 @@
 (keymap-set 'konix/org-global-map "f" 'org-roam-node-find)
 (keymap-set 'konix/org-global-map "r" 'org-roam-ref-find)
 (keymap-set 'konix/org-global-map "C-f" 'konix/org-roam/open-key)
-(keymap-set 'konix/org-global-map "d" 'org-roam-dailies-capture-date)
 (keymap-set 'konix/org-global-map "N" 'konix/org-roam-note)
 
 

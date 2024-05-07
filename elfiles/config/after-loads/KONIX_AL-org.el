@@ -775,7 +775,7 @@ to be organized.
         )
       )
     (if no-date
-        t
+        nil ;; an entry without date has no activity
       res
       )
     )

@@ -1009,6 +1009,12 @@ event before rendering the event.
     (while (string-match ":-)" body)
       (setq body (replace-match
                   "🙂" nil nil body)))
+    (while (string-match ":-P" body)
+      (setq body (replace-match
+                  "😋" nil nil body)))
+    (while (string-match ";-)" body)
+      (setq body (replace-match
+                  "😉" nil nil body)))
     (while (string-match ":-D" body)
       (setq body (replace-match
                   "😁" nil nil

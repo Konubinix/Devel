@@ -4605,24 +4605,18 @@ With `ID', set the ID instead of the CUSTOM_ID."
          (account (plist-get info :account))
          (calendar_id (plist-get info :calendar_id))
          (organizer (plist-get info :organizer))
-         why
-         )
+         why)
     (when (and
            (not optional)
-           (not (yes-or-no-p "This is mandatory meeting, still decline?"))
-           )
-      (user-error "Abort the declining")
-      )
+           (not (yes-or-no-p "This is mandatory meeting, still decline?")))
+      (user-error "Abort the declining"))
     (setq why (read-string
-               (format "Comment for %s: " organizer)
-               ))
+               (format "Comment for %s: " organizer)))
     (shell-command
      (format
       "clk gcal -a \"%s\" select-calendar %s"
       account
-      calendar_id
-      )
-     )
+      calendar_id))
     (when
         (equal 0 (konix/call-process-show-error
                   "clk" "gcal"
@@ -4631,59 +4625,12 @@ With `ID', set the ID instead of the CUSTOM_ID."
                   "decline"
                   id
                   why
-                  updatedraw
-                  )
-               )
-      (konix/org-gcal-reset-tags)
-      (org-agenda-set-tags "declined" 'on)
-      (konix/org-gcal-refresh-line)
-      (message "DONE")
-      )
-    )
-  )
-
-(defun konix/org-gcal-delete ()
-  (interactive)
-  (let* (
-         (info (konix/org-gcal-get-info))
-         (id (plist-get info :id))
-         (updatedraw (if current-prefix-arg "" (plist-get info :updatedraw)))
-         (optional (plist-get info :optional))
-         (account (plist-get info :account))
-         (calendar_id (plist-get info :calendar_id))
-         (organizer (plist-get info :organizer))
-         command
-         )
-    (when (and
-           (not optional)
-           (not (yes-or-no-p "This is mandatory meeting, still delete?"))
-           )
-      (user-error "Abort the deletion")
-      )
-    (shell-command
-     (format
-      "clk gcal -a \"%s\" select-calendar %s"
-      account
-      calendar_id
-      )
-     )
-    (when (and (yes-or-no-p "Sure ?")
-               (equal 0
-                      (konix/call-process-show-error
-                       "clk"
-                       "gcal"
-                       "-a"
-                       account
-                       "del-event"
-                       id
-                       )
-                      )
-               )
-      (call-interactively 'org-agenda-kill)
-      (message "DONE")
-      )
-    )
-  )
+                  updatedraw))
+      (unless current-prefix-arg
+        (konix/org-gcal-reset-tags)
+        (org-agenda-set-tags "declined" 'on)
+        (konix/org-gcal-refresh-line))
+      (message "DONE"))))
 
 (defun konix/org-gcal-tentative ()
   (interactive)

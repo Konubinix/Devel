@@ -197,10 +197,13 @@ reg \\( Temp or Auto \\) and not %twin ")
 (defun konix/ledger/completion-at-point ()
   (interactive)
   (let* (
-         (parsed_args (ledger-parse-arguments))
-         (prefix (caar parsed_args))
-         (start (cadr parsed_args))
+         (start
+          (save-excursion
+            (unless (eq 'posting (ledger-thing-at-point))
+              (error "Not on a posting line"))
+            (point)))
          (end (point))
+         (prefix (buffer-substring-no-properties start end))
          )
     (list
      start

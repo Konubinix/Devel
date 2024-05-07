@@ -22,6 +22,8 @@ packages=(
     pipx
     net-tools tinc
     xinit xdm
+    python3-xdg
+    vim
 )
 
 sudo apt update && sudo apt install --assume-yes "${packages[@]}"

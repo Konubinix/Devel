@@ -15,3 +15,9 @@
   )
 
 (advice-add 'set-mark-command :around 'konix/set-mark-command/deactivate-region)
+
+(defun konix/moving/push-mark (&rest args)
+  (unless (region-active-p) (push-mark))
+  )
+(advice-add #'forward-paragraph :before #'konix/moving/push-mark)
+(advice-add #'org-forward-paragraph :before #'konix/moving/push-mark)

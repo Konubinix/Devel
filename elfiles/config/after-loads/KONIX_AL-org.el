@@ -2786,12 +2786,15 @@ items"
     (setq ans "09:00")
     )
   (when (string-match-p "^\\(n \\)?mm *$" ans) ;; m for morning
-    (setq ans "10:00")
+    (setq ans "09:30")
     )
   (when (string-match-p "^\\(n \\)?mmm *$" ans) ;; m for morning
-    (setq ans "10:30")
+    (setq ans "10:00")
     )
   (when (string-match-p "^\\(n \\)?mmmm *$" ans) ;; m for morning
+    (setq ans "10:30")
+    )
+  (when (string-match-p "^\\(n \\)?mmmmm *$" ans) ;; m for morning
     (setq ans "11:00")
     )
   (when (string-match-p "^\\(n \\)?n *$" ans) ;; n for noon

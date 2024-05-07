@@ -167,3 +167,6 @@ konix_starship_precmd () {
 }
 
 PROMPT_COMMAND="konix_starship_precmd"
+
+# for gpg to work correctly, even in the terminal
+GPG_TTY="$(tty)"

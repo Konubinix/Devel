@@ -248,8 +248,17 @@
                           (:hlines . no)
                           (:tangle . no)))
                        ))))
+            ((string= language "mermaid")
+             (let ((output-file (org-babel-temp-file "mermaid-output-" ".png")))
+               (with-temp-buffer
+                 (insert code-body)
+                 (call-process-region
+                  (point-min) (point-max) "mmdc" nil
+                  nil nil "-i" "-" "-o" output-file "-e" "png"))
+               (start-process "mimeopen" nil "mimeopen" output-file))
+             )
             (t (progn
-                 (message "I can only process sh blocks now. Improve me please.")))))))
+                 (error "%s is not a format I support. Please implement it for me :-)")))))))
 
 
 (provide 'KONIX_AL-markdown-mode)

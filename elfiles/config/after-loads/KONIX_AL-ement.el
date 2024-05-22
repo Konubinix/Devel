@@ -33,7 +33,7 @@
   )
 
 (defface ement-room-direct
-  '((t (:background "yellow")))
+  '((t (:background "sienna")))
   "")
 
 (defface ement-room-invitation
@@ -72,7 +72,7 @@
 (custom-set-faces
  '(ement-room-fully-read-marker ((t (:background "cyan"))))
  '(ement-room-read-receipt-marker ((t (:background "yellow"))))
- '(ement-room-mention ((t (:background "sienna"))))
+ '(ement-room-mention ((t (:background "maroon4"))))
  )
 
 ;; see clk matrix sync --clean |jq '.account_data.events[]|select(.type ==

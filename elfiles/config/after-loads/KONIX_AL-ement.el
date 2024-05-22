@@ -201,6 +201,8 @@
 (defun konix/ement-update-tracking (session room &optional event)
   (let (
         (faces (cond
+                ((string= "m.space" (ement-room-type room))
+                 '())
                 ((ement-room-invite-state room)
                  '(ement-room-invitation))
                 ((let ((events (if event
@@ -269,6 +271,8 @@
    (-filter
     (lambda (room)
       (and
+       (not (string= "m.space" (ement-room-type room))) ;; spaces room never say
+       ;; something I care about
        (not (equal 'leave (ement-room-status room)))
        (or (and current-prefix-arg (konix/ement-room-unread-p session room))
            (ement--room-unread-p room session))

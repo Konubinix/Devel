@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=vlc
+Exec=vlc %f
+NoDisplay=true

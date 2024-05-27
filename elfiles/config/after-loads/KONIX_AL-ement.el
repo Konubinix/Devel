@@ -989,23 +989,6 @@ event before rendering the event.
            )
   )
 
-(defun konix/ement-show-reaction-maybe ()
-  (let (
-        (event (konix/ement-event-at-point))
-        )
-    (when (and (equal (type-of event) 'ement-event) (alist-get 'reactions (ement-event-local event)))
-      (konix/ement-show-reaction)
-      )
-    )
-  )
-
-(defun konix/ement-room-mode-hook ()
-  (interactive)
-  (add-hook 'post-command-hook #'konix/ement-show-reaction-maybe nil t)
-  )
-
-(add-hook 'ement-room-mode-hook #'konix/ement-room-mode-hook)
-
 (defun konix/ement-room-send-filter (content room)
   (when-let (
              (body (alist-get "body" content nil nil #'string-equal))

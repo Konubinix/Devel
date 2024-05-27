@@ -92,6 +92,7 @@ with :results file -> use the name of the file as link description
 with :results file and :ipfa stuff -> use stuff as link description
 with :ipfa cid -> the result is the cid only (override the :results file setting)
 with :ipfa t -> the result is cid?filename (override the :results file setting), without the filename= part
+     to be used with :results raw so as to generate inline images
 "
   (when (assq :ipfa (third info))
     (shell-command "sleep 1 && sync")

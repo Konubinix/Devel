@@ -787,20 +787,18 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
 (defvar konix/org-roam-node-read--completions/cache nil "Memory cache of the list of nodes")
 (defvar konix/org-roam-node-read--completions/cache-time nil "The time when the cache was last taken")
 (defun konix/org-roam-node-read--completions/cache (orig-fun &rest args)
-  (when (or
-         (not konix/org-roam-node-read--completions/cache)
-         (not konix/org-roam-node-read--completions/cache-time)
-         (time-less-p
-          konix/org-roam-node-read--completions/cache-time
-          (file-attribute-modification-time (file-attributes org-roam-db-location))
-          )
-         )
+  (when
+      (or
+       current-prefix-arg
+       (not konix/org-roam-node-read--completions/cache)
+       (not konix/org-roam-node-read--completions/cache-time)
+       (time-less-p
+        konix/org-roam-node-read--completions/cache-time
+        (file-attribute-modification-time (file-attributes org-roam-db-location))))
     (message "Computing the org-roam-node-read--completions")
     (setq konix/org-roam-node-read--completions/cache-time (current-time))
-    (setq konix/org-roam-node-read--completions/cache (apply orig-fun args))
-    )
-  konix/org-roam-node-read--completions/cache
-  )
+    (setq konix/org-roam-node-read--completions/cache (apply orig-fun args)))
+  konix/org-roam-node-read--completions/cache)
 (advice-add #'org-roam-node-read--completions :around #'konix/org-roam-node-read--completions/cache)
 ;; (advice-remove #'org-roam-node-read--completions #'konix/org-roam-node-read--completions/cache)
 

@@ -62,6 +62,7 @@
 (add-hook #'yaml-mode-hook
           #'konix/yaml-mode-outline-hook)
 
+(keymap-set yaml-mode-map "M-TAB" 'completion-at-point)
 
 (provide 'KONIX_AL-yaml-mode)
 ;;; KONIX_AL-yaml-mode.el ends here

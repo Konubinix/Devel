@@ -149,7 +149,6 @@
   (use-package org-search-goto)
   (use-package org-super-agenda)
   (use-package org-transclusion)
-  (use-package origami :commands (origami-mode))
   (use-package ox-hugo)
   (use-package ox-gfm)
   (use-package pdf-tools :straight (:repo "dalanicolai/pdf-tools" :branch "pdf-roll") :magic ("%PDF" . pdf-view-mode))

@@ -67,6 +67,7 @@
   (dired-do-shell-command command nil (list (buffer-file-name))))
 
 (keymap-set image-mode-map "d" #'konix/image-mode/delete)
+(keymap-set image-mode-map "<deletechar>" #'konix/image-mode/delete)
 (keymap-set image-mode-map "i" #'konix/image-mode/ipfa)
 (keymap-set image-mode-map "o" #'konix/image-mode/mimeopen)
 (keymap-set image-mode-map "&" #'konix/image-mode/async-shell-command)

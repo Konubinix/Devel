@@ -297,7 +297,9 @@
 (defun konix/ement-room-unread-p (session room)
   (let* ((timeline (ement-room-timeline room))
          (state (ement-room-state room))
-         (fully-read-event (konix/ement-fully-read-event session room)))
+         ;; sometimes, the event is not reachable, so consider it not here
+         (fully-read-event (with-demoted-errors
+                               (konix/ement-fully-read-event session room))))
     (if (or (not timeline) (not fully-read-event))
         t
       (->> (append timeline state)

@@ -2,4 +2,4 @@
 
 ME="$(basename "${BASH_SOURCE[0]}")"
 source /usr/share/bash-completion/completions/rsync
-complete -F _rsync -o nospace "$ME"
+complete -F _comp_cmd_rsync -o nospace "$ME"

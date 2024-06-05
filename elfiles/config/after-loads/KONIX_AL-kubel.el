@@ -24,13 +24,6 @@
 
 ;;; Code:
 
-(defun konix/kubel--sentinel/goto-point-min (process _)
-  (with-current-buffer (process-buffer process)
-    (goto-char (point-min))
-    )
-  )
-(advice-add 'kubel--sentinel :after 'konix/kubel--sentinel/goto-point-min)
-
 (defun konix/kubel-get-line-at-point ()
   (string-trim (buffer-substring-no-properties (save-excursion (beginning-of-line) (point))(save-excursion (end-of-line) (point))))
   )

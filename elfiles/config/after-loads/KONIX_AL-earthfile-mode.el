@@ -24,63 +24,12 @@
 
 ;;; Code:
 
-(defface konix/earthfile-mode-target-face '((t :inherit font-lock-function-name-face))
-  ""
-  :group 'konix/earthfile-mode-faces)
-
-(defvar konix/earthfile-mode-target-face 'konix/earthfile-mode-target-face
-  "")
-
-(defface konix/earthfile-mode-plus-face '((t :weight bold :inherit konix/earthfile-mode-target-face))
-  ""
-  :group 'konix/earthfile-mode-faces)
-
-(defvar konix/earthfile-mode-plus-face 'konix/earthfile-mode-plus-face
-  "")
-
-(defface konix/earthfile-mode-artifact-face '((t :foreground "yellow"))
-  ""
-  :group 'konix/earthfile-mode-faces)
-
-(defvar konix/earthfile-mode-artifact-face 'konix/earthfile-mode-artifact-face
-  "")
-
-
 (defun konix/earthfile-mode-hook ()
   (setq indent-tabs-mode nil)
   (setq tab-width 4)
   (setq indent-line-function #'tab-to-tab-stop)
-
-  (font-lock-add-keywords
-   nil
-   `(
-     (
-      "\\+\\([a-zA-Z0-9_.-]+\\)"
-      .
-      (1 konix/earthfile-mode-target-face)
-      )
-     (
-      "\\([a-zA-Z0-9_/.-]+\\)\\+"
-      .
-      (1 konix/earthfile-mode-target-face)
-      )
-     (
-      "\\([a-zA-Z0-9_/.-]+\\)?\\(\\+\\)\\([a-zA-Z0-9_-]+\\)"
-      .
-      (2 konix/earthfile-mode-plus-face)
-      )
-     (
-      "\\([a-zA-Z0-9_/.-]+\\)?\\(\\+\\)\\([a-zA-Z0-9_-]+\\)/\\([^ \n]+\\)"
-      .
-      (4 konix/earthfile-mode-artifact-face)
-      )
-     (
-      "SAVE ARTIFACT *\\([^ \n]+\\)"
-      .
-      (1 konix/earthfile-mode-artifact-face)
-      )
-     )
-   )
+  (setq-local lsp-semantic-tokens-enable t)
+  (lsp)
   )
 
 (add-hook #'earthfile-mode-hook

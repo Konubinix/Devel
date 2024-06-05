@@ -102,6 +102,8 @@
  '(ement-room-send-message-filter 'konix/ement-room-send-filter)
  )
 
+;; (custom-set-variables '(ement-room-send-message-filter nil))
+
 (defun konix/ement-room-view-hook (room session)
   (when (and
          ement-room-fully-read-marker

@@ -79,7 +79,7 @@
   (use-package citeproc)
   (use-package copilot :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")))
   (use-package counsel)
-  (use-package lsp-mode :commands (lsp) :straight (:fork (:branch "feat/earthlyls")))
+  (use-package lsp-mode :commands (lsp))
   (use-package dap-mode :after (lsp-mode) :straight (:fork (:branch "vscode-js-debug-feature")))
   ;; (:repo "jeff-phil/dap-mode-PR" :branch "vscode-js-debug-feature")
   (use-package dash)

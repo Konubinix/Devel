@@ -50,18 +50,18 @@
 ;; ################################################################################
 ;; Load config files
 ;; ################################################################################
-(defun konix/loaded-file (file-to-load)
-  (load-history-filename-element (load-history-regexp
-                                  file-to-load))
-  )
+ (defun konix/loaded-file (file-to-load)
+   (load-history-filename-element (load-history-regexp
+                                   file-to-load))
+   )
 (setq konix/loaded-in-init-files
       '(
         "autoinsert" ;; init
         "backup-dir" ;; init
         "bibtex"     ;; loaded by org -> oc-basic
         "browse-url" ;; org - gnus-sum - shr
-        "calendar" ;; init
-        "comint"   ;; loaded by org -> org-pcomplete
+        "calendar"   ;; init
+        "comint"     ;; loaded by org -> org-pcomplete
         "compile" ;; KONIX_org-roam-export -> citeproc -> citeproc-cite -> citeproc-number -> rst -> compile
         "cus-edit"  ;; when accepting the theme for future use
         "delight"   ;; init
@@ -77,12 +77,13 @@
         "package"                ;; init
         "key-chord"              ;; init
         "kmacro"                 ;; loaded by (kbd)
-        "message"        ;; gnus-int - gnus-start - gnu-group - gnus-sum - org
-        "org"            ;; init
-        "org-agenda"     ;; init
-        "ob-comint"      ;; loaded by org
-        "ob-core"        ;; loaded by org
-        "ob-tangle"      ;; org -> ob
+        "message"    ;; gnus-int - gnus-start - gnu-group - gnus-sum - org
+        "org"        ;; init
+        "org-agenda" ;; init
+        "ob-comint"  ;; loaded by org
+        "ob-core"    ;; loaded by org
+        "ob-tangle"  ;; org -> ob
+        "org-roam"
         "ob-sql"         ;; org -> ob-sql -> in my customization
         "password-cache" ;; orm-roam - org-roam-db - urlparse - authsource
         "popup" ;; loaded by autocomplete -> konix/org-mode -> konix/org-setup-holidays -> org

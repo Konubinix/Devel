@@ -788,14 +788,16 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
 (defvar konix/org-roam-node-read--completions/cache-time nil "The time when the cache was last taken")
 (defun konix/org-roam-node-read--completions/cache (orig-fun &rest args)
   (when
-      (and current-prefix-arg
-           (or
-            current-prefix-arg
-            (not konix/org-roam-node-read--completions/cache)
-            (not konix/org-roam-node-read--completions/cache-time)
-            (time-less-p
-             konix/org-roam-node-read--completions/cache-time
-             (file-attribute-modification-time (file-attributes org-roam-db-location)))))
+      (or (not
+           konix/org-roam-node-read--completions/cache)
+          (and current-prefix-arg
+               (or
+                current-prefix-arg
+                (not konix/org-roam-node-read--completions/cache)
+                (not konix/org-roam-node-read--completions/cache-time)
+                (time-less-p
+                 konix/org-roam-node-read--completions/cache-time
+                 (file-attribute-modification-time (file-attributes org-roam-db-location))))))
     (message "Computing the org-roam-node-read--completions")
     (setq konix/org-roam-node-read--completions/cache-time (current-time))
     (setq konix/org-roam-node-read--completions/cache (apply orig-fun

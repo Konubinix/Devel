@@ -85,12 +85,11 @@ then
     source "$HOME/.cargo/env"
 fi
 
-[[ -s "${HOME}/.autojump/etc/profile.d/autojump.sh" ]] && source "${HOME}/.autojump/etc/profile.d/autojump.sh"
-[[ -s "/usr/share/autojump/autojump.bash" ]] && source "/usr/share/autojump/autojump.bash"
 if which starship > /dev/null
 then
 	eval "$(starship init bash)"
 fi
+eval "$(zoxide init bash)"
 
 konix_is_in_tmux () {
     test -n "${TMUX_PANE}"
@@ -166,7 +165,7 @@ konix_starship_precmd () {
     konix_warn_if_took_too_long
 }
 
-PROMPT_COMMAND="konix_starship_precmd"
+PROMPT_COMMAND="__zoxide_hook;konix_starship_precmd"
 
 # for gpg to work correctly, even in the terminal
 GPG_TTY="$(tty)"

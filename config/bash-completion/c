@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+
+# taken from the  output of zoxide init bash
+ME="$(basename "${BASH_SOURCE[0]}")"
+complete -F __zoxide_z_complete -o filenames -- "${ME}"

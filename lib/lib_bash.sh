@@ -52,27 +52,23 @@ function trouve_KONIX {
 }
 
 c () {
-    cd "$@" && ls
+    z "$@" && ls
 }
 
 u () {
-    cd .. && ls
-}
-
-p () {
-	pushd "$@" && ls
-}
-
-b () {
-	popd && ls
+    c ..
 }
 
 t () {
-	cd - && ls
+	c -
 }
 
 m () {
 	mkdir -p "$1" && c "$1"
+}
+
+j () {
+    z "$@"
 }
 
 private_nav_clean_n_stop () {

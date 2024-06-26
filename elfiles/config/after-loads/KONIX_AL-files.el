@@ -35,18 +35,18 @@
 
 (defun konix/force-backup-of-buffer-if-sensible ()
   (let (
-		(buffer-backed-up nil)
-		(file_name (f-canonical (buffer-file-name)))
-		)
-	(unless (or
+                (buffer-backed-up nil)
+                (file_name (f-canonical (buffer-file-name)))
+                )
+        (unless (or
              (string= (vc-backend file_name) "Git")
              (string-prefix-p "/run/user/1000" file_name)
              )
-	  (backup-buffer)
-	  (message "Wrote and backup-ed file '%s'"
-			   file_name)
-	  )
-	)
+          (backup-buffer)
+          (message "Wrote and backup-ed file '%s'"
+                           file_name)
+          )
+        )
   )
 
 (add-hook 'before-save-hook 'konix/force-backup-of-buffer-if-sensible t)
@@ -54,54 +54,43 @@
 (defun konix/gatls-dired-toggle (&optional force)
   (interactive)
   (if (or
-	   (string-equal insert-directory-program
-					 konix/old-insert-directory-program)
-	   force
-	   )
-	  (setq-default insert-directory-program konix/insert-directory-program)
-	(setq-default insert-directory-program konix/old-insert-directory-program)
-	)
+       (string-equal insert-directory-program
+                     konix/old-insert-directory-program)
+       force
+       )
+      (setq-default insert-directory-program konix/insert-directory-program)
+    (setq-default insert-directory-program konix/old-insert-directory-program)
+    )
   (message "insert-directory-program is now %s" insert-directory-program)
   )
 
 (defun konix/find-file-hook ()
   (if (and
-	   (string-match "^\\(.+\\):\\([0-9]+\\):?$" buffer-file-name)
-	   (not
-		(file-exists-p buffer-file-name)
-		)
-	   )
-	  ;; the given file does not exist and is of the form file_name:number, I
-	  ;; most likely wants to open file_name at line number
-	  (progn
-		(let (
-			  (old_buffer (current-buffer))
-			  (file_name (match-string-no-properties 1 buffer-file-name))
-			  (line (match-string-no-properties 2 buffer-file-name))
-			  )
-		  (if (file-exists-p file_name)
-			  (progn
-				(message "Opening %s" file_name)
-				(find-file file_name)
-				(konix/goto-line-prog (string-to-number line))
-				(let (
-					  ;; make sure the buffer is killed even if the
-					  ;; keep-buffers-protected-alist says otherwise
-					  (keep-buffers-protected-alist nil)
-					  )
-				  (kill-buffer old_buffer)
-				  )
-				nil
-				)
-			nil
-			)
-		  )
-		)
-	nil
-	)
-  (call-process "konix_autojump.sh" nil nil nil "-a" (expand-file-name
-                                                      (file-name-directory (buffer-file-name))))
-  )
+       (string-match "^\\(.+\\):\\([0-9]+\\):?$" buffer-file-name)
+       (not
+        (file-exists-p buffer-file-name)))
+      ;; the given file does not exist and is of the form file_name:number, I
+      ;; most likely wants to open file_name at line number
+      (progn
+        (let (
+              (old_buffer (current-buffer))
+              (file_name (match-string-no-properties 1 buffer-file-name))
+              (line (match-string-no-properties 2 buffer-file-name)))
+          (if (file-exists-p file_name)
+              (progn
+                (message "Opening %s" file_name)
+                (find-file file_name)
+                (konix/goto-line-prog (string-to-number line))
+                (let (
+                      ;; make sure the buffer is killed even if the
+                      ;; keep-buffers-protected-alist says otherwise
+                      (keep-buffers-protected-alist nil))
+                  (kill-buffer old_buffer))
+                nil)
+            nil)))
+    nil)
+  (call-process "zoxide" nil nil nil "add" (expand-file-name
+                                            (file-name-directory (buffer-file-name)))))
 (add-to-list 'find-file-hook 'konix/find-file-hook)
 
 (provide '700-KONIX_find-file)

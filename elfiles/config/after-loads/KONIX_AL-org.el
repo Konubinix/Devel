@@ -2913,6 +2913,15 @@ items"
                  :clock-in t
                  :clock-keep t
                  )
+                ("L" "Todo Item for current stuff in current clock" entry (clock)
+                 "* NEXT %? %a
+  :PROPERTIES:
+  :CREATED:  %U
+  :END:
+  :CLOCK:
+  :END:
+"
+                 )
                 ("D" "Todo Item for current stuff (ipfa in dired)" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %? %(konix/org-capture/ipfa)
   :PROPERTIES:

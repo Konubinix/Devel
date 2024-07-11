@@ -80,7 +80,9 @@
   (use-package copilot :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")))
   (use-package counsel)
   (use-package lsp-mode :commands (lsp))
-  (use-package dap-mode :after (lsp-mode) :straight (:fork (:branch "vscode-js-debug-feature")))
+  (use-package dap-mode :after (lsp-mode))
+  ;; I will try to put it back from upstream in case I use dap in the future
+  ;; (use-package dap-mode :after (lsp-mode) :straight (:fork (:branch "vscode-js-debug-feature")))
   ;; (:repo "jeff-phil/dap-mode-PR" :branch "vscode-js-debug-feature")
   (use-package dash)
   (use-package dedicated)
@@ -91,8 +93,7 @@
   (use-package dired-filetype-face)
   (use-package dired-quick-sort)
   (use-package dockerfile-mode)
-  ;; not ready yet
-  (use-package earthfile-mode :straight (:fork (:repo "konubinix/earthly-emacs")))
+  (use-package earthfile-mode)
   (use-package editorconfig)
   (use-package edit-indirect)
   ;; several issues yet to be reported
@@ -175,7 +176,7 @@
   (use-package undo-tree :commands (undo-tree-mode))
   (use-package uuidgen)
   (use-package visible-mark :commands (visible-mark-mode))
-  (use-package w3m)                     ;; to have nice message formatting in notmuch
+  (use-package w3m) ;; to have nice message formatting in notmuch
   (use-package wgrep)
   (use-package ws-butler)
   (use-package which-key)

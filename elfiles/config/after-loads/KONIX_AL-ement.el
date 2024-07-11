@@ -969,7 +969,8 @@ event before rendering the event.
         )
     (with-temp-buffer
       (insert (plist-get (cdr image) :data))
-      (write-file path)
+      (fundamental-mode)
+      (write-region (point-min) (point-max) path)
       )
     )
   )

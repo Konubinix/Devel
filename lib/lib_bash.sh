@@ -68,7 +68,7 @@ m () {
 }
 
 j () {
-    z "$@"
+    z "$@" && ls
 }
 
 private_nav_clean_n_stop () {

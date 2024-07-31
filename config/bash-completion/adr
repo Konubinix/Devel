@@ -1,6 +1,1 @@
-#!/bin/bash -eu
-
-ME="$(basename "${BASH_SOURCE[0]}")"
-COMPLETION_SCRIPT="${HOME}/.nix-profile/share/bash-completion/completions/${ME}"
-
-source "${COMPLETION_SCRIPT}"
+gcloud

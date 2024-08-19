@@ -1,9 +1,9 @@
-;;; KONIX_AL-yaml-mode.el ---                        -*- lexical-binding: t; -*-
+;;; KONIX_AL-yaml-ts-mode.el ---                     -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  konubinix
+;; Copyright (C) 2024  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
-;; Keywords:
+;; Keywords: abbrev
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,12 +23,14 @@
 ;;
 
 ;;; Code:
+
 (require 'outline-yaml)
 
-(add-hook #'yaml-mode-hook
+(add-hook #'yaml-ts-mode-hook
           #'outline-yaml-minor-mode)
 
-(keymap-set yaml-mode-map "M-TAB" 'completion-at-point)
+(keymap-set yaml-ts-mode-map "M-TAB" 'completion-at-point)
 
-(provide 'KONIX_AL-yaml-mode)
-;;; KONIX_AL-yaml-mode.el ends here
+
+(provide 'KONIX_AL-yaml-ts-mode)
+;;; KONIX_AL-yaml-ts-mode.el ends here

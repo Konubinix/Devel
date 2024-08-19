@@ -151,6 +151,11 @@
   (use-package org-search-goto)
   (use-package org-super-agenda)
   (use-package org-transclusion)
+  (use-package outline-yaml
+    :straight (outline-yaml
+               :type git
+               :host github
+               :repo "jamescherti/outline-yaml.el"))
   (use-package ox-hugo)
   (use-package ox-gfm)
   (use-package pdf-tools :straight (:repo "dalanicolai/pdf-tools" :branch "pdf-roll") :magic ("%PDF" . pdf-view-mode))
@@ -183,6 +188,7 @@
   (use-package which-key)
   (use-package windata) ;; implicit dependency of imenu-tree
   (use-package yaml-mode)
+  (use-package yaml-ts-mode :mode (("\\.yaml\\'" . yaml-ts-mode) ("\\.yml\\'" . yaml-ts-mode)))
   (use-package yapfify)
   (use-package yasnippet)
   (use-package zenburn-theme)

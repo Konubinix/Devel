@@ -290,7 +290,15 @@
          (fully-read-event-content (alist-get 'content fully-read-marker))
          (fully-read-event-id (alist-get 'event_id fully-read-event-content))
          (fully-read-event (and fully-read-event-id
-                                (konix/ement-find-event-by-id session room fully-read-event-id))))
+                                (condition-case err
+                                    (konix/ement-find-event-by-id session room fully-read-event-id)
+                                  (konix/ement-id-not-found
+                                   (warn "Fully read event not found for %s"
+                                         (ement-room-display-name room))
+                                   nil
+                                   )
+                                  )
+                                )))
     fully-read-event)
   )
 
@@ -298,8 +306,8 @@
   (let* ((timeline (ement-room-timeline room))
          (state (ement-room-state room))
          ;; sometimes, the event is not reachable, so consider it not here
-         (fully-read-event (with-demoted-errors
-                               (konix/ement-fully-read-event session room))))
+         (fully-read-event
+          (konix/ement-fully-read-event session room)))
     (if (or (not timeline) (not fully-read-event))
         t
       (->> (append timeline state)
@@ -883,6 +891,8 @@ event before rendering the event.
 
 (defvar konix/ement-orphan-events (make-hash-table :test 'equal))
 
+(define-error 'konix/ement-id-not-found "Could not find the id")
+
 (defun konix/ement-find-event-by-id (session room event-id)
   (or
    (gethash event-id (ement-session-events session))
@@ -892,11 +902,21 @@ event before rendering the event.
      (let* (
 
             (room-id (ement-room-id room))
-            (event-data (ement-api session (format "rooms/%s/event/%s" (url-hexify-string room-id) (url-hexify-string event-id)) :timeout 30
-                          :then 'sync
-                          :else (lambda (plz-error)
-                                  (signal 'ement-api-error (list (format "Loading event %s from room %s failed" event-id room-id)
-                                                                 plz-error)))))
+            (event-data (condition-case err (ement-api session (format "rooms/%s/event/%s" (url-hexify-string room-id) (url-hexify-string event-id)) :timeout 30
+                                              :then 'sync
+                                              :else (lambda (plz-error)
+                                                      (signal 'ement-api-error (list (format "Loading event %s from room %s failed" event-id room-id)
+                                                                                     plz-error))))
+
+                          (plz-http-error
+                           (signal 'konix/ement-id-not-found
+                                   (list (format "Could not find id %s in room %s"
+                                                 event-id
+                                                 (ement-room-display-name room))
+                                         err
+                                         ))
+                           )
+                          ))
             (event (ement--make-event event-data))
             )
        (puthash (ement-event-id event) event konix/ement-orphan-events)

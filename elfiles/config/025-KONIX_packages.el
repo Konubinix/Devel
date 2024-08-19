@@ -77,6 +77,7 @@
   (use-package backup-walker)
   (use-package bbdb)
   (use-package citeproc)
+  (use-package codeium :straight (:host github :repo "Exafunction/codeium.el"))
   (use-package copilot :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")))
   (use-package counsel)
   (use-package lsp-mode :commands (lsp))

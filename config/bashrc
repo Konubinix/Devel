@@ -167,5 +167,15 @@ konix_starship_precmd () {
 
 PROMPT_COMMAND="__zoxide_hook;konix_starship_precmd"
 
+PREEXEC_LOCATION="$HOME/.nix-profile/share/bash/bash-preexec.sh"
+if ! test -f "${PREEXEC_LOCATION}"
+then
+    nix profile install nixpkgs#bash-preexec
+fi
+source "${PREEXEC_LOCATION}"
+
+eval "$(atuin init bash --disable-up-arrow)"
+bind -m emacs -x '"\C-s": __atuin_history --keymap-mode=emacs'
+
 # for gpg to work correctly, even in the terminal
 GPG_TTY="$(tty)"

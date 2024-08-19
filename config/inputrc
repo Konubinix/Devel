@@ -80,8 +80,3 @@ TAB:complete
 # C-up and C-down to menu-complete
 "\e[1;5A": "\e-1\C-n"
 "\e[1;5B": menu-complete
-# C-s and C-r like in emacs
-C-r: reverse-search-history
-C-h: "\C-e \C-a\C-kstory \C-y\C-m"
-C-s: forward-search-history
-"\C-f": "\C-e\"\C-afzf --query=\"\C-m"

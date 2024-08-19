@@ -72,6 +72,8 @@ j () {
 }
 
 private_nav_clean_n_stop () {
+    echo "TO BE DONE AGAIN WITH ATUIN"
+    return 1
     history -c
     history -r
     unset KONIX_PRIVATE_NAV
@@ -79,16 +81,22 @@ private_nav_clean_n_stop () {
 }
 
 private_nav_abort () {
+    echo "TO BE DONE AGAIN WITH ATUIN"
+    return 1
     unset KONIX_PRIVATE_NAV
     trap "" EXIT
 }
 
 private_nav () {
+    echo "TO BE DONE AGAIN WITH ATUIN"
+    return 1
     export "KONIX_PRIVATE_NAV=1"
     trap "history -c" EXIT
 }
 
 private_nav_from_now () {
+    echo "TO BE DONE AGAIN WITH ATUIN"
+    return 1
     export "KONIX_PRIVATE_NAV=1"
     history -a
     trap "history -c" EXIT
@@ -157,47 +165,6 @@ urlencode() {
 
     LC_COLLATE=$old_lc_collate
 }
-
-call_history ( ) {
-    HISTTIMEFORMAT="" history "$@"
-}
-
-history_extract_commandline ( ) {
-    local histprefixregexp="......."
-    sed "s/${histprefixregexp}//"
-}
-
-story () {
-    local input="$*"
-    # remove the call to story from the history
-    if call_history|history_extract_commandline|tail -1|grep -q '^story'
-    then
-        history -d -1
-    fi
-    local command="$(call_history|history_extract_commandline|tac|konix_remove_duplicate.py|fzf \
- --query="${input}" \
- --history="${TMPDIR}/story" \
- --history-size=1000000 \
- |trim)"
-    if [ -n "${command}" ]
-    then
-        read -i "${command}" -e -p "$ " command
-    fi
-    if [ -n "${command}" ]
-    then
-        # I don't know why the last command get replaced by the call to history
-        # -s, but since it happens, let's artificially put again the last
-        # command before inserting the new command into the history
-        local last_command="$(call_history|history_extract_commandline|tail -1)"
-        history -s "${last_command}"
-        history -s "${command}"
-        eval "${command}"
-    else
-        echo "Abort"
-    fi
-}
-
-
 
 popline ( ) {
     local file="$1"

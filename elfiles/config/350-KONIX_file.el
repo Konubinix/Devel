@@ -159,6 +159,8 @@
         (with-current-buffer orig-buffer
           (call-process-region (point-min) (point-max) "ipfa" nil temp-buffer)
           )
+        (when (called-interactively-p)
+          (copy-region-as-kill (point-min) (1- (point-max))))
         (message (setq result (string-trim (buffer-substring-no-properties (point-min) (point-max)))))
         )
       )

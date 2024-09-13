@@ -30,6 +30,7 @@
           #'outline-yaml-minor-mode)
 
 (keymap-set yaml-ts-mode-map "M-TAB" 'completion-at-point)
+(keymap-set yaml-ts-mode-map "C-TAB" 'outline-toggle-children)
 
 
 (provide 'KONIX_AL-yaml-ts-mode)

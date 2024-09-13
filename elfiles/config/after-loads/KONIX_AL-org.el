@@ -3547,6 +3547,7 @@ of the clocksum."
   (message "computing the roam cache")
   (setq konix/org-roam-node-read--completions/cache-time (current-time))
   (setq konix/org-roam-node-read--completions/cache (org-roam-node-read--completions))
+  (message "computed the roam cache")
   (setq konix/roam-compute-idle-timer nil))
 
 (defun konix/org-mode/after-save-hook ()

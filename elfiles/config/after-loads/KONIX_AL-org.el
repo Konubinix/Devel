@@ -3833,6 +3833,7 @@ With `ID', set the ID instead of the CUSTOM_ID."
   (interactive)
   (unless (buffer-narrowed-p)
     (let (
+          (limit 25)
           (res 0)
           (res_after_point 0)
           (point (point))
@@ -3871,9 +3872,9 @@ With `ID', set the ID instead of the CUSTOM_ID."
                )
               (string= (buffer-name) "*Org Agenda(agp)*")
               )
-             (< 25 res)
+             (< limit res)
              )
-        (warn (format "Too many tasks (%s)" res))
+        (warn (format "Too many tasks (%s > %s)" res limit))
         )
       (message "%s entries (%s after)" res res_after_point)
       res

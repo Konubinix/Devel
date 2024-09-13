@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: call
+# key: call
+# --
+
+#+call: ${100:function}(${200:arguments}) ${300::headers}

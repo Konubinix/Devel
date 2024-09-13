@@ -33,6 +33,9 @@ settings:
     https://eu.docusign.net: false
     https://www.google.com: false
     https://www.myedenred.fr: false
+  content.headers.user_agent:
+    global: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)
+      Chrome/125.0.0.0 Safari/537.36
   content.javascript.enabled:
     global: true
   content.media.audio_capture:

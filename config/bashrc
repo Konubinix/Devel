@@ -95,10 +95,6 @@ konix_is_in_tmux () {
     test -n "${TMUX_PANE}"
 }
 
-konix_starship_command_took_too_long () {
-    test -n "${STARSHIP_DURATION}" && test ${STARSHIP_DURATION} -gt 3000
-}
-
 konix_tmux_shows_current_window () {
     local current_index="$(tmux display-message -p '#{window_index}')"
     test "${KONIX_TMUX_WINDOW}" == "${current_index}"
@@ -138,7 +134,7 @@ function konix_warn_if_took_too_long(){
     then
         return
     fi
-    if konix_starship_command_took_too_long
+    if test -n "${KONIX_DURATION}" && test ${KONIX_DURATION} -gt 2
     then
         if konix_is_in_tmux
         then
@@ -160,12 +156,6 @@ function konix_warn_if_took_too_long(){
         fi
     fi
 }
-konix_starship_precmd () {
-    starship_precmd "$@"
-    konix_warn_if_took_too_long
-}
-
-PROMPT_COMMAND="__zoxide_hook;konix_starship_precmd"
 
 PREEXEC_LOCATION="$HOME/.nix-profile/share/bash/bash-preexec.sh"
 if ! test -f "${PREEXEC_LOCATION}"
@@ -174,8 +164,25 @@ then
 fi
 source "${PREEXEC_LOCATION}"
 
-eval "$(atuin init bash --disable-up-arrow)"
-bind -m emacs -x '"\C-s": __atuin_history --keymap-mode=emacs'
+preexec_konix() {
+    KONIX_STARTTIME="$(date +%s)"
+    sob_preexec "$1"
+}
+preexec_functions+=(preexec_konix)
+
+postexec_konix() {
+    if test -n "${KONIX_STARTTIME}"
+    then
+        local endtime="$(date +%s)"
+        KONIX_DURATION="$((endtime - KONIX_STARTTIME))"
+        konix_warn_if_took_too_long
+    fi
+    sob_postexec
+}
+precmd_functions+=(postexec_konix)
+
+eval "$(mcfly init bash)"
+eval "$(mcfly-fzf init bash)"
 
 # for gpg to work correctly, even in the terminal
 GPG_TTY="$(tty)"

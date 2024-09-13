@@ -2,77 +2,76 @@
 
 source "${KONIX_LIB_DIR}/pslib.sh"
 
-_SOB_SETUP_DEPTH=0
-
-trap _sob_reset EXIT SIGQUIT  SIGKILL SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT SIGTERM
-
-function _sob_setup () {
-    if [ "${_SOB_SETUP_DEPTH}" == "0" ]
+function sob_preexec () {
+    if ! test -e "${KONIX_SOB_DIR}"
     then
-        _OLD_PS_LS="${PS_LS}"
-        _OLD_PS_SELECT="${PS_SELECT}"
-        PS_LS=sob_ls
-        PS_SELECT=sob_select
-        _SOB_SETUP_DEPTH=1
-    else
-        _SOB_SETUP_DEPTH="$((_SOB_SETUP_DEPTH + 1))"
+        mkdir -p "${KONIX_SOB_DIR}"
+    fi
+    if test "$1" != "byobu"
+    then
+        echo "$1" > "${KONIX_SOB_DIR}/$$"
     fi
 }
 
-function _sob_reset () {
-    PS_LS="${_OLD_PS_LS}"
-    PS_SELECT="${_OLD_PS_SELECT}"
-    unset _OLD_PS_LS
-    unset _OLD_PS_SELECT
-    unset _SOB_SETUP
-    _SOB_SETUP_DEPTH=0
-}
-
-function _sob_teardown () {
-    [ "${_SOB_SETUP_DEPTH}" == "0" ] && return 0
-    _SOB_SETUP_DEPTH="$((_SOB_SETUP_DEPTH - 1))"
-    if [ "${_SOB_SETUP_DEPTH}" -le 0 ]
-    then
-        _sob_reset
-    fi
-}
-
-function sob_uid () {
-    ps_uid
-}
-
-function sob_sons_of_terminal_emulator () {
-    cat "${HOME}/.bash_ppid"
+function sob_postexec () {
+    rm -rf "${KONIX_SOB_DIR}/$$"
 }
 
 function sob_bash_sessions () {
-    pgrep -u "$(sob_uid)" --parent "$(sob_sons_of_terminal_emulator)"
+    ls "${KONIX_SOB_DIR}"|while read pid
+do
+    if test "${pid}" != "$$" # pass when this is the current bash
+    then
+        if test "$(ps --no-headers -q "${pid}" -o comm)" = "bash"
+        then
+            echo "${pid}"
+        else
+            # cleanup
+            rm "${KONIX_SOB_DIR}/${pid}"
+        fi
+    fi
+done
 }
 
-# implements ps_ls
+function sob_get_running_pid () {
+    local parent_pid="$1"
+    ps --no-headers --ppid "${parent_pid}" -o pid,args --sort=pid | tail -1
+}
+
 function sob_ls () {
-    local res_file="$(mktemp)"
     for parent in $(sob_bash_sessions)
     do
-        pgrep --parent "$parent" -u "$(sob_uid)" --list-full ''
-    done > "${res_file}"
-    grep -i "$*" "${res_file}"
-    local res="$?"
-    rm "${res_file}"
-    return $res
+        local running="$(sob_get_running_pid "${parent}")"
+        if test -n "${running}"
+        then
+            echo ${running}
+        fi
+    done
 }
 
-# implements ps_select
-function sob_select () {
-    _sob_setup
-    ps_select "$@"
-    _sob_teardown
+function sob_select () (
+    TMP="$(mktemp -d)"
+    trap "rm -rf '${TMP}'" 0
+
+    sob_ls > "${TMP}/results"
+    local args=()
+    if test -n "$*"
+    then
+        args+=(--query="$*")
+    fi
+    fzf "${args[@]}" < "${TMP}/results"
+)
+
+function _sob_extract_pid () {
+    cut -f1 -d' '
 }
 
 function sob_wait () {
-    _sob_setup
-    ps_wait "$@"
-    _sob_teardown
+    local pid="$(sob_select "$@"|_sob_extract_pid)"
+    if test -n "${pid}"
+    then
+        ps_wait "${pid}"
+    fi
 }
 
 function sob_xeyes () {
@@ -86,8 +85,6 @@ function sob_notify () {
 }
 
 function sob_kill () {
-    _sob_setup
-    local pid="$(ps_select)"
+    local pid="$(sob_select|_sob_extract_pid)"
     kill "$@" "${pid}"
-    _sob_teardown
 }

@@ -54,6 +54,7 @@
 (setq-default org-fontify-quote-and-verse-blocks t)
 (setq-default org-duration-format '(("h") (special . h:mm)))
 (setq-default org-hide-block-startup nil)
+(setq-default konix/org-na-limit 20)
 
 (defun konix/org-get-priority-as-char ()
   (save-excursion
@@ -3833,7 +3834,7 @@ With `ID', set the ID instead of the CUSTOM_ID."
   (interactive)
   (unless (buffer-narrowed-p)
     (let (
-          (limit 25)
+          (limit konix/org-na-limit)
           (res 0)
           (res_after_point 0)
           (point (point))
@@ -3853,7 +3854,7 @@ With `ID', set the ID instead of the CUSTOM_ID."
                    )
                   (string= (buffer-name) "*Org Agenda(agp)*")
                   )
-                 (< 25 res)
+                 (< limit res)
                  )
             (let (
                   (ov (make-overlay (line-beginning-position) (line-end-position)))
@@ -4863,7 +4864,7 @@ With `ID', set the ID instead of the CUSTOM_ID."
                                      &optional keep context filter threshold
                                      )
   "FILTER : e.g: '(\"+C_me\")"
-  (setq threshold (or threshold 25))
+  (setq threshold (or threshold konix/org-na-limit))
   (save-window-excursion
     (let (
           (org-export-with-broken-links t)

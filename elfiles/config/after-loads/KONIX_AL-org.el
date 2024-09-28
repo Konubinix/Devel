@@ -5887,6 +5887,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (setq-default
  org-export-global-macros
  `(
+   ("iframe" . "@@html:<div class=\"iframe-container ratio169\"><iframe src=\"$1\" allowfullscreen title=\"Iframe\"></iframe></div>@@")
    ("result" . "(eval (konix/org-export-macro/result $1))")
    ("youtube" . "@@html:<div class=\"iframe-container ratio169\"><iframe src=\"https://www.youtube-nocookie.com/embed/$1\" allowfullscreen title=\"YouTube Video\"></iframe></div>@@")
    ("peertube"

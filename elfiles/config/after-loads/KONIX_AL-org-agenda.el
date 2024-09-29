@@ -47,10 +47,10 @@
   )
 
 (keymap-set org-agenda-mode-map "+"
-  'konix/org-capture-na-in-heading)
+            'konix/org-capture-na-in-heading)
 
 (keymap-set org-agenda-mode-map "M-t"
-  'konix/org-gtd-triage-all)
+            'konix/org-gtd-triage-all)
 
 (keymap-set org-agenda-mode-map "-"
             #'(lambda () (interactive) (message "Intentionally disable -")))
@@ -63,131 +63,131 @@
             'auto-scroll-mode)
 
 (keymap-set org-agenda-mode-map ":"
-  'konix/org-agenda-counsel-org-tag)
+            'konix/org-agenda-counsel-org-tag)
 
 (keymap-set org-agenda-mode-map "@"
-  'konix/org-agenda-counsel-org-tag)
+            'konix/org-agenda-counsel-org-tag)
 
 (keymap-set org-agenda-mode-map "."
-  'org-agenda-set-tags)
+            'org-agenda-set-tags)
 
 (keymap-set org-agenda-mode-map "M-l"
-  'hl-line-mode)
+            'hl-line-mode)
 
 (keymap-set org-agenda-mode-map "N"
-  'konix/org-roam-note)
+            'konix/org-roam-note)
 
 (keymap-set org-agenda-mode-map "Z"
-  'konix/org-add-timestamp)
+            'konix/org-add-timestamp)
 
 (keymap-set org-agenda-mode-map "Y"
-  'konix/org-toggle-maybe)
+            'konix/org-toggle-maybe)
 
 (keymap-set org-agenda-mode-map "y"
-  #'(lambda () (interactive) (message "Intentionally disable y, too easily triggered to say yes")))
+            #'(lambda () (interactive) (message "Intentionally disable y, too easily triggered to say yes")))
 
 (keymap-set org-agenda-mode-map "!"
-  #'(lambda () (interactive) (message "Intentionally disable !, too easily triggered when saving files")))
+            #'(lambda () (interactive) (message "Intentionally disable !, too easily triggered when saving files")))
 
 (keymap-set org-agenda-mode-map "l"
-  #'recenter-top-bottom)
+            #'recenter-top-bottom)
 
 (keymap-set org-agenda-mode-map "f"
-  #'(lambda () (interactive) (when (yes-or-no-p "Really move later?")
-                               (call-interactively 'org-agenda-later)
-                               )))
+            #'(lambda () (interactive) (when (yes-or-no-p "Really move later?")
+                                         (call-interactively 'org-agenda-later)
+                                         )))
 
 (keymap-set org-agenda-mode-map "b"
-  #'(lambda () (interactive) (when (yes-or-no-p "Really move earlier?")
-                               (call-interactively 'org-agenda-earlier)
-                               )))
+            #'(lambda () (interactive) (when (yes-or-no-p "Really move earlier?")
+                                         (call-interactively 'org-agenda-earlier)
+                                         )))
 
 (keymap-set org-agenda-mode-map "r"
-  #'(lambda () (interactive) (when (yes-or-no-p "Really redo?")
-                               (call-interactively 'org-agenda-redo)
-                               )))
+            #'(lambda () (interactive) (when (yes-or-no-p "Really redo?")
+                                         (call-interactively 'org-agenda-redo)
+                                         )))
 
 (keymap-set org-agenda-mode-map "m"
-  'konix/org-toggle-me)
+            'konix/org-toggle-me)
 
 (keymap-set org-agenda-mode-map "S"
-  'konix/org-toggle-society)
+            'konix/org-toggle-society)
 
 (keymap-set org-agenda-mode-map "w"
-  'konix/org-agenda-refile-noupdate)
+            'konix/org-agenda-refile-noupdate)
 
 (keymap-set org-agenda-mode-map "M-r"
-  'konix/org-agenda-revert-file)
+            'konix/org-agenda-revert-file)
 
 ;; not very useful, but at least less harmful than the clock cancel one
 (keymap-set org-agenda-mode-map "X"
-  'konix/org-clock-echo)
+            'konix/org-clock-echo)
 
 (keymap-set org-agenda-mode-map "x"
-  'konix/org-clock-echo)
+            'konix/org-clock-echo)
 
 (keymap-set org-agenda-mode-map "e"
-  'konix/org-srs)
+            'konix/org-srs)
 
 (keymap-set org-agenda-mode-map "M-c"
-  'konix/org-capture-na-in-heading)
+            'konix/org-capture-na-in-heading)
 
 (keymap-set org-agenda-mode-map "M-d"
-  'konix/org-capture-diary-in-heading)
+            'konix/org-capture-diary-in-heading)
 
 (keymap-set org-agenda-mode-map "M-e"
-  'konix/org-agenda-edit-headline)
+            'konix/org-agenda-edit-headline)
 
 (keymap-set org-agenda-mode-map "SPC"
-  'konix/org-agenda-next-entry)
+            'konix/org-agenda-next-entry)
 
 (keymap-set org-super-agenda-header-map "SPC"
-  'konix/org-agenda-next-entry)
+            'konix/org-agenda-next-entry)
 
 (keymap-set org-agenda-mode-map "<tab>"
-  'konix/org-agenda-next-entry)
+            'konix/org-agenda-next-entry)
 
 (keymap-set org-agenda-mode-map "<backtab>"
-  'konix/org-agenda-previous-entry)
+            'konix/org-agenda-previous-entry)
 
 (keymap-set org-agenda-mode-map "<backspace>"
-  'konix/org-agenda-previous-entry)
+            'konix/org-agenda-previous-entry)
 
 (keymap-set org-agenda-mode-map "DEL"
-  'konix/org-agenda-previous-entry)
+            'konix/org-agenda-previous-entry)
 
 (keymap-set org-super-agenda-header-map "DEL"
-  'konix/org-agenda-previous-entry)
+            'konix/org-agenda-previous-entry)
 
 (keymap-set org-agenda-mode-map "p"
-  'konix/org-agenda-focus-next)
+            'konix/org-agenda-focus-next)
 
 (keymap-set org-agenda-mode-map "P"
-  'konix/org-toggle-project)
+            'konix/org-toggle-project)
 
 (keymap-set org-agenda-mode-map "h"
-  'konix/org-agenda-filter-for-now)
+            'konix/org-agenda-filter-for-now)
 
 (keymap-set org-agenda-mode-map "H"
-  'konix/org-agenda-filter-show-all-for-now)
+            'konix/org-agenda-filter-show-all-for-now)
 
 (keymap-set org-agenda-mode-map "1"
-  'delete-other-windows)
+            'delete-other-windows)
 
 (keymap-set org-agenda-mode-map "u"
-  'konix/org-agenda-refresh-line)
+            'konix/org-agenda-refresh-line)
 
 (keymap-set org-agenda-mode-map "<"
-  'beginning-of-buffer)
+            'beginning-of-buffer)
 
 (keymap-set org-agenda-mode-map ">"
-  'end-of-buffer)
+            'end-of-buffer)
 
 (keymap-set org-agenda-mode-map "g"
-  'beginning-of-buffer)
+            'beginning-of-buffer)
 
 (keymap-set org-agenda-mode-map "G"
-  'end-of-buffer)
+            'end-of-buffer)
 
 (keymap-set org-agenda-mode-map "T" 'org-agenda-todo-yesterday)
 (keymap-set org-agenda-mode-map "$" 'self-insert-command)
@@ -1561,6 +1561,8 @@
     )
   )
 
+(setq konix/org-agenda-export-description-cache (make-hash-table))
+
 (defun konix/org-agenda-export-description nil
   (replace-regexp-in-string "
 " "\\\\n"
@@ -1570,22 +1572,30 @@
        (org-export-babel-evaluate nil)
        (outline (org-format-outline-path (org-get-outline-path)))
        content
+       (key (intern (format "%s-%s" (buffer-file-name) (point))))
        )
-   (save-excursion
-     (org-back-to-heading)
-     (org-end-of-meta-data)
-     (save-restriction
-       (narrow-to-region (point) (org-entry-end-position))
-       (org-ascii-export-as-ascii nil nil t t)
+   (if-let (
+            (content (gethash key konix/org-agenda-export-description-cache))
+            )
+       (progn
+         (message "Getting %s from cache" key)
+         content
+         )
+     (save-excursion
+       (org-back-to-heading)
+       (org-end-of-meta-data)
+       (save-restriction
+         (narrow-to-region (point) (org-entry-end-position))
+         (org-ascii-export-as-ascii nil nil t t)
+         )
        )
-     )
-   (with-current-buffer "*Org ASCII Export*"
-     (setq content (buffer-substring-no-properties (point-min) (point-max)))
-     )
-   ;; (org-md-export-as-markdown nil t)
-   (concat outline "
+     (with-current-buffer "*Org ASCII Export*"
+       (setq content (buffer-substring-no-properties (point-min) (point-max)))
+       )
+     ;; (org-md-export-as-markdown nil t)
+     (puthash key (concat outline "
 
-" content)
+" content) konix/org-agenda-export-description-cache ))
    )
  )
 )

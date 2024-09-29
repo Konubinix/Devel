@@ -199,47 +199,50 @@
 
 (defun konix/org-roam-export/export-buffer ()
   (interactive)
-  (when (member (konix/org-roam-export/extract-kind-unsafe) '(nil "none"
-                                                                  "None"))
-    (error "Cannot be exported")
-    )
-  (let* (
-         (content (org-with-wide-buffer
-                   (buffer-substring-no-properties (point-min) (point-max))
-                   )
-                  )
-         (buffer (generate-new-buffer (buffer-name)))
-         (konix/org-roam-export/buffer-file-name-to-save (file-truename
-                                                          (buffer-file-name)))
-         (directory (file-name-directory konix/org-roam-export/buffer-file-name-to-save))
-         )
-    (save-window-excursion
-      (unwind-protect
-          (with-current-buffer buffer
-            (cd directory)
-            (insert content)
-            (org-mode)
-            (org-element-cache-reset)
-            ;; so that org-export-with-tags if defcustom defined,
-            ;; hence dynamically and that the let-binding below won't trigger
-            ;; some error
-            (require 'ox)
-            (let (
-                  ;; don't bother messing up a temporary buffer while reformating it for
-                  ;; better export
-                  (inhibit-read-only t)
-                  (org-export-with-tags nil)
-                  )
-              (setq konix/org-roam-export/buffer-file-name konix/org-roam-export/buffer-file-name-to-save)
-              (konix/org-roam-export/apply-transformations)
-              (org-hugo-export-wim-to-md)
-              )
-            )
-        (kill-buffer buffer)
+  (let (
+        (kind (konix/org-roam-export/extract-kind-unsafe))
         )
-      )
-    )
-  )
+    (when (member kind '(nil "none"
+                             "None"))
+      (error "Cannot be exported"))
+    (let* (
+           (content (org-with-wide-buffer
+                     (buffer-substring-no-properties (point-min) (point-max))
+                     )
+                    )
+           (buffer (generate-new-buffer (buffer-name)))
+           (konix/org-roam-export/buffer-file-name-to-save (file-truename
+                                                            (buffer-file-name)))
+           (directory (file-name-directory konix/org-roam-export/buffer-file-name-to-save))
+           )
+      (save-window-excursion
+        (unwind-protect
+            (with-current-buffer buffer
+              (cd directory)
+              (insert content)
+              (org-mode)
+              (setq org-hugo-base-dir (expand-file-name kind
+                                                        (konix/org-roam-export/get-publish-dir)))
+              (org-element-cache-reset)
+              ;; so that org-export-with-tags if defcustom defined,
+              ;; hence dynamically and that the let-binding below won't trigger
+              ;; some error
+              (require 'ox)
+              (let (
+                    ;; don't bother messing up a temporary buffer while reformating it for
+                    ;; better export
+                    (inhibit-read-only t)
+                    (org-export-with-tags nil)
+                    )
+                (setq konix/org-roam-export/buffer-file-name konix/org-roam-export/buffer-file-name-to-save)
+                (konix/org-roam-export/apply-transformations)
+                (org-hugo-export-wim-to-md)
+                )
+              )
+          (kill-buffer buffer)
+          )
+        )
+      )))
 
 (defun konix/org-roam-export/extract-kind (&optional filename)
   (or
@@ -1064,19 +1067,6 @@ citation key, for Org-ref cite links."
    )
   )
 
-
-(defun konix/org-export-get-environment/compute-hugo-base-dir (orig-fun &rest args)
-  (let* (
-         (info (apply orig-fun args))
-         (kind (konix/org-roam-export/extract-kind-unsafe))
-         )
-    (when kind
-      (setq info (plist-put info :hugo-base-dir (expand-file-name kind (konix/org-roam-export/get-publish-dir))))
-      )
-    info
-    )
-  )
-(advice-add 'org-export-get-environment :around #'konix/org-export-get-environment/compute-hugo-base-dir)
 (defvar konix/org-roam-auto-publish-last-value nil)
 
 (defun konix/org-roam-hugo-expose-before-saving-for-the-first-time ()

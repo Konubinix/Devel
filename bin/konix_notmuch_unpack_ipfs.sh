@@ -8,9 +8,9 @@ notmuch show --format=raw "${ID}" > "${file}"
 trap "rm -r $dir" EXIT
 clk mail unpack-rfc822 "${file}" --output "${dir}"
 suffix=""
-if [ "$(ls "${dir}"|grep .html|wc -l)" = "1" ]
+if [ "$(ls "${dir}"|grep .html$|wc -l)" = "1" ]
 then
-    suffix="/$(ls "${dir}"|grep .html)"
+    suffix="/$(ls "${dir}"|grep .html$)"
 fi
 
 url="${KONIX_IPFS_GATEWAY}$(ipfa "${dir}"|sed -r 's/^(.+)\?.+/\1/')${suffix}"

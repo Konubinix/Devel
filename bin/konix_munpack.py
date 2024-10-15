@@ -8,6 +8,7 @@ import os
 from collections import namedtuple
 from email.header import decode_header
 from hashlib import sha256
+from pathlib import Path
 
 from konix_file_helper import sanitize_filename
 from konix_mail import make_part_harmless, use_relative_links
@@ -165,8 +166,8 @@ def munpack(message, directory, rel_path=False):
 
         logger.debug("Writing in file {}".format(file_name))
         if sub_type == "html":
-            text = make_part_harmless(text)
-            text = """<?xml version="1.0" encoding="utf-8"?>
+            harmlesstext = make_part_harmless(text)
+            harmlesstext = """<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -184,8 +185,9 @@ def munpack(message, directory, rel_path=False):
 </div>
 </body>
 </html>
-""".format("Mail", text)
-            content = text.encode("utf-8")
+""".format("Mail", harmlesstext)
+            content = harmlesstext.encode("utf-8")
+            Path(file_name + "_orig").write_text(text)
         file_.write(content)
         file_.close()
 

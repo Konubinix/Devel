@@ -1,7 +1,0 @@
-#!/bin/bash
-
-source _ko_nix.sh
-me="$(basename "${0}")"
-bin="$(nix_install_binary "${me}" python3Packages.python-lsp-server)"
-
-exec "${bin}" "$@"

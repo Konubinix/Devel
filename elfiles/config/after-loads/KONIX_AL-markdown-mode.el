@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'cape)
 (custom-set-variables '(markdown-header-scaling t))
 
 (custom-set-faces
@@ -141,6 +142,7 @@
   (auto-fill-mode 1)
   ;; somehow it gets to 0 otherwise
   (setq tab-width 4)
+  (add-to-list 'completion-at-point-functions 'cape-file t)
   )
 (add-hook 'markdown-mode-hook 'konix/markdown-mode-hook)
 

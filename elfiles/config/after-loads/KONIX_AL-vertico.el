@@ -1,8 +1,8 @@
-;;; 700-KONIX_maxima-mode.el ---
+;;; KONIX_AL-vertico.el ---                           -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012  konubinix
+;; Copyright (C) 2022  sam
 
-;; Author: konubinix <konubinixweb@gmail.com>
+;; Author: sam <sam@konixwork>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -24,13 +24,14 @@
 
 ;;; Code:
 
-(setq-default imaxima-use-maxima-mode-flag t)
-(setq-default maxima-command "maxima")
-(defun konix/maxima-mode-hook()
-  (hs-minor-mode t)
-  (auto-complete-mode t)
-  )
-(add-hook 'maxima-mode-hook 'konix/maxima-mode-hook)
+(require 'vertico-directory)
 
-(provide '700-KONIX_maxima-mode)
-;;; 700-KONIX_maxima-mode.el ends here
+(defun konix/vertico/insert-home-directory ()
+    (interactive)
+  (insert "~/"))
+
+(keymap-set vertico-map "DEL" 'vertico-directory-delete-char)
+(keymap-set vertico-map "~" 'konix/vertico/insert-home-directory)
+
+(provide 'KONIX_AL-vertico)
+;;; KONIX_AL-vertico.el ends here

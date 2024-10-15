@@ -27,48 +27,41 @@
 (setq-default reftex-plug-into-AUCTeX t)
 (defun konix/LaTeX-mode-hook()
   (add-to-list 'TeX-command-list
-                           '("Glossary" "makeindex '%s.glo' -s '%s.ist' -t '%s.glg' -o '%s.gls'" TeX-run-command TeX-run-command TeX-run-command TeX-run-command TeX-run-command t t
-                                 :help "Run Glossaries Maker"))
+               '("Glossary" "makeindex '%s.glo' -s '%s.ist' -t '%s.glg' -o '%s.gls'" TeX-run-command TeX-run-command TeX-run-command TeX-run-command TeX-run-command t t
+                 :help "Run Glossaries Maker"))
   (add-to-list 'TeX-command-list
-                           '("PsToPdf" "ps2pdf '%s.ps' '%s.pdf'" TeX-run-command TeX-run-command t t
-                                 :help "Run PDF Maker from PS"))
+               '("PsToPdf" "ps2pdf '%s.ps' '%s.pdf'" TeX-run-command TeX-run-command t t
+                 :help "Run PDF Maker from PS"))
   (add-to-list 'TeX-command-list
-                           '("ViewPdf" "evince '%s.pdf'" TeX-run-command t t
-                                 :help "View the resulting pdf"))
+               '("ViewPdf" "evince '%s.pdf'" TeX-run-command t t
+                 :help "View the resulting pdf"))
   (add-to-list 'TeX-command-list
-                           '("MakePDF" "latex '%s.tex' && dvips '%s.dvi' && ps2pdf '%s.ps'" TeX-run-command TeX-run-command TeX-run-command t t
-                                 :help "Make from tex to pdf"))
+               '("MakePDF" "latex '%s.tex' && dvips '%s.dvi' && ps2pdf '%s.ps'" TeX-run-command TeX-run-command TeX-run-command t t
+                 :help "Make from tex to pdf"))
   (keymap-set LaTeX-mode-map "C-<F5>"
-        '(lambda()
-           (interactive)
-           (TeX-fold-buffer)
-           (preview-document)
-           ))
+              '(lambda()
+                 (interactive)
+                 (TeX-fold-buffer)
+                 (preview-document)
+                 ))
   (keymap-set LaTeX-mode-map "S-<F5>"
-        '(lambda()
-           (interactive)
-           (TeX-fold-clearout-buffer)
-           (preview-clearout-document)
-           ))
+              '(lambda()
+                 (interactive)
+                 (TeX-fold-clearout-buffer)
+                 (preview-clearout-document)
+                 ))
   (keymap-set LaTeX-mode-map "<f5>"
-        '(lambda()
-           (interactive)
-           (preview-at-point)
-           ))
+              '(lambda()
+                 (interactive)
+                 (preview-at-point)
+                 ))
   (setq preview-auto-cache-preamble t)
   (konix/flyspell-mode t)
   (TeX-source-specials-mode t)
-  (auto-complete-mode t)
   (keymap-local-set "C-c r" 'reftex-toc-Rescan)
   (TeX-fold-mode t)
   (turn-on-reftex)
   (outline-minor-mode t)
-  (setq ac-sources (append ac-sources
-                                                   '(
-                                                         ac-source-files-in-current-dir
-                                                         ac-source-filename
-                                                         ac-source-dabbrev
-                                                         )))
   (visual-line-mode 1)
   (preview-install-styles ".")
   )

@@ -24,8 +24,6 @@
 
 ;;; Code:
 
-(require 'auto-complete)
-
 (konix/auto-insert-use-yasnippet-template ".sh$" "sh")
 
 (defun konix/shell/find-command-completions (prefix)
@@ -81,7 +79,6 @@
 (defcustom konix/shell-font-lock-keywords '() "")
 (setq-default explicit-shell-file-name (locate-file "bash" exec-path exec-suffixes))
 (setq-default konix/shell/bash-dirtrack-list '("^[^|\r\n]+|path=\\([^|]+\\)|" 1 nil))
-(add-to-list 'ac-modes 'shell-mode)
 
 (defun konix/shell/is-cmd ()
   (string-match "cmd" (first (process-command(get-buffer-process (buffer-name)))))

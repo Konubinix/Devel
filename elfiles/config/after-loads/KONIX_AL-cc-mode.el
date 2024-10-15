@@ -35,13 +35,6 @@
          )
     (lsp-cquery-enable)
     )
-  (setq ac-sources
-		(append '(
-                  ac-source-konix/lsp
-                  )
-                ac-sources
-                )
-		)
   )
 (add-hook 'c++-mode-hook #'konix/c++-mode-hook)
 

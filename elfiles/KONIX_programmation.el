@@ -24,7 +24,6 @@
 
 ;;; Code:
 (require 'thingatpt)
-(require 'KONIX_auto-complete)
 (require 'highlight-parentheses)
 (require 'editorconfig)
 
@@ -176,7 +175,6 @@ They can be relative or absolute
   (goto-address-prog-mode 1)
   ;; highlight parentheses in prog
   (highlight-parentheses-mode 1)
-  (auto-complete-mode t)
   (auto-fill-mode t)
   ;; Check the parenthesis when saving
   (setq-local konix/check-paren-warn t)

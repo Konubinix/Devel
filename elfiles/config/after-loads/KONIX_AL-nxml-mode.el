@@ -380,39 +380,28 @@ immediately after the section's start-tag."
 (defun konix/nxml-mode-hook ()
   ;; extension of hs-mode regexp to fit <![CDATA[ tags
   (when konix/nxml-qname-keywords
-        (font-lock-add-keywords
-         nil
-         `(
-           (
-                ,(format "</?\\([^>:]+?:\\)?\\(%s\\)[ >]"
-                                 (mapconcat
-                                  'identity
-                                  konix/nxml-qname-keywords
-                                  "\\|")
-                                 )
-                .
-                (2 font-lock-function-name-face)
-                )
-           )
-         )
+    (font-lock-add-keywords
+     nil
+     `(
+       (
+        ,(format "</?\\([^>:]+?:\\)?\\(%s\\)[ >]"
+                 (mapconcat
+                  'identity
+                  konix/nxml-qname-keywords
+                  "\\|")
+                 )
+        .
+        (2 font-lock-function-name-face)
         )
+       )
+     )
+    )
   (auto-fill-mode t)
   (setq show-trailing-whitespace t)
   (setq indent-line-function 'konix/nxml-indent-line)
-  ;; (ac-flyspell-workaround)
-  ;; (flyspell-prog-mode)
   (keymap-local-set "C-<return>" 'konix/nxml-newline-dwim)
   (keymap-local-set "C-c C-d" 'konix/nxml/indirect-buffer-cdata)
   (setq hs-c-start-regexp "\<\!\-\-")
-  (setq ac-sources
-                '(
-                  ac-source-konix/rng
-                  ac-source-yasnippet
-                  ac-source-dictionary
-                  ac-source-files-in-current-dir
-                  ac-source-words-in-same-mode-buffers
-                  )
-                )
   (keymap-local-set "<f1>" 'konix/nxml-zoom-out)
   (keymap-local-set "<f3>" 'konix/nxml-zoom-in)
   (keymap-local-set "<f2> <f3>" 'nxml-show-all)
@@ -425,10 +414,9 @@ immediately after the section's start-tag."
   (keymap-local-set "C-c C-c" 'konix/nxml-show-context)
   (set (make-local-variable 'comment-region-function) 'konix/nxml-comment-region)
   (set (make-local-variable 'uncomment-region-function) 'konix/nxml-uncomment-region)
-  (auto-complete-mode 1)
   (setq header-line-format '(:eval (format "Schema : %s"
-                                                                                   (or rng-current-schema-file-name "Vacuous")
-                                                                                   )))
+                                           (or rng-current-schema-file-name "Vacuous")
+                                           )))
   )
 (add-hook 'nxml-mode-hook
                   'konix/nxml-mode-hook)

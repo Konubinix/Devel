@@ -25,7 +25,6 @@
 ;;; Code:
 
 (defun konix/html-mode-hook ()
-  (auto-complete-mode t)
   (hs-minor-mode t)
   )
 (setq konix/hs-html-mode-info

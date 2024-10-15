@@ -42,7 +42,6 @@
 
 (defun konix/lua-mode-hook()
   (konix/prog/config)
-  (auto-complete-mode t)
   (add-hook 'after-save-hook 'konix/make-executable t t)
   (lsp)
   (add-hook 'after-save-hook

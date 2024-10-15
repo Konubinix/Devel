@@ -40,9 +40,10 @@
   (org-agenda-refile goto rfloc t)
   )
 
-(defun konix/org-agenda-counsel-org-tag ()
+(defun konix/org-agenda-change-tag ()
   (interactive)
-  (call-interactively 'counsel-org-tag-agenda)
+  (konix/org-with-point-on-heading
+   (konix/consult-org-tag))
   (konix/org-agenda-refresh-line)
   )
 
@@ -63,10 +64,10 @@
             'auto-scroll-mode)
 
 (keymap-set org-agenda-mode-map ":"
-            'konix/org-agenda-counsel-org-tag)
+            'konix/org-agenda-change-tag)
 
 (keymap-set org-agenda-mode-map "@"
-            'konix/org-agenda-counsel-org-tag)
+            'konix/org-agenda-change-tag)
 
 (keymap-set org-agenda-mode-map "."
             'org-agenda-set-tags)

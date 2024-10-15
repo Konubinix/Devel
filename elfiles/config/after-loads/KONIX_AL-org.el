@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-
+(require 'cape)
 (require 'KONIX_org-meta-context)
 (require 'org-archive)
 (require 'org-element)
@@ -3647,7 +3647,7 @@ of the clocksum."
   (setq konix/adjust-new-lines-at-end-of-file t)
   ;; (keymap-local-set "C-a" 'move-beginning-of-line)
   ;; (keymap-local-set "C-e" 'move-end-of-line)
-  (keymap-local-set "C-j" 'auto-complete)
+  (keymap-local-set "C-j" 'completion-at-point)
   (keymap-local-set "C-c e" 'org-table-edit-field)
   (keymap-local-set "C-c <down>" 'konix/org-checkbox-toggle-and-down)
   (keymap-local-set "C-c <up>" 'konix/org-checkbox-toggle-and-up)
@@ -3691,15 +3691,8 @@ of the clocksum."
   (unless (and (boundp 'org-link-minor-mode) org-link-minor-mode)
     (konix/flyspell-mode 1)
     )
-  (auto-complete-mode t)
   (konix/org-guess-ispell)
   (abbrev-mode t)
-  ;; (visual-line-mode t)
-  (setq ac-sources (append ac-sources
-                           '(
-                             ac-source-files-in-current-dir
-                             ac-source-filename
-                             )))
   (when
       (and
        (save-excursion
@@ -3715,6 +3708,7 @@ of the clocksum."
         )
       )
     )
+  (add-to-list 'completion-at-point-functions 'cape-file t)
   )
 
 (add-hook 'org-mode-hook 'konix/org-mode-hook)
@@ -5833,8 +5827,8 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("Z" . konix/org-add-timestamp))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("N" . konix/org-roam-note))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("w" . konix/org-refile))
-(konix/push-or-replace-assoc-in-alist 'org-speed-commands '(":" . counsel-org-tag))
-(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("@" . counsel-org-tag))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '(":" . konix/consult-org-tag))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '("@" . konix/consult-org-tag))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("." . org-set-tags-command))
 
 (setq-default org-habit-show-habits nil)

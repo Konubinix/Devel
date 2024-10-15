@@ -1,8 +1,8 @@
-;;; KONIX_AL-structurizr-mode.el ---                 -*- lexical-binding: t; -*-
+;;; KONIX_AL-minibuffer.el ---                           -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024  konubinix
+;; Copyright (C) 2022  sam
 
-;; Author: konubinix <konubinixweb@gmail.com>
+;; Author: sam <sam@konixwork>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,13 +24,14 @@
 
 ;;; Code:
 
-(defun konix/structurizr-mode-hook ()
-  (setq comment-start "//")
-  (setq comment-end "")
-  (hs-minor-mode t))
+(setq-default completion-styles '(orderless basic))
+(setq-default completion-category-defaults nil)
+(setq-default completion-category-overrides '((file (styles partial-completion))))
 
-(add-hook 'structurizr-mode-hook
-          #'konix/structurizr-mode-hook)
+(require 'yasnippet-capf)
+(setq-default completion-at-point-functions (append (default-value
+                                                     'completion-at-point-functions)
+                                                    '(yasnippet-capf)))
 
-(provide 'KONIX_AL-structurizr-mode)
-;;; KONIX_AL-structurizr-mode.el ends here
+(provide 'KONIX_AL-minibuffer)
+;;; KONIX_AL-minibuffer.el ends here

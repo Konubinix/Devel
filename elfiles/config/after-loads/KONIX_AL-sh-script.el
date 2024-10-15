@@ -33,6 +33,7 @@
   )
 
 (defun konix/sh-mode-hook ()
+  (add-to-list 'completion-at-point-functions 'yasnippet-capf)
   (setq indent-tabs-mode nil
         tab-width 4
         sh-basic-offset 4
@@ -46,14 +47,6 @@
                  )
                electric-pair-pairs)
               )
-  (setq ac-sources
-        '(
-          ac-source-yasnippet
-          ac-source-dictionary
-          ac-source-words-in-same-mode-buffers
-          ac-source-files-in-current-dir
-          )
-        )
   (add-hook 'after-save-hook 'konix/sh-script/make-executable t t)
   (lsp)
   )

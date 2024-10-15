@@ -1,6 +1,6 @@
-;;; KONIX_AL-popup.el ---                            -*- lexical-binding: t; -*-
+;;; KONIX_AL-elisp-mode.el ---                       -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015  konubinix
+;; Copyright (C) 2024  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Keywords:
@@ -16,7 +16,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -24,8 +24,19 @@
 
 ;;; Code:
 
-(require 'ivy)
-(setq-default popup-isearch-regexp-builder-function 'ivy--regex-plus)
+(require 'cape)
+(require 'yasnippet-capf)
 
-(provide 'KONIX_AL-popup)
-;;; KONIX_AL-popup.el ends here
+(defun konix/emacs-lisp-mode-hook ()
+  (setq-local completion-at-point-functions
+              (list
+               (cape-capf-super
+                #'yasnippet-capf
+                #'elisp-completion-at-point)
+               )))
+
+(add-hook 'emacs-lisp-mode-hook
+          #'konix/emacs-lisp-mode-hook)
+
+(provide 'KONIX_AL-elisp-mode)
+;;; KONIX_AL-elisp-mode.el ends here

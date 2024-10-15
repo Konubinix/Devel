@@ -27,10 +27,6 @@
 (defun konix/eshell-mode-hook()
   (setq konix/delete-trailing-whitespace nil)
   (setq konix/adjust-new-lines-at-end-of-file nil)
-  (setq ac-sources '(
-					 ac-source-files-in-current-dir
-					 ac-source-filename
-					 ))
   (keymap-set eshell-mode-map "<up>" 'previous-line)
   (keymap-set eshell-mode-map "<down>" 'forward-line)
   )

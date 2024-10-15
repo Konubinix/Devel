@@ -29,6 +29,8 @@
 (require 'lsp-mode)
 (require 'lsp-jedi)
 (require 'dap-python)
+(require 'cape)
+(require 'yasnippet-capf)
 
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)
@@ -60,7 +62,6 @@
   ;; fed up with auto line breaks
   (setq indent-tabs-mode nil)
   (setq-local yas-indent-line 'fixed)
-  (auto-complete-mode 1)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
   (defvar electric-pair-pairs)
   (setq-local electric-pair-pairs
@@ -70,6 +71,12 @@
                  )
                electric-pair-pairs)
               )
+  (setq-local completion-at-point-functions
+              (list
+               (cape-capf-super
+                #'yasnippet-capf
+                #'python-completion-at-point)
+               ))
   (when (and
          (executable-find "jedi-language-server")
          (not (konix/python-is-tiltfile))
@@ -78,15 +85,15 @@
     (require 'lsp-jedi)
     (add-to-list 'lsp-disabled-clients 'pyls)
     (lsp)
+
+    (setq-local completion-at-point-functions
+                (list
+                 (cape-capf-super
+                  #'yasnippet-capf
+                  #'lsp-completion-at-point
+                  #'python-completion-at-point)
+                 ))
     )
-  (setq ac-sources
-        (append '(
-                  ac-source-konix/lsp
-                  ac-source-yasnippet
-                  )
-                )
-        )
-  (auto-complete-mode 1)
   (setq-local yas-indent-line 'fixed)
   ;; the flycheck-select-checker part must be run last, for it might fail and
   ;; prevent he following lines to be run
@@ -110,14 +117,7 @@
     )
   )
 
-(defun konix/inferior-python-mode-hook ()
-  (auto-complete-mode t)
-  (setq ac-sources
-        '(
-          ;;ac-source-konix/python/dir
-          )
-        )
-  )
+(defun konix/inferior-python-mode-hook ())
 (add-hook 'inferior-python-mode-hook
           'konix/inferior-python-mode-hook)
 

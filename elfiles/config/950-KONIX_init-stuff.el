@@ -30,24 +30,38 @@
 (golden-ratio-mode 1)
 (auto-insert-mode 1)
 
-(require 'keep-buffers)
-(require 'backup-dir)
-(require 'framemove)
-(require 'delight)
-(require 'savehist)
-(require 'winner)
-(require 'saveplace)
-(require 'git-wip-mode nil t)
-(require 'sticky-windows)
-(require 'KONIX_minibuffer_edit)
-
 ;; I don't like it by default, but like enabling it in some modes
 (electric-indent-mode -1)
 ;; this is the long part, as it loads my org files
 (which-key-mode 1)
 (editorconfig-mode 1)
 
-(require 'KONIX_org-meta-context)
-
-(setq-default org-roam-v2-ack t)
 (setq debug-on-quit nil) ;; explicitly set to t in .emacs
+
+(defun konix/after-init-hook ()
+
+  (require 'keep-buffers)
+  (require 'backup-dir)
+  (require 'consult)
+  (require 'corfu)
+  (require 'corfu-terminal)
+  (require 'framemove)
+  (require 'delight)
+  (require 'savehist)
+  (require 'recentf)
+  (require 'orderless)
+  (require 'winner)
+  (require 'saveplace)
+  (require 'git-wip-mode nil t)
+  (require 'sticky-windows)
+  (require 'KONIX_minibuffer_edit)
+  (require 'KONIX_org-meta-context)
+
+  (recentf-mode 1)
+  (vertico-mode 1)
+  (global-corfu-mode 1)
+  (corfu-terminal-mode 1)
+  )
+
+(add-hook 'after-init-hook
+          #'konix/after-init-hook)

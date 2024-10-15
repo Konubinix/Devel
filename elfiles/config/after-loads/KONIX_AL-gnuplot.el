@@ -26,21 +26,13 @@
 
 (defvar konix/gnuplot/arguments "smooth cspline with lines")
 (defun konix/gnuplot-mode-hook()
-  (auto-complete-mode t)
-  (setq ac-sources
-		'(
-		  ac-source-files-in-current-dir ;eshell
-		  ac-source-filename ; eshell
-		  ac-source-dabbrev
-		  )
-		)
   (keymap-set gnuplot-mode-map "C-x p" 'konix/gnuplot-mode-map)
   (define-prefix-command 'konix/gnuplot-mode-map)
   (keymap-set konix/gnuplot-mode-map "l" 'konix/gnuplot/load-current-file)
   (keymap-set konix/gnuplot-mode-map "g" 'konix/gnuplot)
   )
 (add-hook 'gnuplot-mode-hook
-		  'konix/gnuplot-mode-hook)
+          'konix/gnuplot-mode-hook)
 
 (provide '700-KONIX_gnuplot-mode)
 ;;; 700-KONIX_gnuplot-mode.el ends here

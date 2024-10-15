@@ -39,17 +39,6 @@
   (lispy-mode)
   (highlight-parentheses-mode)
   (aggressive-indent-mode)
-  (setq ac-sources (append
-                    '(
-                      ac-source-yasnippet
-                      ac-source-functions
-                      ac-source-symbols
-                      ac-source-variables
-                      )
-                    ac-sources
-                    )
-        )
-  (auto-complete-mode t)
   (keymap-local-set "C-h C-f" 'find-function)
   (keymap-local-set "C-h C-v" 'find-variable)
   (turn-on-eldoc-mode)

@@ -25,15 +25,8 @@
 ;;; Code:
 
 (defun konix/Custom-mode-hook()
-  (auto-complete-mode t)
   (turn-on-tempbuf-mode)
-  (setq ac-sources
-		'(
-		  ac-source-files-in-current-dir
-		  ac-source-filename
-		  ac-source-dabbrev
-		  )
-		))
+  )
 
 (add-hook 'Custom-mode-hook 'konix/Custom-mode-hook)
 

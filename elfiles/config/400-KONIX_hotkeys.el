@@ -1,5 +1,6 @@
 ;; package that are needed for my config and cannot wait for the whole package stuff
 
+
 (region-bindings-mode-enable)
 (define-prefix-command 'konix/region-bindings-mode-map)
 (keymap-set region-bindings-mode-map "r" 'konix/region-bindings-mode-map)
@@ -51,8 +52,6 @@
 ;; ################################################################################
 ;; global hotkeys
 ;; ################################################################################
-;; ioccur
-(keymap-set global-map "M-s O" 'ioccur)
 ;; yank and kill commands
 (keymap-set global-map "M-Y" 'konix/yank-pop-more-recent)
 (keymap-set global-map "C-M-y" 'konix/kill-ring-insert)
@@ -130,9 +129,6 @@
 (keymap-global-set "C-S-L" 'konix/horizontal-recenter)
 ;; Kill emacs
 (keymap-global-set "C-x M-k" 'konix/really-kill-emacs)
-;; Auto complete
-(keymap-global-set "C-j" 'hippie-expand)
-(keymap-global-set "C-S-j" 'ac-stop)
 ;; ISPELL
 (keymap-global-set "C-$" 'konix/ispell-region-or-buffer)
 (keymap-global-set "C-?" 'konix/flyspell-region-or-buffer)
@@ -393,7 +389,6 @@
 (keymap-set 'konix/imenu/map "i" 'imenu)
 (keymap-set 'konix/imenu/map "g" 'konix/imenu-tree-goto)
 (keymap-set 'konix/imenu/map "s" 'konix/imenu-tree-show)
-(keymap-set 'konix/imenu/map "." 'counsel-imenu)
 
 ;; ************************************************************
 ;; Uniquify

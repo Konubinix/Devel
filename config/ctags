@@ -2,18 +2,20 @@
 --python-kinds=cfmvi
 --c++-kinds=+cdefglmnpstuv
 --Java-kinds=cefgilmp
---extra=+fq
+--extras=+Ffq
 --exclude=build
 --exclude=node_modules
 --exclude=target
 --exclude=Generated
 --fields=+ialStmnsz
---file-scope=yes
 --langmap=c++:.c++.cc.cp.cpp.cxx.h.h++.hh.hp.hpp.hxx.C.H.txx.ixx(*.hxx.in)
 --regex-c++=/^.+public[ \t]+([^ \t,<]+).*$/\1 PARENT/
---langdef=cmake
---langmap=cmake:.cmake(CMakeLists.txt)
---regex-cmake=/\b[Mm][Aa][Cc][Rr][Oo][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 MACRO_CMAKE/
---regex-cmake=/\b[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 FCT_CMAKE/
---regex-cmake=/\b[sS][eE][tT][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 SET_CMAKE/
---regex-cmake=/\b[Gg][Ee][Tt]_[Ff][Ii][Ll][Ee][Nn][Aa][Mm][Ee]_[Cc][Oo][Mm][Pp][Oo][Nn][Ee][Nn][Tt][ \t\r\n]*\([ \t\r\n]*([a-zA-Z_0-9-]+)/\1 GET_FILENAME_COMPONENT/
+--langdef=structurizr
+--langmap=structurizr:.dsl
+--regex-structurizr=/^[ \t]*(([a-zA-Z_][a-zA-Z0-9_]+)[ \t]*=[ \t]*)?softwareSystem[ \t]+"?([^"]+)"?/\2/s,SoftwareSystem/
+--regex-structurizr=/^[ \t]*(([a-zA-Z_][a-zA-Z0-9_]+)[ \t]*=[ \t]*)?container[ \t]+"?([^"]+)"?/\2/c,Container/
+--regex-structurizr=/^[ \t]*(([a-zA-Z_][a-zA-Z0-9_]+)[ \t]*=[ \t]*)?component[ \t]+"?([^"]+)"?/\2/m,Component/
+--regex-structurizr=/^[ \t]*(([a-zA-Z_][a-zA-Z0-9_]+)[ \t]*=[ \t]*)?person[ \t]+"?([^"]+)"?/\2/p,Person/
+--regex-structurizr=/^[ \t]*(([a-zA-Z_][a-zA-Z0-9_]+)[ \t]*=[ \t]*)?deploymentNode[ \t]+"?([^"]+)"?/\2/n,DeploymentNode/
+--regex-structurizr=/^[ \t]*(([a-zA-Z_][a-zA-Z0-9_]+)[ \t]*=[ \t]*)?deploymentEnvironment[ \t]+"?([^"]+)"?/\2/e,DeploymentEnvironment/
+--regex-structurizr=/^[ \t]*(([a-zA-Z_][a-zA-Z0-9_]+)[ \t]*=[ \t]*)?containerInstance[ \t]+"?([^"]+)"?/\2/e,containerInstance/

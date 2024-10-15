@@ -27,13 +27,13 @@
 (defun konix/ledger/common-open ()
   "Open the common ledger."
   (interactive)
-  (find-file (s-trim (shell-command-to-string "clk ledger -c where-is")))
+  (find-file (s-trim (shell-command-to-string "clk ledger -c where-is 2>/dev/null")))
   )
 
 (defun konix/ledger/personal-open ()
   "Open the personal ledger."
   (interactive)
-  (find-file (s-trim (shell-command-to-string "clk ledger -p where-is")))
+  (find-file (s-trim (shell-command-to-string "clk ledger -p where-is 2>/dev/null")))
   )
 
 

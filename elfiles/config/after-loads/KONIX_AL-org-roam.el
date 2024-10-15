@@ -813,19 +813,6 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
   (setq konix/org-roam-node-read--completions/cache nil)
   )
 
-(defun konix/org-roam-db-update-file/profile (orig-fun &optional file-path &rest args)
-  (setq file-path (or file-path (buffer-file-name (buffer-base-buffer))))
-  (let (
-        (beg (current-time))
-        (res (apply orig-fun file-path args))
-        (end (current-time))
-        )
-    (message "%s s to process %s" (float-time (time-subtract end beg)) file-path)
-    res
-    )
-  )
-(advice-add #'org-roam-db-update-file :around #'konix/org-roam-db-update-file/profile)
-
 (defun konix/org-roam-visit-node-at-point ()
   (interactive)
   (if-let

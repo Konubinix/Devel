@@ -25,6 +25,10 @@
 ;;; Code:
 
 (require 'cape)
+
+(defcustom KONIX_AL-markdown-mode/python-path
+  "python" "The path to the python executable.")
+
 (custom-set-variables '(markdown-header-scaling t))
 
 (custom-set-faces
@@ -258,6 +262,26 @@
                   (point-min) (point-max) "mmdc" nil
                   nil nil "-i" "-" "-o" output-file "-e" "png"))
                (start-process "mimeopen" nil "mimeopen" output-file))
+             )
+            ((string= language "python")
+             (konix/markdown-kill-result-region-maybe)
+             (insert
+              (format "~~~\n%s\n~~~"
+                      (s-trim
+                       (let (
+                             (org-babel-python-command KONIX_AL-markdown-mode/python-path)
+                             )
+                         (org-babel-python-evaluate
+                          nil ;; session
+                          code-body
+                          'output ;; result-type
+                          ;; result-params
+                          ;; preamble
+                          ;; async
+                          ;; graphics-file
+                          ;; params
+                          ))
+                       )))
              )
             (t (progn
                  (error "%s is not a format I support. Please implement it for me :-)")))))))

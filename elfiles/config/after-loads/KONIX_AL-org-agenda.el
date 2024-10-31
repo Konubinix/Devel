@@ -1587,6 +1587,9 @@
        (org-end-of-meta-data)
        (save-restriction
          (narrow-to-region (point) (org-entry-end-position))
+         (konix/org-roam-export/unify-ipfs-links)
+         (konix/org-roam-export/convert-standalone-links)
+         (konix/org-roam-export/convert-remaining-ipfs-links)
          (org-ascii-export-as-ascii nil nil t t)
          )
        )

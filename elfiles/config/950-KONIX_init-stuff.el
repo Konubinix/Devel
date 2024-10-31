@@ -18,7 +18,7 @@
 (setq-default
  custom-safe-themes
  '(
-   "9fb561389e5ac5b9ead13a24fb4c2a3544910f67f12cfcfe77b75f36248017d0"
+   "f87c86fa3d38be32dc557ba3d4cedaaea7bc3d97ce816c0e518dfe9633250e34"
    default)
  )
 (load-theme 'zenburn)

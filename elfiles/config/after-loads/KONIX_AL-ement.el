@@ -869,7 +869,6 @@ event before rendering the event.
               (event (gethash event-id (ement-session-events session)))
               )
         (progn
-          (message msg)
           (ement-room-goto-event event)
           )
       (let (
@@ -880,7 +879,6 @@ event before rendering the event.
           (lambda ()
             ;; now, the event IS here
             (switch-to-buffer buffer)
-            (message msg)
             (ement-room-goto-event (gethash event-id (ement-session-events session)))
             )
           ))

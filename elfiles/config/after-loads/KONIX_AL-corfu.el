@@ -33,7 +33,8 @@
 
 (setq-default corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
 (setq-default corfu-auto t)                 ;; Enable auto completion
-;; (setq-default corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+;; to allow orderless support
+(setq-default corfu-quit-at-boundary 'separator)
 ;; (setq-default corfu-preview-current nil)    ;; Disable current candidate preview
 ;; (setq-default corfu-preselect 'prompt)      ;; Preselect the prompt
 ;; (setq-default corfu-on-exact-match nil)     ;; Configure handling of exact matches

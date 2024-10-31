@@ -10,15 +10,7 @@ if test -e "${TMPDIR}/${UID}/server" || test -e "/run/user/${UID}/emacs/server"
 then
 	if test -n "${DISPLAY}"
 	then
-		# if a window already exists, simply reach it
-		if wmctrl -l -x|grep -q '.Emacs'
-		then
-			exec emacsclient "$@"
-		else
-			# in case a window does not exist (the server must have been opened
-			# in the tty somewhere, create a new frame)
-			exec emacsclient --create-frame "$@"
-		fi
+		exec emacsclient --reuse-frame "$@"
 	else
 		# on a terminal, make sure to make it run on not in window mode
 		exec emacsclient -nw "$@"

@@ -74,7 +74,12 @@
   (use-package auto-scroll :commands (auto-scroll-mode))
   (use-package backup-dir)
   (use-package backup-walker)
-  (use-package bbdb)
+  ;; temporary until https://github.com/radian-software/straight.el/pull/1169
+  ;; gets merge into master, see https://github.com/radian-software/straight.el/issues/1167
+  (use-package bbdb
+    :straight (:type git
+                     :repo "https://git.savannah.nongnu.org/git/bbdb.git"
+                     :files (:defaults "lisp/bbdb-site.el.in")))
   (use-package citeproc)
   (use-package cape)
   (use-package corfu)

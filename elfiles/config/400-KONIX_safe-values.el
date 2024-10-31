@@ -25,9 +25,13 @@
 ;;; Code:
 
 (add-to-list 'safe-local-variable-values
-                         '(konix/delete-trailing-whitespace . t))
+             '(fill-column . 70))
 (add-to-list 'safe-local-variable-values
-                         '(konix/delete-trailing-whitespace . nil))
+             '(compile-command . "make lint test"))
+(add-to-list 'safe-local-variable-values
+             '(konix/delete-trailing-whitespace . t))
+(add-to-list 'safe-local-variable-values
+             '(konix/delete-trailing-whitespace . nil))
 (add-to-list 'safe-local-variable-values
                          '(auto-revert-mode . t))
 (add-to-list 'safe-local-variable-values

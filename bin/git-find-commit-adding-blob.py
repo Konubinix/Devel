@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
+import builtins
 import os
-from multiprocessing import Pool, Manager
+import re
 import shlex
 import sys
-import re
-import builtins
 from collections import defaultdict
+from multiprocessing import Manager, Pool
 
-from joblib import Parallel, delayed, Memory
 import click
-from clk.lib import check_output, progressbar
+from clk.lib import check_output
+from joblib import Memory, Parallel, delayed
+from tqdm import tqdm
 from walrus import Database
 
 cache = Database(host='localhost').cache(name=os.path.basename(__file__),
@@ -81,7 +82,7 @@ def pool(blob_sha):
             (commit, parents, blob_sha, end)
             for commit, *parents in lines  # NOQA
         ])
-    with progressbar(gen, length=len(lines)) as bar:
+    with tqdm(gen, total=len(lines)) as bar:
         for line, res in zip(lines, bar):
             if res:
                 p.terminate()
@@ -92,6 +93,7 @@ def pool(blob_sha):
 @click.command()
 @click.argument("blob-sha")
 def main(blob_sha):
+
     def attempt1():
         info = pool(blob_sha)
         if info:

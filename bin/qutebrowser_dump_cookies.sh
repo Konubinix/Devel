@@ -15,7 +15,7 @@ trap "exit 3" SIGQUIT
 
     # There is no attempt to url encode $1, but SQLite already handles
     # characters like spaces, so only ? % and # should cause issues.
-    sqlite3 -separator $'\t' "file:${XDG_DATA_HOME}/qutebrowser/webengine/Cookies?nolock=1" "
+    sqlite3 -separator '	' "file:${XDG_DATA_HOME}/qutebrowser/webengine/Cookies?nolock=1" "
 SELECT
     host_key,
     IIF(host_key LIKE '.%', 'TRUE', 'FALSE'),

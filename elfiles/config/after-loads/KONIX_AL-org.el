@@ -4056,27 +4056,15 @@ With `ID', set the ID instead of the CUSTOM_ID."
                 'headline
               (lambda (hl)
                 (let* (
-                       (properties (second hl))
-                       (begin (plist-get properties :begin))
-                       (todo_type (plist-get properties :todo-type))
-                       )
+                       (begin (org-element-begin hl))
+                       (todo_type (org-element-property :todo-type hl)))
                   (if (eq todo_type 'todo)
                       begin
                     nil
-                    )
-                  )
-                )
+                    )))
               nil
               nil
-              'headline
-              )
-            )
-           )
-          )
-        )
-      )
-    )
-  )
+              'headline))))))))
 
 ;; state change
 (defun konix/org-trigger-hook (change-plist)

@@ -3183,7 +3183,7 @@ items"
 (setq-default org-agenda-sorting-strategy
               '(
                 ;; Strategy for Weekly/Daily agenda
-                (agenda time-up user-defined-down habit-up priority-down
+                (agenda time-up user-defined-down deadline-up habit-up priority-down
                         category-keep)
                 ;; Strategy for TODO lists
                 (todo priority-down user-defined-down)

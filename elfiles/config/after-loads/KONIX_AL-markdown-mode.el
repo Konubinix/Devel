@@ -233,8 +233,7 @@
     (save-excursion
       (goto-char (second code))
       (forward-line 1)
-
-      (cond ((string= language "sh")
+      (cond ((member language '("shell" "sh"))
              (konix/markdown-kill-result-region-maybe)
              (insert
               (format "~~~\n%s\n~~~"

@@ -42,7 +42,7 @@
                           org-current-tag-alist
                         org-tag-alist)
                       (org-get-buffer-tags))))
-         (tag (completing-read "Tags: " org-last-tags-completion-table)))
+         (tag (completing-read (format "Tags (%s): " (s-join ":" tags)) org-last-tags-completion-table)))
     (konix/org-with-point-on-heading
      (org-toggle-tag tag))))
 

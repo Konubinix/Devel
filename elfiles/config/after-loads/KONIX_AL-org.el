@@ -5761,7 +5761,10 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 
 (defun konix/org-goto-next-open-list-entry ()
   (interactive)
-  (re-search-forward " [[] []] " (org-entry-end-position) t)
+  (let  (
+         (res (re-search-forward " [[] []] " (org-entry-end-position) t)))
+    (forward-char 1)
+    res)
   )
 
 (defun konix/org-goto-first-open-list-entry ()

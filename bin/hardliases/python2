@@ -4,6 +4,7 @@ source _ko_nix.sh
 
 ME="$(basename "${0}")"
 export NIXPKGS_ALLOW_INSECURE=1
-BIN="$(nix_install_binary "${ME}" "" "" "--impure")"
+# --priority 4 to make it of lower priority than other packages, like renault-api
+BIN="$(nix_install_binary "${ME}" "" "" "--priority 4 --impure")"
 
 exec "${BIN}" "${@}"

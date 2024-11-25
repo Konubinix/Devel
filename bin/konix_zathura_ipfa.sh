@@ -12,5 +12,5 @@ trap "exit 3" SIGQUIT
 FILE="$1"
 NAME="$(basename "${FILE}")"
 cd "$(dirname "${FILE}")"
-ipfa "${NAME}"
+ipfa "${NAME}"|konix_xclip_in_all.sh
 konix_display.py "Done ipfa for ${NAME}"

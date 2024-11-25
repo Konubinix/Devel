@@ -6099,64 +6099,82 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     (sit-for 1)
     (konix/org-agenda-filter-for-now)))
 
-(defvar konix/org--deadline-or-schedule/check-schedule-hides-timestamps/inhibit nil)
+(defvar konix/org--deadline-or-schedule/check-timestamps-between-schedule-and-deadline/inhibit nil)
 
 (defun konix/org-edna-process-form/process-warning-only-at-the-end (orig-func &rest args)
   (let (
-        (konix/org--deadline-or-schedule/check-schedule-hides-timestamps/inhibit t)
+        (konix/org--deadline-or-schedule/check-timestamps-between-schedule-and-deadline/inhibit t)
         )
     (apply orig-func args)
     )
-  (konix/org--deadline-or-schedule/check-schedule-hides-timestamps)
+  (konix/org--deadline-or-schedule/check-timestamps-between-schedule-and-deadline)
   )
 (advice-add #'org-edna-process-form :around #'konix/org-edna-process-form/process-warning-only-at-the-end)
 
-(defun konix/org--deadline-or-schedule/check-schedule-hides-timestamps (&rest args)
-  (unless konix/org--deadline-or-schedule/check-schedule-hides-timestamps/inhibit
-    (when-let (
-               (schedule-time (org-get-scheduled-time (point)))
-               )
+(defun konix/org--deadline-or-schedule/check-timestamps-between-schedule-and-deadline (&rest args)
+  (unless konix/org--deadline-or-schedule/check-timestamps-between-schedule-and-deadline/inhibit
+    (let (
+          (schedule-time (org-get-scheduled-time (point)))
+          (deadline-time (org-get-deadline-time (point)))
+          )
       (when-let (
                  (timestamps (konix/org-extract-active-timestamps t))
                  )
-        (->> timestamps
-             (-filter (lambda (ts)
-                        (and
-                         (time-less-p nil ts)
-                         (time-less-p ts schedule-time)
-                         )
-                        )
-                      )
-             (-map
-              (lambda (ts)
-                (warn "%s: Future time %s will be hidden by schedule %s"
-                      (konix/org-get-heading)
-                      (format-time-string "<%Y-%m-%d %H:%M>" ts)
-                      (format-time-string "<%Y-%m-%d %H:%M>" schedule-time)
-                      )
-                )
-              )
-             )
+        (if schedule-time
+            (->> timestamps
+                 (-filter (lambda (ts)
+                            (and
+                             (time-less-p nil ts)
+                             (time-less-p ts schedule-time)
+                             )
+                            )
+                          )
+                 (-map
+                  (lambda (ts)
+                    (warn "%s: Future time %s will be hidden by schedule %s"
+                          (konix/org-get-heading)
+                          (format-time-string "<%Y-%m-%d %H:%M>" ts)
+                          (format-time-string "<%Y-%m-%d %H:%M>" schedule-time)
+                          )
+                    )
+                  )
+                 ))
+        (if deadline-time
+            (->> timestamps
+                 (-filter (lambda (ts)
+                            (and
+                             (time-less-p deadline-time ts)
+                             )
+                            )
+                          )
+                 (-map
+                  (lambda (ts)
+                    (warn "%s: Future time %s will be reached after deadline %s"
+                          (konix/org-get-heading)
+                          (format-time-string "<%Y-%m-%d %H:%M>" ts)
+                          (format-time-string "<%Y-%m-%d %H:%M>" deadline-time)
+                          )
+                    )
+                  )
+                 ))
         )
-      (when-let (
-                 (deadline-time (org-get-deadline-time (point)))
-                 )
-        (when (time-less-p deadline-time schedule-time)
-          (warn "About '%s'
+      (if (and schedule-time deadline-time)
+          (when (time-less-p deadline-time schedule-time)
+            (warn "About '%s'
 Deadline time (%s) before schedule time (%s).
 The entry won't show up until it is too late.
 You should check this is not a mistake."
-                (konix/org-get-heading)
-                (org-format-time-string "%Y-%m-%d %H:%M" deadline-time)
-                (org-format-time-string "%Y-%m-%d %H:%M" schedule-time)
-                )
-          )
+                  (konix/org-get-heading)
+                  (org-format-time-string "%Y-%m-%d %H:%M" deadline-time)
+                  (org-format-time-string "%Y-%m-%d %H:%M" schedule-time)
+                  )
+            )
         )
       )
     )
   )
 
-(advice-add #'org--deadline-or-schedule :after #'konix/org--deadline-or-schedule/check-schedule-hides-timestamps)
+(advice-add #'org--deadline-or-schedule :after #'konix/org--deadline-or-schedule/check-timestamps-between-schedule-and-deadline)
 
 (defun konix/org-kill/confirm-dates-in-the-future ()
   (when-let (

@@ -60,3 +60,5 @@ application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=libreoffice.de
 application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice.desktop;
 application/vnd.openxmlformats-officedocument.presentationml.presentation=libreoffice.desktop;
 application/octet-stream=konix_gpg_mimeopen.desktop;
+text/vnd.trolltech.linguist=vlc-usercreated-1.desktop;
+video/3gpp=vlc.desktop;

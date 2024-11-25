@@ -1585,12 +1585,17 @@
      (save-excursion
        (org-back-to-heading)
        (org-end-of-meta-data)
-       (save-restriction
-         (narrow-to-region (point) (org-entry-end-position))
-         (konix/org-roam-export/unify-ipfs-links)
-         (konix/org-roam-export/convert-standalone-links)
-         (konix/org-roam-export/convert-remaining-ipfs-links)
-         (org-ascii-export-as-ascii nil nil t t)
+       (let ((content (buffer-substring-no-properties (point)
+                                                      (org-entry-end-position))))
+         (with-temp-buffer
+           ;; use another buffer so that the changes made won't impact my files
+           (insert content)
+           (org-mode)
+           (konix/org-roam-export/unify-ipfs-links)
+           (konix/org-roam-export/convert-standalone-links)
+           (konix/org-roam-export/convert-remaining-ipfs-links)
+           (org-ascii-export-as-ascii nil nil t t)
+           )
          )
        )
      (with-current-buffer "*Org ASCII Export*"

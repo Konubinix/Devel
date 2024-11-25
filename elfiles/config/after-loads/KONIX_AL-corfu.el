@@ -33,6 +33,7 @@
 
 (setq-default corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
 (setq-default corfu-auto t)                 ;; Enable auto completion
+(setq-default corfu-auto-delay 0.7)         ;; don't be too intrusive
 ;; to allow orderless support
 (setq-default corfu-quit-at-boundary 'separator)
 ;; (setq-default corfu-preview-current nil)    ;; Disable current candidate preview

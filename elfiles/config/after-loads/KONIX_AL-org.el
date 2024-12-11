@@ -5805,6 +5805,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("Y" . konix/org-toggle-maybe))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("y" . (lambda () (message "Intentionally disable y, too easily triggered to say yes"))))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("a" . (lambda () (message "Intentionally disable a"))))
+(konix/push-or-replace-assoc-in-alist 'org-speed-commands '(";" . (lambda () (message "Intentionally disable ;"))))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("[" . (lambda () (message "Intentionally disable ["))))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '("!" . (lambda () (message "Intentionally disable !"))))
 (konix/push-or-replace-assoc-in-alist 'org-speed-commands '(">" . (lambda () (message "Intentionally disable >"))))

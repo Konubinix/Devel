@@ -11,7 +11,7 @@ import "${out_png}"
 
 # Convert the screenshot to JPG format
 out_jpg="${out_png%.png}.jpg"
-convert "${out_png}" "${out_jpg}"
+magick "${out_png}" "${out_jpg}"
 
 # Compare the sizes of the PNG and JPG files, and keep the smallest one
 size_png=$(stat -c%s "${out_png}")

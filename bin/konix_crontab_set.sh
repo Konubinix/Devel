@@ -1,4 +1,7 @@
 #! /bin/bash
 
 set -eu
-crontab "${KONIX_CRONTAB}"
+if test -e "${KONIX_CRONTAB}"
+then
+    crontab "${KONIX_CRONTAB}"
+fi

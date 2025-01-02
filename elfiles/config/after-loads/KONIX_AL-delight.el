@@ -24,32 +24,38 @@
 
 ;;; Code:
 
+(defface konix/delight/org-mode-face
+  '()
+  ""
+  )
+
+
 (delight '(
-              (emacs-lisp-mode "e" :major)
-              ;; (editorconfig-mode "EC") does not work, done in KONIX_AL-editorconfig.el
-              (hs-minor-mode " hs" "hideshow")
-              (ivy-mode nil "ivy")
-              (auto-complete-mode nil "auto-complete")
-              (flyspell-mode " f" "flyspell")
-              (highlight-parentheses-mode nil "highlight-parentheses")
-              (org-edna-mode nil "org-edna")
-              (yas-minor-mode nil "yasnippet")
-              (org-roam-bibtex-mode nil "org-roam-bibtex")
-              (golden-ratio-mode nil "golden-ratio")
-              (eldoc-mode nil "eldoc")
-              (auto-fill-function nil t)
-              (lisp-interaction-mode "I" :major)
-              (fundamental-mode "F" :major)
-              (text-mode "T" :major)
-              (dired-mode "D" :major)
-              (dired-omit-mode nil "dired-x")
-              (auto-revert-mode " r" "autorevert")
-              (tempbuf-mode nil "tempbuf")
-              (org-mode "O" :major)
-              (org-agenda "OA" :major)
-              (auto-scroll-mode (:propertize " S" face envrc-mode-line-on-face) "auto-scroll")
-              )
-    )
+           (emacs-lisp-mode "e" :major)
+           ;; (editorconfig-mode "EC") does not work, done in KONIX_AL-editorconfig.el
+           (hs-minor-mode " hs" "hideshow")
+           (ivy-mode nil "ivy")
+           (auto-complete-mode nil "auto-complete")
+           (flyspell-mode " f" "flyspell")
+           (highlight-parentheses-mode nil "highlight-parentheses")
+           (org-edna-mode nil "org-edna")
+           (yas-minor-mode nil "yasnippet")
+           (org-roam-bibtex-mode nil "org-roam-bibtex")
+           (golden-ratio-mode nil "golden-ratio")
+           (eldoc-mode nil "eldoc")
+           (auto-fill-function nil t)
+           (lisp-interaction-mode "I" :major)
+           (fundamental-mode "F" :major)
+           (text-mode "T" :major)
+           (dired-mode "D" :major)
+           (dired-omit-mode nil "dired-x")
+           (auto-revert-mode " r" "autorevert")
+           (tempbuf-mode nil "tempbuf")
+           (org-mode (:propertize "O" face konix/delight/org-mode-face) :major)
+           (org-agenda "OA" :major)
+           (auto-scroll-mode (:propertize " S" face envrc-mode-line-on-face) "auto-scroll")
+           )
+         )
 
 (provide 'KONIX_AL-delight)
 ;;; KONIX_AL-delight.el ends here

@@ -349,6 +349,23 @@ ${title}
     )
   )
 
+(defun konix/org-roam/check-links (&optional window)
+  (when (org-roam-file-p)
+    (when-let (
+               (node (org-roam-node-at-point))
+               )
+      (cond ( (null (konix/org-roam/file-has-backlinks))
+              (face-remap-add-relative 'konix/delight/org-mode-face '(:foreground
+                                                                      "red")))
+            ( (null (konix/org-roam/has-backlinks node))
+              (face-remap-add-relative 'konix/delight/org-mode-face '(:foreground
+                                                                      "orange")))
+            ( t
+              (face-remap-add-relative 'konix/delight/org-mode-face '(:foreground
+                                                                      "yellow")))
+            ))
+    ))
+
 (defun konix/org-mode-hook--for-org-roam ()
   (add-hook 'before-save-hook
             'konix/org-roam-quotes-insert-semicolumns
@@ -366,7 +383,12 @@ ${title}
             'konix/org-roam-force-filename
             nil
             t)
+  (konix/org-roam/check-links)
   )
+
+;; (cancel-timer konix/org-roam/timer-check-links)
+(setq-default konix/org-roam/timer-check-links (run-with-idle-timer 3 t 'konix/org-roam/check-links))
+(add-hook 'window-selection-change-functions #'konix/org-roam/check-links)
 
 (add-hook #'org-mode-hook
           #'konix/org-mode-hook--for-org-roam)
@@ -824,6 +846,25 @@ Deprecated for I can know use normal id:, but needed before I migrated all my
     (message "I could not find a node that corresponds to the word %s" word)
     )
   )
+
+
+(defun konix/org-roam/has-backlinks (node)
+  (or (org-roam-backlinks-get node)
+      (org-roam-reflinks-get node))
+  )
+
+(defun konix/org-roam/file-has-backlinks ()
+  (let* (
+         (nodes (konix/org-roam-nodes-in-file)))
+    (or
+     (->> nodes
+          (-map 'org-roam-backlinks-get)
+          (apply 'append) ;; merge into one single list
+          )
+     (->> nodes
+          (-map 'org-roam-reflinks-get)
+          (apply 'append) ;; merge into one single list
+          ))))
 
 (cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
   (let ((level (org-roam-node-level node)))

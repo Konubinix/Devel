@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(setq-default indent-tabs-mode nil)      ;; I don't know of any situation where I prefer tabs
 (setq-default kill-ring-max 3000)
 (require 'savehist)
 

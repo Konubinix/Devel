@@ -118,3 +118,19 @@ LINE is given to 'forward-line."
     (insert content)
     )
   )
+
+(defun konix/ansify-buffer ()
+  "Apply ansi-colors for this buffer."
+  (interactive)
+  (require 'ansi-color)
+  (ansi-color-apply-on-region (point-min) (point-max)))
+
+(defun konix/after-change-function/ansify-new-content (beg end _length)
+  "To by used in `after-change-functions'."
+  (ansi-color-apply-on-region beg end))
+
+(defun konix/ansify-new-content ()
+  "Useful when auto-revert tailing a file that contains ansi codes."
+  (interactive)
+  (add-hook 'after-change-functions
+            #'konix/after-change-function/ansify-new-content nil t))

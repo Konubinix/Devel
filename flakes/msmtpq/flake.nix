@@ -37,7 +37,7 @@
             owner = "Stebalien";
             repo = name;
             rev = "refs/heads/master";
-            sha256 = "sha256-rvJpNApUk71wBWq2PUgePqz4AuTF7eaT/o01+appa+s=";
+            sha256 = "sha256-Ab23+aWvuGv5s+FUoZGCv4gC0RYQEA7pene+b7nw8fw=";
           };
         };
       });

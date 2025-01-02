@@ -7,7 +7,7 @@ fi
 alias ll='ls -l'
 alias la='ls -Al'
 alias l='ls -CF'
-alias gi="grep -i"
+alias gi="grep -i --line-buffered"
 alias CH='grep --color -i -n -r'
 alias CHnr='grep --color -n -i'
 alias SVND="svn status | grep ! | sed 's/!//' | xargs svn delete"

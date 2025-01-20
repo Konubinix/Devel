@@ -362,7 +362,7 @@ ${title}
                                                                       "orange")))
             ( t
               (face-remap-add-relative 'konix/delight/org-mode-face '(:foreground
-                                                                      "yellow")))
+                                                                      nil)))
             ))
     ))
 

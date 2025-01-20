@@ -96,7 +96,7 @@
             (org-link-escape
              (string-replace "\n" "\\n"
                              (ement-room--format-message-body
-                              event))
+                              event ement-session))
              )
 
 

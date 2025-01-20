@@ -825,16 +825,16 @@ event before rendering the event.
 
 (advice-add #'ement-room--render-html :around #'konix/ement-room--render-html/strip-fallback)
 
-(cl-defun konix/ement-room--format-message-body/prepend-replied-content (orig event &key (formatted-p t))
-  (let ((res (funcall orig event :formatted-p formatted-p)))
+(cl-defun konix/ement-room--format-message-body/prepend-replied-content (orig event session &key (formatted-p t))
+  (let ((res (funcall orig event session :formatted-p formatted-p)))
     (if konix/ement-in-thread
         res
-      (let* ((content (ement-event-content (ement--original-event-for event ement-session)))
+      (let* ((content (ement-event-content (ement--original-event-for event session)))
              (relates-to (alist-get 'm.relates_to content))
              (reply-to (and relates-to (alist-get 'm.in_reply_to relates-to)))
              (reply-id (and reply-to (alist-get 'event_id reply-to)))
-             (replied-id (and reply-id (konix/ement-replace/find-newest ement-session ement-room reply-id)))
-             (replied (and replied-id (konix/ement-find-event-by-id ement-session ement-room replied-id)))
+             (replied-id (and reply-id (konix/ement-replace/find-newest session ement-room reply-id)))
+             (replied (and replied-id (konix/ement-find-event-by-id session ement-room replied-id)))
              (replied-content (and replied (ement-event-content replied)))
              (replied-body (and replied-content (or (when-let ((new-content (alist-get 'm.new_content
                                                                                        replied-content)))
@@ -857,6 +857,7 @@ event before rendering the event.
         res))))
 
 (advice-add #'ement-room--format-message-body :around #'konix/ement-room--format-message-body/prepend-replied-content)
+;; (advice-remove #'ement-room--format-message-body #'konix/ement-room--format-message-body/prepend-replied-content)
 
                                         ; event
 

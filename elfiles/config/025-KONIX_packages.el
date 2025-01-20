@@ -136,6 +136,11 @@
   (use-package kubel :commands (kubel))
   (use-package kubernetes)
   (use-package ledger-mode :commands (konix/ledger-run konix/ledger-report))
+  (use-package lsp-bridge
+    :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+                           :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+                           :build (:not compile))
+    )
   (use-package lsp-jedi)
   (use-package lua-mode :commands (lua-mode) :mode "\\.lua$")
   (use-package mic-paren)

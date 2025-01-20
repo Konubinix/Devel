@@ -5168,6 +5168,7 @@ With `ID', set the ID instead of the CUSTOM_ID."
     (keymap-set map "<SPC>" 'konix/org-gtd-context-edit-toggle-comment-forward)
     (keymap-set map "<DEL>" 'konix/org-gtd-context-edit-toggle-comment-backward)
     (keymap-set map "k" '(lambda () (interactive) (save-buffer) (bury-buffer)))
+    (keymap-set map "r" '(lambda () (interactive) (save-buffer) (bury-buffer)))
     (keymap-set map "C" '(lambda () (interactive) (save-buffer) (bury-buffer)))
     (keymap-set map "i" '(lambda () (interactive) (save-buffer) (bury-buffer)))
     (keymap-set map "o" 'konix/org-gtd-context-open-ref)

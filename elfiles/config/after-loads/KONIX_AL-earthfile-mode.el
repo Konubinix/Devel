@@ -28,7 +28,7 @@
   (setq indent-tabs-mode nil)
   (setq tab-width 4)
   (setq indent-line-function #'tab-to-tab-stop)
-  (setq-local lsp-semantic-tokens-enable t)
+  (setq-local lsp-semantic-tokens-enable nil)
   (lsp)
   )
 

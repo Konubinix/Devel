@@ -36,32 +36,33 @@
 
 
 (defun konix/go-mode-hook ()
-    (hs-minor-mode 1)
-    (when (require 'lsp nil t)
-        ;; envrc sets the exec-path before this, but if we don't wait the root loop
-        ;; to make one iteration, it is not taken into account
-        (run-at-time nil nil 'lsp)
-        )
-    (lsp-headerline-breadcrumb-mode)
-    (setq-default gofmt-command "goimports") ;; see https://pkg.go.dev/golang.org/x/tools/cmd/goimports
-    (add-hook 'before-save-hook 'gofmt-before-save nil t)
-    (add-hook 'after-save-hook 'konix/go/make-executable t t)
-    (font-lock-add-keywords
-        nil
-        `(
-             (
-                 "func *\\(?:([a-zA-Z0-9 _*]+)\\)? *\\([A-Z][a-zA-Z0-9_]+\\)"
-                 .
-                 (1 konix/go-font-lock-public-function-name-face)
-                 )
-             (
-                 "type *\\([A-Z][a-zA-Z0-9_]+\\)"
-                 .
-                 (1 konix/go-font-lock-public-function-name-face)
-                 )
-             )
-        )
+  (hs-minor-mode 1)
+  (setq-local lsp-semantic-tokens-enable t)
+  (when (require 'lsp nil t)
+    ;; envrc sets the exec-path before this, but if we don't wait the root loop
+    ;; to make one iteration, it is not taken into account
+    (run-at-time nil nil 'lsp)
     )
+  (lsp-headerline-breadcrumb-mode)
+  (setq-default gofmt-command "goimports") ;; see https://pkg.go.dev/golang.org/x/tools/cmd/goimports
+  (add-hook 'before-save-hook 'gofmt-before-save nil t)
+  (add-hook 'after-save-hook 'konix/go/make-executable t t)
+  (font-lock-add-keywords
+   nil
+   `(
+     (
+      "func *\\(?:([a-zA-Z0-9 _*]+)\\)? *\\([A-Z][a-zA-Z0-9_]+\\)"
+      .
+      (1 konix/go-font-lock-public-function-name-face)
+      )
+     (
+      "type *\\([A-Z][a-zA-Z0-9_]+\\)"
+      .
+      (1 konix/go-font-lock-public-function-name-face)
+      )
+     )
+   )
+  )
 
 (add-hook 'go-mode-hook
     'konix/go-mode-hook)

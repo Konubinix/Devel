@@ -27,8 +27,8 @@
 (defun konix/rust/make-executable ()
   "Make the rust file executable if need be."
   (when (save-excursion
-		  (goto-char (point-min))
-		  (re-search-forward "#!/usr/bin/env run-cargo-script" nil t)
+          (goto-char (point-min))
+          (re-search-forward "#!/usr/bin/env run-cargo-script" nil t)
           )
     (konix/make-executable)
     )
@@ -44,6 +44,7 @@
 (defun konix/rust-mode-hook ()
   "Custom hook around rust mode."
   (konix/prog/config)
+  (setq-local lsp-semantic-tokens-enable t)
   (when (require 'lsp nil t)
     ;; envrc sets the exec-path before this, but if we don't wait the root loop
     ;; to make one iteration, it is not taken into account

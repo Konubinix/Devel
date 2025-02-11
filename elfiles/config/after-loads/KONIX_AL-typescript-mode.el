@@ -30,6 +30,7 @@
 
 (defun konix/typescript-mode-hook ()
   (lsp)
+  (setq-local lsp-semantic-tokens-enable t)
   (konix/prog/config)
   (setq indent-tabs-mode nil) ;; https://google.github.io/styleguide/jsguide.html#whitespace-characters
   (setq tab-width 2) ;; https://google.github.io/styleguide/jsguide.html#formatting-block-indentation

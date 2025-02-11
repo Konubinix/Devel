@@ -320,7 +320,7 @@ ${title}
           (forward-line)
           (require 'uuidgen)
           (insert "\n#+name: " (uuidgen-4) "\n#+BEGIN_QUOTE\n" decoded-body
-                  "\n\n--- " decoded-url "\n#+END_QUOTE\n"))
+                  "\n\n--- " decoded-url " (" (format-time-string "[%Y-%m-%d]") ")\n#+END_QUOTE\n"))
         )
       )
     (pop-to-buffer buffer)

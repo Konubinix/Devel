@@ -6,7 +6,7 @@ ${50:#+NAME: `(uuidgen-4)`
 }#+BEGIN_QUOTE
 $100${200:
 
---- $300}
+--- $300 (`(format-time-string "[%Y-%m-%d]")`)}
 #+END_QUOTE
 
 $0

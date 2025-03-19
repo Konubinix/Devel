@@ -10,4 +10,4 @@ trap "exit 2" SIGINT
 trap "exit 3" SIGQUIT
 
 echo "Running viddy instead" >&2
-exec viddy "$@"
+exec viddy --differences "$@"

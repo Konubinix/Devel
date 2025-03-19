@@ -361,9 +361,7 @@ ${title}
               (face-remap-add-relative 'konix/delight/org-mode-face '(:foreground
                                                                       "orange")))
             ( t
-              (face-remap-add-relative 'konix/delight/org-mode-face '(:foreground
-                                                                      nil)))
-            ))
+              (face-remap-add-relative 'konix/delight/org-mode-face nil))))
     ))
 
 (defun konix/org-mode-hook--for-org-roam ()

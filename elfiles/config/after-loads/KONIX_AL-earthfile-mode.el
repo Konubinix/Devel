@@ -23,12 +23,11 @@
 ;;
 
 ;;; Code:
-
 (defun konix/earthfile-mode-hook ()
   (setq indent-tabs-mode nil)
   (setq tab-width 4)
   (setq indent-line-function #'tab-to-tab-stop)
-  (setq-local lsp-semantic-tokens-enable nil)
+  (setq-local lsp-semantic-tokens-enable t)
   (lsp)
   )
 

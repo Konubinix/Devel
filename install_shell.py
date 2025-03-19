@@ -48,7 +48,14 @@ konix_load_init () {
 }
 
 # if the computer is in bad shape, do not load the whole configuration
-[ "$(cut -d. -f1 /proc/loadavg)" -gt "$(expr 2 \* $(nproc))" ] && return
+if [ "$(cut -d. -f1 /proc/loadavg)" -gt "$(expr 2 \* $(nproc))" ]
+then
+    read -p 'Busy system, load the conf anyway? (Y/n)' answer
+    if test "n" = "${answer}"
+    then
+        return
+    fi
+fi
 konix_load_init
 """)
 

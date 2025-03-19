@@ -24,6 +24,29 @@
 
 ;;; Code:
 
+(defun konix/kubel-capture-context-namespace ()
+  (interactive)
+  (setq-default
+   kubel-context (replace-regexp-in-string
+                  "\n" "" (kubel--exec-to-string "kubectl config current-context"))
+   kubel-namespace (let ((ns (kubel--exec-to-string "kubectl config view --minify --output 'jsonpath={..namespace}'")))
+                     (if (string= ns "")
+                         "default"
+                       ns))))
+
+(defun konix/kubel/before/capture-context-namespace (&rest args)
+  (if current-prefix-arg
+      (progn
+        (setq-default
+         kubel-context (completing-read
+                        "Select context: "
+                        (split-string (kubel--exec-to-string (format "%s config view -o jsonpath='{.contexts[*].name}'" kubel-kubectl)) " "))
+         kubel-namespace (completing-read "Namespace: " (kubel--list-namespace)
+                                          nil nil nil nil "default"))
+        (shell-command (format "clk k8s go %s --namespace %s" kubel-context kubel-namespace)))
+    (konix/kubel-capture-context-namespace)))
+(advice-add #'kubel :before 'konix/kubel/before/capture-context-namespace)
+
 (defun konix/kubel-get-line-at-point ()
   (string-trim (buffer-substring-no-properties (save-excursion (beginning-of-line) (point))(save-excursion (end-of-line) (point))))
   )

@@ -78,7 +78,10 @@
                 #'python-completion-at-point)
                ))
   (when (and
-         (executable-find "jedi-language-server")
+         (or
+          (executable-find "jedi-language-server")
+          (executable-find "pylsp")
+          )
          (not (konix/python-is-tiltfile))
          )
     (require 'lsp)

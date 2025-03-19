@@ -42,8 +42,23 @@ truncate_to_repo = false
 [character]
 success_symbol = "[✔](bold green) "
 error_symbol = "[✗](bold red) "
-[kubernetes.context_aliases]
-"k3d-k3s-default" = "dev"
+[kubernetes]
+disabled=false
+# detect_files=["Tiltfile"]
+# detect_folders=["helm"]
+style= "blue"
+format = '[⛵ $context \($namespace\) ]($style)'
+[[kubernetes.contexts]]
+context_pattern = "kind-clk-k8s"
+style = "green"
+[[kubernetes.contexts]]
+context_pattern = ".*(beta|staging|prod)-eks-cluster"
+style = "bold red"
+context_alias = "beta"
+[[kubernetes.contexts]]
+context_pattern = ".*testing-eks-cluster"
+style = "bold yellow"
+context_alias = "testing"
 [status]
 disabled = false
 pipestatus = true

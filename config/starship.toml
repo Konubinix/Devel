@@ -54,7 +54,7 @@ style = "green"
 [[kubernetes.contexts]]
 context_pattern = ".*(beta|staging|prod)-eks-cluster"
 style = "bold red"
-context_alias = "beta"
+context_alias = "$1"
 [[kubernetes.contexts]]
 context_pattern = ".*testing-eks-cluster"
 style = "bold yellow"

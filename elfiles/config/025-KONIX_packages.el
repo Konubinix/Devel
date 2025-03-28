@@ -143,6 +143,7 @@
     )
   (use-package lsp-jedi)
   (use-package lua-mode :commands (lua-mode) :mode "\\.lua$")
+  ;; (use-package marginalia) -> too much information that I barely look at
   (use-package mic-paren)
   (use-package michelson :straight (:type git :host github :repo "MiloDavis/michelson-mode"))
   (use-package miniedit :commands (miniedit))

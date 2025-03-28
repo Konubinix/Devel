@@ -61,6 +61,7 @@
   (vertico-mode 1)
   (global-corfu-mode 1)
   (corfu-terminal-mode 1)
+  ;; (marginalia-mode 1)
   )
 
 (add-hook 'after-init-hook

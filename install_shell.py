@@ -36,16 +36,11 @@ import_env
 [ -z "$PS1" ] && return
 test "${TERM}" = "dumb" && return
 
-konix_load_init () {
-    # mist be done asap to increase chances the started shell is still in the active window
-    if test -n "${TMUX_PANE}"
-    then
-        export KONIX_TMUX_WINDOW="$(tmux display-message -p '#{window_index}')"
-    fi
-    source "${HOME}/.shrc_var"
-    source "${KONIX_CONFIG_DIR}/bashrc"
-    source "${KONIX_SH_CUSTOM_FILE}"
-}
+# must be done asap to increase chances the started shell is still in the active window
+if test -n "${TMUX_PANE}"
+then
+    export KONIX_TMUX_WINDOW="$(tmux display-message -p '#{window_index}')"
+fi
 
 # if the computer is in bad shape, do not load the whole configuration
 if [ "$(cut -d. -f1 /proc/loadavg)" -gt "$(expr 2 \* $(nproc))" ]
@@ -56,33 +51,14 @@ then
         return
     fi
 fi
-konix_load_init
+
+# don't put this code inside a function, or stuff like preexec won't be
+# persisted in the session
+source "${HOME}/.shrc_var"
+source "${KONIX_CONFIG_DIR}/bashrc"
+source "${KONIX_SH_CUSTOM_FILE}"
 """)
 
-    # ####################################################################################################
-    # SHRC
-    # ####################################################################################################
-    replace_file_content(
-        os.path.join(environ["HOME"], ".shrc"), """#!/bin/bash
-[ -n "${IN_NIX_SHELL}" ] && return
-[ -z "$PS1" ] && return
-test "${TERM}" = "dumb" && return
-
-konix_load_init () {
-    # mist be done asap to increase chances the started shell is still in the active window
-    if test -n "${TMUX_PANE}"
-    then
-        export KONIX_TMUX_WINDOW="$(tmux display-message -p '#{window_index}')"
-    fi
-    source "${HOME}/.shrc_var"
-    source "${KONIX_CONFIG_DIR}/bashrc"
-    source "${KONIX_SH_CUSTOM_FILE}"
-}
-
-# if the computer is in bad shape, do not load the whole configuration
-[ "$(cut -d. -f1 /proc/loadavg)" -gt "$(expr 2 \* $(nproc))" ] && return
-konix_load_init
-""")
     print("Successful installed shell config")
 
 

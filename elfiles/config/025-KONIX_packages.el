@@ -130,7 +130,8 @@
   (use-package ini)
   (use-package js2-mode :commands (js2-mode) :mode ("\\.mjs$" . js2-mode))
   (use-package keep-buffers)
-  (use-package key-chord)
+  ;; https://www.reddit.com/r/emacs/comments/1jfa2bp/looking_for_users_to_test_a_new_version_of/?rdt=34388
+  (use-package key-chord :straight (:fork (:repo "LemonBreezes/key-chord")))
   (use-package kivy-mode)
   (use-package lisp :straight (:type built-in) :mode ("emacs$" . list-mode))
   (use-package lispy)

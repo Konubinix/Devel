@@ -343,6 +343,9 @@
      (org-back-to-heading)
      )
     )
+  (when (get-buffer-window (current-buffer))
+    (recenter-top-bottom 0))
+  (hl-line-flash 7)
   )
 
 (defmacro konix/org-with-point-on-heading (body)

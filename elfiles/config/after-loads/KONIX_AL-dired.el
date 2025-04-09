@@ -255,11 +255,19 @@
 (defun konix/ipfa-file (filename)
   (let (
         (result
-         (with-temp-buffer
-           (cd (file-name-directory filename))
-           (call-process "ipfa" nil (current-buffer) nil (file-name-nondirectory filename))
-           (s-trim (buffer-substring-no-properties (point-min) (point-max)))
-           )
+         (cond
+          ((s-starts-with? "/ipmfs" filename)
+           (s-concat
+            "/ipfs/"
+            (s-trim (shell-command-to-string (format "ipfs files stat --hash '%s'" (s-replace-regexp "^/ipmfs" "" filename))))
+            (format "?filename=%s" filename)))
+          (t
+           (with-temp-buffer
+             (cd (file-name-directory filename))
+             (call-process "ipfa" nil (current-buffer) nil (file-name-nondirectory filename))
+             (s-trim (buffer-substring-no-properties (point-min) (point-max)))
+             )
+           ))
          )
         )
     (when (member current-prefix-arg '((4)))

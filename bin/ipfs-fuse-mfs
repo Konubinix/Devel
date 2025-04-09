@@ -1,0 +1,234 @@
+#!/usr/bin/env python
+
+import errno
+import re
+import stat
+from pathlib import Path
+from subprocess import PIPE, Popen, check_call, check_output
+
+import fuse
+from fuse import Fuse
+
+fuse.fuse_python_api = (0, 2)
+
+
+class MyStat(fuse.Stat):
+
+    def __init__(self):
+        self.st_mode = 0
+        self.st_ino = 0
+        self.st_dev = 0
+        self.st_nlink = 0
+        self.st_uid = 0
+        self.st_gid = 0
+        self.st_size = 0
+        self.st_atime = 0
+        self.st_mtime = 0
+        self.st_ctime = 0
+
+
+class IPFSFS(Fuse):
+
+    def getattr(self, path):
+        if path == "/":
+            f = {"isdir": True}
+        else:
+            try:
+                f = self.findfile(path)
+            except Exception:
+                return -errno.ENOENT
+        st = MyStat()
+        if f["isdir"]:
+            st.st_mode = stat.S_IFDIR | 0o755
+            st.st_nlink = 2
+        else:
+            st.st_mode = stat.S_IFREG | 0o444
+            st.st_nlink = 1
+            st.st_size = int(f["size"])
+        return st
+
+    def findfile(self, path):
+        p = Path(path)
+        return self.listdir(p.parent)[p.name]
+
+    def listdir(self, path):
+        return {
+            re.sub("^(.+?)/?$", r"\1",
+                   line.split("\t")[0]): {
+                "isdir": line.split("\t")[0].endswith("/"),
+                "size": line.split("\t")[2],
+            }
+            for line in check_output(["ipfs", "files", "ls", "-l", path],
+                                     encoding="utf-8").splitlines()
+        }
+
+    def rename(self, old, new):
+        check_call([
+            "ipfs",
+            "files",
+            "mv",
+            old,
+            new,
+        ])
+
+    def unlink(self, path):
+        check_call([
+            "ipfs",
+            "files",
+            "rm",
+            path,
+        ])
+
+    def mkdir(self, path, mode):
+        check_call([
+            "ipfs",
+            "files",
+            "mkdir",
+            "--cid-version",
+            "1",
+            path,
+        ])
+
+    def readdir(self, path, offset):
+        yield fuse.Direntry(".")
+        yield fuse.Direntry("..")
+        for r in self.listdir(path).keys():
+            yield fuse.Direntry(r)
+
+    def open(self, path, flags):
+        pass
+
+    def create(
+        self,
+        path,
+        mode,
+        fi=None,
+    ):
+        # ipfs files write will use dag-pb codec, even if called with
+        # --raw-leaves, I have to ipfs add first and then copy in the mfs with the
+        # appropriate raw codec.
+
+        # here, I only create a file, so copying the empty content with the
+        # appropriate codec is enough
+        check_output([
+            "ipfs", "files", "cp",
+            "/ipfs/bafkreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku",
+            path
+        ], )
+        # p = Popen(
+        #     [
+        #         "ipfs",
+        #         "files",
+        #         "write",
+        #         "--cid-version",
+        #         "1",
+        #         "--create",
+        #         path,
+        #     ],
+        #     stdin=PIPE,
+        # )
+        # p.communicate("")
+        # p.wait()
+
+    def flush(self, path):
+        check_call([
+            "ipfs",
+            "files",
+            "flush",
+            path,
+        ])
+
+    def rmdir(self, path):
+        check_call([
+            "ipfs",
+            "files",
+            "rm",
+            "-r",
+            path,
+        ])
+
+    def write(self, path, buf, offset):
+        # ipfs files write will use dag-pb codec, even if called with
+        # --raw-leaves, I have to ipfs add first and then copy in the mfs with the
+        # appropriate raw codec.
+        if offset != 0:
+            raise NotImplementedError()
+
+        p = Popen(
+            [
+                "ipfa",
+            ],
+            stdin=PIPE,
+            stdout=PIPE,
+        )
+        out, err = p.communicate(buf)
+        p.wait()
+        self.unlink(path)
+        check_call(["ipfs", "files", "cp", out.decode().strip(), path])
+        # p = Popen(
+        #     [
+        #         "ipfs",
+        #         "files",
+        #         "write",
+        #         "--cid-version",
+        #         "1",
+        #         "--offset",
+        #         str(offset),
+        #         path,
+        #     ],
+        #     stdin=PIPE,
+        # )
+        # p.communicate(buf)
+
+        return len(buf)
+
+    def release(self, path, _):
+        pass
+
+    def truncate(self, path, size):
+        if size != 0:
+            raise NotImplementedError(())
+        # same as removing and then creating
+        self.unlink(path)
+        self.create(path, None)
+        # p = Popen(
+        #     [
+        #         "ipfs",
+        #         "files",
+        #         "write",
+        #         "--cid-version",
+        #         "1",
+        #         "--truncate",
+        #         path,
+        #     ],
+        #     stdin=PIPE,
+        # )
+        # p.communicate("")
+
+    def read(self, path, size, offset):
+        content = check_output(["ipfs", "files", "read", path])
+        slen = len(content)
+        if offset < slen:
+            if offset + size > slen:
+                size = slen - offset
+            buf = content[offset:offset + size]
+        else:
+            buf = b''
+        return buf
+
+
+def main():
+    usage = """
+Mount ipfs MFS
+
+""" + Fuse.fusage
+    server = IPFSFS(version="%prog " + fuse.__version__,
+                    usage=usage,
+                    dash_s_do='setsingle')
+
+    server.parse(errex=1)
+    server.main()
+
+
+if __name__ == '__main__':
+    main()

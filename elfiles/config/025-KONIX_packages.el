@@ -172,6 +172,7 @@
   (use-package ox-hugo)
   (use-package ox-gfm)
   (use-package pdf-tools :straight (:repo "dalanicolai/pdf-tools" :branch "pdf-roll") :magic ("%PDF" . pdf-view-mode))
+  (use-package pgmacs :straight (:repo "emarsden/pgmacs" :host github))
   (use-package phi-search-dired)
   (use-package popwin)
   (use-package prism)

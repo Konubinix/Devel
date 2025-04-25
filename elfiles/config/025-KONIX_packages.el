@@ -157,7 +157,7 @@
   (use-package org-checklist :straight org-contrib)
   (use-package org-edna)
   (use-package org-drill :bind-keymap  ("C-f D" . konix/org-drill-key-map))
-  (use-package org-link-minor-mode :straight (:type git :host github :repo "seanohalpin/org-link-minor-mode" :fork t))
+  (use-package orglink)
   (use-package org-mime :commands (konix/org-mime-htmlize-current))
   (use-package org-ql :commands (org-ql-search))
   (use-package org-roam :commands (konix/org-roam-note))

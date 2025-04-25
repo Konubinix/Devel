@@ -226,9 +226,7 @@ reg \\( Temp or Auto \\) and not %twin ")
 (defun konix/legder-mode-hook ()
   (setq completion-at-point-functions
         '(konix/ledger/completion-at-point))
-  (org-link-minor-mode 1)
-  (setq tab-width 8)                    ;; for org-link-minor-mode to work
-  )
+  (orglink-mode 1))
 (add-hook 'ledger-mode-hook 'konix/legder-mode-hook)
 
 (defun konix/ledger-in-comment-line-p ()

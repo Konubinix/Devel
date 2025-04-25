@@ -125,7 +125,6 @@
 
 (defun konix/markdown-mode-hook()
   (konix/flyspell-mode t)
-  ;;(org-link-minor-mode 1)
   (ispell-change-dictionary "american")
   (setq-local electric-pair-pairs
               (append

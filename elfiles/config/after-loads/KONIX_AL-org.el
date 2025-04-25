@@ -6284,7 +6284,7 @@ You should check this is not a mistake."
         (org-show-properties)
         (org-transclusion-mode -1)
         (when org-inline-image-overlays
-          (org-toggle-inline-images)
+          (org-link-preview)
           )
         (setq konix/org-view-mode nil)
         )
@@ -6294,7 +6294,7 @@ You should check this is not a mistake."
       (org-hide-tags)
       (org-hide-scheduling)
       (unless org-inline-image-overlays
-        (org-toggle-inline-images)
+        (org-link-preview)
         )
       (setq konix/org-view-mode t)
       )

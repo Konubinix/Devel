@@ -998,11 +998,19 @@
                           (node (org-roam-node-from-id id))
                           (slug (org-roam-node-slug node))
                           (kind (konix/org-roam-export/node-extract-kind-unsafe node))
+                          (url (konix/org-roam-export/format-url node))
                           )
+                     (when (and (member mykind
+                                        konix/org/roam-export/public-kinds) (not
+                                        (member kind
+                                                konix/org/roam-export/public-kinds)))
+                       (user-error
+                        "%s -> %s unauthorized. A public note cannot point to a  non public note"
+                        (konix/org-roam-export/get-buffer-file-name) url))
                      (goto-char (point-min))
                      (replace-string
                       (format "id:%s" id)
-                      (konix/org-roam-export/format-url node)
+                      url
                       )
                      )
                    )
@@ -1176,6 +1184,7 @@ citation key, for Org-ref cite links."
   (konix/org-roam-export/unify-ipfs-links)
   (konix/org-roam-export/convert-standalone-links)
   (konix/org-roam-export/convert-remaining-ipfs-links)
+  ;; the following will also assert in case a link to a more private stuff exists
   (konix/org-roam-replace-roam-links-with-hugo-compatible-ones)
   )
 

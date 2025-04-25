@@ -646,6 +646,12 @@ globalkeys = gears.table.join(
 		end)
 	end, { description = "toggle mute", group = "music" }),
 	awful.key({}, "XF86AudioNext", function()
+		naughty.notify({
+			preset = naughty.config.presets.normal,
+			title = "MPD",
+			text = "mpc next",
+			timeout = 0.5,
+		})
 		awful.spawn.easy_async("clk mpc next", function(stdout, stderr, exitreason, exitcode)
 			naughty.notify({
 				preset = naughty.config.presets.normal,
@@ -655,6 +661,12 @@ globalkeys = gears.table.join(
 		end)
 	end, { description = "play next song", group = "music" }),
 	awful.key({}, "XF86AudioPrev", function()
+		naughty.notify({
+			preset = naughty.config.presets.normal,
+			title = "MPD",
+			text = "mpc prev",
+			timeout = 0.5,
+		})
 		awful.spawn.easy_async("clk mpc prev", function(stdout, stderr, exitreason, exitcode)
 			naughty.notify({
 				preset = naughty.config.presets.normal,

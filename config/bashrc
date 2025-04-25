@@ -114,7 +114,7 @@ konix_warn_it_took_too_long ( ) {
     then
         args+=(-t boring)
     fi
-    konix_display.py "${args[@]}" -o "'$(HISTTIMEFORMAT=":" history|tail -1|sed -r 's/^[^:]+:(.+)$/\1/')' took ${KONIX_DURATION}s"
+    clk notify "${args[@]}" -o "'$(HISTTIMEFORMAT=":" history|tail -1|sed -r 's/^[^:]+:(.+)$/\1/')' took ${KONIX_DURATION}s"
 }
 
 konix_was_active_not_long_ago ( ) {

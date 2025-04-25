@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
 
-def by_pynotify(message, urgency):
+def by_pynotify(message, urgency, duration, title):
     import notify2
     if not notify2.init("Message"):
         sys.exit(1)
@@ -22,16 +22,27 @@ def by_pynotify(message, urgency):
     n.show()
 
 
-def by_notify_send(message, urgency):
+def by_notify_send(message, urgency, duration, title):
     urgency = {
         "normal": "normal",
         "annoying": "normal",
         "boring": "critical",
     }[urgency]
-    subprocess.check_call(["notify-send", "--urgency", urgency, message])
+    args = [
+        "notify-send",
+        "--expire-time",
+        str(duration),
+        "--urgency",
+        urgency,
+    ]
+    if title:
+        args += [title]
+    args += [message]
+
+    subprocess.check_call(args)
 
 
-def by_sl4a(message, type_):
+def by_sl4a(message, type_, duration, title):
     import andlib
     from konix_android import droid
     if type_ == "normal":
@@ -46,7 +57,7 @@ def by_sl4a(message, type_):
         andlib.display(droid, "!", message, wait=False)
 
 
-def send_to_phone(message, type_):
+def send_to_phone(message, type_, duration, title):
     here = os.path.exists(os.path.expanduser("~/.here"))
     priority = {
         "normal": 1,
@@ -59,18 +70,28 @@ def send_to_phone(message, type_):
 
 
 # type_ is normal or annoying or boring
-def main(message, unique=False, duration=3000, type_="normal", to_phone=False):
+def main(message,
+         unique=False,
+         duration=3000,
+         type_="normal",
+         to_phone=False,
+         title=""):
     message = message.replace("<", "-")
-    try:
-        local_display(message, unique, duration, type_)
-    except Exception as e:
-        LOGGER.critical("Could not display locally")
-        LOGGER.exception(e)
     if to_phone:
-        send_to_phone(message, type_)
+        send_to_phone(message, type_, duration, title)
+    else:
+        try:
+            local_display(message, unique, type_, duration, title)
+        except Exception as e:
+            LOGGER.critical("Could not display locally")
+            LOGGER.exception(e)
 
 
-def local_display(message, unique=False, duration=3000, type_="normal"):
+def local_display(message,
+                  unique=False,
+                  type_="normal",
+                  duration=3000,
+                  title=""):
     candidates = [
         by_notify_send,
         by_pynotify,
@@ -79,7 +100,7 @@ def local_display(message, unique=False, duration=3000, type_="normal"):
 
     for candidate in candidates:
         try:
-            candidate(message, type_)
+            candidate(message, type_, duration, title)
         except Exception as e:
             LOGGER.exception(e)
         else:

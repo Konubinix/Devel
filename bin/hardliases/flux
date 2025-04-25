@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source _ko_nix.sh
+
+ME="$(basename "${0}")"
+BIN="$(nix_install_binary "${ME}" "fluxcd")"
+
+exec "${BIN}" "${@}"

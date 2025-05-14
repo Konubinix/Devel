@@ -16,6 +16,7 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+from subprocess import check_output
 
 import dateutil
 import dateutil.parser
@@ -419,11 +420,11 @@ Attendees:
                         ),
                         self.attendees,
                     ), ),
-                re.sub("^\*",
+                re.sub(r"^\*",
                        ",*",
                        self.text_description.strip(),
                        flags=re.MULTILINE),
-                re.sub("^\*", ",*", str(self).strip(), flags=re.MULTILINE),
+                re.sub(r"^\*", ",*", str(self).strip(), flags=re.MULTILINE),
             )
 
         @property
@@ -517,10 +518,6 @@ Attendees:
     def do_dump_org(self, event_id):
         print(self.get_event(event_id).org_mode)
 
-    def do_clear_token(self, line=None):
-        self.db.delete(self.access_token_name)
-        self.db.delete(self.refresh_token_name)
-
     def db_name_transform(self, name):
         if name in [
                 "access_token",
@@ -540,14 +537,6 @@ Attendees:
     @property
     def access_token_name(self):
         return self.db_name_transform("access_token")
-
-    @property
-    def user_code_name(self):
-        return self.db_name_transform("user_code")
-
-    @property
-    def device_code_name(self):
-        return self.db_name_transform("device_code")
 
     @property
     def refresh_token_name(self):
@@ -575,29 +564,10 @@ Attendees:
     #@lazy("access_token")
     @provides("access_token")
     def refresh_token(self):
-        LOGGER.debug("Refreshing access token")
-        resp = requests.post(
-            "https://oauth2.googleapis.com/token",
-            data={
-                "client_id": self.client_id,
-                "client_secret": self.client_secret,
-                "grant_type": "refresh_token",
-                "scope":
-                "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events",
-                "refresh_token": self.db.get(self.refresh_token_name),
-            })
-        if resp.status_code != 200:
-            LOGGER.critical(resp.text)
-            exit(5)
-
-        data = resp.json()
-        self.db.set("token_type", data["token_type"])
-        assert self.db.get("token_type") == "Bearer"
-        self.db.set(self.access_token_name, data["access_token"])
-        self.db.expire(self.access_token_name, 5)  # int(data["expires_in"]))
-
-    def do_refresh_token(self, line=""):
-        self.refresh_token()
+        access_token = check_output(["oama", "access", self.account],
+                                    encoding="utf-8").strip()
+        self.db.set(self.access_token_name, access_token, ex=5)
+        self.db.set("token_type", "Bearer")
 
     @provides("calendars")
     @needs("access_token")
@@ -607,7 +577,7 @@ Attendees:
             headers={
                 "Authorization":
                 "{} {}".format(self.db.get("token_type"),
-                               self.db.get(self.access_token_name))
+                               self.db.get(self.access_token_name).strip())
             })
         f = urllib.request.urlopen(req)
         assert f.code == 200
@@ -770,7 +740,7 @@ Attendees:
                 "application/json",
                 "Authorization":
                 "{} {}".format(self.db.get("token_type"),
-                               self.db.get(self.access_token_name))
+                               self.db.get(self.access_token_name).strip())
             })
         try:
             f = urllib.request.urlopen(req)
@@ -792,7 +762,7 @@ Attendees:
                 "application/json",
                 "Authorization":
                 "{} {}".format(self.db.get("token_type"),
-                               self.db.get(self.access_token_name))
+                               self.db.get(self.access_token_name).strip())
             },
             method="DELETE")
         f = urllib.request.urlopen(req)
@@ -824,8 +794,8 @@ Attendees:
                     "Content-Type":
                     "application/json",
                     "Authorization":
-                    "{} {}".format(self.db.get("token_type"),
-                                   self.db.get(self.access_token_name))
+                    "{} {}".format("Bearer",
+                                   self.db.get(self.access_token_name).strip())
                 })
             f = urllib.request.urlopen(req)
             assert f.code == 200
@@ -964,7 +934,7 @@ Attendees:
             return
         start, flag = self.parse_time(when)
         time_dict = re.match(
-            '^\s*((?P<hours>\d+)\s*h)?\s*((?P<minutes>\d+)\s*m?)?\s*((?P<seconds>\d+)\s*s)?\s*$',
+            r'^\s*((?P<hours>\d+)\s*h)?\s*((?P<minutes>\d+)\s*m?)?\s*((?P<seconds>\d+)\s*s)?\s*$',
             duration).groupdict()
         duration = datetime.timedelta(seconds=int(time_dict['seconds'] or "0"),
                                       minutes=int(time_dict['minutes'] or "0"),
@@ -1022,7 +992,7 @@ Attendees:
                 "application/json",
                 "Authorization":
                 "{} {}".format(self.db.get("token_type"),
-                               self.db.get(self.access_token_name))
+                               self.db.get(self.access_token_name).strip())
             })
         f = urllib.request.urlopen(req)
         assert f.code == 200
@@ -1188,7 +1158,7 @@ Attendees:
                 "application/json",
                 "Authorization":
                 "{} {}".format(self.db.get("token_type"),
-                               self.db.get(self.access_token_name))
+                               self.db.get(self.access_token_name).strip())
             },
             method='PATCH')
         f = urllib.request.urlopen(req)

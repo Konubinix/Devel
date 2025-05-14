@@ -25,7 +25,7 @@ config.set('content.javascript.enabled', True, 'chrome://*/*')
 # Type: Bool
 config.set('content.javascript.enabled', True, 'qute://*/*')
 
-config.set("editor.command", ["ec", "{file}"])
+config.set("editor.command", ["e", "{file}"])
 config.set("completion.cmd_history_max_items", -1)
 config.set("completion.use_best_match", True)
 config.set("content.user_stylesheets", [

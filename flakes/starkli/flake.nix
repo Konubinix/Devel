@@ -9,8 +9,8 @@
       let pkgs = import nixpkgs { inherit system; };
       in {
         packages.default = pkgs.stdenv.mkDerivation rec {
-          name = "oama";
-          version = "0.20.0";
+          name = "starkli";
+          version = "0.4.1";
 
           dontUnpack = true;
           dontPatch = true;
@@ -25,22 +25,15 @@
             tar xf ${src}
 
             mkdir -p $out/bin
-            mv oama-0.20.0-Linux-x86_64/oama $out/bin/
-
-            mkdir -p $out/share/bash-completion/completions
-            mv oama-0.20.0-Linux-x86_64/completions/oama.bash $out/share/bash-completion/completions
-
-            substituteInPlace $out/share/bash-completion/completions/oama.bash --replace /usr/bin/oama $out/bin/oama
-
-            mkdir -p $out/share/doc/oama
-            mv oama-0.20.0-Linux-x86_64/configs $out/share/doc/oama
+            ls
+            mv starkli $out/bin/
 
             runHook postInstall
           '';
           src = pkgs.fetchurl {
             url =
-              "https://github.com/pdobsan/oama/releases/download/0.20.0/oama-0.20.0-Linux-x86_64.tar.gz";
-            sha256 = "sha256-5H2HoRwL/AVsSZnJeS3REH6hNIDj7dTWs5konbEAFgc=";
+              "https://github.com/xJonathanLEI/starkli/releases/download/v${version}/starkli-x86_64-unknown-linux-gnu.tar.gz";
+            sha256 = "sha256-QhfM11wRYn5RPhxuQ5W03/3r4rinSUvJiek8K4hbi+M=";
           };
         };
       });

@@ -46,6 +46,7 @@
         (shell-command (format "clk k8s go %s --namespace %s" kubel-context kubel-namespace)))
     (konix/kubel-capture-context-namespace)))
 (advice-add #'kubel :before 'konix/kubel/before/capture-context-namespace)
+;; (advice-remove #'kubel 'konix/kubel/before/capture-context-namespace)
 
 (defun konix/kubel-get-line-at-point ()
   (string-trim (buffer-substring-no-properties (save-excursion (beginning-of-line) (point))(save-excursion (end-of-line) (point))))

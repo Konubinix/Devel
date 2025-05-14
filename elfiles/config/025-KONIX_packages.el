@@ -135,7 +135,7 @@
   (use-package kivy-mode)
   (use-package lisp :straight (:type built-in) :mode ("emacs$" . list-mode))
   (use-package lispy)
-  (use-package kubel :commands (kubel))
+  (use-package kubel :commands (kubel) :straight (:fork t))
   (use-package kubernetes)
   (use-package ledger-mode :commands (konix/ledger-run konix/ledger-report))
   (use-package lsp-bridge

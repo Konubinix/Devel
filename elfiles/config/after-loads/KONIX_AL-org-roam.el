@@ -510,7 +510,7 @@ ${title}
       (while (search-forward "#+END_QUOTE" nil t)
         (save-excursion
           (forward-line 0)
-          (insert "\n--- " url "\n")
+          (insert "\n--- " url " ("(format-time-string "[%Y-%m-%d]") ")" "\n")
           )
         )
       (goto-char (point-min))

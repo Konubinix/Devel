@@ -16,7 +16,7 @@ import sys
 import time
 import urllib.parse
 import urllib.request
-from subprocess import check_output
+from subprocess import check_call, check_output
 
 import dateutil
 import dateutil.parser
@@ -564,8 +564,12 @@ Attendees:
     #@lazy("access_token")
     @provides("access_token")
     def refresh_token(self):
-        access_token = check_output(["oama", "access", self.account],
-                                    encoding="utf-8").strip()
+        try:
+            access_token = check_output(["oama", "access", self.account],
+                                        encoding="utf-8").strip()
+        except:
+            check_call(["clk", "ntfy", f"Failed to sync {self.account}"])
+            raise
         self.db.set(self.access_token_name, access_token, ex=5)
         self.db.set("token_type", "Bearer")
 

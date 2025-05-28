@@ -113,22 +113,37 @@ the context caches, including the cached resource list."
 
 (define-key kubel-mode-map [remap kubel-set-context] #'konix/kubel-set-context)
 
-(defvar konix/kubel-auto-refresh-timer nil)
+;;; kubel auto refresh
+
+;; see https://konubinix.eu/braindump/posts/5a287757-aa5d-4917-af2c-febb49032dc7/?title=how_to_change_the_point_in_a_buffer_in_another_window_in_emacs
+(advice-add 'kubel-refresh :after #'konix/persist-point-all-windows)
+;; (advice-remove 'kubel-refresh :after #'konix/persist-point-all-windows)
+
+(defun konix/kubel-auto-refresh ()
+  (mapc (lambda (buffer)
+          (if (buffer-live-p buffer)
+              (with-current-buffer buffer
+                (let ((inhibit-message t)) (kubel-refresh))
+                (hl-line-highlight))
+            (setq konix/kubel-auto-refresh-buffers (remove buffer konix/kubel-auto-refresh-buffers))))
+        konix/kubel-auto-refresh-buffers))
+
+(defvar konix/kubel-auto-refresh-buffers '())
 (defvar konix/kubel-auto-refresh-time 5)
+(defvar konix/kubel-auto-refresh-timer_ (run-at-time nil
+                                                     konix/kubel-auto-refresh-time
+                                                     #'konix/kubel-auto-refresh))
+
 (define-minor-mode konix/kubel-auto-refresh-mode
   "Mode to keep kubel in sync"
   :lighter " K"
-  :global t
   (if konix/kubel-auto-refresh-mode
-      (setq konix/kubel-auto-refresh-timer
-            (run-at-time nil konix/kubel-auto-refresh-time 'konix/kubel-refresh)
-            )
-    (when konix/kubel-auto-refresh-timer
-      (cancel-timer konix/kubel-auto-refresh-timer)
-      (setq konix/kubel-auto-refresh-timer nil)
-      )
+      (add-to-list 'konix/kubel-auto-refresh-buffers (current-buffer))
+    (setq konix/kubel-auto-refresh-buffers (remove (current-buffer) konix/kubel-auto-refresh-buffers))
     )
   )
+
+;;; recentf integration
 
 (with-eval-after-load 'recentf
   ;; don't record the dired buffers, or else after next start C-x b will fail with

@@ -82,23 +82,31 @@
   (kubel)
   )
 
-(defun konix/kubel-refresh ()
+(defun konix/kubel-set-resource (&optional refresh)
+  "Set the resource.
+If called with a prefix argument REFRESH, refreshes
+the context caches, including the cached resource list."
+  (interactive "P")
+  (when refresh (kubel--invalidate-context-caches))
+  (let* ((resource-list (kubel--kubernetes-resources-list)))
+    (kubel-open kubel-context kubel-namespace (completing-read "Select resource: " resource-list))
+    (kubel-refresh)
+    ))
+
+(define-key kubel-mode-map [remap kubel-set-resource] #'konix/kubel-set-resource)
+
+(defun konix/kubel-set-context ()
+  "Set the context."
   (interactive)
-  (if (buffer-live-p (get-buffer (kubel--buffer-name)))
-      (when (get-buffer-window (kubel--buffer-name))
-        (with-current-buffer (kubel--buffer-name)
-          (kubel-mode)
-          )
-        )
-    (progn
-      (konix/kubel-auto-refresh-mode -1)
-      (message "No more kubel buffer, deactivating the auto refresh")
-      )
-    )
+  (kubel-open (completing-read
+               "Select context: "
+               (split-string (kubel--exec-to-string (format "%s config view -o jsonpath='{.contexts[*].name}'" kubel-kubectl)) " "))
+              kubel-namespace
+              kubel-resource)
+  (kubel-refresh)
   )
 
-(add-hook 'kubel-mode-hook
-          #'konix/persist-point-all-windows 100)
+(define-key kubel-mode-map [remap kubel-set-context] #'konix/kubel-set-context)
 
 (defvar konix/kubel-auto-refresh-timer nil)
 (defvar konix/kubel-auto-refresh-time 5)

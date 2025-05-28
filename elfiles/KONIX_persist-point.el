@@ -62,7 +62,7 @@
   )
 
 ;;;###autoload
-(defun konix/persist-point-all-windows ()
+(defun konix/persist-point-all-windows (&rest _)
   (mapc
    (lambda (f)
      (konix/persist-point-all-windows-showing-buffer f)

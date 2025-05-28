@@ -24,6 +24,11 @@
 
 ;;; Code:
 
+(konix/push-or-replace-assoc-in-alist 'kubel-status-faces '("0/1" . kubel-status-error))
+(konix/push-or-replace-assoc-in-alist 'kubel-status-faces '("0/2" . kubel-status-error))
+(konix/push-or-replace-assoc-in-alist 'kubel-status-faces '("1/1" . kubel-status-running))
+(konix/push-or-replace-assoc-in-alist 'kubel-status-faces '("2/2" . kubel-status-running))
+
 (defun konix/kubel-capture-context-namespace ()
   (interactive)
   (setq-default

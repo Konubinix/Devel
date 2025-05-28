@@ -14,5 +14,6 @@ nomad_list_ineligible () {
 
 nomad_name_to_id () {
     local name="$1"
-    nomad node status -json|jq -r ".[] | select(.Name == \"${name}\").ID"
+    nomad node status -json \
+        |jq -r ".[] | select(.Name == \"${name}\" and .Status == \"ready\").ID"
 }

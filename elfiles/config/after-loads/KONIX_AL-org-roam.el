@@ -188,6 +188,7 @@ ${title}
              )
         (konix/org-add-note-no-interaction
          (format "[[id:%s][Roam note]]" org-node-id))
+        (org-mark-ring-push)
         (pop-to-buffer roam-buffer)
         )
       )

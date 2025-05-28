@@ -339,7 +339,12 @@
   (let (
         (buffer (current-buffer))
         )
-    (funcall orig)
+    ;; the read status only makes sense in non invites. It simply need to bury
+    ;; the buffer to make the behavior simulate the ement one in normal buffers
+    (if (ement-room-invite-state ement-room)
+        (bury-buffer)
+      (funcall orig))
+
     (when (not (equal buffer (current-buffer)))
       (unless (and
                (equal major-mode 'ement-room-mode)
@@ -347,9 +352,7 @@
                )
         (tracking-next-buffer)
         )
-      )
-    )
-  )
+      )))
 
 (advice-add #'ement-room-scroll-up-mark-read :around #'konix/ement-room-scroll-up-mark-read/tracking-next-buffer)
 

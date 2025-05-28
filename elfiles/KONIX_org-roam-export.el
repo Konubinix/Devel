@@ -319,7 +319,7 @@
               url
               )
       )
-     ((string-match "^\\(http.+\\(webm\\|mp4\\)\\)$" url)
+     ((string-match "^\\(http.+\\.\\(webm\\|mp4\\)\\)$" url)
       (format "{{{video(%s)}}}" (match-string 1 url))
       )
      ((string-match (concat "^" konix/org-ipfs-link "\\([?]filename=\\([a-zA-Z0-9=_%.-]+\\)\\)$") url)

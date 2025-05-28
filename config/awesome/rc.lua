@@ -355,7 +355,7 @@ function open_or_join(instance, program)
 end
 
 function tell_pulse_volume()
-	awful.spawn.easy_async("clk pulse sink show", function(stdout, stderr, exitreason, exitcode)
+	awful.spawn.easy_async("clk volume show", function(stdout, stderr, exitreason, exitcode)
 		naughty.notify({
 			preset = naughty.config.presets.normal,
 			title = "Volume",
@@ -466,7 +466,7 @@ globalkeys = gears.table.join(
 			text = "Volume down",
 			timeout = 0.5,
 		})
-		awful.spawn("clk pulse sink down")
+		awful.spawn("clk volume down")
 		tell_pulse_volume()
 	end, { description = "change volume", group = "client" }),
 	awful.key({ modkey, "Mod1" }, "Up", function()
@@ -476,7 +476,7 @@ globalkeys = gears.table.join(
 			text = "Volume up",
 			timeout = 0.5,
 		})
-		awful.spawn("clk pulse sink up")
+		awful.spawn("clk volume up")
 		tell_pulse_volume()
 	end, { description = "change volume", group = "client" }),
 	awful.key({}, "XF86AudioRaiseVolume", function()
@@ -486,7 +486,7 @@ globalkeys = gears.table.join(
 			text = "Volume up",
 			timeout = 0.5,
 		})
-		awful.spawn("clk pulse sink up")
+		awful.spawn("clk volume up")
 		tell_pulse_volume()
 	end, { description = "change volume", group = "client" }),
 	awful.key({}, "XF86AudioLowerVolume", function()
@@ -496,7 +496,7 @@ globalkeys = gears.table.join(
 			text = "Volume down",
 			timeout = 0.5,
 		})
-		awful.spawn("clk pulse sink down")
+		awful.spawn("clk volume down")
 		tell_pulse_volume()
 	end, { description = "change volume", group = "client" }),
 	awful.key({ modkey, "Mod1" }, "Right", function()
@@ -641,7 +641,7 @@ globalkeys = gears.table.join(
 		end)
 	end, { description = "toggle mute", group = "music" }),
 	awful.key({}, "XF86AudioMute", function()
-		awful.spawn.easy_async("clk pulse sink toggle-mute", function(stdout, stderr, exitreason, exitcode)
+		awful.spawn.easy_async("clk volume toggle-mute", function(stdout, stderr, exitreason, exitcode)
 			tell_pulse_volume()
 		end)
 	end, { description = "toggle mute", group = "music" }),

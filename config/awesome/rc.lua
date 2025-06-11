@@ -446,7 +446,7 @@ globalkeys = gears.table.join(
 			return
 		end
 		local tag = client.focus.screen.tags[(t.name - 2) % 9 + 1]
-		awful.client.movetotag(tag)
+		client.focus:move_to_tag(tag)
 		tag:view_only()
 	end, { description = "focus previous by index", group = "client" }),
 	awful.key({ modkey, "Shift" }, "Right", function()
@@ -455,7 +455,7 @@ globalkeys = gears.table.join(
 			return
 		end
 		local tag = client.focus.screen.tags[t.name % 9 + 1]
-		awful.client.movetotag(tag)
+		client.focus:move_to_tag(tag)
 		tag:view_only()
 	end, { description = "focus previous by index", group = "client" }),
 

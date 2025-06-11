@@ -240,7 +240,7 @@ click_by_text ( ) {
 }
 
 respawn ( ) {
-    send_command "spawn -u konix_qutebrowser_password.sh"
+    send_command "spawn -u $0 $@"
 }
 
 respawn_on ( ) {

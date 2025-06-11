@@ -28,6 +28,7 @@
   (interactive)
   (with-current-buffer "*MinibufferContent*"
     (let ((content (buffer-string)))
+      (kill-new content)                ;; just in case the following goes wrong
       (kill-buffer)
       (when (active-minibuffer-window)
         (select-window (active-minibuffer-window))

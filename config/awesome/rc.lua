@@ -894,7 +894,17 @@ awful.rules.rules = {
 			floating = false,
 			maximized = false,
 		},
-	}, -- Floating clients.
+	},
+	-- ############ Title bar setup
+	{
+		rule_any = { type = { "normal", "dialog" } },
+		properties = { titlebars_enabled = true },
+	},
+	{
+		rule_any = { class = { "gnuplot_qt" } },
+		properties = { titlebars_enabled = false },
+	},
+	-- ############ Floating setup
 	{
 		rule_any = {
 			instance = {
@@ -903,10 +913,13 @@ awful.rules.rules = {
 				"pinentry",
 			},
 			class = {
+				"Impass",
+				"Konix_impass.py",
 				"Konix_gtk_entry.py",
 				"Arandr",
 				"Blueman-manager",
 				"Gpick",
+				"gnuplot_qt",
 				"vlc",
 				"Kruler",
 				"MessageWin", -- kalarm.
@@ -923,6 +936,12 @@ awful.rules.rules = {
 				"Terminator Preferences",
 				"Choose A Terminal Font",
 				"Emulator", -- android emulator
+				"Slack | mini panel",
+				"Pick a Font",
+				"Change Foreground Color",
+				"Post Processing Plugin",
+				"Print",
+				"Ediff",
 			},
 			role = {
 				"AlarmWindow", -- Thunderbird's calendar.
@@ -932,56 +951,50 @@ awful.rules.rules = {
 		},
 		properties = { floating = true },
 	},
-	{
-		rule = { class = "qutebrowser", name = "Print" },
-		properties = { floating = true, ontop = true },
-	},
+	-- ############### On top setup
 	{
 		rule_any = {
-			name = {
-				"Slack | mini panel",
-				"Pick a Font",
-				"Change Foreground Color",
-				"Post Processing Plugin",
+			class = {
+				"Impass",
+				"Konix_impass.py",
+				"gnuplot_qt",
 			},
-			class = { "Impass", "Konix_impass.py" },
+			name = {
+				"Ediff",
+			},
 		},
-		properties = { floating = true, ontop = true },
-	}, -- Add titlebars to normal clients and dialogs
-	{
-		rule_any = { type = { "normal", "dialog" } },
-		properties = { titlebars_enabled = true },
+		properties = { ontop = true },
 	},
-	{ rule = { class = "Slack" }, properties = { tag = "9" } },
+	-- ####### Placements
+	-- browsers on tag 1
 	{
 		rule_any = { class = { terminal, "qutebrowser", "Chromium" } },
 		properties = { tag = "1" },
-	}, -- move the emacs spawn so that it will come back when ready
-	{ rule = { class = "Emacs" }, properties = { tag = "8" } },
-	{
-		rule = { class = "Emacs", name = "Ediff" },
-		properties = { tag = "1", floating = true, ontop = true },
 	},
-	{ rule = { class = "Pavucontrol" }, properties = { tag = "2" } },
-	{ rule = { class = "Emulator" }, properties = { tag = "2" } },
-	{ rule = { class = "Emacs", name = "konix_emacs.+" }, properties = { tag = "1" } },
-	{
-		rule = { class = "Emacs", name = "emacs-everywhere" },
-		properties = { tag = "1" },
-	},
-
-	-- make sure that the rules is applyed on emacs even though the name is not
-	-- set immediately
+	-- side stuff => less intrusive location
+	{ rule_any = { instance = { "slack", "pavucontrol" } }, properties = { tag = "2" } },
+	-- oamaflow out of my way
+	{ rule = { instance = "oamaflow", class = "qutebrowser" }, properties = { tag = "5" } },
+	-- emacs out of my way until it is ready to be used
 	{
 		rule = { class = "Emacs" },
+		-- make sure to put it back in the front when it will be ready
 		callback = function(c)
-			local maybe_move_to_tag
-
-			maybe_move_to_tag = function(c)
+			function maybe_move_it(c)
+				c:disconnect_signal("property::name", maybe_move_it)
 				if c.name == "konix_emacs_batch" then
-					move_to_tag(c, c.screen.tags[8])
+					move_to_tag(c, c.screen.tags[5])
+					return true
 				elseif string.find(c.name, "konix_emacs") then
 					move_to_tag(c, c.screen.tags[1])
+					return true
+				elseif string.find(c.name, "Ediff") then
+					move_to_tag(c, c.screen.tags[1])
+					return true
+				else
+					move_to_tag(c, c.screen.tags[5])
+					c:connect_signal("property::name", maybe_move_it)
+					return false
 				end
 			end
 
@@ -989,12 +1002,13 @@ awful.rules.rules = {
 				c:move_to_tag(tag)
 				client.focus = c
 				c:raise()
-				c:disconnect_signal("property::name", maybe_move_to_tag)
 			end
 
-			c:connect_signal("property::name", maybe_move_to_tag)
+			maybe_move_it(c)
 		end,
 	},
+	-- android emulator
+	{ rule = { class = "Emulator" }, properties = { tag = "2" } },
 }
 
 -- {{{ Signals

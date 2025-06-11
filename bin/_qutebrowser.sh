@@ -239,6 +239,16 @@ click_by_text ( ) {
     send_js "document.evaluate(\"//${type}[contains(text(),'${text}')]\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();"
 }
 
+wait_and_respawn() {
+    local waiting_time="5s"
+    clk notify "Spawning again the script in ${waiting_time}"
+    sleep "${waiting_time}"
+    respawn "$@"
+    clk notify "Spawned a new password flow"
+    trap "" EXIT
+    exit # to avoid any conflict between this and the newly spawned process
+}
+
 respawn ( ) {
     send_command "spawn -u $0 $@"
 }

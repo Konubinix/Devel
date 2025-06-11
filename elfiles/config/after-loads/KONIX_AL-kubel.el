@@ -106,8 +106,8 @@ the context caches, including the cached resource list."
   (kubel-open (completing-read
                "Select context: "
                (split-string (kubel--exec-to-string (format "%s config view -o jsonpath='{.contexts[*].name}'" kubel-kubectl)) " "))
-              kubel-namespace
-              kubel-resource)
+              "default"
+              "pod")
   (kubel-refresh)
   )
 

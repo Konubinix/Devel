@@ -113,6 +113,18 @@ the context caches, including the cached resource list."
 
 (define-key kubel-mode-map [remap kubel-set-context] #'konix/kubel-set-context)
 
+(defun konix/kubel-set-namespace ()
+  "Set the context."
+  (interactive)
+  (kubel-open kubel-context
+              (completing-read "Namespace: " (kubel--list-namespace)
+                               nil nil nil nil "default")
+              "pod")
+  (kubel-refresh)
+  )
+
+(define-key kubel-mode-map [remap kubel-set-namespace] #'konix/kubel-set-namespace)
+
 ;;; kubel auto refresh
 
 ;; see https://konubinix.eu/braindump/posts/5a287757-aa5d-4917-af2c-febb49032dc7/?title=how_to_change_the_point_in_a_buffer_in_another_window_in_emacs

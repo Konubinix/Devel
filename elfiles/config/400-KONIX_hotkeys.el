@@ -499,31 +499,6 @@
 (keymap-set 'konix/org-meta-context-map "g" 'konix/org-meta-context/goto-root)
 (keymap-set 'konix/org-meta-context-map "t" 'konix/org-meta-context/toggle-restrict)
 
-
-;; ####################################################################################################
-;; Compilation
-;; ####################################################################################################
-(define-prefix-command 'konix/compile/map)
-(keymap-set global-map "<f5>" 'konix/compile/map)
-
-(define-prefix-command 'konix/compile/buffer/map)
-(keymap-set konix/compile/map "b" 'konix/compile/buffer/map)
-
-(keymap-set 'konix/compile/buffer/map "S" 'konix/compile/buffer/show-all)
-(keymap-set 'konix/compile/buffer/map "C" 'konix/compile/buffer/clean-all)
-
-(keymap-set 'konix/compile/map "<f5>" 'konix/compile/make-fast)
-(keymap-set 'konix/compile/map "<f7>" 'konix/compile/make-run)
-(keymap-set 'konix/compile/map "K" 'konix/compile/make-clean)
-(keymap-set 'konix/compile/map "t" 'konix/compile/make-test)
-(keymap-set 'konix/compile/map "c" 'konix/compile)
-(keymap-set 'konix/compile/map "D" 'konix/compile/make-goto-dir)
-
-;; ####################################################################################################
-;; Semantic
-;; ####################################################################################################
-(keymap-global-set "M-§" 'semantic-ia-fast-jump)
-
 ;; ####################################################################################################
 ;; font lock
 ;; ####################################################################################################

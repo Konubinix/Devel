@@ -96,6 +96,7 @@ with :ipfa t -> the result is cid?filename (override the :results file setting),
 "
   (when (assq :ipfa (third info))
     (shell-command "sleep 1 && sync")
+    (setq result (s-trim result))
     (when (not (or (alist-get :file (third info)) (file-exists-p result)))
       (error "ipfa expects either a :file parameter or that the result points to an existing file"))
     (let* (

@@ -20,6 +20,7 @@ else
     sleep ${TIMETOWAIT}
     echo "Sending now!!"
     trap "test -e ${LOG} && cat ${LOG}" 0
+    clk gpg decrypt dir "${KONIX_PERSO_DIR}/msmtprc_nd" msmtprc
     msmtpq-flush || {
         clk ntfy --priority 5 "Could not send a mail. This is important!!"
         exit 2

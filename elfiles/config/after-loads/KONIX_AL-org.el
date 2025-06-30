@@ -4922,8 +4922,6 @@ With `ID', set the ID instead of the CUSTOM_ID."
   (other-window 1)
   )
 
-(setq org-clock-idle-time 30)
-
 (defvar konix/org-agenda-inactive-timestamp-interval-start "-7m" "")
 (defvar konix/org-agenda-inactive-timestamp-interval-stop "" "")
 

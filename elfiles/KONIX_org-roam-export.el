@@ -444,7 +444,7 @@
     (when (string-equal kind "none")
       (user-error "There is no url for something not published")
       )
-    (format "https://konubinix.eu/%s/posts/%s/?title=%s"
+    (format "/%s/posts/%s/?title=%s"
             kind
             (org-roam-node-id node)
             (org-roam-node-slug node)
@@ -461,7 +461,7 @@
        (string-prefix-p org-roam-directory (konix/org-roam-export/get-buffer-file-name))
        )
       (let (
-            (url (konix/org-roam-export/get-url))
+            (url (concat "https://konubinix.eu" (konix/org-roam-export/get-url)))
             )
         (with-temp-buffer
           (insert url)
@@ -699,7 +699,7 @@
                                   )
                                 )
          )
-    (format "https://konubinix.eu/%s/posts/%s/?title=%s#%s"
+    (format "/%s/posts/%s/?title=%s#%s"
             kind
             file-slug
             (org-roam-node-slug node)
@@ -1151,7 +1151,7 @@ citation key, for Org-ref cite links."
     (save-excursion
       (goto-char (point-max))
       (insert
-       (format "\n* [[https://konubinix.eu/%s%s?title=%s][Permalink]]"
+       (format "\n* [[/%s%s?title=%s][Permalink]]"
                (konix/org-roam-export/extract-kind)
                id
                (org-roam-node-slug (konix/org-roam-node-file-node))

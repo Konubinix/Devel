@@ -342,8 +342,6 @@ class GCall(cmd.Cmd, object):
         @property
         def tags(self):
             res = ["gcalgenerated"]
-            if self.colorId == "3":
-                res.append("discret")
             if self.my_response_status:
                 res.append(self.my_response_status)
             if self.recurringEventId:
@@ -922,6 +920,7 @@ Attendees:
         when,
         duration,
         description="",
+        color_id=None,
         attendees_emails=None,
         make_place=None,
         sendNotifications=False,
@@ -971,6 +970,8 @@ Attendees:
             "end": end,
             "attendees": attendees,
         }
+        if color_id:
+            event["colorId"] = color_id
         if reminders:
             event["reminders"] = {
                 "useDefault":
@@ -1206,13 +1207,16 @@ Attendees:
         """title, where, when, duration, [description]
         Hardcoded the fact that no reminder should be set
         """
-        (title, where, when, duration, *description) = shlex.split(line)
-        description = description[0] if description else ""
+        (title, where, when, duration, *rest) = shlex.split(line)
+        description = rest.pop(0) if rest else ""
+        color_id = rest.pop(0) if rest else None
+
         event = self.add_event(title,
                                where,
                                when,
                                duration,
                                description,
+                               color_id=color_id,
                                reminders=False)
         print(event)
 

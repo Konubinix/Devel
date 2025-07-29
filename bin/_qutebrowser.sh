@@ -109,6 +109,12 @@ remove_text ( ) {
     echo "fake-key <DEL>" | send_command_multiline
 }
 
+simulate_keys ( ) {
+    echo "fake-key a" | send_command_multiline
+    echo "fake-key <left>" | send_command_multiline
+    echo "fake-key <DEL>" | send_command_multiline
+}
+
 focus_on ( ) {
     send_js "$*.focus();"
 }

@@ -42,6 +42,18 @@
          )
        )
      (advice-add 'require :before 'konix/require-debug)
+     (defun konix/provide-debug (feature &rest args)
+       (if (equal feature ,feature-to-debug)
+           (debug)
+         )
+       )
+     (advice-add 'provide :before 'konix/provide-debug)
+     (if (featurep ,feature-to-debug)
+         (progn
+           (message (format "feature %s loaded before setting its debug-setup" ,feature-to-debug))
+           (debug))
+       (warn (format "Feature %s ready to go" ,feature-to-debug))
+       )
      )
   )
 

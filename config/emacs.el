@@ -83,6 +83,7 @@
         "envrc"                  ;; init
         "etags"                  ;; lispy
         "gnus"                   ;; gnus-sum - org
+        "go-mode"                ;; assoc-default go--is-go-asm
         "KONIX_org-meta-context" ;; init
         "KONIX_org-roam-export"  ;; init
         "outline"                ;; loaded by org

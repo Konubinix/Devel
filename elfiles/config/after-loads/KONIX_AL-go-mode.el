@@ -25,17 +25,16 @@
 ;;; Code:
 
 
-(require 'dap-dlv-go)
-
 (defface konix/go-font-lock-public-function-name-face '((t :background "gray21" :inherit font-lock-function-name-face))
-    "Face for public stuff."
-    :group 'konix/go-faces)
+  "Face for public stuff."
+  :group 'konix/go-faces)
 
 (defvar konix/go-font-lock-public-function-name-face 'konix/go-font-lock-public-function-name-face
     "Face name to use for go public functions.")
 
 
 (defun konix/go-mode-hook ()
+  (require 'dap-dlv-go)
   (hs-minor-mode 1)
   (setq-local lsp-semantic-tokens-enable t)
   (when (require 'lsp nil t)
@@ -65,7 +64,7 @@
   )
 
 (add-hook 'go-mode-hook
-    'konix/go-mode-hook)
+          'konix/go-mode-hook)
 
 
 (keymap-set go-mode-map "<RET>" 'newline-and-indent)

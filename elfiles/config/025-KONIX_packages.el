@@ -84,7 +84,7 @@
   (use-package codeium :straight (:host github :repo "Exafunction/codeium.el"))
   (use-package consult)
   (use-package consult-yasnippet)
-  (use-package copilot :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")))
+  (use-package copilot)
   (use-package lsp-mode :commands (lsp))
   (use-package dap-mode :after (lsp-mode))
   ;; I will try to put it back from upstream in case I use dap in the future

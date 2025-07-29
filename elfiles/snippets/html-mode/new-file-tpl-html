@@ -6,8 +6,8 @@
   <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script defer src="/ipfs/bafkreib3gcvqpp3fox36m7sn4d6qfcru7n62svzclt5w7lf6j43pkyla4q?orig=https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.js"></script>
-    <script defer src="/ipfs/bafkreihw6a7byfwe4mtoda5ivd6wkdmclapfij6jul5vdb2on5qmori7fe?orig=https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.js"></script>
+    <script defer src="https://ipfs.konubinix.eu/bafkreib3gcvqpp3fox36m7sn4d6qfcru7n62svzclt5w7lf6j43pkyla4q?orig=https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.js"></script>
+    <script defer src="https://ipfs.konubinix.eu/bafkreihw6a7byfwe4mtoda5ivd6wkdmclapfij6jul5vdb2on5qmori7fe?orig=https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>

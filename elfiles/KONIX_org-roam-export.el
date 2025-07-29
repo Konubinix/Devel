@@ -271,7 +271,7 @@
 (defun konix/org-roam-export/add-cors-anywhere (url)
   (if (or
        (string-prefix-p "/" url)
-       (string-prefix-p (getenv "KONIX_IPFS_GATEWAY") url)
+       (string-prefix-p (getenv "KONIX_PUBLIC_IPFS_GATEWAY") url)
        (string-prefix-p "https://konubinix.eu" url)
        (string-match-p "http://localhost" url)
        (string-match-p "http://127.0.0.1" url)
@@ -352,7 +352,10 @@
                    )
          (filename-sans-ext (and filename (file-name-sans-extension filename)))
          (filename-ext (and filename (file-name-extension filename)))
-         (url (konix/org-roam-export/process-url (format "%s%s" (getenv "KONIX_IPFS_GATEWAY") path)))
+         (url (konix/org-roam-export/process-url (format "%s%s" (getenv
+                                                                 "KONIX_PUBLIC_IPFS_GATEWAY")
+                                                         (substring path (length
+                                                                          "/ipfs")))))
          )
     (if filename
         (if explicit
@@ -869,7 +872,7 @@
       ;; don't match ^ +: because this is generally associated with variables,
       ;; like #+NAME\n: /ipfssomething and this will transformation will break it
       (while (re-search-forward
-              "^[ ]*\\(\\(youtube:\\|http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              "^[ ]*\\(\\(youtube:\\|http\\|https://ipfs.konubinix.eu/\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
               nil
               t)
         (replace-match
@@ -883,7 +886,7 @@
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "\\( +\\)\\(\\(youtube:\\|http\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t) ]+\\)$"
+              "\\( +\\)\\(\\(youtube:\\|http\\|/ipfs/\\|https://ipfs.konubinix.eu/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t) ]+\\)$"
               nil
               t)
         (replace-match
@@ -902,22 +905,15 @@
   (save-excursion
     (goto-char (point-min))
     (save-match-data
-      (while (or
-              (re-search-forward
-               "\\(ipfs:/*\\([a-zA-Z0-9.=%?+-]+\\)\\)"
-               nil
-               t)
-              ;; ipfs alone
-              (re-search-forward
-               "[[ \n]\\(/ipfs/\\([a-zA-Z0-9.=%?+-]+\\)\\)"
-               nil
-               t)
-              )
+      (while (re-search-forward
+              (format "['%s([ \n]\\(\\(/ipfs/\\|ipfs:\\)\\([a-zA-Z0-9.=%%?+-]+\\)\\)" dquote)
+              nil
+              t)
         (replace-match
          (format
-          "%s/ipfs/%s"
-          (getenv "KONIX_IPFS_GATEWAY")
-          (match-string-no-properties 2)
+          "%s/%s"
+          (getenv "KONIX_PUBLIC_IPFS_GATEWAY")
+          (match-string-no-properties 3)
           )
          nil
          nil
@@ -1005,7 +1001,7 @@
                                         (member kind
                                                 konix/org/roam-export/public-kinds)))
                        (user-error
-                        "%s -> %s unauthorized. A public note cannot point to a  non public note"
+                        "%s -> %s unauthorized. A public note cannot point to a non public note"
                         (konix/org-roam-export/get-buffer-file-name) url))
                      (goto-char (point-min))
                      (replace-string

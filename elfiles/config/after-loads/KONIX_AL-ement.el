@@ -32,6 +32,10 @@
    )
   )
 
+(custom-set-variables
+ '(ement-room-hide-redacted-message-content nil)
+ )
+
 (defface ement-room-direct
   '((t (:background "sienna")))
   "")

@@ -6,10 +6,19 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = import nixpkgs { inherit system; };
-      in {
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
         packages.env = pkgs.buildEnv {
           name = "msmtpq";
           paths = with pkgs; [ packages.default ];
@@ -37,8 +46,9 @@
             owner = "Stebalien";
             repo = name;
             rev = "refs/heads/master";
-            sha256 = "sha256-Ab23+aWvuGv5s+FUoZGCv4gC0RYQEA7pene+b7nw8fw=";
+            sha256 = "sha256-rt0HLnQNqwVGgOuIEOMHh64il/3RVb5c8R5h3WQru7w=";
           };
         };
-      });
+      }
+    );
 }

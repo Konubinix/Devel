@@ -112,6 +112,7 @@
         "tempbuf"      ;; init
         "thingatpt"    ;; init
         "time-date"    ;; loaded by org
+        "tramp"        ;; saveplace that looks for /ssh:machine:/aaaa files
         "tracking"     ;; init
         "vc-hooks"     ;; loaded by vc -> git-wip-mode
         "framemove"    ;; init

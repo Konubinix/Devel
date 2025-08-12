@@ -54,7 +54,7 @@
     (setq konix/python-mode/flycheck nil)
     )
   (konix/prog/config)
-  (when konix/python-mode/yapf
+  (when (and (not (konix/python-is-tiltfile)) konix/python-mode/yapf)
     (yapf-mode)
     )
   (add-hook 'before-save-hook

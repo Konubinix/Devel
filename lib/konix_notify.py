@@ -2,12 +2,8 @@
 # -*- coding:utf-8 -*-
 import logging
 import os
-import shlex
 import subprocess
 import sys
-from functools import partial
-
-from six.moves.xmlrpc_client import ServerProxy
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)

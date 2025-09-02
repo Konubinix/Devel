@@ -151,8 +151,6 @@
 ;; 0bin paste
 (keymap-set 'konix/global-slow-key-map "p" 'konix/0binpaste)
 (keymap-set 'konix/global-slow-key-map "C-o" 'konix/mimeopen)
-;; toggle gatls_dired
-(keymap-set 'konix/global-slow-key-map "C-l" 'konix/gatls-dired-toggle)
 ;; toggle undo-tree mode
 (keymap-set 'konix/global-slow-key-map "C-u" 'undo-tree-mode)
 ;; calc

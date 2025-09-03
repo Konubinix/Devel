@@ -147,3 +147,18 @@ CURSOR-POS is the position of the cursor within DEFAULT (0 = start)."
             (goto-char (+ (minibuffer-prompt-end) pos))))
       (read-from-minibuffer prompt input))))
 
+(defun konix/micropython-upload-buffer-as-main (&optional reset)
+  (interactive "p")
+  (let* ((temp-file (make-temp-file "micropython-" nil ".py"))
+         (buffer-content (buffer-string)))
+    (with-temp-file temp-file
+      (insert buffer-content))
+    (let ((result (shell-command (format "mpremote cp %s :main.py"
+                                         (shell-quote-argument temp-file)))))
+      (delete-file temp-file)
+      (if (= result 0)
+          (progn (message "Uploaded buffer content to device as main.py")
+                 (when reset
+                   (shell-command "mpremote reset")
+                   (message "Device reset")))
+        (message "Failed to upload to MicroPython device")))))

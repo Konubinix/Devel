@@ -153,18 +153,28 @@ the context caches, including the cached resource list."
 
 (defvar konix/kubel-auto-refresh-buffers '())
 (defvar konix/kubel-auto-refresh-time 5)
-(defvar konix/kubel-auto-refresh-timer_ (run-at-time nil
-                                                     konix/kubel-auto-refresh-time
-                                                     #'konix/kubel-auto-refresh))
+(defvar konix/kubel-auto-refresh-timer_ nil)
 
 (define-minor-mode konix/kubel-auto-refresh-mode
   "Mode to keep kubel in sync"
   :lighter " K"
   (if konix/kubel-auto-refresh-mode
       (add-to-list 'konix/kubel-auto-refresh-buffers (current-buffer))
-    (setq konix/kubel-auto-refresh-buffers (remove (current-buffer) konix/kubel-auto-refresh-buffers))
-    )
-  )
+    (setq konix/kubel-auto-refresh-buffers (remove (current-buffer)
+                                                   konix/kubel-auto-refresh-buffers)))
+  (when (and (f-empty-p konix/kubel-auto-refresh-buffers)
+             konix/kubel-auto-refresh-timer_)
+    (cancel-timer konix/kubel-auto-refresh-timer_)
+    (setq konix/kubel-auto-refresh-timer_ nil))
+  (when (and (not (f-empty-p konix/kubel-auto-refresh-buffers))
+             (not konix/kubel-auto-refresh-timer_))
+    (setq konix/kubel-auto-refresh-timer_ (run-at-time nil
+                                                       konix/kubel-auto-refresh-time
+                                                       #'konix/kubel-auto-refresh))))
+
+(defun konix/kubel-auto-refresh/clean ()
+  (interactive)
+  (setq konix/kubel-auto-refresh-buffers '()))
 
 ;;; recentf integration
 

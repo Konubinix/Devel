@@ -2719,7 +2719,7 @@ items"
 (setq-default org-log-state-notes-into-drawer "LOGBOOK")
 (setq-default org-clock-into-drawer "CLOCK")
 (setq-default org-log-note-clock-out nil)
-(setq-default org-log-note-headings (quote ((done . "CLOSING NOTE %t") (state . "State %-12s %t") (note . "Note prise le %t") (clock-out . ""))))
+(setq-default org-log-note-headings (quote ((done . "CLOSING NOTE %t") (state . "State %-12s %t") (note . "%t") (clock-out . ""))))
 (setq-default org-log-state-notes-insert-after-drawers t)
 (setq-default org-log-redeadline 'time)
 (setq-default org-log-reschedule 'time)

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sed -r 's%(/ipfs/|ipfs:/*|https://ipfs.konubinix.eu/)%\n/ipfs/%g' \
+sed -r 's%(/ipfs/|ipfs:/*|https://ipfs.konubinix.eu/p/)%\n/ipfs/%g' \
 	| grep -v konixnostore \
 	| sed -r 's|^.*(/ipfs/[a-zA-Z0-9]+).*$|\1|' \
 	| grep '/ipfs/[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]' \

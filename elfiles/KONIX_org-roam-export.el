@@ -329,8 +329,7 @@
       (konix/org-roam-export/process-url (konix/org-link-youtube-process url))
       )
      ((string-match (concat "^" konix/org-ipfs-link "[?]\\([a-zA-Z0-9=_%./-]+\\)?$") url)
-      (konix/org-roam-export/process-url (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 2 url) nil))
-      )
+      (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 2 url) nil))
      ((string-match "^cite:\\(.+\\)$" url)
       (konix/org-roam-export/process-url (konix/org-roam/process-url url))
       )
@@ -340,6 +339,16 @@
      )
     )
   )
+
+(defun konix/org-roam-export/prepend-public-prefix-maybe (path)
+  (if-let ((kind (konix/org-roam-export/extract-kind-unsafe)))
+      (if (member kind konix/org/roam-export/public-kinds)
+          (format "%s%s"
+                  (getenv "KONIX_PUBLIC_IPFS_GATEWAY") (substring
+                                                        path (length
+                                                              "/ipfs")))
+        (format "http://home%s" path))
+    (format "http://home%s" path)))
 
 (defun konix/org-export/process-ipfs-link (path filename explicit)
   (let* (
@@ -352,10 +361,8 @@
                    )
          (filename-sans-ext (and filename (file-name-sans-extension filename)))
          (filename-ext (and filename (file-name-extension filename)))
-         (url (konix/org-roam-export/process-url (format "%s%s" (getenv
-                                                                 "KONIX_PUBLIC_IPFS_GATEWAY")
-                                                         (substring path (length
-                                                                          "/ipfs")))))
+         (url (konix/org-roam-export/process-url
+               (konix/org-roam-export/prepend-public-prefix-maybe path)))
          )
     (if filename
         (if explicit
@@ -872,7 +879,7 @@
       ;; don't match ^ +: because this is generally associated with variables,
       ;; like #+NAME\n: /ipfssomething and this will transformation will break it
       (while (re-search-forward
-              "^[ ]*\\(\\(youtube:\\|http\\|https://ipfs.konubinix.eu/\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              "^[ ]*\\(\\(youtube:\\|http\\|https://ipfs.konubinix.eu/p/\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
               nil
               t)
         (replace-match
@@ -886,7 +893,7 @@
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "\\( +\\)\\(\\(youtube:\\|http\\|/ipfs/\\|https://ipfs.konubinix.eu/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t) ]+\\)$"
+              "\\( +\\)\\(\\(youtube:\\|http\\|/ipfs/\\|https://ipfs.konubinix.eu/p/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t) ]+\\)$"
               nil
               t)
         (replace-match
@@ -910,11 +917,7 @@
               nil
               t)
         (replace-match
-         (format
-          "%s/%s"
-          (getenv "KONIX_PUBLIC_IPFS_GATEWAY")
-          (match-string-no-properties 3)
-          )
+         (konix/org-roam-export/prepend-public-prefix-maybe (format "/ipfs/%s" (match-string-no-properties 3)))
          nil
          nil
          nil

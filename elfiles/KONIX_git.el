@@ -1661,30 +1661,21 @@ Uses the macro konix/git/status-buffer/next-or-previous
            )
           )
          )
-    ;; first, tries to erase the buffer content
-    (when (buffer-name (get-buffer git_status_buffer_name))
-      (unless (ignore-errors
-                (with-current-buffer git_status_buffer_name
-                  (toggle-read-only -1)
-                  (erase-buffer)
-                  )
-                t
-                )
-        (ignore-errors(kill-buffer git_status_buffer_name))
-        )
-      )
-    ;; here, the buffer is erased of killed, I want it to be alive
+    (when (get-buffer git_status_buffer_name)
+      (with-current-buffer git_status_buffer_name
+        (read-only-mode -1)
+        (erase-buffer)
+        ))
     (setq git_status_buffer_name (get-buffer-create git_status_buffer_name))
-    ;; Addition of a trace in the buffer in order to communicate with the sentinel
     (with-current-buffer git_status_buffer_name
-      (setq default-directory current-default-directory)
+      (cd current-default-directory)
+      (setq konix/git/status-process (start-process "git status"
+                                                    git_status_buffer_name
+                                                    "sh"
+                                                    "-c"
+                                                    "LC_ALL=C git status && git stash list"
+                                                    ))
       )
-    (setq konix/git/status-process (start-process "git status"
-                                                  git_status_buffer_name
-                                                  "sh"
-                                                  "-c"
-                                                  "LC_ALL=C git status && git stash list"
-                                                  ))
     (konix/set-process-sentinel-exit-hook
      konix/git/status-process
      'konix/git/status-sentinel

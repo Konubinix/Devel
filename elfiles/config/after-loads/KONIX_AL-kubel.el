@@ -103,17 +103,22 @@ the context caches, including the cached resource list."
 (defun konix/kubel-set-context ()
   "Set the context."
   (interactive)
-  (let (
-        (context (completing-read
-                  "Select context: "
-                  (split-string (kubel--exec-to-string (format "%s config view -o jsonpath='{.contexts[*].name}'" kubel-kubectl)) " ")))
-        ) (kubel-open context
-        (let ((ns (kubel--exec-to-string (format "kubectl --context %s config view --minify --output 'jsonpath={..namespace}'" context))))
-          (if (string= ns "")
-              "default"
-            ns))
-        "pods"))
-  (kubel-refresh)
+  (let* (
+         (context (completing-read
+                   "Select context: "
+                   (split-string (kubel--exec-to-string (format "%s config view -o jsonpath='{.contexts[*].name}'" kubel-kubectl)) " ")))
+         (changed (not (s-equals-p context kubel-context)))
+         )
+    (kubel-open context
+                (let ((ns (kubel--exec-to-string (format "kubectl --context %s config view --minify --output 'jsonpath={..namespace}'" context))))
+                  (if (string= ns "")
+                      "default"
+                    ns))
+                "pods")
+    (kubel-refresh)
+    (when changed
+      (kubel--invalidate-context-caches)))
+
   )
 
 (define-key kubel-mode-map [remap kubel-set-context] #'konix/kubel-set-context)

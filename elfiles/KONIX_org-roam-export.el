@@ -372,7 +372,7 @@
                     filename-ext
                     filename
                     )
-          (format "%s?filename=%s.%s"
+          (format "%s?%s.%s"
                   url
                   (konix/org-roam-compute-slug filename-sans-ext)
                   filename-ext

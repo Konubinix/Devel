@@ -24,19 +24,16 @@
 
 ;;; Code:
 
-(require 'yapfify)
-(require 'py-isort)
 (require 'lsp-mode)
 (require 'lsp-jedi)
 (require 'dap-python)
 (require 'cape)
 (require 'yasnippet-capf)
+(require 'lazy-ruff)
 
+(setq-default lazy-ruff-check-command "ruff check --fix -s --extend-select I")
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)
-(defvar konix/python-mode/yapf t "Enable yapf")
-(add-to-list 'safe-local-variable-values '(konix/python-mode/yapf))
-(make-variable-buffer-local 'konix/python-mode/yapf)
 (defvar konix/python-mode/flycheck t "Enable flycheck")
 (add-to-list 'safe-local-variable-values '(konix/python-mode/flycheck))
 (make-variable-buffer-local 'konix/python-mode/flycheck)
@@ -54,11 +51,7 @@
     (setq konix/python-mode/flycheck nil)
     )
   (konix/prog/config)
-  (when (and (not (konix/python-is-tiltfile)) konix/python-mode/yapf)
-    (yapf-mode)
-    )
-  (add-hook 'before-save-hook
-            'py-isort-before-save)
+  (lazy-ruff-mode)
   ;; fed up with auto line breaks
   (setq indent-tabs-mode nil)
   (setq-local yas-indent-line 'fixed)

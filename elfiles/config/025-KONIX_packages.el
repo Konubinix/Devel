@@ -134,6 +134,7 @@
   ;; https://www.reddit.com/r/emacs/comments/1jfa2bp/looking_for_users_to_test_a_new_version_of/?rdt=34388
   (use-package key-chord)
   (use-package kivy-mode)
+  (use-package lazy-ruff)
   (use-package lisp :straight (:type built-in) :mode ("emacs$" . list-mode))
   (use-package lispy)
   (use-package kubel :commands (kubel))
@@ -181,7 +182,6 @@
   (use-package prism)
   (use-package python :straight (:type built-in) :mode (("\\.py\\'" . python-mode)))
   (use-package prettier-js)
-  (use-package py-isort)
   (use-package rainbow-mode) ;; to ease reading logs with ANSI ASCII color codes
   (use-package region-bindings-mode :commands (region-bindings-mode-enable))
   (use-package rust-mode)
@@ -205,7 +205,6 @@
   (use-package windata) ;; implicit dependency of imenu-tree
   (use-package yaml-mode)
   (use-package yaml-ts-mode :mode (("\\.yaml\\'" . yaml-ts-mode) ("\\.yml\\'" . yaml-ts-mode)))
-  (use-package yapfify)
   (use-package yasnippet)
   (use-package yasnippet-capf)
   (use-package zenburn-theme)

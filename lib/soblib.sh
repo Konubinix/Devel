@@ -14,7 +14,10 @@ function sob_preexec () {
 }
 
 function sob_postexec () {
-    rm -rf "${KONIX_SOB_DIR}/$$"
+    if test -e "${KONIX_SOB_DIR}"
+    then
+        rm -rf "${KONIX_SOB_DIR}/$$"
+    fi
 }
 
 function sob_bash_sessions () {

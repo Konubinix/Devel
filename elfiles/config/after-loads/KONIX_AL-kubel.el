@@ -123,9 +123,10 @@ the context caches, including the cached resource list."
 
 (define-key kubel-mode-map [remap kubel-set-context] #'konix/kubel-set-context)
 
-(defun konix/kubel-set-namespace ()
+(defun konix/kubel-set-namespace (&optional refresh)
   "Set the context."
-  (interactive)
+  (interactive "P")
+  (when refresh (kubel--invalidate-context-caches))
   (kubel-open kubel-context
               (completing-read "Namespace: " (kubel--list-namespace)
                                nil nil nil nil "default")

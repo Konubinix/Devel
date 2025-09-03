@@ -1607,6 +1607,7 @@ fallbacking to HEAD")
       (pop-to-buffer (current-buffer))
     (switch-to-buffer (current-buffer))
     )
+  (goto-line 0)
   )
 
 (defmacro konix/git/status-buffer/next-or-previous (moving_function text_prop)

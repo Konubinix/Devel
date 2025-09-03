@@ -134,3 +134,16 @@ LINE is given to 'forward-line."
   (interactive)
   (add-hook 'after-change-functions
             #'konix/after-change-function/ansify-new-content nil t))
+
+(defun konix/read-string-with-cursor (prompt default cursor-pos)
+  "Read a string from the minibuffer.
+PROMPT is the prompt to display.
+DEFAULT is the default value to prefill.
+CURSOR-POS is the position of the cursor within DEFAULT (0 = start)."
+  (let ((input (or default "")))
+    (minibuffer-with-setup-hook
+        (lambda ()
+          (let ((pos (min cursor-pos (length input))))
+            (goto-char (+ (minibuffer-prompt-end) pos))))
+      (read-from-minibuffer prompt input))))
+

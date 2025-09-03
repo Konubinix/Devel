@@ -34,8 +34,7 @@
          )
     (if code
         code
-      (progn
-        (org-up-heading-all 1)
+      (when (org-up-heading-safe)
         (konix/org-github-get-code)
         )
       )

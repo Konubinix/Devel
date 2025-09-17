@@ -30,13 +30,23 @@
   :group 'konix/go-faces)
 
 (defvar konix/go-font-lock-public-function-name-face 'konix/go-font-lock-public-function-name-face
-    "Face name to use for go public functions.")
+  "Face name to use for go public functions.")
+
+(defun konix/go/make-executable ()
+  (when (save-excursion
+          (goto-char (point-min))
+          (re-search-forward "//usr/bin/env go run" nil t)
+          )
+    (konix/make-executable)
+    )
+  )
 
 
 (defun konix/go-mode-hook ()
   (require 'dap-dlv-go)
   (hs-minor-mode 1)
   (setq-local lsp-semantic-tokens-enable t)
+  (add-hook 'after-save-hook 'konix/go/make-executable t t)
   (when (require 'lsp nil t)
     ;; envrc sets the exec-path before this, but if we don't wait the root loop
     ;; to make one iteration, it is not taken into account

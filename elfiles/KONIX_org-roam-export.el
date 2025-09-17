@@ -915,7 +915,7 @@
               nil
               t)
         (replace-match
-         (konix/org-roam-export/prepend-public-prefix-maybe (format "/ipfs/%s" (match-string-no-properties 3)))
+         (save-match-data (konix/org-roam-export/prepend-public-prefix-maybe (format "/ipfs/%s" (match-string-no-properties 3))))
          nil
          nil
          nil

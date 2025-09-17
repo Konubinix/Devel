@@ -322,14 +322,18 @@
      ((string-match "^\\(http.+\\.\\(webm\\|mp4\\)\\)$" url)
       (format "{{{video(%s)}}}" (match-string 1 url))
       )
-     ((string-match (concat "^" konix/org-ipfs-link "\\([?]filename=\\([a-zA-Z0-9=_%.-]+\\)\\)$") url)
-      (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 3 url) t)
-      )
      ((string-match "^youtube:\\(.+\\)$" url)
       (konix/org-roam-export/process-url (konix/org-link-youtube-process url))
       )
+     ((string-match (concat "^" konix/org-ipfs-link "\\([?]filename=\\([a-zA-Z0-9=_%.-]+\\)\\)$") url)
+      ;; need to recurse because the end result url might be caught by other
+      ;; ruls in here
+      (konix/org-roam-export/process-url (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 3 url) t))
+      )
      ((string-match (concat "^" konix/org-ipfs-link "[?]\\([a-zA-Z0-9=_%./-]+\\)?$") url)
-      (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 2 url) nil))
+      ;; need to recurse because the end result url might be caught by other
+      ;; ruls in here
+      (konix/org-roam-export/process-url (konix/org-export/process-ipfs-link (format "/ipfs/%s" (match-string 1 url)) (match-string 2 url) nil)))
      ((string-match "^cite:\\(.+\\)$" url)
       (konix/org-roam-export/process-url (konix/org-roam/process-url url))
       )
@@ -361,25 +365,19 @@
                    )
          (filename-sans-ext (and filename (file-name-sans-extension filename)))
          (filename-ext (and filename (file-name-extension filename)))
-         (url (konix/org-roam-export/process-url
-               (konix/org-roam-export/prepend-public-prefix-maybe path)))
+         (url-suffix (if filename (format (if explicit "?filename=%s.%s" "?%s.%s")
+                                          (konix/org-roam-compute-slug filename-sans-ext)
+                                          filename-ext
+                                          )
+                       ""))
+         (url (konix/org-roam-export/prepend-public-prefix-maybe (format "%s%s" path url-suffix)))
          )
-    (if filename
-        (if explicit
-            (format "[[%s?filename=%s.%s][%s]]"
-                    url
-                    (konix/org-roam-compute-slug filename-sans-ext)
-                    filename-ext
-                    filename
-                    )
-          (format "%s?%s.%s"
-                  url
-                  (konix/org-roam-compute-slug filename-sans-ext)
-                  filename-ext
-                  )
-          )
-      url
-      )
+    (if (and filename explicit)
+        (format "[[%s][%s]]"
+                url
+                filename
+                )
+      url)
     )
   )
 (defun konix/org-roam-get-keyword-global (keyword)

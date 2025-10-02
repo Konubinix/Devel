@@ -48,7 +48,7 @@
                electric-pair-pairs)
               )
   (add-hook 'after-save-hook 'konix/sh-script/make-executable t t)
-  (lsp)
+  ;; (lsp)
   )
 (add-hook 'sh-mode-hook 'konix/sh-mode-hook)
 

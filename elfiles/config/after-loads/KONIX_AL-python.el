@@ -80,7 +80,7 @@
     (require 'lsp)
     (require 'lsp-jedi)
     (add-to-list 'lsp-disabled-clients 'pyls)
-    (lsp)
+    ;; (lsp)
 
     (setq-local completion-at-point-functions
                 (list

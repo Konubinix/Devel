@@ -1441,7 +1441,7 @@ items"
                   (tags "+Agenda&+todo=\"NEXT\"&-maybe&-WAIT&-DELEGATED"
                         (
                          (org-agenda-overriding-header
-                          "Next actions about talking with people (no promises)")
+                          "Likely to see those? Remind me of doing that with them")
                          (org-super-agenda-groups
                           (mapcar
                            (lambda (ag)

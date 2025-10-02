@@ -162,11 +162,11 @@ the context caches, including the cached resource list."
       (add-to-list 'konix/kubel-auto-refresh-buffers (current-buffer))
     (setq konix/kubel-auto-refresh-buffers (remove (current-buffer)
                                                    konix/kubel-auto-refresh-buffers)))
-  (when (and (f-empty-p konix/kubel-auto-refresh-buffers)
+  (when (and (seq-empty-p konix/kubel-auto-refresh-buffers)
              konix/kubel-auto-refresh-timer_)
     (cancel-timer konix/kubel-auto-refresh-timer_)
     (setq konix/kubel-auto-refresh-timer_ nil))
-  (when (and (not (f-empty-p konix/kubel-auto-refresh-buffers))
+  (when (and (not (seq-empty-p konix/kubel-auto-refresh-buffers))
              (not konix/kubel-auto-refresh-timer_))
     (setq konix/kubel-auto-refresh-timer_ (run-at-time nil
                                                        konix/kubel-auto-refresh-time

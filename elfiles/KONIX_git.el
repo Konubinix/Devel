@@ -75,18 +75,20 @@
   (unless prompt
     (setq prompt "Message: ")
     )
-  (let* (
-         (code (konix/org-github-get-code))
-         (repo (konix/org-with-point-on-heading (org-entry-get (point) "KONIX_GH_REPO" t)))
-         (remote (string-trim (shell-command-to-string "git config remote.origin.url")))
-         (in-repo (and repo remote (string-match-p repo remote)))
-         )
-    (konix/read-string-with-cursor
-     "Message: "
-     (if (and code in-repo) (format " #%s" code) "")
-     0
+  (konix/read-string-with-cursor
+   "Message: "
+   (if-let* (
+             (code (konix/org-github-get-code))
+             (repo (konix/org-with-point-on-heading (org-entry-get (point) "KONIX_GH_REPO" t)))
+             (remote (string-trim (shell-command-to-string "git config remote.origin.url")))
+             (in-repo (and repo remote (string-match-p repo remote)))
+             )
+       (format " #%s" code)
+     ""
      )
-    )
+   0
+   )
+
   )
 
 (defun konix/diff/_assert-old-diff-line ()

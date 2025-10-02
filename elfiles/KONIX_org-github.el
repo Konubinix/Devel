@@ -28,8 +28,10 @@
   (let* (
          (heading (konix/org-get-heading))
          (code (save-match-data
-                 (and (string-match "^#\\([0-9]+\\) " heading)
-                      (match-string 1 heading)))
+                 (or (and (string-match "^#\\([0-9]+\\) " heading)
+                          (match-string 1 heading))
+                     (and (string-match ".+ #\\([0-9]+\\)" heading)
+                          (match-string 1 heading))))
                )
          )
     (if code
@@ -43,9 +45,10 @@
   )
 
 (defun konix/org-github-get-code ()
-  (konix/org-with-point-on-heading
-   (konix/_org-github-get-code)
-   )
+  (when org-clock-current-task
+    (konix/org-with-point-on-heading
+     (konix/_org-github-get-code)
+     ))
   )
 
 (defun konix/_org-github-browse ()

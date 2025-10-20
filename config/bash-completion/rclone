@@ -1,10 +1,10 @@
 #!/bin/bash
 
-COMPLETION_SCRIPT="${TMPDIR}/rclone_completer_script.sh"
+# COMPLETION_SCRIPT="${TMPDIR}/rclone_completer_script.sh"
 
-if ! test -e "${COMPLETION_SCRIPT}"
-then
-    rclone genautocomplete bash - > "${COMPLETION_SCRIPT}"
-fi
+# if ! test -e "${COMPLETION_SCRIPT}"
+# then
+#     rclone genautocomplete bash - > "${COMPLETION_SCRIPT}"
+# fi
 
-source "${COMPLETION_SCRIPT}"
+source ${HOME}/.nix-profile/share/bash-completion/completions/rclone.bash

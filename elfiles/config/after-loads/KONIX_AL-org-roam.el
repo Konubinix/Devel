@@ -366,23 +366,24 @@ ${title}
     ))
 
 (defun konix/org-mode-hook--for-org-roam ()
-  (add-hook 'before-save-hook
-            'konix/org-roam-quotes-insert-semicolumns
-            nil
-            t)
-  (add-hook 'before-save-hook
-            'konix/org-generate-custom-ids-in-buffer
-            nil
-            t)
-  (add-hook 'before-save-hook
-            'konix/org-roam-make-sure-has-id
-            nil
-            t)
-  (add-hook 'after-save-hook
-            'konix/org-roam-force-filename
-            nil
-            t)
-  (konix/org-roam/check-links)
+  (when (org-roam-file-p)
+    (add-hook 'before-save-hook
+              'konix/org-roam-quotes-insert-semicolumns
+              nil
+              t)
+    (add-hook 'before-save-hook
+              'konix/org-generate-custom-ids-in-buffer
+              nil
+              t)
+    (add-hook 'before-save-hook
+              'konix/org-roam-make-sure-has-id
+              nil
+              t)
+    (add-hook 'after-save-hook
+              'konix/org-roam-force-filename
+              nil
+              t)
+    (konix/org-roam/check-links))
   )
 
 ;; (cancel-timer konix/org-roam/timer-check-links)

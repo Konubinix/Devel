@@ -123,5 +123,22 @@ with :ipfa t -> the result is cid?filename (override the :results file setting),
 
 (advice-add 'org-babel-insert-result :around 'konix/org-babel-insert-result/ipfa)
 
+
+(defun konix/org-babel-ipfa-block (block-name &optional filename)
+  (save-window-excursion
+    (when filename
+      (find-file filename)
+      )
+    (save-excursion
+      (goto-char (org-babel-find-named-block block-name))
+      (let ((body (seventh (second (first (org-babel-tangle-single-block nil t))))))
+        (with-temp-buffer
+          (insert body)
+          (konix/ipfa-buffer nil)
+          )
+        )
+      ))
+  )
+
 (provide 'KONIX_AL-ob-core)
 ;;; KONIX_AL-ob-core.el ends here

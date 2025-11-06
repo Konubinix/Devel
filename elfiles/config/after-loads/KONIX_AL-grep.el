@@ -39,6 +39,7 @@
  'localhost
  '(grep-command "grep \
 --exclude-dir build \
+--exclude-dir .yarn \
 --exclude-dir .terraform \
 --exclude-dir Build \
 --exclude-dir BUILD \

@@ -9,23 +9,50 @@ settings:
   bindings.commands:
     global:
       normal:
-        Uc: set network user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36
-          (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36"
-        Ud: set network user-agent ""
-        Uf: set network user-agent "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
-          Firefox/45.0"
+        <Alt+Shift+n>: :open https://via.hypothes.is/{url}
+        <Alt+n>: :jseval (function(){window.hypothesisConfig=function(){return{showHighlights:true,appType:'bookmarklet'};};var
+          d=document,s=d.createElement('script');s.setAttribute('src','https://hypothes.is/embed.js');d.body.appendChild(s)})();
+        <Ctrl+Alt+n>: spawn -u konix_qutebrowser_emacs_org_add_roam_capture.sh
+        <Ctrl+Shift+n>: spawn -u konix_qutebrowser_emacs_org_add_quote_at_point.sh
+        <Ctrl+a>: null
+        <Ctrl+e>: konix_qutebrowser_emacs_everywhere.sh
+        <Ctrl+m>: spawn -u konix_qutebrowser_yank_bib.sh
+        <Ctrl+n>: spawn -u konix_qutebrowser_emacs_org_add_roam_note.sh
+        <Ctrl+x>: null
+        SB: open qute://bindings
+        Sb: open qute://bookmarks#bookmarks
+        Sm: messages
         d: null
         dd: tab-close
+        dg: tab-give
         do: tab-only
         dsD: spawn -u konix_qutebrowser_web_search.sh -d
         dsS: spawn -u konix_qutebrowser_web_search.sh
         dsd: spawn -u konix_qutebrowser_web_search.sh -dc
         dss: spawn -u konix_qutebrowser_web_search.sh -c
+        dw: spawn -u konix_qutebrowser_dwim.sh
+        pi: spawn -u konix_qutebrowser_print_ipfa.sh
         sp: spawn -u konix_qutebrowser_password.sh
+        ss: spawn -u konix_qutebrowser_scroll.sh
+        yE: spawn -u konix_qutebrowser_edit_content.sh
         yas: spawn -u konix_qutebrowser_ril_save_url.sh
         ye: spawn -u konix_qutebrowser_edit_emacs.sh -c
+        yi: spawn -u konix_qutebrowser_ipfa.sh
         zc: spawn -u konix_qutebrowser_open_with_chromium.sh
         zf: spawn -u konix_qutebrowser_open_with_firefox.sh
+  colors.webpage.preferred_color_scheme:
+    global: dark
+  completion.cmd_history_max_items:
+    global: -1
+  completion.open_categories:
+    global:
+    - quickmarks
+    - bookmarks
+    - searchengines
+    - history
+    - filesystem
+  completion.use_best_match:
+    global: true
   content.desktop_capture:
     https://teams.microsoft.com: true
     https://webrtc.github.io: true
@@ -33,9 +60,6 @@ settings:
     https://eu.docusign.net: false
     https://www.google.com: false
     https://www.myedenred.fr: false
-  content.headers.user_agent:
-    global: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)
-      Chrome/125.0.0.0 Safari/537.36
   content.javascript.clipboard:
     http://localhost:3000: access-paste
   content.javascript.enabled:
@@ -83,6 +107,12 @@ settings:
   content.register_protocol_handler:
     https://calendar.google.com?cid=%25s: false
     https://mail.google.com?extsrc=mailto&url=%25s: false
+  downloads.remove_finished:
+    global: -1
+  editor.command:
+    global:
+    - e
+    - '{file}'
   hints.next_regexes:
     global:
     - Bloc suivant >>
@@ -100,5 +130,5 @@ settings:
     - \bolder\b
     - \b[<←≪]\b
     - \b(<<|«)\b
-  new_instance_open_target:
-    global: tab-silent
+  tabs.show:
+    global: multiple

@@ -1,7 +1,6 @@
 """My custom conf of qutebrowser."""
 
 import os
-import re
 from pathlib import Path
 
 # pylint: disable=C0111
@@ -23,21 +22,3 @@ config.set(
         str(Path(os.environ["KONIX_PERSO_CONFIG_DIR"]) / "qutebrowser/konubinix.css"),
     ],
 )
-
-
-def read_search_engines(file_path):
-    with open(file_path, "r", encoding="utf-8") as f:
-        text = f.read()
-
-    pattern = r"\[(.*?)\]\s*(https?://[^\s]+)"
-    return {
-        key.replace(" ", "_"): value.replace("%s", "{}")
-        for key, value in re.findall(pattern, text)
-    }
-
-
-search_engines = {"DEFAULT": "https://duckduckgo.com/?q={}"} | read_search_engines(
-    os.environ["KONIX_WEB_SEARCH_ENGINES"]
-)
-
-config.set("url.searchengines", search_engines)

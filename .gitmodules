@@ -5,6 +5,3 @@
 [submodule "config/awesome/awesome-cyclefocus"]
 	path = config/awesome/awesome-cyclefocus
 	url = https://github.com/blueyed/awesome-cyclefocus
-[submodule "python/dracula"]
-	path = python/dracula
-	url = https://github.com/dracula/qutebrowser-dracula-theme.git

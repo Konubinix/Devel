@@ -60,6 +60,8 @@ settings:
     https://eu.docusign.net: false
     https://www.google.com: false
     https://www.myedenred.fr: false
+  content.headers.user_agent:
+    https://accounts.google.com/*: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36
   content.javascript.clipboard:
     http://localhost:3000: access-paste
   content.javascript.enabled:

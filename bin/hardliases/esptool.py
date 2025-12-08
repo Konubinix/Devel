@@ -1,7 +1,12 @@
 #!/bin/bash
+set -o errexit # -e
+set -o errtrace # -E
+set -o nounset # -u
+set -o pipefail
+shopt -s inherit_errexit
 
-source _ko_nix.sh
-me="$(basename "${0}")"
-bin="$(nix_install_binary "${me}" esptool)"
+# ctrl-c
+trap "exit 2" SIGINT
+trap "exit 3" SIGQUIT
 
-exec "${bin}" "$@"
+exec esptool "$@"

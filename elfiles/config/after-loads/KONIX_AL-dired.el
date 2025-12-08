@@ -256,10 +256,10 @@
   (let (
         (result
          (cond
-          ((s-starts-with? "/ipmfs" filename)
+          ((or (s-starts-with? "/ipmfs" filename)(s-starts-with? "/mfs" filename))
            (s-concat
             "/ipfs/"
-            (s-trim (shell-command-to-string (format "ipfs files stat --hash '%s'" (s-replace-regexp "^/ipmfs" "" filename))))
+            (s-trim (shell-command-to-string (format "ipfs files stat --hash '%s'" (s-replace-regexp "^/\\(ip\\)?mfs" "" filename))))
             (format "?filename=%s" filename)))
           (t
            (with-temp-buffer

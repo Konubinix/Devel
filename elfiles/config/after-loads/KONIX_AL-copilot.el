@@ -28,6 +28,7 @@
 (keymap-set copilot-completion-map "C-<tab>" 'copilot-accept-completion-by-word)
 (keymap-set copilot-completion-map "C-n" 'copilot-next-completion)
 (keymap-set copilot-completion-map "C-p" 'copilot-previous-completion)
+(setq-default copilot-lsp-settings '(:github (:copilot (:selectedCompletionModel "claude-sonnet-4"))))
 
 (provide 'KONIX_AL-copilot)
 ;;; KONIX_AL-copilot.el ends here

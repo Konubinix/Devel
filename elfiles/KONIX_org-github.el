@@ -51,7 +51,7 @@
      ))
   )
 
-(defun konix/_org-github-browse ()
+(defun konix/_org-github-browse-current-issue ()
   (let (
         (code (konix/org-github-get-code))
         (repo (org-entry-get (point) "KONIX_GH_REPO" t))
@@ -65,12 +65,24 @@
     )
   )
 
-(defun konix/org-github-browse ()
+(defun konix/org-github-browse-current-issue ()
   (interactive)
-  (konix/org-with-point-on-heading (konix/_org-github-browse))
+  (konix/org-with-point-on-heading (konix/_org-github-browse-current-issue))
   )
 
-(defalias 'konix/org-github-open 'konix/org-github-browse)
+(defun konix/org-github-browse-current-file ()
+  (interactive)
+  (let* (
+         (code (konix/org-github-get-code))
+         (repo (string-trim (shell-command-to-string "gh repo view --json nameWithOwner --template '{{.nameWithOwner}}'")))
+         (line-number (line-number-at-pos))
+         (relative-path (string-trim (shell-command-to-string (format "git ls-files --full-name %s" (buffer-file-name)))))
+         (branch_name (string-trim (shell-command-to-string "git rev-parse --abbrev-ref HEAD")))
+         (url (format "https://github.com/%s/blob/%s/%s#L%d" repo branch_name relative-path line-number))
+         )
+    (browse-url url)
+    )
+  )
 
 (defmacro konix/org-with-point-on-github-heading (body)
   `(konix/org-with-point-on-heading

@@ -27,14 +27,14 @@
             repo = pname;
             rev = "refs/tags/v1.1";
             leaveDotGit = true;
-            sha256 = "sha256-oPb+VGQW19UHCi8GDF1Wyp6Ay06sUE4GdrM/rp9mtcQ=";
+            sha256 = "sha256-M7btfOpUWKErIRNnLRSCw+PeluHKf9j46GB2ggNVEAs=";
           };
 
           SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
           propagatedBuildInputs = with pkgs.python3.pkgs; [
             setuptools
-            setuptools_scm
+            setuptools-scm
             babel
             pygments
           ];

@@ -167,7 +167,9 @@
   (use-package orderless)
   (use-package org-checklist :straight org-contrib)
   (use-package org-edna)
-  (use-package org-drill :bind-keymap  ("C-f D" . konix/org-drill-key-map))
+  (use-package org-drill
+    :bind-keymap  ("C-f D" . konix/org-drill-key-map)
+    :commands (konix/org-drill/find-one-orphan))
   (use-package orglink)
   (use-package org-mime :commands (konix/org-mime-htmlize-current))
   (use-package org-ql :commands (org-ql-search))

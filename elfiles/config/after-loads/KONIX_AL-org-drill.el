@@ -39,6 +39,21 @@
     )
   )
 
+(defun konix/org-drill/find-one-orphan ()
+  (interactive)
+  (cl-block :search-for-next-drill
+    (let* ((ast (org-element-parse-buffer) )
+           results)
+      (org-element-map ast 'headline
+        (lambda (hl)
+          (let ((tags (org-element-property :tags hl))
+                (last_interval (org-element-property :DRILL_LAST_INTERVAL hl)))
+            (when (and (member "drill" tags)
+                       (not last_interval))
+              (goto-char (org-element-property :begin hl))
+              (cl-return-from :search-for-next-drill))))))))
+
+
 (define-prefix-command 'konix/org-drill-key-map)
 (keymap-set 'konix/org-drill-key-map "d" 'org-drill)
 (keymap-set 'konix/org-drill-key-map "r" 'org-drill-resume)

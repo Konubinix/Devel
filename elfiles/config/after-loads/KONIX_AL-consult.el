@@ -26,7 +26,8 @@
 
 (keymap-global-set "C-x b" 'consult-buffer)
 (keymap-global-set "M-s o" 'consult-line)
-(setq-default consult-preview-key '(:debounce 5.0 any))
+;; Disable automatic buffer preview during minibuffer completion
+(setq-default consult-preview-key nil)
 
 (defun konix/consult-org-tag ()
   (interactive)

@@ -267,14 +267,7 @@
 (keymap-set 'konix/ediff-key-map "m" 'ediff-merge)
 (keymap-set 'konix/ediff-key-map "M" 'ediff-merge-with-ancestor)
 
-;; Language tool
-(define-prefix-command 'konix/langtool-key-map)
-(keymap-set konix/global-key-map "l" 'konix/langtool-key-map)
-(keymap-set 'konix/langtool-key-map "l" 'langtool-check)
-(keymap-set 'konix/langtool-key-map "d" 'langtool-check-done)
-(keymap-set 'konix/langtool-key-map "L" 'langtool-switch-default-language)
-(keymap-set 'konix/langtool-key-map "e" 'langtool-show-message-at-point)
-(keymap-set 'konix/langtool-key-map "?" 'langtool-correct-buffer)
+
 
 ;; ************************************************************
 ;; Backup

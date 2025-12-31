@@ -102,6 +102,7 @@
   (use-package earthfile-mode)
   (use-package editorconfig)
   (use-package edit-indirect)
+  (use-package elysium :straight (:fork t))
   ;; several issues yet to be reported
   (use-package ement :straight (:repo "alphapapa/ement.el" :fork (:repo "konubinix/ement.el")))
   (use-package envrc)
@@ -118,6 +119,13 @@
   (use-package go-dlv)
   (use-package go-mode :mode "_helpers.tpl")
   (use-package golden-ratio)
+  (use-package gptel
+    :commands (gptel-menu gptel)
+    :bind (("M-g l g" . gptel-menu)
+           ("M-g l M-g" . gptel))
+    )
+  (use-package gptel-agent
+    :bind ("M-g l a" . gptel-agent))
   (use-package hcl-mode :commands (hcl-mode))
   (use-package highlight-parentheses)
   (use-package highlight-symbol :commands (highlight-symbol))
@@ -147,6 +155,7 @@
     )
   (use-package lsp-jedi)
   (use-package lua-mode :commands (lua-mode) :mode "\\.lua$")
+  (use-package macher)
   ;; (use-package marginalia) -> too much information that I barely look at
   (use-package mic-paren)
   (use-package michelson :straight (:type git :host github :repo "MiloDavis/michelson-mode"))

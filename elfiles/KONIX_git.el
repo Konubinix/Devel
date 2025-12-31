@@ -1376,7 +1376,7 @@ fallbacking to HEAD")
                           (keymap-set map "v" 'konix/git/status-buffer/view-file)
                           map
                           )
-                        "^[     ]+both modified: +\\(.+\\)"
+                        "^[\t ]+both modified: +\\(.+\\)"
                         compilation-info-face)
     (decorate_file_type (let (
                               (map (make-sparse-keymap))

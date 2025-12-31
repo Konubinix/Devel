@@ -202,74 +202,81 @@
   )
 
 (defvar konix/ement-notify-bots '())
+(defvar konix/ement-ignored-bots '())
 (defvar konix/ement-spammy-bots '())
 
 (defun konix/ement-update-tracking (session room &optional event)
-  (let (
-        (faces (cond
-                ((string= "m.space" (ement-room-type room))
-                 '())
-                ((ement-room-invite-state room)
-                 '(ement-room-invitation))
-                ((let ((events (if event
-                                   (list event)
-                                 (konix/ement-events-not-fully-read session
-                                                                    room)))
-                       event
-                       (level 0))
-                   (while (and events (not (equal level 4)))
-                     (setq event (car events))
-                     (setq events (cdr events))
-                     (setq level (max level
-                                      (cond
-                                       ((ement-notify--event-mentions-session-user-p event
-                                                                                     room
-                                                                                     session)
-                                        4)
-                                       ((ement-notify--event-mentions-room-p event
-                                                                             room
-                                                                             session)
-                                        (cond
-                                         ((member (ement-user-id
-                                                   (ement-event-sender event))
-                                                  konix/ement-spammy-bots)
-                                          1)
-                                         ((member (ement-user-id
-                                                   (ement-event-sender event))
-                                                  konix/ement-notify-bots)
-                                          2)
-                                         (t
-                                          3)))
-                                       ((member (ement-user-id
-                                                 (ement-event-sender event))
-                                                konix/ement-notify-bots)
-                                        1)
-                                       (t
-                                        0)))))
-                   (cl-case level
-                     ((4)
-                      '(ement-room-mention))
-                     ((3)
-                      '(ement-room-room-mention))
-                     ((2)
-                      '(ement-room-bot-mention))
-                     ((1)
-                      '(ement-room-bot-no-mention))
-                     (t
-                      nil))))
-                ((konix/ement-room-direct-p session room)
-                 '(ement-room-direct)
-                 )
-                ((ement--room-tagged-p "m.favourite" room)
-                 '(ement-room-favourite)
-                 )
-                ((ement--room-tagged-p "u.followed" room)
-                 '(ement-room-followed)
-                 )
-                (t
-                 '()
-                 ))))
-    (tracking-add-buffer (konix/ement-room-buffer session room) faces)))
+  (let* (
+         (level -1)
+         (faces (cond
+                 ((string= "m.space" (ement-room-type room))
+                  '())
+                 ((ement-room-invite-state room)
+                  '(ement-room-invitation))
+                 ((let ((events (if event
+                                    (list event)
+                                  (konix/ement-events-not-fully-read session
+                                                                     room)))
+                        event)
+                    (while (and events (not (equal level 4)))
+                      (setq event (car events))
+                      (setq events (cdr events))
+                      (setq level (max level
+                                       (cond
+                                        ((ement-notify--event-mentions-session-user-p event
+                                                                                      room
+                                                                                      session)
+                                         4)
+                                        ((ement-notify--event-mentions-room-p event
+                                                                              room
+                                                                              session)
+                                         (cond
+                                          ((member (ement-user-id
+                                                    (ement-event-sender event))
+                                                   konix/ement-spammy-bots)
+                                           1)
+                                          ((member (ement-user-id
+                                                    (ement-event-sender event))
+                                                   konix/ement-notify-bots)
+                                           2)
+                                          (t
+                                           3)))
+                                        ((member (ement-user-id
+                                                  (ement-event-sender event))
+                                                 konix/ement-notify-bots)
+                                         1)
+                                        ((member (ement-user-id
+                                                  (ement-event-sender event))
+                                                 konix/ement-ignored-bots)
+                                         -1)
+                                        (t
+                                         0)))))
+                    (cl-case level
+                      ((4)
+                       '(ement-room-mention))
+                      ((3)
+                       '(ement-room-room-mention))
+                      ((2)
+                       '(ement-room-bot-mention))
+                      ((1)
+                       '(ement-room-bot-no-mention))
+
+                      (t
+                       nil))))
+                 ((konix/ement-room-direct-p session room)
+                  '(ement-room-direct)
+                  )
+                 ((ement--room-tagged-p "m.favourite" room)
+                  '(ement-room-favourite)
+                  )
+                 ((ement--room-tagged-p "u.followed" room)
+                  '(ement-room-followed)
+                  )
+                 (t
+                  '()
+                  ))))
+    (when (>= level 0)
+      (tracking-add-buffer (konix/ement-room-buffer session room) faces))))
 
 (defun konix/ement-unread-rooms (session)
   (->>

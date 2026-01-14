@@ -245,6 +245,11 @@ click_by_text ( ) {
     send_js "document.evaluate(\"//${type}[contains(text(),'${text}')]\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();"
 }
 
+click_by_test_id() {
+    local test_id="$1"
+    send_js "document.querySelector(\"[data-test-id='${test_id}']\").click();"
+}
+
 wait_and_respawn() {
     local waiting_time="5s"
     clk notify "Spawning again the script in ${waiting_time}"

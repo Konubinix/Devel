@@ -11,6 +11,7 @@ LOGGER = logging.getLogger(__name__)
 
 def by_pynotify(message, urgency, duration, title):
     import notify2
+
     if not notify2.init("Message"):
         sys.exit(1)
     n = notify2.Notification("Message", message)
@@ -24,6 +25,8 @@ def by_notify_send(message, urgency, duration, title):
         "annoying": "normal",
         "boring": "critical",
     }[urgency]
+    if urgency == "critical":
+        duration = 360000000
     args = [
         "notify-send",
         "--expire-time",
@@ -41,6 +44,7 @@ def by_notify_send(message, urgency, duration, title):
 def by_sl4a(message, type_, duration, title):
     import andlib
     from konix_android import droid
+
     if type_ == "normal":
         droid.makeToast(message)
     if type_ == "annoying":
@@ -60,18 +64,13 @@ def send_to_phone(message, type_, duration, title):
         "annoying": 2,
         "boring": 3,
     }[type_]
-    subprocess.check_call(
-        ["clk", "ntfy", "--priority",
-         str(priority), message])
+    subprocess.check_call(["clk", "ntfy", "--priority", str(priority), message])
 
 
 # type_ is normal or annoying or boring
-def main(message,
-         unique=False,
-         duration=3000,
-         type_="normal",
-         to_phone=False,
-         title=""):
+def main(
+    message, unique=False, duration=3000, type_="normal", to_phone=False, title=""
+):
     message = message.replace("<", "-")
     if to_phone:
         send_to_phone(message, type_, duration, title)
@@ -83,11 +82,7 @@ def main(message,
             LOGGER.exception(e)
 
 
-def local_display(message,
-                  unique=False,
-                  type_="normal",
-                  duration=3000,
-                  title=""):
+def local_display(message, unique=False, type_="normal", duration=3000, title=""):
     candidates = [
         by_notify_send,
         by_pynotify,

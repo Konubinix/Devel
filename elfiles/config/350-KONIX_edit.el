@@ -129,8 +129,17 @@
   "Go to a random line in this buffer."
   (interactive)
   (push-mark)
-  (konix/goto-line-prog (1+ (random (konix/buffer-line-count))))
-  (konix/go-to-next-visible-line)
+  (let ((line-count (save-excursion
+                      (goto-char (point-min))
+                      (let ((count 0))
+                        (while (not (eobp))
+                          (forward-line 1)
+                          (setq count (1+ count)))
+                        count))))
+    (goto-char (point-min))
+    (dotimes (_ (random line-count))
+      (forward-line 1))
+    (beginning-of-line))
   )
 
 (make-variable-buffer-local 'konix/adjust-new-lines-at-end-of-file)

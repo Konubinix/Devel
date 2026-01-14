@@ -30,7 +30,7 @@
     (if (or (looking-at-p ".*\\[\\[id:")
             (progn (forward-line 1) (looking-at-p ".*\\[\\[id:"))
             (progn (forward-line 1) (looking-at-p ".*\\[\\[id:")))
-        (warn "Beware, this is a tangled file, think about detangling-it"))))
+        (warn "Beware, %s is a tangled file, think about detangling-it" (buffer-file-name) ))))
 
 (defun konix/text-mode-hook ()
   (add-hook 'before-save-hook 'konix/text-mode-hook/warn-if-tangled nil t))

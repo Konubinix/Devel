@@ -89,5 +89,12 @@
                                         (insert (konix/load-project-conventions))))))
                                 gptel--transform-add-context))
 
+(defun konix/gptel-post-response-function (start end)
+  "Notify when gptel is done with a response."
+  (start-process "gptel-done-notify" nil "clk" "ntfy" (format "%s ended answering my request" (buffer-name)) "--priority" "low")
+  (tracking-add-buffer (current-buffer)))
+
+(add-hook 'gptel-post-response-functions #'konix/gptel-post-response-function)
+
 (provide 'KONIX_AL-gptel)
 ;;; KONIX_AL-gptel.el ends here

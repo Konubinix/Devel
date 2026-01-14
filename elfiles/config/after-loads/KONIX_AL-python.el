@@ -25,13 +25,9 @@
 ;;; Code:
 
 (require 'lsp-mode)
-(require 'lsp-jedi)
-(require 'dap-python)
 (require 'cape)
 (require 'yasnippet-capf)
-(require 'lazy-ruff)
 
-(setq-default lazy-ruff-check-command "ruff check --fix -s --extend-select I")
 (setq-default python-guess-indent nil)
 (setq-default python-indent-offset 4)
 (defvar konix/python-mode/flycheck t "Enable flycheck")
@@ -51,11 +47,11 @@
     (setq konix/python-mode/flycheck nil)
     )
   (konix/prog/config)
-  (lazy-ruff-mode)
   ;; fed up with auto line breaks
   (setq indent-tabs-mode nil)
   (setq-local yas-indent-line 'fixed)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
+  (add-hook 'after-save-hook 'lsp-format-buffer t t)
   (defvar electric-pair-pairs)
   (setq-local electric-pair-pairs
               (append
@@ -78,9 +74,10 @@
          (not (konix/python-is-tiltfile))
          )
     (require 'lsp)
-    (require 'lsp-jedi)
     (add-to-list 'lsp-disabled-clients 'pyls)
-    ;; (lsp)
+    (add-to-list 'lsp-disabled-clients 'pylsp)
+    (add-to-list 'lsp-disabled-clients 'zuban-ls)
+    (lsp)
 
     (setq-local completion-at-point-functions
                 (list

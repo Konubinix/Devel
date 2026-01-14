@@ -142,7 +142,6 @@
   ;; https://www.reddit.com/r/emacs/comments/1jfa2bp/looking_for_users_to_test_a_new_version_of/?rdt=34388
   (use-package key-chord)
   (use-package kivy-mode)
-  (use-package lazy-ruff)
   (use-package lisp :straight (:type built-in) :mode ("emacs$" . list-mode))
   (use-package lispy)
   (use-package kubel :commands (kubel))

@@ -207,7 +207,7 @@
 
 (defun konix/ement-update-tracking (session room &optional event)
   (let* (
-         (level -1)
+         (level nil)
          (faces (cond
                  ((string= "m.space" (ement-room-type room))
                   '())
@@ -218,6 +218,7 @@
                                   (konix/ement-events-not-fully-read session
                                                                      room)))
                         event)
+                    (setq level -1)
                     (while (and events (not (equal level 4)))
                       (setq event (car events))
                       (setq events (cdr events))
@@ -275,7 +276,7 @@
                  (t
                   '()
                   ))))
-    (when (>= level 0)
+    (when (or (not level) (>= level 0))
       (tracking-add-buffer (konix/ement-room-buffer session room) faces))))
 
 (defun konix/ement-unread-rooms (session)

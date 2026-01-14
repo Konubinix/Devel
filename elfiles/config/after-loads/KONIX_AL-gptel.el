@@ -25,11 +25,12 @@
 ;;; Code:
 
 ;; :key can be a function that returns the API key.
-(gptel-make-gemini "Gemini" :key (string-trim (shell-command-to-string "clk secret show gemini_api_key --field secret --secret")) :stream t)
+
+(setenv "GEMINI_API_KEY" (string-trim (shell-command-to-string "clk secret show gemini_api_key --field secret --secret")))
 
 (setq-default
- gptel-model 'claude-sonnet-4
- gptel-backend (gptel-make-gh-copilot "Copilot")
+ gptel-model 'gemini-pro-latest
+ gptel-backend (gptel-make-gemini "Gemini" :key (string-trim (shell-command-to-string "clk secret show gemini_api_key --field secret --secret")) :stream t)
  gptel-default-mode 'org-mode
  gptel-expert-commands t
  )

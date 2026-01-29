@@ -41,12 +41,12 @@
   ;;  nil
   ;;  t
   ;;  )
-  ;; (add-hook
-  ;;  'before-save-hook
-  ;;  #'lsp-format-buffer
-  ;;  nil
-  ;;  t
-  ;;  )
+  (add-hook
+   'before-save-hook
+   #'lsp-format-buffer
+   nil
+   t
+   )
   ;; (prettier-js-mode)
   )
 

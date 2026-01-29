@@ -67,6 +67,10 @@
 
   (use-package org :mode ("\\.org_archive" . org-mode))
 
+  (use-package agent-shell
+    :bind (("M-g l a" . agent-shell)
+           ("M-g l b" . konix/agent-shell-pop-to-buffer)
+           ("M-g l r" . konix/agent-shell-request-edit)))
   (use-package aggressive-indent-mode)
   (use-package arduino-mode)
   (use-package argdown :straight (:type built-in) :mode ("\\.argdown\\'" . argdown-mode))
@@ -119,13 +123,6 @@
   (use-package go-dlv)
   (use-package go-mode :mode "_helpers.tpl")
   (use-package golden-ratio)
-  (use-package gptel
-    :commands (gptel-menu gptel)
-    :bind (("M-g l g" . gptel-menu)
-           ("M-g l M-g" . gptel))
-    )
-  (use-package gptel-agent
-    :bind ("M-g l a" . gptel-agent))
   (use-package hcl-mode :commands (hcl-mode))
   (use-package highlight-parentheses)
   (use-package highlight-symbol :commands (highlight-symbol))

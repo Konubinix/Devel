@@ -9,6 +9,7 @@
 (keymap-set konix/region-bindings-mode-map "d" 'delete-rectangle)
 (keymap-set konix/region-bindings-mode-map "l" 'mc/edit-lines)
 (keymap-set konix/region-bindings-mode-map "n" 'cua-rectangle-mark-mode)
+(keymap-set konix/region-bindings-mode-map "r" 'konix/agent-shell-request-edit)
 
 (define-prefix-command 'konix/mc-region-map)
 (keymap-set konix/region-bindings-mode-map "m" 'konix/mc-region-map)

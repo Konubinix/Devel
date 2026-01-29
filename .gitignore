@@ -11,3 +11,4 @@ devel_bin
 exaile
 /.cask-backup
 /result
+/.agent-shell

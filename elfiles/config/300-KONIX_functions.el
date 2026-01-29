@@ -147,6 +147,24 @@ CURSOR-POS is the position of the cursor within DEFAULT (0 = start)."
             (goto-char (+ (minibuffer-prompt-end) pos))))
       (read-from-minibuffer prompt input))))
 
+(defcustom konix/should-notify-idle-threshold 30
+  "Idle time in seconds after which notifications should be shown."
+  :type 'integer
+  :group 'konix)
+
+(defun konix/should-notify-p (&optional buffer)
+  "Return non-nil if a notification should be shown for BUFFER.
+Notifications are appropriate when:
+- The Emacs frame is not focused (user is in another application), OR
+- BUFFER is not visible in any window, OR
+- User has been idle for more than `konix/should-notify-idle-threshold' seconds.
+If BUFFER is nil, uses the current buffer."
+  (let ((buf (or buffer (current-buffer))))
+    (or (not (frame-focus-state))
+        (not (get-buffer-window buf 'visible))
+        (>= (float-time (or (current-idle-time) 0))
+            konix/should-notify-idle-threshold))))
+
 (defun konix/micropython-upload-buffer-as-main (&optional reset)
   (interactive "p")
   (let* ((temp-file (make-temp-file "micropython-" nil ".py"))

@@ -234,7 +234,16 @@
                     (org-export-with-tags nil)
                     )
                 (setq konix/org-roam-export/buffer-file-name konix/org-roam-export/buffer-file-name-to-save)
-                (konix/org-roam-export/apply-transformations)
+                ;; Wrap all transformations in `combine-change-calls' to defer
+                ;; `after-change-functions' hooks until the end. Without this,
+                ;; the org-element cache gets into an inconsistent state after
+                ;; multiple buffer modifications. When a transformation then
+                ;; triggers cache access (e.g., via `org-collect-keywords'), it
+                ;; causes `org-element--parse-to' to hang trying to reconcile
+                ;; the corrupted cache.
+                (combine-change-calls (point-min) (point-max)
+                  (konix/org-roam-export/apply-transformations))
+                (message "Hugo exporting %s" (current-buffer))
                 (org-hugo-export-wim-to-md)
                 )
               )
@@ -883,11 +892,7 @@
         (replace-match
          (format
           "\n%s\n"
-          (konix/org-roam-export/process-url (match-string-no-properties 1))
-          )
-         )
-        )
-      )
+          (konix/org-roam-export/process-url (match-string-no-properties 1))))))
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
@@ -898,13 +903,7 @@
          (format
           "%s%s"
           (match-string-no-properties 1)
-          (konix/org-roam-export/process-url (match-string-no-properties 2))
-          )
-         )
-        )
-      )
-    )
-  )
+          (konix/org-roam-export/process-url (match-string-no-properties 2))))))))
 
 (defun konix/org-roam-export/convert-remaining-ipfs-links ()
   (save-excursion

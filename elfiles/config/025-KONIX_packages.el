@@ -99,6 +99,7 @@
   (use-package default-text-scale)
   (use-package delight)
   (use-package diff :straight (:type built-in) :mode ("COMMIT_EDITMSG". diff-mode))
+  (use-package difflib)
   (use-package dired-copy-paste :straight (:type git :host github :repo "jsilve24/dired-copy-paste"))
   (use-package dired-filetype-face)
   (use-package dired-quick-sort)
@@ -152,6 +153,7 @@
   (use-package lsp-jedi)
   (use-package lua-mode :commands (lua-mode) :mode "\\.lua$")
   (use-package macher)
+  (use-package mcp-server-lib)
   ;; (use-package marginalia) -> too much information that I barely look at
   (use-package mic-paren)
   (use-package michelson :straight (:type git :host github :repo "MiloDavis/michelson-mode"))

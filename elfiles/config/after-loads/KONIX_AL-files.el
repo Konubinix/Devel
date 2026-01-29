@@ -29,6 +29,9 @@
 (setq-default kept-old-versions 50)
 (setq-default kept-new-versions 50)
 (setq-default delete-old-versions t)
+;; avoid renaming files, that trigger the lsp--on-rename-file advice on
+;; rename-file that will mess up with my imports, see https://github.com/emacs-lsp/lsp-mode/issues/3516
+(setq-default backup-by-copying t)
 
 (setq-default konix/old-insert-directory-program insert-directory-program)
 

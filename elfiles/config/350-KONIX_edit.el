@@ -101,18 +101,16 @@
   (yank-pop -1)
   )
 
-(defun konix/indent-region-or-buffer ()
+(defun konix/lsp-format-or-indent-region-or-buffer ()
   (interactive)
-  (save-excursion
-    (when current-prefix-arg
-      (mark-defun)
-      )
-    (if mark-active
-        (indent-region (point) (mark) 'nil)
-      (indent-region (point-min) (point-max) 'nil)
-      )
-    )
-  )
+  (let ((fct (if (and (boundp 'lsp-mode) lsp-mode) #'lsp-format-region #'indent-region))
+        (point-min (if mark-active (point) (point-min)))
+        (point-max (if mark-active (mark) (point-max))))
+    (save-excursion
+      (when current-prefix-arg
+        (mark-defun)
+        )
+      (funcall fct point-min point-max))))
 
 (defun konix/line-number-at-pos-widen ()
   (save-restriction
@@ -133,12 +131,12 @@
                       (goto-char (point-min))
                       (let ((count 0))
                         (while (not (eobp))
-                          (forward-line 1)
+                          (forward-visible-line 1)
                           (setq count (1+ count)))
                         count))))
     (goto-char (point-min))
     (dotimes (_ (random line-count))
-      (forward-line 1))
+      (forward-visible-line 1))
     (beginning-of-line))
   )
 

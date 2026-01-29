@@ -39,9 +39,9 @@
 
 ;; remove keys that I type too much by mistake
 (keymap-global-set "C-x <"
-                #'(lambda () (interactive) (message "Intentionally disable C-x <")))
+                   #'(lambda () (interactive) (message "Intentionally disable C-x <")))
 (keymap-global-set "C-x >"
-                #'(lambda () (interactive) (message "Intentionally disable C-x >")))
+                   #'(lambda () (interactive) (message "Intentionally disable C-x >")))
 
 ;; some vim keys
 (keymap-global-set "C-n" 'dabbrev-completion)
@@ -229,7 +229,7 @@
 ;; Update the env
 (keymap-set 'konix/global-key-map "M-e" 'konix/load-default-env-file)
 ;;Indentation
-(keymap-set 'konix/global-key-map "i" 'konix/indent-region-or-buffer)
+(keymap-set 'konix/global-key-map "i" 'konix/lsp-format-or-indent-region-or-buffer)
 ;; goto
 (keymap-set 'konix/global-key-map "M-g" 'goto-line)
 (keymap-set 'konix/global-key-map "M-r" 'konix/goto-random-line)

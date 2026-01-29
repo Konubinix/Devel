@@ -913,8 +913,6 @@ awful.rules.rules = {
 				"pinentry",
 			},
 			class = {
-				"Impass",
-				"Konix_impass.py",
 				"Konix_gtk_entry.py",
 				"Arandr",
 				"Blueman-manager",
@@ -932,6 +930,7 @@ awful.rules.rules = {
 			-- Note that the name property shown in xprop might be set slightly after creation of the client
 			-- and the name shown there might not match defined rules here.
 			name = {
+				"🔒Impass Password Manager",
 				"Event Tester", -- xev.
 				"Terminator Preferences",
 				"Choose A Terminal Font",
@@ -955,11 +954,10 @@ awful.rules.rules = {
 	{
 		rule_any = {
 			class = {
-				"Impass",
-				"Konix_impass.py",
 				"gnuplot_qt",
 			},
 			name = {
+				"🔒Impass Password Manager",
 				"Ediff",
 			},
 		},

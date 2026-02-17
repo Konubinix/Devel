@@ -29,17 +29,12 @@
 (require 'smerge-mode)
 (require 'difflib)
 (require 'project)
+(require 'KONIX_mcp-server-introspection)
 
 ;;; Configuration
 
 (defconst konix/mcp-server-id "konix-emacs-mcp"
   "Server ID for KONIX MCP server.")
-
-;;; Elysium-like editing support
-
-(defvar konix/mcp-server--edit-target-buffer nil
-  "Buffer to use for the next `get_edit_context' call.
-Set by `konix/agent-shell-request-edit' before sending a request.")
 
 ;;; Helper functions and macros
 
@@ -47,11 +42,12 @@ Set by `konix/agent-shell-request-edit' before sending a request.")
   "Execute BODY with buffer named BUFFER-NAME as current buffer.
 Signals an error if the buffer does not exist."
   (declare (indent 1) (debug t))
-  `(let ((buf (get-buffer ,buffer-name)))
+  `(let* ((decoded-buffer-name (decode-coding-string ,buffer-name 'utf-8))
+          (buf (get-buffer decoded-buffer-name)))
      (if buf
          (with-current-buffer buf
            ,@body)
-       (error "Buffer not found: %s" ,buffer-name))))
+       (error "Buffer not found: %s" decoded-buffer-name))))
 
 (defun konix/mcp-server--get-agenda-content (key)
   "Run org-agenda with KEY and return the buffer content."
@@ -92,14 +88,27 @@ MCP Parameters:
                buffer-info-list)))
      (json-encode (nreverse buffer-info-list)))))
 
-(defun konix/mcp-server-read-buffer (buffer-name)
-  "Read the contents of a buffer.
+(defun konix/mcp-server-read-buffer (buffer-name &optional start-char end-char)
+  "Read the contents of a buffer, optionally a character range.
+
+When START-CHAR and END-CHAR are provided, returns only that substring
+(0-indexed, end exclusive). This avoids needing to shell out to extract
+a region from large buffers.
 
 MCP Parameters:
-  buffer-name - Name of the buffer to read"
+  buffer-name - Name of the buffer to read
+  start-char - (optional) Start character position (0-indexed)
+  end-char - (optional) End character position (0-indexed, exclusive)"
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
-     (buffer-substring-no-properties (point-min) (point-max)))))
+     (let ((content (buffer-substring-no-properties (point-min) (point-max))))
+       (if (and start-char end-char)
+           (let ((start (max 0 (min (string-to-number (format "%s" start-char))
+                                    (length content))))
+                 (end (max 0 (min (string-to-number (format "%s" end-char))
+                                  (length content)))))
+             (substring content start end))
+         content)))))
 
 (defun konix/mcp-server-write-buffer (buffer-name content)
   "Write content to a buffer, replacing its contents.
@@ -150,6 +159,20 @@ MCP Parameters:
                   (remote (string-trim-right (shell-command-to-string (format "git config --get branch.%s.remote" branch)))))
              (json-encode `((branch . ,branch) (remote . ,remote))))
          (error "The directory of buffer %s is not in a git repository" buffer-name))))))
+
+(defun konix/mcp-server-emacs-describe-function (function-name)
+  "Describe an Emacs function and return its documentation as a string.
+
+MCP Parameters:
+  function-name - The name of the function to describe"
+  (mcp-server-lib-with-error-handling
+   (let ((func (intern-soft (decode-coding-string function-name 'utf-8))))
+     (if (and func (fboundp func))
+         (save-window-excursion
+           (describe-function func)
+           (with-current-buffer (help-buffer)
+             (buffer-string)))
+       (error "Function '%s' not found" function-name)))))
 
 (defun konix/mcp-server-gh-run-view ()
   "Run 'gh run view' and return the output.
@@ -207,146 +230,6 @@ MCP Parameters:
   (none)"
   (mcp-server-lib-with-error-handling
    (konix/mcp-server--get-agenda-content "ann")))
-
-;;; Claude Code usage tools
-
-(defun konix/mcp-server--parse-claude-credentials ()
-  "Parse Claude Code credentials from ~/.claude/.credentials.json.
-Returns the OAuth access token or nil if not found."
-  (let ((creds-file (expand-file-name "~/.claude/.credentials.json")))
-    (when (file-exists-p creds-file)
-      (let* ((json-object-type 'alist)
-             (json-array-type 'list)
-             (creds (json-read-file creds-file)))
-        (alist-get 'accessToken (alist-get 'claudeAiOauth creds))))))
-
-(defun konix/mcp-server--format-time-until (unix-timestamp)
-  "Format the time remaining until UNIX-TIMESTAMP as a human-readable string."
-  (let* ((now (float-time))
-         (diff (- unix-timestamp now)))
-    (if (<= diff 0)
-        "now"
-      (let* ((hours (floor (/ diff 3600)))
-             (minutes (floor (/ (mod diff 3600) 60))))
-        (cond
-         ((>= hours 24)
-          (format "%dd %dh" (/ hours 24) (mod hours 24)))
-         ((> hours 0)
-          (format "%dh %dm" hours minutes))
-         (t
-          (format "%dm" minutes)))))))
-
-(defun konix/mcp-server--make-progress-bar (percentage &optional width)
-  "Make a progress bar string for PERCENTAGE (0-100).
-WIDTH defaults to 20 characters."
-  (let* ((width (or width 20))
-         (filled (round (* width (/ percentage 100.0))))
-         (empty (- width filled)))
-    (concat (make-string filled ?█)
-            (make-string empty ?░))))
-
-(defun konix/mcp-server-claude-code-usage ()
-  "Get Claude Code API usage information.
-
-Makes a minimal API call to retrieve rate limit headers from the Anthropic API.
-Returns usage information including:
-- 5-hour window utilization percentage
-- 7-day window status
-- Time until reset
-
-MCP Parameters:
-  (none)"
-  (mcp-server-lib-with-error-handling
-   (let ((token (konix/mcp-server--parse-claude-credentials)))
-     (unless token
-       (error "Claude Code credentials not found in ~/.claude/.credentials.json"))
-     (let* ((url-request-method "POST")
-            (url-request-extra-headers
-             `(("Authorization" . ,(concat "Bearer " token))
-               ("anthropic-version" . "2023-06-01")
-               ("anthropic-beta" . "oauth-2025-04-20")
-               ("content-type" . "application/json")))
-            (url-request-data
-             (json-encode
-              '((model . "claude-haiku-4-5-20251001")
-                (max_tokens . 1)
-                (messages . [((role . "user") (content . "hi"))]))))
-            (response-headers nil)
-            (buffer (url-retrieve-synchronously
-                     "https://api.anthropic.com/v1/messages" t t 30)))
-       (unless buffer
-         (error "Failed to connect to Anthropic API"))
-       (with-current-buffer buffer
-         ;; Parse headers from the response
-         (goto-char (point-min))
-         (while (re-search-forward "^\\([^:]+\\): \\(.+\\)$" nil t)
-           (push (cons (downcase (match-string 1)) (match-string 2))
-                 response-headers))
-         (kill-buffer))
-       (let* ((util-5h (string-to-number
-                        (or (alist-get "anthropic-ratelimit-unified-5h-utilization"
-                                       response-headers nil nil #'string=)
-                            "0")))
-              (status-5h (or (alist-get "anthropic-ratelimit-unified-5h-status"
-                                        response-headers nil nil #'string=)
-                             "unknown"))
-              (reset-5h (string-to-number
-                         (or (alist-get "anthropic-ratelimit-unified-5h-reset"
-                                        response-headers nil nil #'string=)
-                             "0")))
-              (status-7d (or (alist-get "anthropic-ratelimit-unified-7d-status"
-                                        response-headers nil nil #'string=)
-                             "unknown"))
-              (reset-7d (string-to-number
-                         (or (alist-get "anthropic-ratelimit-unified-7d-reset"
-                                        response-headers nil nil #'string=)
-                             "0")))
-              (threshold-7d (alist-get "anthropic-ratelimit-unified-7d-surpassed-threshold"
-                                       response-headers nil nil #'string=))
-              (util-5h-pct (* util-5h 100))
-              (util-7d-pct (if threshold-7d (* (string-to-number threshold-7d) 100) 0)))
-         (json-encode
-          `((usage_5h_percent . ,util-5h-pct)
-            (usage_5h_bar . ,(konix/mcp-server--make-progress-bar util-5h-pct))
-            (status_5h . ,status-5h)
-            (reset_5h . ,(konix/mcp-server--format-time-until reset-5h))
-            (reset_5h_datetime . ,(format-time-string "%Y-%m-%d %H:%M" (seconds-to-time reset-5h)))
-            (usage_7d_percent . ,util-7d-pct)
-            (usage_7d_bar . ,(konix/mcp-server--make-progress-bar util-7d-pct))
-            (status_7d . ,status-7d)
-            (reset_7d . ,(konix/mcp-server--format-time-until reset-7d))
-            (reset_7d_datetime . ,(format-time-string "%Y-%m-%d %H:%M" (seconds-to-time reset-7d)))
-            (summary . ,(format "5h: %s %.1f%% (%s) (resets %s) | 7d: %s %.1f%% %s (resets %s)"
-                                (konix/mcp-server--make-progress-bar util-5h-pct 10)
-                                util-5h-pct
-                                status-5h
-                                (konix/mcp-server--format-time-until reset-5h)
-                                (konix/mcp-server--make-progress-bar util-7d-pct 10)
-                                util-7d-pct
-                                status-7d
-                                (konix/mcp-server--format-time-until reset-7d))))))))))
-
-(defun konix/claude-code-usage ()
-  "Display Claude Code API usage in the minibuffer.
-Interactive command for quick usage check."
-  (interactive)
-  (condition-case err
-      (let* ((json-object-type 'alist)
-             (result (json-read-from-string
-                      (konix/mcp-server-claude-code-usage)))
-             (usage-5h (alist-get 'usage_5h_percent result))
-             (status-5h (alist-get 'status_5h result))
-             (reset-5h (alist-get 'reset_5h result))
-             (reset-5h-dt (alist-get 'reset_5h_datetime result))
-             (usage-7d (alist-get 'usage_7d_percent result))
-             (status-7d (alist-get 'status_7d result))
-             (reset-7d (alist-get 'reset_7d result))
-             (reset-7d-dt (alist-get 'reset_7d_datetime result)))
-        (message "Claude Code: 5h: %.1f%% %s (resets %s @ %s) | 7d: %.1f%% %s (resets %s @ %s)"
-                 usage-5h status-5h reset-5h reset-5h-dt
-                 usage-7d status-7d reset-7d reset-7d-dt))
-    (error (message "Error getting Claude Code usage: %s" (error-message-string err)))))
-
 ;;; Server management tools
 
 (defun konix/mcp-server-get-server-location ()
@@ -358,23 +241,6 @@ MCP Parameters:
    (or (locate-library "KONIX_mcp-server")
        (error "Could not locate KONIX_mcp-server library"))))
 
-(defun konix/mcp-server-reload-and-stop ()
-  "Reload the MCP server file and stop the server.
-
-This reloads the KONIX_mcp-server.el file to pick up any changes,
-then stops the MCP server.
-
-MCP Parameters:
-  (none)"
-  (mcp-server-lib-with-error-handling
-   (let ((server-file (locate-library "KONIX_mcp-server")))
-     (if server-file
-         (progn
-           (load-file server-file)
-           (konix/mcp-server-stop)
-           (format "Reloaded %s and stopped MCP server" server-file))
-       (error "Could not locate KONIX_mcp-server library")))))
-
 (defun konix/mcp-server-reload-and-restart ()
   "Reload the MCP server file and restart the server.
 
@@ -384,13 +250,25 @@ stops the MCP server, and then starts it again.
 MCP Parameters:
   (none)"
   (mcp-server-lib-with-error-handling
-   (let ((server-file (locate-library "KONIX_mcp-server")))
+   (let ((server-file (locate-library "KONIX_mcp-server"))
+         (introspection-file (locate-library "KONIX_mcp-server-introspection")))
      (if server-file
          (progn
+           (when introspection-file
+             (load-file introspection-file))
            (load-file server-file)
            (konix/mcp-server-stop)
            (konix/mcp-server-start)
-           (format "Reloaded %s and restarted MCP server" server-file))
+           ;; Restart the transport process after a short delay so
+           ;; the current tool response can be sent first.
+           (run-at-time 1 nil
+                        (lambda ()
+                          (shell-command "konix_supervisorctl.sh restart mcp")))
+           (format "Reloaded %s%s and restarted MCP server (transport restarting in 1s)"
+                   server-file
+                   (if introspection-file
+                       (format " and %s" introspection-file)
+                     "")))
        (error "Could not locate KONIX_mcp-server library")))))
 
 ;;; Elysium-like editing tools
@@ -406,6 +284,7 @@ MCP Parameters:
   buffer-name - The name of the buffer that should contain the new content"
   (mcp-server-lib-with-error-handling
    (let* (;; Ensure proper UTF-8 decoding of content from MCP transport
+          (buffer-name (decode-coding-string buffer-name 'utf-8))
           (new-content-decoded (decode-coding-string new-content 'utf-8))
           ;; Normalize both old and new content by trimming trailing whitespace
           ;; to avoid spurious diffs at the end of the file
@@ -488,7 +367,7 @@ Similar to `elysium-discard-all-suggested-changes'."
      :read-only t)
     (konix/mcp-server-read-buffer
      :id "read_buffer"
-     :description "Read the contents of an Emacs buffer by name and get its selected region"
+     :description "Read the contents of an Emacs buffer by name. Optionally pass start-char and end-char (0-indexed) to extract a character substring without needing a shell command."
      :read-only t)
     (konix/mcp-server-write-buffer
      :id "write_buffer"
@@ -503,6 +382,10 @@ Similar to `elysium-discard-all-suggested-changes'."
      :id "get_git_info"
      :description "Retrieves the current Git branch and remote tracking branch for the repository associated with a given buffer. Essential for understanding the context of code changes and managing repository operations."
      :read-only t)
+    (konix/mcp-server-emacs-describe-function
+     :id "emacs_describe_function"
+     :description "access the documentation of an emacs function"
+     :read-only t)
     (konix/mcp-server-show-calendar-att
      :id "show_calendar_att"
      :description "Show the ATT (Agenda for Today) view: daily agenda with calendar entries, deadlines, HOF items (projects/goals/areas of focus), and waiting items"
@@ -515,15 +398,68 @@ Similar to `elysium-discard-all-suggested-changes'."
      :id "show_calendar_ann"
      :description "Show the ANN (NEXT Actions with Context) view: actionable NEXT items with context tags (@...), excluding maybe/waiting/future-scheduled items, with deadline and effort info"
      :read-only t)
-    (konix/mcp-server-reload-and-stop
-     :id "reload_and_stop"
-     :description "Reload the MCP server file to pick up changes, then stop the server. Call this automatically after editing KONIX_mcp-server.el to apply changes.")
     (konix/mcp-server-reload-and-restart
      :id "reload_and_restart"
-     :description "Reload the MCP server file to pick up changes, then restart the server. Use this to apply changes while keeping the server running.")
+     :description "Reload the MCP server file to pick up changes, then restart the server. Call this automatically after editing KONIX_mcp-server.el to apply changes.")
     (konix/mcp-server-propose-edit
      :id "propose_edit"
-     :description "Propose code changes and show diff to user. IMPORTANT: Send back the full content, but only change the specific lines that need modification - keep the diff minimal by preserving all unchanged content exactly as-is. The user is responsible for accepting or rejecting the changes."))
+     :description "Propose code changes and show diff to user. IMPORTANT: The new-content parameter MUST contain the ENTIRE file content from beginning to end, not just the changed portion. If you only send a fragment, the rest of the file will be deleted. Always use read_buffer first to get the full content, then modify only the lines you need to change within that full content. Keep the diff minimal by preserving all unchanged content exactly as-is. After calling this tool, you MUST stop and wait for the user to accept or reject the changes before doing anything else. Do NOT proceed with further edits, saves, or any follow-up actions until the user has explicitly confirmed the result.")
+    ;; Introspection tools
+    (konix/mcp-server-introspection-symbol-exists
+     :id "symbol_exists"
+     :description "Check if a symbol exists.")
+    (konix/mcp-server-introspection-load-paths
+     :id "load_paths"
+     :description "Return the users load paths.")
+    (konix/mcp-server-introspection-features
+     :id "features"
+     :description "Return the list of loaded features.")
+    (konix/mcp-server-introspection-manual-names
+     :id "manual_names"
+     :description "Return a list of available manual names.")
+    (konix/mcp-server-introspection-manual-nodes
+     :id "manual_nodes"
+     :description "Retrieve a listing of topic nodes within a manual.")
+    (konix/mcp-server-introspection-manual-node-contents
+     :id "manual_node_contents"
+     :description "Retrieve the contents of a node in a manual.")
+    (konix/mcp-server-introspection-feature-available
+     :id "feature_available"
+     :description "Check if a feature is loaded or available.")
+    (konix/mcp-server-introspection-library-source
+     :id "library_source"
+     :description "Read the source code for a library.")
+    (konix/mcp-server-introspection-symbol-manual-section
+     :id "symbol_manual_section"
+     :description "Returns contents of manual node for a symbol.")
+    (konix/mcp-server-introspection-function-source
+     :id "function_source"
+     :description "Returns the source code for a function.")
+    (konix/mcp-server-introspection-variable-source
+     :id "variable_source"
+     :description "Returns the source code for a variable.")
+    (konix/mcp-server-introspection-variable-value
+     :id "variable_value"
+     :description "Returns the global value for a variable.")
+    (konix/mcp-server-introspection-function-documentation
+     :id "function_documentation"
+     :description "Returns the docstring for a function.")
+    (konix/mcp-server-introspection-variable-documentation
+     :id "variable_documentation"
+     :description "Returns the docstring for a variable.")
+    (konix/mcp-server-introspection-function-completions
+     :id "function_completions"
+     :description "Returns a list of functions matching a prefix.")
+    (konix/mcp-server-introspection-command-completions
+     :id "command_completions"
+     :description "Returns a list of commands matching a prefix.")
+    (konix/mcp-server-introspection-variable-completions
+     :id "variable_completions"
+     :description "Returns a list of variables matching a prefix.")
+    (konix/mcp-server-introspection-package-location
+     :id "package_location"
+     :description "Return the local repository directory for a package managed by straight.el."
+     :read-only t))
   "List of MCP tools to register. Each entry is (FUNCTION . PLIST).")
 
 (defun konix/mcp-server-register-tools ()

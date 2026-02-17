@@ -70,7 +70,8 @@
   (use-package agent-shell
     :bind (("M-g l a" . agent-shell)
            ("M-g l b" . konix/agent-shell-pop-to-buffer)
-           ("M-g l r" . konix/agent-shell-request-edit)))
+           ("M-g l r" . konix/agent-shell-request-edit)
+           ("M-g l t" . konix/agent-shell/toggle-preferred-agent)))
   (use-package aggressive-indent-mode)
   (use-package arduino-mode)
   (use-package argdown :straight (:type built-in) :mode ("\\.argdown\\'" . argdown-mode))

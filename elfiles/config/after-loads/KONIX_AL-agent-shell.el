@@ -27,15 +27,11 @@
 (require 'KONIX_mcp-server)
 
 (require 'KONIX_AL-shell-maker)
+(require 'KONIX_claude-code-usage)
 
 (setq-default
  agent-shell-mcp-servers
  `(
-   ;; (
-   ;;  (name . "konix-mcp")
-   ;;  (command . "clk")
-   ;;  (args . ["mcp", "start"])
-   ;;  (env . []))
 
    (
     (name . "konix-mcp")
@@ -62,11 +58,48 @@
 
 (setq-default agent-shell-google-gemini-command
               '("gemini" "--experimental-acp"
-                ;; "-m" "gemini-2.5-pro"
+                "-m" "gemini-2.5-pro"
+                ;; "-m" "gemini-2.5-flash"
                 ))
 
 
 (setq-default agent-shell-preferred-agent-config (agent-shell-google-make-gemini-config))
+(setq-default agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config))
+
+(defun konix/agent-shell/toggle-preferred-agent ()
+  "Toggle `agent-shell-preferred-agent-config' between Claude Code and Gemini."
+  (interactive)
+  (let ((claude-config (agent-shell-anthropic-make-claude-code-config))
+        (gemini-config (agent-shell-google-make-gemini-config)))
+    (if (equal agent-shell-preferred-agent-config claude-config)
+        (progn
+          (setq-default agent-shell-preferred-agent-config gemini-config)
+          (message "Preferred agent set to Gemini"))
+      (setq-default agent-shell-preferred-agent-config claude-config)
+      (message "Preferred agent set to Claude Code"))))
+
+(defun konix/agent-shell/set-preferred-agent-dwim ()
+  (interactive)
+  (condition-case err
+      (let* ((json-object-type 'alist)
+             (result (json-read-from-string
+                      (konix/claude-code---usage)))
+             (wait-5h (alist-get 'wait_5h_secs result))
+             (wait-7d (alist-get 'wait_7d_secs result))
+             (wait-seconds (max wait-5h wait-7d))
+             (limit-type (if (>= wait-7d wait-5h) "weekly" "5-hour")))
+        (if (<= wait-seconds 0)
+            (progn
+              (setq-default agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config))
+              (message "Preferred agent set to Claude Code"))
+          (progn
+            (setq-default agent-shell-preferred-agent-config (agent-shell-google-make-gemini-config))
+            (message "Claude Code %s usage is high, falling back to Gemini for %s"
+                     limit-type
+                     (konix/claude-code--format-duration wait-seconds)))))
+    (error
+     (message "Error getting Claude Code usage: %s" (error-message-string err))
+     (setq-default agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config)))))
 
 (defun konix/agent-shell/tracking-next-buffer ()
   "Jump to the next buffer in tracking list, unless at prompt.
@@ -77,6 +110,16 @@ If at the prompt, insert a space."
     (tracking-next-buffer)))
 
 (define-key agent-shell-mode-map (kbd "SPC") 'konix/agent-shell/tracking-next-buffer)
+(define-key agent-shell-mode-map (kbd "TAB") 'agent-shell-next-item)
+
+(defvar-local konix/agent-shell--request-start-time nil
+  "Start time of the current agent-shell request.")
+
+(defun konix/agent-shell--record-request-start (&rest _)
+  "Record the start time when a request begins."
+  (setq konix/agent-shell--request-start-time (current-time)))
+
+(advice-add #'shell-maker-submit :before #'konix/agent-shell--record-request-start)
 
 (cl-defun konix/agent-shell--on-request/notify (&key state request)
   (let-alist request
@@ -84,9 +127,14 @@ If at the prompt, insert a space."
            (tracking-add-buffer (current-buffer))
            (when (or (konix/should-notify-p)
                      (konix/shell-maker--idle-since-input-p))
-             (let ((name (buffer-name)))
-               (konix/notify (format "Permission needed for %s in %s" .method name))
-               (shell-command (format "clk ntfy 'Permission needed for %s in %s'" .method name)))))
+             (let* ((name (buffer-name))
+                    (elapsed (if konix/agent-shell--request-start-time
+                                 (float-time (time-subtract (current-time)
+                                                            konix/agent-shell--request-start-time))
+                               0))
+                    (elapsed-str (konix/claude-code--format-duration elapsed)))
+               (konix/notify (format "Permission needed for %s in %s (after %s)" .method name elapsed-str))
+               (shell-command (format "clk ntfy 'Permission needed for %s in %s (after %s)'" .method name elapsed-str)))))
           ((equal .method "fs/read_text_file")
            )
           ((equal .method "fs/write_text_file")
@@ -96,21 +144,23 @@ If at the prompt, insert a space."
 
 (advice-add #'agent-shell--on-request :before #'konix/agent-shell--on-request/notify)
 
-(defun konix/agent-shell-request-edit (instructions)
+(defun konix/agent-shell-request-edit (instructions &optional beg end)
   "Request an edit from agent-shell for the current buffer/region.
 INSTRUCTIONS describes what edit to make.
-Sets `konix/mcp-server--edit-target-buffer' so that `get_edit_context'
-returns the correct buffer.
 Starts agent-shell if no session is running.
 Does not switch focus to agent-shell."
-  (interactive "sEdit instructions: ")
-  (require 'KONIX_mcp-server)
-  (setq konix/mcp-server--edit-target-buffer (current-buffer))
-  ;; Start agent-shell if no session is running
+  (interactive
+   (let* ((beg (if (use-region-p) (region-beginning)))
+          (end (if (use-region-p) (region-end)))
+          (instructions (read-string "Edit instructions: ")))
+     (list instructions beg end)))
+
   (let ((prompt (format
                  "Use the tool read_buffer to get the content of buffer \"%s\"%s and answer the following using the tool propose_edit: %s"
                  (buffer-name)
-                 (if (use-region-p) (format ", then focus on characters %s to %s" (region-beginning) (region-end)) "")
+                 (if (and beg end)
+                     (format " on characters %s to %s" beg end)
+                   "")
                  (if (string-empty-p instructions)
                      "edit the code"
                    instructions))))
@@ -133,6 +183,36 @@ Does not switch focus to agent-shell."
         (when choice
           (pop-to-buffer choice)))
     (message "No agent-shell buffers running.")))
+
+(defcustom konix/agent-shell-auto-select-agent t
+  "Automatically select the preferred agent before creating a new one."
+  :type 'boolean
+  :group 'konix)
+
+(defun konix/agent-shell/toggle-auto-select-agent ()
+  "Toggle the value of `konix/agent-shell-auto-select-agent`."
+  (interactive)
+  (setq konix/agent-shell-auto-select-agent (not konix/agent-shell-auto-select-agent))
+  (message "Agent-shell auto-select agent set to %s" konix/agent-shell-auto-select-agent))
+
+(defun konix/agent-shell--set-preferred-agent-before-creation (func &rest args)
+  "Set the preferred agent before creating a new agent-shell for the project.
+  If called with a prefix arg, `agent-shell-preferred-agent-config' is temporarily nil."
+  (if current-prefix-arg
+      (let ((agent-shell-preferred-agent-config nil))
+        (apply func args))
+    (progn
+      (when (and konix/agent-shell-auto-select-agent
+                 (not (agent-shell-project-buffers)))
+        (konix/agent-shell/set-preferred-agent-dwim))
+      (let ((current-message (current-message)))
+        (prog1
+            (let ((inhibit-message t))
+              (apply func args))
+          (when current-message (message "%s" current-message)))))))
+
+;; (advice-add #'agent-shell--shell-buffer :around #'konix/agent-shell--set-preferred-agent-before-creation)
+;; (advice-remove #'agent-shell--shell-buffer #'konix/agent-shell--set-preferred-agent-before-creation)
 
 (provide 'KONIX_AL-agent-shell)
 ;;; KONIX_AL-agent-shell.el ends here

@@ -213,6 +213,11 @@ deadlined in January if it is triggered in July."
 (defun org-edna-action/repeater! (last-entry &rest args)
   (konix/org-edna--handle-repeater args))
 
+(defun org-edna-condition/assert-call-process? (last-entry program &rest args)
+  (unless (equal 0 (apply 'call-process program nil nil nil args))
+    (user-error "Called '%s%s' that failed" program
+                (if args (string-join args " ") "") )))
+
 (defun _org-edna-action/repeat-until-internal/prefix-given ()
   (equal current-prefix-arg '(4))
   )

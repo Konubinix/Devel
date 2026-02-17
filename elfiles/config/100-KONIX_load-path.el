@@ -2,30 +2,31 @@
 ;; Here stands the needed information to load the good files when they are
 ;; required and to add correct load path in the load-path variable
 ;; ####################################################################################################
+(require 'dash)
 ;; ************************************************************
 ;; Libraries path
 ;; ************************************************************
 (progn
   (setq konix/personal-load-path
-		(list
+        (list
          elfiles
-		 (expand-file-name "git-wip/emacs" devel-dir)
-		 )
-		)
+         (expand-file-name "git-wip/emacs" devel-dir)
+         )
+        )
   ;; add my personal load path to the load-path
   (mapc '(lambda (dir) (add-to-list 'load-path dir)) konix/personal-load-path)
   )
 
 ;; ************************************************************
-;; Autoloads (TODO, automatise that with update-directory-autoloads)
+;; Autoloads
 ;; ************************************************************
 ;; Loaddef file
 (setq-default generated-autoload-file
-			  (expand-file-name
-			   (format "%s/loaddefs.el" (getenv "HOSTNAME"))
-			   perso-dir))
-
-(apply 'update-directory-autoloads konix/personal-load-path)
+              (expand-file-name
+               (format "%s/loaddefs.el" (getenv "HOSTNAME"))
+               perso-dir))
+;; make sure to read the autoloads of my own tools
+(mapc (-rpartial #'loaddefs-generate generated-autoload-file) konix/personal-load-path)
 (when (file-exists-p generated-autoload-file)
   (load-file generated-autoload-file)
   )

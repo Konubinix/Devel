@@ -180,3 +180,17 @@ If BUFFER is nil, uses the current buffer."
                    (shell-command "mpremote reset")
                    (message "Device reset")))
         (message "Failed to upload to MicroPython device")))))
+
+(defun konix/shuffle-lines (beg end)
+  "Shuffle lines in the region."
+  (interactive "r")
+  (let ((lines (split-string (buffer-substring beg end) "\n" t)))
+    (delete-region beg end)
+    (insert (string-join (let ((new-lines (copy-sequence lines)))
+                           (while (not (null new-lines))
+                             (let* ((len (length new-lines))
+                                    (index (random len))
+                                    (line (nth index new-lines)))
+                               (setq new-lines (delete line new-lines))
+                               (insert line "\n"))))
+                         "\n"))))

@@ -77,6 +77,7 @@
  '(ement-room-fully-read-marker ((t (:background "cyan"))))
  '(ement-room-read-receipt-marker ((t (:background "yellow"))))
  '(ement-room-mention ((t (:background "maroon4"))))
+ '(ement-room-redacted ((t (:strike-through t :foreground "gray50"))))
  )
 
 ;; see clk matrix sync --clean |jq '.account_data.events[]|select(.type ==

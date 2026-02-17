@@ -171,7 +171,6 @@
      - Makefile: I like being able to launch make from HOME and having my most often used project compiled
      - .gitk: Some config about gitk, should be inserted into the install_git script
      - .inputrc
-     - .B.blend
      - .screenrc
      - .vimrc
      - .terminator

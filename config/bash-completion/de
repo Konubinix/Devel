@@ -13,7 +13,7 @@ _de () {
     # then, update the line and the point,
     COMP_LINE=${COMP_LINE/de/docker exec -ti}
     COMP_POINT=$((COMP_POINT + 17)) # "docker exec -it" contains 13 characters more than "de"
-    _docker
+    __start_docker
 }
 
 complete -F _de "${ME}"

@@ -156,15 +156,44 @@
      (message "Error getting Claude Code usage: %s" (error-message-string err))
      (setq-default agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config)))))
 
-(defun konix/agent-shell/tracking-next-buffer ()
-  "Jump to the next buffer in tracking list, unless at prompt.
-If at the prompt, insert a space."
+(defun konix/agent-shell/scroll-or-track ()
+  "Scroll down a page, or cycle tracking if at end of buffer.
+At the prompt, insert a space."
   (interactive)
-  (if (shell-maker-point-at-last-prompt-p)
+  (if (and (shell-maker-point-at-last-prompt-p) (not (shell-maker-busy)))
       (self-insert-command 1)
-    (tracking-next-buffer)))
+    (cond
+     ((and (= (window-end) (point-max)) (= (point) (point-max)))
+      (tracking-next-buffer))
+     ((= (window-end) (point-max))
+      (goto-char (point-max)))
+     (t
+      (scroll-up-command)))))
 
-(define-key agent-shell-mode-map (kbd "SPC") 'konix/agent-shell/tracking-next-buffer)
+(defun konix/agent-shell/beginning-of-buffer ()
+  "Go to beginning of buffer, or self-insert at prompt."
+  (interactive)
+  (if (and (shell-maker-point-at-last-prompt-p) (not (shell-maker-busy)))
+      (self-insert-command 1)
+    (goto-char (point-min))))
+
+(defun konix/agent-shell/end-of-buffer ()
+  "Go to end of buffer, or self-insert at prompt."
+  (interactive)
+  (if (and (shell-maker-point-at-last-prompt-p) (not (shell-maker-busy)))
+      (self-insert-command 1)
+    (goto-char (point-max))))
+
+(defun konix/agent-shell/scroll-back ()
+  "Scroll up a page, moving to beginning of buffer if near the top.
+At the prompt, delete backward."
+  (interactive)
+  (if (and (shell-maker-point-at-last-prompt-p) (not (shell-maker-busy)))
+      (delete-backward-char 1)
+    (if (= (window-start) (point-min))
+        (goto-char (point-min))
+      (scroll-down-command))))
+
 (defun konix/agent-shell (&optional arg)
   "Save current buffer if region is active, then call `agent-shell'.
 Passes ARG through to `agent-shell'."
@@ -174,6 +203,10 @@ Passes ARG through to `agent-shell'."
   (cl-letf (((symbol-function 'y-or-n-p) (lambda (_prompt) t)))
     (agent-shell arg)))
 
+(define-key agent-shell-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)
+(define-key agent-shell-mode-map (kbd "SPC") 'konix/agent-shell/scroll-or-track)
+(define-key agent-shell-mode-map (kbd "<") 'konix/agent-shell/beginning-of-buffer)
+(define-key agent-shell-mode-map (kbd ">") 'konix/agent-shell/end-of-buffer)
 (define-key agent-shell-mode-map (kbd "TAB") 'agent-shell-next-item)
 
 (defvar-local konix/agent-shell--request-start-time nil
@@ -248,35 +281,26 @@ Does not switch focus to agent-shell."
           (pop-to-buffer choice)))
     (message "No agent-shell buffers running.")))
 
-(defcustom konix/agent-shell-auto-select-agent t
-  "Automatically select the preferred agent before creating a new one."
-  :type 'boolean
-  :group 'konix)
+(defun konix/agent-shell--has-permission-button-p ()
+  "Return non-nil if current buffer has a permission button."
+  (save-excursion
+    (goto-char (point-min))
+    (text-property-search-forward 'agent-shell-permission-button t t)))
 
-(defun konix/agent-shell/toggle-auto-select-agent ()
-  "Toggle the value of `konix/agent-shell-auto-select-agent`."
+(defun konix/agent-shell-track-ready-buffers ()
+  "Add to tracking all agent-shell buffers where it's the user's turn to write.
+A buffer is ready when `shell-maker-busy' returns nil or when there is
+a pending permission request."
   (interactive)
-  (setq konix/agent-shell-auto-select-agent (not konix/agent-shell-auto-select-agent))
-  (message "Agent-shell auto-select agent set to %s" konix/agent-shell-auto-select-agent))
+  (let ((buffers (agent-shell-buffers))
+        (tracked 0))
+    (dolist (buf buffers)
+      (when (buffer-live-p buf)
+        (with-current-buffer buf
+          (when (or (not (shell-maker-busy))
+                    (konix/agent-shell--has-permission-button-p))
+            (tracking-add-buffer buf)
+            (cl-incf tracked)))))
+    (message "Tracked %d ready agent-shell buffer%s (out of %d)" tracked (if (= tracked 1) "" "s") (length buffers))))
 
-(defun konix/agent-shell--set-preferred-agent-before-creation (func &rest args)
-  "Set the preferred agent before creating a new agent-shell for the project.
-  If called with a prefix arg, `agent-shell-preferred-agent-config' is temporarily nil."
-  (if current-prefix-arg
-      (let ((agent-shell-preferred-agent-config nil))
-        (apply func args))
-    (progn
-      (when (and konix/agent-shell-auto-select-agent
-                 (not (agent-shell-project-buffers)))
-        (konix/agent-shell/set-preferred-agent-dwim))
-      (let ((current-message (current-message)))
-        (prog1
-            (let ((inhibit-message t))
-              (apply func args))
-          (when current-message (message "%s" current-message)))))))
-
-;; (advice-add #'agent-shell--shell-buffer :around #'konix/agent-shell--set-preferred-agent-before-creation)
-;; (advice-remove #'agent-shell--shell-buffer #'konix/agent-shell--set-preferred-agent-before-creation)
-
-(provide 'KONIX_AL-agent-shell)
 ;;; KONIX_AL-agent-shell.el ends here

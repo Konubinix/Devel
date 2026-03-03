@@ -20,8 +20,6 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 
--- Load Debian menu entries
-local debian = require("debian.menu")
 local has_fdo, freedesktop = pcall(require, "freedesktop")
 
 -- Error handling
@@ -121,7 +119,6 @@ else
 	mymainmenu = awful.menu({
 		items = {
 			menu_awesome,
-			{ "Debian", debian.menu.Debian_menu.Debian },
 			menu_terminal,
 		},
 	})
@@ -415,26 +412,18 @@ globalkeys = gears.table.join(
 		master:raise()
 	end, { description = "focus previous by index", group = "client" }),
 	cyclefocus.key({ modkey }, "Tab", {
-		-- cycle_filters as a function callback:
-		-- cycle_filters = { function (c, source_c) return c.screen == source_c.screen end},
-
-		-- cycle_filters from the default filters:
 		cycle_filters = {
 			cyclefocus.filters.same_screen,
 			cyclefocus.filters.common_tag,
 		},
-		keys = { "Tab", "ISO_Left_Tab" }, -- default, could be left out
+		keys = { "Tab", "ISO_Left_Tab" },
 	}),
 	cyclefocus.key({ modkey, "Shift" }, "Tab", {
-		-- cycle_filters as a function callback:
-		-- cycle_filters = { function (c, source_c) return c.screen == source_c.screen end},
-
-		-- cycle_filters from the default filters:
 		cycle_filters = {
 			cyclefocus.filters.same_screen,
 			cyclefocus.filters.common_tag,
 		},
-		keys = { "Tab", "ISO_Left_Tab" }, -- default, could be left out
+		keys = { "Tab", "ISO_Left_Tab" },
 	}),
 	awful.key({ modkey }, "w", function()
 		mymainmenu:show()
@@ -930,6 +919,7 @@ awful.rules.rules = {
 			-- Note that the name property shown in xprop might be set slightly after creation of the client
 			-- and the name shown there might not match defined rules here.
 			name = {
+				"confirm",
 				"🔒Impass Password Manager",
 				"Event Tester", -- xev.
 				"Terminator Preferences",

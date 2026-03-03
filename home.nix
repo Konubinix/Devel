@@ -15,8 +15,25 @@ in
 
   programs.home-manager.enable = true;
 
+  home.packages = with pkgs; [
+    vim
+    emacs
+    git
+    notmuch
+    docker
+  ];
+
+  xsession.windowManager.awesome = {
+    enable = true;
+    luaModules = with pkgs.luaPackages; [
+      luarocks
+      awesome-wm-widgets
+    ];
+  };
+
   # Dotfile symlinks (replaces install.py substitute() calls)
   home.file = {
+    ".config/awesome".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/awesome";
     ".byobu".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/byobu";
     ".inputrc".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/inputrc";
     ".config/starship.toml".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/starship.toml";

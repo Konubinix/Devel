@@ -26,6 +26,8 @@ in
     KONIX_CONFIG_DIR = configDir;
     KONIX_SHARE_DIR = shareDir;
     KONIX_LIB_DIR = "${develDir}/lib";
+    KONIX_PLATFORM = "linux";
+    KONIX_EMACS_CUSTOM_FILE = "${homeDir}/.emacs_custo";
 
     # Editors
     EDITOR = "edit.sh";

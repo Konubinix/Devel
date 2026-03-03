@@ -12,6 +12,7 @@ in
   imports = [
     ./nix/devel-env.nix
     ./nix/devel-bash.nix
+    ./nix/devel-emacs.nix
     # ./nix/perso-env.nix  # from perso.git, uncomment when ready
     # ./nix/host-env.nix   # from host.git, uncomment when ready
   ];

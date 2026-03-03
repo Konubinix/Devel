@@ -194,3 +194,48 @@ If BUFFER is nil, uses the current buffer."
                                (setq new-lines (delete line new-lines))
                                (insert line "\n"))))
                          "\n"))))
+
+(defun konix/emacs-q-command (package)
+  "Generate an `emacs -Q' command that loads PACKAGE and its dependencies.
+Uses straight.el to resolve package locations and dependencies."
+  (interactive (list (straight--select-package "Package")))
+  (let* ((deps (straight-dependencies package))
+         ;; Flatten the dependency tree to get all package names
+         (all-packages (cons package (konix/flatten-deps deps)))
+         ;; Get the build directory for each package (build dirs have
+         ;; correctly symlinked files, unlike repos dirs where files
+         ;; may be in subdirectories, e.g. magit-section in magit/lisp/)
+         (load-paths
+          (mapcar (lambda (pkg)
+                    (straight--build-dir pkg))
+                  all-packages))
+         ;; Build the command
+         (cmd (concat "emacs -Q "
+                      (mapconcat (lambda (path)
+                                   (format "-L %s" (shell-quote-argument path)))
+                                 load-paths
+                                 " ")
+                      " --eval \"(require '"
+                      package
+                      ")\"")))
+    (kill-new cmd)
+    (message "Copied: %s" cmd)
+    cmd))
+
+(defun konix/flatten-deps (deps)
+  "Flatten DEPS tree from `straight-dependencies' into a flat list."
+  (cl-loop for dep in deps
+           if (listp dep)
+           append (cons (car dep) (konix/flatten-deps (cdr dep)))
+           else collect dep))
+
+(defun konix/straight-update-and-rebuild-package (package)
+  "Update PACKAGE and its dependencies from remote, then rebuild all.
+This pulls the package and its transitive dependencies from their
+primary remotes, then rebuilds them all."
+  (interactive (list (straight--select-package "Package to update and rebuild")))
+  (message "Pulling %s and its dependencies..." package)
+  (straight-pull-package-and-deps package)
+  (message "Rebuilding %s and its dependencies..." package)
+  (straight-rebuild-package package t)
+  (message "Done updating and rebuilding %s" package))

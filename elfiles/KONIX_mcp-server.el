@@ -241,11 +241,17 @@ MCP Parameters:
    (or (locate-library "KONIX_mcp-server")
        (error "Could not locate KONIX_mcp-server library"))))
 
+(defun konix/mcp-server-unregister-all-tools ()
+  "Unregister all KONIX MCP tools to allow re-registration with new schemas.
+Clears ALL tools from our server's tools table, not just those in the current list."
+  (let ((tools-table (mcp-server-lib--get-server-tools konix/mcp-server-id)))
+    (clrhash tools-table)))
+
 (defun konix/mcp-server-reload-and-restart ()
   "Reload the MCP server file and restart the server.
 
 This reloads the KONIX_mcp-server.el file to pick up any changes,
-stops the MCP server, and then starts it again.
+unregisters all tools, reloads the code, and re-registers tools with fresh schemas.
 
 MCP Parameters:
   (none)"
@@ -254,11 +260,14 @@ MCP Parameters:
          (introspection-file (locate-library "KONIX_mcp-server-introspection")))
      (if server-file
          (progn
+           ;; Load the new code first
            (when introspection-file
              (load-file introspection-file))
            (load-file server-file)
-           (konix/mcp-server-stop)
-           (konix/mcp-server-start)
+           ;; Now unregister all tools (clears the hash table)
+           (konix/mcp-server-unregister-all-tools)
+           ;; Re-register with fresh schemas from the newly loaded code
+           (konix/mcp-server-register-tools)
            ;; Restart the transport process after a short delay so
            ;; the current tool response can be sent first.
            (run-at-time 1 nil

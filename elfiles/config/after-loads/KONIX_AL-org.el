@@ -6116,7 +6116,12 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   (unless konix/org--deadline-or-schedule/check-timestamps-between-schedule-and-deadline/inhibit
     (let (
           (schedule-time (org-get-scheduled-time (point)))
-          (deadline-time (org-get-deadline-time (point)))
+          (deadline-time (when-let ((dt (org-get-deadline-time (point))))
+                           (if (string-match-p "[0-9]\\{2\\}:[0-9]\\{2\\}"
+                                               (org-entry-get (point) "DEADLINE"))
+                               dt
+                             ;; no explicit time -> treat as end of day (23:59)
+                             (time-add dt 86399))))
           )
       (when-let (
                  (timestamps (konix/org-extract-active-timestamps t))

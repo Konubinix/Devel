@@ -9,6 +9,11 @@ let
   shareDir = "${develDir}/share";
 in
 {
+  imports = [
+    ./nix/devel-env.nix
+    # ./nix/perso-env.nix  # from perso.git, uncomment when ready
+    # ./nix/host-env.nix   # from host.git, uncomment when ready
+  ];
   home.username = "sam";
   home.homeDirectory = "/home/sam";
   home.stateVersion = "24.11";

@@ -29,28 +29,83 @@
 (require 'KONIX_AL-shell-maker)
 (require 'KONIX_claude-code-usage)
 
-(setq-default
- agent-shell-mcp-servers
- `(
+(defvar konix/agent-shell-mcp-server-registry
+  `(("konix-mcp"
+     (name . "konix-mcp")
+     (type . "http")
+     (url . "http://192.168.2.5:9920/mcp")
+     (headers . []))
 
-   (
-    (name . "konix-mcp")
-    (type . "http")
-    (url . "http://192.168.2.5:9920/mcp")
-    (headers . [])
-    )
+    ("konix-emacs"
+     (name . "konix-emacs")
+     (command . ,(expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory))
+     (args . ["--init-function=konix/mcp-server-start"
+              "--stop-function=konix/mcp-server-stop"
+              "--server-id=konix-emacs-mcp"])
+     (env . []))
 
-   (
-    (name . "konix-emacs")
-    (command . ,(expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory))
-    (args . ["--init-function=konix/mcp-server-start"
-             "--stop-function=konix/mcp-server-stop"
-             "--server-id=konix-emacs-mcp"])
-    (env . []))
+    ("chrome-devtools-mcp"
+     (name . "chrome-devtools-mcp")
+     (command . "chrome-devtools-mcp")
+     (args . ["--browserUrl=http://127.0.0.1:9222"])
+     (env . []))
 
-   ))
+    ("appium-mcp"
+     (name . "appium-mcp")
+     (command . "appium-mcp")
+     (args . [])
+     (env . [])))
+  "Alist of (NAME . SERVER-CONFIG) for all available MCP servers.")
 
-(setq-default agent-shell-prefer-viewport-interaction nil)
+(defcustom konix/agent-shell-mcp-enabled-servers
+  '("konix-mcp" "konix-emacs")
+  "List of MCP server names that are currently enabled."
+  :type '(repeat string)
+  :group 'konix
+  :set (lambda (sym val)
+         (set-default sym val)
+         (when (fboundp 'konix/agent-shell-mcp-servers-sync)
+           (konix/agent-shell-mcp-servers-sync))))
+
+(defun konix/agent-shell-mcp-servers-sync ()
+  "Recompute `agent-shell-mcp-servers' from registry and enabled set."
+  (setq-default
+   agent-shell-mcp-servers
+   (cl-loop for name in konix/agent-shell-mcp-enabled-servers
+            for entry = (assoc name konix/agent-shell-mcp-server-registry)
+            when entry
+            collect (cdr entry))))
+
+(konix/agent-shell-mcp-servers-sync)
+
+(defun konix/agent-shell/toggle-mcp-server (name)
+  "Toggle MCP server NAME on or off."
+  (interactive
+   (let* ((names (mapcar #'car konix/agent-shell-mcp-server-registry))
+          (annotator (lambda (candidate)
+                       (if (member candidate konix/agent-shell-mcp-enabled-servers)
+                           " [enabled]"
+                         " [disabled]")))
+          (completion-extra-properties
+           `(:annotation-function ,annotator)))
+     (list (completing-read "Toggle MCP server: " names nil t))))
+  (if (member name konix/agent-shell-mcp-enabled-servers)
+      (progn
+        (setq konix/agent-shell-mcp-enabled-servers
+              (delete name konix/agent-shell-mcp-enabled-servers))
+        (konix/agent-shell-mcp-servers-sync)
+        (message "MCP server %s disabled (%d/%d active)"
+                 name
+                 (length konix/agent-shell-mcp-enabled-servers)
+                 (length konix/agent-shell-mcp-server-registry)))
+    (push name konix/agent-shell-mcp-enabled-servers)
+    (konix/agent-shell-mcp-servers-sync)
+    (message "MCP server %s enabled (%d/%d active)"
+             name
+             (length konix/agent-shell-mcp-enabled-servers)
+             (length konix/agent-shell-mcp-server-registry))))
+
+
 (setq-default agent-shell-show-welcome-message nil)
 
 (setq-default agent-shell-anthropic-claude-command

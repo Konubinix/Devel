@@ -91,7 +91,7 @@ in
 
     # misc
     eject
-    supervisor
+    python3Packages.supervisor
   ];
 
   xsession.windowManager.awesome = {

@@ -42,16 +42,23 @@ since the input was submitted."
           (elapsed (time-subtract (current-time) konix/shell-maker--input-time)))
       (time-less-p elapsed idle-time))))
 
-(cl-defun konix/shell-maker--write-reply/notify (&key config reply failed
-                                                      on-output)
-  (tracking-add-buffer (current-buffer))
-  (when (or (konix/should-notify-p)
-            (konix/shell-maker--idle-since-input-p))
-    (let ((name (buffer-name)))
-      (konix/notify (format "replied to %s" name))
-      (shell-command (format "clk ntfy 'replied to %s'" name)))))
+(defun konix/shell-maker-finish-output/notify (&rest _)
+  "Notify when shell-maker response is complete.
+Only notifies if input has been submitted at least once (not on initial buffer creation)."
+  (when konix/shell-maker--input-time
+    (let ((buffer (current-buffer)))
+      (tracking-add-buffer buffer)
+      (when (or (konix/should-notify-p)
+                (konix/shell-maker--idle-since-input-p))
+        (let* ((name (buffer-name))
+               (elapsed (time-subtract (current-time) konix/shell-maker--input-time))
+               (elapsed-secs (float-time elapsed))
+               (human-time (format-seconds "%hh %mm %ss%z" elapsed-secs))
+               (msg (format "%s (%s)" name human-time)))
+          (konix/notify msg)
+          (shell-command (format "clk ntfy '%s'" msg)))))))
 
-(advice-add #'shell-maker--write-reply :before #'konix/shell-maker--write-reply/notify)
+(advice-add #'shell-maker-finish-output :before #'konix/shell-maker-finish-output/notify)
 
 (provide 'KONIX_AL-shell-maker)
 ;;; KONIX_AL-shell-maker.el ends here

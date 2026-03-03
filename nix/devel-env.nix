@@ -12,6 +12,14 @@ let
   shareDir = "${develDir}/share";
 in
 {
+  # Ensure directories that TMPDIR and others point to exist
+  home.activation.createDirs = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    mkdir -p "${homeDir}/tmp"
+    mkdir -p "${homeDir}/tmp/sob"
+    mkdir -p "${homeDir}/log/err"
+    mkdir -p "${homeDir}/ctrl"
+  '';
+
   home.sessionVariables = {
     # Bootstrap paths
     KONIX_DEVEL_DIR = develDir;
@@ -31,10 +39,8 @@ in
     LC_ALL = "C.UTF-8";
 
     # Shell / history
-    HISTSIZE = "5000000";
-    HISTFILESIZE = "5000000";
+    # HISTSIZE, HISTFILESIZE, HISTCONTROL → managed by programs.bash in devel-bash.nix
     HISTTIMEFORMAT = "%y/%m/%d-%H:%M:%S:";
-    HISTCONTROL = "ignoreboth";
     FZF_CTRL_R_OPTS = "--exact";
     BKT_TTL = "3m";
     LESS = "-SRMX";

@@ -30,6 +30,11 @@ in
     enable = true;
     enableCompletion = true;
 
+    historyFile = "${homeDir}/.bash_history";
+    historyFileSize = 5000000;
+    historySize = 5000000;
+    historyControl = [ "ignoreboth" ];
+
     shellOptions = [
       "autocd"
       "globstar"

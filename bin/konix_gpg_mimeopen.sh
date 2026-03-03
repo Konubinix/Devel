@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eux
+#!/usr/bin/env bash
+set -eux
 
 FILE_PATH="$(readlink -f "${1}")"
 FILE_NAME="${FILE_PATH##*/}"

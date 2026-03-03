@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eux
+#!/usr/bin/env bash
+set -eux
 
 MOVIE="$1"
 SUBTITLES="$2"

@@ -1,3 +1,4 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+set -eu
 
 exec docker run --rm -v /var/run/docker.sock:/var/run/docker.sock assaflavie/runlike "$@"

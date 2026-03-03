@@ -1,3 +1,4 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+set -eu
 
 exec k apply -f "$@"

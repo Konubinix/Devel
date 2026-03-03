@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+set -eu
 
 COMPLETION_SCRIPT="${HOME}/.mvn_completion.sh"
 

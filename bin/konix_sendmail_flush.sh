@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+set -eu
 mkdir -p "${TMPDIR}/logs/"
 LOG="${TMPDIR}/logs/msmtp.log"
 rm -f "${LOG}"

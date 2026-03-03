@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eux
+#!/usr/bin/env bash
+set -eux
 
 # taken from http://www.offlineimap.org/doc/FAQ.html#what-is-the-uid-validity-problem-for-folder
 

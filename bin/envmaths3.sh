@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+set -eu
 
 source /home/sam/.virtualenvs/maths3/bin/activate
 

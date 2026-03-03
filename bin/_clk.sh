@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+set -eu
 
 list_to_choice () {
     echo "[$(sed -r 's-(.+)- "\1"-'| paste -s - -d,)]"

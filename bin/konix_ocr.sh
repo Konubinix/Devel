@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eux
+#!/usr/bin/env bash
+set -eux
 
 which pypdfocr 2>&1 > /dev/null || {
     echo "pip install --user pypdfocr" && exit 1

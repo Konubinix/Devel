@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -x
+#!/usr/bin/env bash
+set -x
 
 
 find -type l -lname "*$(basename "$(readlink "$1")")*"

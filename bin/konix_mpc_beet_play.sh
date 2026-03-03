@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eux
+#!/usr/bin/env bash
+set -eux
 
 mpc clear
 mpc add < <(konix_beet_url.sh "$@")

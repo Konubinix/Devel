@@ -1,3 +1,4 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+set -eu
 
 eval "$(ipfs commands completion bash)"

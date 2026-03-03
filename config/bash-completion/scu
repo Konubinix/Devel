@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+set -eu
 
 source /usr/share/bash-completion/completions/systemctl
 ME="$(basename "${BASH_SOURCE[0]}")"

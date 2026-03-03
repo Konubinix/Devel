@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eux
+#!/usr/bin/env bash
+set -eux
 
 pushd "$(git rev-parse --show-toplevel)"
 wget http://git-annex.branchable.com/tips/automatically_adding_metadata/pre-commit-annex \

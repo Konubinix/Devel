@@ -108,8 +108,8 @@
 
 (setq-default agent-shell-show-welcome-message nil)
 
-(setq-default agent-shell-anthropic-claude-command
-              '("claude-code-acp"))
+
+(setq-default agent-shell-anthropic-claude-acp-command '("claude-code-acp"))
 
 (setq-default agent-shell-google-gemini-command
               '("gemini" "--experimental-acp"

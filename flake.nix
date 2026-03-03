@@ -16,13 +16,17 @@
       pkgs = import nixpkgs { inherit system; };
     in
     {
-      # standalone home-manager (for non-NixOS or testing)
+      # Reusable module for other flakes (e.g. perso.git) to import
+      homeManagerModules.default = ./home.nix;
+      nixosModules.default = ./nixos/configuration.nix;
+
+      # standalone home-manager (devel-only, no perso)
       homeConfigurations."sam" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [ ./home.nix ];
       };
 
-      # NixOS system + home-manager in one shot
+      # NixOS system + home-manager (devel-only, no perso)
       nixosConfigurations."konixos" = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [

@@ -230,7 +230,7 @@ in
       }
 
       # --- bash-preexec hooks ---
-      source "$HOME/.nix-profile/share/bash/bash-preexec.sh"
+      source "${pkgs.bash-preexec}/share/bash/bash-preexec.sh"
 
       preexec_konix() {
         KONIX_STARTTIME="$(date +%s)"

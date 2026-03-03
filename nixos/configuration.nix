@@ -16,7 +16,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "konix2";
+  # networking.hostName is set in the host layer (e.g. konixwork/nix/host-system.nix)
 
   # Enable networking
   networking.networkmanager.enable = true;

@@ -68,6 +68,21 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # Fonts
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-color-emoji
+  ];
+
+  # Audio (PipeWire with PulseAudio compatibility)
+  services.pipewire = {
+    enable = true;
+    pulse.enable = true;
+  };
+
+  # FUSE
+  programs.fuse.userAllowOther = true;
+
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 

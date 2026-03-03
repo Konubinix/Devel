@@ -16,11 +16,82 @@ in
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
+    # editors
     vim
     emacs
+
+    # vcs
     git
+    git-annex
+
+    # mail
     notmuch
+    python3Packages.notmuch
+    offlineimap
+
+    # containers
     docker
+
+    # shell tools
+    bc
+    byobu
+    curl
+    expect # unbuffer
+    fzf
+    htop
+    jq
+    moreutils # sponge
+    rsync
+    unzip
+    autojump
+    fish
+
+    # security
+    gnupg
+    pinentry-gtk2
+    apg
+    gfshare # gfcombine, gfsplit
+    # impass # check if available in nixpkgs
+
+    # spelling
+    aspell
+    aspellDicts.fr
+    aspellDicts.en
+
+    # OCR
+    tesseract
+    # tessdata (eng+fra included by default)
+
+    # X11 tools
+    wmctrl
+    xdotool
+    xscreensaver
+    xterm
+    dmenu # suckless-tools equivalent
+    eog
+    peek
+    pcmanfm
+    libnotify # notify-send
+
+    # terminal
+    terminator
+
+    # browsers
+    chromium
+
+    # audio
+    pavucontrol
+    pasystray
+    # gmpc did not find the correct name so far
+
+    # python
+    python3Packages.pip
+    python3Packages.ipython
+    python3Packages.pyxdg
+
+    # misc
+    eject
+    supervisor
   ];
 
   xsession.windowManager.awesome = {

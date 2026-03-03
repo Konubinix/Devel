@@ -38,7 +38,9 @@
   (konix/prog/config)
   (lispy-mode)
   (highlight-parentheses-mode)
-  (aggressive-indent-mode)
+  (when (and buffer-file-name
+             (string-prefix-p (expand-file-name "~/Prog/Devel/") buffer-file-name))
+    (aggressive-indent-mode))
   (keymap-local-set "C-h C-f" 'find-function)
   (keymap-local-set "C-h C-v" 'find-variable)
   (turn-on-eldoc-mode)

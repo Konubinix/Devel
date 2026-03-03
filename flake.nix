@@ -29,6 +29,7 @@
       # NixOS system + home-manager (devel-only, no perso)
       nixosConfigurations."konixos" = nixpkgs.lib.nixosSystem {
         inherit system;
+        specialArgs = { inherit nixpkgs; };
         modules = [
           ./nixos/configuration.nix
           home-manager.nixosModules.home-manager

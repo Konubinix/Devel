@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running 'nixos-help').
 
-{ config, pkgs, ... }:
+{ config, pkgs, nixpkgs, ... }:
 
 {
   imports =
@@ -11,6 +11,10 @@
     ];
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
+
+  # Pin nixpkgs registry so hardliases (nix profile install nixpkgs#foo)
+  # use the same nixpkgs as the system
+  nix.registry.nixpkgs.flake = nixpkgs;
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;

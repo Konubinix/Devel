@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 UPDATE_SCRIPT=`which konix_info_dir_update.sh`
 for info_path in ${INFOPATH//:/ }

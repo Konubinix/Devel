@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ENV_FILE_NAME="$1"
 if [ -z "$ENV_FILE_NAME" ]

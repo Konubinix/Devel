@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # gnuplot wants to be kill twice to exit properly
 trap "kill %1 ; kill %1 ; exit 0" INT

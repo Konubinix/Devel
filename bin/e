@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # when run from ssh, I don't want emacs to be run in the graphical user
 # interface

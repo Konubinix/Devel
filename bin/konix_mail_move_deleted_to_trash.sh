@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 konix_notmuch_deleted_not_trashed.sh -f | grep "Gmail" | while read line
 do

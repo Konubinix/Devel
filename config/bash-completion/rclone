@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # COMPLETION_SCRIPT="${TMPDIR}/rclone_completer_script.sh"
 

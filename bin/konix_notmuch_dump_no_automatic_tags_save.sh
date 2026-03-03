@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eux
 DIR="${KONIX_PERSO_DIR}/${HOSTNAME}/notmuch_nd"

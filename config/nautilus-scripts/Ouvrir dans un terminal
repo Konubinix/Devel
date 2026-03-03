@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
     #
     # Ce script ouvre le terminal gnome dans le répertoire que vous sélectionnez.
     #

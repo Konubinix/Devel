@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 OFX_FILE_PATH="$(readlink -f "${1}")"

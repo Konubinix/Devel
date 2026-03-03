@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source "${KONIX_DEVEL_DIR}/config/bash-completion/kubectl"
 

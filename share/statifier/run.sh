@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ME="$(readlink -f "${BASH_SOURCE[0]}")"
 MY_DIR="$(dirname "${ME}")"

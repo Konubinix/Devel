@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # put the python of this platform in front of the path
 # the only hacky stuf I need is the platform

@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 CID="$(konix_screenshot.sh)"
 ec --eval "(konix/org-capture-screenshot \"${CID}\")"

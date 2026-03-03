@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 echo "## avconv IS DEPRECATED, USE ffmpeg" >&2
 exec ffmpeg "$@"

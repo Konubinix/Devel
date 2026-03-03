@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 FILE="$(basename ${2})"
 ALIAS="${1}"
@@ -7,7 +7,7 @@ shift 2
 
 echo "The file ${ALIAS_FILE} is to be created with the command:"
 cat <<EOF | tee "${ALIAS_FILE}"
-#! /bin/bash
+#!/usr/bin/env bash
 
 exec ${FILE} $@ "\$@"
 EOF

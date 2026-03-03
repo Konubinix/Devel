@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 URL="$*"
 konix_display.py "Downloading $URL"

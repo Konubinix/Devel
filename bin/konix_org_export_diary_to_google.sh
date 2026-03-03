@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #set -x
 source konix_assert_var.sh "$KONIX_FANCY_ORG_NAME"
 source konix_assert_var.sh "$KONIX_SITE_LOGIN"

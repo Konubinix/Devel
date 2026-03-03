@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 ME="$(basename "${BASH_SOURCE[0]}")"
 COMPLETION_SCRIPT="${HOME}/.nix-profile/share/bash-completion/completions/${ME}"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # -*- mode: sh -*-
 # set -x
 # If not running interactively, don't do anything

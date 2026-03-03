@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash -eux
 
 GIT_DIR="$(git rev-parse --git-dir)"
 PIDFILE="${GIT_DIR}/pid"

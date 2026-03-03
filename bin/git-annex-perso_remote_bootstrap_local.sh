@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 . "${KONIX_LIB_DIR}/lib_bash.sh"
 
@@ -30,19 +30,19 @@ file://$LOCATION
 EOF
 
 cat <<EOF > prehook
-#! /bin/bash
+#!/usr/bin/env bash
 
 git-annex-perso_remoteprehook_local.sh -l$LOCATION
 EOF
 
 cat <<EOF > sync_posthook
-#! /bin/bash
+#!/usr/bin/env bash
 
 git-annex-perso_remoteposthook_local.sh -l$LOCATION
 EOF
 
 cat <<EOF > availhook
-#! /bin/bash
+#!/usr/bin/env bash
 
 git-annex-perso_remoteavailhook_local.sh -l$LOCATION
 EOF

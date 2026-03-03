@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 source _konix_gpgdir_variables.sh
 
 if [ -e "$KONIX_GPGDIR_ENCRYPT_EXCLUDE" ]

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # taken from
 # http://stackoverflow.com/questions/7348698/git-how-to-list-all-objects-in-the-database

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 MAKEFILE="$(konix_find_makefile.sh)"
 res=$?

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if ! which hypermail 2> /dev/null >&2
 then

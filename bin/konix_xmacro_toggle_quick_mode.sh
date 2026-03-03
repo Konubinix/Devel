@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 XMACRO_FILE="$HOME/.konix_xmacro_quick_mode"

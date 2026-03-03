@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/usr/bin/env bash -x
 
 FILE_NAME="$1"
 FILE_ROT="$1.rot.avi"

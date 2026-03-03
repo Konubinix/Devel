@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
     # De Johnathan Bailes
     # Ce script ouvre l'outil de recherche gnome dans le répertoire que vous sélectionnez.
     #

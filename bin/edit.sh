@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if emacsclient -a "failed" --eval '(message "OK")' > /dev/null 2>&1
 then

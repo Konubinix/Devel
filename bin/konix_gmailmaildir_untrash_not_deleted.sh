@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 konix_notmuch_trashed_not_deleted.sh -f | while read line
 do

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Keep the oldest time stamp
 CURRENT="$1"

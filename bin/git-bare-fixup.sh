@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # if the repository is not bare, make is not bare explicitly, or else
 # synchronization will remove my files

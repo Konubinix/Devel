@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 LOCAL_PORT="${1}"
 HOST="${2}"

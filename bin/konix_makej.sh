@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 USED_JOBS="${JOBS:-$(($(nproc) + 1))}"
 if [ -n "${KONIX_MAKE_LOAD_LIMIT}" ]

@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash -eux
 
 INPUT="$1"
 SIZE="${2:-300}"

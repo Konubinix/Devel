@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash -eux
 
 REMOTE="${1:-origin}"
 [ -n "$*" ] && shift

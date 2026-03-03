@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source "${KONIX_LIB_DIR}/konix_xapers_lib.sh"
 

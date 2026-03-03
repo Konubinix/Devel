@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # do not use git checkout @{date}
 # http://blog.endpoint.com/2014/05/git-checkout-at-specific-date.html

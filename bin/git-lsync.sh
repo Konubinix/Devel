@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 git-freeze.sh
 git fetch

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # update-info-dir
 # create a dir file from all installed info files
 # Copyright 2009 Norbert Preining

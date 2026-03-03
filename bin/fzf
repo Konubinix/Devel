@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 source "${KONIX_LIB_DIR}/lib_bash.sh"
 

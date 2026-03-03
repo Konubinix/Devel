@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 FILE="$1"
 FILE="$(echo "$FILE"|iconv -f utf-8 -t iso-8859-1)"

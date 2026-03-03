@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source envmaths35.sh
 jupyter-console --existing "$@"

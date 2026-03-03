@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash -eux
 
 blob="$(git fsck 2>&1 |grep "is empty"|head -1|sed -r 's|error: object file (.+) is empty|\1|')"
 while [ -n "$blob" ]

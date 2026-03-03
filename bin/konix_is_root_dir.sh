@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 USERID="$(ls -na "$1"|sed 's/ \+/ /g'|head -2|tail -1|cut -f3 -d$' ')"
 if [ "$USERID" == "0" ]

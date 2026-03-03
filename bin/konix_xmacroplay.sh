@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -e "$HOME/.konix_in_xmacro" ]
 then

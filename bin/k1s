@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 [[ "$1" = -v || "$1" = --version ]] && { echo "0.1.2"; exit; }
 for d in jq watch curl kubectl; do which "$d" >/dev/null || { echo "Missing dependency: $d"; exit 1; }; done

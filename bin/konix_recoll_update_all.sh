@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 for recoll_dir in "${KONIX_PERSO_DIRS}"/*/recoll
 do

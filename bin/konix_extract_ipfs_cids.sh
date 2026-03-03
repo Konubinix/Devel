@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 sed -r 's%(/p/|/ipfs/|ipfs:/*|https://ipfs.konubinix.eu/[^/]+/)%\n/ipfs/%g' \
 	| grep -v konixnostore \

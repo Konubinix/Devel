@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 MY_DIR="$(dirname "${BASH_SOURCE[0]}")"
 source "${MY_DIR}/init.sh" > /dev/null

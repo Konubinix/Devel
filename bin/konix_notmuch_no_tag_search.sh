@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TAGS="$(notmuch search --output=tags -- '*')"
 TAGS_LINE="not tag:dummy"

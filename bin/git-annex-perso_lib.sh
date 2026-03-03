@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source "${KONIX_LIB_DIR}/lib_bash.sh"
 source "${KONIX_LIB_DIR}/colors.sh"

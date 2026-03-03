@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ( [ -z "$PS1" ] || [ "${TERM}" == "dumb" ] || [ -n "$INEMACS" ]) && return
 source "$KONIX_CONFIG_DIR/shrc"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cd "$(git -c core.bare=false rev-parse --show-toplevel)"
 echo Total size

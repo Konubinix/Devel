@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 SRC="$(readlink -f "${1}")"
 PREF="$(konix_relative_path.py "${SRC}" "${SRC}/../..")"

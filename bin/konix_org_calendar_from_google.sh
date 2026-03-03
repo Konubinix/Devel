@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source konix_assert_var.sh "$KONIX_ICSFILE"
 source konix_assert_var.sh "$KONIX_ORGFILE"

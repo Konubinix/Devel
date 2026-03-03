@@ -1,4 +1,4 @@
-#!/bin/bash -u
+#!/usr/bin/env bash -u
 
 while read l; do
     [[ -n $l && ${l###} = $l ]] && {

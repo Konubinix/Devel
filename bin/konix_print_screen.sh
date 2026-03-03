@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 echo -n "not yet"|konix_xclip_in_all.sh
 CID="$(konix_screenshot.sh)"

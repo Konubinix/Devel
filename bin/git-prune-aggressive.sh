@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # http://stackoverflow.com/questions/7432912/git-cant-find-blob-want-to-get-rid-of-it-from-pack
 echo "## You should think about removing the wip branches that may point to old content"

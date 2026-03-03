@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 emacsclient --eval "(w3m-browse-url \"$1\")"

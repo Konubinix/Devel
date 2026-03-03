@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 mkdir -p "${KONIX_NOTEBOOKS_DIR}"

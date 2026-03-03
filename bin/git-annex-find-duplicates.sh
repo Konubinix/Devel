@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 git annex find --include "*" --format='${key}:${file}\n' \
     | cut -d '-' -f 4- \

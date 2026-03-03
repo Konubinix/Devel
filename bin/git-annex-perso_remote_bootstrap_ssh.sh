@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 . "${KONIX_LIB_DIR}/lib_bash.sh"
 
@@ -45,19 +45,19 @@ ssh://${URL_PORT}$LOCATION
 EOF
 
 cat <<EOF > prehook
-#! /bin/bash
+#!/usr/bin/env bash
 
 git-annex-perso_remoteprehook_ssh.sh $PORT_CMD -u$URL -l$LOCATION
 EOF
 
 cat <<EOF > sync_posthook
-#! /bin/bash
+#!/usr/bin/env bash
 
 git-annex-perso_remoteposthook_ssh.sh $PORT_CMD -u$URL -l$LOCATION
 EOF
 
 cat <<EOF > availhook
-#! /bin/bash
+#!/usr/bin/env bash
 
 git-annex-perso_remoteavailhook_ssh.sh $PORT_CMD -u$URL -l$LOCATION
 EOF

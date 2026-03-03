@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script only calls dmenu and allow successive filtering (like M-* in
 # icicles). An entry validated with RET is chosen. An entry validated with S-RET

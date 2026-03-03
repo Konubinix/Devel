@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 NUMBER_OF_MONTH="${KONIX_TEMP_MAIL_KEEP_MONTHS:-3}"
 SAFE=$1

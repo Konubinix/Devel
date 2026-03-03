@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 git annex find --print0 --metadata ack=restored \
 	| xargs -0 -n 1 ls --literal -l --directory

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 DAEMON_NAME="$1"
 if [ "$DAEMON_NAME" == "" ]

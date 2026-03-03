@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -ue
 mkdir -p "${KONIX_CRYPTOFF}"

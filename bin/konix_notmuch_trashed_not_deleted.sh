@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 OUTPUT=summary
 while getopts "hf" opt; do

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 notmuch new || exit 1
 # Some mua like AppleMail like to add attachment inline. Notmuch doesn't

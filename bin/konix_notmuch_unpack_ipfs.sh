@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ID="${1}"
 dir=`mktemp -d`

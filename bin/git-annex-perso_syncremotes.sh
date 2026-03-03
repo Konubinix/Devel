@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source "git-annex-perso_lib.sh"
 set -u

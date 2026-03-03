@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/usr/bin/env bash -x
 
 xscreensaver-command -watch | while read line
 do

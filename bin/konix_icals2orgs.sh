@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 SRC="$KONIX_PERSO_DIR/icals"
 DST="$KONIX_PERSO_DIR/wiki/icals.org"

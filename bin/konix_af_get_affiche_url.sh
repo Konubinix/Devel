@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ID="$(konix_af.py -i)"
 wget \

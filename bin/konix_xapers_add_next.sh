@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 BIBLIO_SRC="${HOME}/.virtualenvs/biblio/bin/activate"
 if [ -e "${BIBLIO_SRC}" ]

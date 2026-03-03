@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 is_sourced() {
     ! [ "$BASH_SOURCE" == "$0" ]

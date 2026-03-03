@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 folders="$(echo ${HOME}/Mail/*/\[Gmail\].{Trash,Bin,Corbeille})"
 for folder in ${folders}

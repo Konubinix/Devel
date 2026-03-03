@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # inspired from http://askubuntu.com/questions/27894/get-window-size-in-shell
 export id=$(xdotool getactivewindow|xargs printf "0x%.8x\n")

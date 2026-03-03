@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 JSON_FILE="${1}"
 dir=$(mktemp -d)

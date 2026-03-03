@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if ! ps aux|grep sshd|grep -v grep|grep -q sshd
 then

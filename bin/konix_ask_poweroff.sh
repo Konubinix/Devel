@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if zenity --question --text="Poweroff ?"
 then

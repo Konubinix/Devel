@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 file="$1"
 file_abs="$(konix_absolute_path.py "${file}")"

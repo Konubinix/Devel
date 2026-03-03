@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Find_app
 # Author: Lucas van Staden (lvs at dedmeet.com / www.dedmeet.com)
 # This little script will try and find the application attempting to start

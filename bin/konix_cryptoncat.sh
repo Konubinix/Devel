@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eux
 ABS_PATH="$(realpath -e "$1")"

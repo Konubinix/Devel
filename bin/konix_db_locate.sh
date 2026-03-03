@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -d "$KONIX_DB_MEDIA_DBS" ]
 then

@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 source /usr/share/bash-completion/completions/journalctl
 ME="$(basename "${BASH_SOURCE[0]}")"

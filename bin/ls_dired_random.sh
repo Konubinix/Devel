@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 LISTING="$(mktemp)"
 trap "rm '${LISTING}'" 0

@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 tl="$(git rev-parse --show-toplevel)"
 

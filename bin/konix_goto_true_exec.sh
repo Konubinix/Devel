@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TRUE_EXEC="$(konix_find_true_exec.sh "$1")"
 if [ -z "$TRUE_EXEC" ]

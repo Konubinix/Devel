@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The personal raw info is on KONIX_PERSO_RAW_DIR, the local one is on
 # KONIX_PERSO_DIR, get the password from the file KONIX_PERSO_PASS if it exists

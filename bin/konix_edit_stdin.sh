@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TMP_FILE="$(mktemp)"
 trap "rm -rf '$TMP_FILE'" 0

@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash -eux
 
 echo '###### adding to git annex'
 git annex add "$@"

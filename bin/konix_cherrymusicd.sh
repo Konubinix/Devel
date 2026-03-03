@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cherrymusicd "$@"
 while [ -e /tmp/cherrymusic.pid ]

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ARGS=""
 if [ -n "${KONIX_XAPERS_ADD_TAGS}" ]

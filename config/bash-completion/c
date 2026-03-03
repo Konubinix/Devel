@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 # taken from the  output of zoxide init bash
 ME="$(basename "${BASH_SOURCE[0]}")"

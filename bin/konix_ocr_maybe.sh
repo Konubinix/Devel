@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 has_ocr ( ) {
     local filename="$1"

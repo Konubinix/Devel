@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # https://gist.github.com/lukewilkins/5038960
 git config pack.threads 1

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 COMMIT="${1:-HEAD}"
 

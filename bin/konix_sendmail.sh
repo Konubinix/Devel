@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # When given the -r option, heilroom while add the From field in the envelope
 # and pass this -r option through to the msmtp call. msmtp does not recognize

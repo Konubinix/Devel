@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 DIR="${1%%/}/"
 NAME="$(basename $(pwd))"

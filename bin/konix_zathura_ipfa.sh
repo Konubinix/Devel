@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash -eux
 set -o errexit # -e
 set -o errtrace # -E
 set -o nounset # -u

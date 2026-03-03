@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # When using git svn with a repository A that is synced from another repository
 # B via svnsync, git may be confused and add commits from the user svnsync. The

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #set -x
 FILE_TO_EDIT="$1"
 if [ -z "$FILE_TO_EDIT" ]

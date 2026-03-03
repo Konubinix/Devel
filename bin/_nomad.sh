@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 nomad_list_eligible () {
     nomad node status -json|jq -r '.[] | select(.SchedulingEligibility == "eligible").Name'

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Inspired from https://github.com/svend/home-bin/blob/master/spell
 # Check spelling of arguments

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Algorithm: freeze the local copy, then clone only the 40 last commits to a
 # temporaty location ($KONIX_PERSO_DIR.tmp), if everything went ok, move the

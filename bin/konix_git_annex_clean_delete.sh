@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/usr/bin/env bash -x
 
 git annex find --metadata state=delete | while read line
 do

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if ! [ -d "${KONIX_SMB_MOUNT}" ]
 then

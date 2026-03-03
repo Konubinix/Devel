@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -ue
 FILE="$1"
 EXT="${FILE##*.}"

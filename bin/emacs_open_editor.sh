@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 uri="$1"
 filename=`echo $uri|sed 's/.\+#file=\(.\+\)/\1/'`

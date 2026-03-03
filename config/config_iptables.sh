@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 printf "\033[32m##########Configuration d'iptables\n\033[0m"
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 show_context () {
     FILE_NAME=$1

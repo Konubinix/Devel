@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 DIRNAME="${1}"
 CRYPTNAME="${2:-${DIRNAME}_crypt}"

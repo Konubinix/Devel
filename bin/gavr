@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #set -x
 cd `git -c core.bare=false rev-parse --show-toplevel`

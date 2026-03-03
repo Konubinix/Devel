@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 touch "$HOME/.konix_in_xmacro"
 # keycode 135 = Menu

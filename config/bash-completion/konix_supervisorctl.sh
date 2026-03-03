@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 # https://gist.github.com/pfreixes/3187511
 # pfreixes, 2012-07-27

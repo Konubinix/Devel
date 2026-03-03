@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 setxkbmap fr bepo
 exec konix_impass.py gui "$@"

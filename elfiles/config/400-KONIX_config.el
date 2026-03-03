@@ -5,17 +5,18 @@
 ;; configuration of a mode uses a hook over the mode or is too big to be here,
 ;; it is then put into the mode file or into a dedicated file
 ;; ####################################################################################################
+(setq-default use-dialog-box nil)       ;; never ever try to interact using a separate window
 ;; Default font, simple, nice!!
 (setq-default konix/default-font "Monospace 10")
 (setq-default read-file-name-completion-ignore-case t)
 
 (setq-default default-frame-alist
-			  `(
-				(font . ,konix/default-font)
-				(fullscreen . maximized)
-				(vertical-scroll-bars)
-				)
-			  )
+              `(
+                (font . ,konix/default-font)
+                (fullscreen . maximized)
+                (vertical-scroll-bars)
+                )
+              )
 (setq-default initial-frame-alist default-frame-alist)
 
 ;; forward declare it
@@ -77,7 +78,7 @@
               )
 ;; don't use this until I actually find a real use of it
 (setq-default scroll-down-aggressively 0
-			  scroll-up-aggressively 0)
+              scroll-up-aggressively 0)
 
 ;; always recenter point if it moves off screen
 (setq-default scroll-conservatively 0)

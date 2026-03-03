@@ -25,6 +25,26 @@
 ;;; Code:
 
 (require 'outline)
+;(require 'hideshow)
+
+(defun konix/diff-hs-forward-sexp (arg)
+  "Move to end of current diff file or hunk block for hideshow.
+Point is at the beginning of the block start match (diff or @@)."
+  (when (> arg 0)
+    (let ((on-hunk (looking-at "^@@")))
+      (end-of-line)
+      (if on-hunk
+          ;; Inside a hunk header: go to next hunk or next file
+          (if (re-search-forward "^\\(@@\\|diff \\)" nil t)
+              (goto-char (1- (match-beginning 0)))
+            (goto-char (point-max)))
+        ;; Inside a diff header: go to end of file block
+        (if (re-search-forward "^diff " nil t)
+            (goto-char (1- (match-beginning 0)))
+          (goto-char (point-max)))))))
+
+(add-to-list 'hs-special-modes-alist
+             '(diff-mode "^\\(diff \\|@@\\)" nil nil konix/diff-hs-forward-sexp))
 
 ;(konix/outline/setup-keys diff-mode-map)
 (setq-default diff-default-read-only nil)
@@ -82,8 +102,8 @@
 
 (defun konix/diff-mode-hook()
   (setq konix/adjust-new-lines-at-end-of-file nil
-                konix/delete-trailing-whitespace nil
-                )
+        konix/delete-trailing-whitespace nil
+        )
   (setq outline-heading-alist
         '(
           ("commit" . 1)
@@ -92,12 +112,16 @@
   (keymap-local-set "M-/" 'dabbrev-expand)
   (keymap-local-set "C-z" 'diff-undo)
   (auto-fill-mode 1)
+  ;; hs-grok-mode-type requires comment-start and comment-end to be set
+  (setq-local comment-start "#")
+  (setq-local comment-end "")
+  (hs-minor-mode 1)
   ;(konix/outline/setup-keys diff-mode-map)
   (font-lock-add-keywords
    nil
    '(
-         ("^[-+]\\{3\\} /dev/null$" . compilation-error-face)
-         )
+     ("^[-+]\\{3\\} /dev/null$" . compilation-error-face)
+     )
    )
   )
 

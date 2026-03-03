@@ -17,6 +17,7 @@ in
     KONIX_DEVEL_DIR = develDir;
     KONIX_CONFIG_DIR = configDir;
     KONIX_SHARE_DIR = shareDir;
+    KONIX_LIB_DIR = "${develDir}/lib";
 
     # Editors
     EDITOR = "edit.sh";

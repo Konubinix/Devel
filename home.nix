@@ -11,6 +11,7 @@ in
 {
   imports = [
     ./nix/devel-env.nix
+    ./nix/devel-bash.nix
     # ./nix/perso-env.nix  # from perso.git, uncomment when ready
     # ./nix/host-env.nix   # from host.git, uncomment when ready
   ];
@@ -19,7 +20,6 @@ in
   home.stateVersion = "24.11";
 
   programs.home-manager.enable = true;
-  programs.bash.enable = true;
 
   home.sessionPath = [
     "${develDir}/bin"

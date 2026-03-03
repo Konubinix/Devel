@@ -19,7 +19,7 @@
  perso-elfiles (expand-file-name "elfiles" perso-dir)
  perso-host-elfiles (expand-file-name "elfiles"
                                       (expand-file-name
-                                       (getenv "HOSTNAME")
+                                       (or (getenv "HOSTNAME") (system-name))
                                        perso-dir
                                        )
                                       )

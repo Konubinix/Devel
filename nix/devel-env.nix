@@ -3,7 +3,7 @@
 #
 # Perso-dependent vars (KONIX_PERSO_DIR, HOSTNAME) belong in perso-env.nix
 # and host-env.nix respectively.
-{ config, ... }:
+{ config, lib, ... }:
 
 let
   homeDir = config.home.homeDirectory;
@@ -20,7 +20,8 @@ in
     mkdir -p "${homeDir}/ctrl"
   '';
 
-  home.sessionVariables = {
+  # Priority 1500: perso (mkDefault=1000) and host (normal=100) can override
+  home.sessionVariables = lib.mapAttrs (_: lib.mkOverride 1500) {
     # Bootstrap paths
     KONIX_DEVEL_DIR = develDir;
     KONIX_CONFIG_DIR = configDir;

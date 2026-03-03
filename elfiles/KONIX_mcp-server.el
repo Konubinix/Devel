@@ -282,70 +282,131 @@ MCP Parameters:
 
 ;;; Elysium-like editing tools
 
-(defun konix/mcp-server-propose-edit (new-content buffer-name)
-  "Propose an edit using smerge conflict markers (elysium-style).
+(defun konix/mcp-server--inside-smerge-conflict-p ()
+  "Return non-nil if point is inside an smerge conflict region."
+  (save-excursion
+    (let ((pos (point)))
+      (when (re-search-backward "^<<<<<<< " nil t)
+        (let ((conflict-start (point)))
+          (when (re-search-forward "^>>>>>>> " nil t)
+            (let ((conflict-end (point)))
+              (and (>= pos conflict-start)
+                   (<= pos conflict-end)))))))))
 
-Computes a minimal diff and only wraps changed lines in conflict markers,
-allowing the user to use smerge-mode keybindings to accept/reject.
+(defun konix/mcp-server--apply-single-edit (old-string new-string buffer-name)
+  "Apply a single edit, creating an smerge conflict.
+Returns the position after the inserted conflict, or signals an error."
+  (let ((old-string (decode-coding-string old-string 'utf-8))
+        (new-string (decode-coding-string new-string 'utf-8)))
+    ;; Count occurrences, skipping those inside smerge conflicts
+    (let ((count 0)
+          (match-pos nil))
+      (save-excursion
+        (goto-char (point-min))
+        (while (search-forward old-string nil t)
+          (unless (konix/mcp-server--inside-smerge-conflict-p)
+            (setq count (1+ count))
+            (unless match-pos
+              (setq match-pos (match-beginning 0))))))
+      (cond
+       ((= count 0)
+        (error "old_string not found in buffer %s" buffer-name))
+       ((> count 1)
+        (error "old_string found %d times in buffer %s (must be unique)" count buffer-name))
+       (t
+        ;; Replace with smerge conflict
+        ;; Strip leading/trailing newlines to get the actual content
+        (let* ((old-string-trimmed (string-trim old-string "\n+" "\n+"))
+               (new-string-trimmed (string-trim new-string "\n+" "\n+"))
+               ;; Split into lines and find which lines actually differ
+               (old-lines-list (split-string old-string-trimmed "\n"))
+               (new-lines-list (split-string new-string-trimmed "\n"))
+               ;; Find the range of lines that differ
+               (diff-start 0)
+               (diff-end-old (length old-lines-list))
+               (diff-end-new (length new-lines-list)))
+          ;; Find first differing line from the start
+          (while (and (< diff-start (min diff-end-old diff-end-new))
+                      (string= (nth diff-start old-lines-list)
+                               (nth diff-start new-lines-list)))
+            (setq diff-start (1+ diff-start)))
+          ;; Find first differing line from the end
+          (while (and (> diff-end-old diff-start)
+                      (> diff-end-new diff-start)
+                      (string= (nth (1- diff-end-old) old-lines-list)
+                               (nth (1- diff-end-new) new-lines-list)))
+            (setq diff-end-old (1- diff-end-old))
+            (setq diff-end-new (1- diff-end-new)))
+          ;; Now we know: lines 0..diff-start are identical (context before)
+          ;; and lines diff-end-old..end are identical (context after)
+          (let* ((changed-old-lines (cl-subseq old-lines-list diff-start diff-end-old))
+                 (changed-new-lines (cl-subseq new-lines-list diff-start diff-end-new))
+                 ;; Count leading newlines to adjust match position
+                 (leading-newlines (- (length old-string)
+                                      (length (string-trim-left old-string "\n+"))))
+                 ;; Adjust match-pos to skip leading newlines
+                 (content-start (+ match-pos leading-newlines)))
+            (goto-char content-start)
+            ;; Skip the unchanged prefix lines to get to the actual diff
+            (forward-line diff-start)
+            (let* ((line-start (line-beginning-position))
+                   (line-end (save-excursion
+                               (forward-line (length changed-old-lines))
+                               (if (= (length changed-old-lines) 0)
+                                   (line-end-position)
+                                 (forward-char -1)  ; back before the newline
+                                 (line-end-position))))
+                   (old-text (string-join changed-old-lines "\n"))
+                   (new-text (string-join changed-new-lines "\n")))
+              ;; Delete the changed lines
+              (delete-region line-start (min (1+ line-end) (point-max)))
+              (goto-char line-start)
+              ;; Insert smerge conflict with only changed lines
+              (insert "<<<<<<< HEAD\n"
+                      old-text
+                      "\n=======\n"
+                      new-text
+                      "\n>>>>>>> suggested\n")
+              (point)))))))))
+
+(defun konix/mcp-server-propose-edit (buffer-name edits)
+  "Propose edits by replacing old_string with new_string using smerge markers.
+
+Each edit's old_string must be unique in the buffer.
+Use read_buffer first to find the exact text to replace.
 
 MCP Parameters:
-  new-content - The proposed new content to replace the original
-  buffer-name - The name of the buffer that should contain the new content"
+  buffer-name - The buffer to edit
+  edits - JSON array of {\"old_string\": \"...\", \"new_string\": \"...\"} objects"
   (mcp-server-lib-with-error-handling
-   (let* (;; Ensure proper UTF-8 decoding of content from MCP transport
-          (buffer-name (decode-coding-string buffer-name 'utf-8))
-          (new-content-decoded (decode-coding-string new-content 'utf-8))
-          ;; Normalize both old and new content by trimming trailing whitespace
-          ;; to avoid spurious diffs at the end of the file
-          (original-trimmed (string-trim-right (with-current-buffer buffer-name
-                                                 (buffer-substring-no-properties
-                                                  (point-min) (point-max)))))
-          (new-content-trimmed (string-trim-right new-content-decoded))
-          (old-lines (split-string original-trimmed "\n"))
-          (new-lines (split-string new-content-trimmed "\n"))
-          (diff-regions (konix/mcp-server--compute-diff-regions old-lines new-lines)))
-     (with-current-buffer buffer-name
-       ;; Process diff regions in reverse order to preserve positions
-       (dolist (region (reverse diff-regions))
-         (let* ((old-start-idx (nth 0 region))
-                (old-end-idx (nth 1 region))
-                (new-start-idx (nth 2 region))
-                (new-end-idx (nth 3 region))
-                (old-region-lines (seq-subseq old-lines old-start-idx old-end-idx))
-                (new-region-lines (seq-subseq new-lines new-start-idx new-end-idx))
-                (old-region-text (string-join old-region-lines "\n"))
-                (new-region-text (string-join new-region-lines "\n")))
-           ;; Skip no-op regions where old and new content are identical
-           (unless (string= old-region-text new-region-text)
-             ;; Calculate buffer positions for this region
-             (goto-char (point-min))
-             (forward-line old-start-idx)
-             (let ((region-start (point)))
-               (forward-line (- old-end-idx old-start-idx))
-               (let ((region-end (point)))
-                 ;; Delete old content
-                 (delete-region region-start region-end)
-                 ;; Insert conflict
-                 (goto-char region-start)
-                 (insert "<<<<<<< HEAD\n")
-                 (insert old-region-text)
-                 (unless (string-empty-p old-region-text)
-                   (insert "\n"))
-                 (insert "=======\n")
-                 (insert new-region-text)
-                 (unless (string-empty-p new-region-text)
-                   (insert "\n"))
-                 (insert ">>>>>>> suggested\n"))))))
-       ;; Enable smerge-mode for conflict resolution
-       (smerge-mode 1)
-       ;; Position point at the first conflict
-       (goto-char (point-min))
-       (smerge-next)
-       ;; Deactivate any mark/region
-       (deactivate-mark))
-     ;; Switch to the buffer
-     (pop-to-buffer buffer-name)
-     "Changes inserted as smerge conflict. Use smerge keybindings: C-c ^ u (keep upper/HEAD), C-c ^ l (keep lower/suggested), C-c ^ n/p (next/prev conflict).")))
+   (let* ((buffer-name (decode-coding-string buffer-name 'utf-8))
+          ;; edits may come as a pre-parsed vector or as a JSON string
+          (edits-parsed (if (stringp edits)
+                            (json-parse-string edits :object-type 'alist)
+                          edits))
+          (edits-list (append edits-parsed nil)))
+     (konix/mcp-server-with-buffer buffer-name
+       (let ((edit-count 0))
+         ;; Apply edits from end to start to preserve positions
+         (dolist (edit (nreverse (copy-sequence edits-list)))
+           (let* ((old-string (or (alist-get 'old_string edit)
+                                  (cdr (assoc "old_string" edit))
+                                  (gethash "old_string" edit nil)))
+                  (new-string (or (alist-get 'new_string edit)
+                                  (cdr (assoc "new_string" edit))
+                                  (gethash "new_string" edit nil))))
+             (unless old-string
+               (error "Could not extract old_string from edit: %S" edit))
+             (konix/mcp-server--apply-single-edit old-string new-string buffer-name)
+             (setq edit-count (1+ edit-count))))
+         (smerge-mode 1)
+         ;; Go back to start and find the first conflict
+         (goto-char (point-min))
+         (ignore-errors (smerge-next))
+         (deactivate-mark)
+         (pop-to-buffer (current-buffer))
+         (format "%d change(s) proposed as smerge conflicts. Use C-c ^ u (keep HEAD), C-c ^ l (keep suggested)."
+                 edit-count))))))
 
 (defun konix/mcp-server-keep-all-suggested-changes ()
   "Keep all of the LLM suggestions (accept all smerge conflicts).
@@ -412,7 +473,14 @@ Similar to `elysium-discard-all-suggested-changes'."
      :description "Reload the MCP server file to pick up changes, then restart the server. Call this automatically after editing KONIX_mcp-server.el to apply changes.")
     (konix/mcp-server-propose-edit
      :id "propose_edit"
-     :description "Propose code changes and show diff to user. IMPORTANT: The new-content parameter MUST contain the ENTIRE file content from beginning to end, not just the changed portion. If you only send a fragment, the rest of the file will be deleted. Always use read_buffer first to get the full content, then modify only the lines you need to change within that full content. Keep the diff minimal by preserving all unchanged content exactly as-is. After calling this tool, you MUST stop and wait for the user to accept or reject the changes before doing anything else. Do NOT proceed with further edits, saves, or any follow-up actions until the user has explicitly confirmed the result.")
+     :description "Propose code changes by replacing old_string with new_string. Each old_string must be unique in the buffer (error if not found or ambiguous). Use read_buffer first to find the exact text to replace. After calling this tool, you MUST stop and wait for the user to accept or reject the changes before doing anything else.
+
+WORKFLOW:
+1. Call read_buffer to get the buffer content
+2. Identify all the text regions to replace (old_string values)
+3. Call propose_edit with buffer-name and edits (a JSON array of {\"old_string\": \"...\", \"new_string\": \"...\"} objects)
+
+Each old_string should include enough context to be unique (e.g., a whole function definition rather than just one line).")
     ;; Introspection tools
     (konix/mcp-server-introspection-symbol-exists
      :id "symbol_exists"

@@ -156,7 +156,7 @@ Does not switch focus to agent-shell."
      (list instructions beg end)))
 
   (let ((prompt (format
-                 "Use the tool read_buffer to get the content of buffer \"%s\"%s and answer the following using the tool propose_edit: %s"
+                 "Use read_buffer to get the content of buffer \"%s\"%s. Then use propose_edit with buffer-name and edits (a JSON array of {\"old_string\": \"...\", \"new_string\": \"...\"} objects): %s"
                  (buffer-name)
                  (if (and beg end)
                      (format " on characters %s to %s" beg end)
@@ -165,12 +165,12 @@ Does not switch focus to agent-shell."
                      "edit the code"
                    instructions))))
     (save-window-excursion
-      (when-let ((shell-buffer (agent-shell--shell-buffer)))
+      (let ((shell-buffer (agent-shell--shell-buffer)))
         (with-current-buffer shell-buffer
           (let ((inhibit-read-only t))
             (goto-char (process-mark (get-buffer-process (current-buffer))))
-            (delete-region (point) (point-max)))))
-      (agent-shell--insert-to-shell-buffer :text prompt :no-focus t :submit t))))
+            (delete-region (point) (point-max)))
+          (shell-maker-submit :input prompt))))))
 
 (defun konix/agent-shell-pop-to-buffer ()
   "Select a running agent-shell buffer and pop to it."

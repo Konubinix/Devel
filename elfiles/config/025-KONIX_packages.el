@@ -108,7 +108,6 @@
   (use-package earthfile-mode)
   (use-package editorconfig)
   (use-package edit-indirect)
-  (use-package elysium :straight (:fork t))
   ;; several issues yet to be reported
   (use-package ement :straight (:repo "alphapapa/ement.el" :fork (:repo "konubinix/ement.el")))
   (use-package envrc)

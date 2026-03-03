@@ -23,6 +23,7 @@ in
   home.sessionPath = [
     "${develDir}/bin"
     "${develDir}/bin/hardliases"
+    "${config.home.homeDirectory}/.local/bin"
   ];
 
   home.packages = with pkgs; [
@@ -106,6 +107,10 @@ in
     eject
     python3Packages.supervisor
   ];
+
+  # Agents are managed outside NixOS
+  services.gpg-agent.enable = false;
+  programs.gpg.enable = true;
 
   xsession.windowManager.awesome = {
     enable = true;

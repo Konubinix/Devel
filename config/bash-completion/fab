@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-set -eu
+# No set -eu here: this file is sourced into the interactive shell
 
 source <(fab --print-completion-script bash)

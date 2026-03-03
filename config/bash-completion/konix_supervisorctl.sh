@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eu
+# No set -eu here: this file is sourced into the interactive shell
 
 # https://gist.github.com/pfreixes/3187511
 # pfreixes, 2012-07-27

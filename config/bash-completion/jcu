@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eu
+# No set -eu here: this file is sourced into the interactive shell
 
 source /usr/share/bash-completion/completions/journalctl
 ME="$(basename "${BASH_SOURCE[0]}")"

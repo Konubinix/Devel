@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eu
+# No set -eu here: this file is sourced into the interactive shell
 
 # taken from the  output of zoxide init bash
 ME="$(basename "${BASH_SOURCE[0]}")"

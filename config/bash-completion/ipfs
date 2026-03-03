@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-set -eu
+# No set -eu here: this file is sourced into the interactive shell
 
 eval "$(ipfs commands completion bash)"

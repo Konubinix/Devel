@@ -1,0 +1,3 @@
+#!/bin/bash
+source _ko_npx.sh
+npx_run appium-mcp "$@"

@@ -114,7 +114,15 @@ konix_warn_it_took_too_long ( ) {
     then
         args+=(-t boring)
     fi
-    clk notify "${args[@]}" -o "'$(HISTTIMEFORMAT=":" history|tail -1|sed -r 's/^[^:]+:(.+)$/\1/')' took ${KONIX_DURATION}s"
+    local duration_human
+    if (( KONIX_DURATION >= 3600 )); then
+        duration_human="$((KONIX_DURATION / 3600))h $((KONIX_DURATION % 3600 / 60))m $((KONIX_DURATION % 60))s"
+    elif (( KONIX_DURATION >= 60 )); then
+        duration_human="$((KONIX_DURATION / 60))m $((KONIX_DURATION % 60))s"
+    else
+        duration_human="${KONIX_DURATION}s"
+    fi
+    clk notify "${args[@]}" -o "'$(HISTTIMEFORMAT=":" history|tail -1|sed -r 's/^[^:]+:(.+)$/\1/')' took ${duration_human}"
 }
 
 konix_was_active_not_long_ago ( ) {

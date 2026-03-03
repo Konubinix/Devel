@@ -458,6 +458,33 @@ Message-Id: <%s>" id)
     )
   )
 
+(defun konix/notmuch-show-unpack-ipfs-thread ()
+  (interactive)
+  (let* ((messages '()))
+    (notmuch-show-mapc
+     (lambda ()
+       (push (list (cons "id" (notmuch-show-get-message-id))
+                   (cons "depth" (notmuch-show-get-depth))
+                   (cons "from" (notmuch-show-get-from))
+                   (cons "subject" (notmuch-show-get-subject))
+                   (cons "date" (notmuch-show-get-date)))
+             messages)))
+    (setq messages (nreverse messages))
+    (let* ((json-file (make-temp-file "notmuch-thread-" nil ".json"))
+           (_ (with-temp-file json-file
+                (insert (json-encode messages))))
+           (url (string-trim
+                 (shell-command-to-string
+                  (format "konix_notmuch_unpack_ipfs_thread.sh '%s'" json-file)))))
+      (delete-file json-file)
+      (when current-prefix-arg
+        (message "Opening in browser")
+        (browse-url url))
+      (message url)
+      (with-temp-buffer
+        (insert url)
+        (copy-region-as-kill (point-min) (point-max))))))
+
 (defun konix/notmuch-show/ipfa ()
   (interactive)
   (let (
@@ -621,6 +648,8 @@ inspired from `notmuch-show-archive-thread-internal'"
 (keymap-set notmuch-search-mode-map "r" 'konix/notmuch-search-add-noreply)
 (keymap-set notmuch-show-mode-map "M"
   'konix/notmuch-show-unpack-ipfs)
+(keymap-set notmuch-show-mode-map "T"
+  'konix/notmuch-show-unpack-ipfs-thread)
 (keymap-set notmuch-show-mode-map "I"
   'konix/notmuch-show/ipfa)
 (keymap-set notmuch-show-mode-map "C-r" 'konix/notmuch-show-add-noreply)

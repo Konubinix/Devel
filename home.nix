@@ -14,6 +14,12 @@ in
   home.stateVersion = "24.11";
 
   programs.home-manager.enable = true;
+  programs.bash.enable = true;
+
+  home.sessionPath = [
+    "${develDir}/bin"
+    "${develDir}/bin/hardliases"
+  ];
 
   home.packages = with pkgs; [
     # editors

@@ -30,9 +30,12 @@
   (add-to-list 'load-path (expand-file-name elfiles))
   )
 (konix/setup-elfiles elfiles)
-(konix/setup-elfiles perso-elfiles)
-(konix/setup-elfiles perso-host-elfiles)
-(konix/setup-elfiles home-elfiles)
+(when (file-directory-p perso-elfiles)
+  (konix/setup-elfiles perso-elfiles))
+(when (file-directory-p perso-host-elfiles)
+  (konix/setup-elfiles perso-host-elfiles))
+(when (file-directory-p home-elfiles)
+  (konix/setup-elfiles home-elfiles))
 
 (defmacro konix/require-debug-setup (feature-to-debug)
   `(progn
@@ -222,9 +225,12 @@ to find out why it is loaded"
 
 
 (konix/load-config-files (expand-file-name "config" elfiles))
-(konix/load-config-files (expand-file-name "config" perso-elfiles))
-(konix/load-config-files (expand-file-name "config" perso-host-elfiles))
-(konix/load-config-files (expand-file-name "config" home-elfiles))
+(when (file-directory-p (expand-file-name "config" perso-elfiles))
+  (konix/load-config-files (expand-file-name "config" perso-elfiles)))
+(when (file-directory-p (expand-file-name "config" perso-host-elfiles))
+  (konix/load-config-files (expand-file-name "config" perso-host-elfiles)))
+(when (file-directory-p (expand-file-name "config" home-elfiles))
+  (konix/load-config-files (expand-file-name "config" home-elfiles)))
 
 ;; ####################################################################################################
 ;; Starts the serveur

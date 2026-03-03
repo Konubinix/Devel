@@ -165,6 +165,15 @@ If at the prompt, insert a space."
     (tracking-next-buffer)))
 
 (define-key agent-shell-mode-map (kbd "SPC") 'konix/agent-shell/tracking-next-buffer)
+(defun konix/agent-shell (&optional arg)
+  "Save current buffer if region is active, then call `agent-shell'.
+Passes ARG through to `agent-shell'."
+  (interactive "P")
+  (when (and (use-region-p) buffer-file-name (buffer-modified-p))
+    (save-buffer))
+  (cl-letf (((symbol-function 'y-or-n-p) (lambda (_prompt) t)))
+    (agent-shell arg)))
+
 (define-key agent-shell-mode-map (kbd "TAB") 'agent-shell-next-item)
 
 (defvar-local konix/agent-shell--request-start-time nil

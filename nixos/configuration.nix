@@ -21,6 +21,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # networking.hostName is set in the host layer (e.g. konixwork/nix/host-system.nix)
+  environment.variables.HOSTNAME = config.networking.hostName;
 
   # Enable networking
   networking.networkmanager.enable = true;

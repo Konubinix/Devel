@@ -4,7 +4,9 @@
 { config, pkgs, ... }:
 
 let
-  develDir = "/home/sam/Prog/Devel";
+  develDir = "/home/sam/prog/devel";
+  configDir = "${develDir}/config";
+  shareDir = "${develDir}/share";
 in
 {
   home.username = "sam";
@@ -12,4 +14,11 @@ in
   home.stateVersion = "24.11";
 
   programs.home-manager.enable = true;
+
+  # Dotfile symlinks (replaces install.py substitute() calls)
+  home.file = {
+    ".byobu".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/byobu";
+    ".inputrc".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/inputrc";
+    ".config/starship.toml".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/starship.toml";
+  };
 }

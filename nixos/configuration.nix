@@ -25,6 +25,12 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # System packages
+  environment.systemPackages = with pkgs; [
+    net-tools # ifconfig, netstat, etc.
+    tinc      # VPN (configure services.tinc.networks when needed)
+  ];
+
   # Set your time zone.
   time.timeZone = "Europe/Paris";
 

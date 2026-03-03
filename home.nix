@@ -55,6 +55,7 @@ in
     unzip
     autojump
     fish
+    pipx
 
     # security
     gnupg

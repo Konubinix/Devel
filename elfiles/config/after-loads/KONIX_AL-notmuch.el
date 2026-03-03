@@ -198,7 +198,15 @@ Message-Id: <%s>" id)
     (
      ((class color)
       (background dark))
-     (:strike-through "white")
+     (:strike-through "white" :foreground "dark gray" :background "gray20")
+     )
+    (
+     ((class color)
+      (background light))
+     (:strike-through "dark red" :foreground "gray")
+     )
+    (t
+     (:strike-through t :foreground "red")
      )
     )
   ""

@@ -28,7 +28,7 @@ gaps_show_date_maybe ( ) {
 }
 
 gaps_compute_remotes_internal ( ) {
-    local remotes="$(/bin/ls -1 ${GITANNEXSYNC_REMOTES})"
+    local remotes="$(ls -1 ${GITANNEXSYNC_REMOTES})"
     all_remotes=""
     local git_remotes="$(git remote)"
     # check that git remotes are ok

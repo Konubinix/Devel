@@ -106,15 +106,17 @@ in
     # gmpc did not find the correct name so far
 
     # python
-    (python3.withPackages (ps: [ ps.evdev ] ++ (config.konix.extraPythonPackages ps)))
-    python3Packages.pip
-    python3Packages.ipython
-    python3Packages.pyxdg
+    (python3.withPackages (ps: [
+      ps.evdev
+      ps.pip
+      ps.ipython
+      ps.pyxdg
+      ps.supervisor
+    ] ++ (config.konix.extraPythonPackages ps)))
 
     # misc
     which
     eject
-    python3Packages.supervisor
   ];
 
   # Agents are managed outside NixOS

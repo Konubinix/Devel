@@ -8,6 +8,12 @@ let
   develDir = "/home/sam/prog/devel";
   configDir = "${develDir}/config";
   libDir = "${develDir}/lib";
+
+  sessionVarsFile = pkgs.writeText "hm-session-vars.sh" (
+    lib.concatStringsSep "\n" (lib.mapAttrsToList
+      (name: value: "export ${name}=${lib.escapeShellArg value}")
+      config.home.sessionVariables)
+  );
 in
 {
   home.packages = with pkgs; [
@@ -110,9 +116,8 @@ in
     initExtra = ''
       # Re-export session variables so that `home-manager switch` takes
       # effect in every new shell, not just at login.
-      ${lib.concatStringsSep "\n      " (lib.mapAttrsToList
-        (name: value: "export ${name}=${lib.escapeShellArg value}")
-        config.home.sessionVariables)}
+      export HM_SESSION_VARS="${sessionVarsFile}"
+      source "${sessionVarsFile}"
 
       # --- from shrc ---
 

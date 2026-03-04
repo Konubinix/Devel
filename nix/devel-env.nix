@@ -3,7 +3,12 @@
 #
 # Perso-dependent vars (KONIX_PERSO_DIR, HOSTNAME) belong in perso-env.nix
 # and host-env.nix respectively.
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   homeDir = config.home.homeDirectory;
@@ -33,6 +38,7 @@ in
     KONIX_EMACS_CUSTOM_FILE = "${homeDir}/.emacs_custo";
     KONIX_PERSO_DIRS = "${homeDir}/perso";
     KONIX_PERSO_DIR = "${homeDir}/perso/perso";
+    KONIX_PERSO_CONFIG_DIR = "${homeDir}/perso/perso/config";
 
     # Editors
     EDITOR = "edit.sh";

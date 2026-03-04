@@ -14,16 +14,23 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
+      impass = import ./flakes/impass/default.nix { inherit pkgs; };
     in
     {
       # Reusable module for other flakes (e.g. perso.git) to import
-      homeManagerModules.default = ./home.nix;
+      homeManagerModules.default = {
+        imports = [ ./home.nix ];
+        home.packages = [ impass ];
+      };
       nixosModules.default = ./nixos/configuration.nix;
 
       # standalone home-manager (devel-only, no perso)
       homeConfigurations."sam" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-        modules = [ ./home.nix ];
+        modules = [
+          ./home.nix
+          { home.packages = [ impass ]; }
+        ];
       };
 
       # NixOS system + home-manager (devel-only, no perso)

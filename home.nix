@@ -64,7 +64,7 @@ in
     pinentry-gtk2
     apg
     gfshare # gfcombine, gfsplit
-    # impass # check if available in nixpkgs
+    # impass: packaged in flakes/impass, added via flake.nix
 
     # spelling
     aspell

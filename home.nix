@@ -30,6 +30,7 @@ in
     # editors
     vim
     emacs
+    gcc   # needed by emacs native-comp JIT (async compilation invokes gcc driver)
 
     # vcs
     git

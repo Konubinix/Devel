@@ -98,7 +98,7 @@ in
     # gmpc did not find the correct name so far
 
     # python
-    python3
+    (python3.withPackages (ps: [ ps.evdev ]))
     python3Packages.pip
     python3Packages.ipython
     python3Packages.pyxdg

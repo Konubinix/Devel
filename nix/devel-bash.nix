@@ -118,6 +118,24 @@ in
       # effect in every new shell, not just at login.
       export HM_SESSION_VARS="${sessionVarsFile}"
       source "${sessionVarsFile}"
+      _hm_session_var_names() {
+        sed -n 's/^export \([^=]*\)=.*/\1/p' "$HM_SESSION_VARS"
+      }
+      _HM_RELOAD_VARS="$(_hm_session_var_names)"
+      hm-reload() {
+        local new_vars
+        new_vars="$(_hm_session_var_names)"
+        local var
+        for var in $_HM_RELOAD_VARS; do
+          if ! echo "$new_vars" | grep -qxF "$var"; then
+            unset "$var"
+            echo "Unset $var"
+          fi
+        done
+        source "$HM_SESSION_VARS"
+        _HM_RELOAD_VARS="$new_vars"
+        echo "Reloaded $HM_SESSION_VARS"
+      }
 
       # --- from shrc ---
 

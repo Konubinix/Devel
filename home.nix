@@ -1,7 +1,7 @@
 # Bootstrap: git clone git@github.com:konubinix/Devel.git ~/Prog/Devel
 # Then: home-manager switch --flake ~/Prog/Devel
 # Later on NixOS: nixos-rebuild switch --flake ~/Prog/Devel
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   develDir = "/home/sam/prog/devel";
@@ -9,11 +9,19 @@ let
   shareDir = "${develDir}/share";
 in
 {
+  options.konix.extraPythonPackages = lib.mkOption {
+    type = lib.types.functionTo (lib.types.listOf lib.types.package);
+    default = _: [];
+    description = "Extra Python packages to add to the base Python environment.";
+  };
+
   imports = [
     ./nix/devel-env.nix
     ./nix/devel-bash.nix
     ./nix/devel-emacs.nix
   ];
+
+  config = {
   home.username = "sam";
   home.homeDirectory = "/home/sam";
   home.stateVersion = "24.11";
@@ -98,7 +106,7 @@ in
     # gmpc did not find the correct name so far
 
     # python
-    (python3.withPackages (ps: [ ps.evdev ]))
+    (python3.withPackages (ps: [ ps.evdev ] ++ (config.konix.extraPythonPackages ps)))
     python3Packages.pip
     python3Packages.ipython
     python3Packages.pyxdg
@@ -128,4 +136,5 @@ in
     ".inputrc".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/inputrc";
     ".config/starship.toml".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/starship.toml";
   };
+  }; # end config
 }

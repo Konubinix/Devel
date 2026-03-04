@@ -110,7 +110,7 @@ in
       ps.evdev
       ps.pip
       ps.ipython
-      ps.pyxdg
+      ps.xdg
       ps.supervisor
     ] ++ (config.konix.extraPythonPackages ps)))
 

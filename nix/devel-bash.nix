@@ -1,7 +1,7 @@
 # Bash configuration for NixOS.
 # Replaces config/bashrc + config/shrc for the NixOS environment.
 # On Debian, config/bashrc is still used via install.py.
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   homeDir = config.home.homeDirectory;
@@ -108,6 +108,12 @@ in
     };
 
     initExtra = ''
+      # Re-export session variables so that `home-manager switch` takes
+      # effect in every new shell, not just at login.
+      ${lib.concatStringsSep "\n      " (lib.mapAttrsToList
+        (name: value: "export ${name}=${lib.escapeShellArg value}")
+        config.home.sessionVariables)}
+
       # --- from shrc ---
 
       # stty settings

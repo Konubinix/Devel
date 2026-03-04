@@ -100,6 +100,9 @@
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
+  # Enable atd for scheduled jobs (at, atq, atrm)
+  services.atd.enable = true;
+
   # Agents are managed outside NixOS
   programs.ssh.startAgent = false;
   programs.gnupg.agent.enable = false;

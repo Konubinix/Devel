@@ -7,7 +7,7 @@ disabled = true
 [username]
 disabled = true
 [custom.userhost]
-command = 'echo "$USER@$(tput setaf ${HOSTNAME_COLOR:-7})${HOSTNAME}"'
+command = 'c=$(printf "%s" "$HOSTNAME" | cksum | awk "{print \$1 % 6 + 1}"); echo "$USER@$(tput setaf $c)${HOSTNAME}"'
 when = "true"
 description = "show user and host names"
 style = "bold yellow"

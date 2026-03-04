@@ -3,7 +3,7 @@
 #
 # Perso-dependent vars (KONIX_PERSO_DIR, HOSTNAME) belong in perso-env.nix
 # and host-env.nix respectively.
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   homeDir = config.home.homeDirectory;
@@ -27,6 +27,8 @@ in
     KONIX_CONFIG_DIR = configDir;
     KONIX_SHARE_DIR = shareDir;
     KONIX_LIB_DIR = "${develDir}/lib";
+    KONIX_BIN_DIR = "${develDir}/bin";
+    KONIX_SRC_DIR = "${develDir}/src";
     KONIX_PLATFORM = "linux";
     KONIX_EMACS_CUSTOM_FILE = "${homeDir}/.emacs_custo";
     KONIX_PERSO_DIRS = "${homeDir}/perso";
@@ -84,6 +86,8 @@ in
     PYTHONBREAKPOINT = "ipdb.set_trace";
     PYTHONSTARTUP = "";
     VIRTUALENVWRAPPER_PYTHON = "python3";
+    PYTHON_BIN = "${pkgs.python3}/bin/python3";
+    PYTHON_PATH = "${pkgs.python3}/bin";
 
     # Go
     GO111MODULE = "auto";

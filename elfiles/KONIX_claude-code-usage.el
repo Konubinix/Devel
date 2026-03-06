@@ -60,7 +60,7 @@ non-interactively (no TTY prompt that would hang Emacs)."
   (if (yes-or-no-p "Claude Code credentials are expired or missing. Renew them now?")
       (progn
         (message "Running `claude auth login' to renew credentials...")
-        (let ((exit-code (call-process "claude" "/dev/null" "*claude-auth*" nil "auth" "login")))
+        (let ((exit-code (call-process "claude-code" "/dev/null" "*claude-auth*" nil "auth" "login")))
           (if (zerop exit-code)
               (progn
                 (message "Claude Code credentials renewed successfully.")

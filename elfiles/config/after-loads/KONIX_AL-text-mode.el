@@ -27,14 +27,11 @@
 (defvar konix/org-babel-tangling-p nil
   "Non-nil when org-babel-tangle is in progress.")
 
-(defun konix/org-babel-tangle-set-flag ()
-  (setq konix/org-babel-tangling-p t))
+(defun konix/org-babel-tangle-set-flag-around (orig-fun &rest args)
+  (let ((konix/org-babel-tangling-p t))
+    (apply orig-fun args)))
 
-(defun konix/org-babel-tangle-clear-flag ()
-  (setq konix/org-babel-tangling-p nil))
-
-(add-hook 'org-babel-pre-tangle-hook 'konix/org-babel-tangle-set-flag)
-(add-hook 'org-babel-post-tangle-hook 'konix/org-babel-tangle-clear-flag)
+(advice-add 'org-babel-tangle :around 'konix/org-babel-tangle-set-flag-around)
 
 (defun konix/text-mode-hook/warn-if-tangled ()
   (unless konix/org-babel-tangling-p

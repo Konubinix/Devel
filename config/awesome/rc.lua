@@ -2,6 +2,22 @@
 -- found (e.g. lgi). If LuaRocks is not installed, do nothing.
 pcall(require, "luarocks.loader")
 
+-- Import Home Manager session variables so that awesome sees them.
+do
+   local lgi = require("lgi")
+   local GLib = lgi.GLib
+   local handle = io.popen("konix_hm_session_env.sh")
+   if handle then
+      for line in handle:lines() do
+         local name, value = line:match("^([^=]+)=(.*)$")
+         if name then
+            GLib.setenv(name, value, true)
+         end
+      end
+      handle:close()
+   end
+end
+
 local cyclefocus = require("awesome-cyclefocus")
 
 -- Standard awesome library

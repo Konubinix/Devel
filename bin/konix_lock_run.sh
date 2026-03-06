@@ -30,4 +30,4 @@ shift $((OPTIND-1))
     flock ${FLOCK_ARGS} 9 || { echo "A script associated to ${NAME} is already running" >&2 ; exit 128 ; }
     "$@"
     echo "Command ${*} ended" 2>&1
-) 9>"/var/lock/${NAME}.lock"
+) 9>"${XDG_RUNTIME_DIR:-/tmp}/lock-${NAME}.lock"

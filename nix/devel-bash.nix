@@ -9,14 +9,41 @@ let
   configDir = "${develDir}/config";
   libDir = "${develDir}/lib";
 
+  # Plain KEY=VALUE file (no shell expansion) for simple session variables.
   sessionVarsFile = pkgs.writeText "hm-session-vars.sh" (
     lib.concatStringsSep "\n" (lib.mapAttrsToList
       (name: value: "export ${name}=${lib.escapeShellArg value}")
       config.home.sessionVariables)
-    + "\n" + config.home.sessionVariablesExtra
+  );
+
+  # KEY=prefix file for variables that need prepending to existing values.
+  # Merges sessionPath into PATH automatically.
+  sessionPrependVars =
+    let
+      raw = config.home.sessionPrependVariables;
+      sessionPathStr = lib.concatStringsSep ":" config.home.sessionPath;
+      pathEntry = if raw ? PATH
+        then sessionPathStr + ":" + raw.PATH
+        else sessionPathStr;
+    in raw // lib.optionalAttrs (sessionPathStr != "") { PATH = pathEntry; };
+
+  sessionPrependFile = pkgs.writeText "hm-session-prepend-vars.sh" (
+    lib.concatStringsSep "\n" (lib.mapAttrsToList
+      (name: value: "${name}=${value}")
+      sessionPrependVars)
   );
 in
 {
+  options.home.sessionPrependVariables = lib.mkOption {
+    type = lib.types.attrsOf lib.types.str;
+    default = {};
+    description = "Variables whose values are prepended (colon-separated) to existing values.";
+  };
+
+  config = {
+  home.file.".konix_hm-session-vars.sh".source = sessionVarsFile;
+  home.file.".konix_hm-session-prepend-vars.sh".source = sessionPrependFile;
+
   home.packages = with pkgs; [
     bash-preexec
     mcfly
@@ -117,26 +144,11 @@ in
     initExtra = ''
       # Re-export session variables so that `home-manager switch` takes
       # effect in every new shell, not just at login.
-      export HM_SESSION_VARS="${sessionVarsFile}"
-      source "${sessionVarsFile}"
-      _hm_session_var_names() {
-        sed -n 's/^export \([^=]*\)=.*/\1/p' "$HM_SESSION_VARS"
+      _hm_load_vars() {
+        eval "$(konix_hm_session_env.sh | sed 's/^/export /')"
       }
-      _HM_RELOAD_VARS="$(_hm_session_var_names)"
-      hm-reload() {
-        local new_vars
-        new_vars="$(_hm_session_var_names)"
-        local var
-        for var in $_HM_RELOAD_VARS; do
-          if ! echo "$new_vars" | grep -qxF "$var"; then
-            unset "$var"
-            echo "Unset $var"
-          fi
-        done
-        source "$HM_SESSION_VARS"
-        _HM_RELOAD_VARS="$new_vars"
-        echo "Reloaded $HM_SESSION_VARS"
-      }
+      _hm_load_vars
+      hm-reload() { _hm_load_vars; echo "Reloaded session vars"; }
 
       # --- from shrc ---
 
@@ -287,4 +299,5 @@ in
       export GPG_TTY
     '';
   };
+  }; # close config
 }

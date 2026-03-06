@@ -19,7 +19,7 @@
     {
       # Reusable module for other flakes (e.g. perso.git) to import
       homeManagerModules.default = {
-        imports = [ ./home.nix ];
+        imports = [ ./nix/home.nix ];
         home.packages = [ impass ];
       };
       nixosModules.default = ./nixos/configuration.nix;
@@ -28,7 +28,7 @@
       homeConfigurations."sam" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [
-          ./home.nix
+          ./nix/home.nix
           { home.packages = [ impass ]; }
         ];
       };
@@ -43,7 +43,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.sam = import ./home.nix;
+            home-manager.users.sam = import ./nix/home.nix;
           }
         ];
       };

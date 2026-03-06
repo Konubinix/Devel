@@ -183,7 +183,7 @@ If not started yet, start execution. If finished, reset and warn."
    ;; Queue has items, continue
    (konix/org-run-session-blocks--queue
     (konix/org-run-session-blocks--execute-next)
-    (recenter-top-bottom))
+    (recenter))
    ;; No buffer set means we haven't started yet
    ((null konix/org-run-session-blocks--buffer)
     (konix/org-run-session-blocks))

@@ -1,7 +1,4 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running 'nixos-help').
-
+# Base NixOS system configuration (devel layer).
 {
   config,
   pkgs,
@@ -11,7 +8,6 @@
 
 {
   imports = [
-    # copy from /etc/nixos/hardware-configuration.nix per machine
     ./hardware-configuration.nix
   ];
 
@@ -28,7 +24,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # networking.hostName is set in the host layer (e.g. konixwork/nix/host-system.nix)
+  # networking.hostName is set in the host layer (e.g. konixwork/nix/nixos.nix)
   environment.variables.HOSTNAME = config.networking.hostName;
 
   # Enable networking
@@ -79,11 +75,6 @@
 
   # Docker
   virtualisation.docker.enable = true;
-  networking.firewall.enable = false;
-  # # Trust the docker0 bridge so containers in bridge networking mode can reach
-  # # host services (e.g. Nomad tasks connecting to 192.168.2.5).  NixOS enables
-  # # the firewall by default and drops traffic from untrusted interfaces.
-  # networking.firewall.trustedInterfaces = [ "docker0" ];
 
   # Define a user account. Don't forget to set a password with 'passwd'.
   users.users.sam = {

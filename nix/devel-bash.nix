@@ -13,6 +13,7 @@ let
     lib.concatStringsSep "\n" (lib.mapAttrsToList
       (name: value: "export ${name}=${lib.escapeShellArg value}")
       config.home.sessionVariables)
+    + "\n" + config.home.sessionVariablesExtra
   );
 in
 {

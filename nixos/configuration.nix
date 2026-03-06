@@ -79,10 +79,11 @@
 
   # Docker
   virtualisation.docker.enable = true;
-  # Trust the docker0 bridge so containers in bridge networking mode can reach
-  # host services (e.g. Nomad tasks connecting to 192.168.2.5).  NixOS enables
-  # the firewall by default and drops traffic from untrusted interfaces.
-  networking.firewall.trustedInterfaces = [ "docker0" ];
+  networking.firewall.enable = false;
+  # # Trust the docker0 bridge so containers in bridge networking mode can reach
+  # # host services (e.g. Nomad tasks connecting to 192.168.2.5).  NixOS enables
+  # # the firewall by default and drops traffic from untrusted interfaces.
+  # networking.firewall.trustedInterfaces = [ "docker0" ];
 
   # Define a user account. Don't forget to set a password with 'passwd'.
   users.users.sam = {

@@ -43,8 +43,9 @@
 
     ("konix-emacs"
      (name . "konix-emacs")
-     (command . ,(expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory))
-     (args . ["--init-function=konix/mcp-server-start"
+     (command . "bash")
+     (args . [,(expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory)
+              "--init-function=konix/mcp-server-start"
               "--stop-function=konix/mcp-server-stop"
               "--server-id=konix-emacs-mcp"])
      (env . []))
@@ -89,8 +90,8 @@
    (let* ((names (mapcar #'car konix/agent-shell-mcp-server-registry))
           (annotator (lambda (candidate)
                        (if (member candidate konix/agent-shell-mcp-enabled-servers)
-                           " [enabled]"
-                         " [disabled]")))
+                           (propertize " [enabled]" 'face '(:foreground "green"))
+                         (propertize " [disabled]" 'face '(:foreground "red")))))
           (completion-extra-properties
            `(:annotation-function ,annotator)))
      (list (completing-read "Toggle MCP server: " names nil t))))

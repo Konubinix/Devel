@@ -25,9 +25,14 @@
 ;;; Code:
 
 (require 'KONIX_mcp-server)
+(require 'mcp-server-lib-commands)
 
 (require 'KONIX_AL-shell-maker)
 (require 'KONIX_claude-code-usage)
+
+(let ((script (expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory)))
+  (unless (file-exists-p script)
+    (mcp-server-lib-install)))
 
 (defvar konix/agent-shell-mcp-server-registry
   `(("konix-mcp"
@@ -111,14 +116,6 @@
 
 (setq-default agent-shell-anthropic-claude-acp-command '("claude-code-acp"))
 
-(setq-default agent-shell-google-gemini-command
-              '("gemini" "--experimental-acp"
-                "-m" "gemini-2.5-pro"
-                ;; "-m" "gemini-2.5-flash"
-                ))
-
-
-(setq-default agent-shell-preferred-agent-config (agent-shell-google-make-gemini-config))
 (setq-default agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config))
 
 (defun konix/agent-shell/toggle-preferred-agent ()
@@ -218,8 +215,8 @@ Passes ARG through to `agent-shell'."
 
 (advice-add #'shell-maker-submit :before #'konix/agent-shell--record-request-start)
 
-(cl-defun konix/agent-shell--on-request/notify (&key state request)
-  (let-alist request
+(cl-defun konix/agent-shell--on-request/notify (&key state acp-request)
+  (let-alist acp-request
     (cond ((equal .method "session/request_permission")
            (tracking-add-buffer (current-buffer))
            (when (or (konix/should-notify-p)

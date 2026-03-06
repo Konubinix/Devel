@@ -2,15 +2,23 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running 'nixos-help').
 
-{ config, pkgs, nixpkgs, ... }:
+{
+  config,
+  pkgs,
+  nixpkgs,
+  ...
+}:
 
 {
-  imports =
-    [ # copy from /etc/nixos/hardware-configuration.nix per machine
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # copy from /etc/nixos/hardware-configuration.nix per machine
+    ./hardware-configuration.nix
+  ];
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Pin nixpkgs registry so hardliases (nix profile install nixpkgs#foo)
   # use the same nixpkgs as the system
@@ -29,7 +37,7 @@
   # System packages
   environment.systemPackages = with pkgs; [
     net-tools # ifconfig, netstat, etc.
-    tinc      # VPN (configure services.tinc.networks when needed)
+    tinc # VPN (configure services.tinc.networks when needed)
   ];
 
   # Set your time zone.
@@ -71,12 +79,20 @@
 
   # Docker
   virtualisation.docker.enable = true;
+  # Trust the docker0 bridge so containers in bridge networking mode can reach
+  # host services (e.g. Nomad tasks connecting to 192.168.2.5).  NixOS enables
+  # the firewall by default and drops traffic from untrusted interfaces.
+  networking.firewall.trustedInterfaces = [ "docker0" ];
 
   # Define a user account. Don't forget to set a password with 'passwd'.
   users.users.sam = {
     isNormalUser = true;
     description = "sam";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+    ];
   };
 
   # Allow unfree packages

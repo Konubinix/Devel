@@ -192,6 +192,13 @@ If not started yet, start execution. If finished, reset and warn."
     (setq konix/org-run-session-blocks--buffer nil)
     (warn "All blocks executed."))))
 
+(defun konix/org-run-session-blocks-continue-until-end ()
+  "Execute all remaining session blocks without stopping."
+  (interactive)
+  (while konix/org-run-session-blocks--queue
+    (konix/org-run-session-blocks--execute-next))
+  (recenter))
+
 (defun konix/org-run-session-blocks-reset ()
   "Reset the session blocks execution and start from the beginning.
 Kills existing session buffers before restarting."

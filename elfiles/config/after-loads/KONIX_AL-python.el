@@ -51,7 +51,6 @@
   (setq indent-tabs-mode nil)
   (setq-local yas-indent-line 'fixed)
   (add-hook 'after-save-hook 'konix/python/make-executable t t)
-  (add-hook 'after-save-hook 'lsp-format-buffer t t)
   (defvar electric-pair-pairs)
   (setq-local electric-pair-pairs
               (append
@@ -78,6 +77,7 @@
     (add-to-list 'lsp-disabled-clients 'pylsp)
     (add-to-list 'lsp-disabled-clients 'zuban-ls)
     (lsp)
+    (add-hook 'after-save-hook 'lsp-format-buffer t t)
 
     (setq-local completion-at-point-functions
                 (list

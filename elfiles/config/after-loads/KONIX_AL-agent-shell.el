@@ -293,14 +293,21 @@ A buffer is ready when `shell-maker-busy' returns nil or when there is
 a pending permission request."
   (interactive)
   (let ((buffers (agent-shell-buffers))
-        (tracked 0))
+        (tracked 0)
+        last-ready)
     (dolist (buf buffers)
       (when (buffer-live-p buf)
         (with-current-buffer buf
           (when (or (not (shell-maker-busy))
                     (konix/agent-shell--has-permission-button-p))
             (tracking-add-buffer buf)
-            (cl-incf tracked)))))
+            (cl-incf tracked)
+            (setq last-ready buf)))))
+    (when (and last-ready
+               (or (not (derived-mode-p 'agent-shell-mode))
+                   (and (shell-maker-busy)
+                        (not (konix/agent-shell--has-permission-button-p)))))
+      (pop-to-buffer last-ready))
     (message "Tracked %d ready agent-shell buffer%s (out of %d)" tracked (if (= tracked 1) "" "s") (length buffers))))
 
 ;;; KONIX_AL-agent-shell.el ends here

@@ -168,6 +168,9 @@
    (-map 'cdr)
    (-map 'konix/ement-update-tracking-session-unread)
    )
+  (when (and tracking-buffers
+             (not (derived-mode-p 'ement-room-mode)))
+    (pop-to-buffer (car tracking-buffers)))
   (message "Done updating all tracked unread rooms")
   )
 

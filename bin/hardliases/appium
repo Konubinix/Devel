@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+source _ko_npx.sh
+ME="$(basename "${0}")"
+
+if [ ! -d "$HOME/.appium/node_modules/appium-uiautomator2-driver" ]; then
+    npx_run "${ME}" driver install uiautomator2
+fi
+
+npx_run "${ME}" "$@"

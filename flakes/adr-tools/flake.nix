@@ -23,8 +23,6 @@
           dontConfigure = true;
           dontBuild = true;
           doCheck = false;
-          dontPatchShebangs = 1;
-
           installPhase = ''
             runHook preInstall
 
@@ -37,6 +35,8 @@
 
             mkdir -p $out/share/bash-completion/completions/
             cp $src/autocomplete/adr $out/share/bash-completion/completions/
+
+            patchShebangs $out/bin
 
             runHook postInstall
           '';

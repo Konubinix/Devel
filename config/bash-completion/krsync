@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
 ME="$(basename "${BASH_SOURCE[0]}")"
-source /usr/share/bash-completion/completions/rsync
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SELF_DIR}/_find_completion.sh"
+_comp="$(_find_completion rsync)" && source "$_comp" || return
 complete -F _comp_cmd_rsync -o nospace "$ME"

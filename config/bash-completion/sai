@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 ME="$(basename "${BASH_SOURCE[0]}")"
-source /usr/share/bash-completion/completions/apt
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SELF_DIR}/_find_completion.sh"
+_comp="$(_find_completion apt)" && source "$_comp" || return
 
 _sai () {
     # take the words without the initial sai and substitute it with "sudo apt install"

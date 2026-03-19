@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-source /usr/share/bash-completion/completions/docker
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SELF_DIR}/_find_completion.sh"
+_comp="$(_find_completion docker)" && source "$_comp" || return
 
 ME="$(basename "${BASH_SOURCE[0]}")"
 complete -F __start_docker "${ME}"

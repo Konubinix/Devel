@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # No set -eu here: this file is sourced into the interactive shell
 
-source /usr/share/bash-completion/completions/journalctl
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SELF_DIR}/_find_completion.sh"
+_comp="$(_find_completion journalctl)" && source "$_comp" || return
 ME="$(basename "${BASH_SOURCE[0]}")"
 complete -F _journalctl "${ME}"

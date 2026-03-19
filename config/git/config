@@ -88,3 +88,5 @@
 # see https://github.com/doomemacs/doomemacs/issues/7171#issuecomment-2851619677
 [url "https://https.git.savannah.gnu.org/git/"]
     insteadOf = https://git.savannah.gnu.org/git/
+[gc]
+	auto = 0

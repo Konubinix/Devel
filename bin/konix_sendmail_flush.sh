@@ -4,7 +4,7 @@ mkdir -p "${TMPDIR}/logs/"
 LOG="${TMPDIR}/logs/msmtp.log"
 rm -f "${LOG}"
 
-QUEUE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/mail.queue"
+QUEUE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/msmtp/queue"
 mkdir -p "${QUEUE_DIR}"
 
 msg () {
@@ -22,7 +22,7 @@ else
     echo "Sending now!!"
     trap "test -e ${LOG} && cat ${LOG}" 0
     clk gpg decrypt dir "${KONIX_PERSO_DIR}/msmtprc_nd" msmtprc
-    msmtpq-flush || {
+    msmtp-queue -r || {
         clk ntfy --priority 5 "Could not send a mail. This is important!!"
         exit 2
     }

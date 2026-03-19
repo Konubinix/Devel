@@ -32,5 +32,9 @@ fi
 #echo "$@"
 #xmessage "$*"
 clk gpg decrypt dir "${KONIX_PERSO_DIR}/msmtprc_nd" msmtprc
-msmtpq -t --read-envelope-from -oi -C "/run/user/$(id -u)/msmtprc/config" --aliases="${KONIX_MSMTP_ALIASES}" --logfile "${KONIX_MSMTP_LOG}" "$@"
-# the queue will be in /home/sam/perso/perso/konixwork/share/mail.queue
+LOGFILE="$(mktemp)"
+trap "rm -f ${LOGFILE}" 0
+msmtpq -t --read-envelope-from -oi -C "/run/user/$(id -u)/msmtprc/config" --aliases="${KONIX_MSMTP_ALIASES}" --logfile "${LOGFILE}" "$@" || {
+    cat "${LOGFILE}"
+    exit 1
+}

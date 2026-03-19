@@ -5,7 +5,10 @@ get_completions(){
 
     # load bash-completion if necessary
     declare -F _completion_loader &>/dev/null || {
-        source /usr/share/bash-completion/bash_completion
+        local _bc
+        for _bc in /usr/share/bash-completion/bash_completion /run/current-system/sw/share/bash-completion/bash_completion; do
+            [[ -f "$_bc" ]] && { source "$_bc"; break; }
+        done
     }
 
     COMP_LINE=$*

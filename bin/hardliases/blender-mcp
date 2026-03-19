@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+source _ko_nix.sh
+
+ME="$(basename "${0}")"
+BIN="$(nix_install_binary "${ME}" blender-mcp ~/prog/devel/flakes/blender-mcp)"
+
+exec "${BIN}" "${@}"

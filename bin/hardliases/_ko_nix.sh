@@ -32,7 +32,7 @@ function nix_install_binary {
         local path="${flake}#${derivation_name}"
         notify-send "Installing ${path} to use ${bin}"
         local before="$(date +%s)"
-        nix profile install ${extra} "${path}"
+        nix profile add ${extra} "${path}"
         local after="$(date +%s)"
         local elapsed="$((after - before))"
         if test ${elapsed} -ge 5

@@ -4,13 +4,22 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = import nixpkgs { inherit system; };
-      in {
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
         packages.default = pkgs.stdenv.mkDerivation rec {
           name = "logcli";
-          version = "2.8.7";
+          version = "2.8.8";
 
           dontUnpack = true;
           dontPatch = true;
@@ -32,10 +41,10 @@
             runHook postInstall
           '';
           src = pkgs.fetchurl {
-            url =
-              "https://github.com/grafana/loki/releases/download/v2.8.7/logcli-linux-amd64.zip";
+            url = "https://github.com/grafana/loki/releases/download/v${version}/logcli-linux-amd64.zip";
             sha256 = "sha256-Kxl8EBNY8ROeAsQlh7d5dfU35lFlQGu2qhdDA+JAC90=";
           };
         };
-      });
+      }
+    );
 }

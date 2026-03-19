@@ -2,9 +2,10 @@
 set -eu
 
 echo -n "not yet"|konix_xclip_in_all.sh
-CID="$(konix_screenshot.sh)"
+CID_WITH_EXT="$(konix_screenshot.sh)"
+CID="${CID_WITH_EXT%%\?*}"
 hash="${CID#/*/}"
-echo -n "${CID}?a.png"|konix_xclip_in_all.sh
+echo -n "${CID_WITH_EXT}"|konix_xclip_in_all.sh
 
 TMP="$(mktemp -d)"
 trap "rm -rf '${TMP}'" 0
@@ -12,6 +13,7 @@ trap "rm -rf '${TMP}'" 0
 pushd "${TMP}"
 {
     ipfs get "${hash}"
-    xclip -selection clipboard -t image/png -i "${hash}"
+    ext="${CID_WITH_EXT##*.}"
+    xclip -selection clipboard -t "image/${ext}" -i "${hash}"
 }
 popd

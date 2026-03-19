@@ -75,20 +75,21 @@
   (unless prompt
     (setq prompt "Message: ")
     )
-  (konix/read-string-with-cursor
-   "Message: "
-   (if-let* (
-             (code (konix/org-github-get-code))
-             (repo (konix/org-with-point-on-heading (org-entry-get (point) "KONIX_GH_REPO" t)))
-             (remote (string-trim (shell-command-to-string "git config remote.origin.url")))
-             (in-repo (and repo remote (string-match-p repo remote)))
-             )
-       (format " #%s" code)
-     ""
-     )
-   0
-   )
-
+  (let ((prefix (replace-regexp-in-string "_\\'" " " (or (konix/org-with-point-on-heading (org-entry-get (point) "KONIX_GH_COMMIT_PREFIX" t)) "")))
+        (suffix (if-let* (
+                          (code (konix/org-github-get-code))
+                          (repo (konix/org-with-point-on-heading (org-entry-get (point) "KONIX_GH_REPO" t)))
+                          (remote (string-trim (shell-command-to-string "git config remote.origin.url")))
+                          (in-repo (and repo remote (string-match-p repo remote)))
+                          )
+                    (format " #%s" code)
+                  ""
+                  )))
+    (konix/read-string-with-cursor
+     "Message: "
+     (concat prefix suffix)
+     (length prefix)
+     ))
   )
 
 (defun konix/diff/_assert-old-diff-line ()

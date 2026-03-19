@@ -2,22 +2,6 @@
 -- found (e.g. lgi). If LuaRocks is not installed, do nothing.
 pcall(require, "luarocks.loader")
 
--- Import Home Manager session variables so that awesome sees them.
-do
-   local lgi = require("lgi")
-   local GLib = lgi.GLib
-   local handle = io.popen("konix_hm_session_env.sh")
-   if handle then
-      for line in handle:lines() do
-         local name, value = line:match("^([^=]+)=(.*)$")
-         if name then
-            GLib.setenv(name, value, true)
-         end
-      end
-      handle:close()
-   end
-end
-
 local cyclefocus = require("awesome-cyclefocus")
 
 -- Standard awesome library
@@ -564,7 +548,7 @@ globalkeys = gears.table.join(
 		description = "open emacs",
 		group = "launcher",
 	}),
-	awful.key({ modkey, "Control" }, "c", open_or_join("chromium", "chromium"), {}),
+	awful.key({ modkey, "Control" }, "c", open_or_join("chromium-browser", "chromium"), {}),
 	awful.key({ modkey, "Control" }, "v", open_or_join("vlc", "vlc"), {
 		description = "open firefox",
 		group = "launcher",
@@ -978,7 +962,7 @@ awful.rules.rules = {
 	-- side stuff => less intrusive location
 	{ rule_any = { instance = { "slack", "pavucontrol" } }, properties = { tag = "2" } },
 	-- oamaflow out of my way
-	{ rule = { instance = "oamaflow", class = "qutebrowser" }, properties = { tag = "5" } },
+	{ rule_any = { class = { "oamaflow" } }, properties = { tag = "5" } },
 	-- emacs out of my way until it is ready to be used
 	{
 		rule = { class = "Emacs" },

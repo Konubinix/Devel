@@ -415,16 +415,32 @@ end
 -- {{{ Key bindings
 globalkeys = gears.table.join(
 	awful.key({ modkey, "Control" }, "Left", function()
+		local prev = client.focus
 		awful.client.focus.bydirection("left")
+		if client.focus == prev then
+			awful.screen.focus_bydirection("left")
+		end
 	end, { description = "focus by direction", group = "client" }),
 	awful.key({ modkey, "Control" }, "Right", function()
+		local prev = client.focus
 		awful.client.focus.bydirection("right")
+		if client.focus == prev then
+			awful.screen.focus_bydirection("right")
+		end
 	end, { description = "focus by direction", group = "client" }),
 	awful.key({ modkey, "Control" }, "Down", function()
+		local prev = client.focus
 		awful.client.focus.bydirection("down")
+		if client.focus == prev then
+			awful.screen.focus_bydirection("down")
+		end
 	end, { description = "focus by direction", group = "client" }),
 	awful.key({ modkey, "Control" }, "Up", function()
+		local prev = client.focus
 		awful.client.focus.bydirection("up")
+		if client.focus == prev then
+			awful.screen.focus_bydirection("up")
+		end
 	end, { description = "focus by direction", group = "client" }),
 	awful.key({ modkey }, "s", hotkeys_popup.show_help, {
 		description = "show help",
@@ -531,6 +547,9 @@ globalkeys = gears.table.join(
 	awful.key({ modkey, "Mod1" }, "Left", function()
 		awful.screen.focus_relative(-1)
 	end, { description = "focus the previous screen", group = "screen" }),
+	awful.key({ modkey, "Control" }, "o", function()
+		awful.screen.focus_relative(1)
+	end, { description = "focus the next screen", group = "screen" }),
 	awful.key({ modkey }, "u", awful.client.urgent.jumpto, {
 		description = "jump to urgent client",
 		group = "client",

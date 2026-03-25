@@ -372,12 +372,7 @@ MCP Parameters:
            (konix/mcp-server-unregister-all-tools)
            ;; Re-register with fresh schemas from the newly loaded code
            (konix/mcp-server-register-tools)
-           ;; Restart the transport process after a short delay so
-           ;; the current tool response can be sent first.
-           (run-at-time 1 nil
-                        (lambda ()
-                          (shell-command "konix_supervisorctl.sh restart mcp")))
-           (format "Reloaded %s%s and restarted MCP server (transport restarting in 1s)"
+           (format "Reloaded %s%s and re-registered tools"
                    server-file
                    (if introspection-file
                        (format " and %s" introspection-file)

@@ -28,7 +28,10 @@ function nix_install_binary {
             warn "nix not installed, won't be able to run ${bin_name}"
             exit 1
         fi
-        nix flake update --flake "${flake}"
+        if [[ "${flake}" == .* || "${flake}" == /* ]]
+        then
+            nix flake update --flake "${flake}"
+        fi
         local path="${flake}#${derivation_name}"
         notify-send "Installing ${path} to use ${bin}"
         local before="$(date +%s)"

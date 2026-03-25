@@ -255,6 +255,85 @@ MCP Parameters:
   (none)"
   (mcp-server-lib-with-error-handling
    (konix/mcp-server--get-agenda-content "ann")))
+;;; Org babel tools
+
+(defun konix/mcp-server-run-babel-block (buffer-name block-name &optional force)
+  "Execute a named org-babel source block and return its result.
+
+MCP Parameters:
+  buffer-name - Name of the buffer containing the org babel block
+  block-name - The #+NAME of the babel block to execute
+  force - When non-nil, bypass the cache and force re-evaluation"
+  (mcp-server-lib-with-error-handling
+   (konix/mcp-server-with-buffer buffer-name
+     (unless (derived-mode-p 'org-mode)
+       (error "Buffer %s is not in org-mode" buffer-name))
+     (save-excursion
+       (save-restriction
+         (widen)
+         (let ((pos (org-babel-find-named-block block-name)))
+           (unless pos
+             (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
+           (goto-char pos)
+           (let ((info (org-babel-get-src-block-info)))
+             (condition-case err
+                 (let ((result (org-babel-execute-src-block
+                                (when force t) info (when force '((:cache . "no"))))))
+                   (if result
+                       (format "%s" result)
+                     "Block executed successfully (no result returned)"))
+               (error
+                (let ((error-buf (get-buffer "*Org-Babel Error Output*")))
+                  (error "Babel execution error in block '%s' of buffer %s: %s\n%s"
+                         block-name buffer-name (error-message-string err)
+                         (if error-buf
+                             (with-current-buffer error-buf
+                               (buffer-substring-no-properties (point-min) (point-max)))
+                           ""))))))))))))
+
+(defun konix/mcp-server-tangle-babel-block (buffer-name block-name)
+  "Tangle a named org-babel source block, writing it to its :tangle target.
+
+MCP Parameters:
+  buffer-name - Name of the buffer containing the org babel block
+  block-name - The #+NAME of the babel block to tangle"
+  (mcp-server-lib-with-error-handling
+   (konix/mcp-server-with-buffer buffer-name
+     (unless (derived-mode-p 'org-mode)
+       (error "Buffer %s is not in org-mode" buffer-name))
+     (save-excursion
+       (goto-char (point-min))
+       (let ((found nil))
+         (while (and (not found)
+                     (re-search-forward
+                      (format "^[ \t]*#\\+NAME:[ \t]+%s[ \t]*$"
+                              (regexp-quote block-name))
+                      nil t))
+           (forward-line 1)
+           (when (looking-at "[ \t]*#\\+BEGIN_SRC\\|[ \t]*#\\+begin_src")
+             (setq found t)))
+         (unless found
+           (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
+         (org-babel-tangle '(4))
+         (format "Tangled block '%s' from buffer %s" block-name buffer-name))))))
+
+(defun konix/mcp-server-tangle-buffer (buffer-name)
+  "Tangle all source blocks in an org-mode buffer.
+
+Runs `org-babel-tangle' on the entire buffer, writing all blocks
+to their respective :tangle target files.
+
+MCP Parameters:
+  buffer-name - Name of the org-mode buffer to tangle"
+  (mcp-server-lib-with-error-handling
+   (konix/mcp-server-with-buffer buffer-name
+     (unless (derived-mode-p 'org-mode)
+       (error "Buffer %s is not in org-mode" buffer-name))
+     (let ((files (org-babel-tangle)))
+       (format "Tangled %d file(s) from buffer %s: %s"
+               (length files) buffer-name
+               (string-join files ", "))))))
+
 ;;; Server management tools
 
 (defun konix/mcp-server-get-server-location ()
@@ -674,6 +753,15 @@ WORKFLOW:
 3. Call propose_edit with buffer-name and edits (a JSON array of {\"old_string\": \"...\", \"new_string\": \"...\"} objects)
 
 Each old_string should include enough context to be unique (e.g., a whole function definition rather than just one line).")
+    (konix/mcp-server-run-babel-block
+     :id "run_babel_block"
+     :description "Execute a named org-babel source block in a buffer and return its result. The block must have a #+NAME: property. The buffer must be in org-mode.")
+    (konix/mcp-server-tangle-babel-block
+     :id "tangle_babel_block"
+     :description "Tangle a named org-babel source block in a buffer, writing its content to the file specified by its :tangle header argument. The block must have a #+NAME: property. The buffer must be in org-mode.")
+    (konix/mcp-server-tangle-buffer
+     :id "tangle_buffer"
+     :description "Tangle all source blocks in an org-mode buffer, writing each block to its :tangle target file. Use this instead of tangle_babel_block when you want to tangle the entire file at once.")
     (konix/mcp-server-spawn-agent
      :id "spawn_agent"
      :description "Spawn a new agent that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a sub-agent: call this tool, then use coord_post_task or coord_wait_for_answer to send it instructions. The spawned agent will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new agent' or 'in a sub-agent'.")

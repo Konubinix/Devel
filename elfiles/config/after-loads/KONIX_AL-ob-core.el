@@ -93,6 +93,8 @@ with :results file and :ipfa stuff -> use stuff as link description
 with :ipfa cid -> the result is the cid only (override the :results file setting)
 with :ipfa t -> the result is cid?filename (override the :results file setting), without the filename= part
      to be used with :results raw so as to generate inline images
+with :ipfa fig-link -> like t but wraps in #+attr_html/:link/:target _blank and [[...]]
+     so that ox-hugo generates a figure shortcode opening in a new tab
 "
   (when (assq :ipfa (third info))
     (shell-command "sleep 1 && sync")
@@ -112,12 +114,16 @@ with :ipfa t -> the result is cid?filename (override the :results file setting),
               (`(:ipfa ,(and (pred stringp) val)) val)
               (_ "bug")))
            (use-cid (string-equal "cid" (cdr (assq :ipfa (third info)))))
-           (use-no-filename (string-equal "t" (cdr (assq :ipfa (third info))))))
+           (use-no-filename (string-equal "t" (cdr (assq :ipfa (third info)))))
+           (use-fig-link (string-equal "fig-link" (cdr (assq :ipfa (third info))))))
       (setq result (cond
+                    (use-fig-link
+                     (let ((url (format "%s?%s" cid name)))
+                       (format "#+attr_html: :link %s :target _blank\n[[%s]]" url url)))
                     (use-no-filename (format "%s?%s" cid name))
                     (use-cid cid)
                     (t ipfa)))
-      (when (or use-cid use-no-filename) (setq result-params (delete "file" result-params)))
+      (when (or use-cid use-no-filename use-fig-link) (setq result-params (delete "file" result-params)))
       (setcdr (nth 2 info) (append `((:file-desc . ,name-to-use)) (cdr (nth 2 info))))))
   (apply orig-func result result-params info args))
 

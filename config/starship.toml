@@ -7,7 +7,7 @@ disabled = true
 [username]
 disabled = true
 [custom.userhost]
-command = 'n=$((0x$(printf "%s" "$HOSTNAME" | sha256sum | cut -c1-8))); c=$((n % 5 + 2)); s=$((n / 5 % 3)); case $s in 0) fmt=$(tput setaf $c);; 1) fmt="$(tput bold)$(tput setaf $c)";; 2) fmt="$(tput setab $c)$(tput bold)$(tput setaf 0)";; esac; echo "$USER@${fmt}${HOSTNAME}$(tput sgr0)"'
+command = 'n=$((0x$(printf "%s" "$HOSTNAME" | sha256sum | cut -c1-8))); c=$((n % 5 + 2)); s=$((n / 5 % 3)); case $s in 0) fmt=$(tput setaf $c);; 1) fmt="$(tput bold)$(tput setaf $c)";; 2) fmt="$(tput setab $c)$(tput bold)$(tput setaf 0)";; esac; echo "$USER@${fmt}${HOSTNAME}${DISPLAY}$(tput sgr0)"'
 when = "true"
 description = "show user and host names"
 style = "bold yellow"

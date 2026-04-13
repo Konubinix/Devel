@@ -17,9 +17,9 @@ function npx_run {
     local stamp_file="${XDG_CACHE_HOME:-$HOME/.cache}/${stamp_name}-npx-update"
 
     if [ -f "$stamp_file" ] && [ "$(date +%F)" = "$(cat "$stamp_file")" ]; then
-        npx --prefer-offline "$package" "$@"
+        npx --yes --prefer-offline "$package" "$@"
     else
-        npx "$package@latest" "$@"
         date +%F > "$stamp_file"
+        npx --yes "$package@latest" "$@"
     fi
 }

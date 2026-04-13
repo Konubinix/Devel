@@ -33,8 +33,8 @@
   (interactive)
   (setq-default
    kubel-context (replace-regexp-in-string
-                  "\n" "" (kubel--exec-to-string "kubectl config current-context"))
-   kubel-namespace (let ((ns (kubel--exec-to-string "kubectl config view --minify --output 'jsonpath={..namespace}'")))
+                  "\n" "" (kubel--exec-sync "kubectl config current-context"))
+   kubel-namespace (let ((ns (kubel--exec-sync "kubectl config view --minify --output 'jsonpath={..namespace}'")))
                      (if (string= ns "")
                          "default"
                        ns))))
@@ -45,7 +45,7 @@
         (setq-default
          kubel-context (completing-read
                         "Select context: "
-                        (split-string (kubel--exec-to-string (format "%s config view -o jsonpath='{.contexts[*].name}'" kubel-kubectl)) " "))
+                        (split-string (kubel--exec-sync (format "%s config view -o jsonpath='{.contexts[*].name}'" kubel-kubectl)) " "))
          kubel-namespace (completing-read "Namespace: " (kubel--list-namespace)
                                           nil nil nil nil "default"))
         (shell-command (format "clk k8s go %s --namespace %s" kubel-context kubel-namespace)))
@@ -106,11 +106,11 @@ the context caches, including the cached resource list."
   (let* (
          (context (completing-read
                    "Select context: "
-                   (split-string (kubel--exec-to-string (format "%s config view -o jsonpath='{.contexts[*].name}'" kubel-kubectl)) " ")))
+                   (split-string (kubel--exec-sync (format "%s config view -o jsonpath='{.contexts[*].name}'" kubel-kubectl)) " ")))
          (changed (not (s-equals-p context kubel-context)))
          )
     (kubel-open context
-                (let ((ns (kubel--exec-to-string (format "kubectl --context %s config view --minify --output 'jsonpath={..namespace}'" context))))
+                (let ((ns (kubel--exec-sync (format "kubectl --context %s config view --minify --output 'jsonpath={..namespace}'" context))))
                   (if (string= ns "")
                       "default"
                     ns))

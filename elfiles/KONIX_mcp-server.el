@@ -625,8 +625,8 @@ FIRST, do these setup steps in order:
    c. Report results using coord_complete_task.
    d. Go back to step (a) and wait for the next task.
 
-Stay in this loop until you are told to stop."
-                          task agent-name agent-name))
+Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, call kill_agent with your own name \"%s\" to clean yourself up."
+                          task agent-name agent-name agent-name))
           (config (agent-shell-anthropic-make-claude-code-config)))
      (unless (file-directory-p directory)
        (error "Directory does not exist: %s" directory))
@@ -667,7 +667,7 @@ Stay in this loop until you are told to stop."
          (setq-local konix/mcp-server--coordinated-agent t)
          (setq-local konix/mcp-server--agent-name agent-name)
          (shell-maker-submit :input prompt))
-       (format "Spawned coordinated agent '%s' in buffer '%s' with directory %s. The agent will register as \"%s\" in the coordination system. Use coord_post_task or coord_wait_for_answer with to_agent=\"%s\" to send it work."
+       (format "Spawned coordinated agent '%s' in buffer '%s' with directory %s. The agent will register as \"%s\" in the coordination system. Use coord_post_task or coord_ask_and_wait with to_agent=\"%s\" to send it work."
                agent-name (buffer-name shell-buffer) directory agent-name agent-name)))))
 
 (defun konix/mcp-server--find-agent-buffer (agent-name)
@@ -758,7 +758,7 @@ Each old_string should include enough context to be unique (e.g., a whole functi
      :description "Tangle all source blocks in an org-mode buffer, writing each block to its :tangle target file. Use this instead of tangle_babel_block when you want to tangle the entire file at once.")
     (konix/mcp-server-spawn-agent
      :id "spawn_agent"
-     :description "Spawn a new agent that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a sub-agent: call this tool, then use coord_post_task or coord_wait_for_answer to send it instructions. The spawned agent will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new agent' or 'in a sub-agent'.")
+     :description "Spawn a new agent that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a sub-agent: call this tool, then use coord_post_task or coord_ask_and_wait to send it instructions. The spawned agent will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new agent' or 'in a sub-agent'. IMPORTANT: When the agent's goal is accomplished, you MUST call kill_agent to clean it up.")
     (konix/mcp-server-kill-agent
      :id "kill_agent"
      :description "Kill a coordinated agent that was previously spawned with spawn_agent. Use this to clean up a sub-agent when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_agent (refuses to kill other buffers).")

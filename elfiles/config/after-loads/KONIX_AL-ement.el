@@ -170,7 +170,7 @@
    )
   (when (and tracking-buffers
              (not (derived-mode-p 'ement-room-mode)))
-    (pop-to-buffer (car tracking-buffers)))
+    (switch-to-buffer (car tracking-buffers)))
   (message "Done updating all tracked unread rooms")
   )
 

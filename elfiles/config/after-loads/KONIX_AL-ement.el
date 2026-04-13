@@ -161,6 +161,8 @@
 (remove-hook 'ement-notify-notification-predicates 'ement-notify--room-buffer-live-p)
 
 
+(add-hook 'konix/tracking-update-functions #'konix/ement-update-tracking-unread-all)
+
 (defun konix/ement-update-tracking-unread-all (&rest args)
   (interactive)
   (->>

@@ -26,5 +26,9 @@
 
 (add-to-list 'auto-mode-alist '("\\.dsl\\'" . structurizr-mode))
 
+(add-to-list 'magic-mode-alist
+             '("#!.*nix-shell\n#!nix-shell -i python" . python-mode))
+
+
 (provide '990-KONIX-auto-mode-alist)
 ;;; 990-KONIX-auto-mode-alist.el ends here

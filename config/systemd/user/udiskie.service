@@ -1,0 +1,12 @@
+[Install]
+WantedBy=graphical-session.target
+
+[Service]
+ExecStart=%h/.nix-profile/bin/udiskie
+
+[Unit]
+After=graphical-session.target
+After=tray.target
+Description=udiskie mount daemon
+PartOf=graphical-session.target
+Requires=tray.target

@@ -692,6 +692,11 @@ MCP Parameters:
        (error "No coordinated agent found with name '%s'" agent-name))
      (let ((buf-name (buffer-name buffer)))
        (kill-buffer buffer)
+       (let ((url-request-method "DELETE")
+             (url (format "%s/coord/agents/%s"
+                          konix/mcp-server-coord-url
+                          (url-hexify-string agent-name))))
+         (url-retrieve-synchronously url t nil 5))
        (format "Killed coordinated agent '%s' (buffer '%s')" agent-name buf-name)))))
 
 ;;; Tool registration

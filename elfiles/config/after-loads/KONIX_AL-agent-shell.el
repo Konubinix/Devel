@@ -27,8 +27,18 @@
 (require 'KONIX_mcp-server)
 (require 'mcp-server-lib-commands)
 
+(setq agent-shell-viewport--suffix " ▸")
+
 (require 'KONIX_AL-shell-maker)
 (require 'KONIX_claude-code-usage)
+
+(setq-default acp-logging-enabled t)
+(setq-default agent-shell-prefer-viewport-interaction t)
+(setq-default agent-shell-session-strategy 'new)
+
+(defun konix/agent-shell-toggle-prefer-viewport-interaction ()
+  (interactive)
+  (setq-default agent-shell-prefer-viewport-interaction (not agent-shell-prefer-viewport-interaction)))
 
 (let ((script (expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory)))
   (unless (file-exists-p script)
@@ -59,6 +69,12 @@
     ("appium-mcp"
      (name . "appium-mcp")
      (command . "appium-mcp")
+     (args . [])
+     (env . []))
+
+    ("blender-mcp"
+     (name . "blender-mcp")
+     (command . "blender-mcp")
      (args . [])
      (env . [])))
   "Alist of (NAME . SERVER-CONFIG) for all available MCP servers.")
@@ -115,21 +131,75 @@
 (setq-default agent-shell-show-welcome-message nil)
 
 
-(setq-default agent-shell-anthropic-claude-acp-command '("claude-code-acp"))
+(defvar konix/agent-shell-presets
+  `(("default"
+     :acp-command ("claude-agent-acp")
+     :mcp-servers (((name . "konix-mcp")
+                    (type . "http")
+                    (url . "http://192.168.2.5:9920/mcp")
+                    (headers . []))
+                   ((name . "konix-emacs")
+                    (command . "bash")
+                    (args . [,(expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory)
+                             "--init-function=konix/mcp-server-start"
+                             "--stop-function=konix/mcp-server-stop"
+                             "--server-id=konix-emacs-mcp"])
+                    (env . []))))
+    ("remote"
+     :acp-command ("claude" "--agent")
+     :mcp-servers (((name . "konix-mcp")
+                    (type . "http")
+                    (url . "http://192.168.2.5:9920/mcp")
+                    (headers . [])))))
+  "Named presets for agent-shell sessions.
+Each entry is (NAME . PLIST) with :acp-command and :mcp-servers keys.
+:acp-command is a list of strings (command + args).
+:mcp-servers is a list of MCP server alists (full config).")
 
-(setq-default agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config))
+(setq-default agent-shell-anthropic-claude-acp-command '("claude-agent-acp"))
+
+(defun konix/agent-shell-pick-preset ()
+  "Pick a preset and start `agent-shell' with its ACP command, MCP servers and cwd."
+  (interactive)
+  (let* ((names (mapcar #'car konix/agent-shell-presets))
+         (choice (completing-read "Agent preset: " names nil t))
+         (preset (cdr (assoc choice konix/agent-shell-presets)))
+         (cmd (plist-get preset :acp-command))
+         (mcp-servers (plist-get preset :mcp-servers))
+         (cwd (plist-get preset :cwd))
+         (session-id (plist-get preset :session-id))
+         (config (agent-shell-anthropic-make-claude-code-config)))
+    (setf (alist-get :buffer-name config)
+          (format "Claude Code [%s]" choice))
+    (setf (alist-get :client-maker config)
+          (lambda (buffer)
+            (let ((agent-shell-anthropic-claude-acp-command cmd))
+              (agent-shell-anthropic-make-claude-client :buffer buffer))))
+    (let ((shell-buffer (agent-shell--start :config config
+                                            :new-session t
+                                            :no-focus nil
+                                            :session-id session-id)))
+      (with-current-buffer shell-buffer
+        (setq-local agent-shell-mcp-servers mcp-servers)
+        (when cwd
+          (setq-local agent-shell-cwd-function (lambda () cwd)))))))
+
+;; Keep buffer names short so tracking mode-line stays readable
+(setq-default agent-shell-buffer-name-format
+              (lambda (_agent-name project-name)
+                (format "A@%s" project-name)))
+
+(setq-default agent-shell-preferred-agent-config 'claude-code)
 
 (defun konix/agent-shell/toggle-preferred-agent ()
   "Toggle `agent-shell-preferred-agent-config' between Claude Code and Gemini."
   (interactive)
-  (let ((claude-config (agent-shell-anthropic-make-claude-code-config))
-        (gemini-config (agent-shell-google-make-gemini-config)))
-    (if (equal agent-shell-preferred-agent-config claude-config)
-        (progn
-          (setq-default agent-shell-preferred-agent-config gemini-config)
-          (message "Preferred agent set to Gemini"))
-      (setq-default agent-shell-preferred-agent-config claude-config)
-      (message "Preferred agent set to Claude Code"))))
+  (if (eq agent-shell-preferred-agent-config 'claude-code)
+      (progn
+        (setq-default agent-shell-preferred-agent-config 'gemini-cli)
+        (message "Preferred agent set to Gemini"))
+    (setq-default agent-shell-preferred-agent-config 'claude-code)
+    (message "Preferred agent set to Claude Code")))
 
 (defun konix/agent-shell/set-preferred-agent-dwim ()
   (interactive)
@@ -143,26 +213,30 @@
              (limit-type (if (>= wait-7d wait-5h) "weekly" "5-hour")))
         (if (<= wait-seconds 0)
             (progn
-              (setq-default agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config))
+              (setq-default agent-shell-preferred-agent-config 'claude-code)
               (message "Preferred agent set to Claude Code"))
           (progn
-            (setq-default agent-shell-preferred-agent-config (agent-shell-google-make-gemini-config))
+            (setq-default agent-shell-preferred-agent-config 'gemini-cli)
             (message "Claude Code %s usage is high, falling back to Gemini for %s"
                      limit-type
                      (konix/claude-code--format-duration wait-seconds)))))
     (error
      (message "Error getting Claude Code usage: %s" (error-message-string err))
-     (setq-default agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config)))))
+     (setq-default agent-shell-preferred-agent-config 'claude-code))))
 
 (defun konix/agent-shell/scroll-or-track ()
   "Scroll down a page, or cycle tracking if at end of buffer.
 At the prompt, insert a space."
   (interactive)
-  (if (and (shell-maker-point-at-last-prompt-p) (not (shell-maker-busy)))
+  (if (and (eq major-mode 'agent-shell-mode) (shell-maker-point-at-last-prompt-p) (not (shell-maker-busy)))
       (self-insert-command 1)
     (cond
      ((and (= (window-end) (point-max)) (= (point) (point-max)))
-      (tracking-next-buffer))
+      (when (and (not tracking-buffers) (not tracking-start-buffer))
+        (konix/agent-shell-track-ready-buffers))
+      (let ((old (current-buffer)))
+          (tracking-next-buffer)
+          (bury-buffer old)))
      ((= (window-end) (point-max))
       (goto-char (point-max)))
      (t
@@ -186,20 +260,46 @@ At the prompt, insert a space."
   "Scroll up a page, moving to beginning of buffer if near the top.
 At the prompt, delete backward."
   (interactive)
-  (if (and (shell-maker-point-at-last-prompt-p) (not (shell-maker-busy)))
+  (if (and (eq major-mode 'agent-shell-mode) (shell-maker-point-at-last-prompt-p) (not (shell-maker-busy)))
       (delete-backward-char 1)
     (if (= (window-start) (point-min))
         (goto-char (point-min))
       (scroll-down-command))))
 
-(defun konix/agent-shell (&optional arg)
+(defun konix/agent-shell (&optional arg strategy)
   "Save current buffer if region is active, then call `agent-shell'.
 Passes ARG through to `agent-shell'."
   (interactive "P")
   (when (and (use-region-p) buffer-file-name (buffer-modified-p))
     (save-buffer))
-  (cl-letf (((symbol-function 'y-or-n-p) (lambda (_prompt) t)))
+  (let ((agent-shell-session-strategy (or strategy agent-shell-session-strategy)))
     (agent-shell arg)))
+
+(defun konix/agent-shell-resume (&optional arg)
+  (interactive "P")
+  (konix/agent-shell arg 'prompt))
+
+(defun konix/agent-shell-viewport-interrupt-no-confirm ()
+  (interactive)
+  (let ((agent-shell-confirm-interrupt nil))
+    (agent-shell-viewport-interrupt)))
+
+(defun konix/agent-shell-viewport-interrupt-no-confirm-and-reply ()
+  (interactive)
+  (ignore-errors (konix/agent-shell-viewport-interrupt-no-confirm))
+  (if (not (agent-shell-viewport--busy-p))
+      (agent-shell-viewport-reply)
+    (let ((viewport-buffer (current-buffer))
+          token)
+      (setq token
+            (agent-shell-subscribe-to
+             :shell-buffer (agent-shell-viewport--shell-buffer)
+             :event 'turn-complete
+             :on-event (lambda (_event)
+                         (agent-shell-unsubscribe :subscription token)
+                         (with-current-buffer viewport-buffer
+                           (agent-shell-viewport-reply))))))))
+
 
 (define-key agent-shell-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)
 (define-key agent-shell-viewport-view-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)
@@ -234,17 +334,24 @@ Passes ARG through to `agent-shell'."
 (cl-defun konix/agent-shell--on-request/notify (&key state acp-request)
   (let-alist acp-request
     (cond ((equal .method "session/request_permission")
-           (tracking-add-buffer (current-buffer))
-           (when (or (konix/should-notify-p)
-                     (konix/shell-maker--idle-since-input-p))
-             (let* ((name (buffer-name))
-                    (elapsed (if konix/agent-shell--request-start-time
-                                 (float-time (time-subtract (current-time)
-                                                            konix/agent-shell--request-start-time))
-                               0))
-                    (elapsed-str (konix/claude-code--format-duration elapsed)))
-               (konix/notify (format "Permission needed for %s in %s (after %s)" .method name elapsed-str))
-               (shell-command (format "clk ntfy 'Permission needed for %s in %s (after %s)'" .method name elapsed-str)))))
+           (tracking-add-buffer (if agent-shell-prefer-viewport-interaction
+                                    (or (agent-shell-viewport--buffer :shell-buffer (current-buffer) :existing-only t)
+                                        (current-buffer))
+                                  (current-buffer)))
+           (let* ((notify-buf (if agent-shell-prefer-viewport-interaction
+                                  (or (agent-shell-viewport--buffer :shell-buffer (current-buffer) :existing-only t)
+                                      (current-buffer))
+                                (current-buffer)))
+                  (level (or (konix/get-notification-level notify-buf)
+                             (and (konix/shell-maker--idle-since-input-p) :flash))))
+             (when level
+               (let* ((name (buffer-name))
+                      (elapsed (if konix/agent-shell--request-start-time
+                                   (float-time (time-subtract (current-time)
+                                                              konix/agent-shell--request-start-time))
+                                 0))
+                      (elapsed-str (konix/claude-code--format-duration elapsed)))
+                 (konix/do-notify level (format "Permission needed for %s in %s (after %s)" .method name elapsed-str))))))
           ((equal .method "fs/read_text_file")
            )
           ((equal .method "fs/write_text_file")
@@ -283,10 +390,19 @@ Does not switch focus to agent-shell."
           (shell-maker-submit :input prompt))))))
 
 (defun konix/agent-shell-pop-to-buffer ()
-  "Select a running agent-shell buffer and pop to it."
+  "Select a running agent-shell buffer and pop to it.
+When `agent-shell-prefer-viewport-interaction' is set, pop to the
+viewport buffer instead if one exists."
   (interactive)
   (if-let ((buffers (agent-shell-buffers)))
-      (let* ((buffer-names (mapcar #'buffer-name buffers))
+      (let* ((display-buffers
+              (if agent-shell-prefer-viewport-interaction
+                  (mapcar (lambda (buf)
+                            (or (agent-shell-viewport--buffer :shell-buffer buf :existing-only t)
+                                buf))
+                          buffers)
+                buffers))
+             (buffer-names (mapcar #'buffer-name display-buffers))
              (other-buffers (remove (buffer-name) buffer-names))
              (candidates (if other-buffers other-buffers buffer-names))
              (choice (completing-read "Pop to agent-shell buffer: " candidates nil t)))
@@ -313,14 +429,86 @@ a pending permission request."
         (with-current-buffer buf
           (when (or (not (shell-maker-busy))
                     (konix/agent-shell--has-permission-button-p))
-            (tracking-add-buffer buf)
-            (cl-incf tracked)
-            (setq last-ready buf)))))
+            (let ((track-buf (if agent-shell-prefer-viewport-interaction
+                                 (agent-shell-viewport--buffer :shell-buffer buf :existing-only t)
+                               buf)))
+              (when track-buf
+                (tracking-add-buffer track-buf)
+                (cl-incf tracked)
+                (setq last-ready track-buf)))))))
     (when (and last-ready
                (or (not (derived-mode-p 'agent-shell-mode))
                    (and (shell-maker-busy)
                         (not (konix/agent-shell--has-permission-button-p)))))
-      (pop-to-buffer last-ready))
+      (switch-to-buffer last-ready))
     (message "Tracked %d ready agent-shell buffer%s (out of %d)" tracked (if (= tracked 1) "" "s") (length buffers))))
+
+(defun konix/agent-shell-viewport--insert-separator ()
+  "Insert a horizontal line separator at the end of the viewport buffer."
+  (let ((inhibit-read-only t))
+    (save-excursion
+      (goto-char (point-max))
+      (insert (propertize
+               (concat "\n" (make-string (window-width) ?─) "\n")
+               'face '(:foreground "gray50")
+               'agent-shell-turn-separator t)))))
+
+(defun konix/agent-shell--subscribe-turn-complete ()
+  "Subscribe to turn-complete to show a visual separator in viewport."
+  (let ((shell-buf (current-buffer)))
+    (agent-shell-subscribe-to
+     :shell-buffer shell-buf
+     :event 'turn-complete
+     :on-event
+     (lambda (_event)
+       (when-let ((viewport-buffer (agent-shell-viewport--buffer
+                                    :shell-buffer shell-buf
+                                    :existing-only t)))
+         (with-current-buffer viewport-buffer
+           (when (derived-mode-p 'agent-shell-viewport-view-mode)
+             (konix/agent-shell-viewport--insert-separator))))))))
+
+(defun konix/agent-shell-hook ()
+  "Hook for agent-shell-mode."
+  (konix/agent-shell-track-ready-buffers)
+  (konix/agent-shell--subscribe-turn-complete))
+
+(add-hook 'agent-shell-mode-hook #'konix/agent-shell-hook)
+
+(defun konix/agent-shell-dot-subdir-in-emacs-d (subdir)
+  "Return an agent-shell SUBDIR path under `user-emacs-directory'.
+Sanitizes `agent-shell-cwd' so each project gets its own namespace
+under agent-shell/."
+  (let* ((cwd (agent-shell-cwd))
+         (sanitized (string-trim-left
+                     (replace-regexp-in-string "/" "-" cwd)
+                     "-")))
+    (expand-file-name
+     (concat "agent-shell/" sanitized "/" subdir)
+     user-emacs-directory)))
+
+(setq-default agent-shell-dot-subdir-function #'konix/agent-shell-dot-subdir-in-emacs-d)
+
+(defun konix/agent-shell-viewport-view-mode-hook ()
+  (visual-line-mode))
+
+(add-hook 'agent-shell-viewport-view-mode-hook
+          #'konix/agent-shell-viewport-view-mode-hook)
+
+(defun konix/agent-shell-viewport-edit-mode-hook ()
+  (orgalist-mode))
+
+(add-hook 'agent-shell-viewport-edit-mode-hook #'konix/agent-shell-viewport-edit-mode-hook)
+
+(defface konix/agent-shell-wait '((t :foreground "cyan")) "")
+(defface konix/agent-shell-error '((t :foreground "orange")) "")
+
+(defun konix/agent-shell-status-config-advice (config)
+  (pcase (map-elt config :label)
+    ("wait" (setf (map-elt config :face) 'konix/agent-shell-wait))
+    ("error" (setf (map-elt config :face) 'konix/agent-shell-error)))
+  config)
+
+(advice-add 'agent-shell--status-config :filter-return #'konix/agent-shell-status-config-advice)
 
 ;;; KONIX_AL-agent-shell.el ends here

@@ -4703,6 +4703,8 @@ With `ID', set the ID instead of the CUSTOM_ID."
   )
 
 (setq-default org-babel-python-command "python3")
+;; Python indentation is tricky and easily messed up by org mode
+(add-to-list 'org-babel-default-header-args:python '(:preserve-indentation . t))
 (setq-default org-sort-agenda-noeffort-is-high nil)
 
 (defun konix/org-get-contexts nil

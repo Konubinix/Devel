@@ -638,7 +638,8 @@ Stay in this loop until you are told to stop."
            (format "Claude Code [%s]" agent-name))
      (let ((shell-buffer (agent-shell--start :config config
                                              :new-session t
-                                             :no-focus t)))
+                                             :no-focus t
+                                             :session-strategy 'new-deferred)))
        (with-current-buffer shell-buffer
          (setq-local agent-shell-cwd-function (lambda () directory))
          (setq-local agent-shell-mcp-servers

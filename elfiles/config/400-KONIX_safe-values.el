@@ -55,8 +55,10 @@
 (add-to-list 'safe-local-variable-values '(ispell-dictionary . "francais"))
 (add-to-list 'safe-local-variable-values '(eval hl-line-mode t))
 (add-to-list 'safe-local-variable-values '(auto-revert-mode . t))
-(add-to-list 'safe-local-variable-values '(konix/delete-trailing-whitespace))
 (add-to-list 'safe-local-variable-values '(konix/delete-trailing-whitespace . t))
+(add-to-list 'safe-local-variable-values '(org-id-link-to-org-use-id))
+(add-to-list 'safe-local-variable-values '(org-babel-default-header-args:python . ((:preserve-indentation . t))))
+
 
 
 (provide '400-KONIX_safe-values)

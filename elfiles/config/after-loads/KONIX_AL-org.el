@@ -5368,24 +5368,26 @@ With `ID', set the ID instead of the CUSTOM_ID."
   )
 (ad-activate 'org-open-at-point)
 
-(defun konix/org-next-sibbling nil
+(defun konix/org-next-sibbling (&optional states)
   (let (
-        (start-point (point))
+        (prev-point (point))
+        (found nil)
         )
     (save-restriction
       (save-excursion
         (org-up-heading-safe)
         (org-narrow-to-subtree)
         )
-      (org-next-visible-heading 1)
-      (if (eq (point-max) (point))
-          (progn
-            (goto-char start-point)
-            nil
-            )
-        t
-        )
+      (org-forward-heading-same-level 1)
+      (while (and (not (eq (point) prev-point))
+                  (not found)
+                  (not (eq (point-max) (point))))
+        (org-forward-heading-same-level 1)
+        (when (or (null states)
+              (member (org-get-todo-state) states))
+          (setq found t)))
       )
+    found
     )
   )
 
@@ -5403,7 +5405,7 @@ With `ID', set the ID instead of the CUSTOM_ID."
         (org-up-heading-safe)
         (setq parent-id (konix/org-get-id))
         )
-      (setq on-next-sibbling (konix/org-next-sibbling))
+      (setq on-next-sibbling (konix/org-next-sibbling '("NEXT" "TODO")))
       (when on-next-sibbling
         (org-clock-in)
         )

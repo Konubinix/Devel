@@ -24,9 +24,9 @@
 
 ;;; Code:
 (require 'lsp-mode)
-;; (require 'dap-js-debug)
+(require 'dap-js)
 (require 'lsp-angular)
-;; (dap-js-debug-setup)
+
 
 (defun konix/typescript-mode-hook ()
   (lsp)

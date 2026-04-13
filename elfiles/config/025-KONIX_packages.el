@@ -167,6 +167,7 @@
   (use-package ol-emacs-slack :straight (:type git :host github :repo "ag91/ol-emacs-slack"))
   (use-package ol-notmuch)
   (use-package orderless)
+  (use-package orgalist)
   (use-package org-checklist :straight org-contrib)
   (use-package org-edna)
   (use-package org-drill

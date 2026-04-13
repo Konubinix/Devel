@@ -139,7 +139,7 @@
 (keymap-global-set "C-x 1" 'sticky-window-delete-other-windows)
 (keymap-global-set "C-x 9" 'sticky-window-toggle-dedicated)
 (keymap-global-set "C-x 7" 'konix/toggle-window-resizable)
-(keymap-set ctl-x-4-map "t" 'toggle-window-split)
+(keymap-set ctl-x-4-map "t" 'konix/toggle-window-split)
 
 ;; ####################################################################################################
 ;; Slow keymap keys

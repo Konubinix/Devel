@@ -232,6 +232,30 @@ Uses straight.el to resolve package locations and dependencies."
            append (cons (car dep) (konix/flatten-deps (cdr dep)))
            else collect dep))
 
+(defun konix/toggle-window-split ()
+  "Toggle between horizontal and vertical split.
+When there are exactly two windows, switch between them being
+side-by-side (vertical split) and stacked (horizontal split)."
+  (interactive)
+  (unless (= (count-windows) 2)
+    (user-error "Can only toggle split with exactly 2 windows"))
+  (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-start (window-start))
+         (next-win-start (window-start (next-window)))
+         (splitter
+          (if (= (car this-win-edges) (car next-win-edges))
+              #'split-window-horizontally
+            #'split-window-vertically)))
+    (delete-other-windows)
+    (funcall splitter)
+    (set-window-buffer (selected-window) this-win-buffer)
+    (set-window-buffer (next-window) next-win-buffer)
+    (set-window-start (selected-window) this-win-start)
+    (set-window-start (next-window) next-win-start)))
+
 (defun konix/straight-update-and-rebuild-package (package)
   "Update PACKAGE and its dependencies from remote, then rebuild all.
 This pulls the package and its transitive dependencies from their

@@ -452,6 +452,42 @@
 (add-hook 'ement-after-initial-sync-hook
           #'konix/ement-after-initial-sync/find-unseen-reactions)
 
+;; preserve reactions on edited messages
+
+(defun konix/ement-event-hook/copy-reactions-to-replacement (event room session)
+  "Copy reactions from original event to replacement event."
+  (when-let* ((content (ement-event-content event))
+              (relates (alist-get 'm.relates_to content))
+              (_ (string-equal (alist-get 'rel_type relates) "m.replace"))
+              (original-id (alist-get 'event_id relates))
+              (original-event (gethash original-id (ement-session-events session)))
+              (reactions (map-elt (ement-event-local original-event) 'reactions)))
+    (setf (map-elt (ement-event-local event) 'reactions) reactions)))
+
+(add-hook 'ement-event-hook #'konix/ement-event-hook/copy-reactions-to-replacement)
+
+;; fix ewoc invalidation for reactions on edited messages
+(ement-room-defevent "m.reaction"
+  (pcase-let* (((cl-struct ement-event content) event)
+               ((map ('m.relates_to relates-to)) content)
+               ((map ('event_id related-id) ('rel_type rel-type) _key) relates-to))
+    (pcase rel-type
+      ("m.annotation"
+       (if-let ((related-event (cl-loop with fake-event = (make-ement-event :id related-id)
+                                        for timeline-event in (ement-room-timeline ement-room)
+                                        when (ement--events-equal-p fake-event timeline-event)
+                                        return timeline-event)))
+           (progn
+             (cl-pushnew event (map-elt (ement-event-local related-event) 'reactions))
+             (when-let ((nodes (ement-room--ewoc-last-matching ement-ewoc
+                                 (lambda (data)
+                                   (and (ement-event-p data)
+                                        (ement--events-equal-p
+                                         (make-ement-event :id related-id)
+                                         data))))))
+               (ewoc-invalidate ement-ewoc nodes)))
+         (ement-debug "No known related event for" event))))))
+
 ;; mentions
 
 (defvar konix/ement-room--event-mentions-user-p/puppets '())

@@ -46,17 +46,22 @@ since the input was submitted."
   "Notify when shell-maker response is complete.
 Only notifies if input has been submitted at least once (not on initial buffer creation)."
   (when konix/shell-maker--input-time
-    (let ((buffer (current-buffer)))
-      (tracking-add-buffer buffer)
-      (when (or (konix/should-notify-p)
-                (konix/shell-maker--idle-since-input-p))
-        (let* ((name (buffer-name))
-               (elapsed (time-subtract (current-time) konix/shell-maker--input-time))
-               (elapsed-secs (float-time elapsed))
-               (human-time (format-seconds "%hh %mm %ss%z" elapsed-secs))
-               (msg (format "%s (%s)" name human-time)))
-          (konix/notify msg)
-          (shell-command (format "clk ntfy '%s'" msg)))))))
+    (let* ((buffer (current-buffer))
+           (track-buf (if (and (bound-and-true-p agent-shell-prefer-viewport-interaction)
+                               (fboundp 'agent-shell-viewport--buffer))
+                          (or (agent-shell-viewport--buffer :shell-buffer buffer :existing-only t)
+                              buffer)
+                        buffer)))
+      (tracking-add-buffer track-buf)
+      (let ((level (or (konix/get-notification-level track-buf)
+                       (and (konix/shell-maker--idle-since-input-p) :flash))))
+        (when level
+          (let* ((name (buffer-name))
+                 (elapsed (time-subtract (current-time) konix/shell-maker--input-time))
+                 (elapsed-secs (float-time elapsed))
+                 (human-time (format-seconds "%hh %mm %ss%z" elapsed-secs))
+                 (msg (format "%s (%s)" name human-time)))
+            (konix/do-notify level msg)))))))
 
 (advice-add #'shell-maker-finish-output :before #'konix/shell-maker-finish-output/notify)
 

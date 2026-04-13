@@ -89,5 +89,23 @@
 
 (keymap-set tracking-mode-map "C-c b" 'konix/tracking-buffers-list)
 
+(defvar konix/tracking-update-functions nil
+  "Hook run to refresh tracking sources when no buffers are tracked.
+Each function should add relevant buffers to tracking via `tracking-add-buffer'.")
+
+(defun konix/tracking-next-buffer ()
+  "Like `tracking-next-buffer', but refresh tracking sources if empty.
+When there are no tracked buffers and no start buffer to return to,
+run `konix/tracking-update-functions' to populate tracking, then retry."
+  (interactive)
+  (if (or tracking-buffers tracking-start-buffer)
+      (tracking-next-buffer)
+    (run-hooks 'konix/tracking-update-functions)
+    (if (or tracking-buffers tracking-start-buffer)
+        (tracking-next-buffer)
+      (message "No tracked buffers"))))
+
+(keymap-set tracking-mode-map "C-c C-n" 'konix/tracking-next-buffer)
+
 (provide 'KONIX_AL-tracking)
 ;;; KONIX_AL-tracking.el ends here

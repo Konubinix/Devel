@@ -324,7 +324,7 @@
      ((string-match "^\\(http.+\\(\\.stl\\)\\)$" url)
       (format "
 {{{stlview(%s,%s)}}}
-([[%s][{{{icon(fas fa-download)}}}]])"
+@@html:<a href=\"%s\"><i class=\"fas fa-download\"></i></a>@@"
               url (md5 url)
               url
               )

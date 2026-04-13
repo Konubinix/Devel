@@ -34,7 +34,13 @@ fi
 clk gpg decrypt dir "${KONIX_PERSO_DIR}/msmtprc_nd" msmtprc
 LOGFILE="$(mktemp)"
 trap "rm -f ${LOGFILE}" 0
-msmtpq -t --read-envelope-from -oi -C "/run/user/$(id -u)/msmtprc/config" --aliases="${KONIX_MSMTP_ALIASES}" --logfile "${LOGFILE}" "$@" || {
+# msmtpq uses set -o errexit and flushes its queue after sending, so it may
+# return non-zero even when the current mail was sent successfully. Use the
+# msmtp logfile (which records exitcode=EX_OK on success) as the source of
+# truth instead.
+msmtpq -t --read-envelope-from -oi -C "/run/user/$(id -u)/msmtprc/config" --aliases="${KONIX_MSMTP_ALIASES}" --logfile="${LOGFILE}" "$@" > /dev/null 2>&1 || true
+if ! grep -q "exitcode=EX_OK" "${LOGFILE}" 2>/dev/null
+then
     cat "${LOGFILE}"
     exit 1
-}
+fi

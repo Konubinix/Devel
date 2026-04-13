@@ -120,3 +120,6 @@
 /Deskflow
 /mozilla
 /feh
+/bws
+/environment.d
+/systemd/user/tray.target

@@ -92,7 +92,7 @@ def use_relative_links(html, directory="."):
 
 
 def make_part_harmless(html):
-    s = bs(html, "lxml-xml")
+    s = bs(html, "html.parser")
     for img in s.find_all("img", src=True):
         if img.attrs["src"].startswith("data:"):
             continue

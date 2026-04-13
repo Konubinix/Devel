@@ -29,6 +29,7 @@
 (require 'url-util)
 (require 'org-roam)
 (require 'org-transclusion)
+(require 'org-transclusion-indent-mode)
 (require 'f)
 
 (defun konix/org-roam-export/exported-files (kind)

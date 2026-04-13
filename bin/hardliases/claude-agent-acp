@@ -1,3 +1,17 @@
 #!/usr/bin/env bash
+# to use the one on the main branch
+# REPO="agentclientprotocol/claude-agent-acp"
+# CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/claude-agent-acp-git"
+
+# if [ "$1" = "--update" ] || [ ! -d "$CACHE_DIR/dist" ]; then
+#     [ "$1" = "--update" ] && shift
+#     rm -rf "$CACHE_DIR"
+#     git clone --depth 1 "https://github.com/$REPO.git" "$CACHE_DIR" >&2
+#     (cd "$CACHE_DIR" && npm install --ignore-scripts >&2 && npm run build >&2)
+# fi
+
+# exec node "$CACHE_DIR/dist/index.js" "$@"
+
+# Upstream (switch back when the version on npm is good enough):
 source _ko_npx.sh
-npx_run @zed-industries/claude-agent-acp "$@"
+npx_run @agentclientprotocol/claude-agent-acp "$@"

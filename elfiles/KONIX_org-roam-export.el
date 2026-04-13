@@ -60,13 +60,6 @@
                        )
           (posts (expand-file-name "content/posts" publish-dir))
           (new-posts (expand-file-name "content/new-posts" publish-dir))
-          ;; if set to nil, the :exports results won't be taken into account
-          ;; and all source code blocks will be shown
-          (org-export-use-babel t)
-          ;; taken from https://orgmode.org/list/87sgezdukk.fsf@gmail.com/T/,
-          ;; prevent trying to evaluate the source code blocks
-          (org-babel-default-header-args
-           (cons '(:eval . "never-export") org-babel-default-header-args))
           )
     (message "Updating links")
     (when (not
@@ -201,6 +194,13 @@
 (defun konix/org-roam-export/export-buffer ()
   (interactive)
   (let (
+        ;; if set to nil, the :exports results won't be taken into account
+        ;; and all source code blocks will be shown
+        (org-export-use-babel t)
+        ;; taken from https://orgmode.org/list/87sgezdukk.fsf@gmail.com/T/,
+        ;; prevent trying to evaluate the source code blocks
+        (org-babel-default-header-args
+         (cons '(:eval . "never-export") org-babel-default-header-args))
         (kind (konix/org-roam-export/extract-kind-unsafe))
         )
     (when (member kind '(nil "none"

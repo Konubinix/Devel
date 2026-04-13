@@ -58,6 +58,11 @@
   };
 
   services.xserver.enable = true;
+  # Equivalent to: xset r rate 170 150
+  # autoRepeatDelay is in ms (same as xset delay)
+  # autoRepeatInterval is in ms between repeats (1000 / xset rate = 1000 / 150 ≈ 7)
+  services.xserver.autoRepeatDelay = 170;
+  services.xserver.autoRepeatInterval = 7;
 
   # awesome must be declared here so sddm registers the session
   services.xserver.windowManager.awesome.enable = true;
@@ -84,9 +89,10 @@
     isNormalUser = true;
     description = "sam";
     extraGroups = [
+      "dialout"
+      "docker"
       "networkmanager"
       "wheel"
-      "docker"
     ];
   };
 

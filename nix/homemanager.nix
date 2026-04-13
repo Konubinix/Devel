@@ -22,51 +22,55 @@ let
   # Use symlinkJoin so the wrapper output mirrors the original directory structure
   # (including lib/python3.*/site-packages). This lets Python resolve its prefix
   # from the wrapper path and find nix-provided packages (lxml, etc.).
-  wrapWithNixLD = program: pkgs.symlinkJoin {
-    name = "${program.pname or program.name}-nix-ld-wrapped";
-    paths = [ program ];
-    postBuild = ''
-      # Replace bin/ symlinks with wrapper scripts that set LD_LIBRARY_PATH
-      rm -rf $out/bin
-      mkdir -p $out/bin
-      for file in ${program}/bin/*; do
-        new_file=$out/bin/$(basename $file)
-        echo "#! ${pkgs.bash}/bin/bash -e" >> $new_file
-        # Save original LD_LIBRARY_PATH so sitecustomize.py can restore it for
-        # child processes (prevents nix-ld libs from leaking into nix-built binaries).
-        echo 'export _ORIG_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"' >> $new_file
-        echo 'export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$NIX_LD_LIBRARY_PATH"' >> $new_file
-        # -a "$0" preserves the original argv[0] so Python can detect virtualenvs
-        # (pyvenv.cfg lookup). Without it, sys.executable resolves to the nix store
-        # binary and venv site-packages are lost.
-        echo 'exec -a "$0" '$file' "$@"' >> $new_file
-        chmod +x $new_file
-      done
+  wrapWithNixLD =
+    program:
+    pkgs.symlinkJoin {
+      name = "${program.pname or program.name}-nix-ld-wrapped";
+      paths = [ program ];
+      postBuild = ''
+              # Replace bin/ symlinks with wrapper scripts that set LD_LIBRARY_PATH
+              rm -rf $out/bin
+              mkdir -p $out/bin
+              for file in ${program}/bin/*; do
+                new_file=$out/bin/$(basename $file)
+                echo "#! ${pkgs.bash}/bin/bash -e" >> $new_file
+                # Save original LD_LIBRARY_PATH so sitecustomize.py can restore it for
+                # child processes (prevents nix-ld libs from leaking into nix-built binaries).
+                echo 'export _ORIG_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"' >> $new_file
+                echo 'export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$NIX_LD_LIBRARY_PATH"' >> $new_file
+                # -a "$0" preserves the original argv[0] so Python can detect virtualenvs
+                # (pyvenv.cfg lookup). Without it, sys.executable resolves to the nix store
+                # binary and venv site-packages are lost.
+                echo 'exec -a "$0" '$file' "$@"' >> $new_file
+                chmod +x $new_file
+              done
 
-      # Add sitecustomize.py that restores LD_LIBRARY_PATH for child processes.
-      # The dynamic linker caches search paths at startup, so dlopen still uses
-      # the extended paths for loading native extensions (numpy, etc.), but
-      # subprocess children get the clean LD_LIBRARY_PATH.
-      for sitedir in $out/lib/python*/site-packages; do
-        rm -f "$sitedir/sitecustomize.py"
-        cat > "$sitedir/sitecustomize.py" << 'PYEOF'
-import os
-_orig = os.environ.pop("_ORIG_LD_LIBRARY_PATH", None)
-if _orig is not None:
-    if _orig:
-        os.environ["LD_LIBRARY_PATH"] = _orig
-    else:
-        os.environ.pop("LD_LIBRARY_PATH", None)
-PYEOF
-      done
-    '';
-  };
+              # Add sitecustomize.py that restores LD_LIBRARY_PATH for child processes.
+              # The dynamic linker caches search paths at startup, so dlopen still uses
+              # the extended paths for loading native extensions (numpy, etc.), but
+              # subprocess children get the clean LD_LIBRARY_PATH.
+              for sitedir in $out/lib/python*/site-packages; do
+                rm -f "$sitedir/sitecustomize.py"
+                cat > "$sitedir/sitecustomize.py" << 'PYEOF'
+        import os
+        _orig = os.environ.pop("_ORIG_LD_LIBRARY_PATH", None)
+        if _orig is not None:
+            if _orig:
+                os.environ["LD_LIBRARY_PATH"] = _orig
+            else:
+                os.environ.pop("LD_LIBRARY_PATH", None)
+        PYEOF
+              done
+      '';
+    };
 
   # Plain KEY=VALUE file (no shell expansion) for simple session variables.
   sessionVarsFile = pkgs.writeText "hm-session-vars.sh" (
-    lib.concatStringsSep "\n" (lib.mapAttrsToList
-      (name: value: "export ${name}=${lib.escapeShellArg value}")
-      config.home.sessionVariables)
+    lib.concatStringsSep "\n" (
+      lib.mapAttrsToList (
+        name: value: "export ${name}=${lib.escapeShellArg value}"
+      ) config.home.sessionVariables
+    )
   );
 
   # KEY=prefix file for variables that need prepending to existing values.
@@ -75,15 +79,12 @@ PYEOF
     let
       raw = config.home.sessionPrependVariables;
       sessionPathStr = lib.concatStringsSep ":" config.home.sessionPath;
-      pathEntry = if raw ? PATH
-        then sessionPathStr + ":" + raw.PATH
-        else sessionPathStr;
-    in raw // lib.optionalAttrs (sessionPathStr != "") { PATH = pathEntry; };
+      pathEntry = if raw ? PATH then sessionPathStr + ":" + raw.PATH else sessionPathStr;
+    in
+    raw // lib.optionalAttrs (sessionPathStr != "") { PATH = pathEntry; };
 
   sessionPrependFile = pkgs.writeText "hm-session-prepend-vars.sh" (
-    lib.concatStringsSep "\n" (lib.mapAttrsToList
-      (name: value: "${name}=${value}")
-      sessionPrependVars)
+    lib.concatStringsSep "\n" (lib.mapAttrsToList (name: value: "${name}=${value}") sessionPrependVars)
   );
 in
 {
@@ -93,13 +94,34 @@ in
     description = "Extra Python packages to add to the base Python environment.";
   };
 
+  options.konix.pythonEnv = lib.mkOption {
+    type = lib.types.package;
+    readOnly = true;
+    description = "The fully built Python environment (with all extra packages).";
+  };
+
   options.home.sessionPrependVariables = lib.mkOption {
     type = lib.types.attrsOf lib.types.str;
-    default = {};
+    default = { };
     description = "Variables whose values are prepended (colon-separated) to existing values.";
   };
 
   config = {
+    konix.pythonEnv = pkgs.python3.withPackages (
+      ps:
+      [
+        ps.evdev
+        ps.pip
+        ps.ipython
+        ps.xdg
+        ps.supervisor
+        ps.flake8
+        ps.notmuch
+        ps.requests
+      ]
+      ++ (config.konix.extraPythonPackages ps)
+    );
+
     home.username = "sam";
     home.homeDirectory = "/home/sam";
     home.stateVersion = "24.11";
@@ -107,9 +129,10 @@ in
     programs.home-manager.enable = true;
 
     home.sessionPath = lib.mkAfter [
+      "${config.home.homeDirectory}/bin"
+      "${config.home.homeDirectory}/.local/bin"
       "${develDir}/bin"
       "${develDir}/bin/hardliases"
-      "${config.home.homeDirectory}/.local/bin"
     ];
 
     # ── Packages ──────────────────────────────────────────────────────────
@@ -117,22 +140,23 @@ in
     home.packages = with pkgs; [
       # editors
       vim
-      emacs
+      emacs # pgtk is the default since emacs 29+, so emacsclient -c can open graphical frames from emacs --daemon
       gcc # needed by emacs native-comp JIT (async compilation invokes gcc driver)
 
       # vcs
       gitFull # to also have gitk
-      git-annex
 
       # mail
       notmuch
-      python3Packages.notmuch
+
       offlineimap
 
       # containers
       docker
 
       # shell tools
+      direnv
+      nix-direnv
       bc
       byobu
       curl
@@ -149,6 +173,7 @@ in
       bash-preexec
       mcfly
       mcfly-fzf
+      mosh
       sourceHighlight
 
       # security
@@ -185,25 +210,17 @@ in
       # browsers
       chromium
 
-      # audio
+      # audio / media
       pulseaudio # pactl + libpulse.so for pulsectl (PipeWire-compatible)
       pavucontrol
       pasystray
+      ffmpeg
+      yt-dlp
+      git-annex
       # gmpc did not find the correct name so far
 
       # python — wrapped so venvs/pipx can find nix-ld libraries (libstdc++, zlib, …)
-      (wrapWithNixLD (python3.withPackages (
-        ps:
-        [
-          ps.evdev
-          ps.pip
-          ps.ipython
-          ps.xdg
-          ps.supervisor
-          ps.flake8
-        ]
-        ++ (config.konix.extraPythonPackages ps)
-      )))
+      (wrapWithNixLD config.konix.pythonEnv)
 
       # misc
       which
@@ -226,13 +243,20 @@ in
       ];
     };
 
+    xsession.initExtra = ''
+      awesome_log_dir="''${XDG_STATE_HOME:-$HOME/.local/state}/awesome"
+      mkdir -p "$awesome_log_dir"
+      exec > "$awesome_log_dir/stdout.log" 2> "$awesome_log_dir/stderr.log"
+    '';
+
+    xdg.configHome = configDir;
+
     # ── Dotfile symlinks ──────────────────────────────────────────────────
 
     home.file = {
-      ".config/awesome".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/awesome";
+      ".config".source = config.lib.file.mkOutOfStoreSymlink configDir;
       ".byobu".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/byobu";
       ".inputrc".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/inputrc";
-      ".config/starship.toml".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/starship.toml";
       ".konix_hm-session-vars.sh".source = sessionVarsFile;
       ".konix_hm-session-prepend-vars.sh".source = sessionPrependFile;
     };
@@ -249,6 +273,9 @@ in
 
     # Priority 1500: perso (mkDefault=1000) and host (normal=100) can override
     home.sessionVariables = lib.mapAttrs (_: lib.mkOverride 1500) {
+      # dagger
+      DAGGER_NO_NAG = 1;
+
       # Bootstrap paths
       KONIX_DEVEL_DIR = develDir;
       KONIX_CONFIG_DIR = configDir;
@@ -350,7 +377,6 @@ in
       # Mail
       KONIX_MAIL = "konubinixweb@gmail.com";
       KONIX_OFFLINEIMAP_FOLDERS_WITH_TRASH = "0";
-      KONIX_MSMTP_LOG = "-";
       KONIX_TEMP_MAIL_KEEP_MONTHS = "3";
 
       # Network ports / services
@@ -403,12 +429,8 @@ in
 
     # ── Bash ──────────────────────────────────────────────────────────────
 
-    # Native HM integrations (replace manual eval hooks)
-    programs.direnv = {
-      enable = true;
-      nix-direnv.enable = true;
-    };
-
+    # direnv — config is static in config/direnv/, hook added in initExtra
+    # programs.starship — reads config from XDG_CONFIG_HOME/starship.toml (in repo)
     programs.starship.enable = true;
     programs.zoxide.enable = true;
 
@@ -491,11 +513,14 @@ in
         xva = "konix_xapers_view_and.sh";
         xv = "xapers view";
         xvf = "konix_xapers_view_fuzzy.sh";
+
       };
 
       initExtra = ''
         # Re-export session variables so that `home-manager switch` takes
         # effect in every new shell, not just at login.
+        eval "$(direnv hook bash)"
+
         _hm_load_vars() {
           eval "$(konix_hm_session_env.sh | sed 's/^/export /')"
         }

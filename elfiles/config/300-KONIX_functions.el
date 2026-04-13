@@ -152,18 +152,21 @@ CURSOR-POS is the position of the cursor within DEFAULT (0 = start)."
   :type 'integer
   :group 'konix)
 
-(defun konix/should-notify-p (&optional buffer)
-  "Return non-nil if a notification should be shown for BUFFER.
-Notifications are appropriate when:
-- The Emacs frame is not focused (user is in another application), OR
-- BUFFER is not visible in any window, OR
-- User has been idle for more than `konix/should-notify-idle-threshold' seconds.
+(defun konix/get-notification-level (&optional buffer)
+  "Return the appropriate notification level for BUFFER, or nil.
+Returns:
+- `:phone' when the Emacs frame is not focused (user is away),
+- `:flash' when BUFFER is not visible or user has been idle,
+- nil when no notification is needed.
 If BUFFER is nil, uses the current buffer."
   (let ((buf (or buffer (current-buffer))))
-    (or (not (frame-focus-state))
-        (not (get-buffer-window buf 'visible))
-        (>= (float-time (or (current-idle-time) 0))
-            konix/should-notify-idle-threshold))))
+    (cond
+     ((not (display-graphic-p)) :phone)
+     ((not (frame-focus-state)) :phone)
+     ((or (not (get-buffer-window buf 'visible))
+          (>= (float-time (or (current-idle-time) 0))
+              konix/should-notify-idle-threshold))
+      :flash))))
 
 (defun konix/micropython-upload-buffer-as-main (&optional reset)
   (interactive "p")

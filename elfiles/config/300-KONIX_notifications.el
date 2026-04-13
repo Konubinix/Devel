@@ -30,12 +30,18 @@
     )
   )
 
+(defun konix/do-notify (level msg)
+  "Notify the user with MSG at the appropriate LEVEL.
+LEVEL is a symbol returned by `konix/get-notification-level':
+- `:flash' — desktop popup (intrusivity level 2),
+- `:phone' — desktop popup + phone notification via ntfy.
+Does nothing if LEVEL is nil."
+  (when level
+    (konix/notify msg 2)
+    (when (eq level :phone)
+      (shell-command (format "clk ntfy %s" (shell-quote-argument msg))))))
+
 (defun konix/notify (msg &optional intrusivity_level remove_date)
-  (let (
-        (visible-bell nil)
-        )
-    (beep t)
-    )
   (unless remove_date
     (setq msg (concat (format-time-string "%H:%M:") msg))
     )

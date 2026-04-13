@@ -64,15 +64,13 @@ Signals an error if the buffer does not exist."
 
 (defun konix/mcp-server--coord-agent-exists-p (agent-name)
   "Return non-nil if AGENT-NAME is registered in the coordination system."
-  (condition-case nil
-      (let ((url-request-method "GET")
-            (url (format "%s/coord/agents" konix/mcp-server-coord-url)))
-        (with-current-buffer (url-retrieve-synchronously url t nil 5)
-          (goto-char (point-min))
-          (re-search-forward "\n\n")
-          (let ((agents (json-parse-buffer :object-type 'alist)))
-            (assoc-string agent-name agents))))
-    (error nil)))
+  (let ((url-request-method "GET")
+        (url (format "%s/coord/agents" konix/mcp-server-coord-url)))
+    (with-current-buffer (url-retrieve-synchronously url t nil 5)
+      (goto-char (point-min))
+      (re-search-forward "\n\n")
+      (let ((agents (json-parse-buffer :object-type 'alist)))
+        (assoc-string agent-name agents)))))
 
 (defun konix/mcp-server--get-agenda-content (key)
   "Run org-agenda with KEY and return the buffer content."

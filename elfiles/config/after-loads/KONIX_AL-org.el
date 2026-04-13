@@ -330,19 +330,19 @@
               )
 
 (defun konix/org-goto-heading nil
-  (case major-mode
-    ('org-agenda-mode
-     (org-agenda-switch-to nil)
-     (org-back-to-heading)
-     )
-    ('org-mode
-     (org-back-to-heading)
-     )
-    (t
-     (org-clock-goto nil)
-     (org-back-to-heading)
-     )
+  (cond
+   ((eq major-mode 'org-agenda-mode)
+    (org-agenda-switch-to nil)
+    (org-back-to-heading)
     )
+   ((eq major-mode 'org-mode)
+    (org-back-to-heading)
+    )
+   ((or (org-clocking-p) org-clock-history)
+    (org-clock-goto nil)
+    (org-back-to-heading)
+    )
+   )
   (when (get-buffer-window (current-buffer))
     (recenter-top-bottom 0))
   (hl-line-flash 7)

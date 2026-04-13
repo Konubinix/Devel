@@ -348,11 +348,12 @@
   (hl-line-flash 7)
   )
 
-(defmacro konix/org-with-point-on-heading (body)
+(defmacro konix/org-with-point-on-heading (&rest body)
+  (declare (debug (&rest form)) (indent 0))
   `(save-window-excursion
      (save-excursion
        (konix/org-goto-heading)
-       ,body
+       ,@body
        )
      )
   )

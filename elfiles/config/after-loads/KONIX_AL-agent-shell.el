@@ -511,4 +511,28 @@ under agent-shell/."
 
 (advice-add 'agent-shell--status-config :filter-return #'konix/agent-shell-status-config-advice)
 
+;; agent-shell's built-in auto-scroll (eobp check in agent-shell--update-fragment)
+;; only moves the buffer's own point — it doesn't reach windows in other frames.
+(defun konix/agent-shell-follow--after-change (&rest _)
+  "Scroll all windows showing this buffer to the end."
+  (let ((buf (current-buffer)))
+    (walk-windows
+     (lambda (win)
+       (when (eq (window-buffer win) buf)
+         (set-window-point win (point-max))))
+     nil t)))
+
+(define-minor-mode konix/agent-shell-follow-mode
+  "Auto-scroll to end of buffer when content changes."
+  :lighter " Follow"
+  (if konix/agent-shell-follow-mode
+      (progn
+        (add-hook 'after-change-functions
+                  #'konix/agent-shell-follow--after-change nil t)
+        (konix/agent-shell-follow--after-change))
+    (remove-hook 'after-change-functions #'konix/agent-shell-follow--after-change t)))
+
+(define-key agent-shell-mode-map (kbd "F") 'konix/agent-shell-follow-mode)
+(define-key agent-shell-viewport-view-mode-map (kbd "F") 'konix/agent-shell-follow-mode)
+
 ;;; KONIX_AL-agent-shell.el ends here

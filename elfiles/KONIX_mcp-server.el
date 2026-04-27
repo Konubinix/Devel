@@ -119,7 +119,7 @@ When START-CHAR and END-CHAR are provided, returns only that substring
 a region from large buffers.
 
 MCP Parameters:
-  buffer-name - Name of the buffer to read
+  buffer-name - Name of the buffer to read.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
   start-char - (optional) Start character position (0-indexed)
   end-char - (optional) End character position (0-indexed, exclusive)"
   (mcp-server-lib-with-error-handling
@@ -137,7 +137,7 @@ MCP Parameters:
   "Write content to a buffer, replacing its contents.
 
 MCP Parameters:
-  buffer-name - Name of the buffer to write to
+  buffer-name - Name of the buffer to write to.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
   content - The content to write"
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
@@ -149,7 +149,7 @@ MCP Parameters:
   "Save a buffer to its associated file.
 
 MCP Parameters:
-  buffer-name - Name of the buffer to save"
+  buffer-name - Name of the buffer to save.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
      (if (buffer-file-name)
@@ -162,7 +162,7 @@ MCP Parameters:
   "Kill a buffer by name.
 
 MCP Parameters:
-  buffer-name - Name of the buffer to kill"
+  buffer-name - Name of the buffer to kill.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
      (kill-buffer (current-buffer))
@@ -172,7 +172,7 @@ MCP Parameters:
   "Get git branch and remote for the given buffer's directory.
 
 MCP Parameters:
-  buffer-name - Name of the buffer to get git info from"
+  buffer-name - Name of the buffer to get git info from.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
      (let* ((repo-root (locate-dominating-file default-directory ".git")))
@@ -259,7 +259,7 @@ MCP Parameters:
   "Execute a named org-babel source block and return its result.
 
 MCP Parameters:
-  buffer-name - Name of the buffer containing the org babel block
+  buffer-name - Name of the buffer containing the org babel block.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
   block-name - The #+NAME of the babel block to execute
   force - When non-nil, bypass the cache and force re-evaluation"
   (mcp-server-lib-with-error-handling
@@ -293,7 +293,7 @@ MCP Parameters:
   "Tangle a named org-babel source block, writing it to its :tangle target.
 
 MCP Parameters:
-  buffer-name - Name of the buffer containing the org babel block
+  buffer-name - Name of the buffer containing the org babel block.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
   block-name - The #+NAME of the babel block to tangle"
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
@@ -322,7 +322,7 @@ Runs `org-babel-tangle' on the entire buffer, writing all blocks
 to their respective :tangle target files.
 
 MCP Parameters:
-  buffer-name - Name of the org-mode buffer to tangle"
+  buffer-name - Name of the org-mode buffer to tangle.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
      (unless (derived-mode-p 'org-mode)
@@ -467,13 +467,15 @@ Returns the position after the inserted conflict, or signals an error."
               (point)))))))))
 
 (defun konix/mcp-server-propose-edit (buffer-name edits)
-  "Propose edits by replacing old_string with new_string using smerge markers.
+  "Propose edits on buffers by replacing old_string with new_string using smerge markers.
+
+Use that tool only when you have no file to edit, like editing a buffer only.
 
 Each edit's old_string must be unique in the buffer.
 Use read_buffer first to find the exact text to replace.
 
 MCP Parameters:
-  buffer-name - The buffer to edit
+  buffer-name - The buffer to edit.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
   edits - JSON array of {\"old_string\": \"...\", \"new_string\": \"...\"} objects"
   (mcp-server-lib-with-error-handling
    (let* ((buffer-name (decode-coding-string buffer-name 'utf-8))

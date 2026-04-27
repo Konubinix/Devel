@@ -71,6 +71,8 @@
     )
   )
 
+(defvar konix/git/_read-message-history '() "The history to use for git messages")
+
 (defun konix/git/_read-message (&optional prompt)
   (unless prompt
     (setq prompt "Message: ")
@@ -89,6 +91,7 @@
      "Message: "
      (concat prefix suffix)
      (length prefix)
+     'konix/git/_read-message-history
      ))
   )
 

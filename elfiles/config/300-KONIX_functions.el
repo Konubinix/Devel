@@ -135,7 +135,7 @@ LINE is given to 'forward-line."
   (add-hook 'after-change-functions
             #'konix/after-change-function/ansify-new-content nil t))
 
-(defun konix/read-string-with-cursor (prompt default cursor-pos)
+(defun konix/read-string-with-cursor (prompt default cursor-pos &optional history)
   "Read a string from the minibuffer.
 PROMPT is the prompt to display.
 DEFAULT is the default value to prefill.
@@ -145,7 +145,7 @@ CURSOR-POS is the position of the cursor within DEFAULT (0 = start)."
         (lambda ()
           (let ((pos (min cursor-pos (length input))))
             (goto-char (+ (minibuffer-prompt-end) pos))))
-      (read-from-minibuffer prompt input))))
+      (read-from-minibuffer prompt input nil nil history))))
 
 (defcustom konix/should-notify-idle-threshold 30
   "Idle time in seconds after which notifications should be shown."

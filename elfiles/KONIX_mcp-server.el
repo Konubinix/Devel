@@ -610,7 +610,7 @@ Each edit is an alist with keys: name, env_set, env_remove, headers_set, headers
             (setf (alist-get 'headers srv) (vconcat hdr-list)))))))
   servers)
 
-(defun konix/mcp-server-spawn-agent (directory task agent-name &optional mcp-config-changes)
+(defun konix/mcp-server-spawn-agent (directory task agent-name &optional mcp-config-changes model)
   "Spawn a new agent that registers with the coordination system and waits for tasks.
 The agent will register and then block waiting for tasks from the coordinator — the coordinator must send the first task using coord_post_task.
 
@@ -618,7 +618,8 @@ MCP Parameters:
   directory - The working directory for the session
   task - Contextual goal describing the agent's purpose (the agent will wait for concrete tasks from the coordinator via coord_post_task)
   agent-name - Unique name for the agent in the coordination system
-  mcp-config-changes - Optional JSON string describing changes to the MCP server config. Object with keys: \"remove\" (list of server name strings to remove from the default config), \"add\" (list of server config objects to add — each must have \"name\" and either {\"command\", \"args\"} for stdio or {\"type\":\"http\", \"url\"} for HTTP; \"env\" and \"headers\" must be arrays of {\"name\":\"KEY\",\"value\":\"VAL\"} objects, and \"args\" must be an array of strings — example: {\"name\":\"my-srv\",\"command\":\"node\",\"args\":[\"server.js\"],\"env\":[{\"name\":\"TOKEN\",\"value\":\"abc\"}]}), \"edit\" (list of objects to modify existing servers, each with \"name\" and optional \"env_set\" (object of KEY:VALUE to add/override), \"env_remove\" (list of env var names to remove), \"headers_set\" (object of KEY:VALUE), \"headers_remove\" (list of header names to remove))"
+  mcp-config-changes - Optional JSON string describing changes to the MCP server config. Supports the standard MCP config format with these keys: \"mcpServers\" (object mapping server names to configs — each config has \"command\"/\"args\" for stdio or {\"type\":\"http\",\"url\"} for HTTP, \"env\" as a plain object {\"KEY\":\"VALUE\"}, \"headers\" as a plain object — example: {\"mcpServers\":{\"my-srv\":{\"command\":\"node\",\"args\":[\"server.js\"],\"env\":{\"TOKEN\":\"abc\"}}}}), \"remove\" (list of server name strings to remove from the default config), \"edit\" (list of objects to modify existing servers, each with \"name\" and optional \"env_set\" (object of KEY:VALUE to add/override), \"env_remove\" (list of env var names to remove), \"headers_set\" (object of KEY:VALUE), \"headers_remove\" (list of header names to remove))
+  model - Optional model ID or alias (e.g. \"sonnet\", \"opus\", \"claude-sonnet-4-6\")"
   (mcp-server-lib-with-error-handling
    (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
           (task (decode-coding-string task 'utf-8))
@@ -628,6 +629,8 @@ MCP Parameters:
                          (json-parse-string
                           (decode-coding-string mcp-config-changes 'utf-8)
                           :object-type 'alist)))
+          (model-decoded (when (and model (not (string-empty-p model)))
+                           (decode-coding-string model 'utf-8)))
           (prompt (format "You are a coordinated sub-agent. Your goal: %s
 
 CRITICAL RULES:

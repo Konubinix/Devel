@@ -255,13 +255,14 @@ MCP Parameters:
    (konix/mcp-server--get-agenda-content "ann")))
 ;;; Org babel tools
 
-(defun konix/mcp-server-run-babel-block (buffer-name block-name &optional force)
+(defun konix/mcp-server-run-babel-block (buffer-name block-name &optional force save-buffer)
   "Execute a named org-babel source block and return its result.
 
 MCP Parameters:
   buffer-name - Name of the buffer containing the org babel block.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
   block-name - The #+NAME of the babel block to execute
-  force - When non-nil, bypass the cache and force re-evaluation"
+  force - When non-nil, bypass the cache and force re-evaluation
+  save-buffer - When omitted or non-nil, save the buffer to its file after execution (default).  Pass \"false\" or \"no\" to skip saving."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
      (unless (derived-mode-p 'org-mode)
@@ -274,12 +275,27 @@ MCP Parameters:
              (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
            (goto-char pos)
            (let ((info (org-babel-get-src-block-info)))
+             (when-let ((error-buf (get-buffer "*Org-Babel Error Output*")))
+               (kill-buffer error-buf))
              (condition-case err
-                 (let ((result (org-babel-execute-src-block
-                                (when force t) info (when force '((:cache . "no"))))))
-                   (if result
-                       (format "%s" result)
-                     "Block executed successfully (no result returned)"))
+                 (prog1
+                     (let* ((result (org-babel-execute-src-block
+                                     (when force t) info (when force '((:cache . "no")))))
+                            (result-str (if result
+                                            (format "%s" result)
+                                          "Block executed successfully (no result returned)"))
+                            (error-buf (get-buffer "*Org-Babel Error Output*"))
+                            (error-output (when error-buf
+                                            (with-current-buffer error-buf
+                                              (buffer-substring-no-properties
+                                               (point-min) (point-max))))))
+                       (if (and error-output (not (string-empty-p error-output)))
+                           (format "%s\n--- *Org-Babel Error Output* ---\n%s"
+                                   result-str error-output)
+                         result-str))
+                   (when (and (buffer-file-name)
+                              (not (member save-buffer '(:json-false "false" "no" "nil"))))
+                     (save-buffer)))
                (error
                 (let ((error-buf (get-buffer "*Org-Babel Error Output*")))
                   (error "Babel execution error in block '%s' of buffer %s: %s\n%s"

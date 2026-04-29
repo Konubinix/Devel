@@ -329,6 +329,14 @@
               url
               )
       )
+     ((string-match "^\\(http.+\\(\\.glb\\)\\)$" url)
+      (format "
+{{{glbview(%s)}}}
+@@html:<a href=\"%s\"><i class=\"fas fa-download\"></i></a>@@"
+              url
+              url
+              )
+      )
      ((string-match "^\\(http.+\\.\\(webm\\|mp4\\)\\)$" url)
       (format "{{{video(%s)}}}" (match-string 1 url))
       )

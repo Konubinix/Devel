@@ -282,6 +282,8 @@ in
 
     # Priority 1500: perso (mkDefault=1000) and host (normal=100) can override
     home.sessionVariables = lib.mapAttrs (_: lib.mkOverride 1500) {
+      KONIX_MAIL_HARMLESS_IMAGE_PREFIXES = "data:,file:,./";
+
       # dagger
       DAGGER_NO_NAG = 1;
 

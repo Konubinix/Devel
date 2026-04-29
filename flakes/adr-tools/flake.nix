@@ -6,10 +6,19 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = import nixpkgs { inherit system; };
-      in {
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
         packages.env = pkgs.buildEnv {
           name = "adr-tools";
           paths = with pkgs; [ packages.default ];
@@ -47,5 +56,6 @@
             sha256 = "sha256-JEwLn+SY6XcaQ9VhN8ARQaZc1zolgAJKfIqPggzV+sU=";
           };
         };
-      });
+      }
+    );
 }

@@ -71,6 +71,7 @@ let
         name: value: "export ${name}=${lib.escapeShellArg value}"
       ) config.home.sessionVariables
     )
+    + "\n"
   );
 
   # KEY=prefix file for variables that need prepending to existing values.
@@ -85,6 +86,7 @@ let
 
   sessionPrependFile = pkgs.writeText "hm-session-prepend-vars.sh" (
     lib.concatStringsSep "\n" (lib.mapAttrsToList (name: value: "${name}=${value}") sessionPrependVars)
+    + "\n"
   );
 in
 {
@@ -591,7 +593,7 @@ in
         konix_tmux_shows_current_window () {
           local current_index="$(tmux display-message -p '#{window_index}')"
           test "''${KONIX_TMUX_WINDOW}" == "''${current_index}"
-        }
+          }
 
         konix_is_screen_on () {
           test -e ~/.here
@@ -621,13 +623,13 @@ in
           local last_activity="$(tmux display-message -p '#{client_activity}')"
           local now="$(date +%s)"
           test $(( now - last_activity )) -le 3
-        }
+          }
 
         konix_was_inactive_for_a_very_long_time () {
           local last_activity="$(tmux display-message -p '#{client_activity}')"
           local now="$(date +%s)"
           test $(( now - last_activity )) -gt 10
-        }
+          }
 
         function konix_warn_if_took_too_long(){
           if test -z "''${KONIX_BASH_WARN_IF_TOO_LONG}"; then
@@ -703,13 +705,13 @@ in
       (if custom-file
           (load custom-file)
         (display-warning 'No-custom "No custom file found")
-        )
+      )
       (when emacs_com_file
         (with-temp-buffer
           (insert "ended\n")
           (write-file emacs_com_file)
-          )
         )
+      )
     '';
 
     # ~/.emacs_custo — copy default if not present

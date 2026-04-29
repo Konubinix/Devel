@@ -399,6 +399,15 @@ in
       KONIX_NBVIEWER_IP = "0.0.0.0";
       KONIX_NOTEBOOK_BROWSER = "chromium";
       KONIX_NOTEBOOK_VIRTUALENV = "maths3";
+
+      # Playwright — reuse the system chromium instead of the chrome-headless-shell
+      # downloaded by pip (which fails to load libglib/libnss/... outside nix-ld).
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
+      # More robust alternative if the Playwright pip version mismatches: use the
+      # dedicated pkgs.playwright-driver bundle (versions kept in sync with the
+      # Playwright driver), at the cost of ~500MB extra in the nix store.
+      # PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
       KONIX_MINIDNS_PORT = "53000";
       PROXYRESOLV_DNS = "127.0.0.1 -p53000";
       KONIX_BEETWEB_EXTRA_ARGUMENTS = "127.0.0.1 8337";

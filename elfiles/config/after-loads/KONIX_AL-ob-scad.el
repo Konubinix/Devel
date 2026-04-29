@@ -28,6 +28,25 @@
       '((:results . "raw")
         (:exports . "results")))
 
+;; Upstream ob-scad passes destination=0 to call-process: async + discard.
+;; Openscad stderr gets thrown away and org-mode can't tell the STL was
+;; never produced. Wrap the whole execute with an :around advice that swaps
+;; call-process for a synchronous, error-propagating variant.
+(defun KONIX/ob-scad-surface-errors (orig-fun body params)
+  (let ((errbuf (generate-new-buffer " *ob-scad-err*"))
+        (orig-cp (symbol-function 'call-process)))
+    (unwind-protect
+        (cl-letf (((symbol-function 'call-process)
+                   (lambda (program &optional _infile _dest _display &rest args)
+                     (let ((code (apply orig-cp program nil errbuf nil args)))
+                       (unless (and (numberp code) (zerop code))
+                         (error "openscad exited %s:\n%s" code
+                                (with-current-buffer errbuf (buffer-string))))
+                       code))))
+          (funcall orig-fun body params))
+      (kill-buffer errbuf))))
 
-  (provide 'KONIX_AL-ob-scad)
+(advice-add 'org-babel-execute:scad :around #'KONIX/ob-scad-surface-errors)
+
+(provide 'KONIX_AL-ob-scad)
 ;;; KONIX_AL-ob-scad.el ends here

@@ -4120,6 +4120,12 @@ With `ID', set the ID instead of the CUSTOM_ID."
            (member to org-done-keywords)
            (member from org-not-done-keywords)
            )
+      (save-excursion
+        (org-back-to-heading t)
+        (let ((tags (org-get-tags nil t)))
+          (when (or (member "WAIT" tags) (member "DELEGATED" tags))
+            (org-set-tags
+             (seq-remove (lambda (tag) (member tag '("WAIT" "DELEGATED"))) tags)))))
       (konix/org-inform-about-expecting-parties)
       (konix/org-inform-about-informable-parties)
       )

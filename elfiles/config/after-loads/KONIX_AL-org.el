@@ -105,7 +105,6 @@
     '(and
       (tags "maybe")
       (tags "ril")
-      (todo)
       )
     :title "Maybe RIL items"
     ;;:sort 'konix/org-sql-search/</timestamp

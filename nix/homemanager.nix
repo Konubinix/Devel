@@ -102,6 +102,12 @@ in
     description = "The fully built Python environment (with all extra packages).";
   };
 
+  options.konix.develDir = lib.mkOption {
+    type = lib.types.path;
+    readOnly = true;
+    description = "Path to the develdir";
+  };
+
   options.home.sessionPrependVariables = lib.mkOption {
     type = lib.types.attrsOf lib.types.str;
     default = { };
@@ -123,6 +129,7 @@ in
       ]
       ++ (config.konix.extraPythonPackages ps)
     );
+    konix.develDir = "${develDir}";
 
     home.username = "sam";
     home.homeDirectory = "/home/sam";

@@ -300,6 +300,31 @@ Passes ARG through to `agent-shell'."
                            (agent-shell-viewport-reply))))))))
 
 
+(defun konix/agent-shell-viewport-reply-hello ()
+  "Reply with \"hello\" and send immediately."
+  (declare (modes agent-shell-viewport-view-mode))
+  (interactive)
+  (agent-shell-viewport-reply)
+  (insert "hello")
+  (agent-shell-viewport-compose-send))
+
+(defun konix/agent-shell-viewport-reply-try-again ()
+  "Reply with \"try again\" and send immediately."
+  (declare (modes agent-shell-viewport-view-mode))
+  (interactive)
+  (agent-shell-viewport-reply)
+  (insert "try again")
+  (agent-shell-viewport-compose-send))
+
+(defun konix/agent-shell-viewport-reply-go-on ()
+  "Reply with \"go on\" and send immediately."
+  (declare (modes agent-shell-viewport-view-mode))
+  (interactive)
+  (agent-shell-viewport-reply)
+  (insert "go on")
+  (agent-shell-viewport-compose-send))
+
+
 (define-key agent-shell-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)
 (define-key agent-shell-viewport-view-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)
 (define-key agent-shell-mode-map (kbd "SPC") 'konix/agent-shell/scroll-or-track)
@@ -311,6 +336,10 @@ Passes ARG through to `agent-shell'."
 (define-key agent-shell-viewport-view-mode-map (kbd "<") 'beginning-of-buffer)
 (define-key agent-shell-viewport-view-mode-map (kbd ">") 'end-of-buffer)
 (define-key agent-shell-viewport-view-mode-map (kbd "g") 'beginning-of-buffer)
+(define-key agent-shell-viewport-view-mode-map (kbd "h") 'konix/agent-shell-viewport-reply-hello)
+(define-key agent-shell-viewport-view-mode-map (kbd "t") 'konix/agent-shell-viewport-reply-try-again)
+(define-key agent-shell-viewport-view-mode-map (kbd "m") 'agent-shell-viewport-set-session-model)
+(define-key agent-shell-viewport-view-mode-map (kbd "o") 'konix/agent-shell-viewport-reply-go-on)
 (define-key agent-shell-viewport-view-mode-map (kbd "G") 'end-of-buffer)
 (define-key agent-shell-mode-map (kbd "TAB") 'agent-shell-next-item)
 (define-key agent-shell-viewport-view-mode-map (kbd "u") 'konix/agent-shell-track-ready-buffers)

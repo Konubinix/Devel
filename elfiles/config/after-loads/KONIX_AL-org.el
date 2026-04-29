@@ -3620,6 +3620,42 @@ of the clocksum."
   )
 (advice-add 'org-mode :around 'konix/org-mode/time-it)
 
+(defun konix/org-apply-todo-faces-keyword ()
+  "Read a `#+TODO_FACES:' keyword and bind `org-todo-keyword-faces' buffer-locally.
+The value must be a list literal parseable with `read', for example:
+
+  #+TODO_FACES: ((\"DONE\" :foreground \"green\" :weight bold) (\"TODO\" . \"red\"))
+
+The defcustom has no `:set', so `setq-local' is enough."
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+TODO_FACES:[ \t]*\\(.*\\)$" nil t)
+      (condition-case err
+          (setq-local org-todo-keyword-faces (read (match-string 1)))
+        (error (message "Invalid #+TODO_FACES: %s" (error-message-string err)))))))
+
+(defun konix/org-apply-tag-faces-keyword ()
+  "Read a `#+TAG_FACES:' keyword and bind `org-tag-faces' buffer-locally.
+Same contract as `konix/org-apply-todo-faces-keyword' but for tags. Example:
+
+  #+TAG_FACES: ((\"urgent\" . \"red\") (\"work\" :foreground \"blue\" :weight bold))
+
+The defcustom ships with a `:set' that also refreshes
+`org-tags-special-faces-re' (the regexp font-lock uses to spot tags
+with a custom face). `customize-set-variable' would run that `:set'
+but store the value globally; here we replicate the companion regexp
+update buffer-locally so the palette stays scoped to this buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+TAG_FACES:[ \t]*\\(.*\\)$" nil t)
+      (condition-case err
+          (let ((value (read (match-string 1))))
+            (setq-local org-tag-faces value)
+            (setq-local org-tags-special-faces-re
+                        (and value
+                             (concat ":" (regexp-opt (mapcar #'car value) t) ":"))))
+        (error (message "Invalid #+TAG_FACES: %s" (error-message-string err)))))))
+
 (defun konix/org-mode-hook ()
   (message "Starting konix/org-mode-hook hook for %s" (or (buffer-file-name) (buffer-name)))
   (require 'org-roam)
@@ -3713,6 +3749,8 @@ of the clocksum."
       )
     )
   (add-to-list 'completion-at-point-functions 'cape-file t)
+  (konix/org-apply-todo-faces-keyword)
+  (konix/org-apply-tag-faces-keyword)
   )
 
 (add-hook 'org-mode-hook 'konix/org-mode-hook)

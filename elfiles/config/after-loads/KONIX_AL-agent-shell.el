@@ -35,6 +35,7 @@
 (setq-default acp-logging-enabled t)
 (setq-default agent-shell-prefer-viewport-interaction t)
 (setq-default agent-shell-session-strategy 'new)
+(setq-default agent-shell-anthropic-default-model-id "haiku")
 
 (defun konix/agent-shell-toggle-prefer-viewport-interaction ()
   (interactive)
@@ -127,9 +128,7 @@
              (length konix/agent-shell-mcp-enabled-servers)
              (length konix/agent-shell-mcp-server-registry))))
 
-
 (setq-default agent-shell-show-welcome-message nil)
-
 
 (defvar konix/agent-shell-presets
   `(("default"
@@ -235,8 +234,8 @@ At the prompt, insert a space."
       (when (and (not tracking-buffers) (not tracking-start-buffer))
         (konix/agent-shell-track-ready-buffers))
       (let ((old (current-buffer)))
-          (tracking-next-buffer)
-          (bury-buffer old)))
+        (tracking-next-buffer)
+        (bury-buffer old)))
      ((= (window-end) (point-max))
       (goto-char (point-max)))
      (t

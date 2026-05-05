@@ -45,6 +45,7 @@
 
 (konix/auto-insert-use-yasnippet-template "/wiki/.+\\.org\\'" "org")
 
+(setq-default org-complete-tags-always-offer-all-agenda-tags t)
 (setq-default org-empty-line-terminates-plain-lists t)
 (setq-default org--matcher-tags-todo-only nil)
 ;; force the use of scheduling instead of deadline prewarning. They both have the

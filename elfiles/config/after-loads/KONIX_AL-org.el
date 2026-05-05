@@ -2893,11 +2893,27 @@ items"
    )
   )
 
+(defun konix/org-capture-target-sibling-of-clock ()
+  (let ((parent-id
+         (konix/org-with-point-at-clocked-entry
+           (save-excursion
+             (org-up-heading-safe)
+             (konix/org-get-id)))))
+    (org-id-goto parent-id)))
+
 (setq-default org-capture-templates
               `(
                 ("t" "Todo Item" entry (file+headline konix/org-todo_file
                                                       "Refile")
                  #'konix/org-capture-template-todo
+                 )
+                ("s" "Todo sibling to clocked task" entry (function konix/org-capture-target-sibling-of-clock) "* NEXT %?
+  :PROPERTIES:
+  :CREATED:  %U
+  :END:
+  :CLOCK:
+  :END:
+"
                  )
                 ("i" "Todo Item in current clock" entry (clock) "* NEXT %?
   :PROPERTIES:
@@ -2906,10 +2922,6 @@ items"
   :CLOCK:
   :END:
 "
-                 )
-                ("K" "Immediate todo Item in current clock" entry (clock)
-                 #'konix/org-capture-template-todo
-                 :immediate-finish t
                  )
                 ("I" "Clocked todo Item in current clock" entry (clock) "* NEXT %?
   :PROPERTIES:
@@ -2920,15 +2932,6 @@ items"
 "
                  :clock-in t
                  :clock-keep t
-                 )
-                ("L" "Todo Item for current stuff in current clock" entry (clock)
-                 "* NEXT %? %a
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-  :CLOCK:
-  :END:
-"
                  )
                 ("D" "Todo Item for current stuff (ipfa in dired)" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %? %(konix/org-capture/ipfa)
@@ -2950,36 +2953,6 @@ items"
                  )
                 ("l" "Todo Item for current stuff" entry (file+headline konix/org-todo_file "Refile")
                  "* NEXT %? %a
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-  :CLOCK:
-  :END:
-"
-                 )
-                ("a" "Todo Item for git annexed stuff" entry (file+headline konix/org-todo_file "Refile")
-                 "* NEXT %?%(file-name-nondirectory (car (konix/org-capture/git-annex-info)))
-  :PROPERTIES:
-  :CREATED:  %U
-  :ID: %(cdr (konix/org-capture/git-annex-info))
-  :END:
-  :CLOCK:
-  :END:
-  %(konix/org-capture/git-annex)"
-                 )
-                ("u" "Todo Item URGENT" entry (file+headline konix/org-todo_file "Refile")
-                 "* NEXT [#G] %?
-  DEADLINE: %t
-  :PROPERTIES:
-  :CREATED:  %U
-  :END:
-  :CLOCK:
-  :END:
-"
-                 )
-                ("U" "Todo Item URGENT for current stuff" entry (file+headline konix/org-todo_file "Refile")
-                 "* NEXT [#G] %? %a
-  DEADLINE: %t
   :PROPERTIES:
   :CREATED:  %U
   :END:

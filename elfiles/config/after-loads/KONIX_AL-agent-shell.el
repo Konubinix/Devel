@@ -517,6 +517,9 @@ under agent-shell/."
 
 (setq-default agent-shell-dot-subdir-function #'konix/agent-shell-dot-subdir-in-emacs-d)
 
+;; add an advice to agent-shell--ensure-gitignore so that it becomes a noop
+(advice-add 'agent-shell--ensure-gitignore :override #'ignore)
+
 (defun konix/agent-shell-viewport-view-mode-hook ()
   (visual-line-mode))
 

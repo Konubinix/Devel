@@ -266,3 +266,13 @@ primary remotes, then rebuilds them all."
   (message "Rebuilding %s and its dependencies..." package)
   (straight-rebuild-package package t)
   (message "Done updating and rebuilding %s" package))
+
+(defun konix/homemanager-load-session-env ()
+  (interactive)
+  (with-temp-buffer
+        (call-process "konix_hm_session_env.sh" nil (list t nil) nil)
+        (goto-char (point-min))
+        (while (re-search-forward "^\\([^=]+\\)='\\(.*\\)'$" nil t)
+          (setenv (match-string 1)
+                  (let ((value (match-string 2)))
+                    (if (equal value "") nil value))))))

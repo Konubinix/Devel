@@ -95,17 +95,20 @@ Returns the access token."
 
 (defun konix/claude-code--format-duration (seconds)
   "Format a duration in SECONDS as a human-readable string."
-  (if (<= seconds 0)
-      "ok"
-    (let* ((hours (floor (/ seconds 3600)))
-           (minutes (floor (/ (mod seconds 3600) 60))))
-      (cond
-       ((>= hours 24)
-        (format "%dd %dh" (/ hours 24) (mod hours 24)))
-       ((> hours 0)
-        (format "%dh %dm" hours minutes))
-       (t
-        (format "%dm" minutes))))))
+  (let* ((abs-seconds (abs seconds))
+         (negative-p (< seconds 0))
+         (hours (floor (/ abs-seconds 3600)))
+         (minutes (floor (/ (mod abs-seconds 3600) 60)))
+         (formatted (cond
+                     ((>= hours 24)
+                      (format "%dd %dh" (/ hours 24) (mod hours 24)))
+                     ((> hours 0)
+                      (format "%dh %dm" hours minutes))
+                     (t
+                      (format "%dm" minutes)))))
+    (if negative-p
+        (concat "-" formatted)
+      formatted)))
 
 (defun konix/claude-code--elapsed-percent (reset-timestamp interval-seconds)
   "Compute the percentage of INTERVAL-SECONDS elapsed.
@@ -214,8 +217,8 @@ Returns usage information including:
                       (util-7d-pct (* util-7d 100))
                       (elapsed-5h-pct (konix/claude-code--elapsed-percent reset-5h 18000))
                       (elapsed-7d-pct (konix/claude-code--elapsed-percent reset-7d 604800))
-                      (wait-5h-secs (max 0 (* (/ (- util-5h-pct elapsed-5h-pct) 100.0) 18000)))
-                      (wait-7d-secs (max 0 (* (/ (- util-7d-pct elapsed-7d-pct) 100.0) 604800))))
+                      (wait-5h-secs (* (/ (- util-5h-pct elapsed-5h-pct) 100.0) 18000))
+                      (wait-7d-secs  (* (/ (- util-7d-pct elapsed-7d-pct) 100.0) 604800)))
                  (json-encode
                   `((usage_5h_percent . ,util-5h-pct)
                     (elapsed_5h_percent . ,elapsed-5h-pct)

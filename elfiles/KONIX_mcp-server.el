@@ -545,6 +545,28 @@ Similar to `elysium-discard-all-suggested-changes'."
 
 ;;; Agent-shell tools
 
+(defun konix/mcp-server--normalize-mcp-changes (mcp-changes)
+  "Normalize mcp-config-changes to the expected add/remove/edit format.
+Supports both the native {\"add\"/\"remove\"/\"edit\"} format and the
+.mcp.json {\"mcpServers\": {\"name\": config}} format.
+Signals an error if neither format is recognized."
+  (let ((has-native-keys (or (alist-get 'add mcp-changes)
+                             (alist-get 'remove mcp-changes)
+                             (alist-get 'edit mcp-changes)))
+        (mcp-servers (alist-get 'mcpServers mcp-changes)))
+    (cond
+     (has-native-keys mcp-changes)
+     (mcp-servers
+      (let (servers-to-add)
+        (map-do (lambda (name config)
+                  (push `((name . ,(symbol-name name)) ,@(append config nil))
+                        servers-to-add))
+                mcp-servers)
+        `((add . ,(vconcat (nreverse servers-to-add))))))
+     (t
+      (error "mcp-config-changes must use {\"add\"/\"remove\"/\"edit\"} or {\"mcpServers\": {}} format; got keys: %s"
+             (mapcar #'car mcp-changes))))))
+
 (defun konix/mcp-server--normalize-server-config (srv)
   "Normalize a server config parsed from JSON to the agent-shell format.
 JSON gives env/headers as alists like ((KEY . VAL) ...),
@@ -618,7 +640,11 @@ MCP Parameters:
   directory - The working directory for the session
   task - Contextual goal describing the agent's purpose (the agent will wait for concrete tasks from the coordinator via coord_post_task)
   agent-name - Unique name for the agent in the coordination system
-  mcp-config-changes - Optional JSON string describing changes to the MCP server config. Supports the standard MCP config format with these keys: \"mcpServers\" (object mapping server names to configs — each config has \"command\"/\"args\" for stdio or {\"type\":\"http\",\"url\"} for HTTP, \"env\" as a plain object {\"KEY\":\"VALUE\"}, \"headers\" as a plain object — example: {\"mcpServers\":{\"my-srv\":{\"command\":\"node\",\"args\":[\"server.js\"],\"env\":{\"TOKEN\":\"abc\"}}}}), \"remove\" (list of server name strings to remove from the default config), \"edit\" (list of objects to modify existing servers, each with \"name\" and optional \"env_set\" (object of KEY:VALUE to add/override), \"env_remove\" (list of env var names to remove), \"headers_set\" (object of KEY:VALUE), \"headers_remove\" (list of header names to remove))
+  mcp-config-changes - Optional JSON string describing changes to the MCP server config. Supported keys:
+    \"add\": list of server config objects to add.  Each object has \"name\", \"command\", \"args\", and optionally \"env\" (plain object {\"KEY\":\"VALUE\"} or array [{\"name\":\"KEY\",\"value\":\"VALUE\"}]) and \"headers\" (same formats).
+    \"remove\": list of server name strings to remove from the default config.
+    \"edit\": list of objects to modify existing servers, each with \"name\" and optional \"env_set\" ({KEY:VALUE to add/override}), \"env_remove\" (list of var names to remove), \"headers_set\" ({KEY:VALUE}), \"headers_remove\" (list of header names to remove).
+    Example: {\"add\":[{\"name\":\"my-srv\",\"command\":\"node\",\"args\":[\"server.js\"],\"env\":{\"TOKEN\":\"abc\"}}]}
   model - Optional model ID or alias (e.g. \"sonnet\", \"opus\", \"claude-sonnet-4-6\")"
   (mcp-server-lib-with-error-handling
    (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
@@ -626,9 +652,10 @@ MCP Parameters:
           (agent-name (decode-coding-string agent-name 'utf-8))
           (mcp-changes (when (and mcp-config-changes
                                   (not (string-empty-p mcp-config-changes)))
-                         (json-parse-string
-                          (decode-coding-string mcp-config-changes 'utf-8)
-                          :object-type 'alist)))
+                         (konix/mcp-server--normalize-mcp-changes
+                          (json-parse-string
+                           (decode-coding-string mcp-config-changes 'utf-8)
+                           :object-type 'alist))))
           (model-decoded (when (and model (not (string-empty-p model)))
                            (decode-coding-string model 'utf-8)))
           (prompt (format "You are a coordinated sub-agent. Your goal: %s

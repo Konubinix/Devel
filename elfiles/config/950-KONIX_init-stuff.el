@@ -66,3 +66,5 @@
 
 (add-hook 'after-init-hook
           #'konix/after-init-hook)
+
+(konix/homemanager-load-session-env)

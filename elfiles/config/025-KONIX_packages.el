@@ -95,10 +95,7 @@
   (use-package consult-yasnippet)
   (use-package copilot)
   (use-package lsp-mode :commands (lsp))
-  (use-package dap-mode :after (lsp-mode))
-  ;; I will try to put it back from upstream in case I use dap in the future
-  ;; (use-package dap-mode :after (lsp-mode) :straight (:fork (:branch "vscode-js-debug-feature")))
-  ;; (:repo "jeff-phil/dap-mode-PR" :branch "vscode-js-debug-feature")
+  (use-package dap-mode :after (lsp-mode) :straight (:fork (:branch "konubinix")))
   (use-package dash)
   (use-package dedicated)
   (use-package default-text-scale)

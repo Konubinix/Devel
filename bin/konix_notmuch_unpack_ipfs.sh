@@ -13,7 +13,7 @@ python3 - "${dir}" <<'PYEOF'
 import os, sys, re, html as h
 
 output_dir = sys.argv[1]
-files = [f for f in sorted(os.listdir(output_dir)) if f not in ("index.html", "msg")]
+files = [f for f in sorted(os.listdir(output_dir)) if f not in ("index.html")]
 html_files = [f for f in files if f.endswith('.html')]
 
 page = """<!DOCTYPE html>

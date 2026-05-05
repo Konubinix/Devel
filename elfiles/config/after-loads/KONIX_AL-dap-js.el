@@ -58,5 +58,46 @@ bind its port.  See commentary above for why this is needed."
 
 (advice-add 'dap--create-session :before #'konix/dap-js-wait-for-server)
 
+
+(defconst konix-dap-js/trace-log-file "/tmp/vscode-js-debug.log"
+  "Path vscode-js-debug writes its CDP trace to when the inject-trace
+advice is active. Overwritten on each new session.")
+
+(defun konix-dap-js/inject-trace (orig conf &rest args)
+  "Inject :trace into any pwa-node debug CONF that doesn't already have one.
+Makes vscode-js-debug write a CDP-level log to
+`konix-dap-js/trace-log-file', covering every Debugger.scriptParsed
+event, source-map fetch, and setBreakpointByUrl attempt. The string
+\"verbose\" and the boolean t forms are silently dropped by
+vscode-js-debug; only the object form below takes effect."
+  (let ((conf (if (and (string= (plist-get conf :type) "pwa-node")
+                       (not (plist-member conf :trace)))
+                  (append conf
+                          (list :trace (list :console t :stdio t
+                                             :logFile konix-dap-js/trace-log-file)))
+                conf)))
+    (apply orig conf args)))
+
+(defun konix-dap-js/toggle-trace (&optional arg)
+  "Toggle dap-debug auto-injection of :trace for pwa-node sessions.
+Without ARG, flip the current state. With a positive prefix turn it
+ON, with zero or negative turn it OFF. When ON, vscode-js-debug
+writes a verbose CDP log to `konix-dap-js/trace-log-file' on every
+new session. When OFF (the default), no trace key is added and any
+:trace already present in the launch config is honoured untouched."
+  (interactive "P")
+  (let* ((currently-on (advice-member-p 'konix-dap-js/inject-trace 'dap-debug))
+         (turn-on (cond ((null arg) (not currently-on))
+                        ((<= (prefix-numeric-value arg) 0) nil)
+                        (t t))))
+    (if turn-on
+        (progn
+          (advice-add 'dap-debug :around #'konix-dap-js/inject-trace)
+          (message "dap-js trace injection: ON (-> %s)"
+                   konix-dap-js/trace-log-file))
+      (advice-remove 'dap-debug #'konix-dap-js/inject-trace)
+      (message "dap-js trace injection: OFF"))))
+
+
 (provide 'KONIX_AL-dap-js)
 ;;; KONIX_AL-dap-js.el ends here

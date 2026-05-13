@@ -255,12 +255,28 @@ MCP Parameters:
    (konix/mcp-server--get-agenda-content "ann")))
 ;;; Org babel tools
 
+(defun konix/mcp-server--find-named-call (name)
+  "Find a #+CALL: line preceded by a #+NAME: NAME affiliated keyword.
+Return the position of the #+CALL: line, or nil if none is found."
+  (save-excursion
+    (goto-char (point-min))
+    (let ((case-fold-search t)
+          (regexp (format "^[ \t]*#\\+name:[ \t]+%s[ \t]*$"
+                          (regexp-quote name))))
+      (catch 'found
+        (while (re-search-forward regexp nil t)
+          (save-excursion
+            (forward-line 1)
+            (when (looking-at-p "^[ \t]*#\\+call:[ \t]+")
+              (throw 'found (line-beginning-position)))))
+        nil))))
+
 (defun konix/mcp-server-run-babel-block (buffer-name block-name &optional force save-buffer)
-  "Execute a named org-babel source block and return its result.
+  "Execute a named org-babel source block or CALL line and return its result.
 
 MCP Parameters:
   buffer-name - Name of the buffer containing the org babel block.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
-  block-name - The #+NAME of the babel block to execute
+  block-name - The #+NAME of the babel block or CALL line to execute
   force - When non-nil, bypass the cache and force re-evaluation
   save-buffer - When omitted or non-nil, save the buffer to its file after execution (default).  Pass \"false\" or \"no\" to skip saving."
   (mcp-server-lib-with-error-handling
@@ -270,11 +286,16 @@ MCP Parameters:
      (save-excursion
        (save-restriction
          (widen)
-         (let ((pos (org-babel-find-named-block block-name)))
+         (let* ((src-pos (org-babel-find-named-block block-name))
+                (call-pos (unless src-pos
+                            (konix/mcp-server--find-named-call block-name)))
+                (pos (or src-pos call-pos)))
            (unless pos
              (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
            (goto-char pos)
-           (let ((info (org-babel-get-src-block-info)))
+           (let ((info (if call-pos
+                           (org-babel-lob-get-info)
+                         (org-babel-get-src-block-info))))
              (when-let ((error-buf (get-buffer "*Org-Babel Error Output*")))
                (kill-buffer error-buf))
              (condition-case err

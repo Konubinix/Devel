@@ -227,7 +227,7 @@
 ;; Goto emacs config
 (keymap-set 'konix/global-key-map "h" 'konix/hack-on-emacs)
 ;; Update the env
-(keymap-set 'konix/global-key-map "M-e" 'konix/load-default-env-file)
+(keymap-set 'konix/global-key-map "M-e" 'konix/homemanager-load-session-env)
 ;;Indentation
 (keymap-set 'konix/global-key-map "i" 'konix/lsp-format-or-indent-region-or-buffer)
 ;; goto

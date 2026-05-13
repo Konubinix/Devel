@@ -970,4 +970,16 @@ under agent-shell/."
 (define-key agent-shell-mode-map (kbd "F") 'konix/agent-shell-follow-mode)
 (define-key agent-shell-viewport-view-mode-map (kbd "F") 'konix/agent-shell-follow-mode)
 
+(defun konix/agent-shell-ui-update-fragment-save-point (orig &rest args)
+  (let ((p (point)))
+    (apply orig args)
+    (unless konix/agent-shell-follow-mode
+      (goto-char p))))
+
+(advice-add 'agent-shell-ui-update-fragment :around
+            #'konix/agent-shell-ui-update-fragment-save-point)
+
+;; (advice-remove 'agent-shell-ui-update-fragment
+;;             #'konix/agent-shell-ui-update-fragment-save-point)
+
 ;;; KONIX_AL-agent-shell.el ends here

@@ -703,12 +703,13 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
        (error "An agent named '%s' already exists locally. Kill it first or use a different name" agent-name))
      (when (konix/mcp-server--coord-agent-exists-p agent-name)
        (error "An agent named '%s' is already registered in the coordination system" agent-name))
-     (setf (alist-get :buffer-name config)
-           (format "Claude Code [%s]" agent-name))
-     (let ((shell-buffer (agent-shell--start :config config
-                                             :new-session t
-                                             :no-focus t
-                                             :session-strategy 'new-deferred)))
+     (let* ((konix/agent-shell-buffer-label
+             (konix/agent-shell--truncate-label
+              (or (konix/agent-shell--clean-label task) agent-name)))
+            (shell-buffer (agent-shell--start :config config
+                                              :new-session t
+                                              :no-focus t
+                                              :session-strategy 'new-deferred)))
        (with-current-buffer shell-buffer
          (setq-local agent-shell-cwd-function (lambda () directory))
          (setq-local agent-shell-mcp-servers
@@ -767,6 +768,44 @@ MCP Parameters:
                           (url-hexify-string agent-name))))
          (url-retrieve-synchronously url t nil 5))
        (format "Killed coordinated agent '%s' (buffer '%s')" agent-name buf-name)))))
+
+(defun konix/mcp-server-rename-agent-shell (label)
+  "Rename the calling agent-shell buffer (shell + viewport) to LABEL.
+
+The caller is identified as the unique `agent-shell-mode' buffer where
+`shell-maker-busy' returns non-nil — the agent is mid-turn while
+invoking this tool.  Errors when zero or multiple busy agent-shells
+are found.
+
+LABEL is incorporated into the buffer name via
+`agent-shell-buffer-name-format' (the user's format decides the final
+shape).  An empty LABEL clears the label and reverts to the default.
+
+MCP Parameters:
+  label - A short label (e.g. a 3-7 word session description) used as
+          the new buffer name.  Pass an empty string to revert to the
+          default project-based name."
+  (mcp-server-lib-with-error-handling
+   (unless (and (fboundp 'konix/agent-shell--apply-label-format)
+                (fboundp 'konix/agent-shell--rename-pair))
+     (error "konix agent-shell rename helpers not loaded"))
+   (let ((busy-shells (seq-filter
+                       (lambda (b)
+                         (with-current-buffer b
+                           (and (derived-mode-p 'agent-shell-mode)
+                                (shell-maker-busy))))
+                       (buffer-list))))
+     (cond
+      ((null busy-shells)
+       (error "No busy agent-shell buffer found (cannot identify caller)"))
+      ((cdr busy-shells)
+       (error "Ambiguous: %d busy agent-shell buffers; cannot identify caller"
+              (length busy-shells)))
+      (t
+       (let* ((shell (car busy-shells))
+              (formatted (konix/agent-shell--apply-label-format shell label)))
+         (konix/agent-shell--rename-pair shell formatted)
+         (format "Renamed agent-shell to %s" formatted)))))))
 
 ;;; Tool registration
 
@@ -836,6 +875,9 @@ Each old_string should include enough context to be unique (e.g., a whole functi
     (konix/mcp-server-kill-agent
      :id "kill_agent"
      :description "Kill a coordinated agent that was previously spawned with spawn_agent. Use this to clean up a sub-agent when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_agent (refuses to kill other buffers).")
+    (konix/mcp-server-rename-agent-shell
+     :id "rename_agent_shell"
+     :description "Rename the calling agent-shell buffer (shell + viewport) to a short label that summarises the current session. Use this when the user asks you to rename your own buffer with a meaningful name — pick a 3-7 word descriptive label and call this tool. The label is incorporated into the buffer name via the user's format (typically appears as `A@<label>`). Pass an empty string to revert to the default project-based name. Only works while the calling agent-shell is mid-turn (which it normally is when you call any tool).")
     ;; Introspection tools
     (konix/mcp-server-introspection-symbol-exists
      :id "symbol_exists"

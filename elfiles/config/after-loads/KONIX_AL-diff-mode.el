@@ -27,6 +27,9 @@
 (require 'outline)
 ;(require 'hideshow)
 
+(customize-set-variable 'diff-refine 'font-lock)
+
+
 (defun konix/diff-hs-forward-sexp (arg)
   "Move to end of current diff file or hunk block for hideshow.
 Point is at the beginning of the block start match (diff or @@)."

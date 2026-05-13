@@ -75,6 +75,7 @@
            ("M-g l r" . konix/agent-shell-request-edit)
            ("M-g l s" . konix/agent-shell-resume)
            ("M-g l t" . konix/agent-shell/toggle-mcp-server)
+           ("M-g l U" . konix/claude-code-usage)
            ("M-g l u" . konix/agent-shell-track-ready-buffers)))
   (use-package aggressive-indent-mode)
   (use-package arduino-mode)

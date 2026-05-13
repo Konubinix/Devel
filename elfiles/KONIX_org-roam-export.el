@@ -478,32 +478,49 @@
     )
   )
 
+(defmacro konix/org-roam-export/with-node-url (self-fn &rest body)
+  "Execute BODY with `url' bound to the node's full URL.
+If not in an org-roam buffer or prefix arg given, prompt for a node and
+recurse by calling SELF-FN interactively in that node's buffer."
+  `(if (and
+        (not current-prefix-arg)
+        (equal major-mode 'org-mode)
+        (string-prefix-p org-roam-directory (konix/org-roam-export/get-buffer-file-name))
+        )
+       (let ((url (concat "https://konubinix.eu" (konix/org-roam-export/get-url))))
+         ,@body
+         )
+     (let* ((node (org-roam-node-read))
+            (file-path (org-roam-node-file node)))
+       (save-window-excursion
+         (with-current-buffer (find-file file-path)
+           (call-interactively ,self-fn)
+           )
+         )
+       )
+     )
+  )
+
 ;;;###autoload
 (defun konix/org-roam-export/yank-url ()
   (interactive)
-  (if (and
-       (not current-prefix-arg)
-       (equal major-mode 'org-mode)
-       (string-prefix-p org-roam-directory (konix/org-roam-export/get-buffer-file-name))
-       )
-      (let (
-            (url (concat "https://konubinix.eu" (konix/org-roam-export/get-url)))
-            )
-        (with-temp-buffer
-          (insert url)
-          (clipboard-kill-region (point-min) (point-max))
-          )
-        (message "%s copied into the clipboard" url)
-        )
-    (let* ((node (org-roam-node-read))
-           (file-path (org-roam-node-file node)))
-      (save-window-excursion
-        (with-current-buffer (find-file file-path)
-          (call-interactively 'konix/org-roam-export/yank-url)
-          )
-        )
-      )
-    )
+  (konix/org-roam-export/with-node-url
+   'konix/org-roam-export/yank-url
+   (with-temp-buffer
+     (insert url)
+     (clipboard-kill-region (point-min) (point-max))
+     )
+   (message "%s copied into the clipboard" url)
+   )
+  )
+
+;;;###autoload
+(defun konix/org-roam-export/browse-url ()
+  (interactive)
+  (konix/org-roam-export/with-node-url
+   'konix/org-roam-export/browse-url
+   (browse-url url)
+   )
   )
 
 (defun konix/org-roam-export/add-roam-alias ()

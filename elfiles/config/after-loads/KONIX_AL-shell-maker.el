@@ -65,5 +65,74 @@ Only notifies if input has been submitted at least once (not on initial buffer c
 
 (advice-add #'shell-maker-finish-output :before #'konix/shell-maker-finish-output/notify)
 
+;; Disable the overlay-based table prettification and align markdown tables
+;; in plain text via `markdown-table-align' from agent-shell's section hook.
+
+(with-eval-after-load 'markdown-overlays-tables
+  (setq markdown-overlays-prettify-tables nil))
+
+(defconst konix/md-tables--preserve-properties
+  '(agent-shell-ui-state agent-shell-ui-section
+                         help-echo field read-only front-sticky)
+  "Text properties to re-apply after `markdown-table-align'.
+`markdown-table-align' deletes and re-inserts each table line, which
+strips text properties.  Without restoring them, the block loses its
+`agent-shell-ui-state' marker; the next streaming chunk then fails to
+locate the block via `text-property-search-backward' and gets inserted
+as a brand-new block at point-max — leaving stale, duplicated tables
+in the buffer.")
+
+(defun konix/md-tables--props-at (pos)
+  "Return a plist of `konix/md-tables--preserve-properties' set at POS."
+  (let ((src (text-properties-at pos))
+        acc)
+    (dolist (key konix/md-tables--preserve-properties)
+      (when (plist-member src key)
+        (push (plist-get src key) acc)
+        (push key acc)))
+    acc))
+
+(defun konix/md-tables--align-region (start end)
+  "Align every markdown table in the buffer between START and END.
+Preserves the text properties listed in
+`konix/md-tables--preserve-properties' on the rewritten lines, so the
+agent-shell block markers survive the alignment."
+  (require 'markdown-mode)
+  (let ((props (konix/md-tables--props-at start)))
+    (save-excursion
+      (save-restriction
+        (narrow-to-region start end)
+        (let ((inhibit-read-only t))
+          (goto-char (point-min))
+          (while (not (eobp))
+            (if (markdown-table-at-point-p)
+                (let ((tstart (copy-marker (markdown-table-begin)))
+                      (tend (copy-marker (markdown-table-end) t)))
+                  (markdown-table-align)
+                  (when props
+                    (add-text-properties tstart tend props))
+                  (goto-char tend)
+                  (set-marker tstart nil)
+                  (set-marker tend nil))
+              (forward-line 1))))))))
+
+(defun konix/md-tables-align-after-finish (&rest _)
+  "Align markdown tables in the current shell buffer and its viewport.
+Per-chunk alignment during streaming corrupts the table because the
+range passed to the chunk callback can cut a row mid-cell.  Aligning
+once on the stable buffer after `shell-maker-finish-output' avoids
+that — see the plan file."
+  (konix/md-tables--align-region (point-min) (point-max))
+  (when (fboundp 'agent-shell-viewport--buffer)
+    (when-let ((vbuf (agent-shell-viewport--buffer
+                      :shell-buffer (current-buffer)
+                      :existing-only t)))
+      (with-current-buffer vbuf
+        (let ((inhibit-read-only t))
+          (konix/md-tables--align-region (point-min) (point-max)))))))
+
+(advice-add #'shell-maker-finish-output :after
+            #'konix/md-tables-align-after-finish)
+
 (provide 'KONIX_AL-shell-maker)
 ;;; KONIX_AL-shell-maker.el ends here

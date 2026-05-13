@@ -918,7 +918,8 @@ recurse by calling SELF-FN interactively in that node's buffer."
         (replace-match
          (format
           "\n%s\n"
-          (konix/org-roam-export/process-url (match-string-no-properties 1))))))
+          (konix/org-roam-export/process-url (match-string-no-properties 1)))
+         t t)))
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
@@ -929,7 +930,8 @@ recurse by calling SELF-FN interactively in that node's buffer."
          (format
           "%s%s"
           (match-string-no-properties 1)
-          (konix/org-roam-export/process-url (match-string-no-properties 2))))))))
+          (konix/org-roam-export/process-url (match-string-no-properties 2)))
+         t t)))))
 
 (defun konix/org-roam-export/convert-remaining-ipfs-links ()
   (save-excursion

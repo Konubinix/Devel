@@ -44,15 +44,18 @@
 (defun konix/auto-revert--highlight-changes ()
   "Pulse changed lines after auto-revert."
   (when (and buffer-file-name konix/auto-revert--old-content)
-    (let ((old-lines (split-string konix/auto-revert--old-content "\n"))
-          (new-lines (split-string (buffer-string) "\n"))
-          regions region-start region-end)
+    (let* ((old-vec (vconcat (split-string konix/auto-revert--old-content "\n")))
+           (new-vec (vconcat (split-string (buffer-string) "\n")))
+           (old-len (length old-vec))
+           (new-len (length new-vec))
+           regions region-start region-end)
       (setq konix/auto-revert--old-content nil)
       (save-excursion
         (goto-char (point-min))
-        (dotimes (i (max (length old-lines) (length new-lines)))
-          (if (and (< i (length new-lines))
-                   (not (equal (nth i old-lines) (nth i new-lines))))
+        (dotimes (i (max old-len new-len))
+          (if (and (< i new-len)
+                   (not (equal (and (< i old-len) (aref old-vec i))
+                               (aref new-vec i))))
               (progn
                 (unless region-start
                   (setq region-start (line-beginning-position)))

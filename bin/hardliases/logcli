@@ -1,1 +1,7 @@
-kubectl-node_shell
+#!/usr/bin/env bash
+
+source _ko_nix.sh
+me="$(basename "${0}")"
+bin="$(nix_install_binary "${me}" grafana-loki)"
+
+exec "${bin}" "$@"

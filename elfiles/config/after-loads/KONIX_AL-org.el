@@ -5641,6 +5641,7 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
   )
 
 (defmacro konix/org-with-point-set-to-next-visible-line (&rest body)
+  (declare (debug t))
   `(let (
          (col (current-column))
          )

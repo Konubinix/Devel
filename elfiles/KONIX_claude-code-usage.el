@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'plz)
+
 (defun konix/claude-code--parse-claude-credentials ()
   "Parse Claude Code credentials from ~/.claude/.credentials.json.
 Returns the OAuth access token or nil if not found."
@@ -125,6 +127,25 @@ Returns a float between 0 and 100."
 (defvar konix/claude-code--usage-cache-time nil
   "Timestamp for `konix/claude-code---usage' cache.")
 
+(defun konix/claude-code--call-rate-limit-probe (token)
+  "POST a 1-token completion and return the `plz-response' struct.
+On non-2xx the response is recovered from the signaled `plz-error',
+so the caller can inspect status + rate-limit headers uniformly."
+  (condition-case err
+      (plz 'post "https://api.anthropic.com/v1/messages"
+        :headers `(("Authorization" . ,(concat "Bearer " token))
+                   ("anthropic-version" . "2023-06-01")
+                   ("anthropic-beta" . "oauth-2025-04-20")
+                   ("content-type" . "application/json"))
+        :body (json-encode
+               '((model . "claude-haiku-4-5-20251001")
+                 (max_tokens . 1)
+                 (messages . [((role . "user") (content . "hi"))])))
+        :as 'response :timeout 30)
+    (plz-http-error
+     (or (plz-error-response (caddr err))
+         (signal (car err) (cdr err))))))
+
 ;;;###autoload
 (defun konix/claude-code---usage ()
   "Get Claude Code API usage information.
@@ -141,101 +162,55 @@ Returns usage information including:
        konix/claude-code--usage-cache-time
        (< (- (float-time) konix/claude-code--usage-cache-time) 600))
       konix/claude-code--usage-cache
-    (let ((result
-           (let ((token (konix/claude-code--ensure-valid-credentials)))
-             (let* ((url-request-method "POST")
-                    (url-request-extra-headers
-                     `(("Authorization" . ,(concat "Bearer " token))
-                       ("anthropic-version" . "2023-06-01")
-                       ("anthropic-beta" . "oauth-2025-04-20")
-                       ("content-type" . "application/json")))
-                    (url-request-data
-                     (json-encode
-                      '((model . "claude-haiku-4-5-20251001")
-                        (max_tokens . 1)
-                        (messages . [((role . "user") (content . "hi"))]))))
-                    (response-headers nil)
-                    (response-status nil)
-                    (buffer (url-retrieve-synchronously
-                             "https://api.anthropic.com/v1/messages" t t 30)))
-               (unless buffer
-                 (error "Failed to connect to Anthropic API"))
-               (with-current-buffer buffer
-                 ;; Parse status code
-                 (goto-char (point-min))
-                 (when (re-search-forward "^HTTP/[0-9.]+ \\([0-9]+\\)" nil t)
-                   (setq response-status (string-to-number (match-string 1))))
-                 ;; Parse headers from the response
-                 (goto-char (point-min))
-                 (while (re-search-forward "^\\([^:]+\\): \\(.+\\)$" nil t)
-                   (push (cons (downcase (match-string 1)) (match-string 2))
-                         response-headers))
-                 (kill-buffer))
-               ;; If we got a 401, credentials are stale — renew and retry once
-               (when (eql response-status 401)
-                 (konix/claude-code--renew-credentials)
-                 (setq token (konix/claude-code--parse-claude-credentials))
-                 (let* ((url-request-method "POST")
-                        (url-request-extra-headers
-                         `(("Authorization" . ,(concat "Bearer " token))
-                           ("anthropic-version" . "2023-06-01")
-                           ("anthropic-beta" . "oauth-2025-04-20")
-                           ("content-type" . "application/json")))
-                        (url-request-data
-                         (json-encode
-                          '((model . "claude-haiku-4-5-20251001")
-                            (max_tokens . 1)
-                            (messages . [((role . "user") (content . "hi"))]))))
-                        (retry-buffer (url-retrieve-synchronously
-                                       "https://api.anthropic.com/v1/messages" t t 30)))
-                   (unless retry-buffer
-                     (error "Failed to connect to Anthropic API on retry"))
-                   (setq response-headers nil)
-                   (with-current-buffer retry-buffer
-                     (goto-char (point-min))
-                     (while (re-search-forward "^\\([^:]+\\): \\(.+\\)$" nil t)
-                       (push (cons (downcase (match-string 1)) (match-string 2))
-                             response-headers))
-                     (kill-buffer))))
-               (let* ((util-5h (string-to-number
-                                (or (alist-get "anthropic-ratelimit-unified-5h-utilization"
-                                               response-headers nil nil #'string=)
-                                    "0")))
-                      (reset-5h (string-to-number
-                                 (or (alist-get "anthropic-ratelimit-unified-5h-reset"
-                                                response-headers nil nil #'string=)
-                                     "0")))
-                      (reset-7d (string-to-number
-                                 (or (alist-get "anthropic-ratelimit-unified-7d-reset"
-                                                response-headers nil nil #'string=)
-                                     "0")))
-                      (util-7d (string-to-number
-                                (or (alist-get "anthropic-ratelimit-unified-7d-utilization"
-                                               response-headers nil nil #'string=)
-                                    "0")))
-                      (util-5h-pct (* util-5h 100))
-                      (util-7d-pct (* util-7d 100))
-                      (elapsed-5h-pct (konix/claude-code--elapsed-percent reset-5h 18000))
-                      (elapsed-7d-pct (konix/claude-code--elapsed-percent reset-7d 604800))
-                      (wait-5h-secs (* (/ (- util-5h-pct elapsed-5h-pct) 100.0) 18000))
-                      (wait-7d-secs  (* (/ (- util-7d-pct elapsed-7d-pct) 100.0) 604800)))
-                 (json-encode
-                  `((usage_5h_percent . ,util-5h-pct)
-                    (elapsed_5h_percent . ,elapsed-5h-pct)
-                    (wait_5h . ,(konix/claude-code--format-duration wait-5h-secs))
-                    (wait_5h_secs . ,wait-5h-secs)
-                    (reset_5h . ,(if (< reset-5h 0) "N/A" (konix/claude-code--format-time-until reset-5h)))
-                    (reset_5h_datetime . ,(if (< reset-5h 0) "N/A" (format-time-string
-                                                                    "%Y-%m-%d %H:%M" (seconds-to-time reset-5h))))
-                    (usage_7d_percent . ,util-7d-pct)
-                    (elapsed_7d_percent . ,elapsed-7d-pct)
-                    (wait_7d . ,(konix/claude-code--format-duration wait-7d-secs))
-                    (wait_7d_secs . ,wait-7d-secs)
-                    (reset_7d . ,(if (< reset-7d 0) "N/A" (konix/claude-code--format-time-until reset-7d)))
-                    (reset_7d_datetime . ,(if (< reset-7d 0) "N/A" (format-time-string
-                                                                    "%Y-%m-%d %H:%M"
-                                                                    (seconds-to-time
-                                                                     reset-7d)))))))))))
+    (let* ((token (konix/claude-code--ensure-valid-credentials))
+           (response (konix/claude-code--call-rate-limit-probe token))
+           (response (if (eql (plz-response-status response) 401)
+                         (progn
+                           (konix/claude-code--renew-credentials)
+                           (konix/claude-code--call-rate-limit-probe
+                            (konix/claude-code--parse-claude-credentials)))
+                       response))
+           (headers (plz-response-headers response))
+           (util-5h (string-to-number
+                     (or (alist-get 'anthropic-ratelimit-unified-5h-utilization
+                                    headers)
+                         "0")))
+           (reset-5h (string-to-number
+                      (or (alist-get 'anthropic-ratelimit-unified-5h-reset
+                                     headers)
+                          "0")))
+           (reset-7d (string-to-number
+                      (or (alist-get 'anthropic-ratelimit-unified-7d-reset
+                                     headers)
+                          "0")))
+           (util-7d (string-to-number
+                     (or (alist-get 'anthropic-ratelimit-unified-7d-utilization
+                                    headers)
+                         "0")))
+           (util-5h-pct (* util-5h 100))
+           (util-7d-pct (* util-7d 100))
+           (elapsed-5h-pct (konix/claude-code--elapsed-percent reset-5h 18000))
+           (elapsed-7d-pct (konix/claude-code--elapsed-percent reset-7d 604800))
+           (wait-5h-secs (* (/ (- util-5h-pct elapsed-5h-pct) 100.0) 18000))
+           (wait-7d-secs (* (/ (- util-7d-pct elapsed-7d-pct) 100.0) 604800))
+           (result
+            (json-encode
+             `((usage_5h_percent . ,util-5h-pct)
+               (elapsed_5h_percent . ,elapsed-5h-pct)
+               (wait_5h . ,(konix/claude-code--format-duration wait-5h-secs))
+               (wait_5h_secs . ,wait-5h-secs)
+               (reset_5h . ,(if (< reset-5h 0) "N/A" (konix/claude-code--format-time-until reset-5h)))
+               (reset_5h_datetime . ,(if (< reset-5h 0) "N/A" (format-time-string
+                                                               "%Y-%m-%d %H:%M" (seconds-to-time reset-5h))))
+               (usage_7d_percent . ,util-7d-pct)
+               (elapsed_7d_percent . ,elapsed-7d-pct)
+               (wait_7d . ,(konix/claude-code--format-duration wait-7d-secs))
+               (wait_7d_secs . ,wait-7d-secs)
+               (reset_7d . ,(if (< reset-7d 0) "N/A" (konix/claude-code--format-time-until reset-7d)))
+               (reset_7d_datetime . ,(if (< reset-7d 0) "N/A" (format-time-string
+                                                               "%Y-%m-%d %H:%M"
+                                                               (seconds-to-time
+                                                                reset-7d))))))))
       (setq konix/claude-code--usage-cache result
             konix/claude-code--usage-cache-time (float-time))
       result)))

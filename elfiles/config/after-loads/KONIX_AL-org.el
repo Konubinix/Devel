@@ -4727,6 +4727,10 @@ With `ID', set the ID instead of the CUSTOM_ID."
 (setq-default org-babel-python-command "python3")
 ;; Python indentation is tricky and easily messed up by org mode
 (add-to-list 'org-babel-default-header-args:python '(:preserve-indentation . t))
+;; Don't re-evaluate babel blocks on export: results are already serialized in
+;; the document, and recomputing them only slows export down.
+(add-to-list 'org-babel-default-header-args '(:eval . "no-export"))
+(add-to-list 'org-babel-default-inline-header-args '(:eval . "no-export"))
 (setq-default org-sort-agenda-noeffort-is-high nil)
 
 (defun konix/org-get-contexts nil

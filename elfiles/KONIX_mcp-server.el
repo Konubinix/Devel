@@ -371,6 +371,18 @@ MCP Parameters:
 
 ;;; Server management tools
 
+(defun konix/mcp-server-load-file (file-path)
+  "Load an Emacs Lisp file.
+
+MCP Parameters:
+  file-path - Absolute path to the .el file to load"
+  (mcp-server-lib-with-error-handling
+   (let ((path (expand-file-name (decode-coding-string file-path 'utf-8))))
+     (unless (file-exists-p path)
+       (error "File not found: %s" path))
+     (load-file path)
+     (format "Loaded %s" path))))
+
 (defun konix/mcp-server-get-server-location ()
   "Get the location of the MCP server elisp file.
 
@@ -847,6 +859,9 @@ MCP Parameters:
      :id "show_calendar_ann"
      :description "Show the ANN (NEXT Actions with Context) view: actionable NEXT items with context tags (@...), excluding maybe/waiting/future-scheduled items, with deadline and effort info"
      :read-only t)
+    (konix/mcp-server-load-file
+     :id "load_file"
+     :description "Load an Emacs Lisp file at the given absolute path using load-file.")
     (konix/mcp-server-reload-and-restart
      :id "reload_and_restart"
      :description "Reload the MCP server file to pick up changes, then restart the server. Call this automatically after editing KONIX_mcp-server.el to apply changes.")

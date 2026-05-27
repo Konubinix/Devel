@@ -70,6 +70,7 @@
   (use-package agent-shell
     :bind (("M-g l a" . konix/agent-shell)
            ("M-g l b" . konix/agent-shell-pop-to-buffer)
+           ("M-g l SPC" . konix/mcp-server-show-spawn-tree)
            ("M-g l f" . agent-shell-fork)
            ("M-g l o" . agent-shell-reload)
            ("M-g l r" . konix/agent-shell-request-edit)

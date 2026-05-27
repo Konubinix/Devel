@@ -30,6 +30,7 @@
 (require 'difflib)
 (require 'project)
 (require 'KONIX_mcp-server-introspection)
+(require 'KONIX_mcp-server-agent-shell)
 
 ;;; Configuration
 
@@ -40,14 +41,6 @@
   "Base URL of the coordination HTTP server."
   :type 'string
   :group 'konix-mcp)
-
-;;; Buffer-local variables for coordinated agents
-
-(defvar-local konix/mcp-server--coordinated-agent nil
-  "Non-nil if this buffer is a coordinated agent spawned by `konix/mcp-server-spawn-agent'.")
-
-(defvar-local konix/mcp-server--agent-name nil
-  "The coordination name of this agent buffer.")
 
 ;;; Helper functions and macros
 
@@ -61,16 +54,6 @@ Signals an error if the buffer does not exist."
          (with-current-buffer buf
            ,@body)
        (error "Buffer not found: %s" decoded-buffer-name))))
-
-(defun konix/mcp-server--coord-agent-exists-p (agent-name)
-  "Return non-nil if AGENT-NAME is registered in the coordination system."
-  (let ((url-request-method "GET")
-        (url (format "%s/coord/agents" konix/mcp-server-coord-url)))
-    (with-current-buffer (url-retrieve-synchronously url t nil 5)
-      (goto-char (point-min))
-      (re-search-forward "\n\n")
-      (let ((agents (json-parse-buffer :object-type 'alist)))
-        (assoc-string agent-name agents)))))
 
 (defun konix/mcp-server--get-agenda-content (key)
   "Run org-agenda with KEY and return the buffer content."
@@ -407,23 +390,23 @@ unregisters all tools, reloads the code, and re-registers tools with fresh schem
 MCP Parameters:
   (none)"
   (mcp-server-lib-with-error-handling
-   (let ((server-file (locate-library "KONIX_mcp-server"))
-         (introspection-file (locate-library "KONIX_mcp-server-introspection")))
+   (let* ((server-file (locate-library "KONIX_mcp-server"))
+          (sibling-files
+           (delq nil
+                 (mapcar #'locate-library
+                         '("KONIX_mcp-server-introspection"
+                           "KONIX_mcp-server-agent-shell")))))
      (if server-file
          (progn
-           ;; Load the new code first
-           (when introspection-file
-             (load-file introspection-file))
+           (dolist (f sibling-files)
+             (load-file f))
            (load-file server-file)
-           ;; Now unregister all tools (clears the hash table)
            (konix/mcp-server-unregister-all-tools)
-           ;; Re-register with fresh schemas from the newly loaded code
            (konix/mcp-server-register-tools)
-           (format "Reloaded %s%s and re-registered tools"
-                   server-file
-                   (if introspection-file
-                       (format " and %s" introspection-file)
-                     "")))
+           (format "Reloaded %s and re-registered tools"
+                   (mapconcat #'identity
+                              (append sibling-files (list server-file))
+                              ", ")))
        (error "Could not locate KONIX_mcp-server library")))))
 
 ;;; Elysium-like editing tools
@@ -576,249 +559,6 @@ Similar to `elysium-discard-all-suggested-changes'."
     (while (ignore-errors (not (smerge-next)))
       (smerge-keep-upper))))
 
-;;; Agent-shell tools
-
-(defun konix/mcp-server--normalize-mcp-changes (mcp-changes)
-  "Normalize mcp-config-changes to the expected add/remove/edit format.
-Supports both the native {\"add\"/\"remove\"/\"edit\"} format and the
-.mcp.json {\"mcpServers\": {\"name\": config}} format.
-Signals an error if neither format is recognized."
-  (let ((has-native-keys (or (alist-get 'add mcp-changes)
-                             (alist-get 'remove mcp-changes)
-                             (alist-get 'edit mcp-changes)))
-        (mcp-servers (alist-get 'mcpServers mcp-changes)))
-    (cond
-     (has-native-keys mcp-changes)
-     (mcp-servers
-      (let (servers-to-add)
-        (map-do (lambda (name config)
-                  (push `((name . ,(symbol-name name)) ,@(append config nil))
-                        servers-to-add))
-                mcp-servers)
-        `((add . ,(vconcat (nreverse servers-to-add))))))
-     (t
-      (error "mcp-config-changes must use {\"add\"/\"remove\"/\"edit\"} or {\"mcpServers\": {}} format; got keys: %s"
-             (mapcar #'car mcp-changes))))))
-
-(defun konix/mcp-server--normalize-server-config (srv)
-  "Normalize a server config parsed from JSON to the agent-shell format.
-JSON gives env/headers as alists like ((KEY . VAL) ...),
-but `agent-shell-mcp-servers' expects them as vectors of
-name/value alists: [((name . KEY) (value . VAL)) ...].
-Similarly, args may be a list but agent-shell expects a vector."
-  (let ((srv (append srv nil)))
-    (dolist (field '(env headers))
-      (when-let ((val (alist-get field srv)))
-        (when (and val (not (vectorp val)))
-          (let ((entries nil))
-            (map-do (lambda (k v)
-                      (push `((name . ,(symbol-name k)) (value . ,v)) entries))
-                    val)
-            (setf (alist-get field srv) (vconcat (nreverse entries)))))))
-    (when-let ((args (alist-get 'args srv)))
-      (when (and args (not (vectorp args)))
-        (setf (alist-get 'args srv) (vconcat args))))
-    srv))
-
-(defun konix/mcp-server--name-value-set (entries key value)
-  "In a list of ((name . N) (value . V)) alists, set KEY to VALUE.
-If an entry with name KEY exists, update its value; otherwise append a new entry.
-Returns the updated list."
-  (let ((existing (cl-find-if (lambda (e) (equal (alist-get 'name e) key)) entries)))
-    (if existing
-        (progn (setf (alist-get 'value existing) value) entries)
-      (append entries (list `((name . ,key) (value . ,value)))))))
-
-(defun konix/mcp-server--name-value-remove (entries keys)
-  "Remove all entries whose name is in KEYS from a list of ((name . N) (value . V)) alists."
-  (cl-remove-if (lambda (e) (seq-contains-p keys (alist-get 'name e) #'equal)) entries))
-
-(defun konix/mcp-server--apply-edits (servers edits)
-  "Apply EDITS to SERVERS, modifying env/headers of servers matched by name.
-Each edit is an alist with keys: name, env_set, env_remove, headers_set, headers_remove."
-  (dolist (edit (append edits nil))
-    (let* ((srv-name (alist-get 'name edit))
-           (srv (cl-find-if (lambda (s) (equal (alist-get 'name s) srv-name)) servers)))
-      (unless srv
-        (error "Cannot edit MCP server '%s': not found in current config" srv-name))
-      (let ((env-set (alist-get 'env_set edit))
-            (env-remove (alist-get 'env_remove edit))
-            (headers-set (alist-get 'headers_set edit))
-            (headers-remove (alist-get 'headers_remove edit)))
-        (when (or env-set env-remove)
-          (let ((env-list (append (alist-get 'env srv) nil)))
-            (when env-remove
-              (setq env-list (konix/mcp-server--name-value-remove env-list (append env-remove nil))))
-            (when env-set
-              (map-do (lambda (k v)
-                        (setq env-list (konix/mcp-server--name-value-set env-list (symbol-name k) v)))
-                      env-set))
-            (setf (alist-get 'env srv) (vconcat env-list))))
-        (when (or headers-set headers-remove)
-          (let ((hdr-list (append (alist-get 'headers srv) nil)))
-            (when headers-remove
-              (setq hdr-list (konix/mcp-server--name-value-remove hdr-list (append headers-remove nil))))
-            (when headers-set
-              (map-do (lambda (k v)
-                        (setq hdr-list (konix/mcp-server--name-value-set hdr-list (symbol-name k) v)))
-                      headers-set))
-            (setf (alist-get 'headers srv) (vconcat hdr-list)))))))
-  servers)
-
-(defun konix/mcp-server-spawn-agent (directory task agent-name &optional mcp-config-changes model)
-  "Spawn a new agent that registers with the coordination system and waits for tasks.
-The agent will register and then block waiting for tasks from the coordinator — the coordinator must send the first task using coord_post_task.
-
-MCP Parameters:
-  directory - The working directory for the session
-  task - Contextual goal describing the agent's purpose (the agent will wait for concrete tasks from the coordinator via coord_post_task)
-  agent-name - Unique name for the agent in the coordination system
-  mcp-config-changes - Optional JSON string describing changes to the MCP server config. Supported keys:
-    \"add\": list of server config objects to add.  Each object has \"name\", \"command\", \"args\", and optionally \"env\" (plain object {\"KEY\":\"VALUE\"} or array [{\"name\":\"KEY\",\"value\":\"VALUE\"}]) and \"headers\" (same formats).
-    \"remove\": list of server name strings to remove from the default config.
-    \"edit\": list of objects to modify existing servers, each with \"name\" and optional \"env_set\" ({KEY:VALUE to add/override}), \"env_remove\" (list of var names to remove), \"headers_set\" ({KEY:VALUE}), \"headers_remove\" (list of header names to remove).
-    Example: {\"add\":[{\"name\":\"my-srv\",\"command\":\"node\",\"args\":[\"server.js\"],\"env\":{\"TOKEN\":\"abc\"}}]}
-  model - Optional model ID or alias (e.g. \"sonnet\", \"opus\", \"claude-sonnet-4-6\")"
-  (mcp-server-lib-with-error-handling
-   (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
-          (task (decode-coding-string task 'utf-8))
-          (agent-name (decode-coding-string agent-name 'utf-8))
-          (mcp-changes (when (and mcp-config-changes
-                                  (not (string-empty-p mcp-config-changes)))
-                         (konix/mcp-server--normalize-mcp-changes
-                          (json-parse-string
-                           (decode-coding-string mcp-config-changes 'utf-8)
-                           :object-type 'alist))))
-          (model-decoded (when (and model (not (string-empty-p model)))
-                           (decode-coding-string model 'utf-8)))
-          (prompt (format "You are a coordinated sub-agent. Your goal: %s
-
-CRITICAL RULES:
-- You MUST stay strictly focused on the instructions given to you. Do NOT take initiatives beyond what is asked.
-- If something goes wrong (a tool fails, a command errors out, etc.), do NOT try to debug or fix it on your own. Instead, report the error back as your result and wait for further instructions.
-- Do NOT explore, investigate, or attempt workarounds unless explicitly told to do so.
-
-FIRST, do these setup steps in order:
-1. Register with the coordination system using coord_register with name \"%s\" and a description of your role.
-2. Then enter a loop:
-   a. Call coord_wait with agent \"%s\" to block until you receive a task.
-   b. Execute the task you receive strictly as described. If it fails, report the failure.
-   c. Report results using coord_complete_task.
-   d. Go back to step (a) and wait for the next task.
-
-Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, call kill_agent with your own name \"%s\" to clean yourself up."
-                          task agent-name agent-name agent-name))
-          (config (agent-shell-anthropic-make-claude-code-config)))
-     (unless (file-directory-p directory)
-       (error "Directory does not exist: %s" directory))
-     (when (konix/mcp-server--find-agent-buffer agent-name)
-       (error "An agent named '%s' already exists locally. Kill it first or use a different name" agent-name))
-     (when (konix/mcp-server--coord-agent-exists-p agent-name)
-       (error "An agent named '%s' is already registered in the coordination system" agent-name))
-     (let* ((konix/agent-shell-buffer-label
-             (konix/agent-shell--truncate-label
-              (or (konix/agent-shell--clean-label task) agent-name)))
-            (shell-buffer (agent-shell--start :config config
-                                              :new-session t
-                                              :no-focus t
-                                              :session-strategy 'new-deferred)))
-       (with-current-buffer shell-buffer
-         (setq-local agent-shell-cwd-function (lambda () directory))
-         (setq-local agent-shell-mcp-servers
-                     (let ((servers (copy-sequence (default-value 'agent-shell-mcp-servers))))
-                       (when mcp-changes
-                         (let ((to-remove (alist-get 'remove mcp-changes))
-                               (to-add (alist-get 'add mcp-changes))
-                               (to-edit (alist-get 'edit mcp-changes)))
-                           (when to-remove
-                             (setq servers
-                                   (cl-remove-if
-                                    (lambda (srv)
-                                      (seq-contains-p to-remove
-                                                      (alist-get 'name srv)
-                                                      #'equal))
-                                    servers)))
-                           (when to-add
-                             (setq servers
-                                   (append servers
-                                           (mapcar #'konix/mcp-server--normalize-server-config
-                                                   (append to-add nil)))))
-                           (when to-edit
-                             (setq servers (konix/mcp-server--apply-edits servers to-edit)))))
-                       servers))
-         (setq-local konix/mcp-server--coordinated-agent t)
-         (setq-local konix/mcp-server--agent-name agent-name)
-         (shell-maker-submit :input prompt))
-       (format "Spawned coordinated agent '%s' in buffer '%s' with directory %s. The agent will register as \"%s\" in the coordination system. Use coord_post_task or coord_ask_and_wait with to_agent=\"%s\" to send it work."
-               agent-name (buffer-name shell-buffer) directory agent-name agent-name)))))
-
-(defun konix/mcp-server--find-agent-buffer (agent-name)
-  "Find the buffer for coordinated agent AGENT-NAME.
-Searches all buffers for one with a matching `konix/mcp-server--agent-name'."
-  (cl-find-if
-   (lambda (buf)
-     (and (buffer-local-value 'konix/mcp-server--coordinated-agent buf)
-          (equal (buffer-local-value 'konix/mcp-server--agent-name buf)
-                 agent-name)))
-   (buffer-list)))
-
-(defun konix/mcp-server-kill-agent (agent-name)
-  "Kill a coordinated agent buffer that was spawned with spawn_agent.
-
-MCP Parameters:
-  agent-name - The agent name used when spawning"
-  (mcp-server-lib-with-error-handling
-   (let* ((agent-name (decode-coding-string agent-name 'utf-8))
-          (buffer (konix/mcp-server--find-agent-buffer agent-name)))
-     (unless buffer
-       (error "No coordinated agent found with name '%s'" agent-name))
-     (let ((buf-name (buffer-name buffer)))
-       (kill-buffer buffer)
-       (let ((url-request-method "DELETE")
-             (url (format "%s/coord/agents/%s"
-                          konix/mcp-server-coord-url
-                          (url-hexify-string agent-name))))
-         (url-retrieve-synchronously url t nil 5))
-       (format "Killed coordinated agent '%s' (buffer '%s')" agent-name buf-name)))))
-
-(defun konix/mcp-server-rename-agent-shell (label)
-  "Rename the calling agent-shell buffer (shell + viewport) to LABEL.
-
-The caller is identified as the unique `agent-shell-mode' buffer where
-`shell-maker-busy' returns non-nil — the agent is mid-turn while
-invoking this tool.  Errors when zero or multiple busy agent-shells
-are found.
-
-LABEL is incorporated into the buffer name via
-`agent-shell-buffer-name-format' (the user's format decides the final
-shape).  An empty LABEL clears the label and reverts to the default.
-
-MCP Parameters:
-  label - A short label (e.g. a 3-7 word session description) used as
-          the new buffer name.  Pass an empty string to revert to the
-          default project-based name."
-  (mcp-server-lib-with-error-handling
-   (unless (and (fboundp 'konix/agent-shell--apply-label-format)
-                (fboundp 'konix/agent-shell--rename-pair))
-     (error "konix agent-shell rename helpers not loaded"))
-   (let ((busy-shells (seq-filter
-                       (lambda (b)
-                         (with-current-buffer b
-                           (and (derived-mode-p 'agent-shell-mode)
-                                (shell-maker-busy))))
-                       (buffer-list))))
-     (cond
-      ((null busy-shells)
-       (error "No busy agent-shell buffer found (cannot identify caller)"))
-      ((cdr busy-shells)
-       (error "Ambiguous: %d busy agent-shell buffers; cannot identify caller"
-              (length busy-shells)))
-      (t
-       (let* ((shell (car busy-shells))
-              (formatted (konix/agent-shell--apply-label-format shell label)))
-         (konix/agent-shell--rename-pair shell formatted)
-         (format "Renamed agent-shell to %s" formatted)))))))
-
 ;;; Tool registration
 
 (defconst konix/mcp-server--tools
@@ -889,10 +629,10 @@ Each old_string should include enough context to be unique (e.g., a whole functi
      :description "Spawn a new agent that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a sub-agent: call this tool, then use coord_post_task or coord_ask_and_wait to send it instructions. The spawned agent will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new agent' or 'in a sub-agent'. IMPORTANT: When the agent's goal is accomplished, you MUST call kill_agent to clean it up.")
     (konix/mcp-server-kill-agent
      :id "kill_agent"
-     :description "Kill a coordinated agent that was previously spawned with spawn_agent. Use this to clean up a sub-agent when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_agent (refuses to kill other buffers).")
-    (konix/mcp-server-rename-agent-shell
-     :id "rename_agent_shell"
-     :description "Rename the calling agent-shell buffer (shell + viewport) to a short label that summarises the current session. Use this when the user asks you to rename your own buffer with a meaningful name — pick a 3-7 word descriptive label and call this tool. The label is incorporated into the buffer name via the user's format (typically appears as `A@<label>`). Pass an empty string to revert to the default project-based name. Only works while the calling agent-shell is mid-turn (which it normally is when you call any tool).")
+     :description "Kill a coordinated agent that was previously spawned with spawn_agent. By default also kills all its descendant agents recursively so no orphan is left behind; pass non-recursive=true to kill only the targeted agent. Use this to clean up a sub-agent when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_agent (refuses to kill other buffers).")
+    (konix/mcp-server-set-label
+     :id "set_label"
+     :description "Set a short label on the calling agent-shell buffer (shell + viewport) that summarises the current session. Use this when the user asks you to label/rename your own buffer with a meaningful name — pick a 3-7 word descriptive label and call this tool. The label is incorporated into the buffer name via the user's format (typically appears as `A@<label>`). Pass an empty string to revert to the default project-based name. Only works while the calling agent-shell is mid-turn (which it normally is when you call any tool).")
     ;; Introspection tools
     (konix/mcp-server-introspection-symbol-exists
      :id "symbol_exists"

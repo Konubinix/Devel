@@ -120,14 +120,26 @@
           abiVersion = "x86_64"; # armeabi-v7a, mips, x86_64
           systemImageType = "google_apis_playstore";
         };
-        devShell = pkgs.mkShell rec {
-          packages = deps;
+        devShells.default = pkgs.mkShell rec {
+          packages = deps ++ [ jdk pkgs.gradle_8 ];
           LANG = "C.UTF-8";
           LC_ALL = "C.UTF-8";
 
+          JAVA_HOME = "${jdk}";
           # Note: ANDROID_HOME is deprecated. Use ANDROID_SDK_ROOT.
           ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
+          ANDROID_HOME     = "${androidSdk}/libexec/android-sdk";
           ANDROID_NDK_ROOT = "${ANDROID_SDK_ROOT}/ndk-bundle";
+
+          # The aapt2 AGP pulls from Maven isn't patchelf'd for NixOS; point
+          # AGP at the build-tools aapt2 shipped in this SDK instead.
+          shellHook = ''
+            BT_DIR=$(ls -1 "$ANDROID_SDK_ROOT/build-tools" 2>/dev/null \
+                     | sort -V | tail -1)
+            if [ -n "$BT_DIR" ]; then
+              export GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=$ANDROID_SDK_ROOT/build-tools/$BT_DIR/aapt2"
+            fi
+          '';
 
           # see https://github.com/NixOS/nixpkgs/issues/154898
           # I don't need this anymore?

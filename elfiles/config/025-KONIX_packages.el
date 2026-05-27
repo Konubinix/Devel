@@ -139,6 +139,7 @@
   (use-package imenu-tree)
   (use-package ini)
   (use-package js2-mode :commands (js2-mode) :mode ("\\.mjs$" . js2-mode))
+  (use-package jujutsu :straight (:type git :host github :repo "bennyandresen/jujutsu.el"))
   (use-package keep-buffers)
   ;; https://www.reddit.com/r/emacs/comments/1jfa2bp/looking_for_users_to_test_a_new_version_of/?rdt=34388
   (use-package key-chord)
@@ -156,6 +157,7 @@
   (use-package lsp-jedi)
   (use-package lua-mode :commands (lua-mode) :mode "\\.lua$")
   (use-package macher)
+  (use-package majutsu :straight (:type git :host github :repo "0WD0/majutsu"))
   (use-package mcp-server-lib)
   ;; (use-package marginalia) -> too much information that I barely look at
   (use-package mic-paren)
@@ -209,6 +211,7 @@
   (use-package typescript-mode)
   (use-package undo-tree :commands (undo-tree-mode))
   (use-package uuidgen)
+  (use-package vc-jj :straight (:type git :host codeberg :repo "emacs-jj-vc/vc-jj.el"))
   (use-package vertico)
   (use-package visible-mark :commands (visible-mark-mode))
   (use-package w3m) ;; to have nice message formatting in notmuch

@@ -160,6 +160,8 @@ Each entry is (NAME . PLIST) with :acp-command and :mcp-servers keys.
 (defun konix/agent-shell-pick-preset ()
   "Pick a preset and start `agent-shell' with its ACP command, MCP servers and cwd."
   (interactive)
+  (when agent-shell-prefer-viewport-interaction
+    (user-error "konix/agent-shell-pick-preset only displays the shell buffer; viewport mode unsupported (unset `agent-shell-prefer-viewport-interaction')"))
   (let* ((names (mapcar #'car konix/agent-shell-presets))
          (choice (completing-read "Agent preset: " names nil t))
          (preset (cdr (assoc choice konix/agent-shell-presets)))
@@ -246,11 +248,17 @@ At the prompt, insert a space."
       (self-insert-command 1)
     (cond
      ((and (= (window-end) (point-max)) (= (point) (point-max)))
+      (with-current-buffer (or (agent-shell-viewport--shell-buffer) (current-buffer))
+        (setq konix/agent-shell--seen t))
       (when (and (not tracking-buffers) (not tracking-start-buffer))
-        (konix/agent-shell-track-ready-buffers))
+        (konix/agent-shell-track-ready-buffers t))
       (let ((old (current-buffer)))
         (tracking-next-buffer)
-        (bury-buffer old)))
+        (bury-buffer
+         ;; bury-buffer with explicit current-buffer does nothing, but
+         ;; bury-buffer with nil buries the current buffer
+         (unless (equal (current-buffer) old) old)
+         )))
      ((= (window-end) (point-max))
       (goto-char (point-max)))
      (t
@@ -289,30 +297,76 @@ Passes ARG through to `agent-shell'."
   (let ((agent-shell-session-strategy (or strategy agent-shell-session-strategy)))
     (agent-shell arg)))
 
-(defun konix/agent-shell-resume (&optional arg)
-  (interactive "P")
-  (konix/agent-shell arg 'prompt))
+(defun konix/agent-shell-resume ()
+  "Start a fresh agent-shell session in resume mode.
+Calls `agent-shell--start' directly to forward `:session-strategy', which
+`agent-shell--dwim' drops on its `:new-shell' branch — without this, a
+second resume can't ask which session to load.  Same pattern as
+`konix/agent-shell-pick-preset'."
+  (interactive)
+  (unless agent-shell-prefer-viewport-interaction
+    (user-error "konix/agent-shell-resume only supports viewport mode (set `agent-shell-prefer-viewport-interaction')"))
+  (when (and (use-region-p) buffer-file-name (buffer-modified-p))
+    (save-buffer))
+  (let ((shell (agent-shell--start
+                :config (or (agent-shell--resolve-preferred-config)
+                            (agent-shell-select-config :prompt "Start new agent: "))
+                :new-session t
+                :session-strategy 'prompt
+                :no-focus t)))
+    (agent-shell-subscribe-to
+     :shell-buffer shell :event 'session-selected
+     :on-event (lambda (_) (agent-shell-viewport--show-buffer :shell-buffer shell)))))
 
 (defun konix/agent-shell-viewport-interrupt-no-confirm ()
   (interactive)
   (let ((agent-shell-confirm-interrupt nil))
-    (agent-shell-viewport-interrupt)))
+    ;; ignore is needed because the function will raise a user-error to say
+    ;; everything is ok
+    (ignore-errors (agent-shell-viewport-interrupt))))
+
+(defmacro konix/agent-shell-viewport--when-idle (&rest body)
+  `(let ((viewport-buffer (current-buffer)))
+     (if (not (agent-shell-viewport--busy-p))
+         (with-current-buffer viewport-buffer
+           ,@body)
+       (let (token)
+         (setq token
+               (agent-shell-subscribe-to
+                :shell-buffer (agent-shell-viewport--shell-buffer)
+                :event 'turn-complete
+                :on-event (lambda (_event)
+                            (agent-shell-unsubscribe :subscription token)
+                            (with-current-buffer viewport-buffer
+                              ,@body))))))))
+
+(defmacro konix/agent-shell-viewport--interrupt-then (&rest body)
+  `(progn
+     (konix/agent-shell-viewport-interrupt-no-confirm)
+     (konix/agent-shell-viewport--when-idle ,@body)))
 
 (defun konix/agent-shell-viewport-interrupt-no-confirm-and-reply ()
   (interactive)
-  (ignore-errors (konix/agent-shell-viewport-interrupt-no-confirm))
-  (if (not (agent-shell-viewport--busy-p))
-      (agent-shell-viewport-reply)
-    (let ((viewport-buffer (current-buffer))
-          token)
-      (setq token
-            (agent-shell-subscribe-to
-             :shell-buffer (agent-shell-viewport--shell-buffer)
-             :event 'turn-complete
-             :on-event (lambda (_event)
-                         (agent-shell-unsubscribe :subscription token)
-                         (with-current-buffer viewport-buffer
-                           (agent-shell-viewport-reply))))))))
+  (konix/agent-shell-viewport--interrupt-then
+   (agent-shell-viewport-reply)))
+
+(defun konix/agent-shell-viewport-read-interrupt-and-submit ()
+  "Stop the agent, read a prompt, then immediately submit it."
+  (declare (modes agent-shell-viewport-view-mode))
+  (interactive)
+  (konix/agent-shell-viewport-interrupt-no-confirm)
+  (let ((prompt (read-string "Prompt: ")))
+    (konix/agent-shell-viewport--when-idle
+     (agent-shell-viewport-reply)
+     (insert prompt)
+     (agent-shell-viewport-compose-send))))
+
+(defun konix/agent-shell-read-interrupt-and-submit ()
+  "Stop the agent, read a prompt, then immediately submit it."
+  (declare (modes agent-shell-mode))
+  (interactive)
+  (agent-shell-interrupt t)
+  (call-interactively #'agent-shell-queue-request))
 
 (defun konix/agent-shell-viewport-reply-hello ()
   "Reply with \"hello\" and send immediately."
@@ -694,7 +748,7 @@ uniquified to `<saved-name><2>'."
   "Reload the current agent-shell session, preserving its buffer name.
 Wraps `agent-shell-reload', which kills the shell and starts a new
 one — losing any custom label set via `konix/agent-shell-rename-buffer'
-or the MCP `rename_agent_shell' tool."
+or the MCP `set_label' tool."
   (declare (modes agent-shell-mode
                   agent-shell-viewport-view-mode
                   agent-shell-viewport-edit-mode))
@@ -733,6 +787,8 @@ forked shell adopts the same name, uniquified by Emacs to
 (define-key agent-shell-viewport-view-mode-map (kbd "u") 'konix/agent-shell-track-ready-buffers)
 (define-key agent-shell-viewport-view-mode-map (kbd "<delete>") 'konix/agent-shell-viewport-interrupt-no-confirm)
 (define-key agent-shell-viewport-view-mode-map (kbd "R") 'konix/agent-shell-viewport-interrupt-no-confirm-and-reply)
+(define-key agent-shell-viewport-view-mode-map (kbd "M-r") 'konix/agent-shell-viewport-read-interrupt-and-submit)
+(define-key agent-shell-mode-map (kbd "M-r") 'konix/agent-shell-read-interrupt-and-submit)
 (define-key agent-shell-viewport-view-mode-map (kbd "r") 'agent-shell-viewport-queue-request)
 (define-key agent-shell-viewport-view-mode-map (kbd "RET") 'agent-shell-viewport-reply)
 (define-key agent-shell-viewport-edit-mode-map (kbd "C-<return>") 'agent-shell-viewport-compose-send)
@@ -841,10 +897,16 @@ viewport buffer instead if one exists."
     (goto-char (point-min))
     (text-property-search-forward 'agent-shell-permission-button t t)))
 
-(defun konix/agent-shell-track-ready-buffers ()
+(defvar-local konix/agent-shell--seen nil
+  "Non-nil when the user has seen the last completed turn without needing to act yet.
+Cleared automatically when a new turn completes.")
+
+(defun konix/agent-shell-track-ready-buffers (&optional unobtrusive)
   "Add to tracking all agent-shell buffers where it's the user's turn to write.
 A buffer is ready when `shell-maker-busy' returns nil or when there is
-a pending permission request."
+a pending permission request.
+When UNOBTRUSIVE is non-nil, do not switch to the last ready buffer, and skip
+buffers already seen by the user (unless there is a pending permission request)."
   (interactive)
   (let ((buffers (agent-shell-buffers))
         (tracked 0)
@@ -852,16 +914,20 @@ a pending permission request."
     (dolist (buf buffers)
       (when (buffer-live-p buf)
         (with-current-buffer buf
-          (when (or (not (shell-maker-busy))
-                    (konix/agent-shell--has-permission-button-p))
-            (let ((track-buf (if agent-shell-prefer-viewport-interaction
-                                 (agent-shell-viewport--buffer :shell-buffer buf :existing-only t)
-                               buf)))
-              (when track-buf
-                (tracking-add-buffer track-buf)
-                (cl-incf tracked)
-                (setq last-ready track-buf)))))))
-    (when (and last-ready
+          (let ((has-permission (konix/agent-shell--has-permission-button-p)))
+            (when (and (or (not (shell-maker-busy)) has-permission)
+                       (or (not unobtrusive)
+                           has-permission
+                           (not konix/agent-shell--seen)))
+              (let ((track-buf (if agent-shell-prefer-viewport-interaction
+                                   (agent-shell-viewport--buffer :shell-buffer buf :existing-only t)
+                                 buf)))
+                (when track-buf
+                  (tracking-add-buffer track-buf)
+                  (cl-incf tracked)
+                  (setq last-ready track-buf))))))))
+    (when (and (not unobtrusive)
+               last-ready
                (or (not (derived-mode-p 'agent-shell-mode))
                    (and (shell-maker-busy)
                         (not (konix/agent-shell--has-permission-button-p)))))
@@ -879,8 +945,21 @@ a pending permission request."
                'agent-shell-turn-separator t)))))
 
 (defun konix/agent-shell--subscribe-turn-complete ()
-  "Subscribe to turn-complete to auto-rename and show a viewport separator."
+  "Subscribe to events that affect tracking, rename, and viewport.
+On `turn-complete', clear `konix/agent-shell--seen', auto-rename, and
+insert a viewport separator.  On `permission-request' and
+`tool-call-update', clear `konix/agent-shell--seen' so the user is
+notified of new agent activity."
   (let ((shell-buf (current-buffer)))
+    (dolist (event '(permission-request tool-call-update))
+      (agent-shell-subscribe-to
+       :shell-buffer shell-buf
+       :event event
+       :on-event
+       (lambda (_event)
+         (when (buffer-live-p shell-buf)
+           (with-current-buffer shell-buf
+             (setq konix/agent-shell--seen nil))))))
     (agent-shell-subscribe-to
      :shell-buffer shell-buf
      :event 'turn-complete
@@ -888,6 +967,7 @@ a pending permission request."
      (lambda (_event)
        (when (buffer-live-p shell-buf)
          (with-current-buffer shell-buf
+           (setq konix/agent-shell--seen nil)
            (konix/agent-shell--auto-rename-from-title)))
        (when-let ((viewport-buffer (agent-shell-viewport--buffer
                                     :shell-buffer shell-buf
@@ -903,9 +983,22 @@ a pending permission request."
 
 (add-hook 'agent-shell-mode-hook #'konix/agent-shell-hook)
 
-(dolist (buf (agent-shell-buffers))
-  (with-current-buffer buf
-    (konix/agent-shell--auto-rename-from-title)))
+(defvar konix/agent-shell-track-ready-idle-timer nil)
+
+(defun konix/agent-shell-track-ready-buffers--idle ()
+  "Silently update tracking without switching buffers or messaging."
+  (let ((inhibit-message t))
+    (konix/agent-shell-track-ready-buffers t)))
+
+(defun konix/agent-shell-track-ready-start-idle-timer ()
+  "Start an idle timer to periodically call `konix/agent-shell-track-ready-buffers'."
+  (when konix/agent-shell-track-ready-idle-timer
+    (cancel-timer konix/agent-shell-track-ready-idle-timer))
+  (setq konix/agent-shell-track-ready-idle-timer
+        (run-with-idle-timer 5 :repeat #'konix/agent-shell-track-ready-buffers--idle)))
+
+(konix/agent-shell-track-ready-start-idle-timer)
+;; (cancel-timer konix/agent-shell-track-ready-idle-timer)
 
 (defun konix/agent-shell-dot-subdir-in-emacs-d (subdir)
   "Return an agent-shell SUBDIR path under `user-emacs-directory'.
@@ -970,16 +1063,16 @@ under agent-shell/."
 (define-key agent-shell-mode-map (kbd "F") 'konix/agent-shell-follow-mode)
 (define-key agent-shell-viewport-view-mode-map (kbd "F") 'konix/agent-shell-follow-mode)
 
-(defun konix/agent-shell-ui-update-fragment-save-point (orig &rest args)
-  (let ((p (point)))
-    (apply orig args)
-    (unless konix/agent-shell-follow-mode
-      (goto-char p))))
 
-(advice-add 'agent-shell-ui-update-fragment :around
-            #'konix/agent-shell-ui-update-fragment-save-point)
+(defun konix/agent-shell--suppress-shell-display (orig shell-buffer)
+  (if (and agent-shell-prefer-viewport-interaction
+           (buffer-live-p shell-buffer)
+           (with-current-buffer shell-buffer
+             (derived-mode-p 'agent-shell-mode)))
+      nil
+    (funcall orig shell-buffer)))
 
-;; (advice-remove 'agent-shell-ui-update-fragment
-;;             #'konix/agent-shell-ui-update-fragment-save-point)
+(advice-add 'agent-shell--display-buffer :around
+            #'konix/agent-shell--suppress-shell-display)
 
 ;;; KONIX_AL-agent-shell.el ends here

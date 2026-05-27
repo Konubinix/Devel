@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'outline)
-;(require 'hideshow)
+                                        ;(require 'hideshow)
 
 (customize-set-variable 'diff-refine 'font-lock)
 
@@ -49,7 +49,7 @@ Point is at the beginning of the block start match (diff or @@)."
 (add-to-list 'hs-special-modes-alist
              '(diff-mode "^\\(diff \\|@@\\)" nil nil konix/diff-hs-forward-sexp))
 
-;(konix/outline/setup-keys diff-mode-map)
+                                        ;(konix/outline/setup-keys diff-mode-map)
 (setq-default diff-default-read-only nil)
 (setq-default konix/diff/sha1-regexp "[a-f0-9]")
 ;; match the --- in front of a file also, as well as commit and diff lines
@@ -61,11 +61,15 @@ Point is at the beginning of the block start match (diff or @@)."
 (konix/push-or-replace-assoc-in-alist
  'diff-font-lock-keywords
  '("^\\(commit\\) [a-f0-9]\\{40,40\\}$"                        ;context
-  (1 'diff-hunk-header))
+   (1 'diff-hunk-header))
  )
 
 (keymap-set diff-mode-map "C-p" 'outline-previous-visible-heading)
 (keymap-set diff-mode-map "C-n" 'outline-next-visible-heading)
+(keymap-set diff-mode-map "TAB" 'hs-toggle-hiding)
+(keymap-set diff-mode-map "<backtab>" 'hs-hide-all)
+(keymap-set diff-mode-map "RET" 'diff-goto-source)
+(keymap-set diff-mode-map "C-k" 'diff-hunk-kill)
 
 (defun konix/outline-level/around (orig-fun)
   (or
@@ -99,9 +103,9 @@ Point is at the beginning of the block start match (diff or @@)."
 
 
 (set-face-attribute 'diff-changed
-                                        nil
-                                        :background "light pink"
-                                        )
+                    nil
+                    :background "light pink"
+                    )
 
 (defun konix/diff-mode-hook()
   (setq konix/adjust-new-lines-at-end-of-file nil
@@ -119,7 +123,7 @@ Point is at the beginning of the block start match (diff or @@)."
   (setq-local comment-start "#")
   (setq-local comment-end "")
   (hs-minor-mode 1)
-  ;(konix/outline/setup-keys diff-mode-map)
+                                        ;(konix/outline/setup-keys diff-mode-map)
   (font-lock-add-keywords
    nil
    '(

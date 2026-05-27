@@ -24,7 +24,14 @@
             # emulator = "34.1.9";
           };
           platforms = [ # "30"
+            # Needed by `how_to_transform_my_android_phone_into_a_music_box.org`:
+            # AGP 8.7 won't accept compileSdk < 33 in app/build.gradle, even
+            # though the app targets API 27 (Android 8.1, Nexus 5X) at
+            # runtime — compileSdk is the compiler's API surface, not the
+            # device's. 34 was picked over 35 to match the build-tools
+            # version already pinned above.
             "34"
+            "35"
           ];
           abis = [ # "armeabi-v7a" "arm64-v8a"
             "x86_64"
@@ -36,7 +43,7 @@
         androidComposition = androidEnv.composeAndroidPackages {
           # toolsVersion = "26.1.1";
           # platformToolsVersion = "34.0.5";
-          # buildToolsVersions = [ android.versions.buildTools ];
+          buildToolsVersions = [ "34.0.0" ];
           platformVersions = android.platforms;
           abiVersions = android.abis;
 

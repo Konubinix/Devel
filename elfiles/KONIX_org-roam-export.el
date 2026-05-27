@@ -1186,6 +1186,134 @@ citation key, for Org-ref cite links."
     )
   )
 
+(defun konix/org-roam-export/pretty-named-blocks ()
+  "Inject a visible name marker above each named src block.
+Skip blocks whose `:exports' value hides the code (\"none\" or
+\"results\") — the name would otherwise dangle above nothing.
+Noweb refs (<<x>>) are turned into anchors client-side; the link
+target is the ox-hugo-generated `code-snippet--<name>' anchor that
+already sits right before the code fence."
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^[ \t]*#\\+NAME:[ \t]+\\(.+?\\)[ \t]*$" nil t)
+      (let ((name (match-string-no-properties 1))
+            (name-line-beg (line-beginning-position))
+            (header-params nil)
+            (src-params-str nil)
+            (is-src nil))
+        (save-excursion
+          (forward-line 1)
+          (while (looking-at
+                  "^[ \t]*#\\+\\(CAPTION\\|HEADER\\|HEADERS\\|ATTR_[A-Z]+\\|RESULTS\\):\\([^\n]*\\)$")
+            (let ((kw (match-string-no-properties 1))
+                  (val (match-string-no-properties 2)))
+              (when (member kw '("HEADER" "HEADERS"))
+                (let ((p (ignore-errors
+                           (org-babel-parse-header-arguments val))))
+                  ;; Prepend so later HEADER lines win on duplicate keys.
+                  (setq header-params (append p header-params)))))
+            (forward-line 1))
+          (when (looking-at "^[ \t]*#\\+BEGIN_SRC\\b\\(.*\\)$")
+            (setq is-src t)
+            (setq src-params-str (match-string-no-properties 1))))
+        (when is-src
+          (let* ((src-params (ignore-errors
+                               (org-babel-parse-header-arguments src-params-str)))
+                 (all-params (append src-params header-params))
+                 (exports-val (cdr (assq :exports all-params))))
+            (unless (and (stringp exports-val)
+                         (member exports-val '("none" "results")))
+              (save-excursion
+                (goto-char name-line-beg)
+                (insert
+                 (format
+                  "#+BEGIN_EXPORT hugo\n<div class=\"konix-block-name-marker\" data-name=\"%s\"></div>\n#+END_EXPORT\n"
+                  name))))))))))
+
+(defconst konix/org-roam-export/noweb-style
+  "<style>
+.konix-block-name-marker { display: none; }
+.konix-named-block {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.65em;
+  padding: 1px 6px;
+  background: rgba(127, 127, 127, 0.25);
+  color: inherit;
+  border-radius: 0 4px 0 4px;
+  font-family: monospace;
+  line-height: 1.5;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+}
+.noweb-ref { text-decoration: underline dotted; }
+</style>"
+  "CSS embedded in each exported page that has named src blocks.")
+
+(defconst konix/org-roam-export/noweb-script
+  "<script>
+(function () {
+  document.addEventListener(\"DOMContentLoaded\", function () {
+    // Attach the named-block labels at top-right of each code block.
+    document.querySelectorAll(\".konix-block-name-marker\").forEach(function (marker) {
+      var name = marker.getAttribute(\"data-name\");
+      if (!name) return;
+      var slug = \"code-snippet--\" + name.replace(/[_/]/g, \"-\");
+      var anchor = document.getElementById(slug);
+      if (!anchor) return;
+      var blocks = Array.from(document.querySelectorAll(\".highlight, pre\"));
+      var container = blocks.find(function (b) {
+        return !b.contains(anchor) &&
+               (anchor.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+      });
+      if (!container) return;
+      if (getComputedStyle(container).position === \"static\") {
+        container.style.position = \"relative\";
+      }
+      var label = document.createElement(\"span\");
+      label.className = \"konix-named-block\";
+      label.textContent = name;
+      container.appendChild(label);
+    });
+
+    // Turn <<x>> patterns in code into anchor links.
+    document.querySelectorAll(\"pre code\").forEach(function (code) {
+      code.innerHTML = code.innerHTML.replace(
+        /&lt;&lt;(.*?)&gt;&gt;/g,
+        function (match, inner) {
+          var n = inner
+            .replace(/<[^>]+>/g, \"\")
+            .replace(/\\(.*\\)\\s*$/, \"\")
+            .trim();
+          if (!/^[A-Za-z0-9_./-]+$/.test(n)) return match;
+          var s = \"code-snippet--\" + n.replace(/[_/]/g, \"-\");
+          if (!document.getElementById(s)) return match;
+          return '<a href=\"#' + s + '\" class=\"noweb-ref\">&lt;&lt;' + inner + '&gt;&gt;</a>';
+        }
+      );
+    });
+  });
+})();
+</script>"
+  "Client-side JS that injects named-block labels and turns <<x>> into anchor links.
+The slug rule mirrors `org-blackfriday--get-reference': `_' and `/'
+become `-'.")
+
+(defun konix/org-roam-export/inject-noweb-assets ()
+  "Append the CSS + JS bundle to the buffer when it has src blocks."
+  (when (save-excursion
+          (goto-char (point-min))
+          (re-search-forward "^[ \t]*#\\+BEGIN_SRC\\b" nil t))
+    (save-excursion
+      (goto-char (point-max))
+      (insert "\n#+BEGIN_EXPORT hugo\n"
+              konix/org-roam-export/noweb-style
+              "\n"
+              konix/org-roam-export/noweb-script
+              "\n#+END_EXPORT\n"))))
+
 (defun konix/org-roam-export/apply-transformations ()
   (konix/org-roam-export/set-export-file-name)
   (konix/org-roam-export/remove-org-backlinks)
@@ -1205,6 +1333,8 @@ citation key, for Org-ref cite links."
   (konix/org-roam-export/load-transclusion)
   ;; I need to put stuff that modify the buffer after loading the
   ;; transclusion
+  (konix/org-roam-export/pretty-named-blocks)
+  (konix/org-roam-export/inject-noweb-assets)
   (konix/org-roam-export/unify-ipfs-links)
   (konix/org-roam-export/convert-standalone-links)
   (konix/org-roam-export/convert-remaining-ipfs-links)

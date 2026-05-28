@@ -625,11 +625,11 @@ Each old_string should include enough context to be unique (e.g., a whole functi
      :id "tangle_buffer"
      :description "Tangle all source blocks in an org-mode buffer, writing each block to its :tangle target file. Use this instead of tangle_babel_block when you want to tangle the entire file at once.")
     (konix/mcp-server-spawn-agent
-     :id "spawn_agent"
-     :description "Spawn a new agent that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a sub-agent: call this tool, then use coord_post_task or coord_ask_and_wait to send it instructions. The spawned agent will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new agent' or 'in a sub-agent'. IMPORTANT: When the agent's goal is accomplished, you MUST call kill_agent to clean it up.")
+     :id "spawn_buddy"
+     :description "Spawn a new buddy that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a buddy: call this tool, then use coord_post_task or coord_ask_and_wait to send it instructions. The spawned buddy will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new buddy'. IMPORTANT: When the buddy's goal is accomplished, you MUST call kill_buddy to clean it up.")
     (konix/mcp-server-kill-agent
-     :id "kill_agent"
-     :description "Kill a coordinated agent that was previously spawned with spawn_agent. By default also kills all its descendant agents recursively so no orphan is left behind; pass non-recursive=true to kill only the targeted agent. Use this to clean up a sub-agent when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_agent (refuses to kill other buffers).")
+     :id "kill_buddy"
+     :description "Kill a buddy that was previously spawned with spawn_buddy. By default also kills all its descendant buddies recursively so no orphan is left behind; pass non-recursive=true to kill only the targeted buddy. Use this to clean up a buddy when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_buddy (refuses to kill other buffers).")
     (konix/mcp-server-set-label
      :id "set_label"
      :description "Set a short label on the calling agent-shell buffer (shell + viewport) that summarises the current session. Use this when the user asks you to label/rename your own buffer with a meaningful name — pick a 3-7 word descriptive label and call this tool. The label is incorporated into the buffer name via the user's format (typically appears as `A@<label>`). Pass an empty string to revert to the default project-based name. Only works while the calling agent-shell is mid-turn (which it normally is when you call any tool).")

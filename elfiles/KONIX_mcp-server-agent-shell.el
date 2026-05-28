@@ -22,7 +22,7 @@
 
 ;; Agent-shell session management for the KONIX MCP server:
 ;;   - Per-session tagging so MCP requests carry their caller's identity
-;;   - spawn_agent / kill_agent / kill_agent_subtree MCP tools
+;;   - spawn_buddy / kill_buddy MCP tools (and the kill_agent_subtree Emacs command)
 ;;   - set_label MCP tool
 ;;   - Interactive *Spawn Tree* view (M-x konix/mcp-server-show-spawn-tree)
 
@@ -123,7 +123,7 @@ base server-id so existing tool lookups keep working."
 (defun konix/mcp-server--coord-agent-exists-p (agent-name)
   "Return non-nil if AGENT-NAME is registered in the coordination system."
   (condition-case _
-      (let ((agents (plz 'get (format "%s/coord/agents"
+      (let ((agents (plz 'get (format "%s/coord/buddies"
                                       konix/mcp-server-coord-url)
                       :as #'json-read :timeout 5)))
         (assoc-string agent-name agents))
@@ -134,7 +134,7 @@ base server-id so existing tool lookups keep working."
 Queries `/coord/agents'.  Returns an empty hash on any failure."
   (let ((table (make-hash-table :test 'equal)))
     (condition-case _
-        (let ((agents (plz 'get (format "%s/coord/agents"
+        (let ((agents (plz 'get (format "%s/coord/buddies"
                                         konix/mcp-server-coord-url)
                         :as #'json-read :timeout 2)))
           (dolist (cell agents)
@@ -349,16 +349,16 @@ nil if zero or more than one buffer is busy."
   (let ((busy (konix/mcp-server--busy-agent-shells)))
     (and busy (null (cdr busy)) (car busy))))
 
-;;; spawn_agent / kill_agent / kill_agent_subtree
+;;; spawn_buddy / kill_buddy / kill_agent_subtree
 
-(defun konix/mcp-server-spawn-agent (directory task agent-name &optional mcp-config-changes model)
-  "Spawn a new agent that registers with the coordination system and waits for tasks.
-The agent will register and then block waiting for tasks from the coordinator — the coordinator must send the first task using coord_post_task.
+(defun konix/mcp-server-spawn-agent (directory task buddy-name &optional mcp-config-changes model)
+  "Spawn a new buddy that registers with the coordination system and waits for tasks.
+The buddy will register and then block waiting for tasks from the coordinator — the coordinator must send the first task using coord_post_task.
 
 MCP Parameters:
   directory - The working directory for the session
-  task - Contextual goal describing the agent's purpose (the agent will wait for concrete tasks from the coordinator via coord_post_task)
-  agent-name - Unique name for the agent in the coordination system
+  task - Contextual goal describing the buddy's purpose (the buddy will wait for concrete tasks from the coordinator via coord_post_task)
+  buddy-name - Unique name for the buddy in the coordination system
   mcp-config-changes - Optional JSON string describing changes to the MCP server config. Supported keys:
     \"add\": list of server config objects to add.  Each object has \"name\", \"command\", \"args\", and optionally \"env\" (plain object {\"KEY\":\"VALUE\"} or array [{\"name\":\"KEY\",\"value\":\"VALUE\"}]) and \"headers\" (same formats).
     \"remove\": list of server name strings to remove from the default config.
@@ -368,7 +368,7 @@ MCP Parameters:
   (mcp-server-lib-with-error-handling
    (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
           (task (decode-coding-string task 'utf-8))
-          (agent-name (decode-coding-string agent-name 'utf-8))
+          (buddy-name (decode-coding-string buddy-name 'utf-8))
           (mcp-changes (when (and mcp-config-changes
                                   (not (string-empty-p mcp-config-changes)))
                          (konix/mcp-server--normalize-mcp-changes
@@ -377,7 +377,7 @@ MCP Parameters:
                            :object-type 'alist))))
           (model-decoded (when (and model (not (string-empty-p model)))
                            (decode-coding-string model 'utf-8)))
-          (prompt (format "You are a coordinated sub-agent. Your goal: %s
+          (prompt (format "You are a coordinated buddy. Your goal: %s
 
 CRITICAL RULES:
 - You MUST stay strictly focused on the instructions given to you. Do NOT take initiatives beyond what is asked.
@@ -387,23 +387,23 @@ CRITICAL RULES:
 FIRST, do these setup steps in order:
 1. Register with the coordination system using coord_register with name \"%s\" and a description of your role.
 2. Then enter a loop:
-   a. Call coord_wait with agent \"%s\" to block until you receive a task.
+   a. Call coord_wait with buddy \"%s\" to block until you receive a task.
    b. Execute the task you receive strictly as described. If it fails, report the failure.
    c. Report results using coord_complete_task.
    d. Go back to step (a) and wait for the next task.
 
-Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, call kill_agent with your own name \"%s\" to clean yourself up."
-                          task agent-name agent-name agent-name))
+Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, call kill_buddy with your own name \"%s\" to clean yourself up."
+                          task buddy-name buddy-name buddy-name))
           (config (agent-shell-anthropic-make-claude-code-config)))
      (unless (file-directory-p directory)
        (error "Directory does not exist: %s" directory))
-     (when (konix/mcp-server--find-agent-buffer agent-name)
-       (error "An agent named '%s' already exists locally. Kill it first or use a different name" agent-name))
-     (when (konix/mcp-server--coord-agent-exists-p agent-name)
-       (error "An agent named '%s' is already registered in the coordination system" agent-name))
+     (when (konix/mcp-server--find-agent-buffer buddy-name)
+       (error "A buddy named '%s' already exists locally. Kill it first or use a different name" buddy-name))
+     (when (konix/mcp-server--coord-agent-exists-p buddy-name)
+       (error "A buddy named '%s' is already registered in the coordination system" buddy-name))
      (let* ((konix/agent-shell-buffer-label
              (konix/agent-shell--truncate-label
-              (or (konix/agent-shell--clean-label task) agent-name)))
+              (or (konix/agent-shell--clean-label task) buddy-name)))
             (shell-buffer (agent-shell--start :config config
                                               :new-session t
                                               :no-focus t
@@ -432,19 +432,19 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
                            (when to-edit
                              (setq servers (konix/mcp-server--apply-edits servers to-edit)))))
                        (konix/mcp-server--tag-konix-mcp-session
-                        (konix/mcp-server--tag-konix-server-id servers agent-name)
-                        agent-name)))
+                        (konix/mcp-server--tag-konix-server-id servers buddy-name)
+                        buddy-name)))
          (setq-local konix/mcp-server--coordinated-agent t)
-         (setq-local konix/mcp-server--agent-name agent-name)
+         (setq-local konix/mcp-server--agent-name buddy-name)
          (setq-local konix/mcp-server--parent-buffer
                      konix/mcp-server--calling-buffer)
          (when konix/mcp-server--session-tag
            (remhash konix/mcp-server--session-tag konix/mcp-server--session-buffers))
-         (setq-local konix/mcp-server--session-tag agent-name)
-         (konix/mcp-server--register-session-tag agent-name (current-buffer))
+         (setq-local konix/mcp-server--session-tag buddy-name)
+         (konix/mcp-server--register-session-tag buddy-name (current-buffer))
          (shell-maker-submit :input prompt))
-       (format "Spawned coordinated agent '%s' in buffer '%s' with directory %s. The agent will register as \"%s\" in the coordination system. Use coord_post_task or coord_ask_and_wait with to_agent=\"%s\" to send it work."
-               agent-name (buffer-name shell-buffer) directory agent-name agent-name)))))
+       (format "Spawned coordinated buddy '%s' in buffer '%s' with directory %s. The buddy will register as \"%s\" in the coordination system. Use coord_post_task or coord_ask_and_wait with to_buddy=\"%s\" to send it work."
+               buddy-name (buffer-name shell-buffer) directory buddy-name buddy-name)))))
 
 (defun konix/mcp-server--find-agent-buffer (agent-name)
   "Find the buffer for coordinated agent AGENT-NAME.
@@ -462,7 +462,7 @@ Searches all buffers for one with a matching `konix/mcp-server--agent-name'."
     (kill-buffer buffer)
     (when agent
       (ignore-errors
-        (plz 'delete (format "%s/coord/agents/%s"
+        (plz 'delete (format "%s/coord/buddies/%s"
                              konix/mcp-server-coord-url
                              (url-hexify-string agent))
           :timeout 5)))))
@@ -479,28 +479,34 @@ Returns the list of buffer names that were targeted."
         (konix/mcp-server--render-spawn-tree-into tree)))
     names))
 
-(defun konix/mcp-server-kill-agent (agent-name &optional non-recursive)
-  "Kill a coordinated agent buffer that was spawned with spawn_agent.
+(defun konix/mcp-server-kill-agent (buddy-name &optional non-recursive)
+  "Kill a coordinated buddy buffer that was spawned with spawn_buddy.
 
-By default, also kills every descendant agent recursively so no orphan is
-left behind.  Pass NON-RECURSIVE to kill only the targeted agent.
+By default, also kills every descendant buddy recursively so no orphan is
+left behind.  Pass NON-RECURSIVE to kill only the targeted buddy.
 
 MCP Parameters:
-  agent-name - The agent name used when spawning
-  non-recursive - When t, kill only this agent; otherwise also kill all its descendant agents recursively (default)"
+  buddy-name - The buddy name used when spawning
+  non-recursive - When t, kill only this buddy; otherwise also kill all its descendant buddies recursively (default)"
   (mcp-server-lib-with-error-handling
-   (let* ((agent-name (decode-coding-string agent-name 'utf-8))
-          (buffer (konix/mcp-server--find-agent-buffer agent-name)))
+   (let* ((buddy-name (decode-coding-string buddy-name 'utf-8))
+          (buffer (konix/mcp-server--find-agent-buffer buddy-name)))
      (unless buffer
-       (error "No coordinated agent found with name '%s'" agent-name))
+       (error "No coordinated buddy found with name '%s'" buddy-name))
      (let* ((targets (if non-recursive
                          (list buffer)
                        (konix/mcp-server--descendants-of buffer)))
-            (names (konix/mcp-server--kill-buffers targets)))
+            (kill-buffer-query-functions nil)
+            (confirm-kill-processes nil)
+            (names (progn
+                     (dolist (b targets)
+                       (when-let ((proc (get-buffer-process b)))
+                         (set-process-query-on-exit-flag proc nil)))
+                     (konix/mcp-server--kill-buffers targets))))
        (if (= (length names) 1)
-           (format "Killed coordinated agent '%s'" agent-name)
-         (format "Killed coordinated agent '%s' and %d descendant%s: %s"
-                 agent-name
+           (format "Killed coordinated buddy '%s'" buddy-name)
+         (format "Killed coordinated buddy '%s' and %d descendant%s: %s"
+                 buddy-name
                  (1- (length names))
                  (if (= (length names) 2) "" "s")
                  (string-join (cdr names) ", ")))))))
@@ -714,13 +720,8 @@ point if possible."
 (defun konix/mcp-server--spawn-tree-tick ()
   "Auto-refresh tick: re-render *Spawn Tree* if it is displayed."
   (let ((buf (get-buffer "*Spawn Tree*")))
-    (cond
-     ((not (and buf (get-buffer-window buf 'visible)))
-      (when konix/mcp-server--spawn-tree-timer
-        (cancel-timer konix/mcp-server--spawn-tree-timer)
-        (setq konix/mcp-server--spawn-tree-timer nil)))
-     (t
-      (konix/mcp-server--render-spawn-tree-into buf)))))
+    (when (and buf (get-buffer-window buf 'visible))
+      (konix/mcp-server--render-spawn-tree-into buf))))
 
 (defun konix/mcp-server--caller-shell-buffer ()
   "Return the agent-shell buffer associated with the current buffer, or nil.

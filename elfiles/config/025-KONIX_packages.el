@@ -97,7 +97,7 @@
   (use-package consult-yasnippet)
   (use-package copilot)
   (use-package lsp-mode :commands (lsp))
-  (use-package dap-mode :after (lsp-mode) :straight (:fork (:branch "konubinix")))
+  (use-package dap-mode :after (lsp-mode) :straight (:fork (:branch "mine")))
   (use-package dash)
   (use-package dedicated)
   (use-package default-text-scale)

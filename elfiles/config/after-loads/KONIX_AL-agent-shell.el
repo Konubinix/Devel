@@ -1089,6 +1089,17 @@ notified of new agent activity."
          (when (buffer-live-p shell-buf)
            (with-current-buffer shell-buf
              (setq konix/agent-shell--seen nil))))))
+    ;; `init-finished' fires once the session is established — for a resumed
+    ;; session its title is already known on disk, so guess the buffer name
+    ;; immediately instead of waiting for the first `turn-complete'.
+    (agent-shell-subscribe-to
+     :shell-buffer shell-buf
+     :event 'init-finished
+     :on-event
+     (lambda (_event)
+       (when (buffer-live-p shell-buf)
+         (with-current-buffer shell-buf
+           (konix/agent-shell--auto-rename-from-title)))))
     (agent-shell-subscribe-to
      :shell-buffer shell-buf
      :event 'turn-complete

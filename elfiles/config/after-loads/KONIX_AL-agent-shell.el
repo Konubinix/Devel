@@ -149,28 +149,76 @@ reference-counted server-side so the themed servers coexist safely."
              (length konix/agent-shell-mcp-enabled-servers)
              (length konix/agent-shell-mcp-server-registry))))
 
+(defun konix/agent-shell-mcp--server-config->json-value (config)
+  "Convert a registry server CONFIG alist to a `.mcp.json' value alist.
+Drops the `name' key (in `.mcp.json' the server name is the object key,
+not a field) and converts empty `headers'/`env' vectors to empty JSON
+objects so the output matches the `{}' shape Claude Code expects rather
+than the `[]' the registry happens to use."
+  (cl-loop for (key . val) in config
+           unless (eq key 'name)
+           collect (cons key
+                         (if (and (memq key '(headers env))
+                                  (vectorp val)
+                                  (zerop (length val)))
+                             (make-hash-table)
+                           val))))
+
+(defun konix/agent-shell-mcp-servers->json (names)
+  "Return a pretty-printed `.mcp.json' string for registry servers NAMES.
+Unknown names are silently skipped.  The result is the JSON object
+Claude Code reads from a project `.mcp.json': a single `mcpServers' key
+mapping each server name to its config."
+  (let ((servers
+         (cl-loop for name in names
+                  for entry = (assoc name konix/agent-shell-mcp-server-registry)
+                  when entry
+                  collect (cons name
+                                (konix/agent-shell-mcp--server-config->json-value
+                                 (cdr entry)))))
+        (json-encoding-pretty-print t))
+    (json-encode `(("mcpServers" . ,servers)))))
+
+(defun konix/agent-shell-mcp-export-json (names)
+  "Build a `.mcp.json' for the selected MCP server NAMES and show it.
+Interactively, read a comma-separated list of registry server names
+\(defaulting to the currently enabled set), render the `mcpServers'
+object Claude Code reads from `.mcp.json', display it in a buffer and
+copy it to the kill ring."
+  (interactive
+   (list (completing-read-multiple
+          "Servers for .mcp.json: "
+          (mapcar #'car konix/agent-shell-mcp-server-registry)
+          nil t
+          (mapconcat #'identity konix/agent-shell-mcp-enabled-servers ","))))
+  (let ((json (konix/agent-shell-mcp-servers->json names)))
+    (kill-new json)
+    (with-current-buffer (get-buffer-create "*mcp.json*")
+      (erase-buffer)
+      (insert json "\n")
+      (when (fboundp 'js-json-mode) (js-json-mode))
+      (goto-char (point-min))
+      (display-buffer (current-buffer)))
+    (message "Generated .mcp.json for %d server%s (copied to kill ring)"
+             (length names) (if (= (length names) 1) "" "s"))))
+
 (setq-default agent-shell-show-welcome-message nil)
 
 (defvar konix/agent-shell-presets
   `(("default"
      :acp-command ("claude-agent-acp")
-     :mcp-servers (((name . "konix-mcp")
-                    (type . "http")
-                    (url . "http://192.168.2.5:9920/mcp")
-                    (headers . []))
-                   ((name . "konix-emacs")
-                    (command . "bash")
-                    (args . [,(expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory)
-                             "--init-function=konix/mcp-server-start"
-                             "--stop-function=konix/mcp-server-stop"
-                             "--server-id=konix-emacs-mcp"])
-                    (env . []))))
+     :mcp-servers (,(konix/agent-shell-mcp-http-server "konix-browser" "browser")
+                   ,(konix/agent-shell-mcp-http-server "konix-legal" "legal")
+                   ,(konix/agent-shell-mcp-http-server "konix-notes" "notes")
+                   ,(konix/agent-shell-mcp-emacs-server "konix-emacs-buffers")
+                   ,(konix/agent-shell-mcp-emacs-server "konix-emacs-org")
+                   ,(konix/agent-shell-mcp-emacs-server "konix-emacs-agents")
+                   ,(konix/agent-shell-mcp-emacs-server "konix-emacs-elisp")))
     ("remote"
      :acp-command ("claude" "--agent")
-     :mcp-servers (((name . "konix-mcp")
-                    (type . "http")
-                    (url . "http://192.168.2.5:9920/mcp")
-                    (headers . [])))))
+     :mcp-servers (,(konix/agent-shell-mcp-http-server "konix-browser" "browser")
+                   ,(konix/agent-shell-mcp-http-server "konix-legal" "legal")
+                   ,(konix/agent-shell-mcp-http-server "konix-notes" "notes"))))
   "Named presets for agent-shell sessions.
 Each entry is (NAME . PLIST) with :acp-command and :mcp-servers keys.
 :acp-command is a list of strings (command + args).

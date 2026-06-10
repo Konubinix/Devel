@@ -35,7 +35,7 @@
 (setq-default acp-logging-enabled t)
 (setq-default agent-shell-prefer-viewport-interaction t)
 (setq-default agent-shell-session-strategy 'new)
-(setq-default agent-shell-anthropic-default-model-id "haiku")
+(setq-default agent-shell-anthropic-default-model-id "sonnet")
 
 (defun konix/agent-shell-toggle-prefer-viewport-interaction ()
   (interactive)

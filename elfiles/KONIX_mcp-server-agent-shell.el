@@ -322,10 +322,7 @@ Returns t unconditionally so the kill of this buffer always proceeds."
         (run-with-timer
          0 nil
          (lambda ()
-           (setq konix/mcp-server--subtree-kill-in-progress t)
-           (unwind-protect
-               (konix/mcp-server--kill-buffers descendants)
-             (setq konix/mcp-server--subtree-kill-in-progress nil)))))))
+           (konix/mcp-server--kill-buffers descendants))))))
   t)
 
 (defun konix/mcp-server--tag-current-agent-shell ()
@@ -526,10 +523,19 @@ Searches all buffers for one with a matching `konix/mcp-server--agent-name'."
 
 (defun konix/mcp-server--kill-buffers (buffers)
   "Kill each agent-shell buffer in BUFFERS and refresh the *Spawn Tree* view.
-Returns the list of buffer names that were targeted."
-  (let ((names (mapcar #'buffer-name buffers)))
+This is the single programmatic kill primitive: it kills without any
+interactive confirmation.  Binding `konix/mcp-server--subtree-kill-in-progress'
+short-circuits the buffer-local `--maybe-kill-subtree' query function (a global
+`let' on `kill-buffer-query-functions' cannot, as the hook is buffer-local),
+and `confirm-kill-processes' plus the per-process exit flag suppress the
+running-process prompt.  Returns the list of buffer names that were targeted."
+  (let ((names (mapcar #'buffer-name buffers))
+        (konix/mcp-server--subtree-kill-in-progress t)
+        (confirm-kill-processes nil))
     (dolist (b buffers)
       (when (buffer-live-p b)
+        (when-let ((proc (get-buffer-process b)))
+          (set-process-query-on-exit-flag proc nil))
         (konix/mcp-server--kill-buffer b)))
     (when-let ((tree (get-buffer "*Spawn Tree*")))
       (when (get-buffer-window tree 'visible)
@@ -553,13 +559,7 @@ MCP Parameters:
      (let* ((targets (if non-recursive
                          (list buffer)
                        (konix/mcp-server--descendants-of buffer)))
-            (kill-buffer-query-functions nil)
-            (confirm-kill-processes nil)
-            (names (progn
-                     (dolist (b targets)
-                       (when-let ((proc (get-buffer-process b)))
-                         (set-process-query-on-exit-flag proc nil)))
-                     (konix/mcp-server--kill-buffers targets))))
+            (names (konix/mcp-server--kill-buffers targets)))
        (if (= (length names) 1)
            (format "Killed coordinated buddy '%s'" buddy-name)
          (format "Killed coordinated buddy '%s' and %d descendant%s: %s"

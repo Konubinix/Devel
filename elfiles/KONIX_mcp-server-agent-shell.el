@@ -120,14 +120,38 @@ base server-id so existing tool lookups keep working."
 
 ;;; Coord HTTP helpers
 
-(defun konix/mcp-server--coord-agent-exists-p (agent-name)
-  "Return non-nil if AGENT-NAME is registered in the coordination system."
-  (condition-case _
-      (let ((agents (plz 'get (format "%s/coord/buddies"
-                                      konix/mcp-server-coord-url)
-                      :as #'json-read :timeout 5)))
-        (assoc-string agent-name agents))
-    (plz-error nil)))
+(defun konix/mcp-server--coord-reserve (agent-name)
+  "Reserve AGENT-NAME in the coordination system, marking it as coming online.
+The coord server performs an atomic registered-or-reserved duplicate check
+and answers 409 if the name is already taken; this signals an error in that
+case so the caller aborts the spawn.  Returns non-nil on success."
+  (condition-case err
+      (progn
+        (plz 'post (format "%s/coord/reservations/%s"
+                           konix/mcp-server-coord-url
+                           (url-hexify-string agent-name))
+          :timeout 5)
+        t)
+    (plz-error
+     ;; `plz' signals (plz-http-error "..." PLZ-ERROR-STRUCT); the struct is
+     ;; the last element of the error data.
+     (let* ((data (car (last err)))
+            (resp (and (plz-error-p data) (plz-error-response data))))
+       (if (and resp (= (plz-response-status resp) 409))
+           (error "A buddy named '%s' is already registered or reserved in the coordination system"
+                  agent-name)
+         (error "Could not reserve buddy name '%s' with the coordination system: %s"
+                agent-name err))))))
+
+(defun konix/mcp-server--coord-release-reservation (agent-name)
+  "Release the coordination reservation for AGENT-NAME, ignoring errors.
+Used to undo `konix/mcp-server--coord-reserve' when the spawn fails before
+the buddy can register."
+  (ignore-errors
+    (plz 'delete (format "%s/coord/reservations/%s"
+                         konix/mcp-server-coord-url
+                         (url-hexify-string agent-name))
+      :timeout 5)))
 
 (defun konix/mcp-server--fetch-coord-by-session-tag ()
   "Return a hash table mapping session-tag → coord agent name.
@@ -351,9 +375,11 @@ nil if zero or more than one buffer is busy."
 
 ;;; spawn_buddy / kill_buddy / kill_agent_subtree
 
-(defun konix/mcp-server-spawn-agent (directory task buddy-name &optional mcp-config-changes model)
+(defun konix/mcp-server-spawn-agent (directory task buddy-name &optional mcp-config-changes model coord-only)
   "Spawn a new buddy that registers with the coordination system and waits for tasks.
-The buddy will register and then block waiting for tasks from the coordinator — the coordinator must send the first task using coord_post_task.
+The buddy will register and then block waiting for tasks from the coordinator — the coordinator must send the first task using coord_post_task or coord_ask_and_wait.
+
+You do NOT need to wait for the buddy to finish registering: call coord_ask_and_wait (or coord_post_task) with to_buddy=BUDDY-NAME immediately after this returns. The task is queued and delivered the moment the buddy registers, and coord_ask_and_wait then blocks until it answers.
 
 MCP Parameters:
   directory - The working directory for the session
@@ -364,7 +390,8 @@ MCP Parameters:
     \"remove\": list of server name strings to remove from the default config.
     \"edit\": list of objects to modify existing servers, each with \"name\" and optional \"env_set\" ({KEY:VALUE to add/override}), \"env_remove\" (list of var names to remove), \"headers_set\" ({KEY:VALUE}), \"headers_remove\" (list of header names to remove).
     Example: {\"add\":[{\"name\":\"my-srv\",\"command\":\"node\",\"args\":[\"server.js\"],\"env\":{\"TOKEN\":\"abc\"}}]}
-  model - Optional model ID or alias (e.g. \"sonnet\", \"opus\", \"claude-sonnet-4-6\")"
+  model - Optional buddy model: \"default\" (Opus), \"opus\", \"sonnet\" or \"haiku\" (\"opus\" is an alias for \"default\").  Defaults to `agent-shell-anthropic-default-model-id'.
+  coord-only - When t, point this buddy's konix-mcp at the slim /coord endpoint (coordination tools only) instead of the full /mcp. Use for coordination/demo buddies so their tool list stays small; leave unset for buddies that need the full toolset (legifrance, chrome-devtools, etc.)."
   (mcp-server-lib-with-error-handling
    (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
           (task (decode-coding-string task 'utf-8))
@@ -376,32 +403,43 @@ MCP Parameters:
                            (decode-coding-string mcp-config-changes 'utf-8)
                            :object-type 'alist))))
           (model-decoded (when (and model (not (string-empty-p model)))
-                           (decode-coding-string model 'utf-8)))
+                           (let ((decoded (decode-coding-string model 'utf-8)))
+                             (if (string= decoded "opus") "default" decoded))))
           (prompt (format "You are a coordinated buddy. Your goal: %s
+
+HOW TO CALL COORDINATION TOOLS:
+- coord_register, coord_wait, coord_complete_task, coord_ask_and_wait, coord_list_buddies, spawn_buddy and kill_buddy are MCP tools. Invoke each one by emitting a tool call, exactly like any other tool.
+- If one isn't visible in your toolset yet, load its schema with ToolSearch first, then invoke it directly.
+- coord_wait and coord_ask_and_wait block server-side until there is something to return, so just call them and let them block. To wait for another buddy, call the coord tool again; if it reports \"not registered\", call coord_list_buddies and retry.
 
 CRITICAL RULES:
 - You MUST stay strictly focused on the instructions given to you. Do NOT take initiatives beyond what is asked.
 - If something goes wrong (a tool fails, a command errors out, etc.), do NOT try to debug or fix it on your own. Instead, report the error back as your result and wait for further instructions.
 - Do NOT explore, investigate, or attempt workarounds unless explicitly told to do so.
 
-FIRST, do these setup steps in order:
-1. Register with the coordination system using coord_register with name \"%s\" and a description of your role.
-2. Then enter a loop:
+FIRST, do these setup steps in order. The coordination tools are MCP tools that start out \"deferred\": their schemas are not loaded yet, so you cannot call them until step 1 loads them. Do NOT skip step 1, and do NOT try to reach these tools any other way.
+1. Call ToolSearch with EXACTLY this query to load the coordination tool schemas: select:mcp__konix-mcp__coord_register,mcp__konix-mcp__coord_wait,mcp__konix-mcp__coord_complete_task — once it returns, those tools are directly callable like any built-in tool.
+2. Call the coord_register tool with name \"%s\" and a description of your role.
+3. Then enter a loop:
    a. Call coord_wait with buddy \"%s\" to block until you receive a task.
    b. Execute the task you receive strictly as described. If it fails, report the failure.
-   c. Report results using coord_complete_task.
+   c. Report results by calling coord_complete_task.
    d. Go back to step (a) and wait for the next task.
 
-Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, call kill_buddy with your own name \"%s\" to clean yourself up."
+Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, invoke the kill_buddy tool with your own name \"%s\" to clean yourself up."
                           task buddy-name buddy-name buddy-name))
           (config (agent-shell-anthropic-make-claude-code-config)))
      (unless (file-directory-p directory)
        (error "Directory does not exist: %s" directory))
      (when (konix/mcp-server--find-agent-buffer buddy-name)
        (error "A buddy named '%s' already exists locally. Kill it first or use a different name" buddy-name))
-     (when (konix/mcp-server--coord-agent-exists-p buddy-name)
-       (error "A buddy named '%s' is already registered in the coordination system" buddy-name))
-     (let* ((konix/agent-shell-buffer-label
+     ;; Reserve the name with the coordination system before starting the
+     ;; shell.  This does the atomic registered-or-reserved duplicate check
+     ;; (closing the check-then-register race) and lets a parent ask this
+     ;; buddy by name before it has registered.
+     (konix/mcp-server--coord-reserve buddy-name)
+     (condition-case err
+         (let* ((konix/agent-shell-buffer-label
              (konix/agent-shell--truncate-label
               (or (konix/agent-shell--clean-label task) buddy-name)))
             (shell-buffer (agent-shell--start :config config
@@ -410,6 +448,8 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
                                               :session-strategy 'new-deferred)))
        (with-current-buffer shell-buffer
          (setq-local agent-shell-cwd-function (lambda () directory))
+         (when model-decoded
+           (setq-local agent-shell-anthropic-default-model-id model-decoded))
          (setq-local agent-shell-mcp-servers
                      (let ((servers (copy-sequence (default-value 'agent-shell-mcp-servers))))
                        (when mcp-changes
@@ -431,6 +471,20 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
                                                    (append to-add nil)))))
                            (when to-edit
                              (setq servers (konix/mcp-server--apply-edits servers to-edit)))))
+                       (when coord-only
+                         (setq servers
+                               (mapcar
+                                (lambda (srv)
+                                  (let ((url (alist-get 'url srv)))
+                                    (if (and (equal (alist-get 'name srv) "konix-mcp")
+                                             url (string-suffix-p "/mcp" url))
+                                        (let ((srv (copy-alist srv)))
+                                          (setf (alist-get 'url srv)
+                                                (concat (substring url 0 (- (length url) 4))
+                                                        "/coord"))
+                                          srv)
+                                      srv)))
+                                servers)))
                        (konix/mcp-server--tag-konix-mcp-session
                         (konix/mcp-server--tag-konix-server-id servers buddy-name)
                         buddy-name)))
@@ -443,8 +497,11 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
          (setq-local konix/mcp-server--session-tag buddy-name)
          (konix/mcp-server--register-session-tag buddy-name (current-buffer))
          (shell-maker-submit :input prompt))
-       (format "Spawned coordinated buddy '%s' in buffer '%s' with directory %s. The buddy will register as \"%s\" in the coordination system. Use coord_post_task or coord_ask_and_wait with to_buddy=\"%s\" to send it work."
-               buddy-name (buffer-name shell-buffer) directory buddy-name buddy-name)))))
+       (format "Spawned coordinated buddy '%s' in buffer '%s' with directory %s. The buddy is reserved as \"%s\" in the coordination system and will register shortly. You can immediately call coord_ask_and_wait (or coord_post_task) with to_buddy=\"%s\" to send it work — no need to wait for it to register first; the task is queued and delivered as soon as it comes online. If the buddy fails to come online, coord_ask_and_wait returns early (within its come-online pre-timeout) instead of blocking the full timeout."
+               buddy-name (buffer-name shell-buffer) directory buddy-name buddy-name))
+       (error
+        (konix/mcp-server--coord-release-reservation buddy-name)
+        (signal (car err) (cdr err)))))))
 
 (defun konix/mcp-server--find-agent-buffer (agent-name)
   "Find the buffer for coordinated agent AGENT-NAME.

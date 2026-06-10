@@ -244,6 +244,31 @@
   )
 (advice-add 'org-log-into-drawer :around #'konix/org-log-into-drawer)
 
+(defun konix/org-clean-old-timestamps ()
+  "Remove TIMESTAMP drawer entries whose insertion time is >= 1 hour old."
+  (save-excursion
+    (org-back-to-heading t)
+    (let ((one-hour-ago (time-subtract (current-time) (seconds-to-time 3600)))
+          (heading-end (save-excursion (outline-next-heading) (point))))
+      (when (re-search-forward "^[ \t]*:TIMESTAMP:[ \t]*$" heading-end t)
+        (let ((drawer-content-start (line-beginning-position 2))
+              (drawer-end-pos (progn
+                                (re-search-forward "^[ \t]*:END:[ \t]*$" nil t)
+                                (line-beginning-position))))
+          (goto-char drawer-content-start)
+          (while (< (point) drawer-end-pos)
+            (let* ((line-start (line-beginning-position))
+                   (line-end (line-end-position))
+                   (line (buffer-substring-no-properties line-start line-end)))
+              (if (and (string-match "^[ \t]*- On \\(\\[[^]]+\\]\\):" line)
+                       (time-less-p
+                        (org-time-string-to-time (match-string 1 line))
+                        one-hour-ago))
+                  (let ((del-end (min (1+ line-end) (point-max))))
+                    (delete-region line-start del-end)
+                    (setq drawer-end-pos (- drawer-end-pos (- del-end line-start))))
+                (forward-line 1)))))))))
+
 (defun konix/org-add-timestamp ()
   (interactive)
   (let* (
@@ -256,6 +281,7 @@
                   (org-indent-line)
                   (insert (format-time-string "- On [%Y-%m-%d %a %H:%M]: " (current-time)))
                   (org-insert-time-stamp time t)
+                  (konix/org-clean-old-timestamps)
                   )
                 ))
          )

@@ -45,21 +45,42 @@
   (unless (file-exists-p script)
     (mcp-server-lib-install)))
 
-(defvar konix/agent-shell-mcp-server-registry
-  `(("konix-mcp"
-     (name . "konix-mcp")
-     (type . "http")
-     (url . "http://192.168.2.5:9920/mcp")
-     (headers . []))
+(defvar konix/agent-shell-mcp-base-url "http://192.168.2.5:9920"
+  "Base URL of the konix MCP HTTP server.
+The toolset is split into per-theme mounts hanging off this base:
+/browser, /legal, /notes (and /coord for spawned buddies).")
 
-    ("konix-emacs"
-     (name . "konix-emacs")
-     (command . "bash")
-     (args . [,(expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory)
-              "--init-function=konix/mcp-server-start"
-              "--stop-function=konix/mcp-server-stop"
-              "--server-id=konix-emacs-mcp"])
-     (env . []))
+(defun konix/agent-shell-mcp-http-server (name theme)
+  "Return an MCP server alist named NAME for the THEME mount of the konix server."
+  `((name . ,name)
+    (type . "http")
+    (url . ,(concat konix/agent-shell-mcp-base-url "/" theme))
+    (headers . [])))
+
+(defun konix/agent-shell-mcp-emacs-server (server-id)
+  "Return an MCP server alist for the SERVER-ID theme of the Emacs stdio server.
+SERVER-ID doubles as the client-side server name and the --server-id routing
+key handed to the shared emacs-mcp-stdio.sh bridge; it must be one of the
+themes registered in `konix/mcp-server-ids' on the Emacs side.  Every theme
+shares the one bridge script and the same init/stop functions, which are
+reference-counted server-side so the themed servers coexist safely."
+  `((name . ,server-id)
+    (command . "bash")
+    (args . [,(expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory)
+             "--init-function=konix/mcp-server-start"
+             "--stop-function=konix/mcp-server-stop"
+             ,(concat "--server-id=" server-id)])
+    (env . [])))
+
+(defvar konix/agent-shell-mcp-server-registry
+  `(("konix-browser" . ,(konix/agent-shell-mcp-http-server "konix-browser" "browser"))
+    ("konix-legal"   . ,(konix/agent-shell-mcp-http-server "konix-legal" "legal"))
+    ("konix-notes"   . ,(konix/agent-shell-mcp-http-server "konix-notes" "notes"))
+
+    ("konix-emacs-buffers" . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-buffers"))
+    ("konix-emacs-org"     . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-org"))
+    ("konix-emacs-agents"  . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-agents"))
+    ("konix-emacs-elisp"   . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-elisp"))
 
     ("chrome-devtools-mcp"
      (name . "chrome-devtools-mcp")
@@ -81,7 +102,7 @@
   "Alist of (NAME . SERVER-CONFIG) for all available MCP servers.")
 
 (defcustom konix/agent-shell-mcp-enabled-servers
-  '("konix-mcp" "konix-emacs")
+  '( )
   "List of MCP server names that are currently enabled."
   :type '(repeat string)
   :group 'konix

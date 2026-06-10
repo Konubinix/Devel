@@ -25,6 +25,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'mcp-server-lib)
 (require 'smerge-mode)
 (require 'difflib)
@@ -34,8 +35,17 @@
 
 ;;; Configuration
 
-(defconst konix/mcp-server-id "konix-emacs-mcp"
-  "Server ID for KONIX MCP server.")
+(defconst konix/mcp-server-ids
+  '("konix-emacs-buffers"
+    "konix-emacs-org"
+    "konix-emacs-agents"
+    "konix-emacs-elisp")
+  "List of server-ids exposed by the KONIX MCP server, one per theme.
+Each id is the routing key emacs-mcp-stdio.sh passes via --server-id, and
+the key under which that theme's tools live in `mcp-server-lib's per-server
+tools table.  Splitting the toolset across several server-ids lets each
+theme be mounted as a separate MCP server on the client side, so groups of
+tools can be enabled/disabled independently.")
 
 (defcustom konix/mcp-server-coord-url "http://127.0.0.1:9921"
   "Base URL of the coordination HTTP server."
@@ -419,9 +429,10 @@ MCP Parameters:
 
 (defun konix/mcp-server-unregister-all-tools ()
   "Unregister all KONIX MCP tools to allow re-registration with new schemas.
-Clears ALL tools from our server's tools table, not just those in the current list."
-  (let ((tools-table (mcp-server-lib--get-server-tools konix/mcp-server-id)))
-    (clrhash tools-table)))
+Clears ALL tools from every themed server's tools table, not just those in
+the current list."
+  (dolist (server-id konix/mcp-server-ids)
+    (clrhash (mcp-server-lib--get-server-tools server-id))))
 
 (defun konix/mcp-server-reload-and-restart ()
   "Reload the MCP server file and restart the server.
@@ -604,165 +615,195 @@ Similar to `elysium-discard-all-suggested-changes'."
 ;;; Tool registration
 
 (defconst konix/mcp-server--tools
-  '((konix/mcp-server-list-buffers
-     :id "list_buffers"
-     :description "List all open Emacs buffers with their properties (name, file, mode, modified status, size)"
-     :read-only t)
-    (konix/mcp-server-read-buffer
-     :id "read_buffer"
-     :description "Read the contents of an Emacs buffer by name. Optionally pass start-char and end-char (0-indexed) to extract a character substring without needing a shell command."
-     :read-only t)
-    (konix/mcp-server-write-buffer
-     :id "write_buffer"
-     :description "Write content to an Emacs buffer, replacing its contents")
-    (konix/mcp-server-save-buffer
-     :id "save_buffer"
-     :description "Save an Emacs buffer to its associated file")
-    (konix/mcp-server-kill-buffer
-     :id "kill_buffer"
-     :description "Kill (close) an Emacs buffer by name")
-    (konix/mcp-server-get-git-info-from-buffer
-     :id "get_git_info"
-     :description "Retrieves the current Git branch and remote tracking branch for the repository associated with a given buffer. Essential for understanding the context of code changes and managing repository operations."
-     :read-only t)
-    (konix/mcp-server-emacs-describe-function
-     :id "emacs_describe_function"
-     :description "access the documentation of an emacs function"
-     :read-only t)
-    (konix/mcp-server-show-calendar-att
-     :id "show_calendar_att"
-     :description "Show the ATT (Agenda for Today) view: daily agenda with calendar entries, deadlines, HOF items (projects/goals/areas of focus), and waiting items"
-     :read-only t)
-    (konix/mcp-server-show-calendar-ada
-     :id "show_calendar_ada"
-     :description "Show the ADA (Doctor Actions) view: GTD diagnostic showing organizational errors like items needing refile, projects missing NEXT actions, items missing contexts or commitments"
-     :read-only t)
-    (konix/mcp-server-show-calendar-ann
-     :id "show_calendar_ann"
-     :description "Show the ANN (NEXT Actions with Context) view: actionable NEXT items with context tags (@...), excluding maybe/waiting/future-scheduled items, with deadline and effort info"
-     :read-only t)
-    (konix/mcp-server-load-file
-     :id "load_file"
-     :description "Load an Emacs Lisp file at the given absolute path using load-file.")
-    (konix/mcp-server-reload-and-restart
-     :id "reload_and_restart"
-     :description "Reload the MCP server file to pick up changes, then restart the server. Call this automatically after editing KONIX_mcp-server.el to apply changes.")
-    (konix/mcp-server-propose-edit
-     :id "propose_edit"
-     :description "LAST RESORT TOOL. Always use the built-in edit tool, and fallback with this only as fallback. Propose code changes by replacing old_string with new_string. Each old_string must be unique in the buffer (error if not found or ambiguous). Use read_buffer first to find the exact text to replace. After calling this tool, you MUST stop and wait for the user to accept or reject the changes before doing anything else.
+  '(("konix-emacs-buffers"
+     (konix/mcp-server-list-buffers
+      :id "list_buffers"
+      :description "List all open Emacs buffers with their properties (name, file, mode, modified status, size)"
+      :read-only t)
+     (konix/mcp-server-read-buffer
+      :id "read_buffer"
+      :description "Read the contents of an Emacs buffer by name. Optionally pass start-char and end-char (0-indexed) to extract a character substring without needing a shell command."
+      :read-only t)
+     (konix/mcp-server-write-buffer
+      :id "write_buffer"
+      :description "Write content to an Emacs buffer, replacing its contents")
+     (konix/mcp-server-save-buffer
+      :id "save_buffer"
+      :description "Save an Emacs buffer to its associated file")
+     (konix/mcp-server-kill-buffer
+      :id "kill_buffer"
+      :description "Kill (close) an Emacs buffer by name")
+     (konix/mcp-server-get-git-info-from-buffer
+      :id "get_git_info"
+      :description "Retrieves the current Git branch and remote tracking branch for the repository associated with a given buffer. Essential for understanding the context of code changes and managing repository operations."
+      :read-only t)
+     (konix/mcp-server-propose-edit
+      :id "propose_edit"
+      :description "LAST RESORT TOOL. Always use the built-in edit tool, and fallback with this only as fallback. Propose code changes by replacing old_string with new_string. Each old_string must be unique in the buffer (error if not found or ambiguous). Use read_buffer first to find the exact text to replace. After calling this tool, you MUST stop and wait for the user to accept or reject the changes before doing anything else.
 
 WORKFLOW:
 1. Call read_buffer to get the buffer content
 2. Identify all the text regions to replace (old_string values)
 3. Call propose_edit with buffer-name and edits (a JSON array of {\"old_string\": \"...\", \"new_string\": \"...\"} objects)
 
-Each old_string should include enough context to be unique (e.g., a whole function definition rather than just one line).")
-    (konix/mcp-server-run-babel
-     :id "run_babel"
-     :description "Execute org-babel in a buffer (must be in org-mode): pass block-name to run one named source block (or CALL line) and return its result, or omit block-name (or pass \"all\" / \"*\") to execute EVERY block in the buffer at once, refreshing all #+RESULTS. A named block must have a #+NAME: property.")
-    (konix/mcp-server-remove-babel-result
-     :id "remove_babel_result"
-     :description "Remove the result of a named org-babel block (its #+RESULTS and output, including an export block), via org-babel-remove-result, leaving the source block. The block must have a #+NAME: property; the buffer must be in org-mode.")
-    (konix/mcp-server-tangle-babel-block
-     :id "tangle_babel_block"
-     :description "Tangle a named org-babel source block in a buffer, writing its content to the file specified by its :tangle header argument. The block must have a #+NAME: property. The buffer must be in org-mode.")
-    (konix/mcp-server-tangle-buffer
-     :id "tangle_buffer"
-     :description "Tangle all source blocks in an org-mode buffer, writing each block to its :tangle target file. Use this instead of tangle_babel_block when you want to tangle the entire file at once.")
-    (konix/mcp-server-spawn-agent
-     :id "spawn_buddy"
-     :description "Spawn a new buddy that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a buddy: call this tool, then use coord_post_task or coord_ask_and_wait to send it instructions. The spawned buddy will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new buddy'. IMPORTANT: When the buddy's goal is accomplished, you MUST call kill_buddy to clean it up.")
-    (konix/mcp-server-kill-agent
-     :id "kill_buddy"
-     :description "Kill a buddy that was previously spawned with spawn_buddy. By default also kills all its descendant buddies recursively so no orphan is left behind; pass non-recursive=true to kill only the targeted buddy. Use this to clean up a buddy when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_buddy (refuses to kill other buffers).")
-    (konix/mcp-server-set-label
-     :id "set_label"
-     :description "Set a short label on the calling agent-shell buffer (shell + viewport) that summarises the current session. Use this when the user asks you to label/rename your own buffer with a meaningful name — pick a 3-7 word descriptive label and call this tool. The label is incorporated into the buffer name via the user's format (typically appears as `A@<label>`). Pass an empty string to revert to the default project-based name. Only works while the calling agent-shell is mid-turn (which it normally is when you call any tool).")
-    ;; Introspection tools
-    (konix/mcp-server-introspection-symbol-exists
-     :id "symbol_exists"
-     :description "Check if a symbol exists.")
-    (konix/mcp-server-introspection-load-paths
-     :id "load_paths"
-     :description "Return the users load paths.")
-    (konix/mcp-server-introspection-features
-     :id "features"
-     :description "Return the list of loaded features.")
-    (konix/mcp-server-introspection-manual-names
-     :id "manual_names"
-     :description "Return a list of available manual names.")
-    (konix/mcp-server-introspection-manual-nodes
-     :id "manual_nodes"
-     :description "Retrieve a listing of topic nodes within a manual.")
-    (konix/mcp-server-introspection-manual-node-contents
-     :id "manual_node_contents"
-     :description "Retrieve the contents of a node in a manual.")
-    (konix/mcp-server-introspection-feature-available
-     :id "feature_available"
-     :description "Check if a feature is loaded or available.")
-    (konix/mcp-server-introspection-library-source
-     :id "library_source"
-     :description "Read the source code for a library.")
-    (konix/mcp-server-introspection-symbol-manual-section
-     :id "symbol_manual_section"
-     :description "Returns contents of manual node for a symbol.")
-    (konix/mcp-server-introspection-function-source
-     :id "function_source"
-     :description "Returns the source code for a function.")
-    (konix/mcp-server-introspection-variable-source
-     :id "variable_source"
-     :description "Returns the source code for a variable.")
-    (konix/mcp-server-introspection-variable-value
-     :id "variable_value"
-     :description "Returns the global value for a variable.")
-    (konix/mcp-server-introspection-function-documentation
-     :id "function_documentation"
-     :description "Returns the docstring for a function.")
-    (konix/mcp-server-introspection-variable-documentation
-     :id "variable_documentation"
-     :description "Returns the docstring for a variable.")
-    (konix/mcp-server-introspection-function-completions
-     :id "function_completions"
-     :description "Returns a list of functions matching a prefix.")
-    (konix/mcp-server-introspection-command-completions
-     :id "command_completions"
-     :description "Returns a list of commands matching a prefix.")
-    (konix/mcp-server-introspection-variable-completions
-     :id "variable_completions"
-     :description "Returns a list of variables matching a prefix.")
-    (konix/mcp-server-introspection-package-location
-     :id "package_location"
-     :description "Return the local repository directory for a package managed by straight.el."
-     :read-only t))
-  "List of MCP tools to register. Each entry is (FUNCTION . PLIST).")
+Each old_string should include enough context to be unique (e.g., a whole function definition rather than just one line)."))
+
+    ("konix-emacs-org"
+     (konix/mcp-server-show-calendar-att
+      :id "show_calendar_att"
+      :description "Show the ATT (Agenda for Today) view: daily agenda with calendar entries, deadlines, HOF items (projects/goals/areas of focus), and waiting items"
+      :read-only t)
+     (konix/mcp-server-show-calendar-ada
+      :id "show_calendar_ada"
+      :description "Show the ADA (Doctor Actions) view: GTD diagnostic showing organizational errors like items needing refile, projects missing NEXT actions, items missing contexts or commitments"
+      :read-only t)
+     (konix/mcp-server-show-calendar-ann
+      :id "show_calendar_ann"
+      :description "Show the ANN (NEXT Actions with Context) view: actionable NEXT items with context tags (@...), excluding maybe/waiting/future-scheduled items, with deadline and effort info"
+      :read-only t)
+     (konix/mcp-server-run-babel
+      :id "run_babel"
+      :description "Execute org-babel in a buffer (must be in org-mode): pass block-name to run one named source block (or CALL line) and return its result, or omit block-name (or pass \"all\" / \"*\") to execute EVERY block in the buffer at once, refreshing all #+RESULTS. A named block must have a #+NAME: property.")
+     (konix/mcp-server-remove-babel-result
+      :id "remove_babel_result"
+      :description "Remove the result of a named org-babel block (its #+RESULTS and output, including an export block), via org-babel-remove-result, leaving the source block. The block must have a #+NAME: property; the buffer must be in org-mode.")
+     (konix/mcp-server-tangle-babel-block
+      :id "tangle_babel_block"
+      :description "Tangle a named org-babel source block in a buffer, writing its content to the file specified by its :tangle header argument. The block must have a #+NAME: property. The buffer must be in org-mode.")
+     (konix/mcp-server-tangle-buffer
+      :id "tangle_buffer"
+      :description "Tangle all source blocks in an org-mode buffer, writing each block to its :tangle target file. Use this instead of tangle_babel_block when you want to tangle the entire file at once."))
+
+    ("konix-emacs-agents"
+     (konix/mcp-server-spawn-agent
+      :id "spawn_buddy"
+      :description "Spawn a new buddy that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a buddy: call this tool, then use coord_post_task or coord_ask_and_wait to send it instructions. The spawned buddy will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new buddy'. IMPORTANT: When the buddy's goal is accomplished, you MUST call kill_buddy to clean it up.")
+     (konix/mcp-server-kill-agent
+      :id "kill_buddy"
+      :description "Kill a buddy that was previously spawned with spawn_buddy. By default also kills all its descendant buddies recursively so no orphan is left behind; pass non-recursive=true to kill only the targeted buddy. Use this to clean up a buddy when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_buddy (refuses to kill other buffers).")
+     (konix/mcp-server-set-label
+      :id "set_label"
+      :description "Set a short label on the calling agent-shell buffer (shell + viewport) that summarises the current session. Use this when the user asks you to label/rename your own buffer with a meaningful name — pick a 3-7 word descriptive label and call this tool. The label is incorporated into the buffer name via the user's format (typically appears as `A@<label>`). Pass an empty string to revert to the default project-based name. Only works while the calling agent-shell is mid-turn (which it normally is when you call any tool)."))
+
+    ("konix-emacs-elisp"
+     (konix/mcp-server-emacs-describe-function
+      :id "emacs_describe_function"
+      :description "access the documentation of an emacs function"
+      :read-only t)
+     (konix/mcp-server-load-file
+      :id "load_file"
+      :description "Load an Emacs Lisp file at the given absolute path using load-file.")
+     (konix/mcp-server-reload-and-restart
+      :id "reload_and_restart"
+      :description "Reload the MCP server file to pick up changes, then restart the server. Call this automatically after editing KONIX_mcp-server.el to apply changes.")
+     ;; Introspection tools
+     (konix/mcp-server-introspection-symbol-exists
+      :id "symbol_exists"
+      :description "Check if a symbol exists.")
+     (konix/mcp-server-introspection-load-paths
+      :id "load_paths"
+      :description "Return the users load paths.")
+     (konix/mcp-server-introspection-features
+      :id "features"
+      :description "Return the list of loaded features.")
+     (konix/mcp-server-introspection-manual-names
+      :id "manual_names"
+      :description "Return a list of available manual names.")
+     (konix/mcp-server-introspection-manual-nodes
+      :id "manual_nodes"
+      :description "Retrieve a listing of topic nodes within a manual.")
+     (konix/mcp-server-introspection-manual-node-contents
+      :id "manual_node_contents"
+      :description "Retrieve the contents of a node in a manual.")
+     (konix/mcp-server-introspection-feature-available
+      :id "feature_available"
+      :description "Check if a feature is loaded or available.")
+     (konix/mcp-server-introspection-library-source
+      :id "library_source"
+      :description "Read the source code for a library.")
+     (konix/mcp-server-introspection-symbol-manual-section
+      :id "symbol_manual_section"
+      :description "Returns contents of manual node for a symbol.")
+     (konix/mcp-server-introspection-function-source
+      :id "function_source"
+      :description "Returns the source code for a function.")
+     (konix/mcp-server-introspection-variable-source
+      :id "variable_source"
+      :description "Returns the source code for a variable.")
+     (konix/mcp-server-introspection-variable-value
+      :id "variable_value"
+      :description "Returns the global value for a variable.")
+     (konix/mcp-server-introspection-function-documentation
+      :id "function_documentation"
+      :description "Returns the docstring for a function.")
+     (konix/mcp-server-introspection-variable-documentation
+      :id "variable_documentation"
+      :description "Returns the docstring for a variable.")
+     (konix/mcp-server-introspection-function-completions
+      :id "function_completions"
+      :description "Returns a list of functions matching a prefix.")
+     (konix/mcp-server-introspection-command-completions
+      :id "command_completions"
+      :description "Returns a list of commands matching a prefix.")
+     (konix/mcp-server-introspection-variable-completions
+      :id "variable_completions"
+      :description "Returns a list of variables matching a prefix.")
+     (konix/mcp-server-introspection-package-location
+      :id "package_location"
+      :description "Return the local repository directory for a package managed by straight.el."
+      :read-only t)))
+  "Alist of (SERVER-ID . TOOLS) grouping MCP tools by theme.
+Each TOOLS entry is (FUNCTION . PLIST); SERVER-ID must be one of
+`konix/mcp-server-ids'.")
 
 (defun konix/mcp-server-register-tools ()
-  "Register all KONIX MCP tools."
-  (dolist (tool konix/mcp-server--tools)
-    (let ((func (car tool))
-          (plist (cdr tool)))
-      (apply #'mcp-server-lib-register-tool
-             func
-             :server-id konix/mcp-server-id
-             plist))))
+  "Register all KONIX MCP tools, each under its theme's server-id."
+  (dolist (group konix/mcp-server--tools)
+    (let ((server-id (car group)))
+      (dolist (tool (cdr group))
+        (apply #'mcp-server-lib-register-tool
+               (car tool)
+               :server-id server-id
+               (cdr tool))))))
 
 ;;; Server start/stop
 
+(defvar konix/mcp-server--client-count 0
+  "Number of stdio bridges (emacs-mcp-stdio.sh processes) currently connected.
+Because the themed servers all share `mcp-server-lib's single global
+`mcp-server-lib--running' flag, each bridge runs `konix/mcp-server-start' on
+connect and `konix/mcp-server-stop' on disconnect.  We reference-count them
+so the flag is only flipped off once the *last* bridge is gone — otherwise
+one theme disconnecting would silently take down all the others.")
+
 (defun konix/mcp-server-start ()
-  "Start the KONIX MCP server.
-If already running, just re-register tools without error."
+  "Start the KONIX MCP server (reference-counted across stdio bridges).
+Registers all themed tools (idempotent) and, on the first connecting
+bridge, actually starts the underlying mcp-server-lib server."
   (interactive)
   (konix/mcp-server-register-tools)
+  (cl-incf konix/mcp-server--client-count)
   (if mcp-server-lib--running
-      (message "KONIX MCP server already running (tools re-registered)")
+      (message "KONIX MCP server already running (%d client(s), tools re-registered)"
+               konix/mcp-server--client-count)
     (mcp-server-lib-start)
-    (message "KONIX MCP server started")))
+    (message "KONIX MCP server started (%d client(s))"
+             konix/mcp-server--client-count)))
 
 (defun konix/mcp-server-stop ()
-  "Stop the KONIX MCP server."
+  "Stop the KONIX MCP server when the last stdio bridge disconnects.
+Decrements the bridge reference count and only calls `mcp-server-lib-stop'
+once it reaches zero, so a single theme disconnecting does not take the
+other themed servers down with it."
   (interactive)
-  (mcp-server-lib-stop)
-  (message "KONIX MCP server stopped"))
+  (when (> konix/mcp-server--client-count 0)
+    (cl-decf konix/mcp-server--client-count))
+  (if (and (= konix/mcp-server--client-count 0) mcp-server-lib--running)
+      (progn
+        (mcp-server-lib-stop)
+        (message "KONIX MCP server stopped (last client disconnected)"))
+    (message "KONIX MCP server still running (%d client(s) remaining)"
+             konix/mcp-server--client-count)))
 
 (provide 'KONIX_mcp-server)
 ;;; KONIX_mcp-server.el ends here

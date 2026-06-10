@@ -53,7 +53,6 @@
 (defvar agent-shell--state)
 (defvar agent-shell-prefer-viewport-interaction)
 (defvar konix/agent-shell-buffer-label)
-(defvar konix/mcp-server-id)
 (defvar konix/mcp-server-coord-url)
 (defvar konix/agent-shell--seen)
 
@@ -89,11 +88,15 @@ or nil if the caller is not a registered agent-shell session.")
 (defconst konix/mcp-server--caller-delimiter "::"
   "Delimiter inserted between the base server-id and the caller's agent name.")
 
-(defun konix/mcp-server--server-id-with-caller (caller)
-  "Return the value to pass via --server-id encoding CALLER (nil = base id)."
+(defun konix/mcp-server--server-id-with-caller (base caller)
+  "Return BASE server-id with CALLER encoded (nil CALLER = BASE unchanged).
+BASE is the theme's own server-id (e.g. \"konix-emacs-agents\"); each themed
+stdio server keeps its own base and only gets `::CALLER' appended, so the
+dispatch advice can both route to the right tools table and recover the
+calling agent."
   (if caller
-      (concat konix/mcp-server-id konix/mcp-server--caller-delimiter caller)
-    konix/mcp-server-id))
+      (concat base konix/mcp-server--caller-delimiter caller)
+    base))
 
 (defun konix/mcp-server--decode-server-id (server-id)
   "Return (BASE-ID . CALLER-OR-NIL) parsed from SERVER-ID."
@@ -288,17 +291,33 @@ which is re-vectorized into the field."
    servers))
 
 (defun konix/mcp-server--tag-konix-server-id (servers caller)
-  "Return SERVERS with the konix-emacs entry's --server-id arg encoding CALLER."
-  (konix/mcp-server--update-server-field
-   servers "konix-emacs" 'args
-   (lambda (args)
-     (mapcar (lambda (a)
-               (if (and (stringp a)
-                        (string-prefix-p "--server-id=" a))
-                   (format "--server-id=%s"
-                           (konix/mcp-server--server-id-with-caller caller))
-                 a))
-             args))))
+  "Return SERVERS with every themed konix-emacs entry's --server-id encoding CALLER.
+Matches any server carrying a `--server-id=' argument — i.e. each of the
+split-by-theme konix-emacs stdio servers — and rewrites that argument to
+append `::CALLER' to whatever base server-id it already holds, so each theme
+keeps its own routing key.  Servers without such an argument (e.g. the HTTP
+konix-* mounts) are returned untouched."
+  (mapcar
+   (lambda (srv)
+     (let ((args (append (alist-get 'args srv) nil)))
+       (if (cl-some (lambda (a)
+                      (and (stringp a) (string-prefix-p "--server-id=" a)))
+                    args)
+           (let ((copy (copy-alist srv)))
+             (setf (alist-get 'args copy)
+                   (vconcat
+                    (mapcar
+                     (lambda (a)
+                       (if (and (stringp a) (string-prefix-p "--server-id=" a))
+                           (format "--server-id=%s"
+                                   (konix/mcp-server--server-id-with-caller
+                                    (substring a (length "--server-id="))
+                                    caller))
+                         a))
+                     args)))
+             copy)
+         srv)))
+   servers))
 
 (defun konix/mcp-server--tag-konix-mcp-session (servers session-tag)
   "Return SERVERS with the konix-mcp entry's headers carrying SESSION-TAG.

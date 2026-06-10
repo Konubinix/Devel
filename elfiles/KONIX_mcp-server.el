@@ -649,7 +649,7 @@ Similar to `elysium-discard-all-suggested-changes'."
      :description "Reload the MCP server file to pick up changes, then restart the server. Call this automatically after editing KONIX_mcp-server.el to apply changes.")
     (konix/mcp-server-propose-edit
      :id "propose_edit"
-     :description "Propose code changes by replacing old_string with new_string. Each old_string must be unique in the buffer (error if not found or ambiguous). Use read_buffer first to find the exact text to replace. After calling this tool, you MUST stop and wait for the user to accept or reject the changes before doing anything else.
+     :description "LAST RESORT TOOL. Always use the built-in edit tool, and fallback with this only as fallback. Propose code changes by replacing old_string with new_string. Each old_string must be unique in the buffer (error if not found or ambiguous). Use read_buffer first to find the exact text to replace. After calling this tool, you MUST stop and wait for the user to accept or reject the changes before doing anything else.
 
 WORKFLOW:
 1. Call read_buffer to get the buffer content

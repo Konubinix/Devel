@@ -1,0 +1,6 @@
+# [[id:2b1bd642-8cac-4fba-8bdc-f139504bc586][config:1]]
+[revset-aliases]
+"mine_deps()" = "bookmarks() ~ (mine | trunk())"
+[aliases]
+update-mine = ["rebase", "-r", "mine", "-o", "all:mine_deps()"]
+# config:1 ends here

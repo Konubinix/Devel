@@ -6,9 +6,3 @@ name = "Samuel Loury"
 behavior = "own"
 backend  = "gpg"
 key      = "konubinix"
-
-[revset-aliases]
-"mine_deps()" = "bookmarks() ~ (mine | trunk())"
-
-[aliases]
-update-mine = ["rebase", "-r", "mine", "-d", "mine_deps()"]

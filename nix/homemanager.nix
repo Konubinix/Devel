@@ -370,6 +370,9 @@ in
       # Ruby
       GEM_HOME = "${homeDir}/.local";
 
+      # jj
+      JJ_CONFIG = "${configDir}/jj";
+
       # Git
       GIT_ALLOW_PROTOCOL = "file:git:http:https:ssh:bzr";
       KONIX_GIT_ANNEX_DIRED_METADATA = "--metadata state=next";

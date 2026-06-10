@@ -790,6 +790,98 @@ forked shell adopts the same name, uniquified by Emacs to
   (interactive)
   (konix/agent-shell--call-preserving-name #'agent-shell-fork))
 
+(defcustom konix/agent-shell-renewal-margin-seconds 60
+  "Extra seconds to wait past the computed 5h renewal before resuming.
+The rate-limit reset boundary is approximate (and the usage probe may
+be a few seconds stale), so `konix/agent-shell-reload-at-renewal' adds
+this margin to be sure the window has actually rolled over before it
+reloads and sends \"continue\"."
+  :type 'integer
+  :group 'konix)
+
+(defvar konix/agent-shell--renewal-timers nil
+  "Alist of (SHELL-NAME . TIMER) for pending renewal reloads.
+Lets `konix/agent-shell-reload-at-renewal' replace an existing timer
+for the same buffer and `konix/agent-shell-cancel-renewal' cancel it.")
+
+(defun konix/agent-shell--go-on-at-renewal (buffer shell-name)
+  "Reply \"go on\" in BUFFER once the renewal timer fires.
+Drops the SHELL-NAME entry from `konix/agent-shell--renewal-timers' and,
+when BUFFER is still live, calls `konix/agent-shell-viewport-reply-go-on'
+there."
+  (setq konix/agent-shell--renewal-timers
+        (assoc-delete-all shell-name konix/agent-shell--renewal-timers))
+  (if (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (konix/agent-shell-viewport-reply-go-on))
+    (message "Renewal: buffer %S is gone, nothing to continue" shell-name)))
+
+(defun konix/agent-shell-reload-at-renewal ()
+  "At credit renewal, reply \"go on\" to this session.
+Run this from the agent-shell viewport that just hit 100%% of a Claude
+credit window.  It queries the renewal time from the rate-limit headers
+\(forcing a fresh probe) and arms a one-shot timer that, when it fires,
+simply calls `konix/agent-shell-viewport-reply-go-on' in this buffer.
+
+The wait is the shorter of the 5-hour and 7-day windows (plus
+`konix/agent-shell-renewal-margin-seconds').  When neither window has
+reached 100%% there is nothing to wait for, so the reply is sent now.
+
+Re-running for the same buffer replaces any pending timer.  Cancel with
+`konix/agent-shell-cancel-renewal'."
+  (declare (modes agent-shell-mode
+                  agent-shell-viewport-view-mode
+                  agent-shell-viewport-edit-mode))
+  (interactive)
+  (let* ((buffer (current-buffer))
+         (shell (konix/agent-shell--current-shell-or-error))
+         (shell-name (buffer-name shell))
+         (json-object-type 'alist)
+         ;; bypass the 10-minute usage cache so the renewal time is accurate
+         (result (json-read-from-string
+                  (let ((current-prefix-arg t))
+                    (konix/claude-code---usage))))
+         (usage-5h (alist-get 'usage_5h_percent result))
+         (usage-7d (alist-get 'usage_7d_percent result))
+         (wait-secs (min (alist-get 'wait_5h_secs result)
+                         (alist-get 'wait_7d_secs result)))
+         (delay (+ (max 0 wait-secs) konix/agent-shell-renewal-margin-seconds))
+         (existing (assoc shell-name konix/agent-shell--renewal-timers)))
+    (when existing
+      (cancel-timer (cdr existing))
+      (setq konix/agent-shell--renewal-timers
+            (assoc-delete-all shell-name konix/agent-shell--renewal-timers)))
+    (if (and (< usage-5h 100) (< usage-7d 100))
+        ;; not rate-limited yet: no need to wait, continue immediately
+        (progn
+          (agent-shell-viewport-reply-continue)
+          (message "Usage below 100%%, continuing %S now" shell-name))
+      (let ((timer (run-at-time delay nil
+                                #'konix/agent-shell--go-on-at-renewal
+                                buffer shell-name)))
+        (push (cons shell-name timer) konix/agent-shell--renewal-timers))
+      (message "Will continue %S at renewal (in %s, +%ds margin)"
+               shell-name
+               (konix/claude-code--format-duration wait-secs)
+               konix/agent-shell-renewal-margin-seconds))))
+
+(defun konix/agent-shell-cancel-renewal ()
+  "Cancel a pending renewal reload scheduled for the current shell."
+  (declare (modes agent-shell-mode
+                  agent-shell-viewport-view-mode
+                  agent-shell-viewport-edit-mode))
+  (interactive)
+  (let* ((shell (konix/agent-shell--current-shell-or-error))
+         (shell-name (buffer-name shell))
+         (existing (assoc shell-name konix/agent-shell--renewal-timers)))
+    (if existing
+        (progn
+          (cancel-timer (cdr existing))
+          (setq konix/agent-shell--renewal-timers
+                (assoc-delete-all shell-name konix/agent-shell--renewal-timers))
+          (message "Cancelled renewal reload for %S" shell-name))
+      (message "No renewal reload pending for %S" shell-name))))
+
 
 (define-key agent-shell-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)
 (define-key agent-shell-viewport-view-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)

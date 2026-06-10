@@ -876,19 +876,32 @@ When `agent-shell-prefer-viewport-interaction' is set, pop to the
 viewport buffer instead if one exists."
   (interactive)
   (if-let ((buffers (agent-shell-buffers)))
-      (let* ((display-buffers
-              (if agent-shell-prefer-viewport-interaction
-                  (mapcar (lambda (buf)
-                            (or (agent-shell-viewport--buffer :shell-buffer buf :existing-only t)
-                                buf))
-                          buffers)
-                buffers))
-             (buffer-names (mapcar #'buffer-name display-buffers))
-             (other-buffers (remove (buffer-name) buffer-names))
-             (candidates (if other-buffers other-buffers buffer-names))
-             (choice (completing-read "Pop to agent-shell buffer: " candidates nil t)))
+      (let* ((nodes (konix/mcp-server--collect-agent-nodes))
+             (coord-by-tag (konix/mcp-server--fetch-coord-by-session-tag))
+             (caller (konix/mcp-server--caller-shell-buffer))
+             ;; For each shell buffer: its spawn-tree line and the buffer to
+             ;; actually pop to (the viewport buffer when preferred).
+             (entries
+              (mapcar
+               (lambda (buf)
+                 (list :line (konix/mcp-server--spawn-tree-line-string buf nodes coord-by-tag)
+                       :shell buf
+                       :pop (if agent-shell-prefer-viewport-interaction
+                                (or (agent-shell-viewport--buffer :shell-buffer buf :existing-only t)
+                                    buf)
+                              buf)))
+               buffers))
+             ;; Drop the buffer we are called from so we always switch somewhere
+             ;; else, unless it is the only one.
+             (others (cl-remove caller entries
+                                :key (lambda (e) (plist-get e :shell))))
+             (candidates (or others entries))
+             (alist (mapcar (lambda (e) (cons (plist-get e :line) (plist-get e :pop)))
+                            candidates))
+             (choice (completing-read "Pop to agent-shell buffer: "
+                                      (mapcar #'car alist) nil t)))
         (when choice
-          (pop-to-buffer choice)))
+          (pop-to-buffer (cdr (assoc choice alist)))))
     (message "No agent-shell buffers running.")))
 
 (defun konix/agent-shell--has-permission-button-p ()

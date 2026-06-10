@@ -348,6 +348,35 @@ MCP Parameters:
          (org-babel-tangle '(4))
          (format "Tangled block '%s' from buffer %s" block-name buffer-name))))))
 
+(defun konix/mcp-server-remove-babel-result (buffer-name block-name &optional save-buffer)
+  "Remove the result of a named org-babel block, via `org-babel-remove-result'.
+
+Deletes the block's =#+RESULTS:= and its output (including an export block),
+leaving the source block. Generic primitive: e.g. turn a rendered argument into
+a plain definition block by editing its header to :eval no, then drop its stale
+map with this.
+
+MCP Parameters:
+  buffer-name - Name of the org-mode buffer.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
+  block-name - The #+NAME of the block whose result to remove.
+  save-buffer - When omitted or non-nil, save the buffer after removal (default).  Pass \"false\" or \"no\" to skip saving."
+  (mcp-server-lib-with-error-handling
+   (konix/mcp-server-with-buffer buffer-name
+     (unless (derived-mode-p 'org-mode)
+       (error "Buffer %s is not in org-mode" buffer-name))
+     (save-excursion
+       (save-restriction
+         (widen)
+         (let ((pos (org-babel-find-named-block block-name)))
+           (unless pos
+             (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
+           (goto-char pos)
+           (org-babel-remove-result)
+           (when (and (buffer-file-name)
+                      (not (member save-buffer '(:json-false "false" "no" "nil"))))
+             (save-buffer))
+           (format "Removed result of block '%s' in buffer %s" block-name buffer-name)))))))
+
 (defun konix/mcp-server-tangle-buffer (buffer-name)
   "Tangle all source blocks in an org-mode buffer.
 
@@ -631,6 +660,9 @@ Each old_string should include enough context to be unique (e.g., a whole functi
     (konix/mcp-server-run-babel
      :id "run_babel"
      :description "Execute org-babel in a buffer (must be in org-mode): pass block-name to run one named source block (or CALL line) and return its result, or omit block-name (or pass \"all\" / \"*\") to execute EVERY block in the buffer at once, refreshing all #+RESULTS. A named block must have a #+NAME: property.")
+    (konix/mcp-server-remove-babel-result
+     :id "remove_babel_result"
+     :description "Remove the result of a named org-babel block (its #+RESULTS and output, including an export block), via org-babel-remove-result, leaving the source block. The block must have a #+NAME: property; the buffer must be in org-mode.")
     (konix/mcp-server-tangle-babel-block
      :id "tangle_babel_block"
      :description "Tangle a named org-babel source block in a buffer, writing its content to the file specified by its :tangle header argument. The block must have a #+NAME: property. The buffer must be in org-mode.")

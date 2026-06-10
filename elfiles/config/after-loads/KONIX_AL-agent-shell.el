@@ -681,9 +681,15 @@ truncated label so callers can pass it onward (e.g. to
     truncated))
 
 (defun konix/agent-shell--at-default-name-p (shell)
-  "Return non-nil when SHELL's buffer name is the un-labelled default."
-  (string= (buffer-name shell)
-           (konix/agent-shell--apply-label-format shell nil)))
+  "Return non-nil when SHELL's buffer name is the un-labelled default.
+Also matches the uniquify `<N>' suffix Emacs appends when several
+sessions share a project (e.g. `A@devel<2>'), so a resumed session
+opened alongside an existing one is still eligible for auto-rename."
+  (let ((default (konix/agent-shell--apply-label-format shell nil))
+        (name (buffer-name shell)))
+    (or (string= name default)
+        (string-match-p (concat "\\`" (regexp-quote default) "<[0-9]+>\\'")
+                        name))))
 
 (defun konix/agent-shell--auto-rename-from-title ()
   "Rename the current shell to its on-disk session title — once.

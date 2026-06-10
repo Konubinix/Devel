@@ -70,14 +70,17 @@
 
 (defun konix/org-agenda-gtd-get-clear ()
   (interactive)
-  (org-ql-search
-    (org-agenda-files)
-    '(and
-      (ts :from -7 :to today)
-      (not (tags "structure" "habit" "temp" "ril"))
+  (let ((excluded-tags '("structure" "habit" "temp" "ril"))
+        (days-back 7))
+    (org-ql-search
+      (org-agenda-files)
+      `(and
+        (ts :from ,(- days-back) :to today)
+        (not (tags ,@excluded-tags))
+        )
+      :title (format "Clear recent Items from last %d days (excluding: %s)" days-back (string-join excluded-tags ", "))
+      :sort '(date)
       )
-    :title "Clear recent Items"
-    :sort '(date)
     )
   )
 

@@ -254,13 +254,18 @@ Return the position of the #+CALL: line, or nil if none is found."
               (throw 'found (line-beginning-position)))))
         nil))))
 
-(defun konix/mcp-server-run-babel-block (buffer-name block-name &optional force save-buffer)
-  "Execute a named org-babel source block or CALL line and return its result.
+(defun konix/mcp-server-run-babel (buffer-name &optional block-name force save-buffer)
+  "Execute a named org-babel source block (or CALL line), or every block in the buffer.
+
+If BLOCK-NAME is omitted (or \"all\" / \"*\"), all source blocks are executed via
+`org-babel-execute-buffer' (confirmation disabled), refreshing every #+RESULTS at
+once.  Otherwise the single named block (or CALL line) is executed and its result
+returned.
 
 MCP Parameters:
-  buffer-name - Name of the buffer containing the org babel block.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
-  block-name - The #+NAME of the babel block or CALL line to execute
-  force - When non-nil, bypass the cache and force re-evaluation
+  buffer-name - Name of the buffer containing the org babel block(s).  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
+  block-name - The #+NAME of the babel block or CALL line to execute.  Omit (or pass \"all\" / \"*\") to execute EVERY block in the buffer.
+  force - When non-nil, bypass the cache and force re-evaluation (single-block only)
   save-buffer - When omitted or non-nil, save the buffer to its file after execution (default).  Pass \"false\" or \"no\" to skip saving."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
@@ -269,45 +274,53 @@ MCP Parameters:
      (save-excursion
        (save-restriction
          (widen)
-         (let* ((src-pos (org-babel-find-named-block block-name))
-                (call-pos (unless src-pos
-                            (konix/mcp-server--find-named-call block-name)))
-                (pos (or src-pos call-pos)))
-           (unless pos
-             (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
-           (goto-char pos)
-           (let ((info (if call-pos
-                           (org-babel-lob-get-info)
-                         (org-babel-get-src-block-info))))
-             (when-let ((error-buf (get-buffer "*Org-Babel Error Output*")))
-               (kill-buffer error-buf))
-             (condition-case err
-                 (prog1
-                     (let* ((result (org-babel-execute-src-block
-                                     (when force t) info (when force '((:cache . "no")))))
-                            (result-str (if result
-                                            (format "%s" result)
-                                          "Block executed successfully (no result returned)"))
-                            (error-buf (get-buffer "*Org-Babel Error Output*"))
-                            (error-output (when error-buf
-                                            (with-current-buffer error-buf
-                                              (buffer-substring-no-properties
-                                               (point-min) (point-max))))))
-                       (if (and error-output (not (string-empty-p error-output)))
-                           (format "%s\n--- *Org-Babel Error Output* ---\n%s"
-                                   result-str error-output)
-                         result-str))
-                   (when (and (buffer-file-name)
-                              (not (member save-buffer '(:json-false "false" "no" "nil"))))
-                     (save-buffer)))
-               (error
-                (let ((error-buf (get-buffer "*Org-Babel Error Output*")))
-                  (error "Babel execution error in block '%s' of buffer %s: %s\n%s"
-                         block-name buffer-name (error-message-string err)
-                         (if error-buf
-                             (with-current-buffer error-buf
-                               (buffer-substring-no-properties (point-min) (point-max)))
-                           ""))))))))))))
+         (when-let ((error-buf (get-buffer "*Org-Babel Error Output*")))
+           (kill-buffer error-buf))
+         (let ((whole (member block-name '(nil "" "all" "*" :json-false))))
+           (condition-case err
+               (prog1
+                   (let* ((result-str
+                           (if whole
+                               (let ((org-confirm-babel-evaluate nil))
+                                 (org-babel-execute-buffer)
+                                 (format "Executed all babel blocks in buffer %s" buffer-name))
+                             (let* ((src-pos (org-babel-find-named-block block-name))
+                                    (call-pos (unless src-pos
+                                                (konix/mcp-server--find-named-call block-name)))
+                                    (pos (or src-pos call-pos)))
+                               (unless pos
+                                 (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
+                               (goto-char pos)
+                               (let* ((info (if call-pos
+                                                (org-babel-lob-get-info)
+                                              (org-babel-get-src-block-info)))
+                                      (result (org-babel-execute-src-block
+                                               (when force t) info (when force '((:cache . "no"))))))
+                                 (if result
+                                     (format "%s" result)
+                                   "Block executed successfully (no result returned)")))))
+                          (error-buf (get-buffer "*Org-Babel Error Output*"))
+                          (error-output (when error-buf
+                                          (with-current-buffer error-buf
+                                            (buffer-substring-no-properties
+                                             (point-min) (point-max))))))
+                     (if (and error-output (not (string-empty-p error-output)))
+                         (format "%s\n--- *Org-Babel Error Output* ---\n%s"
+                                 result-str error-output)
+                       result-str))
+                 (when (and (buffer-file-name)
+                            (not (member save-buffer '(:json-false "false" "no" "nil"))))
+                   (save-buffer)))
+             (error
+              (let ((error-buf (get-buffer "*Org-Babel Error Output*")))
+                (error "Babel execution error in buffer %s%s: %s\n%s"
+                       buffer-name
+                       (if whole "" (format " block '%s'" block-name))
+                       (error-message-string err)
+                       (if error-buf
+                           (with-current-buffer error-buf
+                             (buffer-substring-no-properties (point-min) (point-max)))
+                         "")))))))))))
 
 (defun konix/mcp-server-tangle-babel-block (buffer-name block-name)
   "Tangle a named org-babel source block, writing it to its :tangle target.
@@ -615,9 +628,9 @@ WORKFLOW:
 3. Call propose_edit with buffer-name and edits (a JSON array of {\"old_string\": \"...\", \"new_string\": \"...\"} objects)
 
 Each old_string should include enough context to be unique (e.g., a whole function definition rather than just one line).")
-    (konix/mcp-server-run-babel-block
-     :id "run_babel_block"
-     :description "Execute a named org-babel source block in a buffer and return its result. The block must have a #+NAME: property. The buffer must be in org-mode.")
+    (konix/mcp-server-run-babel
+     :id "run_babel"
+     :description "Execute org-babel in a buffer (must be in org-mode): pass block-name to run one named source block (or CALL line) and return its result, or omit block-name (or pass \"all\" / \"*\") to execute EVERY block in the buffer at once, refreshing all #+RESULTS. A named block must have a #+NAME: property.")
     (konix/mcp-server-tangle-babel-block
      :id "tangle_babel_block"
      :description "Tangle a named org-babel source block in a buffer, writing its content to the file specified by its :tangle header argument. The block must have a #+NAME: property. The buffer must be in org-mode.")

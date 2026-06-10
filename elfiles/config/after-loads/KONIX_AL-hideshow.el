@@ -29,6 +29,18 @@
 (setq-default hs-isearch-open t)
 
 
+(defvar-local konix/hs-all-hidden nil
+  "Whether `konix/hs-toggle-all' last hid everything.")
+
+(defun konix/hs-toggle-all ()
+  "Toggle global visibility like `org-shifttab' (backtab), using hideshow.
+Alternate between HIDE ALL and SHOW ALL on successive calls."
+  (interactive)
+  (if konix/hs-all-hidden
+      (progn (hs-show-all) (message "SHOW ALL"))
+    (hs-hide-all) (message "HIDE ALL"))
+  (setq konix/hs-all-hidden (not konix/hs-all-hidden)))
+
 (defvar konix/hs-zoom-in-hide-level nil)
 (defun konix/hs-zoom-in ()
   (interactive)

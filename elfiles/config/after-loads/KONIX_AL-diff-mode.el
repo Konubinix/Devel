@@ -67,7 +67,7 @@ Point is at the beginning of the block start match (diff or @@)."
 (keymap-set diff-mode-map "C-p" 'outline-previous-visible-heading)
 (keymap-set diff-mode-map "C-n" 'outline-next-visible-heading)
 (keymap-set diff-mode-map "TAB" 'hs-toggle-hiding)
-(keymap-set diff-mode-map "<backtab>" 'hs-hide-all)
+(keymap-set diff-mode-map "<backtab>" 'konix/hs-toggle-all)
 (keymap-set diff-mode-map "RET" 'diff-goto-source)
 (keymap-set diff-mode-map "C-k" 'diff-hunk-kill)
 

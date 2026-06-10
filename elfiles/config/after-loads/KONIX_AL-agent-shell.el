@@ -368,6 +368,24 @@ second resume can't ask which session to load.  Same pattern as
   (agent-shell-interrupt t)
   (call-interactively #'agent-shell-queue-request))
 
+(defun konix/agent-shell-viewport-read-then-interrupt-or-queue ()
+  "Read a prompt, then ask whether to interrupt-and-submit (like M-r) or queue it (like r)."
+  (declare (modes agent-shell-viewport-view-mode))
+  (interactive)
+  (let ((prompt (read-string "Prompt: ")))
+    (if (and (agent-shell-viewport--busy-p) (y-or-n-p "Interrupt? "))
+        (progn
+          (konix/agent-shell-viewport-interrupt-no-confirm)
+          (konix/agent-shell-viewport--when-idle
+           (agent-shell-viewport-reply)
+           (insert prompt)
+           (agent-shell-viewport-compose-send)))
+      (agent-shell-viewport--ensure-buffer)
+      (let ((shell-buffer (or (agent-shell--current-shell)
+                              (user-error "Not in an agent-shell buffer"))))
+        (with-current-buffer shell-buffer
+          (agent-shell-queue-request prompt))))))
+
 (defun konix/agent-shell-viewport-reply-hello ()
   "Reply with \"hello\" and send immediately."
   (declare (modes agent-shell-viewport-view-mode))
@@ -789,7 +807,7 @@ forked shell adopts the same name, uniquified by Emacs to
 (define-key agent-shell-viewport-view-mode-map (kbd "R") 'konix/agent-shell-viewport-interrupt-no-confirm-and-reply)
 (define-key agent-shell-viewport-view-mode-map (kbd "M-r") 'konix/agent-shell-viewport-read-interrupt-and-submit)
 (define-key agent-shell-mode-map (kbd "M-r") 'konix/agent-shell-read-interrupt-and-submit)
-(define-key agent-shell-viewport-view-mode-map (kbd "r") 'agent-shell-viewport-queue-request)
+(define-key agent-shell-viewport-view-mode-map (kbd "r") 'konix/agent-shell-viewport-read-then-interrupt-or-queue)
 (define-key agent-shell-viewport-view-mode-map (kbd "RET") 'agent-shell-viewport-reply)
 (define-key agent-shell-viewport-edit-mode-map (kbd "C-<return>") 'agent-shell-viewport-compose-send)
 (define-key agent-shell-viewport-edit-mode-map (kbd "C-j") 'agent-shell-viewport-compose-send)

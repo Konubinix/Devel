@@ -243,7 +243,7 @@ send_space ( ) {
 click_by_text ( ) {
     local type="$1"
     local text="$2"
-    send_js "document.evaluate(\"//${type}[contains(text(),'${text}')]\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();"
+    send_js "document.evaluate(\"//${type}[normalize-space(.)='${text}']\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();"
 }
 
 click_by_test_id() {

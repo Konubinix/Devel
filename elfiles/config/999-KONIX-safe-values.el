@@ -28,5 +28,12 @@
 (add-to-list 'safe-local-variable-values '(org-drill-maximum-duration . 5))
 (add-to-list 'safe-local-variable-values '(org-drill-maximum-duration . 15))
 
+;; A project opts into extra agent-shell MCP servers by setting this in its
+;; `.dir-locals.el' (a list of registry names).  Declared safe here, at
+;; startup, so it is accepted without a prompt even before agent-shell (and its
+;; after-load `KONIX_AL-agent-shell.el', which consumes it) is loaded.
+(put 'konix/agent-shell-mcp-project-servers 'safe-local-variable
+     (lambda (val) (and (listp val) (seq-every-p #'stringp val))))
+
 (provide '999-KONIX-safe-values)
 ;;; 999-KONIX-safe-values.el ends here

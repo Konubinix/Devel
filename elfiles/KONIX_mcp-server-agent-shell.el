@@ -463,13 +463,28 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
             (shell-buffer (agent-shell--start :config config
                                               :new-session t
                                               :no-focus t
-                                              :session-strategy 'new-deferred)))
+                                              :session-strategy 'new)))
        (with-current-buffer shell-buffer
          (setq-local agent-shell-cwd-function (lambda () directory))
          (when model-decoded
            (setq-local agent-shell-anthropic-default-model-id model-decoded))
          (setq-local agent-shell-mcp-servers
-                     (let ((servers (copy-sequence (default-value 'agent-shell-mcp-servers))))
+                     (let ((servers
+                            ;; Resolve the buddy directory's `.dir-locals.el'
+                            ;; (whose `konix/agent-shell-mcp-project-servers'
+                            ;; the `hack-local-variables-hook' consumer folds
+                            ;; into `agent-shell-mcp-servers') so a buddy honors
+                            ;; the project's enabled servers, not just the
+                            ;; global default.  `agent-shell--start' can't do
+                            ;; this itself: it hacks dir-locals before
+                            ;; `agent-shell-cwd-function' is set, so its
+                            ;; `default-directory' isn't the buddy's yet.
+                            (copy-sequence
+                             (with-temp-buffer
+                               (setq default-directory
+                                     (file-name-as-directory directory))
+                               (hack-dir-local-variables-non-file-buffer)
+                               agent-shell-mcp-servers))))
                        (when mcp-changes
                          (let ((to-remove (alist-get 'remove mcp-changes))
                                (to-add (alist-get 'add mcp-changes))

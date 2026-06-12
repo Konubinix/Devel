@@ -591,20 +591,84 @@ Passes ARG through to `agent-shell'."
   (let ((agent-shell-session-strategy (or strategy agent-shell-session-strategy)))
     (agent-shell arg)))
 
+;; The ACP server does not remember a session's model across resume: its
+;; `session/resume' response reports the server default (e.g. "haiku"), not
+;; the model the session actually ran on. So we persist the model per
+;; session id ourselves -- captured on every model change -- and replay it
+;; when resuming, to land back on the model left behind for that session.
+(defvar konix/agent-shell-session-models-file
+  (expand-file-name "konix/agent-shell-session-models.el" user-emacs-directory)
+  "File persisting the last model id used per agent-shell session id.")
+
+(defvar konix/agent-shell-session-models nil
+  "Alist (SESSION-ID . MODEL-ID) of the last model used per session.")
+
+(defvar konix/agent-shell-session-models--loaded nil
+  "Non-nil once `konix/agent-shell-session-models' was read from disk.")
+
+(defun konix/agent-shell-session-models--ensure-loaded ()
+  (unless konix/agent-shell-session-models--loaded
+    (setq konix/agent-shell-session-models
+          (when (file-exists-p konix/agent-shell-session-models-file)
+            (with-temp-buffer
+              (insert-file-contents konix/agent-shell-session-models-file)
+              (ignore-errors (read (current-buffer)))))
+          konix/agent-shell-session-models--loaded t)))
+
+(defun konix/agent-shell-session-model-get (session-id)
+  "Return the persisted model id for SESSION-ID, or nil."
+  (when session-id
+    (konix/agent-shell-session-models--ensure-loaded)
+    (cdr (assoc session-id konix/agent-shell-session-models))))
+
+(defun konix/agent-shell-session-model-put (session-id model-id)
+  "Persist MODEL-ID as the model in use for SESSION-ID."
+  (when (and session-id model-id)
+    (konix/agent-shell-session-models--ensure-loaded)
+    (unless (equal model-id (cdr (assoc session-id konix/agent-shell-session-models)))
+      (setf (alist-get session-id konix/agent-shell-session-models nil nil #'equal)
+            model-id)
+      (make-directory (file-name-directory konix/agent-shell-session-models-file) t)
+      (with-temp-file konix/agent-shell-session-models-file
+        (prin1 konix/agent-shell-session-models (current-buffer))))))
+
+(defun konix/agent-shell--persist-model-id (&rest args)
+  "Record the model id being set (ARGS plist) for the current session.
+Advice on `agent-shell--config-option-set-model-id', the single choke
+point for model changes (manual selection and bootstrap alike)."
+  (when (derived-mode-p 'agent-shell-mode)
+    (konix/agent-shell-session-model-put
+     (map-nested-elt (agent-shell--state) '(:session :id))
+     (plist-get args :model-id))))
+
+(advice-add 'agent-shell--config-option-set-model-id :before
+            #'konix/agent-shell--persist-model-id)
+
 (defun konix/agent-shell-resume ()
   "Start a fresh agent-shell session in resume mode.
 Calls `agent-shell--start' directly to forward `:session-strategy', which
 `agent-shell--dwim' drops on its `:new-shell' branch — without this, a
-second resume can't ask which session to load.  Same pattern as
-`konix/agent-shell-pick-preset'."
+second resume can't ask which session to load."
   (interactive)
   (unless agent-shell-prefer-viewport-interaction
     (user-error "konix/agent-shell-resume only supports viewport mode (set `agent-shell-prefer-viewport-interaction')"))
   (when (and (use-region-p) buffer-file-name (buffer-modified-p))
     (save-buffer))
   (let ((shell (agent-shell--start
-                :config (or (agent-shell--resolve-preferred-config)
-                            (agent-shell-select-config :prompt "Start new agent: "))
+                ;; Override :default-model-id with a per-session lookup so the
+                ;; resumed session lands back on the model we last persisted
+                ;; for it (see `konix/agent-shell-session-models-file'), rather
+                ;; than the global `agent-shell-anthropic-default-model-id' or
+                ;; the server's resume default. The lambda runs in
+                ;; `agent-shell--handle' once the session id is known; nil
+                ;; (no record) skips the set and keeps the server's model.
+                :config (map-insert (or (agent-shell--resolve-preferred-config)
+                                        (agent-shell-select-config :prompt "Start new agent: "))
+                                    :default-model-id
+                                    (lambda ()
+                                      (konix/agent-shell-session-model-get
+                                       (map-nested-elt (agent-shell--state)
+                                                       '(:session :id)))))
                 :new-session t
                 :session-strategy 'prompt
                 :no-focus t)))
@@ -1043,24 +1107,53 @@ the next agent-emitted `ai-title' and auto-rename again."
   (konix/agent-shell--rename-with-label
    (konix/agent-shell--current-shell-or-error) nil))
 
-(defun konix/agent-shell--call-preserving-name (cmd)
-  "Call CMD interactively, then propagate the current shell's name to
-the resulting new shell.  After CMD returns, `current-buffer' is the
-newly created shell or its viewport (because `agent-shell--start' is
-followed by a `select-window' on the new buffer); we look the new
-shell up via `agent-shell--current-shell' and re-apply the saved
-name when it differs.
+(defun konix/agent-shell--call-preserving-name-and-model (cmd)
+  "Call CMD interactively, then propagate the current shell's name and
+model to the resulting new shell.  After CMD returns, `current-buffer'
+is the newly created shell or its viewport (because `agent-shell--start'
+is followed by a `select-window' on the new buffer); we look the new
+shell up via `agent-shell--current-shell' and re-apply the saved name
+when it differs.
+
+A freshly started session resets to the agent's default model, so we
+also re-select the original model.  We defer it to the first
+`init-finished' event: it fires after the pipeline's own
+`agent-shell-anthropic-default-model-id' step, which would otherwise
+overwrite our choice.  Since `init-finished' is re-emitted on every
+subsequent command, we unsubscribe after the first fire so a later
+manual model change in the new shell is not fought back.  We do not
+check the new session's model list: variants like
+\"claude-fable-5[1m]\" are accepted by the agent without being
+listed.
 
 Used to wrap `agent-shell-reload' and `agent-shell-fork'.  In the
 fork case the original shell stays alive, so the rename gets
 uniquified to `<saved-name><2>'."
   (let* ((shell (or (agent-shell--current-shell)
                     (user-error "Not in an agent-shell buffer or viewport")))
-         (saved-name (buffer-name shell)))
+         (saved-name (buffer-name shell))
+         (saved-model-id (agent-shell--current-model-id
+                          (buffer-local-value 'agent-shell--state shell))))
     (call-interactively cmd)
     (when-let ((new-shell (agent-shell--current-shell)))
       (unless (string= saved-name (buffer-name new-shell))
-        (konix/agent-shell--rename-pair new-shell saved-name)))))
+        (konix/agent-shell--rename-pair new-shell saved-name))
+      (when saved-model-id
+        (let (token)
+          (setq token
+                (agent-shell-subscribe-to
+                 :shell-buffer new-shell
+                 :event 'init-finished
+                 :on-event
+                 (lambda (_event)
+                   (when (buffer-live-p new-shell)
+                     (with-current-buffer new-shell
+                       (agent-shell-unsubscribe :subscription token)
+                       (unless (equal saved-model-id
+                                      (agent-shell--current-model-id (agent-shell--state)))
+                         (agent-shell--set-default-model
+                          :shell-buffer new-shell
+                          :model-id saved-model-id))))))))))))
 
 (defun konix/agent-shell-reload ()
   "Reload the current agent-shell session, preserving its buffer name.
@@ -1071,7 +1164,7 @@ or the MCP `set_label' tool."
                   agent-shell-viewport-view-mode
                   agent-shell-viewport-edit-mode))
   (interactive)
-  (konix/agent-shell--call-preserving-name #'agent-shell-reload))
+  (konix/agent-shell--call-preserving-name-and-model #'agent-shell-reload))
 
 (defun konix/agent-shell-fork ()
   "Fork the current agent-shell session, propagating its buffer name.
@@ -1082,7 +1175,7 @@ forked shell adopts the same name, uniquified by Emacs to
                   agent-shell-viewport-view-mode
                   agent-shell-viewport-edit-mode))
   (interactive)
-  (konix/agent-shell--call-preserving-name #'agent-shell-fork))
+  (konix/agent-shell--call-preserving-name-and-model #'agent-shell-fork))
 
 (defcustom konix/agent-shell-renewal-margin-seconds 60
   "Extra seconds to wait past the computed 5h renewal before resuming.

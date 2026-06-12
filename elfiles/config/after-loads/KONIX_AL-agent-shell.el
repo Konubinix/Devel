@@ -1200,7 +1200,11 @@ there."
         (assoc-delete-all shell-name konix/agent-shell--renewal-timers))
   (if (buffer-live-p buffer)
       (with-current-buffer buffer
-        (konix/agent-shell-viewport-reply-go-on))
+        (with-current-buffer (agent-shell-shell-buffer)
+          (agent-shell--insert-to-shell-buffer
+           :text "continue"
+           :submit t)
+          ))
     (message "Renewal: buffer %S is gone, nothing to continue" shell-name)))
 
 (defun konix/agent-shell-reload-at-renewal ()
@@ -1230,8 +1234,10 @@ Re-running for the same buffer replaces any pending timer.  Cancel with
                     (konix/claude-code---usage))))
          (usage-5h (alist-get 'usage_5h_percent result))
          (usage-7d (alist-get 'usage_7d_percent result))
-         (wait-secs (min (alist-get 'wait_5h_secs result)
-                         (alist-get 'wait_7d_secs result)))
+         (reset-5h-secs (alist-get 'reset_5h_secs result))
+         (reset-7d-secs (alist-get 'reset_7d_secs result))
+         (min-reset-secs (min reset-5h-secs reset-7d-secs))
+         (wait-secs (- min-reset-secs (time-to-seconds (current-time))))
          (delay (+ (max 0 wait-secs) konix/agent-shell-renewal-margin-seconds))
          (existing (assoc shell-name konix/agent-shell--renewal-timers)))
     (when existing

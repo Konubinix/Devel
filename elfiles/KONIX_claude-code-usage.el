@@ -199,6 +199,7 @@ Returns usage information including:
                (elapsed_5h_percent . ,elapsed-5h-pct)
                (wait_5h . ,(konix/claude-code--format-duration wait-5h-secs))
                (wait_5h_secs . ,wait-5h-secs)
+               (reset_5h_secs . ,reset-5h)
                (reset_5h . ,(if (< reset-5h 0) "N/A" (konix/claude-code--format-time-until reset-5h)))
                (reset_5h_datetime . ,(if (< reset-5h 0) "N/A" (format-time-string
                                                                "%Y-%m-%d %H:%M" (seconds-to-time reset-5h))))
@@ -206,6 +207,7 @@ Returns usage information including:
                (elapsed_7d_percent . ,elapsed-7d-pct)
                (wait_7d . ,(konix/claude-code--format-duration wait-7d-secs))
                (wait_7d_secs . ,wait-7d-secs)
+               (reset_7d_secs . ,reset-7d)
                (reset_7d . ,(if (< reset-7d 0) "N/A" (konix/claude-code--format-time-until reset-7d)))
                (reset_7d_datetime . ,(if (< reset-7d 0) "N/A" (format-time-string
                                                                "%Y-%m-%d %H:%M"

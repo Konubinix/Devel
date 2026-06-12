@@ -44,6 +44,9 @@
 (declare-function shell-maker-submit "shell-maker")
 (declare-function konix/agent-shell--apply-label-format "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--rename-pair "KONIX_AL-agent-shell")
+(declare-function konix/agent-shell--rename-with-label "KONIX_AL-agent-shell")
+(declare-function konix/agent-shell--local-session-label "KONIX_AL-agent-shell")
+(declare-function konix/agent-shell--highlight-label-overflow "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--clean-label "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--truncate-label "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--has-permission-button-p "KONIX_AL-agent-shell")
@@ -529,7 +532,11 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
            (remhash konix/mcp-server--session-tag konix/mcp-server--session-buffers))
          (setq-local konix/mcp-server--session-tag buddy-name)
          (konix/mcp-server--register-session-tag buddy-name (current-buffer))
-         (shell-maker-submit :input prompt))
+         (agent-shell--insert-to-shell-buffer
+          :shell-buffer (current-buffer)
+          :text prompt
+          :submit t
+          :no-focus t))
        (format "Spawned coordinated buddy '%s' in buffer '%s' with directory %s. The buddy is reserved as \"%s\" in the coordination system and will register shortly. You can immediately call coord_ask_and_wait (or coord_post_task) with to_buddy=\"%s\" to send it work — no need to wait for it to register first; the task is queued and delivered as soon as it comes online. If the buddy fails to come online, coord_ask_and_wait returns early (within its come-online pre-timeout) instead of blocking the full timeout."
                buddy-name (buffer-name shell-buffer) directory buddy-name buddy-name))
        (error
@@ -721,6 +728,33 @@ for top-level buffers."
     (display-buffer shell-buf '(display-buffer-use-some-window
                                 (inhibit-same-window . t)))))
 
+(defun konix/mcp-server-spawn-tree-rename ()
+  "Edit the label of the agent-shell buffer at point.
+Prompt for a label (pre-filling the agent's suggested session label,
+with the soon-to-be-truncated tail highlighted), then rename the
+shell + viewport pair via `konix/agent-shell--rename-with-label' and
+refresh the tree.  An empty label clears the label and reverts to the
+default project-based name."
+  (interactive)
+  (let ((shell-buf (get-text-property (point) 'konix/shell-buffer)))
+    (unless (buffer-live-p shell-buf)
+      (user-error "No agent-shell buffer at point"))
+    (unless (and (fboundp 'konix/agent-shell--rename-with-label)
+                 (fboundp 'konix/agent-shell--local-session-label))
+      (error "konix agent-shell rename helpers not loaded"))
+    (let* ((suggestion (or (konix/agent-shell--local-session-label shell-buf) ""))
+           (raw (minibuffer-with-setup-hook
+                    (lambda ()
+                      (add-hook 'post-command-hook
+                                #'konix/agent-shell--highlight-label-overflow
+                                nil t)
+                      (konix/agent-shell--highlight-label-overflow))
+                  (read-string "Buffer label (empty = none): "
+                               suggestion
+                               'konix/agent-shell--rename-history))))
+      (konix/agent-shell--rename-with-label shell-buf raw)
+      (konix/mcp-server--render-spawn-tree-into (current-buffer)))))
+
 (defvar konix/mcp-server-spawn-tree-mode-map
   (let ((m (make-sparse-keymap)))
     (set-keymap-parent m special-mode-map)
@@ -732,6 +766,7 @@ for top-level buffers."
     (define-key m (kbd "p")         #'previous-line)
     (define-key m (kbd "k")         #'konix/mcp-server-kill-agent-subtree)
     (define-key m (kbd "o")         #'konix/mcp-server-spawn-tree-show-in-other-window)
+    (define-key m (kbd "r")         #'konix/mcp-server-spawn-tree-rename)
     m)
   "Keymap for `konix/mcp-server-spawn-tree-mode'.")
 

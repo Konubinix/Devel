@@ -32,6 +32,13 @@
 (require 'org-transclusion-indent-mode)
 (require 'f)
 
+(defvar konix/org/roam-export/kinds '())
+(defvar konix/org/roam-export/public-kinds '())
+(defvar konix/org-roam-export/ipfs-links "https://ipfs.konubinix.eu/p/\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/")
+(defvar konix/org-roam-export/link-regex
+  (format "\\(youtube:\\|http\\|%s\\)[^\n\t ]+" konix/org-roam-export/ipfs-links))
+
+
 (defun konix/org-roam-export/exported-files (kind)
   (split-string
    (string-trim
@@ -853,9 +860,6 @@ recurse by calling SELF-FN interactively in that node's buffer."
   (konix/org-roam-export/extract-kind-unsafe)
   )
 
-(defvar konix/org/roam-export/kinds '())
-(defvar konix/org/roam-export/public-kinds '())
-
 ;;;###autoload
 (defun konix/org-roam-export/toggle-publish (&optional kind)
   (interactive)
@@ -905,14 +909,43 @@ recurse by calling SELF-FN interactively in that node's buffer."
    )
   )
 
+(defun konix/org-roam-export/verbatim-picture-link-to-standalone-links ()
+  "Exporting in :results raw is good, but tends to duplicate the
+result. verbatim prepends a : but does not result in a good export"
+  (save-excursion
+    (goto-char (point-min))
+    (save-match-data
+      (while (re-search-forward
+              (format "^[ ]*: \\(\\(%s\\)ba[a-z0-9]+\\?[a-z0-9-]+.\\(png\\|jpe?g\\)\\)$"
+                      konix/org-roam-export/ipfs-links)
+               nil
+               t)
+        (replace-match
+         (format
+          "\n%s\n"
+          (konix/org-roam-export/process-url (match-string-no-properties 1)))
+         t t)))
+    (goto-char (point-min))
+    (save-match-data
+      (while (re-search-forward
+              (format "^[ ]*: \\(#\\+attr_html: :link /ipfs/.+\\)[\n\t\r ]*: \\(\\[\\[\\(/ipfs/ba.+\\)\\)$"
+                      konix/org-roam-export/ipfs-links)
+               nil
+               t)
+        (replace-match
+         (format
+          "\n%s\n%s\n"
+          (match-string-no-properties 1)
+          (konix/org-roam-export/process-url (match-string-no-properties 2)))
+         t t)))
+    ))
+
 (defun konix/org-roam-export/convert-standalone-links ()
   (save-excursion
     (goto-char (point-min))
     (save-match-data
-      ;; don't match ^ +: because this is generally associated with variables,
-      ;; like #+NAME\n: /ipfssomething and this will transformation will break it
       (while (re-search-forward
-              "^[ ]*\\(\\(youtube:\\|http\\|https://ipfs.konubinix.eu/p/\\|/ipfs/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t ]+\\)$"
+              (format "^[ ]*\\(%s\\)$" konix/org-roam-export/link-regex)
               nil
               t)
         (replace-match
@@ -923,7 +956,7 @@ recurse by calling SELF-FN interactively in that node's buffer."
     (goto-char (point-min))
     (save-match-data
       (while (re-search-forward
-              "\\( +\\)\\(\\(youtube:\\|http\\|/ipfs/\\|https://ipfs.konubinix.eu/p/\\|ip[fn]s:/*\\|file:/+ipfs/\\)[^\n\t) ]+\\)$"
+              (format "\\( +\\)\\(%s\\)$" konix/org-roam-export/link-regex)
               nil
               t)
         (replace-match
@@ -1336,6 +1369,8 @@ become `-'.")
   (konix/org-roam-export/pretty-named-blocks)
   (konix/org-roam-export/inject-noweb-assets)
   (konix/org-roam-export/unify-ipfs-links)
+  (konix/org-roam-export/verbatim-picture-link-to-standalone-links)
+  ;; needs the canonicalisation above
   (konix/org-roam-export/convert-standalone-links)
   (konix/org-roam-export/convert-remaining-ipfs-links)
   ;; the following will also assert in case a link to a more private stuff exists

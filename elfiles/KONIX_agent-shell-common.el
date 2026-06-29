@@ -23,6 +23,10 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+(require 'map)
+(require 'seq)
+
 (setq-default acp-logging-enabled t)
 (setq-default agent-shell-prefer-viewport-interaction t)
 (setq-default agent-shell-session-strategy 'new)
@@ -33,6 +37,8 @@
     (mcp-server-lib-install)))
 
 (setq-default agent-shell-show-welcome-message nil)
+
+(setq-default agent-shell-session-restore-verbosity 'full)
 
 (setq-default agent-shell-anthropic-claude-acp-command '("claude-agent-acp"))
 
@@ -110,6 +116,90 @@ Used by `konix/agent-shell--with-session-label' for skip-path
 notifications (busy, no session id, etc.).")
 
 (advice-add 'agent-shell--ensure-gitignore :override #'ignore)
+
+(defun konix/agent-shell--background-tool-p (tool-call)
+  "Return non-nil when TOOL-CALL launches a command in the background.
+Inspects the ACP tool call's `:raw-input' for a non-nil `run_in_background'
+parameter -- Claude Code's Bash background flag, preserved verbatim by
+agent-shell.  Shared by the permission policy (the `@background' evaluator)
+and the tracking module (the per-turn background flag)."
+  (and (map-elt (map-elt tool-call :raw-input) 'run_in_background) t))
+
+;;; Permission responder hook --------------------------------------------------
+;; agent-shell exposes a single `agent-shell-permission-responder-function'.
+;; We fan it out into an abnormal hook so independent modules can each
+;; contribute a responder without knowing about one another: the blacklist /
+;; whitelist policy (`KONIX_agent-shell-permissions') and the user notification
+;; (`KONIX_agent-shell-notifications').  `run-hook-with-args-until-success'
+;; stops at the first responder that handles the request, so a responder added
+;; later that only observes and returns nil naturally acts as a fallback,
+;; firing only when no earlier one handled it -- no dedicated fallback needed.
+
+(defvar konix/agent-shell-permission-responder-functions nil
+  "Abnormal hook of permission responders, tried in order until one handles.
+Each function takes the PERMISSION alist (see
+`agent-shell-permission-responder-function') and returns non-nil once it has
+answered the request, nil to let the next responder try.
+`konix/agent-shell-permission-responder' runs them with
+`run-hook-with-args-until-success' and is installed as
+`agent-shell-permission-responder-function'.  Because functions added later
+run later, a responder that always returns nil (it only observes, e.g. the
+notification in `KONIX_agent-shell-notifications') fires only when no earlier
+responder handled the request.")
+
+(defun konix/agent-shell-permission-responder (permission)
+  "Run `konix/agent-shell-permission-responder-functions' until one handles.
+Installed as `agent-shell-permission-responder-function'.  Returns non-nil
+when a responder answered PERMISSION, nil to fall back to the interactive
+dialog."
+  (run-hook-with-args-until-success
+   'konix/agent-shell-permission-responder-functions permission))
+
+(setq-default agent-shell-permission-responder-function
+              #'konix/agent-shell-permission-responder)
+
+;;; Backfill streaming-prose events --------------------------------------------
+;; agent-shell emits bus events (`agent-shell--emit-event') for tool calls,
+;; permissions, file writes, turn completion, etc., but NOT for the agent's
+;; streamed prose: `agent_message_chunk' / `agent_thought_chunk' notifications
+;; are rendered straight to the buffer by `agent-shell--update-fragment' without
+;; an event.  So a reaction wanting to watch what the agent SAYS mid-turn has no
+;; event to subscribe to.  We backfill the missing events here by advising the
+;; renderer: each prose chunk re-emits as `agent-message-chunk' /
+;; `agent-thought-chunk' on the bus, making prose and tool activity uniformly
+;; subscribable (see `KONIX_agent-shell-steering').  agent-shell tags the prose
+;; fragments with a BLOCK-ID ending in the notification type, which is how we
+;; tell a prose chunk from any other fragment update.
+
+(declare-function agent-shell--emit-event "agent-shell")
+(declare-function agent-shell--state "agent-shell")
+
+(defconst konix/agent-shell--prose-fragment-suffixes
+  '(("agent_message_chunk" . agent-message-chunk)
+    ("agent_thought_chunk" . agent-thought-chunk))
+  "Map a prose fragment BLOCK-ID suffix to the bus event to emit for it.")
+
+(cl-defun konix/agent-shell--emit-prose-event
+    (&rest _args &key state block-id body &allow-other-keys)
+  "Re-emit a streamed prose chunk as a bus event.
+An `:after' advice on `agent-shell--update-fragment'.  When BLOCK-ID names a
+prose fragment, emit the matching event (see
+`konix/agent-shell--prose-fragment-suffixes') with the chunk BODY, in STATE's
+shell buffer so subscribers run there."
+  (when-let* (((stringp block-id))
+              (event (cdr (seq-find (lambda (pair)
+                                      (string-suffix-p (car pair) block-id))
+                                    konix/agent-shell--prose-fragment-suffixes)))
+              (buffer (map-elt state :buffer))
+              ((buffer-live-p buffer)))
+    (with-current-buffer buffer
+      (ignore-errors
+        (agent-shell--emit-event
+         :event event
+         :data (list (cons :text body) (cons :block-id block-id)))))))
+
+(advice-add 'agent-shell--update-fragment :after
+            #'konix/agent-shell--emit-prose-event)
 
 (provide 'KONIX_agent-shell-common)
 ;;; KONIX_agent-shell-common.el ends here

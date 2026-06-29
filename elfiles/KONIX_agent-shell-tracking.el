@@ -24,6 +24,10 @@
 ;;; Code:
 
 (require 'KONIX_agent-shell-common)
+;; For honoring a blacklist `@background' rule on a background launch (which
+;; never reaches the permission responder): the policy matcher, the interrupt
+;; helper and the interrupt toggle all live in the permissions module.
+(require 'KONIX_agent-shell-permissions)
 
 (define-key agent-shell-viewport-view-mode-map (kbd "u") 'konix/agent-shell-track-ready-buffers)
 (defun konix/agent-shell-pop-to-buffer ()
@@ -69,6 +73,71 @@ viewport buffer instead if one exists."
 (defvar-local konix/agent-shell--seen nil
   "Non-nil when the user has seen the last completed turn without needing to act yet.
 Cleared automatically when a new turn completes.")
+
+(defvar-local konix/agent-shell--background-launched nil
+  "Non-nil when the agent launched a command in the background this turn.
+Set from the live `tool-call-update' stream by
+`konix/agent-shell--update-background-status' and reset at the start of each
+new turn (on `input-submitted').  The structural counterpart of a background
+launch for the autoresponse layer, whose turn-complete matcher sees only the
+agent's prose -- read via the `@background' evaluator.")
+
+(defvar-local konix/agent-shell--background-seen-ids nil
+  "Tool-call-ids of background launches already accounted for this session.
+A single background launch emits several `tool-call-update' notifications and
+its `completed' update may even land in a later turn, so each id is handled
+exactly once -- counted on first sighting -- and never reset, so a stale
+update cannot re-flag the turn or re-fire the blacklist reaction.")
+
+(defun konix/agent-shell--reject-background-launch (tool-call)
+  "Honor a blacklist rule that matches the background TOOL-CALL.
+A backgrounded command never triggers a permission request, so the blacklist
+responder never sees it.  When a rule (e.g. the key `@background') matches,
+steer the agent from the tool-call stream instead by enqueueing the rule's
+reason.  Non-matching launches are left alone, so this is opt-in through the
+blacklist.
+
+We deliberately do NOT interrupt (unlike the permission responder, which can
+reject a tool *before* it runs): by the time a background tool-call-update
+arrives the command has already executed, so a cancel prevents nothing -- and
+it is actively harmful here.  Claude Code's cancel is soft (the SDK does not
+yield promptly; agent-shell force-completes the turn while the underlying
+query keeps running), and a turn that ends as \"cancelled\" never drains the
+pending-request queue (`agent-shell--process-pending-request' runs only on
+\"end_turn\"), so an interrupt swallows the reason entirely.  Enqueueing and
+letting the turn finish normally delivers it reliably at the next turn
+boundary."
+  (when-let* ((entries (konix/agent-shell--policy-matches
+                        konix/agent-shell--blacklist
+                        (konix/agent-shell--tool-call-with-context tool-call))))
+    (let* ((default-reason
+            (concat "You launched a command in the background, which is"
+                    " blacklisted here.  Do not run commands in the"
+                    " background; re-run in the foreground if needed."))
+           ;; Every rule that matched contributes its line (see
+           ;; `konix/agent-shell--blacklist-notice'); entries with no reason of
+           ;; their own fall back to the generic background explanation.
+           (notice (konix/agent-shell--blacklist-notice entries default-reason)))
+      (konix/agent-shell--enqueue-reason notice)
+      (message "%s" notice))))
+
+(defun konix/agent-shell--update-background-status (event)
+  "React to a background launch seen in a `tool-call-update' EVENT.
+The update may omit `:raw-input', so look the tool call up by id in the
+session state -- which carries the merged raw input.  On the FIRST sighting of
+a background tool call (`konix/agent-shell--background-tool-p'): flag the turn
+for the autoresponse layer and run `konix/agent-shell--reject-background-launch'
+to honor a blacklist rule.  Deduplicated by id via
+`konix/agent-shell--background-seen-ids'."
+  (when-let* ((data (map-elt event :data))
+              (tool-call-id (map-elt data :tool-call-id))
+              ((not (member tool-call-id konix/agent-shell--background-seen-ids)))
+              (tool-call (map-elt (map-elt (agent-shell--state) :tool-calls)
+                                  tool-call-id))
+              ((konix/agent-shell--background-tool-p tool-call)))
+    (push tool-call-id konix/agent-shell--background-seen-ids)
+    (setq konix/agent-shell--background-launched t)
+    (konix/agent-shell--reject-background-launch tool-call)))
 
 (defun konix/agent-shell-track-ready-buffers (&optional unobtrusive)
   "Add to tracking all agent-shell buffers where it's the user's turn to write.
@@ -125,10 +194,25 @@ notified of new agent activity."
        :shell-buffer shell-buf
        :event event
        :on-event
-       (lambda (_event)
+       (lambda (event)
          (when (buffer-live-p shell-buf)
            (with-current-buffer shell-buf
-             (setq konix/agent-shell--seen nil))))))
+             (setq konix/agent-shell--seen nil)
+             (when (eq (map-elt event :event) 'tool-call-update)
+               (konix/agent-shell--update-background-status event)))))))
+    ;; A new turn starts clean: clear the per-turn background flag whenever a
+    ;; prompt is submitted (human or an autoresponse), so `@background' reacts
+    ;; only to launches in the turn that just ran.  Resetting here (not at
+    ;; `turn-complete') avoids racing the autoresponse reader, which inspects
+    ;; the flag at turn-complete.
+    (agent-shell-subscribe-to
+     :shell-buffer shell-buf
+     :event 'input-submitted
+     :on-event
+     (lambda (_event)
+       (when (buffer-live-p shell-buf)
+         (with-current-buffer shell-buf
+           (setq konix/agent-shell--background-launched nil)))))
     ;; `init-finished' fires once the session is established — for a resumed
     ;; session its title is already known on disk, so guess the buffer name
     ;; immediately instead of waiting for the first `turn-complete'.

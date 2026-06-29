@@ -35,5 +35,29 @@
 (put 'konix/agent-shell-mcp-project-servers 'safe-local-variable
      (lambda (val) (and (listp val) (seq-every-p #'stringp val))))
 
+;; A project black/whitelists agent-shell tools by setting these in its
+;; `.dir-locals.el' (each an alist of (KEY . VALUE), both strings).  Declared
+;; safe here so they are accepted without a prompt even before agent-shell is
+;; loaded.  See `konix/agent-shell-tool-blacklist-project' and
+;; `konix/agent-shell-tool-whitelist-project'.
+(let ((alist-of-strings-p
+       (lambda (val)
+         (and (listp val)
+              (seq-every-p (lambda (e)
+                             (and (consp e) (stringp (car e)) (stringp (cdr e))))
+                           val)))))
+  (put 'konix/agent-shell-tool-blacklist-project 'safe-local-variable
+       alist-of-strings-p)
+  (put 'konix/agent-shell-tool-whitelist-project 'safe-local-variable
+       alist-of-strings-p)
+  ;; A project sets its auto-response rules the same way (see
+  ;; `KONIX_agent-shell-autoresponse.el'): an alist of strings.
+  (put 'konix/agent-shell-autoresponse-rules-project 'safe-local-variable
+       alist-of-strings-p)
+  ;; And its mid-turn steering rules (see `KONIX_agent-shell-steering.el'):
+  ;; an alist of (KEY . GUIDANCE) strings.
+  (put 'konix/agent-shell-steering-rules-project 'safe-local-variable
+       alist-of-strings-p))
+
 (provide '999-KONIX-safe-values)
 ;;; 999-KONIX-safe-values.el ends here

@@ -39,26 +39,19 @@
 (define-key agent-shell-viewport-view-mode-map (kbd "RET") 'agent-shell-viewport-reply)
 (define-key agent-shell-viewport-edit-mode-map (kbd "C-<return>") 'agent-shell-viewport-compose-send)
 (define-key agent-shell-viewport-edit-mode-map (kbd "C-j") 'agent-shell-viewport-compose-send)
-(define-key agent-shell-mode-map (kbd "F") 'konix/agent-shell-follow-mode)
 (define-key agent-shell-viewport-view-mode-map (kbd "F") 'konix/agent-shell-follow-mode)
-
-
-;; Org links to agent-shell sessions: store with `org-store-link' from a
-;; shell or viewport buffer; following the link pops to the live buffer
-;; running that session, resuming the session first when none does.
-;;
-;; Link format: agent-shell:SESSION-ID?cwd=DIR.  The cwd must travel in
-;; the link because resuming needs to happen from the session's project
-;; directory (the ACP session/load takes a cwd, and the project's
-;; `.dir-locals.el' MCP servers are resolved from `default-directory').
 
 
 ;;; Feature modules ----------------------------------------------------------
 (require 'KONIX_agent-shell-common)
+(require 'KONIX_agent-shell-panel)
 (require 'KONIX_agent-shell-mcp)
 (require 'KONIX_agent-shell-naming)
 (require 'KONIX_agent-shell-model)
 (require 'KONIX_agent-shell-session-ops)
+(require 'KONIX_agent-shell-permissions)
+(require 'KONIX_agent-shell-autoresponse)
+(require 'KONIX_agent-shell-steering)
 (require 'KONIX_agent-shell-viewport)
 (require 'KONIX_agent-shell-tracking)
 (require 'KONIX_agent-shell-notifications)

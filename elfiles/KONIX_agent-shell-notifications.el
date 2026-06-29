@@ -34,35 +34,37 @@
 
 (advice-add #'shell-maker-submit :before #'konix/agent-shell--record-request-start)
 
-(cl-defun konix/agent-shell--on-request/notify (&key state acp-request)
-  (let-alist acp-request
-    (cond ((equal .method "session/request_permission")
-           (tracking-add-buffer (if agent-shell-prefer-viewport-interaction
-                                    (or (agent-shell-viewport--buffer :shell-buffer (current-buffer) :existing-only t)
-                                        (current-buffer))
-                                  (current-buffer)))
-           (let* ((notify-buf (if agent-shell-prefer-viewport-interaction
-                                  (or (agent-shell-viewport--buffer :shell-buffer (current-buffer) :existing-only t)
-                                      (current-buffer))
-                                (current-buffer)))
-                  (level (or (konix/get-notification-level notify-buf)
-                             (and (konix/shell-maker--idle-since-input-p) :flash))))
-             (when level
-               (let* ((name (buffer-name))
-                      (elapsed (if konix/agent-shell--request-start-time
-                                   (float-time (time-subtract (current-time)
-                                                              konix/agent-shell--request-start-time))
-                                 0))
-                      (elapsed-str (konix/claude-code--format-duration elapsed)))
-                 (konix/do-notify level (format "Permission needed for %s in %s (after %s)" .method name elapsed-str))))))
-          ((equal .method "fs/read_text_file")
-           )
-          ((equal .method "fs/write_text_file")
-           )
-          (t
-           ))))
+(defun konix/agent-shell--notify-permission-needed (_permission)
+  "Notify the user that a permission request needs an interactive answer.
+Registered last on `konix/agent-shell-permission-responder-functions', so it
+runs only when no earlier responder (the blacklist/whitelist policy) handled
+the request -- exactly when the user is needed to answer.  Runs in the
+session's shell buffer.  Always returns nil so it never claims to handle the
+request: it only observes, leaving the interactive dialog to appear."
+  (let* ((notify-buf (if agent-shell-prefer-viewport-interaction
+                         (or (agent-shell-viewport--buffer
+                              :shell-buffer (current-buffer) :existing-only t)
+                             (current-buffer))
+                       (current-buffer)))
+         (level (or (konix/get-notification-level notify-buf)
+                    (and (konix/shell-maker--idle-since-input-p) :flash))))
+    (tracking-add-buffer notify-buf)
+    (when level
+      (let* ((name (buffer-name))
+             (elapsed (if konix/agent-shell--request-start-time
+                          (float-time (time-subtract
+                                       (current-time)
+                                       konix/agent-shell--request-start-time))
+                        0))
+             (elapsed-str (konix/claude-code--format-duration elapsed)))
+        (konix/do-notify
+         level (format "Permission needed in %s (after %s)" name elapsed-str)))))
+  ;; Never handle the request -- the dialog must still appear.
+  nil)
 
-(advice-add #'agent-shell--on-request :before #'konix/agent-shell--on-request/notify)
+(add-hook 'konix/agent-shell-permission-responder-functions
+          #'konix/agent-shell--notify-permission-needed
+          t)
 
 (defun konix/agent-shell-request-edit (instructions &optional beg end)
   "Request an edit from agent-shell for the current buffer/region.

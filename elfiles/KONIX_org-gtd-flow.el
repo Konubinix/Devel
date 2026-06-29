@@ -268,7 +268,7 @@
     (when (and (konix/org-with-point-on-heading (org-entry-is-todo-p))
                (konix/org-gtd-triage/ask (format "Correct todo state (%s)"
                                                  (konix/org-with-point-on-heading
-                                                  (org-get-todo-state))))
+                                                   (org-get-todo-state))))
                )
       (org-agenda-todo)
       )
@@ -286,8 +286,8 @@
       (cond
        ((konix/org-gtd-triage/ask "Is a single task?")
         (konix/org-with-point-on-heading
-         (org-toggle-tag "project" 'on)
-         )
+          (org-toggle-tag "project" 'on)
+          )
         (konix/org-agenda-refresh-line)
         )
        (t ;(konix/org-gtd-triage/ask "Already correct context/agenda?")
@@ -543,7 +543,10 @@
     )
   )
 (add-hook 'org-blocker-hook
-          'konix/org-blocker-hook)
+          'konix/org-blocker-hook
+          0)    ;; first, because it may change the state of children and impact the decision of other hooks
+;; (remove-hook 'org-blocker-hook
+;;              'konix/org-blocker-hook)
 
 (defun konix/org-depend-block-todo/but_not_done (orig_func &rest args)
   (let* (
@@ -750,16 +753,16 @@
          (heading (konix/org-get-heading))
          (deadline-prefix
           (konix/org-with-point-on-heading
-           (or
-            (konix/org-agenda-deadline-prefix)
-            (if-let
-                (
-                 (parent-prefix(konix/org-agenda-deadline-in-parent-prefix))
-                 )
-                (format "P-%s" parent-prefix)
-              )
+            (or
+             (konix/org-agenda-deadline-prefix)
+             (if-let
+                 (
+                  (parent-prefix(konix/org-agenda-deadline-in-parent-prefix))
+                  )
+                 (format "P-%s" parent-prefix)
+               )
+             )
             )
-           )
           )
          )
     (defun konix/org-agenda-project-gtd-workflow-item/ask (message)

@@ -585,18 +585,24 @@ You should check this is not a mistake."
 (require 'KONIX_org-agenda-commands)
 (require 'KONIX_org-agenda-reports)
 (require 'KONIX_org-capture)
-(require 'KONIX_org-clock)
 (require 'KONIX_org-config)
 (require 'KONIX_org-edit)
-(require 'KONIX_org-gtd-flow)
 (require 'KONIX_org-gtd-parties)
 (require 'KONIX_org-gtd-tags)
+;; Load the clock module *after* KONIX_org-gtd-tags: it calls `org-clock-load',
+;; which `find-file-noselect's the persisted clock file and so opens an org
+;; buffer. That buffer must be fontified with the GTD `org-todo-keywords' /
+;; `org-todo-keyword-faces' set by KONIX_org-gtd-tags, not the org defaults.
+(require 'KONIX_org-clock)
 (require 'KONIX_org-links)
 (require 'KONIX_org-ui)
 (require 'KONIX_org-integrations)
 
 (konix/org-setup-holidays)
 (konix/school-holidays-get)
+
+;; this one contains the org-blocker-hook that MUST be before all of the other hooks
+(require 'KONIX_org-gtd-flow)
 
 (provide 'KONIX_AL-org)
 ;;; KONIX_AL-org.el ends here

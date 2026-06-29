@@ -85,6 +85,7 @@
   (use-package auto-scroll :commands (auto-scroll-mode))
   (use-package backup-dir)
   (use-package backup-walker)
+  (use-package bash-completion)
   ;; temporary until https://github.com/radian-software/straight.el/pull/1169
   ;; gets merge into master, see https://github.com/radian-software/straight.el/issues/1167
   (use-package bbdb)

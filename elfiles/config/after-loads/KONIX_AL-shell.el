@@ -178,8 +178,12 @@
 
 (defun konix/shell-mode-hook ()
   (setq indent-tabs-mode nil)
+  (add-hook 'completion-at-point-functions
+            #'bash-completion-capf-nonexclusive nil t)
   (lsp)
   )
+
+(bash-completion-setup)
 (add-hook 'shell-mode-hook
           'konix/shell-mode-hook
           )

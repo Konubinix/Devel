@@ -1,6 +1,10 @@
 # [[id:2b1bd642-8cac-4fba-8bdc-f139504bc586][config:1]]
 [revset-aliases]
 "mine_deps()" = "bookmarks() ~ (mine | trunk())"
+"dangling()" = "all() ~ (ancestors(bookmarks() | remote_bookmarks() | tags() | @) | root())"
 [aliases]
-update-mine = ["rebase", "-r", "mine", "-o", "all:mine_deps()"]
+update-mine = ["rebase", "-r", "mine", "-o", "mine_deps()"]
+all = ["logs", "-r", "all()"]
+watch = ["util", "exec", "--", "bash", "-ec", "watchexec --quiet --clear --restart --watch=$JJ_WORKSPACE_ROOT/.jj/repo/op_heads/heads --ignore-nothing --wrap-process none -- jj log"]
+cleandangling = ["abandon", "-r", "dangling()"]
 # config:1 ends here

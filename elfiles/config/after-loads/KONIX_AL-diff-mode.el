@@ -107,6 +107,18 @@ Point is at the beginning of the block start match (diff or @@)."
                     :background "light pink"
                     )
 
+(set-face-attribute 'diff-file-header
+                    nil
+                    :foreground "gold"
+                    :weight 'bold
+                    )
+
+(set-face-attribute 'diff-hunk-header
+                    nil
+                    :foreground "cyan"
+                    :weight 'bold
+                    )
+
 (defun konix/diff-mode-hook()
   (setq konix/adjust-new-lines-at-end-of-file nil
         konix/delete-trailing-whitespace nil

@@ -528,17 +528,10 @@
 ;; git hotkeys
 ;; ####################################################################################################
 (define-prefix-command 'konix/git-global-map)
-(define-prefix-command 'konix/jj-global-map)
-
-(defun konix/vcs/jj-repo-p ()
-  "Non-nil if `default-directory' is inside a jj repo (`.jj' present upward)."
-  (locate-dominating-file default-directory ".jj"))
 
 (defun konix/vcs/dispatch-map (_default)
   "Menu-item :filter dispatching `C-x v' to the jj or git prefix map."
-  (if (konix/vcs/jj-repo-p)
-      konix/jj-global-map
-    konix/git-global-map))
+  konix/git-global-map)
 
 (keymap-set global-map "C-x v"
             '(menu-item "" konix/git-global-map
@@ -677,118 +670,6 @@
 (keymap-set konix/git-global-map-checkout "g" 'gited-list-branches)
 
 (keymap-global-set "C-< g" 'konix/git/command-with-completion)
-
-;; ####################################################################################################
-;; jj hotkeys (parallel layout to git; dispatched via konix/vcs/dispatch-map)
-;; ####################################################################################################
-(keymap-set konix/jj-global-map "i" 'konix/jj/init)
-(keymap-set konix/jj-global-map "e" 'konix/jj/edit)
-(keymap-set konix/jj-global-map "D" 'konix/jj/describe)
-
-(define-prefix-command 'konix/jj-global-map-log)
-(keymap-set konix/jj-global-map "l" 'konix/jj-global-map-log)
-(keymap-set konix/jj-global-map-log "l" 'konix/jj/log)
-(keymap-set konix/jj-global-map-log "r" 'konix/jj/op/log)
-(keymap-set konix/jj-global-map-log "p" 'konix/jj/log/pick-axe)
-(keymap-set konix/jj-global-map-log "f" 'konix/jj/log/file)
-(keymap-set konix/jj-global-map-log "b" 'konix/jj/annotate/file)
-(keymap-set konix/jj-global-map-log "a" 'konix/jj/log/all)
-
-(define-prefix-command 'konix/jj-global-map-cherry)
-(keymap-set konix/jj-global-map "C" 'konix/jj-global-map-cherry)
-(define-prefix-command 'konix/jj-global-map-cherry-pick)
-(keymap-set konix/jj-global-map-cherry "p" 'konix/jj-global-map-cherry-pick)
-(keymap-set konix/jj-global-map-cherry-pick "p" 'konix/jj/duplicate)
-
-(define-prefix-command 'konix/jj-global-map-push)
-(keymap-set konix/jj-global-map "p" 'konix/jj-global-map-push)
-(keymap-set konix/jj-global-map-push "P" 'konix/jj/git/push)
-(keymap-set konix/jj-global-map-push "p" 'konix/jj/pull)
-(keymap-set konix/jj-global-map-push "f" 'konix/jj/git/fetch)
-
-(define-prefix-command 'konix/jj-global-map-commit)
-(keymap-set konix/jj-global-map "c" 'konix/jj-global-map-commit)
-(keymap-set konix/jj-global-map-commit "c" 'konix/jj/describe)
-(keymap-set konix/jj-global-map-commit "m" 'konix/jj/describe/message)
-(keymap-set konix/jj-global-map-commit "a" 'konix/jj/squash/into-parent)
-(keymap-set konix/jj-global-map-commit "A" 'konix/jj/squash/into-parent)
-(keymap-set konix/jj-global-map-commit "p" 'konix/jj/describe/parent)
-
-(define-prefix-command 'konix/jj-global-map-diff)
-(keymap-set konix/jj-global-map "d" 'konix/jj-global-map-diff)
-(keymap-set konix/jj-global-map-diff "d" 'konix/jj/diff)
-(keymap-set konix/jj-global-map-diff "f" 'konix/jj/diff-file)
-(keymap-set konix/jj-global-map-diff "m" 'konix/jj/resolve)
-(keymap-set konix/jj-global-map-diff "p" 'konix/jj/diff/parent)
-(keymap-set konix/jj-global-map-diff "r" 'konix/jj/diff/rev)
-
-(define-prefix-command 'konix/jj-global-map-stash)
-(keymap-set konix/jj-global-map "S" 'konix/jj-global-map-stash)
-(keymap-set konix/jj-global-map-stash "s" 'konix/jj/new/sibling)
-(keymap-set konix/jj-global-map-stash "n" 'konix/jj/new/sibling)
-
-(define-prefix-command 'konix/jj-global-map-add)
-(keymap-set konix/jj-global-map "a" 'konix/jj-global-map-add)
-(keymap-set konix/jj-global-map-add "f" 'konix/jj/squash/file)
-(keymap-set konix/jj-global-map-add "u" 'konix/jj/squash)
-(keymap-set konix/jj-global-map-add "i" 'konix/jj/squash/interactive)
-(keymap-set konix/jj-global-map-add "r" 'konix/jj/restore/file)
-(keymap-set konix/jj-global-map-add "s" 'konix/jj/split)
-
-(define-prefix-command 'konix/jj-global-map-rebase)
-(keymap-set konix/jj-global-map "r" 'konix/jj-global-map-rebase)
-(keymap-set konix/jj-global-map-rebase "r" 'konix/jj/rebase)
-(keymap-set konix/jj-global-map-rebase "o" 'konix/jj/rebase/onto)
-(keymap-set konix/jj-global-map-rebase "b" 'konix/jj/rebase/branch)
-(keymap-set konix/jj-global-map-rebase "i" 'konix/jj/split/interactive)
-(keymap-set konix/jj-global-map-rebase "a" 'konix/jj/op/undo)
-(keymap-set konix/jj-global-map-rebase "c" 'konix/jj/resolve)
-
-(define-prefix-command 'konix/jj-global-map-status)
-(keymap-set konix/jj-global-map "s" 'konix/jj-global-map-status)
-(keymap-set konix/jj-global-map-status "s" 'konix/jj/status)
-
-(define-prefix-command 'konix/jj-global-map-reset)
-(keymap-set konix/jj-global-map "R" 'konix/jj-global-map-reset)
-(keymap-set konix/jj-global-map-reset "r" 'konix/jj/abandon)
-(keymap-set konix/jj-global-map-reset "H" 'konix/jj/restore)
-(keymap-set konix/jj-global-map-reset "f" 'konix/jj/restore/from-parent/file)
-
-(define-prefix-command 'konix/jj-global-map-revert)
-(keymap-set konix/jj-global-map "C-r" 'konix/jj-global-map-revert)
-(keymap-set konix/jj-global-map-revert "c" 'konix/jj/backout)
-
-(define-prefix-command 'konix/jj-global-map-branch)
-(keymap-set konix/jj-global-map "b" 'konix/jj-global-map-branch)
-(keymap-set konix/jj-global-map-branch "b" 'konix/jj/bookmark)
-(keymap-set konix/jj-global-map-branch "d" 'konix/jj/bookmark/delete)
-(keymap-set konix/jj-global-map-branch "a" 'konix/jj/bookmark/add)
-(keymap-set konix/jj-global-map-branch "r" 'konix/jj/bookmark/rename)
-(keymap-set konix/jj-global-map-branch "m" 'konix/jj/bookmark/move)
-
-(define-prefix-command 'konix/jj-global-map-show)
-(keymap-set konix/jj-global-map "h" 'konix/jj-global-map-show)
-(keymap-set konix/jj-global-map-show "c" 'konix/jj/show)
-(keymap-set konix/jj-global-map-show "o" 'konix/jj/annotate/at-pos)
-(keymap-set konix/jj-global-map-show "h" 'konix/jj/show/head)
-(keymap-set konix/jj-global-map-show "p" 'konix/jj/show/parent)
-
-(define-prefix-command 'konix/jj-global-map-checkout)
-(keymap-set konix/jj-global-map-branch "c" 'konix/jj-global-map-checkout)
-(keymap-set konix/jj-global-map-checkout "f" 'konix/jj/restore/file)
-(keymap-set konix/jj-global-map-checkout "c" 'konix/jj/edit)
-
-(define-prefix-command 'konix/jj-global-map-new)
-(keymap-set konix/jj-global-map "n" 'konix/jj-global-map-new)
-(keymap-set konix/jj-global-map-new "n" 'konix/jj/new)
-(keymap-set konix/jj-global-map-new "s" 'konix/jj/new/sibling)
-(keymap-set konix/jj-global-map-new "r" 'konix/jj/new/from-rev)
-
-(define-prefix-command 'konix/jj-global-map-op)
-(keymap-set konix/jj-global-map "o" 'konix/jj-global-map-op)
-(keymap-set konix/jj-global-map-op "l" 'konix/jj/op/log)
-(keymap-set konix/jj-global-map-op "u" 'konix/jj/op/undo)
-(keymap-set konix/jj-global-map-op "r" 'konix/jj/op/restore)
 
 ;; Multi cursor
 (define-prefix-command 'konix/multi-cursor-map)

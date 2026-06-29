@@ -29,6 +29,7 @@
 
 (require 'KONIX_AL-shell-maker)
 (require 'KONIX_claude-code-usage)
+(require 'KONIX_claude-permissions)
 
 (define-key agent-shell-viewport-view-mode-map (kbd "<") 'beginning-of-buffer)
 (define-key agent-shell-viewport-view-mode-map (kbd ">") 'end-of-buffer)

@@ -34,6 +34,7 @@
   environment.systemPackages = with pkgs; [
     net-tools # ifconfig, netstat, etc.
     tinc # VPN (configure services.tinc.networks when needed)
+    udftools
     (writeShellScriptBin "konix_tty_is_ssh" (builtins.readFile ./scripts/konix_tty_is_ssh.sh))
   ];
 

@@ -26,6 +26,10 @@
 
 (setq-default org-plantuml-exec-mode 'plantuml)
 
+(setq-default org-babel-default-header-args:plantuml
+              '((:results . "file") (:cache . "yes") (:ipfa . "t") (:exports . "results")))
+
+
 ;; used only if (eq org-plantuml-exec-mode 'jar)
 ;; (setq-default org-plantuml-jar-path plantuml-jar-path)
 

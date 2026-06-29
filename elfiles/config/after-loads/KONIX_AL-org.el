@@ -37,6 +37,7 @@
 (require 'ob-python)
 (require 'ob-shell)
 (require 'ob-org)
+(require 'ob-plantuml)
 (require 'ob-sql)
 (require 'ob-calc)                      ; to ease inline stuff like src_calc[:exports both]{45 / 32.8} {{{results(=1.37195121951=)}}}
 (require 'org-edna)

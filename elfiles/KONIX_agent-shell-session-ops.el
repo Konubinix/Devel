@@ -51,11 +51,17 @@ uniquified to `<saved-name><2>'."
                     (user-error "Not in an agent-shell buffer or viewport")))
          (saved-name (buffer-name shell))
          (saved-model-id (agent-shell--current-model-id
-                          (buffer-local-value 'agent-shell--state shell))))
+                          (buffer-local-value 'agent-shell--state shell)))
+         (saved-note (konix/agent-shell-governing-note shell)))
     (call-interactively cmd)
     (when-let ((new-shell (agent-shell--current-shell)))
       (unless (string= saved-name (buffer-name new-shell))
         (konix/agent-shell--rename-pair new-shell saved-name))
+      ;; A fork lands on a fresh session id, so re-bind the note (which also
+      ;; persists it under the new id); a reload keeps the id but lost the
+      ;; buffer-local, so this restores it.
+      (when saved-note
+        (konix/agent-shell-set-governing-note new-shell saved-note))
       (when saved-model-id
         (let (token)
           (setq token
@@ -109,21 +115,58 @@ reloads and sends \"continue\"."
 Lets `konix/agent-shell-reload-at-renewal' replace an existing timer
 for the same buffer and `konix/agent-shell-cancel-renewal' cancel it.")
 
-(defun konix/agent-shell--go-on-at-renewal (buffer shell-name)
+(defun konix/agent-shell--continue-restoring-mode (mode-id continue-fn)
+  "Restore session MODE-ID in the current shell buffer, then call CONTINUE-FN.
+MODE-ID is the session/permission mode (e.g. Claude Code's
+`default'/`acceptEdits'/`plan'/`bypassPermissions') captured when the
+renewal was armed.  A renewal timer can fire after a long wait during
+which the mode drifted from what the user had set, so the resumed turn
+must run under the original mode -- otherwise, say, a `bypassPermissions'
+session would stall on permission prompts.
+
+When MODE-ID is nil, already the current mode, or cannot be set (no live
+session or no modes available), CONTINUE-FN is called directly.
+Otherwise the mode change is requested first and CONTINUE-FN runs from its
+success callback, so the mode is in place before the continue prompt is
+submitted."
+  (if (and mode-id
+           (map-nested-elt (agent-shell--state) '(:session :id))
+           (agent-shell--get-available-modes (agent-shell--state))
+           (not (equal mode-id
+                       (agent-shell--current-mode-id (agent-shell--state)))))
+      (agent-shell--set-default-session-mode
+       :shell-buffer (current-buffer)
+       :mode-id mode-id
+       :on-mode-changed continue-fn)
+    (funcall continue-fn)))
+
+(defun konix/agent-shell--go-on-at-renewal (buffer shell-name &optional mode-id)
   "Reply \"go on\" in BUFFER once the renewal timer fires.
 Drops the SHELL-NAME entry from `konix/agent-shell--renewal-timers' and,
-when BUFFER is still live, calls `konix/agent-shell-viewport-reply-go-on'
-there."
+when BUFFER is still live, restores the session/permission MODE-ID captured
+when the renewal was armed (see `konix/agent-shell--continue-restoring-mode')
+before submitting the continue prompt in its shell buffer."
   (setq konix/agent-shell--renewal-timers
         (assoc-delete-all shell-name konix/agent-shell--renewal-timers))
   (if (buffer-live-p buffer)
       (with-current-buffer buffer
-        (with-current-buffer (agent-shell-shell-buffer)
-          (agent-shell--insert-to-shell-buffer
-           :text "continue"
-           :submit t)
-          ))
+        (let ((shell-buffer (agent-shell-shell-buffer)))
+          (with-current-buffer shell-buffer
+            (konix/agent-shell--continue-restoring-mode
+             mode-id
+             (lambda ()
+               (agent-shell--insert-to-shell-buffer
+                :shell-buffer shell-buffer
+                :text "you were interrupted for a long time. If you were registered in the coord system, you likely have missed the heartbeat: thus register again. Anyway, continue your work"
+                :submit t))))))
     (message "Renewal: buffer %S is gone, nothing to continue" shell-name)))
+
+(defun konix/agent-shell-reload-at-renewal-all ()
+    (interactive)
+    (mapc (lambda (buf)
+            (with-current-buffer buf
+              (konix/agent-shell-reload-at-renewal)))
+          (agent-shell-buffers)))
 
 (defun konix/agent-shell-reload-at-renewal ()
   "At credit renewal, reply \"go on\" to this session.
@@ -145,6 +188,10 @@ Re-running for the same buffer replaces any pending timer.  Cancel with
   (let* ((buffer (current-buffer))
          (shell (konix/agent-shell--current-shell-or-error))
          (shell-name (buffer-name shell))
+         ;; capture the session/permission mode now so the renewal can
+         ;; restore it before resuming, even if it drifts during the wait
+         (mode-id (with-current-buffer shell
+                    (agent-shell--current-mode-id (agent-shell--state))))
          (json-object-type 'alist)
          ;; bypass the 10-minute usage cache so the renewal time is accurate
          (result (json-read-from-string
@@ -169,7 +216,7 @@ Re-running for the same buffer replaces any pending timer.  Cancel with
           (message "Usage below 100%%, continuing %S now" shell-name))
       (let ((timer (run-at-time delay nil
                                 #'konix/agent-shell--go-on-at-renewal
-                                buffer shell-name)))
+                                buffer shell-name mode-id)))
         (push (cons shell-name timer) konix/agent-shell--renewal-timers))
       (message "Will continue %S at renewal (in %s, +%ds margin)"
                shell-name

@@ -117,11 +117,65 @@ matches it."
                      :no-focus t)))
         (konix/org-agent-shell--pop-to-shell shell)))))
 
+(declare-function konix/mcp-server-render-note "KONIX_mcp-server-agent-shell")
+(declare-function agent-shell--insert-to-shell-buffer "agent-shell")
+(declare-function agent-shell--resolve-preferred-config "agent-shell")
+(declare-function agent-shell-select-config "agent-shell")
+
+(defun konix/org-agent-shell-with-note-follow-link (link &optional _arg)
+  "Open a fresh Opus agent-shell primed with the org note LINK.
+A relative LINK resolves against the directory of the file holding the
+link.  The note is rendered with `konix/mcp-server-render-note'
+(transclusions resolved inline) into the boot prompt, which then points
+the agent at the link's file.  The note is also bound to the new session
+\(see `konix/agent-shell-set-governing-note'), so the agent calls
+`spawn_auditor' with no note path.  Prompts for a free-form message
+appended to the boot prompt (leave empty for none)."
+  (let* ((source (buffer-file-name))
+         (base (if source (file-name-directory source) default-directory))
+         (note (expand-file-name (string-trim link) base))
+         (rendered (konix/mcp-server-render-note note))
+         (message (string-trim (read-string "Message to append to the prompt: ")))
+         (prompt (format "%s
+
+Now, let's focus on %s
+When spawning an audit buddy, call spawn_auditor.%s"
+                         rendered
+                         (or source "the current file")
+                         (if (string-empty-p message)
+                             ""
+                           (concat "\n\n" message)))))
+    (let* ((default-directory base)
+           (shell (agent-shell--start
+                   ;; Force the default model (opus), as `konix/agent-shell-resume'
+                   ;; does, by overriding the config's :default-model-id.
+                   :config (map-insert
+                            (or (agent-shell--resolve-preferred-config)
+                                (agent-shell-select-config
+                                 :prompt "Start new agent: "))
+                            :default-model-id
+                            (lambda () "default"))
+                   :new-session t
+                   :session-strategy 'new
+                   :no-focus t)))
+      (with-current-buffer shell
+        (setq-local agent-shell-cwd-function (lambda () base))
+        (konix/agent-shell-set-governing-note shell note)
+        (agent-shell--insert-to-shell-buffer
+         :shell-buffer shell
+         :text prompt
+         :submit t
+         :no-focus t))
+      (konix/org-agent-shell--pop-to-shell shell))))
+
 (with-eval-after-load 'ol
   (org-link-set-parameters
    "agent-shell"
    :store #'konix/org-agent-shell-store-link
-   :follow #'konix/org-agent-shell-follow-link))
+   :follow #'konix/org-agent-shell-follow-link)
+  (org-link-set-parameters
+   "agent-shell-with-note"
+   :follow #'konix/org-agent-shell-with-note-follow-link))
 
 (provide 'KONIX_agent-shell-org-links)
 ;;; KONIX_agent-shell-org-links.el ends here

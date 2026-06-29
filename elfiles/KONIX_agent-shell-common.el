@@ -201,5 +201,108 @@ shell buffer so subscribers run there."
 (advice-add 'agent-shell--update-fragment :after
             #'konix/agent-shell--emit-prose-event)
 
+;;; Per-session persisted attributes -------------------------------------------
+;; A small disk-backed store mapping an agent-shell SESSION-ID to a value (the
+;; model last used in it, the note governing it, ...).  Generalised so each
+;; attribute is one store instance rather than its own copy of the
+;; load/get/put dance.
+
+(cl-defstruct (konix/agent-shell-session-store
+               (:constructor konix/agent-shell-session-store-create))
+  file       ; absolute path the alist is persisted to
+  alist      ; (SESSION-ID . VALUE) pairs
+  loaded)    ; non-nil once read from disk
+
+(defun konix/agent-shell-session-store--ensure-loaded (store)
+  (unless (konix/agent-shell-session-store-loaded store)
+    (setf (konix/agent-shell-session-store-alist store)
+          (let ((file (konix/agent-shell-session-store-file store)))
+            (when (file-exists-p file)
+              (with-temp-buffer
+                (insert-file-contents file)
+                (ignore-errors (read (current-buffer))))))
+          (konix/agent-shell-session-store-loaded store) t)))
+
+(defun konix/agent-shell-session-store-get (store session-id)
+  "Return the value stored for SESSION-ID in STORE, or nil."
+  (when session-id
+    (konix/agent-shell-session-store--ensure-loaded store)
+    (cdr (assoc session-id (konix/agent-shell-session-store-alist store)))))
+
+(defun konix/agent-shell-session-store-put (store session-id value)
+  "Persist VALUE for SESSION-ID in STORE (no-op when already equal)."
+  (when (and session-id value)
+    (konix/agent-shell-session-store--ensure-loaded store)
+    (unless (equal value (cdr (assoc session-id
+                                     (konix/agent-shell-session-store-alist store))))
+      (setf (alist-get session-id (konix/agent-shell-session-store-alist store)
+                       nil nil #'equal)
+            value)
+      (let ((file (konix/agent-shell-session-store-file store)))
+        (make-directory (file-name-directory file) t)
+        (with-temp-file file
+          (prin1 (konix/agent-shell-session-store-alist store) (current-buffer)))))))
+
+;;; Per-session governing note -------------------------------------------------
+;; The note whose principles an audit buddy spawned from a session must hold.
+;; Buffer-local for the live shell, mirrored to disk keyed by session id so it
+;; survives reload/resume (same id) and carried across fork (new id) by
+;; `konix/agent-shell--call-preserving-name-and-model'.  `spawn_auditor' reads
+;; it from the calling shell, so the agent calls the tool with no note path.
+
+(declare-function agent-shell-subscribe-to "agent-shell")
+(declare-function agent-shell-unsubscribe "agent-shell")
+
+(defvar konix/agent-shell-session-notes-store
+  (konix/agent-shell-session-store-create
+   :file (expand-file-name "konix/agent-shell-session-notes.el" user-emacs-directory))
+  "Store mapping a session id to its governing note path.")
+
+(defvar-local konix/agent-shell--governing-note nil
+  "Buffer-local governing note path bound to this shell, or nil.")
+
+(defun konix/agent-shell--shell-session-id (shell)
+  "Return SHELL's ACP session id, or nil."
+  (and (buffer-live-p shell)
+       (map-nested-elt (buffer-local-value 'agent-shell--state shell)
+                       '(:session :id))))
+
+(defun konix/agent-shell-governing-note (&optional shell)
+  "Return the governing note path bound to SHELL (default current buffer).
+Prefers SHELL's buffer-local binding and falls back to the value
+persisted for its session id, so a reloaded or freshly resumed shell
+still resolves its note."
+  (let ((shell (or shell (current-buffer))))
+    (when (buffer-live-p shell)
+      (or (buffer-local-value 'konix/agent-shell--governing-note shell)
+          (konix/agent-shell-session-store-get
+           konix/agent-shell-session-notes-store
+           (konix/agent-shell--shell-session-id shell))))))
+
+(defun konix/agent-shell-set-governing-note (shell note-path)
+  "Bind NOTE-PATH as SHELL's governing note, buffer-local and on disk.
+The disk entry is keyed by SHELL's session id; when the id is not known
+yet (a just-started session), it is written once the session is ready."
+  (when (buffer-live-p shell)
+    (with-current-buffer shell
+      (setq-local konix/agent-shell--governing-note note-path))
+    (if-let ((id (konix/agent-shell--shell-session-id shell)))
+        (konix/agent-shell-session-store-put
+         konix/agent-shell-session-notes-store id note-path)
+      (let (token)
+        (setq token
+              (agent-shell-subscribe-to
+               :shell-buffer shell
+               :event 'init-finished
+               :on-event
+               (lambda (_event)
+                 (when (buffer-live-p shell)
+                   (with-current-buffer shell
+                     (agent-shell-unsubscribe :subscription token)
+                     (konix/agent-shell-session-store-put
+                      konix/agent-shell-session-notes-store
+                      (konix/agent-shell--shell-session-id shell)
+                      note-path))))))))))
+
 (provide 'KONIX_agent-shell-common)
 ;;; KONIX_agent-shell-common.el ends here

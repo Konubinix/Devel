@@ -237,7 +237,9 @@ notified of new agent activity."
              (setq konix/agent-shell--seen nil)
              (when (eq (map-elt event :event) 'tool-call-update)
                (konix/agent-shell--update-waiting-status event)
-               (konix/agent-shell--update-background-status event)))))))
+               (konix/agent-shell--update-background-status event)
+               (when (fboundp 'konix/mcp-server-watch-deadline-event)
+                 (konix/mcp-server-watch-deadline-event event))))))))
     ;; A new turn starts clean: clear the per-turn background flag whenever a
     ;; prompt is submitted (human or an autoresponse), so `@background' reacts
     ;; only to launches in the turn that just ran.  Resetting here (not at

@@ -23,6 +23,7 @@
 ;; Agent-shell session management for the KONIX MCP server:
 ;;   - Per-session tagging so MCP requests carry their caller's identity
 ;;   - spawn_buddy / kill_buddy MCP tools (and the kill_agent_subtree Emacs command)
+;;   - interrupt_buddy MCP tool
 ;;   - set_label MCP tool
 ;;   - Interactive *Spawn Tree* view (M-x konix/mcp-server-show-spawn-tree)
 
@@ -43,6 +44,7 @@
 (declare-function shell-maker-busy "shell-maker")
 (declare-function shell-maker-submit "shell-maker")
 (declare-function konix/agent-shell--apply-label-format "KONIX_AL-agent-shell")
+(declare-function konix/agent-shell-governing-note "KONIX_agent-shell-common")
 (declare-function konix/agent-shell--rename-pair "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--rename-with-label "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--local-session-label "KONIX_AL-agent-shell")
@@ -411,9 +413,131 @@ nil if zero or more than one buffer is busy."
   (let ((busy (konix/mcp-server--busy-agent-shells)))
     (and busy (null (cdr busy)) (car busy))))
 
+;;; Auto-respawn on context pressure
+
+(defvar-local konix/mcp-server--auto-respawn nil
+  "Non-nil if this buddy auto-respawns a fresh copy when its context fills up.")
+
+(defvar-local konix/mcp-server--respawn-threshold 80
+  "Context-usage percentage at which this buddy respawns (when auto-respawn).")
+
+(defvar-local konix/mcp-server--respawn-spec nil
+  "Plist of spawn parameters used to rebuild this buddy on respawn.
+Keys: :directory :task :prompt :mcp-changes-json :model :coord-only :threshold.")
+
+(defvar-local konix/mcp-server--respawn-count 0
+  "How many times this buddy lineage has auto-respawned (runaway backstop).")
+
+(defvar-local konix/mcp-server--respawn-in-progress nil
+  "Non-nil once a respawn is scheduled for this buffer, so it fires only once.")
+
+(defconst konix/mcp-server--respawn-max 30
+  "Maximum auto-respawns for one buddy lineage before giving up.")
+
+(defvar konix/mcp-server--prompt-override nil
+  "When non-nil, `konix/mcp-server-spawn-agent' uses this string as the buddy's
+prompt verbatim instead of building the generic coordination prompt.  Dynamically
+bound by specialised spawners (e.g. the auditor) and by respawn (to reuse the
+stored prompt).  It is the COMPLETE prompt — any lifecycle note is already in it.")
+
+(defconst konix/mcp-server--respawn-buddy-prompt-note
+  "\n\nYOUR LIFECYCLE — IMPORTANT: you may be automatically replaced by a FRESH \
+copy of yourself at any task boundary (when your context grows large). The \
+replacement keeps your name but starts with NO memory of this conversation or of \
+any previous task. Therefore treat EVERY task as self-contained: never rely on \
+something you learned in an earlier task; everything you need must be in the task \
+itself or in the files it points you to. Re-read those files each task rather than \
+trusting your memory."
+  "Appended to a buddy's spawn prompt when it is spawned with auto-respawn.")
+
+(defun konix/mcp-server--context-percent (buffer)
+  "Return BUFFER's context-usage percentage as a float, or nil if unknown.
+Reads `:context-used' / `:context-size' from the agent-shell session usage."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (when-let* ((state (ignore-errors (agent-shell--state)))
+                  (usage (map-elt state :usage))
+                  (used (map-elt usage :context-used))
+                  (size (map-elt usage :context-size))
+                  ((numberp used)) ((numberp size)) ((> size 0)))
+        (/ (* 100.0 used) size)))))
+
+(defun konix/mcp-server--respawn-buddy (buffer)
+  "Kill BUFFER and spawn a fresh buddy under the same name from its spec.
+The successor inherits the lineage's incremented respawn count and the
+original parent, so the spawn tree and the runaway backstop both survive.
+Kill happens first: it DELETEs the coord registration, freeing the name so
+the reserve in the fresh spawn cannot collide with the corpse."
+  (when (buffer-live-p buffer)
+    (let ((spec   (buffer-local-value 'konix/mcp-server--respawn-spec buffer))
+          (name   (buffer-local-value 'konix/mcp-server--agent-name buffer))
+          (count  (1+ (buffer-local-value 'konix/mcp-server--respawn-count buffer)))
+          (parent (buffer-local-value 'konix/mcp-server--parent-buffer buffer)))
+      (konix/mcp-server--kill-buffers (list buffer))
+      ;; Rebind the dynamic caller so the successor keeps the original parent in
+      ;; the spawn tree (a programmatic respawn has no MCP caller of its own).
+      (let ((konix/mcp-server--calling-buffer parent)
+            (konix/mcp-server--prompt-override (plist-get spec :prompt)))
+        (konix/mcp-server-spawn-agent
+         (plist-get spec :directory)
+         (plist-get spec :task)
+         name
+         (plist-get spec :mcp-changes-json)
+         (plist-get spec :model)
+         (plist-get spec :coord-only)
+         t
+         (plist-get spec :threshold)))
+      (when-let ((newbuf (konix/mcp-server--find-agent-buffer name)))
+        (with-current-buffer newbuf
+          (setq-local konix/mcp-server--respawn-count count)))
+      (message "Auto-respawn: '%s' replaced by a fresh copy (respawn #%d)" name count))))
+
+(defun konix/mcp-server--maybe-respawn-on-event (buffer event)
+  "On a `coord_complete_task' completion in BUFFER, respawn if context is full.
+EVENT is the `tool-call-update' event alist.  This is the seam: the verdict
+is already delivered server-side and the buddy has not yet issued the next
+`coord_wait', so interrupting now means no task can be drained by the corpse."
+  (when (and (buffer-live-p buffer)
+             (buffer-local-value 'konix/mcp-server--auto-respawn buffer)
+             (not (buffer-local-value 'konix/mcp-server--respawn-in-progress buffer)))
+    (let* ((data   (map-elt event :data))
+           (tc     (map-elt data :tool-call))
+           (title  (and tc (map-elt tc :title)))
+           (status (and tc (map-elt tc :status))))
+      (when (and (stringp title)
+                 (string-match-p "coord_complete_task" title)
+                 (equal status "completed"))
+        (let ((pct       (konix/mcp-server--context-percent buffer))
+              (threshold (buffer-local-value 'konix/mcp-server--respawn-threshold buffer))
+              (count     (buffer-local-value 'konix/mcp-server--respawn-count buffer))
+              (name      (buffer-local-value 'konix/mcp-server--agent-name buffer)))
+          (when (and pct (>= pct threshold))
+            (cond
+             ((>= count konix/mcp-server--respawn-max)
+              (message "Auto-respawn: '%s' hit the respawn cap (%d) at %.0f%% context; leaving it running"
+                       name count pct))
+             (t
+              (with-current-buffer buffer
+                (setq-local konix/mcp-server--respawn-in-progress t)
+                ;; Stop the turn now so the buddy cannot issue coord_wait and
+                ;; drain a task it would never complete.
+                (ignore-errors (agent-shell-interrupt t)))
+              (message "Auto-respawn: '%s' at %.0f%% context (>= %s%%), respawning fresh"
+                       name pct threshold)
+              ;; Defer kill+respawn until the notification handler unwinds.
+              (run-with-timer 0 nil #'konix/mcp-server--respawn-buddy buffer)))))))))
+
+(defun konix/mcp-server--setup-respawn-subscription (buffer)
+  "Subscribe BUFFER to `tool-call-update' so it can auto-respawn on context pressure."
+  (agent-shell-subscribe-to
+   :shell-buffer buffer
+   :event 'tool-call-update
+   :on-event (lambda (event)
+               (konix/mcp-server--maybe-respawn-on-event buffer event))))
+
 ;;; spawn_buddy / kill_buddy / kill_agent_subtree
 
-(defun konix/mcp-server-spawn-agent (directory task buddy-name &optional mcp-config-changes model coord-only)
+(defun konix/mcp-server-spawn-agent (directory task buddy-name &optional mcp-config-changes model coord-only auto-respawn respawn-threshold)
   "Spawn a new buddy that registers with the coordination system and waits for tasks.
 The buddy will register and then block waiting for tasks from the coordinator — the coordinator must send the first task using coord_post_task or coord_ask_and_wait.
 
@@ -429,7 +553,9 @@ MCP Parameters:
     \"edit\": list of objects to modify existing servers, each with \"name\" and optional \"env_set\" ({KEY:VALUE to add/override}), \"env_remove\" (list of var names to remove), \"headers_set\" ({KEY:VALUE}), \"headers_remove\" (list of header names to remove).
     Example: {\"add\":[{\"name\":\"my-srv\",\"command\":\"node\",\"args\":[\"server.js\"],\"env\":{\"TOKEN\":\"abc\"}}]}
   model - Optional buddy model: \"default\" (Opus), \"opus\", \"sonnet\" or \"haiku\" (\"opus\" is an alias for \"default\").  Defaults to `agent-shell-anthropic-default-model-id'.
-  coord-only - When t, point this buddy's konix-mcp at the slim /coord endpoint (coordination tools only) instead of the full /mcp. Use for coordination/demo buddies so their tool list stays small; leave unset for buddies that need the full toolset (legifrance, chrome-devtools, etc.)."
+  coord-only - When t, point this buddy's konix-mcp at the slim /coord endpoint (coordination tools only) instead of the full /mcp. Use for coordination/demo buddies so their tool list stays small; leave unset for buddies that need the full toolset (legifrance, chrome-devtools, etc.).
+  auto-respawn - When t, this buddy automatically replaces itself with a FRESH copy (same name, empty context) once its context usage crosses respawn-threshold, retiring at the seam right after it completes a task. The replacement keeps the name but has NO memory of earlier tasks, so only enable this when every task you send is self-contained (all needed state in the task or in files it points to). Enable it knowingly: a buddy spawned this way may reset between tasks. Defaults to nil (the buddy lives until explicitly killed).
+  respawn-threshold - Context-usage percentage (0-100) that triggers a respawn. Ignored unless auto-respawn is t. Defaults to 80."
   (mcp-server-lib-with-error-handling
    (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
           (task (decode-coding-string task 'utf-8))
@@ -443,7 +569,15 @@ MCP Parameters:
           (model-decoded (when (and model (not (string-empty-p model)))
                            (let ((decoded (decode-coding-string model 'utf-8)))
                              (if (string= decoded "opus") "default" decoded))))
-          (prompt (format "You are a coordinated buddy. Your goal: %s
+          (auto-respawn-on (and auto-respawn
+                                (not (member auto-respawn '(:json-false "false" "no" "nil")))))
+          (respawn-threshold-num (cond ((numberp respawn-threshold) respawn-threshold)
+                                       ((and (stringp respawn-threshold)
+                                             (not (string-empty-p respawn-threshold)))
+                                        (string-to-number respawn-threshold))
+                                       (t 80)))
+          (prompt (or konix/mcp-server--prompt-override
+                  (concat (format "You are a coordinated buddy. Your goal: %s
 
 HOW TO CALL COORDINATION TOOLS:
 - coord_register, coord_wait, coord_complete_task, coord_ask_and_wait, coord_list_buddies, spawn_buddy and kill_buddy are MCP tools. Invoke each one by emitting a tool call, exactly like any other tool.
@@ -459,13 +593,18 @@ FIRST, do these setup steps in order. The coordination tools are MCP tools that 
 1. Call ToolSearch with EXACTLY this query to load the coordination tool schemas: select:mcp__konix-mcp__coord_register,mcp__konix-mcp__coord_wait,mcp__konix-mcp__coord_complete_task — once it returns, those tools are directly callable like any built-in tool.
 2. Call the coord_register tool with name \"%s\" and a description of your role.
 3. Then enter a loop:
-   a. Call coord_wait with buddy \"%s\" to block until you receive a task.
+   a. Call coord_wait with buddy \"%s\" to block until you receive your FIRST task.
    b. Execute the task you receive strictly as described. If it fails, report the failure.
-   c. Report results by calling coord_complete_task.
-   d. Go back to step (a) and wait for the next task.
+   c. Report your result by calling coord_complete_task. By DEFAULT it blocks and hands back your NEXT task, so you do NOT call coord_wait again — just act on whatever it returns and report that with coord_complete_task too. (Pass wait=false only when you must return immediately instead of blocking: an interim \"need more time\" before continuing the SAME task, or your final report just before kill_buddy.)
+   d. Repeat (c) for every further task.
+
+RESPECT THE CALLER'S DEADLINE: each task you receive carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — you MUST call coord_complete_task BEFORE the deadline or you may be killed. If you cannot finish the real work in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task wait=false (say what you have done and what remains), keep working, then report the real result with coord_complete_task. A late silence breaks cooperation; an honest \"need more time\" keeps it intact.
 
 Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, invoke the kill_buddy tool with your own name \"%s\" to clean yourself up."
-                          task buddy-name buddy-name buddy-name))
+                          task buddy-name buddy-name buddy-name)
+                          (if auto-respawn-on
+                              konix/mcp-server--respawn-buddy-prompt-note
+                            ""))))
           (config (agent-shell-anthropic-make-claude-code-config)))
      (unless (file-directory-p directory)
        (error "Directory does not exist: %s" directory))
@@ -549,6 +688,15 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
            (remhash konix/mcp-server--session-tag konix/mcp-server--session-buffers))
          (setq-local konix/mcp-server--session-tag buddy-name)
          (konix/mcp-server--register-session-tag buddy-name (current-buffer))
+         (when auto-respawn-on
+           (setq-local konix/mcp-server--auto-respawn t)
+           (setq-local konix/mcp-server--respawn-threshold respawn-threshold-num)
+           (setq-local konix/mcp-server--respawn-spec
+                       (list :directory directory :task task :prompt prompt
+                             :mcp-changes-json mcp-config-changes
+                             :model model :coord-only coord-only
+                             :threshold respawn-threshold-num))
+           (konix/mcp-server--setup-respawn-subscription (current-buffer)))
          (agent-shell--insert-to-shell-buffer
           :shell-buffer (current-buffer)
           :text prompt
@@ -559,6 +707,114 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
        (error
         (konix/mcp-server--coord-release-reservation buddy-name)
         (signal (car err) (cdr err)))))))
+
+;;; render_note — return a note's full text, referenced content resolved
+
+(defun konix/mcp-server--resolve-transclusions ()
+  "Materialise transclusions in the current buffer and return its text with the
+`#+transclude:' directive lines removed (the pulled-in content kept)."
+  (require 'org-transclusion)
+  (org-transclusion-add-all)
+  (string-trim
+   (string-join
+    (seq-remove
+     (lambda (l) (string-prefix-p "#+transclude:" (string-trim-left l)))
+     (split-string (buffer-substring-no-properties (point-min) (point-max)) "\n"))
+    "\n")))
+
+(defun konix/mcp-server-render-note (note-path)
+  "Return NOTE-PATH's text with every #+transclude resolved — the whole note.
+Each `#+transclude:' directive is materialised with org-transclusion (relative
+`file:' links resolved against the note's own directory), pulling the canonical
+content it references — e.g. shared principles — inline where it sits, prose and
+diagram SOURCE intact.  The directive lines are dropped, leaving the pulled-in
+content.  A note with no transclusions returns itself.  Read fresh on each call.
+
+MCP Parameters:
+  note-path - Absolute path of the note to render."
+  (mcp-server-lib-with-error-handling
+   (let ((note-path (expand-file-name (decode-coding-string note-path 'utf-8))))
+     (unless (file-readable-p note-path)
+       (error "Note not readable: %s" note-path))
+     ;; A `with-temp-buffer' visits no file, so nothing here ever prompts to save
+     ;; or confirm a kill — this must stay non-interactive.
+     (with-temp-buffer
+       (insert-file-contents note-path)
+       (setq default-directory (file-name-directory note-path))
+       (org-mode)
+       (konix/mcp-server--resolve-transclusions)))))
+
+(defun konix/mcp-server--build-auditor-prompt (principles buddy-name)
+  "Return the baked AUDIT-buddy prompt: PRINCIPLES inlined, serve as BUDDY-NAME.
+PRINCIPLES is the governing note's text with its transclusions already
+resolved, written straight into the prompt so the auditor boots holding the
+rules with nothing to fetch."
+  (format "You are an AUDIT buddy. You READ and JUDGE; you do NOT edit any file, ever.
+
+The principles you audit against are below. Hold them. Audit every draft against them; do NOT audit from memory of what they \"probably\" said.
+
+===== PRINCIPLES =====
+%s
+===== END =====
+
+Then register and serve: for each draft, change, or document sent to you, READ the current version it names and audit it AGAINST THOSE PRINCIPLES.
+
+AUDIT SUBSTANCE ONLY — does the content honour the principles? Cite, do not assert.
+NEVER flag these — deterministic tools own them, not you: org =CUSTOM_ID= / =:ID:=, espaces insécables, line length or wrapping, heading slugs, file names. If you catch yourself about to raise one, drop it.
+VERDICT — one concern per finding: the offending span (VERBATIM), the principle text it breaks (VERBATIM), and which principle. End with: PASS, or NEEDS-WORK and the finding count.
+
+HOW TO CALL COORDINATION TOOLS:
+- coord_register, coord_wait and coord_complete_task are MCP tools; emit a tool call to invoke each. If one is not visible yet, load its schema with ToolSearch first.
+- coord_wait blocks server-side until a task arrives; just call it and let it block.
+
+SETUP, in order:
+1. Call ToolSearch with EXACTLY: select:mcp__konix-mcp__coord_register,mcp__konix-mcp__coord_wait,mcp__konix-mcp__coord_complete_task
+2. Call coord_register with name \"%s\" and a short description (\"audit buddy\").
+3. Loop: coord_wait (buddy \"%s\") to block until your FIRST draft arrives; read and audit it; report your verdict with coord_complete_task. By DEFAULT coord_complete_task blocks and returns your NEXT draft, so do NOT call coord_wait again — audit whatever it hands back and report that with coord_complete_task too. (Pass wait=false only to return immediately instead of blocking: an interim \"need more time\" before finishing the SAME audit.)
+
+RESPECT THE CALLER'S DEADLINE: each draft you receive carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — call coord_complete_task with your verdict BEFORE the deadline or you may be killed. If the audit will not be done in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task wait=false (with what you have checked so far), then finish and report the real verdict — rather than letting the caller time out.
+
+Keep serving every draft until you are told to stop or killed. Do NOT kill yourself after an audit — an auditor serves many passes."
+          principles buddy-name buddy-name))
+
+(defun konix/mcp-server-spawn-auditor (directory buddy-name &optional respawn-threshold)
+  "Spawn a standing AUDIT buddy with the governing principles baked into its boot prompt.
+
+The auditor only reads and returns verdicts; it never edits.  It audits SUBSTANCE
+against the principles and ignores tooling-owned mechanics (CUSTOM_ID, :ID:,
+espaces insécables, wrapping, slugs).  The governing note is the one bound to the
+CALLING session (set when it was opened via an `agent-shell-with-note' link, and
+carried across resume/reload/fork); its whole text is read and inlined into the
+boot prompt.  Send the auditor a draft with coord_ask_and_wait (to_buddy =
+BUDDY-NAME); it returns a cited verdict (PASS or NEEDS-WORK + findings).  Kill it
+with kill_buddy when done.  An auto-respawn reuses the same baked prompt; to pick
+up edits to the principles, kill it and spawn a fresh one.
+
+MCP Parameters:
+  directory - The working directory for the session
+  buddy-name - Unique name for the auditor in the coordination system
+  respawn-threshold - Context-usage percentage (0-100) at which it respawns. Defaults to 80."
+  (mcp-server-lib-with-error-handling
+   (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
+          (governing-note
+           (or (and konix/mcp-server--calling-buffer
+                    (konix/agent-shell-governing-note
+                     konix/mcp-server--calling-buffer))
+               (error "No governing note is bound to the calling session; open it via an `agent-shell-with-note' org link before spawning an auditor")))
+          (name (decode-coding-string buddy-name 'utf-8))
+          (principles (konix/mcp-server-render-note governing-note))
+          (konix/mcp-server--prompt-override
+           (concat (konix/mcp-server--build-auditor-prompt principles name)
+                   konix/mcp-server--respawn-buddy-prompt-note)))
+     (konix/mcp-server-spawn-agent
+      directory
+      (format "audit: %s" governing-note)
+      name
+      nil
+      "opus"
+      nil
+      t
+      respawn-threshold))))
 
 (defun konix/mcp-server--find-agent-buffer (agent-name)
   "Find the buffer for coordinated agent AGENT-NAME.
@@ -627,6 +883,142 @@ MCP Parameters:
                  (1- (length names))
                  (if (= (length names) 2) "" "s")
                  (string-join (cdr names) ", ")))))))
+
+(defun konix/mcp-server--coord-registered-p (name)
+  "Return non-nil if NAME is registered in the coordination system."
+  (condition-case _
+      (seq-find (lambda (cell) (equal (symbol-name (car cell)) name))
+                (plz 'get (format "%s/coord/buddies" konix/mcp-server-coord-url)
+                  :as #'json-read :timeout 5))
+    (error nil)))
+
+(defun konix/mcp-server--interrupt-and-submit (buffer text)
+  "Cancel BUFFER's in-flight turn and submit TEXT as its next prompt.
+When the turn is still unwinding, TEXT is submitted from the
+`turn-complete' event (the seam M-r uses) rather than now."
+  (with-current-buffer buffer
+    (let ((agent-shell-confirm-interrupt nil))
+      ;; ignore-errors: interrupt signals a user-error to say all is well.
+      (ignore-errors (agent-shell-interrupt)))
+    (let ((submit (lambda ()
+                    (agent-shell--insert-to-shell-buffer
+                     :shell-buffer buffer :text text :submit t :no-focus t))))
+      (if (not (shell-maker-busy))
+          (funcall submit)
+        (let (token)
+          (setq token
+                (agent-shell-subscribe-to
+                 :shell-buffer buffer :event 'turn-complete
+                 :on-event (lambda (_event)
+                             (agent-shell-unsubscribe :subscription token)
+                             (funcall submit)))))))))
+
+(defun konix/mcp-server-interrupt-agent (buddy-name from-buddy message)
+  "Interrupt coordinated buddy BUDDY-NAME, as FROM-BUDDY, and ask it MESSAGE.
+
+Cancels the buddy's in-flight turn and submits a prompt asking MESSAGE.
+The interrupt bypasses the coord task cycle, so the prompt tells the
+buddy to reply via coord_send_message to FROM-BUDDY, then resume waiting;
+collect the reply as FROM-BUDDY with coord_wait/coord_get_messages.
+FROM-BUDDY must already be registered, else this refuses to run.
+
+MCP Parameters:
+  buddy-name - The buddy to interrupt
+  from-buddy - Your coord name (must be registered); the buddy replies here
+  message - What to ask the buddy"
+  (mcp-server-lib-with-error-handling
+   (let* ((buddy-name (decode-coding-string buddy-name 'utf-8))
+          (from-buddy (decode-coding-string from-buddy 'utf-8))
+          (message (decode-coding-string message 'utf-8))
+          (buffer (konix/mcp-server--find-agent-buffer buddy-name)))
+     (unless buffer
+       (error "No coordinated buddy found with name '%s'" buddy-name))
+     (unless (konix/mcp-server--coord-registered-p from-buddy)
+       (error "from-buddy '%s' is not registered in the coordination system" from-buddy))
+     (konix/mcp-server--interrupt-and-submit
+      buffer
+      (format "You were INTERRUPTED out-of-band by \"%s\" (not a coord task, so nothing to coord_complete_task):\n\n%s\n\nReply with coord_send_message from_buddy=\"%s\" to_buddy=\"%s\" (a plain shell answer will NOT reach them), then call coord_wait to resume."
+              from-buddy message buddy-name from-buddy))
+     (format "Interrupted '%s'; told it to reply via coord to '%s'." buddy-name from-buddy))))
+
+;;; Auto-interrupt before a task answer deadline
+
+(defcustom konix/mcp-server-deadline-lead-seconds 20
+  "Seconds before a buddy's task answer deadline at which to auto-interrupt it.
+When a buddy drains a coordination task carrying an `answer_by' deadline,
+it is interrupted this many seconds before that deadline so it can report
+or ask for more time rather than letting the blocked caller time out."
+  :type 'integer
+  :group 'konix)
+
+(defvar-local konix/mcp-server--deadline-timer nil
+  "One-shot timer that interrupts this buddy shortly before its task deadline.")
+
+(defun konix/mcp-server--tool-call-result-text (tool-call)
+  "Return the concatenated text of TOOL-CALL's result content blocks."
+  (mapconcat (lambda (item) (or (map-nested-elt item '(content text)) ""))
+             (append (map-elt tool-call :content) nil)
+             "\n"))
+
+(defun konix/mcp-server--parse-answer-by (text)
+  "Return the deadline (Emacs time) from coord's `COORD_DEADLINE:' marker in TEXT.
+The coord server stamps `COORD_DEADLINE: <iso8601>' (the soonest task
+deadline) into a drained-task result, OUTSIDE the escaped task JSON, so
+this reads it with a single match instead of digging through that JSON.
+Returns nil when no marker is present."
+  (require 'iso8601)
+  (when (string-match "COORD_DEADLINE: \\([0-9T:.+-]+\\)" text)
+    (ignore-errors (encode-time (iso8601-parse (match-string 1 text))))))
+
+(defun konix/mcp-server--cancel-deadline-timer ()
+  "Cancel this buffer's pending deadline interrupt, if any."
+  (when (timerp konix/mcp-server--deadline-timer)
+    (cancel-timer konix/mcp-server--deadline-timer))
+  (setq konix/mcp-server--deadline-timer nil))
+
+(defun konix/mcp-server--deadline-fire (buffer)
+  "Interrupt BUFFER to demand a report before its task deadline lapses."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (setq konix/mcp-server--deadline-timer nil)
+      (konix/mcp-server--interrupt-and-submit
+       buffer
+       (format "⏰ Your task answer deadline is ~%ds away — not enough time to write a long answer through coord_complete_task before the caller gives up. NOW, in order: (1) call coord_complete_task with a SHORT message that beats the clock — your final answer if it is brief, else an interim \"need more time\" stating what is done and what remains; (2) only AFTER that, send any longer write-up as a separate coord_send_message to the caller (the task's `from`). Do not let a long summary delay step 1; do NOT go silent."
+               konix/mcp-server-deadline-lead-seconds)))))
+
+(defun konix/mcp-server--arm-deadline-timer (deadline)
+  "Arm a one-shot interrupt for DEADLINE (Emacs time) in the current buffer.
+Fires `konix/mcp-server-deadline-lead-seconds' before DEADLINE (or right
+away when already inside that window); a deadline already past is ignored."
+  (konix/mcp-server--cancel-deadline-timer)
+  (let* ((remaining (float-time (time-subtract deadline (current-time))))
+         (delay (- remaining konix/mcp-server-deadline-lead-seconds)))
+    (when (> remaining 0)
+      (setq konix/mcp-server--deadline-timer
+            (run-with-timer (max delay 1) nil
+                            #'konix/mcp-server--deadline-fire (current-buffer))))))
+
+(defun konix/mcp-server-watch-deadline-event (event)
+  "From a `tool-call-update' EVENT, arm or cancel this buddy's deadline interrupt.
+Call from within the buddy's shell buffer.  Both `coord_wait' and (in its
+default report-and-wait mode) `coord_complete_task' return the buddy's next
+task, which carries the caller's `answer_by' deadline via the `COORD_DEADLINE'
+marker.  So on either tool completing: arm a one-shot interrupt for that
+deadline when the marker is present, else cancel any pending one (a bare
+`wait=false' completion or a failed call carries no marker)."
+  (let* ((data (map-elt event :data))
+         (tool-call (map-elt data :tool-call))
+         (title (map-elt tool-call :title))
+         (status (map-elt tool-call :status)))
+    (when (and (member status '("completed" "failed"))
+               (stringp title)
+               (let ((case-fold-search t))
+                 (string-match-p "coord_wait\\|coord_complete_task" title)))
+      (if-let ((deadline (and (equal status "completed")
+                              (konix/mcp-server--parse-answer-by
+                               (konix/mcp-server--tool-call-result-text tool-call)))))
+          (konix/mcp-server--arm-deadline-timer deadline)
+        (konix/mcp-server--cancel-deadline-timer)))))
 
 (defun konix/mcp-server--descendants-of (buffer)
   "Return BUFFER plus all agent-shell descendants, top-down."

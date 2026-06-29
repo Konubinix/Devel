@@ -25,41 +25,20 @@
 
 (require 'KONIX_agent-shell-common)
 
-(defvar konix/agent-shell-session-models-file
-  (expand-file-name "konix/agent-shell-session-models.el" user-emacs-directory)
-  "File persisting the last model id used per agent-shell session id.")
-
-(defvar konix/agent-shell-session-models nil
-  "Alist (SESSION-ID . MODEL-ID) of the last model used per session.")
-
-(defvar konix/agent-shell-session-models--loaded nil
-  "Non-nil once `konix/agent-shell-session-models' was read from disk.")
-
-(defun konix/agent-shell-session-models--ensure-loaded ()
-  (unless konix/agent-shell-session-models--loaded
-    (setq konix/agent-shell-session-models
-          (when (file-exists-p konix/agent-shell-session-models-file)
-            (with-temp-buffer
-              (insert-file-contents konix/agent-shell-session-models-file)
-              (ignore-errors (read (current-buffer)))))
-          konix/agent-shell-session-models--loaded t)))
+(defvar konix/agent-shell-session-models-store
+  (konix/agent-shell-session-store-create
+   :file (expand-file-name "konix/agent-shell-session-models.el" user-emacs-directory))
+  "Store mapping a session id to the last model id used in it.")
 
 (defun konix/agent-shell-session-model-get (session-id)
   "Return the persisted model id for SESSION-ID, or nil."
-  (when session-id
-    (konix/agent-shell-session-models--ensure-loaded)
-    (cdr (assoc session-id konix/agent-shell-session-models))))
+  (konix/agent-shell-session-store-get
+   konix/agent-shell-session-models-store session-id))
 
 (defun konix/agent-shell-session-model-put (session-id model-id)
   "Persist MODEL-ID as the model in use for SESSION-ID."
-  (when (and session-id model-id)
-    (konix/agent-shell-session-models--ensure-loaded)
-    (unless (equal model-id (cdr (assoc session-id konix/agent-shell-session-models)))
-      (setf (alist-get session-id konix/agent-shell-session-models nil nil #'equal)
-            model-id)
-      (make-directory (file-name-directory konix/agent-shell-session-models-file) t)
-      (with-temp-file konix/agent-shell-session-models-file
-        (prin1 konix/agent-shell-session-models (current-buffer))))))
+  (konix/agent-shell-session-store-put
+   konix/agent-shell-session-models-store session-id model-id))
 
 (defun konix/agent-shell--persist-model-id (&rest args)
   "Record the model id being set (ARGS plist) for the current session.
@@ -86,7 +65,7 @@ second resume can't ask which session to load."
   (let ((shell (agent-shell--start
                 ;; Override :default-model-id with a per-session lookup so the
                 ;; resumed session lands back on the model we last persisted
-                ;; for it (see `konix/agent-shell-session-models-file'), rather
+                ;; for it (see `konix/agent-shell-session-models-store'), rather
                 ;; than the global `agent-shell-anthropic-default-model-id' or
                 ;; the server's resume default. The lambda runs in
                 ;; `agent-shell--handle' once the session id is known; nil

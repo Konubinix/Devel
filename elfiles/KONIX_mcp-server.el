@@ -678,9 +678,19 @@ Each old_string should include enough context to be unique (e.g., a whole functi
      (konix/mcp-server-spawn-agent
       :id "spawn_buddy"
       :description "Spawn a new buddy that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a buddy: call this tool, then use coord_post_task or coord_ask_and_wait to send it instructions. The spawned buddy will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new buddy'. IMPORTANT: When the buddy's goal is accomplished, you MUST call kill_buddy to clean it up.")
+     (konix/mcp-server-render-note
+      :id "render_note"
+      :description "Return a note's full text, with any shared content it references pulled in inline (e.g. principles defined in another note). Pass the note's path. Use this to read a note completely — a plain file read can show only a reference, not the referenced text. Read fresh from disk on each call."
+      :read-only t)
+     (konix/mcp-server-spawn-auditor
+      :id "spawn_auditor"
+      :description "Spawn a STANDING audit buddy that reviews edits to a principle-governed note against the principles governing it. It judges substance only — never edits, ignores mechanics (CUSTOM_ID, :ID:, espaces insécables, wrapping, slugs) — and returns a cited verdict per finding: the offending span verbatim + the principle verbatim + which principle, ending PASS or NEEDS-WORK + count. The governing note is inherited from YOUR session (it was bound when the session was opened via an agent-shell-with-note link), so you do NOT pass it — just pass directory and a buddy-name. If no note is bound, the call errors. Send each draft with coord_ask_and_wait (to_buddy = its name), iterate to PASS, then kill_buddy. Use this, not spawn_buddy, for principle-governed reviews.")
      (konix/mcp-server-kill-agent
       :id "kill_buddy"
       :description "Kill a buddy that was previously spawned with spawn_buddy. By default also kills all its descendant buddies recursively so no orphan is left behind; pass non-recursive=true to kill only the targeted buddy. Use this to clean up a buddy when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_buddy (refuses to kill other buffers).")
+     (konix/mcp-server-interrupt-agent
+      :id "interrupt_buddy"
+      :description "Interrupt a buddy mid-turn and ask it something, useful when you need a report from it urgently and cannot wait for the normal coord task cycle. Since this bypasses the task cycle, the buddy replies via coord_send_message to from-buddy (your coord name, which must already be registered); collect it with coord_wait/coord_get_messages.")
      (konix/mcp-server-set-label
       :id "set_label"
       :description "Set a short label on the calling agent-shell buffer (shell + viewport) that summarises the current session. Use this when the user asks you to label/rename your own buffer with a meaningful name — pick a 3-7 word descriptive label and call this tool. The label is incorporated into the buffer name via the user's format (typically appears as `A@<label>`). Pass an empty string to revert to the default project-based name. Only works while the calling agent-shell is mid-turn (which it normally is when you call any tool)."))

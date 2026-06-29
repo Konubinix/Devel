@@ -178,6 +178,23 @@ Queries `/coord/agents'.  Returns an empty hash on any failure."
       (error nil))
     table))
 
+(defun konix/mcp-server--fetch-coord-rooms-by-buddy ()
+  "Return a hash table mapping buddy name → list of room names.
+Queries `/coord/rooms'.  Returns an empty hash on any failure."
+  (let ((table (make-hash-table :test 'equal)))
+    (condition-case _
+        (let ((rooms (plz 'get (format "%s/coord/rooms"
+                                       konix/mcp-server-coord-url)
+                       :as #'json-read :timeout 2)))
+          (dolist (cell rooms)
+            (let ((room (symbol-name (car cell)))
+                  (members (cdr cell)))
+              (seq-doseq (m members)
+                (let ((m (if (stringp m) m (format "%s" m))))
+                  (push room (gethash m table)))))))
+      (error nil))
+    table))
+
 ;;; MCP server config normalization
 
 (defun konix/mcp-server--normalize-mcp-changes (mcp-changes)
@@ -323,11 +340,11 @@ konix-* mounts) are returned untouched."
    servers))
 
 (defun konix/mcp-server--tag-konix-mcp-session (servers session-tag)
-  "Return SERVERS with the konix-mcp entry's headers carrying SESSION-TAG.
-Adds or updates an X-Session-Tag header so the konix-mcp HTTP server can
+  "Return SERVERS with the konix-coord entry's headers carrying SESSION-TAG.
+Adds or updates an X-Session-Tag header so the konix-coord HTTP server can
 correlate `coord_register' calls with the calling agent-shell buffer."
   (konix/mcp-server--update-server-field
-   servers "konix-mcp" 'headers
+   servers "konix-coord" 'headers
    (lambda (headers)
      (konix/mcp-server--name-value-set headers "X-Session-Tag" session-tag))))
 
@@ -652,7 +669,9 @@ at point; otherwise it is read via completion."
 
 (defun konix/mcp-server--agent-status (buf)
   "Return a cons (STATUS . SEEN) describing agent-shell BUF.
-STATUS is one of: `dead', `awaiting-permission', `busy', `idle'.
+STATUS is one of: `dead', `awaiting-permission', `waiting', `busy', `idle'.
+`waiting' means the agent is mid-turn but blocked in a coordination wait
+tool (see `konix/agent-shell--waiting-tool-id').
 SEEN is non-nil when the user has already seen the last completed turn."
   (with-current-buffer buf
     (let* ((state (and (boundp 'agent-shell--state) agent-shell--state))
@@ -662,6 +681,9 @@ SEEN is non-nil when the user has already seen the last completed turn."
       (cons (cond
              ((not client) 'dead)
              (awaiting 'awaiting-permission)
+             ((and (shell-maker-busy)
+                   (bound-and-true-p konix/agent-shell--waiting-tool-id))
+              'waiting)
              ((shell-maker-busy) 'busy)
              (t 'idle))
             (bound-and-true-p konix/agent-shell--seen)))))
@@ -678,6 +700,11 @@ SEEN is non-nil when the user has already seen the last completed turn."
   '((t :foreground "cyan" :weight bold))
   "Face for the [awaiting permission] status badge in the spawn tree.")
 
+(defface konix/mcp-server-status-waiting-face
+  '((t :foreground "medium purple" :weight bold))
+  "Face for the [waiting] status badge in the spawn tree.
+Marks an agent blocked in a coordination wait tool.")
+
 (defface konix/mcp-server-status-dead-face
   '((t :inherit error :weight bold))
   "Face for the [dead] status badge in the spawn tree.")
@@ -690,11 +717,12 @@ SEEN is non-nil when the user has already seen the last completed turn."
   '((t :inherit shadow :slant italic))
   "Face for the \" - seen\" suffix appended to status labels.")
 
-(defcustom konix/mcp-server-seen-dim 50
-  "Percentage by which a seen agent's status color is desaturated.
-The hue is preserved; the color is merely dimmed."
-  :type 'number
-  :group 'konix-mcp)
+(defface konix/mcp-server-status-seen-bg-face
+  '((((background dark)) :background "#2d2d2d")
+    (((background light)) :background "#e8e8e8"))
+  "Background tint applied to a seen agent's whole spawn-tree line.
+Dims the line by recessing it, while the foreground keeps its full
+color and readability.")
 
 (defun konix/mcp-server--status-label (status-cons)
   "Return a short bracketed, propertized label for STATUS-CONS, a (STATUS . SEEN) cons."
@@ -703,6 +731,8 @@ The hue is preserved; the color is merely dimmed."
                   ('busy (propertize "[busy]" 'face 'konix/mcp-server-status-busy-face))
                   ('awaiting-permission
                    (propertize "[awaiting permission]" 'face 'konix/mcp-server-status-awaiting-permission-face))
+                  ('waiting
+                   (propertize "[waiting]" 'face 'konix/mcp-server-status-waiting-face))
                   ('dead (propertize "[dead]" 'face 'konix/mcp-server-status-dead-face))
                   (_ (propertize "[idle]" 'face 'konix/mcp-server-status-idle-face)))))
       (if seen
@@ -794,13 +824,15 @@ needs to be maintained up front."
          (rgb (color-hsl-to-rgb hue 0.65 lightness)))
     (apply #'color-rgb-to-hex (append rgb '(2)))))
 
-(defun konix/mcp-server--spawn-tree-line-string (buf &optional nodes coord-by-tag)
+(defun konix/mcp-server--spawn-tree-line-string (buf &optional nodes coord-by-tag rooms-by-buddy)
   "Return the propertized spawn-tree line string for agent-shell BUF.
-NODES and COORD-BY-TAG are as produced by
-`konix/mcp-server--collect-agent-nodes' and
-`konix/mcp-server--fetch-coord-by-session-tag'; when nil they are computed."
+NODES, COORD-BY-TAG and ROOMS-BY-BUDDY are as produced by
+`konix/mcp-server--collect-agent-nodes',
+`konix/mcp-server--fetch-coord-by-session-tag' and
+`konix/mcp-server--fetch-coord-rooms-by-buddy'; when nil they are computed."
   (let* ((nodes (or nodes (konix/mcp-server--collect-agent-nodes)))
          (coord-by-tag (or coord-by-tag (konix/mcp-server--fetch-coord-by-session-tag)))
+         (rooms-by-buddy (or rooms-by-buddy (konix/mcp-server--fetch-coord-rooms-by-buddy)))
          (node (cl-find buf nodes :key #'car))
          (agent (or (and node (nth 1 node))
                     (let ((tag (buffer-local-value
@@ -811,36 +843,45 @@ NODES and COORD-BY-TAG are as produced by
          (status-text (konix/mcp-server--status-label status-sym))
          (status-face (get-text-property 0 'face status-text))
          (line-face (if seen
-                        `(:slant italic
-                          :foreground ,(color-desaturate-name
-                                        (face-foreground status-face nil 'default)
-                                        konix/mcp-server-seen-dim))
+                        (list :slant 'italic
+                              :foreground (face-foreground status-face nil 'default))
                       status-face))
          (model-name (with-current-buffer buf (agent-shell--current-model-id (agent-shell--state))))
-         (model-color (let ((c (konix/mcp-server--model-color model-name)))
-                        (if seen (color-desaturate-name c konix/mcp-server-seen-dim) c)))
+         (model-color (konix/mcp-server--model-color model-name))
          (model-face (if seen (list :foreground model-color :slant 'italic)
                        (list :foreground model-color)))
          (name (or agent
                    (konix/agent-shell--local-session-label buf)
                    (buffer-name buf)))
+         (rooms (and agent (gethash agent rooms-by-buddy)))
+         (rooms-suffix
+          (if rooms
+              (format "  {%s}"
+                      (string-join (sort (copy-sequence rooms) #'string<) ","))
+            ""))
          (buffer-suffix (if agent (format "  (%s)" (buffer-name buf)) "")))
     ;; Assemble from independently-faced segments: the model carries its own
     ;; per-model color by construction, so there is no positional offset to
     ;; keep in sync with how the line is built.
     (cl-flet ((faced (s) (if line-face (propertize s 'face line-face) s)))
-      (concat (faced name)
-              (faced "  ")
-              (propertize model-name 'face model-face)
-              (faced buffer-suffix)
-              (faced "  ")
-              (faced status-text)))))
+      (let ((line (concat (faced name)
+                          (faced "  ")
+                          (propertize model-name 'face model-face)
+                          (faced buffer-suffix)
+                          (faced rooms-suffix)
+                          (faced "  ")
+                          status-text)))
+        (when seen
+          (add-face-text-property 0 (length line)
+                                  'konix/mcp-server-status-seen-bg-face
+                                  'append line))
+        line))))
 
-(defun konix/mcp-server--insert-spawn-tree-line (buf nodes coord-by-tag)
+(defun konix/mcp-server--insert-spawn-tree-line (buf nodes coord-by-tag rooms-by-buddy)
   "Insert one tree line for agent-shell BUF (no indent — caller wraps with
 `hierarchy-labelfn-indent').  Attach a `konix/shell-buffer' text property
 on the line so `k' and the caller-shell locator can find the buffer."
-  (let ((head (konix/mcp-server--spawn-tree-line-string buf nodes coord-by-tag)))
+  (let ((head (konix/mcp-server--spawn-tree-line-string buf nodes coord-by-tag rooms-by-buddy)))
     (insert head)
     (put-text-property (line-beginning-position) (point) 'konix/shell-buffer buf)
     (insert "\n")))
@@ -859,10 +900,11 @@ Set to nil to disable auto-refresh."
 point if possible."
   (let* ((nodes (konix/mcp-server--collect-agent-nodes))
          (coord-by-tag (konix/mcp-server--fetch-coord-by-session-tag))
+         (rooms-by-buddy (konix/mcp-server--fetch-coord-rooms-by-buddy))
          (h (hierarchy-new))
          (line-labelfn
           (lambda (b _indent)
-            (konix/mcp-server--insert-spawn-tree-line b nodes coord-by-tag)))
+            (konix/mcp-server--insert-spawn-tree-line b nodes coord-by-tag rooms-by-buddy)))
          (action-fn
           (lambda (b _indent)
             (let ((vp (and (bound-and-true-p agent-shell-prefer-viewport-interaction)

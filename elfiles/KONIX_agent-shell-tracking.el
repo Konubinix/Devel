@@ -38,13 +38,14 @@ viewport buffer instead if one exists."
   (if-let ((buffers (agent-shell-buffers)))
       (let* ((nodes (konix/mcp-server--collect-agent-nodes))
              (coord-by-tag (konix/mcp-server--fetch-coord-by-session-tag))
+             (rooms-by-buddy (konix/mcp-server--fetch-coord-rooms-by-buddy))
              (caller (konix/mcp-server--caller-shell-buffer))
              ;; For each shell buffer: its spawn-tree line and the buffer to
              ;; actually pop to (the viewport buffer when preferred).
              (entries
               (mapcar
                (lambda (buf)
-                 (list :line (konix/mcp-server--spawn-tree-line-string buf nodes coord-by-tag)
+                 (list :line (konix/mcp-server--spawn-tree-line-string buf nodes coord-by-tag rooms-by-buddy)
                        :shell buf
                        :pop (if agent-shell-prefer-viewport-interaction
                                 (or (agent-shell-viewport--buffer :shell-buffer buf :existing-only t)
@@ -73,6 +74,42 @@ viewport buffer instead if one exists."
 (defvar-local konix/agent-shell--seen nil
   "Non-nil when the user has seen the last completed turn without needing to act yet.
 Cleared automatically when a new turn completes.")
+
+(defvar-local konix/agent-shell--waiting-tool-id nil
+  "Tool-call-id of an in-flight coordination wait, or nil.
+Set while the agent is blocked in a `coord_wait'/`coord_ask_and_wait'
+MCP tool call so the spawn tree can show a distinct `waiting' status
+instead of the generic `busy'.")
+
+(defcustom konix/agent-shell-waiting-tool-regexp
+  (rx (or "coord_wait" "coord_ask_and_wait"))
+  "Regexp matching tool-call titles that mean the agent is blocked waiting.
+Matched case-insensitively against the ACP tool-call title, e.g.
+\"mcp__konix-coord__coord_wait\"."
+  :type 'regexp
+  :group 'konix)
+
+(defun konix/agent-shell--waiting-tool-p (title)
+  "Return non-nil when TITLE names a blocking coordination wait tool."
+  (and (stringp title)
+       (let ((case-fold-search t))
+         (string-match-p konix/agent-shell-waiting-tool-regexp title))))
+
+(defun konix/agent-shell--update-waiting-status (event)
+  "Update `konix/agent-shell--waiting-tool-id' from a `tool-call-update' EVENT.
+Set the flag when a coordination wait tool starts blocking, clear it
+once that same tool call finishes."
+  (let* ((data (map-elt event :data))
+         (tool-call-id (map-elt data :tool-call-id))
+         (tool-call (map-elt data :tool-call))
+         (title (map-elt tool-call :title))
+         (status (map-elt tool-call :status)))
+    (cond
+     ((member status '("completed" "failed"))
+      (when (equal tool-call-id konix/agent-shell--waiting-tool-id)
+        (setq konix/agent-shell--waiting-tool-id nil)))
+     ((konix/agent-shell--waiting-tool-p title)
+      (setq konix/agent-shell--waiting-tool-id tool-call-id)))))
 
 (defvar-local konix/agent-shell--background-launched nil
   "Non-nil when the agent launched a command in the background this turn.
@@ -199,6 +236,7 @@ notified of new agent activity."
            (with-current-buffer shell-buf
              (setq konix/agent-shell--seen nil)
              (when (eq (map-elt event :event) 'tool-call-update)
+               (konix/agent-shell--update-waiting-status event)
                (konix/agent-shell--update-background-status event)))))))
     ;; A new turn starts clean: clear the per-turn background flag whenever a
     ;; prompt is submitted (human or an autoresponse), so `@background' reacts
@@ -232,6 +270,7 @@ notified of new agent activity."
        (when (buffer-live-p shell-buf)
          (with-current-buffer shell-buf
            (setq konix/agent-shell--seen nil)
+           (setq konix/agent-shell--waiting-tool-id nil)
            (konix/agent-shell--auto-rename-from-title)))
        (when-let ((viewport-buffer (agent-shell-viewport--buffer
                                     :shell-buffer shell-buf

@@ -208,8 +208,7 @@ under agent-shell/."
 (add-hook 'agent-shell-viewport-view-mode-hook
           #'konix/agent-shell-viewport-view-mode-hook)
 
-(defun konix/agent-shell-viewport-edit-mode-hook ()
-  (orgalist-mode))
+(defun konix/agent-shell-viewport-edit-mode-hook ())
 
 (add-hook 'agent-shell-viewport-edit-mode-hook #'konix/agent-shell-viewport-edit-mode-hook)
 

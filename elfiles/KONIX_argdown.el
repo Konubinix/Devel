@@ -287,19 +287,71 @@ on the svg."
     (concat (konix/ipfa-buffer nil) suffix)))
 
 (defconst argdown--epistemic-tag-colors
-      '(("affirmation péremptoire" . "#d73027")
-        ("témoignage d'une partie" . "#fc8d59")
-        ("témoignage de tiers"     . "#fee08b")
-        ("présomption"             . "#d9ef8b")
-        ("constat"                 . "#91cf60")
-        ("acte authentique"        . "#1a9850"))
-      "House epistemic-strength scale for argument-map tags, weakest→strongest,
-    as a dialed-back red→green (RdYlGn) ramp.  A statement/argument tagged
+      '(;; GENERIC ladder of proof — by warrant TYPE, weakest→strongest.  Grounded
+        ;; in the zététique « échelle de la preuve » (Durand) and the AFIS
+        ;; « niveaux de preuve » (Caroti), themselves resting on Hume/Laplace and
+        ;; the GRADE evidence hierarchy — not invented here.
+        ("bare assertion"          . "#a50026")
+        ("interested testimony"    . "#d73027")
+        ("anecdote"                . "#f46d43")
+        ("received opinion"        . "#fdae61")
+        ("disinterested testimony" . "#fee08b")
+        ("expert judgment"         . "#d9ef8b")
+        ("convergent testimony"    . "#a6d96a")
+        ("documented observation"  . "#66bd63")
+        ("reproducible study"      . "#1a9850")
+        ("established consensus"   . "#006837")
+        ;; Evidence-LAW aliases — the same rungs in legal vocabulary, at the
+        ;; matching colour, so law reads as one INSTANTIATION of the generic
+        ;; ladder and existing legal notes keep rendering.  (présomption is
+        ;; legacy: a derivation, not a warrant — new notes let PCS propagation
+        ;; colour the conclusion instead of tagging it.)
+        ("affirmation péremptoire" . "#a50026")   ; = bare assertion
+        ("témoignage d'une partie" . "#d73027")   ; = interested testimony
+        ("témoignage de tiers"     . "#fee08b")   ; = disinterested testimony
+        ("présomption"             . "#a6d96a")   ; legacy (a derivation)
+        ("constat"                 . "#66bd63")   ; = documented observation
+        ("acte authentique"        . "#006837"))  ; = established consensus
+      "House epistemic-strength scale for argument-map tags, weakest→strongest, as
+    a dialed-back red→green (RdYlGn) ramp.  A statement/argument tagged
     `#(<level>)' takes that colour as its node border; the *pure* red/green are
     left to the relation edges (attack/support), so the tags use the muted RdYlGn
-    hues.  A cross-note convention — injected into *every* map by
-    `argdown--frontmatter', never redefined per note.  See the \"Epistemic nuance
-    scale\" section.")
+    hues.  The rungs are a GENERIC ladder of proof (by warrant type), so the scale
+    serves any domain; the legal terms are aliases mapping evidence-law's types
+    onto the same rungs/colours.  A cross-note convention — injected into *every*
+    map by `argdown--frontmatter', never redefined per note.  See the \"Epistemic
+    nuance scale\" section.")
+
+    (defconst argdown--epistemic-ramp
+      '("#a50026" "#d73027" "#f46d43" "#fdae61" "#fee08b"
+        "#d9ef8b" "#a6d96a" "#66bd63" "#1a9850" "#006837")
+      "The dialed-back red→green ramp, indexed by epistemic RANK 0 (weakest) → 9
+    (strongest) — the colour carrier for `argdown--epistemic-tag-rank' and for the
+    propagated conclusion/argument colours.  Pure #ff0000/#00ff00 stay reserved for
+    the relation edges, so these are the muted RdYlGn hues.")
+
+    (defconst argdown--epistemic-tag-rank
+      '(("bare assertion"          . 0)
+        ("interested testimony"    . 1)
+        ("anecdote"                . 2)
+        ("received opinion"        . 3)
+        ("disinterested testimony" . 4)
+        ("expert judgment"         . 5)
+        ("convergent testimony"    . 6)
+        ("documented observation"  . 7)
+        ("reproducible study"      . 8)
+        ("established consensus"   . 9)
+        ;; legal aliases → the rank of their generic rung
+        ("affirmation péremptoire" . 0)
+        ("témoignage d'une partie" . 1)
+        ("témoignage de tiers"     . 4)
+        ("présomption"             . 6)
+        ("constat"                 . 7)
+        ("acte authentique"        . 9))
+      "Tag → epistemic RANK (0–9) on `argdown--epistemic-ramp'; legal aliases share
+    their generic rung's rank.  Used by `argdown--strength-colors' to seed and
+    propagate weakest-link strength.  (`argdown--epistemic-tag-colors' is the same
+    mapping pre-resolved to colours, for the `tagColors' frontmatter.)")
 
     (defun argdown--yaml-key (s)
       "Quote S as a YAML mapping key.  Statement/argument titles carry spaces,
@@ -490,12 +542,13 @@ Chroma has no argdown lexer, so colorize with `argdown-mode' + htmlize.
   (advice-add 'org-hugo-src-block :around #'konix/ox-hugo-src-block--argdown))
 
 (defconst argdown--inference-force-ranks
-  '(("non sequitur" . 0) ("ténue" . 1) ("plausible" . 2)
-    ("solide" . 3) ("forte" . 4) ("déductive" . 5))
+  '(("non sequitur" . 0) ("ténue" . 2) ("plausible" . 4)
+    ("solide" . 6) ("forte" . 8) ("déductive" . 9))
   "How strongly the premises bring the conclusion — a scale for the *inference*
-(the `----'), independent of the premises' evidential weight, mapped onto the
-same 0–5 rank as `argdown--epistemic-tag-colors' so the two combine by weakest
-link.  Marked as inference data: `-- {force: \"<level>\"} --'.")
+(the `----'), independent of the premises' evidential weight, spread onto the
+same 0–9 rank as `argdown--epistemic-ramp' so the two combine by weakest link
+(`déductive' = 9 never caps a premise-driven rank; `non sequitur' = 0 collapses
+it).  Marked as inference data: `-- {force: \"<level>\"} --'.")
 
 (defun argdown--lighten (hex frac)
   "Blend HEX (\"#rrggbb\") toward white by FRAC (0.0–1.0).  For argument fills:
@@ -520,7 +573,7 @@ readable while still reading as the rank's hue."
 
 (defun argdown--strength (title tag-rank concludes memo inprog)
   "Propagated epistemic rank of statement TITLE — an index into
-`argdown--epistemic-tag-colors' (lower = weaker) — or nil if undetermined.
+`argdown--epistemic-ramp' (lower = weaker) — or nil if undetermined.
 An asserted tag wins; else the best (max) supporting argument's weakest (min)
 link — the links being the argument's premises AND its inference force.
 Recursive over chains, memoised in MEMO, cycle-guarded by INPROG.  CONCLUDES
@@ -563,8 +616,9 @@ argument's own weakest link)."
       (let* ((st (cdr s))
              (title (alist-get 'title st))
              (tags (alist-get 'tags st))
-             (rank (cl-position-if (lambda (tc) (member (car tc) tags))
-                                   argdown--epistemic-tag-colors)))
+             (rank (cl-some (lambda (tag)
+                              (cdr (assoc tag argdown--epistemic-tag-rank)))
+                            tags)))
         (when (and title rank) (puthash title rank tag-rank))))
     (dolist (a (alist-get 'arguments model))
       (let* ((arg (cdr a))
@@ -591,7 +645,7 @@ argument's own weakest link)."
                    (not (gethash title tag-rank)))
           (let ((rank (argdown--strength title tag-rank concludes memo inprog)))
             (when rank
-              (push (cons title (cdr (nth rank argdown--epistemic-tag-colors))) scolors))))))
+              (push (cons title (nth rank argdown--epistemic-ramp)) scolors))))))
     ;; argument fill colours — each argument's own weakest link, lightened
     (dolist (a args)
       (let ((atitle (nth 0 a)) (mn (nth 2 a)))   ; seed with inference rank
@@ -600,7 +654,7 @@ argument's own weakest link)."
             (when ps (setq mn (if mn (min mn ps) ps)))))
         (when mn
           (push (cons atitle (argdown--lighten
-                              (cdr (nth mn argdown--epistemic-tag-colors)) 0.7))
+                              (nth mn argdown--epistemic-ramp) 0.7))
                 acolors))))
     (cons scolors acolors)))
 

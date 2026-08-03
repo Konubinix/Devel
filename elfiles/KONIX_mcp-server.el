@@ -691,6 +691,9 @@ Each old_string should include enough context to be unique (e.g., a whole functi
      (konix/mcp-server-interrupt-agent
       :id "interrupt_buddy"
       :description "Interrupt a buddy mid-turn and ask it something, useful when you need a report from it urgently and cannot wait for the normal coord task cycle. Since this bypasses the task cycle, the buddy replies via coord_send_message to from-buddy (your coord name, which must already be registered); collect it with coord_wait/coord_get_messages.")
+     (konix/mcp-server-set-governing-note
+      :id "set_governing_note"
+      :description "Bind a governing note to YOUR session so you can later call spawn_auditor with no note path. Pass the absolute path to the org note whose principles govern this work. The MCP servers the note declares with #+MCP_SERVERS: are enabled for the session (and for its auditors). Use this ONLY when your session was NOT opened via an agent-shell-with-note link and has no note bound yet. This is write-once: if a note is already bound, the call errors — you must never change your own governing note, only the user may rebind it. When in doubt whether a note is already bound, just try spawn_auditor first; only reach for this if it errors that no note is bound.")
      (konix/mcp-server-set-label
       :id "set_label"
       :description "Set a short label on the calling agent-shell buffer (shell + viewport) that summarises the current session. Use this when the user asks you to label/rename your own buffer with a meaningful name — pick a 3-7 word descriptive label and call this tool. The label is incorporated into the buffer name via the user's format (typically appears as `A@<label>`). Pass an empty string to revert to the default project-based name. Only works while the calling agent-shell is mid-turn (which it normally is when you call any tool)."))

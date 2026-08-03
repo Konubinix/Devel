@@ -874,6 +874,30 @@ MCP Parameters:
           t
           respawn-threshold))))))
 
+(defun konix/mcp-server-set-governing-note (note-path)
+  "Bind NOTE-PATH as the CALLING session's governing note, once.
+
+Lets an agent that was NOT opened via an `agent-shell-with-note' org
+link adopt a governing note so it can later call `spawn_auditor' with no
+note path.  This is deliberately write-once: if a note is already bound
+to the session, the call errors — an agent must never re-point its own
+governing note; only the user may (via
+`konix/agent-shell-bind-governing-note').
+
+MCP Parameters:
+  note-path - Absolute path to the org note whose principles govern the session."
+  (mcp-server-lib-with-error-handling
+   (let ((shell (or konix/mcp-server--calling-buffer
+                    (error "Cannot identify the calling session; no agent-shell buffer is bound to this request")))
+         (note (expand-file-name (decode-coding-string note-path 'utf-8))))
+     (when-let ((existing (konix/agent-shell-governing-note shell)))
+       (error "A governing note is already bound to this session (%s); an agent may not change its own governing note — ask the user to rebind it"
+              existing))
+     (unless (file-readable-p note)
+       (error "Note file is not readable: %s" note))
+     (konix/agent-shell-set-governing-note shell note)
+     (format "Bound governing note: %s" note))))
+
 (defun konix/mcp-server--find-agent-buffer (agent-name)
   "Find the buffer for coordinated agent AGENT-NAME.
 Searches all buffers for one with a matching `konix/mcp-server--agent-name'."

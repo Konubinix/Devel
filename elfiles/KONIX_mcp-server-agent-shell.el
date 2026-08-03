@@ -1496,10 +1496,10 @@ seconds while displayed; press `g' to refresh manually."
 (defun konix/mcp-server-set-label (label)
   "Rename the calling agent-shell buffer (shell + viewport) to LABEL.
 
-The caller is identified as the unique `agent-shell-mode' buffer where
-`shell-maker-busy' returns non-nil — the agent is mid-turn while
-invoking this tool.  Errors when zero or multiple busy agent-shells
-are found.
+The caller is `konix/mcp-server--calling-buffer', bound by the dispatch
+advice from the request's own server-id tag, so the rename is
+unambiguous even with several agents mid-turn.  A legacy session with no
+caller tag falls back to the unique `shell-maker-busy' agent-shell.
 
 LABEL is incorporated into the buffer name via
 `agent-shell-buffer-name-format' (the user's format decides the final
@@ -1510,21 +1510,27 @@ MCP Parameters:
           the new buffer name.  Pass an empty string to revert to the
           default project-based name."
   (mcp-server-lib-with-error-handling
-   (unless (and (fboundp 'konix/agent-shell--apply-label-format)
-                (fboundp 'konix/agent-shell--rename-pair))
+   (unless (and (fboundp 'konix/agent-shell--rename-with-label)
+                (fboundp 'konix/agent-shell--append-claude-title))
      (error "konix agent-shell rename helpers not loaded"))
-   (let ((busy-shells (konix/mcp-server--busy-agent-shells)))
-     (cond
-      ((null busy-shells)
-       (error "No busy agent-shell buffer found (cannot identify caller)"))
-      ((cdr busy-shells)
-       (error "Ambiguous: %d busy agent-shell buffers; cannot identify caller"
-              (length busy-shells)))
-      (t
-       (let* ((shell (car busy-shells))
-              (formatted (konix/agent-shell--apply-label-format shell label)))
-         (konix/agent-shell--rename-pair shell formatted)
-         (format "Renamed agent-shell to %s" formatted)))))))
+   (let* ((label (decode-coding-string label 'utf-8))
+          (shell
+           (or (and (buffer-live-p konix/mcp-server--calling-buffer)
+                    konix/mcp-server--calling-buffer)
+               (let ((busy-shells (konix/mcp-server--busy-agent-shells)))
+                 (cond
+                  ((null busy-shells)
+                   (error "No busy agent-shell buffer found (cannot identify caller)"))
+                  ((cdr busy-shells)
+                   (error "Ambiguous: %d busy agent-shell buffers; cannot identify caller"
+                          (length busy-shells)))
+                  (t (car busy-shells))))))
+          (truncated (konix/agent-shell--rename-with-label shell label)))
+     (konix/agent-shell--append-claude-title
+      (with-current-buffer shell
+        (map-nested-elt (agent-shell--state) '(:session :id)))
+      truncated)
+     (format "Renamed agent-shell to %s" (buffer-name shell)))))
 
 (provide 'KONIX_mcp-server-agent-shell)
 ;;; KONIX_mcp-server-agent-shell.el ends here

@@ -663,42 +663,31 @@ Each TOOLS entry is (FUNCTION . PLIST); SERVER-ID must be one of
 
 ;;; Server start/stop
 
-(defvar konix/mcp-server--client-count 0
-  "Number of stdio bridges (emacs-mcp-stdio.sh processes) currently connected.
-Because the themed servers all share `mcp-server-lib's single global
-`mcp-server-lib--running' flag, each bridge runs `konix/mcp-server-start' on
-connect and `konix/mcp-server-stop' on disconnect.  We reference-count them
-so the flag is only flipped off once the *last* bridge is gone — otherwise
-one theme disconnecting would silently take down all the others.")
-
 (defun konix/mcp-server-start ()
-  "Start the KONIX MCP server (reference-counted across stdio bridges).
-Registers all themed tools (idempotent) and, on the first connecting
-bridge, actually starts the underlying mcp-server-lib server."
+  "Start the KONIX MCP server if not already running, re-registering tools.
+Left running for the whole Emacs session: bridges are usually signal-killed,
+so `konix/mcp-server-stop' cannot be relied on to fire on disconnect and a
+client count cannot be kept honest.  A long-lived shared server is harmless."
   (interactive)
   (konix/mcp-server-register-tools)
-  (cl-incf konix/mcp-server--client-count)
   (if mcp-server-lib--running
-      (message "KONIX MCP server already running (%d client(s), tools re-registered)"
-               konix/mcp-server--client-count)
+      (message "KONIX MCP server already running (tools re-registered)")
     (mcp-server-lib-start)
-    (message "KONIX MCP server started (%d client(s))"
-             konix/mcp-server--client-count)))
+    (message "KONIX MCP server started")))
 
 (defun konix/mcp-server-stop ()
-  "Stop the KONIX MCP server when the last stdio bridge disconnects.
-Decrements the bridge reference count and only calls `mcp-server-lib-stop'
-once it reaches zero, so a single theme disconnecting does not take the
-other themed servers down with it."
+  "Stop the shared KONIX MCP server, but only when invoked interactively.
+Bridges pass this as their `--stop-function'; since all themes share one
+server, honouring a bridge disconnect would take the others down too, so a
+non-interactive call is a no-op."
   (interactive)
-  (when (> konix/mcp-server--client-count 0)
-    (cl-decf konix/mcp-server--client-count))
-  (if (and (= konix/mcp-server--client-count 0) mcp-server-lib--running)
-      (progn
-        (mcp-server-lib-stop)
-        (message "KONIX MCP server stopped (last client disconnected)"))
-    (message "KONIX MCP server still running (%d client(s) remaining)"
-             konix/mcp-server--client-count)))
+  (if (called-interactively-p 'interactive)
+      (if mcp-server-lib--running
+          (progn
+            (mcp-server-lib-stop)
+            (message "KONIX MCP server stopped"))
+        (message "KONIX MCP server is not running"))
+    (message "KONIX MCP server left running (bridge disconnect ignored)")))
 
 (provide 'KONIX_mcp-server)
 ;;; KONIX_mcp-server.el ends here

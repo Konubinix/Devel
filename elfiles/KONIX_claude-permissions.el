@@ -335,10 +335,19 @@ are discarded, and `skip' entries are left in the local file."
            (shared-file (expand-file-name "settings.json" claude-dir))
            (local (konix/claude--read-settings local-file))
            (shared (konix/claude--read-settings shared-file))
-           (shared-allow (alist-get 'allow (alist-get 'permissions shared))))
+           (shared-allow (alist-get 'allow (alist-get 'permissions shared)))
+           (keep (nreverse keep))
+           (already (seq-filter (lambda (perm) (member perm shared-allow)) keep)))
+      (when already
+        (display-warning
+         'konix/claude-triage
+         (format "%s already contains %d kept permission(s): %s"
+                 shared-file (length already)
+                 (mapconcat #'identity already ", "))
+         :warning))
       (konix/claude--write-settings
        shared-file
-       (konix/claude--set-allow shared (append shared-allow (nreverse keep))))
+       (konix/claude--set-allow shared (append shared-allow keep)))
       (konix/claude--write-settings
        local-file
        (konix/claude--set-allow local (nreverse skip))))

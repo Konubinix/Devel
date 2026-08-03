@@ -137,6 +137,37 @@
     )
   )
 
+(defun konix/org-gcal-rename ()
+  (interactive)
+  (let* (
+         (info (konix/org-gcal-get-info))
+         (new_name (read-string "New name: "))
+         (id (plist-get info :id))
+         (account (plist-get info :account))
+         (calendar_id (plist-get info :calendar_id)))
+    (shell-command
+     (format
+      "clk gcal -a \"%s\" select-calendar %s"
+      account
+      calendar_id
+      )
+     )
+    (when (equal 0
+                 (konix/call-process-show-error
+                  "clk" "gcal"
+                  "-a"
+                  account
+                  "run"
+                  "update_event"
+                  (format "\"%s\" \"%s\"" id new_name)
+                  )
+                 )
+      (unless current-prefix-arg
+        (error "TODO: implement renaming in org as well")
+        )
+      (message "DONE")
+      )))
+
 
 (defun konix/org-gcal-decline ()
   (interactive)

@@ -125,3 +125,4 @@
 /environment.d
 /systemd/user/tray.target
 /sunshine
+/git/gitk

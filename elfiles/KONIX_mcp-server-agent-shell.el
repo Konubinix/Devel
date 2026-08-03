@@ -1300,6 +1300,10 @@ default project-based name."
     (define-key m (kbd "k")         #'konix/mcp-server-kill-agent-subtree)
     (define-key m (kbd "o")         #'konix/mcp-server-spawn-tree-show-in-other-window)
     (define-key m (kbd "r")         #'konix/mcp-server-spawn-tree-rename)
+    (define-key m (kbd "U")         #'konix/claude-code-usage)
+    ;; Stores an `agent-shell-tree' link to all top-level sessions, via the
+    ;; `:store' handler in KONIX_agent-shell-org-links.el.
+    (define-key m (kbd "l")         #'org-store-link)
     m)
   "Keymap for `konix/mcp-server-spawn-tree-mode'.")
 

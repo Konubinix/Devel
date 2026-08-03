@@ -23,7 +23,10 @@
 
 ;;; Code:
 
+(require 'map)
+(require 'seq)
 (require 'KONIX_agent-shell-common)
+(require 'KONIX_agent-shell-permissions)
 
 (defun konix/org-agent-shell--find-shell (session-id)
   "Return the live shell buffer whose session is SESSION-ID, or nil."
@@ -43,6 +46,20 @@ buffer with the location of the org link being followed."
       (agent-shell-viewport--show-buffer :shell-buffer shell :append "")
     (pop-to-buffer shell)))
 
+(defun konix/org-agent-shell--session-spec (shell)
+  "Return SHELL's link spec \"SESSION-ID?cwd=DIR\", or nil without a session id."
+  (with-current-buffer shell
+    (let ((session-id (map-nested-elt (agent-shell--state) '(:session :id))))
+      (when (and session-id (not (string-empty-p session-id)))
+        (format "%s?cwd=%s"
+                session-id
+                (agent-shell--resolve-path (agent-shell-cwd)))))))
+
+(defun konix/org-agent-shell--shell-label (shell)
+  "Return SHELL's session label, falling back to its buffer name."
+  (or (konix/agent-shell--local-session-label shell)
+      (buffer-name shell)))
+
 (defun konix/org-agent-shell-store-link (&optional _interactive)
   "Store an org link to the current agent-shell session.
 Return nil outside agent-shell shell/viewport buffers so other link
@@ -52,22 +69,17 @@ when available, else the shell buffer name."
                         'agent-shell-viewport-view-mode
                         'agent-shell-viewport-edit-mode)
     (let* ((shell (konix/agent-shell--current-shell-or-error))
-           (session-id (with-current-buffer shell
-                         (map-nested-elt (agent-shell--state)
-                                         '(:session :id))))
+           (spec (konix/org-agent-shell--session-spec shell))
            (line (string-trim
                   (buffer-substring-no-properties
                    (line-beginning-position) (line-end-position))))
-           (label (or (konix/agent-shell--local-session-label shell)
-                      (buffer-name shell))))
-      (when (or (not session-id) (string-empty-p session-id))
+           (label (konix/org-agent-shell--shell-label shell)))
+      (unless spec
         (user-error "No session id yet, cannot store an agent-shell link"))
       (org-link-store-props
        :type "agent-shell"
-       :link (format "agent-shell:%s?cwd=%s&line=%s"
-                     session-id
-                     (with-current-buffer shell
-                       (agent-shell--resolve-path (agent-shell-cwd)))
+       :link (format "agent-shell:%s&line=%s"
+                     spec
                      (url-hexify-string line))
        :description (if (string-empty-p line)
                         label
@@ -86,21 +98,22 @@ Search from the buffer start; do nothing when LINE is nil or absent."
         (when-let ((window (get-buffer-window shell t)))
           (set-window-point window pos))))))
 
-(defun konix/org-agent-shell-follow-link (link &optional _arg)
-  "Open an agent-shell session LINK (\"SESSION-ID?cwd=DIR&line=CONTENT\").
+(defun konix/org-agent-shell--open-session (spec)
+  "Open the session SPEC (\"SESSION-ID?cwd=DIR[&line=CONTENT]\").
 Pop to the live shell running that session if one exists; otherwise
 resume the session — from its stored cwd, replaying its persisted
 model like `konix/agent-shell-resume' — and pop to the result.
-When LINK carries a line, move point to the first line whose content
-matches it."
-  (pcase-let* ((`(,session-id ,rest) (split-string link "\\?cwd="))
+When SPEC carries a line, move point to the first line whose content
+matches it.  Return the shell buffer."
+  (pcase-let* ((`(,session-id ,rest) (split-string spec "\\?cwd="))
                (`(,cwd ,line) (split-string (or rest "") "&line="))
                (line (and line (not (string-empty-p line))
                           (url-unhex-string line))))
     (if-let ((shell (konix/org-agent-shell--find-shell session-id)))
         (progn
           (konix/org-agent-shell--pop-to-shell shell)
-          (konix/org-agent-shell--goto-line-content shell line))
+          (konix/org-agent-shell--goto-line-content shell line)
+          shell)
       (let* ((default-directory (or cwd default-directory))
              (shell (agent-shell--start
                      :config (map-insert
@@ -115,7 +128,46 @@ matches it."
                      :session-id session-id
                      :new-session t
                      :no-focus t)))
-        (konix/org-agent-shell--pop-to-shell shell)))))
+        (konix/org-agent-shell--pop-to-shell shell)
+        shell))))
+
+(defun konix/org-agent-shell-follow-link (link &optional _arg)
+  "Open an agent-shell session LINK (\"SESSION-ID?cwd=DIR&line=CONTENT\").
+See `konix/org-agent-shell--open-session' for the exact behavior."
+  (konix/org-agent-shell--open-session link))
+
+(declare-function konix/mcp-server--agent-parent "KONIX_mcp-server-agent-shell")
+
+(defun konix/org-agent-shell--top-level-shells ()
+  "Return the agent-shell buffers that have no agent-shell parent."
+  (seq-remove #'konix/mcp-server--agent-parent (agent-shell-buffers)))
+
+(defun konix/org-agent-shell-tree-store-link (&optional _interactive)
+  "Store an org link to every top-level agent-shell session.
+Only fires in the spawn-tree buffer (see
+`konix/mcp-server-show-spawn-tree'), so other link types get a chance
+elsewhere.  Top-level sessions without a session id yet are skipped.
+Following the stored link reopens all the stored sessions (see
+`konix/org-agent-shell-tree-follow-link')."
+  (when (derived-mode-p 'konix/mcp-server-spawn-tree-mode)
+    (let ((shells (seq-filter #'konix/org-agent-shell--session-spec
+                              (konix/org-agent-shell--top-level-shells))))
+      (unless shells
+        (user-error "No top-level agent-shell session with a session id"))
+      (org-link-store-props
+       :type "agent-shell-tree"
+       :link (concat "agent-shell-tree:"
+                     (mapconcat #'konix/org-agent-shell--session-spec shells ";"))
+       :description (mapconcat #'konix/org-agent-shell--shell-label shells ", ")))))
+
+(defun konix/org-agent-shell-tree-follow-link (link &optional _arg)
+  "Open every session of the agent-shell-tree LINK (\";\"-separated specs).
+Each session is opened like an agent-shell link — popping to the live
+shell when one exists, resuming the session otherwise (see
+`konix/org-agent-shell--open-session') — so following the link brings
+the whole stored set back.  Point ends in the last stored session."
+  (dolist (spec (split-string link ";" t))
+    (konix/org-agent-shell--open-session spec)))
 
 (declare-function konix/mcp-server-render-note "KONIX_mcp-server-agent-shell")
 (declare-function agent-shell--insert-to-shell-buffer "agent-shell")
@@ -175,7 +227,11 @@ When spawning an audit buddy, call spawn_auditor.%s"
    :follow #'konix/org-agent-shell-follow-link)
   (org-link-set-parameters
    "agent-shell-with-note"
-   :follow #'konix/org-agent-shell-with-note-follow-link))
+   :follow #'konix/org-agent-shell-with-note-follow-link)
+  (org-link-set-parameters
+   "agent-shell-tree"
+   :store #'konix/org-agent-shell-tree-store-link
+   :follow #'konix/org-agent-shell-tree-follow-link))
 
 (provide 'KONIX_agent-shell-org-links)
 ;;; KONIX_agent-shell-org-links.el ends here

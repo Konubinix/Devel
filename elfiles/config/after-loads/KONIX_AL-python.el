@@ -41,6 +41,8 @@
                                           (buffer-file-name)))
   )
 
+(defun konix/python-mode-hook ())
+
 (defun konix/python-mode-hook ()
   (setq tab-width 4)
   (when (konix/python-is-tiltfile)

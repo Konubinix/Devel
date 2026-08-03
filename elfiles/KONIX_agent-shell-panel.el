@@ -43,7 +43,8 @@
   "One on/off column of a panel.
 HEADER is the column title; KEY the `kbd' string toggling it on the row at
 point; MEMBER-P a predicate (id -> bool) and TOGGLE a function (id -> any),
-both run in the origin buffer; WIDTH the column width."
+both run in the origin buffer; WIDTH the column width.  KEY and TOGGLE may
+be nil for a read-only column."
   header key member-p toggle (width 9))
 
 (cl-defstruct (konix/agent-shell-panel
@@ -154,10 +155,12 @@ Per-panel axis and extra keys are layered on top in
       (let ((map (make-sparse-keymap)))
         (set-keymap-parent map konix/agent-shell-panel-mode-map)
         (dolist (ax (konix/agent-shell-panel-axes spec))
-          (define-key map (kbd (konix/agent-shell-panel-axis-key ax))
-                      (let ((axis ax))
-                        (lambda () (interactive)
-                          (konix/agent-shell-panel--toggle-axis axis)))))
+          (when (and (konix/agent-shell-panel-axis-key ax)
+                     (konix/agent-shell-panel-axis-toggle ax))
+            (define-key map (kbd (konix/agent-shell-panel-axis-key ax))
+                        (let ((axis ax))
+                          (lambda () (interactive)
+                            (konix/agent-shell-panel--toggle-axis axis))))))
         (dolist (binding (konix/agent-shell-panel-extra-keys spec))
           (define-key map (kbd (car binding)) (cdr binding)))
         (use-local-map map))

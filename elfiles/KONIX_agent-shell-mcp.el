@@ -266,22 +266,6 @@ is enabled, preserving the original key hints."
 (advice-add 'agent-shell--make-header :filter-args
             #'konix/agent-shell--make-header-mcp-bindings)
 
-(defun konix/agent-shell-mcp--toggle-session (name)
-  "Flip MCP server NAME in the current agent-shell session only.
-The control-panel primitive behind the \"Session\" column: it mutates the
-session's buffer-local `agent-shell-mcp-servers' and nothing else.  Nothing
-is persisted, so the change touches neither the global baseline nor any file,
-affects only this session, and is gone at the next Emacs launch.  Reload the
-session (`agent-shell-reload') if it needs to take effect mid-conversation."
-  (with-current-buffer (konix/agent-shell--current-shell-or-error)
-    (let* ((names (delq nil (mapcar (lambda (server) (alist-get 'name server))
-                                    agent-shell-mcp-servers)))
-           (new (if (member name names)
-                    (delete name names)
-                  (append names (list name)))))
-      (setq-local agent-shell-mcp-servers
-                  (konix/agent-shell-mcp-servers-for new)))))
-
 (defun konix/agent-shell-mcp--project-dir-locals-file ()
   "Return the project `.dir-locals.el' path relevant to the current buffer.
 Walks up from `default-directory' to an existing `.dir-locals.el', else to the
@@ -395,7 +379,8 @@ copy it to the kill ring."
 ;; A `konix/agent-shell-panel' matrix of every registry server against the
 ;; Global baseline (`konix/agent-shell-mcp-enabled-servers'), the persisted
 ;; Project (`.dir-locals.el') and the live Session (the origin shell's
-;; buffer-local `agent-shell-mcp-servers').  `G'/`p'/`s' flip each axis.
+;; buffer-local `agent-shell-mcp-servers').  `G'/`p' flip the first two;
+;; Session is read-only, derived from global + project + governing note.
 
 (defun konix/agent-shell-mcp--toggle-global (name)
   "Flip MCP server NAME in the global baseline.
@@ -414,7 +399,7 @@ Not persisted -- set the variable in your init or via Customize for that."
   (konix/agent-shell-panel-create
    :buffer-name "*MCP servers*"
    :mode-name "MCP-Servers"
-   :help "MCP servers: G global, p project, s session, g refresh, q quit"
+   :help "MCP servers: G global, p project, g refresh, q quit (Session is read-only)"
    :name-header "Server"
    :name-width 24
    :rows (lambda () (mapcar #'car konix/agent-shell-mcp-server-registry))
@@ -432,17 +417,16 @@ Not persisted -- set the variable in your init or via Customize for that."
                                (konix/agent-shell-mcp--project-dir-locals-file))))
      :toggle #'konix/agent-shell-mcp--toggle-project)
     (konix/agent-shell-panel-axis-create
-     :header "Session" :key "s"
+     :header "Session"
      :member-p (lambda (name)
                  (member name (ignore-errors
-                                (konix/agent-shell-mcp-session-server-names))))
-     :toggle #'konix/agent-shell-mcp--toggle-session))))
+                                (konix/agent-shell-mcp-session-server-names))))))))
 
 (defun konix/agent-shell/mcp-servers-menu ()
-  "Open the MCP server control panel (Global/Project/Session toggles).
+  "Open the MCP server control panel.
 `G' toggles the global baseline (running Emacs), `p' the project's
-`.dir-locals.el' (persistent, future sessions), `s' the live session
-\(ephemeral)."
+`.dir-locals.el' (persistent, future sessions).  The Session column is
+read-only: it reflects global + project + governing-note state."
   (interactive)
   (konix/agent-shell-panel-open (konix/agent-shell-mcp--panel)))
 

@@ -913,11 +913,17 @@ Searches all buffers for one with a matching `konix/mcp-server--agent-name'."
   (let ((agent (buffer-local-value 'konix/mcp-server--agent-name buffer)))
     (kill-buffer buffer)
     (when agent
-      (ignore-errors
-        (plz 'delete (format "%s/coord/buddies/%s"
-                             konix/mcp-server-coord-url
-                             (url-hexify-string agent))
-          :timeout 5)))))
+      ;; Never let a coord server that is down or slow block a kill, but say so:
+      ;; a deregistration lost here leaves a ghost that makes coord_ask_and_wait
+      ;; skip its come-online check and block on a buddy that is gone.
+      (condition-case err
+          (plz 'delete (format "%s/coord/buddies/%s"
+                               konix/mcp-server-coord-url
+                               (url-hexify-string agent))
+            :timeout 5)
+        (error
+         (message "konix/mcp-server: could not deregister buddy '%s' (%s); it may linger as a ghost registration"
+                  agent (error-message-string err)))))))
 
 (defun konix/mcp-server--kill-buffers (buffers)
   "Kill each agent-shell buffer in BUFFERS and refresh the *Spawn Tree* view.

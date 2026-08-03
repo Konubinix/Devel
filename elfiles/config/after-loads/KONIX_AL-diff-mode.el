@@ -71,6 +71,36 @@ Point is at the beginning of the block start match (diff or @@)."
 (keymap-set diff-mode-map "RET" 'diff-goto-source)
 (keymap-set diff-mode-map "C-k" 'diff-hunk-kill)
 
+(defun konix/diff/reveal-point-after-kill (&rest _)
+  "Reveal the folded block that ends up containing point.
+After killing a hunk, `diff-hunk-kill' moves point to the next
+hunk, which may be hidden inside a folded file block.  Peel every
+hideshow overlay covering point so that location becomes visible
+\(looping because `hs-allow-nesting' allows nested folds)."
+  (when (bound-and-true-p hs-minor-mode)
+    (let ((guard 20) ov)
+      (while (and (> guard 0)
+                  (setq ov (hs-overlay-at (point))))
+        (setq guard (1- guard))
+        (delete-overlay ov)))))
+
+(advice-add 'diff-hunk-kill :after #'konix/diff/reveal-point-after-kill)
+
+(defun konix/diff-hunk-kill/around (orig-fun &rest args)
+  "Kill the whole file when point's hunk is its file's only hunk.
+Otherwise behave like `diff-hunk-kill'.  This avoids leaving an
+empty file header behind after killing a file's last hunk."
+  (if (save-excursion
+        (ignore-errors
+          (pcase-let ((`(,beg ,end) (diff-bounds-of-file)))
+            (goto-char beg)
+            (and (re-search-forward diff-hunk-header-re end t)
+                 (not (re-search-forward diff-hunk-header-re end t))))))
+      (diff-file-kill)
+    (apply orig-fun args)))
+
+(advice-add 'diff-hunk-kill :around #'konix/diff-hunk-kill/around)
+
 (defun konix/outline-level/around (orig-fun)
   (or
    (and
@@ -131,6 +161,8 @@ Point is at the beginning of the block start match (diff or @@)."
   (keymap-local-set "M-/" 'dabbrev-expand)
   (keymap-local-set "C-z" 'diff-undo)
   (auto-fill-mode 1)
+  ;; diff hunk bounds detection rely on newline of hunks being only one space lines
+  (setq konix/delete-trailing-whitespace nil)
   ;; hs-grok-mode-type requires comment-start and comment-end to be set
   (setq-local comment-start "#")
   (setq-local comment-end "")

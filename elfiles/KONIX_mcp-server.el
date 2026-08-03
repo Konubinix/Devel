@@ -680,7 +680,7 @@ Each old_string should include enough context to be unique (e.g., a whole functi
       :description "Spawn a new buddy that automatically registers with the coordination system and enters a wait loop for tasks. Use this when you want to delegate work to a buddy: call this tool, then use coord_post_task or coord_ask_and_wait to send it instructions. The spawned buddy will execute tasks and report results via coord_complete_task. This is the preferred way to run something 'in a new buddy'. IMPORTANT: When the buddy's goal is accomplished, you MUST call kill_buddy to clean it up.")
      (konix/mcp-server-render-note
       :id "render_note"
-      :description "Return a note's full text, with any shared content it references pulled in inline (e.g. principles defined in another note). Pass the note's path. Use this to read a note completely — a plain file read can show only a reference, not the referenced text. Read fresh from disk on each call."
+      :description "Return a note's content as clean, readable prose, with any shared content it references pulled in inline (e.g. principles defined in another note). Org internals (headings markup, property drawers, #+ keywords) are exported away, leaving only the substance. Pass the note's path. Use this to read a note completely — a plain file read can show only a reference, not the referenced text, and leaves org bookkeeping in your context. Read fresh from disk on each call."
       :read-only t)
      (konix/mcp-server-spawn-auditor
       :id "spawn_auditor"

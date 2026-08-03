@@ -722,13 +722,23 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
      (split-string (buffer-substring-no-properties (point-min) (point-max)) "\n"))
     "\n")))
 
+(defun konix/mcp-server--note-substance (org-text)
+  "Return ORG-TEXT ASCII-exported, dropping the org front-matter metadata.
+Headings markup, property drawers, `#+' keywords and other org bookkeeping
+are rendered away, leaving only the readable content — so an agent handed the
+result never has to wade through org internals."
+  (require 'ox-ascii)
+  (string-trim
+   (org-export-string-as org-text 'ascii t '(:ascii-charset utf-8))))
+
 (defun konix/mcp-server-render-note (note-path)
-  "Return NOTE-PATH's text with every #+transclude resolved — the whole note.
+  "Return NOTE-PATH rendered to clean prose with every #+transclude resolved.
 Each `#+transclude:' directive is materialised with org-transclusion (relative
 `file:' links resolved against the note's own directory), pulling the canonical
-content it references — e.g. shared principles — inline where it sits, prose and
-diagram SOURCE intact.  The directive lines are dropped, leaving the pulled-in
-content.  A note with no transclusions returns itself.  Read fresh on each call.
+content it references — e.g. shared principles — inline where it sits.  The
+result is then ASCII-exported with `konix/mcp-server--note-substance', so what
+comes back is the note's substance only: no headings markup, property drawers
+or `#+' keywords to pollute an agent's context.  Read fresh on each call.
 
 MCP Parameters:
   note-path - Absolute path of the note to render."
@@ -742,13 +752,14 @@ MCP Parameters:
        (insert-file-contents note-path)
        (setq default-directory (file-name-directory note-path))
        (org-mode)
-       (konix/mcp-server--resolve-transclusions)))))
+       (konix/mcp-server--note-substance
+        (konix/mcp-server--resolve-transclusions))))))
 
 (defun konix/mcp-server--build-auditor-prompt (principles buddy-name)
   "Return the baked AUDIT-buddy prompt: PRINCIPLES inlined, serve as BUDDY-NAME.
-PRINCIPLES is the governing note's text with its transclusions already
-resolved, written straight into the prompt so the auditor boots holding the
-rules with nothing to fetch."
+PRINCIPLES is the governing note's substance — transclusions already resolved
+and exported to prose by `konix/mcp-server-render-note' — written straight into
+the prompt so the auditor boots holding the rules with nothing to fetch."
   (format "You are an AUDIT buddy. You READ and JUDGE; you do NOT edit any file, ever.
 
 The principles you audit against are below. Hold them. Audit every draft against them; do NOT audit from memory of what they \"probably\" said.

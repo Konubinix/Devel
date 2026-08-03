@@ -63,126 +63,6 @@ tangle/build it (see argdown_in_org_mode.org)")))
     (with-temp-file in (insert body))
     (funcall fn (expand-file-name in))))
 
-(defconst argdown--iframe-reset-style
-  "<style>html,body{margin:0;padding:0;height:100%}.argdown-figure{margin:0;height:100%}argdown-map{display:block;height:100%}svg a[*|href]{cursor:pointer}svg a[*|href] text[font-weight=\"bold\"]{fill:#1a73e8;text-decoration:underline}</style>"
-  "Strip the iframe's default body margin and let Argdown's web-component
-fill the fixed viewport (its toolbar — zoom-lock, fullscreen, source toggle —
-is the component's own).  The rest is the *link affordance*: the component
-draws every node alike, so a node we made clickable (its `<a>' got an injected
-`xlink:href') is otherwise indistinguishable.  We mark it — the bold title
-line turns blue + underlined, the cursor a pointer — by styling `a[*|href]'
-(the `*|' matches the namespaced `xlink:href'); plain nodes and edge anchors
-have no href and stay untouched.  This document-level CSS reaches the SVG even
-though it is *slotted* light-DOM inside the component (slotted content is
-styled by the host document, not the shadow tree).")
-
-(defconst argdown--iframe-click-guard
-  ;; concat + \n: short source lines, and a multi-line script in the emitted
-  ;; #+RESULTS rather than one giant line.
-  (concat
-   "<script>\n"
-   "(function(){\n"
-   "  var sx=null, sy=null, moved=false;\n"
-   "  addEventListener('pointerdown', function(e){ sx=e.clientX; sy=e.clientY; moved=false; }, true);\n"
-   "  addEventListener('pointermove', function(e){\n"
-   "    if(sx!==null && Math.hypot(e.clientX-sx, e.clientY-sy) > 6) moved=true; }, true);\n"
-   "  addEventListener('click', function(e){\n"
-   "    if(moved){ e.preventDefault(); e.stopPropagation(); moved=false; } }, true);\n"
-   "})();\n"
-   "</script>")
-  "The one bit of behaviour we add to the web-component: cancel the click that
-*ends a drag*.  Argdown's component pans the map on pointer-drag but doesn't
-suppress the trailing `click', so releasing a pan over a source node fired its
-link — opening Légifrance mid-pan.  This capture-phase guard remembers whether
-the pointer moved past ~6px between `pointerdown' and `click'; if so it
-`preventDefault'+`stopPropagation's the click (no navigation) — a still click
-passes through and follows the link.  Capture phase + a window listener run
-before the component's own handlers, so it works without touching the
-component.  It is NOT a pan/zoom reimplementation — the component still does
-all the panning and zooming; we only veto the spurious end-of-drag click.")
-
-(defconst argdown--open-in-tab
-  ;; concat + \n: short source lines, and a readable multi-line script in the
-  ;; emitted #+RESULTS rather than one giant line.
-  (concat
-   "<button id=\"argdown-open-tab\" title=\"open this map in a new tab\""
-   " style=\"position:fixed;top:8px;right:8px;z-index:2147483647;"
-   "font:13px/1 sans-serif;padding:6px 9px;border:1px solid #ccc;border-radius:6px;"
-   "background:#fff;color:#1a73e8;cursor:pointer;display:none\">"
-   "⛶ open in new tab</button>\n"
-   "<script>\n"
-   "(function(){\n"
-   "  var b=document.getElementById('argdown-open-tab');\n"
-   "  if(!b) return;\n"
-   "  if(window.top===window.self){ b.remove(); return; }\n"
-   "  b.style.display='block';\n"
-   "  b.addEventListener('click', function(){\n"
-   "    var html='<!DOCTYPE html>\\n'+document.documentElement.outerHTML;\n"
-   "    var url=URL.createObjectURL(new Blob([html],{type:'text/html'}));\n"
-   "    window.open(url,'_blank');\n"
-   "  });\n"
-   "})();\n"
-   "</script>")
-  "An *open-in-tab* button for the publish iframe.  The web-component's own
-fullscreen button is not always a real fullscreen: depending on the browser and
-the embedding page's permissions policy it only fills the 70vh `srcdoc' *stage*,
-not the screen — so there is no fullscreen view.  This button is the way out: on
-click it serialises the iframe's *own* document to a `blob:' URL and opens it as
-a top-level tab, where the map fills the whole viewport (and the component's
-fullscreen then works against the full screen).  The publish path has no
-standalone URL — the map lives only inside `srcdoc' — so re-serialising the live
-document is the only handle we have.  Guarded on `window.top !== window.self': it
-shows only when framed, and removes itself in the resulting top-level tab (and in
-`konix/argdown-preview', already top-level), so it never clutters a full view.")
-
-(defun argdown--srcdoc-escape (html)
-  "Escape HTML for a double-quoted `srcdoc' attribute value.
-Escape `&', `<', `>', `\"' and `=' (escape `&' first) — the browser peels
-off exactly one layer before parsing the value as a document, so inner
-entities like `&#39;' survive and the tags come back intact.  `<'/`>' must
-go too: leaving them raw lets Hugo's link rewriter find tags *inside* the
-attribute and corrupt them.  And `=' must go because that rewriter is a
-blunt `s|href=|target=\"_blank\" href=|' sed: the web-component pulls a CDN
-`<link href=…>' stylesheet, and even with the `<' escaped the literal text
-`href=' is still there for the sed to match — injecting raw quotes that
-truncate the srcdoc.  Encoding every `=' as `&#61;' leaves nothing for it
-to match; the browser decodes `&#61;'→`=' in the same single pass.  Runs of
-blank lines are collapsed to a single newline (a blank line ends a Goldmark
-type-6 HTML block); real newlines stay, so the emitted attribute is readable
-in the org source rather than one giant line."
-  (let* ((s (replace-regexp-in-string "&" "&amp;" html t t))
-         (s (replace-regexp-in-string "<" "&lt;" s t t))
-         (s (replace-regexp-in-string ">" "&gt;" s t t))
-         (s (replace-regexp-in-string "\"" "&quot;" s t t))
-         (s (replace-regexp-in-string "=" "&#61;" s t t))
-         (s (replace-regexp-in-string "\n\\(?:[ \t]*\n\\)+" "\n" s)))
-    s))
-
-(defun argdown--document (content-html)
-  "Wrap CONTENT-HTML in a standalone HTML document.
-This is the single source of truth for both destinations: the publish path
-embeds it in the iframe (`argdown--iframe-wrap'), and `konix/argdown-preview'
-opens it in a browser — so the preview is faithful by construction.  CONTENT
-is Argdown's web-component (it carries its own CDN css/js and toolbar); the
-document adds a margin reset + link affordance (`argdown--iframe-reset-style')
-and the end-of-drag click guard (`argdown--iframe-click-guard'), plus the
-framed-only open-in-tab escape hatch (`argdown--open-in-tab').  Newlines
-between parts keep the embedded form readable in the org source."
-  (concat "<!DOCTYPE html>\n<html><head><meta charset=\"utf-8\">\n"
-          argdown--iframe-reset-style "\n</head>\n<body>\n"
-          content-html "\n" argdown--iframe-click-guard
-          "\n" argdown--open-in-tab
-          "\n</body></html>"))
-
-(defun argdown--iframe-wrap (content-html)
-  "Wrap CONTENT-HTML in a srcdoc iframe (the publish path), entity-escaping
-`argdown--document' so it survives Goldmark and the link rewriter (see
-`argdown-helpers' narrative).  `allowfullscreen' lets the web-component's
-fullscreen button expand the map out of its 70vh stage."
-  (format
-   "<iframe class=\"argdown-frame\" allowfullscreen style=\"width:100%%;height:70vh;min-height:320px;border:0\" srcdoc=\"%s\"></iframe>"
-   (argdown--srcdoc-escape (argdown--document content-html))))
-
 (defun argdown--run (cmd)
   "Run argdown shell CMD, returning stdout.  On a non-zero exit or empty
 output, signal an error carrying argdown's OWN diagnostics — stderr, or a
@@ -215,48 +95,15 @@ fail with a cryptic \"End of file while parsing JSON\"."
    (format "argdown map -f %s --stdout --silent %s"
            (shell-quote-argument fmt) (shell-quote-argument in))))
 
-(defun argdown--map-svg (in)
-  "Return Argdown's own SVG map of INPUT file with a clickable source link
-injected into each node that cites one (matched by `xlink:title' against the
-`argdown json' link model — see `argdown--inject-links').  We ride Argdown's
-renderer — its layout, argument→conclusion edges, styling — and only splice
-in the href.  The `<?xml?>'/doctype prolog is stripped so the SVG embeds in
-an HTML body."
-  (let* ((raw (argdown--stdout "svg" in))
-         (svg (if (string-match "<svg" raw) (substring raw (match-beginning 0)) raw)))
-    (argdown--inject-links svg (argdown--source-urls in))))
-
-(defun argdown--web-component (in)
-  "Return Argdown's own web-component HTML for INPUT file, with a clickable
-source link injected into each node that cites one.  `argdown web-component'
-emits the CDN `<link>'/`<script>' tags plus a `<figure>'/`<argdown-map>'
-whose `<div slot=\"map\">' holds the very SVG `argdown map' produces — same
-`<a xlink:title>' nodes `argdown--inject-links' splices an `xlink:href' into.
-We ride the whole viewer (its map, zoom, fullscreen and source-toggle
-toolbar); the href is the only thing that's ours."
-  (argdown--inject-links
-   (org-babel-eval
-    (format "argdown web-component --stdout --silent %s" (shell-quote-argument in))
-    "")
-   (argdown--source-urls in)))
-
-(defun argdown--publish-content (in)
-  "The published view of INPUT file: Argdown's web-component, whose slotted
-map nodes carry the clickable source links (`[label](url)' → real `<a href>')."
-  (argdown--web-component in))
-
-(defun argdown--publish-iframe (in)
-  "Return the published map for INPUT file as a web-component srcdoc iframe."
-  (argdown--iframe-wrap (argdown--publish-content in)))
-
 (defun argdown--render (fmt in out)
-  "Render INPUT file's map to file OUT in FMT, using Argdown's renderer.
-`svg' goes through `argdown--map-svg' (so the saved map is clickable too);
-`dot'/`gv' write Argdown's DOT; `pdf' uses Argdown's bundled Graphviz (it
-refuses stdout, so via a temp folder); png/jpg/webp are an ImageMagick step
-on the svg."
+  "Render INPUT file's map to file OUT in FMT, using Argdown's renderer.  A
+`:file' export is a *static* image, so it rides Argdown's own Graphviz layout:
+`svg' is Argdown's SVG (`argdown--stdout'); `dot'/`gv' write Argdown's DOT;
+`pdf' uses Argdown's bundled Graphviz (it refuses stdout, so via a temp
+folder); png/jpg/webp are an ImageMagick step on the svg.  (The interactive,
+self-contained map is a different artifact — see `argdown--map-html'.)"
   (pcase fmt
-    ("svg" (with-temp-file out (insert (argdown--map-svg in))))
+    ("svg" (with-temp-file out (insert (argdown--stdout "svg" in))))
     ((or "dot" "gv") (with-temp-file out (insert (argdown--stdout "dot" in))))
     ("pdf"
      (let ((dir (make-temp-file "argdown-pdf" t)))
@@ -273,7 +120,7 @@ on the svg."
      (let ((svg (org-babel-temp-file "argdown-" ".svg"))
            (magick (or (executable-find "magick") (executable-find "convert"))))
        (unless magick (error "argdown: need ImageMagick (magick/convert) for %s" fmt))
-       (with-temp-file svg (insert (argdown--map-svg in)))
+       (with-temp-file svg (insert (argdown--stdout "svg" in)))
        (org-babel-eval (format "%s %s %s" magick
                                (shell-quote-argument (expand-file-name svg))
                                (shell-quote-argument (expand-file-name out))) "")))
@@ -315,8 +162,8 @@ on the svg."
       "House epistemic-strength scale for argument-map tags, weakest→strongest, as
     a dialed-back red→green (RdYlGn) ramp.  A statement/argument tagged
     `#(<level>)' takes that colour as its node border; the *pure* red/green are
-    left to the relation edges (attack/support), so the tags use the muted RdYlGn
-    hues.  The rungs are a GENERIC ladder of proof (by warrant type), so the scale
+    left to the relation edges (their polarity — for/against), so the tags use the
+    muted RdYlGn hues.  The rungs are a GENERIC ladder of proof (by warrant type), so the scale
     serves any domain; the legal terms are aliases mapping evidence-law's types
     onto the same rungs/colours.  A cross-note convention — injected into *every*
     map by `argdown--frontmatter', never redefined per note.  See the \"Epistemic
@@ -409,12 +256,17 @@ title→hex), or nil when empty.  Titles are quoted YAML keys (`argdown--yaml-ke
                                    body))
                    "\n\n")))
 
+    (defvar org-babel-default-header-args:argdown '((:cache . "yes") (:results . "output html"))
+      "Default header args for argdown src blocks — caching on by default.")
+
     (defun org-babel-execute:argdown (body params)
       "Render an Argdown BODY.  Dispatch on headers:
-    - :file F                -> write the map to F (svg/dot/pdf/png/jpg/webp),
+    - :file F                -> write a static map image to F (svg/dot/pdf/png/jpg/webp),
                                 return nil so Org inserts the [[file:F]] link
-    - :results output html   -> web-component map iframe (interactive viewer:
-                                zoom/fullscreen/source toggle), links clickable
+    - :results output html   -> our own inline-SVG map fragment (interactive: fold,
+                                inline source links); the shared engine that drives
+                                it is injected once per page on export
+                                (`argdown--inject-runtime')
     - :results ... pdf|png   -> render and upload to IPFS, return the URL
     Composition (prepended to BODY via `argdown--compose'): :argdown-include REFS
     pulls named blocks (local or `file.org:name', recursive); :argdown-collect SPEC
@@ -432,7 +284,7 @@ title→hex), or nil when empty.  Titles are quoted YAML keys (`argdown--yaml-ke
                           (pcase e ("gv" "dot") ("jpeg" "jpg") (_ e)))))
                (argdown--render fmt in (expand-file-name file))
                nil))
-            ((member "html" rp) (argdown--publish-iframe in))
+            ((member "html" rp) (argdown--map-html in))
             ((member "pdf" rp)
              (let ((out (org-babel-temp-file "argdown-" ".pdf")))
                (argdown--render "pdf" in out)
@@ -444,22 +296,23 @@ title→hex), or nil when empty.  Titles are quoted YAML keys (`argdown--yaml-ke
             (t (error "argdown: give :file F, or :results output html|pdf|png")))))))
 
     (defun konix/argdown-preview ()
-      "Open the argdown src block at point as a standalone HTML document in a
-    browser — the very document the publish path embeds in its iframe, so what
-    you see is what you'll publish.  Sources are composed (:argdown-include /
-    :argdown-collect) exactly as on render.  The viewer is Argdown's
-    web-component, which loads its toolbar/zoom/fullscreen from a CDN — so the
-    interactive map needs the network; offline, only the static slotted SVG
-    paints."
+      "Open the argdown src block at point in a browser as the very map the
+    published page will embed — what you see is what you'll publish.  Sources are
+    composed (:argdown-include / :argdown-collect) exactly as on render, then
+    `argdown--map-html' builds the map fragment; the page pairs it with the shared
+    `argdown--runtime-html' — the same one-per-page assembly the publish path does
+    — wrapped in a minimal standalone document (charset + body).  It carries its
+    own inline SVG, CSS and JS — no network, no CDN."
       (interactive)
       (argdown--require-bin)
       (let ((info (org-babel-get-src-block-info 'light)))
         (unless (and info (equal (nth 0 info) "argdown"))
           (user-error "Point is not in an argdown src block"))
         (let* ((full (argdown--render-input (nth 1 info) (nth 2 info)))
-               (html (argdown--with-input
-                      full (lambda (in)
-                             (argdown--document (argdown--publish-content in)))))
+               (frag (argdown--with-input full #'argdown--map-html))
+               (html (concat "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
+                             "</head><body>\n" (argdown--runtime-html) "\n"
+                             frag "\n</body></html>"))
                (file (make-temp-file "argdown-preview-" nil ".html")))
           (with-temp-file file (insert html))
       (shell-command (format "clk ipfs browse '%s' &" file))
@@ -474,60 +327,11 @@ title→hex), or nil when empty.  Titles are quoted YAML keys (`argdown--yaml-ke
    (argdown--run (format "argdown json --stdout --silent %s" (shell-quote-argument in)))
    :object-type 'alist :array-type 'list :null-object nil :false-object nil))
 
-(defun argdown--source-urls (in)
-  "Hash of each statement/argument description *text* → its first source url
-(the `[label](url)' a node carries), from the `argdown json' model — the
-lookup table for link injection.  One source per node: only the first link a
-statement carries is kept."
-  (let ((model (argdown--json in)) (h (make-hash-table :test 'equal)))
-    (dolist (key '(statements arguments))
-      (dolist (e (alist-get key model))
-        (let* ((m (car (alist-get 'members (cdr e))))
-               (url (and m (cl-some (lambda (r)
-                                      (and (equal (alist-get 'type r) "link")
-                                           (alist-get 'url r)))
-                                    (alist-get 'ranges m)))))
-          (when url (puthash (or (alist-get 'text m) "") url h)))))
-    h))
-
-(defun argdown--svg-unescape (s)
-  "Decode the entities Graphviz writes into an SVG attribute, so an
-`xlink:title' can be compared to the model's plain text."
-  (let* ((s (replace-regexp-in-string "&#39;" "'" s t t))
-         (s (replace-regexp-in-string "&#45;" "-" s t t))
-         (s (replace-regexp-in-string "&quot;" "\"" s t t))
-         (s (replace-regexp-in-string "&lt;" "<" s t t))
-         (s (replace-regexp-in-string "&gt;" ">" s t t)))
-    (replace-regexp-in-string "&amp;" "&" s t t)))
-
-(defun argdown--inject-links (svg urls)
-  "Splice xlink:href into each node <a> of SVG whose `xlink:title' matches a
-text in URLS (text→url), making the whole node a clickable link to its
-source.  Argdown wraps every node — and every edge — in `<a xlink:title=…>'
-with no href; an edge title (e.g. \"support\") has no model match and is left
-untouched.  Argdown's own layout, argument edges, and styling are preserved.
-The link gets `target=\"_blank\"' (with `rel=\"noopener\"'): the map lives in
-a srcdoc iframe, and a source like Légifrance sends `X-Frame-Options: DENY'
-— navigating *inside* the frame would just show \"refused to connect\", so the
-source must open at the top level, in a new tab."
-  (with-temp-buffer
-    (insert svg)
-    (goto-char (point-min))
-    (while (re-search-forward "<a xlink:title=\"\\([^\"]*\\)\">" nil t)
-      (let* ((attr (match-string 1))
-             (url (gethash (argdown--svg-unescape attr) urls)))
-        (when url
-          (replace-match
-           (concat "<a target=\"_blank\" rel=\"noopener\" xlink:href=\""
-                   url "\" xlink:title=\"" attr "\">")
-           t t))))
-    (buffer-string)))
-
 (defun konix/ox-hugo--argdown-html (src-block info)
   "Return SRC-BLOCK fontified as inline-styled argdown HTML.
 Chroma has no argdown lexer, so colorize with `argdown-mode' + htmlize.
 `org-html-fontify-code' strips the enclosing <pre>, so re-wrap it."
-  (format "<pre class=\"src src-argdown\">\n%s</pre>\n"
+  (format "<pre class=\"src src-argdown\" style=\"white-space:pre-wrap;\">\n%s</pre>\n"
           (org-html-fontify-code
            (org-export-format-code-default src-block info)
            "argdown")))
@@ -918,3 +722,769 @@ as a `fill-paragraph-function'."
 
 (provide 'KONIX_argdown)
 ;;; KONIX_argdown.el ends here
+
+(defun argdown--node-id (kind title)
+  "Unique node identity: KIND (\"s\" statement / \"a\" argument) prefixed to
+TITLE.  Argdown merges by title only within a kind, so a [statement] and an
+<argument> of the same title are two nodes; the kind prefix keeps them apart."
+  (concat kind ":" title))
+
+(defun argdown--map-nodes (model)
+  "Every node of the argdown MODEL as (ID TITLE KIND) — statements (kind \"s\")
+then arguments (kind \"a\"), in order.  ID is the kind+title key
+(`argdown--node-id'); TITLE is what the box shows; KIND selects the right body
+text (`argdown--node-html')."
+  (append
+   (delq nil (mapcar (lambda (s) (let ((tt (alist-get 'title (cdr s))))
+                                   (and tt (list (argdown--node-id "s" tt) tt "s"))))
+                     (alist-get 'statements model)))
+   (delq nil (mapcar (lambda (a) (let ((tt (alist-get 'title (cdr a))))
+                                   (and tt (list (argdown--node-id "a" tt) tt "a"))))
+                     (alist-get 'arguments model)))))
+
+(defun argdown--xml-escape (s)
+  "Escape `&', `<', `>' in S for XML text content."
+  (let* ((s (replace-regexp-in-string "&" "&amp;" s t t))
+         (s (replace-regexp-in-string "<" "&lt;" s t t)))
+    (replace-regexp-in-string ">" "&gt;" s t t)))
+
+(defconst argdown--node-w 220
+  "Fixed node-box width.  Constant so the strength badge and the fold ⊕ sit at
+stable offsets and the body text wraps to a known column; the box's *height* is
+what varies, remeasured to the wrapped text by the layout pass.")
+
+(defun argdown--node-width (_title)
+  "Node-box width — the constant `argdown--node-w'."
+  argdown--node-w)
+
+(defun argdown--strip-annotations (s)
+  "Drop Argdown inline `#(tag)' / `#tag' grade annotations from S and squeeze
+runs of whitespace to one space (edges kept, so a stripped span still joins its
+neighbours): the badge names the grade, so the body stays prose."
+  (let* ((s (replace-regexp-in-string "#([^)]*)" "" s))
+         (s (replace-regexp-in-string "#[[:alnum:]_-]+" "" s)))
+    (replace-regexp-in-string "[ \t\n]+" " " s)))
+
+(defun argdown--first-member (members)
+  "The first MEMBER whose `text' is non-empty, or nil.  A node declared as a bare
+reference before it is defined (`+ <arg>' then later `<arg>: …') contributes an
+empty member first; skip it and take the one with the real text (and its
+ranges)."
+  (cl-some (lambda (m)
+             (let ((tx (alist-get 'text m)))
+               (and tx (not (string-empty-p (string-trim tx))) m)))
+           members))
+
+(defun argdown--render-ranges (text ranges)
+  "TEXT rendered to inline body HTML, honouring its RANGES: each `link' range
+(Argdown character offsets, stop inclusive) becomes an <a> on its own label
+where it sits, the rest is grade-stripped (`argdown--strip-annotations') and
+escaped.  So a source citation reads as a real link in the prose."
+  (let ((links (sort (seq-filter (lambda (r) (equal (alist-get 'type r) "link"))
+                                 (copy-sequence ranges))
+                     (lambda (a b) (< (alist-get 'start a) (alist-get 'start b)))))
+        (pos 0) (len (length text)) (out ""))
+    (dolist (r links)
+      (let ((s (alist-get 'start r)) (e (1+ (alist-get 'stop r))) (url (alist-get 'url r)))
+        (when (and url (>= s pos) (<= e len))
+          (when (> s pos)
+            (setq out (concat out (argdown--xml-escape
+                                   (argdown--strip-annotations (substring text pos s))))))
+          (setq out (concat out (format "<a href=\"%s\" target=\"_blank\" rel=\"noopener\">%s</a>"
+                                        (argdown--xml-escape url)
+                                        (argdown--xml-escape (substring text s e)))))
+          (setq pos e))))
+    (when (< pos len)
+      (setq out (concat out (argdown--xml-escape
+                             (argdown--strip-annotations (substring text pos))))))
+    (string-trim out)))
+
+(defun argdown--node-html (model title kind)
+  "Body HTML for the KIND (\"s\"/\"a\") node titled TITLE: its first non-empty
+member's text rendered with that member's ranges (`argdown--render-ranges') — a
+source citation kept as an inline link, the #(grade) tag dropped (the badge is
+its home).  KIND picks the right collection, so a [statement] and an <argument>
+sharing a title each show their own words.  Empty string for a node with no body."
+  (let ((mem (cl-some (lambda (e)
+                        (and (equal (alist-get 'title (cdr e)) title)
+                             (argdown--first-member (alist-get 'members (cdr e)))))
+                      (alist-get (if (equal kind "a") 'arguments 'statements) model))))
+    (if mem (argdown--render-ranges (alist-get 'text mem) (alist-get 'ranges mem)) "")))
+
+(defun argdown--node-g (id title html)
+  "A <g> node box identified by ID (its unique kind+title key, in `data-id')
+carrying its body HTML: a rounded rect and, as selectable rich text in a
+<foreignObject> (so a reader can sweep it for a hypothes.is anchor and click a
+source link inline), the title over the body prose.  `data-id' is the
+layout/fold handle; the box height is a placeholder the layout pass remeasures
+to the wrapped content.
+
+A statement written inline, with no author-given title, is auto-named
+`Untitled N' by Argdown (no flag distinguishes it — only the name's shape).
+That name is noise, so it is not shown: such a node drops the heading and
+shows its text alone; a real title still reads as the bold heading above the
+prose.  Should an untitled node somehow have no text either, the auto-name is
+the last resort, so the box is never blank."
+  (let* ((w (argdown--node-width title))
+         (eid (argdown--xml-escape id))
+         (untitled (string-match-p "\\`Untitled [0-9]+\\'" title))
+         (head (if (or untitled (string-empty-p title)) ""
+                 (format "<div class=\"argdown-node-title\">%s</div>"
+                         (argdown--xml-escape title))))
+         (body (if (string-empty-p html) ""
+                 (format "<div class=\"argdown-node-text\">%s</div>" html)))
+         (content (if (string-empty-p (concat head body))
+                      (format "<div class=\"argdown-node-title\">%s</div>"
+                              (argdown--xml-escape title))
+                    (concat head body))))
+    (format (concat "<g class=\"argdown-node\" data-id=\"%s\">"
+                    "<rect width=\"%d\" height=\"40\" rx=\"4\" fill=\"#fff\" stroke=\"#888\"/>"
+                    "<foreignObject width=\"%d\" height=\"40\">"
+                    "<div xmlns=\"http://www.w3.org/1999/xhtml\" class=\"argdown-node-body\">"
+                    "%s</div></foreignObject></g>")
+            eid w w content)))
+
+(defun argdown--edge-id (type title)
+  "Node id for an edge endpoint titled TITLE, from its Argdown TYPE: an
+\"argument\" keys to \"a\", any statement type (\"equivalence-class\") to \"s\"
+— matching `argdown--map-nodes' so the endpoint names the same node."
+  (argdown--node-id (if (equal type "argument") "a" "s") title))
+
+(defun argdown--map-edges (model)
+  "Every edge of the argdown MODEL as (FROM-ID TO-ID TYPE): the top-level
+relations Argdown reports (`relationType' — support/attack, and in strict mode
+entails/contrary/contradictory/undercut), their endpoints keyed by
+`fromType'/`toType' (`argdown--edge-id') so they name the right node when a
+title is shared, plus the inferential edges synthesized from each argument's pcs
+(`argdown--pcs-edges')."
+  (append
+   (mapcar (lambda (r)
+             (list (argdown--edge-id (alist-get 'fromType r) (alist-get 'from r))
+                   (argdown--edge-id (alist-get 'toType r) (alist-get 'to r))
+                   (alist-get 'relationType r)))
+           (alist-get 'relations model))
+   (argdown--pcs-edges model)))
+
+(defconst argdown--relation-styles
+  '(("support"       "#00ff00" ""          nil "dialectical · for")
+    ("attack"        "#ff0000" ""          nil "dialectical · against")
+    ("entails"       "#00ff00" "6 4"       nil "logical · for")
+    ("contrary"      "#ff0000" "6 4"       nil "logical · against")
+    ("contradictory" "#ff0000" "2 3"       t   "logical · mutually exclusive")
+    ("undercut"      "#ff0000" "8 3 2 3"   nil "attacks the inference"))
+  "Edge look per Argdown relation type: (TYPE STROKE DASHARRAY DOUBLE-HEADED
+GLOSS).  Polarity is the colour — pure green for, pure red against (Argdown's
+own convention, and why the epistemic node scale stays off pure red/green);
+kind is the line style — solid for the dialectical pair (support/attack),
+dashed for the logical entails/contrary, dotted for the mutual contradictory
+(drawn with an arrowhead at both ends), dash-dot for the inference-aimed
+undercut.  No two combinations coincide; GLOSS is the legend's plain reading.")
+
+(defun argdown--relation-style (type)
+  "The `argdown--relation-styles' row for relation TYPE, or a neutral grey solid
+fallback (with TYPE as its own gloss) for any type not foreseen."
+  (or (assoc type argdown--relation-styles)
+      (list type "#888888" "" nil type)))
+
+(defun argdown--map-edges-svg (model)
+  "Two <path>s per edge in MODEL, a contiguous pair.  The first is the visible
+hairline: endpoint node ids (`data-from'/`data-to' — the layout adapter's
+routing inputs), a per-type class, and the look from `argdown--relation-style'
+— stroke colour (polarity), dash (kind), and the shared `argdown-arrow' marker
+at the end (and, for the mutual contradictory, the start too).  The second is
+its `argdown-edge-hit' twin: no paint, a fat stroke, a finger-sized tap band
+laid over the hairline so the edge can be tapped to travel it — carrying the
+same endpoints, since that is what the tap navigates by."
+  (mapconcat
+   (lambda (e)
+     (let* ((type (nth 2 e))
+            (from (argdown--xml-escape (nth 0 e)))
+            (to (argdown--xml-escape (nth 1 e)))
+            (st (argdown--relation-style type))
+            (stroke (nth 1 st)) (dash (nth 2 st)) (double (nth 3 st)))
+       (format (concat "<path class=\"argdown-edge argdown-edge--%s\""
+                       " data-from=\"%s\" data-to=\"%s\" fill=\"none\""
+                       " stroke=\"%s\"%s marker-end=\"url(#argdown-arrow)\"%s/>"
+                       "<path class=\"argdown-edge-hit\" data-from=\"%s\" data-to=\"%s\"/>")
+               (argdown--xml-escape type) from to
+               stroke
+               (if (string-empty-p dash) "" (format " stroke-dasharray=\"%s\"" dash))
+               (if double " marker-start=\"url(#argdown-arrow)\"" "")
+               from to)))
+   (argdown--map-edges model) "\n"))
+
+(defun argdown--pcs-edges (model)
+  "Support edges from each reconstructed argument's pcs, as node ids
+(`argdown--node-id'): premise→argument for every role=\"premise\" member and
+argument→conclusion for the role=\"main-conclusion\" (premises and conclusions
+are statements, so \"s\"; the argument itself \"a\")."
+  (let (out)
+    (dolist (a (alist-get 'arguments model))
+      (let ((aid (argdown--node-id "a" (alist-get 'title (cdr a)))))
+        (dolist (m (alist-get 'pcs (cdr a)))
+          (pcase (alist-get 'role m)
+            ("premise" (push (list (argdown--node-id "s" (alist-get 'title m)) aid "support") out))
+            ("main-conclusion" (push (list aid (argdown--node-id "s" (alist-get 'title m)) "support") out))))))
+    (nreverse out)))
+
+(defconst argdown--dagre-path
+  (expand-file-name "argdown-vendor/dagre-0.8.5.min.js"
+                    (file-name-directory (or load-file-name "~/prog/devel/elfiles/")))
+  "Where `vendor-dagre' wrote the bundle, beside this file.")
+
+(defun argdown--dagre-js ()
+  "The vendored dagre UMD bundle as a string, to inline into a fragment."
+  (with-temp-buffer (insert-file-contents argdown--dagre-path) (buffer-string)))
+
+(defconst argdown--fold-dom-js
+  (concat
+   "  var nodes = [].slice.call(root.querySelectorAll('.argdown-node'));\n"
+   "  var edges = [].slice.call(root.querySelectorAll('.argdown-edge'));\n"
+   "  var byId = {}, children = {}, folded = {};\n"
+   "  nodes.forEach(function(n){ byId[n.getAttribute('data-id')] = n; });\n"
+   "  edges.forEach(function(e){\n"
+   "    var f = e.getAttribute('data-from'), t = e.getAttribute('data-to');\n"
+   "    (children[t] = children[t] || []).push(f);\n"
+   "  });\n")
+  "DOM handles and the supporter adjacency (children[Y] = the nodes supporting Y),
+scoped to one map's ROOT element so several maps on a page never mix.")
+
+(defconst argdown--fold-visible-js
+  (concat
+   "  function visibleSet(){\n"
+   "    var vis = {};\n"
+   "    nodes.forEach(function(n){ vis[n.getAttribute('data-id')] = true; });\n"
+   "    Object.keys(folded).forEach(function(ft){\n"
+   "      if(!folded[ft]) return;\n"
+   "      var stack = (children[ft] || []).slice();\n"
+   "      while(stack.length){\n"
+   "        var c = stack.pop();\n"
+   "        if(vis[c]){ vis[c] = false; (children[c] || []).forEach(function(x){ stack.push(x); }); }\n"
+   "      }\n"
+   "    });\n"
+   "    return vis;\n"
+   "  }\n")
+  "Node ids still visible: all except the transitive supporters of folded nodes.")
+
+(defconst argdown--fold-mark-js
+  (concat
+   "  function marks(){\n"
+   "    nodes.forEach(function(n){\n"
+   "      var t = n.getAttribute('data-id');\n"
+   "      var collapsed = folded[t] && (children[t] || []).length > 0;\n"
+   "      var box = n.querySelector('rect:not(.argdown-fold-stack)');\n"
+   "      n.querySelectorAll('.argdown-fold-stack').forEach(function(s){ s.remove(); });\n"
+   "      if(collapsed){\n"
+   "        [5, 10].forEach(function(off){\n"
+   "          var s = document.createElementNS('http://www.w3.org/2000/svg', 'rect');\n"
+   "          s.setAttribute('class', 'argdown-fold-stack');\n"
+   "          s.setAttribute('x', off); s.setAttribute('y', off);\n"
+   "          s.setAttribute('width', box.getAttribute('width'));\n"
+   "          s.setAttribute('height', box.getAttribute('height'));\n"
+   "          s.setAttribute('rx', 4);\n"
+   "          s.setAttribute('fill', box.getAttribute('fill'));\n"
+   "          s.setAttribute('stroke', box.getAttribute('stroke'));\n"
+   "          n.insertBefore(s, n.firstChild);\n"
+   "        });\n"
+   "      }\n"
+   "      var mark = n.querySelector('.argdown-foldmark');\n"
+   "      if(collapsed && !mark){\n"
+   "        mark = document.createElementNS('http://www.w3.org/2000/svg', 'text');\n"
+   "        mark.setAttribute('class', 'argdown-foldmark');\n"
+   "        mark.setAttribute('x', +box.getAttribute('width') - 5);\n"
+   "        mark.setAttribute('y', 20);\n"
+   "        mark.setAttribute('text-anchor', 'end');\n"
+   "        mark.textContent = '⊕';\n"
+   "        n.appendChild(mark);\n"
+   "      } else if(!collapsed && mark){ mark.remove(); }\n"
+   "    });\n"
+   "  }\n")
+  "Mark each folded node (one with hidden supporters): a card or two stacked\nbehind the box (`argdown-fold-stack' rects) show the hidden subtree as depth,\nand a ⊕ sits in its corner; both clear when it expands.")
+
+(defconst argdown--place-js
+  (concat
+   "  function place(nodes, edges){\n"
+   "    var FAN_WRAP_MIN = 6;\n"
+   "    var g = new dagre.graphlib.Graph({multigraph:true});\n"
+   "    g.setGraph({rankdir:'BT', nodesep:40, ranksep:60, marginx:20, marginy:20});\n"
+   "    g.setDefaultEdgeLabel(function(){ return {}; });\n"
+   "    nodes.forEach(function(n){ g.setNode(n.id, {width:n.w, height:n.h}); });\n"
+   "    var indeg = {}, outdeg = {};\n"
+   "    edges.forEach(function(e){ outdeg[e.from] = (outdeg[e.from]||0) + 1;\n"
+   "      indeg[e.to] = (indeg[e.to]||0) + 1; });\n"
+   "    var minlen = edges.map(function(){ return 1; }), fans = {};\n"
+   "    edges.forEach(function(e, i){\n"
+   "      if((indeg[e.from]||0) === 0 && outdeg[e.from] === 1) (fans[e.to] = fans[e.to] || []).push(i);\n"
+   "    });\n"
+   "    Object.keys(fans).forEach(function(t){\n"
+   "      var idx = fans[t];\n"
+   "      if(idx.length > FAN_WRAP_MIN){\n"
+   "        var rows = Math.ceil(Math.sqrt(idx.length));\n"
+   "        idx.forEach(function(j, k){ minlen[j] = 1 + (k % rows); });\n"
+   "      }\n"
+   "    });\n"
+   "    edges.forEach(function(e, i){ g.setEdge(e.from, e.to, {minlen:minlen[i]}, 'e'+i); });\n"
+   "    dagre.layout(g);\n"
+   "    var pos = {};\n"
+   "    nodes.forEach(function(n){ var nd = g.node(n.id); pos[n.id] = {x:nd.x, y:nd.y}; });\n"
+   "    var points = edges.map(function(e, i){\n"
+   "      var ed = g.edge(e.from, e.to, 'e'+i); return ed && ed.points ? ed.points : [];\n"
+   "    });\n"
+   "    var gr = g.graph();\n"
+   "    return {width:gr.width, height:gr.height, pos:pos, points:points};\n"
+   "  }\n")
+  "The layout-engine adapter: sized boxes + from→to edges in, positions +
+routed points + size out.  Wide fans are staggered across ranks via edge
+`minlen' (the `unflatten' technique): a target's leaf supporters, once past
+`FAN_WRAP_MIN', wrap into a balanced grid of about √n rows rather than one
+very wide row.  The sole dagre-specific piece.")
+
+(defconst argdown--fold-layout-js
+  (concat
+   "  function edgePath(pts){\n"
+   "    if(pts.length < 3) return 'M' + pts.map(function(p){ return p.x+' '+p.y; }).join(' L');\n"
+   "    var d = 'M' + pts[0].x + ' ' + pts[0].y;\n"
+   "    for(var i=1;i<pts.length-1;i++){\n"
+   "      var xc=(pts[i].x+pts[i+1].x)/2, yc=(pts[i].y+pts[i+1].y)/2;\n"
+   "      d += ' Q ' + pts[i].x + ' ' + pts[i].y + ' ' + xc + ' ' + yc;\n"
+   "    }\n"
+   "    return d + ' L ' + pts[pts.length-1].x + ' ' + pts[pts.length-1].y;\n"
+   "  }\n"
+   "  function layout(){\n"
+   "    var vis = visibleSet();\n"
+   "    var boxes = [], links = [], els = [];\n"
+   "    root.querySelectorAll('.argdown-node').forEach(function(n){\n"
+   "      var t = n.getAttribute('data-id');\n"
+   "      n.style.display = vis[t] ? '' : 'none';\n"
+   "      if(!vis[t]) return;\n"
+   "      var r = n.querySelector('rect:not(.argdown-fold-stack)');\n"
+   "      var body = n.querySelector('.argdown-node-body');\n"
+   "      if(body){\n"
+   "        var h = Math.ceil(body.scrollHeight) + 2;\n"
+   "        r.setAttribute('height', h);\n"
+   "        var fo = n.querySelector('foreignObject');\n"
+   "        if(fo) fo.setAttribute('height', h);\n"
+   "      }\n"
+   "      boxes.push({id:t, w:+r.getAttribute('width'), h:+r.getAttribute('height')});\n"
+   "    });\n"
+   "    root.querySelectorAll('.argdown-edge').forEach(function(e){\n"
+   "      var f = e.getAttribute('data-from'), t = e.getAttribute('data-to'), on = vis[f] && vis[t];\n"
+   "      e.style.display = on ? '' : 'none';\n"
+   "      var hit = e.nextElementSibling;\n"
+   "      if(hit && hit.classList.contains('argdown-edge-hit')) hit.style.display = on ? '' : 'none';\n"
+   "      if(on){ links.push({from:f, to:t}); els.push(e); }\n"
+   "    });\n"
+   "    var res = place(boxes, links);\n"
+   "    boxes.forEach(function(b){\n"
+   "      var p = res.pos[b.id];\n"
+   "      byId[b.id].setAttribute('transform', 'translate(' + (p.x-b.w/2) + ',' + (p.y-b.h/2) + ')');\n"
+   "    });\n"
+   "    els.forEach(function(el, i){\n"
+   "      var pts = res.points[i];\n"
+   "      if(pts && pts.length){\n"
+   "        var dp = edgePath(pts);\n"
+   "        el.setAttribute('d', dp);\n"
+   "        var hit = el.nextElementSibling;\n"
+   "        if(hit && hit.classList.contains('argdown-edge-hit')) hit.setAttribute('d', dp);\n"
+   "      }\n"
+   "    });\n"
+   "    var svg = root.querySelector('svg');\n"
+   "    svg.setAttribute('width', res.width); svg.setAttribute('height', res.height);\n"
+   "    svg.setAttribute('viewBox', '0 0 ' + res.width + ' ' + res.height);\n"
+   "    marks();\n"
+   "    var vp = root.querySelector('.argdown-viewport');\n"
+   "    if(vp) vp.style.visibility = 'visible';\n"
+   "  }\n")
+  "Fit each visible box's height to its wrapped text (`scrollHeight' — a
+layout metric in CSS pixels, so it is independent of the browser's zoom), then
+gather the boxes+edges, ask the adapter to place them, and write back
+transforms, edge d, svg size, fold markers — and finally reveal the content
+group (it ships `visibility:hidden' so the un-positioned stack never paints;
+the reader sees the laid-out map appear, not a stack flinging into place).")
+
+(defconst argdown--flash-js
+  (concat
+   "  function flash(n){\n"
+   "    n.classList.remove('argdown-flash');\n"
+   "    void n.getBoundingClientRect();\n"
+   "    n.classList.add('argdown-flash');\n"
+   "    setTimeout(function(){ n.classList.remove('argdown-flash'); }, 800);\n"
+   "  }\n")
+  "Pulse a node's border to catch the eye on arrival: remove `argdown-flash',
+force a reflow (so re-adding restarts the animation even on a repeat), add it,
+and clear it once the pulse is done.")
+
+(defconst argdown--fold-click-js
+  (concat
+   "  nodes.forEach(function(n){\n"
+   "    n.style.cursor = 'pointer';\n"
+   "    n.addEventListener('click', function(ev){\n"
+   "      if(ev.target.closest('a')) return;\n"
+   "      if(window.getSelection && String(window.getSelection()).length) return;\n"
+   "      var t = n.getAttribute('data-id');\n"
+   "      folded[t] = !folded[t];\n"
+   "      layout();\n"
+   "      n.scrollIntoView({block:'center', inline:'center'});\n"
+   "      flash(n);\n"
+   "    });\n"
+   "  });\n")
+  "Click a box to toggle its fold and relayout — unless the click landed on a
+real link (it navigates) or on a live text selection (the reader is sweeping
+the sentence to annotate it, not folding).  The relayout can fling the clicked
+box far (a wide subtree collapsing re-packs the whole map), so afterwards the
+box is scrolled to the centre of the view and `flash'ed — the claim you folded
+stays where you are looking, and the eye catches where it landed.")
+
+(defconst argdown--legend-toggle-js
+  (concat
+   "  var lt = root.querySelector('.argdown-legend-toggle');\n"
+   "  if(lt){ lt.addEventListener('click', function(){\n"
+   "    lt.closest('.argdown-legend').classList.toggle('argdown-legend-collapsed');\n"
+   "  }); }\n")
+  "Fold the legend body away (and back) when its toggle is clicked.")
+
+(defconst argdown--trace-js
+  (concat
+   "  if(window.matchMedia && matchMedia('(hover: hover)').matches){\n"
+   "    var mapEl = root;\n"
+   "    nodes.forEach(function(n){\n"
+   "      var id = n.getAttribute('data-id');\n"
+   "      n.addEventListener('mouseenter', function(){\n"
+   "        mapEl.classList.add('argdown-tracing');\n"
+   "        edges.forEach(function(e){\n"
+   "          e.classList.toggle('argdown-edge-hl',\n"
+   "            e.getAttribute('data-from')===id || e.getAttribute('data-to')===id);\n"
+   "        });\n"
+   "      });\n"
+   "      n.addEventListener('mouseleave', function(){\n"
+   "        mapEl.classList.remove('argdown-tracing');\n"
+   "        edges.forEach(function(e){ e.classList.remove('argdown-edge-hl'); });\n"
+   "      });\n"
+   "    });\n"
+   "  }\n")
+  "Hover a node to trace its web: the map takes `argdown-tracing' (dimming
+every edge) and the node's incident edges take `argdown-edge-hl' (lit to full
+strength), so a dense map is read one claim at a time.  Wired only where a
+pointer can hover (`matchMedia('(hover: hover)')') — on a touch device a tap is
+a click, so tracing there would fire on the same tap as the fold; a tap folds
+instead.  `nodes'/`edges' are the handles from `argdown--fold-dom-js'.")
+
+(defconst argdown--edge-nav-js
+  (concat
+   "  root.querySelectorAll('.argdown-edge-hit').forEach(function(h){\n"
+   "    h.addEventListener('click', function(ev){\n"
+   "      var f = byId[h.getAttribute('data-from')], t = byId[h.getAttribute('data-to')];\n"
+   "      if(!f || !t) return;\n"
+   "      function far(n){ var r = n.getBoundingClientRect();\n"
+   "        return Math.hypot(r.left + r.width/2 - ev.clientX, r.top + r.height/2 - ev.clientY); }\n"
+   "      var target = far(f) >= far(t) ? f : t;\n"
+   "      target.scrollIntoView({behavior:'smooth', block:'center', inline:'center'});\n"
+   "      flash(target);\n"
+   "    });\n"
+   "  });\n")
+  "Tap an edge to travel it: glide (a smooth-scroll, not a jump) to its far end
+— the endpoint farther from where the finger landed, the node you are not at —
+and `flash' it on arrival.  So a tap near a premise reaches the argument using
+it, and a tap near a conclusion reaches the argument supporting it; the edge
+runs both ways.  The tap band paints above the nodes, so a tap within a few px
+of where an edge meets a box travels the edge rather than folding the box: a
+small dead-zone at the node's rim, the price of a finger-sized target.")
+
+(defconst argdown--layout-js
+  (concat "function argdownInitAll(){\n"
+          "  document.querySelectorAll('.argdown-map').forEach(function(root){\n"
+          "    if(root.dataset.argdownReady) return;\n"
+          "    root.dataset.argdownReady = '1';\n"
+          argdown--fold-dom-js
+          argdown--fold-visible-js
+          argdown--fold-mark-js
+          argdown--place-js
+          argdown--fold-layout-js
+          argdown--flash-js
+          argdown--fold-click-js
+          "  layout();\n"
+          argdown--legend-toggle-js
+          argdown--trace-js
+          argdown--edge-nav-js
+          "  });\n"
+          "}\n"
+          "if(document.readyState === 'loading')"
+          " document.addEventListener('DOMContentLoaded', argdownInitAll);\n"
+          "else argdownInitAll();\n")
+  "Lay out every map on the page, each scoped to its own `root': DOM handles,
+fold visibility, the fold markers, the layout-engine adapter, the layout pass,
+the arrival flash, the click wiring, the legend toggle, the hover-trace, and
+the edge-tap travel.  Runs when the maps are in the DOM; the `argdownReady'
+flag makes a repeat call a no-op.")
+
+(defun argdown--map-grades (model)
+  "Alist of node title → (GRADE . COLOUR) for nodes whose tags name an
+epistemic rung (`argdown--epistemic-tag-colors')."
+  (let (out)
+    (dolist (key '(statements arguments))
+      (dolist (e (alist-get key model))
+        (let* ((o (cdr e))
+               (title (alist-get 'title o))
+               (grade (cl-some (lambda (tag)
+                                 (and (assoc tag argdown--epistemic-tag-colors) tag))
+                               (alist-get 'tags o))))
+          (when (and title grade)
+            (push (cons title (cons grade (cdr (assoc grade argdown--epistemic-tag-colors))))
+                  out)))))
+    out))
+
+(defun argdown--node-badge (grade color)
+  "A strength badge stating GRADE, filled with its house COLOR, riding the box."
+  (format (concat "<g class=\"argdown-badge\" transform=\"translate(0,-15)\">"
+                  "<rect width=\"%d\" height=\"14\" rx=\"2\" fill=\"%s\"/>"
+                  "<text x=\"4\" y=\"11\" font-size=\"10\" fill=\"#fff\">%s</text></g>")
+          (+ 8 (* 6 (length grade))) color (argdown--xml-escape grade)))
+
+(defun argdown--strength-labels (in)
+  "Weakest-link *labels* to badge propagated nodes — the reading companion of
+`argdown--strength-colors', keeping the capping link's own word rather than
+its hue.  Return (CONCLUSION-LABELS . ARGUMENT-LABELS), each an alist
+title→(WORD . RANK): an argument wears its weakest link — the lowest-ranked of
+its premises' epistemic tags and its inference forces — named with that link's
+word; an untagged conclusion inherits its strongest concluding argument's
+weakest link.  Only directly-tagged premises and marked inference forces carry
+a word here, so a premise whose strength is itself propagated adds no label."
+  (let* ((model (argdown--json in))
+         (tag (make-hash-table :test 'equal))        ; statement title → (word . rank)
+         (per-concl (make-hash-table :test 'equal))  ; conclusion → list of (word . rank)
+         (arg-labels nil))
+    (dolist (s (alist-get 'statements model))
+      (let* ((st (cdr s))
+             (title (alist-get 'title st))
+             (word (cl-some (lambda (tg) (and (assoc tg argdown--epistemic-tag-rank) tg))
+                            (alist-get 'tags st))))
+        (when (and title word)
+          (puthash title (cons word (cdr (assoc word argdown--epistemic-tag-rank))) tag))))
+    (dolist (a (alist-get 'arguments model))
+      (let* ((arg (cdr a))
+             (atitle (alist-get 'title arg))
+             (pcs (alist-get 'pcs arg))
+             (concl (cl-some (lambda (m) (and (equal (alist-get 'role m) "main-conclusion")
+                                              (alist-get 'title m)))
+                             pcs))
+             (fword nil) (frank nil)
+             (weakest nil))
+        (dolist (m pcs)
+          (let* ((inf (alist-get 'inference m))
+                 (f (and inf (alist-get 'force (alist-get 'data inf))))
+                 (fr (and f (cdr (assoc f argdown--inference-force-ranks)))))
+            (when (and fr (or (not frank) (< fr frank)))
+              (setq frank fr fword f))))
+        (when fword (setq weakest (cons fword frank)))
+        (dolist (m pcs)
+          (when (equal (alist-get 'role m) "premise")
+            (let ((pt (gethash (alist-get 'title m) tag)))
+              (when (and pt (or (not weakest) (< (cdr pt) (cdr weakest))))
+                (setq weakest pt)))))
+        (when weakest
+          (when atitle (push (cons atitle weakest) arg-labels))
+          (when concl (puthash concl (cons weakest (gethash concl per-concl)) per-concl)))))
+    (let (concl-labels)
+      (maphash (lambda (title ws)
+                 (let ((best (car ws)))
+                   (dolist (w (cdr ws)) (when (> (cdr w) (cdr best)) (setq best w)))
+                   (push (cons title best) concl-labels)))
+               per-concl)
+      (cons concl-labels (nreverse arg-labels)))))
+
+(defun argdown--legend-relations (model)
+  "The `argdown--relation-styles' rows for the relation types present in MODEL's
+edges, kept in the styles' canonical order."
+  (let ((present (delete-dups (mapcar (lambda (e) (nth 2 e)) (argdown--map-edges model)))))
+    (seq-filter (lambda (row) (member (car row) present)) argdown--relation-styles)))
+
+(defun argdown--legend-epistemic (in model)
+  "Alist (COLOUR . LABEL) for every epistemic colour the map renders, weakest→
+strongest: each directly applied tag (labelled by its word) at its rank, plus
+each propagated-strength rank present that no direct tag already covers
+(labelled by its rung on the scale).  So a border/fill tint is never a hue with
+no legend row."
+  (let ((byrank (make-hash-table)))
+    (dolist (g (argdown--map-grades model))       ; g = (title . (tag . colour))
+      (let* ((tag (cadr g))
+             (r (cdr (assoc tag argdown--epistemic-tag-rank))))
+        (when r
+          (let ((cur (gethash r byrank)))
+            (puthash r (if (and cur (not (member tag (split-string cur ", "))))
+                           (concat cur ", " tag)
+                         (or cur tag))
+                     byrank)))))
+    (let* ((sc (argdown--strength-colors in))
+           (light (mapcar (lambda (c) (argdown--lighten c 0.7)) argdown--epistemic-ramp)))
+      (dolist (h (append (mapcar #'cdr (car sc)) (mapcar #'cdr (cdr sc))))
+        (let ((r (or (cl-position h argdown--epistemic-ramp :test #'equal)
+                     (cl-position h light :test #'equal))))
+          (when (and r (not (gethash r byrank)))
+            (puthash r (car (rassoc r (seq-take argdown--epistemic-tag-rank 10))) byrank)))))
+    (let (rows)
+      (dolist (r (sort (hash-table-keys byrank) #'<))
+        (push (cons (nth r argdown--epistemic-ramp) (gethash r byrank)) rows))
+      (nreverse rows))))
+
+(defun argdown--legend-relation-row (row)
+  "A legend line for relation-style ROW: a miniature of its own line (colour,
+dash, end arrow, and a start arrow for the double-headed) beside its gloss."
+  (let ((type (nth 0 row)) (stroke (nth 1 row)) (dash (nth 2 row))
+        (double (nth 3 row)) (gloss (nth 4 row)))
+    (concat
+     "<div class=\"argdown-legend-row\">"
+     (format (concat "<svg class=\"argdown-legend-swatch\" width=\"34\" height=\"12\">"
+                     "<line x1=\"3\" y1=\"6\" x2=\"27\" y2=\"6\" stroke=\"%s\" stroke-width=\"2\""
+                     "%s marker-end=\"url(#argdown-arrow)\"%s/></svg>")
+             stroke
+             (if (string-empty-p dash) "" (format " stroke-dasharray=\"%s\"" dash))
+             (if double " marker-start=\"url(#argdown-arrow)\"" ""))
+     (format "<span><b>%s</b> — %s</span>"
+             (argdown--xml-escape type) (argdown--xml-escape gloss))
+     "</div>")))
+
+(defun argdown--legend-epistemic-row (pair)
+  "A legend line for epistemic PAIR (COLOUR . LABEL): a colour chip and its name."
+  (format (concat "<div class=\"argdown-legend-row\">"
+                  "<span class=\"argdown-legend-chip\" style=\"background:%s\"></span>"
+                  "<span>%s</span></div>")
+          (car pair) (argdown--xml-escape (cdr pair))))
+
+(defun argdown--map-legend (in model)
+  "The map's colour key as an HTML panel — every relation type and every
+epistemic colour present, each with its swatch.  Starts collapsed
+(`argdown-legend-collapsed', body hidden) so it never covers the map; the
+toggle opens it.  Empty string when the map carries no coloured relation or
+grade.  Sits in the map corner."
+  (let ((rels (argdown--legend-relations model))
+        (epi (argdown--legend-epistemic in model)))
+    (if (not (or rels epi)) ""
+      (concat
+       "<div class=\"argdown-legend argdown-legend-collapsed\">"
+       "<button class=\"argdown-legend-toggle\" type=\"button\">Legend</button>"
+       "<div class=\"argdown-legend-body\">"
+       (when rels
+         (concat "<div class=\"argdown-legend-head\">Relations</div>"
+                 (mapconcat #'argdown--legend-relation-row rels "")))
+       (when epi
+         (concat "<div class=\"argdown-legend-head\">Strength</div>"
+                 (mapconcat #'argdown--legend-epistemic-row epi "")
+                 "<div class=\"argdown-legend-note\">Node border/fill = propagated"
+                 " strength, same scale (fill paler).</div>"))
+       "</div></div>"))))
+
+(defconst argdown--map-css
+  (concat
+   "<style>"
+   ".argdown-map{position:relative;}"
+   ".argdown-map .argdown-node-body{font:13px/1.35 system-ui,-apple-system,sans-serif;"
+   "padding:5px 7px;box-sizing:border-box;color:#111;"
+   "-webkit-user-select:text;user-select:text;}"
+   ".argdown-map .argdown-node-title{font-weight:600;margin-bottom:2px;}"
+   ".argdown-map .argdown-node-text{font-weight:400;}"
+   ".argdown-map foreignObject{overflow:visible;}"
+   ".argdown-map .argdown-edge{opacity:.35;transition:opacity .1s;}"
+   ".argdown-map .argdown-edge-hit{fill:none;stroke:transparent;stroke-width:12;"
+   "pointer-events:stroke;cursor:pointer;}"
+   ".argdown-map.argdown-tracing .argdown-edge{opacity:.08;}"
+   ".argdown-map.argdown-tracing .argdown-edge.argdown-edge-hl{opacity:1;stroke-width:2.5;}"
+   "@keyframes argdown-flash{0%{stroke:#1a73e8;stroke-width:5;}25%{stroke-width:1;}"
+   "50%{stroke:#1a73e8;stroke-width:5;}75%{stroke-width:1;}100%{stroke:#1a73e8;stroke-width:5;}}"
+   ".argdown-map .argdown-node.argdown-flash > rect:not(.argdown-fold-stack){animation:argdown-flash .7s ease-out;}"
+   ".argdown-map .argdown-legend{position:absolute;top:8px;right:8px;"
+   "font:12px/1.4 system-ui,-apple-system,sans-serif;background:rgba(255,255,255,.94);"
+   "border:1px solid #ccc;border-radius:6px;padding:6px 8px;max-width:19em;"
+   "box-shadow:0 1px 4px rgba(0,0,0,.15);}"
+   ".argdown-map .argdown-legend-toggle{font:inherit;font-weight:600;cursor:pointer;"
+   "background:none;border:0;padding:0;color:#333;}"
+   ".argdown-map .argdown-legend-toggle::after{content:' \\25BE';}"
+   ".argdown-map .argdown-legend-collapsed .argdown-legend-toggle::after{content:' \\25B8';}"
+   ".argdown-map .argdown-legend-collapsed .argdown-legend-body{display:none;}"
+   ".argdown-map .argdown-legend-body{margin-top:5px;}"
+   ".argdown-map .argdown-legend-head{font-weight:600;margin:5px 0 2px;color:#555;}"
+   ".argdown-map .argdown-legend-row{display:flex;align-items:center;gap:6px;margin:1px 0;}"
+   ".argdown-map .argdown-legend-chip{display:inline-block;width:14px;height:14px;"
+   "border-radius:3px;flex:none;}"
+   ".argdown-map .argdown-legend-note{margin-top:4px;color:#777;font-size:11px;}"
+   "</style>")
+  "Scoped styling: the node bodies (a readable HTML column, title bold over
+prose, text selectable — the hypothes.is anchor rides `user-select:text' — and
+`overflow:visible' so text shows through the placeholder box until the layout
+fits it); the edges, which recede at rest (translucent) and, while the map is
+`argdown-tracing', dim further except the hovered node's `argdown-edge-hl' set;
+the corner legend (`position:absolute' on the `position:relative' map, a
+`-collapsed' class the toggle flips to fold the body away, the ▾/▸ caret
+tracking it); and the `argdown-flash' keyframes that pulse a just-folded
+node's border.")
+
+(defun argdown--map-html (in)
+  "Render INPUT's argument model as one map fragment: a single
+`.argdown-map' element carrying its inline SVG.  It holds no engine and no
+styling of its own — those are shared, emitted once per page by
+`argdown--runtime-html' — so a page with many maps carries the heavy layout
+code just once, and each stored result stays small."
+  (let* ((model (argdown--json in))
+         (grades (argdown--map-grades model))
+         (slabels (let ((sl (argdown--strength-labels in)))
+                    (append (car sl) (cdr sl))))
+         (colors (argdown--strength-colors in))
+         (borders (car colors)) (fills (cdr colors))
+         (nodes (mapconcat
+                 (lambda (nd)
+                   (let* ((id (nth 0 nd)) (title (nth 1 nd)) (kind (nth 2 nd))
+                          (gd (cdr (assoc title grades)))
+                          (sl (and (not gd) (cdr (assoc title slabels))))
+                          (b (cdr (assoc title borders)))
+                          (f (cdr (assoc title fills)))
+                          (g (argdown--node-g id title (argdown--node-html model title kind)))
+                          (g (if b (string-replace "stroke=\"#888\""
+                                                   (format "stroke=\"%s\"" b) g) g))
+                          (g (if f (string-replace "fill=\"#fff\""
+                                                   (format "fill=\"%s\"" f) g) g))
+                          (g (cond
+                              (gd (string-replace
+                                   "</g>"
+                                   (concat (argdown--node-badge (car gd) (cdr gd)) "</g>") g))
+                              (sl (string-replace
+                                   "</g>"
+                                   (concat (argdown--node-badge
+                                            (car sl) (nth (cdr sl) argdown--epistemic-ramp))
+                                           "</g>") g))
+                              (t g))))
+                     g))
+                 (argdown--map-nodes model) "\n")))
+    (concat
+     "<div class=\"argdown-map\"><svg>\n"
+     "<defs><marker id=\"argdown-arrow\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\""
+     " markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\">"
+     "<path d=\"M0,0 L10,5 L0,10 z\" fill=\"context-stroke\"/></marker></defs>\n"
+     "<g class=\"argdown-viewport\" style=\"visibility:hidden\">\n"
+     nodes "\n" (argdown--map-edges-svg model) "\n"
+     "</g>\n</svg>" (argdown--map-legend in model) "</div>\n")))
+
+(defun argdown--runtime-html ()
+  "The one-per-page runtime shared by every map: the layout engine, the map
+CSS (injected into the head), and `argdownInitAll'.  The `window.argdownInitAll'
+guard keeps extra copies harmless when a loaded page is stitched from several
+exported pieces — the engine installs from the first, the rest no-op."
+  (concat
+   "<script data-argdown-runtime>\n"
+   "if(!window.argdownInitAll){\n"
+   (argdown--dagre-js) "\n"
+   "document.head.insertAdjacentHTML('beforeend', "
+   (json-encode argdown--map-css) ");\n"
+   argdown--layout-js
+   "}\n</script>"))
+
+(defun argdown--inject-runtime (output _backend _info)
+  "Export filter: emit the shared map runtime once per page.  If OUTPUT holds a
+map fragment but no runtime, insert `argdown--runtime-html' just before the
+first map; otherwise return OUTPUT unchanged."
+  (if (and (string-match-p "class=\"argdown-map\"" output)
+           (not (string-match-p "data-argdown-runtime" output)))
+      (let ((pos (string-match "<div class=\"argdown-map\"" output)))
+        (concat (substring output 0 pos)
+                (argdown--runtime-html) "\n"
+                (substring output pos)))
+    output))
+(add-to-list 'org-export-filter-final-output-functions #'argdown--inject-runtime)

@@ -50,6 +50,11 @@
        alist-of-strings-p)
   (put 'konix/agent-shell-tool-whitelist-project 'safe-local-variable
        alist-of-strings-p)
+  ;; And the per-project set of disabled (kept-but-inert) rules for each.
+  (put 'konix/agent-shell-tool-blacklist-disabled-project 'safe-local-variable
+       alist-of-strings-p)
+  (put 'konix/agent-shell-tool-whitelist-disabled-project 'safe-local-variable
+       alist-of-strings-p)
   ;; A project sets its mid-turn steering rules the same way (see
   ;; `KONIX_agent-shell-steering.el'): an alist of (KEY . GUIDANCE) strings.
   (put 'konix/agent-shell-steering-rules-project 'safe-local-variable

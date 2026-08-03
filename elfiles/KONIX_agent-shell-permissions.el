@@ -762,6 +762,34 @@ in the project.")
 (defvar-local konix/agent-shell-tool-whitelist nil
   "Buffer-local SESSION alist of (KEY . NOTE) whitelisted tools.")
 
+;;; Disabled overlay -----------------------------------------------------------
+;; Per-axis enable/disable markers, one alist per axis mapping KEY -> "off"/"on"
+;; (unset = enabled).  Resolved session>project>global and subtracted from the
+;; effective policy, so a rule can be turned off without deleting it, and a
+;; global "off" overridden by a narrower "on".
+
+(defcustom konix/agent-shell-tool-blacklist-disabled-global nil
+  "GLOBAL blacklist enable/disable markers (alist of KEY -> \"off\"/\"on\")."
+  :type '(alist :key-type string :value-type string)
+  :group 'konix)
+
+(defvar konix/agent-shell-tool-blacklist-disabled-project nil
+  "PROJECT blacklist enable/disable markers, from `.dir-locals.el'.")
+
+(defvar-local konix/agent-shell-tool-blacklist-disabled nil
+  "SESSION blacklist enable/disable markers.")
+
+(defcustom konix/agent-shell-tool-whitelist-disabled-global nil
+  "GLOBAL whitelist enable/disable markers (alist of KEY -> \"off\"/\"on\")."
+  :type '(alist :key-type string :value-type string)
+  :group 'konix)
+
+(defvar konix/agent-shell-tool-whitelist-disabled-project nil
+  "PROJECT whitelist enable/disable markers, from `.dir-locals.el'.")
+
+(defvar-local konix/agent-shell-tool-whitelist-disabled nil
+  "SESSION whitelist enable/disable markers.")
+
 ;;; Policy descriptor ----------------------------------------------------------
 
 (cl-defstruct (konix/agent-shell-policy
@@ -776,9 +804,28 @@ non-nil, is a zero-argument function (run in the origin buffer) returning
 the key-completion candidates for this policy; it defaults to
 `konix/agent-shell--tool-candidates' so the tool policies keep their
 tool-aware completion while other policies (e.g. autoresponse) can supply
-their own."
+their own.  DISABLED-POLICY, when non-nil, is a companion whose \"off\" keys
+`konix/agent-shell-policy--effective' subtracts."
   name global-var project-var session-var default value-label value-prompt
-  candidates-fn)
+  candidates-fn disabled-policy)
+
+(defvar konix/agent-shell--blacklist-disabled
+  (konix/agent-shell-policy--make
+   :name "blacklist-disabled"
+   :global-var 'konix/agent-shell-tool-blacklist-disabled-global
+   :project-var 'konix/agent-shell-tool-blacklist-disabled-project
+   :session-var 'konix/agent-shell-tool-blacklist-disabled
+   :default "on")
+  "Enable/disable companion of `konix/agent-shell--blacklist'.")
+
+(defvar konix/agent-shell--whitelist-disabled
+  (konix/agent-shell-policy--make
+   :name "whitelist-disabled"
+   :global-var 'konix/agent-shell-tool-whitelist-disabled-global
+   :project-var 'konix/agent-shell-tool-whitelist-disabled-project
+   :session-var 'konix/agent-shell-tool-whitelist-disabled
+   :default "on")
+  "Enable/disable companion of `konix/agent-shell--whitelist'.")
 
 (defvar konix/agent-shell--blacklist
   (konix/agent-shell-policy--make
@@ -788,7 +835,8 @@ their own."
    :session-var 'konix/agent-shell-tool-blacklist
    :default "Don't use this tool."
    :value-label "Reason"
-   :value-prompt "Reason (sent to the agent): ")
+   :value-prompt "Reason (sent to the agent): "
+   :disabled-policy konix/agent-shell--blacklist-disabled)
   "The blacklist policy: matching tools are auto-rejected and steered.")
 
 (defvar konix/agent-shell--whitelist
@@ -799,7 +847,8 @@ their own."
    :session-var 'konix/agent-shell-tool-whitelist
    :default ""
    :value-label "Note"
-   :value-prompt "Note (optional): ")
+   :value-prompt "Note (optional): "
+   :disabled-policy konix/agent-shell--whitelist-disabled)
   "The whitelist policy: matching tools are auto-approved.")
 
 (defun konix/agent-shell-policy--candidates (policy)
@@ -1004,13 +1053,45 @@ Read in the current buffer (the responder runs in the shell buffer);
 session shadows project shadows global for the same key.  The project axis
 is read from the live `.dir-locals.el' (not the session's start-time
 buffer-local snapshot), so rules added to a project at runtime take effect
-in the running session."
+in the running session.  Keys disabled via POLICY's DISABLED-POLICY are dropped."
   (let ((result (copy-alist (symbol-value (konix/agent-shell-policy-global-var policy)))))
     (dolist (entry (konix/agent-shell-policy--project-entries policy))
       (setf (alist-get (car entry) result nil nil #'equal) (cdr entry)))
     (dolist (entry (symbol-value (konix/agent-shell-policy-session-var policy)))
       (setf (alist-get (car entry) result nil nil #'equal) (cdr entry)))
+    (when (konix/agent-shell-policy-disabled-policy policy)
+      (dolist (key (mapcar #'car result))
+        (when (konix/agent-shell-policy--disabled-p policy key)
+          (setf (alist-get key result nil t #'equal) nil))))
     result))
+
+(defun konix/agent-shell-policy--disabled-p (policy key)
+  "Non-nil when KEY resolves to \"off\" in POLICY's disabled companion."
+  (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
+    (equal (konix/agent-shell-policy--value-for off key) "off")))
+
+(defun konix/agent-shell-policy--disable-decider (policy key)
+  "Return (LEVEL . STATE) for the most-specific axis marking KEY, or nil.
+LEVEL is \"s\"/\"p\"/\"G\"; STATE its \"off\"/\"on\"."
+  (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
+    (cl-loop for (level . entries-fn)
+             in `(("s" . ,#'konix/agent-shell-policy--session-entries)
+                  ("p" . ,#'konix/agent-shell-policy--project-entries)
+                  ("G" . ,#'konix/agent-shell-policy--global-entries))
+             for cell = (assoc key (funcall entries-fn off))
+             when cell return (cons level (cdr cell)))))
+
+(defun konix/agent-shell-policy--set-disabled (policy key level state)
+  "Write KEY's marker for POLICY on LEVEL (session/project/global) to STATE.
+STATE is \"off\", \"on\", or nil to unset it (defer to the broader axis)."
+  (let ((off (konix/agent-shell-policy-disabled-policy policy)))
+    (pcase level
+      ('global  (if state (konix/agent-shell-policy--set-global off key state)
+                  (konix/agent-shell-policy--remove-global off key)))
+      ('project (if state (konix/agent-shell-policy--set-project off key state)
+                  (konix/agent-shell-policy--remove-project off key)))
+      (_        (if state (konix/agent-shell-policy--set-session off key state)
+                  (konix/agent-shell-policy--remove-session off key))))))
 
 (defun konix/agent-shell-policy--match (policy tool-call)
   "Return POLICY's matching entry for TOOL-CALL, or nil.
@@ -1617,7 +1698,7 @@ it."
   (konix/agent-shell-panel-create
    :buffer-name (format "*Tool %s*" (konix/agent-shell-policy-name policy))
    :mode-name (format "Tool-%s" (capitalize (konix/agent-shell-policy-name policy)))
-   :help (format "Tool %s: G global, p project, s session, a add, e/RET edit, d delete, g refresh, q quit"
+   :help (format "Tool %s: G global, p project, s session, t enable/disable, a add, e/RET edit, d delete, r reapply, g refresh, q quit"
                  (konix/agent-shell-policy-name policy))
    :name-header "Regexp/predicate"
    :name-width 30
@@ -1642,26 +1723,43 @@ it."
      #'konix/agent-shell-policy--set-session
      #'konix/agent-shell-policy--remove-session))
    :value-columns
-   (list (list (konix/agent-shell-policy-value-label policy) 40
+   (list (list "On" 6
+               (lambda (key)
+                 (concat
+                  (konix/agent-shell-panel--cell
+                   (not (konix/agent-shell-policy--disabled-p policy key)))
+                  (when-let ((decider (konix/agent-shell-policy--disable-decider
+                                       policy key)))
+                    (propertize (car decider) 'face 'shadow)))))
+         (list (konix/agent-shell-policy-value-label policy) 40
                (lambda (key) (konix/agent-shell-policy--value-for policy key))))
    :extra-keys
-   '(("a"   . konix/agent-shell-policy-menu-add)
+   '(("t"   . konix/agent-shell-policy-menu-toggle-enabled)
+     ("a"   . konix/agent-shell-policy-menu-add)
      ("e"   . konix/agent-shell-policy-menu-edit)
      ("RET" . konix/agent-shell-policy-menu-edit)
-     ("d"   . konix/agent-shell-policy-menu-delete))))
+     ("d"   . konix/agent-shell-policy-menu-delete)
+     ("r"   . konix/agent-shell-policy-menu-reapply))))
+
+(defun konix/agent-shell-policy-menu-reapply ()
+  "Reapply the policies to the session's pending permission requests.
+Runs `konix/agent-shell-reapply-policies' in the panel's origin (shell)
+buffer, so a rule just added/edited here acts on what is already waiting."
+  (interactive)
+  (with-current-buffer (konix/agent-shell-panel--origin-buffer)
+    (call-interactively #'konix/agent-shell-reapply-policies)))
 
 (defun konix/agent-shell-policy-menu-add ()
   "Add an entry to a chosen axis of the panel's policy."
   (interactive)
   (let* ((policy (konix/agent-shell-panel-current-data))
          (origin (konix/agent-shell-panel--origin-buffer))
-         (id (tabulated-list-get-id))
          (key (with-current-buffer origin
                 (completing-read
                  (format "%s tool (regexp, @evaluator, or (lambda ...)): "
                          (capitalize (konix/agent-shell-policy-name policy)))
                  (ignore-errors (konix/agent-shell-policy--candidates policy))
-                 nil nil id 'regexp-history)))
+                 nil nil nil 'regexp-history)))
          (value (read-string (konix/agent-shell-policy-value-prompt policy)
                              (with-current-buffer origin
                                (konix/agent-shell-policy--value-for policy key))))
@@ -1702,16 +1800,41 @@ If the key changes, the old one is replaced on each axis it occupied."
           (konix/agent-shell-policy--set-session policy new-key new-value)))
       (konix/agent-shell-panel--refresh))))
 
-(defun konix/agent-shell-policy-menu-delete ()
-  "Remove the key at point from all three axes of the panel's policy."
+(defun konix/agent-shell-policy-menu-toggle-enabled ()
+  "Set the rule at point disabled/enabled/inherit on a chosen axis.
+Prompts for the level (session/project/global) and state; the rule's own
+key, value and axes are left intact."
   (interactive)
   (when-let ((key (tabulated-list-get-id)))
-    (let ((policy (konix/agent-shell-panel-current-data))
-          (origin (konix/agent-shell-panel--origin-buffer)))
+    (let* ((policy (konix/agent-shell-panel-current-data))
+           (origin (konix/agent-shell-panel--origin-buffer))
+           (level (intern (completing-read
+                           "Level: " '("session" "project" "global") nil t
+                           nil nil "session")))
+           (state (pcase (completing-read
+                          "State: " '("disabled" "enabled" "unset") nil t
+                          nil nil "disabled")
+                    ("disabled" "off") ("enabled" "on") (_ nil))))
+      (with-current-buffer origin
+        (konix/agent-shell-policy--set-disabled policy key level state)))
+    (konix/agent-shell-panel--refresh)))
+
+(defun konix/agent-shell-policy-menu-delete ()
+  "Remove the key at point from all three axes of the panel's policy.
+Also clears any disabled marker so it does not outlive the rule."
+  (interactive)
+  (when-let ((key (tabulated-list-get-id)))
+    (let* ((policy (konix/agent-shell-panel-current-data))
+           (origin (konix/agent-shell-panel--origin-buffer))
+           (off (konix/agent-shell-policy-disabled-policy policy)))
       (konix/agent-shell-policy--remove-global policy key)
+      (when off (konix/agent-shell-policy--remove-global off key))
       (with-current-buffer origin
         (konix/agent-shell-policy--remove-session policy key)
-        (konix/agent-shell-policy--remove-project policy key)))
+        (konix/agent-shell-policy--remove-project policy key)
+        (when off
+          (konix/agent-shell-policy--remove-session off key)
+          (konix/agent-shell-policy--remove-project off key))))
     (konix/agent-shell-panel--refresh)))
 
 ;;;###autoload

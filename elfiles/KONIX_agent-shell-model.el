@@ -52,6 +52,54 @@ point for model changes (manual selection and bootstrap alike)."
 (advice-add 'agent-shell--config-option-set-model-id :before
             #'konix/agent-shell--persist-model-id)
 
+;; The session/permission mode ("Manual", "Accept Edits", ...) suffers the
+;; same amnesia as the model: `session/resume' lands back on the server's
+;; default mode, not the one the session was left in.  Same cure: persist it
+;; per session id and replay it on resume.
+
+(defvar konix/agent-shell-session-modes-store
+  (konix/agent-shell-session-store-create
+   :file (expand-file-name "konix/agent-shell-session-modes.el" user-emacs-directory))
+  "Store mapping a session id to the last session mode id used in it.")
+
+(defun konix/agent-shell-session-mode-get (session-id)
+  "Return the persisted session mode id for SESSION-ID, or nil."
+  (konix/agent-shell-session-store-get
+   konix/agent-shell-session-modes-store session-id))
+
+(defun konix/agent-shell-session-mode-put (session-id mode-id)
+  "Persist MODE-ID as the session mode in use for SESSION-ID."
+  (konix/agent-shell-session-store-put
+   konix/agent-shell-session-modes-store session-id mode-id))
+
+(defun konix/agent-shell--persist-mode-id (&rest args)
+  "Record the mode id being set (ARGS plist) for the current session.
+Advice on `agent-shell--config-option-set-mode-id', the choke point for
+deliberate mode changes (cycle, selection and bootstrap alike)."
+  (when (derived-mode-p 'agent-shell-mode)
+    (konix/agent-shell-session-mode-put
+     (map-nested-elt (agent-shell--state) '(:session :id))
+     (plist-get args :mode-id))))
+
+(advice-add 'agent-shell--config-option-set-mode-id :before
+            #'konix/agent-shell--persist-mode-id)
+
+(cl-defun konix/agent-shell--persist-pushed-mode-id
+    (&rest _args &key state acp-notification &allow-other-keys)
+  "Record a mode change pushed by the agent for its session.
+Advice on `agent-shell--on-notification': unlike the model, the mode also
+changes agent-side (e.g. plan approval switching to Accept Edits) through a
+`current_mode_update' notification that mutates the state directly, so the
+`agent-shell--config-option-set-mode-id' choke point never sees it."
+  (when (equal (map-nested-elt acp-notification '(params update sessionUpdate))
+               "current_mode_update")
+    (konix/agent-shell-session-mode-put
+     (map-nested-elt state '(:session :id))
+     (map-nested-elt acp-notification '(params update currentModeId)))))
+
+(advice-add 'agent-shell--on-notification :after
+            #'konix/agent-shell--persist-pushed-mode-id)
+
 (defun konix/agent-shell-resume ()
   "Start a fresh agent-shell session in resume mode.
 Calls `agent-shell--start' directly to forward `:session-strategy', which
@@ -63,20 +111,28 @@ second resume can't ask which session to load."
   (when (and (use-region-p) buffer-file-name (buffer-modified-p))
     (save-buffer))
   (let ((shell (agent-shell--start
-                ;; Override :default-model-id with a per-session lookup so the
-                ;; resumed session lands back on the model we last persisted
-                ;; for it (see `konix/agent-shell-session-models-store'), rather
-                ;; than the global `agent-shell-anthropic-default-model-id' or
-                ;; the server's resume default. The lambda runs in
+                ;; Override :default-model-id and :default-session-mode-id
+                ;; with per-session lookups so the resumed session lands back
+                ;; on the model and mode we last persisted for it (see
+                ;; `konix/agent-shell-session-models-store' and
+                ;; `konix/agent-shell-session-modes-store'), rather than the
+                ;; global `agent-shell-anthropic-default-model-id' or the
+                ;; server's resume defaults. The lambdas run in
                 ;; `agent-shell--handle' once the session id is known; nil
-                ;; (no record) skips the set and keeps the server's model.
-                :config (map-insert (or (agent-shell--resolve-preferred-config)
-                                        (agent-shell-select-config :prompt "Start new agent: "))
-                                    :default-model-id
-                                    (lambda ()
-                                      (konix/agent-shell-session-model-get
-                                       (map-nested-elt (agent-shell--state)
-                                                       '(:session :id)))))
+                ;; (no record) skips the set and keeps the server's value.
+                :config (map-insert
+                         (map-insert (or (agent-shell--resolve-preferred-config)
+                                         (agent-shell-select-config :prompt "Start new agent: "))
+                                     :default-model-id
+                                     (lambda ()
+                                       (konix/agent-shell-session-model-get
+                                        (map-nested-elt (agent-shell--state)
+                                                        '(:session :id)))))
+                         :default-session-mode-id
+                         (lambda ()
+                           (konix/agent-shell-session-mode-get
+                            (map-nested-elt (agent-shell--state)
+                                            '(:session :id)))))
                 :new-session t
                 :session-strategy 'prompt
                 :no-focus t)))

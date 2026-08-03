@@ -27,7 +27,8 @@
 (require 'map)
 (require 'seq)
 
-(setq-default acp-logging-enabled t)
+;; (setq-default acp-logging-enabled t)
+(setq-default acp-logging-enabled nil)
 (setq-default agent-shell-prefer-viewport-interaction t)
 (setq-default agent-shell-session-strategy 'new)
 (setq-default agent-shell-anthropic-default-model-id "sonnet")

@@ -173,6 +173,80 @@ the whole stored set back.  Point ends in the last stored session."
 (declare-function agent-shell--insert-to-shell-buffer "agent-shell")
 (declare-function agent-shell--resolve-preferred-config "agent-shell")
 (declare-function agent-shell-select-config "agent-shell")
+(declare-function agent-shell--state "agent-shell")
+(declare-function agent-shell-subscribe-to "agent-shell")
+(declare-function agent-shell-unsubscribe "agent-shell")
+
+;;; Governing-note boot gate ----------------------------------------------------
+;; A session opened via an `agent-shell-with-note' link is primed with a
+;; governing note that is meant to be read and followed.  Its first two tool
+;; calls must be `set_label' and `spawn_auditor' (either order): until both
+;; have completed, the `@note-boot-gate' session blacklist rule below declines
+;; every other tool, steering the agent back to the note's boot instructions.
+
+(defconst konix/org-agent-shell--note-boot-required '("set_label" "spawn_auditor")
+  "Tool names a note-booted session must run before any other tool.")
+
+(defvar-local konix/agent-shell--note-boot-pending nil
+  "Required boot tools (`konix/org-agent-shell--note-boot-required') not yet run.
+Non-nil only in a shell armed by `konix/org-agent-shell--note-boot-arm'; while
+non-nil the `@note-boot-gate' blacklist rule declines every other tool.")
+
+(defun konix/org-agent-shell--note-boot-tool (tool-call)
+  "Return the required boot tool TOOL-CALL invokes, or nil.
+The tool name is matched as a substring of the call's `:title', so a bare
+`set_label', an `mcp__...__set_label' id or any decorated title all count."
+  (let ((title (or (map-elt tool-call :title) ""))
+        (case-fold-search t))
+    (seq-find (lambda (name) (string-match-p (regexp-quote name) title))
+              konix/org-agent-shell--note-boot-required)))
+
+(konix/agent-shell-define-tool-evaluator "note-boot-gate" (tool-call)
+  "Match any tool but the required boot tools while the boot gate is armed."
+  (and konix/agent-shell--note-boot-pending
+       (not (konix/org-agent-shell--note-boot-tool tool-call))))
+
+(defun konix/org-agent-shell--note-boot-arm (shell)
+  "Arm SHELL's boot gate: decline every tool until the required ones have run.
+Installs the `@note-boot-gate' session blacklist rule and watches the
+tool-call updates; each of `konix/org-agent-shell--note-boot-required' is
+struck off when it completes, and once none is left the rule is removed and
+the watch torn down."
+  (with-current-buffer shell
+    (setq-local konix/agent-shell--note-boot-pending
+                (copy-sequence konix/org-agent-shell--note-boot-required))
+    (setf (alist-get "@note-boot-gate" konix/agent-shell-tool-blacklist
+                     nil nil #'equal)
+          (format "This session is governed by a note that is meant to be read and followed: before anything else, call %s (in any order). Every other tool is declined until both have run."
+                  (string-join konix/org-agent-shell--note-boot-required
+                               " and "))))
+  (let (token)
+    (setq token
+          (agent-shell-subscribe-to
+           :shell-buffer shell :event 'tool-call-update
+           :on-event
+           (lambda (event)
+             (if (not (buffer-live-p shell))
+                 (agent-shell-unsubscribe :subscription token)
+               (with-current-buffer shell
+                 (when-let* ((data (map-elt event :data))
+                             (id (map-elt data :tool-call-id))
+                             (tool-call
+                              (or (map-elt (map-elt (agent-shell--state)
+                                                    :tool-calls)
+                                           id)
+                                  (map-elt data :tool-call)))
+                             ((equal (map-elt tool-call :status) "completed"))
+                             (name (konix/org-agent-shell--note-boot-tool
+                                    tool-call)))
+                   (setq konix/agent-shell--note-boot-pending
+                         (delete name konix/agent-shell--note-boot-pending))
+                   (unless konix/agent-shell--note-boot-pending
+                     (setf (alist-get "@note-boot-gate"
+                                      konix/agent-shell-tool-blacklist
+                                      nil t #'equal)
+                           nil)
+                     (agent-shell-unsubscribe :subscription token))))))))))
 
 (defun konix/org-agent-shell-with-note-follow-link (link &optional _arg)
   "Open a fresh Opus agent-shell primed with the org note LINK.
@@ -181,8 +255,10 @@ link.  The note is rendered with `konix/mcp-server-render-note'
 (transclusions resolved inline) into the boot prompt, which then points
 the agent at the link's file.  The note is also bound to the new session
 \(see `konix/agent-shell-set-governing-note'), so the agent calls
-`spawn_auditor' with no note path.  Prompts for a free-form message
-appended to the boot prompt (leave empty for none)."
+`spawn_auditor' with no note path.  The session boots gated: until
+`set_label' and `spawn_auditor' have both run, every other tool call is
+auto-declined (see `konix/org-agent-shell--note-boot-arm').  Prompts for a
+free-form message appended to the boot prompt (leave empty for none)."
   (let* ((source (buffer-file-name))
          (base (if source (file-name-directory source) default-directory))
          (note (expand-file-name (string-trim link) base))
@@ -191,7 +267,10 @@ appended to the boot prompt (leave empty for none)."
          (prompt (format "%s
 
 Now, let's focus on %s
-When spawning an audit buddy, call spawn_auditor.%s"
+
+First thing, call the set_label tool (provide a meaningful name) and spawn_auditor: they must be your first two tool calls, in either order — every other tool is declined until both have run.
+
+Make sure you provide absolute paths in audit requests.%s"
                          rendered
                          (or source "the current file")
                          (if (string-empty-p message)
@@ -213,6 +292,7 @@ When spawning an audit buddy, call spawn_auditor.%s"
       (with-current-buffer shell
         (setq-local agent-shell-cwd-function (lambda () base))
         (konix/agent-shell-set-governing-note shell note)
+        (konix/org-agent-shell--note-boot-arm shell)
         (agent-shell--insert-to-shell-buffer
          :shell-buffer shell
          :text prompt

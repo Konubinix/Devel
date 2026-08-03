@@ -1,0 +1,99 @@
+#+title: cadquery org-babel language
+
+Reusable Python behind the =cadquery= org-babel language (see
+=KONIX_ob-cadquery.el=).  This file is ingested into the Library of Babel, so any
+note can pull the block below in with a =<<cadquery>>= noweb reference.
+
+* the compose plugin
+
+  The block plugs =composeunion= / =composecut= / =composeintersect= onto
+  =cq.Workplane= (see [[https://cadquery.readthedocs.io/en/latest/extending.html][Extending CadQuery]]).  They behave exactly like
+  =union= / =cut= / =intersect= but also record, on the result, what the step is
+  built from — so the fluent chain stays plain cadquery, no wrapper.
+
+  Recording accumulates only within one step's chain: =_compose_reset()= (injected
+  by the executor right after every =<<...>>= noweb inclusion) drops the head, so
+  the next =composeX= on the just-included shape starts a fresh recording with
+  that shape as the grey base.  Hence each block renders *its* step: base grey,
+  unioned parts orange, removed material (=before ∩ tool=) translucent red.
+
+  =cadquery_export= is the single entry point the language calls; a shape without
+  a recording (e.g. =result.val()=) is exported as STL instead.
+
+  #+name: cadquery
+  #+BEGIN_SRC python :eval no
+    import cadquery as cq
+
+    # Recording lives in a plain module-global list -- no state on Workplane
+    # objects, so only the documented "add a method to cq.Workplane" plugin
+    # mechanism is used.  It survives plain ops (mix composecut and a hidden
+    # plain cut freely); _compose_reset() (injected after each <<...>> noweb
+    # inclusion) clears it so each step records only its own ops.
+    _LOG = []
+
+    def _compose_reset():
+        _LOG.clear()
+
+    def _compose_op(name, role):
+        orig = getattr(cq.Workplane, name)
+        def method(self, other, *a, **k):
+            result = orig(self, other, *a, **k)
+            if not _LOG:
+                _LOG.append(("base", self))
+            _LOG.append((role, other, self))   # operand, and shape before this op
+            return result
+        return method
+
+    cq.Workplane.composeunion     = _compose_op("union", "add")
+    cq.Workplane.composecut       = _compose_op("cut", "cut")
+    cq.Workplane.composeintersect = _compose_op("intersect", "intersect")
+
+    _GREY = cq.Color(0.7, 0.7, 0.7, 1.0)
+    # `add' shows the new material, opaque.  A subtractive op is split into two
+    # disjoint, contrasted, very translucent parts: what it removes from the
+    # part, and the tool's reach beyond the part.
+    _ADD_COLORS = [cq.Color(0.75, 0.2, 0.9, 1.0),    # violet
+                   cq.Color(0.95, 0.35, 0.7, 1.0),   # pink
+                   cq.Color(0.5, 0.2, 0.8, 1.0)]     # purple
+    _A = 0.18
+    _GHOST = 0.06
+    _HOLLOW = {                          # (removed-from-part, tool-reach-beyond)
+        "cut":       (cq.Color(0.9, 0.15, 0.15, _GHOST),  # red, very ghostly -- material cut away
+                      cq.Color(0.9, 0.25, 0.2, _A)),      # red -- tool beyond the part
+        "intersect": (cq.Color(0.15, 0.4, 0.95, _A),      # blue -- base clipped away
+                      cq.Color(0.2, 0.85, 0.4, _A)),      # green -- tool beyond the part
+    }
+
+    def cadquery_export(obj, out, tolerance=0.1):
+        if len(_LOG) > 1:
+            base = _LOG[0][1]
+            view = cq.Assembly()
+            kept = base.intersect(obj)
+            if kept.solids().vals():
+                view.add(kept, color=_GREY, name="kept")
+            added_left = obj.cut(base)              # all new material, split per add
+            counts = {"add": 0, "cut": 0, "intersect": 0}
+            for role, operand, before in _LOG[1:]:
+                i = counts[role]
+                counts[role] += 1
+                if role == "add":
+                    piece = added_left.intersect(operand)   # only the genuinely new material
+                    added_left = added_left.cut(operand)
+                    if piece.solids().vals():
+                        view.add(piece, color=_ADD_COLORS[i % len(_ADD_COLORS)],
+                                 name="add_%d" % i)
+                    continue
+                removed = (before.intersect(operand) if role == "cut"
+                           else before.cut(operand))        # material taken from the part
+                reach = operand.cut(before)                 # tool beyond the part
+                rem_col, reach_col = _HOLLOW[role]
+                if removed.solids().vals():
+                    view.add(removed, color=rem_col, name="%s_%d_removed" % (role, i))
+                if reach.solids().vals():
+                    view.add(reach, color=reach_col, name="%s_%d_reach" % (role, i))
+            out = out.rsplit(".", 1)[0] + ".glb"
+            view.export(out)
+        else:
+            cq.exporters.export(obj, out, angularTolerance=tolerance)
+        return out
+  #+END_SRC

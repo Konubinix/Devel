@@ -146,5 +146,10 @@ with :ipfa fig-link -> like t but wraps in #+attr_html/:link/:target _blank and 
       ))
   )
 
+(require 'KONIX_ob-cadquery)
+
+(with-eval-after-load 'org
+  (add-to-list 'org-src-lang-modes '("cadquery" . python)))
+
 (provide 'KONIX_AL-ob-core)
 ;;; KONIX_AL-ob-core.el ends here

@@ -26,8 +26,11 @@
 
 (setq-default org-plantuml-exec-mode 'plantuml)
 
+;; `:cmdline' must be present (even empty): `org-babel-execute:plantuml' splices
+;; its value into the command with `mapconcat #'identity', so a missing/nil
+;; :cmdline makes any plantuml block error with "Wrong type argument: stringp, nil".
 (setq-default org-babel-default-header-args:plantuml
-              '((:results . "file") (:cache . "yes") (:ipfa . "t") (:exports . "results")))
+              '((:results . "file") (:file . "/tmp/plantuml.png") (:cache . "yes") (:ipfa . "fig-link") (:exports . "results") (:cmdline . "")))
 
 
 ;; used only if (eq org-plantuml-exec-mode 'jar)

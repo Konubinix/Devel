@@ -25,59 +25,189 @@
 ;;; Code:
 
 (require 'plz)
+(require 'term)
 
-(defun konix/claude-code--parse-claude-credentials ()
-  "Parse Claude Code credentials from ~/.claude/.credentials.json.
-Returns the OAuth access token or nil if not found."
-  (let ((creds-file (expand-file-name "~/.claude/.credentials.json")))
-    (when (file-exists-p creds-file)
-      (let* ((json-object-type 'alist)
-             (json-array-type 'list)
-             (creds (json-read-file creds-file)))
-        (alist-get 'accessToken (alist-get 'claudeAiOauth creds))))))
+(defconst konix/claude-code--credentials-file "~/.claude/.credentials.json"
+  "Where the Claude Code CLI stores its OAuth credentials.")
 
-(defun konix/claude-code--credentials-expired-p ()
-  "Check if the Claude Code OAuth credentials are expired.
-Returns non-nil if the credentials file is missing, the token is absent,
-or the expiresAt timestamp has passed."
-  (let ((creds-file (expand-file-name "~/.claude/.credentials.json")))
-    (or (not (file-exists-p creds-file))
-        (let* ((json-object-type 'alist)
-               (json-array-type 'list)
-               (creds (json-read-file creds-file))
-               (oauth (alist-get 'claudeAiOauth creds))
-               (token (alist-get 'accessToken oauth))
-               (expires-at (alist-get 'expiresAt oauth)))
-          (or (null token)
-              (string-empty-p token)
-              (and expires-at
-                   (numberp expires-at)
-                   (<= expires-at (float-time))))))))
+(defconst konix/claude-code--oauth-token-url
+  "https://platform.claude.com/v1/oauth/token"
+  "Token endpoint the Claude Code CLI performs its OAuth grants against.")
+
+(defconst konix/claude-code--oauth-client-id
+  "9d1c250a-e61b-44d9-88ed-5944d1962f5e"
+  "OAuth client id of the Claude Code CLI.")
+
+(defconst konix/claude-code--oauth-default-scopes
+  '("user:inference" "user:profile" "user:sessions:claude_code"
+    "user:mcp_servers" "user:file_upload")
+  "Scopes to ask for when the credentials file records none.")
+
+(defvar konix/claude-code--refresh-margin 300
+  "Renew the access token when fewer than this many seconds remain.")
+
+(define-error 'konix/claude-code-refresh-error
+  "Claude Code token refresh failed")
+
+(define-error 'konix/claude-code-refresh-rejected
+  "Claude Code refresh token is no longer usable"
+  'konix/claude-code-refresh-error)
+
+(defun konix/claude-code--read-credentials ()
+  "Read the Claude Code credentials file, or nil when it does not exist.
+Returns the whole top level object, so that keys we do not know about
+survive a rewrite."
+  (let ((file (expand-file-name konix/claude-code--credentials-file)))
+    (when (file-exists-p file)
+      (let ((json-object-type 'alist)
+            (json-array-type 'list))
+        (json-read-file file)))))
+
+(defun konix/claude-code--oauth-expiry (oauth)
+  "Return when OAUTH expires, as a Unix time in seconds, or nil.
+The credentials file stores `expiresAt' in milliseconds."
+  (let ((expires-at (alist-get 'expiresAt oauth)))
+    (when (numberp expires-at)
+      (/ expires-at 1000.0))))
+
+(defun konix/claude-code--token-fresh-p (oauth)
+  "Return non-nil when OAUTH holds a token good for a while longer."
+  (let ((token (alist-get 'accessToken oauth))
+        (expiry (konix/claude-code--oauth-expiry oauth)))
+    (and (stringp token)
+         (not (string-empty-p token))
+         expiry
+         (> expiry (+ (float-time) konix/claude-code--refresh-margin)))))
+
+(defun konix/claude-code--write-credentials (credentials)
+  "Write CREDENTIALS to the Claude Code credentials file, atomically.
+Goes through a temporary file in the same directory, created with mode
+600 by `make-temp-file', so that a crash cannot leave a truncated
+credentials file behind."
+  (let* ((file (expand-file-name konix/claude-code--credentials-file))
+         (tmp (make-temp-file (concat file "."))))
+    (with-temp-file tmp
+      (insert (json-encode credentials)))
+    (set-file-modes tmp #o600)
+    (rename-file tmp file t)))
+
+(defun konix/claude-code--oauth-refresh-request (oauth)
+  "POST a refresh_token grant for OAUTH and return the parsed response.
+Signals `konix/claude-code-refresh-rejected' when the server refuses the
+refresh token itself, `konix/claude-code-refresh-error' otherwise."
+  (let ((body (json-encode
+               `((grant_type . "refresh_token")
+                 (refresh_token . ,(alist-get 'refreshToken oauth))
+                 (client_id . ,konix/claude-code--oauth-client-id)
+                 (scope . ,(string-join
+                            (or (alist-get 'scopes oauth)
+                                konix/claude-code--oauth-default-scopes)
+                            " "))))))
+    (condition-case err
+        (plz 'post konix/claude-code--oauth-token-url
+          :headers '(("content-type" . "application/json"))
+          :body body
+          :as (lambda ()
+                (let ((json-object-type 'alist)
+                      (json-array-type 'list))
+                  (json-read)))
+          :timeout 30)
+      (plz-error
+       (let* ((response (plz-error-response (caddr err)))
+              (status (and response (plz-response-status response)))
+              (payload (and response (plz-response-body response))))
+         (signal (if (and payload (string-match-p "invalid_grant" payload))
+                     'konix/claude-code-refresh-rejected
+                   'konix/claude-code-refresh-error)
+                 (list (format "HTTP %s: %s"
+                               (or status "?")
+                               (or payload "no body")))))))))
+
+(defun konix/claude-code--refresh-credentials (&optional force)
+  "Renew the Claude Code access token using the stored refresh token.
+Returns the fresh access token.
+
+Re-reads the credentials file first: the Claude CLI or an agent-shell
+subprocess may have renewed it in the meantime, and refresh tokens are
+rotated on every use, so racing them would invalidate the file.  Unless
+FORCE is non-nil, a token that is still fresh is returned as is."
+  (let* ((credentials (konix/claude-code--read-credentials))
+         (oauth (alist-get 'claudeAiOauth credentials))
+         (refresh-token (alist-get 'refreshToken oauth)))
+    (unless credentials
+      (signal 'konix/claude-code-refresh-rejected (list "No credentials file")))
+    (if (and (not force) (konix/claude-code--token-fresh-p oauth))
+        (alist-get 'accessToken oauth)
+      (unless (and (stringp refresh-token) (not (string-empty-p refresh-token)))
+        (signal 'konix/claude-code-refresh-rejected (list "No refresh token")))
+      (let* ((response (konix/claude-code--oauth-refresh-request oauth))
+             (access-token (alist-get 'access_token response))
+             (expires-in (alist-get 'expires_in response))
+             (refresh-expires-in (alist-get 'refresh_token_expires_in response))
+             (scope (alist-get 'scope response))
+             (now (float-time)))
+        (unless (stringp access-token)
+          (signal 'konix/claude-code-refresh-error
+                  (list "Response carried no access_token")))
+        ;; Without a usable expires_in we would store a fresh token behind a
+        ;; stale expiry, and re-grant on every single call afterwards.
+        (unless (numberp expires-in)
+          (signal 'konix/claude-code-refresh-error
+                  (list (format "Response carried no usable expires_in: %S"
+                                expires-in))))
+        (setf (alist-get 'accessToken oauth) access-token)
+        (setf (alist-get 'refreshToken oauth)
+              (or (alist-get 'refresh_token response) refresh-token))
+        (setf (alist-get 'expiresAt oauth) (round (* 1000 (+ now expires-in))))
+        (when (numberp refresh-expires-in)
+          (setf (alist-get 'refreshTokenExpiresAt oauth)
+                (round (* 1000 (+ now refresh-expires-in)))))
+        (when (stringp scope)
+          (setf (alist-get 'scopes oauth) (split-string scope " " t)))
+        (setf (alist-get 'claudeAiOauth credentials) oauth)
+        (konix/claude-code--write-credentials credentials)
+        (message "Claude Code access token renewed.")
+        access-token))))
 
 (defun konix/claude-code--renew-credentials ()
-  "Renew Claude Code OAuth credentials by running `claude auth login'.
-This launches the Claude CLI authentication flow to obtain fresh tokens.
-Uses `call-process' with /dev/null as stdin so the process runs
-non-interactively (no TTY prompt that would hang Emacs)."
-  (if (yes-or-no-p "Claude Code credentials are expired or missing. Renew them now?")
-      (progn
-        (message "Running `claude auth login' to renew credentials...")
-        (let ((exit-code (call-process "claude-code" "/dev/null" "*claude-auth*" nil "auth" "login")))
-          (if (zerop exit-code)
-              (progn
-                (message "Claude Code credentials renewed successfully.")
-                t)
-            (display-buffer "*claude-auth*")
-            (error "Failed to renew Claude Code credentials (exit code %d). See *claude-auth* buffer" exit-code))))
-    (error "Claude Code credentials are expired. Please run `claude auth login' manually")))
+  "Start the interactive Claude Code login flow in a terminal buffer.
+Only needed when the refresh token itself is gone or was revoked.  The
+flow goes through a browser, so it cannot complete synchronously: this
+always signals an error, asking to retry once login is done."
+  (when (yes-or-no-p "Claude Code credentials cannot be refreshed.  Log in again? ")
+    (pop-to-buffer
+     (let ((buffer (make-term "claude-auth" "claude-code" nil "auth" "login")))
+       (with-current-buffer buffer
+         (term-mode)
+         (term-char-mode))
+       buffer)))
+  (error "Claude Code credentials are expired.  Complete `claude-code auth login', then retry"))
 
-(defun konix/claude-code--ensure-valid-credentials ()
-  "Ensure Claude Code credentials are valid, renewing if needed.
-Returns the access token."
-  (when (konix/claude-code--credentials-expired-p)
-    (konix/claude-code--renew-credentials))
-  (or (konix/claude-code--parse-claude-credentials)
-      (error "Claude Code credentials not found in ~/.claude/.credentials.json")))
+(defun konix/claude-code--ensure-valid-credentials (&optional stale-token)
+  "Return a valid Claude Code access token, renewing it when needed.
+
+STALE-TOKEN, when given, is a token the API just rejected.  Any *other*
+token already sitting in the credentials file is then preferred over
+performing a new grant: the Claude CLI or an agent-shell subprocess may
+well have renewed it in the meantime, and the token endpoint rate limits
+redundant refreshes."
+  (let* ((credentials (konix/claude-code--read-credentials))
+         (oauth (alist-get 'claudeAiOauth credentials))
+         (token (alist-get 'accessToken oauth)))
+    (cond
+     ((null credentials)
+      (konix/claude-code--renew-credentials))
+     ((and stale-token (stringp token) (not (equal token stale-token)))
+      token)
+     ((and (not stale-token) (konix/claude-code--token-fresh-p oauth))
+      token)
+     (t
+      (condition-case err
+          (konix/claude-code--refresh-credentials (and stale-token t))
+        (konix/claude-code-refresh-rejected
+         (message "Claude Code token refresh rejected: %s"
+                  (error-message-string err))
+         (konix/claude-code--renew-credentials)))))))
 
 (defun konix/claude-code--format-time-until (unix-timestamp)
   "Format the time remaining until UNIX-TIMESTAMP as a human-readable string."
@@ -165,10 +295,8 @@ Returns usage information including:
     (let* ((token (konix/claude-code--ensure-valid-credentials))
            (response (konix/claude-code--call-rate-limit-probe token))
            (response (if (eql (plz-response-status response) 401)
-                         (progn
-                           (konix/claude-code--renew-credentials)
-                           (konix/claude-code--call-rate-limit-probe
-                            (konix/claude-code--parse-claude-credentials)))
+                         (konix/claude-code--call-rate-limit-probe
+                          (konix/claude-code--ensure-valid-credentials token))
                        response))
            (headers (plz-response-headers response))
            (util-5h (string-to-number

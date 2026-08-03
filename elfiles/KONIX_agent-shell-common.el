@@ -262,6 +262,9 @@ shell buffer so subscribers run there."
 (defvar-local konix/agent-shell--governing-note nil
   "Buffer-local governing note path bound to this shell, or nil.")
 
+(defvar konix/agent-shell-governing-note-functions nil
+  "Abnormal hook run with SHELL and NOTE-PATH after a governing note is bound.")
+
 (defun konix/agent-shell--shell-session-id (shell)
   "Return SHELL's ACP session id, or nil."
   (and (buffer-live-p shell)
@@ -303,7 +306,35 @@ yet (a just-started session), it is written once the session is ready."
                      (konix/agent-shell-session-store-put
                       konix/agent-shell-session-notes-store
                       (konix/agent-shell--shell-session-id shell)
-                      note-path))))))))))
+                      note-path))))))))
+    (run-hook-with-args 'konix/agent-shell-governing-note-functions
+                        shell note-path)))
+
+(defun konix/agent-shell--restore-governing-note ()
+  "Re-bind this shell's persisted governing note once its session id is known.
+A resumed session resolves its note lazily through the store, but nothing
+runs `konix/agent-shell-governing-note-functions'; re-binding on the first
+`init-finished' with an id restores those side effects.  A note bound
+explicitly before that point wins."
+  (let ((shell (current-buffer))
+        token)
+    (setq token
+          (agent-shell-subscribe-to
+           :shell-buffer shell
+           :event 'init-finished
+           :on-event
+           (lambda (_event)
+             (if (not (buffer-live-p shell))
+                 (agent-shell-unsubscribe :subscription token)
+               (when-let ((id (konix/agent-shell--shell-session-id shell)))
+                 (with-current-buffer shell
+                   (agent-shell-unsubscribe :subscription token)
+                   (unless konix/agent-shell--governing-note
+                     (when-let ((note (konix/agent-shell-session-store-get
+                                       konix/agent-shell-session-notes-store id)))
+                       (konix/agent-shell-set-governing-note shell note)))))))))))
+
+(add-hook 'agent-shell-mode-hook #'konix/agent-shell--restore-governing-note)
 
 (provide 'KONIX_agent-shell-common)
 ;;; KONIX_agent-shell-common.el ends here

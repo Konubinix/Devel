@@ -45,6 +45,9 @@
 (declare-function shell-maker-submit "shell-maker")
 (declare-function konix/agent-shell--apply-label-format "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell-governing-note "KONIX_agent-shell-common")
+(declare-function konix/agent-shell-set-governing-note "KONIX_agent-shell-common")
+(declare-function konix/agent-shell-mcp-servers-for "KONIX_agent-shell-mcp")
+(declare-function konix/agent-shell-mcp-note-server-names "KONIX_agent-shell-mcp")
 (declare-function konix/agent-shell--rename-pair "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--rename-with-label "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--local-session-label "KONIX_AL-agent-shell")
@@ -124,6 +127,15 @@ base server-id so existing tool lookups keep working."
                (konix/mcp-server--calling-buffer
                 (and caller (gethash caller konix/mcp-server--session-buffers))))
     (funcall orig-fn json base)))
+
+(defun konix/mcp-server--caller-identity ()
+  "Return a stable identity string for the calling session, or error.
+Prefers the caller's coord agent name, falls back to its session tag."
+  (or (and (buffer-live-p konix/mcp-server--calling-buffer)
+           (buffer-local-value 'konix/mcp-server--agent-name
+                               konix/mcp-server--calling-buffer))
+      konix/mcp-server--calling-agent
+      (error "Cannot identify the calling session to namespace the auditor")))
 
 (advice-add 'mcp-server-lib-process-jsonrpc :around
             #'konix/mcp-server--dispatch-with-caller)
@@ -423,7 +435,8 @@ nil if zero or more than one buffer is busy."
 
 (defvar-local konix/mcp-server--respawn-spec nil
   "Plist of spawn parameters used to rebuild this buddy on respawn.
-Keys: :directory :task :prompt :mcp-changes-json :model :coord-only :threshold.")
+Keys: :directory :task :prompt :mcp-changes-json :extra-servers :model
+:coord-only :threshold.")
 
 (defvar-local konix/mcp-server--respawn-count 0
   "How many times this buddy lineage has auto-respawned (runaway backstop).")
@@ -439,6 +452,12 @@ Keys: :directory :task :prompt :mcp-changes-json :model :coord-only :threshold."
 prompt verbatim instead of building the generic coordination prompt.  Dynamically
 bound by specialised spawners (e.g. the auditor) and by respawn (to reuse the
 stored prompt).  It is the COMPLETE prompt — any lifecycle note is already in it.")
+
+(defvar konix/mcp-server--extra-mcp-servers nil
+  "Extra MCP server configs folded into a spawned buddy's resolved set.
+Each replaces any same-named entry from the buddy directory's baseline.
+Dynamically bound by specialised spawners (e.g. the auditor, with its
+governing note's `#+MCP_SERVERS:' servers) and by respawn.")
 
 (defconst konix/mcp-server--respawn-buddy-prompt-note
   "\n\nYOUR LIFECYCLE — IMPORTANT: you may be automatically replaced by a FRESH \
@@ -477,7 +496,8 @@ the reserve in the fresh spawn cannot collide with the corpse."
       ;; Rebind the dynamic caller so the successor keeps the original parent in
       ;; the spawn tree (a programmatic respawn has no MCP caller of its own).
       (let ((konix/mcp-server--calling-buffer parent)
-            (konix/mcp-server--prompt-override (plist-get spec :prompt)))
+            (konix/mcp-server--prompt-override (plist-get spec :prompt))
+            (konix/mcp-server--extra-mcp-servers (plist-get spec :extra-servers)))
         (konix/mcp-server-spawn-agent
          (plist-get spec :directory)
          (plist-get spec :task)
@@ -663,6 +683,17 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
                                                    (append to-add nil)))))
                            (when to-edit
                              (setq servers (konix/mcp-server--apply-edits servers to-edit)))))
+                       (when konix/mcp-server--extra-mcp-servers
+                         (let ((extra-names
+                                (mapcar (lambda (srv) (alist-get 'name srv))
+                                        konix/mcp-server--extra-mcp-servers)))
+                           (setq servers
+                                 (append
+                                  (cl-remove-if
+                                   (lambda (srv)
+                                     (member (alist-get 'name srv) extra-names))
+                                   servers)
+                                  konix/mcp-server--extra-mcp-servers))))
                        (when coord-only
                          (setq servers
                                (mapcar
@@ -694,6 +725,7 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
            (setq-local konix/mcp-server--respawn-spec
                        (list :directory directory :task task :prompt prompt
                              :mcp-changes-json mcp-config-changes
+                             :extra-servers konix/mcp-server--extra-mcp-servers
                              :model model :coord-only coord-only
                              :threshold respawn-threshold-num))
            (konix/mcp-server--setup-respawn-subscription (current-buffer)))
@@ -788,44 +820,59 @@ RESPECT THE CALLER'S DEADLINE: each draft you receive carries the deadline the c
 Keep serving every draft until you are told to stop or killed. Do NOT kill yourself after an audit — an auditor serves many passes."
           principles buddy-name buddy-name))
 
-(defun konix/mcp-server-spawn-auditor (directory buddy-name &optional respawn-threshold)
+(defun konix/mcp-server-spawn-auditor (directory &optional label respawn-threshold)
   "Spawn a standing AUDIT buddy with the governing principles baked into its boot prompt.
 
 The auditor only reads and returns verdicts; it never edits.  It audits SUBSTANCE
 against the principles and ignores tooling-owned mechanics (CUSTOM_ID, :ID:,
 espaces insécables, wrapping, slugs).  The governing note is the one bound to the
-CALLING session (set when it was opened via an `agent-shell-with-note' link, and
-carried across resume/reload/fork); its whole text is read and inlined into the
-boot prompt.  Send the auditor a draft with coord_ask_and_wait (to_buddy =
-BUDDY-NAME); it returns a cited verdict (PASS or NEEDS-WORK + findings).  Kill it
-with kill_buddy when done.  An auto-respawn reuses the same baked prompt; to pick
-up edits to the principles, kill it and spawn a fresh one.
+CALLING session, carried across resume/reload/fork; its whole text is read and
+inlined into the boot prompt, and the MCP servers it declares with
+`#+MCP_SERVERS:' are enabled in the auditor too.
+
+The auditor's coordination name is DERIVED, not chosen: `<caller>::<label>' (LABEL
+defaults to \"auditor\").  Two different callers can never collide, and one caller
+can run several auditors by using distinct labels.  Re-calling with a label whose
+auditor already exists returns that standing auditor instead of spawning another.
+Send it a draft with coord_ask_and_wait (to_buddy = the returned name); it returns
+a cited verdict (PASS or NEEDS-WORK + findings).  Kill it with kill_buddy when
+done; to pick up edits to the principles, kill it and spawn a fresh one.
 
 MCP Parameters:
   directory - The working directory for the session
-  buddy-name - Unique name for the auditor in the coordination system
+  label - Short role label, unique WITHIN your session (e.g. \"auditor\", \"style\"). Defaults to \"auditor\". The coordination name is \"<your-session>::<label>\"; the tool returns the exact name to pass as to_buddy.
   respawn-threshold - Context-usage percentage (0-100) at which it respawns. Defaults to 80."
   (mcp-server-lib-with-error-handling
    (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
+          (caller (konix/mcp-server--caller-identity))
+          (label (let ((l (and label (string-trim (decode-coding-string label 'utf-8)))))
+                   (if (or (null l) (string-empty-p l)) "auditor" l)))
+          (name (concat caller konix/mcp-server--caller-delimiter label))
           (governing-note
            (or (and konix/mcp-server--calling-buffer
                     (konix/agent-shell-governing-note
                      konix/mcp-server--calling-buffer))
                (error "No governing note is bound to the calling session; open it via an `agent-shell-with-note' org link before spawning an auditor")))
-          (name (decode-coding-string buddy-name 'utf-8))
-          (principles (konix/mcp-server-render-note governing-note))
-          (konix/mcp-server--prompt-override
-           (concat (konix/mcp-server--build-auditor-prompt principles name)
-                   konix/mcp-server--respawn-buddy-prompt-note)))
-     (konix/mcp-server-spawn-agent
-      directory
-      (format "audit: %s" governing-note)
-      name
-      nil
-      "opus"
-      nil
-      t
-      respawn-threshold))))
+          (existing (konix/mcp-server--find-agent-buffer name)))
+     (if existing
+         (format "An auditor named \"%s\" is already serving this session (buffer '%s'); reusing it. Send drafts with coord_ask_and_wait to_buddy=\"%s\". To pick up edited principles, kill_buddy it and spawn a fresh one."
+                 name (buffer-name existing) name)
+       (let* ((principles (konix/mcp-server-render-note governing-note))
+              (konix/mcp-server--prompt-override
+               (concat (konix/mcp-server--build-auditor-prompt principles name)
+                       konix/mcp-server--respawn-buddy-prompt-note))
+              (konix/mcp-server--extra-mcp-servers
+               (konix/agent-shell-mcp-servers-for
+                (konix/agent-shell-mcp-note-server-names governing-note))))
+         (konix/mcp-server-spawn-agent
+          directory
+          (format "audit: %s" governing-note)
+          name
+          nil
+          "opus"
+          nil
+          t
+          respawn-threshold))))))
 
 (defun konix/mcp-server--find-agent-buffer (agent-name)
   "Find the buffer for coordinated agent AGENT-NAME.

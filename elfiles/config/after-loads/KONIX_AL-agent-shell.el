@@ -51,7 +51,6 @@
 (require 'KONIX_agent-shell-model)
 (require 'KONIX_agent-shell-session-ops)
 (require 'KONIX_agent-shell-permissions)
-(require 'KONIX_agent-shell-autoresponse)
 (require 'KONIX_agent-shell-steering)
 (require 'KONIX_agent-shell-viewport)
 (require 'KONIX_agent-shell-tracking)

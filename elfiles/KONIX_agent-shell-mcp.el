@@ -157,6 +157,51 @@ spawner's `with-temp-buffer' resolution path."
 
 (add-hook 'hack-local-variables-hook #'konix/agent-shell-mcp-apply-project-servers)
 
+(defun konix/agent-shell-mcp-note-server-names (note-path)
+  "Return the MCP server names NOTE-PATH declares, or nil.
+Collects every `#+MCP_SERVERS:' keyword of the note file itself
+\(transclusions are not resolved), names separated by commas or
+whitespace."
+  (when (and note-path (file-readable-p note-path))
+    (with-temp-buffer
+      (insert-file-contents note-path)
+      (goto-char (point-min))
+      (let ((case-fold-search t)
+            names)
+        (while (re-search-forward "^#\\+MCP_SERVERS:\\(.*\\)$" nil t)
+          (setq names (append names
+                              (split-string (match-string 1) "[ \t,]+" t))))
+        names))))
+
+(declare-function konix/mcp-server--tag-konix-server-id "KONIX_mcp-server-agent-shell")
+(declare-function konix/mcp-server--tag-konix-mcp-session "KONIX_mcp-server-agent-shell")
+
+(defun konix/agent-shell-mcp-apply-note-servers (shell note-path)
+  "Enable in SHELL the MCP servers NOTE-PATH declares with `#+MCP_SERVERS:'.
+On `konix/agent-shell-governing-note-functions', so every note-binding
+path folds them into the session's buffer-local `agent-shell-mcp-servers'.
+Servers already effective are left untouched; new entries get the session
+tag the mode hook gave the baseline ones.  Mid-conversation the change
+takes effect at the next reload."
+  (when-let ((names (konix/agent-shell-mcp-note-server-names note-path)))
+    (with-current-buffer shell
+      (let* ((present (delq nil (mapcar (lambda (server) (alist-get 'name server))
+                                        agent-shell-mcp-servers)))
+             (added (konix/agent-shell-mcp-servers-for
+                     (seq-remove (lambda (name) (member name present)) names))))
+        (when added
+          (when (and (bound-and-true-p konix/mcp-server--session-tag)
+                     (fboundp 'konix/mcp-server--tag-konix-server-id))
+            (setq added (konix/mcp-server--tag-konix-mcp-session
+                         (konix/mcp-server--tag-konix-server-id
+                          added konix/mcp-server--session-tag)
+                         konix/mcp-server--session-tag)))
+          (setq-local agent-shell-mcp-servers
+                      (append agent-shell-mcp-servers added)))))))
+
+(add-hook 'konix/agent-shell-governing-note-functions
+          #'konix/agent-shell-mcp-apply-note-servers)
+
 (defun konix/agent-shell-mcp-session-server-names ()
   "Return the MCP server names effective in the current session.
 Reads the buffer-local `agent-shell-mcp-servers' from the underlying shell

@@ -1,6 +1,7 @@
 /.cask
 *.pyc
 /config/elfiles/comphist.dat
+/config/retroarch
 *~
 *.elc
 *#

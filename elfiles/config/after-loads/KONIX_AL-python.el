@@ -77,7 +77,8 @@
     (add-to-list 'lsp-disabled-clients 'pylsp)
     (add-to-list 'lsp-disabled-clients 'zuban-ls)
     (lsp)
-    (add-hook 'after-save-hook 'lsp-format-buffer t t)
+    ;; run-hooks: Capability not supported by the language server: "documentFormattingProvider"
+    ;; (add-hook 'after-save-hook 'lsp-format-buffer t t)
 
     (setq-local completion-at-point-functions
                 (list

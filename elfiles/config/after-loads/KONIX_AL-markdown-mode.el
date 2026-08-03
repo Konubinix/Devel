@@ -221,7 +221,11 @@
               (code-body (buffer-substring-no-properties (first code) (second code)))
               (language (save-excursion
                           (goto-char (first code))
-                          (forward-line -1)
+                          ;; sometimes, it leads to the end of line of the
+                          ;; language line, some other times, it leads to the
+                          ;; beginning of the following line
+                          (when (equal (pos-bol) (point))
+                            (forward-line -1))
                           (buffer-substring-no-properties
                            (+ 3 (point-at-bol))
                            (point-at-eol)
@@ -258,7 +262,7 @@
                  (insert code-body)
                  (call-process-region
                   (point-min) (point-max) "mmdc" nil
-                  nil nil "-i" "-" "-o" output-file "-e" "png"))
+                  nil nil "-w" "1600" "-H" "800" "-i" "-" "-o" output-file "-e" "png"))
                (start-process "mimeopen" nil "mimeopen" output-file))
              )
             ((string= language "python")
@@ -282,7 +286,7 @@
                        )))
              )
             (t (progn
-                 (error "%s is not a format I support. Please implement it for me :-)")))))))
+                 (error "%s is not a format I support. Please implement it forme :-)" language)))))))
 
 
 (provide 'KONIX_AL-markdown-mode)

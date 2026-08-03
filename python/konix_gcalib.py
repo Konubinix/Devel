@@ -432,7 +432,9 @@ Attendees:
             else:
                 date = dateutil.parser.parse(self.start.get("date"))
             if date.tzinfo is None:
-                date = date.replace(tzinfo=get_local_timezone())
+                # localize (not replace): replace attaches the zone's LMT (e.g. +00:18 for CET),
+                # localize applies the real civil offset with DST (+01:00/+02:00)
+                date = get_local_timezone().localize(date)
             return date
 
         @property
@@ -442,7 +444,9 @@ Attendees:
             else:
                 date = dateutil.parser.parse(self.end.get("date"))
             if date.tzinfo is None:
-                date = date.replace(tzinfo=get_local_timezone())
+                # localize (not replace): replace attaches the zone's LMT (e.g. +00:18 for CET),
+                # localize applies the real civil offset with DST (+01:00/+02:00)
+                date = get_local_timezone().localize(date)
             return date
 
         @property

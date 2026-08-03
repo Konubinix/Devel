@@ -63,6 +63,7 @@
 (defvar konix/agent-shell-buffer-label)
 (defvar konix/mcp-server-coord-url)
 (defvar konix/agent-shell--seen)
+(defvar konix/agent-shell--last-error)
 
 ;;; Buffer-local variables for coordinated agents
 
@@ -1156,9 +1157,8 @@ at point; otherwise it is read via completion."
 
 (defun konix/mcp-server--agent-status (buf)
   "Return a cons (STATUS . SEEN) describing agent-shell BUF.
-STATUS is one of: `dead', `awaiting-permission', `waiting', `busy', `idle'.
-`waiting' means the agent is mid-turn but blocked in a coordination wait
-tool (see `konix/agent-shell--waiting-tool-id').
+STATUS is one of: `dead', `error', `awaiting-permission', `waiting',
+`sleeping', `busy', `idle'.
 SEEN is non-nil when the user has already seen the last completed turn."
   (with-current-buffer buf
     (let* ((state (and (boundp 'agent-shell--state) agent-shell--state))
@@ -1167,10 +1167,13 @@ SEEN is non-nil when the user has already seen the last completed turn."
                           (konix/agent-shell--has-permission-button-p))))
       (cons (cond
              ((not client) 'dead)
+             ((and (bound-and-true-p konix/agent-shell--last-error)
+                   (not (shell-maker-busy)))
+              'error)
              (awaiting 'awaiting-permission)
              ((and (shell-maker-busy)
                    (bound-and-true-p konix/agent-shell--waiting-tool-id))
-              'waiting)
+              (or (bound-and-true-p konix/agent-shell--waiting-tool-kind) 'waiting))
              ((shell-maker-busy) 'busy)
              (t 'idle))
             (bound-and-true-p konix/agent-shell--seen)))))
@@ -1192,9 +1195,19 @@ SEEN is non-nil when the user has already seen the last completed turn."
   "Face for the [waiting] status badge in the spawn tree.
 Marks an agent blocked in a coordination wait tool.")
 
+(defface konix/mcp-server-status-sleeping-face
+  '((t :foreground "light slate gray" :weight bold))
+  "Face for the [sleeping] status badge in the spawn tree.
+Marks an agent idling in `coord_sleep'.")
+
 (defface konix/mcp-server-status-dead-face
   '((t :inherit error :weight bold))
   "Face for the [dead] status badge in the spawn tree.")
+
+(defface konix/mcp-server-status-error-face
+  '((t :foreground "white" :background "dark red" :weight bold))
+  "Face for the [error] status badge in the spawn tree.
+Marks a session whose last turn ended in an ACP error.")
 
 (defface konix/mcp-server-status-idle-face
   '((t :foreground "green" :weight bold))
@@ -1220,7 +1233,10 @@ color and readability.")
                    (propertize "[awaiting permission]" 'face 'konix/mcp-server-status-awaiting-permission-face))
                   ('waiting
                    (propertize "[waiting]" 'face 'konix/mcp-server-status-waiting-face))
+                  ('sleeping
+                   (propertize "[sleeping]" 'face 'konix/mcp-server-status-sleeping-face))
                   ('dead (propertize "[dead]" 'face 'konix/mcp-server-status-dead-face))
+                  ('error (propertize "[error]" 'face 'konix/mcp-server-status-error-face))
                   (_ (propertize "[idle]" 'face 'konix/mcp-server-status-idle-face)))))
       (if seen
           (concat base (propertize " - seen" 'face 'konix/mcp-server-status-seen-suffix-face))

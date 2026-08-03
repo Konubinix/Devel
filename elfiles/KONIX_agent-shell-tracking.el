@@ -76,40 +76,69 @@ viewport buffer instead if one exists."
 Cleared automatically when a new turn completes.")
 
 (defvar-local konix/agent-shell--waiting-tool-id nil
-  "Tool-call-id of an in-flight coordination wait, or nil.
-Set while the agent is blocked in a `coord_wait'/`coord_ask_and_wait'
-MCP tool call so the spawn tree can show a distinct `waiting' status
-instead of the generic `busy'.")
+  "Tool-call-id of an in-flight blocking coordination tool, or nil.
+The kind is recorded in `konix/agent-shell--waiting-tool-kind'.")
 
-(defcustom konix/agent-shell-waiting-tool-regexp
-  (rx (or "coord_wait" "coord_ask_and_wait"))
-  "Regexp matching tool-call titles that mean the agent is blocked waiting.
-Matched case-insensitively against the ACP tool-call title, e.g.
-\"mcp__konix-coord__coord_wait\"."
-  :type 'regexp
+(defvar-local konix/agent-shell--waiting-tool-kind nil
+  "Kind of the in-flight blocking coordination tool: `waiting', `sleeping', or nil.")
+
+(defvar-local konix/agent-shell--last-error nil
+  "Plist (:code :message) of the last ACP error, or nil.
+Set from the `error' event; cleared when a new turn is submitted.")
+
+(defun konix/agent-shell--record-error (event)
+  "Record the ACP `error' EVENT into `konix/agent-shell--last-error'."
+  (let ((data (map-elt event :data)))
+    (setq konix/agent-shell--last-error
+          (list :code (map-elt data :code)
+                :message (map-elt data :message)))))
+
+(defcustom konix/agent-shell-waiting-tools
+  '("coord_wait" "coord_ask_and_wait" "coord_complete_task")
+  "Coordination tool names, matched as a substring of the tool-call title,
+that mean the agent is blocked waiting.  `coord_complete_task' blocks by
+default, handing back the buddy's next task."
+  :type '(repeat string)
   :group 'konix)
 
-(defun konix/agent-shell--waiting-tool-p (title)
-  "Return non-nil when TITLE names a blocking coordination wait tool."
+(defcustom konix/agent-shell-sleeping-tools
+  '("coord_sleep")
+  "Coordination tool names, matched as a substring of the tool-call title,
+that mean the agent is sleeping."
+  :type '(repeat string)
+  :group 'konix)
+
+(defun konix/agent-shell--title-names-p (title tools)
+  "Return non-nil when TITLE contains one of the tool names in TOOLS."
   (and (stringp title)
-       (let ((case-fold-search t))
-         (string-match-p konix/agent-shell-waiting-tool-regexp title))))
+       (seq-some (lambda (name) (string-search name title)) tools)))
+
+(defun konix/agent-shell--blocking-tool-kind (title)
+  "Return `sleeping', `waiting', or nil for the blocking tool named by TITLE."
+  (cond
+   ((konix/agent-shell--title-names-p title konix/agent-shell-sleeping-tools) 'sleeping)
+   ((konix/agent-shell--title-names-p title konix/agent-shell-waiting-tools) 'waiting)))
+
+(defun konix/agent-shell--waiting-tool-p (title)
+  "Return non-nil when TITLE names a blocking coordination tool."
+  (and (konix/agent-shell--blocking-tool-kind title) t))
 
 (defun konix/agent-shell--update-waiting-status (event)
-  "Update `konix/agent-shell--waiting-tool-id' from a `tool-call-update' EVENT.
-Set the flag when a coordination wait tool starts blocking, clear it
-once that same tool call finishes."
+  "Set or clear the blocking-tool state from a `tool-call-update' EVENT."
   (let* ((data (map-elt event :data))
          (tool-call-id (map-elt data :tool-call-id))
          (tool-call (map-elt data :tool-call))
          (title (map-elt tool-call :title))
-         (status (map-elt tool-call :status)))
+         (status (map-elt tool-call :status))
+         (kind (konix/agent-shell--blocking-tool-kind title)))
     (cond
      ((member status '("completed" "failed"))
       (when (equal tool-call-id konix/agent-shell--waiting-tool-id)
-        (setq konix/agent-shell--waiting-tool-id nil)))
-     ((konix/agent-shell--waiting-tool-p title)
-      (setq konix/agent-shell--waiting-tool-id tool-call-id)))))
+        (setq konix/agent-shell--waiting-tool-id nil
+              konix/agent-shell--waiting-tool-kind nil)))
+     (kind
+      (setq konix/agent-shell--waiting-tool-id tool-call-id
+            konix/agent-shell--waiting-tool-kind kind)))))
 
 (defvar-local konix/agent-shell--background-launched nil
   "Non-nil when the agent launched a command in the background this turn.
@@ -226,7 +255,7 @@ insert a viewport separator.  On `permission-request' and
 `tool-call-update', clear `konix/agent-shell--seen' so the user is
 notified of new agent activity."
   (let ((shell-buf (current-buffer)))
-    (dolist (event '(permission-request tool-call-update))
+    (dolist (event '(permission-request tool-call-update error))
       (agent-shell-subscribe-to
        :shell-buffer shell-buf
        :event event
@@ -235,11 +264,14 @@ notified of new agent activity."
          (when (buffer-live-p shell-buf)
            (with-current-buffer shell-buf
              (setq konix/agent-shell--seen nil)
-             (when (eq (map-elt event :event) 'tool-call-update)
-               (konix/agent-shell--update-waiting-status event)
-               (konix/agent-shell--update-background-status event)
-               (when (fboundp 'konix/mcp-server-watch-deadline-event)
-                 (konix/mcp-server-watch-deadline-event event))))))))
+             (pcase (map-elt event :event)
+               ('tool-call-update
+                (konix/agent-shell--update-waiting-status event)
+                (konix/agent-shell--update-background-status event)
+                (when (fboundp 'konix/mcp-server-watch-deadline-event)
+                  (konix/mcp-server-watch-deadline-event event)))
+               ('error
+                (konix/agent-shell--record-error event))))))))
     ;; A new turn starts clean: clear the per-turn background flag whenever a
     ;; prompt is submitted (human or an autoresponse), so `@background' reacts
     ;; only to launches in the turn that just ran.  Resetting here (not at
@@ -252,7 +284,8 @@ notified of new agent activity."
      (lambda (_event)
        (when (buffer-live-p shell-buf)
          (with-current-buffer shell-buf
-           (setq konix/agent-shell--background-launched nil)))))
+           (setq konix/agent-shell--background-launched nil)
+           (setq konix/agent-shell--last-error nil)))))
     ;; `init-finished' fires once the session is established — for a resumed
     ;; session its title is already known on disk, so guess the buffer name
     ;; immediately instead of waiting for the first `turn-complete'.
@@ -273,6 +306,7 @@ notified of new agent activity."
          (with-current-buffer shell-buf
            (setq konix/agent-shell--seen nil)
            (setq konix/agent-shell--waiting-tool-id nil)
+           (setq konix/agent-shell--waiting-tool-kind nil)
            (konix/agent-shell--auto-rename-from-title)))
        (when-let ((viewport-buffer (agent-shell-viewport--buffer
                                     :shell-buffer shell-buf

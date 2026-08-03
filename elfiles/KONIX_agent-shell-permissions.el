@@ -856,18 +856,63 @@ Uses POLICY's `candidates-fn' when set, else `konix/agent-shell--tool-candidates
   "Return the project `.dir-locals.el' for the current buffer."
   (konix/agent-shell-mcp--project-dir-locals-file))
 
+(defvar konix/agent-shell-policy--warned-dir-locals nil
+  "Alist of (FILE . MTIME) already warned about as malformed, to warn once.")
+
+(defun konix/agent-shell-policy--warn-malformed (file detail)
+  "Warn once per broken state that FILE is not a readable dir-locals alist.
+DETAIL says what went wrong.  Keyed on FILE's modification time so a fixed
+file that later re-breaks warns again.  A leftover git conflict marker is
+the usual culprit; while it stands the project's agent-shell rules are
+ignored."
+  (let ((mtime (file-attribute-modification-time (file-attributes file))))
+    (unless (equal mtime (cdr (assoc file konix/agent-shell-policy--warned-dir-locals)))
+      (setf (alist-get file konix/agent-shell-policy--warned-dir-locals
+                       nil nil #'equal)
+            mtime)
+      (display-warning
+       '(konix agent-shell)
+       (format "%s is not a readable dir-locals alist (%s); its project rules \
+are being IGNORED -- a leftover git conflict marker is a likely cause."
+               file detail)
+       :warning))))
+
 (defun konix/agent-shell-policy--project-in-file (policy file)
   "Return POLICY's project alist stored in FILE.
 Reads the `nil'-mode entry of FILE's directory-local alist; a fresh list,
-or nil when FILE is absent or sets no such variable."
+or nil when FILE is absent or sets no such variable.  A garbled or
+conflict-marked file (whose first sexp may `read' as a bare symbol, or fail
+to parse) yields nil and a one-shot `konix/agent-shell-policy--warn-malformed'
+warning, rather than crashing callers."
   (when (file-exists-p file)
-    (let ((alist (with-temp-buffer
-                   (insert-file-contents file)
-                   (goto-char (point-min))
-                   (ignore-errors (read (current-buffer))))))
-      (copy-alist
-       (alist-get (konix/agent-shell-policy-project-var policy)
-                  (alist-get nil alist))))))
+    (let ((raw (with-temp-buffer
+                 (insert-file-contents file)
+                 (goto-char (point-min))
+                 (condition-case err
+                     (cons 'ok (read (current-buffer)))
+                   ;; No complete sexp: an empty (or comment-only) file is fine.
+                   (end-of-file (cons 'empty nil))
+                   ;; Any other read error means the file is garbled.
+                   (error (cons 'error err))))))
+      (pcase raw
+        (`(empty . ,_) nil)
+        (`(error . ,err)
+         (konix/agent-shell-policy--warn-malformed file (error-message-string err))
+         nil)
+        (`(ok . ,alist)
+         (cond
+          ((not (listp alist))
+           (konix/agent-shell-policy--warn-malformed
+            file (format "read as %s, not a list" (type-of alist)))
+           nil)
+          (t
+           (let ((nil-mode (alist-get nil alist)))
+             (if (listp nil-mode)
+                 (copy-alist
+                  (alist-get (konix/agent-shell-policy-project-var policy) nil-mode))
+               (konix/agent-shell-policy--warn-malformed
+                file "its nil-mode entry is not an alist")
+               nil)))))))))
 
 (defun konix/agent-shell-policy--pp-value (object)
   "Pretty-print OBJECT into the current buffer without re-parsing it.

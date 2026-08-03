@@ -82,28 +82,33 @@
          (* (not (any ".\n"))) (or "test" "tests" "spec" "specs"))
      said)))
 
+(konix/agent-shell-define-tool-evaluator "possible-insecable-character-failure" (tool-call)
+  "Match an Edit on a `.org' note that failed with an OLD_STRING-not-found
+error -- the fingerprint of espaces insécables (U+00A0) breaking the exact
+match.  Cheap alist gates first, then the `:content' failure text, so other
+edit failures (unread file, stale read, perms) do not trigger."
+  (let* ((raw (map-elt tool-call :raw-input))
+         (file (and (listp raw) (map-elt raw 'file_path))))
+    (and (equal (map-elt tool-call :status) "failed")
+         (equal (map-elt tool-call :kind) "edit")
+         (stringp file)
+         (string-match-p "\\.org\\'" file)
+         (let ((text (mapconcat
+                      (lambda (item) (or (map-nested-elt item '(content text)) ""))
+                      (append (map-elt tool-call :content) nil) "\n"))
+               (case-fold-search t))
+           (string-match-p "not found in file\\|string to replace not found" text)))))
+
 ;;; The policy -----------------------------------------------------------------
 
-(defconst konix/agent-shell-steering-example-rules
-  '(("@severaltoplevelcommands(git)"
-     . "One git command at a time, and tell me what you intend before running it.")
-    ("@drift-scope-creep"
-     . "Stay strictly within the scope I requested -- finish only that, nothing more.")
-    ("@drift-skip-tests"
-     . "Do not skip, disable, or comment out tests; fix the underlying cause.")
-    ("\\bfrom scratch\\b"
-     . "Do not rewrite from scratch; make the smallest change on existing code."))
-  "Ready-to-use examples (one per KEY shape), NOT active by default.
-Enable some via `konix/agent-shell-steering-add', or all with
-\(setq konix/agent-shell-steering-rules-global
-      konix/agent-shell-steering-example-rules).
-Prose rules also fire when the agent merely discusses the words; prefer
-tool-targeting rules (e.g. `@severaltoplevelcommands') for precision.")
-
-(defcustom konix/agent-shell-steering-rules-global nil
+(defcustom konix/agent-shell-steering-rules-global
+  '(
+    ("@background" . "Use foreground and the sleep mcp tool if needed")
+    ("@possible-insecable-character-failure"
+     . "That edit to a .org note failed. On a typeset note the usual cause is espaces insécables (U+00A0), which defeat the exact string match. Do NOT re-anchor around it: run the note_strip_insecables MCP tool on the file, redo all edits, then note_insecables to restore.")
+    )
   "GLOBAL (KEY . GUIDANCE) steering rules; opt-in (steering cancels turns).
-KEY matches as in `konix/agent-shell-tool-blacklist-global'.  See
-`konix/agent-shell-steering-example-rules'."
+KEY matches as in `konix/agent-shell-tool-blacklist-global'."
   :type '(alist :key-type string :value-type string) :group 'konix)
 
 (defvar konix/agent-shell-steering-rules-project nil
@@ -240,6 +245,7 @@ Added to `agent-shell-mode-hook'."
                      (konix/agent-shell-steering--on-input-submitted event)))))))
 
 (add-hook 'agent-shell-mode-hook #'konix/agent-shell-steering--subscribe)
+;; (remove-hook 'agent-shell-mode-hook #'konix/agent-shell-steering--subscribe)
 
 ;;; Commands -------------------------------------------------------------------
 

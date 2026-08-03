@@ -336,5 +336,85 @@ explicitly before that point wins."
 
 (add-hook 'agent-shell-mode-hook #'konix/agent-shell--restore-governing-note)
 
+;;; Interrupt-and-reply, across shell / viewport / diff -----------------------
+;; A canned prompt (tl;dr, comment vomit, ...) means the same thing from any
+;; agent-shell buffer, so `konix/agent-shell-define-reply' spins each one into a
+;; command bound across every keymap in a single line.  Two mechanisms deliver
+;; it: the viewport reply/compose flow (defined in `KONIX_agent-shell-viewport')
+;; when a viewport is in play, and the plain `agent-shell-queue-request'
+;; otherwise.
+
+(declare-function agent-shell-interrupt "agent-shell")
+(declare-function agent-shell-queue-request "agent-shell")
+(declare-function agent-shell-set-session-mode "agent-shell")
+(declare-function agent-shell--shell-buffer "agent-shell")
+(declare-function agent-shell-viewport--buffer "agent-shell-viewport")
+(declare-function konix/agent-shell-viewport--interrupt-set-default-and-reply
+                  "KONIX_agent-shell-viewport")
+
+(defun konix/agent-shell-set-session-mode (mode-name)
+  "Switch the current session to the mode named MODE-NAME, without prompting.
+
+Non-viewport counterpart of `konix/agent-shell-viewport-set-session-mode'."
+  (cl-letf (((symbol-function 'completing-read)
+             (lambda (&rest _) mode-name)))
+    (ignore-errors
+      (agent-shell-set-session-mode))))
+
+(defun konix/agent-shell--interrupt-set-default-and-reply (prompt)
+  "Interrupt the agent, switch to the Default mode, then queue PROMPT.
+`agent-shell-queue-request' queues PROMPT while busy and sends it once the
+interrupted turn completes."
+  (agent-shell-interrupt t)
+  (konix/agent-shell-set-session-mode "Manual")
+  (agent-shell-queue-request prompt))
+
+(defun konix/agent-shell-interrupt-set-default-and-reply (prompt)
+  "Interrupt the current session and reply with PROMPT, from any agent-shell buffer.
+Uses the viewport mechanism when in (or resolving to) a viewport, and the plain
+shell mechanism otherwise.  Works from `agent-shell-mode',
+`agent-shell-viewport-view-mode' and `agent-shell-diff-mode'."
+  (cond
+   ((derived-mode-p 'agent-shell-viewport-view-mode)
+    (konix/agent-shell-viewport--interrupt-set-default-and-reply prompt))
+   ((derived-mode-p 'agent-shell-mode)
+    (konix/agent-shell--interrupt-set-default-and-reply prompt))
+   (t
+    (let* ((shell (or (agent-shell--shell-buffer :no-error t :no-create t)
+                      (user-error "No agent-shell for current project")))
+           (viewport (agent-shell-viewport--buffer
+                      :shell-buffer shell :existing-only t)))
+      (if viewport
+          (with-current-buffer viewport
+            (konix/agent-shell-viewport--interrupt-set-default-and-reply prompt))
+        (with-current-buffer shell
+          (konix/agent-shell--interrupt-set-default-and-reply prompt)))))))
+
+(defvar agent-shell-mode-map)
+(defvar agent-shell-viewport-view-mode-map)
+(defvar agent-shell-diff-mode-map)
+
+(defun konix/agent-shell-define-key (key command)
+  "Bind KEY to COMMAND in the shell, viewport-view and diff keymaps at once."
+  (dolist (map (list agent-shell-mode-map
+                     agent-shell-viewport-view-mode-map
+                     agent-shell-diff-mode-map))
+    (define-key map (kbd key) command)))
+
+(defmacro konix/agent-shell-define-reply (name key prompt)
+  "Define interactive command NAME and bind KEY to it in every agent-shell keymap.
+NAME interrupts the current session and replies with PROMPT (see
+`konix/agent-shell-interrupt-set-default-and-reply').  Invoke where every
+keymap is loaded (the `KONIX_AL-agent-shell' after-load), not at this file's
+load time, since `agent-shell-diff-mode-map' arrives with `agent-shell-diff'."
+  (declare (indent defun))
+  `(progn
+     (defun ,name ()
+       ,(format "Interrupt the current session and reply %S." prompt)
+       (declare (modes agent-shell-mode agent-shell-viewport-view-mode agent-shell-diff-mode))
+       (interactive)
+       (konix/agent-shell-interrupt-set-default-and-reply ,prompt))
+     (konix/agent-shell-define-key ,key #',name)))
+
 (provide 'KONIX_agent-shell-common)
 ;;; KONIX_agent-shell-common.el ends here

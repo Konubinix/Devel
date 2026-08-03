@@ -148,31 +148,53 @@ At the prompt, delete backward."
           (agent-shell-queue-request prompt))))))
 
 (defun konix/agent-shell-viewport-reply-hello ()
-  "Reply with \"hello\" and send immediately."
+  "Interrupt, reply with \"hello\" and send immediately."
   (declare (modes agent-shell-viewport-view-mode))
   (interactive)
-  (agent-shell-viewport-reply)
-  (insert "hello")
-  (agent-shell-viewport-compose-send))
+  (konix/agent-shell-viewport--interrupt-and-reply "hello"))
 
 (defun konix/agent-shell-viewport-reply-try-again ()
-  "Reply with \"try again\" and send immediately."
+  "Interrupt, reply with \"try again\" and send immediately."
   (declare (modes agent-shell-viewport-view-mode))
   (interactive)
-  (agent-shell-viewport-reply)
-  (insert "try again")
-  (agent-shell-viewport-compose-send))
+  (konix/agent-shell-viewport--interrupt-and-reply "try again"))
 
 (defun konix/agent-shell-viewport-reply-go-on ()
-  "Reply with \"go on\" and send immediately."
+  "Interrupt, reply with \"go on\" and send immediately."
   (declare (modes agent-shell-viewport-view-mode))
   (interactive)
-  (agent-shell-viewport-reply)
-  (insert "go on")
-  (agent-shell-viewport-compose-send))
+  (konix/agent-shell-viewport--interrupt-and-reply "go on"))
+
+(defun konix/agent-shell-viewport-set-session-mode (mode-name)
+  "Switch the current session to the mode named MODE-NAME, without prompting.
+
+Reuses the interactive `agent-shell-viewport-set-session-mode' by
+feeding MODE-NAME to its `completing-read'.  A no-op when that mode is
+already active (the underlying \"already\" error is ignored)."
+  (cl-letf (((symbol-function 'completing-read)
+             (lambda (&rest _) mode-name)))
+    (ignore-errors
+      (agent-shell-viewport-set-session-mode))))
+
+(defun konix/agent-shell-viewport--interrupt-and-reply (prompt)
+  "Interrupt the agent, then reply with PROMPT and send immediately."
+  (konix/agent-shell-viewport--interrupt-then
+   (agent-shell-viewport-reply)
+   (insert prompt)
+   (agent-shell-viewport-compose-send)))
+
+(defun konix/agent-shell-viewport--interrupt-set-default-and-reply (prompt)
+  "Interrupt the agent, switch to the Default mode, then reply with PROMPT."
+  (konix/agent-shell-viewport--interrupt-then
+   (konix/agent-shell-viewport-set-session-mode "Manual")
+   (agent-shell-viewport-reply)
+   (insert prompt)
+   (agent-shell-viewport-compose-send)))
 
 (define-key agent-shell-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)
 (define-key agent-shell-viewport-view-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)
+(define-key agent-shell-viewport-view-mode-map (kbd "RET")
+            #'(lambda () (interactive) (message "Intentionally disable RET, too easily triggered")))
 (define-key agent-shell-mode-map (kbd "SPC") 'konix/agent-shell/scroll-or-track)
 (define-key agent-shell-viewport-view-mode-map (kbd "SPC") 'konix/agent-shell/scroll-or-track)
 (define-key agent-shell-mode-map (kbd "<") 'konix/agent-shell/beginning-of-buffer)
@@ -181,6 +203,8 @@ At the prompt, delete backward."
 (define-key agent-shell-mode-map (kbd "G") 'konix/agent-shell/end-of-buffer)
 (define-key agent-shell-viewport-view-mode-map (kbd "h") 'konix/agent-shell-viewport-reply-hello)
 (define-key agent-shell-viewport-view-mode-map (kbd "t") 'konix/agent-shell-viewport-reply-try-again)
+(define-key agent-shell-viewport-view-mode-map (kbd "T") 'konix/mcp-server-show-spawn-tree)
+(define-key agent-shell-viewport-view-mode-map (kbd "U") 'konix/claude-code-usage)
 (define-key agent-shell-viewport-view-mode-map (kbd "o") 'konix/agent-shell-viewport-reply-go-on)
 (define-key agent-shell-viewport-view-mode-map (kbd "<delete>") 'konix/agent-shell-viewport-interrupt-no-confirm)
 (define-key agent-shell-viewport-view-mode-map (kbd "R") 'konix/agent-shell-viewport-interrupt-no-confirm-and-reply)

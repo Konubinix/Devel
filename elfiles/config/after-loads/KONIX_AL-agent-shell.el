@@ -57,4 +57,21 @@
 (require 'KONIX_agent-shell-notifications)
 (require 'KONIX_agent-shell-org-links)
 
+;;; Shared reply commands, defined and bound once across all agent-shell keymaps
+;; `agent-shell-diff-mode-map' lives in the `agent-shell-diff' feature, so pull
+;; it in before `konix/agent-shell-define-reply' binds across every keymap.
+(require 'agent-shell-diff)
+(konix/agent-shell-define-reply konix/agent-shell-tl-dr
+  "M-t" "tl;dr.")
+(konix/agent-shell-define-reply konix/agent-shell-TL-DR
+  "M-T" "tl;dr. If you need to convey sequence of event, use plantuml, if you need to show me complex argumentation, use argdown")
+(konix/agent-shell-define-reply konix/agent-shell-comment-vomit "M-v" "don't vomit useless comment please")
+(konix/agent-shell-define-reply konix/agent-shell-red-herring   "M-h" "that's a red herring")
+(konix/agent-shell-define-reply konix/agent-shell-blabbering
+  "M-b"
+  "It feels like you expect something from me. I have better things to do than reading your blabbering. I only read the last message. Never assume I read what you are thinking I read. If you have something to ask, just ask it now.")
+(konix/agent-shell-define-reply konix/agent-shell-bullshit
+  "M-B"
+  "You are trying to bullshit me. Look on the internet please.")
+
 ;;; KONIX_AL-agent-shell.el ends here

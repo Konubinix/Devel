@@ -33,12 +33,20 @@
       (user-error "No agent-shell viewport for current project"))
     viewport))
 
-(defun konix/agent-shell-diff-read-interrupt-and-submit ()
-  "From an agent-shell-diff buffer, interrupt the agent and submit a new prompt."
-  (declare (modes agent-shell-diff-mode))
-  (interactive)
-  (with-current-buffer (konix/agent-shell-diff--viewport-buffer)
-    (call-interactively #'konix/agent-shell-viewport-read-interrupt-and-submit)))
+(defmacro konix/agent-shell-diff-define-delegate (name viewport-command docstring)
+  "Define command NAME running VIEWPORT-COMMAND from the viewport buffer.
+DOCSTRING documents the generated command."
+  (declare (indent defun))
+  `(defun ,name ()
+     ,docstring
+     (declare (modes agent-shell-diff-mode))
+     (interactive)
+     (with-current-buffer (konix/agent-shell-diff--viewport-buffer)
+       (call-interactively #',viewport-command))))
+
+(konix/agent-shell-diff-define-delegate konix/agent-shell-diff-read-interrupt-and-submit
+  konix/agent-shell-viewport-read-interrupt-and-submit
+  "From an agent-shell-diff buffer, interrupt the agent and submit a new prompt.")
 
 (defun konix/agent-shell-diff-pop-to-viewport ()
   "Pop back to the agent-shell viewport buffer without accepting or rejecting."

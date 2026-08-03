@@ -25,6 +25,9 @@
 
 (require 'KONIX_agent-shell-common)
 
+(declare-function konix/mcp-server-render-note "KONIX_mcp-server-agent-shell")
+(declare-function agent-shell--insert-to-shell-buffer "agent-shell")
+
 (defun konix/agent-shell--call-preserving-name-and-model (cmd)
   "Call CMD interactively, then propagate the current shell's name and
 model to the resulting new shell.  After CMD returns, `current-buffer'
@@ -100,6 +103,30 @@ forked shell adopts the same name, uniquified by Emacs to
                   agent-shell-viewport-edit-mode))
   (interactive)
   (konix/agent-shell--call-preserving-name-and-model #'agent-shell-fork))
+
+(defun konix/agent-shell-bind-governing-note (note-path)
+  "Bind NOTE-PATH as the current shell's governing note and send it to the agent.
+Does after the fact what the `agent-shell-with-note' org link does at
+start-up: binds the note (so `spawn_auditor' needs no note path) and
+submits its rendered text.  Prompts for the note, defaulting to any
+already bound."
+  (declare (modes agent-shell-mode
+                  agent-shell-viewport-view-mode
+                  agent-shell-viewport-edit-mode))
+  (interactive
+   (let ((shell (konix/agent-shell--current-shell-or-error)))
+     (list (read-file-name "Governing note: " nil
+                           (konix/agent-shell-governing-note shell) t))))
+  (let* ((shell (konix/agent-shell--current-shell-or-error))
+         (note (expand-file-name note-path)))
+    (konix/agent-shell-set-governing-note shell note)
+    (agent-shell--insert-to-shell-buffer
+     :shell-buffer shell
+     :text (concat (konix/mcp-server-render-note note)
+                   "\n\nThe note above now governs this session; call spawn_auditor (no note path) for audits.")
+     :submit t
+     :no-focus t)
+    (message "Bound governing note %s to %S" note (buffer-name shell))))
 
 (defcustom konix/agent-shell-renewal-margin-seconds 60
   "Extra seconds to wait past the computed 5h renewal before resuming.

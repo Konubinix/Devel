@@ -133,9 +133,29 @@ already bound."
 The rate-limit reset boundary is approximate (and the usage probe may
 be a few seconds stale), so `konix/agent-shell-reload-at-renewal' adds
 this margin to be sure the window has actually rolled over before it
-reloads and sends \"continue\"."
+checks whether the session needs resuming."
   :type 'integer
   :group 'konix)
+
+(defcustom konix/agent-shell-rate-limit-regexp
+  (rx (or "usage limit" "spend limit" "rate limit" "/usage-credits"
+          "limit reached"))
+  "Regexp matching what a session says when the rate limit stops it.
+A refused turn leaves the limit notice as the agent's last words, e.g.
+\"You've hit your org's monthly spend limit \\=· run /usage-credits to ask
+your admin for a higher limit\"."
+  :type 'regexp
+  :group 'konix)
+
+(declare-function konix/agent-shell--last-agent-message "KONIX_agent-shell-permissions")
+
+(defun konix/agent-shell--rate-limited-p ()
+  "Return non-nil when the current shell's last words are a limit notice.
+See `konix/agent-shell-rate-limit-regexp'."
+  (when-let* ((last-message (ignore-errors
+                              (konix/agent-shell--last-agent-message))))
+    (let ((case-fold-search t))
+      (string-match-p konix/agent-shell-rate-limit-regexp last-message))))
 
 (defvar konix/agent-shell--renewal-timers nil
   "Alist of (SHELL-NAME . TIMER) for pending renewal reloads.
@@ -168,24 +188,29 @@ submitted."
     (funcall continue-fn)))
 
 (defun konix/agent-shell--go-on-at-renewal (buffer shell-name &optional mode-id)
-  "Reply \"go on\" in BUFFER once the renewal timer fires.
-Drops the SHELL-NAME entry from `konix/agent-shell--renewal-timers' and,
-when BUFFER is still live, restores the session/permission MODE-ID captured
-when the renewal was armed (see `konix/agent-shell--continue-restoring-mode')
-before submitting the continue prompt in its shell buffer."
+  "Resume BUFFER's session once the renewal timer fires, if it was stopped.
+Drops the SHELL-NAME entry from `konix/agent-shell--renewal-timers'.
+Whether there is anything to resume is decided here, at renewal:
+only a session the rate limit stopped (`konix/agent-shell--rate-limited-p')
+is told to continue, under the MODE-ID captured when the renewal was armed
+\(see `konix/agent-shell--continue-restoring-mode'); one that kept working
+is left alone."
   (setq konix/agent-shell--renewal-timers
         (assoc-delete-all shell-name konix/agent-shell--renewal-timers))
   (if (buffer-live-p buffer)
       (with-current-buffer buffer
         (let ((shell-buffer (agent-shell-shell-buffer)))
           (with-current-buffer shell-buffer
-            (konix/agent-shell--continue-restoring-mode
-             mode-id
-             (lambda ()
-               (agent-shell--insert-to-shell-buffer
-                :shell-buffer shell-buffer
-                :text "you were interrupted for a long time. If you were registered in the coord system, you likely have missed the heartbeat: thus register again. Anyway, continue your work"
-                :submit t))))))
+            (if (not (konix/agent-shell--rate-limited-p))
+                (message "Renewal: %S was not stopped by the rate limit, leaving it alone"
+                         shell-name)
+              (konix/agent-shell--continue-restoring-mode
+               mode-id
+               (lambda ()
+                 (agent-shell--insert-to-shell-buffer
+                  :shell-buffer shell-buffer
+                  :text "you were interrupted for a long time. If you were registered in the coord system, you likely have missed the heartbeat: thus register again. Anyway, continue your work"
+                  :submit t)))))))
     (message "Renewal: buffer %S is gone, nothing to continue" shell-name)))
 
 (defun konix/agent-shell-reload-at-renewal-all ()
@@ -196,15 +221,15 @@ before submitting the continue prompt in its shell buffer."
           (agent-shell-buffers)))
 
 (defun konix/agent-shell-reload-at-renewal ()
-  "At credit renewal, reply \"go on\" to this session.
-Run this from the agent-shell viewport that just hit 100%% of a Claude
-credit window.  It queries the renewal time from the rate-limit headers
-\(forcing a fresh probe) and arms a one-shot timer that, when it fires,
-simply calls `konix/agent-shell-viewport-reply-go-on' in this buffer.
+  "At credit renewal, resume this session if the rate limit stopped it.
+Run this from the agent-shell viewport of a session held back by a Claude
+credit window.  Nothing is sent now: it queries the renewal time from the
+rate-limit headers (forcing a fresh probe) and arms a one-shot timer,
+which decides what to do when it fires (see
+`konix/agent-shell--go-on-at-renewal').
 
-The wait is the shorter of the 5-hour and 7-day windows (plus
-`konix/agent-shell-renewal-margin-seconds').  When neither window has
-reached 100%% there is nothing to wait for, so the reply is sent now.
+The wait is the shorter of the 5-hour and 7-day windows, plus
+`konix/agent-shell-renewal-margin-seconds'.
 
 Re-running for the same buffer replaces any pending timer.  Cancel with
 `konix/agent-shell-cancel-renewal'."
@@ -224,8 +249,6 @@ Re-running for the same buffer replaces any pending timer.  Cancel with
          (result (json-read-from-string
                   (let ((current-prefix-arg t))
                     (konix/claude-code---usage))))
-         (usage-5h (alist-get 'usage_5h_percent result))
-         (usage-7d (alist-get 'usage_7d_percent result))
          (reset-5h-secs (alist-get 'reset_5h_secs result))
          (reset-7d-secs (alist-get 'reset_7d_secs result))
          (min-reset-secs (min reset-5h-secs reset-7d-secs))
@@ -236,19 +259,14 @@ Re-running for the same buffer replaces any pending timer.  Cancel with
       (cancel-timer (cdr existing))
       (setq konix/agent-shell--renewal-timers
             (assoc-delete-all shell-name konix/agent-shell--renewal-timers)))
-    (if (and (< usage-5h 100) (< usage-7d 100))
-        ;; not rate-limited yet: no need to wait, continue immediately
-        (progn
-          (agent-shell-viewport-reply-continue)
-          (message "Usage below 100%%, continuing %S now" shell-name))
-      (let ((timer (run-at-time delay nil
-                                #'konix/agent-shell--go-on-at-renewal
-                                buffer shell-name mode-id)))
-        (push (cons shell-name timer) konix/agent-shell--renewal-timers))
-      (message "Will continue %S at renewal (in %s, +%ds margin)"
-               shell-name
-               (konix/claude-code--format-duration wait-secs)
-               konix/agent-shell-renewal-margin-seconds))))
+    (let ((timer (run-at-time delay nil
+                              #'konix/agent-shell--go-on-at-renewal
+                              buffer shell-name mode-id)))
+      (push (cons shell-name timer) konix/agent-shell--renewal-timers))
+    (message "Will check %S at renewal (in %s, +%ds margin)"
+             shell-name
+             (konix/claude-code--format-duration (max 0 wait-secs))
+             konix/agent-shell-renewal-margin-seconds)))
 
 (defun konix/agent-shell-cancel-renewal ()
   "Cancel a pending renewal reload scheduled for the current shell."

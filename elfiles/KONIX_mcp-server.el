@@ -50,6 +50,14 @@ tools can be enabled/disabled independently.")
   :type 'string
   :group 'konix-mcp)
 
+(defcustom konix/mcp-server-read-buffer-max-chars 100000
+  "Maximum number of characters `konix/mcp-server-read-buffer' returns at once.
+When a buffer (or the requested range) is larger than this, the tool
+signals an error asking the caller to pass START-CHAR and END-CHAR to read
+a smaller slice, rather than flooding the client with a huge payload."
+  :type 'integer
+  :group 'konix-mcp)
+
 ;;; Helper functions and macros
 
 (defmacro konix/mcp-server-with-buffer (buffer-name &rest body)
@@ -59,8 +67,9 @@ Signals an error if the buffer does not exist."
   `(let* ((decoded-buffer-name (decode-coding-string ,buffer-name 'utf-8))
           (buf (get-buffer decoded-buffer-name)))
      (if buf
-         (with-current-buffer buf
-           ,@body)
+         (save-window-excursion
+           (with-current-buffer buf
+             ,@body))
        (error "Buffer not found: %s" decoded-buffer-name))))
 
 (defun konix/mcp-server--get-agenda-content (key)
@@ -109,8 +118,15 @@ MCP Parameters:
                                     (length content))))
                  (end (max 0 (min (string-to-number (format "%s" end-char))
                                   (length content)))))
+             (when (> (- end start) konix/mcp-server-read-buffer-max-chars)
+               (error "Requested range is %d chars, exceeds limit of %d; request a smaller range with start-char/end-char"
+                      (- end start) konix/mcp-server-read-buffer-max-chars))
              (substring content start end))
-         content)))))
+         (progn
+           (when (> (length content) konix/mcp-server-read-buffer-max-chars)
+             (error "Buffer is %d chars, exceeds limit of %d; read it in slices with start-char/end-char (0-indexed, end exclusive)"
+                    (length content) konix/mcp-server-read-buffer-max-chars))
+           content))))))
 
 (defun konix/mcp-server-write-buffer (buffer-name content)
   "Write content to a buffer, replacing its contents.
@@ -146,6 +162,29 @@ MCP Parameters:
    (konix/mcp-server-with-buffer buffer-name
      (kill-buffer (current-buffer))
      (format "Killed buffer %s" buffer-name))))
+
+(defun konix/mcp-server-ensure-file-open (file-path)
+  "Ensure FILE-PATH is visited in a buffer with `auto-revert-mode' on.
+Opens the file if it is not already visited, then turns on auto-revert so
+the buffer stays in sync with on-disk changes made by other tools.
+
+MCP Parameters:
+  file-path - Absolute or relative path of the file to open."
+  (mcp-server-lib-with-error-handling
+   (let* ((file-path (decode-coding-string file-path 'utf-8))
+          (expanded (expand-file-name file-path)))
+     (unless (file-exists-p expanded)
+       (error "File does not exist: %s" expanded))
+     (let* ((existing (find-buffer-visiting expanded))
+            (buf (or existing (find-file-noselect expanded))))
+       (with-current-buffer buf
+         (unless (bound-and-true-p auto-revert-mode)
+           (auto-revert-mode 1))
+         (json-encode
+          `((buffer . ,(buffer-name))
+            (file . ,(buffer-file-name))
+            (already-open . ,(if existing t :json-false))
+            (auto-revert . t))))))))
 
 (defun konix/mcp-server-get-git-info-from-buffer (buffer-name)
   "Get git branch and remote for the given buffer's directory.
@@ -469,6 +508,9 @@ MCP Parameters:
      (konix/mcp-server-kill-buffer
       :id "kill_buffer"
       :description "Kill (close) an Emacs buffer by name")
+     (konix/mcp-server-ensure-file-open
+      :id "ensure_file_open"
+      :description "Ensure a file is visited in an Emacs buffer with auto-revert-mode enabled, so the buffer stays in sync with on-disk changes. Opens the file if not already open. Returns the buffer name and whether it was already open.")
      (konix/mcp-server-get-git-info-from-buffer
       :id "get_git_info"
       :description "Retrieves the current Git branch and remote tracking branch for the repository associated with a given buffer. Essential for understanding the context of code changes and managing repository operations."

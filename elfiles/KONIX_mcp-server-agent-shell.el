@@ -598,7 +598,7 @@ FIRST, do these setup steps in order. The coordination tools are MCP tools that 
    c. Report your result by calling coord_complete_task. By DEFAULT it blocks and hands back your NEXT task, so you do NOT call coord_wait again — just act on whatever it returns and report that with coord_complete_task too. (Pass wait=false only when you must return immediately instead of blocking: an interim \"need more time\" before continuing the SAME task, or your final report just before kill_buddy.)
    d. Repeat (c) for every further task.
 
-RESPECT THE CALLER'S DEADLINE: each task you receive carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — you MUST call coord_complete_task BEFORE the deadline or you may be killed. If you cannot finish the real work in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task wait=false (say what you have done and what remains), keep working, then report the real result with coord_complete_task. A late silence breaks cooperation; an honest \"need more time\" keeps it intact.
+RESPECT THE CALLER'S DEADLINE: each task you receive carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — you MUST call coord_complete_task BEFORE the deadline or you may be killed. If you cannot finish the real work in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task wait=false (say what you have done and what remains), keep working, then report the real result with coord_complete_task. A late silence breaks cooperation; an honest \"need more time\" keeps it intact. Every coord reply also ends with a \"COORD_DEADLINE:\" line — your nearest outstanding deadline (or \"none\"). Treat it as an ambient signal: if it is close, or you already know you need more time, report now as above; otherwise keep working. Report once per deadline; do not re-acknowledge it on every coord call.
 
 Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, invoke the kill_buddy tool with your own name \"%s\" to clean yourself up."
                           task buddy-name buddy-name buddy-name)
@@ -772,7 +772,7 @@ SETUP, in order:
 2. Call coord_register with name \"%s\" and a short description (\"audit buddy\").
 3. Loop: coord_wait (buddy \"%s\") to block until your FIRST draft arrives; read and audit it; report your verdict with coord_complete_task. By DEFAULT coord_complete_task blocks and returns your NEXT draft, so do NOT call coord_wait again — audit whatever it hands back and report that with coord_complete_task too. (Pass wait=false only to return immediately instead of blocking: an interim \"need more time\" before finishing the SAME audit.)
 
-RESPECT THE CALLER'S DEADLINE: each draft you receive carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — call coord_complete_task with your verdict BEFORE the deadline or you may be killed. If the audit will not be done in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task wait=false (with what you have checked so far), then finish and report the real verdict — rather than letting the caller time out.
+RESPECT THE CALLER'S DEADLINE: each draft you receive carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — call coord_complete_task with your verdict BEFORE the deadline or you may be killed. If the audit will not be done in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task wait=false (with what you have checked so far), then finish and report the real verdict — rather than letting the caller time out. Every coord reply also ends with a \"COORD_DEADLINE:\" line — your nearest outstanding deadline (or \"none\"). Treat it as an ambient signal: if it is close, or you already know you need more time, report now as above; otherwise keep working. Report once per deadline; do not re-acknowledge it on every coord call.
 
 Keep serving every draft until you are told to stop or killed. Do NOT kill yourself after an audit — an auditor serves many passes."
           principles buddy-name buddy-name))
@@ -983,7 +983,7 @@ Returns nil when no marker is present."
       (setq konix/mcp-server--deadline-timer nil)
       (konix/mcp-server--interrupt-and-submit
        buffer
-       (format "⏰ Your task answer deadline is ~%ds away — not enough time to write a long answer through coord_complete_task before the caller gives up. NOW, in order: (1) call coord_complete_task with a SHORT message that beats the clock — your final answer if it is brief, else an interim \"need more time\" stating what is done and what remains; (2) only AFTER that, send any longer write-up as a separate coord_send_message to the caller (the task's `from`). Do not let a long summary delay step 1; do NOT go silent."
+       (format "I had to interrupt you to let you know that you only have ~%d to report to your caller buddy. Just call coord_complete_task to answer that you need more time (if you have not drained the task yet, coord_wait to fetch it first). It will provide more and you will be able to continue your work."
                konix/mcp-server-deadline-lead-seconds)))))
 
 (defun konix/mcp-server--arm-deadline-timer (deadline)
@@ -999,26 +999,33 @@ away when already inside that window); a deadline already past is ignored."
                             #'konix/mcp-server--deadline-fire (current-buffer))))))
 
 (defun konix/mcp-server-watch-deadline-event (event)
-  "From a `tool-call-update' EVENT, arm or cancel this buddy's deadline interrupt.
-Call from within the buddy's shell buffer.  Both `coord_wait' and (in its
-default report-and-wait mode) `coord_complete_task' return the buddy's next
-task, which carries the caller's `answer_by' deadline via the `COORD_DEADLINE'
-marker.  So on either tool completing: arm a one-shot interrupt for that
-deadline when the marker is present, else cancel any pending one (a bare
-`wait=false' completion or a failed call carries no marker)."
-  (let* ((data (map-elt event :data))
-         (tool-call (map-elt data :tool-call))
-         (title (map-elt tool-call :title))
-         (status (map-elt tool-call :status)))
-    (when (and (member status '("completed" "failed"))
-               (stringp title)
-               (let ((case-fold-search t))
-                 (string-match-p "coord_wait\\|coord_complete_task" title)))
-      (if-let ((deadline (and (equal status "completed")
-                              (konix/mcp-server--parse-answer-by
-                               (konix/mcp-server--tool-call-result-text tool-call)))))
-          (konix/mcp-server--arm-deadline-timer deadline)
-        (konix/mcp-server--cancel-deadline-timer)))))
+  "Arm/cancel this buddy's deadline interrupt from a coord call's EVENT.
+On a completed coord call the `COORD_DEADLINE: <iso>|none' marker in the reply
+arms (timestamp) or cancels (`none') the one-shot; replies without the marker
+are left alone.
+
+`coord_complete_task' is special-cased on the way IN.  The instant that call
+starts it has already discharged the caller deadline server-side, but it then
+BLOCKS handing back the next task, so its own reply -- which would clear the
+stale deadline via the marker -- does not arrive until much later (possibly
+after a full wait timeout).  Cancelling on the in-flight update kills the stale
+caller-deadline timer immediately, so the buddy is not spuriously interrupted
+to \"report before your deadline\" for a task it has already answered.  When the
+blocking reply eventually lands, the `completed' branch re-arms to the next
+task's deadline (or clears it), so nothing is lost by cancelling early."
+  (let* ((tool-call (map-elt (map-elt event :data) :tool-call))
+         (status (map-elt tool-call :status))
+         (title (map-elt tool-call :title)))
+    (cond
+     ((equal status "completed")
+      (let ((text (konix/mcp-server--tool-call-result-text tool-call)))
+        (if-let ((deadline (konix/mcp-server--parse-answer-by text)))
+            (konix/mcp-server--arm-deadline-timer deadline)
+          (when (string-match-p "COORD_DEADLINE: none" text)
+            (konix/mcp-server--cancel-deadline-timer)))))
+     ((and (stringp title)
+           (string-match-p "coord_complete_task" title))
+      (konix/mcp-server--cancel-deadline-timer)))))
 
 (defun konix/mcp-server--descendants-of (buffer)
   "Return BUFFER plus all agent-shell descendants, top-down."

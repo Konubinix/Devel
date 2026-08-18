@@ -30,7 +30,21 @@
 ;;; Code:
 
 (defconst org-babel-header-args:cadquery
-  '((obj . :any) (tolerance . :any)))
+  '((obj . :any) (tolerance . :any))
+  "Header args specific to `cadquery', for completion and block checking.")
+
+(defvar org-babel-default-header-args:cadquery
+  '((:python . "/home/sam/perso/konixwork/share/pipx/venvs/clk/bin/python")
+    (:results . "raw")
+    (:exports . "both")
+    (:ipfa . "t")
+    (:cache . "yes")
+    (:var . "out=\"/tmp/outfile.stl\"")
+    (:noweb . "strip-export"))
+  "Defaults merged into every `cadquery' block.
+`org-babel-get-src-block-info' merges `org-babel-default-header-args:<lang>';
+the plain `org-babel-header-args:<lang>' above only declares what is legal, so
+defaults stated there never reach a block.")
 
 (defconst konix/ob-cadquery-library
   (expand-file-name "KONIX_ob-cadquery.org"

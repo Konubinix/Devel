@@ -412,6 +412,10 @@ update buffer-locally so the palette stays scoped to this buffer."
 
 (setq-default org-show-notification-handler 'konix/org-show-notification-handler)
 
+;; keeps the language mode's indenter out of src blocks, where re-indenting the
+;; code changes what it means
+(setq-default org-src-tab-acts-natively nil)
+
 (defadvice org-open-at-point (before push-ring ())
   (org-mark-ring-push)
   )

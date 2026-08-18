@@ -685,7 +685,7 @@ MCP Parameters:
 HOW TO CALL COORDINATION TOOLS:
 - coord_register, coord_wait, coord_complete_task, coord_ask_and_wait, coord_list_buddies, spawn_buddy and kill_buddy are MCP tools. Invoke each one by emitting a tool call, exactly like any other tool.
 - If one isn't visible in your toolset yet, load its schema with ToolSearch first, then invoke it directly.
-- coord_wait and coord_ask_and_wait block server-side until there is something to return, so just call them and let them block. To wait for another buddy, call the coord tool again; if it reports \"not registered\", call coord_list_buddies and retry.
+- coord_wait and coord_ask_and_wait block server-side until there is something to return, so just call them and let them block. A target does not need to be registered to be reached, so a name coord accepts is a name that gets the work.
 
 CRITICAL RULES:
 - You MUST stay strictly focused on the instructions given to you. Do NOT take initiatives beyond what is asked.
@@ -696,7 +696,7 @@ FIRST, do these setup steps in order. The coordination tools are MCP tools that 
 1. Call ToolSearch with EXACTLY this query to load the coordination tool schemas: select:mcp__konix-mcp__coord_register,mcp__konix-mcp__coord_wait,mcp__konix-mcp__coord_complete_task — once it returns, those tools are directly callable like any built-in tool.
 2. Call the coord_register tool with name \"%s\" and a description of your role.
 3. Then enter a loop:
-   a. Call coord_wait with buddy \"%s\" to block until you receive your FIRST task.
+   a. Call coord_wait to block until you receive your FIRST task. It takes no name: coord knows which session you are.
    b. Execute the task you receive strictly as described. If it fails, report the failure.
    c. Report your result by calling coord_complete_task. By DEFAULT it blocks and hands back your NEXT task, so you do NOT call coord_wait again — just act on whatever it returns and report that with coord_complete_task too. (Pass wait=false only when you must return immediately instead of blocking: an interim \"need more time\" before continuing the SAME task, or your final report just before kill_buddy.)
    d. Repeat (c) for every further task.
@@ -704,7 +704,7 @@ FIRST, do these setup steps in order. The coordination tools are MCP tools that 
 RESPECT THE CALLER'S DEADLINE: each task you receive carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — you MUST call coord_complete_task BEFORE the deadline or you may be killed. If you cannot finish the real work in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task wait=false (say what you have done and what remains), keep working, then report the real result with coord_complete_task. A late silence breaks cooperation; an honest \"need more time\" keeps it intact. Every coord reply also ends with a \"COORD_DEADLINE:\" line — your nearest outstanding deadline (or \"none\"). Treat it as an ambient signal: if it is close, or you already know you need more time, report now as above; otherwise keep working. Report once per deadline; do not re-acknowledge it on every coord call.
 
 Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, invoke the kill_buddy tool with your own name \"%s\" to clean yourself up."
-                          task buddy-name buddy-name buddy-name)
+                          task buddy-name buddy-name)
                           (if auto-respawn-on
                               konix/mcp-server--respawn-buddy-prompt-note
                             ""))))
@@ -926,14 +926,14 @@ HOW TO CALL COORDINATION TOOLS:
 - coord_wait blocks server-side until a task arrives; just call it and let it block.
 
 SETUP, in order:
-1. Call ToolSearch with EXACTLY: select:mcp__konix-mcp__coord_register,mcp__konix-mcp__coord_wait,mcp__konix-mcp__coord_complete_task
+1. Call ToolSearch to find the coord tools
 2. Call coord_register with name \"%s\" and a short description (\"audit buddy\").
-3. Loop: coord_wait (buddy \"%s\") to block until your FIRST draft arrives; read and audit it; report your verdict with coord_complete_task. By DEFAULT coord_complete_task blocks and returns your NEXT draft, so do NOT call coord_wait again — audit whatever it hands back and report that with coord_complete_task too. (Pass wait=false only to return immediately instead of blocking: an interim \"need more time\" before finishing the SAME audit.)
+3. Loop: coord_wait (it takes no name; coord knows which session you are) to block until your FIRST draft arrives; read and audit it; report your verdict with coord_complete_task. By DEFAULT coord_complete_task blocks and returns your NEXT draft, so do NOT call coord_wait again — audit whatever it hands back and report that with coord_complete_task too. (Pass wait=false only to return immediately instead of blocking: an interim \"need more time\" before finishing the SAME audit.)
 
 RESPECT THE CALLER'S DEADLINE: each draft you receive carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — call coord_complete_task with your verdict BEFORE the deadline or you may be killed. If the audit will not be done in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task wait=false (with what you have checked so far), then finish and report the real verdict — rather than letting the caller time out. Every coord reply also ends with a \"COORD_DEADLINE:\" line — your nearest outstanding deadline (or \"none\"). Treat it as an ambient signal: if it is close, or you already know you need more time, report now as above; otherwise keep working. Report once per deadline; do not re-acknowledge it on every coord call.
 
 Keep serving every draft until you are told to stop or killed. Do NOT kill yourself after an audit — an auditor serves many passes."
-          principles buddy-name buddy-name))
+          principles buddy-name))
 
 (defun konix/mcp-server-spawn-auditor (directory &optional label respawn-threshold)
   "Spawn a standing AUDIT buddy with the governing principles baked into its boot prompt.
@@ -1199,8 +1199,8 @@ MCP Parameters:
        (error "from-buddy '%s' is not registered in the coordination system" from-buddy))
      (konix/mcp-server--interrupt-and-submit
       buffer
-      (format "You were INTERRUPTED out-of-band by \"%s\" (not a coord task, so nothing to coord_complete_task):\n\n%s\n\nReply with coord_send_message from_buddy=\"%s\" to_buddy=\"%s\" (a plain shell answer will NOT reach them), then call coord_wait to resume."
-              from-buddy message buddy-name from-buddy))
+      (format "You were INTERRUPTED out-of-band by \"%s\" (not a coord task, so nothing to coord_complete_task):\n\n%s\n\nReply with coord_send_message to_buddy=\"%s\" (a plain shell answer will NOT reach them), then call coord_wait to resume."
+              from-buddy message from-buddy))
      (format "Interrupted '%s'; told it to reply via coord to '%s'." buddy-name from-buddy))))
 
 (defun konix/mcp-server--nudge-prompt (payload from-buddy)

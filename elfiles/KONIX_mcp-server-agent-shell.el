@@ -206,6 +206,43 @@ is gone until the heartbeat timeout notices."
                          (url-hexify-string buddy-name))
       :timeout 5)))
 
+(defun konix/mcp-server--delivery-request (method kind delivery)
+  "Send METHOD to coord's KIND endpoint for DELIVERY.  Non-nil on success.
+Nil for a missing DELIVERY too — a caller holding no delivery has nothing to say
+about one, and answering yes would quietly restore the pre-lease behaviour."
+  (and delivery
+       (not (equal delivery 0))
+       (ignore-errors
+         (plz method (format "%s/coord/%s/%s"
+                             konix/mcp-server-coord-url kind
+                             (url-hexify-string (format "%s" delivery)))
+           :timeout 5)
+         t)))
+
+(defun konix/mcp-server--coord-claim-delivery (delivery)
+  "Ask coord whether force-fed DELIVERY is still ours to make.  Non-nil if so.
+
+Checked immediately before inserting the text, because coord takes an unconfirmed
+delivery back once its lease lapses and re-queues the work — submitting one we no
+longer hold would hand the buddy the same work twice.
+
+This does NOT consume the delivery, only extend it.  It is probed over a channel
+that can drop the reply, and `plz' runs `accept-process-output' under
+`with-local-quit', so a `C-g' here re-signals a `quit' that `ignore-errors' does
+not catch: were the claim destructive, every such interruption would commit work
+that then never got inserted, which is exactly the silent loss the lease exists to
+prevent."
+  (konix/mcp-server--delivery-request 'post "deliveries-claim" delivery))
+
+(defun konix/mcp-server--coord-commit-delivery (delivery)
+  "Tell coord the force-fed text for DELIVERY really was submitted."
+  (konix/mcp-server--delivery-request 'post "deliveries" delivery))
+
+(defun konix/mcp-server--coord-release-delivery (delivery)
+  "Hand DELIVERY back to coord because the text never made it in.
+Coord requeues the work and re-nudges, rather than waiting out the whole lease."
+  (konix/mcp-server--delivery-request 'delete "deliveries" delivery))
+
 (cl-defstruct (konix/mcp-server-coord-view
                (:constructor konix/mcp-server--make-coord-view))
   "Coord's per-buddy state, as one `/coord/overview' request.
@@ -1090,26 +1127,53 @@ pick, since the generated name says nothing on its own."
                   :as #'json-read :timeout 5))
     (error nil)))
 
-(defun konix/mcp-server--interrupt-and-submit (buffer text)
+(defvar-local konix/mcp-server--pending-submit nil
+  "Subscription waiting for this buffer's turn to end so a submit can happen.
+At most one: a second interrupt supersedes the first rather than queueing behind
+it, or a buffer nudged repeatedly would accumulate handlers that all fire — and
+all insert — the moment it finally becomes free.")
+
+(defun konix/mcp-server--interrupt-and-submit (buffer text &optional around-submit)
   "Cancel BUFFER's in-flight turn and submit TEXT as its next prompt.
 When the turn is still unwinding, TEXT is submitted from the
-`turn-complete' event (the seam M-r uses) rather than now."
+`turn-complete' event (the seam M-r uses) rather than now.
+
+AROUND-SUBMIT, when given, is called with one argument — a thunk that performs the
+submit — and decides whether and when to call it.  A busy buffer reaches that
+point long after this function has returned, possibly minutes later and possibly
+never, so anything that must be true *at the moment of insertion* belongs in here
+rather than in whatever this function returned to."
   (with-current-buffer buffer
-    (let ((agent-shell-confirm-interrupt nil))
-      ;; ignore-errors: interrupt signals a user-error to say all is well.
-      (ignore-errors (agent-shell-interrupt)))
-    (let ((submit (lambda ()
-                    (agent-shell--insert-to-shell-buffer
-                     :shell-buffer buffer :text text :submit t :no-focus t))))
+    ;; Only a turn in flight is worth cancelling.  Interrupting an idle buffer
+    ;; lands in the same place, but by way of a cancellation the agent has to
+    ;; read past before it reaches the text we came here to submit.
+    (when (shell-maker-busy)
+      (let ((agent-shell-confirm-interrupt nil))
+        ;; ignore-errors: interrupt signals a user-error to say all is well.
+        (ignore-errors (agent-shell-interrupt))))
+    (let* ((insert (lambda ()
+                     (agent-shell--insert-to-shell-buffer
+                      :shell-buffer buffer :text text :submit t :no-focus t)))
+           (submit (lambda ()
+                     (if around-submit
+                         (funcall around-submit insert)
+                       (funcall insert)))))
       (if (not (shell-maker-busy))
           (funcall submit)
+        (when konix/mcp-server--pending-submit
+          (agent-shell-unsubscribe
+           :subscription konix/mcp-server--pending-submit))
         (let (token)
           (setq token
                 (agent-shell-subscribe-to
                  :shell-buffer buffer :event 'turn-complete
                  :on-event (lambda (_event)
                              (agent-shell-unsubscribe :subscription token)
-                             (funcall submit)))))))))
+                             (when (buffer-live-p buffer)
+                               (with-current-buffer buffer
+                                 (setq konix/mcp-server--pending-submit nil)))
+                             (funcall submit))))
+          (setq konix/mcp-server--pending-submit token))))))
 
 (defun konix/mcp-server-interrupt-agent (buddy-name from-buddy message)
   "Interrupt coordinated buddy BUDDY-NAME, as FROM-BUDDY, and ask it MESSAGE.
@@ -1138,6 +1202,85 @@ MCP Parameters:
       (format "You were INTERRUPTED out-of-band by \"%s\" (not a coord task, so nothing to coord_complete_task):\n\n%s\n\nReply with coord_send_message from_buddy=\"%s\" to_buddy=\"%s\" (a plain shell answer will NOT reach them), then call coord_wait to resume."
               from-buddy message buddy-name from-buddy))
      (format "Interrupted '%s'; told it to reply via coord to '%s'." buddy-name from-buddy))))
+
+(defun konix/mcp-server--nudge-prompt (payload from-buddy)
+  "The prompt handing PAYLOAD over, sent by FROM-BUDDY."
+  (concat
+   (format "You were NUDGED%s: you had coordination work queued that you never picked up, so here it is. This IS the work — there is nothing to fetch, and no need to call coord_wait to see it. Your turn was cut short only because you were not waiting: from coord_wait this would have reached you without an interrupt.\n\n"
+           (if (and from-buddy (not (string-empty-p from-buddy)))
+               (format " by \"%s\"" from-buddy)
+             ""))
+   payload
+   "\n\nAct on the above and answer through coord: a task with coord_complete_task, a message with coord_send_message, and nothing for a result. The coord tools take no name for you — coord knows which session is calling — so you can answer whether or not you ever registered. Then keep waiting rather than ending your turn."))
+
+(defun konix/mcp-server--nudge (key buddy-name payload &optional from-buddy delivery)
+  "Submit PAYLOAD to the buffer named KEY, as BUDDY-NAME's pending coord work.
+KEY is this Emacs's index; BUDDY-NAME is coord's name for it, shown to the buddy."
+  (let ((buffer (konix/mcp-server--buffer-for-buddy key)))
+    (unless buffer
+      (display-warning
+       'konix/mcp-server
+       (format "Could not nudge '%s': no agent-shell buffer is named '%s'. The work stays queued%s."
+               buddy-name key
+               (if (and from-buddy (not (string-empty-p from-buddy)))
+                   (format " and its sender \"%s\" is being told" from-buddy)
+                 ""))
+       :warning)
+      (error "No agent-shell buffer is named '%s'" key))
+    ;; A buffer whose client is gone would swallow the submit without ever
+    ;; running it, so coord would keep re-leasing the same work forever.
+    (when (eq (car (konix/mcp-server--agent-status buffer)) 'dead)
+      (konix/mcp-server--coord-deregister key)
+      (display-warning
+       'konix/mcp-server
+       (format "Could not nudge '%s': its buffer is still here but its agent is dead. Deregistered it from coord."
+               buddy-name)
+       :warning)
+      (error "Buddy '%s' has a buffer but no live agent" buddy-name))
+    (konix/mcp-server--interrupt-and-submit
+     buffer
+     (konix/mcp-server--nudge-prompt payload from-buddy)
+     (lambda (insert)
+       (when (konix/mcp-server--coord-claim-delivery delivery)
+         (let (inserted)
+           (unwind-protect
+               (when (buffer-live-p buffer)
+                 ;; The force-fed text never passes through a tool result, so the
+                 ;; marker in it is the only chance to arm the pre-deadline
+                 ;; interrupt.
+                 (with-current-buffer buffer
+                   (when-let ((deadline (konix/mcp-server--parse-answer-by payload)))
+                     (konix/mcp-server--arm-deadline-timer deadline)))
+                 ;; Returning is not evidence of insertion.  With no ACP session
+                 ;; id yet, `agent-shell--insert-to-shell-buffer' inserts nothing,
+                 ;; signals nothing, and returns a `prompt-ready' subscription
+                 ;; token; only a real insert answers with an alist carrying :end.
+                 ;; Committing on the token would drop the work with no lease left
+                 ;; to recover it from.
+                 (let ((result (funcall insert)))
+                   (setq inserted
+                         (integerp (ignore-errors (alist-get :end result))))
+                   (unless inserted
+                     ;; That subscription would insert this text later, behind
+                     ;; coord's back and after we have handed the work back —
+                     ;; delivering it twice. Drop it and let coord re-nudge once
+                     ;; the session is actually up.
+                     (ignore-errors
+                       (agent-shell-unsubscribe :subscription result)))))
+             ;; Runs on a `C-g' or an error too, which is the point: coord must
+             ;; either be told the buddy has the text, or get the work back.
+             (if inserted
+                 (konix/mcp-server--coord-commit-delivery delivery)
+               (konix/mcp-server--coord-release-delivery delivery)))))))
+    (format "Nudged '%s' with its pending work." buddy-name)))
+
+(defun konix/mcp-server--agent-idle-p (key)
+  "Return t when KEY names a buffer whose agent has nothing in flight.
+Anything else — busy, waiting, awaiting permission, dead, no buffer — is nil."
+  (let ((buffer (konix/mcp-server--buffer-for-buddy key)))
+    (and buffer
+         (eq (car (konix/mcp-server--agent-status buffer)) 'idle)
+         t)))
 
 ;;; Auto-interrupt before a task answer deadline
 
@@ -1181,7 +1324,7 @@ Returns nil when no marker is present."
       (setq konix/mcp-server--deadline-timer nil)
       (konix/mcp-server--interrupt-and-submit
        buffer
-       (format "I had to interrupt you to let you know that you only have ~%d to report to your caller buddy. Just call coord_complete_task to answer that you need more time (if you have not drained the task yet, coord_wait to fetch it first). It will provide more and you will be able to continue your work."
+       (format "I had to interrupt you to let you know that you only have ~%ds to report to your caller buddy. Just call coord_complete_task to answer that you need more time (if you have not drained the task yet, coord_wait to fetch it first). It will provide more and you will be able to continue your work."
                konix/mcp-server-deadline-lead-seconds)))))
 
 (defun konix/mcp-server--arm-deadline-timer (deadline)

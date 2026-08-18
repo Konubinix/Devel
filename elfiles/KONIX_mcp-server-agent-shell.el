@@ -85,6 +85,16 @@ later passes to `coord_register' does not change this one.  Also travels as the
 (defvar-local konix/mcp-server--session-tag nil
   "Unique identifier for this agent-shell session, embedded in --server-id suffixes.")
 
+(defvar konix/mcp-server--birth-counter 0
+  "Monotonic counter handing out `konix/mcp-server--birth-order' values.")
+
+(defvar-local konix/mcp-server--birth-order nil
+  "This buffer's creation rank, and the spawn tree's sort key.
+`buffer-list' is most-recently-used ordered, so rendering the tree straight
+from it made rows jump around whenever you merely visited an agent-shell
+buffer.  Sorting on birth order instead keeps every line put, and shows
+siblings in the order they were spawned.")
+
 (defvar konix/mcp-server--buddy-buffers (make-hash-table :test 'equal)
   "Maps `konix/mcp-server--buddy-name' → agent-shell buffer.
 The single index: complete for every agent-shell buffer, which is what lets a
@@ -422,6 +432,8 @@ just read it."
     (require 'org-id)
     (let ((name (format "s%s" (substring (org-id-uuid) 0 8))))
       (setq-local konix/mcp-server--buddy-name name)
+      (setq-local konix/mcp-server--birth-order
+                  (cl-incf konix/mcp-server--birth-counter))
       (konix/mcp-server--register-buddy-name name (current-buffer))
       (setq-local agent-shell-mcp-servers
                   (konix/mcp-server--tag-konix-mcp-session
@@ -1260,14 +1272,25 @@ color and readability.")
 (defun konix/mcp-server--collect-agent-nodes ()
   "Return a list of (BUFFER BUDDY-NAME PARENT-BUFFER) for every agent-shell buffer.
 BUDDY-NAME is always set — every agent-shell buffer has one from birth, whether or
-not it ever registered with coord.  PARENT-BUFFER is nil for top-level buffers."
+not it ever registered with coord.  PARENT-BUFFER is nil for top-level buffers.
+
+Sorted by `konix/mcp-server--birth-order', never by `buffer-list' order, which
+is most-recently-used and would make the rendered tree jump around.  Buffers
+predating a reload of this file have no birth order; they are the oldest ones
+around, so they sort first, ties broken on the buddy name to stay stable."
   (let (nodes)
     (dolist (buf (buffer-list))
       (when (with-current-buffer buf (derived-mode-p 'agent-shell-mode))
         (let ((agent (buffer-local-value 'konix/mcp-server--buddy-name buf))
               (parent (buffer-local-value 'konix/mcp-server--parent-buffer buf)))
           (push (list buf agent parent) nodes))))
-    (nreverse nodes)))
+    (sort nodes
+          (lambda (a b)
+            (let ((oa (or (buffer-local-value 'konix/mcp-server--birth-order (car a)) -1))
+                  (ob (or (buffer-local-value 'konix/mcp-server--birth-order (car b)) -1)))
+              (if (= oa ob)
+                  (string< (or (nth 1 a) "") (or (nth 1 b) ""))
+                (< oa ob)))))))
 
 (defun konix/mcp-server-spawn-tree-show-in-other-window ()
   "Display the agent-shell buffer at point in another window, keeping focus here."

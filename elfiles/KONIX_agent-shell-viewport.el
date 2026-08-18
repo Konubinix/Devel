@@ -159,11 +159,11 @@ At the prompt, delete backward."
   (interactive)
   (konix/agent-shell-viewport--interrupt-and-reply "try again"))
 
-(defun konix/agent-shell-viewport-reply-go-on ()
-  "Interrupt, reply with \"go on\" and send immediately."
+(defun konix/agent-shell-viewport-reply-go-ahead ()
+  "Interrupt, reply with \"go ahead\" and send immediately."
   (declare (modes agent-shell-viewport-view-mode))
   (interactive)
-  (konix/agent-shell-viewport--interrupt-and-reply "go on"))
+  (konix/agent-shell-viewport--interrupt-and-reply "go ahead"))
 
 (defun konix/agent-shell-viewport-set-session-mode (mode-name)
   "Switch the current session to the mode named MODE-NAME, without prompting.
@@ -205,7 +205,7 @@ already active (the underlying \"already\" error is ignored)."
 (define-key agent-shell-viewport-view-mode-map (kbd "t") 'konix/agent-shell-viewport-reply-try-again)
 (define-key agent-shell-viewport-view-mode-map (kbd "T") 'konix/mcp-server-show-spawn-tree)
 (define-key agent-shell-viewport-view-mode-map (kbd "U") 'konix/claude-code-usage)
-(define-key agent-shell-viewport-view-mode-map (kbd "o") 'konix/agent-shell-viewport-reply-go-on)
+(define-key agent-shell-viewport-view-mode-map (kbd "o") 'konix/agent-shell-viewport-reply-go-ahead)
 (define-key agent-shell-viewport-view-mode-map (kbd "<delete>") 'konix/agent-shell-viewport-interrupt-no-confirm)
 (define-key agent-shell-viewport-view-mode-map (kbd "R") 'konix/agent-shell-viewport-interrupt-no-confirm-and-reply)
 (define-key agent-shell-viewport-view-mode-map (kbd "M-r") 'konix/agent-shell-viewport-read-interrupt-and-submit)

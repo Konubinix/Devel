@@ -61,17 +61,31 @@
 ;; `agent-shell-diff-mode-map' lives in the `agent-shell-diff' feature, so pull
 ;; it in before `konix/agent-shell-define-reply' binds across every keymap.
 (require 'agent-shell-diff)
-(konix/agent-shell-define-reply konix/agent-shell-tl-dr
-  "M-t" "tl;dr.")
-(konix/agent-shell-define-reply konix/agent-shell-TL-DR
-  "M-T" "tl;dr. If you need to convey sequence of event, use plantuml, if you need to show me complex argumentation, use argdown")
-(konix/agent-shell-define-reply konix/agent-shell-comment-vomit "M-v" "don't vomit useless comment please")
-(konix/agent-shell-define-reply konix/agent-shell-red-herring   "M-h" "that's a red herring")
-(konix/agent-shell-define-reply konix/agent-shell-blabbering
-  "M-b"
-  "It feels like you expect something from me. I have better things to do than reading your blabbering. I only read the last message. Never assume I read what you are thinking I read. If you have something to ask, just ask it now.")
 (konix/agent-shell-define-reply konix/agent-shell-bullshit
+
   "M-B"
   "You are trying to bullshit me. Look on the internet please.")
+(konix/agent-shell-define-reply konix/agent-shell-look-on-the-internet
+  "M-i" "Look on the Internet.")
+
+(konix/agent-shell-define-reply konix/agent-shell-comment-vomit
+  "M-v"
+  "A comment is a place to make the code below clearer if that is needed. It's generally discouraged and is a smell that the code needs to be refactor to have a better design and should be as small as possible. It's not a place to put your opinion, todo list or other stuff you don't want to forget")
+
+(konix/agent-shell-define-reply konix/agent-shell-no-opinion
+  "M-o"
+  "My work is not a dump of your opinion, todo list or stuff you don't want to forget. Focus on helping me, not having fun.")
+
+
+(konix/agent-shell-define-reply konix/agent-shell-red-herring   "M-h" "that's not helping. Are you lost?")
+
+(konix/agent-shell-define-reply konix/agent-shell-symptoms
+  "M-S" "fix the cause, not the symptom")
+
+(konix/agent-shell-define-reply konix/agent-shell-tl-dr
+  "M-t" "You say too many things, I stopped reading. Start again one step at a time with the context for me to understand. Assume I know nothing about what's prior to this message.")
+(konix/agent-shell-define-reply konix/agent-shell-blabbering
+  "M-b"
+  "Let's sync. Remind us here of the goal we are trying to achieve, then explain step we are on, ask the next question and only the next question clearly, then provide the context I need to answer you. Assume I forgot everything we discussed so far. Everything else you write won't be read.")
 
 ;;; KONIX_AL-agent-shell.el ends here

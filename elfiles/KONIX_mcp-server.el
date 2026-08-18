@@ -594,6 +594,10 @@ MCP Parameters:
      (konix/mcp-server-kill-agent
       :id "kill_buddy"
       :description "Kill a buddy that was previously spawned with spawn_buddy. By default also kills all its descendant buddies recursively so no orphan is left behind; pass non-recursive=true to kill only the targeted buddy. Use this to clean up a buddy when it is no longer needed or before spawning a fresh replacement. Only works on buffers created by spawn_buddy (refuses to kill other buffers).")
+     (konix/mcp-server-list-potential-buddies
+      :id "list_potential_buddies"
+      :description "List every agent-shell buffer in this Emacs with the name that reaches it, including buddies not registered with coord. Use this when coord_list_buddies does not show who you need: an unregistered buddy is still reachable (a message to its name is force-fed into its buffer) but its name is generated and unguessable. Each row gives that name plus directory, model, buffer, status and inbox count, to tell the sessions apart."
+      :read-only t)
      (konix/mcp-server-interrupt-agent
       :id "interrupt_buddy"
       :description "Interrupt a buddy mid-turn and ask it something, useful when you need a report from it urgently and cannot wait for the normal coord task cycle. Since this bypasses the task cycle, the buddy replies via coord_send_message to from-buddy (your coord name, which must already be registered); collect it with coord_wait/coord_get_messages.")

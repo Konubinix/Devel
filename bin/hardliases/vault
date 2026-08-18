@@ -4,6 +4,8 @@ source _ko_nix.sh
 
 ME="$(basename "${0}")"
 export NIXPKGS_ALLOW_UNFREE=1
-BIN="$(nix_install_binary "${ME}" "" "" "--impure")"
+# nixpkgs' vault is BUSL, so hydra never builds it and installing it compiles
+# the whole go tree; vault-bin is the upstream release binary
+BIN="$(nix_install_binary "${ME}" "vault-bin" "" "--impure")"
 
 exec "${BIN}" "${@}"

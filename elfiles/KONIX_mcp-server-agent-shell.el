@@ -36,6 +36,7 @@
 (require 'plz)
 (require 'seq)
 (require 'color)
+(require 'KONIX_mcp-server-spawn-tree-frame)
 
 (declare-function agent-shell--start "agent-shell")
 (declare-function agent-shell-anthropic-make-claude-code-config "agent-shell-anthropic")
@@ -1346,8 +1347,7 @@ around, so they sort first, ties broken on the buddy name to stay stable."
   "Display the agent-shell buffer at point in another window, keeping focus here."
   (interactive)
   (when-let ((shell-buf (get-text-property (point) 'konix/shell-buffer)))
-    (display-buffer shell-buf '(display-buffer-use-some-window
-                                (inhibit-same-window . t)))))
+    (konix/mcp-server--display-agent-from-tree shell-buf)))
 
 (defun konix/mcp-server-spawn-tree-rename ()
   "Edit the label of the agent-shell buffer at point.
@@ -1385,6 +1385,7 @@ default project-based name."
     (define-key m (kbd "<backtab>") #'backward-button)
     (define-key m (kbd "n")         #'next-line)
     (define-key m (kbd "p")         #'previous-line)
+    (define-key m (kbd "q")         #'konix/mcp-server-spawn-tree-quit)
     (define-key m (kbd "k")         #'konix/mcp-server-kill-agent-subtree)
     (define-key m (kbd "o")         #'konix/mcp-server-spawn-tree-show-in-other-window)
     (define-key m (kbd "r")         #'konix/mcp-server-spawn-tree-rename)
@@ -1593,7 +1594,7 @@ point if possible."
                            (fboundp 'agent-shell-viewport--buffer)
                            (agent-shell-viewport--buffer
                             :shell-buffer b :existing-only t))))
-              (pop-to-buffer (or vp b))))))
+              (konix/mcp-server--pop-to-agent-from-tree (or vp b))))))
     (hierarchy-add-trees h (mapcar #'car nodes)
                          #'konix/mcp-server--agent-parent)
     (with-current-buffer buf
@@ -1624,12 +1625,6 @@ point if possible."
   "`revert-buffer-function' for the spawn tree buffer."
   (konix/mcp-server--render-spawn-tree-into (current-buffer)))
 
-(defun konix/mcp-server--spawn-tree-tick ()
-  "Auto-refresh tick: re-render *Spawn Tree* if it is displayed."
-  (let ((buf (get-buffer "*Spawn Tree*")))
-    (when (and buf (get-buffer-window buf 'visible))
-      (konix/mcp-server--render-spawn-tree-into buf))))
-
 (defun konix/mcp-server--caller-shell-buffer ()
   "Return the agent-shell buffer associated with the current buffer, or nil.
 Handles both shell-mode buffers and their viewport counterparts."
@@ -1639,40 +1634,6 @@ Handles both shell-mode buffers and their viewport counterparts."
          (or (derived-mode-p 'agent-shell-viewport-view-mode)
              (derived-mode-p 'agent-shell-viewport-edit-mode)))
     (agent-shell-viewport--shell-buffer))))
-
-(defun konix/mcp-server--goto-button-for-shell (shell-buf)
-  "Place point on the first button whose `konix/shell-buffer' is SHELL-BUF.
-Returns non-nil on success."
-  (when shell-buf
-    (let ((pos (point-min))
-          found)
-      (while (and (not found)
-                  (setq pos (next-button pos)))
-        (when (eq (get-text-property pos 'konix/shell-buffer) shell-buf)
-          (goto-char pos)
-          (setq found t)))
-      found)))
-
-(defun konix/mcp-server-show-spawn-tree ()
-  "Display the spawn tree of agent-shell buffers.
-The buffer auto-refreshes every `konix/mcp-server-spawn-tree-refresh-interval'
-seconds while displayed; press `g' to refresh manually."
-  (interactive)
-  (let ((caller-shell (konix/mcp-server--caller-shell-buffer))
-        (buf (get-buffer-create "*Spawn Tree*")))
-    (with-current-buffer buf
-      (konix/mcp-server-spawn-tree-mode)
-      (konix/mcp-server--render-spawn-tree-into buf)
-      (goto-char (point-min))
-      (or (konix/mcp-server--goto-button-for-shell caller-shell)
-          (ignore-errors (forward-button 1))))
-    (pop-to-buffer buf)
-    (when (and konix/mcp-server-spawn-tree-refresh-interval
-               (not konix/mcp-server--spawn-tree-timer))
-      (setq konix/mcp-server--spawn-tree-timer
-            (run-with-timer konix/mcp-server-spawn-tree-refresh-interval
-                            konix/mcp-server-spawn-tree-refresh-interval
-                            #'konix/mcp-server--spawn-tree-tick)))))
 
 ;;; set_label
 

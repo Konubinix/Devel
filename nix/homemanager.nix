@@ -441,6 +441,8 @@ in
       MANPATH = "${homeDir}/.nix-profile/share/man:";
       LD_LIBRARY_PATH = "${homeDir}/.local/lib";
       PKG_CONFIG_PATH = "";
+      # kernel headers for pip-built C extensions (evdev needs linux/input.h)
+      CPATH = "${pkgs.linuxHeaders}/include";
       KONIX_RIL_TRIES = "3";
       KONIX_RIL_TIMEOUT = "10";
 

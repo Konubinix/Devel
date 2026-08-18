@@ -711,7 +711,8 @@ Reference it as the key `@wrapped-script-run(REGEXP)'."
             names)))))
 
 (defcustom konix/agent-shell-command-whitelist
-  '("diff" "echo" "grep" "sort" "head" "uniq" "which" "awk" "timeout" "true" "false" "cat")
+  '("diff" "echo" "grep" "sort" "head" "uniq" "which" "awk" "plantuml"
+  "openscad" "argdown" "ls" "head" "true" "false" "cat")
   "Command specs any combination of which `@whitelisted-commands' auto-approves.
 Each is a `konix/agent-shell--command-matches-p' spec (name or subcommand prefix)."
   :type '(repeat string)
@@ -735,8 +736,7 @@ the reference, e.g. `@whitelisted-commands(ls, gh pr check)'."
 ;; (buffer-local) axes.
 
 (defcustom konix/agent-shell-tool-blacklist-global
-  `(("| tail" . "Don't use tail. Redirect to temp file instead.")
-    ("\\(^\\(Write\\|Read\\) /tmp/[a-zA-Z0-9_.-]+$\\|> /tmp\\)" . "Write temp files into ./.agent-shell/tmp/ instead")
+  `(("\\(^\\(Write\\|Read\\) /tmp/[a-zA-Z0-9_.-]+$\\|> /tmp\\)" . "Write temp files into ./.agent-shell/tmp/ instead")
     ("^Edit /tmp/[a-zA-Z0-9_.-]+$" . "Write temp files into ./.agent-shell/tmp/ instead")
     ("@severaltoplevelcommands(git)" . "One git command at a time")
     ("revert-buffer.+buffer-modified-p" . "use tool ensure_open")
@@ -771,7 +771,8 @@ in the project.")
     ("^docker logs")
     ("^bash -n")
     ("^gargdown map")
-    ("^python3? -m py_compile"))
+    ("^python3? -m py_compile")
+    ("^python3 -c \"import ast; ast.parse(open"))
   "GLOBAL baseline alist of (KEY . NOTE) whitelisted (auto-approved) tools.
 Applied to every session, beneath the project and session layers which
 shadow it.  KEY matches as in `konix/agent-shell-tool-blacklist-global';
@@ -1209,7 +1210,7 @@ scheduled per turn (`konix/agent-shell--reason-delivery-scheduled')."
     (and (stringp reason) (not (string-empty-p (string-trim reason))))))
 
 (defun konix/agent-shell--blacklist-entry-notice (entry &optional default-reason)
-  "Return the `Automatic decline...' line for one matched blacklist ENTRY.
+  "Return the `Autoamtic decline...' line for one matched blacklist ENTRY.
 X = the rule that fired (its key/pattern); Y = its recorded reason.  When the
 entry carries no reason, DEFAULT-REASON is used if given (the caller's generic
 explanation), otherwise the line is just `because of KEY'.  This single

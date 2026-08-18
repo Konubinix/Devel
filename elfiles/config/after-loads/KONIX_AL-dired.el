@@ -252,7 +252,10 @@
   (call-interactively 'dired-mark)
   )
 
-(defun konix/ipfa-file (filename)
+(defun konix/ipfa-file (filename &optional no-filename gateway browse)
+  "Upload FILENAME to IPFS and return its address.
+NO-FILENAME drops the \"filename=\" part, GATEWAY prefixes with
+KONIX_IPFS_GATEWAY, BROWSE opens the result."
   (let (
         (result
          (cond
@@ -270,13 +273,13 @@
            ))
          )
         )
-    (when (member current-prefix-arg '((4)))
+    (when no-filename
       (setq result (s-replace "filename=" "" result))
       )
-    (when (member current-prefix-arg '((64)(16)))
+    (when gateway
       (setq result (concat (getenv "KONIX_IPFS_GATEWAY") result))
       )
-    (when (equal current-prefix-arg '(64))
+    (when browse
       (browse-url result)
       )
     result
@@ -290,7 +293,10 @@
          (current-file (file-name-nondirectory (dired-get-file-for-visit)))
          (filename (expand-file-name current-file current-directory))
          )
-    (konix/ipfa-file filename)
+    (konix/ipfa-file filename
+                     (member current-prefix-arg '((4)))
+                     (member current-prefix-arg '((16) (64)))
+                     (equal current-prefix-arg '(64)))
     )
   )
 

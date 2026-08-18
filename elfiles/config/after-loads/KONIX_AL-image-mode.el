@@ -44,7 +44,10 @@
 (defun konix/image-mode/ipfa ()
   (interactive)
   (let (
-        (result (konix/ipfa-file (buffer-file-name)))
+        (result (konix/ipfa-file (buffer-file-name)
+                                 (member current-prefix-arg '((4)))
+                                 (member current-prefix-arg '((16) (64)))
+                                 (equal current-prefix-arg '(64))))
         )
     (kill-new result)
     (message "Put %s in the kill ring" result)

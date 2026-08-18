@@ -1073,6 +1073,19 @@ client.connect_signal("manage", function(c)
 		-- Prevent clients from being unreachable after screen count changes.
 		awful.placement.no_offscreen(c)
 	end
+
+	-- Steam games (class steam_app_<appid>) open windowed unless told otherwise, and their
+	-- titlebar then shows up when streaming to the projector. An awful.rules entry does not
+	-- work: being Wine/Proton clients they set their class and window state after mapping,
+	-- so the rule either does not match yet or is immediately overridden. Re-assert a little
+	-- later instead.
+	gears.timer.start_new(3, function()
+		if c.valid and c.class and c.class:match("^steam_app_") then
+			c.fullscreen = true
+		end
+		return false
+	end)
+
 end)
 
 -- Where each of the `placed_by_hand' clients was last seen, by the name it was

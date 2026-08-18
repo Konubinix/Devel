@@ -543,6 +543,24 @@ Each replaces any same-named entry from the buddy directory's baseline.
 Dynamically bound by specialised spawners (e.g. the auditor, with its
 governing note's `#+MCP_SERVERS:' servers) and by respawn.")
 
+(defvar konix/mcp-server--config-override nil
+  "Agent config a spawned buddy runs on, instead of the calling session's.
+Dynamically bound by respawn, whose caller is the retiring buddy's parent
+rather than the buddy itself.")
+
+(defun konix/mcp-server--caller-agent-config ()
+  "Return the registered agent config the calling session runs on, or nil.
+The registered one, not the caller's own copy: a session started by
+`konix/agent-shell-resume' carries per-session-id model and mode lookups that
+would resolve to nothing under a buddy's fresh session id, silently dropping
+the model it was spawned with."
+  (when-let* (((buffer-live-p konix/mcp-server--calling-buffer))
+              (identifier (map-elt (agent-shell-get-config
+                                    konix/mcp-server--calling-buffer)
+                                   :identifier)))
+    (seq-find (lambda (config) (eq (map-elt config :identifier) identifier))
+              agent-shell-agent-configs)))
+
 (defconst konix/mcp-server--respawn-buddy-prompt-note
   "\n\nYOUR LIFECYCLE — IMPORTANT: you may be automatically replaced by a FRESH \
 copy of yourself at any task boundary (when your context grows large). The \
@@ -581,7 +599,8 @@ the reserve in the fresh spawn cannot collide with the corpse."
       ;; the spawn tree (a programmatic respawn has no MCP caller of its own).
       (let ((konix/mcp-server--calling-buffer parent)
             (konix/mcp-server--prompt-override (plist-get spec :prompt))
-            (konix/mcp-server--extra-mcp-servers (plist-get spec :extra-servers)))
+            (konix/mcp-server--extra-mcp-servers (plist-get spec :extra-servers))
+            (konix/mcp-server--config-override (plist-get spec :config)))
         (konix/mcp-server-spawn-agent
          (plist-get spec :directory)
          (plist-get spec :task)
@@ -641,6 +660,20 @@ is already delivered server-side and the buddy has not yet issued the next
 
 ;;; spawn_buddy / kill_buddy / kill_agent_subtree
 
+(defun konix/mcp-server--caller-model-id ()
+  "Return the model id the CALLING session runs on, or nil if unknown."
+  (when (buffer-live-p konix/mcp-server--calling-buffer)
+    (with-current-buffer konix/mcp-server--calling-buffer
+      (ignore-errors (agent-shell--current-model-id (agent-shell--state))))))
+
+(defun konix/mcp-server--spawn-model-note (asked caller)
+  "Return the nudge for a buddy put on ASKED by a spawner running CALLER.
+Empty unless they differ: only overriding the inherited model is worth asking about."
+  (if (and asked caller (not (equal asked caller)))
+      (format " MODEL: you put this buddy on \"%s\" while you run \"%s\" — you overrode the model it would have inherited from you. Sure \"%s\" fits this work? If not, kill_buddy it and spawn again passing no model."
+              asked caller asked)
+    ""))
+
 (defun konix/mcp-server-spawn-agent (directory task buddy-name &optional mcp-config-changes model coord-only auto-respawn respawn-threshold)
   "Spawn a new buddy that registers with the coordination system and waits for tasks.
 The buddy will register and then block waiting for tasks from the coordinator — the coordinator must send the first task using coord_post_task or coord_ask_and_wait.
@@ -656,7 +689,7 @@ MCP Parameters:
     \"remove\": list of server name strings to remove from the default config.
     \"edit\": list of objects to modify existing servers, each with \"name\" and optional \"env_set\" ({KEY:VALUE to add/override}), \"env_remove\" (list of var names to remove), \"headers_set\" ({KEY:VALUE}), \"headers_remove\" (list of header names to remove).
     Example: {\"add\":[{\"name\":\"my-srv\",\"command\":\"node\",\"args\":[\"server.js\"],\"env\":{\"TOKEN\":\"abc\"}}]}
-  model - Optional buddy model: \"default\" (Opus), \"opus\", \"sonnet\" or \"haiku\" (\"opus\" is an alias for \"default\").  Defaults to `agent-shell-anthropic-default-model-id'.
+  model - Optional buddy model: \"default\", \"opus\" (alias for \"default\"), \"sonnet\" or \"haiku\".  OMIT IT to inherit the model YOU are running on, which is the right choice unless you have a reason: pass one only to deviate deliberately, e.g. \"haiku\" for mechanical, high-volume work. Overriding your own model is reported back to you in the result.
   coord-only - When t, point this buddy's konix-mcp at the slim /coord endpoint (coordination tools only) instead of the full /mcp. Use for coordination/demo buddies so their tool list stays small; leave unset for buddies that need the full toolset (legifrance, chrome-devtools, etc.).
   auto-respawn - When t, this buddy automatically replaces itself with a FRESH copy (same name, empty context) once its context usage crosses respawn-threshold, retiring at the seam right after it completes a task. The replacement keeps the name but has NO memory of earlier tasks, so only enable this when every task you send is self-contained (all needed state in the task or in files it points to). Enable it knowingly: a buddy spawned this way may reset between tasks. Defaults to nil (the buddy lives until explicitly killed).
   respawn-threshold - Context-usage percentage (0-100) that triggers a respawn. Ignored unless auto-respawn is t. Defaults to 80."
@@ -670,9 +703,15 @@ MCP Parameters:
                           (json-parse-string
                            (decode-coding-string mcp-config-changes 'utf-8)
                            :object-type 'alist))))
-          (model-decoded (when (and model (not (string-empty-p model)))
-                           (let ((decoded (decode-coding-string model 'utf-8)))
-                             (if (string= decoded "opus") "default" decoded))))
+          (model-asked (when (and model (not (string-empty-p model)))
+                         (let ((decoded (decode-coding-string model 'utf-8)))
+                           (if (string= decoded "opus") "default" decoded))))
+          (caller-model (konix/mcp-server--caller-model-id))
+          ;; Asking for no model inherits the spawner's, like the agent config
+          ;; below.  Left to the server it was the cheapest tier, since
+          ;; `agent-shell-anthropic-default-model-id' is nil and the wrapper
+          ;; unsets ANTHROPIC_MODEL — an opus would silently spawn a haiku.
+          (model-effective (or model-asked caller-model))
           (auto-respawn-on (and auto-respawn
                                 (not (member auto-respawn '(:json-false "false" "no" "nil")))))
           (respawn-threshold-num (cond ((numberp respawn-threshold) respawn-threshold)
@@ -709,7 +748,12 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
                           (if auto-respawn-on
                               konix/mcp-server--respawn-buddy-prompt-note
                             ""))))
-          (config (agent-shell-anthropic-make-claude-code-config)))
+          ;; A buddy runs the agent its spawner runs, so a spawn tree stays on
+          ;; one provider.  Only a spawn with no live caller falls back to the
+          ;; default agent.
+          (config (or konix/mcp-server--config-override
+                      (konix/mcp-server--caller-agent-config)
+                      (agent-shell-anthropic-make-claude-code-config))))
      (unless (file-directory-p directory)
        (error "Directory does not exist: %s" directory))
      (when (konix/mcp-server--buffer-for-buddy buddy-name)
@@ -729,8 +773,9 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
                                               :session-strategy 'new)))
        (with-current-buffer shell-buffer
          (setq-local agent-shell-cwd-function (lambda () directory))
-         (when model-decoded
-           (setq-local agent-shell-anthropic-default-model-id model-decoded))
+         (setq-local default-directory (file-name-as-directory directory))
+         (when model-effective
+           (setq-local agent-shell-anthropic-default-model-id model-effective))
          (setq-local agent-shell-mcp-servers
                      (let ((servers
                             ;; Resolve the buddy directory's `.dir-locals.el'
@@ -812,8 +857,11 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
                        (list :directory directory :task task :prompt prompt
                              :mcp-changes-json mcp-config-changes
                              :extra-servers konix/mcp-server--extra-mcp-servers
-                             :model model :coord-only coord-only
-                             :threshold respawn-threshold-num))
+                             ;; Resolved, not asked: a respawn is spawned by the
+                             ;; parent, whose model may differ.
+                             :model model-effective :coord-only coord-only
+                             :threshold respawn-threshold-num
+                             :config config))
            (konix/mcp-server--setup-respawn-subscription (current-buffer)))
          (konix/agent-shell-ensure-viewport (current-buffer))
          (agent-shell--insert-to-shell-buffer
@@ -821,8 +869,9 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
           :text prompt
           :submit t
           :no-focus t))
-       (format "Spawned coordinated buddy '%s' in buffer '%s' with directory %s. The buddy is reserved as \"%s\" in the coordination system and will register shortly. You can immediately call coord_ask_and_wait (or coord_post_task) with to_buddy=\"%s\" to send it work — no need to wait for it to register first; the task is queued and delivered as soon as it comes online. If the buddy fails to come online, coord_ask_and_wait returns early (within its come-online pre-timeout) instead of blocking the full timeout."
-               buddy-name (buffer-name shell-buffer) directory buddy-name buddy-name))
+       (format "Spawned coordinated buddy '%s' in buffer '%s' with directory %s. The buddy is reserved as \"%s\" in the coordination system and will register shortly. You can immediately call coord_ask_and_wait (or coord_post_task) with to_buddy=\"%s\" to send it work — no need to wait for it to register first; the task is queued and delivered as soon as it comes online. If the buddy fails to come online, coord_ask_and_wait returns early (within its come-online pre-timeout) instead of blocking the full timeout.%s"
+               buddy-name (buffer-name shell-buffer) directory buddy-name buddy-name
+               (konix/mcp-server--spawn-model-note model-asked caller-model)))
        (error
         (konix/mcp-server--coord-release-reservation buddy-name)
         (signal (car err) (cdr err)))))))

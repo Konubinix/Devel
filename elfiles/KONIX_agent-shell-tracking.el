@@ -37,15 +37,14 @@ viewport buffer instead if one exists."
   (interactive)
   (if-let ((buffers (agent-shell-buffers)))
       (let* ((nodes (konix/mcp-server--collect-agent-nodes))
-             (coord-by-tag (konix/mcp-server--fetch-coord-by-session-tag))
-             (rooms-by-buddy (konix/mcp-server--fetch-coord-rooms-by-buddy))
+             (view (konix/mcp-server--fetch-coord-view))
              (caller (konix/mcp-server--caller-shell-buffer))
              ;; For each shell buffer: its spawn-tree line and the buffer to
              ;; actually pop to (the viewport buffer when preferred).
              (entries
               (mapcar
                (lambda (buf)
-                 (list :line (konix/mcp-server--spawn-tree-line-string buf nodes coord-by-tag rooms-by-buddy)
+                 (list :line (konix/mcp-server--spawn-tree-line-string buf nodes view)
                        :shell buf
                        :pop (if agent-shell-prefer-viewport-interaction
                                 (or (agent-shell-viewport--buffer :shell-buffer buf :existing-only t)

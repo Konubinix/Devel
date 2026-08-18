@@ -55,7 +55,7 @@
 (declare-function konix/agent-shell--clean-label "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--truncate-label "KONIX_AL-agent-shell")
 (declare-function konix/agent-shell--has-permission-button-p "KONIX_AL-agent-shell")
-(declare-function konix/agent-shell--local-session-label "KONIX_AL-agent-shell")
+(declare-function konix/agent-shell--at-default-name-p "KONIX_AL-agent-shell")
 (defvar agent-shell-mcp-servers)
 (defvar agent-shell-cwd-function)
 (defvar agent-shell--state)
@@ -81,9 +81,6 @@ later passes to `coord_register' does not change this one.  Also travels as the
 
 (defvar-local konix/mcp-server--parent-buffer nil
   "The agent-shell buffer that spawned this one, or nil if spawned directly by the user.")
-
-(defvar-local konix/mcp-server--session-tag nil
-  "Unique identifier for this agent-shell session, embedded in --server-id suffixes.")
 
 (defvar konix/mcp-server--birth-counter 0
   "Monotonic counter handing out `konix/mcp-server--birth-order' values.")
@@ -195,22 +192,6 @@ the buddy can register."
                          (url-hexify-string agent-name))
       :timeout 5)))
 
-(defun konix/mcp-server--fetch-coord-by-session-tag ()
-  "Return a hash table mapping session-tag → coord agent name.
-Queries `/coord/agents'.  Returns an empty hash on any failure."
-  (let ((table (make-hash-table :test 'equal)))
-    (condition-case _
-        (let ((agents (plz 'get (format "%s/coord/buddies"
-                                        konix/mcp-server-coord-url)
-                        :as #'json-read :timeout 2)))
-          (dolist (cell agents)
-            (let* ((name (symbol-name (car cell)))
-                   (info (cdr cell))
-                   (tag (alist-get 'session_tag info)))
-              (when (and tag (stringp tag) (not (string-empty-p tag)))
-                (puthash tag name table)))))
-      (error nil))
-    table))
 (defun konix/mcp-server--coord-deregister (buddy-name)
   "Drop BUDDY-NAME's coord registration, whatever name it registered under.
 By tag rather than by name: a buddy is free to `coord_register' as something
@@ -223,22 +204,43 @@ is gone until the heartbeat timeout notices."
                          (url-hexify-string buddy-name))
       :timeout 5)))
 
-(defun konix/mcp-server--fetch-coord-rooms-by-buddy ()
-  "Return a hash table mapping buddy name → list of room names.
-Queries `/coord/rooms'.  Returns an empty hash on any failure."
-  (let ((table (make-hash-table :test 'equal)))
+(cl-defstruct (konix/mcp-server-coord-view
+               (:constructor konix/mcp-server--make-coord-view))
+  "Coord's per-buddy state, as one `/coord/overview' request.
+NAMES-BY-TAG maps a buffer's own name to the coord names registered from it — a
+list, since nothing stops one buffer registering more than once, and dropping the
+extras is what makes such a registration invisible.  ROOMS and PENDING are keyed
+by coord name."
+  (names-by-tag (make-hash-table :test 'equal))
+  (rooms (make-hash-table :test 'equal))
+  (pending (make-hash-table :test 'equal))
+  (nudge-in (make-hash-table :test 'equal)))
+
+(defun konix/mcp-server--fetch-coord-view ()
+  "Return coord's state as a `konix/mcp-server-coord-view'.
+One request rather than one per table: the spawn tree refreshes on a timer.
+Empty on any failure."
+  (let ((view (konix/mcp-server--make-coord-view)))
     (condition-case _
-        (let ((rooms (plz 'get (format "%s/coord/rooms"
-                                       konix/mcp-server-coord-url)
-                       :as #'json-read :timeout 2)))
-          (dolist (cell rooms)
-            (let ((room (symbol-name (car cell)))
-                  (members (cdr cell)))
-              (seq-doseq (m members)
-                (let ((m (if (stringp m) m (format "%s" m))))
-                  (push room (gethash m table)))))))
+        (dolist (cell (plz 'get (format "%s/coord/overview"
+                                        konix/mcp-server-coord-url)
+                        :as #'json-read :timeout 2))
+          (let* ((name (symbol-name (car cell)))
+                 (info (cdr cell))
+                 (tag (alist-get 'session_tag info))
+                 (pending (alist-get 'pending info))
+                 (nudge-in (alist-get 'nudge_in info)))
+            (when (and (stringp tag) (not (string-empty-p tag)))
+              (let ((table (konix/mcp-server-coord-view-names-by-tag view)))
+                (puthash tag (cons name (gethash tag table)) table)))
+            (when (and (numberp pending) (> pending 0))
+              (puthash name pending (konix/mcp-server-coord-view-pending view)))
+            (when (numberp nudge-in)
+              (puthash name nudge-in (konix/mcp-server-coord-view-nudge-in view)))
+            (puthash name (append (alist-get 'rooms info) nil)
+                     (konix/mcp-server-coord-view-rooms view))))
       (error nil))
-    table))
+    view))
 
 ;;; MCP server config normalization
 
@@ -1000,6 +1002,54 @@ MCP Parameters:
                  (if (= (length names) 2) "" "s")
                  (string-join (cdr names) ", ")))))))
 
+(defun konix/mcp-server-list-potential-buddies ()
+  "List every agent-shell buffer in this Emacs and the name that reaches it.
+
+Answers the question `coord_list_buddies' cannot: which buddies exist but have
+not registered.  Those are reachable all the same — a message sent to one is
+force-fed into its buffer — but their names are uuids nobody could guess, so this
+is the only way to learn them.
+
+A registered buddy is listed under the name it chose; an unregistered one under
+its buffer's own name.  Directory, model and label are what actually let a caller
+pick, since the generated name says nothing on its own."
+  (mcp-server-lib-with-error-handling
+   (let ((view (konix/mcp-server--fetch-coord-view))
+         rows)
+     (dolist (buf (buffer-list))
+       (when (with-current-buffer buf (derived-mode-p 'agent-shell-mode))
+         (let* ((buddy (buffer-local-value 'konix/mcp-server--buddy-name buf))
+                (registered
+                 (and buddy
+                      (sort (copy-sequence
+                             (gethash buddy
+                                      (konix/mcp-server-coord-view-names-by-tag view)))
+                            #'string<)))
+                (keys (delq nil (cons buddy (copy-sequence registered))))
+                (status (car (konix/mcp-server--agent-status buf))))
+           (push (list (cons 'name (or (car registered) buddy))
+                       (cons 'registered (if registered t :json-false))
+                       (cons 'buddy_name buddy)
+                       (cons 'pending
+                             (apply #'+
+                                    (mapcar
+                                     (lambda (k)
+                                       (or (gethash k (konix/mcp-server-coord-view-pending view))
+                                           0))
+                                     keys)))
+                       (cons 'directory (buffer-local-value 'default-directory buf))
+                       (cons 'model (with-current-buffer buf
+                                      (ignore-errors
+                                        (agent-shell--current-model-id
+                                         (agent-shell--state)))))
+                       (cons 'buffer (buffer-name buf))
+                       (cons 'status (symbol-name status))
+                       (cons 'spawned (if (buffer-local-value
+                                           'konix/mcp-server--spawned-buddy buf)
+                                          t :json-false)))
+                 rows))))
+     (json-encode (nreverse rows)))))
+
 (defun konix/mcp-server--coord-registered-p (name)
   "Return non-nil if NAME is registered in the coordination system."
   (condition-case _
@@ -1369,20 +1419,21 @@ needs to be maintained up front."
          (rgb (color-hsl-to-rgb hue 0.65 lightness)))
     (apply #'color-rgb-to-hex (append rgb '(2)))))
 
-(defun konix/mcp-server--spawn-tree-line-string (buf &optional nodes coord-by-tag rooms-by-buddy)
+(defun konix/mcp-server--spawn-tree-line-string (buf &optional nodes view)
   "Return the propertized spawn-tree line string for agent-shell BUF.
-NODES, COORD-BY-TAG and ROOMS-BY-BUDDY are as produced by
-`konix/mcp-server--collect-agent-nodes',
-`konix/mcp-server--fetch-coord-by-session-tag' and
-`konix/mcp-server--fetch-coord-rooms-by-buddy'; when nil they are computed."
+NODES and VIEW are as produced by `konix/mcp-server--collect-agent-nodes' and
+`konix/mcp-server--fetch-coord-view'; when nil they are computed."
   (let* ((nodes (or nodes (konix/mcp-server--collect-agent-nodes)))
-         (coord-by-tag (or coord-by-tag (konix/mcp-server--fetch-coord-by-session-tag)))
-         (rooms-by-buddy (or rooms-by-buddy (konix/mcp-server--fetch-coord-rooms-by-buddy)))
+         (view (or view (konix/mcp-server--fetch-coord-view)))
          (node (cl-find buf nodes :key #'car))
-         (agent (or (and node (nth 1 node))
-                    (let ((tag (buffer-local-value
-                                'konix/mcp-server--session-tag buf)))
-                      (and tag (gethash tag coord-by-tag)))))
+         (buddy (or (and node (nth 1 node))
+                    (buffer-local-value 'konix/mcp-server--buddy-name buf)))
+         ;; The names it registered under, which it is free to choose and Emacs is
+         ;; never told about — so they are pulled from coord, not mirrored locally.
+         (agents (and buddy (sort (copy-sequence
+                                   (gethash buddy (konix/mcp-server-coord-view-names-by-tag view)))
+                                  #'string<)))
+         (agent (car agents))
          (status-sym (konix/mcp-server--agent-status buf))
          (seen (cdr status-sym))
          (status-text (konix/mcp-server--status-label status-sym))
@@ -1395,14 +1446,42 @@ NODES, COORD-BY-TAG and ROOMS-BY-BUDDY are as produced by
          (model-color (konix/mcp-server--model-color model-name))
          (model-face (if seen (list :foreground model-color :slant 'italic)
                        (list :foreground model-color)))
-         (name (or agent
-                   (konix/agent-shell--local-session-label buf)
+         ;; Only consult the JSONL title while the buffer is still un-labelled:
+         ;; Claude keeps appending fresher `ai-title' records, which would bury
+         ;; the label `set_label' or the interactive rename just applied.
+         (name (or (and agents (string-join agents ","))
+                   (and (konix/agent-shell--at-default-name-p buf)
+                        (konix/agent-shell--local-session-label buf))
                    (buffer-name buf)))
-         (rooms (and agent (gethash agent rooms-by-buddy)))
+         ;; Unregistered buddies are addressable too, so their name has to be
+         ;; readable here — it is the only place to learn it before they register.
+         (buddy-suffix (if (or agent (not buddy))
+                           ""
+                         (concat "  " (propertize buddy 'face 'shadow))))
+         (rooms (and agent (gethash agent (konix/mcp-server-coord-view-rooms view))))
          (rooms-suffix
           (if rooms
               (format "  {%s}"
                       (string-join (sort (copy-sequence rooms) #'string<) ","))
+            ""))
+         ;; Both names reach this buffer, and coord queues under whichever the
+         ;; sender used, so the inbox is the sum rather than a pick.
+         (inbox-keys (delq nil (cons buddy (copy-sequence agents))))
+         (pending (apply #'+ (mapcar
+                              (lambda (k)
+                                (or (gethash k (konix/mcp-server-coord-view-pending view)) 0))
+                              inbox-keys)))
+         (nudge-in (car (sort (delq nil (mapcar
+                                         (lambda (k)
+                                           (gethash k (konix/mcp-server-coord-view-nudge-in view)))
+                                         inbox-keys))
+                              #'<)))
+         (inbox-suffix
+          (if (> pending 0)
+              (propertize (if nudge-in
+                              (format "  [%d in %ds]" pending nudge-in)
+                            (format "  [%d]" pending))
+                          'face 'warning)
             ""))
          (buffer-suffix (if agent (format "  (%s)" (buffer-name buf)) "")))
     ;; Assemble from independently-faced segments: the model carries its own
@@ -1410,10 +1489,12 @@ NODES, COORD-BY-TAG and ROOMS-BY-BUDDY are as produced by
     ;; keep in sync with how the line is built.
     (cl-flet ((faced (s) (if line-face (propertize s 'face line-face) s)))
       (let ((line (concat (faced name)
+                          buddy-suffix
                           (faced "  ")
                           (propertize model-name 'face model-face)
                           (faced buffer-suffix)
                           (faced rooms-suffix)
+                          inbox-suffix
                           (faced "  ")
                           status-text)))
         (when seen
@@ -1422,34 +1503,90 @@ NODES, COORD-BY-TAG and ROOMS-BY-BUDDY are as produced by
                                   'append line))
         line))))
 
-(defun konix/mcp-server--insert-spawn-tree-line (buf nodes coord-by-tag rooms-by-buddy)
+(defun konix/mcp-server--insert-spawn-tree-line (buf nodes view)
   "Insert one tree line for agent-shell BUF (no indent — caller wraps with
 `hierarchy-labelfn-indent').  Attach a `konix/shell-buffer' text property
 on the line so `k' and the caller-shell locator can find the buffer."
-  (let ((head (konix/mcp-server--spawn-tree-line-string buf nodes coord-by-tag rooms-by-buddy)))
+  (let ((head (konix/mcp-server--spawn-tree-line-string buf nodes view)))
     (insert head)
     (put-text-property (line-beginning-position) (point) 'konix/shell-buffer buf)
     (insert "\n")))
 
-(defcustom konix/mcp-server-spawn-tree-refresh-interval 1.5
-  "Seconds between auto-refreshes of the *Spawn Tree* buffer.
-Set to nil to disable auto-refresh."
-  :type '(choice (number :tag "Seconds") (const :tag "Off" nil))
-  :group 'konix-mcp)
+(defun konix/mcp-server--orphan-inboxes (nodes view)
+  "Pending work in VIEW queued under names that reach no buffer in NODES.
+A sorted alist of (NAME . COUNT).  Unlisted it is invisible: coord holds it, the
+sender was told it was sent, and nothing here can be interrupted to take it."
+  (let ((reachable
+         (apply #'append
+                (mapcar (lambda (node)
+                          (let ((buddy (nth 1 node)))
+                            (delq nil
+                                  (cons buddy
+                                        (copy-sequence
+                                         (and buddy
+                                              (gethash buddy
+                                                       (konix/mcp-server-coord-view-names-by-tag
+                                                        view))))))))
+                        nodes)))
+        orphans)
+    (maphash (lambda (name count)
+               (unless (member name reachable)
+                 (push (list name count
+                             (gethash name
+                                      (konix/mcp-server-coord-view-nudge-in view)))
+                       orphans)))
+             (konix/mcp-server-coord-view-pending view))
+    (sort orphans (lambda (a b) (string< (car a) (car b))))))
 
-(defvar konix/mcp-server--spawn-tree-timer nil
-  "Idle timer refreshing the *Spawn Tree* buffer when visible.")
+(defun konix/mcp-server--read-pending-name ()
+  "Prompt for a name coord holds work for, marking the ones no buffer answers to."
+  (let* ((view (konix/mcp-server--fetch-coord-view))
+         (orphans (mapcar #'car
+                          (konix/mcp-server--orphan-inboxes
+                           (konix/mcp-server--collect-agent-nodes) view)))
+         candidates)
+    (maphash
+     (lambda (name count)
+       (push (cons (format "%s  [%d]%s" name count
+                           (if (member name orphans) "  (no buffer answers to it)" ""))
+                   name)
+             candidates))
+     (konix/mcp-server-coord-view-pending view))
+    (unless candidates
+      (user-error "Coord is holding no work for anybody"))
+    (cdr (assoc (completing-read "Discard the queue for: "
+                                 (sort candidates (lambda (a b) (string< (car a) (car b))))
+                                 nil t)
+                candidates))))
+
+(defun konix/mcp-server-discard-pending (name)
+  "Throw away everything coord has queued for NAME.
+
+Interactively, offers every name coord holds work for, flagging those no buffer
+answers to — the ones that will never be delivered.
+
+Tasks are abandoned rather than dropped, so anybody blocked waiting on one is told
+at once instead of sitting out its timeout.  That includes tasks NAME had posted
+to others, which a discarded identity is in no position to collect."
+  (interactive (list (konix/mcp-server--read-pending-name)))
+  (message "%s"
+           (condition-case err
+               (plz 'delete (format "%s/coord/pending/%s"
+                                    konix/mcp-server-coord-url
+                                    (url-hexify-string name))
+                 :as #'json-read :timeout 5)
+             (error (format "Could not discard '%s': %s"
+                            name (error-message-string err))))))
 
 (defun konix/mcp-server--render-spawn-tree-into (buf)
   "Render the current spawn tree into BUF using `hierarchy', preserving
 point if possible."
   (let* ((nodes (konix/mcp-server--collect-agent-nodes))
-         (coord-by-tag (konix/mcp-server--fetch-coord-by-session-tag))
-         (rooms-by-buddy (konix/mcp-server--fetch-coord-rooms-by-buddy))
+         (view (konix/mcp-server--fetch-coord-view))
          (h (hierarchy-new))
          (line-labelfn
           (lambda (b _indent)
-            (konix/mcp-server--insert-spawn-tree-line b nodes coord-by-tag rooms-by-buddy)))
+            (konix/mcp-server--insert-spawn-tree-line b nodes view)))
          (action-fn
           (lambda (b _indent)
             (let ((vp (and (bound-and-true-p agent-shell-prefer-viewport-interaction)
@@ -1471,6 +1608,14 @@ point if possible."
             (hierarchy-labelfn-indent line-labelfn)
             action-fn)
            h))
+        (when-let ((orphans (konix/mcp-server--orphan-inboxes nodes view)))
+          (insert (propertize "\nQueued for names nothing here answers to:\n"
+                              'face 'error))
+          (dolist (orphan orphans)
+            (insert (if (nth 2 orphan)
+                        (format "  %s  [%d in %ds]\n"
+                                (nth 0 orphan) (nth 1 orphan) (nth 2 orphan))
+                      (format "  %s  [%d]\n" (nth 0 orphan) (nth 1 orphan))))))
         (goto-char (point-min))
         (forward-line (1- line))
         (move-to-column col)))))

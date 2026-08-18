@@ -98,8 +98,9 @@
     defaultSession = "none+awesome";
   };
 
-  # Configure console keymap
-  console.keyMap = "fr";
+  # Derive the console keymap from services.xserver.xkb (fr/bepo) so the layout
+  # is configured in exactly one place. Must not set console.keyMap alongside it.
+  console.useXkbConfig = true;
 
   # Docker
   virtualisation.docker.enable = true;

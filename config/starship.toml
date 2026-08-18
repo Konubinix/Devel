@@ -1,7 +1,7 @@
 add_newline = false
 format = "$username$custom$git_branch$git_status$git_metrics$directory$kubernetes$gcloud$all$line_break$character"
 [git_metrics]
-disabled = false
+disabled = true
 [hostname]
 disabled = true
 [username]

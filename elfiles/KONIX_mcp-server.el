@@ -408,7 +408,9 @@ map with this.
 MCP Parameters:
   buffer-name - Name of the org-mode buffer.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
   block-name - The #+NAME of the block whose result to remove.
-  save-buffer - When omitted or non-nil, save the buffer after removal (default).  Pass \"false\" or \"no\" to skip saving."
+  save-buffer - When omitted or non-nil, save the buffer after removal (default).  Pass \"false\" or \"no\" to skip saving.
+
+Errors when nothing was removed, rather than reporting a success it did not achieve."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
      (unless (derived-mode-p 'org-mode)
@@ -420,11 +422,17 @@ MCP Parameters:
            (unless pos
              (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
            (goto-char pos)
-           (org-babel-remove-result)
-           (when (and (buffer-file-name)
-                      (not (member save-buffer '(:json-false "false" "no" "nil"))))
-             (save-buffer))
-           (format "Removed result of block '%s' in buffer %s" block-name buffer-name)))))))
+           (unless (org-babel-get-src-block-info 'no-eval)
+             (when (re-search-forward "^[ \t]*#\\+begin_src" nil t)
+               (beginning-of-line)))
+           (let ((size-before (buffer-size)))
+             (org-babel-remove-result)
+             (when (= size-before (buffer-size))
+               (error "Nothing removed for block '%s' in buffer %s" block-name buffer-name))
+             (when (and (buffer-file-name)
+                        (not (member save-buffer '(:json-false "false" "no" "nil"))))
+               (save-buffer))
+             (format "Removed result of block '%s' in buffer %s" block-name buffer-name))))))))
 
 (defun konix/mcp-server-tangle-buffer (buffer-name)
   "Tangle all source blocks in an org-mode buffer.

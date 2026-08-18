@@ -190,12 +190,12 @@ takes effect at the next reload."
              (added (konix/agent-shell-mcp-servers-for
                      (seq-remove (lambda (name) (member name present)) names))))
         (when added
-          (when (and (bound-and-true-p konix/mcp-server--session-tag)
+          (when (and (bound-and-true-p konix/mcp-server--buddy-name)
                      (fboundp 'konix/mcp-server--tag-konix-server-id))
             (setq added (konix/mcp-server--tag-konix-mcp-session
                          (konix/mcp-server--tag-konix-server-id
-                          added konix/mcp-server--session-tag)
-                         konix/mcp-server--session-tag)))
+                          added konix/mcp-server--buddy-name)
+                         konix/mcp-server--buddy-name)))
           (setq-local agent-shell-mcp-servers
                       (append agent-shell-mcp-servers added)))))))
 

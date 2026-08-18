@@ -67,11 +67,17 @@
 
 ;;; Buffer-local variables for coordinated agents
 
-(defvar-local konix/mcp-server--coordinated-agent nil
-  "Non-nil if this buffer is a coordinated agent spawned by `konix/mcp-server-spawn-agent'.")
+(defvar-local konix/mcp-server--spawned-buddy nil
+  "Non-nil if this buffer was spawned by `konix/mcp-server-spawn-agent'.
+Only `kill_buddy' cares: it refuses buffers it did not create.  It is NOT a
+precondition for being addressable — every agent-shell buffer is.")
 
-(defvar-local konix/mcp-server--agent-name nil
-  "The coordination name of this agent buffer.")
+(defvar-local konix/mcp-server--buddy-name nil
+  "This buffer's coordination identity, and its key in `konix/mcp-server--buddy-buffers'.
+Set for EVERY agent-shell buffer from birth, so a
+buffer is addressable before it has registered with coord — and whatever name it
+later passes to `coord_register' does not change this one.  Also travels as the
+`X-Session-Tag' header, which is how coord correlates a call back to this buffer.")
 
 (defvar-local konix/mcp-server--parent-buffer nil
   "The agent-shell buffer that spawned this one, or nil if spawned directly by the user.")
@@ -79,8 +85,10 @@
 (defvar-local konix/mcp-server--session-tag nil
   "Unique identifier for this agent-shell session, embedded in --server-id suffixes.")
 
-(defvar konix/mcp-server--session-buffers (make-hash-table :test 'equal)
-  "Maps session-tag → agent-shell buffer for caller resolution.")
+(defvar konix/mcp-server--buddy-buffers (make-hash-table :test 'equal)
+  "Maps `konix/mcp-server--buddy-name' → agent-shell buffer.
+The single index: complete for every agent-shell buffer, which is what lets a
+nudge reach one that never registered.")
 
 ;;; Caller identification via session-specific server-id
 
@@ -126,14 +134,15 @@ base server-id so existing tool lookups keep working."
                 (konix/mcp-server--decode-server-id server-id))
                (konix/mcp-server--calling-agent caller)
                (konix/mcp-server--calling-buffer
-                (and caller (gethash caller konix/mcp-server--session-buffers))))
+                (and caller (gethash caller konix/mcp-server--buddy-buffers))))
     (funcall orig-fn json base)))
 
 (defun konix/mcp-server--caller-identity ()
   "Return a stable identity string for the calling session, or error.
-Prefers the caller's coord agent name, falls back to its session tag."
+The caller's buddy name, which every agent-shell buffer has from birth, so the
+dynamic tag is only reached for a caller with no live buffer at all."
   (or (and (buffer-live-p konix/mcp-server--calling-buffer)
-           (buffer-local-value 'konix/mcp-server--agent-name
+           (buffer-local-value 'konix/mcp-server--buddy-name
                                konix/mcp-server--calling-buffer))
       konix/mcp-server--calling-agent
       (error "Cannot identify the calling session to namespace the auditor")))
@@ -192,6 +201,17 @@ Queries `/coord/agents'.  Returns an empty hash on any failure."
                 (puthash tag name table)))))
       (error nil))
     table))
+(defun konix/mcp-server--coord-deregister (buddy-name)
+  "Drop BUDDY-NAME's coord registration, whatever name it registered under.
+By tag rather than by name: a buddy is free to `coord_register' as something
+else, and Emacs is never told when it does.  Left behind, the registration would
+make `coord_ask_and_wait' skip its come-online check and block on a buddy that
+is gone until the heartbeat timeout notices."
+  (ignore-errors
+    (plz 'delete (format "%s/coord/buddies-by-tag/%s"
+                         konix/mcp-server-coord-url
+                         (url-hexify-string buddy-name))
+      :timeout 5)))
 
 (defun konix/mcp-server--fetch-coord-rooms-by-buddy ()
   "Return a hash table mapping buddy name → list of room names.
@@ -299,16 +319,24 @@ Each edit is an alist with keys: name, env_set, env_remove, headers_set, headers
             (setf (alist-get 'headers srv) (vconcat hdr-list)))))))
   servers)
 
-;;; Session tagging hook
+;;; Buddy naming hook
 
-(defun konix/mcp-server--register-session-tag (tag buffer)
-  "Register TAG → BUFFER in the session-buffer registry."
-  (puthash tag buffer konix/mcp-server--session-buffers))
+(defun konix/mcp-server--register-buddy-name (name buffer)
+  "Register NAME → BUFFER in the buddy registry."
+  (puthash name buffer konix/mcp-server--buddy-buffers))
 
-(defun konix/mcp-server--unregister-session-tag ()
-  "Remove the current buffer's tag from the session-buffer registry."
-  (when konix/mcp-server--session-tag
-    (remhash konix/mcp-server--session-tag konix/mcp-server--session-buffers)))
+(defun konix/mcp-server--unregister-buddy-name ()
+  "Remove the current buffer from the buddy registry, and from coord."
+  (when konix/mcp-server--buddy-name
+    (remhash konix/mcp-server--buddy-name konix/mcp-server--buddy-buffers)
+    (konix/mcp-server--coord-deregister konix/mcp-server--buddy-name)))
+
+(defun konix/mcp-server--buffer-for-buddy (name)
+  "The agent-shell buffer whose buddy name is NAME, or nil.
+One lookup: the registry covers every agent-shell buffer, registered with coord
+or not."
+  (when-let ((buffer (gethash name konix/mcp-server--buddy-buffers)))
+    (and (buffer-live-p buffer) buffer)))
 
 (defun konix/mcp-server--update-server-field (servers name field transform)
   "Return SERVERS with the entry named NAME's FIELD updated by TRANSFORM.
@@ -381,31 +409,32 @@ Returns t unconditionally so the kill of this buffer always proceeds."
            (konix/mcp-server--kill-buffers descendants))))))
   t)
 
-(defun konix/mcp-server--tag-current-agent-shell ()
-  "Tag the current agent-shell buffer with a unique session id and configure
-its buffer-local `agent-shell-mcp-servers' to carry that tag in the
-konix-emacs server's --server-id arg."
+(defun konix/mcp-server--name-current-agent-shell ()
+  "Give the current agent-shell buffer its buddy name and carry it in its
+buffer-local `agent-shell-mcp-servers' as the konix-emacs --server-id suffix.
+
+Every agent-shell buffer gets one, so it is addressable by name before it has
+said anything to coord.  A uuid rather than something derived from the buffer
+name: a rename must not move a buddy's identity out from under a sender that
+just read it."
   (when (and (derived-mode-p 'agent-shell-mode)
-             (not konix/mcp-server--session-tag))
-    (let ((tag (format "sess-%s" (substring (md5 (format "%s-%s-%s"
-                                                          (buffer-name)
-                                                          (emacs-pid)
-                                                          (random)))
-                                            0 12))))
-      (setq-local konix/mcp-server--session-tag tag)
-      (konix/mcp-server--register-session-tag tag (current-buffer))
+             (not konix/mcp-server--buddy-name))
+    (require 'org-id)
+    (let ((name (format "s%s" (substring (org-id-uuid) 0 8))))
+      (setq-local konix/mcp-server--buddy-name name)
+      (konix/mcp-server--register-buddy-name name (current-buffer))
       (setq-local agent-shell-mcp-servers
                   (konix/mcp-server--tag-konix-mcp-session
                    (konix/mcp-server--tag-konix-server-id
                     (copy-sequence agent-shell-mcp-servers)
-                    tag)
-                   tag))
+                    name)
+                   name))
       (add-hook 'kill-buffer-hook
-                #'konix/mcp-server--unregister-session-tag nil t)
+                #'konix/mcp-server--unregister-buddy-name nil t)
       (add-hook 'kill-buffer-query-functions
                 #'konix/mcp-server--maybe-kill-subtree nil t))))
 
-(add-hook 'agent-shell-mode-hook #'konix/mcp-server--tag-current-agent-shell)
+(add-hook 'agent-shell-mode-hook #'konix/mcp-server--name-current-agent-shell)
 
 ;;; Caller detection helpers (used by set_label)
 
@@ -490,7 +519,7 @@ Kill happens first: it DELETEs the coord registration, freeing the name so
 the reserve in the fresh spawn cannot collide with the corpse."
   (when (buffer-live-p buffer)
     (let ((spec   (buffer-local-value 'konix/mcp-server--respawn-spec buffer))
-          (name   (buffer-local-value 'konix/mcp-server--agent-name buffer))
+          (name   (buffer-local-value 'konix/mcp-server--buddy-name buffer))
           (count  (1+ (buffer-local-value 'konix/mcp-server--respawn-count buffer)))
           (parent (buffer-local-value 'konix/mcp-server--parent-buffer buffer)))
       (konix/mcp-server--kill-buffers (list buffer))
@@ -508,7 +537,7 @@ the reserve in the fresh spawn cannot collide with the corpse."
          (plist-get spec :coord-only)
          t
          (plist-get spec :threshold)))
-      (when-let ((newbuf (konix/mcp-server--find-agent-buffer name)))
+      (when-let ((newbuf (konix/mcp-server--buffer-for-buddy name)))
         (with-current-buffer newbuf
           (setq-local konix/mcp-server--respawn-count count)))
       (message "Auto-respawn: '%s' replaced by a fresh copy (respawn #%d)" name count))))
@@ -531,7 +560,7 @@ is already delivered server-side and the buddy has not yet issued the next
         (let ((pct       (konix/mcp-server--context-percent buffer))
               (threshold (buffer-local-value 'konix/mcp-server--respawn-threshold buffer))
               (count     (buffer-local-value 'konix/mcp-server--respawn-count buffer))
-              (name      (buffer-local-value 'konix/mcp-server--agent-name buffer)))
+              (name      (buffer-local-value 'konix/mcp-server--buddy-name buffer)))
           (when (and pct (>= pct threshold))
             (cond
              ((>= count konix/mcp-server--respawn-max)
@@ -629,7 +658,7 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
           (config (agent-shell-anthropic-make-claude-code-config)))
      (unless (file-directory-p directory)
        (error "Directory does not exist: %s" directory))
-     (when (konix/mcp-server--find-agent-buffer buddy-name)
+     (when (konix/mcp-server--buffer-for-buddy buddy-name)
        (error "A buddy named '%s' already exists locally. Kill it first or use a different name" buddy-name))
      ;; Reserve the name with the coordination system before starting the
      ;; shell.  This does the atomic registered-or-reserved duplicate check
@@ -712,14 +741,16 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
                        (konix/mcp-server--tag-konix-mcp-session
                         (konix/mcp-server--tag-konix-server-id servers buddy-name)
                         buddy-name)))
-         (setq-local konix/mcp-server--coordinated-agent t)
-         (setq-local konix/mcp-server--agent-name buddy-name)
+         (setq-local konix/mcp-server--spawned-buddy t)
          (setq-local konix/mcp-server--parent-buffer
                      konix/mcp-server--calling-buffer)
-         (when konix/mcp-server--session-tag
-           (remhash konix/mcp-server--session-tag konix/mcp-server--session-buffers))
-         (setq-local konix/mcp-server--session-tag buddy-name)
-         (konix/mcp-server--register-session-tag buddy-name (current-buffer))
+         ;; Rename off the uuid the mode hook gave it: a spawned buddy is known by
+         ;; the name the spawner picked, and that same string is already in the
+         ;; child's --server-id and X-Session-Tag above, which must agree.
+         (when konix/mcp-server--buddy-name
+           (remhash konix/mcp-server--buddy-name konix/mcp-server--buddy-buffers))
+         (setq-local konix/mcp-server--buddy-name buddy-name)
+         (konix/mcp-server--register-buddy-name buddy-name (current-buffer))
          (when auto-respawn-on
            (setq-local konix/mcp-server--auto-respawn t)
            (setq-local konix/mcp-server--respawn-threshold respawn-threshold-num)
@@ -854,7 +885,7 @@ MCP Parameters:
                     (konix/agent-shell-governing-note
                      konix/mcp-server--calling-buffer))
                (error "No governing note is bound to the calling session; open it via an `agent-shell-with-note' org link before spawning an auditor")))
-          (existing (konix/mcp-server--find-agent-buffer name)))
+          (existing (konix/mcp-server--buffer-for-buddy name)))
      (if existing
          (format "An auditor named \"%s\" is already serving this session (buffer '%s'); reusing it. Send drafts with coord_ask_and_wait to_buddy=\"%s\". To pick up edited principles, kill_buddy it and spawn a fresh one."
                  name (buffer-name existing) name)
@@ -899,32 +930,11 @@ MCP Parameters:
      (konix/agent-shell-set-governing-note shell note)
      (format "Bound governing note: %s" note))))
 
-(defun konix/mcp-server--find-agent-buffer (agent-name)
-  "Find the buffer for coordinated agent AGENT-NAME.
-Searches all buffers for one with a matching `konix/mcp-server--agent-name'."
-  (cl-find-if
-   (lambda (buf)
-     (and (buffer-local-value 'konix/mcp-server--coordinated-agent buf)
-          (equal (buffer-local-value 'konix/mcp-server--agent-name buf)
-                 agent-name)))
-   (buffer-list)))
-
 (defun konix/mcp-server--kill-buffer (buffer)
-  "Kill agent-shell BUFFER, cleaning up its coord registration if any."
-  (let ((agent (buffer-local-value 'konix/mcp-server--agent-name buffer)))
-    (kill-buffer buffer)
-    (when agent
-      ;; Never let a coord server that is down or slow block a kill, but say so:
-      ;; a deregistration lost here leaves a ghost that makes coord_ask_and_wait
-      ;; skip its come-online check and block on a buddy that is gone.
-      (condition-case err
-          (plz 'delete (format "%s/coord/buddies/%s"
-                               konix/mcp-server-coord-url
-                               (url-hexify-string agent))
-            :timeout 5)
-        (error
-         (message "konix/mcp-server: could not deregister buddy '%s' (%s); it may linger as a ghost registration"
-                  agent (error-message-string err)))))))
+  "Kill agent-shell BUFFER.
+`kill-buffer-hook' runs `--unregister-buddy-name', which is what drops the coord
+registration, so a kill by any other route cleans up too."
+  (kill-buffer buffer))
 
 (defun konix/mcp-server--kill-buffers (buffers)
   "Kill each agent-shell buffer in BUFFERS and refresh the *Spawn Tree* view.
@@ -958,9 +968,14 @@ MCP Parameters:
   non-recursive - When t, kill only this buddy; otherwise also kill all its descendant buddies recursively (default)"
   (mcp-server-lib-with-error-handling
    (let* ((buddy-name (decode-coding-string buddy-name 'utf-8))
-          (buffer (konix/mcp-server--find-agent-buffer buddy-name)))
+          (buffer (konix/mcp-server--buffer-for-buddy buddy-name)))
      (unless buffer
        (error "No coordinated buddy found with name '%s'" buddy-name))
+     ;; Checked here rather than left to the lookup: every agent-shell buffer is
+     ;; addressable now, so refusing the ones we did not spawn has to be said.
+     (unless (buffer-local-value 'konix/mcp-server--spawned-buddy buffer)
+       (error "Buddy '%s' was not created by spawn_buddy; refusing to kill it"
+              buddy-name))
      (let* ((targets (if non-recursive
                          (list buffer)
                        (konix/mcp-server--descendants-of buffer)))
@@ -1019,7 +1034,7 @@ MCP Parameters:
    (let* ((buddy-name (decode-coding-string buddy-name 'utf-8))
           (from-buddy (decode-coding-string from-buddy 'utf-8))
           (message (decode-coding-string message 'utf-8))
-          (buffer (konix/mcp-server--find-agent-buffer buddy-name)))
+          (buffer (konix/mcp-server--buffer-for-buddy buddy-name)))
      (unless buffer
        (error "No coordinated buddy found with name '%s'" buddy-name))
      (unless (konix/mcp-server--coord-registered-p from-buddy)
@@ -1243,13 +1258,13 @@ color and readability.")
         base))))
 
 (defun konix/mcp-server--collect-agent-nodes ()
-  "Return a list of (BUFFER AGENT-NAME PARENT-BUFFER) for every agent-shell buffer.
-AGENT-NAME is nil for non-coordinated buffers.  PARENT-BUFFER is nil
-for top-level buffers."
+  "Return a list of (BUFFER BUDDY-NAME PARENT-BUFFER) for every agent-shell buffer.
+BUDDY-NAME is always set — every agent-shell buffer has one from birth, whether or
+not it ever registered with coord.  PARENT-BUFFER is nil for top-level buffers."
   (let (nodes)
     (dolist (buf (buffer-list))
       (when (with-current-buffer buf (derived-mode-p 'agent-shell-mode))
-        (let ((agent (buffer-local-value 'konix/mcp-server--agent-name buf))
+        (let ((agent (buffer-local-value 'konix/mcp-server--buddy-name buf))
               (parent (buffer-local-value 'konix/mcp-server--parent-buffer buf)))
           (push (list buf agent parent) nodes))))
     (nreverse nodes)))

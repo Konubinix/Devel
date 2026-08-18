@@ -37,6 +37,7 @@
 (require 'seq)
 (require 'color)
 (require 'KONIX_mcp-server-spawn-tree-frame)
+(require 'KONIX_org-transclusion-resolve)
 
 (declare-function agent-shell--start "agent-shell")
 (declare-function agent-shell-anthropic-make-claude-code-config "agent-shell-anthropic")
@@ -789,35 +790,70 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
 
 ;;; render_note — return a note's full text, referenced content resolved
 
-(defun konix/mcp-server--resolve-transclusions ()
-  "Materialise transclusions in the current buffer and return its text with the
-`#+transclude:' directive lines removed (the pulled-in content kept)."
-  (require 'org-transclusion)
-  (org-transclusion-add-all)
-  (string-trim
-   (string-join
-    (seq-remove
-     (lambda (l) (string-prefix-p "#+transclude:" (string-trim-left l)))
-     (split-string (buffer-substring-no-properties (point-min) (point-max)) "\n"))
-    "\n")))
+(defun konix/mcp-server--note-drop-results (tree _backend _info)
+  "Remove every `#+RESULTS:' block from TREE, returning TREE.
+With babel off the source block's code is already there; its stale output — an
+image link, a tangled file name — is noise an agent cannot use."
+  (dolist (el (org-element-map tree org-element-all-elements
+                (lambda (el) (and (org-element-property :results el) el))))
+    (org-element-extract-element el))
+  tree)
 
-(defun konix/mcp-server--note-substance (org-text)
+(defun konix/mcp-server--note-absolute-links (tree _backend _info)
+  "Rewrite TREE's `file:' and `id:' links to absolute paths, returning TREE.
+Paths expand against `default-directory' — the note's own directory — and an
+`id:' resolves through `org-id-find', retyped `file' so `org-ascii-link' prints
+it verbatim.  A `::' search option is kept; an unresolvable id is left alone."
+  (require 'org-id)
+  (org-element-map tree 'link
+    (lambda (link)
+      (let ((type (org-element-property :type link)))
+        (cond
+         ((string= type "file")
+          (org-element-put-property
+           link :raw-link
+           (concat "file:" (expand-file-name (org-element-property :path link))
+                   (let ((search (org-element-property :search-option link)))
+                     (and search (concat "::" search))))))
+         ((string= type "id")
+          (when-let ((file (car (org-id-find (org-element-property :path link)))))
+            (org-element-put-property link :type "file")
+            (org-element-put-property link :raw-link (concat "file:" file))))))))
+  tree)
+
+(defun konix/mcp-server--note-substance (org-text &optional base-dir)
   "Return ORG-TEXT ASCII-exported, dropping the org front-matter metadata.
 Headings markup, property drawers, `#+' keywords and other org bookkeeping
 are rendered away, leaving only the readable content — so an agent handed the
-result never has to wade through org internals."
+result never has to wade through org internals.
+
+The export is tuned for that reader rather than for print: babel off, so a
+source block shows its CODE whatever `:exports' says and nothing is evaluated;
+links in place rather than deferred into footnotes; results blocks dropped and
+paths made absolute against BASE-DIR, the note's own directory."
   (require 'ox-ascii)
   (string-trim
-   (org-export-string-as org-text 'ascii t '(:ascii-charset utf-8))))
+   (let ((org-export-select-tags '())
+         ;; (org-export-exclude-tags '())
+         (org-export-use-babel nil)
+         (org-ascii-links-to-notes nil)
+         (default-directory (or base-dir default-directory))
+         (org-export-filter-parse-tree-functions
+          (list #'konix/mcp-server--note-drop-results
+                #'konix/mcp-server--note-absolute-links)))
+     (org-export-string-as org-text 'ascii t '(:ascii-charset utf-8)))))
 
 (defun konix/mcp-server-render-note (note-path)
   "Return NOTE-PATH rendered to clean prose with every #+transclude resolved.
-Each `#+transclude:' directive is materialised with org-transclusion (relative
-`file:' links resolved against the note's own directory), pulling the canonical
-content it references — e.g. shared principles — inline where it sits.  The
-result is then ASCII-exported with `konix/mcp-server--note-substance', so what
-comes back is the note's substance only: no headings markup, property drawers
-or `#+' keywords to pollute an agent's context.  Read fresh on each call.
+Each `#+transclude:' directive is materialised, recursively, by
+`konix/org-transclusion-resolve-file' (relative `file:' links resolved against
+the note's own directory), pulling the canonical content it references — e.g.
+shared principles — inline where it sits.  A directive that cannot be resolved
+is an error rather than a gap: half a set of principles reads as the whole set.
+The result is then ASCII-exported with `konix/mcp-server--note-substance', so
+what comes back is the note's substance only: no headings markup, property
+drawers or `#+' keywords to pollute an agent's context, source blocks showing
+their code, and every link an absolute path.  Read fresh on each call.
 
 MCP Parameters:
   note-path - Absolute path of the note to render."
@@ -825,14 +861,9 @@ MCP Parameters:
    (let ((note-path (expand-file-name (decode-coding-string note-path 'utf-8))))
      (unless (file-readable-p note-path)
        (error "Note not readable: %s" note-path))
-     ;; A `with-temp-buffer' visits no file, so nothing here ever prompts to save
-     ;; or confirm a kill — this must stay non-interactive.
-     (with-temp-buffer
-       (insert-file-contents note-path)
-       (setq default-directory (file-name-directory note-path))
-       (org-mode)
-       (konix/mcp-server--note-substance
-        (konix/mcp-server--resolve-transclusions))))))
+     (konix/mcp-server--note-substance
+      (konix/org-transclusion-resolve-file note-path)
+      (file-name-directory note-path)))))
 
 (defun konix/mcp-server--build-auditor-prompt (principles buddy-name)
   "Return the baked AUDIT-buddy prompt: PRINCIPLES inlined, serve as BUDDY-NAME.

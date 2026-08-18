@@ -922,6 +922,14 @@ root.keys(globalkeys)
 -- }}}
 
 -- {{{ Rules
+-- Clients I place by hand: floating, above the rest, and coming back where I
+-- left them, as they come and go a lot.  Matched as substrings of the name.
+local placed_by_hand = {
+	"🔒Impass Password Manager",
+	"Ediff",
+	"IA agent tree",
+}
+
 -- Rules to apply to new clients (through the "manage" signal).
 awful.rules.rules = {
 	-- All clients will match this rule.
@@ -974,9 +982,8 @@ awful.rules.rules = {
 			},
 			-- Note that the name property shown in xprop might be set slightly after creation of the client
 			-- and the name shown there might not match defined rules here.
-			name = {
+			name = gears.table.join({
 				"confirm",
-				"🔒Impass Password Manager",
 				"Event Tester", -- xev.
 				"Terminator Preferences",
 				"Choose A Terminal Font",
@@ -986,8 +993,7 @@ awful.rules.rules = {
 				"Change Foreground Color",
 				"Post Processing Plugin",
 				"Print",
-				"Ediff",
-			},
+			}, placed_by_hand),
 			role = {
 				"AlarmWindow", -- Thunderbird's calendar.
 				"ConfigManager", -- Thunderbird's about:config.
@@ -1002,10 +1008,7 @@ awful.rules.rules = {
 			class = {
 				"gnuplot_qt",
 			},
-			name = {
-				"🔒Impass Password Manager",
-				"Ediff",
-			},
+			name = placed_by_hand,
 		},
 		properties = { ontop = true },
 	},
@@ -1034,6 +1037,10 @@ awful.rules.rules = {
 					return true
 				elseif string.find(c.name, "Ediff") then
 					move_to_tag(c, c.screen.tags[1])
+					return true
+				elseif c.name == "IA agent tree" then
+					-- a panel: it belongs to whatever I am looking at
+					move_to_tag(c, c.screen.selected_tag)
 					return true
 				else
 					move_to_tag(c, c.screen.tags[5])
@@ -1067,6 +1074,50 @@ client.connect_signal("manage", function(c)
 		awful.placement.no_offscreen(c)
 	end
 end)
+
+-- Where each of the `placed_by_hand' clients was last seen, by the name it was
+-- recognized by: it is a new client every time it comes back.  Also done here
+-- and not only through awful.rules, as emacs names its frames after they are
+-- managed, too late for the rules above to match: the client has been tiled by
+-- then and setting `floating' is what undoes that.
+local geometry_by_hand = {}
+
+local function place_by_hand(c)
+	if c.placed_by_hand or not c.name then
+		return
+	end
+	for _, name in ipairs(placed_by_hand) do
+		if string.find(c.name, name, 1, true) then
+			c.placed_by_hand = name
+			c.floating = true
+			c.ontop = true
+			local geometry = geometry_by_hand[name]
+			if geometry then
+				-- The tags belong to a screen, so tell it about the move,
+				-- otherwise it stays listed on the screen it was born on.
+				local s = awful.screen.getbycoord(geometry.x, geometry.y)
+				if s then
+					c.screen = s
+				end
+				c:geometry(geometry)
+				-- Whatever awesome makes of a client showing up carries on
+				-- after this, so say it again once it is done.
+				gears.timer.delayed_call(function()
+					if c.valid then
+						c:geometry(geometry)
+					end
+				end)
+			end
+			c:connect_signal("property::geometry", function(cc)
+				geometry_by_hand[name] = cc:geometry()
+			end)
+			return
+		end
+	end
+end
+
+client.connect_signal("manage", place_by_hand)
+client.connect_signal("property::name", place_by_hand)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal("request::titlebars", function(c)

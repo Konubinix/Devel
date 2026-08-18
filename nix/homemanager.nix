@@ -241,7 +241,8 @@ in
 
     # Agents are managed outside NixOS
     services.gpg-agent.enable = false;
-    programs.gpg.enable = true;
+    # ~/.gnupg is populated at startup by our own scripts
+    programs.gpg.enable = false;
 
     # ── Window manager ────────────────────────────────────────────────────
 

@@ -14,6 +14,7 @@ let
   configDir = "${develDir}/config";
   shareDir = "${develDir}/share";
   libDir = "${develDir}/lib";
+  cacheDir = "${homeDir}/.cache";
 
   # Wrap a package's binaries so that LD_LIBRARY_PATH includes NIX_LD_LIBRARY_PATH.
   # This lets pip-installed native extensions (numpy, etc.) find libstdc++ and friends
@@ -333,7 +334,7 @@ in
 
       # XDG
       XDG_CONFIG_HOME = configDir;
-      XDG_CACHE_HOME = "${homeDir}/.cache";
+      XDG_CACHE_HOME = cacheDir;
       XDG_DOWNLOAD_DIR = "${homeDir}/Downloads";
       XDG_LOG_HOME = "${homeDir}/tmp/logs";
 
@@ -448,6 +449,9 @@ in
       COMP_KNOWN_HOSTS_WITH_HOSTFILE = "1";
       COMP_KNOWN_HOSTS_WITH_AVAHI = "1";
       COMP_TAR_INTERNAL_PATHS = "1";
+
+      KONIX_HARDLIASES_STAMP_DIR = "${cacheDir}/hardliasesstamps/";
+
     };
 
     # ── Bash ──────────────────────────────────────────────────────────────

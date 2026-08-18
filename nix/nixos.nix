@@ -139,7 +139,12 @@
 
   programs = {
     # FUSE
-    fuse.userAllowOther = true;
+    # enable is required: the whole module body is mkIf cfg.enable, so without it
+    # userAllowOther is inert and no setuid fusermount wrapper is created.
+    fuse = {
+      enable = true;
+      userAllowOther = true;
+    };
 
     # Agents are managed outside NixOS
     ssh.startAgent = false;

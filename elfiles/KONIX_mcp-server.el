@@ -30,6 +30,8 @@
 (require 'project)
 (require 'KONIX_mcp-server-introspection)
 (require 'KONIX_mcp-server-agent-shell)
+;; tangled from how_to_write_and_audit_a_note.org, where the format it checks is stated
+(require 'KONIX_mcp-server-note-mechanics)
 
 ;;; Configuration
 
@@ -71,6 +73,17 @@ Signals an error if the buffer does not exist."
            (with-current-buffer buf
              ,@body))
        (error "Buffer not found: %s" decoded-buffer-name))))
+
+(defun konix/mcp-server-assert-buffer-fresh (buffer-name)
+  "Refuse to report on BUFFER-NAME unless it holds what is on disk.
+A checker that reads a stale buffer reports clean on content it never read,
+which is worse than no checker at all.  Call this before walking a buffer."
+  (unless (bound-and-true-p auto-revert-mode)
+    (error "Buffer %s has no auto-revert-mode, so it may hold neither what is on disk nor what you last wrote — reopen it with ensure_open, then check again"
+           buffer-name))
+  (when (buffer-modified-p)
+    (error "Buffer %s has unsaved changes, so what it holds is not what is on disk — save it, or reopen it with ensure_open, then check again"
+           buffer-name)))
 
 (defun konix/mcp-server--get-agenda-content (key)
   "Run org-agenda with KEY and return the buffer content."
@@ -447,6 +460,66 @@ Errors when nothing was removed, rather than reporting a success it did not achi
                (save-buffer))
              (format "Removed result of block '%s' in buffer %s" block-name buffer-name))))))))
 
+(defun konix/mcp-server-babel-results-stale (buffer-name)
+  "Report source blocks whose =#+RESULTS= no longer matches their body.
+
+A cached block records org's own hash in =#+RESULTS[<sha1>]:=; recomputing
+`org-babel-sha1-hash' and comparing catches the case where the block was edited
+and never re-run — the source says one thing and the rendered result says
+another, with every other check still green.
+
+Reports three groups plus a tally, because a silent run is not conformance:
+stale blocks (hash mismatch — re-run them), blocks with no hash (no :cache, so
+freshness is simply not decidable here — never reported as fresh), and blocks
+with no =#+RESULTS= at all (nothing was ever rendered inline).  The tally is
+what distinguishes « everything is fresh » from « there was nothing to check ».
+
+MCP Parameters:
+  buffer-name - Name of the org-mode buffer to check.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
+  (mcp-server-lib-with-error-handling
+   (konix/mcp-server-with-buffer buffer-name
+     (unless (derived-mode-p 'org-mode)
+       (error "Buffer %s is not in org-mode" buffer-name))
+     (save-excursion
+       (save-restriction
+         (widen)
+         (let ((total 0) (fresh 0) stale unhashed noresult)
+           (org-babel-map-src-blocks nil
+             (setq total (1+ total))
+             (let* ((line (line-number-at-pos))
+                    (name (or (nth 4 (org-babel-get-src-block-info t)) "<no #+NAME>"))
+                    (lang (or (org-element-property :language (org-element-at-point)) "?"))
+                    (recorded (org-babel-current-result-hash))
+                    (label (format "  line %d  %s (%s)" line name lang)))
+               (if recorded
+                   (let ((now (org-babel-sha1-hash (org-babel-get-src-block-info))))
+                     (if (equal recorded now)
+                         (setq fresh (1+ fresh))
+                       (push (format "%s\n      recorded   %s\n      recomputed %s"
+                                     label recorded now)
+                             stale)))
+                 ;; no hash: freshness is undecidable, so say which kind of silence
+                 (if (org-babel-where-is-src-block-result)
+                     (push label unhashed)
+                   (push label noresult)))))
+           (if (zerop total)
+               "no source block in this buffer"
+             (string-join
+              (delq nil
+                    (list
+                     (when stale
+                       (format "stale — the #+RESULTS no longer matches the block body:\n%s"
+                               (string-join (nreverse stale) "\n")))
+                     (when unhashed
+                       (format "no-hash — a #+RESULTS without a hash (no :cache), freshness undecidable:\n%s"
+                               (string-join (nreverse unhashed) "\n")))
+                     (when noresult
+                       (format "no-result — no #+RESULTS at all (nothing rendered inline):\n%s"
+                               (string-join (nreverse noresult) "\n")))
+                     (format "%d source block(s): %d stale, %d fresh, %d undecidable, %d without result"
+                             total (length stale) fresh (length unhashed) (length noresult))))
+              "\n"))))))))
+
 (defun konix/mcp-server-tangle-buffer (buffer-name)
   "Tangle all source blocks in an org-mode buffer.
 
@@ -463,6 +536,21 @@ MCP Parameters:
        (format "Tangled %d file(s) from buffer %s: %s"
                (length files) buffer-name
                (string-join files ", "))))))
+
+(defun konix/mcp-server-note-indent (buffer-name)
+  "Re-indent an org buffer using org's own rules.
+
+MCP Parameters:
+  buffer-name - Name of the org-mode buffer to re-indent.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
+  (mcp-server-lib-with-error-handling
+   (konix/mcp-server-with-buffer buffer-name
+     (unless (derived-mode-p 'org-mode)
+       (error "Buffer %s is not in org-mode" buffer-name))
+     (save-restriction
+       (widen)
+       (indent-region (point-min) (point-max)))
+     (when (buffer-file-name) (save-buffer))
+     (format "indent: %s" buffer-name))))
 
 ;;; Server management tools
 
@@ -508,7 +596,8 @@ MCP Parameters:
            (delq nil
                  (mapcar #'locate-library
                          '("KONIX_mcp-server-introspection"
-                           "KONIX_mcp-server-agent-shell")))))
+                           "KONIX_mcp-server-agent-shell"
+                           "KONIX_mcp-server-note-mechanics")))))
      (if server-file
          (progn
            (dolist (f sibling-files)
@@ -578,7 +667,18 @@ MCP Parameters:
       :description "Tangle a named org-babel source block in a buffer, writing its content to the file specified by its :tangle header argument. The block must have a #+NAME: property. The buffer must be in org-mode.")
      (konix/mcp-server-tangle-buffer
       :id "tangle_buffer"
-      :description "Tangle all source blocks in an org-mode buffer, writing each block to its :tangle target file. Use this instead of tangle_babel_block when you want to tangle the entire file at once."))
+      :description "Tangle all source blocks in an org-mode buffer, writing each block to its :tangle target file. Use this instead of tangle_babel_block when you want to tangle the entire file at once.")
+     (konix/mcp-server-babel-results-stale
+      :id "babel_results_stale"
+      :description "Report source blocks whose #+RESULTS no longer matches their body, by recomputing org's own org-babel-sha1-hash and comparing it to the hash recorded in #+RESULTS[<sha1>]:. Catches the block that was edited and never re-run — where the source says one thing and the rendered result another, with every other check still green (a lint that only parses the source cannot see this). Reports three groups, since a silent run is not conformance: STALE (hash mismatch, re-run them), NO HASH (no :cache, so freshness is not decidable — never reported as fresh), and NO RESULT (nothing rendered inline at all). Call it after editing any block whose result is exported. Read-only."
+      :read-only t)
+     (konix/mcp-server-note-mechanics
+      :id "note_mechanics"
+      :description "Report every mechanical flaw of an org note, and inventory the intentions in use with their counts. The report names each flaw group, the line it sits on and what is wrong there — bullet form, intention word, line and bullet length, link and transclusion, heading depth, inline footnote — as how_to_write_and_audit_a_note.org defines them. Nothing else is mechanisable — whether a claim carries a predicate, and whether a why is real, are what the audit is for. A silent run is not conformance. Read-only."
+      :read-only t)
+     (konix/mcp-server-note-indent
+      :id "note_indent"
+      :description "Re-indent an org buffer with org's own rules: nesting levels normalized, item bodies moved to their item's continuation column. Works on the whole file even if the buffer is narrowed, and saves it. This is THE tool for re-indenting a note — do not use sed, python or a shell command instead."))
 
     ("konix-emacs-agents"
      (konix/mcp-server-spawn-agent

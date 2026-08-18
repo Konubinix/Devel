@@ -293,6 +293,7 @@ Make sure you provide absolute paths in audit requests.%s"
         (setq-local agent-shell-cwd-function (lambda () base))
         (konix/agent-shell-set-governing-note shell note)
         (konix/org-agent-shell--note-boot-arm shell)
+        (konix/agent-shell-ensure-viewport shell)
         (agent-shell--insert-to-shell-buffer
          :shell-buffer shell
          :text prompt

@@ -352,6 +352,16 @@ explicitly before that point wins."
 (declare-function konix/agent-shell-viewport--interrupt-set-default-and-reply
                   "KONIX_agent-shell-viewport")
 
+(defun konix/agent-shell-ensure-viewport (shell-buffer)
+  "Create SHELL-BUFFER's viewport companion without displaying it.  Return it.
+For shells started with `:no-focus', where
+`agent-shell-viewport--show-buffer' would steal the selected window.
+Call BEFORE submitting the first prompt: agent-shell only mirrors
+fragments into a viewport that already exists, and the submit is what
+switches it to view mode."
+  (when (buffer-live-p shell-buffer)
+    (agent-shell-viewport--buffer :shell-buffer shell-buffer)))
+
 (defun konix/agent-shell-set-session-mode (mode-name)
   "Switch the current session to the mode named MODE-NAME, without prompting.
 

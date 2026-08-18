@@ -46,6 +46,7 @@
 (declare-function shell-maker-busy "shell-maker")
 (declare-function shell-maker-submit "shell-maker")
 (declare-function konix/agent-shell--apply-label-format "KONIX_AL-agent-shell")
+(declare-function konix/agent-shell-ensure-viewport "KONIX_agent-shell-common")
 (declare-function konix/agent-shell-governing-note "KONIX_agent-shell-common")
 (declare-function konix/agent-shell-set-governing-note "KONIX_agent-shell-common")
 (declare-function konix/agent-shell-mcp-servers-for "KONIX_agent-shell-mcp")
@@ -814,6 +815,7 @@ Stay in this loop until you are told to stop or until your goal is fully achieve
                              :model model :coord-only coord-only
                              :threshold respawn-threshold-num))
            (konix/mcp-server--setup-respawn-subscription (current-buffer)))
+         (konix/agent-shell-ensure-viewport (current-buffer))
          (agent-shell--insert-to-shell-buffer
           :shell-buffer (current-buffer)
           :text prompt

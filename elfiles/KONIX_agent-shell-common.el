@@ -87,6 +87,15 @@ Passes ARG through to `agent-shell'."
   (let ((agent-shell-session-strategy (or strategy agent-shell-session-strategy)))
     (agent-shell arg)))
 
+(defun konix/agent-shell/start-with-agent ()
+  "Start a shell on an agent picked now, leaving `agent-shell-preferred-agent-config'
+alone.  Forces a new shell: the DWIM path would reuse the project's existing one
+and ignore the pick."
+  (interactive)
+  (let ((agent-shell-preferred-agent-config
+         (map-elt (agent-shell-select-config :prompt "Start agent: ") :identifier)))
+    (konix/agent-shell '(4))))
+
 ;; The ACP server does not remember a session's model across resume: its
 ;; `session/resume' response reports the server default (e.g. "haiku"), not
 ;; the model the session actually ran on. So we persist the model per

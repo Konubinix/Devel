@@ -72,6 +72,7 @@
 (require 'KONIX_agent-shell-panel)
 (require 'KONIX_agent-shell-mcp)
 (require 'KONIX_shell-parse)
+(require 'KONIX_shell-search)
 
 (declare-function agent-shell--state "agent-shell")
 (declare-function agent-shell--enqueue-request "agent-shell")
@@ -461,6 +462,49 @@ See `konix/agent-shell--toplevel-command-p'."
                    (treesit-node-text c t)))
             (treesit-node-children command t)))
 
+(defun konix/agent-shell--argument-literal (node)
+  "Return NODE's value as the literal string the shell would pass along, or nil
+when that value is not statically knowable.
+
+Quoting is undone (`\"/home/sam\"' and `'/home/sam'' both give `/home/sam') and
+the two expansions that still denote a fixed path are resolved: a leading `~'
+and `$HOME'/`${HOME}'.  Any other expansion, command substitution or process
+substitution makes the whole argument unknown -- nil rather than a guess, since
+callers use this to decide what a command really touches."
+  (pcase (treesit-node-type node)
+    ("word" (let ((text (treesit-node-text node t)))
+              ;; `~' is a shell feature, not part of the file name.
+              (if (string-match-p "\\`~\\(/\\|\\'\\)" text)
+                  (expand-file-name text)
+                text)))
+    ("raw_string" (string-trim (treesit-node-text node t) "'" "'"))
+    ("string_content" (treesit-node-text node t))
+    ((or "simple_expansion" "expansion")
+     (when-let ((var (car (treesit-filter-child
+                           node (lambda (c)
+                                  (equal (treesit-node-type c) "variable_name"))
+                           t))))
+       (when (equal (treesit-node-text var t) "HOME")
+         (expand-file-name "~"))))
+    ;; A `string' holds its content in children (empty when `""'), and a
+    ;; `concatenation' glues pieces like `$HOME' and `/prog' together: both are
+    ;; only known when every piece is.
+    ((or "string" "concatenation")
+     (let ((parts (mapcar #'konix/agent-shell--argument-literal
+                          (treesit-node-children node t))))
+       (unless (memq nil parts) (apply #'concat parts))))))
+
+(defun konix/agent-shell--command-argument-literals (command)
+  "Return COMMAND node's arguments as literals, one entry per argument, in order.
+Unlike `konix/agent-shell--command-word-arguments' this sees through quoting and
+`~'/`$HOME' expansion, and it keeps a nil placeholder for every argument whose
+value is not statically knowable (see `konix/agent-shell--argument-literal')
+instead of dropping it -- callers that walk a command line need `argument 1 is
+something we cannot read' to stay distinguishable from `there is no argument 1'."
+  (mapcar #'konix/agent-shell--argument-literal
+          (seq-filter (lambda (c) (equal (treesit-node-field-name c) "argument"))
+                      (treesit-node-children command t))))
+
 (defun konix/agent-shell--command-name (command)
   "Return COMMAND node's command name as a string, or nil."
   (when-let ((n (treesit-node-child-by-field-name command "name")))
@@ -549,40 +593,21 @@ So `git status && git push' does not match -- push is not curation."
       (and commands
            (seq-every-p #'konix/agent-shell--git-curation-command-p commands)))))
 
-(defconst konix/agent-shell--lost-search-tools
-  '("find" "grep" "rg" "ag" "ack")
-  "Search commands considered by the `@lost-search' evaluator.")
-
-(defconst konix/agent-shell--lost-search-always-recursive
-  '("find" "rg" "ag" "ack")
-  "Tools from `konix/agent-shell--lost-search-tools' that scan a whole
-directory tree without needing an explicit recursive flag, unlike plain
-`grep' (which needs `-r'/`-R'/`--recursive' to do the same).")
-
-(defconst konix/agent-shell--lost-search-root-re
-  (format "\\`\\(~\\|%s\\)\\(/.*\\)?\\'"
-          (regexp-quote (string-remove-prefix "/" (expand-file-name "~"))))
-  "Regexp matching a search-root argument that is $HOME or a path under it.")
-
-(defun konix/agent-shell--lost-search-root-p (word)
-  "Non-nil when WORD names $HOME (or a path under it) or the filesystem root."
-  (or (equal word "/")
-      (string-match-p konix/agent-shell--lost-search-root-re word)))
-
 (konix/agent-shell-define-tool-evaluator "lost-search" (tool-call)
-  "Match a `find'/`grep'/`rg'/`ag'/`ack' scan rooted at $HOME (or below) or at
-`/' -- the mark of an agent that has lost track of where something lives and
-is brute-forcing the whole tree instead of asking the user for guidance."
+  "Match a `find'/`grep'/`rg'/`ag'/`ack' scan of a whole aggregating directory
+\(see `konix/shell-search-broad-roots') -- the mark of an agent that has lost
+track of where something lives and is brute-forcing everything instead of
+asking the user for guidance.  A scan bounded to a project, or to named files,
+is left alone.  Which arguments a command really walks comes from its own
+command line grammar, see `KONIX_shell-search'."
   (when-let ((root (konix/agent-shell--command-ast tool-call)))
     (seq-some
      (lambda (c)
-       (let ((name (konix/agent-shell--command-name c)))
-         (and (member name konix/agent-shell--lost-search-tools)
-              (let ((words (konix/agent-shell--command-word-arguments c)))
-                (and (or (member name konix/agent-shell--lost-search-always-recursive)
-                         (member "-r" words) (member "-R" words)
-                         (member "--recursive" words))
-                     (seq-some #'konix/agent-shell--lost-search-root-p words))))))
+       (let ((name (konix/agent-shell--command-name c))
+             (arguments (konix/agent-shell--command-argument-literals c)))
+         (and (konix/shell-search-recursive-p name arguments)
+              (seq-some #'konix/shell-search-broad-root-p
+                        (konix/shell-search-roots name arguments)))))
      (konix/agent-shell--command-nodes root))))
 
 (defconst konix/agent-shell--read-only-filters

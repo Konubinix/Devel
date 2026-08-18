@@ -14,6 +14,7 @@
 ;;; Code:
 
 (require 'ob)
+(require 'ox)
 (require 'cl-lib)
 
 (defface argdown-supportive-claim-face '((t :foreground "green"))
@@ -133,6 +134,9 @@ self-contained map is a different artifact — see `argdown--map-html'.)"
     (insert-file-contents-literally file)
     (concat (konix/ipfa-buffer nil) suffix)))
 
+(defvar org-babel-default-header-args:argdown '((:cache . "yes") (:results . "output html"))
+  "Default header args for argdown src blocks — the interactive map, cached.")
+
 (defconst argdown--epistemic-tag-colors
       '(;; GENERIC ladder of proof — by warrant TYPE, weakest→strongest.  Grounded
         ;; in the zététique « échelle de la preuve » (Durand) and the AFIS
@@ -219,7 +223,11 @@ title→hex), or nil when empty.  Titles are quoted YAML keys (`argdown--yaml-ke
     the house epistemic tag colours (`argdown--epistemic-tag-colors', always); the
     propagated conclusion border colours STATEMENT-COLORS and the per-argument fill
     colours ARGUMENT-COLORS (alists title→hex, when given — see
-    `argdown--strength-colors'); and `model.mode: strict' when MODE is \"strict\".
+    `argdown--strength-colors'); and `model.mode: strict' unless MODE is \"loose\".
+    Strict is the default because these notes require inferences to hold literally —
+    in loose mode a `+' between statements claims only dialectical support, which
+    lets a mere corroboration read as a deduction with nothing flagging it.
+    `:argdown-mode loose' is the explicit opt-out.
     Everything under one `===' block — Argdown accepts frontmatter only at the very
     top and only once, so colours + mode must share it (a second block, or one
     lower down, is a parse error)."
@@ -229,7 +237,7 @@ title→hex), or nil when empty.  Titles are quoted YAML keys (`argdown--yaml-ke
                   argdown--epistemic-tag-colors "\n")
        (argdown--color-map "statementColors" statement-colors)
        (argdown--color-map "argumentColors" argument-colors)
-       (and (equal mode "strict") "\nmodel:\n    mode: strict")
+       (unless (equal mode "loose") "\nmodel:\n    mode: strict")
        "\n==="))
 
     (defun argdown--compose (body params &optional statement-colors argument-colors)
@@ -240,10 +248,10 @@ title→hex), or nil when empty.  Titles are quoted YAML keys (`argdown--yaml-ke
     its sources exactly as the published render does.  `argdown--frontmatter'
     always leads with the house epistemic tag colours, optionally the propagated
     conclusion border colours STATEMENT-COLORS and per-argument fill colours
-    ARGUMENT-COLORS (see `argdown--render-input'), and — when :argdown-mode is
-    \"strict\" — folds `model.mode: strict' into that same single block (Argdown
+    ARGUMENT-COLORS (see `argdown--render-input'), and — unless :argdown-mode is
+    \"loose\" — folds `model.mode: strict' into that same single block (Argdown
     requires one frontmatter, at the very top, else a parse error): in strict mode
-    + / - / >< between statements then read as logical entails / contrary /
+    + / - / >< between statements read as logical entails / contrary /
     contradictory instead of dialectical support / attack, while an argument's
     + / - stay support / attack."
       (let ((inc (let ((c (cdr (assq :argdown-include params)))) (and c (format "%s" c))))
@@ -255,9 +263,6 @@ title→hex), or nil when empty.  Titles are quoted YAML keys (`argdown--yaml-ke
                                    (and col (konix/argdown-collect col))
                                    body))
                    "\n\n")))
-
-    (defvar org-babel-default-header-args:argdown '((:cache . "yes") (:results . "output html"))
-      "Default header args for argdown src blocks — caching on by default.")
 
     (defun org-babel-execute:argdown (body params)
       "Render an Argdown BODY.  Dispatch on headers:
@@ -323,18 +328,93 @@ title→hex), or nil when empty.  Titles are quoted YAML keys (`argdown--yaml-ke
 
 (defun argdown--json (in)
   "Parse the `argdown json' model of INPUT file into an alist tree."
-  (json-parse-string
-   (argdown--run (format "argdown json --stdout --silent %s" (shell-quote-argument in)))
-   :object-type 'alist :array-type 'list :null-object nil :false-object nil))
+  (argdown--split-steps
+   (json-parse-string
+    (argdown--run (format "argdown json --stdout --silent %s" (shell-quote-argument in)))
+    :object-type 'alist :array-type 'list :null-object nil :false-object nil)))
+
+(defun argdown--with-role (m role)
+  "Member M with its `role' set to ROLE."
+  (cons (cons 'role role) (assq-delete-all 'role (copy-alist m))))
+
+(defun argdown--argument-steps (arg)
+  "ARG's pcs cut into one member list per inference step: a step holds the
+premises it consumes — the previous step's conclusion among them — and ends on
+the conclusion it establishes."
+  (let (steps pending)
+    (dolist (m (alist-get 'pcs arg))
+      (if (member (alist-get 'role m) '("intermediary-conclusion" "main-conclusion"))
+          (progn
+            (push (append (nreverse pending)
+                          (list (argdown--with-role m "main-conclusion")))
+                  steps)
+            (setq pending (list (argdown--with-role m "premise"))))
+        (push m pending)))
+    (nreverse steps)))
+
+(defun argdown--split-steps (model)
+  "MODEL with every argument of several steps replaced by one argument per step,
+titled after it.  A step keeps the whole argument's members, so its box reads the
+same description."
+  (let (out)
+    (dolist (a (alist-get 'arguments model))
+      (let* ((arg (cdr a))
+             (steps (argdown--argument-steps arg))
+             (n (length steps))
+             (k 0))
+        (if (<= n 1)
+            (push a out)
+          (dolist (s steps)
+            (setq k (1+ k))
+            (let* ((title (format "%s (%d/%d)" (alist-get 'title arg) k n))
+                   (rest (assq-delete-all 'title (assq-delete-all 'pcs (copy-alist arg)))))
+              (push (cons (intern title)
+                          (append (list (cons 'title title) (cons 'pcs s)) rest))
+                    out))))))
+    (append (list (cons 'arguments (nreverse out)))
+            (assq-delete-all 'arguments (copy-alist model)))))
+
+(defconst konix/argdown--marker-re
+  "[ \t]*\\(\\[[^]]*\\]\\|<[^>]*>\\|([0-9]+)\\|[-+]\\|><\\|=+\\|----\\|#\\)"
+  "Regexp matching the start of an argdown structural line (statement,
+argument, premise number, relation, inference…).")
+
+(defun konix/ox-hugo--argdown-statements (src html)
+  "Group HTML into (INDENT . TEXT) statements, SRC deciding where each opens."
+  (let* ((chop (lambda (s) (replace-regexp-in-string "\n\\'" "" s)))
+         (srcs (split-string (funcall chop src) "\n"))
+         (htmls (split-string (funcall chop html) "\n"))
+         (col (lambda (s) (- (length s) (length (string-trim-left s)))))
+         (out (list (cons (funcall col (car srcs)) (car htmls)))))
+    (setq srcs (cdr srcs))
+    (dolist (h (cdr htmls))
+      (let ((s (or (pop srcs) "")))
+        (if (or (string-empty-p (string-trim s))
+                (string-match-p (concat "\\`" konix/argdown--marker-re) s))
+            (push (cons (funcall col s) h) out)
+          (setcdr (car out) (concat (cdar out) " " (string-trim h))))))
+    (nreverse out)))
+
+(defconst konix/argdown--hang 2
+  "Columns a statement's marker hangs out of its text column.")
+
+(defun konix/ox-hugo--argdown-block (statements)
+  "Render STATEMENTS, each (INDENT . TEXT), as one block keeping its columns."
+  (concat "<div class=\"src src-argdown\" style=\"font-family:monospace;\">\n"
+          (mapconcat
+           (lambda (s)
+             (let ((text (string-trim-left (cdr s))))
+               (format "<div style=\"padding-left:%dch;text-indent:-%dch;\">%s</div>"
+                       (+ (car s) konix/argdown--hang) konix/argdown--hang
+                       (if (string-empty-p text) "<br>" text))))
+           statements "\n")
+          "\n</div>\n"))
 
 (defun konix/ox-hugo--argdown-html (src-block info)
-  "Return SRC-BLOCK fontified as inline-styled argdown HTML.
-Chroma has no argdown lexer, so colorize with `argdown-mode' + htmlize.
-`org-html-fontify-code' strips the enclosing <pre>, so re-wrap it."
-  (format "<pre class=\"src src-argdown\" style=\"white-space:pre-wrap;\">\n%s</pre>\n"
-          (org-html-fontify-code
-           (org-export-format-code-default src-block info)
-           "argdown")))
+  "Return SRC-BLOCK fontified as inline-styled argdown HTML."
+  (let ((src (org-export-format-code-default src-block info)))
+    (konix/ox-hugo--argdown-block
+     (konix/ox-hugo--argdown-statements src (org-html-fontify-code src "argdown")))))
 
 (defun konix/ox-hugo-src-block--argdown (orig src-block contents info)
   "Fontify argdown src blocks with Emacs; defer everything else to ORIG."
@@ -622,12 +702,6 @@ table keying (file . name) to break cycles.  Included premises come first."
   (konix/argdown--expand-into spec (make-hash-table :test 'equal) nil))
 
 ;;; Editing comfort — wrap long statement lines, on M-q
-
-(defconst konix/argdown--marker-re
-  "[ \t]*\\(\\[[^]]*\\]\\|<[^>]*>\\|([0-9]+)\\|[-+]\\|><\\|=+\\|----\\|#\\)"
-  "Regexp matching the start of an argdown structural line (statement,
-argument, premise number, relation, inference…), anchored at point via
-`looking-at'.  Lines that don't match are description continuations.")
 
 (defun konix/argdown--stmt-bounds ()
   "Return (BEG . END) of the argdown statement paragraph at point, or nil.
@@ -1472,7 +1546,7 @@ exported pieces — the engine installs from the first, the rest no-op."
    "if(!window.argdownInitAll){\n"
    (argdown--dagre-js) "\n"
    "document.head.insertAdjacentHTML('beforeend', "
-   (json-encode argdown--map-css) ");\n"
+   (replace-regexp-in-string "</" "<\\\\/" (json-encode argdown--map-css)) ");\n"
    argdown--layout-js
    "}\n</script>"))
 

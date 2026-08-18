@@ -163,6 +163,19 @@ MCP Parameters:
      (kill-buffer (current-buffer))
      (format "Killed buffer %s" buffer-name))))
 
+(defun konix/mcp-server-revert-buffer (buffer-name)
+  "Revert a buffer to its associated file, discarding unsaved changes.
+
+MCP Parameters:
+  buffer-name - Name of the buffer to revert.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
+  (mcp-server-lib-with-error-handling
+   (konix/mcp-server-with-buffer buffer-name
+     (if (buffer-file-name)
+         (progn
+           (revert-buffer t t)
+           (format "Reverted buffer %s from %s" buffer-name (buffer-file-name)))
+       (error "Buffer %s is not visiting a file" buffer-name)))))
+
 (defun konix/mcp-server-ensure-file-open (file-path)
   "Ensure FILE-PATH is visited in a buffer with `auto-revert-mode' on.
 Opens the file if it is not already visited, then turns on auto-revert so
@@ -530,6 +543,9 @@ MCP Parameters:
      (konix/mcp-server-kill-buffer
       :id "kill_buffer"
       :description "Kill (close) an Emacs buffer by name")
+     (konix/mcp-server-revert-buffer
+      :id "revert_buffer"
+      :description "Revert an Emacs buffer to its associated file on disk, discarding unsaved changes, without prompting for confirmation")
      (konix/mcp-server-ensure-file-open
       :id "ensure_file_open"
       :description "Ensure a file is visited in an Emacs buffer with auto-revert-mode enabled, so the buffer stays in sync with on-disk changes. Opens the file if not already open. Returns the buffer name and whether it was already open.")

@@ -64,9 +64,11 @@ function nix_install_binary {
             warn "substitute ${element} with a more uptodate version (${bin}, ${registry}, ${stamp}, ${stamped})"
             if ! nix profile remove "${element}"
             then
+                # deliberately not stamping: ${bin} is still the build made
+                # against the previous registry, so recording the current one
+                # would claim it is uptodate and stop us ever retrying. Leave
+                # the stamp stale so the next call attempts the upgrade again.
                 warn "could not remove ${element}, keeping the current ${bin_name}"
-                mkdir -p "$(dirname "${stamp}")"
-                printf '%s\n' "${registry}" > "${stamp}"
                 echo "${bin}"
                 return 0
             fi

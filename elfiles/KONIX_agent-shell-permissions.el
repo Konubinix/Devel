@@ -738,12 +738,10 @@ the reference, e.g. `@whitelisted-commands(ls, gh pr check)'."
 (defcustom konix/agent-shell-tool-blacklist-global
   `(("\\(^\\(Write\\|Read\\) /tmp/[a-zA-Z0-9_.-]+$\\|> /tmp\\)" . "Write temp files into ./.agent-shell/tmp/ instead")
     ("^Edit /tmp/[a-zA-Z0-9_.-]+$" . "Write temp files into ./.agent-shell/tmp/ instead")
-    ("@severaltoplevelcommands(git)" . "One git command at a time")
-    ("revert-buffer.+buffer-modified-p" . "use tool ensure_open")
     ("@severalcommands" . "One command at a time. Use redirection to a file in ./.agent-shell/tmp if needing to chain stuff")
     ("@lost-search" . "You are lost, simply ask the user for guidance. Don't try to do all by yourself, make a team with the user.")
     ("@hascommand(cd)" . "Don't cd")
-    ("^chmod \\+x.+;" . "separate chmod and the rest")
+    ("^\\(bash -c\\|python3? -c\\|python3? - <<\\)" . "No oneliner")
     ("@edit-agent-permissions" . "Ask the user to do this")
     ("find ~/.emacs.d" . "Use the mcp tools")
     )
@@ -768,11 +766,9 @@ in the project.")
 (defcustom konix/agent-shell-tool-whitelist-global
   '(("^Write \.agent-shell/tmp/[a-zA-Z0-9_.-]+$" . "")
     ("^mkdir -p \\(./\\)?.agent-shell/tmp$")
-    ("^docker logs")
     ("^bash -n")
     ("^gargdown map")
-    ("^python3? -m py_compile")
-    ("^python3 -c \"import ast; ast.parse(open"))
+    ("^python3? -m py_compile"))
   "GLOBAL baseline alist of (KEY . NOTE) whitelisted (auto-approved) tools.
 Applied to every session, beneath the project and session layers which
 shadow it.  KEY matches as in `konix/agent-shell-tool-blacklist-global';

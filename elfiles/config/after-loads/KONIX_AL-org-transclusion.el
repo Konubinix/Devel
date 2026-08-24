@@ -28,5 +28,35 @@
 (keymap-set org-transclusion-map "o" 'org-open-at-point)
 (keymap-set org-transclusion-map "RET" 'org-open-at-point)
 (keymap-set org-transclusion-map "j" 'org-transclusion-open-source)
+
+(setq org-transclusion-exclude-elements nil)
+
+(defun konix/org-transclusion-strip-frontmatter (obj _plist)
+  "Drop the file-level property drawer and the #+keywords from OBJ.
+A section holding a file header has no heading as grandparent, whereas the
+section of a heading does."
+  (org-element-map obj '(property-drawer keyword)
+    (lambda (el)
+      (let* ((sec (org-element-property :parent el))
+             (gp  (and sec (org-element-property :parent sec))))
+        (when (and (eq (org-element-type sec) 'section)
+                   (not (eq (org-element-type gp) 'headline)))
+          (org-element-extract-element el)))))
+  obj)
+
+(add-hook 'org-transclusion-content-filter-org-functions
+          #'konix/org-transclusion-strip-frontmatter)
+
+(defun konix/org-transclusion-content-format-org-level-auto (type content keyword-values)
+  "Format CONTENT like `org-transclusion-content-format-org', :level defaulting to auto."
+  (org-transclusion-content-format-org
+   type content
+   (if (plist-member keyword-values :level)
+       keyword-values
+     (append keyword-values '(:level "auto")))))
+
+(add-hook 'org-transclusion-content-format-functions
+          #'konix/org-transclusion-content-format-org-level-auto)
+
 (provide 'KONIX_AL-org-transclusion)
 ;;; KONIX_AL-org-transclusion.el ends here

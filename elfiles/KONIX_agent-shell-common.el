@@ -339,6 +339,25 @@ Non-viewport counterpart of `konix/agent-shell-viewport-set-session-mode'."
     (ignore-errors
       (agent-shell-set-session-mode))))
 
+(defmacro konix/agent-shell--when-idle (&rest body)
+  "Run BODY in the current shell buffer once it is no longer busy.
+If the shell is already idle, run BODY immediately.  Otherwise wait for the
+agent's `turn-complete' event (the interrupted turn finishing) before running
+BODY.  Shell equivalent of `konix/agent-shell-viewport--when-idle'."
+  `(let ((shell-buffer (current-buffer)))
+     (if (not (shell-maker-busy))
+         (with-current-buffer shell-buffer
+           ,@body)
+       (let (token)
+         (setq token
+               (agent-shell-subscribe-to
+                :shell-buffer shell-buffer
+                :event 'turn-complete
+                :on-event (lambda (_event)
+                            (agent-shell-unsubscribe :subscription token)
+                            (with-current-buffer shell-buffer
+                              ,@body))))))))
+
 (defmacro konix/agent-shell--once-init-finished (shell &rest body)
   "Run BODY once in SHELL on its first `init-finished', then unsubscribe.
 By that point the session id and its available models are populated, so
@@ -356,20 +375,26 @@ BODY can read `agent-shell--state' safely (e.g. set the model)."
                   ,@body)))))))
 
 (defun konix/agent-shell--interrupt-set-default-and-reply (prompt)
-  "Interrupt the agent, switch to the Default mode, then queue PROMPT.
-`agent-shell-queue-request' queues PROMPT while busy and sends it once the
-interrupted turn completes."
-  (agent-shell-interrupt t)
-  (konix/agent-shell-set-session-mode "Manual")
-  (agent-shell-queue-request prompt))
+  "Interrupt the agent, switch to the Manual mode, then reply with PROMPT.
+Unlike `agent-shell-queue-request', this submits PROMPT directly once the
+interrupted turn has completed (mirroring the viewport flow) instead of
+enqueuing it as a pending request.  An idle shell is left alone: PROMPT is
+submitted straight away, without a cancel notification."
+  (when (shell-maker-busy)
+    (agent-shell-interrupt t))
+  (konix/agent-shell--when-idle
+   (konix/agent-shell-set-session-mode "Manual")
+   (agent-shell--insert-to-shell-buffer :text prompt :submit t :no-focus t)))
 
 (defun konix/agent-shell-interrupt-set-default-and-reply (prompt)
   "Interrupt the current session and reply with PROMPT, from any agent-shell buffer.
 Uses the viewport mechanism when in (or resolving to) a viewport, and the plain
-shell mechanism otherwise.  Works from `agent-shell-mode',
-`agent-shell-viewport-view-mode' and `agent-shell-diff-mode'."
+shell mechanism otherwise.  Works from `agent-shell-mode', both viewport modes
+and `agent-shell-diff-mode'.  The compose (edit) mode matters most: that is
+where an idle viewport waits."
   (cond
-   ((derived-mode-p 'agent-shell-viewport-view-mode)
+   ((derived-mode-p 'agent-shell-viewport-view-mode
+                    'agent-shell-viewport-edit-mode)
     (konix/agent-shell-viewport--interrupt-set-default-and-reply prompt))
    ((derived-mode-p 'agent-shell-mode)
     (konix/agent-shell--interrupt-set-default-and-reply prompt))
@@ -386,12 +411,16 @@ shell mechanism otherwise.  Works from `agent-shell-mode',
 
 (defvar agent-shell-mode-map)
 (defvar agent-shell-viewport-view-mode-map)
+(defvar agent-shell-viewport-edit-mode-map)
 (defvar agent-shell-diff-mode-map)
 
 (defun konix/agent-shell-define-key (key command)
-  "Bind KEY to COMMAND in the shell, viewport-view and diff keymaps at once."
+  "Bind KEY to COMMAND in every agent-shell keymap at once.
+Compose mode included: that is where an idle viewport waits, at the price of
+shadowing its `text-mode' binding there."
   (dolist (map (list agent-shell-mode-map
                      agent-shell-viewport-view-mode-map
+                     agent-shell-viewport-edit-mode-map
                      agent-shell-diff-mode-map))
     (define-key map (kbd key) command)))
 

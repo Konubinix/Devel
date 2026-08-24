@@ -102,8 +102,11 @@ At the prompt, delete backward."
                               ,@body))))))))
 
 (defmacro konix/agent-shell-viewport--interrupt-then (&rest body)
+  "Interrupt the agent if it is busy, then run BODY once the turn is over.
+When nothing is in flight, BODY simply runs right away."
   `(progn
-     (konix/agent-shell-viewport-interrupt-no-confirm)
+     (when (agent-shell-viewport--busy-p)
+       (konix/agent-shell-viewport-interrupt-no-confirm))
      (konix/agent-shell-viewport--when-idle ,@body)))
 
 (defun konix/agent-shell-viewport-interrupt-no-confirm-and-reply ()
@@ -183,13 +186,36 @@ already active (the underlying \"already\" error is ignored)."
    (insert prompt)
    (agent-shell-viewport-compose-send)))
 
+(defun konix/agent-shell-viewport--draft-snapshot ()
+  "Return a compose snapshot of the current draft, or nil when it is blank."
+  (let ((draft (buffer-string)))
+    (unless (string-empty-p (string-trim draft))
+      `((:content . ,draft) (:location . ,(point))))))
+
+(defun konix/agent-shell-viewport--set-default-and-reply (prompt)
+  "Switch to Manual mode and send PROMPT, from either viewport mode.
+In compose mode (where an idle viewport waits) PROMPT replaces the draft,
+`agent-shell-viewport-reply' being view-mode only.  The draft comes back as
+the compose snapshot, restored after the send because
+`agent-shell-viewport-compose-send' clears it."
+  (konix/agent-shell-viewport-set-session-mode "Manual")
+  (if (not (derived-mode-p 'agent-shell-viewport-edit-mode))
+      (progn
+        (agent-shell-viewport-reply)
+        (insert prompt)
+        (agent-shell-viewport-compose-send))
+    (let ((snapshot (konix/agent-shell-viewport--draft-snapshot))
+          (viewport (current-buffer)))
+      (agent-shell-viewport--initialize :prompt prompt)
+      (agent-shell-viewport-compose-send)
+      (when (and snapshot (buffer-live-p viewport))
+        (with-current-buffer viewport
+          (setq agent-shell-viewport--compose-snapshot snapshot))))))
+
 (defun konix/agent-shell-viewport--interrupt-set-default-and-reply (prompt)
-  "Interrupt the agent, switch to the Default mode, then reply with PROMPT."
+  "Interrupt the agent when busy, switch to Manual mode, then reply with PROMPT."
   (konix/agent-shell-viewport--interrupt-then
-   (konix/agent-shell-viewport-set-session-mode "Manual")
-   (agent-shell-viewport-reply)
-   (insert prompt)
-   (agent-shell-viewport-compose-send)))
+   (konix/agent-shell-viewport--set-default-and-reply prompt)))
 
 (define-key agent-shell-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)
 (define-key agent-shell-viewport-view-mode-map (kbd "DEL") 'konix/agent-shell/scroll-back)

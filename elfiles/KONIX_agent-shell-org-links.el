@@ -303,6 +303,28 @@ Make sure you provide absolute paths in audit requests.%s"
          :no-focus t))
       (konix/org-agent-shell--pop-to-shell shell))))
 
+(defcustom konix/org-agent-shell-note-directory
+  (file-name-as-directory (expand-file-name "roam" perso-dir))
+  "Directory `agent-shell-with-note' link completion starts in."
+  :type 'directory
+  :group 'konix)
+
+(defun konix/org-agent-shell-with-note-complete (&optional _arg)
+  "Read a note file and return the `agent-shell-with-note' link to it."
+  (let* ((dir (file-name-as-directory
+               (expand-file-name konix/org-agent-shell-note-directory)))
+         (note (expand-file-name (read-file-name "Note: " dir dir t)))
+         (base (file-name-as-directory
+                (expand-file-name (if buffer-file-name
+                                      (file-name-directory buffer-file-name)
+                                    default-directory)))))
+    (unless (file-regular-p note)
+      (user-error "Not a note file: %s" note))
+    (concat "agent-shell-with-note:"
+            (if (equal (file-name-directory note) base)
+                (concat "./" (file-name-nondirectory note))
+              (abbreviate-file-name note)))))
+
 (with-eval-after-load 'ol
   (org-link-set-parameters
    "agent-shell"
@@ -310,6 +332,7 @@ Make sure you provide absolute paths in audit requests.%s"
    :follow #'konix/org-agent-shell-follow-link)
   (org-link-set-parameters
    "agent-shell-with-note"
+   :complete #'konix/org-agent-shell-with-note-complete
    :follow #'konix/org-agent-shell-with-note-follow-link)
   (org-link-set-parameters
    "agent-shell-tree"

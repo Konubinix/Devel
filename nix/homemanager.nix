@@ -225,7 +225,6 @@ in
       pavucontrol
       pasystray
       ffmpeg
-      yt-dlp
       git-annex
       # gmpc did not find the correct name so far
 

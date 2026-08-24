@@ -1226,33 +1226,6 @@ rather than in whatever this function returned to."
                              (funcall submit))))
           (setq konix/mcp-server--pending-submit token))))))
 
-(defun konix/mcp-server-interrupt-agent (buddy-name from-buddy message)
-  "Interrupt coordinated buddy BUDDY-NAME, as FROM-BUDDY, and ask it MESSAGE.
-
-Cancels the buddy's in-flight turn and submits a prompt asking MESSAGE.
-The interrupt bypasses the coord task cycle, so the prompt tells the
-buddy to reply via coord_send_message to FROM-BUDDY, then resume waiting;
-collect the reply as FROM-BUDDY with coord_wait/coord_get_messages.
-FROM-BUDDY must already be registered, else this refuses to run.
-
-MCP Parameters:
-  buddy-name - The buddy to interrupt
-  from-buddy - Your coord name (must be registered); the buddy replies here
-  message - What to ask the buddy"
-  (mcp-server-lib-with-error-handling
-   (let* ((buddy-name (decode-coding-string buddy-name 'utf-8))
-          (from-buddy (decode-coding-string from-buddy 'utf-8))
-          (message (decode-coding-string message 'utf-8))
-          (buffer (konix/mcp-server--buffer-for-buddy buddy-name)))
-     (unless buffer
-       (error "No coordinated buddy found with name '%s'" buddy-name))
-     (unless (konix/mcp-server--coord-registered-p from-buddy)
-       (error "from-buddy '%s' is not registered in the coordination system" from-buddy))
-     (konix/mcp-server--interrupt-and-submit
-      buffer
-      (format "You were INTERRUPTED out-of-band by \"%s\" (not a coord task, so nothing to coord_complete_task):\n\n%s\n\nReply with coord_send_message to_buddy=\"%s\" (a plain shell answer will NOT reach them), then call coord_wait to resume."
-              from-buddy message from-buddy))
-     (format "Interrupted '%s'; told it to reply via coord to '%s'." buddy-name from-buddy))))
 
 (defun konix/mcp-server--nudge-prompt (payload from-buddy)
   "The prompt handing PAYLOAD over, sent by FROM-BUDDY."

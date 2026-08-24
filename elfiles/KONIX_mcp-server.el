@@ -707,9 +707,6 @@ MCP Parameters:
       :id "list_potential_buddies"
       :description "List every agent-shell buffer in this Emacs with the name that reaches it, including buddies not registered with coord. Use this when coord_list_buddies does not show who you need: an unregistered buddy is still reachable (a message to its name is force-fed into its buffer) but its name is generated and unguessable. Each row gives that name plus directory, model, buffer, status and inbox count, to tell the sessions apart."
       :read-only t)
-     (konix/mcp-server-interrupt-agent
-      :id "interrupt_buddy"
-      :description "Interrupt a buddy mid-turn and ask it something, useful when you need a report from it urgently and cannot wait for the normal coord task cycle. Since this bypasses the task cycle, the buddy replies via coord_send_message to from-buddy (your coord name, which must already be registered); collect it with coord_wait/coord_get_messages.")
      (konix/mcp-server-set-governing-note
       :id "set_governing_note"
       :description "Bind a governing note to YOUR session so you can later call spawn_auditor with no note path. Pass the absolute path to the org note whose principles govern this work. The MCP servers the note declares with #+MCP_SERVERS: are enabled for the session (and for its auditors). Use this ONLY when your session was NOT opened via an agent-shell-with-note link and has no note bound yet. This is write-once: if a note is already bound, the call errors — you must never change your own governing note, only the user may rebind it. When in doubt whether a note is already bound, just try spawn_auditor first; only reach for this if it errors that no note is bound.")

@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'color)
 (require 'plz)
 (require 'term)
 
@@ -252,6 +253,12 @@ Returns a float between 0 and 100."
          (elapsed (- now window-start)))
     (min 100.0 (max 0.0 (* 100.0 (/ elapsed (float interval-seconds)))))))
 
+(defcustom konix/claude-code-usage-cache-lifetime 600
+  "Seconds a `konix/claude-code---usage' result is served from the cache.
+Also the rate at which displays of it, such as the *Spawn Tree* header,
+have anything new to show."
+  :type 'number)
+
 (defvar konix/claude-code--usage-cache nil
   "Cache for `konix/claude-code---usage' result.")
 (defvar konix/claude-code--usage-cache-time nil
@@ -279,7 +286,7 @@ so the caller can inspect status + rate-limit headers uniformly."
 ;;;###autoload
 (defun konix/claude-code---usage ()
   "Get Claude Code API usage information.
-Caches the result for 10 minutes.
+Caches the result for `konix/claude-code-usage-cache-lifetime' seconds.
 
 Makes a minimal API call to retrieve rate limit headers from the Anthropic API.
 Returns usage information including:
@@ -290,7 +297,8 @@ Returns usage information including:
        (not current-prefix-arg)
        konix/claude-code--usage-cache
        konix/claude-code--usage-cache-time
-       (< (- (float-time) konix/claude-code--usage-cache-time) 600))
+       (< (- (float-time) konix/claude-code--usage-cache-time)
+          konix/claude-code-usage-cache-lifetime))
       konix/claude-code--usage-cache
     (let* ((token (konix/claude-code--ensure-valid-credentials))
            (response (konix/claude-code--call-rate-limit-probe token))
@@ -344,6 +352,73 @@ Returns usage information including:
       (setq konix/claude-code--usage-cache result
             konix/claude-code--usage-cache-time (float-time))
       result)))
+
+(defconst konix/claude-code--usage-windows
+  '(("5h" . 18000)
+    ("7d" . 604800))
+  "The rate limit windows the API reports, and their length in seconds.")
+
+(defun konix/claude-code--usage-pace-color (wait left)
+  "Return the color for a window needing WAIT seconds of idling, LEFT to go.
+Green under pace, red once the idling would eat half of what remains: the
+same overspend is worth panicking about with hours to go and worth
+shrugging at right before a reset wipes it.  A fraction rather than
+percentage points, so both windows share the scale."
+  (let* ((over (/ wait (max 1.0 left)))
+         (hue (cond ((<= over -0.5) 120)
+                    ((>= over 0.5) 0)
+                    (t (- 60 (* 120 over)))))
+         (lightness (if (eq (frame-parameter nil 'background-mode) 'dark)
+                        0.65 0.35)))
+    (apply #'color-rgb-to-hex
+           (append (color-hsl-to-rgb (/ hue 360.0) 0.9 lightness) '(2)))))
+
+(defun konix/claude-code--usage-window-summary (result window interval)
+  "Return WINDOW's part of a one-line summary of RESULT, propertized.
+INTERVAL is WINDOW's length in seconds.  Only the utilization is read from
+RESULT; everything the clock gives is recomputed, so a summary rendered
+long after the fetch still tells the truth about the time left."
+  (let ((usage (or (alist-get (intern (format "usage_%s_percent" window)) result) 0))
+        (reset (or (alist-get (intern (format "reset_%s_secs" window)) result) 0)))
+    (if (<= reset 0)
+        (propertize (format "%s %d%% (no reset)" window usage) 'face 'shadow)
+      (let* ((elapsed (konix/claude-code--elapsed-percent reset interval))
+             (wait (* (/ (- usage elapsed) 100.0) interval)))
+        (propertize (format "%s %d%%/%d%% w:%s in %s @%s"
+                            window usage elapsed
+                            (konix/claude-code--format-duration wait)
+                            (konix/claude-code--format-time-until reset)
+                            (format-time-string
+                             (if (> interval 86400) "%a %H:%M" "%H:%M")
+                             (seconds-to-time reset)))
+                    'face `(:foreground
+                            ,(konix/claude-code--usage-pace-color
+                              wait (- reset (float-time)))))))))
+
+;;;###autoload
+(defun konix/claude-code-usage-summary ()
+  "Return a one-line propertized summary of the usage figures at hand.
+Reads the cache `konix/claude-code---usage' fills and never fetches, so a
+display redrawing often can call it for free.  Nil before the first fetch."
+  (when konix/claude-code--usage-cache
+    (let* ((json-object-type 'alist)
+           (result (json-read-from-string konix/claude-code--usage-cache)))
+      (concat
+       (mapconcat (lambda (window)
+                    (konix/claude-code--usage-window-summary
+                     result (car window) (cdr window)))
+                  konix/claude-code--usage-windows
+                  "   ")
+       (propertize
+        (format "  (%s/%s)"
+                (format-time-string
+                 "%H:%M" (seconds-to-time konix/claude-code--usage-cache-time))
+                (format-time-string
+                 "%H:%M" (seconds-to-time
+                          (+ konix/claude-code--usage-cache-time
+                             konix/claude-code-usage-cache-lifetime))))
+        'face 'shadow
+        'help-echo "Usage figures: fetched at / refreshed again at")))))
 
 ;;;###autoload
 (defun konix/claude-code-usage ()

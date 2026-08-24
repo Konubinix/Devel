@@ -39,10 +39,24 @@
 ;; let notmuch decide which identity is the default
 (setq-default gnus-alias-default-identity nil)
 
-(keymap-set message-mode-map "C-<tab>" 'konix/notmuch-message-completion-toggle)
 (keymap-set message-mode-map "C-c I" 'gnus-alias-select-identity)
 (keymap-set message-mode-map "C-c i" 'konix/gnus-alias-determine-identity)
 (keymap-set message-mode-map "C-c o m" 'konix/org-mime-htmlize-current)
+
+(defun konix/message-completion-function ()
+  "redo message-completion-function so that it calls the function for real.
+
+ The original one returns a lambda that is never called"
+  (let ((alist message-completion-alist))
+    (while (and alist
+                (let ((mail-abbrev-mode-regexp (caar alist)))
+                  (not (mail-abbrev-in-expansion-header-p))))
+      (setq alist (cdr alist)))
+    (when (cdar alist)
+      (let ((fun (cdar alist)))
+        (funcall fun)
+        ))))
+
 
 (defun konix/message-mode-hook ()
   (visual-line-mode 1)
@@ -50,7 +64,7 @@
 
   (orgtbl-mode)
   (footnote-mode)
-  ;(orgalist-mode 1)
+                                        ;(orgalist-mode 1)
   )
 (add-hook 'message-mode-hook
                   'konix/message-mode-hook)

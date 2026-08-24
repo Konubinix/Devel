@@ -24,25 +24,27 @@
 
 ;;; Code:
 
-(require 'notmuch-address)
+(require 'notmuch-addr)
 (require 'ol-notmuch)
 (require 'notmuch-tree)
 (require 'thingatpt)
 (require 'uuidgen)
 (require 'gnus-alias)
 
+(notmuch-addr-setup)
+
 (defun konix/notmuch/record-url-to-ril-unflag-and-next (url)
   (interactive
    (list
-        (thing-at-point 'url)
-        )
+    (thing-at-point 'url)
+    )
    )
   (async-shell-command
    (format
-        "konix_ril_save_url.sh '%s' && konix_display.py 'Saved %s'"
-        url
-        url
-        )
+    "konix_ril_save_url.sh '%s' && konix_display.py 'Saved %s'"
+    url
+    url
+    )
    )
   (konix/notmuch-show-unflag-and-next)
   )
@@ -130,7 +132,6 @@ Message-Id: <%s>" id)
 (setq-default mm-default-directory mailcap-download-directory)
 (setq-default notmuch-crypto-process-mime t)
 (setq-default notmuch-archive-tags '("-inbox" "-unread" "-later"))
-(setq-default notmuch-address-command 'internal)
 
 (defface konix/notmuch-search-flagged
   '(
@@ -523,29 +524,6 @@ Message-Id: <%s>" id)
     )
   )
 
-
-(defun konix/notmuch-message-completion-toggle ()
-  (interactive)
-  (require 'notmuch)
-  (let* (
-         (notmuch-address-message-alist-member
-          (cons notmuch-address-completion-headers-regexp
-                #'notmuch-address-expand-name)
-          )
-         (need_to_remove (not (not (member notmuch-address-message-alist-member
-                                           message-completion-alist))))
-         (msg (if need_to_remove "Disable" "Enable"))
-         )
-        (if need_to_remove
-                (setq message-completion-alist (remove
-                                                                                notmuch-address-message-alist-member
-                                                                                message-completion-alist))
-          (add-to-list 'message-completion-alist
-                                   notmuch-address-message-alist-member)
-          )
-        (message "%s of notmuch completion" msg)
-        )
-  )
 (defun konix/notmuch-keymap-set-search-show (key function)
   (keymap-set notmuch-show-mode-map key function)
   (keymap-set notmuch-search-mode-map key function)

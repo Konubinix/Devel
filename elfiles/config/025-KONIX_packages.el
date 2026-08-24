@@ -168,6 +168,7 @@
   (use-package miniedit :commands (miniedit))
   (use-package multiple-cursors)
   (use-package nix-mode :commands (nix-mode))
+  (use-package notmuch-addr)
   (use-package ol-emacs-slack :straight (:type git :host github :repo "ag91/ol-emacs-slack"))
   (use-package ol-notmuch)
   (use-package orderless)

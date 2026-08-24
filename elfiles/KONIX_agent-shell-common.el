@@ -26,12 +26,13 @@
 (require 'cl-lib)
 (require 'map)
 (require 'seq)
+(require 'KONIX_agent-shell-store)
 
 ;; (setq-default acp-logging-enabled t)
 (setq-default acp-logging-enabled nil)
 (setq-default agent-shell-prefer-viewport-interaction t)
 (setq-default agent-shell-session-strategy 'new)
-(setq-default agent-shell-anthropic-default-model-id "sonnet")
+(setq-default agent-shell-anthropic-default-model-id nil)
 
 (let ((script (expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory)))
   (unless (file-exists-p script)
@@ -210,48 +211,6 @@ shell buffer so subscribers run there."
 
 (advice-add 'agent-shell--update-fragment :after
             #'konix/agent-shell--emit-prose-event)
-
-;;; Per-session persisted attributes -------------------------------------------
-;; A small disk-backed store mapping an agent-shell SESSION-ID to a value (the
-;; model last used in it, the note governing it, ...).  Generalised so each
-;; attribute is one store instance rather than its own copy of the
-;; load/get/put dance.
-
-(cl-defstruct (konix/agent-shell-session-store
-               (:constructor konix/agent-shell-session-store-create))
-  file       ; absolute path the alist is persisted to
-  alist      ; (SESSION-ID . VALUE) pairs
-  loaded)    ; non-nil once read from disk
-
-(defun konix/agent-shell-session-store--ensure-loaded (store)
-  (unless (konix/agent-shell-session-store-loaded store)
-    (setf (konix/agent-shell-session-store-alist store)
-          (let ((file (konix/agent-shell-session-store-file store)))
-            (when (file-exists-p file)
-              (with-temp-buffer
-                (insert-file-contents file)
-                (ignore-errors (read (current-buffer))))))
-          (konix/agent-shell-session-store-loaded store) t)))
-
-(defun konix/agent-shell-session-store-get (store session-id)
-  "Return the value stored for SESSION-ID in STORE, or nil."
-  (when session-id
-    (konix/agent-shell-session-store--ensure-loaded store)
-    (cdr (assoc session-id (konix/agent-shell-session-store-alist store)))))
-
-(defun konix/agent-shell-session-store-put (store session-id value)
-  "Persist VALUE for SESSION-ID in STORE (no-op when already equal)."
-  (when (and session-id value)
-    (konix/agent-shell-session-store--ensure-loaded store)
-    (unless (equal value (cdr (assoc session-id
-                                     (konix/agent-shell-session-store-alist store))))
-      (setf (alist-get session-id (konix/agent-shell-session-store-alist store)
-                       nil nil #'equal)
-            value)
-      (let ((file (konix/agent-shell-session-store-file store)))
-        (make-directory (file-name-directory file) t)
-        (with-temp-file file
-          (prin1 (konix/agent-shell-session-store-alist store) (current-buffer)))))))
 
 ;;; Per-session governing note -------------------------------------------------
 ;; The note whose principles an audit buddy spawned from a session must hold.

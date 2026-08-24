@@ -82,30 +82,46 @@
          (* (not (any ".\n"))) (or "test" "tests" "spec" "specs"))
      said)))
 
-(konix/agent-shell-define-tool-evaluator "possible-insecable-character-failure" (tool-call)
-  "Match an Edit on a `.org' note that failed with an OLD_STRING-not-found
-error -- the fingerprint of espaces insécables (U+00A0) breaking the exact
-match.  Cheap alist gates first, then the `:content' failure text, so other
-edit failures (unread file, stale read, perms) do not trigger."
+(defun konix/agent-shell-steering--desinsecable (string)
+  "STRING with its espaces insécables (U+00A0) turned into plain spaces."
+  (string-replace (string #x00a0) " " string))
+
+(defun konix/agent-shell-steering--file-text (file)
+  "Contents of FILE, from a live buffer visiting it when there is one."
+  (when (stringp file)
+    (if-let ((buf (find-buffer-visiting file)))
+        (with-current-buffer buf
+          (buffer-substring-no-properties (point-min) (point-max)))
+      (when (file-readable-p file)
+        (with-temp-buffer (insert-file-contents file) (buffer-string))))))
+
+(konix/agent-shell-define-tool-evaluator "insecable-character-failure" (tool-call)
+  "Match an OLD_STRING-not-found Edit on a `.org' note whose OLD_STRING would
+have been found had the espaces insécables (U+00A0) been plain spaces."
   (let* ((raw (map-elt tool-call :raw-input))
-         (file (and (listp raw) (map-elt raw 'file_path))))
+         (file (and (listp raw) (map-elt raw 'file_path)))
+         (old (and (listp raw) (map-elt raw 'old_string))))
     (and (equal (map-elt tool-call :status) "failed")
          (equal (map-elt tool-call :kind) "edit")
-         (stringp file)
+         (stringp file) (stringp old)
          (string-match-p "\\.org\\'" file)
-         (let ((text (mapconcat
-                      (lambda (item) (or (map-nested-elt item '(content text)) ""))
-                      (append (map-elt tool-call :content) nil) "\n"))
+         (let ((failure (mapconcat
+                         (lambda (item) (or (map-nested-elt item '(content text)) ""))
+                         (append (map-elt tool-call :content) nil) "\n"))
                (case-fold-search t))
-           (string-match-p "not found in file\\|string to replace not found" text)))))
+           (string-match-p "not found in file\\|string to replace not found" failure))
+         (when-let ((contents (konix/agent-shell-steering--file-text file)))
+           (string-match-p
+            (regexp-quote (konix/agent-shell-steering--desinsecable old))
+            (konix/agent-shell-steering--desinsecable contents))))))
 
 ;;; The policy -----------------------------------------------------------------
 
 (defcustom konix/agent-shell-steering-rules-global
   '(
     ("@background" . "Use foreground and the sleep mcp tool if needed")
-    ("@possible-insecable-character-failure"
-     . "That edit to a .org note failed. On a typeset note the usual cause is espaces insécables (U+00A0), which defeat the exact string match. Do NOT re-anchor around it: run the note_strip_insecables MCP tool on the file, redo all edits, then note_insecables to restore.")
+    ("@insecable-character-failure"
+     . "That edit to a .org note failed on espaces insécables (U+00A0): its OLD_STRING is in the file, spelled with insecables where you used plain spaces. Do NOT re-anchor around it: run the note_strip_insecables MCP tool on the file, redo all edits, then note_insecables to restore.")
     )
   "GLOBAL (KEY . GUIDANCE) steering rules; opt-in (steering cancels turns).
 KEY matches as in `konix/agent-shell-tool-blacklist-global'."

@@ -34,6 +34,9 @@
 (setq-default agent-shell-session-strategy 'new)
 (setq-default agent-shell-anthropic-default-model-id nil)
 
+(defconst konix/agent-shell-default-model-id "default"
+  "Model id standing for the agent's own default.")
+
 (let ((script (expand-file-name "emacs-mcp-stdio.sh" user-emacs-directory)))
   (unless (file-exists-p script)
     (mcp-server-lib-install)))

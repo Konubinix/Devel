@@ -26,6 +26,7 @@
 (require 'map)
 (require 'seq)
 (require 'KONIX_agent-shell-common)
+(require 'KONIX_agent-shell-model)
 (require 'KONIX_agent-shell-permissions)
 (require 'KONIX_agent-shell-resume)
 
@@ -250,8 +251,91 @@ the watch torn down."
                            nil)
                      (agent-shell-unsubscribe :subscription token))))))))))
 
-(defun konix/org-agent-shell-with-note-follow-link (link &optional _arg)
-  "Open a fresh Opus agent-shell primed with the org note LINK.
+;;; Which provider/model edits the note ---------------------------------------
+;; A with-note link may name its agent and model as a query on the note path:
+;; "./note.org?agent=claude&model=opus".  Naming them in the link is what makes
+;; them known without a session, hence exportable.
+
+(defun konix/org-agent-shell--nonempty (string)
+  "Return STRING trimmed, or nil when it is nil or blank."
+  (when-let* ((string (and (stringp string) (string-trim string)))
+              ((not (string-empty-p string))))
+    string))
+
+(defun konix/org-agent-shell--note-link-parse (link)
+  "Split an `agent-shell-with-note' LINK into a (PATH AGENT MODEL) list.
+AGENT and MODEL come from LINK's query string and are nil when absent."
+  (let* ((link (string-trim link))
+         (query (string-search "?" link))
+         (params (when query
+                   (mapcar (lambda (pair)
+                             (pcase-let ((`(,key ,value) (split-string pair "=")))
+                               (cons key (konix/org-agent-shell--nonempty
+                                          (and value (url-unhex-string value))))))
+                           (split-string (substring link (1+ query)) "&" t)))))
+    (list (string-trim (if query (substring link 0 query) link))
+          (map-elt params "agent" nil #'equal)
+          (map-elt params "model" nil #'equal))))
+
+(defun konix/org-agent-shell--note-link-query (config model)
+  "Return the query string naming CONFIG and MODEL, empty when both are nil."
+  (if-let ((params (append
+                    (when config
+                      `(("agent" . ,(symbol-name (map-elt config :identifier)))))
+                    (when-let ((model (konix/org-agent-shell--nonempty model)))
+                      `(("model" . ,model))))))
+      (concat "?" (mapconcat (pcase-lambda (`(,key . ,value))
+                               (format "%s=%s" key (url-hexify-string value)))
+                             params "&"))
+    ""))
+
+(defun konix/org-agent-shell--config-by-name (name)
+  "Return the agent config NAME designates, or nil.
+NAME is matched case-insensitively against each config's `:identifier' and
+`:mode-line-name', exactly first then as a prefix, so both \"claude-code\"
+and \"claude\" land on the Claude Code config."
+  (when-let ((name (downcase (or (konix/org-agent-shell--nonempty name) ""))))
+    (cl-flet ((names (config)
+                (list (downcase (symbol-name (map-elt config :identifier)))
+                      (downcase (or (map-elt config :mode-line-name) "")))))
+      (unless (string-empty-p name)
+        (or (seq-find (lambda (config) (member name (names config)))
+                      agent-shell-agent-configs)
+            (seq-find (lambda (config)
+                        (seq-some (lambda (candidate)
+                                    (string-prefix-p name candidate))
+                                  (names config)))
+                      agent-shell-agent-configs))))))
+
+(defun konix/org-agent-shell--provider-label (agent)
+  "Return the display name of the agent AGENT designates.
+A nil AGENT stands for the preferred config, the one a link without an
+agent starts.  An unknown AGENT is returned as it was given."
+  (if-let ((config (or (konix/org-agent-shell--config-by-name agent)
+                       (and (not (konix/org-agent-shell--nonempty agent))
+                            (agent-shell--resolve-preferred-config)))))
+      (or (map-elt config :mode-line-name)
+          (symbol-name (map-elt config :identifier)))
+    (or (konix/org-agent-shell--nonempty agent) "an unknown agent")))
+
+(defcustom konix/org-agent-shell-note-export-format
+  "this note is edited using %s/%s"
+  "Format of an exported `agent-shell-with-note' link, given provider and model."
+  :type 'string
+  :group 'konix)
+
+(defun konix/org-agent-shell-with-note-export (link _description _backend _info)
+  "Export the `agent-shell-with-note' LINK as who edits the note.
+Provider and model come from LINK when it names them, else from the
+preferred config and `konix/agent-shell-default-model-id'."
+  (pcase-let ((`(,_path ,agent ,model)
+               (konix/org-agent-shell--note-link-parse link)))
+    (format konix/org-agent-shell-note-export-format
+            (konix/org-agent-shell--provider-label agent)
+            (or model konix/agent-shell-default-model-id))))
+
+(defun konix/org-agent-shell-with-note-follow-link (link &optional arg)
+  "Open a fresh agent-shell primed with the org note LINK.
 A relative LINK resolves against the directory of the file holding the
 link.  The note is rendered with `konix/mcp-server-render-note'
 (transclusions resolved inline) into the boot prompt, which then points
@@ -260,37 +344,59 @@ the agent at the link's file.  The note is also bound to the new session
 `spawn_auditor' with no note path.  The session boots gated: until
 `set_label' and `spawn_auditor' have both run, every other tool call is
 auto-declined (see `konix/org-agent-shell--note-boot-arm').  Prompts for a
-free-form message appended to the boot prompt (leave empty for none)."
-  (let* ((source (buffer-file-name))
-         (base (if source (file-name-directory source) default-directory))
-         (note (expand-file-name (string-trim link) base))
-         (rendered (konix/mcp-server-render-note note))
-         (message (string-trim (read-string "Message to append to the prompt: ")))
-         (prompt (format "%s
+free-form message appended to the boot prompt (leave empty for none).
+The agent and model come from LINK when it names them, else from the
+preferred config on its default model.  A prefix ARG overrides both,
+prompting for the config and then for the model."
+  (pcase-let* ((`(,path ,agent ,link-model)
+                (konix/org-agent-shell--note-link-parse link))
+               (source (buffer-file-name))
+               (base (if source (file-name-directory source) default-directory))
+               (note (expand-file-name path base))
+               (rendered (konix/mcp-server-render-note note))
+               (message (string-trim
+                         (read-string "Message to append to the prompt: ")))
+               (prompt (format "%s
 
 Now, let's focus on %s
 
 First thing, call the set_label tool (provide a meaningful name) and spawn_auditor: they must be your first two tool calls, in either order — every other tool is declined until both have run.
 
 Make sure you provide absolute paths in audit requests.%s"
-                         rendered
-                         (or source "the current file")
-                         (if (string-empty-p message)
-                             ""
-                           (concat "\n\n" message)))))
+                               rendered
+                               (or source "the current file")
+                               (if (string-empty-p message)
+                                   ""
+                                 (concat "\n\n" message)))))
     (let* ((default-directory base)
+           (config (if arg
+                       (agent-shell-select-config :prompt "Start agent: ")
+                     (or (konix/org-agent-shell--config-by-name agent)
+                         (agent-shell--resolve-preferred-config)
+                         (agent-shell-select-config :prompt "Start new agent: "))))
+           (model (unless arg
+                    (or link-model konix/agent-shell-default-model-id)))
            (shell (agent-shell--start
-                   ;; Force the default model (opus), as `konix/agent-shell-resume'
-                   ;; does, by overriding the config's :default-model-id.
-                   :config (map-insert
-                            (or (agent-shell--resolve-preferred-config)
-                                (agent-shell-select-config
-                                 :prompt "Start new agent: "))
-                            :default-model-id
-                            (lambda () "default"))
+                   :config (if model
+                               (map-insert config :default-model-id
+                                           (lambda () model))
+                             config)
                    :new-session t
                    :session-strategy 'new
                    :no-focus t)))
+      (when arg
+        (konix/agent-shell--once-init-finished shell
+          (let ((model (completing-read
+                        "Model: "
+                        (mapcar (lambda (m)
+                                  (or (map-elt m :model-id)
+                                      (map-elt m :name)))
+                                (agent-shell--get-available-models
+                                 (agent-shell--state)))
+                        nil nil)))
+            (unless (string-empty-p model)
+              (agent-shell--set-default-model
+               :shell-buffer shell :model-id model)))))
       (with-current-buffer shell
         (setq-local agent-shell-cwd-function (lambda () base))
         (konix/agent-shell-set-governing-note shell note)
@@ -309,21 +415,54 @@ Make sure you provide absolute paths in audit requests.%s"
   :type 'directory
   :group 'konix)
 
+(defun konix/org-agent-shell--model-candidates (config)
+  "Return the model ids CONFIG's live shells report.
+Completion only, any model id can be typed."
+  (delete-dups
+   (seq-mapcat
+    (lambda (shell)
+      (let ((state (buffer-local-value 'agent-shell--state shell)))
+        (when (eq (map-nested-elt state '(:agent-config :identifier))
+                  (map-elt config :identifier))
+          (seq-keep (lambda (model) (map-elt model :model-id))
+                    (agent-shell--get-available-models state)))))
+    (agent-shell-buffers))))
+
 (defun konix/org-agent-shell-with-note-complete (&optional _arg)
-  "Read a note file and return the `agent-shell-with-note' link to it."
+  "Read a note file, an agent and a model; return the link to them.
+The agent defaults to the preferred config.  An empty model is left out
+of the link, which then starts on `konix/agent-shell-default-model-id'."
   (let* ((dir (file-name-as-directory
                (expand-file-name konix/org-agent-shell-note-directory)))
          (note (expand-file-name (read-file-name "Note: " dir dir t)))
          (base (file-name-as-directory
                 (expand-file-name (if buffer-file-name
                                       (file-name-directory buffer-file-name)
-                                    default-directory)))))
+                                    default-directory))))
+         (preferred (agent-shell--resolve-preferred-config))
+         (config (or (konix/org-agent-shell--config-by-name
+                      (completing-read
+                       "Agent: "
+                       (mapcar (lambda (config)
+                                 (symbol-name (map-elt config :identifier)))
+                               agent-shell-agent-configs)
+                       nil t nil nil
+                       (when preferred
+                         (symbol-name (map-elt preferred :identifier)))))
+                     preferred))
+         (model (completing-read
+                 (format "Model for %s (empty for its default): "
+                         (konix/org-agent-shell--provider-label
+                          (and config (symbol-name
+                                       (map-elt config :identifier)))))
+                 (konix/org-agent-shell--model-candidates config))))
     (unless (file-regular-p note)
       (user-error "Not a note file: %s" note))
     (concat "agent-shell-with-note:"
             (if (equal (file-name-directory note) base)
                 (concat "./" (file-name-nondirectory note))
-              (abbreviate-file-name note)))))
+              (abbreviate-file-name note))
+            (konix/org-agent-shell--note-link-query config model))))
 
 (with-eval-after-load 'ol
   (org-link-set-parameters
@@ -333,7 +472,8 @@ Make sure you provide absolute paths in audit requests.%s"
   (org-link-set-parameters
    "agent-shell-with-note"
    :complete #'konix/org-agent-shell-with-note-complete
-   :follow #'konix/org-agent-shell-with-note-follow-link)
+   :follow #'konix/org-agent-shell-with-note-follow-link
+   :export #'konix/org-agent-shell-with-note-export)
   (org-link-set-parameters
    "agent-shell-tree"
    :store #'konix/org-agent-shell-tree-store-link

@@ -66,21 +66,12 @@ uniquified to `<saved-name><2>'."
       (when saved-note
         (konix/agent-shell-set-governing-note new-shell saved-note))
       (when saved-model-id
-        (let (token)
-          (setq token
-                (agent-shell-subscribe-to
-                 :shell-buffer new-shell
-                 :event 'init-finished
-                 :on-event
-                 (lambda (_event)
-                   (when (buffer-live-p new-shell)
-                     (with-current-buffer new-shell
-                       (agent-shell-unsubscribe :subscription token)
-                       (unless (equal saved-model-id
-                                      (agent-shell--current-model-id (agent-shell--state)))
-                         (agent-shell--set-default-model
-                          :shell-buffer new-shell
-                          :model-id saved-model-id))))))))))))
+        (konix/agent-shell--once-init-finished new-shell
+          (unless (equal saved-model-id
+                         (agent-shell--current-model-id (agent-shell--state)))
+            (agent-shell--set-default-model
+             :shell-buffer new-shell
+             :model-id saved-model-id)))))))
 
 (defun konix/agent-shell-reload ()
   "Reload the current agent-shell session, preserving its buffer name.

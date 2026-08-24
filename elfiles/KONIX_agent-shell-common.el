@@ -339,6 +339,22 @@ Non-viewport counterpart of `konix/agent-shell-viewport-set-session-mode'."
     (ignore-errors
       (agent-shell-set-session-mode))))
 
+(defmacro konix/agent-shell--once-init-finished (shell &rest body)
+  "Run BODY once in SHELL on its first `init-finished', then unsubscribe.
+By that point the session id and its available models are populated, so
+BODY can read `agent-shell--state' safely (e.g. set the model)."
+  `(let (token)
+     (setq token
+           (agent-shell-subscribe-to
+            :shell-buffer ,shell
+            :event 'init-finished
+            :on-event
+            (lambda (_event)
+              (when (buffer-live-p ,shell)
+                (with-current-buffer ,shell
+                  (agent-shell-unsubscribe :subscription token)
+                  ,@body)))))))
+
 (defun konix/agent-shell--interrupt-set-default-and-reply (prompt)
   "Interrupt the agent, switch to the Default mode, then queue PROMPT.
 `agent-shell-queue-request' queues PROMPT while busy and sends it once the

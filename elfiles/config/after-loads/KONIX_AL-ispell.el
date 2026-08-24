@@ -27,22 +27,8 @@
 
 (setq-default ispell-dictionary "francais")
 
-
-(let (
-      (flags
-       (getenv "KONIX_ASPELL_EXTRA_FLAGS")
-       )
-      )
-  (when flags
-    (setq-default ispell-extra-args
-		  (split-string
-		   flags
-		   " "
-		   t
-		   )
-		  )
-    )
-  )
+(setq-default ispell-alternate-dictionary
+              (expand-file-name "share/dict/words.txt" "~/.nix-profile"))
 
 (provide 'KONIX_AL-ispell)
 ;;; KONIX_AL-ispell.el ends here

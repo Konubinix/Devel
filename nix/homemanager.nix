@@ -153,6 +153,8 @@ in
       emacs # pgtk is the default since emacs 29+, so emacsclient -c can open graphical frames from emacs --daemon
       gcc # needed by emacs native-comp JIT (async compilation invokes gcc driver)
 
+      scowl # Spell checker oriented word lists
+
       # vcs
       gitFull # to also have gitk
 

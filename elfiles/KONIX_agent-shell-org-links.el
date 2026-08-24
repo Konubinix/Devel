@@ -27,6 +27,7 @@
 (require 'seq)
 (require 'KONIX_agent-shell-common)
 (require 'KONIX_agent-shell-permissions)
+(require 'KONIX_agent-shell-resume)
 
 (defun konix/org-agent-shell--find-shell (session-id)
   "Return the live shell buffer whose session is SESSION-ID, or nil."
@@ -117,7 +118,8 @@ matches it.  Return the shell buffer."
       (let* ((default-directory (or cwd default-directory))
              (shell (agent-shell--start
                      :config (map-insert
-                              (or (agent-shell--resolve-preferred-config)
+                              (or (konix/agent-shell-session-config session-id)
+                                  (agent-shell--resolve-preferred-config)
                                   (agent-shell-select-config
                                    :prompt "Resume with agent: "))
                               :default-model-id

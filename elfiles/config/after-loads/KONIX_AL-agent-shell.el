@@ -49,6 +49,7 @@
 (require 'KONIX_agent-shell-mcp)
 (require 'KONIX_agent-shell-naming)
 (require 'KONIX_agent-shell-model)
+(require 'KONIX_agent-shell-resume)
 (require 'KONIX_agent-shell-session-ops)
 (require 'KONIX_agent-shell-permissions)
 (require 'KONIX_agent-shell-steering)

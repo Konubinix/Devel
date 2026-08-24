@@ -100,45 +100,5 @@ changes agent-side (e.g. plan approval switching to Accept Edits) through a
 (advice-add 'agent-shell--on-notification :after
             #'konix/agent-shell--persist-pushed-mode-id)
 
-(defun konix/agent-shell-resume ()
-  "Start a fresh agent-shell session in resume mode.
-Calls `agent-shell--start' directly to forward `:session-strategy', which
-`agent-shell--dwim' drops on its `:new-shell' branch — without this, a
-second resume can't ask which session to load."
-  (interactive)
-  (unless agent-shell-prefer-viewport-interaction
-    (user-error "konix/agent-shell-resume only supports viewport mode (set `agent-shell-prefer-viewport-interaction')"))
-  (when (and (use-region-p) buffer-file-name (buffer-modified-p))
-    (save-buffer))
-  (let ((shell (agent-shell--start
-                ;; Override :default-model-id and :default-session-mode-id
-                ;; with per-session lookups so the resumed session lands back
-                ;; on the model and mode we last persisted for it (see
-                ;; `konix/agent-shell-session-models-store' and
-                ;; `konix/agent-shell-session-modes-store'), rather than the
-                ;; global `agent-shell-anthropic-default-model-id' or the
-                ;; server's resume defaults. The lambdas run in
-                ;; `agent-shell--handle' once the session id is known; nil
-                ;; (no record) skips the set and keeps the server's value.
-                :config (map-insert
-                         (map-insert (or (agent-shell--resolve-preferred-config)
-                                         (agent-shell-select-config :prompt "Start new agent: "))
-                                     :default-model-id
-                                     (lambda ()
-                                       (konix/agent-shell-session-model-get
-                                        (map-nested-elt (agent-shell--state)
-                                                        '(:session :id)))))
-                         :default-session-mode-id
-                         (lambda ()
-                           (konix/agent-shell-session-mode-get
-                            (map-nested-elt (agent-shell--state)
-                                            '(:session :id)))))
-                :new-session t
-                :session-strategy 'prompt
-                :no-focus t)))
-    (agent-shell-subscribe-to
-     :shell-buffer shell :event 'session-selected
-     :on-event (lambda (_) (agent-shell-viewport--show-buffer :shell-buffer shell)))))
-
 (provide 'KONIX_agent-shell-model)
 ;;; KONIX_agent-shell-model.el ends here

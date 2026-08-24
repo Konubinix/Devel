@@ -18,11 +18,13 @@
       in
       let
         impass = import ./default.nix { inherit pkgs; };
+        # impass's own wrapped Python, which has all deps (gpg, pygobject, etc.).
+        # Bound here, not just exposed below, so the shellHook can refer to it.
+        impassPython = "${impass}/bin/.impass-wrapped";
       in
       {
         packages.default = impass;
-        # Use impass's own wrapped Python which has all deps (gpg, pygobject, etc.)
-        impassPython = "${impass}/bin/.impass-wrapped";
+        inherit impassPython;
         devShells.default = pkgs.mkShell {
           packages = [ impass ];
           shellHook = ''

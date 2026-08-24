@@ -326,7 +326,7 @@ returned.
 MCP Parameters:
   buffer-name - Name of the buffer containing the org babel block(s).  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers.
   block-name - The #+NAME of the babel block or CALL line to execute.  Omit (or pass \"all\" / \"*\") to execute EVERY block in the buffer.
-  force - When non-nil, bypass the cache and force re-evaluation (single-block only)"
+  force - When non-nil, re-execute even if a cached result would have been returned."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
      (unless (derived-mode-p 'org-mode)
@@ -354,8 +354,12 @@ MCP Parameters:
                  (let* ((result-str
                          (if whole
                              (let ((org-confirm-babel-evaluate nil))
+                               (when force
+                                 (org-babel-remove-result-one-or-many t))
                                (org-babel-execute-buffer)
-                               (format "Executed all babel blocks in buffer %s" buffer-name))
+                               (format "Executed all babel blocks in buffer %s%s"
+                                       buffer-name
+                                       (if force " (forced)" "")))
                            (let* ((src-pos (org-babel-find-named-block block-name))
                                   (call-pos (unless src-pos
                                               (konix/mcp-server--find-named-call block-name)))
@@ -366,8 +370,9 @@ MCP Parameters:
                              (let* ((info (if call-pos
                                               (org-babel-lob-get-info)
                                             (org-babel-get-src-block-info)))
-                                    (result (org-babel-execute-src-block
-                                             (when force t) info (when force '((:cache . "no"))))))
+                                    (result (progn
+                                              (when force (org-babel-remove-result info))
+                                              (org-babel-execute-src-block nil info))))
                                (if result
                                    (format "%s" result)
                                  "Block executed successfully (no result returned)")))))

@@ -276,3 +276,7 @@ primary remotes, then rebuilds them all."
           (setenv (match-string 1)
                   (let ((value (match-string 2)))
                     (if (equal value "") nil value))))))
+
+(defun konix/uniquify-region ()
+    (interactive)
+    (call-interactively 'delete-duplicate-lines))

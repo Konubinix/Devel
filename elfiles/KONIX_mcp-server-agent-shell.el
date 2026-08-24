@@ -36,6 +36,7 @@
 (require 'plz)
 (require 'seq)
 (require 'color)
+(require 'face-remap)
 (require 'KONIX_mcp-server-spawn-tree-frame)
 (require 'KONIX_org-transclusion-resolve)
 
@@ -1500,6 +1501,14 @@ Marks a session whose last turn ended in an ACP error.")
 Dims the line by recessing it, while the foreground keeps its full
 color and readability.")
 
+(defface konix/mcp-server-spawn-tree-nobody-working-face
+  '((((background dark)) :background "#4a1414")
+    (((background light)) :background "#ffdcdc"))
+  "Background of the whole *Spawn Tree* buffer when no top-level agent works.")
+
+(defconst konix/mcp-server--working-statuses '(busy waiting sleeping)
+  "Statuses in which an agent progresses on its own, needing no user.")
+
 (defun konix/mcp-server--status-label (status-cons)
   "Return a short bracketed, propertized label for STATUS-CONS, a (STATUS . SEEN) cons."
   (pcase-let ((`(,status . ,seen) status-cons))
@@ -1780,6 +1789,20 @@ to others, which a discarded identity is in no position to collect."
              (error (format "Could not discard '%s': %s"
                             name (error-message-string err))))))
 
+(defun konix/mcp-server--nobody-working-p (nodes)
+  "Non-nil when no top-level agent among NODES is working.
+NODES is as produced by `konix/mcp-server--collect-agent-nodes'.  A top-level
+session stays busy while the buddies it waits on work, so its own status
+answers for its subtree.  Nil when there is no top-level agent at all."
+  (let ((roots (cl-remove-if (lambda (node)
+                               (konix/mcp-server--agent-parent (car node)))
+                             nodes)))
+    (and roots
+         (not (cl-some (lambda (node)
+                         (memq (car (konix/mcp-server--agent-status (car node)))
+                               konix/mcp-server--working-statuses))
+                       roots)))))
+
 (defun konix/mcp-server--render-spawn-tree-into (buf)
   "Render the current spawn tree into BUF using `hierarchy', preserving
 point if possible."
@@ -1820,7 +1843,11 @@ point if possible."
                       (format "  %s  [%d]\n" (nth 0 orphan) (nth 1 orphan))))))
         (goto-char (point-min))
         (forward-line (1- line))
-        (move-to-column col)))))
+        (move-to-column col))
+      (let ((want (and (konix/mcp-server--nobody-working-p nodes)
+                       'konix/mcp-server-spawn-tree-nobody-working-face)))
+        (unless (eq want (and buffer-face-mode buffer-face-mode-face))
+          (buffer-face-set want))))))
 
 (defun konix/mcp-server--spawn-tree-revert (&rest _)
   "`revert-buffer-function' for the spawn tree buffer."

@@ -730,6 +730,70 @@ Reference it as the key `@wrapped-script-run(REGEXP)'."
                   (member name allowed)))
             names)))))
 
+(defconst konix/agent-shell--sed-read-only-options
+  '("-n" "--quiet" "--silent" "-E" "-r" "--regexp-extended" "-s" "--separate"
+    "-z" "--null-data" "-u" "--unbuffered" "--posix" "--sandbox")
+  "`sed' options that cannot make it write or execute anything.
+Absent on purpose: `-i'/`--in-place' (rewrites the file) and `-f'/`--file' (a
+script we cannot see).")
+
+(defconst konix/agent-shell--sed-read-only-script-re
+  (rx-to-string
+   (let* ((regexp '(seq "/" (* (or (seq "\\" nonl) (not (any "/")))) "/"))
+          (address `(* (or ,regexp (any "0-9" "$,~+! "))))
+          (command `(or (any "pd=")
+                        (seq "s/" (* (or (seq "\\" nonl) (not (any "/")))) "/"
+                             (* (or (seq "\\" nonl) (not (any "/")))) "/"
+                             (* (any "gpiImM0-9"))))))
+     `(seq bos ,address ,command (* (seq ";" ,address ,command)) (* " ") eos)))
+  "Regexp of the sed scripts we accept: addresses, then `p', `d', `=' or a
+`s/../../' -- nothing else, since `w'/`W'/`s///w' write, `r'/`R' read more
+files and `e'/`s///e' run a shell.  Only matching what is positively read-only
+keeps a `w' command from hiding behind the `w' of a regexp like `/window/'.")
+
+(defun konix/agent-shell--path-inside-project-p (path)
+  "Non-nil when PATH is relative with no `..' hop, so it stays in the project.
+An absolute path reaches out of it -- including a `~'/`$HOME' argument, which
+`konix/agent-shell--argument-literal' has already expanded."
+  (and (not (file-name-absolute-p path))
+       (not (member ".." (split-string path "/")))))
+
+(defun konix/agent-shell--sed-read-only-p (command)
+  "Non-nil when COMMAND, a `sed' node, only reads project files and writes stdout.
+Reads the invocation as `sed OPTIONS SCRIPT FILES...', all three parts checked:
+`konix/agent-shell--sed-read-only-options',
+`konix/agent-shell--sed-read-only-script-re' and
+`konix/agent-shell--path-inside-project-p'.  An argument whose value is not
+statically knowable is refused, as are the `-e' and `-f' forms."
+  (when (konix/agent-shell--command-name-is command "sed")
+    (let* ((arguments (konix/agent-shell--command-argument-literals command))
+           (options (seq-take-while (lambda (a) (string-prefix-p "-" a))
+                                    (remq nil arguments)))
+           (script (nth (length options) arguments))
+           (files (nthcdr (1+ (length options)) arguments)))
+      (and script
+           (not (memq nil arguments))
+           (seq-every-p (lambda (o)
+                          (member o konix/agent-shell--sed-read-only-options))
+                        options)
+           (string-match-p konix/agent-shell--sed-read-only-script-re script)
+           (seq-every-p #'konix/agent-shell--path-inside-project-p files)))))
+
+(konix/agent-shell-define-tool-evaluator "read-only-sed" (tool-call)
+  "Match a lone read-only `sed', e.g.
+`sed -n \\='/from/,/to/p\\=' .agent-shell/tmp/notes.txt' -- auto-approvable.
+`sed' is in neither `konix/agent-shell-command-whitelist' nor
+`konix/agent-shell--read-only-filters' because it also writes and executes,
+so the invocation is read instead (`konix/agent-shell--sed-read-only-p').
+Combining commands is `@severalcommands'' business: here the line must be that
+`sed' alone, with no chaining nor redirection (`konix/shell-parse-chained-p')."
+  (unless (konix/shell-parse-chained-p
+           (or (konix/agent-shell--tool-call-command tool-call) ""))
+    (when-let ((root (konix/agent-shell--command-ast tool-call)))
+      (let ((commands (konix/agent-shell--command-nodes root)))
+        (and (= (length commands) 1)
+             (konix/agent-shell--sed-read-only-p (car commands)))))))
+
 (defcustom konix/agent-shell-command-whitelist
   '("diff" "echo" "grep" "sort" "head" "uniq" "which" "awk" "plantuml"
   "openscad" "argdown" "ls" "head" "true" "false" "cat")
@@ -789,6 +853,7 @@ in the project.")
     ("^bash -n")
     ("^gargdown map")
     ("^python3? -m py_compile")
+    ("@read-only-sed" . "sed that only reads project files and prints")
     ("@ghapi"))
   "GLOBAL baseline alist of (KEY . NOTE) whitelisted (auto-approved) tools.
 Applied to every session, beneath the project and session layers which

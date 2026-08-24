@@ -549,13 +549,16 @@ MCP Parameters:
   buffer-name - Name of the org-mode buffer to re-indent.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
-     (unless (derived-mode-p 'org-mode)
-       (error "Buffer %s is not in org-mode" buffer-name))
-     (save-restriction
-       (widen)
-       (indent-region (point-min) (point-max)))
-     (when (buffer-file-name) (save-buffer))
-     (format "indent: %s" buffer-name))))
+     (let ((inhibit-read-only t)
+           (org-src-preserve-indentation t)
+           (org-src-tab-acts-natively nil))
+       (unless (derived-mode-p 'org-mode)
+         (error "Buffer %s is not in org-mode" buffer-name))
+       (save-restriction
+         (widen)
+         (org-indent-region (point-min) (point-max)))
+       (when (buffer-file-name) (save-buffer))
+       (format "indent: %s" buffer-name)))))
 
 ;;; Server management tools
 

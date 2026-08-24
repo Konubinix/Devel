@@ -1597,6 +1597,9 @@ default project-based name."
 (define-derived-mode konix/mcp-server-spawn-tree-mode special-mode "Spawn-Tree"
   "Major mode for the *Spawn Tree* buffer."
   (setq-local revert-buffer-function #'konix/mcp-server--spawn-tree-revert)
+  (when konix/mcp-server-spawn-tree-show-usage
+    (setq-local header-line-format
+                '(:eval (konix/mcp-server-spawn-tree-usage-header))))
   (hl-line-mode 1))
 
 (defun konix/mcp-server--agent-parent (buf)

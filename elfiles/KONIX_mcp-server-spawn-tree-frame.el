@@ -25,7 +25,9 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'KONIX_dedicated-frame)
+(require 'KONIX_claude-code-usage)
 
 (declare-function konix/mcp-server-spawn-tree-mode "KONIX_mcp-server-agent-shell")
 (declare-function konix/mcp-server--render-spawn-tree-into "KONIX_mcp-server-agent-shell")
@@ -50,8 +52,21 @@ Set to nil to disable auto-refresh."
   :type '(choice (number :tag "Seconds") (const :tag "Off" nil))
   :group 'konix-mcp)
 
+(defcustom konix/mcp-server-spawn-tree-show-usage t
+  "Whether the *Spawn Tree* carries a header line of Claude usage figures.
+Refetched every `konix/claude-code-usage-cache-lifetime' seconds while the
+tree is displayed, which is as often as there is anything new to show."
+  :type 'boolean
+  :group 'konix-mcp)
+
 (defvar konix/mcp-server--spawn-tree-timer nil
   "Idle timer refreshing the *Spawn Tree* buffer when visible.")
+
+(defvar konix/mcp-server--spawn-tree-usage-timer nil
+  "Timer refetching the usage figures of the *Spawn Tree* header.")
+
+(defvar konix/mcp-server--spawn-tree-usage-error nil
+  "Why the last usage fetch failed, or nil when it went through.")
 
 (defun konix/mcp-server--pop-to-agent-from-tree (buf)
   "Select BUF, an agent picked from the tree, leaving the tree where it is."
@@ -63,22 +78,69 @@ Set to nil to disable auto-refresh."
                           '(display-buffer-use-some-window
                             (inhibit-same-window . t)))))
 
-(defun konix/mcp-server--spawn-tree-tick ()
-  "Auto-refresh tick: re-render *Spawn Tree* if it is displayed.
+(defun konix/mcp-server--untrigger-timer (timer)
+  "Clear TIMER's `triggered' flag, so that a `quit' cannot park it.
 
 `timer-event-handler' clears a repeating timer's `triggered' flag only when
-the tick returns normally, so a `quit' thrown out of here parks the timer in
+the tick returns normally, so a `quit' thrown out of one parks it in
 `timer-list' with the flag set and `timer_check' skips it forever.  `plz'
-waits under `with-local-quit', so any stray `C-g' does it.  Clear the flag
-ourselves and let the `quit' through to whatever it was aimed at."
+waits under `with-local-quit', so any stray `C-g' does it.  Called from an
+`unwind-protect', this clears the flag and lets the `quit' through to
+whatever it was aimed at."
+  (when (and (timerp timer)
+             ;; Not for one cancelled mid-tick (bug#14156).
+             (memq timer timer-list))
+    (setf (timer--triggered timer) nil)))
+
+(defun konix/mcp-server--spawn-tree-tick ()
+  "Auto-refresh tick: re-render *Spawn Tree* if it is displayed."
   (unwind-protect
       (let ((buf (get-buffer "*Spawn Tree*")))
         (when (and buf (get-buffer-window buf 'visible))
           (konix/mcp-server--render-spawn-tree-into buf)))
-    (when (and (timerp konix/mcp-server--spawn-tree-timer)
-               ;; Not for one cancelled mid-tick (bug#14156).
-               (memq konix/mcp-server--spawn-tree-timer timer-list))
-      (setf (timer--triggered konix/mcp-server--spawn-tree-timer) nil))))
+    (konix/mcp-server--untrigger-timer konix/mcp-server--spawn-tree-timer)))
+
+(defun konix/mcp-server--spawn-tree-usage-tick ()
+  "Refetch the usage figures of the header if the *Spawn Tree* is displayed.
+Errors are kept for the header to report rather than signalled, so that a
+revoked token or a network outage does not take the timer down with it."
+  (unwind-protect
+      (let ((buf (get-buffer "*Spawn Tree*")))
+        (when (and buf (get-buffer-window buf 'visible))
+          (setq konix/mcp-server--spawn-tree-usage-error
+                (condition-case err
+                    ;; A dead refresh token would have us ask, from a timer,
+                    ;; whether to log in again.  Declining is the only sane
+                    ;; answer here, and it turns into the error below.
+                    (cl-letf (((symbol-function 'yes-or-no-p) #'ignore))
+                      (konix/claude-code---usage)
+                      nil)
+                  (error (error-message-string err))))
+          (with-current-buffer buf (force-mode-line-update))))
+    (konix/mcp-server--untrigger-timer
+     konix/mcp-server--spawn-tree-usage-timer)))
+
+(defun konix/mcp-server--escape-mode-line-percent (string)
+  "Return STRING with every % doubled, faces intact.
+A `header-line-format' expands %-constructs, which would eat the
+percentages; `insert-and-inherit' keeps the added % in the face of the one
+it doubles."
+  (with-temp-buffer
+    (insert string)
+    (goto-char (point-min))
+    (while (search-forward "%" nil t)
+      (insert-and-inherit "%"))
+    (buffer-string)))
+
+(defun konix/mcp-server-spawn-tree-usage-header ()
+  "Return the usage figures for the *Spawn Tree* `header-line-format'.
+Runs on every redisplay, hence reads the cache and never fetches."
+  (konix/mcp-server--escape-mode-line-percent
+   (concat (or (konix/claude-code-usage-summary)
+               (propertize "usage: fetching..." 'face 'shadow))
+           (when konix/mcp-server--spawn-tree-usage-error
+             (propertize "  [stale]" 'face 'error
+                         'help-echo konix/mcp-server--spawn-tree-usage-error)))))
 
 (defun konix/mcp-server-spawn-tree-quit ()
   "Bury the *Spawn Tree* and delete the frame it got to itself.
@@ -88,6 +150,9 @@ fresh timer."
   (when (timerp konix/mcp-server--spawn-tree-timer)
     (cancel-timer konix/mcp-server--spawn-tree-timer)
     (setq konix/mcp-server--spawn-tree-timer nil))
+  (when (timerp konix/mcp-server--spawn-tree-usage-timer)
+    (cancel-timer konix/mcp-server--spawn-tree-usage-timer)
+    (setq konix/mcp-server--spawn-tree-usage-timer nil))
   (konix/dedicated-frame-quit-window))
 
 (defun konix/mcp-server--goto-button-for-shell (shell-buf)
@@ -109,7 +174,8 @@ It gets a frame of its own, per `konix/mcp-server-spawn-tree-frame-parameters',
 dedicated so that picking an agent there shows it in another frame.
 The buffer auto-refreshes every `konix/mcp-server-spawn-tree-refresh-interval'
 seconds while displayed; press `g' to refresh manually, `q' to delete the
-frame."
+frame.  Its header line carries the Claude usage figures, refetched every
+`konix/claude-code-usage-cache-lifetime' seconds while displayed."
   (interactive)
   (let ((caller-shell (konix/mcp-server--caller-shell-buffer))
         (buf (get-buffer-create "*Spawn Tree*")))
@@ -129,7 +195,15 @@ frame."
       (setq konix/mcp-server--spawn-tree-timer
             (run-with-timer konix/mcp-server-spawn-tree-refresh-interval
                             konix/mcp-server-spawn-tree-refresh-interval
-                            #'konix/mcp-server--spawn-tree-tick)))))
+                            #'konix/mcp-server--spawn-tree-tick)))
+    (when konix/mcp-server-spawn-tree-show-usage
+      (when (timerp konix/mcp-server--spawn-tree-usage-timer)
+        (cancel-timer konix/mcp-server--spawn-tree-usage-timer))
+      ;; Poll far more often than the figures can change, so that a fetch
+      ;; landing off-schedule cannot push the next one a whole cache away:
+      ;; a tick finding them warm costs a float comparison.
+      (setq konix/mcp-server--spawn-tree-usage-timer
+            (run-with-timer 0 60 #'konix/mcp-server--spawn-tree-usage-tick)))))
 
 (provide 'KONIX_mcp-server-spawn-tree-frame)
 ;;; KONIX_mcp-server-spawn-tree-frame.el ends here

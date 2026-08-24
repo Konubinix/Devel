@@ -1945,6 +1945,16 @@ Also clears any disabled marker so it does not outlive the rule."
           (konix/agent-shell-policy--remove-project off key))))
     (konix/agent-shell-panel--refresh)))
 
+(defun konix/agent-shell--permission-key-maybe-insert (command)
+  "Run COMMAND, unless in `agent-shell-mode' at the prompt, where we self-insert.
+Mirrors `konix/agent-shell/scroll-or-track' so bare permission keys stay
+typeable while composing a message and only open the panel when reading output."
+  (if (and (eq major-mode 'agent-shell-mode)
+           (shell-maker-point-at-last-prompt-p)
+           (not (shell-maker-busy)))
+      (self-insert-command 1)
+    (command-execute command)))
+
 ;;;###autoload
 (defun konix/agent-shell/blacklist-menu ()
   "Open the tool-blacklist control panel for global/project/session editing."
@@ -1959,8 +1969,14 @@ Also clears any disabled marker so it does not outlive the rule."
   (konix/agent-shell-panel-open
    (konix/agent-shell--policy-panel konix/agent-shell--whitelist)))
 
+(define-key agent-shell-mode-map               (kbd "B")
+            (lambda () (interactive) (konix/agent-shell--permission-key-maybe-insert #'konix/agent-shell/blacklist-menu)))
 (define-key agent-shell-viewport-view-mode-map (kbd "B") #'konix/agent-shell/blacklist-menu)
+(define-key agent-shell-mode-map               (kbd "W")
+            (lambda () (interactive) (konix/agent-shell--permission-key-maybe-insert #'konix/agent-shell/whitelist-menu)))
 (define-key agent-shell-viewport-view-mode-map (kbd "W") #'konix/agent-shell/whitelist-menu)
+(define-key agent-shell-mode-map               (kbd "I")
+            (lambda () (interactive) (konix/agent-shell--permission-key-maybe-insert #'konix/agent-shell-describe-permission)))
 (define-key agent-shell-viewport-view-mode-map (kbd "I") #'konix/agent-shell-describe-permission)
 
 (provide 'KONIX_agent-shell-permissions)

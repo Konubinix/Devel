@@ -14,4 +14,28 @@
 
 # Upstream (switch back when the version on npm is good enough):
 source _ko_npx.sh
+
+# Backend selection is passed explicitly by Emacs (per session) so a session
+# keeps its backend across reload/resume. Default: anthropic.
+BACKEND="orcarouter"
+BACKEND="anthropic"
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --backend) BACKEND="$2"; shift 2;;
+        --) shift; break;;
+        *) break;;
+    esac
+done
+
+case "$BACKEND" in
+    orcarouter)
+        export ANTHROPIC_BASE_URL="https://api.orcarouter.ai"
+        export ANTHROPIC_AUTH_TOKEN="your api key here"
+        export ANTHROPIC_MODEL="tencent/hy3"
+        ;;
+    anthropic)
+        unset ANTHROPIC_BASE_URL ANTHROPIC_AUTH_TOKEN ANTHROPIC_MODEL
+        ;;
+esac
+
 npx_run @agentclientprotocol/claude-agent-acp "$@"

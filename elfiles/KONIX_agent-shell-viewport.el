@@ -230,6 +230,7 @@ the compose snapshot, restored after the send because
 (define-key agent-shell-viewport-view-mode-map (kbd "h") 'konix/agent-shell-viewport-reply-hello)
 (define-key agent-shell-viewport-view-mode-map (kbd "t") 'konix/agent-shell-viewport-reply-try-again)
 (define-key agent-shell-viewport-view-mode-map (kbd "T") 'konix/mcp-server-show-spawn-tree)
+(define-key agent-shell-viewport-view-mode-map (kbd "P") 'konix/agent-shell-pop-to-buffer)
 (define-key agent-shell-viewport-view-mode-map (kbd "U") 'konix/claude-code-usage)
 (define-key agent-shell-viewport-view-mode-map (kbd "o") 'konix/agent-shell-viewport-reply-go-ahead)
 (define-key agent-shell-viewport-view-mode-map (kbd "<delete>") 'konix/agent-shell-viewport-interrupt-no-confirm)

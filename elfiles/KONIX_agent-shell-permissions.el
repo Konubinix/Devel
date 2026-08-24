@@ -656,20 +656,40 @@ the fields are mere query parameters and it stays a read.  Tokenized with
      (or (seq-some (lambda (m) (string-match-p read-method-re m)) method-tokens)
          (not (seq-some (lambda (tk) (string-match-p field-re tk)) tokens))))))
 
+(defun konix/agent-shell--command-sans-stdout-redirect (command)
+  "Return COMMAND without its trailing `> FILE', when it has a plain one."
+  (or (car (konix/shell-parse-split-stdout-redirect command)) command))
+
+(konix/agent-shell-define-tool-evaluator "writes-outside" (tool-call &optional directory)
+  "Match a line redirecting its output anywhere but inside DIRECTORY.
+Resolved with `file-in-directory-p', so neither a `..' hop nor a symlink walks
+out of DIRECTORY.  A redirection too tangled to read (`2>', `&>', several of
+them), a missing DIRECTORY and no DIRECTORY at all all match, so an unreadable
+write counts as a write.  Reference it as `@writes-outside(DIRECTORY)'."
+  (let* ((line (or (konix/agent-shell--tool-call-command tool-call) ""))
+         (redirect (konix/shell-parse-split-stdout-redirect line)))
+    (cond
+     (redirect
+      (not (and directory
+                (file-in-directory-p (expand-file-name (nth 1 redirect))
+                                     (expand-file-name directory)))))
+     ((string-match-p ">" (konix/shell-parse-mask-inert-spans line)) t))))
+
 (konix/agent-shell-define-tool-evaluator "ghapi" (tool-call)
   "Match read-only `gh api' calls (so they can be auto-approved).
 True only when the whole command line *is* that read -- never a `gh api'
 buried in a larger one-liner that also does unrelated work:
 - it must not chain beyond a single pipeline (no `;', `&', `&&', `||', `<',
-  `>', subshell, backtick or `$(...)' -- see `konix/shell-parse-chained-p',
-  which respects quoting);
+  subshell, backtick or `$(...)' -- see `konix/shell-parse-chained-p', which
+  respects quoting);
 - its first pipeline stage must be a read-only `gh api' (see
   `konix/agent-shell--ghapi-read-segment-p');
 - any further pipeline stages must be read-only filters such as `jq' (see
   `konix/agent-shell--read-only-filters'), so `gh api ... | jq ...' is fine
   while `gh api ... | sh' is not.
 Anything else falls through to a manual prompt."
-  (let ((command (or (konix/agent-shell--tool-call-command tool-call) "")))
+  (let ((command (konix/agent-shell--command-sans-stdout-redirect
+                  (or (konix/agent-shell--tool-call-command tool-call) ""))))
     (and
      (not (string-empty-p (string-trim command)))
      (not (konix/shell-parse-chained-p command))
@@ -736,8 +756,8 @@ the reference, e.g. `@whitelisted-commands(ls, gh pr check)'."
 ;; (buffer-local) axes.
 
 (defcustom konix/agent-shell-tool-blacklist-global
-  `(("\\(^\\(Write\\|Read\\) /tmp/[a-zA-Z0-9_.-]+$\\|> /tmp\\)" . "Write temp files into ./.agent-shell/tmp/ instead")
-    ("^Edit /tmp/[a-zA-Z0-9_.-]+$" . "Write temp files into ./.agent-shell/tmp/ instead")
+  `(("\\(^\\(Write\\|Read\\|Edit\\) /tmp/[a-zA-Z0-9_.-]+$\\)" . "Write temp files into ./.agent-shell/tmp/ instead")
+    ("@writes-outside(.agent-shell/tmp)" . "Redirect output into ./.agent-shell/tmp/ instead")
     ("@severalcommands" . "One command at a time. Use redirection to a file in ./.agent-shell/tmp if needing to chain stuff")
     ("@lost-search" . "You are lost, simply ask the user for guidance. Don't try to do all by yourself, make a team with the user.")
     ("@hascommand(cd)" . "Don't cd")
@@ -768,7 +788,8 @@ in the project.")
     ("^mkdir -p \\(./\\)?.agent-shell/tmp$")
     ("^bash -n")
     ("^gargdown map")
-    ("^python3? -m py_compile"))
+    ("^python3? -m py_compile")
+    ("@ghapi"))
   "GLOBAL baseline alist of (KEY . NOTE) whitelisted (auto-approved) tools.
 Applied to every session, beneath the project and session layers which
 shadow it.  KEY matches as in `konix/agent-shell-tool-blacklist-global';

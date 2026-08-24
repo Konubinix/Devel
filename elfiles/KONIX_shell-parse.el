@@ -35,6 +35,7 @@
 ;;   without quoted content (URLs, JSON) causing false positives.
 ;; - `konix/shell-parse-chained-p': does the line chain beyond one pipeline?
 ;; - `konix/shell-parse-pipeline-segments': split a pipeline into its stages.
+;; - `konix/shell-parse-split-stdout-redirect': peel a trailing `> FILE' off.
 ;;
 ;; Quoting note: double quotes are intentionally NOT masked, because the shell
 ;; still performs `$(...)' command substitution inside them.  The bias is
@@ -138,6 +139,51 @@ strings -- the whole COMMAND as a single element when it has no pipe."
       (setq i (1+ i)))
     (push (substring command start) segments)
     (mapcar #'string-trim (nreverse segments))))
+
+(defun konix/shell-parse-split-stdout-redirect (command)
+  "Split COMMAND into its body and a trailing plain stdout redirection.
+Returns (BODY TARGET APPEND), both unjudged, or nil when COMMAND has no
+redirection or one we decline to read: `<', `2>', `>&', `>|', several of them,
+an empty body, or a target that is not a single trailing word.  Both forms
+sending stderr along with stdout to the one file are read: `&>' and a dropped
+fd duplication (`2>&1' names no file, so it is not counted as a redirection).
+Quoting is respected via `konix/shell-parse-mask-inert-spans'."
+  (let* ((masked (konix/shell-parse-mask-inert-spans command))
+         (clean (copy-sequence command))
+         (runs '())
+         (position 0))
+    (while (string-match "[0-9]*>&[0-9]+" masked position)
+      (setq position (match-end 0))
+      (let ((index (match-beginning 0)))
+        (while (< index position)
+          (aset masked index ?\s)
+          (aset clean index ?\s)
+          (setq index (1+ index)))))
+    (setq position 0)
+    (while (string-match ">+" masked position)
+      (push (cons (match-beginning 0) (match-end 0)) runs)
+      (setq position (match-end 0)))
+    (when (and (= (length runs) 1)
+               (not (string-match-p "<" masked)))
+      (let* ((beginning (caar runs))
+             (end (cdar runs))
+             (before (and (> beginning 0) (aref masked (1- beginning))))
+             (after (and (< end (length masked)) (aref masked end)))
+             ;; `&>' starting a word is the both-streams form, not a `&' job
+             (both (and (eq before ?&)
+                        (or (= beginning 1)
+                            (memq (aref masked (- beginning 2))
+                                  '(?\s ?\t ?\n)))))
+             (body (substring clean 0 (if both (1- beginning) beginning)))
+             (words (konix/shell-parse-tokenize (substring clean end))))
+        (and (memq (- end beginning) '(1 2))
+             (or both
+                 (not (and before (or (eq before ?&) (<= ?0 before ?9)))))
+             (not (memq after '(?& ?|)))
+             (not (string-empty-p (string-trim body)))
+             (= (length words) 1)
+             (not (string-match-p "[|;&<>`()]" (substring masked end)))
+             (list body (car words) (= (- end beginning) 2)))))))
 
 (provide 'KONIX_shell-parse)
 ;;; KONIX_shell-parse.el ends here

@@ -7,10 +7,22 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Consumed as a plain file by nix/nixos.nix, which turns it into the
+    # global flake registry. Pinned here so it refreshes on `nix flake
+    # update` rather than being refetched whenever tarball-ttl lapses.
+    flake-registry = {
+      url = "github:NixOS/flake-registry";
+      flake = false;
+    };
   };
 
   outputs =
-    { nixpkgs, home-manager, ... }:
+    {
+      nixpkgs,
+      home-manager,
+      flake-registry,
+      ...
+    }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
@@ -36,7 +48,7 @@
       # NixOS system + home-manager (devel-only, no perso)
       nixosConfigurations."konix" = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit nixpkgs; };
+        specialArgs = { inherit nixpkgs flake-registry; };
         modules = [
           ./nix/nixos.nix
           home-manager.nixosModules.home-manager

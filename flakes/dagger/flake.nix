@@ -4,7 +4,12 @@
   inputs = {
     nixpkgs.url = "nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
-    dagger.url = "github:dagger/nix";
+    dagger = {
+      url = "github:dagger/nix";
+      # else the dagger CLI is built against dagger/nix's own nixpkgs
+      # instead of the one pinned in the registry
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

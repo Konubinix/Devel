@@ -3,6 +3,7 @@
   config,
   pkgs,
   nixpkgs,
+  flake-registry,
   ...
 }:
 
@@ -16,9 +17,33 @@
     "flakes"
   ];
 
-  # Pin nixpkgs registry so hardliases (nix profile install nixpkgs#foo)
-  # use the same nixpkgs as the system
-  nix.registry.nixpkgs.flake = nixpkgs;
+  # Registry: the upstream entries (so `nix run home-manager` and friends
+  # keep working) with our own pins layered on top. Upstream targets carry no
+  # rev, so unpinned ids are still fetched at use time; pinned ones aren't.
+  nix.registry =
+    let
+      upstream = builtins.fromJSON (
+        builtins.readFile "${flake-registry}/flake-registry.json"
+      );
+    in
+    builtins.listToAttrs (
+      map (e: {
+        name = e.from.id;
+        value.to = e.to;
+      }) upstream.flakes
+    )
+    // {
+      # Pinned so hardliases (nix profile add nixpkgs#foo) use the same
+      # nixpkgs as the system.
+      nixpkgs.flake = nixpkgs;
+    };
+
+  # Serve the above as the *global* registry rather than fetching
+  # channels.nixos.org every time tarball-ttl lapses. This is also what makes
+  # the pins reach flakes/*/flake.nix: flake inputs (eg nixpkgs.url =
+  # "nixpkgs") resolve against the global registry and skip the system one,
+  # so a pin only applies to them if it lives in this file.
+  nix.settings.flake-registry = "/etc/nix/registry.json";
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;

@@ -1,6 +1,6 @@
 {
   description = "RetroArch with cores for SNES, N64 and Game Boy Color";
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "nixpkgs";
 
   outputs = { self, nixpkgs }:
     let

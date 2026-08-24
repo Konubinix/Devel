@@ -512,15 +512,16 @@ MCP Parameters:
              (string-join
               (delq nil
                     (list
+                     ;; `reverse', not `nreverse': the tally below counts these lists.
                      (when stale
                        (format "stale — the #+RESULTS no longer matches the block body:\n%s"
-                               (string-join (nreverse stale) "\n")))
+                               (string-join (reverse stale) "\n")))
                      (when unhashed
                        (format "no-hash — a #+RESULTS without a hash (no :cache), freshness undecidable:\n%s"
-                               (string-join (nreverse unhashed) "\n")))
+                               (string-join (reverse unhashed) "\n")))
                      (when noresult
                        (format "no-result — no #+RESULTS at all (nothing rendered inline):\n%s"
-                               (string-join (nreverse noresult) "\n")))
+                               (string-join (reverse noresult) "\n")))
                      (format "%d source block(s): %d stale, %d fresh, %d undecidable, %d without result"
                              total (length stale) fresh (length unhashed) (length noresult))))
               "\n"))))))))

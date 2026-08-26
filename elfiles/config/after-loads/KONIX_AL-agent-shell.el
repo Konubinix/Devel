@@ -31,18 +31,6 @@
 (require 'KONIX_claude-code-usage)
 (require 'KONIX_claude-permissions)
 
-(define-key agent-shell-viewport-view-mode-map (kbd "<") 'beginning-of-buffer)
-(define-key agent-shell-viewport-view-mode-map (kbd ">") 'end-of-buffer)
-(define-key agent-shell-viewport-view-mode-map (kbd "g") 'beginning-of-buffer)
-(define-key agent-shell-viewport-view-mode-map (kbd "m") 'agent-shell-viewport-set-session-model)
-(define-key agent-shell-viewport-view-mode-map (kbd "G") 'end-of-buffer)
-(define-key agent-shell-mode-map (kbd "TAB") 'agent-shell-next-item)
-(define-key agent-shell-viewport-view-mode-map (kbd "RET") 'agent-shell-viewport-reply)
-(define-key agent-shell-viewport-edit-mode-map (kbd "C-<return>") 'agent-shell-viewport-compose-send)
-(define-key agent-shell-viewport-edit-mode-map (kbd "C-j") 'agent-shell-viewport-compose-send)
-(define-key agent-shell-viewport-view-mode-map (kbd "F") 'konix/agent-shell-follow-mode)
-
-
 ;;; Feature modules ----------------------------------------------------------
 (require 'KONIX_agent-shell-common)
 (require 'KONIX_agent-shell-panel)

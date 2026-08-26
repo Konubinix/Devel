@@ -930,6 +930,12 @@ local placed_by_hand = {
 	"IA agent tree",
 }
 
+-- Same, matched against the whole class instead of the name.
+local placed_by_hand_classes = {
+	".scrcpy-wrapped", -- through the nix wrapper
+	"scrcpy",
+}
+
 -- Rules to apply to new clients (through the "manage" signal).
 awful.rules.rules = {
 	-- All clients will match this rule.
@@ -965,7 +971,7 @@ awful.rules.rules = {
 				"copyq", -- Includes session name in class.
 				"pinentry",
 			},
-			class = {
+			class = gears.table.join({
 				"Konix_gtk_entry.py",
 				"Arandr",
 				"Blueman-manager",
@@ -979,10 +985,12 @@ awful.rules.rules = {
 				"Wpa_gui",
 				"veromix",
 				"xtightvncviewer",
-			},
+				"M2101K7AG",
+			}, placed_by_hand_classes),
 			-- Note that the name property shown in xprop might be set slightly after creation of the client
 			-- and the name shown there might not match defined rules here.
 			name = gears.table.join({
+				"M2101K7AG",
 				"confirm",
 				"Event Tester", -- xev.
 				"Terminator Preferences",
@@ -1005,9 +1013,9 @@ awful.rules.rules = {
 	-- ############### On top setup
 	{
 		rule_any = {
-			class = {
+			class = gears.table.join({
 				"gnuplot_qt",
-			},
+			}, placed_by_hand_classes),
 			name = placed_by_hand,
 		},
 		properties = { ontop = true },
@@ -1062,6 +1070,30 @@ awful.rules.rules = {
 	{ rule = { class = "Emulator" }, properties = { tag = "2" } },
 }
 
+-- By name, not index: streaming rearranges the xrandr layout, which renumbers the screens.
+local STREAMED_OUTPUT = "DP-1"
+
+local function streamed_screen()
+	for s in screen do
+		if s.outputs and s.outputs[STREAMED_OUTPUT] then
+			return s
+		end
+	end
+end
+
+local function is_streamed_game(c)
+	return c.valid and c.class and (c.class:match("^steam_app_") or c.class:lower() == "retroarch")
+end
+
+naughty.config.notify_callback = function(args)
+	for _, c in ipairs(client.get()) do
+		if is_streamed_game(c) and c.fullscreen then
+			return nil
+		end
+	end
+	return args
+end
+
 -- {{{ Signals
 -- Signal function to execute when a new client appears.
 client.connect_signal("manage", function(c)
@@ -1078,55 +1110,75 @@ client.connect_signal("manage", function(c)
 	-- titlebar then shows up when streaming to the projector. An awful.rules entry does not
 	-- work: being Wine/Proton clients they set their class and window state after mapping,
 	-- so the rule either does not match yet or is immediately overridden. Re-assert a little
-	-- later instead.
+	-- later instead. retroarch names itself late too, and spawns a fresh window per core.
 	gears.timer.start_new(3, function()
-		if c.valid and c.class and c.class:match("^steam_app_") then
+		if is_streamed_game(c) then
+			local s = streamed_screen()
+			if s then
+				c.screen = s
+			end
 			c.fullscreen = true
+			c:raise()
 		end
 		return false
 	end)
-
 end)
 
--- Where each of the `placed_by_hand' clients was last seen, by the name it was
--- recognized by: it is a new client every time it comes back.  Also done here
--- and not only through awful.rules, as emacs names its frames after they are
--- managed, too late for the rules above to match: the client has been tiled by
--- then and setting `floating' is what undoes that.
+-- Where each of the `placed_by_hand' clients was last seen, by the name or
+-- class it was recognized by: it is a new client every time it comes back.
+-- Also done here and not only through awful.rules, as emacs names its frames
+-- after they are managed, too late for the rules above to match: the client has
+-- been tiled by then and setting `floating' is what undoes that.
 local geometry_by_hand = {}
 
-local function place_by_hand(c)
-	if c.placed_by_hand or not c.name then
-		return
+local function key_by_hand(c)
+	for _, class in ipairs(placed_by_hand_classes) do
+		if c.class == class then
+			return class
+		end
+	end
+	if not c.name then
+		return nil
 	end
 	for _, name in ipairs(placed_by_hand) do
 		if string.find(c.name, name, 1, true) then
-			c.placed_by_hand = name
-			c.floating = true
-			c.ontop = true
-			local geometry = geometry_by_hand[name]
-			if geometry then
-				-- The tags belong to a screen, so tell it about the move,
-				-- otherwise it stays listed on the screen it was born on.
-				local s = awful.screen.getbycoord(geometry.x, geometry.y)
-				if s then
-					c.screen = s
-				end
-				c:geometry(geometry)
-				-- Whatever awesome makes of a client showing up carries on
-				-- after this, so say it again once it is done.
-				gears.timer.delayed_call(function()
-					if c.valid then
-						c:geometry(geometry)
-					end
-				end)
-			end
-			c:connect_signal("property::geometry", function(cc)
-				geometry_by_hand[name] = cc:geometry()
-			end)
-			return
+			return name
 		end
 	end
+	return nil
+end
+
+local function place_by_hand(c)
+	if c.placed_by_hand then
+		return
+	end
+	local key = key_by_hand(c)
+	if not key then
+		return
+	end
+	c.placed_by_hand = key
+	c.floating = true
+	c.ontop = true
+	local geometry = geometry_by_hand[key]
+	if geometry then
+		-- The tags belong to a screen, so tell it about the move, otherwise it
+		-- stays listed on the screen it was born on.
+		local s = awful.screen.getbycoord(geometry.x, geometry.y)
+		if s then
+			c.screen = s
+		end
+		c:geometry(geometry)
+		-- Whatever awesome makes of a client showing up carries on after this,
+		-- so say it again once it is done.
+		gears.timer.delayed_call(function()
+			if c.valid then
+				c:geometry(geometry)
+			end
+		end)
+	end
+	c:connect_signal("property::geometry", function(cc)
+		geometry_by_hand[key] = cc:geometry()
+	end)
 end
 
 client.connect_signal("manage", place_by_hand)

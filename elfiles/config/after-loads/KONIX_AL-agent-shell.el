@@ -58,6 +58,10 @@
 (require 'KONIX_agent-shell-notifications)
 (require 'KONIX_agent-shell-org-links)
 
+(require 'tracking)
+(add-to-list 'tracking-shorten-modes 'agent-shell-mode)
+(add-to-list 'tracking-shorten-modes 'agent-shell-viewport-view-mode)
+
 ;;; Shared reply commands, defined and bound once across all agent-shell keymaps
 ;; `agent-shell-diff-mode-map' lives in the `agent-shell-diff' feature, so pull
 ;; it in before `konix/agent-shell-define-reply' binds across every keymap.

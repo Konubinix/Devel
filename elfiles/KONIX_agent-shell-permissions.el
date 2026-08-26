@@ -425,13 +425,33 @@ project `.dir-locals.el' or a Claude settings file.  Composes
    '(or "@edit-dir-locals" "@edit-claude-settings")
    tool-call))
 
-(defun konix/agent-shell--command-ast (tool-call)
-  "Return the bash AST root of TOOL-CALL's command line, or nil for a non-shell
-tool.  Signals an error when the bash tree-sitter grammar is unavailable."
+(defun konix/agent-shell--bash-ast-buffer (tool-call)
+  "Return (BUFFER . ROOT) for TOOL-CALL's command line, or nil for a non-shell
+tool.  Signals an error when the bash tree-sitter grammar is unavailable.
+BUFFER owns ROOT and must be killed once done with it, which
+`konix/agent-shell--with-bash-ast' takes care of."
   (when-let ((command (konix/agent-shell--tool-call-command tool-call)))
     (unless (treesit-language-available-p 'bash)
       (error "The bash tree-sitter grammar is required (treesit-install-language-grammar 'bash)"))
-    (treesit-parse-string command 'bash)))
+    (let ((buffer (generate-new-buffer " *konix-bash-ast*" t)))
+      (with-current-buffer buffer
+        (insert command)
+        (cons buffer (treesit-parser-root-node (treesit-parser-create 'bash)))))))
+
+(defmacro konix/agent-shell--with-bash-ast (root tool-call &rest body)
+  "Bind ROOT to TOOL-CALL's bash AST root, evaluate BODY, then release the tree.
+Evaluates to nil without running BODY for a non-shell tool.
+BODY must return plain data: nodes die with the tree."
+  (declare (indent 2) (debug (symbolp form body)))
+  (let ((cell (make-symbol "cell"))
+        (buffer (make-symbol "buffer")))
+    `(when-let ((,cell (konix/agent-shell--bash-ast-buffer ,tool-call)))
+       (let ((,buffer (car ,cell))
+             (,root (cdr ,cell)))
+         (unwind-protect
+             (progn ,@body)
+           (when (buffer-live-p ,buffer)
+             (kill-buffer ,buffer)))))))
 
 (defun konix/agent-shell--command-names (root)
   "Return every command name in ROOT's AST."
@@ -543,21 +563,21 @@ nil -- when COMMANDS simply has more than one entry."
   "Match a line running a command matching one of SPECS.
 Each SPEC is a `konix/agent-shell--command-matches-p' spec (name or subcommand
 prefix), e.g. `@hascommand(cd, gh pr check)'."
-  (when-let ((root (konix/agent-shell--command-ast tool-call)))
+  (konix/agent-shell--with-bash-ast root tool-call
     (seq-some (lambda (c) (konix/agent-shell--command-matches-any-p c specs))
               (konix/agent-shell--command-nodes root))))
 
 (konix/agent-shell-define-tool-evaluator "severalcommands" (tool-call &rest specs)
   "Match a command line with several commands (matching one of SPECS, if given).
 SPECS are as in `hascommand'."
-  (when-let ((root (konix/agent-shell--command-ast tool-call)))
+  (konix/agent-shell--with-bash-ast root tool-call
     (konix/agent-shell--several-match-p
      (konix/agent-shell--command-nodes root) specs)))
 
 (konix/agent-shell-define-tool-evaluator "severaltoplevelcommands" (tool-call &rest specs)
   "Match a command line with several top-level commands (matching one of SPECS,
 if given).  SPECS are as in `hascommand'."
-  (when-let ((root (konix/agent-shell--command-ast tool-call)))
+  (konix/agent-shell--with-bash-ast root tool-call
     (konix/agent-shell--several-match-p
      (konix/agent-shell--command-nodes root t) specs)))
 
@@ -566,7 +586,7 @@ if given).  SPECS are as in `hascommand'."
 `&&', `&', subshell or `$(...)' chaining).  When SPECS is given (as in
 `hascommand'), that lone command must match one of them, so
 `@onlycommand(gh pr check)' matches `gh pr check 123' but not `gh pr create'."
-  (when-let ((root (konix/agent-shell--command-ast tool-call)))
+  (konix/agent-shell--with-bash-ast root tool-call
     (let ((commands (konix/agent-shell--command-nodes root)))
       (and (= (length commands) 1)
            (or (null specs)
@@ -588,7 +608,7 @@ if given).  SPECS are as in `hascommand'."
 (konix/agent-shell-define-tool-evaluator "git-curation" (tool-call)
   "Match when every command on the line is a `git' curation subcommand.
 So `git status && git push' does not match -- push is not curation."
-  (when-let ((root (konix/agent-shell--command-ast tool-call)))
+  (konix/agent-shell--with-bash-ast root tool-call
     (let ((commands (mapcar #'cdr (treesit-query-capture root '((command) @c)))))
       (and commands
            (seq-every-p #'konix/agent-shell--git-curation-command-p commands)))))
@@ -600,7 +620,7 @@ track of where something lives and is brute-forcing everything instead of
 asking the user for guidance.  A scan bounded to a project, or to named files,
 is left alone.  Which arguments a command really walks comes from its own
 command line grammar, see `KONIX_shell-search'."
-  (when-let ((root (konix/agent-shell--command-ast tool-call)))
+  (konix/agent-shell--with-bash-ast root tool-call
     (seq-some
      (lambda (c)
        (let ((name (konix/agent-shell--command-name c))
@@ -710,7 +730,7 @@ every command on it must be that script, `timeout', `echo', or a read-only
 filter (grep/head/...).  So the timeout value, args and any grep filter are
 free, but no extra command can be smuggled in via `;' or `|'.
 Reference it as the key `@wrapped-script-run(REGEXP)'."
-  (when-let ((root (konix/agent-shell--command-ast tool-call)))
+  (konix/agent-shell--with-bash-ast root tool-call
     (let ((commands (mapcar #'cdr (treesit-query-capture root '((command) @c))))
           (names (konix/agent-shell--command-names root))
           (allowed (append konix/agent-shell--read-only-filters '("timeout" "echo"))))
@@ -789,7 +809,7 @@ Combining commands is `@severalcommands'' business: here the line must be that
 `sed' alone, with no chaining nor redirection (`konix/shell-parse-chained-p')."
   (unless (konix/shell-parse-chained-p
            (or (konix/agent-shell--tool-call-command tool-call) ""))
-    (when-let ((root (konix/agent-shell--command-ast tool-call)))
+    (konix/agent-shell--with-bash-ast root tool-call
       (let ((commands (konix/agent-shell--command-nodes root)))
         (and (= (length commands) 1)
              (konix/agent-shell--sed-read-only-p (car commands)))))))
@@ -806,7 +826,7 @@ Each is a `konix/agent-shell--command-matches-p' spec (name or subcommand prefix
   "Match when every command on the line matches a whitelisted spec.
 The whitelist is `konix/agent-shell-command-whitelist' plus the EXTRA specs from
 the reference, e.g. `@whitelisted-commands(ls, gh pr check)'."
-  (when-let ((root (konix/agent-shell--command-ast tool-call)))
+  (konix/agent-shell--with-bash-ast root tool-call
     (let ((commands (konix/agent-shell--command-nodes root))
           (whitelist (append konix/agent-shell-command-whitelist extra)))
       (and commands
@@ -1525,21 +1545,22 @@ Parses the command line with the bash tree-sitter grammar and lists every
 another command's branch) and its flattened text -- so the reader can
 author `hascommand'/`severalcommands'/`severaltoplevelcommands' KEYs.
 Returns nil for a non-shell tool or when the grammar is unavailable."
-  (when-let ((root (ignore-errors (konix/agent-shell--command-ast tool-call)))
-             (commands (mapcar #'cdr
-                               (treesit-query-capture root '((command) @c)))))
-    (mapconcat
-     (lambda (cmd)
-       (let ((name (or (when-let ((n (treesit-node-child-by-field-name
-                                      cmd "name")))
-                         (treesit-node-text n t))
-                       "?"))
-             (text (replace-regexp-in-string
-                    "[ \t\n]+" " " (string-trim (treesit-node-text cmd t)))))
-         (format "  %s %-12s %s"
-                 (if (konix/agent-shell--toplevel-command-p cmd) "*" " ")
-                 name text)))
-     commands "\n")))
+  (when (treesit-language-available-p 'bash)
+    (konix/agent-shell--with-bash-ast root tool-call
+      (when-let ((commands (mapcar #'cdr
+                                   (treesit-query-capture root '((command) @c)))))
+        (mapconcat
+         (lambda (cmd)
+           (let ((name (or (when-let ((n (treesit-node-child-by-field-name
+                                          cmd "name")))
+                             (treesit-node-text n t))
+                           "?"))
+                 (text (replace-regexp-in-string
+                        "[ \t\n]+" " " (string-trim (treesit-node-text cmd t)))))
+             (format "  %s %-12s %s"
+                     (if (konix/agent-shell--toplevel-command-p cmd) "*" " ")
+                     name text)))
+         commands "\n")))))
 
 (defun konix/agent-shell--describe-tool-call (id tool-call)
   "Return a multi-line string describing TOOL-CALL (with id ID).

@@ -139,5 +139,8 @@
 (require 'KONIX_ement-threads)
 (require 'KONIX_ement-misc)
 
+(require 'tracking)
+(add-to-list 'tracking-shorten-modes 'ement-room-mode)
+
 (provide 'KONIX_AL-ement)
 ;;; KONIX_AL-ement.el ends here

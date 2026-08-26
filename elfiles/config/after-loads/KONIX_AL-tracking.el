@@ -26,6 +26,10 @@
 
 (setq-default tracking-sort-faces-first t)
 
+;; Shortening abbreviates against every buffer in Emacs, so start from none and
+;; let each mode opt in.  A mode left out shows its full name in the mode line.
+(setq-default tracking-shorten-modes nil)
+
 (defun konix/tracking/kill-emacs-query-function ()
   (with-temp-buffer
     (insert

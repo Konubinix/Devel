@@ -944,13 +944,14 @@ in the project.")
   "Buffer-local SESSION alist of (KEY . NOTE) whitelisted tools.")
 
 ;;; Disabled overlay -----------------------------------------------------------
-;; Per-axis enable/disable markers, one alist per axis mapping KEY -> "off"/"on"
-;; (unset = enabled).  Resolved session>project>global and subtracted from the
-;; effective policy, so a rule can be turned off without deleting it, and a
-;; global "off" overridden by a narrower "on".
+;; Per-axis enable/disable markers, one alist per axis mapping KEY ->
+;; "off"/"once"/"on" (unset = enabled).  Resolved session>project>global and
+;; subtracted from the effective policy, so a rule can be turned off without
+;; deleting it, and a global "off" overridden by a narrower "on".  "once" is a
+;; one-shot "off": the next request the rule would have matched spends it.
 
 (defcustom konix/agent-shell-tool-blacklist-disabled-global nil
-  "GLOBAL blacklist enable/disable markers (alist of KEY -> \"off\"/\"on\")."
+  "GLOBAL blacklist enable/disable markers (alist of KEY -> \"off\"/\"once\"/\"on\")."
   :type '(alist :key-type string :value-type string)
   :group 'konix)
 
@@ -961,7 +962,7 @@ in the project.")
   "SESSION blacklist enable/disable markers.")
 
 (defcustom konix/agent-shell-tool-whitelist-disabled-global nil
-  "GLOBAL whitelist enable/disable markers (alist of KEY -> \"off\"/\"on\")."
+  "GLOBAL whitelist enable/disable markers (alist of KEY -> \"off\"/\"once\"/\"on\")."
   :type '(alist :key-type string :value-type string)
   :group 'konix)
 
@@ -1246,14 +1247,19 @@ in the running session.  Keys disabled via POLICY's DISABLED-POLICY are dropped.
           (setf (alist-get key result nil t #'equal) nil))))
     result))
 
-(defun konix/agent-shell-policy--disabled-p (policy key)
-  "Non-nil when KEY resolves to \"off\" in POLICY's disabled companion."
+(defun konix/agent-shell-policy--disabled-state (policy key)
+  "Return KEY's resolved marker in POLICY's disabled companion, or nil.
+One of \"on\", \"off\" or \"once\"; nil when POLICY has no companion."
   (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
-    (equal (konix/agent-shell-policy--value-for off key) "off")))
+    (konix/agent-shell-policy--value-for off key)))
+
+(defun konix/agent-shell-policy--disabled-p (policy key)
+  "Non-nil when KEY resolves to \"off\" or \"once\" in POLICY's disabled companion."
+  (member (konix/agent-shell-policy--disabled-state policy key) '("off" "once")))
 
 (defun konix/agent-shell-policy--disable-decider (policy key)
   "Return (LEVEL . STATE) for the most-specific axis marking KEY, or nil.
-LEVEL is \"s\"/\"p\"/\"G\"; STATE its \"off\"/\"on\"."
+LEVEL is \"s\"/\"p\"/\"G\"; STATE its \"off\"/\"once\"/\"on\"."
   (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
     (cl-loop for (level . entries-fn)
              in `(("s" . ,#'konix/agent-shell-policy--session-entries)
@@ -1264,7 +1270,7 @@ LEVEL is \"s\"/\"p\"/\"G\"; STATE its \"off\"/\"on\"."
 
 (defun konix/agent-shell-policy--set-disabled (policy key level state)
   "Write KEY's marker for POLICY on LEVEL (session/project/global) to STATE.
-STATE is \"off\", \"on\", or nil to unset it (defer to the broader axis)."
+STATE is \"off\", \"once\", \"on\", or nil to unset it (defer to the broader axis)."
   (let ((off (konix/agent-shell-policy-disabled-policy policy)))
     (pcase level
       ('global  (if state (konix/agent-shell-policy--set-global off key state)
@@ -1273,6 +1279,11 @@ STATE is \"off\", \"on\", or nil to unset it (defer to the broader axis)."
                   (konix/agent-shell-policy--remove-project off key)))
       (_        (if state (konix/agent-shell-policy--set-session off key state)
                   (konix/agent-shell-policy--remove-session off key))))))
+
+(defun konix/agent-shell-policy--decider-level (letter)
+  "Return the `konix/agent-shell-policy--set-disabled' level for LETTER.
+LETTER is a `konix/agent-shell-policy--disable-decider' \"s\"/\"p\"/\"G\"."
+  (pcase letter ("G" 'global) ("p" 'project) (_ 'session)))
 
 (defun konix/agent-shell-policy--match (policy tool-call)
   "Return POLICY's matching entry for TOOL-CALL, or nil.
@@ -1428,10 +1439,29 @@ when handled, nil (fall back to the dialog) when there is no allow option."
                (if (and note (not (string-empty-p note))) (format ": %s" note) "")))
     t))
 
+(defun konix/agent-shell-policy--consume-once (policy tool-call)
+  "Spend POLICY's \"once\" markers whose rule matches TOOL-CALL.
+The rule was left out of the effective policy for this request; clearing
+its marker on the axis that set it puts it back on for the next one."
+  (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
+    (let ((haystack (konix/agent-shell--tool-haystack tool-call)))
+      (dolist (entry (konix/agent-shell-policy--effective off))
+        (when (and (equal (cdr entry) "once")
+                   (konix/agent-shell--key-matches-p (car entry) tool-call haystack))
+          (konix/agent-shell-policy--set-disabled
+           policy (car entry)
+           (konix/agent-shell-policy--decider-level
+            (car (konix/agent-shell-policy--disable-decider policy (car entry))))
+           nil)
+          (message "One-shot skip spent: %s is back on in the %s"
+                   (car entry) (konix/agent-shell-policy-name policy)))))))
+
 (defun konix/agent-shell--policy-responder (permission)
   "Auto-reject blacklisted and auto-approve whitelisted tools.
 A blacklist match takes precedence over a whitelist match (deny over
-allow).  Return non-nil when handled, nil to let the next responder on
+allow).  Rules marked \"once\" are skipped here and spent by
+`konix/agent-shell-policy--consume-once'.  Return non-nil when handled,
+nil to let the next responder on
 `konix/agent-shell-permission-responder-functions' try.  This is the base
 responder registered on that hook."
   (let* ((tool-call (konix/agent-shell--tool-call-with-context
@@ -1441,6 +1471,8 @@ responder registered on that hook."
          (whitelisted (unless blacklisted
                         (konix/agent-shell-policy--match
                          konix/agent-shell--whitelist tool-call))))
+    (konix/agent-shell-policy--consume-once konix/agent-shell--blacklist tool-call)
+    (konix/agent-shell-policy--consume-once konix/agent-shell--whitelist tool-call)
     (cond
      (blacklisted (konix/agent-shell--blacklist-act permission blacklisted))
      (whitelisted (konix/agent-shell--whitelist-act permission whitelisted))
@@ -1875,12 +1907,18 @@ it."
                (funcall set-fn policy k
                         (konix/agent-shell-policy--value-for policy k))))))
 
+(defun konix/agent-shell-policy--enabled-cell (policy key)
+  "Render KEY's enabled state in POLICY's panel: ✓ on, ✗ off, 1 one-shot off."
+  (pcase (konix/agent-shell-policy--disabled-state policy key)
+    ("once" (propertize "1" 'face '(:foreground "orange3" :weight bold)))
+    (state (konix/agent-shell-panel--cell (not (equal state "off"))))))
+
 (defun konix/agent-shell--policy-panel (policy)
   "Return the `konix/agent-shell-panel' that edits POLICY."
   (konix/agent-shell-panel-create
    :buffer-name (format "*Tool %s*" (konix/agent-shell-policy-name policy))
    :mode-name (format "Tool-%s" (capitalize (konix/agent-shell-policy-name policy)))
-   :help (format "Tool %s: G global, p project, s session, t enable/disable, a add, e/RET edit, d delete, r reapply, g refresh, q quit"
+   :help (format "Tool %s: G global, p project, s session, t enable/disable/once, a add, e/RET edit, d delete, r reapply, g refresh, q quit"
                  (konix/agent-shell-policy-name policy))
    :name-header "Regexp/predicate"
    :name-width 30
@@ -1908,8 +1946,7 @@ it."
    (list (list "On" 6
                (lambda (key)
                  (concat
-                  (konix/agent-shell-panel--cell
-                   (not (konix/agent-shell-policy--disabled-p policy key)))
+                  (konix/agent-shell-policy--enabled-cell policy key)
                   (when-let ((decider (konix/agent-shell-policy--disable-decider
                                        policy key)))
                     (propertize (car decider) 'face 'shadow)))))
@@ -1983,9 +2020,10 @@ If the key changes, the old one is replaced on each axis it occupied."
       (konix/agent-shell-panel--refresh))))
 
 (defun konix/agent-shell-policy-menu-toggle-enabled ()
-  "Set the rule at point disabled/enabled/inherit on a chosen axis.
+  "Set the rule at point disabled/once/enabled/inherit on a chosen axis.
 Prompts for the level (session/project/global) and state; the rule's own
-key, value and axes are left intact."
+key, value and axes are left intact.  `once' disables the rule for the
+next request it would have matched only, then resets itself."
   (interactive)
   (when-let ((key (tabulated-list-get-id)))
     (let* ((policy (konix/agent-shell-panel-current-data))
@@ -1994,9 +2032,9 @@ key, value and axes are left intact."
                            "Level: " '("session" "project" "global") nil t
                            nil nil "session")))
            (state (pcase (completing-read
-                          "State: " '("disabled" "enabled" "unset") nil t
+                          "State: " '("disabled" "once" "enabled" "unset") nil t
                           nil nil "disabled")
-                    ("disabled" "off") ("enabled" "on") (_ nil))))
+                    ("disabled" "off") ("once" "once") ("enabled" "on") (_ nil))))
       (with-current-buffer origin
         (konix/agent-shell-policy--set-disabled policy key level state)))
     (konix/agent-shell-panel--refresh)))

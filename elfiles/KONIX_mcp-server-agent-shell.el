@@ -690,7 +690,7 @@ MCP Parameters:
     \"remove\": list of server name strings to remove from the default config.
     \"edit\": list of objects to modify existing servers, each with \"name\" and optional \"env_set\" ({KEY:VALUE to add/override}), \"env_remove\" (list of var names to remove), \"headers_set\" ({KEY:VALUE}), \"headers_remove\" (list of header names to remove).
     Example: {\"add\":[{\"name\":\"my-srv\",\"command\":\"node\",\"args\":[\"server.js\"],\"env\":{\"TOKEN\":\"abc\"}}]}
-  model - Optional buddy model: \"default\", \"opus\" (alias for \"default\"), \"sonnet\" or \"haiku\".  OMIT IT to inherit the model YOU are running on, which is the right choice unless you have a reason: pass one only to deviate deliberately, e.g. \"haiku\" for mechanical, high-volume work. Overriding your own model is reported back to you in the result.
+  model - Optional buddy model: \"default\", \"sonnet\" or \"haiku\".  OMIT IT to inherit the model YOU are running on, which is the right choice unless you have a reason: pass one only to deviate deliberately, e.g. \"haiku\" for mechanical, high-volume work. Overriding your own model is reported back to you in the result.
   coord-only - When t, point this buddy's konix-mcp at the slim /coord endpoint (coordination tools only) instead of the full /mcp. Use for coordination/demo buddies so their tool list stays small; leave unset for buddies that need the full toolset (legifrance, chrome-devtools, etc.).
   auto-respawn - When t, this buddy automatically replaces itself with a FRESH copy (same name, empty context) once its context usage crosses respawn-threshold, retiring at the seam right after it completes a task. The replacement keeps the name but has NO memory of earlier tasks, so only enable this when every task you send is self-contained (all needed state in the task or in files it points to). Enable it knowingly: a buddy spawned this way may reset between tasks. Defaults to nil (the buddy lives until explicitly killed).
   respawn-threshold - Context-usage percentage (0-100) that triggers a respawn. Ignored unless auto-respawn is t. Defaults to 80."
@@ -705,8 +705,7 @@ MCP Parameters:
                            (decode-coding-string mcp-config-changes 'utf-8)
                            :object-type 'alist))))
           (model-asked (when (and model (not (string-empty-p model)))
-                         (let ((decoded (decode-coding-string model 'utf-8)))
-                           (if (string= decoded "opus") "default" decoded))))
+                         (decode-coding-string model 'utf-8)))
           (caller-model (konix/mcp-server--caller-model-id))
           ;; Asking for no model inherits the spawner's, like the agent config
           ;; below.  Left to the server it was the cheapest tier, since
@@ -1036,7 +1035,7 @@ MCP Parameters:
           (format "audit: %s" governing-note)
           name
           nil
-          "opus"
+          "default"
           nil
           t
           respawn-threshold))))))

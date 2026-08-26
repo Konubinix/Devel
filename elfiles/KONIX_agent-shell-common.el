@@ -26,6 +26,7 @@
 (require 'cl-lib)
 (require 'map)
 (require 'seq)
+(require 'agent-shell)
 (require 'KONIX_agent-shell-store)
 
 ;; (setq-default acp-logging-enabled t)
@@ -88,8 +89,17 @@ Passes ARG through to `agent-shell'."
   (interactive "P")
   (when (and (use-region-p) buffer-file-name (buffer-modified-p))
     (save-buffer))
-  (let ((agent-shell-session-strategy (or strategy agent-shell-session-strategy)))
-    (agent-shell arg)))
+  (let* ((agent-shell-session-strategy (or strategy agent-shell-session-strategy))
+         (shell (unless (or arg (use-region-p)
+                            (derived-mode-p '(agent-shell-mode
+                                              agent-shell-viewport-view-mode
+                                              agent-shell-viewport-edit-mode)))
+                  (agent-shell--shell-buffer :no-create t :no-error t))))
+    (if shell
+        (agent-shell--display-buffer
+         (or (agent-shell-viewport--buffer :shell-buffer shell :existing-only t)
+             shell))
+      (agent-shell arg))))
 
 (defun konix/agent-shell/start-with-agent ()
   "Start a shell on an agent picked now, leaving `agent-shell-preferred-agent-config'

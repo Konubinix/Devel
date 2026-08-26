@@ -116,7 +116,7 @@ empty `.agent-shell/tmp', since a path matcher may consult the filesystem."
   (nil . "sed -n 's|a|b|p' foo.txt"))            ; only `/' delimits a `s'
 
 (konix/agent-shell-tests-deftest-evaluator
-    konix/agent-shell-test-ghapi-accepts-reads "ghapi"
+    konix/agent-shell-test-gh-read-accepts-api-reads "gh-read"
   (t . "gh api repos/o/r/issues/352/comments")
   (t . "gh api foo | jq .")
   (t . "gh api -X GET foo -f state=open")
@@ -126,7 +126,21 @@ empty `.agent-shell/tmp', since a path matcher may consult the filesystem."
   (t . "gh api foo | jq . > /etc/passwd"))
 
 (konix/agent-shell-tests-deftest-evaluator
-    konix/agent-shell-test-ghapi-refuses "ghapi"
+    konix/agent-shell-test-gh-read-accepts-subcommand-reads "gh-read"
+  (t . "gh issue list --repo o/r --state all --limit 100 --search \"timeout OR hang\" > ./.agent-shell/tmp/issues.txt 2>&1")
+  (t . "gh pr view 352 --json title,body")
+  (t . "gh pr diff 352 | head -50")
+  (t . "gh pr checks 352")
+  (t . "gh run list --workflow ci.yml")
+  (t . "gh run view 42 --log | grep -i error")
+  (t . "gh search issues emacsclient --repo o/r")
+  (t . "gh repo view o/r")
+  (t . "gh release list")
+  (t . "gh auth status")
+  (t . "gh status"))
+
+(konix/agent-shell-tests-deftest-evaluator
+    konix/agent-shell-test-gh-read-refuses "gh-read"
   (nil . "gh api -X POST foo")
   (nil . "gh api foo -f title=hi")
   (nil . "gh api foo | sh")
@@ -135,7 +149,20 @@ empty `.agent-shell/tmp', since a path matcher may consult the filesystem."
   (nil . "gh api foo > $(whoami).txt")
   (nil . "gh api foo 2> e.txt")                  ; unreadable redirection
   (nil . "gh api foo > a > b")
-  (nil . "gh pr list"))
+  (nil . "gh issue list | sh")
+  (nil . "gh issue list && rm -rf /")
+  (nil . "gh")
+  (nil . "gh pr create --title hi --body there")
+  (nil . "gh pr merge 352")
+  (nil . "gh issue close 352")
+  (nil . "gh repo clone o/r")                    ; writes the working tree
+  (nil . "gh release download v1")
+  (nil . "gh run watch 42")                      ; blocks
+  (nil . "gh secret list")                       ; credential names
+  (nil . "gh variable get FOO")
+  (nil . "gh issue list --web")                  ; pops a browser, prints nothing
+  (nil . "gh pr view 352 -w")
+  (nil . "git status"))
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-writes-outside-allows-scratch

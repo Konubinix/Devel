@@ -637,18 +637,56 @@ command line grammar, see `KONIX_shell-search'."
 Deliberately excludes anything that can execute (`sh', `xargs', `awk', ...)
 or write files (`tee', `sed -i', `yq -i', ...).")
 
-(defun konix/agent-shell--ghapi-read-segment-p (segment)
-  "Return non-nil when SEGMENT is a read-only `gh api' invocation.
-SEGMENT is one pipeline stage (no `|').  `gh api' is a GET (read) by default,
-silently becomes a POST when fields are supplied with
-`-f'/`-F'/`--field'/`--raw-field'/`--input', and is an explicit write when
-`-X'/`--method' names POST/PUT/PATCH/DELETE.  Read-only means: it is a bare
-`gh ... api ...', names no write method, and carries no implicit-POST
-field/input flag -- unless the method is explicitly GET/HEAD, in which case
-the fields are mere query parameters and it stays a read.  Tokenized with
+(defconst konix/agent-shell--gh-read-subcommands
+  '(("status") ("version") ("auth" "status")
+    ("config" "get") ("config" "list") ("alias" "list") ("extension" "list")
+    ("issue" "list") ("issue" "view") ("issue" "status")
+    ("pr" "list") ("pr" "view") ("pr" "status") ("pr" "diff") ("pr" "checks")
+    ("repo" "list") ("repo" "view") ("label" "list")
+    ("release" "list") ("release" "view")
+    ("gist" "list") ("gist" "view")
+    ("cache" "list") ("ruleset" "list") ("ruleset" "view")
+    ("run" "list") ("run" "view") ("workflow" "list") ("workflow" "view")
+    ("org" "list")
+    ("project" "list") ("project" "view")
+    ("project" "item-list") ("project" "field-list")
+    ("search" "issues") ("search" "prs") ("search" "repos")
+    ("search" "code") ("search" "commits"))
+  "`gh' subcommand paths that only print to stdout -- safe to auto-approve.
+Each entry is the (GROUP VERB) pair naming the subcommand, or a one-element
+list for a top-level command.  `gh api' is deliberately absent: whether it
+reads depends on its flags, see `konix/agent-shell--gh-api-read-p'.
+
+Kept out on purpose: anything writing the working tree (`repo clone',
+`release download', `run download'), anything blocking for a long time
+\(`run watch'), anything mutating GitHub (`create', `edit', `merge',
+`close', ...), and the secret/variable readers, whose output is a credential
+even though the call itself is a read.")
+
+(defun konix/agent-shell--gh-subcommand-path (tokens)
+  "Return the leading subcommand words of the `gh' call TOKENS, at most two.
+Skips any option word sitting between `gh' and its subcommand, and stops at
+the first option word after it -- so both `gh issue list --state all' and
+`gh --foo issue list' yield (\"issue\" \"list\").  TOKENS comes from
 `konix/shell-parse-tokenize'."
-  (let* ((tokens (konix/shell-parse-tokenize segment))
-         (write-method-re "\\`\\(?:-X\\|--method\\)?\\(?:POST\\|PUT\\|PATCH\\|DELETE\\)\\'")
+  (let ((rest (cdr tokens))
+        (path '()))
+    (while (and rest (string-prefix-p "-" (car rest)))
+      (setq rest (cdr rest)))
+    (while (and rest (< (length path) 2) (not (string-prefix-p "-" (car rest))))
+      (push (car rest) path)
+      (setq rest (cdr rest)))
+    (nreverse path)))
+
+(defun konix/agent-shell--gh-api-read-p (tokens)
+  "Return non-nil when the `gh api' call TOKENS only reads.
+`gh api' is a GET (read) by default, silently becomes a POST when fields are
+supplied with `-f'/`-F'/`--field'/`--raw-field'/`--input', and is an explicit
+write when `-X'/`--method' names POST/PUT/PATCH/DELETE.  Read-only means: it
+names no write method and carries no implicit-POST field/input flag -- unless
+the method is explicitly GET/HEAD, in which case the fields are mere query
+parameters and it stays a read."
+  (let* ((write-method-re "\\`\\(?:-X\\|--method\\)?\\(?:POST\\|PUT\\|PATCH\\|DELETE\\)\\'")
          (read-method-re "\\`\\(?:-X\\|--method\\)?\\(?:GET\\|HEAD\\)\\'")
          ;; No `\\='' anchor: also catches glued `-fkey=val' / `--field=...'.
          (field-re "\\`\\(?:-[fF]\\|--field\\|--raw-field\\|--input\\)")
@@ -666,15 +704,28 @@ the fields are mere query parameters and it stays a read.  Tokenized with
             acc))
          (case-fold-search t))
     (and
-     tokens
-     (equal (car tokens) "gh")
-     (member "api" tokens)
-     ;; No write method anywhere.
      (not (seq-some (lambda (m) (string-match-p write-method-re m)) method-tokens))
-     ;; Either an explicit read method (fields become query params), or no
-     ;; field/input flags (which would otherwise imply a POST).
      (or (seq-some (lambda (m) (string-match-p read-method-re m)) method-tokens)
          (not (seq-some (lambda (tk) (string-match-p field-re tk)) tokens))))))
+
+(defun konix/agent-shell--gh-read-segment-p (segment)
+  "Return non-nil when SEGMENT is a read-only `gh' invocation.
+SEGMENT is one pipeline stage (no `|').  Read-only means its subcommand is
+listed in `konix/agent-shell--gh-read-subcommands', or it is a `gh api' call
+that reads (see `konix/agent-shell--gh-api-read-p').  A `--web' anywhere
+disqualifies it: that form prints nothing and pops a browser window open
+instead.  Tokenized with `konix/shell-parse-tokenize'."
+  (let* ((tokens (konix/shell-parse-tokenize segment))
+         (path (konix/agent-shell--gh-subcommand-path tokens)))
+    (and
+     tokens
+     (equal (car tokens) "gh")
+     path
+     (not (seq-intersection '("-w" "--web") tokens))
+     (if (equal (car path) "api")
+         (konix/agent-shell--gh-api-read-p tokens)
+       (or (member (list (car path)) konix/agent-shell--gh-read-subcommands)
+           (member path konix/agent-shell--gh-read-subcommands))))))
 
 (defun konix/agent-shell--command-sans-stdout-redirect (command)
   "Return COMMAND without its trailing `> FILE', when it has a plain one."
@@ -695,18 +746,20 @@ write counts as a write.  Reference it as `@writes-outside(DIRECTORY)'."
                                      (expand-file-name directory)))))
      ((string-match-p ">" (konix/shell-parse-mask-inert-spans line)) t))))
 
-(konix/agent-shell-define-tool-evaluator "ghapi" (tool-call)
-  "Match read-only `gh api' calls (so they can be auto-approved).
-True only when the whole command line *is* that read -- never a `gh api'
-buried in a larger one-liner that also does unrelated work:
+(konix/agent-shell-define-tool-evaluator "gh-read" (tool-call)
+  "Match read-only `gh' calls (so they can be auto-approved).
+That is a `gh api' GET, or one of the listing/viewing subcommands enumerated
+in `konix/agent-shell--gh-read-subcommands' -- `gh issue list', `gh pr diff',
+`gh run view', ...  True only when the whole command line *is* that read --
+never a `gh' read buried in a larger one-liner that also does unrelated work:
 - it must not chain beyond a single pipeline (no `;', `&', `&&', `||', `<',
   subshell, backtick or `$(...)' -- see `konix/shell-parse-chained-p', which
   respects quoting);
-- its first pipeline stage must be a read-only `gh api' (see
-  `konix/agent-shell--ghapi-read-segment-p');
+- its first pipeline stage must be a read-only `gh' (see
+  `konix/agent-shell--gh-read-segment-p');
 - any further pipeline stages must be read-only filters such as `jq' (see
-  `konix/agent-shell--read-only-filters'), so `gh api ... | jq ...' is fine
-  while `gh api ... | sh' is not.
+  `konix/agent-shell--read-only-filters'), so `gh issue list ... | jq ...' is
+  fine while `gh api ... | sh' is not.
 Anything else falls through to a manual prompt."
   (let ((command (konix/agent-shell--command-sans-stdout-redirect
                   (or (konix/agent-shell--tool-call-command tool-call) ""))))
@@ -714,7 +767,7 @@ Anything else falls through to a manual prompt."
      (not (string-empty-p (string-trim command)))
      (not (konix/shell-parse-chained-p command))
      (let ((segments (konix/shell-parse-pipeline-segments command)))
-       (and (konix/agent-shell--ghapi-read-segment-p (car segments))
+       (and (konix/agent-shell--gh-read-segment-p (car segments))
             (seq-every-p
              (lambda (seg)
                (let ((tokens (konix/shell-parse-tokenize seg)))
@@ -874,7 +927,7 @@ in the project.")
     ("^gargdown map")
     ("^python3? -m py_compile")
     ("@read-only-sed" . "sed that only reads project files and prints")
-    ("@ghapi"))
+    ("@gh-read" . "gh api GETs and the list/view subcommands"))
   "GLOBAL baseline alist of (KEY . NOTE) whitelisted (auto-approved) tools.
 Applied to every session, beneath the project and session layers which
 shadow it.  KEY matches as in `konix/agent-shell-tool-blacklist-global';

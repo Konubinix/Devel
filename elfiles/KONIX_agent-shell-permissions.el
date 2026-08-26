@@ -593,7 +593,7 @@ if given).  SPECS are as in `hascommand'."
                (konix/agent-shell--command-matches-any-p (car commands) specs))))))
 
 (defconst konix/agent-shell--git-curation-subcommands
-  '("stash" "rebase" "diff" "branch" "fetch" "reset" "cherry-pick" "revert"
+  '("stash" "rebase" "grep" "diff" "branch" "fetch" "reset" "cherry-pick" "revert"
     "restore" "status" "apply" "log" "ls-tree" "ls-files" "show" "checkout" "add" "switch" "merge"
     "tag" "reflog" "filter-branch" "filter-repo" "worktree" "commit")
   "Git subcommands that curate/rewrite history or working-tree state.")

@@ -161,7 +161,7 @@
   (use-package lua-mode :commands (lua-mode) :mode "\\.lua$")
   (use-package macher)
   (use-package majutsu :straight (:type git :host github :repo "0WD0/majutsu"))
-  (use-package mcp-server-lib)
+  (use-package mcp-server-lib :straight (:fork t :branch "mine"))
   ;; (use-package marginalia) -> too much information that I barely look at
   (use-package mic-paren)
   (use-package michelson :straight (:type git :host github :repo "MiloDavis/michelson-mode"))

@@ -111,6 +111,9 @@
 
 (remove-hook 'ement-after-initial-sync-hook 'ement-room-list--after-initial-sync)
 
+(keymap-set ement-room-mode-map "g" #'beginning-of-buffer)
+(keymap-set ement-room-mode-map "G" #'end-of-buffer)
+(keymap-set ement-room-mode-map "r" #'ement-room-dispatch-new-message)
 (keymap-set ement-room-mode-map ">" #'end-of-buffer)
 (keymap-set ement-room-mode-map "<" #'beginning-of-buffer)
 (keymap-set ement-room-mode-map "e" 'ement-room-edit-message)

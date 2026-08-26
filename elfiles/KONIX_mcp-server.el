@@ -318,7 +318,7 @@ Return the position of the #+CALL: line, or nil if none is found."
   "Execute a named org-babel source block (or CALL line), or every block in the buffer.
 
 If BLOCK-NAME is omitted (or \"all\" / \"*\"), all source blocks are executed via
-`org-babel-execute-buffer' (confirmation disabled), refreshing every #+RESULTS at
+`org-babel-execute-buffer', refreshing every #+RESULTS at
 once.  Otherwise the single named block (or CALL line) is executed and its result
 returned.
 
@@ -360,7 +360,9 @@ MCP Parameters:
                                 (format "Executed all babel blocks in buffer %s%s"
                                         buffer-name
                                         (if force " (forced)" "")))
-                            (let* ((src-pos (org-babel-find-named-block block-name))
+                            ;; Left at t, the prompt blocks and no MCP caller can answer it.
+                            (let* ((org-confirm-babel-evaluate nil)
+                                   (src-pos (org-babel-find-named-block block-name))
                                    (call-pos (unless src-pos
                                                (konix/mcp-server--find-named-call block-name)))
                                    (pos (or src-pos call-pos)))
@@ -488,7 +490,8 @@ MCP Parameters:
      (save-excursion
        (save-restriction
          (widen)
-         (let ((total 0) (fresh 0) stale unhashed noresult)
+         (let ((org-confirm-babel-evaluate nil)
+               (total 0) (fresh 0) stale unhashed noresult)
            (org-babel-map-src-blocks nil
              (setq total (1+ total))
              (let* ((line (line-number-at-pos))

@@ -5,6 +5,6 @@
 [aliases]
 update-mine = ["rebase", "-r", "mine", "-o", "mine_deps()"]
 all = ["logs", "-r", "all()"]
-watch = ["util", "exec", "--", "bash", "-ec", "watchexec --quiet --clear --restart --watch=$JJ_WORKSPACE_ROOT/.jj/repo/op_heads/heads --ignore-nothing --wrap-process none -- jj log"]
+watch = ["util", "exec", "--", "viddy", "--differences", "--interval", "100ms", "--exec", "bash", "/home/sam/perso/perso/bin/jj_watch_log.sh"]
 cleandangling = ["abandon", "-r", "dangling()"]
 # config:1 ends here

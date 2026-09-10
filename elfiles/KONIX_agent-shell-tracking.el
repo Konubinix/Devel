@@ -70,6 +70,13 @@ viewport buffer instead if one exists."
     (goto-char (point-min))
     (text-property-search-forward 'agent-shell-permission-button t t)))
 
+(defvar konix/agent-shell-track-ready-skip-functions nil
+  "Functions, run in a ready buffer, any of which keeps it out of the round.")
+
+(defun konix/agent-shell--skip-tracking-p ()
+  "Return non-nil when something keeps this ready buffer out of the round."
+  (run-hook-with-args-until-success 'konix/agent-shell-track-ready-skip-functions))
+
 (defvar-local konix/agent-shell--seen nil
   "Non-nil when the user has seen the last completed turn without needing to act yet.
 Cleared automatically when a new turn completes.")
@@ -219,6 +226,7 @@ buffers already seen by the user (unless there is a pending permission request).
         (with-current-buffer buf
           (let ((has-permission (konix/agent-shell--has-permission-button-p)))
             (when (and (or (not (shell-maker-busy)) has-permission)
+                       (not (konix/agent-shell--skip-tracking-p))
                        (or (not unobtrusive)
                            has-permission
                            (not konix/agent-shell--seen)))

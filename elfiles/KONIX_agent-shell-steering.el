@@ -182,8 +182,8 @@ matches the same event contributes its own `because of KEY: GUIDANCE' line
 agent is told about all of them, not just the first.
 
 At the cap the turn is cancelled and control is genuinely handed back to the
-human: the guidance is shown to the user with `message' but NOT submitted as a
-new prompt.  Submitting it (as earlier rounds do, via
+human: the guidance replaces the turn's `Cancelled' stop-reason block but is
+NOT submitted as a new prompt.  Submitting it (as earlier rounds do, via
 `konix/agent-shell--interrupt-and-deliver') would start yet another agent turn
 -- the opposite of handing control back -- which is the bug the \"Giving
 control back to user now\" notice used to lie about."
@@ -222,17 +222,15 @@ control back to user now\" notice used to lie about."
         (if last
             ;; Cap reached: cancel the turn and hand control back to the human.
             ;; Do NOT submit the notice (that would start a new agent turn);
-            ;; the delivery function raises it as an Emacs warning instead, so
-            ;; it is surfaced to the user without being fed back to the agent.
+            ;; the delivery function writes it into the turn's stop-reason
+            ;; block instead, replacing the bare `Cancelled'.
             ;; Going through `--interrupt-and-deliver' (rather than a bare
             ;; interrupt) means its poll still cancels the straggler permission
             ;; the soft cancel may surface, so no widget lingers.
             (progn
               (setq konix/agent-shell-steering--cap-stopped t)
               (konix/agent-shell--interrupt-and-deliver
-               notice
-               (lambda (text)
-                 (display-warning 'konix/agent-shell-steering text :warning))))
+               notice #'konix/agent-shell--show-in-stop-reason))
           (setq konix/agent-shell-steering--auto-submitting t)
           (konix/agent-shell--interrupt-and-deliver notice))))))
 

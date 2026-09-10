@@ -1480,7 +1480,16 @@ queued the usual way and arrives at the natural end of the turn."
   :group 'konix)
 
 (defvar-local konix/agent-shell--reason-delivery-scheduled nil
-  "Non-nil while an immediate reason delivery is pending for this turn.")
+  "Non-nil while an immediate reason delivery is pending for this turn.
+`auto-submit' when the reason will be submitted as the next prompt,
+`handback' when a DELIVER-FN surfaces it to the user instead.")
+
+(defun konix/agent-shell--automation-continues-p ()
+  "Return non-nil when the cancelled turn's reason goes back to the agent.
+It is submitted as the next prompt as soon as the turn ends, so the buffer
+falls idle in between with nothing waiting for the user.  A `handback'
+delivery, which gives the reason to the user instead, does not count."
+  (eq konix/agent-shell--reason-delivery-scheduled 'auto-submit))
 
 (defun konix/agent-shell--enqueue-reason (reason)
   "Enqueue REASON as a follow-up prompt, unless already pending.
@@ -1488,6 +1497,17 @@ Runs in the session's shell buffer (the responder's `current-buffer')."
   (when (derived-mode-p 'agent-shell-mode)
     (unless (member reason (map-elt (agent-shell--state) :pending-requests))
       (agent-shell--enqueue-request :prompt reason))))
+
+(defun konix/agent-shell--show-in-stop-reason (text)
+  "Rewrite the cancelled turn's stop-reason block to say TEXT.
+Replaces the bare `Cancelled' agent-shell puts there, so the reason shows
+in the transcript.  Falls back to a new block when there is none."
+  (when (derived-mode-p 'agent-shell-mode)
+    (agent-shell--update-fragment
+     :state (agent-shell--state)
+     :block-id (format "%s-stop-reason"
+                       (map-elt (agent-shell--state) :request-count))
+     :body text)))
 
 (defun konix/agent-shell--interrupt-and-deliver (reason &optional deliver-fn)
   "Force-cancel the current turn, then deliver REASON once the turn has ended.
@@ -1507,11 +1527,13 @@ session event bus, not by polling `shell-maker-busy':
 By default REASON is SUBMITTED as the next prompt (steering/blacklist
 redirect).  DELIVER-FN, when non-nil, is called with REASON instead -- so
 control is handed back to the human while REASON is surfaced some other way
-\(the steering cap raises it as an Emacs warning).  Only one delivery is
+\(the steering cap writes it into the turn's stop-reason block).  Only one
+delivery is
 scheduled per turn (`konix/agent-shell--reason-delivery-scheduled')."
   (when (and (derived-mode-p 'agent-shell-mode)
              (not konix/agent-shell--reason-delivery-scheduled))
-    (setq konix/agent-shell--reason-delivery-scheduled t)
+    (setq konix/agent-shell--reason-delivery-scheduled
+          (if deliver-fn 'handback 'auto-submit))
     (let ((buffer (current-buffer))
           (perm-token nil)
           (done-token nil))

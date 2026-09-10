@@ -44,8 +44,13 @@ since the input was submitted."
 
 (defun konix/shell-maker-finish-output/notify (&rest _)
   "Notify when shell-maker response is complete.
-Only notifies if input has been submitted at least once (not on initial buffer creation)."
-  (when konix/shell-maker--input-time
+Only notifies if input has been submitted at least once (not on initial buffer creation).
+A turn cancelled to hand the agent a reason it will be given right back
+\(`konix/agent-shell--automation-continues-p') finishes its output like any
+other, but nothing is waiting for the user there, so it is passed over."
+  (when (and konix/shell-maker--input-time
+             (not (and (fboundp 'konix/agent-shell--automation-continues-p)
+                       (konix/agent-shell--automation-continues-p))))
     (let* ((buffer (current-buffer))
            (track-buf (if (and (bound-and-true-p agent-shell-prefer-viewport-interaction)
                                (fboundp 'agent-shell-viewport--buffer))

@@ -25,6 +25,7 @@
 
 (require 'map)
 (require 'seq)
+(require 'ol)
 (require 'KONIX_agent-shell-common)
 (require 'KONIX_agent-shell-model)
 (require 'KONIX_agent-shell-permissions)
@@ -318,21 +319,51 @@ agent starts.  An unknown AGENT is returned as it was given."
           (symbol-name (map-elt config :identifier)))
     (or (konix/org-agent-shell--nonempty agent) "an unknown agent")))
 
+(defun konix/org-agent-shell--note-title (note)
+  "Return the `#+title' NOTE declares, or nil."
+  (with-temp-buffer
+    (let ((case-fold-search t))
+      (ignore-errors (insert-file-contents note nil 0 4096))
+      (goto-char (point-min))
+      (when (re-search-forward "^#\\+title:[ \t]*\\(.*\\)$" nil t)
+        (konix/org-agent-shell--nonempty (match-string 1))))))
+
+(defun konix/org-agent-shell--note-markdown-link (path &optional base)
+  "Return the markdown link naming the governing note at PATH.
+PATH is resolved against BASE to read the `#+title' the link shows,
+falling back to the note's file name.  Both notes export to the same
+directory, so the target is the sibling markdown file."
+  (let ((note (expand-file-name path (or base default-directory))))
+    (format "[%s](%s.md)"
+            (or (konix/org-agent-shell--note-title note)
+                (file-name-base note))
+            (file-name-base note))))
+
 (defcustom konix/org-agent-shell-note-export-format
-  "this note is edited using %s/%s"
-  "Format of an exported `agent-shell-with-note' link, given provider and model."
+  "this note is edited using %s/%s, governed by the note %s"
+  "Format of an exported `agent-shell-with-note' link.
+Given the provider, the model and a markdown link to the governing
+note, in that order."
   :type 'string
   :group 'konix)
 
-(defun konix/org-agent-shell-with-note-export (link _description _backend _info)
+(defun konix/org-agent-shell-with-note-export (link _description _backend info)
   "Export the `agent-shell-with-note' LINK as who edits the note.
 Provider and model come from LINK when it names them, else from the
-preferred config and `konix/agent-shell-default-model-id'."
-  (pcase-let ((`(,_path ,agent ,model)
+preferred config and `konix/agent-shell-default-model-id'.  The
+governing note is LINK's path, resolved against the exported file
+\(INFO's `:input-file') as following the link resolves it, and shown as
+a markdown link to its exported sibling."
+  (pcase-let ((`(,path ,agent ,model)
                (konix/org-agent-shell--note-link-parse link)))
     (format konix/org-agent-shell-note-export-format
             (konix/org-agent-shell--provider-label agent)
-            (or model konix/agent-shell-default-model-id))))
+            (or model konix/agent-shell-default-model-id)
+            (konix/org-agent-shell--note-markdown-link
+             path
+             (when-let ((source (or (plist-get info :input-file)
+                                    (buffer-file-name))))
+               (file-name-directory source))))))
 
 (defun konix/org-agent-shell-with-note-follow-link (link &optional arg)
   "Open a fresh agent-shell primed with the org note LINK.
@@ -464,20 +495,19 @@ of the link, which then starts on `konix/agent-shell-default-model-id'."
               (abbreviate-file-name note))
             (konix/org-agent-shell--note-link-query config model))))
 
-(with-eval-after-load 'ol
-  (org-link-set-parameters
-   "agent-shell"
-   :store #'konix/org-agent-shell-store-link
-   :follow #'konix/org-agent-shell-follow-link)
-  (org-link-set-parameters
-   "agent-shell-with-note"
-   :complete #'konix/org-agent-shell-with-note-complete
-   :follow #'konix/org-agent-shell-with-note-follow-link
-   :export #'konix/org-agent-shell-with-note-export)
-  (org-link-set-parameters
-   "agent-shell-tree"
-   :store #'konix/org-agent-shell-tree-store-link
-   :follow #'konix/org-agent-shell-tree-follow-link))
+(org-link-set-parameters
+ "agent-shell"
+ :store #'konix/org-agent-shell-store-link
+ :follow #'konix/org-agent-shell-follow-link)
+(org-link-set-parameters
+ "agent-shell-with-note"
+ :complete #'konix/org-agent-shell-with-note-complete
+ :follow #'konix/org-agent-shell-with-note-follow-link
+ :export #'konix/org-agent-shell-with-note-export)
+(org-link-set-parameters
+ "agent-shell-tree"
+ :store #'konix/org-agent-shell-tree-store-link
+ :follow #'konix/org-agent-shell-tree-follow-link)
 
 (provide 'KONIX_agent-shell-org-links)
 ;;; KONIX_agent-shell-org-links.el ends here

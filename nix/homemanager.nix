@@ -190,7 +190,7 @@ in
 
       # security
       gnupg
-      pinentry-gtk2
+      pinentry-gnome3
       apg
       gfshare # gfcombine, gfsplit
       # impass: packaged in flakes/impass, added via flake.nix

@@ -427,16 +427,10 @@ project `.dir-locals.el' or a Claude settings file.  Composes
 
 (defun konix/agent-shell--bash-ast-buffer (tool-call)
   "Return (BUFFER . ROOT) for TOOL-CALL's command line, or nil for a non-shell
-tool.  Signals an error when the bash tree-sitter grammar is unavailable.
-BUFFER owns ROOT and must be killed once done with it, which
+tool.  BUFFER owns ROOT and must be killed once done with it, which
 `konix/agent-shell--with-bash-ast' takes care of."
-  (when-let ((command (konix/agent-shell--tool-call-command tool-call)))
-    (unless (treesit-language-available-p 'bash)
-      (error "The bash tree-sitter grammar is required (treesit-install-language-grammar 'bash)"))
-    (let ((buffer (generate-new-buffer " *konix-bash-ast*" t)))
-      (with-current-buffer buffer
-        (insert command)
-        (cons buffer (treesit-parser-root-node (treesit-parser-create 'bash)))))))
+  (konix/shell-parse-bash-ast-buffer
+   (konix/agent-shell--tool-call-command tool-call)))
 
 (defmacro konix/agent-shell--with-bash-ast (root tool-call &rest body)
   "Bind ROOT to TOOL-CALL's bash AST root, evaluate BODY, then release the tree.
@@ -731,20 +725,47 @@ instead.  Tokenized with `konix/shell-parse-tokenize'."
   "Return COMMAND without its trailing `> FILE', when it has a plain one."
   (or (car (konix/shell-parse-split-stdout-redirect command)) command))
 
+(defconst konix/agent-shell--file-write-redirect-operators
+  '(">" ">>" "&>" "&>>" ">|" ">&")
+  "Bash redirection operators that can open a file for writing.")
+
+(defconst konix/agent-shell--null-devices
+  '("/dev/null" "/dev/zero")
+  "Character devices that discard whatever is written to them.
+Redirecting into one leaves no file behind, so it is not a write for the
+purpose of `writes-outside' and its kin.")
+
+(defun konix/agent-shell--redirect-target (redirect)
+  "Return the file REDIRECT opens for writing, `unknown' when unreadable, else nil.
+REDIRECT is a `file_redirect' node.  A `<', a descriptor destination
+\(`2>&1', `2>&-') and a null device (`2>/dev/null') open no file."
+  (let ((operator (seq-some
+                   (lambda (child)
+                     (member (treesit-node-type child)
+                             konix/agent-shell--file-write-redirect-operators))
+                   (treesit-node-children redirect)))
+        (destination (treesit-node-child-by-field-name redirect "destination")))
+    (when (and operator destination
+               (not (equal (treesit-node-type destination) "number")))
+      (let ((target (konix/agent-shell--argument-literal destination)))
+        (cond ((null target) 'unknown)
+              ((member target konix/agent-shell--null-devices) nil)
+              (t target))))))
+
 (konix/agent-shell-define-tool-evaluator "writes-outside" (tool-call &optional directory)
-  "Match a line redirecting its output anywhere but inside DIRECTORY.
-Resolved with `file-in-directory-p', so neither a `..' hop nor a symlink walks
-out of DIRECTORY.  A redirection too tangled to read (`2>', `&>', several of
-them), a missing DIRECTORY and no DIRECTORY at all all match, so an unreadable
-write counts as a write.  Reference it as `@writes-outside(DIRECTORY)'."
-  (let* ((line (or (konix/agent-shell--tool-call-command tool-call) ""))
-         (redirect (konix/shell-parse-split-stdout-redirect line)))
-    (cond
-     (redirect
-      (not (and directory
-                (file-in-directory-p (expand-file-name (nth 1 redirect))
-                                     (expand-file-name directory)))))
-     ((string-match-p ">" (konix/shell-parse-mask-inert-spans line)) t))))
+  "Match a line opening a file for writing outside DIRECTORY.
+Redirections are read from the bash AST, so a `>' inside a quoted argument
+opens nothing.  An unreadable target and a missing DIRECTORY count as outside.
+Reference it as `@writes-outside(DIRECTORY)'."
+  (konix/agent-shell--with-bash-ast root tool-call
+    (seq-some
+     (lambda (capture)
+       (when-let ((target (konix/agent-shell--redirect-target (cdr capture))))
+         (or (eq target 'unknown)
+             (not (and directory
+                       (file-in-directory-p (expand-file-name target)
+                                            (expand-file-name directory)))))))
+     (treesit-query-capture root '((file_redirect) @r)))))
 
 (konix/agent-shell-define-tool-evaluator "gh-read" (tool-call)
   "Match read-only `gh' calls (so they can be auto-approved).
@@ -858,10 +879,11 @@ statically knowable is refused, as are the `-e' and `-f' forms."
 `sed' is in neither `konix/agent-shell-command-whitelist' nor
 `konix/agent-shell--read-only-filters' because it also writes and executes,
 so the invocation is read instead (`konix/agent-shell--sed-read-only-p').
-Combining commands is `@severalcommands'' business: here the line must be that
-`sed' alone, with no chaining nor redirection (`konix/shell-parse-chained-p')."
+Combining commands is `@severalcommands'' business: here the line must run that
+`sed' alone (`konix/shell-parse-chained-p'), give or take a plain `> FILE'."
   (unless (konix/shell-parse-chained-p
-           (or (konix/agent-shell--tool-call-command tool-call) ""))
+           (konix/agent-shell--command-sans-stdout-redirect
+            (or (konix/agent-shell--tool-call-command tool-call) "")))
     (konix/agent-shell--with-bash-ast root tool-call
       (let ((commands (konix/agent-shell--command-nodes root)))
         (and (= (length commands) 1)

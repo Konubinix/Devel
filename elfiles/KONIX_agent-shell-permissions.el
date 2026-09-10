@@ -1075,6 +1075,7 @@ in the project.")
     ("^gargdown map")
     ("^python3? -m py_compile")
     ("@read-only-sed" . "sed that only reads project files and prints")
+    ("@read-only-find" . "find that only walks project files and prints")
     ("@gh-read" . "gh api GETs and the list/view subcommands"))
   "GLOBAL baseline alist of (KEY . NOTE) whitelisted (auto-approved) tools.
 Applied to every session, beneath the project and session layers which

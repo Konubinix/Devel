@@ -82,6 +82,48 @@
          (* (not (any ".\n"))) (or "test" "tests" "spec" "specs"))
      said)))
 
+(defun konix/agent-shell-tool-among-p (tool-call names)
+  "Non-nil when TOOL-CALL's title carries one of NAMES.
+Each name matches as a substring, so a server or `readonly_' prefix need not be
+spelled out."
+  (let ((title (or (map-elt tool-call :title) "")))
+    (seq-some (lambda (name) (string-match-p (regexp-quote name) title))
+              names)))
+
+(konix/agent-shell-define-tool-evaluator "tool-among" (tool-call &rest names)
+  "Match a tool call whose title carries one of NAMES.
+Under `not' in a composed key this holds every tool but a named few:
+`(and \"@some-gate-shut\" (not \"@tool-among(read_thing,write_thing)\"))'."
+  (konix/agent-shell-tool-among-p tool-call names))
+
+(defun konix/agent-shell-tool-named-p (tool-call names)
+  "Non-nil when TOOL-CALL's title is one of NAMES.
+The title is compared whole, so a tool that merely carries a name does not
+match it."
+  (and (member (or (map-elt tool-call :title) "") names) t))
+
+(konix/agent-shell-define-tool-evaluator "tool-named" (tool-call &rest names)
+  "Match a tool call whose title is exactly one of NAMES.
+Where `tool-among' would let through anything carrying a name, this lets
+through the named tools and nothing else."
+  (konix/agent-shell-tool-named-p tool-call names))
+
+(defun konix/agent-shell-tool-mentions-p (tool-call text)
+  "Non-nil when TOOL-CALL names TEXT anywhere in what it asks for.
+What it asks for is its title, kind, command line and input -- the request
+only, never the wider conversation."
+  (and (stringp text)
+       (not (string-empty-p text))
+       (string-match-p
+        (regexp-quote text)
+        (or (ignore-errors (konix/agent-shell--tool-haystack tool-call)) ""))))
+
+(konix/agent-shell-define-tool-evaluator "tool-mentions" (tool-call &rest texts)
+  "Match a tool call naming one of TEXTS anywhere in what it asks for."
+  (and (seq-some (lambda (text) (konix/agent-shell-tool-mentions-p tool-call text))
+                 texts)
+       t))
+
 (defun konix/agent-shell-steering--desinsecable (string)
   "STRING with its espaces insécables (U+00A0) turned into plain spaces."
   (string-replace (string #x00a0) " " string))

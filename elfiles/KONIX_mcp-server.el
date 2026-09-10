@@ -515,6 +515,31 @@ MCP Parameters:
                  (if (org-babel-where-is-src-block-result)
                      (push label unhashed)
                    (push label noresult)))))
+           ;; A #+CALL: renders a result of its own and has no block to map over, so the
+           ;; map above never reaches it and its hash would go unread.
+           (save-excursion
+             (goto-char (point-min))
+             (while (re-search-forward "^[ \t]*#\\+CALL:" nil t)
+               (let* ((el (org-element-at-point))
+                      (info (ignore-errors (org-babel-lob-get-info el))))
+                 (when info
+                   (setq total (1+ total))
+                   (let* ((line (line-number-at-pos))
+                          (name (or (org-element-property :name el)
+                                    (org-element-property :call el)
+                                    "<no #+NAME>"))
+                          (recorded (org-babel-current-result-hash))
+                          (label (format "  line %d  %s (call)" line name)))
+                     (if recorded
+                         (let ((now (ignore-errors (org-babel-sha1-hash info))))
+                           (if (and now (equal recorded now))
+                               (setq fresh (1+ fresh))
+                             (push (format "%s\n      recorded   %s\n      recomputed %s"
+                                           label recorded (or now "not computable"))
+                                   stale)))
+                       (if (org-babel-where-is-src-block-result)
+                           (push label unhashed)
+                         (push label noresult))))))))
            (if (zerop total)
                "no source block in this buffer"
              (string-join

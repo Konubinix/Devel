@@ -547,23 +547,40 @@ MCP Parameters:
                (length files) buffer-name
                (string-join files ", "))))))
 
-(defun konix/mcp-server-note-indent (buffer-name)
-  "Re-indent an org buffer using org's own rules.
+(defun konix/mcp-server-note-format (buffer-name)
+  "Re-indent an org buffer using org's own rules, and realign its tables.
 
 MCP Parameters:
-  buffer-name - Name of the org-mode buffer to re-indent.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
+  buffer-name - Name of the org-mode buffer to format.  Try to guess it from the file name (Emacs uses the basename as buffer name) instead of calling list-buffers."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
      (let ((inhibit-read-only t)
            (org-src-preserve-indentation t)
-           (org-src-tab-acts-natively nil))
+           (org-src-tab-acts-natively nil)
+           (tables 0))
        (unless (derived-mode-p 'org-mode)
          (error "Buffer %s is not in org-mode" buffer-name))
+       (when (and (buffer-file-name)
+                  (not (verify-visited-file-modtime (current-buffer))))
+         (when (buffer-modified-p)
+           (error "Buffer %s and its file have both changed; resolve that first"
+                  buffer-name))
+         (revert-buffer t t t))
        (save-restriction
          (widen)
-         (org-indent-region (point-min) (point-max)))
+         (org-indent-region (point-min) (point-max))
+         (save-excursion
+           ;; Bottom-up: realigning a table moves everything after it.
+           (dolist (begin (nreverse
+                           (org-element-map (org-element-parse-buffer) 'table
+                             (lambda (table)
+                               (and (eq (org-element-property :type table) 'org)
+                                    (org-element-property :begin table))))))
+             (goto-char begin)
+             (setq tables (1+ tables))
+             (org-table-align))))
        (when (buffer-file-name) (save-buffer))
-       (format "indent: %s" buffer-name)))))
+       (format "format: %s, %d table(s) realigned" buffer-name tables)))))
 
 ;;; Server management tools
 
@@ -795,9 +812,9 @@ It lets a client allow them as a batch, with one `mcp__SERVER__readonly_*' rule.
       :id "note_mechanics"
       :description "Report every mechanical flaw of an org note, and inventory the intentions in use with their counts. The report names each flaw group, the line it sits on and what is wrong there — bullet form, intention word, line and bullet length, link and transclusion, heading depth, inline footnote — as how_to_write_and_audit_a_note.org defines them. Nothing else is mechanisable — whether a claim carries a predicate, and whether a why is real, are what the audit is for. A silent run is not conformance. Read-only."
       :read-only t)
-     (konix/mcp-server-note-indent
-      :id "note_indent"
-      :description "Re-indent an org buffer with org's own rules: nesting levels normalized, item bodies moved to their item's continuation column. Works on the whole file even if the buffer is narrowed, and saves it. This is THE tool for re-indenting a note — do not use sed, python or a shell command instead."))
+     (konix/mcp-server-note-format
+      :id "note_format"
+      :description "Lay out an org buffer the way org itself would: nesting levels normalized, item bodies moved to their item's continuation column, and every table's column widths and separator rows recomputed from its cells. Works on the whole file even if the buffer is narrowed, and saves it. This is THE tool to call after editing a note — write a table's cells with single spaces around the pipes and let this compute the widths; do not pad columns by hand and do not use sed, awk, python or a shell command instead. It was called note_indent before it learned to align tables."))
 
     ("konix-emacs-agents"
      (konix/mcp-server-spawn-agent

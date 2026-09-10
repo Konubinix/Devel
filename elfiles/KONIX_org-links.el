@@ -106,6 +106,13 @@ https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
     )
   )
 
+(defun konix/org-export-macro/blendview (url)
+  (format
+   "@@html:<iframe src=\"https://tools.simonwillison.net/blender-viewer?url=%s\" style=\"border:0;width:100%%;height:500px;\" title=\"BlenderViewer\"></iframe>@@"
+   (url-hexify-string url)
+   )
+  )
+
 (defun konix/org/copy-region-without-links ()
   (interactive)
   (let* (

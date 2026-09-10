@@ -180,6 +180,7 @@
    ("icon" . "@@html:<i class=\"$1\"></i>@@")
    ("stlview" . "@@html:<iframe src=\"https://www.viewstl.com/?embedded&url=$1\" style=\"border:0;width:100%;height:500px;\"></iframe>@@")
    ("glbview" . "@@html:<script type=\"module\" src=\"https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js\"></script><model-viewer src=\"$1\" auto-rotate camera-controls style=\"width:100%;height:500px;background:#eee\"></model-viewer>@@")
+   ("blendview" . "(eval (konix/org-export-macro/blendview $1))")
    ("embedpdf" . ,(format "@@html:<div class=\"iframe-container ratio-full-height\"><iframe src=\"%s/pdfviewer/web/viewer.html?file=$1\" title=\"PDFViewer\"></iframe></div>@@"
                           (getenv "KONIX_PDFVIEWER_GATEWAY")
                           )

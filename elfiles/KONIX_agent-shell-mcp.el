@@ -64,6 +64,7 @@ reference-counted server-side so the themed servers coexist safely."
     ("konix-emacs-org"     . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-org"))
     ("konix-emacs-agents"  . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-agents"))
     ("konix-emacs-elisp"   . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-elisp"))
+    ("konix-emacs-workspace"   . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-workspace"))
 
     ("chrome-devtools-mcp"
      (name . "chrome-devtools-mcp")

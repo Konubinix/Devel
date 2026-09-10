@@ -31,6 +31,7 @@
 (require 'project)
 (require 'KONIX_mcp-server-introspection)
 (require 'KONIX_mcp-server-agent-shell)
+(require 'KONIX_mcp-server-workspace)
 ;; tangled from how_to_write_and_audit_a_note.org, where the format it checks is stated
 (require 'KONIX_mcp-server-note-mechanics)
 
@@ -40,7 +41,8 @@
   '("konix-emacs-buffers"
     "konix-emacs-org"
     "konix-emacs-agents"
-    "konix-emacs-elisp")
+    "konix-emacs-elisp"
+    "konix-emacs-workspace")
   "List of server-ids exposed by the KONIX MCP server, one per theme.
 Each id is the routing key emacs-mcp-stdio.sh passes via --server-id, and
 the key under which that theme's tools live in `mcp-server-lib's per-server
@@ -761,6 +763,7 @@ MCP Parameters:
                  (mapcar #'locate-library
                          '("KONIX_mcp-server-introspection"
                            "KONIX_mcp-server-agent-shell"
+                           "KONIX_mcp-server-workspace"
                            "KONIX_mcp-server-note-mechanics")))))
      (if server-file
          (progn
@@ -965,11 +968,17 @@ It lets a client allow them as a batch, with one `mcp__SERVER__readonly_*' rule.
 Each TOOLS entry is (FUNCTION . PLIST); SERVER-ID must be one of
 `konix/mcp-server-ids'.")
 
+(defvar konix/mcp-server-extra-tools nil
+  "Groups contributed by files that tangle their own tools.
+Same shape as `konix/mcp-server--tools'.  A file declaring a tool it also
+defines adds its group here, so the two cannot drift apart.  Left alone if
+already bound, since such a file is loaded before this one.")
+
 (defun konix/mcp-server-register-tools ()
   "Register all KONIX MCP tools, each under its theme's server-id.
 A `:read-only t' tool is exposed under `konix/mcp-server-read-only-prefix'
 followed by its id."
-  (dolist (group konix/mcp-server--tools)
+  (dolist (group (append konix/mcp-server--tools konix/mcp-server-extra-tools))
     (let ((server-id (car group)))
       (dolist (tool (cdr group))
         (let ((props (copy-sequence (cdr tool))))

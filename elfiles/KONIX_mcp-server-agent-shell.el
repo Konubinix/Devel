@@ -1508,8 +1508,18 @@ color and readability.")
 (defconst konix/mcp-server--working-statuses '(busy waiting sleeping)
   "Statuses in which an agent progresses on its own, needing no user.")
 
-(defun konix/mcp-server--status-label (status-cons)
-  "Return a short bracketed, propertized label for STATUS-CONS, a (STATUS . SEEN) cons."
+(defvar konix/mcp-server-status-face-functions nil
+  "Functions, run in a session's buffer, any of which faces its idle badge.")
+
+(defun konix/mcp-server--given-status-face (buf status)
+  "Return the face something else gives BUF's badge, STATUS being what it is in."
+  (when (eq status 'idle)
+    (with-current-buffer buf
+      (run-hook-with-args-until-success 'konix/mcp-server-status-face-functions))))
+
+(defun konix/mcp-server--status-label (status-cons &optional face)
+  "Return a short bracketed, propertized label for STATUS-CONS, a (STATUS . SEEN) cons.
+FACE, when given, colours the badge in place of the status's own."
   (pcase-let ((`(,status . ,seen) status-cons))
     (let ((base (pcase status
                   ('busy (propertize "[busy]" 'face 'konix/mcp-server-status-busy-face))
@@ -1522,6 +1532,8 @@ color and readability.")
                   ('dead (propertize "[dead]" 'face 'konix/mcp-server-status-dead-face))
                   ('error (propertize "[error]" 'face 'konix/mcp-server-status-error-face))
                   (_ (propertize "[idle]" 'face 'konix/mcp-server-status-idle-face)))))
+      (when face
+        (setq base (propertize (substring-no-properties base) 'face face)))
       (if seen
           (concat base (propertize " - seen" 'face 'konix/mcp-server-status-seen-suffix-face))
         base))))
@@ -1646,7 +1658,9 @@ NODES and VIEW are as produced by `konix/mcp-server--collect-agent-nodes' and
          (agent (car agents))
          (status-sym (konix/mcp-server--agent-status buf))
          (seen (cdr status-sym))
-         (status-text (konix/mcp-server--status-label status-sym))
+         (status-text (konix/mcp-server--status-label
+                       status-sym
+                       (konix/mcp-server--given-status-face buf (car status-sym))))
          (status-face (get-text-property 0 'face status-text))
          (line-face (if seen
                         (list :slant 'italic

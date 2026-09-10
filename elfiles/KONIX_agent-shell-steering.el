@@ -169,6 +169,36 @@ Reads the tool's own output, where Monitor announces `Monitor started (task
      konix/agent-shell-steering-monitor-regexp
      (or (ignore-errors (konix/agent-shell--tool-output-text tool-call)) ""))))
 
+;;; Compaction guard ------------------------------------------------------------
+
+(defcustom konix/agent-shell-steering-compaction-regexp
+  (rx bos "Compact" (or "ing" "ed") symbol-end)
+  "Match the prose by which the agent announces it is compacting its context."
+  :type 'regexp :group 'konix)
+
+(defun konix/agent-shell-steering--compaction-text-p (text)
+  "Non-nil when TEXT is the agent announcing a compaction.
+Only its first and last non-empty lines are tested, so the notice counts when
+appended to prose already emitted, while a mention buried in a paragraph does
+not."
+  (when (stringp text)
+    (let ((lines (seq-remove #'string-empty-p
+                             (mapcar #'string-trim (split-string text "\n"))))
+          (case-fold-search nil))
+      (seq-some (lambda (line)
+                  (string-match-p konix/agent-shell-steering-compaction-regexp
+                                  line))
+                (delq nil (list (car lines) (car (last lines))))))))
+
+(defun konix/agent-shell-steering--compacting-p (event)
+  "Non-nil when EVENT reaches steering while the agent is compacting.
+Tests both the chunk EVENT carries, a delta possibly holding only part of the
+notice, and the agent's last message block."
+  (or (konix/agent-shell-steering--compaction-text-p
+       (map-elt (map-elt event :data) :text))
+      (konix/agent-shell-steering--compaction-text-p
+       (ignore-errors (konix/agent-shell--last-agent-message)))))
+
 ;;; The policy -----------------------------------------------------------------
 
 (defcustom konix/agent-shell-steering-rules-global
@@ -245,6 +275,7 @@ NOT submitted as a new prompt.  Submitting it (as earlier rounds do, via
 control back to user now\" notice used to lie about."
   (when (and (not konix/agent-shell--reason-delivery-scheduled)
              (not konix/agent-shell-steering--cap-stopped)
+             (not (konix/agent-shell-steering--compacting-p event))
              (shell-maker-busy)
              (null (konix/agent-shell--pending-permission-ids)))
     (when-let* ((pair (ignore-errors

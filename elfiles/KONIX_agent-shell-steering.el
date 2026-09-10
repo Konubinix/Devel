@@ -147,9 +147,7 @@ have been found had the espaces insécables (U+00A0) been plain spaces."
          (equal (map-elt tool-call :kind) "edit")
          (stringp file) (stringp old)
          (string-match-p "\\.org\\'" file)
-         (let ((failure (mapconcat
-                         (lambda (item) (or (map-nested-elt item '(content text)) ""))
-                         (append (map-elt tool-call :content) nil) "\n"))
+         (let ((failure (konix/agent-shell--tool-output-text tool-call))
                (case-fold-search t))
            (string-match-p "not found in file\\|string to replace not found" failure))
          (when-let ((contents (konix/agent-shell-steering--file-text file)))
@@ -157,11 +155,27 @@ have been found had the espaces insécables (U+00A0) been plain spaces."
             (regexp-quote (konix/agent-shell-steering--desinsecable old))
             (konix/agent-shell-steering--desinsecable contents))))))
 
+(defcustom konix/agent-shell-steering-monitor-regexp
+  (rx "Monitor started" (* space) "(task")
+  "Match the notice by which the Monitor tool reports a watch has started."
+  :type 'regexp :group 'konix)
+
+(konix/agent-shell-define-tool-evaluator "background-monitor" (tool-call)
+  "Match a tool call that started a background monitor.
+Reads the tool's own output, where Monitor announces `Monitor started (task
+..., timeout ...ms)'."
+  (let ((case-fold-search nil))
+    (string-match-p
+     konix/agent-shell-steering-monitor-regexp
+     (or (ignore-errors (konix/agent-shell--tool-output-text tool-call)) ""))))
+
 ;;; The policy -----------------------------------------------------------------
 
 (defcustom konix/agent-shell-steering-rules-global
   '(
     ("@background" . "Use foreground and the sleep mcp tool if needed")
+    ("@background-monitor"
+     . "Background events are not handled here, nothing will deliver them to you: use the sleep mcp tool to wait instead.")
     ("@insecable-character-failure"
      . "That edit to a .org note failed on espaces insécables (U+00A0): its OLD_STRING is in the file, spelled with insecables where you used plain spaces. Do NOT re-anchor around it: run the note_strip_insecables MCP tool on the file, redo all edits, then note_insecables to restore.")
     )

@@ -338,6 +338,14 @@ JSON -- so a regexp can target a command line or any tool argument
                      raw-string)
                "\n")))
 
+(defun konix/agent-shell--tool-output-text (tool-call)
+  "Return the text TOOL-CALL has produced so far.
+Joins the `text' of its `:content' blocks.  Outside the regexp haystack, which
+carries the request only, so reading a tool's output needs a lisp matcher."
+  (mapconcat (lambda (item) (or (map-nested-elt item '(content text)) ""))
+             (append (map-elt tool-call :content) nil)
+             "\n"))
+
 ;;; Parametrizable evaluators --------------------------------------------------
 ;; An evaluator may take parameters, referenced as `@NAME(ARG, ARG, ...)' --
 ;; the call syntax of Org Babel's `#+call: NAME(ARG, ARG)'.  The argument list

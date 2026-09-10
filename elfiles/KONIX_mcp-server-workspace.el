@@ -481,18 +481,8 @@
            (konix/mcp-server-workspace--read-file file
              (not (konix/mcp-server-workspace--anything-left-p)))))
 
-    (defconst konix/mcp-server-workspace-cut-said "Nothing more to do for the writer"
-      "What the shell says where it would have said the turn was cancelled.")
-
     (defvar-local konix/mcp-server-workspace--cut nil
       "Non-nil while this writer's turn was cut short for want of work.")
-
-    (defun konix/mcp-server-workspace--leave-the-round (writer)
-      "Take WRITER, and whatever shows it, out of the round the user walks."
-      (tracking-remove-buffer writer)
-      (when-let ((shown (agent-shell-viewport--buffer
-                         :shell-buffer writer :existing-only t)))
-        (tracking-remove-buffer shown)))
 
     (defun konix/mcp-server-workspace--cut-short (writer)
       "Cut WRITER's turn short when its workspace leaves it nothing to work on."
@@ -507,6 +497,12 @@
               (ignore-errors
                 (konix/agent-shell--cancel-pending-permissions))
               (konix/mcp-server-workspace--leave-the-round writer))))))
+    (defun konix/mcp-server-workspace--leave-the-round (writer)
+      "Take WRITER, and whatever shows it, out of the round the user walks."
+      (tracking-remove-buffer writer)
+      (when-let ((shown (agent-shell-viewport--buffer
+                         :shell-buffer writer :existing-only t)))
+        (tracking-remove-buffer shown)))
 
     (defun konix/mcp-server-workspace--nothing-here-for-the-user-p ()
       "Non-nil when this session's own workspace leaves it nothing to do."
@@ -515,7 +511,6 @@
 
     (add-hook 'konix/agent-shell-track-ready-skip-functions
               #'konix/mcp-server-workspace--nothing-here-for-the-user-p)
-
     (defface konix/mcp-server-workspace-nothing-left-face
       '((t :inherit shadow :weight bold))
       "Face the badge of a session whose workspace leaves it nothing wears."
@@ -528,6 +523,8 @@
 
     (add-hook 'konix/mcp-server-status-face-functions
               #'konix/mcp-server-workspace--nothing-left-face)
+    (defconst konix/mcp-server-workspace-cut-said "Nothing more to do for the writer"
+      "What the shell says where it would have said the turn was cancelled.")
 
     (defun konix/mcp-server-workspace--say-cut (event)
       "Say on EVENT what a turn cut short for want of work was, in the shell's own block."
@@ -540,7 +537,6 @@
          :block-id (format "%s-stop-reason"
                            (map-elt (agent-shell--state) :request-count))
          :body konix/mcp-server-workspace-cut-said)))
-
     (defvar-local konix/mcp-server-workspace--pushed nil
       "What was left to this writer when it was last told to carry on.")
 

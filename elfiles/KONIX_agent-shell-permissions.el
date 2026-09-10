@@ -2129,8 +2129,54 @@ buffer, so a rule just added/edited here acts on what is already waiting."
   (with-current-buffer (konix/agent-shell-panel--origin-buffer)
     (call-interactively #'konix/agent-shell-reapply-policies)))
 
+(defun konix/agent-shell--command-before-redirection (tool-call)
+  "Return TOOL-CALL's command line up to its first redirection, or nil.
+The whole command line when it has none, or when its AST is unavailable."
+  (when-let ((command (konix/agent-shell--tool-call-command tool-call)))
+    (or (ignore-errors
+          (konix/agent-shell--with-bash-ast root tool-call
+            (when-let ((starts (mapcar (lambda (capture)
+                                         (treesit-node-start (cdr capture)))
+                                       (treesit-query-capture
+                                        root '([(file_redirect)
+                                                (heredoc_redirect)] @r)))))
+              (string-trim (substring command 0 (1- (apply #'min starts)))))))
+        command)))
+
+(defun konix/agent-shell--tool-call-policy-key (tool-call)
+  "Return a policy KEY matching TOOL-CALL, or nil.
+An MCP call gets an `@mcp' candidate of
+`konix/agent-shell--mcp-candidates', the one holding an argument when there
+is one.  Anything else (a shell command, an edit, a write) gets its command
+line up to its first redirection, falling back to its title then its kind,
+regexp-quoted and anchored with `^': `konix/agent-shell--tool-haystack'
+gives each of those its own line."
+  (if-let* ((candidates (and (fboundp 'konix/agent-shell--mcp-candidates)
+                             (konix/agent-shell--mcp-candidates tool-call))))
+      (or (cadr candidates) (car candidates))
+    (when-let* ((field (seq-find (lambda (field)
+                                   (and (stringp field)
+                                        (not (string-empty-p field))))
+                                 (list (konix/agent-shell--command-before-redirection
+                                        tool-call)
+                                       (map-elt tool-call :title)
+                                       (map-elt tool-call :kind)))))
+      (concat "^" (regexp-quote field)))))
+
+(defun konix/agent-shell--pending-policy-key ()
+  "Return `konix/agent-shell--tool-call-policy-key' of the waiting request.
+Nil when none is waiting.  Call it in the shell buffer or in a viewport of it."
+  (when-let* ((shell (ignore-errors (konix/agent-shell--current-shell-or-error))))
+    (with-current-buffer shell
+      (when-let* ((id (car (konix/agent-shell--pending-permission-ids)))
+                  (tool-call (map-nested-elt (agent-shell--state)
+                                             (list :tool-calls id))))
+        (konix/agent-shell--tool-call-policy-key tool-call)))))
+
 (defun konix/agent-shell-policy-menu-add ()
-  "Add an entry to a chosen axis of the panel's policy."
+  "Add an entry to a chosen axis of the panel's policy.
+The key prompt starts prefilled with `konix/agent-shell--pending-policy-key'
+when a permission request is waiting in the origin session."
   (interactive)
   (let* ((policy (konix/agent-shell-panel-current-data))
          (origin (konix/agent-shell-panel--origin-buffer))
@@ -2139,7 +2185,10 @@ buffer, so a rule just added/edited here acts on what is already waiting."
                  (format "%s tool (regexp, @evaluator, or (lambda ...)): "
                          (capitalize (konix/agent-shell-policy-name policy)))
                  (ignore-errors (konix/agent-shell-policy--candidates policy))
-                 nil nil nil 'regexp-history)))
+                 nil nil
+                 (when-let ((prefill (konix/agent-shell--pending-policy-key)))
+                   (cons prefill 0))
+                 'regexp-history)))
          (value (read-string (konix/agent-shell-policy-value-prompt policy)
                              (with-current-buffer origin
                                (konix/agent-shell-policy--value-for policy key))))

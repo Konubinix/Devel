@@ -728,6 +728,10 @@ MCP Parameters:
 
 ;;; Tool registration
 
+(defconst konix/mcp-server-read-only-prefix "readonly_"
+  "Prefix given to the id of every tool declared `:read-only t'.
+It lets a client allow them as a batch, with one `mcp__SERVER__readonly_*' rule.")
+
 (defconst konix/mcp-server--tools
   '(("konix-emacs-buffers"
      (konix/mcp-server-list-buffers
@@ -838,55 +842,72 @@ MCP Parameters:
      ;; Introspection tools
      (konix/mcp-server-introspection-symbol-exists
       :id "symbol_exists"
-      :description "Check if a symbol exists.")
+      :description "Check if a symbol exists."
+      :read-only t)
      (konix/mcp-server-introspection-load-paths
       :id "load_paths"
-      :description "Return the users load paths.")
+      :description "Return the users load paths."
+      :read-only t)
      (konix/mcp-server-introspection-features
       :id "features"
-      :description "Return the list of loaded features.")
+      :description "Return the list of loaded features."
+      :read-only t)
      (konix/mcp-server-introspection-manual-names
       :id "manual_names"
-      :description "Return a list of available manual names.")
+      :description "Return a list of available manual names."
+      :read-only t)
      (konix/mcp-server-introspection-manual-nodes
       :id "manual_nodes"
-      :description "Retrieve a listing of topic nodes within a manual.")
+      :description "Retrieve a listing of topic nodes within a manual."
+      :read-only t)
      (konix/mcp-server-introspection-manual-node-contents
       :id "manual_node_contents"
-      :description "Retrieve the contents of a node in a manual.")
+      :description "Retrieve the contents of a node in a manual."
+      :read-only t)
      (konix/mcp-server-introspection-feature-available
       :id "feature_available"
-      :description "Check if a feature is loaded or available.")
+      :description "Check if a feature is loaded or available."
+      :read-only t)
      (konix/mcp-server-introspection-library-source
       :id "library_source"
-      :description "Read the source code for a library.")
+      :description "Read the source code for a library."
+      :read-only t)
      (konix/mcp-server-introspection-symbol-manual-section
       :id "symbol_manual_section"
-      :description "Returns contents of manual node for a symbol.")
+      :description "Returns contents of manual node for a symbol."
+      :read-only t)
      (konix/mcp-server-introspection-function-source
       :id "function_source"
-      :description "Returns the source code for a function.")
+      :description "Returns the source code for a function."
+      :read-only t)
      (konix/mcp-server-introspection-variable-source
       :id "variable_source"
-      :description "Returns the source code for a variable.")
+      :description "Returns the source code for a variable."
+      :read-only t)
      (konix/mcp-server-introspection-variable-value
       :id "variable_value"
-      :description "Returns the global value for a variable.")
+      :description "Returns the global value for a variable."
+      :read-only t)
      (konix/mcp-server-introspection-function-documentation
       :id "function_documentation"
-      :description "Returns the docstring for a function.")
+      :description "Returns the docstring for a function."
+      :read-only t)
      (konix/mcp-server-introspection-variable-documentation
       :id "variable_documentation"
-      :description "Returns the docstring for a variable.")
+      :description "Returns the docstring for a variable."
+      :read-only t)
      (konix/mcp-server-introspection-function-completions
       :id "function_completions"
-      :description "Returns a list of functions matching a prefix.")
+      :description "Returns a list of functions matching a prefix."
+      :read-only t)
      (konix/mcp-server-introspection-command-completions
       :id "command_completions"
-      :description "Returns a list of commands matching a prefix.")
+      :description "Returns a list of commands matching a prefix."
+      :read-only t)
      (konix/mcp-server-introspection-variable-completions
       :id "variable_completions"
-      :description "Returns a list of variables matching a prefix.")
+      :description "Returns a list of variables matching a prefix."
+      :read-only t)
      (konix/mcp-server-introspection-package-location
       :id "package_location"
       :description "Return the local repository directory for a package managed by straight.el."
@@ -896,14 +917,21 @@ Each TOOLS entry is (FUNCTION . PLIST); SERVER-ID must be one of
 `konix/mcp-server-ids'.")
 
 (defun konix/mcp-server-register-tools ()
-  "Register all KONIX MCP tools, each under its theme's server-id."
+  "Register all KONIX MCP tools, each under its theme's server-id.
+A `:read-only t' tool is exposed under `konix/mcp-server-read-only-prefix'
+followed by its id."
   (dolist (group konix/mcp-server--tools)
     (let ((server-id (car group)))
       (dolist (tool (cdr group))
-        (apply #'mcp-server-lib-register-tool
-               (car tool)
-               :server-id server-id
-               (cdr tool))))))
+        (let ((props (copy-sequence (cdr tool))))
+          (when (plist-get props :read-only)
+            (setq props (plist-put props :id
+                                   (concat konix/mcp-server-read-only-prefix
+                                           (plist-get props :id)))))
+          (apply #'mcp-server-lib-register-tool
+                 (car tool)
+                 :server-id server-id
+                 props))))))
 
 ;;; Server start/stop
 

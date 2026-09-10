@@ -360,14 +360,14 @@ Returns usage information including:
 
 (defun konix/claude-code--usage-pace-color (wait left)
   "Return the color for a window needing WAIT seconds of idling, LEFT to go.
-Green under pace, red once the idling would eat half of what remains: the
-same overspend is worth panicking about with hours to go and worth
-shrugging at right before a reset wipes it.  A fraction rather than
+Green on pace, red once the idling would eat half of what remains, cyan
+once as much of the window is going to waste.  A fraction rather than
 percentage points, so both windows share the scale."
   (let* ((over (/ wait (max 1.0 left)))
-         (hue (cond ((<= over -0.5) 120)
+         (hue (cond ((<= over -0.5) 185)
                     ((>= over 0.5) 0)
-                    (t (- 60 (* 120 over)))))
+                    ((< over 0) (- 120 (* 130 over)))
+                    (t (- 120 (* 240 over)))))
          (lightness (if (eq (frame-parameter nil 'background-mode) 'dark)
                         0.65 0.35)))
     (apply #'color-rgb-to-hex

@@ -52,7 +52,6 @@
               )
 
 (setq-default org-directory (concat perso-dir "/wiki"))
-(setq-default org-cycle-separator-lines -1)
 (setq-default org-default-notes-file (concat org-directory "/notes.org"))
 (setq-default org-enforce-todo-checkbox-dependencies t)
 (setq-default org-enforce-todo-dependencies t)

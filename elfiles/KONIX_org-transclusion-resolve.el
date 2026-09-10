@@ -50,6 +50,10 @@
 
 (require 'org)
 
+;; Defined by `org-transclusion', which is required lazily; declaring it special
+;; here keeps the `let' below dynamic once byte-compiled.
+(defvar org-transclusion-content-filter-org-functions)
+
 (defcustom konix/org-transclusion-resolve-max-total 200
   "Hard ceiling on how many `#+transclude:' directives one text may expand."
   :type 'integer
@@ -59,6 +63,11 @@
   "How often one identical `#+transclude:' line may expand before it is a cycle."
   :type 'integer
   :group 'konix)
+
+(defvar konix/org-transclusion-resolve-keep-frontmatter nil
+  "When non-nil, keep the frontmatter of the files being transcluded.
+Inhibits `konix/org-transclusion-strip-frontmatter', so the `#+keywords:'
+and file-level property drawer of a transcluded note reach the result.")
 
 (defconst konix/org-transclusion-resolve--keyword-regexp
   "^[ \t]*#\\+transclude:"
@@ -92,6 +101,7 @@ Point must sit at the beginning of the directive line."
 No directive can remain when this returns: each one is either replaced by the
 content it names, or this signals an error.  Relative links resolve against
 `default-directory', so set it to the note's own directory beforehand.
+Honours `konix/org-transclusion-resolve-keep-frontmatter'.
 
 See the Commentary of `KONIX_org-transclusion-resolve' for why
 `org-transclusion-add-all' cannot do this."
@@ -103,7 +113,12 @@ See the Commentary of `KONIX_org-transclusion-resolve' for why
       (org-transclusion-mode +1)))
   (let ((seen (make-hash-table :test #'equal))
         (total 0)
-        (done nil))
+        (done nil)
+        (org-transclusion-content-filter-org-functions
+         (if konix/org-transclusion-resolve-keep-frontmatter
+             (remq 'konix/org-transclusion-strip-frontmatter
+                   org-transclusion-content-filter-org-functions)
+           org-transclusion-content-filter-org-functions)))
     (while (not done)
       (goto-char (point-min))
       (if (not (let ((case-fold-search t))

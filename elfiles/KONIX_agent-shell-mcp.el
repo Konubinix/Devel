@@ -25,6 +25,7 @@
 
 (require 'KONIX_agent-shell-common)
 (require 'KONIX_agent-shell-panel)
+(require 'KONIX_org-transclusion-resolve)
 
 (defvar konix/agent-shell-mcp-base-url "http://192.168.2.5:9920"
   "Base URL of the konix MCP HTTP server.
@@ -159,19 +160,21 @@ spawner's `with-temp-buffer' resolution path."
 
 (defun konix/agent-shell-mcp-note-server-names (note-path)
   "Return the MCP server names NOTE-PATH declares, or nil.
-Collects every `#+MCP_SERVERS:' keyword of the note file itself
-\(transclusions are not resolved), names separated by commas or
-whitespace."
+Collects every `#+MCP_SERVERS:' keyword of the note with its `#+transclude:'
+directives resolved and their frontmatter kept, so the declaration of a
+transcluded note counts too.  An unresolvable directive signals an error.
+Names are separated by commas or whitespace, and deduplicated."
   (when (and note-path (file-readable-p note-path))
     (with-temp-buffer
-      (insert-file-contents note-path)
+      (insert (let ((konix/org-transclusion-resolve-keep-frontmatter t))
+                (konix/org-transclusion-resolve-file note-path)))
       (goto-char (point-min))
       (let ((case-fold-search t)
             names)
-        (while (re-search-forward "^#\\+MCP_SERVERS:\\(.*\\)$" nil t)
+        (while (re-search-forward "^[ \t]*#\\+MCP_SERVERS:\\(.*\\)$" nil t)
           (setq names (append names
                               (split-string (match-string 1) "[ \t,]+" t))))
-        names))))
+        (delete-dups names)))))
 
 (declare-function konix/mcp-server--tag-konix-server-id "KONIX_mcp-server-agent-shell")
 (declare-function konix/mcp-server--tag-konix-mcp-session "KONIX_mcp-server-agent-shell")

@@ -1081,8 +1081,17 @@ local function streamed_screen()
 	end
 end
 
+-- steam_proton is what proton calls a window with no steam app id behind it, i.e. every game
+-- bought outside steam and launched by its own sunshine entry.
 local function is_streamed_game(c)
-	return c.valid and c.class and (c.class:match("^steam_app_") or c.class:lower() == "retroarch")
+	return c.valid
+		and c.class
+		and (
+			c.class:match("^steam_app_")
+			or c.class == "steam_proton"
+			or c.class:lower() == "retroarch"
+			or c.class:lower() == "dosbox"
+		)
 end
 
 naughty.config.notify_callback = function(args)
@@ -1093,6 +1102,30 @@ naughty.config.notify_callback = function(args)
 	end
 	return args
 end
+
+-- The callback above only turns away what arrives after the game is up. Whatever was already
+-- on screen when the stream starts stays there, on top of the game and streamed with it, until
+-- its own timeout -- and a critical preset has none. So clear the screen at that moment too.
+local function clear_notifications_for_stream(c)
+	if is_streamed_game(c) and c.fullscreen then
+		naughty.destroy_all_notifications()
+	end
+end
+
+-- Covers a game that is already open and goes fullscreen later; the manage timer below covers
+-- the one that comes up fullscreen, where there is no property change to hear.
+client.connect_signal("property::fullscreen", clear_notifications_for_stream)
+
+-- These games re-apply a geometry of their own after being fullscreened, and awesome takes it,
+-- leaving the picture shifted and cropped. So clamp a fullscreen game to its screen.
+client.connect_signal("property::geometry", function(c)
+	if is_streamed_game(c) and c.fullscreen then
+		local g, s = c:geometry(), c.screen.geometry
+		if g.x ~= s.x or g.y ~= s.y or g.width ~= s.width or g.height ~= s.height then
+			c:geometry(s)
+		end
+	end
+end)
 
 -- {{{ Signals
 -- Signal function to execute when a new client appears.
@@ -1119,6 +1152,7 @@ client.connect_signal("manage", function(c)
 			end
 			c.fullscreen = true
 			c:raise()
+			clear_notifications_for_stream(c)
 		end
 		return false
 	end)

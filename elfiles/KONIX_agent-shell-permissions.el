@@ -279,6 +279,27 @@ e.g. tokenize it with `split-string-shell-command'."
     (agent-shell--tool-call-command-to-string
      (map-elt (map-elt tool-call :raw-input) 'command))))
 
+(defconst konix/agent-shell--path-input-keys
+  '(file_path filePath file-path path notebook_path notebookPath)
+  "The `:raw-input' keys naming a file a tool call targets.
+Claude Code sends `file_path' (`Edit', `Write') and `notebook_path'
+\(`NotebookEdit'); the other spellings cover the other agents and the MCP
+tools.")
+
+(defun konix/agent-shell--tool-call-target-paths (tool-call)
+  "Return the file paths TOOL-CALL's input names, as strings.
+Only the keys of `konix/agent-shell--path-input-keys' are read, so a path
+quoted inside an edit's `old_string'/`new_string' is not taken for a target.
+A non-string value yields nothing."
+  (let ((raw-input (map-elt tool-call :raw-input)))
+    (when (listp raw-input)
+      (seq-keep (lambda (key)
+                  (let ((value (map-elt raw-input key)))
+                    (and (stringp value)
+                         (not (string-empty-p (string-trim value)))
+                         (string-trim value))))
+                konix/agent-shell--path-input-keys))))
+
 (defun konix/agent-shell--tool-haystack (tool-call)
   "Return the text a policy regexp is matched against for TOOL-CALL.
 Joins the tool `:title', `:kind', the executed command line (from
@@ -862,12 +883,24 @@ script we cannot see).")
 files and `e'/`s///e' run a shell.  Only matching what is positively read-only
 keeps a `w' command from hiding behind the `w' of a regexp like `/window/'.")
 
+(defun konix/agent-shell--path-inside-p (path directory)
+  "Non-nil when PATH, canonicalized, is inside DIRECTORY.
+Both are resolved with `file-truename', which expands a relative name
+against `default-directory' and walks the symlinks.  DIRECTORY need not
+exist, unlike with `file-in-directory-p'.  A remote name is refused before
+canonicalizing it, which would have Tramp reach the host it names."
+  (and (stringp path) (stringp directory)
+       (not (file-remote-p path))
+       (not (file-remote-p directory))
+       (not (file-remote-p default-directory))
+       (string-prefix-p
+        (file-name-as-directory (file-truename directory))
+        (file-name-as-directory (file-truename path)))))
+
 (defun konix/agent-shell--path-inside-project-p (path)
-  "Non-nil when PATH is relative with no `..' hop, so it stays in the project.
-An absolute path reaches out of it -- including a `~'/`$HOME' argument, which
-`konix/agent-shell--argument-literal' has already expanded."
-  (and (not (file-name-absolute-p path))
-       (not (member ".." (split-string path "/")))))
+  "Non-nil when PATH, canonicalized, is inside the project `default-directory'.
+See `konix/agent-shell--path-inside-p'."
+  (konix/agent-shell--path-inside-p path default-directory))
 
 (defun konix/agent-shell--sed-read-only-p (command)
   "Non-nil when COMMAND, a `sed' node, only reads project files and writes stdout.
@@ -906,6 +939,64 @@ Combining commands is `@severalcommands'' business: here the line must run that
         (and (= (length commands) 1)
              (konix/agent-shell--sed-read-only-p (car commands)))))))
 
+(konix/agent-shell-define-tool-evaluator "project-paths" (tool-call)
+  "Match a line no argument of which reaches outside the project.
+An argument resolving out of it (`konix/agent-shell--path-inside-project-p')
+or not statically knowable does not."
+  (konix/agent-shell--with-bash-ast root tool-call
+    (seq-every-p
+     (lambda (command)
+       (let ((arguments (konix/agent-shell--command-argument-literals command)))
+         (and (not (memq nil arguments))
+              (seq-every-p #'konix/agent-shell--path-inside-project-p arguments))))
+     (konix/agent-shell--command-nodes root))))
+
+(konix/agent-shell-define-tool-evaluator "command-args-inside"
+    (tool-call &optional spec directory)
+  "Match a command matching SPEC called on something inside DIRECTORY.
+SPEC is a `konix/agent-shell--command-matches-p' spec (name or subcommand
+prefix); reference the pair as `@command-args-inside(SPEC, DIRECTORY)'.  One
+argument of that command resolving inside DIRECTORY is enough; an argument
+whose value is not statically knowable resolves nowhere."
+  (and spec directory
+       (konix/agent-shell--with-bash-ast root tool-call
+         (seq-some
+          (lambda (command)
+            (and (konix/agent-shell--command-matches-p command spec)
+                 (seq-some
+                  (lambda (argument)
+                    (konix/agent-shell--path-inside-p argument directory))
+                  (konix/agent-shell--command-argument-literals command))))
+          (konix/agent-shell--command-nodes root)))))
+
+(defun konix/agent-shell--file-tool-target-paths (tool-call)
+  "Return the paths TOOL-CALL targets, or nil when it runs a command line.
+A shell command writing a file is `@writes-outside''s business.  See
+`konix/agent-shell--tool-call-target-paths'."
+  (unless (konix/agent-shell--tool-call-command tool-call)
+    (konix/agent-shell--tool-call-target-paths tool-call)))
+
+(konix/agent-shell-define-tool-evaluator "edits-inside" (tool-call &optional directory)
+  "Match an `edit' tool call every target of which is inside DIRECTORY.
+Reference it as `@edits-inside(DIRECTORY)'.  The call must name at least one
+target; a missing DIRECTORY matches nothing."
+  (and directory
+       (equal (map-elt tool-call :kind) "edit")
+       (let ((paths (konix/agent-shell--file-tool-target-paths tool-call)))
+         (and paths
+              (seq-every-p (lambda (path)
+                             (konix/agent-shell--path-inside-p path directory))
+                           paths)))))
+
+(konix/agent-shell-define-tool-evaluator "targets-inside" (tool-call &optional directory)
+  "Match a file tool call naming a target inside DIRECTORY, whatever its kind.
+Reference it as `@targets-inside(DIRECTORY)'.  `@edits-inside' quantified the
+other way, so both fail closed: one target inside is enough here."
+  (and directory
+       (seq-some (lambda (path)
+                   (konix/agent-shell--path-inside-p path directory))
+                 (konix/agent-shell--file-tool-target-paths tool-call))))
+
 (defcustom konix/agent-shell-command-whitelist
   '("diff" "echo" "grep" "sort" "head" "uniq" "which" "awk" "plantuml"
   "openscad" "argdown" "ls" "head" "true" "false" "cat")
@@ -932,14 +1023,14 @@ the reference, e.g. `@whitelisted-commands(ls, gh pr check)'."
 ;; (buffer-local) axes.
 
 (defcustom konix/agent-shell-tool-blacklist-global
-  `(("\\(^\\(Write\\|Read\\|Edit\\) /tmp/[a-zA-Z0-9_.-]+$\\)" . "Write temp files into ./.agent-shell/tmp/ instead")
+  `(("@targets-inside(/tmp)" . "Write temp files into ./.agent-shell/tmp/ instead")
     ("@writes-outside(.agent-shell/tmp)" . "Redirect output into ./.agent-shell/tmp/ instead")
     ("@severalcommands" . "One command at a time. Use redirection to a file in ./.agent-shell/tmp if needing to chain stuff")
     ("@lost-search" . "You are lost, simply ask the user for guidance. Don't try to do all by yourself, make a team with the user.")
     ("@hascommand(cd)" . "Don't cd")
     ("^\\(bash -c\\|python3? -c\\|python3? - <<\\)" . "No oneliner")
     ("@edit-agent-permissions" . "Ask the user to do this")
-    ("find ~/.emacs.d" . "Use the mcp tools")
+    ("@command-args-inside(find, ~/.emacs.d)" . "Use the mcp tools")
     )
   "GLOBAL baseline alist of (KEY . REASON) blacklisted tools.
 Applied to every session, beneath the project and session layers which
@@ -960,8 +1051,8 @@ in the project.")
   "Buffer-local SESSION alist of (KEY . REASON) blacklisted tools.")
 
 (defcustom konix/agent-shell-tool-whitelist-global
-  '(("^Write \.agent-shell/tmp/[a-zA-Z0-9_.-]+$" . "")
-    ("^mkdir -p \\(./\\)?.agent-shell/tmp$")
+  '(("@edits-inside(.agent-shell/tmp)" . "Edits and writes confined to ./.agent-shell/tmp/")
+    ("(and \"@onlycommand(grep, mmdc, plantuml, jq, strings, base64, ls, sqlite3, rg, tail, sort, cut, mkdir, unzip)\" \"@project-paths\")")
     ("^bash -n")
     ("^gargdown map")
     ("^python3? -m py_compile")

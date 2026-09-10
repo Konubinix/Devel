@@ -428,7 +428,11 @@ MCP Parameters:
              (setq found t)))
          (unless found
            (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
-         (org-babel-tangle '(4))
+         ;; No one is there to answer `org-confirm-babel-evaluate' over MCP, and
+         ;; tangling evaluates on its own (noweb `<<block()>>' expansion, lisp-valued
+         ;; headers), so a prompt here is a hang, not a safeguard.
+         (let ((org-confirm-babel-evaluate nil))
+           (org-babel-tangle '(4)))
          (format "Tangled block '%s' from buffer %s" block-name buffer-name))))))
 
 (defun konix/mcp-server-remove-babel-result (buffer-name block-name &optional save-buffer)
@@ -542,7 +546,10 @@ MCP Parameters:
    (konix/mcp-server-with-buffer buffer-name
      (unless (derived-mode-p 'org-mode)
        (error "Buffer %s is not in org-mode" buffer-name))
-     (let ((files (org-babel-tangle)))
+     ;; See `konix/mcp-server-tangle-babel-block': confirmation cannot be answered
+     ;; from here, so it would hang rather than protect anything.
+     (let ((files (let ((org-confirm-babel-evaluate nil))
+                    (org-babel-tangle))))
        (format "Tangled %d file(s) from buffer %s: %s"
                (length files) buffer-name
                (string-join files ", "))))))

@@ -35,7 +35,7 @@
         (ts :from ,(- days-back) :to today)
         (not (tags ,@excluded-tags))
         )
-      :title (format "Clear recent Items from last %d days (excluding: %s)" days-back (string-join excluded-tags ", "))
+      :title (format "Clear -%d days (excluding: %s)" days-back (string-join excluded-tags ", "))
       :sort '(date)
       )
     )

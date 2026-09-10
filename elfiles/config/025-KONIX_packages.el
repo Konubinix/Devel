@@ -167,7 +167,7 @@
   (use-package michelson :straight (:type git :host github :repo "MiloDavis/michelson-mode"))
   (use-package miniedit :commands (miniedit))
   (use-package multiple-cursors)
-  (use-package nix-mode :commands (nix-mode))
+  (use-package nix-mode :commands (nix-mode) :straight (:fork t :branch "mine"))
   (use-package notmuch-addr)
   (use-package ol-emacs-slack :straight (:type git :host github :repo "ag91/ol-emacs-slack"))
   (use-package ol-notmuch)

@@ -375,7 +375,7 @@ whole narration, not just the request."
         (ignore-errors (funcall (eval form t) tool-call)))))
    (t
     (let ((case-fold-search t))
-      (string-match-p key haystack)))))
+      (string-match key haystack)))))
 
 (defun konix/agent-shell--spec-matches-p (spec tool-call haystack)
   "Return non-nil when SPEC matches TOOL-CALL against HAYSTACK.
@@ -397,6 +397,24 @@ function, or a boolean combination `(and SPEC...)', `(or SPEC...)' or
      (ignore-errors (funcall spec tool-call)))
     (_
      (konix/agent-shell--key-matches-p spec tool-call haystack))))
+
+(defun konix/agent-shell--matching-entries (entries subject haystack)
+  "Return the (KEY . VALUE) ENTRIES whose KEY matches SUBJECT/HAYSTACK, in order.
+A regexp KEY leaves its match data live, so the returned VALUE has its `\\N'
+backreferences replaced by the captures: the blacklist entry
+\(\"echo \\\\(.+\\\\)\" . \"do not print \\\\1\") declines `echo foobar' with
+\"do not print foobar\".  Match data is cleared before each KEY, so a VALUE
+whose backreferences KEY captured nothing for is kept verbatim."
+  (delq nil
+        (mapcar
+         (lambda (entry)
+           (set-match-data nil)
+           (when (konix/agent-shell--key-matches-p (car entry) subject haystack)
+             (cons (car entry)
+                   (or (ignore-errors
+                         (match-substitute-replacement (cdr entry) t nil haystack))
+                       (cdr entry)))))
+         entries)))
 
 (defun konix/agent-shell-tool-match-p (spec tool-call)
   "Return non-nil when SPEC matches TOOL-CALL.
@@ -1415,14 +1433,18 @@ STATE is \"off\", \"once\", \"on\", or nil to unset it (defer to the broader axi
 LETTER is a `konix/agent-shell-policy--disable-decider' \"s\"/\"p\"/\"G\"."
   (pcase letter ("G" 'global) ("p" 'project) (_ 'session)))
 
+(defun konix/agent-shell--policy-matches (policy tool-call)
+  "Return every POLICY entry matching TOOL-CALL, in effective order.
+Entries are matched by `konix/agent-shell--matching-entries', so a regexp
+key's captures appear in the returned reasons."
+  (konix/agent-shell--matching-entries
+   (konix/agent-shell-policy--effective policy)
+   tool-call
+   (konix/agent-shell--tool-haystack tool-call)))
+
 (defun konix/agent-shell-policy--match (policy tool-call)
-  "Return POLICY's matching entry for TOOL-CALL, or nil.
-Each entry's key is tested with `konix/agent-shell--key-matches-p' (regexp
-against the tool haystack, or a predicate form when it starts with `(')."
-  (let ((haystack (konix/agent-shell--tool-haystack tool-call)))
-    (seq-find (lambda (entry)
-                (konix/agent-shell--key-matches-p (car entry) tool-call haystack))
-              (konix/agent-shell-policy--effective policy))))
+  "Return POLICY's first matching entry for TOOL-CALL, or nil."
+  (car (konix/agent-shell--policy-matches policy tool-call)))
 
 ;;; Blacklist steering ---------------------------------------------------------
 
@@ -1695,18 +1717,6 @@ a now-whitelisted one auto-approved.  Returns the number resolved."
 ;; command line and the whole raw input as JSON).  This dumps that haystack
 ;; verbatim, plus the offered options and the rules that already fire, so you
 ;; can craft the regexp/evaluator with confidence rather than by guessing.
-
-(defun konix/agent-shell--policy-matches (policy tool-call)
-  "Return every POLICY entry (KEY . VALUE) that matches TOOL-CALL.
-Unlike `konix/agent-shell-policy--match', which stops at the first hit, this
-returns all matching entries (in effective order).  The blacklist responder
-and the background-launch steering use it to steer the agent with every
-matched reason, and the inspector uses it to show each rule that already fires
-on the request."
-  (let ((haystack (konix/agent-shell--tool-haystack tool-call)))
-    (seq-filter (lambda (entry)
-                  (konix/agent-shell--key-matches-p (car entry) tool-call haystack))
-                (konix/agent-shell-policy--effective policy))))
 
 (defun konix/agent-shell--rule-suggestions (tool-call)
   "Return a block of example policy KEYs that would match TOOL-CALL.

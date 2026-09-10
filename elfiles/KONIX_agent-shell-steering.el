@@ -168,8 +168,9 @@ regexp against the agent's last message (lisp keys also get `:agent-said')."
 Like `konix/agent-shell--policy-matches' for the blacklist: every rule that
 fires on the same event is returned (session shadows project shadows global),
 so steering can tell the agent about all of them, not just the first."
-  (seq-filter (lambda (e) (konix/agent-shell--key-matches-p (car e) subject haystack))
-              (konix/agent-shell-policy--effective konix/agent-shell--steering)))
+  (konix/agent-shell--matching-entries
+   (konix/agent-shell-policy--effective konix/agent-shell--steering)
+   subject haystack))
 
 ;;; Trigger --------------------------------------------------------------------
 

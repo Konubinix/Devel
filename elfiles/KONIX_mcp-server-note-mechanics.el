@@ -1,4 +1,4 @@
-;; [[id:6872a682-fc48-4e82-bbcd-6d4055a55f77][the checker, tangled:1]]
+;; [[id:6872a682-fc48-4e82-bbcd-6d4055a55f77::note-mechanics][note-mechanics]]
 ;;; KONIX_mcp-server-note-mechanics.el --- tangled from how_to_write_and_audit_a_note.org
 (defconst konix/note-intention-words
   '(("tl;dr"      . "what the note says, in one line")
@@ -12,21 +12,56 @@
     ("scope"      . "where the rule above reaches, and where it stops")
     ("example"    . "one instance of what precedes"))
   "The intention words a note may use, each with what it does.")
-(defun konix/mcp-server--visible-length (line)
+(defun konix/mcp-server--visible-length (line &optional markdown)
   "Length of LINE as it renders — an org link counts its description, or its target
-where it has none."
-  (length (replace-regexp-in-string
-           "\\[\\[\\([^]]*?\\)\\]\\[\\([^]]*?\\)\\]\\]" "\\2"
-           (replace-regexp-in-string "\\[\\[\\([^]]*?\\)\\]\\]" "\\1" line))))
+where it has none.  With MARKDOWN, a =[text](target)= counts its text alone, the
+target being an =href= the reader is never shown."
+  (let ((s (replace-regexp-in-string
+            "\\[\\[\\([^]]*?\\)\\]\\[\\([^]]*?\\)\\]\\]" "\\2"
+            (replace-regexp-in-string "\\[\\[\\([^]]*?\\)\\]\\]" "\\1" line))))
+    (length (if markdown
+                (replace-regexp-in-string
+                 "\\[\\([^]]*?\\)\\](\\([^)]*?\\))" "\\1" s)
+              s))))
+
+(defun konix/mcp-server--rendered-link-ranges (tree)
+  "Every span in TREE where a =[text](target)= is a link whose target no reader
+sees — an argdown block org exports as a map, or not at all, rather than as its
+own source.  Org is asked what it will export, since a header argument reaches a
+block from a =#+HEADER:= line, a property or a default as well as from its own."
+  (org-element-map tree 'src-block
+    (lambda (el)
+      (when (equal (org-element-property :language el) "argdown")
+        (let ((exports (save-excursion
+                         (goto-char (org-element-property :post-affiliated el))
+                         (cdr (assq :exports
+                                    (nth 2 (org-babel-get-src-block-info t)))))))
+          (when (member exports '("results" "none"))
+            (cons (org-element-property :begin el)
+                  (org-element-property :end el))))))))
+
+(defun konix/mcp-server--own-form-p (el)
+  "Non-nil where EL is no stray body line — it is either a bullet's own text, whose
+parent is the item itself at any nesting, or it sits in a quote block or a footnote
+definition, both of which keep their own form.  Those two are looked for at any
+depth, a quote block standing between EL and its bullet, and a definition holding
+blocks that hold EL."
+  (or (eq (org-element-type (org-element-property :parent el)) 'item)
+      (let ((p (org-element-property :parent el)))
+        (while (and p (not (memq (org-element-type p)
+                                 '(quote-block footnote-definition))))
+          (setq p (org-element-property :parent p)))
+        (and p t))))
 
 (defun konix/mcp-server--bullet-length (item)
   "How long ITEM reads — its « intention word », its =::= and its own text, wrapping
 folded back into one run.  A nested bullet is a bullet of its own and counts there,
-and an org link counts as it renders."
+a quote block keeps its own form and is not the bullet's to answer for, and an org
+link counts as it renders."
   (let* ((own (seq-remove (lambda (c)
                             (memq (org-element-type c)
-                                  '(plain-list table src-block example-block
-                                    export-block fixed-width)))
+                                  '(plain-list table quote-block src-block
+                                    example-block export-block fixed-width)))
                           (org-element-contents item)))
          (tag (org-element-property :tag item))
          (say (lambda (d) (org-no-properties (org-element-interpret-data d))))
@@ -65,15 +100,19 @@ its tags, so the depth rule has nothing to guard."
        t))
 
 (defun konix/mcp-server--babel-result-ranges ()
-  "Every babel result in the buffer, as a list of (BEG . END) — the lines babel wrote."
+  "Every babel result in the buffer, as a list of (BEG . END) — the lines babel wrote.
+Found by the =#+RESULTS:= keyword rather than by walking the source blocks, since a
+=#+CALL:= line writes one too and has no block of its own to walk from."
   (let (ranges)
-    (org-babel-map-src-blocks nil
-      (let ((res (org-babel-where-is-src-block-result)))
-        (when res
-          (save-excursion
-            (goto-char res)
-            (forward-line 1)
-            (push (cons res (org-babel-result-end)) ranges)))))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward org-babel-result-regexp nil t)
+        (let ((beg (match-beginning 0)) end)
+          (goto-char beg)
+          (forward-line 1)
+          (setq end (org-babel-result-end))
+          (push (cons beg end) ranges)
+          (goto-char (max end (1+ beg))))))
     ranges))
 
 (defun konix/mcp-server--skip-ranges (tree)
@@ -211,7 +250,7 @@ MCP Parameters:
                                               (or org-footnote-section "Footnotes")))
                              hl)))))
               not-a-bullet no-tag long-tag unknown-tag long-line long-bullet bad-link
-              deep inline-fn stray-top orphan
+              deep inline-fn undef-fn stray-top orphan
               (seen (make-hash-table :test #'equal)))
          (org-element-map tree '(paragraph item)
            (lambda (el)
@@ -219,8 +258,7 @@ MCP Parameters:
                    (tag (org-element-property :tag el)))
                (pcase (org-element-type el)
                  ('paragraph
-                  (unless (memq (org-element-type (org-element-property :parent el))
-                                '(item footnote-definition))
+                  (unless (konix/mcp-server--own-form-p el)
                     (push line not-a-bullet)))
                  ('item
                   (let ((n (konix/mcp-server--bullet-length el)))
@@ -242,13 +280,15 @@ MCP Parameters:
                             (unless (member word allowed)
                               (push (cons line word) unknown-tag)))
                         (push (cons line word) long-tag)))))))))
-         (let ((ranges (konix/mcp-server--babel-result-ranges)))
+         (let ((ranges (konix/mcp-server--babel-result-ranges))
+               (rendered (konix/mcp-server--rendered-link-ranges tree)))
            (save-excursion
              (goto-char (point-min))
              (while (not (eobp))
                (let* ((bol (line-beginning-position))
                       (vis (konix/mcp-server--visible-length
-                            (buffer-substring-no-properties bol (line-end-position)))))
+                            (buffer-substring-no-properties bol (line-end-position))
+                            (konix/mcp-server--in-ranges-p bol rendered))))
                  (when (and (>= vis 120)
                             (not (konix/mcp-server--exempt-line-p bol ranges)))
                    (push (cons (line-number-at-pos) vis) long-line)))
@@ -309,10 +349,22 @@ MCP Parameters:
                                      (org-element-property :begin el))
                                     flaw raw transclude)
                               bad-link)))))))))
-         (org-element-map tree 'footnote-reference
-           (lambda (fn)
-             (when (eq (org-element-property :type fn) 'inline)
-               (push (line-number-at-pos (org-element-property :begin fn)) inline-fn))))
+         (let ((defined
+                (append
+                 (org-element-map tree 'footnote-definition
+                   (lambda (fd) (org-element-property :label fd)))
+                 (org-element-map tree 'footnote-reference
+                   (lambda (fn)
+                     (when (eq (org-element-property :type fn) 'inline)
+                       (org-element-property :label fn)))))))
+           (org-element-map tree 'footnote-reference
+             (lambda (fn)
+               (let ((line (line-number-at-pos (org-element-property :begin fn)))
+                     (label (org-element-property :label fn)))
+                 (if (eq (org-element-property :type fn) 'inline)
+                     (push line inline-fn)
+                   (when (and label (not (member label defined)))
+                     (push (cons line label) undef-fn)))))))
          (let (inventory
                (say (lambda (f)
                       (pcase f
@@ -371,6 +423,10 @@ MCP Parameters:
                      (format "inline-footnote — its text sits in the line, not at the foot:\n%s"
                              (mapconcat (lambda (l) (format "  line %d" l))
                                         (nreverse inline-fn) "\n")))
+                   (when undef-fn
+                     (format "undefined-footnote — the reference has no definition:\n%s"
+                             (mapconcat (lambda (c) (format "  line %d: %s" (car c) (cdr c)))
+                                        (nreverse undef-fn) "\n")))
                    (let ((ls (funcall group (lambda (l)
                                               (and (not (nth 3 l))
                                                    (memq (nth 1 l) '(broken unknown)))))))
@@ -414,4 +470,4 @@ MCP Parameters:
             "\n")))))))
 
 (provide 'KONIX_mcp-server-note-mechanics)
-;; the checker, tangled:1 ends here
+;; note-mechanics ends here

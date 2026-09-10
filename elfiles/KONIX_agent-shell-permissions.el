@@ -1193,7 +1193,7 @@ their own.  DISABLED-POLICY, when non-nil, is a companion whose \"off\" keys
    :global-var 'konix/agent-shell-tool-blacklist-global
    :project-var 'konix/agent-shell-tool-blacklist-project
    :session-var 'konix/agent-shell-tool-blacklist
-   :default "Don't use this tool."
+   :default ""
    :value-label "Reason"
    :value-prompt "Reason (sent to the agent): "
    :disabled-policy konix/agent-shell--blacklist-disabled)

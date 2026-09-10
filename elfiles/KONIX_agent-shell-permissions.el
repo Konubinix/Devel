@@ -1100,7 +1100,7 @@ in the project.")
 (defcustom konix/agent-shell-tool-whitelist-global
   '(("@edits-inside(.agent-shell/tmp)" . "Edits and writes confined to ./.agent-shell/tmp/")
     ("(and \"@onlycommand(grep, mmdc, plantuml, jq, strings, base64, ls, sqlite3, rg, tail, sort, cut, mkdir, unzip)\" \"@project-paths\")")
-    ("^bash -n")
+    ("^\\(ba\\)?sh -n")
     ("^gargdown map")
     ("^python3? -m py_compile")
     ("@read-only-sed" . "sed that only reads project files and prints")

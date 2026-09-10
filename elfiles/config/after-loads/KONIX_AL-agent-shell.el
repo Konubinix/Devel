@@ -40,6 +40,7 @@
 (require 'KONIX_agent-shell-resume)
 (require 'KONIX_agent-shell-session-ops)
 (require 'KONIX_agent-shell-permissions)
+(require 'KONIX_agent-shell-permissions-mcp)
 (require 'KONIX_agent-shell-permissions-find)
 (require 'KONIX_agent-shell-steering)
 (require 'KONIX_agent-shell-viewport)

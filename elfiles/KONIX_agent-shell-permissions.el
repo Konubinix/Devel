@@ -100,24 +100,42 @@ the MCP servers / agent runtime) -- the kind set is fixed, so it can be
 matched without waiting for a matching tool to appear in a session.")
 
 (defvar-local konix/agent-shell-tool-history nil
-  "Buffer-local list of tool titles/kinds seen in this session.
+  "Buffer-local list of policy candidates this session's tool calls yielded.
 Accumulated as tool calls happen (see
 `konix/agent-shell--record-tool-call') and never cleared, unlike
 agent-shell's own `:tool-calls' state which is wiped at the end of every
 turn.  Used to offer past tools as policy completions.")
 
+(defvar konix/agent-shell-tool-candidate-functions nil
+  "Functions returning further policy candidates for a tool call.
+Each is called with the tool-call alist and returns a list of strings, added
+to `konix/agent-shell-tool-history' beside the call's title and kind.  The
+extension point a matcher module registers into, so a rule shape it
+introduces can be completed rather than typed out -- see
+`KONIX_agent-shell-permissions-mcp'.")
+
+(defun konix/agent-shell--tool-call-candidates (tool-call)
+  "Return the policy-completion candidates TOOL-CALL yields.
+Its title and kind, plus whatever
+`konix/agent-shell-tool-candidate-functions' make of it."
+  (append (seq-filter (lambda (field)
+                        (and (stringp field) (not (string-empty-p field))))
+                      (list (map-elt tool-call :title)
+                            (map-elt tool-call :kind)))
+          (mapcan (lambda (function)
+                    (ignore-errors (funcall function tool-call)))
+                  konix/agent-shell-tool-candidate-functions)))
+
 (defun konix/agent-shell--record-tool-call (state _tool-call-id tool-call)
-  "Record TOOL-CALL's title and kind into the session's tool history.
+  "Record the candidates TOOL-CALL yields into the session's tool history.
 An `:after' advice on `agent-shell--save-tool-call'.  STATE carries the
 shell `:buffer', where `konix/agent-shell-tool-history' lives, so the
 history survives the per-turn clearing of STATE's `:tool-calls'."
   (when-let* ((buffer (map-elt state :buffer))
               ((buffer-live-p buffer)))
     (with-current-buffer buffer
-      (dolist (field (list (map-elt tool-call :title)
-                           (map-elt tool-call :kind)))
-        (when (and (stringp field) (not (string-empty-p field)))
-          (cl-pushnew field konix/agent-shell-tool-history :test #'equal))))))
+      (dolist (candidate (konix/agent-shell--tool-call-candidates tool-call))
+        (cl-pushnew candidate konix/agent-shell-tool-history :test #'equal)))))
 
 (advice-add 'agent-shell--save-tool-call :after
             #'konix/agent-shell--record-tool-call)
@@ -185,10 +203,12 @@ two apart."
 
 (defun konix/agent-shell--tool-candidates ()
   "Return policy completion candidates for the current session.
-The fixed ACP tool kinds (`konix/agent-shell-tool-kinds'), the titles and
-kinds of tool calls seen so far this session
-\(`konix/agent-shell-tool-history'), and the registered named evaluators
-\(`konix/agent-shell-tool-evaluators') as `@NAME'."
+The fixed ACP tool kinds (`konix/agent-shell-tool-kinds'), what the tool
+calls seen so far this session yielded
+\(`konix/agent-shell-tool-history' -- their titles and kinds, and the rules
+`konix/agent-shell-tool-candidate-functions' made of them), and the
+registered named evaluators (`konix/agent-shell-tool-evaluators') as
+`@NAME'."
   (with-current-buffer (konix/agent-shell--current-shell-or-error)
     (delete-dups
      (append (copy-sequence konix/agent-shell-tool-kinds)

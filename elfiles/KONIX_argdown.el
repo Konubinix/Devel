@@ -1,4 +1,4 @@
-;; [[id:4a21535e-8f34-4a0b-8014-bc862bda9785::KONIX_argdown-mode][KONIX_argdown-mode]]
+;; [[id:4a21535e-8f34-4a0b-8014-bc862bda9785::-*- lexical-binding: t; -*-][-*- lexical-binding: t; -*-]]
 ;;; KONIX_argdown.el --- Argdown mode + org-babel  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021  konubinix
@@ -50,7 +50,7 @@
    markdown-unordered-list-item-prefix "  + "
    )
   )
-;; KONIX_argdown-mode ends here
+;; -*- lexical-binding: t; -*- ends here
 
 (defun argdown--require-bin ()
   "Error unless the `argdown' CLI is reachable (it ships its own Graphviz)."

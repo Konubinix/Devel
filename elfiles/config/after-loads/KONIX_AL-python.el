@@ -41,7 +41,6 @@
                                           (buffer-file-name)))
   )
 
-(defun konix/python-mode-hook ())
 
 (defun konix/python-mode-hook ()
   (setq tab-width 4)
@@ -103,6 +102,8 @@
   )
 (add-hook 'python-mode-hook
           'konix/python-mode-hook)
+
+(defun konix/python-mode-hook ())
 
 (defun konix/python/make-executable ()
   (when (save-excursion

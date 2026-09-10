@@ -447,11 +447,6 @@ BODY must return plain data: nodes die with the tree."
            (when (buffer-live-p ,buffer)
              (kill-buffer ,buffer)))))))
 
-(defun konix/agent-shell--command-names (root)
-  "Return every command name in ROOT's AST."
-  (mapcar (lambda (cap) (treesit-node-text (cdr cap) t))
-          (treesit-query-capture root '((command_name) @n))))
-
 (defun konix/agent-shell--toplevel-command-p (node)
   "Non-nil when NODE is a command not in the branch of another command."
   (let ((parent (treesit-node-parent node)) (top t))
@@ -486,7 +481,8 @@ and `$HOME'/`${HOME}'.  Any other expansion, command substitution or process
 substitution makes the whole argument unknown -- nil rather than a guess, since
 callers use this to decide what a command really touches."
   (pcase (treesit-node-type node)
-    ("word" (let ((text (treesit-node-text node t)))
+    ((or "word" "number")
+     (let ((text (treesit-node-text node t)))
               ;; `~' is a shell feature, not part of the file name.
               (if (string-match-p "\\`~\\(/\\|\\'\\)" text)
                   (expand-file-name text)
@@ -631,6 +627,29 @@ command line grammar, see `KONIX_shell-search'."
 Deliberately excludes anything that can execute (`sh', `xargs', `awk', ...)
 or write files (`tee', `sed -i', `yq -i', ...).")
 
+(defconst konix/agent-shell--command-wrappers
+  '(("timeout" . "\\`[0-9]+\\(?:\\.[0-9]+\\)?[smhd]?\\'")
+    ("nice" . "\\`-?[0-9]+\\'")
+    ("ionice" . "\\`[0-9]+\\'")
+    ("stdbuf")
+    ("time"))
+  "Commands running the command that follows them, as (NAME . VALUE-REGEXP).
+NAME's own words are its options plus the one value VALUE-REGEXP matches, nil
+for a wrapper taking options alone.")
+
+(defun konix/agent-shell--sans-command-wrapper (tokens)
+  "Return TOKENS without their leading `konix/agent-shell--command-wrappers'.
+What comes back starts at the command TOKENS run."
+  (if-let ((wrapper (assoc (car tokens) konix/agent-shell--command-wrappers)))
+      (let ((rest (cdr tokens)))
+        (while (and (stringp (car rest))
+                    (or (string-prefix-p "-" (car rest))
+                        (and (cdr wrapper)
+                             (string-match-p (cdr wrapper) (car rest)))))
+          (setq rest (cdr rest)))
+        (konix/agent-shell--sans-command-wrapper rest))
+    tokens))
+
 (defconst konix/agent-shell--gh-read-subcommands
   '(("status") ("version") ("auth" "status")
     ("config" "get") ("config" "list") ("alias" "list") ("extension" "list")
@@ -640,7 +659,8 @@ or write files (`tee', `sed -i', `yq -i', ...).")
     ("release" "list") ("release" "view")
     ("gist" "list") ("gist" "view")
     ("cache" "list") ("ruleset" "list") ("ruleset" "view")
-    ("run" "list") ("run" "view") ("workflow" "list") ("workflow" "view")
+    ("run" "list") ("run" "view") ("run" "watch")
+    ("workflow" "list") ("workflow" "view")
     ("org" "list")
     ("project" "list") ("project" "view")
     ("project" "item-list") ("project" "field-list")
@@ -652,10 +672,9 @@ list for a top-level command.  `gh api' is deliberately absent: whether it
 reads depends on its flags, see `konix/agent-shell--gh-api-read-p'.
 
 Kept out on purpose: anything writing the working tree (`repo clone',
-`release download', `run download'), anything blocking for a long time
-\(`run watch'), anything mutating GitHub (`create', `edit', `merge',
-`close', ...), and the secret/variable readers, whose output is a credential
-even though the call itself is a read.")
+`release download', `run download'), anything mutating GitHub (`create',
+`edit', `merge', `close', ...), and the secret/variable readers, whose output
+is a credential even though the call itself is a read.")
 
 (defun konix/agent-shell--gh-subcommand-path (tokens)
   "Return the leading subcommand words of the `gh' call TOKENS, at most two.
@@ -709,7 +728,8 @@ listed in `konix/agent-shell--gh-read-subcommands', or it is a `gh api' call
 that reads (see `konix/agent-shell--gh-api-read-p').  A `--web' anywhere
 disqualifies it: that form prints nothing and pops a browser window open
 instead.  Tokenized with `konix/shell-parse-tokenize'."
-  (let* ((tokens (konix/shell-parse-tokenize segment))
+  (let* ((tokens (konix/agent-shell--sans-command-wrapper
+                  (konix/shell-parse-tokenize segment)))
          (path (konix/agent-shell--gh-subcommand-path tokens)))
     (and
      tokens
@@ -798,31 +818,28 @@ Anything else falls through to a manual prompt."
              (cdr segments)))))))
 
 (konix/agent-shell-define-tool-evaluator "wrapped-script-run" (tool-call script-re)
-  "Match a run of the script matched by SCRIPT-RE, however it is wrapped.
-Auto-approvable: the line must reference a command matching SCRIPT-RE, and
-every command on it must be that script, `timeout', `echo', or a read-only
-filter (grep/head/...).  So the timeout value, args and any grep filter are
-free, but no extra command can be smuggled in via `;' or `|'.
+  "Match a line whose only work is running the script SCRIPT-RE names.
+SCRIPT-RE must appear on it, and every command it runs -- read through its
+wrapper prefix -- must be that script or a read-only filter.
 Reference it as the key `@wrapped-script-run(REGEXP)'."
   (konix/agent-shell--with-bash-ast root tool-call
-    (let ((commands (mapcar #'cdr (treesit-query-capture root '((command) @c))))
-          (names (konix/agent-shell--command-names root))
-          (allowed (append konix/agent-shell--read-only-filters '("timeout" "echo"))))
+    (let ((commands (konix/agent-shell--command-nodes root)))
       (and commands
            ;; the script is referenced somewhere on the line
            (seq-some
             (lambda (c)
               (seq-some (lambda (w) (string-match-p script-re w))
-                        (cons (or (treesit-node-text
-                                   (treesit-node-child-by-field-name c "name") t) "")
+                        (cons (or (konix/agent-shell--command-name c) "")
                               (konix/agent-shell--command-word-arguments c))))
             commands)
-           ;; every command is the script, timeout, echo, or a read-only filter
            (seq-every-p
-            (lambda (name)
-              (or (string-match-p script-re name)
-                  (member name allowed)))
-            names)))))
+            (lambda (c)
+              (when-let ((name (car (konix/agent-shell--sans-command-wrapper
+                                     (cons (konix/agent-shell--command-name c)
+                                           (konix/agent-shell--command-argument-literals c))))))
+                (or (string-match-p script-re name)
+                    (member name konix/agent-shell--read-only-filters))))
+            commands)))))
 
 (defconst konix/agent-shell--sed-read-only-options
   '("-n" "--quiet" "--silent" "-E" "-r" "--regexp-extended" "-s" "--separate"

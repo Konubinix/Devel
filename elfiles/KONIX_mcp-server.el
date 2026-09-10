@@ -26,6 +26,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'bytecomp)
 (require 'mcp-server-lib)
 (require 'project)
 (require 'KONIX_mcp-server-introspection)
@@ -578,6 +579,108 @@ MCP Parameters:
      (load-file path)
      (format "Loaded %s" path))))
 
+(defun konix/mcp-server--check-parens (path)
+  "Return nil when PATH's parens balance, else a string locating the problem.
+Run before byte-compiling: the reader stops at the first unbalanced form and
+reports it as a plain end-of-file, which says nothing about where the stray
+paren is, whereas `check-parens' points at it."
+  (with-temp-buffer
+    (insert-file-contents path)
+    (delay-mode-hooks (emacs-lisp-mode))
+    (condition-case err
+        (progn (check-parens) nil)
+      (error (format "%s:%d:%d: unbalanced expression: %s"
+                     (file-name-nondirectory path)
+                     (line-number-at-pos)
+                     (current-column)
+                     (error-message-string err))))))
+
+(defconst konix/mcp-server--bytecomp-noise-regexp
+  (rx bos (or "Entering directory" "Leaving directory"
+              (seq "Compiling file " (* nonl) " at ")
+              "Wrote "))
+  "Progress lines `byte-compile-file' writes into its log whatever we bind.
+Dropped from the reported output, which keeps only the diagnostics.")
+
+(defun konix/mcp-server--bytecomp-warnings ()
+  "Return the byte-compile log when it holds a diagnostic, else nil.
+A diagnostic is a line carrying `Warning:' or `Error:'; the log is never
+empty otherwise, since `byte-compile-file' always logs its progress."
+  (when-let ((buf (get-buffer byte-compile-log-buffer)))
+    (let* ((lines (with-current-buffer buf
+                    (split-string (buffer-substring-no-properties
+                                   (point-min) (point-max))
+                                  "\n" t)))
+           (kept (seq-remove
+                  (lambda (line)
+                    (string-match-p konix/mcp-server--bytecomp-noise-regexp line))
+                  lines)))
+      (when (seq-some (lambda (line)
+                        (string-match-p (rx (or "Warning:" "Error:")) line))
+                      kept)
+        (string-join kept "\n")))))
+
+(defun konix/mcp-server-check-elisp (file-path)
+  "Byte-compile an Emacs Lisp file and return its warnings, without loading it.
+
+Checks paren balance first, then byte-compiles in THIS Emacs, so the real
+`load-path' and already-loaded features are in scope and every `require' at
+the top of the file resolves.  A batch `emacs -Q' cannot do that: it dies on
+the first `require' and never reads the rest of the file, so it reports
+nothing about the code you actually changed.
+
+The .elc is written to a temporary directory and discarded, and the file is
+never loaded, so nothing in the running Emacs changes -- use `load_file' for
+that.  Catches unbalanced parens, calls to undefined functions, references to
+free variables, wrong argument counts and unused lexical bindings.
+
+An empty warning list is the passing answer; the return value says so
+explicitly rather than staying silent.
+
+MCP Parameters:
+  file-path - Absolute path to the .el file to check"
+  (mcp-server-lib-with-error-handling
+   (let ((path (expand-file-name (decode-coding-string file-path 'utf-8))))
+     (unless (file-exists-p path)
+       (error "File not found: %s" path))
+     ;; Compiling reads from disk, so an unsaved buffer would have us check
+     ;; code the caller never wrote and report clean on it.
+     (when-let ((buf (find-buffer-visiting path)))
+       (when (buffer-modified-p buf)
+         (error "Buffer %s has unsaved changes, so %s on disk is not what you edited — save it, then check again"
+                (buffer-name buf) (file-name-nondirectory path))))
+     (or (konix/mcp-server--check-parens path)
+         (let* ((tmp-dir (make-temp-file "konix-bytecomp" t))
+                (byte-compile-dest-file-function
+                 (lambda (_src) (expand-file-name "checked.elc" tmp-dir)))
+                (byte-compile-warnings t)
+                (byte-compile-verbose nil)
+                ;; Log into a buffer of our own, never displayed and killed
+                ;; below: the caller gets the diagnostics as its return value,
+                ;; so popping the log up in the user's Emacs and leaving it
+                ;; behind is pure noise.  `warning-minimum-level' is what
+                ;; `display-warning' consults before displaying the buffer,
+                ;; and `inhibit-message' hides the "Wrote ...elc" echo.
+                (byte-compile-log-buffer (generate-new-buffer-name
+                                          " *konix-bytecomp-log*"))
+                (warning-minimum-level :emergency)
+                (inhibit-message t))
+           (unwind-protect
+               (let* ((ok (byte-compile-file path))
+                      (log (konix/mcp-server--bytecomp-warnings)))
+                 (cond
+                  ((and ok (null log))
+                   (format "%s: compiles clean, no warning"
+                           (file-name-nondirectory path)))
+                  (ok (format "%s: compiles, with warnings:\n%s"
+                              (file-name-nondirectory path) log))
+                  (t (format "%s: FAILED to compile:\n%s"
+                             (file-name-nondirectory path)
+                             (or log "no detail in the compile log")))))
+             (when-let ((buf (get-buffer byte-compile-log-buffer)))
+               (kill-buffer buf))
+             (delete-directory tmp-dir t)))))))
+
 (defun konix/mcp-server-get-server-location ()
   "Get the location of the MCP server elisp file.
 
@@ -725,6 +828,10 @@ MCP Parameters:
      (konix/mcp-server-load-file
       :id "load_file"
       :description "Load an Emacs Lisp file at the given absolute path using load-file.")
+     (konix/mcp-server-check-elisp
+      :id "check_elisp"
+      :description "Byte-compile an .el file in THIS Emacs and return its warnings, without loading it. This is THE way to check elisp you just edited — do NOT shell out to `emacs -Q --batch` (it has no load-path, so it dies on the file's first require and never reads the code you changed) and do NOT hand-roll a --eval one-liner. Checks paren balance first (pointing at the stray paren, which the reader's bare end-of-file error does not), then compiles with all warnings on: undefined functions, free variables, wrong argument counts, unused lexical bindings. The .elc goes to a temp dir and is discarded and the file is never loaded, so the running Emacs is unchanged (use load_file to actually load). Errors if an unsaved buffer visits the file, rather than checking a stale on-disk copy. Read-only."
+      :read-only t)
      (konix/mcp-server-reload-and-restart
       :id "reload_and_restart"
       :description "Reload the MCP server file to pick up changes, then restart the server. Call this automatically after editing KONIX_mcp-server.el to apply changes.")

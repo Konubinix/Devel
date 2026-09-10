@@ -23,6 +23,8 @@
 
 ;;; Code:
 
+(add-to-list 'org-roam-file-exclude-regexp "\\.agent-shell/")
+
 (defun konix/org-roam-compute-slug (title)
   (org-roam-node-slug (org-roam-node-create :title title))
   )

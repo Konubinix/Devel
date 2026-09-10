@@ -252,51 +252,78 @@ shell buffer so subscribers run there."
        (map-nested-elt (buffer-local-value 'agent-shell--state shell)
                        '(:session :id))))
 
-(defun konix/agent-shell-governing-note (&optional shell)
-  "Return the governing note path bound to SHELL (default current buffer).
-Prefers SHELL's buffer-local binding and falls back to the value
-persisted for its session id, so a reloaded or freshly resumed shell
-still resolves its note."
+;;; Per-session bindings -------------------------------------------------------
+;; A store keyed by session id is enough for whatever is set with the id already
+;; in hand — the model and the mode are set that way, from advice on the choke
+;; point.  What is set against a *shell* needs three things more: somewhere to
+;; hold the value while a fresh session has no id yet, a deferred write once it
+;; has one, and side effects to run each time it binds.
+
+(cl-defstruct (konix/agent-shell-session-binding
+               (:constructor konix/agent-shell-session-binding-create))
+  store       ; `konix/agent-shell-session-store' it is persisted to
+  variable    ; buffer-local symbol holding it before the session has an id
+  on-bind)    ; called with (SHELL VALUE) whenever it binds, VALUE nil on unbind
+
+(defun konix/agent-shell-session-binding-value (binding &optional shell)
+  "Return what BINDING holds for SHELL, or nil.
+The buffer-local first, then the store, so a resumed shell resolves it
+without anything having run."
   (let ((shell (or shell (current-buffer))))
     (when (buffer-live-p shell)
-      (or (buffer-local-value 'konix/agent-shell--governing-note shell)
+      (or (buffer-local-value (konix/agent-shell-session-binding-variable binding)
+                              shell)
           (konix/agent-shell-session-store-get
-           konix/agent-shell-session-notes-store
+           (konix/agent-shell-session-binding-store binding)
            (konix/agent-shell--shell-session-id shell))))))
 
-(defun konix/agent-shell-set-governing-note (shell note-path)
-  "Bind NOTE-PATH as SHELL's governing note, buffer-local and on disk.
-The disk entry is keyed by SHELL's session id; when the id is not known
-yet (a just-started session), it is written once the session is ready."
+(defun konix/agent-shell-session-binding--persist (binding shell value)
+  "Write VALUE for SHELL into BINDING's store, waiting for an id if need be."
+  (if-let ((id (konix/agent-shell--shell-session-id shell)))
+      (konix/agent-shell-session-store-put
+       (konix/agent-shell-session-binding-store binding) id value)
+    (let (token)
+      (setq token
+            (agent-shell-subscribe-to
+             :shell-buffer shell
+             :event 'init-finished
+             :on-event
+             (lambda (_event)
+               (when (buffer-live-p shell)
+                 (agent-shell-unsubscribe :subscription token)
+                 (konix/agent-shell-session-store-put
+                  (konix/agent-shell-session-binding-store binding)
+                  (konix/agent-shell--shell-session-id shell)
+                  value))))))))
+
+(defun konix/agent-shell-session-binding-bind (binding shell value)
+  "Bind VALUE to SHELL under BINDING, buffer-local and on disk."
   (when (buffer-live-p shell)
     (with-current-buffer shell
-      (setq-local konix/agent-shell--governing-note note-path))
-    (if-let ((id (konix/agent-shell--shell-session-id shell)))
-        (konix/agent-shell-session-store-put
-         konix/agent-shell-session-notes-store id note-path)
-      (let (token)
-        (setq token
-              (agent-shell-subscribe-to
-               :shell-buffer shell
-               :event 'init-finished
-               :on-event
-               (lambda (_event)
-                 (when (buffer-live-p shell)
-                   (with-current-buffer shell
-                     (agent-shell-unsubscribe :subscription token)
-                     (konix/agent-shell-session-store-put
-                      konix/agent-shell-session-notes-store
-                      (konix/agent-shell--shell-session-id shell)
-                      note-path))))))))
-    (run-hook-with-args 'konix/agent-shell-governing-note-functions
-                        shell note-path)))
+      (set (make-local-variable
+            (konix/agent-shell-session-binding-variable binding))
+           value))
+    (konix/agent-shell-session-binding--persist binding shell value)
+    (when-let ((on-bind (konix/agent-shell-session-binding-on-bind binding)))
+      (funcall on-bind shell value))))
 
-(defun konix/agent-shell--restore-governing-note ()
-  "Re-bind this shell's persisted governing note once its session id is known.
-A resumed session resolves its note lazily through the store, but nothing
-runs `konix/agent-shell-governing-note-functions'; re-binding on the first
-`init-finished' with an id restores those side effects.  A note bound
-explicitly before that point wins."
+(defun konix/agent-shell-session-binding-unbind (binding shell)
+  "Drop what BINDING holds for SHELL, buffer-local and on disk."
+  (when (buffer-live-p shell)
+    (with-current-buffer shell
+      (set (make-local-variable
+            (konix/agent-shell-session-binding-variable binding))
+           nil))
+    (konix/agent-shell-session-store-remove
+     (konix/agent-shell-session-binding-store binding)
+     (konix/agent-shell--shell-session-id shell))
+    (when-let ((on-bind (konix/agent-shell-session-binding-on-bind binding)))
+      (funcall on-bind shell nil))))
+
+(defun konix/agent-shell-session-binding-restore (binding)
+  "Bind this shell back to what BINDING persisted, once its id is known.
+The value resolves lazily through the store either way; this is what runs
+the side effects again.  A value bound before that point wins."
   (let ((shell (current-buffer))
         token)
     (setq token
@@ -308,12 +335,40 @@ explicitly before that point wins."
              (if (not (buffer-live-p shell))
                  (agent-shell-unsubscribe :subscription token)
                (when-let ((id (konix/agent-shell--shell-session-id shell)))
-                 (with-current-buffer shell
-                   (agent-shell-unsubscribe :subscription token)
-                   (unless konix/agent-shell--governing-note
-                     (when-let ((note (konix/agent-shell-session-store-get
-                                       konix/agent-shell-session-notes-store id)))
-                       (konix/agent-shell-set-governing-note shell note)))))))))))
+                 (agent-shell-unsubscribe :subscription token)
+                 (unless (buffer-local-value
+                          (konix/agent-shell-session-binding-variable binding)
+                          shell)
+                   (when-let ((value (konix/agent-shell-session-store-get
+                                      (konix/agent-shell-session-binding-store
+                                       binding)
+                                      id)))
+                     (konix/agent-shell-session-binding-bind
+                      binding shell value))))))))))
+
+(defvar konix/agent-shell--governing-note-binding
+  (konix/agent-shell-session-binding-create
+   :store konix/agent-shell-session-notes-store
+   :variable 'konix/agent-shell--governing-note
+   :on-bind (lambda (shell note-path)
+              (run-hook-with-args 'konix/agent-shell-governing-note-functions
+                                  shell note-path)))
+  "The governing note, held per session.")
+
+(defun konix/agent-shell-governing-note (&optional shell)
+  "Return the governing note path bound to SHELL (default current buffer)."
+  (konix/agent-shell-session-binding-value
+   konix/agent-shell--governing-note-binding shell))
+
+(defun konix/agent-shell-set-governing-note (shell note-path)
+  "Bind NOTE-PATH as SHELL's governing note, buffer-local and on disk."
+  (konix/agent-shell-session-binding-bind
+   konix/agent-shell--governing-note-binding shell note-path))
+
+(defun konix/agent-shell--restore-governing-note ()
+  "Bind this shell back to its persisted governing note once its id is known."
+  (konix/agent-shell-session-binding-restore
+   konix/agent-shell--governing-note-binding))
 
 (add-hook 'agent-shell-mode-hook #'konix/agent-shell--restore-governing-note)
 

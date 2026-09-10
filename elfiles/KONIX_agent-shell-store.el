@@ -65,5 +65,19 @@
         (with-temp-file file
           (prin1 (konix/agent-shell-session-store-alist store) (current-buffer)))))))
 
+(defun konix/agent-shell-session-store-remove (store session-id)
+  "Drop what STORE holds for SESSION-ID (no-op when it holds nothing)."
+  (when session-id
+    (konix/agent-shell-session-store--ensure-loaded store)
+    (when (assoc session-id (konix/agent-shell-session-store-alist store))
+      (setf (konix/agent-shell-session-store-alist store)
+            (assoc-delete-all session-id
+                              (konix/agent-shell-session-store-alist store)))
+      (let ((file (konix/agent-shell-session-store-file store)))
+        (make-directory (file-name-directory file) t)
+        (with-temp-file file
+          (prin1 (konix/agent-shell-session-store-alist store)
+                 (current-buffer)))))))
+
 (provide 'KONIX_agent-shell-store)
 ;;; KONIX_agent-shell-store.el ends here

@@ -95,7 +95,7 @@ make sure to insert any mml content after the secure tag
 (require 'jl-encrypt)
 (setq mml2015-encrypt-to-self t)
 
-(setq-default jl-encrypt-without-signature t)
+(setq-default mml-secure-insert-signature nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Check attachments of mails ;;

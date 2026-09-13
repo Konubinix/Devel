@@ -174,6 +174,7 @@
                               konix/mcp-server-workspace-keyword-faces)
                              configured)))
        (org-set-font-lock-defaults)
+       (font-lock-refresh-defaults)
        (font-lock-flush))
      (defmacro konix/mcp-server-workspace--read-file (file &rest body)
        "Run BODY in the buffer holding FILE, leaving point where it stood."
@@ -207,7 +208,7 @@
        "Return the value of this buffer's NAME file keyword, or nil."
        (cadr (car (org-collect-keywords (list name)))))
      (defun konix/mcp-server-workspace--ensure-front-matter ()
-       "Declare in this buffer what its own keywords have to say."
+       "Declare in this buffer what its own keywords have to say, and have org read it."
        (konix/mcp-server-workspace--ensure-keyword "WORKSPACE" "t")
        (konix/mcp-server-workspace--ensure-keyword
         "TODO" (format "%s | %s"
@@ -220,7 +221,8 @@
                              (default-value 'org-lowest-priority)
                              (default-value 'org-default-priority)))
        (konix/mcp-server-workspace--ensure-keyword
-        "STARTUP" "overview linkpreviews"))
+        "STARTUP" "overview linkpreviews")
+       (org-set-regexps-and-options))
      (defun konix/mcp-server-workspace--ensure-session-link (shell)
        "Declare in this buffer the link resuming SHELL, when it has a session to link to."
        (when-let ((spec (konix/org-agent-shell--session-spec shell)))
@@ -301,8 +303,8 @@
     (defun konix/mcp-server-set-workspace (file)
       "Bind FILE as the document this session writes its questions into.
 
-    MCP Parameters:
-      file - Absolute path of the Org document to work in"
+MCP Parameters:
+  file - Absolute path of the Org document to work in"
       (mcp-server-lib-with-error-handling
        (let ((writer (konix/mcp-server-workspace--writer))
              (file (expand-file-name (decode-coding-string file 'utf-8))))
@@ -417,10 +419,16 @@
                                " do."))))
          "There is something for you in the workspace. Read it back and take it up."))
 
+     (defun konix/mcp-server-workspace--say-now (writer text)
+       "Say TEXT to WRITER, whose turn is over."
+       (agent-shell--insert-to-shell-buffer
+        :shell-buffer writer :text text :submit t :no-focus t)
+       t)
+
      (defun konix/mcp-server-workspace--submit (writer &optional text now)
-       "Tell WRITER there is something for it — once it is idle, or at once if NOW.
-     TEXT overrides the headings it would otherwise be handed.  Returns non-nil
-     when the text went over or is on its way."
+       "Tell WRITER of the workspace, as its turn ends or at once if NOW.
+     TEXT overrides the headings it would otherwise be handed.  Returns t
+     where it heard it and `queued' where it hears it as the turn ends."
        (ignore-errors (konix/mcp-server-workspace--install-steering writer))
        (when (with-current-buffer writer
                (ignore-errors (konix/agent-shell--rate-limited-p)))
@@ -428,32 +436,35 @@
                      (buffer-name writer)))
        (with-current-buffer writer
          (let ((text (or text (konix/mcp-server-workspace--nudge writer)))
-               (cut (and now (shell-maker-busy))))
-           (when cut
+               (cut-for-it (and now (shell-maker-busy))))
+           (when cut-for-it
              (let ((agent-shell-confirm-interrupt nil))
                (ignore-errors (agent-shell-interrupt))))
-           (cond
-            ((not (shell-maker-busy))
-             (agent-shell--insert-to-shell-buffer
-              :shell-buffer writer :text text :submit t :no-focus t)
-             t)
-                 (cut
-                  (konix/mcp-server-workspace--say-when-idle writer text)
-                  t)))))
+           (if (not (shell-maker-busy))
+               (konix/mcp-server-workspace--say-now writer text)
+             (let ((waiting (konix/mcp-server-workspace--say-when-idle
+                             writer text cut-for-it)))
+               (if (shell-maker-busy)
+                   'queued
+                 (agent-shell-unsubscribe :subscription waiting)
+                 (konix/mcp-server-workspace--say-now writer text)))))))
 
-     (defun konix/mcp-server-workspace--say-when-idle (writer text)
-       "Say TEXT to WRITER once the turn it is in has finished."
+     (defun konix/mcp-server-workspace--say-when-idle (writer text &optional cut-for-it)
+       "Wait for WRITER's turn to end and say TEXT then, returning what waits.
+     A turn cut short takes TEXT with it, CUT-FOR-IT saying the cut was made to
+     make way for it."
        (let (token)
          (setq token
                (agent-shell-subscribe-to
                 :shell-buffer writer :event 'turn-complete
                 :on-event
-                (lambda (_event)
+                (lambda (event)
                   (agent-shell-unsubscribe :subscription token)
-                  (when (buffer-live-p writer)
-                    (agent-shell--insert-to-shell-buffer
-                     :shell-buffer writer :text text
-                     :submit t :no-focus t)))))))
+                  (when (and (buffer-live-p writer)
+                             (or cut-for-it
+                                 (not (equal (map-elt (map-elt event :data) :stop-reason)
+                                             "cancelled"))))
+                    (konix/mcp-server-workspace--say-now writer text)))))))
     (defun konix/mcp-server-workspace--anything-left-p ()
       "Non-nil when this buffer still holds work of the writer's own."
       (save-excursion
@@ -647,6 +658,10 @@
     (defconst konix/mcp-server-workspace-taken-up-key "@workspace-nothing-taken-up"
       "Steering key holding back a writer that holds no question.")
 
+    (defun konix/mcp-server-workspace--only-thinking-p (subject)
+      "Non-nil when SUBJECT is the session thinking rather than working."
+      (equal (map-elt subject :kind) "think"))
+
     (defconst konix/mcp-server-workspace-schema-tool "ToolSearch"
       "Tool a session fetches another tool's own schema with.")
 
@@ -679,6 +694,7 @@
     (konix/agent-shell-define-tool-evaluator "workspace-read-directly" (subject)
       "Hold back a call reading the bound workspace file rather than asking for it."
       (and (map-elt subject :title)
+           (not (konix/mcp-server-workspace--only-thinking-p subject))
            (not (konix/mcp-server-workspace--own-tool-p subject))
            (when-let ((file (konix/mcp-server-workspace-file (current-buffer))))
              (konix/agent-shell-tool-mentions-p subject file))
@@ -729,6 +745,7 @@
     (konix/agent-shell-define-tool-evaluator "workspace-nothing-taken-up" (subject)
       "Hold back a writer calling a tool while it holds no question."
       (and (map-elt subject :title)
+           (not (konix/mcp-server-workspace--only-thinking-p subject))
            (not (konix/agent-shell-tool-named-p
                  subject (konix/mcp-server-workspace--permitted-tools)))
            (when-let ((file (konix/mcp-server-workspace-file (current-buffer))))
@@ -1002,11 +1019,26 @@
          "the workspace tools a bound writer answers with"
          'session)))
 
+    (defconst konix/mcp-server-workspace-directory ".ws"
+      "Where under a project the prompt offers to put a workspace.")
+
     (defun konix/mcp-server-workspace--make-unless-there (file)
-      "Make FILE an empty workspace unless it is there already."
+      "Make FILE an empty workspace, and its directory, unless they are there."
       (unless (file-readable-p file)
+        (make-directory (file-name-directory file) t)
         (write-region (format "#+TITLE: %s\n\n" (file-name-base file))
                       nil file)))
+
+    (defun konix/mcp-server-workspace--read-file-name ()
+      "Read where a workspace goes, offering this project's own place for it."
+      (let ((where (file-name-as-directory
+                    (expand-file-name
+                     konix/mcp-server-workspace-directory
+                     (konix/mcp-server-workspace--project-of (current-buffer))))))
+        (expand-file-name
+         (minibuffer-with-setup-hook
+             (lambda () (search-backward ".org" nil t))
+           (read-file-name "Workspace: " where nil nil ".org")))))
 
     (defun konix/mcp-server-workspace-bind (file &optional goal)
       "Bind FILE as the workspace of the agent-shell this is called from, on GOAL."
@@ -1019,8 +1051,7 @@
                          (konix/agent-shell-mcp-session-server-names))
            (user-error "This session has no %s tools to answer with"
                        konix/mcp-server-workspace-server-name))
-         (let ((file (expand-file-name
-                      (read-file-name "Workspace: " nil (buffer-file-name)))))
+         (let ((file (konix/mcp-server-workspace--read-file-name)))
            (unless (string-suffix-p ".org" file)
              (user-error "A workspace has to be an Org file: %s" file))
            (list file
@@ -1060,6 +1091,37 @@
                      #'konix/mcp-server-workspace-goto)))
       (define-key agent-shell-viewport-view-mode-map (kbd "O")
                   #'konix/mcp-server-workspace-goto))
+    (defun konix/mcp-server-workspace--of-this-project ()
+      "Return the workspaces of the project this buffer sits in, by their paths."
+      (let ((where (file-name-as-directory
+                    (expand-file-name
+                     konix/mcp-server-workspace-directory
+                     (konix/mcp-server-workspace--project-of (current-buffer))))))
+        (when (file-directory-p where)
+          (seq-filter (lambda (file) (string-suffix-p ".org" file))
+                      (directory-files where t)))))
+
+    (defun konix/mcp-server-workspace--open-its-session (file)
+      "Open the session FILE names, where it names one."
+      (when-let* ((link (konix/mcp-server-workspace--read-file file
+                          (konix/mcp-server-workspace--keyword "SESSION"))))
+        (org-link-open-from-string link)))
+
+    (defun konix/mcp-server-workspace-pick ()
+      "Go to one of this project's workspaces, and to the session writing in it."
+      (interactive)
+      (let* ((files (konix/mcp-server-workspace--of-this-project))
+             (file (pcase (length files)
+                     (0 (user-error "No workspace of this project to pick from"))
+                     (1 (car files))
+                     (_ (expand-file-name
+                         (completing-read "Workspace: "
+                                          (mapcar #'file-name-nondirectory files)
+                                          nil t)
+                         (file-name-directory (car files)))))))
+        (konix/mcp-server-workspace--open-its-session file)
+        (pop-to-buffer (find-file-noselect file))
+        (konix/mcp-server-workspace--land-on-a-users-question)))
     (defun konix/mcp-server-workspace--tint-colour ()
       "Return the tint a bound session's background carries."
       (let ((base (face-background 'default nil t)))
@@ -1198,7 +1260,7 @@
         (define-key map "?" #'konix/mcp-server-workspace-answer-what)
         (define-key map "r" #'konix/mcp-server-workspace-answer)
         (define-key map "R" #'konix/mcp-server-workspace-answer)
-        (define-key map "P" #'konix/mcp-server-workspace-goto-writer)
+        (define-key map "P" #'konix/agent-shell-pop-to-buffer)
         (define-key map "O" #'konix/mcp-server-workspace-goto-writer)
         (define-key map "a" #'konix/mcp-server-workspace-goto-writer)
         (define-key map "o" #'org-open-at-point)
@@ -1814,26 +1876,39 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
           (funcall mutate))
         (konix/mcp-server-workspace--show file writer nil)
         file))
+    (defconst konix/mcp-server-workspace-new-question-error
+      (concat "A question you have just made comes back to the user, so ask it and wait."
+              " Take one up only once they have had their say on it.")
+      "What a writer is told when it makes a question and keeps it.")
+
+    (defun konix/mcp-server-workspace--users-act-p (act)
+      "Non-nil when ACT hands a question to the user, naming none doing so too."
+      (or (null act)
+          (string-empty-p (string-trim act))
+          (and (member (cdr (assoc-string (string-trim act)
+                                          konix/mcp-server-workspace-acts t))
+                       konix/mcp-server-workspace-users-keywords)
+               t)))
     (defun konix/mcp-server-set-workspace-question
         (file line &optional label note says also act id keyword url)
       "Write one question of the workspace at FILE and LINE, replacing or adding it.
 
-    The revision to diff against is read from the workspace rather than given
-    again, and without ACT the question comes back to the user.  KEYWORD is the
-    name ACT went by before, taken while a session that opened on the old schema
-    is still running.
+The revision to diff against is read from the workspace rather than given
+again, and without ACT the question comes back to the user.  KEYWORD is the
+name ACT went by before, taken while a session that opened on the old schema
+is still running.
 
-    MCP Parameters:
-      file - Absolute path of the question's anchor
-      line - Line in that file
-      label - What this question asks the user
-      note - Optional JSON array of « intention :: text » bullets
-      says - Optional caption for the link itself
-      also - Optional JSON array of further {file, line, says} or {url, says}
-      act - Optional work, refine, todo or close; settling is the user's own
-      id - Optional id of the question to rewrite, as the listing tool gives it
-      keyword - What act was called before; pass act instead
-      url - Optional web address, written out whole and counting against no limit"
+MCP Parameters:
+  file - Absolute path of the question's anchor
+  line - Line in that file
+  label - What this question asks the user
+  note - Optional JSON array of « intention :: text » bullets
+  says - Optional caption for the link itself
+  also - Optional JSON array of further {file, line, says} or {url, says}
+  act - Optional work, refine, todo or close; settling is the user's own
+  id - Optional id of the question to rewrite, as the listing tool gives it
+  keyword - What act was called before; pass act instead
+  url - Optional web address, written out whole and counting against no limit"
       (mcp-server-lib-with-error-handling
        (setq act (or act keyword))
        (when (and (null id)
@@ -1929,8 +2004,8 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
     (defun konix/mcp-server-delete-workspace-question (id)
       "Remove the workspace's question, fact or answer whose id is ID.
 
-    MCP Parameters:
-      id - Id of the heading to remove, as the listing tool gives it"
+MCP Parameters:
+  id - Id of the heading to remove, as the listing tool gives it"
       (mcp-server-lib-with-error-handling
        (konix/mcp-server-workspace--edit
         (lambda ()
@@ -1968,6 +2043,80 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
         (or (cdr (assoc-string named konix/mcp-server-workspace-acts t))
             (error "Unknown act \"%s\" — one of: %s" act
                    (mapconcat #'car konix/mcp-server-workspace-acts ", ")))))
+    (defun konix/mcp-server-set-workspace-state (id &optional act keyword)
+      "Perform ACT on the workspace's question whose id is ID.
+
+Every other character of that heading is left alone.  KEYWORD is the name ACT
+went by before, taken while a session that opened on the old schema is still
+running.
+
+MCP Parameters:
+  id - Id of the question to act on, as the listing tool gives it
+  act - work, refine, todo or close
+  keyword - What act was called before; pass act instead"
+      (mcp-server-lib-with-error-handling
+       (setq act (or act keyword))
+       (konix/mcp-server-workspace--act-said
+        act id
+        (konix/mcp-server-workspace--edit
+         (lambda ()
+           (let* ((keyword (konix/mcp-server-workspace--act-keyword act))
+                  (was (konix/mcp-server-workspace--refuse-the-act id keyword))
+                  (word-start (+ (line-beginning-position)
+                                 (1+ (org-current-level))))
+                  (word-end (+ word-start (length was))))
+             (delete-region word-start word-end)
+             (goto-char word-start)
+             (insert keyword)))))))
+    (defconst konix/mcp-server-workspace-put-off-error
+      (concat "The user put that question off. Leave it alone and take up one they have"
+              " not.")
+      "What a writer is told when it goes for a question the user put off.")
+
+    (defconst konix/mcp-server-workspace-waiting-error
+      (concat "That question waits on the user, so no act of yours reaches it. Wait: it"
+              " comes back to you the moment they say anything.")
+      "What a writer is told when it acts on a question waiting on the user.")
+
+    (defun konix/mcp-server-workspace--refuse-the-act (id keyword)
+      "Refuse KEYWORD on the question ID, or return the state it stands in.
+    Point is left on its heading and not a character of it is written."
+      (unless (konix/mcp-server-workspace--goto-id id)
+        (error "No heading %s in the workspace" id))
+      (when (equal (org-current-level) 2)
+        (error "An answer is the user's to move, not yours: %s" id))
+      (let ((was (or (konix/mcp-server-workspace--state-at-point)
+                     (error "A fact stands in no state, so there is none to act on"))))
+        (when (and (equal keyword konix/mcp-server-workspace-working-keyword)
+                   (not (equal was konix/mcp-server-workspace-working-keyword))
+                   (konix/mcp-server-workspace--working-p))
+          (error "%s" (concat "You already hold a question."
+                              " Put that one down first, or work on it")))
+        (when (equal was konix/mcp-server-workspace-later-keyword)
+          (error "%s" konix/mcp-server-workspace-put-off-error))
+        (when (member was konix/mcp-server-workspace-users-keywords)
+          (error "%s" konix/mcp-server-workspace-waiting-error))
+        (when (and (member keyword konix/mcp-server-workspace-users-keywords)
+                   (konix/mcp-server-workspace--nothing-written-p))
+          (error "%s" konix/mcp-server-workspace-empty-handover-error))
+        was))
+    (defun konix/mcp-server-workspace--act-said (act id file)
+      "Return what a writer is told of ACT on ID, FILE being the workspace it is in."
+      (string-trim
+       (concat (format "%s: %s" act id)
+               (when (equal (konix/mcp-server-workspace--act-keyword act)
+                            konix/mcp-server-workspace-working-keyword)
+                 (let ((goal (konix/mcp-server-workspace--goal-line file)))
+                   (concat "\n\n" konix/mcp-server-workspace-holding-said "\n\n"
+                           (if (string-empty-p goal)
+                               konix/mcp-server-workspace-no-goal-said
+                             goal)))))))
+    (defun konix/mcp-server-workspace--working-p ()
+      "Non-nil when a question of this buffer is one the writer is on."
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward
+         (concat "^\\* " konix/mcp-server-workspace-working-keyword " ") nil t)))
     (defconst konix/mcp-server-workspace-empty-handover-error
       (concat "Nothing is written under that question, so handing it to the user says"
               " nothing. Say what you are asking in its body, or leave it in TODO, which"
@@ -1990,92 +2139,6 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
                   (line-beginning-position)
                   (konix/mcp-server-workspace--question-end)))))
 
-    (defun konix/mcp-server-workspace--users-act-p (act)
-      "Non-nil when ACT hands a question to the user, naming none doing so too."
-      (or (null act)
-          (string-empty-p (string-trim act))
-          (and (member (cdr (assoc-string (string-trim act)
-                                          konix/mcp-server-workspace-acts t))
-                       konix/mcp-server-workspace-users-keywords)
-               t)))
-
-    (defconst konix/mcp-server-workspace-new-question-error
-      (concat "A question you have just made comes back to the user, so ask it and wait."
-              " Take one up only once they have had their say on it.")
-      "What a writer is told when it makes a question and keeps it.")
-
-    (defconst konix/mcp-server-workspace-waiting-error
-      (concat "That question waits on the user, so no act of yours reaches it. Wait: it"
-              " comes back to you the moment they say anything.")
-      "What a writer is told when it acts on a question waiting on the user.")
-
-    (defconst konix/mcp-server-workspace-put-off-error
-      (concat "The user put that question off. Leave it alone and take up one they have"
-              " not.")
-      "What a writer is told when it goes for a question the user put off.")
-
-    (defun konix/mcp-server-workspace--working-p ()
-      "Non-nil when a question of this buffer is one the writer is on."
-      (save-excursion
-        (goto-char (point-min))
-        (re-search-forward
-         (concat "^\\* " konix/mcp-server-workspace-working-keyword " ") nil t)))
-
-    (defun konix/mcp-server-workspace--act-said (act id file)
-      "Return what a writer is told of ACT on ID, FILE being the workspace it is in."
-      (string-trim
-       (concat (format "%s: %s" act id)
-               (when (equal (konix/mcp-server-workspace--act-keyword act)
-                            konix/mcp-server-workspace-working-keyword)
-                 (let ((goal (konix/mcp-server-workspace--goal-line file)))
-                   (concat "\n\n" konix/mcp-server-workspace-holding-said "\n\n"
-                           (if (string-empty-p goal)
-                               konix/mcp-server-workspace-no-goal-said
-                             goal)))))))
-
-    (defun konix/mcp-server-set-workspace-state (id &optional act keyword)
-      "Perform ACT on the workspace's question whose id is ID.
-
-    Every other character of that heading is left alone.  KEYWORD is the name ACT
-    went by before, taken while a session that opened on the old schema is still
-    running.
-
-    MCP Parameters:
-      id - Id of the question to act on, as the listing tool gives it
-      act - work, refine, todo or close
-      keyword - What act was called before; pass act instead"
-      (mcp-server-lib-with-error-handling
-       (setq act (or act keyword))
-       (konix/mcp-server-workspace--act-said
-        act id
-        (konix/mcp-server-workspace--edit
-         (lambda ()
-           (let ((keyword (konix/mcp-server-workspace--act-keyword act)))
-            (unless (konix/mcp-server-workspace--goto-id id)
-              (error "No heading %s in the workspace" id))
-            (when (equal (org-current-level) 2)
-              (error "An answer is the user's to move, not yours: %s" id))
-            (unless (konix/mcp-server-workspace--state-at-point)
-              (error "A fact stands in no state, so there is none to act on"))
-            (let* ((was (konix/mcp-server-workspace--state-at-point))
-                   (word-start (+ (line-beginning-position)
-                                  (1+ (org-current-level))))
-                   (word-end (+ word-start (length was))))
-              (when (and (equal keyword konix/mcp-server-workspace-working-keyword)
-                         (not (equal was konix/mcp-server-workspace-working-keyword))
-                         (konix/mcp-server-workspace--working-p))
-                (error "%s" (concat "You already hold a question."
-                                    " Put that one down first, or work on it")))
-              (when (equal was konix/mcp-server-workspace-later-keyword)
-                (error "%s" konix/mcp-server-workspace-put-off-error))
-              (when (member was konix/mcp-server-workspace-users-keywords)
-                (error "%s" konix/mcp-server-workspace-waiting-error))
-              (when (and (member keyword konix/mcp-server-workspace-users-keywords)
-                         (konix/mcp-server-workspace--nothing-written-p))
-                (error "%s" konix/mcp-server-workspace-empty-handover-error))
-              (delete-region word-start word-end)
-              (goto-char word-start)
-              (insert keyword))))))))
      (defun konix/mcp-server-workspace--body-end (limit)
        "Return where what is written under the heading at point ends, within LIMIT."
        (save-excursion
@@ -2114,16 +2177,16 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
          (label &optional note id about file line says also url)
        "Write one fact of the workspace, replacing the one ID names or adding it.
 
-     MCP Parameters:
-       label - What the fact is called, ending in no question mark and opening on no state
-       note - Optional JSON array of « intention :: text » bullets
-       id - Optional id of the fact to rewrite, as the listing tool gives it
-       about - Optional id of the question this reports on, which then links to it
-       file - Optional absolute path of a place this fact points at
-       line - Line in that file
-       says - Optional caption for the link itself
-       also - Optional JSON array of further {file, line, says} or {url, says}
-       url - Optional web address, written out whole and counting against no limit"
+MCP Parameters:
+  label - What the fact is called, ending in no question mark and opening on no state
+  note - Optional JSON array of « intention :: text » bullets
+  id - Optional id of the fact to rewrite, as the listing tool gives it
+  about - Optional id of the question this reports on, which then links to it
+  file - Optional absolute path of a place this fact points at
+  line - Line in that file
+  says - Optional caption for the link itself
+  also - Optional JSON array of further {file, line, says} or {url, says}
+  url - Optional web address, written out whole and counting against no limit"
        (mcp-server-lib-with-error-handling
         (let* ((its-id (or id (org-id-new)))
                (entry (list (cons 'label label) (cons 'note note) (cons 'id its-id)
@@ -2362,6 +2425,50 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
           (when (> end (line-end-position))
             (org-fold-region (line-end-position) end nil 'outline)))))
 
+    (defun konix/mcp-server-workspace--waiting-on-the-user-p ()
+      "Non-nil when the heading point stands in is the user's to read."
+      (or (member (org-get-todo-state)
+                  konix/mcp-server-workspace-users-keywords)
+          (and (konix/mcp-server-workspace--fact-at-point-p)
+               (not (konix/mcp-server-workspace--read-p)))))
+
+    (defun konix/mcp-server-workspace--in-an-answer-p ()
+      "Non-nil when point stands in something the user said under a question."
+      (and (not (org-before-first-heading-p))
+           (equal 2 (save-excursion
+                      (konix/mcp-server-workspace--goto-heading)
+                      (org-current-level)))))
+
+    (defun konix/mcp-server-workspace-focus-question ()
+      "Fold the workspace, and open what point stands in while it waits on the user.
+    Whatever the user was reading, standing in it, is left in view."
+      (interactive)
+      (let ((reading (and (not (invisible-p (line-beginning-position)))
+                          (point-marker))))
+        (when (konix/mcp-server-workspace--in-an-answer-p)
+          (konix/mcp-server-workspace--goto-question))
+        (org-cycle-overview)
+        (unless (org-before-first-heading-p)
+          (when (konix/mcp-server-workspace--waiting-on-the-user-p)
+            (konix/mcp-server-workspace--show-its-words)))
+        (konix/mcp-server-workspace--in-view-again
+         konix/mcp-server-workspace--reading)
+        (org-link-preview-region)
+        (when (and reading (invisible-p (marker-position reading)))
+          (save-excursion
+            (goto-char reading)
+            (org-fold-show-context)))
+        (when reading (set-marker reading nil))))
+    (defun konix/mcp-server-workspace-next-question ()
+      "Move to what waits on the user next, in their own order."
+      (interactive)
+      (konix/mcp-server-workspace--goto-waiting))
+
+    (defun konix/mcp-server-workspace-previous-question ()
+      "Move back to what waited on the user before this one, in their own order."
+      (interactive)
+      (konix/mcp-server-workspace--goto-waiting t))
+
     (defun konix/mcp-server-workspace--place-here ()
       "Return (FILE . LINE) for the file line the block line point is on stands for."
       (save-excursion
@@ -2402,44 +2509,6 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
             (forward-line (1- (cdr place)))
             (recenter))
         (org-open-at-point)))
-
-    (defun konix/mcp-server-workspace--waiting-on-the-user-p ()
-      "Non-nil when the heading point stands in is the user's to read."
-      (or (member (org-get-todo-state)
-                  konix/mcp-server-workspace-users-keywords)
-          (and (konix/mcp-server-workspace--fact-at-point-p)
-               (not (konix/mcp-server-workspace--read-p)))))
-
-    (defun konix/mcp-server-workspace-focus-question ()
-      "Fold the workspace, and open what point stands in while it waits on the user.
-    Whatever the user was reading, standing in it, is left in view."
-      (interactive)
-      (let ((reading (and (not (invisible-p (line-beginning-position)))
-                          (point-marker))))
-        (unless (org-before-first-heading-p)
-          (ignore-errors (konix/mcp-server-workspace--goto-question)))
-        (org-cycle-overview)
-        (unless (org-before-first-heading-p)
-          (when (konix/mcp-server-workspace--waiting-on-the-user-p)
-            (konix/mcp-server-workspace--show-its-words)))
-        (konix/mcp-server-workspace--in-view-again
-         konix/mcp-server-workspace--reading)
-        (org-link-preview-region)
-        (when (and reading (invisible-p (marker-position reading)))
-          (save-excursion
-            (goto-char reading)
-            (org-fold-show-context)))
-        (when reading (set-marker reading nil))))
-    (defun konix/mcp-server-workspace-next-question ()
-      "Move to what waits on the user next, in their own order."
-      (interactive)
-      (konix/mcp-server-workspace--goto-waiting))
-
-    (defun konix/mcp-server-workspace-previous-question ()
-      "Move back to what waited on the user before this one, in their own order."
-      (interactive)
-      (konix/mcp-server-workspace--goto-waiting t))
-
      (defun konix/mcp-server-workspace--land-on-a-users-question (&rest _)
        "Put point on a question of the user's, unless it already stands on one."
        (when (and (bound-and-true-p konix/mcp-server-workspace-mode)
@@ -2858,10 +2927,40 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
                    #'konix/mcp-server-workspace-raise-with-writer)
        (define-key agent-shell-viewport-view-mode-map (kbd "M-RET")
                    #'konix/mcp-server-workspace-raise-with-writer))
+     (defun konix/mcp-server-workspace--writer-named ()
+       "Return the live session this workspace's front matter names, or nil."
+       (when-let* ((named (konix/mcp-server-workspace--keyword "SESSION")))
+         (seq-find (lambda (shell)
+                     (when-let* ((spec (konix/org-agent-shell--session-spec shell)))
+                       (string-search spec named)))
+                   (agent-shell-buffers))))
+
+     (defun konix/mcp-server-workspace--named-session-spec ()
+       "Return the raw agent-shell spec this workspace's SESSION keyword names, or nil."
+       (when-let* ((named (konix/mcp-server-workspace--keyword "SESSION"))
+                   (start (string-search "agent-shell:" named))
+                   (from (+ start (length "agent-shell:"))))
+         (substring named from (string-search "]" named from))))
+
+     (defun konix/mcp-server-workspace--resume-named-writer ()
+       "Resume this workspace's named session in the background, or nil without one."
+       (when-let* ((spec (konix/mcp-server-workspace--named-session-spec)))
+         (pcase-let* ((`(,session-id ,rest) (split-string spec "\\?cwd="))
+                      (`(,cwd ,_line) (split-string (or rest "") "&line="))
+                      (shell (konix/org-agent-shell--resume-session session-id cwd)))
+           (konix/agent-shell-ensure-viewport shell)
+           (when buffer-file-name
+             (konix/mcp-server-workspace--remember shell buffer-file-name))
+           shell)))
+
      (defun konix/mcp-server-workspace--target-writer ()
        "Return the writer this workspace talks to, asking only if it has to."
        (or (and (buffer-live-p konix/mcp-server-workspace--writer-buffer)
                 konix/mcp-server-workspace--writer-buffer)
+           (setq-local konix/mcp-server-workspace--writer-buffer
+                       (konix/mcp-server-workspace--writer-named))
+           (setq-local konix/mcp-server-workspace--writer-buffer
+                       (konix/mcp-server-workspace--resume-named-writer))
            (let ((shells (seq-filter
                           (lambda (buffer)
                             (with-current-buffer buffer
@@ -2905,12 +3004,10 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
          (user-error "This workspace names no goal"))
        (let ((writer (konix/mcp-server-workspace--target-writer)))
          (message
-          (cond ((konix/mcp-server-workspace--submit
-                  writer konix/mcp-server-workspace-goal-guidance)
-                 "Sent the writer back to the goal")
-                (t (konix/mcp-server-workspace--say-when-idle
-                    writer konix/mcp-server-workspace-goal-guidance)
-                   "Queued — the writer goes back to the goal at the turn's end")))))
+          (if (eq t (konix/mcp-server-workspace--submit
+                     writer konix/mcp-server-workspace-goal-guidance))
+              "Sent the writer back to the goal"
+            "Queued — the writer goes back to the goal at the turn's end"))))
     (defun konix/mcp-server-workspace--line-here ()
       "Return the words of the line point is on, quoted, the markup dropped."
       (let ((words (if (org-at-heading-p)
@@ -2925,12 +3022,22 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
           (setq words (substring words (+ said 4))))
         (format "« %s »" (string-trim words))))
 
-    (defun konix/mcp-server-workspace--write-answer (answer &optional body)
-      "Put ANSWER, and BODY under it, at the question at point, with the line it was said on."
-      (let ((here (konix/mcp-server-workspace--line-here)))
+    (defun konix/mcp-server-workspace--stood-on ()
+      "Return what the user stands on: a fact, the question's id, and the line's words."
+      (list (konix/mcp-server-workspace--fact-here)
+            (unless (org-before-first-heading-p)
+              (save-excursion
+                (konix/mcp-server-workspace--goto-question)
+                (org-entry-get (point) "ID")))
+            (konix/mcp-server-workspace--line-here)))
+
+    (defun konix/mcp-server-workspace--write-answer (standing answer &optional body)
+      "Put ANSWER, and BODY under it, at the question STANDING was taken on."
+      (pcase-let ((`(,_fact ,question ,here) standing))
         (konix/mcp-server-workspace--write
           (save-excursion
-            (konix/mcp-server-workspace--goto-heading)
+            (unless (and question (konix/mcp-server-workspace--goto-id question))
+              (konix/mcp-server-workspace--goto-heading))
             (goto-char (konix/mcp-server-workspace--question-end))
             (unless (bolp) (insert "\n"))
             (insert "** " (string-trim answer) "\n"
@@ -2938,6 +3045,59 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
                     "   - what :: said on " here "\n"
                     (konix/mcp-server-workspace--body-under body "   "))))))
 
+    (defun konix/mcp-server-workspace--send (standing answer &optional now body)
+      "Put ANSWER, and BODY under it, where STANDING says, and tell the writer, NOW."
+      (konix/mcp-server-workspace--one-line-or-error answer)
+      (konix/mcp-server-workspace--target-writer)
+      (if (car standing)
+          (konix/mcp-server-workspace--ask-about-fact standing answer body)
+        (konix/mcp-server-workspace--write-answer standing answer body)
+        (when-let* ((question (nth 1 standing)))
+          (konix/mcp-server-workspace--goto-id question))
+        (konix/mcp-server-workspace--hand-back)
+        (message
+         (if (eq t (konix/mcp-server-workspace--submit
+                    konix/mcp-server-workspace--writer-buffer nil now))
+             "Woke the writer"
+           "Queued — the writer reads it as its turn ends")))
+      (konix/mcp-server-workspace--goto-waiting)
+      (konix/mcp-server-workspace-focus-question))
+    (defun konix/mcp-server-workspace-answer (&optional now)
+      "Read an answer to what point stands on and send it, NOW if asked to."
+      (interactive "P")
+      (let ((standing (konix/mcp-server-workspace--stood-on))
+            (place (konix/mcp-server-workspace--location-at-point t)))
+        (pcase-let ((`(,answer ,body)
+                     (konix/mcp-server-workspace--read-heading-and-body
+                      (if place
+                          (format "Answer on %s:%d: "
+                                  (file-name-nondirectory (car place)) (cdr place))
+                        "Answer: "))))
+          (konix/mcp-server-workspace--send standing answer now body))))
+
+    (defun konix/mcp-server-workspace-answer-yes (&optional now)
+      "Answer yes to what point stands on, NOW if asked to."
+      (interactive "P")
+      (konix/mcp-server-workspace--send
+       (konix/mcp-server-workspace--stood-on) "yes" now))
+
+    (defun konix/mcp-server-workspace-answer-no (&optional now)
+      "Answer no to what point stands on, NOW if asked to."
+      (interactive "P")
+      (konix/mcp-server-workspace--send
+       (konix/mcp-server-workspace--stood-on) "no" now))
+    (defun konix/mcp-server-workspace-answer-what (&optional now)
+      "Ask the writer what it was supposed to mean.
+    Sends back the region, or the whole question when nothing is selected.  NOW if asked to."
+      (interactive "P")
+      (konix/mcp-server-workspace--send
+       (konix/mcp-server-workspace--stood-on)
+       (if (use-region-p)
+           (format "\"%s\" ?"
+                   (string-trim (buffer-substring-no-properties
+                                 (region-beginning) (region-end))))
+         "?")
+       now))
     (defun konix/mcp-server-workspace--fact-pointed-at ()
       "Return (ID . HEADING) for the fact the line point is on points at, or nil."
       (save-excursion
@@ -2960,12 +3120,11 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
             (when (konix/mcp-server-workspace--fact-at-point-p)
               (cons (org-entry-get (point) "ID") (org-get-heading t t t t))))))
 
-    (defun konix/mcp-server-workspace--ask-about-fact (answer &optional body)
-      "Raise ANSWER, and BODY under it, as a subject about the fact point is on."
-      (let* ((fact (konix/mcp-server-workspace--fact-here))
-             (id (car fact))
-             (heading (cdr fact))
-             (here (konix/mcp-server-workspace--line-here)))
+    (defun konix/mcp-server-workspace--ask-about-fact (standing answer &optional body)
+      "Raise ANSWER, and BODY under it, as a subject about the fact STANDING names."
+      (pcase-let* ((`(,fact ,_question ,here) standing)
+                   (id (car fact))
+                   (heading (cdr fact)))
         (unless id
           (user-error "That fact carries no id, so nothing can point at it"))
         (konix/mcp-server-workspace-add-subject
@@ -2975,61 +3134,11 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
                    "")
                  (format "- what :: said on %s\n" here)
                  (format "- what :: about [[id:%s][%s]]" id heading)))))
-
-    (defun konix/mcp-server-workspace--send (answer &optional now body)
-      "Put ANSWER, and BODY under it, at the question at point and tell the writer, NOW."
-      (konix/mcp-server-workspace--one-line-or-error answer)
-      (konix/mcp-server-workspace--target-writer)
-      (let ((fact (konix/mcp-server-workspace--fact-here)))
-        (if fact
-            (konix/mcp-server-workspace--ask-about-fact answer body)
-          (konix/mcp-server-workspace--write-answer answer body)
-          (konix/mcp-server-workspace--hand-back)
-          (message
-           (if (konix/mcp-server-workspace--submit
-                konix/mcp-server-workspace--writer-buffer nil now)
-               "Woke the writer"
-             "Queued — the writer is working and will read it back"))))
-      (konix/mcp-server-workspace--goto-waiting)
-      (konix/mcp-server-workspace-focus-question))
-
-    (defun konix/mcp-server-workspace-answer (&optional now)
-      "Read an answer to the question at point and send it, NOW if asked to."
-      (interactive "P")
-      (let ((place (konix/mcp-server-workspace--location-at-point t)))
-        (pcase-let ((`(,answer ,body)
-                     (konix/mcp-server-workspace--read-heading-and-body
-                      (if place
-                          (format "Answer on %s:%d: "
-                                  (file-name-nondirectory (car place)) (cdr place))
-                        "Answer: "))))
-          (konix/mcp-server-workspace--send answer now body))))
-
-    (defun konix/mcp-server-workspace-answer-yes (&optional now)
-      "Answer yes to the question at point, NOW if asked to."
-      (interactive "P")
-      (konix/mcp-server-workspace--send "yes" now))
-
-    (defun konix/mcp-server-workspace-answer-no (&optional now)
-      "Answer no to the question at point, NOW if asked to."
-      (interactive "P")
-      (konix/mcp-server-workspace--send "no" now))
-    (defun konix/mcp-server-workspace-answer-what (&optional now)
-      "Ask the writer what it was supposed to mean.
-    Sends back the region, or the whole question when nothing is selected.  NOW if asked to."
-      (interactive "P")
-      (konix/mcp-server-workspace--send
-       (if (use-region-p)
-           (format "\"%s\" ?"
-                   (string-trim (buffer-substring-no-properties
-                                 (region-beginning) (region-end))))
-         "?")
-       now))
      (defun konix/mcp-server-set-workspace-revision (revspec)
        "Say which revision this session's workspace is read against.
 
-     MCP Parameters:
-       revspec - Anything git takes: HEAD~1, main..HEAD, a sha"
+MCP Parameters:
+  revspec - Anything git takes: HEAD~1, main..HEAD, a sha"
        (mcp-server-lib-with-error-handling
         (let ((now (string-trim (decode-coding-string revspec 'utf-8))))
           (when (string-empty-p now)
@@ -3042,14 +3151,7 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
                                        (line-end-position))
                         (insert (format "#+REVSPEC: %s" now)))
                (konix/mcp-server-workspace--goto-front-matter)
-               (insert (format "#+REVSPEC: %s\n" now)))
-             (unless (konix/mcp-server-workspace--working-p)
-               (goto-char (point-max))
-               (unless (bolp) (insert "\n"))
-               (insert "* " konix/mcp-server-workspace-working-keyword
-                       " Reading " now " — what is worth asking about it?\n"
-                       "  :PROPERTIES:\n  :ID:       " (org-id-new) "\n  :END:\n"
-                       "  - what :: the questions here are read against " now ".\n"))))
+               (insert (format "#+REVSPEC: %s\n" now)))))
           (format "The workspace is read against %s" now))))
      (defconst konix/mcp-server-workspace-no-revision-guidance
        (concat "This workspace names no revision, so the user's key for the diff has"
@@ -3103,10 +3205,10 @@ COOKIES carries the priority each question wears, so a rewrite keeps it."
     (defun konix/mcp-server-show-diff (revspec &optional paths directory)
       "Show `git diff REVSPEC -- PATHS' in a `diff-mode' buffer and display it.
 
-    MCP Parameters:
-      revspec - Revision or range to diff, as git would take it
-      paths - Optional JSON array of paths to restrict the diff to
-      directory - Repository to run git in, defaulting to the user's buffer"
+MCP Parameters:
+  revspec - Revision or range to diff, as git would take it
+  paths - Optional JSON array of paths to restrict the diff to
+  directory - Repository to run git in, defaulting to the user's buffer"
       (mcp-server-lib-with-error-handling
        (let ((buffer (konix/mcp-server-workspace--render-diff
                       revspec

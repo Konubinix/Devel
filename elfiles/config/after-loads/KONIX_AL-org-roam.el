@@ -29,6 +29,9 @@
 (require 'oc)
 (require 'oc-csl)
 
+(add-to-list 'org-roam-file-exclude-regexp "\\.agent-shell/")
+(add-to-list 'org-roam-file-exclude-regexp "\\.ws/")
+
 (keymap-set org-mode-map "C-c n l" #'org-roam-buffer-toggle)
 (keymap-set org-mode-map "C-c n t" #'konix/org-roam-export/toggle-publish)
 (keymap-set org-mode-map "C-j" #'completion-at-point)

@@ -726,6 +726,7 @@ in
 
     # ~/.emacs — main entry point
     home.file.".emacs".text = ''
+      ;; -*- lexical-binding: t; -*-
       (setq debug-on-quit t)
       (setq emacs_com_file (getenv "EMACS_START_COM"))
       (load-file "${homeDir}/.emacs_var")

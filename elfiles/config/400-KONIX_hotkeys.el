@@ -352,7 +352,6 @@
 
 (keymap-set 'konix/tags/map "s" 'konix/tags/search)
 (keymap-set 'konix/tags/map "p" 'pop-tag-mark)
-(keymap-set 'konix/tags/map "w" 'konix/tags/restore-window-configuration)
 (keymap-set 'konix/tags/map "i" 'konix/tags/add-include-current-head)
 (keymap-set 'konix/tags/map "I" 'konix/tags/init)
 (keymap-set 'konix/tags/map "d" 'konix/tags/add-tags-dirs-current-head)

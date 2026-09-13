@@ -211,11 +211,6 @@ TAGS_FILE_NAMETHE"
 	)
   )
 
-(defun konix/tags/restore-window-configuration ()
-  (interactive)
-  (set-window-configuration konix/tags/windows-configuration-saved)
-  )
-
 (defun konix/tags/echo-tags-table-list ()
   (interactive)
   (message "%s" tags-table-list)

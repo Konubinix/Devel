@@ -1,4 +1,4 @@
-;;; KONIX_AL-delight.el ---
+;;; KONIX_AL-delight.el ---                          -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

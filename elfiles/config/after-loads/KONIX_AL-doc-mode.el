@@ -1,4 +1,4 @@
-;;; KONIX_AL-doc-mode.el ---
+;;; KONIX_AL-doc-mode.el ---                         -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

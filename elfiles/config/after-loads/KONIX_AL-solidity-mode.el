@@ -1,4 +1,4 @@
-;;; KONIX_AL-solidity-mode.el ---
+;;; KONIX_AL-solidity-mode.el ---                    -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

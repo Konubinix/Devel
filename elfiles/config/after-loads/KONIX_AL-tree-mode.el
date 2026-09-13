@@ -1,4 +1,4 @@
-;;; KONIX_AL-tree-mode.el ---
+;;; KONIX_AL-tree-mode.el ---                        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

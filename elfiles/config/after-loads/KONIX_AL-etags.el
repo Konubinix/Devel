@@ -1,4 +1,4 @@
-;;; KONIX_AL-etags.el ---
+;;; KONIX_AL-etags.el ---                            -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

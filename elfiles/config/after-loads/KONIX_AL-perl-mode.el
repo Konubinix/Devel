@@ -1,4 +1,4 @@
-;;; 700-KONIX_perl.el ---
+;;; 700-KONIX_perl.el ---                            -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

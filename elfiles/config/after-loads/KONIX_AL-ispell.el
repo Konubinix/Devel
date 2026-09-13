@@ -1,4 +1,4 @@
-;;; KONIX_AL-ispell.el ---
+;;; KONIX_AL-ispell.el ---                           -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

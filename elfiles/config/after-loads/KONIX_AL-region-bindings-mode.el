@@ -1,4 +1,4 @@
-;;; KONIX_AL-region-bindings-mode.el ---
+;;; KONIX_AL-region-bindings-mode.el ---             -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

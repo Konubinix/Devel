@@ -1,4 +1,4 @@
-;;; 700-KONIX_notmuch.el ---
+;;; 700-KONIX_notmuch.el ---                         -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

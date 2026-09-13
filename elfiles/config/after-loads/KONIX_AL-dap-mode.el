@@ -1,3 +1,4 @@
+;;; KONIX_AL-dap-mode.el ---                         -*- lexical-binding: t; -*-
 ;; Copyright (C) 2012  konubinix
 
 ;; Author: konubinix <konubinixweb@gmail.com>

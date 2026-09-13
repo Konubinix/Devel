@@ -1,4 +1,4 @@
-;;; KONIX_AL-cc-vars.el ---
+;;; KONIX_AL-cc-vars.el ---                          -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

@@ -1,4 +1,4 @@
-;;; KONIX_AL-envrc.el ---
+;;; KONIX_AL-envrc.el ---                            -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

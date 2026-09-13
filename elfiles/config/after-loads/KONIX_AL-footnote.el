@@ -1,4 +1,4 @@
-;;; KONIX_AL-footnote.el ---
+;;; KONIX_AL-footnote.el ---                         -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

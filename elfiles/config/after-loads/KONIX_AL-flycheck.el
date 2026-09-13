@@ -1,4 +1,4 @@
-;;; KONIX_AL-flycheck.el ---
+;;; KONIX_AL-flycheck.el ---                         -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026  konubinix
 

@@ -1,4 +1,4 @@
-;;; KONIX_AL-grep.el ---
+;;; KONIX_AL-grep.el ---                             -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

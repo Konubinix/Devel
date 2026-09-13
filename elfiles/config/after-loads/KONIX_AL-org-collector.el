@@ -1,4 +1,4 @@
-;;; KONIX_AL-org-collector.el ---
+;;; KONIX_AL-org-collector.el ---                    -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

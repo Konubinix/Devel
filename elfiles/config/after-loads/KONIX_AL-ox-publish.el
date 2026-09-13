@@ -1,4 +1,4 @@
-;;; KONIX_AL-ox-publish.el ---
+;;; KONIX_AL-ox-publish.el ---                       -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

@@ -1,4 +1,4 @@
-;;; KONIX_AL-cmake.el ---
+;;; KONIX_AL-cmake.el ---                            -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

@@ -1,4 +1,4 @@
-;;; KONIX_AL-text-translator.el ---
+;;; KONIX_AL-text-translator.el ---                  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

@@ -1,4 +1,4 @@
-;;; 700-KONIX_diff.el ---
+;;; 700-KONIX_diff.el ---                            -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

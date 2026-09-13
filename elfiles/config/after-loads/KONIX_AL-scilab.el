@@ -1,4 +1,4 @@
-;;; 700-KONIX_scilab-mode.el ---
+;;; 700-KONIX_scilab-mode.el ---                     -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

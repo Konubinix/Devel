@@ -1,4 +1,4 @@
-;;; KONIX_AL-bookmark.el ---
+;;; KONIX_AL-bookmark.el ---                         -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

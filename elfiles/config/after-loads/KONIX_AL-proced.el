@@ -1,4 +1,4 @@
-;;; 700-KONIX_proced.el ---
+;;; 700-KONIX_proced.el ---                          -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

@@ -1,4 +1,4 @@
-;;; KONIX_AL-tracking.el ---
+;;; KONIX_AL-tracking.el ---                         -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

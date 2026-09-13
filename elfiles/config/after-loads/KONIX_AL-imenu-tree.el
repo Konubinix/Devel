@@ -1,4 +1,4 @@
-;;; KONIX_AL-imenu-tree.el ---
+;;; KONIX_AL-imenu-tree.el ---                       -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

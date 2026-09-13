@@ -1,4 +1,4 @@
-;;; 400-KONIX_diary.el ---
+;;; 400-KONIX_diary.el ---                           -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

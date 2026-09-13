@@ -1,4 +1,4 @@
-;;; 700-KONIX_w3m.el ---
+;;; 700-KONIX_w3m.el ---                             -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

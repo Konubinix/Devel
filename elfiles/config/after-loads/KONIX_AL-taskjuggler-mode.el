@@ -1,3 +1,4 @@
+;;; KONIX_AL-taskjuggler-mode.el ---                 -*- lexical-binding: t; -*-
 ;;; KONIX_AL-taskjuggler-mode ---
 
 ;; Copyright (C) 2014  konubinix

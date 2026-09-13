@@ -1,4 +1,4 @@
-;;; KONIX_AL-org-bibtex.el ---
+;;; KONIX_AL-org-bibtex.el ---                       -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

@@ -1,4 +1,4 @@
-;;; 700-KONIX_find-file.el ---
+;;; 700-KONIX_find-file.el ---                       -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 
@@ -52,6 +52,10 @@
   )
 
 (add-hook 'before-save-hook 'konix/force-backup-of-buffer-if-sensible t)
+
+;; keep-buffers may not be loaded when this file is read, and the let below
+;; means to be seen by kill-buffer, not by its own body.
+(defvar keep-buffers-protected-alist)
 
 (defun konix/find-file-hook ()
   (if (and

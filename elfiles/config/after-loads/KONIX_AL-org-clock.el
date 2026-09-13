@@ -1,4 +1,4 @@
-;;; KONIX_AL-org-clock.el ---
+;;; KONIX_AL-org-clock.el ---                        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

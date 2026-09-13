@@ -1,4 +1,4 @@
-;;; 700-KONIX_wikipedia.el ---
+;;; 700-KONIX_wikipedia.el ---                       -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

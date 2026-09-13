@@ -1,4 +1,4 @@
-;;; KONIX_AL-bitlbee.el ---
+;;; KONIX_AL-bitlbee.el ---                          -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

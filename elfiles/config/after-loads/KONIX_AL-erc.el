@@ -1,4 +1,4 @@
-;;; 400-KONIX_erc.el ---
+;;; 400-KONIX_erc.el ---                             -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

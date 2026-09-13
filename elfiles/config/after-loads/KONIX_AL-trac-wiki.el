@@ -1,4 +1,4 @@
-;;; 400-KONIX_trac-wiki.el ---
+;;; 400-KONIX_trac-wiki.el ---                       -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

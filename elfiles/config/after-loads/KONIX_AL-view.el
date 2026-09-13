@@ -1,4 +1,4 @@
-;;; 700-KONIX_view.el ---
+;;; 700-KONIX_view.el ---                            -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

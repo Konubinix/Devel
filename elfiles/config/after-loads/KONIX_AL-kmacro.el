@@ -1,4 +1,4 @@
-;;; KONIX_AL-kmacro.el ---
+;;; KONIX_AL-kmacro.el ---                           -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

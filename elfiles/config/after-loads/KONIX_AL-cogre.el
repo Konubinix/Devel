@@ -1,4 +1,4 @@
-;;; KONIX_AL-cogre.el ---
+;;; KONIX_AL-cogre.el ---                            -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

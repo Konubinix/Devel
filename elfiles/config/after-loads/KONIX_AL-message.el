@@ -1,4 +1,4 @@
-;;; 400-KONIX_message.el ---
+;;; 400-KONIX_message.el ---                         -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

@@ -1,4 +1,4 @@
-;;; KONIX_AL-ledger.el ---
+;;; KONIX_AL-ledger.el ---                           -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

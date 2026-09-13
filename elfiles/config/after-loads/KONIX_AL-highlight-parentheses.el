@@ -1,4 +1,4 @@
-;;; KONIX_AL-highlight-parentheses.el ---
+;;; KONIX_AL-highlight-parentheses.el ---            -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

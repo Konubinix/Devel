@@ -1,4 +1,4 @@
-;;; KONIX_AL-circe-color-nicks.el ---
+;;; KONIX_AL-circe-color-nicks.el ---                -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

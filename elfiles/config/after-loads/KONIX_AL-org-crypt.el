@@ -1,4 +1,4 @@
-;;; KONIX_AL-org-crypt.el ---
+;;; KONIX_AL-org-crypt.el ---                        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

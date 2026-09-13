@@ -1,4 +1,4 @@
-;;; 700-KONIX_ediff.el ---
+;;; 700-KONIX_ediff.el ---                           -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

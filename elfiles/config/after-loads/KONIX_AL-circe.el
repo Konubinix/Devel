@@ -1,4 +1,4 @@
-;;; KONIX_AL-circe.el ---
+;;; KONIX_AL-circe.el ---                            -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

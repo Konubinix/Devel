@@ -1,4 +1,4 @@
-;;; KONIX_AL-undo-tree.el ---
+;;; KONIX_AL-undo-tree.el ---                        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

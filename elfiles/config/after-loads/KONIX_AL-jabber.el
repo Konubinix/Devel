@@ -1,4 +1,4 @@
-;;; 400-KONIX_jabber.el ---
+;;; 400-KONIX_jabber.el ---                          -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

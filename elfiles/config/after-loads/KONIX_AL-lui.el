@@ -1,4 +1,4 @@
-;;; KONIX_AL-lui.el ---
+;;; KONIX_AL-lui.el ---                              -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

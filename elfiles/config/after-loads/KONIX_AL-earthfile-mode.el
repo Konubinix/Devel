@@ -1,4 +1,4 @@
-;;; KONIX_AL-earthfile-mode.el ---
+;;; KONIX_AL-earthfile-mode.el ---                   -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

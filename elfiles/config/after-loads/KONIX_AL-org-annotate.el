@@ -1,4 +1,4 @@
-;;; KONIX_AL-org-annotate.el ---
+;;; KONIX_AL-org-annotate.el ---                     -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 
@@ -35,6 +35,10 @@
 	(konix/notify (format "File %s has annotation" filename))
 	)
   )
+
+;; The let below is the re-entrancy guard the recursive call reads with
+;; `boundp', so it has to bind dynamically rather than lexically.
+(defvar already_in_konix/org-annotate-file-is-annotated-p)
 
 (defun konix/org-annotate-file-is-annotated-p (filename)
   (unless (or

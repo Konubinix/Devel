@@ -1,4 +1,4 @@
-;;; KONIX_AL-notmuch-show.el ---
+;;; KONIX_AL-notmuch-show.el ---                     -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013  konubinix
 

@@ -1,4 +1,4 @@
-;;; KONIX_AL-ruby-mode.el ---
+;;; KONIX_AL-ruby-mode.el ---                        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 

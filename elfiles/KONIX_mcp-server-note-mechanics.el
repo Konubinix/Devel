@@ -1,4 +1,4 @@
-;; [[id:6872a682-fc48-4e82-bbcd-6d4055a55f77::note-mechanics][note-mechanics]]
+;; [[id:6872a682-fc48-4e82-bbcd-6d4055a55f77::-*- lexical-binding: t; -*-][-*- lexical-binding: t; -*-]]
 ;;; KONIX_mcp-server-note-mechanics.el --- tangled from how_to_write_and_audit_a_note.org
 (defconst konix/note-intention-words
   '(("tl;dr"      . "what the note says, in one line")

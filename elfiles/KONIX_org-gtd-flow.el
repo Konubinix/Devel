@@ -221,30 +221,6 @@
   (message "org-super-agenda per commitment: %s" (if org-super-agenda-groups t nil))
   )
 
-(defun konix/org-agenda-per-aof-toggle nil
-  (interactive)
-  (set (make-variable-buffer-local
-        'org-super-agenda-groups)
-       (if org-super-agenda-groups
-           nil
-         (konix/org-super-agenda-per konix/org-gtd-aof)
-         )
-       )
-  (message "org-super-agenda per aof: %s" (if org-super-agenda-groups t nil))
-  )
-
-(defun konix/org-agenda-per-group-aof-toggle nil
-  (interactive)
-  (set (make-variable-buffer-local
-        'org-super-agenda-groups)
-       (if org-super-agenda-groups
-           nil
-         (konix/org-super-agenda-per konix/org-gtd-group-aof)
-         )
-       )
-  (message "org-super-agenda per group aof: %s" (if org-super-agenda-groups t nil))
-  )
-
 (defvar konix/org-gtd-agenda/history nil)
 (defvar konix/org-gtd-context/history nil)
 (eval-after-load "savehist.el"

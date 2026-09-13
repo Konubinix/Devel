@@ -712,7 +712,7 @@ in
 
     # ~/.emacs_var — simplified for NixOS (env vars already in process environment)
     home.file.".emacs_var".text = ''
-      ;; -*- mode:emacs-lisp -*-
+      ;; -*- mode:emacs-lisp; lexical-binding: t; -*-
       ;; NixOS: env vars set by Home Manager, no need for konix_import_env.el
       (defvar python-bin (executable-find "python3"))
       (defvar perso-dir (or (getenv "KONIX_PERSO_DIR") (expand-file-name "perso" "~")))

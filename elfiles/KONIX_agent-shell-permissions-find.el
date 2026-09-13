@@ -81,7 +81,7 @@ see).")
 It has to stay inside the project, just like the starting points -- unlike the
 `-newerXt' forms, whose value is a timestamp rather than a path.")
 
-(defun konix/agent-shell--find-read-only-p (command)
+(defun konix/agent-shell--find-read-only-p (command &optional directory)
   "Non-nil when COMMAND, a `find' node, only walks project files and prints them.
 Reads the invocation as `find FLAGS STARTING-POINTS EXPRESSION': the flags may
 only be `konix/agent-shell--find-link-flags', the starting points must stay in
@@ -94,9 +94,11 @@ argument after it (`konix/agent-shell--find-read-only-options', or
 path).  Anything unlisted is refused, as is an argument whose value is not
 statically knowable."
   (when (konix/agent-shell--command-name-is command "find")
-    (let* ((arguments (konix/agent-shell--command-argument-literals command))
+    (let* ((directory (or directory default-directory))
+           (arguments (konix/agent-shell--command-argument-literals command))
            (rest arguments)
-           (ok (not (memq nil arguments))))
+           (ok (not (memq nil arguments)))
+           (starting-point nil))
       (while (member (car rest) konix/agent-shell--find-link-flags)
         (pop rest))
       ;; The starting points, which run until the expression begins.
@@ -104,7 +106,12 @@ statically knowable."
                   (not (string-prefix-p "-" (car rest)))
                   (not (member (car rest)
                                konix/agent-shell--find-read-only-operators)))
-        (setq ok (konix/agent-shell--path-inside-project-p (pop rest))))
+        (setq starting-point t
+              ok (konix/agent-shell--path-inside-p (pop rest) directory)))
+      ;; None given: `find' walks `default-directory'.
+      (unless starting-point
+        (setq ok (and ok (konix/agent-shell--path-inside-p
+                          default-directory directory))))
       ;; The expression.
       (while (and ok rest)
         (let ((argument (pop rest)))
@@ -116,12 +123,12 @@ statically knowable."
             ;; means we misread the line.
             (setq ok (and rest (progn (pop rest) t))))
            ((member argument konix/agent-shell--find-read-only-path-options)
-            (setq ok (and rest (konix/agent-shell--path-inside-project-p
-                                (pop rest)))))
+            (setq ok (and rest (konix/agent-shell--path-inside-p
+                                (pop rest) directory))))
            (t (setq ok nil)))))
       ok)))
 
-(konix/agent-shell-define-tool-evaluator "read-only-find" (tool-call)
+(konix/agent-shell-define-tool-evaluator "read-only-find" (tool-call &optional directory)
   "Match a lone read-only `find', e.g.
 `find .agent-shell/tmp -maxdepth 2 -name \\='*.txt\\='' -- auto-approvable.
 `find' is in neither `konix/agent-shell-command-whitelist' nor
@@ -136,7 +143,7 @@ executes, so the invocation is read instead
     (konix/agent-shell--with-bash-ast root tool-call
       (let ((commands (konix/agent-shell--command-nodes root)))
         (and (= (length commands) 1)
-             (konix/agent-shell--find-read-only-p (car commands)))))))
+             (konix/agent-shell--find-read-only-p (car commands) directory))))))
 
 (provide 'KONIX_agent-shell-permissions-find)
 ;;; KONIX_agent-shell-permissions-find.el ends here

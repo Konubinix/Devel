@@ -264,6 +264,22 @@ parsing, so KEY may carry arguments."
   (nil . "sed -n '1,5p' $HOME/.ssh/id_rsa")
   (nil . "sed -n '1,5p' ../other/secret"))
 
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-read-only-sed-in-a-given-directory
+    (format "@read-only-sed(%s)"
+            (file-name-directory (directory-file-name default-directory)))
+  (t . "sed -n '1,5p' ../notes.txt")
+  (t . "sed -n '1,5p' foo.txt")
+  (nil . "sed -n '1,5p' /etc/shadow")
+  (nil . "sed -n '1,5p' ~/.ssh/id_rsa")
+  (nil . "sed -i 's/a/b/' ../notes.txt"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-read-only-sed-narrowed-below-the-project
+    "@read-only-sed(.agent-shell/tmp)"
+  (t . "sed -n '1p' .agent-shell/tmp/notes.txt")
+  (nil . "sed -n '1p' foo.txt"))
+
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-path-inside-project
     (lambda (path) (and (konix/agent-shell--path-inside-project-p path) t))
@@ -353,6 +369,25 @@ parsing, so KEY may carry arguments."
   (nil . "find -L /etc -name passwd")
   (nil . "find . -newer /etc/shadow")
   (nil . "find . -samefile ~/.ssh/id_rsa"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-read-only-find-in-a-given-directory
+    (format "@read-only-find(%s)"
+            (file-name-directory (directory-file-name default-directory)))
+  (t . "find .. -maxdepth 1 -name '*.txt'")
+  (t . "find . -name '*.el'")
+  (t . "find")
+  (t . "find . -newer ../Makefile")
+  (nil . "find / -name id_rsa")
+  (nil . "find ~/.ssh -type f")
+  (nil . "find .. -name '*.txt' -delete"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-read-only-find-narrowed-below-the-project
+    "@read-only-find(.agent-shell/tmp)"
+  (t . "find .agent-shell/tmp -type f")
+  (nil . "find . -type f")
+  (nil . "find"))
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-find-refuses-unrecognized "read-only-find"

@@ -948,15 +948,17 @@ canonicalizing it, which would have Tramp reach the host it names."
 See `konix/agent-shell--path-inside-p'."
   (konix/agent-shell--path-inside-p path default-directory))
 
-(defun konix/agent-shell--sed-read-only-p (command)
-  "Non-nil when COMMAND, a `sed' node, only reads project files and writes stdout.
+(defun konix/agent-shell--sed-read-only-p (command &optional directory)
+  "Non-nil when COMMAND, a `sed' node, only reads DIRECTORY and writes stdout.
+DIRECTORY defaults to the project `default-directory'.
 Reads the invocation as `sed OPTIONS SCRIPT FILES...', all three parts checked:
 `konix/agent-shell--sed-read-only-options',
 `konix/agent-shell--sed-read-only-script-re' and
-`konix/agent-shell--path-inside-project-p'.  An argument whose value is not
+`konix/agent-shell--path-inside-p'.  An argument whose value is not
 statically knowable is refused, as are the `-e' and `-f' forms."
   (when (konix/agent-shell--command-name-is command "sed")
-    (let* ((arguments (konix/agent-shell--command-argument-literals command))
+    (let* ((directory (or directory default-directory))
+           (arguments (konix/agent-shell--command-argument-literals command))
            (options (seq-take-while (lambda (a) (string-prefix-p "-" a))
                                     (remq nil arguments)))
            (script (nth (length options) arguments))
@@ -967,9 +969,11 @@ statically knowable is refused, as are the `-e' and `-f' forms."
                           (member o konix/agent-shell--sed-read-only-options))
                         options)
            (string-match-p konix/agent-shell--sed-read-only-script-re script)
-           (seq-every-p #'konix/agent-shell--path-inside-project-p files)))))
+           (seq-every-p (lambda (file)
+                          (konix/agent-shell--path-inside-p file directory))
+                        files)))))
 
-(konix/agent-shell-define-tool-evaluator "read-only-sed" (tool-call)
+(konix/agent-shell-define-tool-evaluator "read-only-sed" (tool-call &optional directory)
   "Match a lone read-only `sed', e.g.
 `sed -n \\='/from/,/to/p\\=' .agent-shell/tmp/notes.txt' -- auto-approvable.
 `sed' is in neither `konix/agent-shell-command-whitelist' nor
@@ -983,7 +987,7 @@ Combining commands is `@severalcommands'' business: here the line must run that
     (konix/agent-shell--with-bash-ast root tool-call
       (let ((commands (konix/agent-shell--command-nodes root)))
         (and (= (length commands) 1)
-             (konix/agent-shell--sed-read-only-p (car commands)))))))
+             (konix/agent-shell--sed-read-only-p (car commands) directory))))))
 
 (konix/agent-shell-define-tool-evaluator "project-paths" (tool-call)
   "Match a line no argument of which reaches outside the project.

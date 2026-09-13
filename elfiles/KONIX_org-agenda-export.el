@@ -23,6 +23,8 @@
 
 ;;; Code:
 
+(require 'ox)
+
 (defun konix/org-agenda-get-start-time (&optional dateprop)
   (setq dateprop (or dateprop 'date))
   (let (

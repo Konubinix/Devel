@@ -44,9 +44,7 @@ Alternate between HIDE ALL and SHOW ALL on successive calls."
 (defvar konix/hs-zoom-in-hide-level nil)
 (defun konix/hs-zoom-in ()
   (interactive)
-  (let (
-		new_point
-		)
+  (progn
 	(cond
 	 (current-prefix-arg
 	  (setq konix/hs-zoom-in-hide-level (not konix/hs-zoom-in-hide-level))
@@ -118,15 +116,15 @@ Alternate between HIDE ALL and SHOW ALL on successive calls."
 		beg
 		end
 		)
+	(save-excursion
+	  (hs-find-block-beginning)
+	  (setq beg (point))
+	  (looking-at hs-block-start-regexp)
+	  (hs-forward-sexp (match-data t) 1)
+	  (setq end (point))
+	  )
+	(narrow-to-region beg end)
 	)
-  (save-excursion
-	(hs-find-block-beginning)
-	(setq beg (point))
-	(looking-at hs-block-start-regexp)
-	(hs-forward-sexp (match-data t) 1)
-	(setq end (point))
-	)
-  (narrow-to-region beg end)
   )
 
 (defun konix/safe-hs-inside-comment-p ()

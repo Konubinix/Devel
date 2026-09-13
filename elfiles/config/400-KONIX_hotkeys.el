@@ -455,7 +455,6 @@
 (keymap-set 'konix/org-global-map "<up>" 'org-mark-ring-push)
 (keymap-set 'konix/org-global-map "<left>" 'org-mark-ring-goto)
 (keymap-set 'konix/org-global-map "<right>" 'konix/org-mark-ring-goto-newest)
-(keymap-set 'konix/org-global-map "a" 'org-annotate-file)
 (keymap-set 'konix/org-global-map "s" 'org-sort)
 (keymap-set 'konix/org-global-map "l" 'org-store-link)
 (keymap-set 'konix/org-global-map "p" 'konix/org-focus-next)

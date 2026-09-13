@@ -20,6 +20,13 @@ note can pull the block below in with a =<<cadquery>>= noweb reference.
   =cadquery_export= is the single entry point the language calls; a shape without
   a recording (e.g. =result.val()=) is exported as STL instead.
 
+  =openscad= runs an openscad source and sews the stl it answers into a cadquery
+  solid, so a part a scad library already draws needs no redrawing here;
+  =nix_build= builds a nix expression and hands back its store path, which is how
+  a note pins such a library without installing anything.  =bosl2= puts the two
+  together for [[https://github.com/BelfrySCAD/BOSL2][BOSL2]], whose threads,
+  bottle necks and caps a note then calls by name.
+
   #+name: cadquery
   #+BEGIN_SRC python :eval no
     import cadquery as cq
@@ -63,6 +70,150 @@ note can pull the block below in with a =<<cadquery>>= noweb reference.
         "intersect": (cq.Color(0.15, 0.4, 0.95, _A),      # blue -- base clipped away
                       cq.Color(0.2, 0.85, 0.4, _A)),      # green -- tool beyond the part
     }
+
+    def openscad(source, libraries=None):
+        """Render an openscad SOURCE and hand back what it made, as a cadquery
+        solid.  LIBRARIES, when given, is a directory put on OPENSCADPATH so the
+        source can include what lives there.  openscad answers in stl, a bag of
+        triangles, so each one becomes a face and the faces are sewn back into
+        the one solid cadquery will cut and join."""
+        import os, subprocess, tempfile
+        work = tempfile.mkdtemp()
+        scad, stl = (os.path.join(work, n) for n in ("part.scad", "part.stl"))
+        with open(scad, "w") as handle:
+            handle.write(source)
+        env = dict(os.environ)
+        if libraries:
+            env["OPENSCADPATH"] = libraries
+        subprocess.run(["nix-shell", "-p", "openscad", "--run",
+                        "openscad -o %s %s" % (stl, scad)],
+                       env=env, stderr=subprocess.DEVNULL, check=True)
+        return _sew(stl)
+
+    def _sew(stl):
+        from OCP.RWStl import RWStl
+        from OCP.TopoDS import TopoDS
+        from OCP.BRepBuilderAPI import (
+            BRepBuilderAPI_MakePolygon, BRepBuilderAPI_MakeFace,
+            BRepBuilderAPI_Sewing, BRepBuilderAPI_MakeSolid,
+        )
+        poly = RWStl.ReadFile_s(stl)
+        sewing = BRepBuilderAPI_Sewing(1e-6)
+        for i in range(1, poly.NbTriangles() + 1):
+            a, b, c = poly.Triangle(i).Get()
+            face = BRepBuilderAPI_MakePolygon(
+                poly.Node(a), poly.Node(b), poly.Node(c), True)
+            sewing.Add(BRepBuilderAPI_MakeFace(face.Wire()).Face())
+        sewing.Perform()
+        shell = TopoDS.Shell_s(sewing.SewedShape())
+        return cq.Workplane(obj=cq.Solid(BRepBuilderAPI_MakeSolid(shell).Solid()))
+
+    _BOSL2_REV = "4e031aafe189efcf4eb0250c24d3216b6a429458"
+    _BOSL2_SHA = "0cfq0rjwrr3rzmhrdd90fq62jq42zgc17h2lshr2mdapf34lrfg0"
+    _BOSL2_NIX = """
+    with import <nixpkgs> { };
+    let
+      src = fetchzip {
+        url = "https://github.com/BelfrySCAD/BOSL2/archive/%s.tar.gz";
+        sha256 = "%s";
+      };
+    in
+    runCommand "bosl2-libraries" { } ''
+      mkdir -p $out/BOSL2
+      cp -r ${src}/* $out/BOSL2/
+    ''
+    """ % (_BOSL2_REV, _BOSL2_SHA)
+
+    def bosl2(call, *files):
+        """Render a BOSL2 CALL and hand back the solid it makes.  FILES names the
+        BOSL2 sources the call needs -- "threading.scad", "bottlecaps.scad" and so
+        on -- "std.scad" being included whatever happens.  The library itself is
+        pinned to a revision and built by nix, so nothing is installed."""
+        head = "".join("include <BOSL2/%s>\n" % name
+                       for name in ("std.scad",) + files)
+        return openscad(head + call, libraries=nix_build(_BOSL2_NIX))
+
+    class raw(str):
+        """A value written into the scad as it stands, for a constant the
+        language knows by name -- =BOTTOM=, =UP= -- rather than a string."""
+
+    def _scad_value(value):
+        if isinstance(value, raw):
+            return str(value)
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        if isinstance(value, str):
+            return '"%s"' % value
+        if isinstance(value, (list, tuple)):
+            return "[%s]" % ", ".join(_scad_value(v) for v in value)
+        return repr(value)
+
+    _PARTCAD_PACKAGE = """
+    partcad: ">=0.8.0"
+    dependencies:
+      pub:
+        type: git
+        url: https://github.com/partcad/partcad-index.git
+        revision: main
+    """
+
+    def partcad(path, **params):
+        """A part of the PartCAD public registry, as a cadquery solid.  PATH is
+        what the registry calls it, "//pub/std/metric/bosl2/bottlecaps:generic_b
+        ottle_neck" and the like, and PARAMS what it is to be built with.  The
+        package that points at the registry is written to a temporary directory,
+        so asking for a part leaves nothing behind."""
+        import os, tempfile
+        import partcad as pc
+        work = tempfile.mkdtemp()
+        with open(os.path.join(work, "partcad.yaml"), "w") as handle:
+            handle.write(_PARTCAD_PACKAGE)
+        context = pc.init(work)
+        return cq.Workplane(
+            obj=context.get_part_cadquery(path, params=params or None))
+
+    _BOSL2_WIKI = "https://github.com/BelfrySCAD/BOSL2/wiki/%s"
+
+    class _Scad(object):
+        """Every module of the scad FILES, reachable by its own name: what you
+        call on this is written out as a call and rendered.  `doc' holds the wiki
+        page of each file, which is where the modules and their arguments are
+        listed, and printing this says the same."""
+
+        def __init__(self, files):
+            self._files = files
+            self.doc = [_BOSL2_WIKI % name for name in files]
+
+        def __repr__(self):
+            return "BOSL2 %s -- see %s" % (", ".join(self._files),
+                                           ", ".join(self.doc))
+
+        def __getattr__(self, name):
+            def call(*args, **kwargs):
+                written = [_scad_value(a) for a in args]
+                written += ["%s=%s" % (k, _scad_value(v))
+                            for k, v in kwargs.items()]
+                return bosl2("%s(%s);" % (name, ", ".join(written)),
+                             *self._files)
+            return call
+
+    def scad(*files):
+        """BOSL2's FILES as an object whose every module is a method, so a part
+        the library already draws is one call and needs no wrapper written for
+        it: =scad("bottlecaps.scad").generic_bottle_neck(id=26, ...)=.  What it
+        can be asked for is what its wiki page lists, and `doc' links there."""
+        return _Scad(files)
+
+    def nix_build(expression):
+        """Build a nix EXPRESSION and hand back the store path it made, so a note
+        can pin what it needs without installing anything or leaving a trace."""
+        import os, subprocess, tempfile
+        path = os.path.join(tempfile.mkdtemp(), "expression.nix")
+        with open(path, "w") as handle:
+            handle.write(expression)
+        return subprocess.run(["nix-build", "--no-out-link", path],
+                              capture_output=True, text=True,
+                              check=True).stdout.strip()
 
     def cadquery_export(obj, out, tolerance=0.1):
         if len(_LOG) > 1:

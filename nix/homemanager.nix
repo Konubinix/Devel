@@ -298,7 +298,6 @@ in
       KONIX_BIN_DIR = "${develDir}/bin";
       KONIX_SRC_DIR = "${develDir}/src";
       KONIX_PLATFORM = "linux";
-      KONIX_EMACS_CUSTOM_FILE = "${homeDir}/.emacs_custo";
       KONIX_PERSO_DIRS = "${homeDir}/perso";
       KONIX_PERSO_DIR = "${homeDir}/perso/perso";
       KONIX_PERSO_CONFIG_DIR = "${homeDir}/perso/perso/config";
@@ -721,7 +720,7 @@ in
       (defvar elfiles (expand-file-name "elfiles" (getenv "KONIX_DEVEL_DIR")) "where I put my emacs files")
       (defvar emacs-config-dir (expand-file-name "config" elfiles) "where I put my emacs custom config files")
       (defvar devel-dir (getenv "KONIX_DEVEL_DIR") "Where I put my devel files (the installation path)")
-      (setq custom-file (getenv "KONIX_EMACS_CUSTOM_FILE"))
+      (setq-default custom-file "${configDir}/emacs-custom.el")
     '';
 
     # ~/.emacs — main entry point
@@ -742,13 +741,6 @@ in
           (write-file emacs_com_file)
         )
       )
-    '';
-
-    # ~/.emacs_custo — copy default if not present
-    home.activation.emacsCustom = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-      if [ ! -f "${homeDir}/.emacs_custo" ]; then
-        cp "${configDir}/emacs-custom.el" "${homeDir}/.emacs_custo"
-      fi
     '';
 
     # ~/init_bin symlink (used by various scripts, not just emacs)

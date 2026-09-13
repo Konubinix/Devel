@@ -101,6 +101,25 @@ Search from the buffer start; do nothing when LINE is nil or absent."
         (when-let ((window (get-buffer-window shell t)))
           (set-window-point window pos))))))
 
+(defun konix/org-agent-shell--resume-session (session-id cwd)
+  "Return the live shell running SESSION-ID, resuming it from CWD if none is.
+Never pops to it or moves point: a caller wanting that calls
+`konix/org-agent-shell--pop-to-shell' itself."
+  (or (konix/org-agent-shell--find-shell session-id)
+      (let ((default-directory (or cwd default-directory)))
+        (agent-shell--start
+         :config (map-insert
+                  (or (konix/agent-shell-session-config session-id)
+                      (agent-shell--resolve-preferred-config)
+                      (agent-shell-select-config :prompt "Resume with agent: "))
+                  :default-model-id
+                  (lambda ()
+                    (konix/agent-shell-session-model-get
+                     (map-nested-elt (agent-shell--state) '(:session :id)))))
+         :session-id session-id
+         :new-session t
+         :no-focus t))))
+
 (defun konix/org-agent-shell--open-session (spec)
   "Open the session SPEC (\"SESSION-ID?cwd=DIR[&line=CONTENT]\").
 Pop to the live shell running that session if one exists; otherwise
@@ -111,29 +130,11 @@ matches it.  Return the shell buffer."
   (pcase-let* ((`(,session-id ,rest) (split-string spec "\\?cwd="))
                (`(,cwd ,line) (split-string (or rest "") "&line="))
                (line (and line (not (string-empty-p line))
-                          (url-unhex-string line))))
-    (if-let ((shell (konix/org-agent-shell--find-shell session-id)))
-        (progn
-          (konix/org-agent-shell--pop-to-shell shell)
-          (konix/org-agent-shell--goto-line-content shell line)
-          shell)
-      (let* ((default-directory (or cwd default-directory))
-             (shell (agent-shell--start
-                     :config (map-insert
-                              (or (konix/agent-shell-session-config session-id)
-                                  (agent-shell--resolve-preferred-config)
-                                  (agent-shell-select-config
-                                   :prompt "Resume with agent: "))
-                              :default-model-id
-                              (lambda ()
-                                (konix/agent-shell-session-model-get
-                                 (map-nested-elt (agent-shell--state)
-                                                 '(:session :id)))))
-                     :session-id session-id
-                     :new-session t
-                     :no-focus t)))
-        (konix/org-agent-shell--pop-to-shell shell)
-        shell))))
+                          (url-unhex-string line)))
+               (shell (konix/org-agent-shell--resume-session session-id cwd)))
+    (konix/org-agent-shell--pop-to-shell shell)
+    (konix/org-agent-shell--goto-line-content shell line)
+    shell))
 
 (defun konix/org-agent-shell-follow-link (link &optional _arg)
   "Open an agent-shell session LINK (\"SESSION-ID?cwd=DIR&line=CONTENT\").

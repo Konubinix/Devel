@@ -1,4 +1,4 @@
-;;; KONIX_org-gtd-tags.el ---
+;;; KONIX_org-gtd-tags.el ---                        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

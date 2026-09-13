@@ -1,4 +1,4 @@
-;;; KONIX_programmation.el --- Some utilities to facilitate programmation
+;;; KONIX_programmation.el --- Some utilities to facilitate programmation -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2010
 
@@ -435,7 +435,8 @@ They can be relative or absolute
 (defun konix/hide-ifdef-define (var)
   (interactive (list
                 (let ((block_courant (konix/hide-ifdef-find-block)))
-                  (setq var (read-string "Definer quoi ? " block_courant))
+                  ;; the setq went to a global; the read alone is the argument
+                  (read-string "Definer quoi ? " block_courant)
                   )
                 )
                )
@@ -445,7 +446,8 @@ They can be relative or absolute
 (defun konix/hide-ifdef-undef (var)
   (interactive (list
                 (let ((block_courant (konix/hide-ifdef-find-block)))
-                  (setq var (read-string "Undefiner quoi ? " block_courant))
+                  ;; the setq went to a global; the read alone is the argument
+                  (read-string "Undefiner quoi ? " block_courant)
                   )
                 )
                )
@@ -470,14 +472,23 @@ They can be relative or absolute
 ;; ******************************************************************************************
 ;; PYTHON
 ;; ******************************************************************************************
+;; the filter below and `konix/python/dir' share these two, so they have to be
+;; special: `konix/python/dir' binds them and the filter, called from elsewhere,
+;; is the one that writes them.
+(defvar konix/python/dir_filter_buffer ""
+  "What the filter has read of the dir() answer so far.")
+
+(defvar konix/python/dir_filter_got-result nil
+  "Non-nil once the filter has read the end of the dir() answer.")
+
 (defun konix/python/dir_filter (proc string)
   "Fill the `konix/python/dir_filter_buffer' buffer until the character \n is received
-When receiving the character \n at the end of the output, set got_result to t,
-elsen set it to nil
+When receiving the character \n at the end of the output, set
+`konix/python/dir_filter_got-result' to t, elsen set it to nil
 "
   (setq konix/python/dir_filter_buffer (concat konix/python/dir_filter_buffer
                                                string))
-  (setq got_result
+  (setq konix/python/dir_filter_got-result
         (if (string-match-p "\n" string)
             t
           nil
@@ -491,12 +502,12 @@ elsen set it to nil
          (old_process_filter (process-filter proc))
          (konix/python/dir_filter_result nil)
          (konix/python/dir_filter_buffer "")
-         (got_result nil)
+         (konix/python/dir_filter_got-result nil)
          )
     (set-process-filter proc 'konix/python/dir_filter)
     (process-send-string proc
                          (format "dir(%s)\n" class))
-    (while (not got_result)
+    (while (not konix/python/dir_filter_got-result)
       (accept-process-output proc 1)
       )
     ;; here, the whole dir line is got
@@ -507,7 +518,10 @@ elsen set it to nil
       (goto-char (point-min))
       (when (re-search-forward "\\[" nil t)
         (while (re-search-forward "'\\([^']+\\)'" nil t)
-          (add-to-list 'konix/python/dir_filter_result (match-string 1) t)
+          (let ((name (match-string 1)))
+            (unless (member name konix/python/dir_filter_result)
+              (setq konix/python/dir_filter_result
+                    (append konix/python/dir_filter_result (list name)))))
           )
         )
       )

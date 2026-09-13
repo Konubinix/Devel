@@ -1,4 +1,4 @@
-;;; KONIX_org-gtd-parties.el ---
+;;; KONIX_org-gtd-parties.el ---                     -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

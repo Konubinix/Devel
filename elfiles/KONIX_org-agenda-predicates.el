@@ -1,4 +1,4 @@
-;;; KONIX_org-agenda-predicates.el ---
+;;; KONIX_org-agenda-predicates.el ---               -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 
@@ -128,9 +128,13 @@
               t
               )
         (save-match-data
-          (add-to-list 'timestamps (float-time
-                                    (org-time-string-to-time (match-string 1))
-                                    ))
+          (let (
+                (stamp (float-time
+                        (org-time-string-to-time (match-string 1))))
+                )
+            (unless (member stamp timestamps)
+              (setq timestamps (cons stamp timestamps)))
+            )
           )
         )
       )

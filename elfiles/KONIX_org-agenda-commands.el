@@ -1,4 +1,4 @@
-;;; KONIX_org-agenda-commands.el ---
+;;; KONIX_org-agenda-commands.el ---                 -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

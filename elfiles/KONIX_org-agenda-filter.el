@@ -1,4 +1,4 @@
-;;; KONIX_org-agenda-filter.el ---
+;;; KONIX_org-agenda-filter.el ---                   -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 
@@ -96,7 +96,10 @@
              (setq tags (org-get-at-bol 'tags) ; used in eval
                    cat (get-text-property (point) 'org-category))
              (if (and
-                  (not (eval konix/org-entry-predicate))
+                  ;; The predicate is a form built above out of `tags', so it
+                  ;; is handed the bindings it used to read dynamically.
+                  (not (eval konix/org-entry-predicate
+                             `((tags . ,tags) (cat . ,cat))))
                   )
                  (org-agenda-filter-hide-line 'tag))
              (beginning-of-line 2))
@@ -225,19 +228,27 @@
 
 (defun konix/org-agenda-reset-apply-filter (filters)
   (interactive "sFilters: ")
-  (setq raw_filters filters)
-  (setq filters '())
-  (while (and
-          (not
-           (string-equal raw_filters "")
-           )
-          (not (null raw_filters))
-          )
-    (if (string-match "^\\([+-][^+-]+\\)\\(.*\\)$" raw_filters)
-        (add-to-list 'filters (match-string 1 raw_filters))
-      (add-to-list 'filters (format "+%s" raw_filters))
+  (let (
+        ;; it was a global, set here and read nowhere else
+        (raw_filters filters)
+        )
+    (setq filters '())
+    (while (and
+            (not
+             (string-equal raw_filters "")
+             )
+            (not (null raw_filters))
+            )
+      (let (
+            (filter (if (string-match "^\\([+-][^+-]+\\)\\(.*\\)$" raw_filters)
+                        (match-string 1 raw_filters)
+                      (format "+%s" raw_filters)))
+            )
+        (unless (member filter filters)
+          (setq filters (cons filter filters)))
+        )
+      (setq raw_filters (match-string 2 raw_filters))
       )
-    (setq raw_filters (match-string 2 raw_filters))
     )
 
   (with-current-buffer org-agenda-buffer

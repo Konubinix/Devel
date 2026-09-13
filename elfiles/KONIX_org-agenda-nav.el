@@ -1,4 +1,4 @@
-;;; KONIX_org-agenda-nav.el ---
+;;; KONIX_org-agenda-nav.el ---                      -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 
@@ -423,7 +423,8 @@
               )
         (konix/goto-random-line)
         )
-      (add-to-list 'visited-points (point))
+      (unless (member (point) visited-points)
+        (setq visited-points (cons (point) visited-points)))
       (recenter-top-bottom 0)
       (when (y-or-n-p (format "Take this one (%s)?"
                               (konix/org-get-heading)

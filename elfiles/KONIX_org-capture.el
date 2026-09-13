@@ -1,4 +1,4 @@
-;;; KONIX_org-capture.el ---
+;;; KONIX_org-capture.el ---                         -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 
@@ -32,6 +32,12 @@
   )
 (defun konix/org-todo_file ()
   (expand-file-name "todo.org" org-directory))
+
+;; org declares these two only for itself, so the let below binds them
+;; lexically and never sees what `org-read-date' sets unless we say they are
+;; special here too.
+(defvar org-time-was-given)
+(defvar org-end-time-was-given)
 
 (defun konix/org-get-time nil
   (let* (

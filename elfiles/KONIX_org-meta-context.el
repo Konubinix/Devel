@@ -1,3 +1,4 @@
+;;; KONIX_org-meta-context.el ---                    -*- lexical-binding: t; -*-
 ;; The meta context library allows the user to easily change the value of
 ;; `org-directory' cycling into the `konix/org-meta-contexts' list
 

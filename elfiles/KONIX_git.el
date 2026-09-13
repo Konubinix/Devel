@@ -1,4 +1,4 @@
-;;; KONIX_git.el --- GIT facilities
+;;; KONIX_git.el --- GIT facilities                  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2010  sam
 
@@ -391,7 +391,8 @@
                             )
               )
       )
-    (add-to-list 'branches "  HEAD")
+    (unless (member "  HEAD" branches)
+      (setq branches (cons "  HEAD" branches)))
     (setq branches (remove "* (no branch)" branches))
     (mapcar
      '(lambda(e)

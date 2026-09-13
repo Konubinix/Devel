@@ -1,4 +1,4 @@
-;;; KONIX_org-agenda-display.el ---
+;;; KONIX_org-agenda-display.el ---                  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014  konubinix
 
@@ -506,7 +506,12 @@
            (setq match_end (match-end match))
            (when (or
                   (not predicate)
-                  (eval predicate)
+                  ;; A predicate could read any of these while they were
+                  ;; dynamic, so it is handed them rather than left to guess.
+                  (eval predicate
+                        `((regexp . ,regexp) (match . ,match)
+                          (match_beg . ,match_beg) (match_end . ,match_end)
+                          (prop . ,prop)))
                   )
              (let (
                    (ov (make-overlay match_beg match_end))

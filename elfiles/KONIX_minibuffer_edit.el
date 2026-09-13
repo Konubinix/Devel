@@ -1,4 +1,4 @@
-;;; KONIX_minibuffer_edit.el --- Operations on minibuffer content
+;;; KONIX_minibuffer_edit.el --- Operations on minibuffer content -*- lexical-binding: t; -*-
 
 ;; Author: konubinix <konubinixweb@gmail.com>
 ;; Version: 1.0

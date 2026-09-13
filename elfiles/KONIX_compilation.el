@@ -1,4 +1,4 @@
-;;; KONIX_compilation.el --- Compilation facilities
+;;; KONIX_compilation.el --- Compilation facilities  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2010
 
@@ -228,6 +228,12 @@ If the file exists, it is automatically deleted
 recognizable"
   )
 
+(defconst konix/compile/compilation-buffer-name-max-length 20
+  "How much of the command the compilation buffer name shows before eliding it.
+It used to be a `let' read from the function below, which only worked
+while this file was read with dynamic binding."
+  )
+
 (defvar konix/compile/compilation-buffer-name-suffix ""
   "A string to add at the end of the compilation buffer name to make it more
 recognizable"
@@ -257,7 +263,6 @@ DIRECTORY : Folder from which the research is made
    ;; un rep -> cherche le rep
    ((file-directory-p directory)
     (let* (
-		   (res nil)
 		   (me (expand-file-name directory))
 		   (parent (directory-file-name (file-name-directory me)))
 		   (locate_makefile_level (locate-file "Makefile"
@@ -437,10 +442,10 @@ PARAM : a string with parameters given to make
 		 (new_buffer_name
 		  (format "%s*compilation of '%s'*%s"
 				  konix/compile/compilation-buffer-name-prefix
-				  (if (> (length command) max_lenght)
+				  (if (> (length command) konix/compile/compilation-buffer-name-max-length)
 					  (concat (substring-no-properties command
 													   0
-													   max_lenght)
+													   konix/compile/compilation-buffer-name-max-length)
 							  "...")
 					command
 					)
@@ -495,7 +500,6 @@ PARAM : a string with parameters given to make
   (setq konix/in-compile-command t)
   (setq-default konix/compile-command command)
   (let* (
-		 (max_lenght 20)
 		 (compilation-buffer-name-function
 		  `(lambda (arg)
 			 (konix/compile/_compilation-buffer-name-function ,command)

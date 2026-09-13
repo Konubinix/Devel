@@ -1,4 +1,4 @@
-;;; KONIX_org-ui.el ---
+;;; KONIX_org-ui.el ---                              -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

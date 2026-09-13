@@ -1,4 +1,4 @@
-;;; KONIX_org-config.el ---
+;;; KONIX_org-config.el ---                          -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

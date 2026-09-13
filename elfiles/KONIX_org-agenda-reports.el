@@ -1,4 +1,4 @@
-;;; KONIX_org-agenda-reports.el ---
+;;; KONIX_org-agenda-reports.el ---                  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012  konubinix
 

@@ -1,3 +1,4 @@
+;;; emacs.el ---                                     -*- lexical-binding: t; -*-
 (setq-default load-prefer-newer t)
 (mapc (lambda (file)
         (when (string-prefix-p "ECRYPT" file)
@@ -25,9 +26,12 @@
                                       )
  home-elfiles (expand-file-name "~/.elfiles")
  )
-(defun konix/setup-elfiles (elfiles)
-  (add-to-list 'load-path (expand-file-name "config" elfiles))
-  (add-to-list 'load-path (expand-file-name elfiles))
+(defun konix/setup-elfiles (directory)
+  "Put DIRECTORY and its config subdirectory on the `load-path'.
+Named DIRECTORY rather than `elfiles', which is one of the variables
+`.emacs_var' defines and would have been shadowed here."
+  (add-to-list 'load-path (expand-file-name "config" directory))
+  (add-to-list 'load-path (expand-file-name directory))
   )
 (konix/setup-elfiles elfiles)
 (when (file-directory-p perso-elfiles)

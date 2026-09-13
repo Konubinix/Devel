@@ -54,7 +54,6 @@
   (require 'winner)
   (require 'saveplace)
   (require 'git-wip-mode nil t)
-  (require 'sticky-windows)
   (require 'KONIX_minibuffer_edit)
   (require 'KONIX_org-meta-context)
 

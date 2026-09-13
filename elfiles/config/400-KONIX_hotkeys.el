@@ -135,10 +135,10 @@
 (keymap-global-set "C-$" 'konix/ispell-region-or-buffer)
 (keymap-global-set "C-?" 'konix/flyspell-region-or-buffer)
 (keymap-global-set "C-M-$" 'ispell-change-dictionary)
-;; redefining C-x 0 and C-x 1 in order to use sticky windows
-(keymap-global-set "C-x 0" 'sticky-window-delete-window)
-(keymap-global-set "C-x 1" 'sticky-window-delete-other-windows)
-(keymap-global-set "C-x 9" 'sticky-window-toggle-dedicated)
+;; redefining C-x 0 and C-x 1 so that a window I asked to keep stays
+(keymap-global-set "C-x 0" 'konix/window-delete)
+(keymap-global-set "C-x 1" 'konix/window-delete-others)
+(keymap-global-set "C-x 9" 'konix/window-toggle-sticky)
 (keymap-global-set "C-x 7" 'konix/toggle-window-resizable)
 (keymap-set ctl-x-4-map "t" 'konix/toggle-window-split)
 

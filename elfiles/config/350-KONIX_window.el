@@ -50,6 +50,55 @@
   (konix/windmove-bring-buffer 'down prefix)
   )
 
+(defun konix/window-set-sticky (window sticky)
+  "Make WINDOW stay put when STICKY is non-nil, or let it go again.
+Dedicating it is what `konix/window-delete' and `konix/window-delete-others'
+look at; the `no-delete-other-windows' parameter is what the plain
+`delete-other-windows' looks at, so code that calls it directly leaves the
+window alone too."
+  (set-window-dedicated-p window sticky)
+  (set-window-parameter window 'no-delete-other-windows sticky)
+  )
+
+(defun konix/window-keep-visible ()
+  "Insure the buffer associated with the current window stays visible.
+This is handy for ERC buffers where you would like to see the
+conversation while you work in other windows within the frame.
+A prefix arg reverses this operation."
+  (interactive)
+  (konix/window-set-sticky (selected-window) (not current-prefix-arg))
+  (message "Current window set as dedicated")
+  )
+
+(defun konix/window-toggle-sticky ()
+  "Toggle whether the selected window stays put."
+  (interactive)
+  (let* (
+                 (window (selected-window))
+                 (sticky (not (window-dedicated-p window)))
+                 )
+        (konix/window-set-sticky window sticky)
+        (message "This window becomes %sdedicated" (if sticky "" "not-"))
+        )
+  )
+
+(defun konix/window-delete ()
+  "Delete the selected window, unless it is one I asked to keep.
+A prefix arg deletes it anyway."
+  (interactive)
+  (let ((window (selected-window)))
+        (if (and (not current-prefix-arg) (window-dedicated-p window))
+                (error "This is a dedicated window. Use C-u prefix on this keybinding to really delete it.")
+          (konix/window-set-sticky window nil)
+          (delete-window window))))
+
+(defun konix/window-delete-others ()
+  "Delete the other windows, leaving the ones I asked to keep."
+  (interactive)
+  (dolist (window (cdr (window-list)))
+        (unless (window-dedicated-p window)
+          (delete-window window))))
+
 (defun konix/toggle-window-resizable ()
   (interactive)
   (setq window-size-fixed (not window-size-fixed))

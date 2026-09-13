@@ -41,7 +41,7 @@
 	(call-interactively 'imenu-tree)
 	(with-current-buffer "*imenu-tree*"
 	  ;;(setq window-size-fixed t)
-	  (sticky-window-keep-window-visible)
+	  (konix/window-keep-visible)
 	  )
 	(pop-to-buffer previous_buffer)
 	)

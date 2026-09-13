@@ -24,6 +24,7 @@
 ;;; Code:
 
 (require 'KONIX_org-helpers)
+(require 'ox)
 
 (defun konix/org-is-in-schedule-p ()
   (or (string-equal
@@ -32,8 +33,8 @@
        )
       (let (
             (scheduled_time (konix/org-with-point-on-heading
-                             (org-get-scheduled-time (point))
-                             ))
+                              (org-get-scheduled-time (point))
+                              ))
             )
         (and
          scheduled_time
@@ -46,6 +47,7 @@
 ;; ######################################################################
 ;; Notmuch
 ;; ######################################################################
+
 (defun konix/org-agenda-export-this (
                                      thiscmdkey
                                      files

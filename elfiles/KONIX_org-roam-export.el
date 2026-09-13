@@ -200,6 +200,9 @@
 
 (defun konix/org-roam-export/export-buffer ()
   (interactive)
+  ;; so that ox's variables are defcustom defined, hence dynamically, and that
+  ;; the let-bindings below won't trigger some error
+  (require 'ox)
   (let (
         ;; if set to nil, the :exports results won't be taken into account
         ;; and all source code blocks will be shown
@@ -231,10 +234,6 @@
               (org-mode)
               (setq org-hugo-base-dir (expand-file-name kind
                                                         (konix/org-roam-export/get-publish-dir)))
-              ;; so that org-export-with-tags if defcustom defined,
-              ;; hence dynamically and that the let-binding below won't trigger
-              ;; some error
-              (require 'ox)
               (let (
                     ;; don't bother messing up a temporary buffer while reformating it for
                     ;; better export

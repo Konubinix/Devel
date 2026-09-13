@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(require 'json)
 (require 'KONIX_agent-shell-common)
 (require 'KONIX_agent-shell-panel)
 (require 'KONIX_org-transclusion-resolve)

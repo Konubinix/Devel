@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'color)
+(require 'json)
 (require 'plz)
 (require 'term)
 

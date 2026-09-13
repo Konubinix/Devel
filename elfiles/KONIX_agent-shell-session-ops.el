@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(require 'json)
 (require 'KONIX_agent-shell-common)
 
 (declare-function konix/mcp-server-render-note "KONIX_mcp-server-agent-shell")

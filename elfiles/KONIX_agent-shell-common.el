@@ -24,6 +24,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'json)
 (require 'map)
 (require 'seq)
 (require 'agent-shell)

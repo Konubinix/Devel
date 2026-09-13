@@ -1,3 +1,4 @@
+;;; 350-KONIX_browse.el ---                          -*- lexical-binding: t; -*-
 
 (defun konix/www/browse-url (url &rest args)
   "Browse the url. With prefix argument, forces w3m. Else, uses the default method."

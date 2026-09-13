@@ -1,3 +1,4 @@
+;;; 350-KONIX_kill.el ---                            -*- lexical-binding: t; -*-
 
 (defvar konix/really-kill-buffer-ignore-name
   '(
@@ -13,6 +14,10 @@
 	dired-mode
 	)
   )
+
+;; keep-buffers may not be loaded when this file is read, and the let below
+;; means to be seen by kill-buffer, not by its own body.
+(defvar keep-buffers-protected-alist)
 
 (defun konix/really-kill-buffer (&optional buffer)
   (interactive)

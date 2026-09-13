@@ -1,3 +1,4 @@
+;;; 100-KONIX_load-path.el ---                       -*- lexical-binding: t; -*-
 ;; ####################################################################################################
 ;; Here stands the needed information to load the good files when they are
 ;; required and to add correct load path in the load-path variable

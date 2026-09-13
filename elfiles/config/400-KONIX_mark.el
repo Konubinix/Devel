@@ -1,3 +1,4 @@
+;;; 400-KONIX_mark.el ---                            -*- lexical-binding: t; -*-
 (transient-mark-mode 1)
 
 (defun konix/set-mark-command/deactivate-region (orig &rest args)

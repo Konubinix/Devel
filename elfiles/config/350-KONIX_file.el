@@ -1,3 +1,4 @@
+;;; 350-KONIX_file.el ---                            -*- lexical-binding: t; -*-
 (defun konix/yank-current-buffer-file-name (full_path)
   (interactive "P")
   (let (

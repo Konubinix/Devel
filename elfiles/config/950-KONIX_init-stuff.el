@@ -1,3 +1,4 @@
+;;; 950-KONIX_init-stuff.el ---                      -*- lexical-binding: t; -*-
 (setq konix/start-calendar nil)
 
 (unless (getenv "KONIX_EMACS_BATCH")

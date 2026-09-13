@@ -1,3 +1,4 @@
+;;; 350-KONIX_dev.el ---                             -*- lexical-binding: t; -*-
 
 (defun konix/hack-on-emacs ()
   "Va dans le repertoire ~/.elfiles pour aller hacker un peu."

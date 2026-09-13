@@ -1,3 +1,4 @@
+;;; 350-KONIX_window.el ---                          -*- lexical-binding: t; -*-
 (defun konix/windmove-bring-buffer (dir &optional prefix)
   (let*(
                 (buffer1 (current-buffer))

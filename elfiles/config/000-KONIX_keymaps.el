@@ -1,3 +1,4 @@
+;;; 000-KONIX_keymaps.el ---                         -*- lexical-binding: t; -*-
 (global-unset-key (kbd "C-<"))
 (global-unset-key (kbd "C-à"))			;for bépo keyboards
 (global-unset-key (kbd "<f2>"))

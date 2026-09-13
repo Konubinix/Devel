@@ -1,3 +1,4 @@
+;;; 300-KONIX_alist-helpers.el ---                   -*- lexical-binding: t; -*-
 (defun konix/push-or-replace-in-alist (alist key &rest values)
   (or (symbolp alist) (error "Not a symbol"))
   (let(

@@ -1,3 +1,4 @@
+;;; 300-KONIX_auto-insert.el ---                     -*- lexical-binding: t; -*-
 
 (defun konix/auto-insert-use-yasnippet-template (condition suffix)
   (define-auto-insert condition

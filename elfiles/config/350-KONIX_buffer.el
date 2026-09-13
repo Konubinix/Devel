@@ -1,3 +1,4 @@
+;;; 350-KONIX_buffer.el ---                          -*- lexical-binding: t; -*-
 (defun konix/buffer/show-all (buffer_list)
    (delete-other-windows)
    (let* (

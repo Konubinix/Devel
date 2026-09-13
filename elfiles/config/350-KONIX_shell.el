@@ -1,3 +1,4 @@
+;;; 350-KONIX_shell.el ---                           -*- lexical-binding: t; -*-
 
 (defun konix/async-shellbuffer/get-all()
   (remove-if

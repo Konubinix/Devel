@@ -1,3 +1,4 @@
+;;; 300-KONIX_functions.el ---                       -*- lexical-binding: t; -*-
 ;;; package --- Summary
 ;;; General use functions
 ;;; Commentary:

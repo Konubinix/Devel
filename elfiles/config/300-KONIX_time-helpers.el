@@ -1,3 +1,4 @@
+;;; 300-KONIX_time-helpers.el ---                    -*- lexical-binding: t; -*-
 (defun konix/time-range-to-list (range)
   (let* (
 		 (start (car range))
@@ -5,12 +6,14 @@
 		 (end (cdr range))
 		 (res nil)
 		 )
-	(add-to-list 'res current t)
+	(unless (member current res)
+	  (setq res (append res (list current))))
 	(while (time-less-p current end)
 	  (setq current
 			(time-add current (seconds-to-time (* 60 60 24)))
 			)
-	  (add-to-list 'res current t)
+	  (unless (member current res)
+		(setq res (append res (list current))))
 	  )
 	res
 	)

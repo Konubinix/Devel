@@ -1,3 +1,4 @@
+;;; 300-KONIX_notifications.el ---                   -*- lexical-binding: t; -*-
 (defcustom konix/notify-gtk/background-color "#3bffdc"
   "Background color of the gtk popup showing the notification"
   )
@@ -15,10 +16,9 @@
                 ))
         )
     (when above_all
-      (add-to-list
-       'args
-       "-a"
-       ))
+      (unless (member "-a" args)
+        (setq args (cons "-a" args))
+        ))
     (apply
      `(call-process "konix_gtk_entry.py"
                     nil

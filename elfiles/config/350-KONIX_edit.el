@@ -1,3 +1,4 @@
+;;; 350-KONIX_edit.el ---                            -*- lexical-binding: t; -*-
 (defun konix/kill-ring-to-clipboard ()
   (interactive)
   (with-temp-buffer

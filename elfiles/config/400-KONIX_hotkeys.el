@@ -1,3 +1,4 @@
+;;; 400-KONIX_hotkeys.el ---                         -*- lexical-binding: t; -*-
 ;; package that are needed for my config and cannot wait for the whole package stuff
 
 

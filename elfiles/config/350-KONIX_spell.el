@@ -1,3 +1,4 @@
+;;; 350-KONIX_spell.el ---                           -*- lexical-binding: t; -*-
 
 (defun konix/ispell-region-or-buffer ()
   (interactive)

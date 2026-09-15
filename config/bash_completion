@@ -37,3 +37,6 @@ _konix_completion_loader()
     return "${res}"
 } &&
 complete -D -F _konix_completion_loader
+
+# the completions that programs install for themselves
+[[ -f "${HOME}/.bash_completion" ]] && . "${HOME}/.bash_completion"

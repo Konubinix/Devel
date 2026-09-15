@@ -31,7 +31,7 @@
 (require 'project)
 (require 'KONIX_mcp-server-introspection)
 (require 'KONIX_mcp-server-agent-shell)
-(require 'KONIX_mcp-server-workspace)
+(require 'KONIX_agent-shell-workspace)
 ;; tangled from how_to_write_and_audit_a_note.org, where the format it checks is stated
 (require 'KONIX_mcp-server-note-mechanics)
 
@@ -763,7 +763,7 @@ MCP Parameters:
                  (mapcar #'locate-library
                          '("KONIX_mcp-server-introspection"
                            "KONIX_mcp-server-agent-shell"
-                           "KONIX_mcp-server-workspace"
+                           "KONIX_agent-shell-workspace"
                            "KONIX_mcp-server-note-mechanics")))))
      (if server-file
          (progn

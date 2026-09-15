@@ -71,6 +71,7 @@
 (require 'KONIX_agent-shell-common)
 (require 'KONIX_agent-shell-panel)
 (require 'KONIX_agent-shell-mcp)
+(require 'KONIX_dir-locals)
 (require 'KONIX_shell-parse)
 (require 'KONIX_shell-search)
 
@@ -1330,56 +1331,11 @@ warning, rather than crashing callers."
                 file "its nil-mode entry is not an alist")
                nil)))))))))
 
-(defun konix/agent-shell-policy--pp-value (object)
-  "Pretty-print OBJECT into the current buffer without re-parsing it.
-A drop-in `pp-default-function' for writing dir-locals.  On Emacs 30 the
-default printer is `pp-fill', which reflows its output by re-walking it with
-`scan-sexps'; our values are alists keyed by regexps full of brackets,
-parens and quotes (e.g. \"\\\\bgit\\\\b\\\\|[^\\n']*\"), and that walk treats
-those string contents as code and throws (scan-error \"Unbalanced
-parentheses\"), aborting the whole write.  We never re-parse: an alist (a
-proper list) is printed one element per line -- the pretty, diffable layout
-we want in `.dir-locals.el' -- with each element emitted by `prin1', which
-always produces `read'-able text.  Anything else falls back to `prin1'."
-  (if (and (consp object) (proper-list-p object))
-      (progn
-        (insert "(")
-        (let ((first t))
-          (dolist (element object)
-            (if first (setq first nil) (insert "\n "))
-            (prin1 element (current-buffer))))
-        (insert ")"))
-    (prin1 object (current-buffer))))
-
 (defun konix/agent-shell-policy--write-project (policy new file)
   "Persist NEW as POLICY's project variable in FILE.
-Deletes the variable when NEW is empty.  Edits FILE off-screen, mirroring
-`konix/agent-shell-mcp--toggle-project': `find-file' is overridden so the
-dir-locals buffer is created without display, saved, and killed again when
-we were the ones who opened it."
-  (let ((var (konix/agent-shell-policy-project-var policy))
-        (pre-existing (find-buffer-visiting file)))
-    ;; `add-dir-local-variable' (via the `find-file' override) and the
-    ;; `kill-buffer' below both change the current buffer.  Preserve the
-    ;; caller's buffer so a follow-up write in the same command (e.g. the
-    ;; remove+set of a rename edit) still resolves `default-directory' -- and
-    ;; thus the project's `.dir-locals.el' -- from the right place.  Without
-    ;; this, the second write targets a stray buffer's file and the entry
-    ;; vanishes from the real project file instead of being edited.
-    (save-current-buffer
-      ;; `dir-locals-to-string' serializes the value with `pp-to-string',
-      ;; which honours `pp-default-function'.  Force our scan-free printer so
-      ;; the regexp-laden alist does not crash `pp-fill' (see
-      ;; `konix/agent-shell-policy--pp-value').
-      (cl-letf (((symbol-function 'find-file)
-                 (lambda (filename &rest _) (set-buffer (find-file-noselect filename))))
-                (pp-default-function #'konix/agent-shell-policy--pp-value))
-        (if new
-            (add-dir-local-variable nil var new file)
-          (delete-dir-local-variable nil var file)))
-      (when-let ((buf (find-buffer-visiting file)))
-        (with-current-buffer buf (save-buffer))
-        (unless pre-existing (kill-buffer buf))))))
+Deletes the variable when NEW is empty."
+  (konix/dir-locals-modify
+   file (konix/agent-shell-policy-project-var policy) new))
 
 (defun konix/agent-shell-policy--project-entries (policy)
   "Return POLICY's project alist from the current project's dir-locals."
@@ -1391,7 +1347,13 @@ we were the ones who opened it."
   (let* ((file (konix/agent-shell-policy--project-file))
          (current (konix/agent-shell-policy--project-in-file policy file)))
     (konix/agent-shell-policy--write-project
-     policy (cons (cons key value) (assoc-delete-all key current)) file)))
+     policy
+     (if (assoc key current)
+         (mapcar (lambda (cell)
+                   (if (equal (car-safe cell) key) (cons key value) cell))
+                 current)
+       (append current (list (cons key value))))
+     file)))
 
 (defun konix/agent-shell-policy--remove-project (policy key)
   "Remove KEY from POLICY's project axis (`.dir-locals.el')."

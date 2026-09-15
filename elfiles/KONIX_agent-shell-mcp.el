@@ -24,6 +24,7 @@
 ;;; Code:
 
 (require 'json)
+(require 'KONIX_dir-locals)
 (require 'KONIX_agent-shell-common)
 (require 'KONIX_agent-shell-panel)
 (require 'KONIX_org-transclusion-resolve)
@@ -302,30 +303,14 @@ The control-panel primitive behind the \"Project\" column: it edits
 creating the file when there is none yet and deleting the variable when the
 list becomes empty.  This is the *persistent* axis only — sessions started
 afterwards pick it up; the running session is left untouched (use the Session
-column, or `agent-shell-reload', to apply it now).
-
-`modify-dir-local-variable' would `find-file' (hence display and stack) the
-dir-locals buffer; we override `find-file' so the buffer is created off-screen
-instead, then save it and kill it again when we were the ones who opened it,
-so editing the file never disturbs the window or the buffer order."
+column, or `agent-shell-reload', to apply it now)."
   (let* ((file (konix/agent-shell-mcp--project-dir-locals-file))
-         (pre-existing (find-buffer-visiting file))
          (current (konix/agent-shell-mcp--project-servers-in-file file))
          (new (if (member name current)
                   (delete name current)
                 (append current (list name)))))
-    (cl-letf (((symbol-function 'find-file)
-               (lambda (filename &rest _) (set-buffer (find-file-noselect filename)))))
-      (if new
-          (add-dir-local-variable
-           nil 'konix/agent-shell-mcp-project-servers new file)
-        ;; `delete-dir-local-variable' is a no-op (and creates nothing) when
-        ;; the file does not exist, so the no-dir-locals case is safe.
-        (delete-dir-local-variable
-         nil 'konix/agent-shell-mcp-project-servers file)))
-    (when-let ((buf (find-buffer-visiting file)))
-      (with-current-buffer buf (save-buffer))
-      (unless pre-existing (kill-buffer buf)))))
+    (konix/dir-locals-modify
+     file 'konix/agent-shell-mcp-project-servers new)))
 
 (defun konix/agent-shell-mcp--server-config->json-value (config)
   "Convert a registry server CONFIG alist to a `.mcp.json' value alist.

@@ -1068,13 +1068,34 @@ the reference, e.g. `@whitelisted-commands(ls, gh pr check)'."
                           (konix/agent-shell--command-matches-any-p c whitelist))
                         commands)))))
 
+(konix/agent-shell-define-tool-evaluator "use-a-wrong-tmp-dir" (tool-call)
+  "Match a tool call reaching into a temp directory other than ./.agent-shell/tmp.
+The wrong ones are ~/tmp, /tmp, /var/tmp and $TMPDIR; a command called on
+something inside one of them matches, so does a file tool targeting something
+inside one.  `mktemp' matches whatever its arguments say, as it lands in
+$TMPDIR or /tmp without ever naming the directory."
+  (let* ((tmpdir (getenv "TMPDIR"))
+         (dirs (delete-dups
+                (mapcar (lambda (dir)
+                          (directory-file-name (expand-file-name dir)))
+                        (append '("~/tmp" "/tmp" "/var/tmp")
+                                (unless (or (null tmpdir) (string-empty-p tmpdir))
+                                  (list tmpdir)))))))
+    (konix/agent-shell-tool-match-p
+     `(or "@hascommand(mktemp)"
+          ,@(mapcan (lambda (dir)
+                      (list (format "@command-args-inside(.+, %s)" dir)
+                            (format "@targets-inside(%s)" dir)))
+                    dirs))
+     tool-call)))
+
 ;;; Policy variables -----------------------------------------------------------
 ;; Each policy has Global (defcustom) / Project (.dir-locals.el, declared
 ;; `safe-local-variable' in `999-KONIX-safe-values.el') / Session
 ;; (buffer-local) axes.
 
 (defcustom konix/agent-shell-tool-blacklist-global
-  `(("@targets-inside(/tmp)" . "Write temp files into ./.agent-shell/tmp/ instead")
+  `(("@use-a-wrong-tmp-dir" . "Write temp files into ./.agent-shell/tmp/ instead")
     ("@writes-outside(.agent-shell/tmp)" . "Redirect output into ./.agent-shell/tmp/ instead")
     ("^command -v" . "Use nix-shell")
     ("@severalcommands" . "One command at a time. Use redirection to a file in ./.agent-shell/tmp if needing to chain stuff")

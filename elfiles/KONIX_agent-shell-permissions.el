@@ -1126,7 +1126,7 @@ in the project.")
 
 (defcustom konix/agent-shell-tool-whitelist-global
   '(("@edits-inside(.agent-shell/tmp)" . "Edits and writes confined to ./.agent-shell/tmp/")
-    ("(and \"@onlycommand(grep, mmdc, plantuml, jq, strings, base64, ls, sqlite3, rg, tail, sort, cut, mkdir, unzip)\" \"@project-paths\")")
+    ("(and \"@onlycommand(rm, grep, date, uniq, head, awk, sed, mmdc, plantuml, jq, strings, base64, ls, sqlite3, rg, tail, sort, cut, mkdir, unzip)\" \"@project-paths\")")
     ("^\\(ba\\)?sh -n")
     ("^mcp__konix-browser__readonly")
     ("^nix-instantiate --parse")

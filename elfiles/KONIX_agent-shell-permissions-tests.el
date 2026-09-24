@@ -30,6 +30,7 @@
 (require 'KONIX_agent-shell-permissions)
 (require 'KONIX_agent-shell-permissions-mcp)
 (require 'KONIX_agent-shell-permissions-find)
+(require 'KONIX_agent-shell-permissions-git)
 
 (defconst konix/agent-shell-tests-report-file
   (expand-file-name "../.agent-shell/tmp/permissions-tests.txt"
@@ -833,6 +834,87 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (nil . "echo $(cd /tmp)")
   (nil . "ls -la")
   (nil . "echo cd"))
+
+(konix/agent-shell-tests-deftest-evaluator
+    konix/agent-shell-test-git-readonly "git-readonly"
+  (t . "git log --oneline")
+  (t . "git -C sub log --oneline")        ; `-C''s value is not the subcommand
+  (t . "git --no-pager diff")
+  (t . "git branch -a")
+  (nil . "git -C log push")               ; `log' is `-C''s value
+  (nil . "git \"$sub\"")                  ; unreadable subcommand
+  (nil . "git")
+  (nil . "git branch feat")
+  (nil . "git push origin status")
+  (nil . "ls"))
+
+(konix/agent-shell-tests-deftest-evaluator
+    konix/agent-shell-test-git-write "git-write"
+  (t . "git commit -m x")
+  (t . "git status && git reset --hard")
+  (nil . "git branch -a")
+  (nil . "git push origin main")
+  (nil . "rm -rf ."))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-git-write-subcommands "@git-write(commit, add)"
+  (t . "git -C sub commit -m x")
+  (t . "git add .")
+  (nil . "git reset --hard"))
+
+(konix/agent-shell-tests-deftest-evaluator
+    konix/agent-shell-test-git-runs-code "git-runs-code"
+  (t . "git -c core.pager=less log")
+  (t . "git --config-env=core.pager=PAGER log")
+  (t . "git rebase --exec 'make test' main")
+  (t . "git rebase -x make main")
+  (t . "git filter-branch --tree-filter 'rm x' HEAD")
+  (t . "git fetch --upload-pack=cmd origin")
+  (t . "git bisect run make")
+  (t . "git status && git submodule foreach make")
+  (t . "git rebase \"$opt\" main")        ; could be an --exec
+  (t . "git \"$sub\"")
+  (nil . "git -C sub log")                ; `-C' is no `-c'
+  (nil . "git log --exec=x")              ; `log' has no such option
+  (nil . "git rebase -i main")
+  (nil . "git")
+  (nil . "ls -x"))
+
+(defun konix/agent-shell-tests--git-kind (command)
+  "Return `read', `write' or nil for the lone git COMMAND line."
+  (konix/agent-shell--with-bash-ast root
+      (konix/agent-shell-tests--shell-call command)
+    (let ((node (car (konix/agent-shell--command-nodes root))))
+      (cond ((konix/agent-shell--git-read-only-p node) 'read)
+            ((konix/agent-shell--git-write-p node) 'write)))))
+
+(ert-deftest konix/agent-shell-test-git-read-only-and-write ()
+  (dolist (case '((read . "git log --oneline")
+                  (read . "git branch")
+                  (read . "git branch -a --merged=main")
+                  (read . "git branch --list 'feat*'")
+                  (read . "git tag -l 'v*'")
+                  (read . "git stash list")
+                  (read . "git stash show -p")
+                  (read . "git reflog")
+                  (read . "git worktree list")
+                  (write . "git branch feat")      ; creates it
+                  (write . "git branch -D feat")
+                  (write . "git branch --unset-upstream")
+                  (write . "git tag v1")
+                  (write . "git stash")            ; a bare stash pushes
+                  (write . "git reflog expire --all")
+                  (write . "git worktree add ../x")
+                  (write . "git commit -m x")
+                  (write . "git clean -fdx")
+                  (write . "git pull --rebase")
+                  (nil . "git push origin main")   ; sends to a remote
+                  (write . "git branch \"$name\"") ; unreadable, so no listing
+                  (nil . "git push origin status")
+                  (nil . "git \"$sub\"")))
+    (should (equal (cons (konix/agent-shell-tests--git-kind (cdr case))
+                         (cdr case))
+                   case))))
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-project-paths "@project-paths"

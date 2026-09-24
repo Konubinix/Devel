@@ -42,6 +42,7 @@
 (require 'KONIX_agent-shell-permissions)
 (require 'KONIX_agent-shell-permissions-mcp)
 (require 'KONIX_agent-shell-permissions-find)
+(require 'KONIX_agent-shell-permissions-git)
 (require 'KONIX_agent-shell-steering)
 (require 'KONIX_agent-shell-viewport)
 (require 'KONIX_agent-shell-tracking)

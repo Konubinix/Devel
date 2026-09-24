@@ -650,27 +650,6 @@ if given).  SPECS are as in `hascommand'."
            (or (null specs)
                (konix/agent-shell--command-matches-any-p (car commands) specs))))))
 
-(defconst konix/agent-shell--git-curation-subcommands
-  '("stash" "rebase" "grep" "diff" "update-ref" "branch" "fetch" "reset" "cherry-pick" "revert"
-    "restore" "status" "apply" "log" "ls-tree" "ls-files" "show" "checkout" "add" "switch" "merge"
-    "tag" "reflog" "filter-branch" "filter-repo" "worktree" "commit")
-  "Git subcommands that curate/rewrite history or working-tree state.")
-
-(defun konix/agent-shell--git-curation-command-p (command)
-  "Non-nil when COMMAND node is a `git' running a curation subcommand."
-  (and (konix/agent-shell--command-name-matches command "^git$")
-       (seq-some (lambda (w)
-                   (member w konix/agent-shell--git-curation-subcommands))
-                 (konix/agent-shell--command-word-arguments command))))
-
-(konix/agent-shell-define-tool-evaluator "git-curation" (tool-call)
-  "Match when every command on the line is a `git' curation subcommand.
-So `git status && git push' does not match -- push is not curation."
-  (konix/agent-shell--with-bash-ast root tool-call
-    (let ((commands (mapcar #'cdr (treesit-query-capture root '((command) @c)))))
-      (and commands
-           (seq-every-p #'konix/agent-shell--git-curation-command-p commands)))))
-
 (konix/agent-shell-define-tool-evaluator "lost-search" (tool-call)
   "Match a `find'/`grep'/`rg'/`ag'/`ack' scan of a whole aggregating directory
 \(see `konix/shell-search-broad-roots') -- the mark of an agent that has lost

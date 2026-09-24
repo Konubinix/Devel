@@ -588,16 +588,16 @@ something we cannot read' to stay distinguishable from `there is no argument 1'.
   (when-let ((n (treesit-node-child-by-field-name command "name")))
     (treesit-node-text n t)))
 
-(defun konix/agent-shell--command-name-is (command name)
-  "Non-nil when COMMAND node's name is the string NAME."
-  (equal (konix/agent-shell--command-name command) name))
+(defun konix/agent-shell--command-name-matches (command regexp)
+  "Non-nil when COMMAND node's name matches the string REGEXP."
+  (string-match-p regexp (konix/agent-shell--command-name command)))
 
 (defun konix/agent-shell--command-matches-p (command spec)
   "Non-nil when COMMAND node matches SPEC, a whitespace-separated command +
 subcommand prefix like `gh pr check' (trailing args free); a single-word SPEC
 like `grep' matches on command name alone."
   (when-let ((toks (split-string spec)))
-    (and (konix/agent-shell--command-name-is command (car toks))
+    (and (konix/agent-shell--command-name-matches command (car toks))
          (equal (cdr toks)
                 (seq-take (konix/agent-shell--command-word-arguments command)
                           (length (cdr toks)))))))
@@ -658,7 +658,7 @@ if given).  SPECS are as in `hascommand'."
 
 (defun konix/agent-shell--git-curation-command-p (command)
   "Non-nil when COMMAND node is a `git' running a curation subcommand."
-  (and (konix/agent-shell--command-name-is command "git")
+  (and (konix/agent-shell--command-name-matches command "^git$")
        (seq-some (lambda (w)
                    (member w konix/agent-shell--git-curation-subcommands))
                  (konix/agent-shell--command-word-arguments command))))
@@ -957,7 +957,7 @@ Reads the invocation as `sed OPTIONS SCRIPT FILES...', all three parts checked:
 `konix/agent-shell--sed-read-only-script-re' and
 `konix/agent-shell--path-inside-p'.  An argument whose value is not
 statically knowable is refused, as are the `-e' and `-f' forms."
-  (when (konix/agent-shell--command-name-is command "sed")
+  (when (konix/agent-shell--command-name-matches command "^sed$")
     (let* ((directory (or directory default-directory))
            (arguments (konix/agent-shell--command-argument-literals command))
            (options (seq-take-while (lambda (a) (string-prefix-p "-" a))

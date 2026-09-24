@@ -93,7 +93,7 @@ argument after it (`konix/agent-shell--find-read-only-options', or
 `konix/agent-shell--find-read-only-path-options' when that argument is a
 path).  Anything unlisted is refused, as is an argument whose value is not
 statically knowable."
-  (when (konix/agent-shell--command-name-is command "find")
+  (when (konix/agent-shell--command-name-matches command "\\`find\\'")
     (let* ((directory (or directory default-directory))
            (arguments (konix/agent-shell--command-argument-literals command))
            (rest arguments)

@@ -52,5 +52,8 @@
   )
 (add-hook 'sh-mode-hook 'konix/sh-mode-hook)
 
+(custom-set-faces
+ '(sh-heredoc ((((class color) (background light)) (:foreground "blue")))))
+
 (provide '700-KONIX_sh-mode)
 ;;; 700-KONIX_sh-mode.el ends here

@@ -32,5 +32,8 @@
   )
 (add-hook 'eshell-mode-hook 'konix/eshell-mode-hook)
 
+(custom-set-faces
+ '(eshell-prompt ((t (:foreground "Blue" :weight bold)))))
+
 (provide '700-KONIX_eshell-mode)
 ;;; 700-KONIX_eshell-mode.el ends here

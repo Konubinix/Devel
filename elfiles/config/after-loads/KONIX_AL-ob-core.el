@@ -26,6 +26,7 @@
 
 (add-to-list 'safe-local-variable-values '(org-babel-noweb-wrap-end . "]]"))
 (add-to-list 'safe-local-variable-values '(org-babel-noweb-wrap-start . "[["))
+(add-to-list 'safe-local-variable-values '(org-confirm-babel-evaluate . nil))
 
 (setq-default org-babel-default-header-args
               '((:session . "none")

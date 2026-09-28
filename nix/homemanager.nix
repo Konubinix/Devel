@@ -271,6 +271,9 @@ in
       ".inputrc".source = config.lib.file.mkOutOfStoreSymlink "${configDir}/inputrc";
       ".konix_hm-session-vars.sh".source = sessionVarsFile;
       ".konix_hm-session-prepend-vars.sh".source = sessionPrependFile;
+      # docker only looks up its plugins here, PATH is not enough
+      ".docker/cli-plugins/docker-scout".source =
+        config.lib.file.mkOutOfStoreSymlink "${develDir}/bin/hardliases/docker-scout";
     };
 
     # ── Environment variables ─────────────────────────────────────────────

@@ -11,6 +11,7 @@
   imports = [
     ./hardware-configuration.nix
     ./voyager-ergol.nix
+    ./zsa-udev.nix
   ];
 
   nix.settings.experimental-features = [

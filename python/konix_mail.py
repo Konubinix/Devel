@@ -8,6 +8,7 @@ import mailbox
 import os
 import re
 import uuid
+from email.header import decode_header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from hashlib import md5
@@ -124,6 +125,88 @@ def make_part_harmless(html):
     for elem in s.find_all("link", attrs={"type": "text/css"}, src=True):
         elem.extract()
     return str(s)
+
+
+XHTML = """<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Mail</title>
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+</head>
+<body>
+{}
+</body>
+</html>
+"""
+
+
+def parse_mail(raw):
+    """Parse the raw bytes of a mail, falling back to latin-1 when it is not
+    utf-8"""
+    for encoding in ("utf-8", "latin-1"):
+        try:
+            return email.message_from_string(raw.decode(encoding))
+        except UnicodeDecodeError:
+            pass
+
+
+def decode_header_value(value):
+    return ", ".join(
+        part if isinstance(part, str) else part.decode(encoding or "utf-8")
+        for part, encoding in decode_header(value)
+    )
+
+
+def munpack(mail, directory):
+    """Write the parts of mail into directory, pointing the cid: links to the
+    files of the parts they refer to"""
+    from hashlib import sha256
+    from pathlib import Path
+
+    from konix_file_helper import sanitize_filename
+
+    parts = [part for part in mail.walk() if part.get_payload(decode=True) is not None]
+    subject = sanitize_filename(decode_header_value(mail["Subject"]))
+    lone_subtypes = {
+        subtype
+        for subtype in ("html", "plain")
+        if len([part for part in mail.walk() if part.get_content_subtype() == subtype]) == 1
+    }
+
+    def name(part):
+        if filename := part.get_filename():
+            return decode_header_value(filename)
+        subtype = part.get_content_subtype()
+        if subtype in lone_subtypes:
+            return f"{subject}.{subtype}"
+        suffix = sha256(part.get_payload(decode=True)).hexdigest()[:10]
+        return f"{part.get_content_maintype()}-{suffix}.{subtype}"
+
+    cid_links = {
+        f"cid:{part['Content-Id'].strip('<>')}": f"./{name(part)}"
+        for part in parts
+        if part["Content-Id"]
+    }
+    for part in parts:
+        content = part.get_payload(decode=True)
+        path = Path(directory) / name(part)
+        if part.get_content_maintype() == "text":
+            charset = part.get_content_charset() or "utf-8"
+            if "ascii" in charset:
+                charset = "utf-8"
+            try:
+                text = content.decode(charset)
+            except UnicodeDecodeError:
+                text = part.get_payload()
+            for cid, link in cid_links.items():
+                text = text.replace(cid, link)
+            content = text.encode(charset)
+            if part.get_content_subtype() == "html":
+                Path(f"{path}_orig").write_text(text)
+                content = XHTML.format(make_part_harmless(text)).encode("utf-8")
+        path.write_bytes(content)
 
 
 def html_inject_cid(html, msg):

@@ -447,52 +447,24 @@ Message-Id: <%s>" id)
   (interactive)
   (konix/notmuch-add-tag "noreply")
   )
-(defun konix/notmuch-show-unpack-ipfs ()
-  (interactive)
-  (let ((url (string-trim (shell-command-to-string
-                           (format
-                            "konix_notmuch_unpack_ipfs.sh '%s'"
-                            (notmuch-show-get-message-id))
-                           )))
-        )
+(defun konix/notmuch-unpack-ipfs (query)
+  "Publish the messages matching QUERY into ipfs, killing the url.
+
+With a prefix argument, also open it in the browser."
+  (let ((url (car (last (process-lines "clk" "mail" "notmuch" "ipfa" query)))))
     (when current-prefix-arg
       (message "Opening in browser")
-      (browse-url url)
-      )
+      (browse-url url))
     (message url)
-    (with-temp-buffer
-      (insert url)
-      (copy-region-as-kill (point-min) (point-max))
-      )
-    )
-  )
+    (kill-new url)))
+
+(defun konix/notmuch-show-unpack-ipfs ()
+  (interactive)
+  (konix/notmuch-unpack-ipfs (notmuch-show-get-message-id)))
 
 (defun konix/notmuch-show-unpack-ipfs-thread ()
   (interactive)
-  (let* ((messages '()))
-    (notmuch-show-mapc
-     (lambda ()
-       (push (list (cons "id" (notmuch-show-get-message-id))
-                   (cons "depth" (notmuch-show-get-depth))
-                   (cons "from" (notmuch-show-get-from))
-                   (cons "subject" (notmuch-show-get-subject))
-                   (cons "date" (notmuch-show-get-date)))
-             messages)))
-    (setq messages (nreverse messages))
-    (let* ((json-file (make-temp-file "notmuch-thread-" nil ".json"))
-           (_ (with-temp-file json-file
-                (insert (json-encode messages))))
-           (url (string-trim
-                 (shell-command-to-string
-                  (format "konix_notmuch_unpack_ipfs_thread.sh '%s'" json-file)))))
-      (delete-file json-file)
-      (when current-prefix-arg
-        (message "Opening in browser")
-        (browse-url url))
-      (message url)
-      (with-temp-buffer
-        (insert url)
-        (copy-region-as-kill (point-min) (point-max))))))
+  (konix/notmuch-unpack-ipfs notmuch-show-thread-id))
 
 (defun konix/notmuch-show/ipfa ()
   (interactive)

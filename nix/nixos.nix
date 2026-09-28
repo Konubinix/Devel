@@ -10,6 +10,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./voyager-ergol.nix
   ];
 
   nix.settings.experimental-features = [

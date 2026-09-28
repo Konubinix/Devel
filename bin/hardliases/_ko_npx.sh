@@ -15,11 +15,13 @@ function npx_run {
     shift
     local stamp_name="${package//\//-}"
     local stamp_file="${XDG_CACHE_HOME:-$HOME/.cache}/${stamp_name}-npx-update"
+    local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/ko-npx/${stamp_name}"
 
     if [ -f "$stamp_file" ] && [ "$(date +%F)" = "$(cat "$stamp_file")" ]; then
-        npx --yes --prefer-offline "$package" "$@"
+        npx --yes --prefer-offline --cache "$cache_dir" "$package" "$@"
     else
         date +%F > "$stamp_file"
-        npx --yes "$package@latest" "$@"
+        rm -rf "$cache_dir/_cacache"
+        npx --yes --cache "$cache_dir" "$package@latest" "$@"
     fi
 }

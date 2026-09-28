@@ -6,10 +6,20 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachSystem [ "x86_64-linux" ] (
+      system:
       let
-        pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
 
         version = "1.17377.1";
         src = pkgs.fetchurl {
@@ -20,7 +30,10 @@
         unpacked = pkgs.stdenvNoCC.mkDerivation {
           pname = "claude-desktop-unpacked";
           inherit version src;
-          nativeBuildInputs = [ pkgs.dpkg pkgs.gnutar ];
+          nativeBuildInputs = [
+            pkgs.dpkg
+            pkgs.gnutar
+          ];
           # tar without -p: drops chrome-sandbox's setuid bit (unused with
           # --no-sandbox), which the nix build sandbox forbids setting.
           unpackPhase = "dpkg-deb --fsys-tarfile $src | tar -x";
@@ -40,21 +53,59 @@
 
         fhs = pkgs.buildFHSEnv {
           name = "claude-desktop";
-          targetPkgs = p: (with p; [
-            unpacked
-            glib gtk3 pango cairo gdk-pixbuf librsvg
-            atk at-spi2-atk at-spi2-core
-            nss nspr cups dbus expat
-            libdrm mesa libgbm libGL libxkbcommon vulkan-loader
-            alsa-lib libnotify libsecret
-            xorg.libX11 xorg.libXcomposite xorg.libXdamage xorg.libXext
-            xorg.libXfixes xorg.libXrandr xorg.libxcb xorg.libXtst
-            xorg.libXi xorg.libXcursor xorg.libXrender xorg.libXScrnSaver
-            xorg.libxshmfence xorg.libxkbfile
-            udev libuuid zlib fontconfig freetype
-            xdg-utils cacert pciutils
-            qemu virtiofsd  # Cowork VM
-          ]) ++ [ ovmfDebian ];
+          targetPkgs =
+            p:
+            (with p; [
+              unpacked
+              glib
+              gtk3
+              pango
+              cairo
+              gdk-pixbuf
+              librsvg
+              atk
+              at-spi2-atk
+              at-spi2-core
+              nss
+              nspr
+              cups
+              dbus
+              expat
+              libdrm
+              mesa
+              libgbm
+              libGL
+              libxkbcommon
+              vulkan-loader
+              alsa-lib
+              libnotify
+              libsecret
+              libx11
+              libxcomposite
+              libxdamage
+              libxext
+              libxfixes
+              libxrandr
+              libxcb
+              libxtst
+              libxi
+              libxcursor
+              libxrender
+              libxscrnsaver
+              libxshmfence
+              libxkbfile
+              udev
+              libuuid
+              zlib
+              fontconfig
+              freetype
+              xdg-utils
+              cacert
+              pciutils
+              qemu
+              virtiofsd # Cowork VM
+            ])
+            ++ [ ovmfDebian ];
           # awesome sets XDG_CURRENT_DESKTOP=none+awesome, so Chromium's OSCrypt
           # auto-picks the "basic" (plaintext) backend and never opens a Secret
           # Service session. Force libsecret so secrets go through org.freedesktop.secrets.
@@ -62,19 +113,23 @@
         };
       in
       {
-        packages.default = pkgs.runCommand "claude-desktop-${version}" {
-          meta = with pkgs.lib; {
-            description = "Claude Desktop (official Anthropic Linux build), wrapped for NixOS";
-            homepage = "https://claude.ai";
-            license = licenses.unfree;
-            platforms = [ "x86_64-linux" ];
-            mainProgram = "claude-desktop";
-          };
-        } ''
-          mkdir -p $out/bin $out/share
-          ln -s ${fhs}/bin/claude-desktop $out/bin/claude-desktop
-          cp -r ${unpacked}/share/applications $out/share/
-          cp -r ${unpacked}/share/icons        $out/share/
-        '';
-      });
+        packages.default =
+          pkgs.runCommand "claude-desktop-${version}"
+            {
+              meta = with pkgs.lib; {
+                description = "Claude Desktop (official Anthropic Linux build), wrapped for NixOS";
+                homepage = "https://claude.ai";
+                license = licenses.unfree;
+                platforms = [ "x86_64-linux" ];
+                mainProgram = "claude-desktop";
+              };
+            }
+            ''
+              mkdir -p $out/bin $out/share
+              ln -s ${fhs}/bin/claude-desktop $out/bin/claude-desktop
+              cp -r ${unpacked}/share/applications $out/share/
+              cp -r ${unpacked}/share/icons        $out/share/
+            '';
+      }
+    );
 }

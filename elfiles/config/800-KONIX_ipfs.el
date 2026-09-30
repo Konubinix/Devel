@@ -25,19 +25,39 @@
 ;;; Code:
 
 
-(defun konix/find-file/ipfs-ignore-query-parameter (orig-fun filename &rest args)
-  (apply orig-fun (replace-regexp-in-string konix/org-ipfs-link-with-query "/ipfs/\\1" filename) args)
-  )
-(advice-add 'find-file :around #'konix/find-file/ipfs-ignore-query-parameter)
-(advice-add 'org-link-open-as-file :around #'konix/find-file/ipfs-ignore-query-parameter)
-(advice-add 'file-exists-p :around #'konix/find-file/ipfs-ignore-query-parameter)
-(advice-add 'org--create-inline-image :around #'konix/find-file/ipfs-ignore-query-parameter)
-
 ;; this is to detect ipfs links, not urls that will end going into some
 ;; ipfscontent like https://ipfs.konubinix.eu/p
 (defvar konix/org-ipfs-protocol-regexp "\\(?:file:/+ip[fn]s/\\|ip[nf]s:/*\\|/ip[fn]s/\\)")
 (defvar konix/org-ipfs-link (concat konix/org-ipfs-protocol-regexp "\\([a-zA-Z0-9/%.~_-]+\\)"))
 (defvar konix/org-ipfs-link-with-query (concat konix/org-ipfs-link "[?]\\([a-zA-Z0-9=_%.-]+\\)\\([.][a-zA-Z0-9]+\\)?"))
+
+(defun konix/ipfs-strip-query (name)
+  "Return NAME with the query parameter of an ipfs link stripped out.
+Anything that is not a string carrying such a link is returned unchanged."
+  (if (and (stringp name)
+           (string-match-p konix/org-ipfs-link-with-query name))
+      (replace-regexp-in-string konix/org-ipfs-link-with-query "/ipfs/\\1" name)
+    name))
+
+(defun konix/find-file/ipfs-ignore-query-parameter (orig-fun filename &rest args)
+  (apply orig-fun (konix/ipfs-strip-query filename) args)
+  )
+(advice-add 'find-file :around #'konix/find-file/ipfs-ignore-query-parameter)
+(advice-add 'org-link-open-as-file :around #'konix/find-file/ipfs-ignore-query-parameter)
+(advice-add 'org--create-inline-image :around #'konix/find-file/ipfs-ignore-query-parameter)
+
+(defun konix/ipfs-file-name-handler (operation &rest args)
+  "Run OPERATION on ARGS, with the ipfs query parameters stripped out."
+  (let ((inhibit-file-name-handlers
+         (cons 'konix/ipfs-file-name-handler
+               (and (eq inhibit-file-name-operation operation)
+                    inhibit-file-name-handlers)))
+        (inhibit-file-name-operation operation))
+    (apply operation (mapcar #'konix/ipfs-strip-query args))))
+
+(add-to-list 'file-name-handler-alist
+             (cons konix/org-ipfs-link-with-query
+                   #'konix/ipfs-file-name-handler))
 
 (defun konix/org-display-inline-images/ipfs (&optional include-linked refresh beg end)
   (let (

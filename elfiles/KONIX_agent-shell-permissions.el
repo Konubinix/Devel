@@ -993,16 +993,29 @@ Combining commands is `@severalcommands'' business: here the line must run that
         (and (= (length commands) 1)
              (konix/agent-shell--sed-read-only-p (car commands) directory))))))
 
+(defun konix/agent-shell--not-a-path-p (argument)
+  "Non-nil when ARGUMENT holds a backslash and names no file.
+Once the shell has removed the quoting, a backslash left is part of the name,
+which a real file name hardly ever has: `/^\\.\\/foo$/d' is a regexp.  A remote
+name is refused before checking it, which would have Tramp reach the host."
+  (and (string-search "\\" argument)
+       (not (file-remote-p (expand-file-name argument)))
+       (not (file-exists-p argument))))
+
 (konix/agent-shell-define-tool-evaluator "project-paths" (tool-call)
   "Match a line no argument of which reaches outside the project.
 An argument resolving out of it (`konix/agent-shell--path-inside-project-p')
-or not statically knowable does not."
+or not statically knowable does not, unless it is no path at all
+\(`konix/agent-shell--not-a-path-p')."
   (konix/agent-shell--with-bash-ast root tool-call
     (seq-every-p
      (lambda (command)
        (let ((arguments (konix/agent-shell--command-argument-literals command)))
          (and (not (memq nil arguments))
-              (seq-every-p #'konix/agent-shell--path-inside-project-p arguments))))
+              (seq-every-p (lambda (argument)
+                             (or (konix/agent-shell--path-inside-project-p argument)
+                                 (konix/agent-shell--not-a-path-p argument)))
+                           arguments))))
      (konix/agent-shell--command-nodes root))))
 
 (konix/agent-shell-define-tool-evaluator "command-args-inside"

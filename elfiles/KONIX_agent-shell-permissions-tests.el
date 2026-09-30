@@ -918,7 +918,12 @@ PATH defaults to `konix/agent-shell-tests--review'."
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-project-paths "@project-paths"
+  (:setup (make-symbolic-link "/etc" "e\\tc"))
   (t . "grep -n foo bar.el")
+  ;; a backslash makes a regexp, not a path
+  (t . "sed -i '/^\\.\\/clk-root\\/bin\\/typo$/d' doc/a.md tests/b.sh")
+  ;; unless it names a file
+  (nil . "grep -n foo 'e\\tc/shadow'")
   (t . "grep -n foo ./sub/bar.el")
   (nil . "grep -n foo /etc/shadow")
   (nil . "grep -n foo ~/.ssh/id_rsa")

@@ -70,6 +70,7 @@ Point is at the beginning of the block start match (diff or @@)."
 (keymap-set diff-mode-map "<backtab>" 'konix/hs-toggle-all)
 (keymap-set diff-mode-map "RET" 'diff-goto-source)
 (keymap-set diff-mode-map "C-k" 'diff-hunk-kill)
+(keymap-set diff-mode-map "M-s" 'auto-scroll-mode)
 
 (defun konix/diff/reveal-point-after-kill (&rest _)
   "Reveal the folded block that ends up containing point.

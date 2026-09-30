@@ -1511,6 +1511,17 @@ color and readability.")
 (defvar konix/mcp-server-status-face-functions nil
   "Functions, run in a session's buffer, any of which faces its idle badge.")
 
+(defvar konix/mcp-server-goes-on-functions nil
+  "Functions, run in an idle session's buffer, any of which says it will go on alone.")
+
+(defun konix/mcp-server--working-p (buf)
+  "Non-nil when BUF progresses on its own: working, or idle but bound to go on."
+  (let ((status (car (konix/mcp-server--agent-status buf))))
+    (or (memq status konix/mcp-server--working-statuses)
+        (and (eq status 'idle)
+             (with-current-buffer buf
+               (run-hook-with-args-until-success 'konix/mcp-server-goes-on-functions))))))
+
 (defun konix/mcp-server--given-status-face (buf status)
   "Return the face something else gives BUF's badge, STATUS being what it is in."
   (when (eq status 'idle)
@@ -1811,9 +1822,7 @@ answers for its subtree.  Nil when there is no top-level agent at all."
                                (konix/mcp-server--agent-parent (car node)))
                              nodes)))
     (and roots
-         (not (cl-some (lambda (node)
-                         (memq (car (konix/mcp-server--agent-status (car node)))
-                               konix/mcp-server--working-statuses))
+         (not (cl-some (lambda (node) (konix/mcp-server--working-p (car node)))
                        roots)))))
 
 (defun konix/mcp-server--render-spawn-tree-into (buf)

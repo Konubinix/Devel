@@ -353,7 +353,8 @@ MCP Parameters:
   force - When non-nil, re-execute even if a cached result would have been returned."
   (mcp-server-lib-with-error-handling
    (konix/mcp-server-with-buffer buffer-name
-     (let ((inhibit-read-only t))
+     (let ((inhibit-read-only t)
+           (org-confirm-babel-evaluate nil))
       (unless (derived-mode-p 'org-mode)
         (error "Buffer %s is not in org-mode" buffer-name))
       (save-excursion
@@ -378,16 +379,14 @@ MCP Parameters:
               (condition-case err
                   (let* ((result-str
                           (if whole
-                              (let ((org-confirm-babel-evaluate nil))
+                              (progn
                                 (when force
                                   (org-babel-remove-result-one-or-many t))
                                 (org-babel-execute-buffer)
                                 (format "Executed all babel blocks in buffer %s%s"
                                         buffer-name
                                         (if force " (forced)" "")))
-                            ;; Left at t, the prompt blocks and no MCP caller can answer it.
-                            (let* ((org-confirm-babel-evaluate nil)
-                                   (src-pos (org-babel-find-named-block block-name))
+                            (let* ((src-pos (org-babel-find-named-block block-name))
                                    (call-pos (unless src-pos
                                                (konix/mcp-server--find-named-call block-name)))
                                    (pos (or src-pos call-pos)))
@@ -613,6 +612,7 @@ MCP Parameters:
      (let ((inhibit-read-only t)
            (org-src-preserve-indentation t)
            (org-src-tab-acts-natively nil)
+           (org-confirm-babel-evaluate nil)
            (tables 0))
        (unless (derived-mode-p 'org-mode)
          (error "Buffer %s is not in org-mode" buffer-name))

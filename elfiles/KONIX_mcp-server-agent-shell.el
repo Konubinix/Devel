@@ -113,6 +113,14 @@ or nil if the caller is not a registered agent-shell session.")
 (defvar konix/mcp-server--subtree-kill-in-progress nil
   "Non-nil during a programmatic subtree kill to suppress nested kill prompts.")
 
+(defconst konix/mcp-server--coord-server-name "konix-coord"
+  "Name the coord HTTP server goes by in a session's MCP servers.
+Its tools reach the agent as mcp__NAME__TOOL.")
+
+(defun konix/mcp-server--coord-tool (tool)
+  "Return the name the agent knows coord's TOOL by."
+  (format "mcp__%s__%s" konix/mcp-server--coord-server-name tool))
+
 (defconst konix/mcp-server--caller-delimiter "::"
   "Delimiter inserted between the base server-id and the caller's agent name.")
 
@@ -440,7 +448,7 @@ konix-* mounts) are returned untouched."
 Adds or updates an X-Session-Tag header so the konix-coord HTTP server can
 correlate `coord_register' calls with the calling agent-shell buffer."
   (konix/mcp-server--update-server-field
-   servers "konix-coord" 'headers
+   servers konix/mcp-server--coord-server-name 'headers
    (lambda (headers)
      (konix/mcp-server--name-value-set headers "X-Session-Tag" session-tag))))
 
@@ -723,7 +731,7 @@ MCP Parameters:
                   (concat (format "You are a coordinated buddy. Your goal: %s
 
 HOW TO CALL COORDINATION TOOLS:
-- coord_register, coord_wait, coord_complete_task, coord_ask_and_wait, coord_list_buddies, spawn_buddy and kill_buddy are MCP tools. Invoke each one by emitting a tool call, exactly like any other tool.
+- coord_register, coord_wait, coord_complete_task, coord_ask_and_wait, readonly_coord_list_buddies, spawn_buddy and kill_buddy are MCP tools. Invoke each one by emitting a tool call, exactly like any other tool.
 - If one isn't visible in your toolset yet, load its schema with ToolSearch first, then invoke it directly.
 - coord_wait and coord_ask_and_wait block server-side until there is something to return, so just call them and let them block. A target does not need to be registered to be reached, so a name coord accepts is a name that gets the work.
 
@@ -733,7 +741,7 @@ CRITICAL RULES:
 - Do NOT explore, investigate, or attempt workarounds unless explicitly told to do so.
 
 FIRST, do these setup steps in order. The coordination tools are MCP tools that start out \"deferred\": their schemas are not loaded yet, so you cannot call them until step 1 loads them. Do NOT skip step 1, and do NOT try to reach these tools any other way.
-1. Call ToolSearch with EXACTLY this query to load the coordination tool schemas: select:mcp__konix-mcp__coord_register,mcp__konix-mcp__coord_wait,mcp__konix-mcp__coord_complete_task — once it returns, those tools are directly callable like any built-in tool.
+1. Call ToolSearch with EXACTLY this query to load the coordination tool schemas: select:%s — once it returns, those tools are directly callable like any built-in tool.
 2. Call the coord_register tool with name \"%s\" and a description of your role.
 3. Then enter a loop:
    a. Call coord_wait to block until you receive your FIRST task. It takes no name: coord knows which session you are.
@@ -744,7 +752,11 @@ FIRST, do these setup steps in order. The coordination tools are MCP tools that 
 RESPECT THE CALLER'S DEADLINE: each task you receive carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — you MUST call coord_complete_task BEFORE the deadline or you may be killed. If you cannot finish the real work in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task interim=true (say what you have done and what remains), keep working, then report the real result with coord_complete_task on the SAME task. A late silence breaks cooperation; an honest \"need more time\" keeps it intact. Every coord reply also ends with a \"COORD_DEADLINE:\" line — your nearest outstanding deadline (or \"none\"). Treat it as an ambient signal: if it is close, or you already know you need more time, report now as above; otherwise keep working. Report once per deadline; do not re-acknowledge it on every coord call.
 
 Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, invoke the kill_buddy tool with your own name \"%s\" to clean yourself up."
-                          task buddy-name buddy-name)
+                          task
+                          (mapconcat #'konix/mcp-server--coord-tool
+                                     '("coord_register" "coord_wait" "coord_complete_task")
+                                     ",")
+                          buddy-name buddy-name)
                           (if auto-respawn-on
                               konix/mcp-server--respawn-buddy-prompt-note
                             ""))))

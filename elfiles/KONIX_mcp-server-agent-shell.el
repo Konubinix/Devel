@@ -1677,7 +1677,10 @@ NODES and VIEW are as produced by `konix/mcp-server--collect-agent-nodes' and
                         (list :slant 'italic
                               :foreground (face-foreground status-face nil 'default))
                       status-face))
-         (model-name (with-current-buffer buf (agent-shell--current-model-id (agent-shell--state))))
+         ;; No model yet while a (re)spawned session is still starting.
+         (model-name (or (with-current-buffer buf
+                           (agent-shell--current-model-id (agent-shell--state)))
+                         ""))
          (model-color (konix/mcp-server--model-color model-name))
          (model-face (if seen (list :foreground model-color :slant 'italic)
                        (list :foreground model-color)))

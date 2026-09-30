@@ -140,6 +140,7 @@
   (use-package imenu-tree)
   (use-package ini)
   (use-package jl-encrypt :straight (:type git :host gitlab :repo "lechten/defaultencrypt"))
+  (use-package json5-ts-mode)
   (use-package js2-mode :commands (js2-mode) :mode ("\\.mjs$" . js2-mode))
   (use-package jujutsu :straight (:type git :host github :repo "bennyandresen/jujutsu.el"))
   (use-package keep-buffers)

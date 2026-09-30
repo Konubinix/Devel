@@ -25,6 +25,7 @@
 ;;; Code:
 
 (add-to-list 'auto-mode-alist '("\\.dsl\\'" . structurizr-mode))
+(add-to-list 'auto-mode-alist '("\\.json5\\'" . json5-ts-mode))
 
 (add-to-list 'magic-mode-alist
              '("#!.*nix-shell\n#!nix-shell -i python" . python-mode))

@@ -92,7 +92,6 @@
   (use-package citeproc)
   (use-package cape)
   (use-package corfu)
-  (use-package corfu-terminal)
   (use-package codeium :straight (:host github :repo "Exafunction/codeium.el"))
   (use-package consult)
   (use-package consult-yasnippet)

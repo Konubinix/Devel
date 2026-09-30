@@ -61,6 +61,7 @@ reference-counted server-side so the themed servers coexist safely."
     ("konix-legal"   . ,(konix/agent-shell-mcp-http-server "konix-legal" "legal"))
     ("konix-notes"   . ,(konix/agent-shell-mcp-http-server "konix-notes" "notes"))
     ("konix-coord"   . ,(konix/agent-shell-mcp-http-server "konix-coord" "coord"))
+    ("konix-qutebrowser" . ,(konix/agent-shell-mcp-http-server "konix-qutebrowser" "qutebrowser"))
 
     ("konix-emacs-buffers" . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-buffers"))
     ("konix-emacs-org"     . ,(konix/agent-shell-mcp-emacs-server "konix-emacs-org"))

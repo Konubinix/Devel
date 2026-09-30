@@ -16,6 +16,9 @@ config = config  # noqa: F821 pylint: disable=E0602,C0103
 # #+END_QUOTE
 config.load_autoconfig()
 
+# a command reaching qutebrowser over its socket raises the window unless this is silent
+c.new_instance_open_target = "tab-silent"
+
 config.set(
     "content.user_stylesheets",
     [

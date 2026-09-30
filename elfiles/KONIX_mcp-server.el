@@ -428,6 +428,23 @@ MCP Parameters:
                                 (buffer-substring-no-properties (point-min) (point-max)))
                             "")))))))))))))
 
+(defun konix/mcp-server--tangle-with-context (tangle)
+  "Call TANGLE, and on error re-signal it with the context an agent needs.
+The bare message of `org-babel-tangle' (e.g. « Wrong type argument: stringp,
+nil ») names neither the block nor the call that failed, so the backtrace of
+the error and the heading point was under are added to it."
+  (let ((org-confirm-babel-evaluate nil)
+        (trace nil))
+    (condition-case err
+        (handler-bind ((error (lambda (_) (setq trace (backtrace-to-string)))))
+          (funcall tangle))
+      (error
+       (error "%s\nat line %d, under heading %S\nbacktrace:\n%s"
+              (error-message-string err)
+              (line-number-at-pos)
+              (and (derived-mode-p 'org-mode) (org-get-heading t t t t))
+              (truncate-string-to-width (or trace "") 4000))))))
+
 (defun konix/mcp-server-tangle-babel-block (buffer-name block-name)
   "Tangle a named org-babel source block, writing it to its :tangle target.
 
@@ -454,8 +471,7 @@ MCP Parameters:
          ;; No one is there to answer `org-confirm-babel-evaluate' over MCP, and
          ;; tangling evaluates on its own (noweb `<<block()>>' expansion, lisp-valued
          ;; headers), so a prompt here is a hang, not a safeguard.
-         (let ((org-confirm-babel-evaluate nil))
-           (org-babel-tangle '(4)))
+         (konix/mcp-server--tangle-with-context (lambda () (org-babel-tangle '(4))))
          (format "Tangled block '%s' from buffer %s" block-name buffer-name))))))
 
 (defun konix/mcp-server-remove-babel-result (buffer-name block-name &optional save-buffer)
@@ -596,8 +612,7 @@ MCP Parameters:
        (error "Buffer %s is not in org-mode" buffer-name))
      ;; See `konix/mcp-server-tangle-babel-block': confirmation cannot be answered
      ;; from here, so it would hang rather than protect anything.
-     (let ((files (let ((org-confirm-babel-evaluate nil))
-                    (org-babel-tangle))))
+     (let ((files (konix/mcp-server--tangle-with-context #'org-babel-tangle)))
        (format "Tangled %d file(s) from buffer %s: %s"
                (length files) buffer-name
                (string-join files ", "))))))
@@ -641,16 +656,25 @@ MCP Parameters:
 ;;; Server management tools
 
 (defun konix/mcp-server-load-file (file-path)
-  "Load an Emacs Lisp file.
+  "Load an Emacs Lisp file, saying the warnings loading it raised.
 
 MCP Parameters:
   file-path - Absolute path to the .el file to load"
   (mcp-server-lib-with-error-handling
-   (let ((path (expand-file-name (decode-coding-string file-path 'utf-8))))
+   (let ((path (expand-file-name (decode-coding-string file-path 'utf-8)))
+         (warned nil))
      (unless (file-exists-p path)
        (error "File not found: %s" path))
-     (load-file path)
-     (format "Loaded %s" path))))
+     (let ((display (symbol-function 'display-warning)))
+       (cl-letf (((symbol-function 'display-warning)
+                  (lambda (type message &rest rest)
+                    (push (format "%s: %s" type message) warned)
+                    (apply display type message rest))))
+         (load-file path)))
+     (concat (format "Loaded %s" path)
+             (when warned
+               (concat ", with warnings:\n"
+                       (string-join (nreverse warned) "\n")))))))
 
 (defun konix/mcp-server--check-parens (path)
   "Return nil when PATH's parens balance, else a string locating the problem.

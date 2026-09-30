@@ -140,11 +140,20 @@ that mean the agent is sleeping."
     (cond
      ((member status '("completed" "failed"))
       (when (equal tool-call-id konix/agent-shell--waiting-tool-id)
-        (setq konix/agent-shell--waiting-tool-id nil
-              konix/agent-shell--waiting-tool-kind nil)))
+        (konix/agent-shell--clear-waiting-status)))
      (kind
       (setq konix/agent-shell--waiting-tool-id tool-call-id
-            konix/agent-shell--waiting-tool-kind kind)))))
+            konix/agent-shell--waiting-tool-kind kind))
+     ;; A cancelled blocking call may never get its closing update, so
+     ;; another tool starting is what tells us the agent moved on.
+     ((and konix/agent-shell--waiting-tool-id
+           (not (equal tool-call-id konix/agent-shell--waiting-tool-id)))
+      (konix/agent-shell--clear-waiting-status)))))
+
+(defun konix/agent-shell--clear-waiting-status ()
+  "Forget the in-flight blocking coordination tool."
+  (setq konix/agent-shell--waiting-tool-id nil
+        konix/agent-shell--waiting-tool-kind nil))
 
 (defvar-local konix/agent-shell--background-launched nil
   "Non-nil when the agent launched a command in the background this turn.
@@ -292,7 +301,10 @@ notified of new agent activity."
        (when (buffer-live-p shell-buf)
          (with-current-buffer shell-buf
            (setq konix/agent-shell--background-launched nil)
-           (setq konix/agent-shell--last-error nil)))))
+           (setq konix/agent-shell--last-error nil)
+           ;; Whatever the agent blocked in last turn, a fresh prompt means
+           ;; it is no longer blocked there.
+           (konix/agent-shell--clear-waiting-status)))))
     ;; `init-finished' fires once the session is established — for a resumed
     ;; session its title is already known on disk, so guess the buffer name
     ;; immediately instead of waiting for the first `turn-complete'.
@@ -312,8 +324,7 @@ notified of new agent activity."
        (when (buffer-live-p shell-buf)
          (with-current-buffer shell-buf
            (setq konix/agent-shell--seen nil)
-           (setq konix/agent-shell--waiting-tool-id nil)
-           (setq konix/agent-shell--waiting-tool-kind nil)
+           (konix/agent-shell--clear-waiting-status)
            (konix/agent-shell--auto-rename-from-title)))
        (when-let ((viewport-buffer (agent-shell-viewport--buffer
                                     :shell-buffer shell-buf

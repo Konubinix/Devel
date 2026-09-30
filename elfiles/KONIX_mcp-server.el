@@ -28,6 +28,19 @@
 (require 'cl-lib)
 (require 'bytecomp)
 (require 'mcp-server-lib)
+
+;; The library reports an error as its printed form, « Error: (error #("..." 44
+;; 102 (org-todo-head ...))) », properties and all. An agent reads the message
+;; as well as anyone, so it is handed the message alone. Defined before the
+;; tool modules below are loaded, so their tools expand this one.
+(defmacro mcp-server-lib-with-error-handling (&rest body)
+  "Run BODY, reporting any error it raises as a tool error in plain words."
+  `(condition-case err
+       (progn ,@body)
+     (error
+      (mcp-server-lib-tool-throw
+       (substring-no-properties (error-message-string err))))))
+
 (require 'project)
 (require 'KONIX_mcp-server-introspection)
 (require 'KONIX_mcp-server-agent-shell)

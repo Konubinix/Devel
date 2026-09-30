@@ -12,6 +12,7 @@
     ./hardware-configuration.nix
     ./voyager-ergol.nix
     ./zsa-udev.nix
+    ./voyager-disco.nix
   ];
 
   nix.settings.experimental-features = [

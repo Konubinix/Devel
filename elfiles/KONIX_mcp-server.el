@@ -80,13 +80,22 @@ a smaller slice, rather than flooding the client with a huge payload."
 
 (defmacro konix/mcp-server-with-buffer (buffer-name &rest body)
   "Execute BODY with buffer named BUFFER-NAME as current buffer.
-Signals an error if the buffer does not exist."
+Signals an error if the buffer does not exist.
+
+Auto-revert is let catch up first: the file may have been written a moment
+ago, and the notification saying so waits for Emacs to be idle, which it is
+not while it runs this call.  Left stale, the buffer makes anything visiting
+its file ask whether to reread it."
   (declare (indent 1) (debug t))
   `(let* ((decoded-buffer-name (decode-coding-string ,buffer-name 'utf-8))
           (buf (get-buffer decoded-buffer-name)))
      (if buf
          (save-window-excursion
            (with-current-buffer buf
+             (when (and (buffer-file-name)
+                        (not (buffer-modified-p))
+                        (not (verify-visited-file-modtime buf)))
+               (revert-buffer t t t))
              ,@body))
        (error "Buffer not found: %s" decoded-buffer-name))))
 

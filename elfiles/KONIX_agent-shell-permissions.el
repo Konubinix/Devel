@@ -600,7 +600,8 @@ something we cannot read' to stay distinguishable from `there is no argument 1'.
 subcommand prefix like `gh pr check' (trailing args free); a single-word SPEC
 like `grep' matches on command name alone."
   (when-let ((toks (split-string spec)))
-    (and (konix/agent-shell--command-name-matches command (car toks))
+    (and (konix/agent-shell--command-name-matches
+          command (concat "\\`\\(?:" (car toks) "\\)\\'"))
          (equal (cdr toks)
                 (seq-take (konix/agent-shell--command-word-arguments command)
                           (length (cdr toks)))))))

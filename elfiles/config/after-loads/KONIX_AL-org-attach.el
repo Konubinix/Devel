@@ -24,6 +24,7 @@
 
 ;;; Code:
 (setq-default org-attach-store-link-p 'attached)
+(setq-default org-attach-use-inheritance t)
 
 (defun konix/org-attach-ipfa (file)
   (interactive

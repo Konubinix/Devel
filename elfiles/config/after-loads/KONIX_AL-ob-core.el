@@ -40,6 +40,9 @@
                 (:padline . "yes")
                 (:tangle . "no"))
               )
+;; Don't re-evaluate babel blocks on export: results are already serialized in
+;; the document, and recomputing them only slows export down.
+(add-to-list 'org-babel-default-inline-header-args '(:eval . "no-export"))
 
 (setq org-export-babel-evaluate t)
 

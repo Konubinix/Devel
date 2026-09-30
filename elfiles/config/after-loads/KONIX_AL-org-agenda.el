@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(setq-default org-agenda-sort-noeffort-is-high nil)
+
 (require 'org-super-agenda)
 (org-super-agenda-mode 1)
 

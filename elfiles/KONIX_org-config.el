@@ -25,7 +25,6 @@
 
 (require 'KONIX_org-helpers)
 
-(setq-default org-export-allow-bind-keywords t)
 (setq-default org-complete-tags-always-offer-all-agenda-tags t)
 (setq-default org-empty-line-terminates-plain-lists t)
 (setq-default org--matcher-tags-todo-only nil)
@@ -34,7 +33,6 @@
 (setq-default org-deadline-warning-days -10000)
 (setq-default org-adapt-indentation t)
 (setq-default org-fontify-quote-and-verse-blocks t)
-(setq-default org-duration-format '(("h") (special . h:mm)))
 (setq-default org-hide-block-startup nil)
 (setq-default konix/org-na-limit 20)
 
@@ -55,27 +53,9 @@
 (setq-default org-default-notes-file (concat org-directory "/notes.org"))
 (setq-default org-enforce-todo-checkbox-dependencies t)
 (setq-default org-enforce-todo-dependencies t)
-(setq-default org-export-exclude-tags '("noexport" "PERSO"))
-(setq-default org-export-html-with-timestamp t)
-(setq-default org-export-headline-levels 10)
-(setq-default org-export-mark-todo-in-toc t)
-(setq-default org-export-with-tags t)
-(setq-default org-export-with-sub-superscripts nil)
 (setq-default org-hide-leading-stars t)
 (setq-default org-hierarchical-todo-statistics nil)
 (setq-default org-insert-labeled-timestamps-at-point nil)
-(setq org-infojs-options '((path . "http://orgmode.org/org-info.js")
-                           (view . "info")
-                           (toc . t)
-                           (ftoc . "0")
-                           (tdepth . "max")
-                           (sdepth . "max")
-                           (mouse . "underline")
-                           (buttons . "0")
-                           (ltoc . "1")
-                           (up . :link-up)
-                           (home . :link-home)))
-(setq-default org-id-link-to-org-use-id t)
 (setq-default org-log-done (quote time))
 (setq-default org-log-done-with-time t)
 (setq-default org-log-state-notes-into-drawer "LOGBOOK")
@@ -100,22 +80,8 @@
 (setq-default org-default-priority ?P)
 (setq-default org-lowest-priority ?Z)
 (setq-default org-provide-todo-statistics 'all-headlines)
-(setq-default org-refile-targets
-              '(
-                (org-agenda-files . (:maxlevel . 5))
-                )
-              )
-(setq-default org-refile-use-outline-path 'full-file-path)
-(setq-default org-refile-use-cache t)
-(setq-default org-outline-path-complete-in-steps nil)
 (setq-default org-src-fontify-natively t)
-(setq-default org-src-tab-acts-natively t)
-(setq-default org-export-html-link-up "..")
-(setq-default org-export-html-link-home "index.html")
-(setq-default org-export-with-archived-trees t)
-(setq-default org-export-with-drawers '("LOGBOOK"))
 (setq-default org-reverse-note-order t)
-(setq org-timer-timer-is-countdown nil)
 ;; TODO: a task that does not wait for external event. I is possible it may not
 ;; be done right now because it waits for other tasks to complete
 ;; NEXT; a TODO task that may be done right now, no more dependency
@@ -135,20 +101,6 @@
 (setq-default org-return-follows-link t)
 (setq-default org-tab-follows-link t)
 
-(setq-default org-babel-python-command "python3")
-;; Python indentation is tricky and easily messed up by org mode
-(add-to-list 'org-babel-default-header-args:python '(:preserve-indentation . t))
-;; Don't re-evaluate babel blocks on export: results are already serialized in
-;; the document, and recomputing them only slows export down.
-(add-to-list 'org-babel-default-header-args '(:eval . "no-export"))
-(add-to-list 'org-babel-default-inline-header-args '(:eval . "no-export"))
-(setq-default org-sort-agenda-noeffort-is-high nil)
-
-(setq-default
- org-edna-finder-use-cache t
- org-edna-finder-cache-timeout 300
- )
-
 (setq konix/org-gtd-context-edit-syntax-table
       (let (
             (synTable (make-syntax-table))
@@ -161,32 +113,7 @@
         )
       )
 
-(setq-default org-habit-show-habits nil)
-
-(setq-default org-attach-use-inheritance t)
 (setq-default org-use-property-inheritance nil)
-
-(setq-default
- org-export-global-macros
- `(
-   ("iframe" . "@@html:<div class=\"iframe-container ratio169\"><iframe src=\"$1\" allowfullscreen title=\"Iframe\"></iframe></div>@@")
-   ("result" . "(eval (konix/org-export-macro/result $1))")
-   ("youtube" . "@@html:<div class=\"iframe-container ratio169\"><iframe src=\"https://www.youtube-nocookie.com/embed/$1\" allowfullscreen title=\"YouTube Video\"></iframe></div>@@")
-   ("peertube"
-    . "@@html:<iframe src=\"https://$1/videos/embed/$2\" style=\"min-height: 400px; width: 100%;\" frameborder=\"0\" sandbox=\"allow-same-origin allow-scripts\" allowfullscreen=\"allowfullscreen\"></iframe>@@")
-   ("audio" . "@@html:<audio controls><source src=\"$1\" type=\"audio/mpeg\">Your browser does not support the audio element.</audio>@@")
-   ("video" . "@@html:<video controls><source src=\"$1\" type=\"video/mp4\">Your browser does not support the video tag.</video>@@")
-   ("icon" . "@@html:<i class=\"$1\"></i>@@")
-   ("stlview" . "@@html:<iframe src=\"https://www.viewstl.com/?embedded&url=$1\" style=\"border:0;width:100%;height:500px;\"></iframe>@@")
-   ("glbview" . "@@html:<script type=\"module\" src=\"https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js\"></script><model-viewer src=\"$1\" auto-rotate camera-controls style=\"width:100%;height:500px;background:#eee\"></model-viewer>@@")
-   ("blendview" . "(eval (konix/org-export-macro/blendview $1))")
-   ("embedpdf" . ,(format "@@html:<div class=\"iframe-container ratio-full-height\"><iframe src=\"%s/pdfviewer/web/viewer.html?file=$1\" title=\"PDFViewer\"></iframe></div>@@"
-                          (getenv "KONIX_PDFVIEWER_GATEWAY")
-                          )
-    )
-   ("embeddir" . ,(format "@@html:<div class=\"iframe-container ratio-full-height\"><iframe src=\"$1\" title=\"Embed\"></iframe></div>@@"))
-   )
- )
 
 (setq-default konix/org-srs-values '("perfect response"
                                      "correct response after a hesitation"

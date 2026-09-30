@@ -1,4 +1,4 @@
-;;; KONIX_AL-org-id.el ---                           -*- lexical-binding: t; -*-
+;;; KONIX_AL-ob-python.el ---                        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026  konubinix
 
@@ -16,7 +16,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -24,15 +24,9 @@
 
 ;;; Code:
 
-(setq-default org-id-link-to-org-use-id t)
+(setq-default org-babel-python-command "python3")
+;; Python indentation is tricky and easily messed up by org mode
+(add-to-list 'org-babel-default-header-args:python '(:preserve-indentation . t))
 
-(defun konix/org-id-check-duplicates ()
-  "Call org-id-update-id-locations but avoid returning the whole list.
-
-That list makes emacs crash because of the long line in the message buffer"
-  (interactive)
-  (org-id-update-id-locations)
-  nil)
-
-(provide 'KONIX_AL-org-id)
-;;; KONIX_AL-org-id.el ends here
+(provide 'KONIX_AL-ob-python)
+;;; KONIX_AL-ob-python.el ends here

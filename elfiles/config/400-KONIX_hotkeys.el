@@ -80,15 +80,10 @@
 (keymap-global-set "C-M-S-m" 'konix/delete-paren-at-point)
 ;; Other frame
 (keymap-global-set "C-M-<tab>" 'other-frame)
-;; Move buffer to other frame
-(keymap-global-set "C-M-S-<tab>" 'konix/switch-buffer-other-frame)
-(keymap-global-set "C-M-S-<iso-lefttab>" 'konix/switch-buffer-other-frame)
 ;; list buffers with bs-show instead of list-buffer
 (keymap-global-set "C-x C-b" 'bs-show)
 ;; Undo sur CTRL-Z (habitude...)
 (keymap-global-set "C-z" 'undo)
-;; transpose
-(keymap-global-set "M-T" 'konix/transpose-split-word)
 ;; incr and decr integer at point
 (keymap-global-set "C-+" 'konix/increase-at-point)
 (keymap-global-set "C--" 'konix/decrease-at-point)
@@ -150,8 +145,6 @@
 
 (keymap-set 'konix/global-slow-key-map "<" 'beginning-of-buffer)
 (keymap-set 'konix/global-slow-key-map ">" 'end-of-buffer)
-;; 0bin paste
-(keymap-set 'konix/global-slow-key-map "p" 'konix/0binpaste)
 (keymap-set 'konix/global-slow-key-map "C-o" 'konix/mimeopen)
 ;; toggle undo-tree mode
 (keymap-set 'konix/global-slow-key-map "C-u" 'undo-tree-mode)
@@ -166,16 +159,8 @@
 (keymap-set 'konix/global-slow-key-map "k" 'bury-buffer)
 ;; grep
 (keymap-set 'konix/global-slow-key-map "C-s" 'grep)
-;; insert the date
-(keymap-set 'konix/global-slow-key-map "C-t" 'konix/insert-iso-time-string)
-;; insert the number of seconds since the epoch to the past month
-(keymap-set 'konix/global-slow-key-map "C-M" 'konix/insert-past-month-string)
-;; insert the number of second since the 00:00 1/1/1970
-(keymap-set 'konix/global-slow-key-map "C-d" 'konix/insert-seconds-since-1970)
 ;; Lance l'explorer
 (keymap-set 'konix/global-slow-key-map "C-e" 'konix/explorer)
-;; compte les mots de la region
-(keymap-set 'konix/global-slow-key-map "C-w" 'konix/count-words-region)
 ;; calendar
 (keymap-set 'konix/global-slow-key-map "c" 'calendar)
 ;; org agenda
@@ -307,20 +292,8 @@
 (keymap-set 'konix/global-fast-key-map "<down>" 'windmove-down)
 ;; Other frame
 (keymap-set 'konix/global-fast-key-map "<tab>" 'other-frame)
-;; Other frame
-(keymap-set 'konix/global-fast-key-map "<backtab>" 'konix/switch-buffer-other-frame)
 ;; sort lines
 (keymap-set 'konix/global-fast-key-map "C-s" 'sort-lines)
-
-;; **********************************************************************
-;; frame configuration manipulation
-;; **********************************************************************
-(define-prefix-command 'konix/frame-configuration/map)
-(keymap-set 'konix/global-fast-key-map "f" 'konix/frame-configuration/map)
-
-(keymap-set 'konix/frame-configuration/map "p" 'konix/frame-configuration-push)
-(keymap-set 'konix/frame-configuration/map "*" 'konix/frame-configuration-pop)
-(keymap-set 'konix/frame-configuration/map "h" 'konix/frame-configuration-top)
 
 ;; ************************************************************
 ;; Customize
@@ -442,7 +415,6 @@
 (keymap-set 'konix/org-global-map "C-i" 'konix/org-clock-back-previous-task)
 (keymap-set 'konix/org-global-map "g" 'konix/org-clock-goto)
 (keymap-set 'konix/org-global-map "G" 'konix/org-agenda-goto-today-clock)
-(keymap-set 'konix/org-global-map "b" 'konix/org-goto-bookmarks)
 (keymap-set 'konix/org-global-map "O" 'org-clock-out)
 (keymap-set 'konix/org-global-map "I" 'org-clock-in-last)
 (keymap-set 'konix/org-global-map "c" 'org-capture)
@@ -450,7 +422,6 @@
 (keymap-set 'konix/org-global-map "M-d" 'konix/org-capture-diary-in-heading)
 (keymap-set 'konix/org-global-map "C-e" 'org-clock-modify-effort-estimate)
 (keymap-set 'konix/org-global-map "n" 'konix/org-insert-at-point)
-(keymap-set 'konix/org-global-map "x" 'konix/org-link-toggle-cross)
 (keymap-set 'konix/org-global-map "<up>" 'org-mark-ring-push)
 (keymap-set 'konix/org-global-map "<left>" 'org-mark-ring-goto)
 (keymap-set 'konix/org-global-map "<right>" 'konix/org-mark-ring-goto-newest)
@@ -469,15 +440,12 @@
 (keymap-set 'konix/org-global-map "C-n" 'konix/org-create-next-sibbling)
 (keymap-set 'konix/org-global-map "i" 'org-id-copy)
 (keymap-set 'konix/org-global-map "/" 'org-sparse-tree)
-(keymap-set 'konix/org-global-map "-" 'konix/org-sparse-next-actions)
 (keymap-set 'konix/org-global-map "C-l" 'org-toggle-link-display)
 (keymap-set 'konix/org-global-map "M-l" 'org-insert-link-global)
-(keymap-set 'konix/org-global-map "C-s" 'konix/org-store-agenda-views)
 (keymap-set 'konix/org-global-map "C-r" 'konix/org-element-cache-reset-all)
 (keymap-set 'konix/org-global-map "t" 'konix/org-clock-todo)
 (keymap-set 'konix/org-global-map "f" 'org-roam-node-find)
 (keymap-set 'konix/org-global-map "r" 'org-roam-ref-find)
-(keymap-set 'konix/org-global-map "C-f" 'konix/org-roam/open-key)
 (keymap-set 'konix/org-global-map "N" 'konix/org-roam-note)
 
 
@@ -508,13 +476,11 @@
 (keymap-set 'konix/global-fast-notmuch-key-map "s" 'notmuch-search)
 (keymap-set 'konix/global-fast-notmuch-key-map "M" 'konix/notmuch-search-no-tag)
 (keymap-set 'konix/global-fast-notmuch-key-map "t" 'notmuchticker-treeview)
-(keymap-set 'konix/global-fast-notmuch-key-map "f" 'konix/open-mail-follow)
 
 (keymap-set 'konix/global-slow-notmuch-key-map "m" 'notmuch)
 (keymap-set 'konix/global-slow-notmuch-key-map "s" 'notmuch-search)
 (keymap-set 'konix/global-slow-notmuch-key-map "M" 'konix/notmuch-search-no-tag)
 (keymap-set 'konix/global-slow-notmuch-key-map "t" 'notmuchticker-treeview)
-(keymap-set 'konix/global-slow-notmuch-key-map "f" 'konix/open-mail-follow)
 
 ;; ####################################################################################################
 ;; highlight-symbol
@@ -536,7 +502,7 @@
             '(menu-item "" konix/git-global-map
                         :filter konix/vcs/dispatch-map))
 
-(keymap-set konix/git-global-map "m" 'konix/git-modified-files)
+(keymap-set konix/git-global-map "m" 'konix/git/modified-files)
 (keymap-set konix/git-global-map "i" 'konix/git/init)
 
 (define-prefix-command 'konix/git-global-map-tag)
@@ -668,7 +634,6 @@
 (keymap-set konix/git-global-map-checkout "<down>" 'konix/git/checkout/parent)
 (keymap-set konix/git-global-map-checkout "g" 'gited-list-branches)
 
-(keymap-global-set "C-< g" 'konix/git/command-with-completion)
 
 ;; Multi cursor
 (define-prefix-command 'konix/multi-cursor-map)

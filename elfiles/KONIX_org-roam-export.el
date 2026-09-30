@@ -44,7 +44,7 @@
    (string-trim
     (shell-command-to-string
      (format
-      "grep -r -l '^#+KONIX_ORG_PUBLISH_KIND: %s' %s|grep -v '#$'|grep -v none"
+      "grep -r -l --exclude-dir=.agent-shell --exclude-dir=.ws '^#+KONIX_ORG_PUBLISH_KIND: %s' %s|grep -v '#$'|grep -v none"
       kind
       org-roam-directory
       )

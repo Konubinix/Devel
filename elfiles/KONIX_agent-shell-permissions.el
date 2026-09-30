@@ -654,6 +654,26 @@ if given).  SPECS are as in `hascommand'."
            (or (null specs)
                (konix/agent-shell--command-matches-any-p (car commands) specs))))))
 
+(konix/agent-shell-define-tool-evaluator "argv" (tool-call regexp)
+  "Match a line every command of which has an argv matching REGEXP.
+The argv is the command name and its argument literals joined by spaces, so
+redirections are not part of it: `clk foo --help > FILE' reads `clk foo --help'.
+An argument whose value is not statically knowable makes the command fail to
+match.  Reference it as `@argv(REGEXP)'; REGEXP cannot hold a top-level comma."
+  (konix/agent-shell--with-bash-ast root tool-call
+    (let ((commands (konix/agent-shell--command-nodes root)))
+      (and commands
+           (seq-every-p
+            (lambda (c)
+              (let ((arguments (konix/agent-shell--command-argument-literals c)))
+                (and (not (memq nil arguments))
+                     (string-match-p
+                      regexp
+                      (string-join (cons (konix/agent-shell--command-name c)
+                                         arguments)
+                                   " ")))))
+            commands)))))
+
 (konix/agent-shell-define-tool-evaluator "lost-search" (tool-call)
   "Match a `find'/`grep'/`rg'/`ag'/`ack' scan of a whole aggregating directory
 \(see `konix/shell-search-broad-roots') -- the mark of an agent that has lost
@@ -1118,7 +1138,8 @@ in the project.")
     ("^python3? -m py_compile")
     ("@read-only-sed" . "sed that only reads project files and prints")
     ("@read-only-find" . "find that only walks project files and prints")
-    ("@gh-read" . "gh api GETs and the list/view subcommands"))
+    ("@gh-read" . "gh api GETs and the list/view subcommands")
+    ("(and \"@onlycommand\" \"@argv(^clk .+ --help$)\")" . "clk help pages"))
   "GLOBAL baseline alist of (KEY . NOTE) whitelisted (auto-approved) tools.
 Applied to every session, beneath the project and session layers which
 shadow it.  KEY matches as in `konix/agent-shell-tool-blacklist-global';

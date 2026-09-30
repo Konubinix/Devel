@@ -1112,6 +1112,7 @@ $TMPDIR or /tmp without ever naming the directory."
 
 (defcustom konix/agent-shell-tool-blacklist-global
   `(("@use-a-wrong-tmp-dir" . "Write temp files into ./.agent-shell/tmp/ instead")
+    ("^sleep" . "Use the sleep tool")
     ("@writes-outside(.agent-shell/tmp)" . "Redirect output into ./.agent-shell/tmp/ instead")
     ("^command -v" . "Use nix-shell")
     ("python3 -m json.tool" . "jq")

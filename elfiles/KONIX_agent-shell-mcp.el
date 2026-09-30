@@ -80,11 +80,6 @@ reference-counted server-side so the themed servers coexist safely."
      (args . [])
      (env . []))
 
-    ("grafana-mcp"
-     (name . "grafana-mcp")
-     (type . "http")
-     (url . "http://localhost:8009/mcp"))
-
     ("blender-mcp"
      (name . "blender-mcp")
      (command . "blender-mcp")

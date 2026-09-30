@@ -121,7 +121,7 @@ Named DIRECTORY rather than `elfiles', which is one of the variables
         "time-date"    ;; loaded by org
         "tramp"        ;; saveplace that looks for /ssh:machine:/aaaa files
         "tracking"     ;; init
-        "vc-hooks"     ;; loaded by vc -> git-wip-mode
+        "vc-hooks"     ;; loaded by vc
         "framemove"    ;; init
         "golden-ratio" ;; init
         "keep-buffers" ;; init

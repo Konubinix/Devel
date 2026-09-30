@@ -11,7 +11,6 @@
   (setq konix/personal-load-path
         (list
          elfiles
-         (expand-file-name "git-wip/emacs" devel-dir)
          )
         )
   ;; add my personal load path to the load-path

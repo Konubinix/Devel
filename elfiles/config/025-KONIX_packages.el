@@ -121,7 +121,6 @@
   (use-package flycheck-languagetool)
   (use-package framemove)
   (use-package git-timemachine :commands (git-timemachine))
-  (use-package git-wip-timemachine)
   (use-package gnuplot-mode)
   (use-package gnus-alias)
   (use-package gitri :straight (:type built-in) :mode ("git-rebase-todo" . gitri-mode))
@@ -162,6 +161,8 @@
   (use-package lua-mode :commands (lua-mode) :mode "\\.lua$")
   (use-package macher)
   (use-package majutsu :straight (:type git :host github :repo "0WD0/majutsu"))
+  ;; not used as a git UI, but provides magit-wip-mode (replaces git-wip)
+  (use-package magit)
   (use-package mcp-server-lib :straight (:fork t :branch "mine"))
   ;; (use-package marginalia) -> too much information that I barely look at
   (use-package mic-paren)

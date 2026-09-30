@@ -53,7 +53,7 @@
   (require 'orderless)
   (require 'winner)
   (require 'saveplace)
-  (require 'git-wip-mode nil t)
+  (require 'magit-wip)
   (require 'KONIX_minibuffer_edit)
   (require 'KONIX_org-meta-context)
 
@@ -61,6 +61,7 @@
   (vertico-mode 1)
   (global-corfu-mode 1)
   (corfu-terminal-mode 1)
+  (magit-wip-mode 1)
   ;; (marginalia-mode 1)
   )
 

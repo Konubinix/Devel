@@ -58,6 +58,10 @@
 
 (setq-default straight-recipe-overrides nil)
 ;; (straight-override-recipe '(org :branch "release_9.5.5"))
+;; temporary until https://github.com/alphapapa/taxy.el/pull/20
+;; gets merge into master, see https://github.com/alphapapa/taxy.el/issues/19
+(straight-override-recipe
+ '(taxy :type git :host github :repo "Thaodan/taxy.el" :branch "shortdoc_fix"))
 
 ;; best setting according to the author
 (setq-default straight-check-for-modifications '(watch-files find-when-checking))

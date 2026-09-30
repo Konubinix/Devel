@@ -219,6 +219,38 @@ line or a table row, neither of which can be wrapped, or a line babel wrote."
           (when (and (>= pos (car r)) (< pos (cdr r))) (throw 'found t)))
         nil)))
 
+(defun konix/mcp-server--archived-p (el)
+  "Non-nil when EL sits under a heading the export leaves behind."
+  (let ((hl (org-element-lineage el '(headline))))
+    (catch 'archived
+      (while hl
+        (when (member org-archive-tag (org-element-property :tags hl))
+          (throw 'archived t))
+        (setq hl (org-element-lineage hl '(headline))))
+      nil)))
+
+(defun konix/mcp-server--named-blocks (tree)
+  "Every name TREE gives a block, mapped to whether the export drops it."
+  (let ((named (make-hash-table :test #'equal)))
+    (org-element-map tree '(src-block table example-block fixed-width)
+      (lambda (el)
+        (let ((name (org-element-property :name el)))
+          (when name
+            (puthash name (konix/mcp-server--archived-p el) named)))))
+    named))
+
+(defun konix/mcp-server--export-error ()
+  "What the export says when it refuses this buffer, or nil when it comes out.
+Org resolves every reference as it exports, so a name that is there to read and
+gone to the export — one an archived heading takes away — only shows up here."
+  (condition-case err
+      (let ((org-confirm-babel-evaluate nil)
+            (org-babel-default-header-args
+             (cons '(:eval . "never-export") org-babel-default-header-args)))
+        (org-export-as 'ascii nil nil t)
+        nil)
+    (error (error-message-string err))))
+
 (defun konix/mcp-server-note-mechanics (buffer-name)
   "Report the mechanical flaws of an org note, and count each intention word in use.
 See the note this is tangled from for what a checker may decide.
@@ -249,8 +281,9 @@ MCP Parameters:
                                        (equal (org-element-property :raw-value hl)
                                               (or org-footnote-section "Footnotes")))
                              hl)))))
+              (export-error (konix/mcp-server--export-error))
               not-a-bullet no-tag long-tag unknown-tag long-line long-bullet bad-link
-              deep inline-fn undef-fn stray-top orphan
+              deep inline-fn undef-fn dup-fn stray-top orphan
               (seen (make-hash-table :test #'equal)))
          (org-element-map tree '(paragraph item)
            (lambda (el)
@@ -349,14 +382,23 @@ MCP Parameters:
                                      (org-element-property :begin el))
                                     flaw raw transclude)
                               bad-link)))))))))
-         (let ((defined
-                (append
+         (let* ((def-places
                  (org-element-map tree 'footnote-definition
-                   (lambda (fd) (org-element-property :label fd)))
-                 (org-element-map tree 'footnote-reference
-                   (lambda (fn)
-                     (when (eq (org-element-property :type fn) 'inline)
-                       (org-element-property :label fn)))))))
+                   (lambda (fd)
+                     (cons (org-element-property :label fd)
+                           (line-number-at-pos (org-element-property :begin fd))))))
+                (defined
+                 (append
+                  (mapcar #'car def-places)
+                  (org-element-map tree 'footnote-reference
+                    (lambda (fn)
+                      (when (eq (org-element-property :type fn) 'inline)
+                        (org-element-property :label fn)))))))
+           (dolist (place def-places)
+             (when (and (car place)
+                        (< 1 (seq-count (lambda (other) (equal (car other) (car place)))
+                                        def-places)))
+               (push (cons (cdr place) (car place)) dup-fn)))
            (org-element-map tree 'footnote-reference
              (lambda (fn)
                (let ((line (line-number-at-pos (org-element-property :begin fn)))
@@ -427,6 +469,12 @@ MCP Parameters:
                      (format "undefined-footnote — the reference has no definition:\n%s"
                              (mapconcat (lambda (c) (format "  line %d: %s" (car c) (cdr c)))
                                         (nreverse undef-fn) "\n")))
+                   (when dup-fn
+                     (format (concat "twice-defined-footnote — defined more than once, which"
+                                     " is what a reference wrapped to the start of a line"
+                                     " becomes:\n%s")
+                             (mapconcat (lambda (c) (format "  line %d: %s" (car c) (cdr c)))
+                                        (nreverse dup-fn) "\n")))
                    (let ((ls (funcall group (lambda (l)
                                               (and (not (nth 3 l))
                                                    (memq (nth 1 l) '(broken unknown)))))))
@@ -453,6 +501,8 @@ MCP Parameters:
                          (lambda (l) (format "  line %d: %s — %s" (nth 0 l) (nth 2 l)
                                              (funcall say (nth 1 l))))
                          ls "\n"))))
+                   (when export-error
+                     (format "no-export — the export stops on it:\n  %s" export-error))
                    (when deep
                      (format "deep — go deeper:\n%s"
                              (mapconcat
@@ -470,4 +520,4 @@ MCP Parameters:
             "\n")))))))
 
 (provide 'KONIX_mcp-server-note-mechanics)
-;; note-mechanics ends here
+;; -*- lexical-binding: t; -*- ends here

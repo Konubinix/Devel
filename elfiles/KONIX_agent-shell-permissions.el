@@ -1930,6 +1930,9 @@ No prefix -> `session'; one prefix -> `project'; two -> `global'."
   (konix/agent-shell-policy--remove-session policy key)
   (konix/agent-shell-policy--remove-project policy key)
   (konix/agent-shell-policy--remove-global policy key)
+  (dolist (extra konix/agent-shell-policy-extra-axes)
+    (when (assoc key (funcall (plist-get extra :entries) policy))
+      (funcall (plist-get extra :remove) policy key)))
   (message "Removed %S from %s (global, project and session)"
            key (konix/agent-shell-policy-name policy)))
 
@@ -2075,35 +2078,71 @@ it."
     ("once" (propertize "1" 'face '(:foreground "orange3" :weight bold)))
     (state (konix/agent-shell-panel--cell (not (equal state "off"))))))
 
+(defvar konix/agent-shell-policy-extra-axes nil
+  "Further axes the policy panels offer beside Global, Project and Session.
+Each is a plist of :header, :key, and the functions :entries (POLICY),
+:set (POLICY KEY VALUE) and :remove (POLICY KEY), called in the shell buffer.
+An optional :available, called there with no argument, offers the axis only
+where it returns non-nil.")
+
+(defun konix/agent-shell--policy-extras-here ()
+  "Return the extra axes available from the shell here."
+  (seq-filter (lambda (extra)
+                (let ((available (plist-get extra :available)))
+                  (or (null available)
+                      (with-current-buffer
+                          (or (ignore-errors (konix/agent-shell--current-shell-or-error))
+                              (current-buffer))
+                        (funcall available)))))
+              konix/agent-shell-policy-extra-axes))
+
+(defun konix/agent-shell--policy-extra-axis (policy extra)
+  "Build the panel axis EXTRA, one of `konix/agent-shell-policy-extra-axes', for POLICY."
+  (konix/agent-shell--policy-axis
+   policy (plist-get extra :header) (plist-get extra :key)
+   (plist-get extra :entries) (plist-get extra :set) (plist-get extra :remove)))
+
+(defun konix/agent-shell--policy-extra-named (name)
+  "Return the extra axis whose header is NAME, whatever its case."
+  (seq-find (lambda (extra) (string-equal-ignore-case (plist-get extra :header) name))
+            konix/agent-shell-policy-extra-axes))
+
 (defun konix/agent-shell--policy-panel (policy)
   "Return the `konix/agent-shell-panel' that edits POLICY."
   (konix/agent-shell-panel-create
    :buffer-name (format "*Tool %s*" (konix/agent-shell-policy-name policy))
    :mode-name (format "Tool-%s" (capitalize (konix/agent-shell-policy-name policy)))
-   :help (format "Tool %s: G global, p project, s session, t enable/disable/once, a add, e/RET edit, d delete, r reapply, g refresh, q quit"
-                 (konix/agent-shell-policy-name policy))
+   :help (format "Tool %s: G global, p project, s session,%s t enable/disable/once, a add, e/RET edit, d delete, r reapply, g refresh, q quit"
+                 (konix/agent-shell-policy-name policy)
+                 (mapconcat (lambda (extra)
+                              (format " %s %s," (plist-get extra :key)
+                                      (downcase (plist-get extra :header))))
+                            (konix/agent-shell--policy-extras-here) ""))
    :name-header "Regexp/predicate"
    :name-width 30
    :data policy
    :rows (lambda () (konix/agent-shell-policy--all-keys policy))
    :label (lambda (key) (format "%s" key))
    :axes
-   (list
-    (konix/agent-shell--policy-axis
-     policy "Global" "G"
-     #'konix/agent-shell-policy--global-entries
-     #'konix/agent-shell-policy--set-global
-     #'konix/agent-shell-policy--remove-global 8)
-    (konix/agent-shell--policy-axis
-     policy "Project" "p"
-     #'konix/agent-shell-policy--project-entries
-     #'konix/agent-shell-policy--set-project
-     #'konix/agent-shell-policy--remove-project)
-    (konix/agent-shell--policy-axis
-     policy "Session" "s"
-     #'konix/agent-shell-policy--session-entries
-     #'konix/agent-shell-policy--set-session
-     #'konix/agent-shell-policy--remove-session))
+   (append
+    (list
+     (konix/agent-shell--policy-axis
+      policy "Global" "G"
+      #'konix/agent-shell-policy--global-entries
+      #'konix/agent-shell-policy--set-global
+      #'konix/agent-shell-policy--remove-global 8)
+     (konix/agent-shell--policy-axis
+      policy "Project" "p"
+      #'konix/agent-shell-policy--project-entries
+      #'konix/agent-shell-policy--set-project
+      #'konix/agent-shell-policy--remove-project)
+     (konix/agent-shell--policy-axis
+      policy "Session" "s"
+      #'konix/agent-shell-policy--session-entries
+      #'konix/agent-shell-policy--set-session
+      #'konix/agent-shell-policy--remove-session))
+    (mapcar (lambda (extra) (konix/agent-shell--policy-extra-axis policy extra))
+            (konix/agent-shell--policy-extras-here)))
    :value-columns
    (list (list "On" 6
                (lambda (key)
@@ -2193,12 +2232,20 @@ when a permission request is waiting in the origin session."
          (value (read-string (konix/agent-shell-policy-value-prompt policy)
                              (with-current-buffer origin
                                (konix/agent-shell-policy--value-for policy key))))
-         (axis (completing-read "Axis: " '("session" "project" "global") nil t)))
+         (axis (completing-read "Axis: "
+                                (append '("session" "project" "global")
+                                        (mapcar (lambda (extra)
+                                                  (downcase (plist-get extra :header)))
+                                                (with-current-buffer origin
+                                                  (konix/agent-shell--policy-extras-here))))
+                                nil t)))
     (with-current-buffer origin
       (pcase axis
         ("global"  (konix/agent-shell-policy--set-global policy key value))
         ("project" (konix/agent-shell-policy--set-project policy key value))
-        (_         (konix/agent-shell-policy--set-session policy key value))))
+        ("session" (konix/agent-shell-policy--set-session policy key value))
+        (_ (funcall (plist-get (konix/agent-shell--policy-extra-named axis) :set)
+                    policy key value))))
     (konix/agent-shell-panel--refresh)))
 
 (defun konix/agent-shell-policy-menu-edit ()
@@ -2213,6 +2260,10 @@ If the key changes, the old one is replaced on each axis it occupied."
                          (assoc key (konix/agent-shell-policy--project-entries policy))))
            (on-session (with-current-buffer origin
                          (assoc key (konix/agent-shell-policy--session-entries policy))))
+           (on-extras (with-current-buffer origin
+                        (seq-filter (lambda (extra)
+                                      (assoc key (funcall (plist-get extra :entries) policy)))
+                                    konix/agent-shell-policy-extra-axes)))
            (new-key (read-string "Key (regexp, @evaluator, or (lambda ...)): " key 'regexp-history))
            (new-value (read-string (konix/agent-shell-policy-value-prompt policy)
                                    (with-current-buffer origin
@@ -2227,7 +2278,10 @@ If the key changes, the old one is replaced on each axis it occupied."
           (konix/agent-shell-policy--set-project policy new-key new-value))
         (when on-session
           (when renamed (konix/agent-shell-policy--remove-session policy key))
-          (konix/agent-shell-policy--set-session policy new-key new-value)))
+          (konix/agent-shell-policy--set-session policy new-key new-value))
+        (dolist (extra on-extras)
+          (when renamed (funcall (plist-get extra :remove) policy key))
+          (funcall (plist-get extra :set) policy new-key new-value)))
       (konix/agent-shell-panel--refresh))))
 
 (defun konix/agent-shell-policy-menu-toggle-enabled ()
@@ -2263,6 +2317,9 @@ Also clears any disabled marker so it does not outlive the rule."
       (with-current-buffer origin
         (konix/agent-shell-policy--remove-session policy key)
         (konix/agent-shell-policy--remove-project policy key)
+        (dolist (extra konix/agent-shell-policy-extra-axes)
+          (when (assoc key (funcall (plist-get extra :entries) policy))
+            (funcall (plist-get extra :remove) policy key)))
         (when off
           (konix/agent-shell-policy--remove-session off key)
           (konix/agent-shell-policy--remove-project off key))))

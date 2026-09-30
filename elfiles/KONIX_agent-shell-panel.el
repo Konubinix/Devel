@@ -56,10 +56,11 @@ origin buffer) and LABEL maps an id to its first-column string (origin
 buffer).  AXES is a list of `konix/agent-shell-panel-axis'.  VALUE-COLUMNS
 is a list of (HEADER WIDTH FN) trailing columns, FN mapping an id to a
 string (origin buffer).  EXTRA-KEYS is an alist of (KEY-STRING . COMMAND).
-DATA is free for the owner to stash context (e.g. a policy)."
+DATA is free for the owner to stash context (e.g. a policy).  LABEL-FACE is the
+face of the first column in a panel with no axes, which has none else."
   buffer-name mode-name help
   name-header (name-width 30)
-  rows label axes value-columns extra-keys data)
+  rows label axes value-columns extra-keys data label-face)
 
 (defvar-local konix/agent-shell-panel--spec nil
   "The `konix/agent-shell-panel' the current panel buffer renders.")
@@ -99,10 +100,14 @@ DATA is free for the owner to stash context (e.g. a policy)."
                                  (and (funcall (konix/agent-shell-panel-axis-member-p ax) id) t))
                                axes))
                       (on-any (seq-some #'identity memberships))
-                      (label (propertize
-                              (funcall (konix/agent-shell-panel-label spec) id)
-                              'face (if on-any '(:foreground "green3")
-                                      '(:foreground "red3"))))
+                      (label (let ((text (funcall (konix/agent-shell-panel-label spec) id)))
+                               (if axes
+                                   (propertize text
+                                               'face (if on-any '(:foreground "green3")
+                                                       '(:foreground "red3")))
+                                 (if-let* ((face (konix/agent-shell-panel-label-face spec)))
+                                     (propertize text 'face face)
+                                   text))))
                       (axis-cells (mapcar #'konix/agent-shell-panel--cell memberships))
                       (value-cells (mapcar (lambda (vc)
                                              (or (funcall (nth 2 vc) id) ""))

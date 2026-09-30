@@ -329,16 +329,29 @@ agent starts.  An unknown AGENT is returned as it was given."
       (when (re-search-forward "^#\\+title:[ \t]*\\(.*\\)$" nil t)
         (konix/org-agent-shell--nonempty (match-string 1))))))
 
+(declare-function konix/org-roam-export/extract-kind-unsafe "KONIX_org-roam-export")
+(declare-function konix/org-roam-export/format-url "KONIX_org-roam-export")
+(declare-function org-roam-node-at-point "org-roam-node")
+
 (defun konix/org-agent-shell--note-markdown-link (path &optional base)
   "Return the markdown link naming the governing note at PATH.
 PATH is resolved against BASE to read the `#+title' the link shows,
-falling back to the note's file name.  Both notes export to the same
-directory, so the target is the sibling markdown file."
-  (let ((note (expand-file-name path (or base default-directory))))
-    (format "[%s](%s.md)"
-            (or (konix/org-agent-shell--note-title note)
-                (file-name-base note))
-            (file-name-base note))))
+falling back to the note's file name.  The target is the note's
+published url, as `konix/org-roam-export/format-url' computes it for
+the note's kind (blog, braindump...).  An unpublished note gets its
+title alone, for it has no url to point to."
+  (let* ((note (expand-file-name path (or base default-directory)))
+         (title (or (konix/org-agent-shell--note-title note)
+                    (file-name-base note)))
+         (node (with-current-buffer (find-file-noselect note)
+                 (unless (member (konix/org-roam-export/extract-kind-unsafe)
+                                 '(nil "none"))
+                   (org-with-wide-buffer
+                    (goto-char (point-min))
+                    (org-roam-node-at-point))))))
+    (if node
+        (format "[%s](%s)" title (konix/org-roam-export/format-url node))
+      title)))
 
 (defcustom konix/org-agent-shell-note-export-format
   "this note is edited using %s/%s, governed by the note %s"
@@ -354,7 +367,7 @@ Provider and model come from LINK when it names them, else from the
 preferred config and `konix/agent-shell-default-model-id'.  The
 governing note is LINK's path, resolved against the exported file
 \(INFO's `:input-file') as following the link resolves it, and shown as
-a markdown link to its exported sibling."
+a markdown link to its published url."
   (pcase-let ((`(,path ,agent ,model)
                (konix/org-agent-shell--note-link-parse link)))
     (format konix/org-agent-shell-note-export-format

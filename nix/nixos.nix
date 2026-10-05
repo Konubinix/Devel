@@ -51,7 +51,10 @@
   nix.settings.flake-registry = "/etc/nix/registry.json";
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot = {
+    enable = true;
+    configurationLimit = 2;
+  };
   boot.loader.efi.canTouchEfiVariables = true;
 
   # networking.hostName is set in the host layer (e.g. konixwork/nix/nixos.nix)

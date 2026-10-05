@@ -91,6 +91,8 @@ let
   );
 in
 {
+  imports = [ ./user-jobs.nix ];
+
   options.konix.extraPythonPackages = lib.mkOption {
     type = lib.types.functionTo (lib.types.listOf lib.types.package);
     default = _: [ ];
@@ -123,7 +125,6 @@ in
         ps.pip
         ps.ipython
         ps.xdg
-        ps.supervisor
         ps.flake8
         ps.notmuch
         ps.requests
@@ -384,7 +385,6 @@ in
       # Config file refs (devel)
       MAILCAPS = "${configDir}/mailcap";
       HYPERMAIL_CONFIG = "${configDir}/hmrc";
-      KONIX_SUPERVISORDCONF = "${configDir}/supervisord.conf";
       KONIX_UDISKIE_CONFIG = "${configDir}/udiskie.yml";
       KONIX_DEFAULT_CTAGS_CONFIG = "${configDir}/ctags";
       MERGE_ICS_CONF_FILE = "${configDir}/merge_ics.cfg";

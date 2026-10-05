@@ -253,6 +253,34 @@ prevent."
 Coord requeues the work and re-nudges, rather than waiting out the whole lease."
   (konix/mcp-server--delivery-request 'delete "deliveries" delivery))
 
+(defun konix/mcp-server--coord-report-idle (buffer)
+  "Tell coord BUFFER's turn ended and nothing will go on with it.
+Coord then reminds the buddy of any task it holds open, which is what keeps a
+caller from waiting forever on a worker that stopped without answering — an
+interim followed by an ended turn, typically.  Left to an idle buffer only: one
+an autoresponse is about to restart is not stopped.  Asynchronous, since it
+runs from `turn-complete' and coord being away must not stall the buffer."
+  (when (and (buffer-live-p buffer)
+             (not (konix/mcp-server--working-p buffer)))
+    (when-let* ((name (buffer-local-value 'konix/mcp-server--buddy-name buffer)))
+      (ignore-errors
+        (plz 'post (format "%s/coord/idle/%s"
+                           konix/mcp-server-coord-url
+                           (url-hexify-string name))
+          :then #'ignore :else #'ignore :timeout 5)))))
+
+(defun konix/mcp-server--subscribe-idle-report ()
+  "Report the current agent-shell buffer to coord each time its turn completes.
+Deferred a tick, so whatever `turn-complete' sets off — an autoresponse
+submitting the next prompt — has settled before idleness is judged."
+  (let ((buffer (current-buffer)))
+    (agent-shell-subscribe-to
+     :shell-buffer buffer
+     :event 'turn-complete
+     :on-event (lambda (_event)
+                 (run-with-timer 0 nil #'konix/mcp-server--coord-report-idle
+                                 buffer)))))
+
 (cl-defstruct (konix/mcp-server-coord-view
                (:constructor konix/mcp-server--make-coord-view))
   "Coord's per-buddy state, as one `/coord/overview' request.
@@ -492,6 +520,7 @@ just read it."
                     (copy-sequence agent-shell-mcp-servers)
                     name)
                    name))
+      (konix/mcp-server--subscribe-idle-report)
       (add-hook 'kill-buffer-hook
                 #'konix/mcp-server--unregister-buddy-name nil t)
       (add-hook 'kill-buffer-query-functions

@@ -15,6 +15,8 @@
     ./voyager-disco.nix
   ];
 
+  nixpkgs.overlays = [ (import ./pins-overlay.nix) ];
+
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
@@ -63,6 +65,7 @@
     net-tools # ifconfig, netstat, etc.
     tinc # VPN (configure services.tinc.networks when needed)
     udftools
+    git-annex
     (writeShellScriptBin "konix_tty_is_ssh" (builtins.readFile ./scripts/konix_tty_is_ssh.sh))
   ];
 
@@ -174,6 +177,8 @@
       enable = true;
       userAllowOther = true;
     };
+
+    mosh.enable = true;
 
     # Agents are managed outside NixOS
     ssh.startAgent = false;

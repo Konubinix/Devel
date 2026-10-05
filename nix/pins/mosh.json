@@ -1,0 +1,11 @@
+{
+  "reason": "abseil 20260817 needs C++20, mosh's configure picks gnu++17",
+  "nixpkgs": {
+    "lastModified": 1790149054,
+    "narHash": "sha256-FfjXg6mAzKQBCY+7V9keGWOXG4DV2Eym/qA987lFl8A=",
+    "owner": "NixOS",
+    "repo": "nixpkgs",
+    "rev": "8825bebf6324e0579d012936eff73379af284b6d",
+    "type": "github"
+  }
+}

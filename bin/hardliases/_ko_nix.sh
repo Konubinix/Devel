@@ -23,6 +23,13 @@ function nix_install_binary {
     local stamp="${KONIX_HARDLIASES_STAMP_DIR}/${bin_name}"
     local registry stamped=""
     registry="$(readlink -f /etc/nix/registry.json || true)"
+    local pin
+    pin="$(dirname "${BASH_SOURCE[0]}")/../../nix/pins/${derivation_name}.json"
+    if test "${flake}" = nixpkgs && test -s "${pin}"
+    then
+        flake="github:NixOS/nixpkgs/$(jq -r .nixpkgs.rev "${pin}")"
+        registry="${flake}"
+    fi
     if test -s "${stamp}"
     then
         read -r stamped < "${stamp}" || true

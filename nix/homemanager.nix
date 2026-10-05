@@ -185,7 +185,6 @@ in
       bash-preexec
       mcfly
       mcfly-fzf
-      mosh
       sourceHighlight
 
       # security
@@ -227,7 +226,6 @@ in
       pavucontrol
       pasystray
       ffmpeg
-      git-annex
       # gmpc did not find the correct name so far
 
       # python — wrapped so venvs/pipx can find nix-ld libraries (libstdc++, zlib, …)

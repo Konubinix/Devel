@@ -70,7 +70,7 @@ A lone object, or a string that is not JSON at all, yields a one-element list."
   "Longest bullet a question may carry.")
 
 (defconst konix/agent-shell-workspace-body-max 300
-  "Longest body a question may carry, bullets and link captions together.")
+  "Longest body a question may carry, bullets and place captions together.")
 
 (defconst konix/agent-shell-workspace-lines-max 80
   "Most lines a rendered question may take, code shown included.")
@@ -85,10 +85,11 @@ A lone object, or a string that is not JSON at all, yields a one-element list."
   "Refuse RENDERED, what HEADING comes to, for taking too many lines."
   (let ((lines (1+ (cl-count ?\n rendered))))
     (when (> lines konix/agent-shell-workspace-lines-max)
-      (error "\"%s\" comes to %d lines, max %d — point at fewer places"
-             heading lines konix/agent-shell-workspace-lines-max))))
+      (error "\"%s\" comes to %d lines, max %d. %s Point at fewer places."
+             heading lines konix/agent-shell-workspace-lines-max
+             konix/agent-shell-workspace-limits-said))))
 (defconst konix/agent-shell-workspace-fresh-keyword "TODO"
-  "Keyword a question the writer has not begun opens on.")
+  "Keyword a question the writer has to take up opens on.")
 
 (defconst konix/agent-shell-workspace-refine-keyword "REFINE"
   "Keyword a question waiting on the user's answer opens on.")
@@ -129,12 +130,12 @@ A lone object, or a string that is not JSON at all, yields a one-element list."
         konix/agent-shell-workspace-awaiting-keyword
         konix/agent-shell-workspace-closing-keyword
         konix/agent-shell-workspace-later-keyword)
-  "Keywords a question still open opens on, in the order it walks them.")
+  "Keywords a question still open opens on, in the order the file declares them.")
 
 (defconst konix/agent-shell-workspace-keywords
   (append konix/agent-shell-workspace-open-keywords
           (list konix/agent-shell-workspace-done-keyword))
-  "Keywords a question's heading can open on, the open ones and the closing one.")
+  "Keywords a question's heading can open on, the open ones and the settled one.")
 (defun konix/agent-shell-workspace--keyword-regexp (keywords)
   "Return a regexp matching a question's heading opening on one of KEYWORDS."
   (concat "^\\* \\(" (mapconcat #'identity keywords "\\|") "\\) "))
@@ -171,24 +172,6 @@ depends on its run, `konix/agent-shell-workspace--the-writers-at-point-p' says."
   (konix/agent-shell-workspace--keyword-regexp
    (list konix/agent-shell-workspace-done-keyword))
   "Regexp matching a question the user has settled.")
-(defun konix/agent-shell-workspace--facts-in-view ()
-  "Return the ids of the facts whose words the user has open."
-  (let (found)
-    (save-excursion
-      (goto-char (point-min))
-      (unless (org-at-heading-p)
-        (outline-next-heading))
-      (while (org-at-heading-p)
-        (when-let ((id (and (konix/agent-shell-workspace--fact-at-point-p)
-                            (org-entry-get nil "ID"))))
-          (save-excursion
-            (org-end-of-meta-data t)
-            (when (and (not (eobp))
-                       (not (org-at-heading-p))
-                       (not (invisible-p (point))))
-              (push id found))))
-        (outline-next-heading)))
-    found))
 (defun konix/agent-shell-workspace--cut-if-done ()
   "Cut the writer this workspace talks to, where nothing there is its own."
   (when (buffer-live-p konix/agent-shell-workspace--writer-buffer)
@@ -210,6 +193,25 @@ depends on its run, `konix/agent-shell-workspace--the-writers-at-point-p' says."
      (konix/agent-shell-workspace-focus-question)
      (konix/agent-shell-workspace--cut-if-done)
      (konix/agent-shell-workspace--plan-next-soon)))
+(defun konix/agent-shell-workspace--facts-in-view ()
+  "Return the ids of the facts whose words the user has open."
+  (let (found)
+    (save-excursion
+      (goto-char (point-min))
+      (unless (org-at-heading-p)
+        (outline-next-heading))
+      (while (org-at-heading-p)
+        (when-let ((id (and (konix/agent-shell-workspace--fact-at-point-p)
+                            (org-entry-get nil "ID"))))
+          (save-excursion
+            (org-end-of-meta-data t)
+            (when (and (not (eobp))
+                       (not (org-at-heading-p))
+                       (not (invisible-p (point))))
+              (push id found))))
+        (outline-next-heading)))
+    found))
+
 (defvar-local konix/agent-shell-workspace--reading nil
   "Ids of the facts the user has open, which folding leaves open.")
 
@@ -225,23 +227,22 @@ depends on its run, `konix/agent-shell-workspace--the-writers-at-point-p' says."
   "Face of the keyword a question asking leave to run a command opens on."
   :group 'agent-shell)
 
-(defconst konix/agent-shell-workspace-goal-face-spec
+(defconst konix/agent-shell-workspace-project-face-spec
   '((t :inherit font-lock-constant-face :weight bold :inverse-video t))
-  "What the goal face looks like, set as well as declared.")
+  "What the project face looks like, set as well as declared.")
 
-(defface konix/agent-shell-workspace-goal-face
-  konix/agent-shell-workspace-goal-face-spec
-  "Face of the workspace's goal line."
+(defface konix/agent-shell-workspace-project-face
+  konix/agent-shell-workspace-project-face-spec
+  "Face of the label a project shows ahead of its keyword."
   :group 'agent-shell)
 
-(face-spec-set 'konix/agent-shell-workspace-goal-face
-               konix/agent-shell-workspace-goal-face-spec
+(face-spec-set 'konix/agent-shell-workspace-project-face
+               konix/agent-shell-workspace-project-face-spec
                'face-defface-spec)
 
-(defconst konix/agent-shell-workspace-goal-keywords
-  '(("^#\\+GOAL:.*$" 0 'konix/agent-shell-workspace-goal-face prepend)
-    ("^[ \t]*- goal :: .*$" 0 'bold prepend))
-  "What picks out the workspace's goal line, and a question's goal bullet in bold.")
+(defconst konix/agent-shell-workspace-project-font-lock
+  '(("^[ \t]*- for :: .*$" 0 'bold prepend))
+  "What picks out a question's « for » line, in bold.")
 
 (defconst konix/agent-shell-workspace-keyword-faces
   (list (cons konix/agent-shell-workspace-fresh-keyword
@@ -272,7 +273,7 @@ depends on its run, `konix/agent-shell-workspace--the-writers-at-point-p' says."
                         configured)))
   (org-set-font-lock-defaults)
   (font-lock-refresh-defaults)
-  (font-lock-add-keywords nil konix/agent-shell-workspace-goal-keywords 'append)
+  (font-lock-add-keywords nil konix/agent-shell-workspace-project-font-lock 'append)
   (font-lock-flush))
 (defmacro konix/agent-shell-workspace--read-file (file &rest body)
   "Run BODY in the buffer holding FILE, leaving point where it stood."
@@ -331,8 +332,6 @@ LAST puts it below every other keyword there."
                         (default-value 'org-default-priority)))
   (konix/agent-shell-workspace--ensure-keyword
    "STARTUP" "overview linkpreviews")
-  (when-let ((goal (konix/agent-shell-workspace--keyword "GOAL")))
-    (konix/agent-shell-workspace--ensure-keyword "GOAL" goal t))
   (org-set-regexps-and-options))
 (defun konix/agent-shell-workspace--ensure-session-link (shell)
   "Declare in this buffer the link resuming SHELL, when it has a session to link to."
@@ -365,18 +364,55 @@ One gaining its id is new, made by hand, and says so."
   "Make this buffer a workspace: its keywords said, its headings addressable."
   (konix/agent-shell-workspace--ensure-front-matter)
   (konix/agent-shell-workspace--ensure-ids))
-(defun konix/agent-shell-workspace--forget-goal ()
-  "Take this buffer's GOAL line off, there being none to declare."
-  (save-excursion
-    (goto-char (point-min))
-    (when (re-search-forward "^#\\+GOAL: *.*$" nil t)
-      (delete-region (match-beginning 0) (min (point-max) (1+ (match-end 0)))))))
+(defconst konix/agent-shell-workspace-project-label "PROJECT"
+  "Label a project of the workspace shows ahead of its keyword; no keyword of its own.")
 
-(defun konix/agent-shell-workspace--ensure-goal (goal)
-  "Declare GOAL in this buffer, or take the line off when GOAL is empty."
-  (if (and goal (not (string-empty-p (string-trim goal))))
-      (konix/agent-shell-workspace--ensure-keyword "GOAL" (string-trim goal) t)
-    (konix/agent-shell-workspace--forget-goal)))
+(defconst konix/agent-shell-workspace-project-tag "project"
+  "Tag every project carries, open, put off or settled.")
+
+(defun konix/agent-shell-workspace--project-at-point-p ()
+  "Non-nil when the heading at point is a project, open, put off or settled."
+  (member konix/agent-shell-workspace-project-tag (org-get-tags nil t)))
+
+(defun konix/agent-shell-workspace--next-open-project ()
+  "Move to the next open project after point, neither put off nor settled; nil if none."
+  (let (found)
+    (while (and (not found)
+                (re-search-forward
+                 (format "^\\* .*:%s:" konix/agent-shell-workspace-project-tag) nil t))
+      (let ((state (org-get-todo-state)))
+        (setq found (and state
+                         (not (member state
+                                      (list konix/agent-shell-workspace-later-keyword
+                                            konix/agent-shell-workspace-done-keyword)))))))
+    found))
+
+(defun konix/agent-shell-workspace--projects-here ()
+  "Return the words of every open project of this buffer, in the order they stand."
+  (let (projects)
+    (save-excursion
+      (goto-char (point-min))
+      (while (konix/agent-shell-workspace--next-open-project)
+        (push (string-trim (substring-no-properties (org-get-heading t t t t))) projects)))
+    (nreverse projects)))
+
+(defun konix/agent-shell-workspace--ensure-project (project)
+  "Make PROJECT one of this buffer's projects, ahead of the questions; nothing when empty."
+  (when-let* ((project (and project (string-trim project)))
+              ((not (string-empty-p project)))
+              ((not (member project (konix/agent-shell-workspace--projects-here)))))
+    (save-excursion
+      (goto-char (point-min))
+      (unless (re-search-forward "^\\* " nil t)
+        (goto-char (point-max)))
+      (beginning-of-line)
+      (unless (bolp) (insert "\n"))
+      (insert "* " konix/agent-shell-workspace-fresh-keyword " " project
+              " :" konix/agent-shell-workspace-project-tag ":\n"
+              "  :PROPERTIES:\n  :ID:       " (org-id-new) "\n"
+              "  :" konix/agent-shell-workspace-by-hand-property ":       user\n"
+              (konix/agent-shell-workspace--touched "  ")
+              "  :END:\n"))))
 (defvar-local konix/agent-shell-workspace--file nil
   "Document this agent-shell session writes its questions into.")
 
@@ -428,33 +464,8 @@ One gaining its id is new, made by hand, and says so."
       (error "Cannot tell which session is calling, so nothing is written"))
     (or (konix/agent-shell-workspace-file writer)
         (error "No workspace is bound to this session — ask the user to bind one"))))
-    (defun konix/mcp-server-set-workspace (file)
-      "Bind FILE as the document this session writes its questions into.
-
-MCP Parameters:
-  file - Absolute path of the Org document to work in"
-      (mcp-server-lib-with-error-handling
-       (let ((writer (konix/agent-shell-workspace--writer))
-             (file (expand-file-name (decode-coding-string file 'utf-8))))
-         (unless (buffer-live-p writer)
-           (error "Cannot identify the calling session"))
-         (when (konix/agent-shell-workspace-file writer)
-           (error "This session already has a workspace; ask the user to rebind it"))
-         (unless (string-suffix-p ".org" file)
-           (error "A workspace has to be an Org file"))
-         (setq file (konix/agent-shell-workspace--named-as-one file))
-         (konix/agent-shell-workspace--make-unless-there file)
-         (konix/agent-shell-workspace--write-file file
-           (konix/agent-shell-workspace--ensure-well-formed)
-           (konix/agent-shell-workspace--ensure-session-link writer))
-         (konix/agent-shell-workspace--remember writer file)
-         (with-current-buffer writer
-           (setq-local konix/agent-shell-workspace--briefed t))
-         (konix/agent-shell-workspace-binding-briefing))))
 (defconst konix/agent-shell-workspace-briefing
-  "You are now bound to a workspace. Binding is done: never call
-set_workspace, which is refused you and will only cost you the turn. What this
-implies for you:
+  "You are now bound to a workspace. What this implies for you:
 
 - Nobody reads this chat: the user reads the workspace alone, so whatever you write
   here is lost. Put your questions there. One heading per question, each ending in a
@@ -462,9 +473,10 @@ implies for you:
 - What only tells them something is a fact, never a question with a mark tacked on.
   Write it with set_workspace_fact, passing about with the id of the question it
   reports on, so that question links to it.
-- Write them one at a time with set_workspace_question. A question you have just made
+- Write a question with set_workspace_question, or several with their order at once
+  with set_workspace_plan. A question you have just made
   comes back to the user: you cannot make one and take it up yourself.
-- A body is bullets in intention :: text form, 120 characters each and 300 per
+- A body is bullets in intention :: text form, %d characters each and %d per
   question. Past that the call is refused, so say less rather than shorter.
 "
   "What a writer is told about writing, bound to a workspace.")
@@ -473,15 +485,16 @@ implies for you:
   new question, so pass the id whenever you mean to rewrite one.
 - Read %s rather than assuming how far the user has got.
 - Each comes back saying where it stands: yours, held, awaiting, asked, permission,
-  finished, settled or later. Only the first two are ones you may act on.
+  finished, settled or later. Only the first two are ones you may act on. A heading
+  marked project is the user's alone: no act of yours reaches it.
 - When the one you hold waits on a long run of yours, a test suite say, await it,
   passing the run as command, or as on the id of a question already awaiting that
   run, and take up another meanwhile. Once the run ends it is yours again, a line
   under it saying how the run went.
 - A command needing root is awaited the same way with root true, never with sudo:
   it waits on the user's leave, and they give the password. No other way runs as root.
-- A priority may follow it, [#A] the highest. Weigh it when you choose which to take
-  up; nothing refuses you a lower one, and you never write a priority yourself.
+- A priority may follow it, [#A] the highest. You are shown, and may take up, only
+  your highest-standing ones; you never write a priority yourself.
 - later is one the user has put off. No act of yours reaches it: leave it where it
   stands, and work on something else.
 - When the user answers, the question comes back to you on its own. That is your
@@ -498,8 +511,8 @@ implies for you:
 - A place is a link, never directions. Pass file and line and the tool writes the link;
   a path spelled out in prose, or « look under x/y », is something they will not follow.
 - close it once the work is done and only their agreement is left. That is how a
-  question ends, and it is the act you will forget: refine hands the work back to
-  you, close hands them the finished thing.
+  question ends, and it is the act you will forget: refine asks them, and hands it
+  back to you once they answer; close hands them the finished thing.
 - a question whose last word from them asks you something is not done once you
   answer it: the answer hands it back, so refine it.
 - refine as soon as what the one you hold asks is unclear, and do not hesitate: a
@@ -521,37 +534,72 @@ implies for you:
   workspace in hand. Never wait inside Emacs, which would stop it reading their keys.
 - Never read the workspace file yourself; %s gives you everything in it."
   "What a writer is told about what is left to the user and to its turn.")
-(defconst konix/agent-shell-workspace-goal-said
-  (concat "Our goal: %s"
-          "\n\nWhatever you and the user do must get closer to reaching that goal."
+(defconst konix/agent-shell-workspace-project-said
+  (concat "Our projects: %s"
+          "\n\nWhatever you and the user do must get them closer to done."
           " In case of doubt, ask the user with set_workspace_question.")
-  "What a writer is told about the goal, its own goal filled in.")
+  "What a writer is told about the projects, the ones that concern it filled in.")
 
-(defun konix/agent-shell-workspace-binding-briefing (&optional goal)
-  "Return what a writer is told when it is bound to a workspace, to work on GOAL."
+(defun konix/agent-shell-workspace-binding-briefing (&optional project)
+  "Return what a writer is told when it is bound to a workspace.
+PROJECT is the open projects it works toward, said as one line."
   (let ((listing (concat konix/mcp-server-read-only-prefix
                          "list_workspace_questions"))
         (acting "set_workspace_state"))
-    (concat konix/agent-shell-workspace-briefing
+    (concat (format konix/agent-shell-workspace-briefing
+                    konix/agent-shell-workspace-bullet-max
+                    konix/agent-shell-workspace-body-max)
             (format konix/agent-shell-workspace-briefing-reading listing listing)
             (format konix/agent-shell-workspace-briefing-acts acting)
             (format konix/agent-shell-workspace-briefing-rest listing)
-            (when (and goal (not (string-empty-p (string-trim goal))))
+            (when (and project (not (string-empty-p (string-trim project))))
               (concat "\n\n"
-                      (format konix/agent-shell-workspace-goal-said
-                              (string-trim goal)))))))
-(defun konix/agent-shell-workspace--goal-in (file)
-  "Return the goal the workspace FILE declares, or nil."
+                      (format konix/agent-shell-workspace-project-said
+                              (string-trim project)))))))
+(defun konix/agent-shell-workspace--projects-in (file)
+  "Return the open projects the workspace FILE has, as one line, or nil."
   (when (and file (file-readable-p file))
     (konix/agent-shell-workspace--read-file file
-      (let ((goal (konix/agent-shell-workspace--keyword "GOAL")))
-        (unless (or (null goal) (string-empty-p (string-trim goal)))
-          (string-trim goal))))))
+      (when-let ((projects (konix/agent-shell-workspace--projects-here)))
+        (mapconcat (lambda (project) (format "« %s »" project)) projects " ; ")))))
 
-(defun konix/agent-shell-workspace--goal-line (file)
-  "Return the workspace FILE's goal as a line to put ahead of something, or empty."
-  (if-let ((goal (konix/agent-shell-workspace--goal-in file)))
-      (concat (format konix/agent-shell-workspace-goal-said goal) "\n\n")
+(defun konix/agent-shell-workspace--held-projects-in (file)
+  "Return the open projects the question held in FILE is for, as one line, or nil."
+  (when (and file (file-readable-p file))
+    (konix/agent-shell-workspace--read-file file
+      (save-excursion
+        (goto-char (point-min))
+        (when (let (held)
+                (while (and (not held)
+                            (konix/agent-shell-workspace--search-state
+                             (konix/agent-shell-workspace--keyword-regexp
+                              (list konix/agent-shell-workspace-working-keyword))))
+                  (setq held (not (konix/agent-shell-workspace--project-at-point-p))))
+                held)
+          (let ((limit (konix/agent-shell-workspace--question-end))
+                (open (konix/agent-shell-workspace--projects-here))
+                projects)
+            (while (re-search-forward
+                    (konix/agent-shell-workspace--said-line-regexp
+                     konix/agent-shell-workspace-for-said)
+                    limit t)
+              (let ((words (save-excursion
+                             (when (konix/agent-shell-workspace--goto-id
+                                    (match-string-no-properties 1))
+                               (string-trim (substring-no-properties
+                                             (org-get-heading t t t t)))))))
+                (when (member words open)
+                  (push words projects))))
+            (when projects
+              (mapconcat (lambda (project) (format "« %s »" project))
+                         (nreverse projects) " ; "))))))))
+
+(defun konix/agent-shell-workspace--project-line (file)
+  "Return the workspace FILE's projects as a line to put ahead of something, or empty.
+Where the writer holds a question, the projects it is for; else every open one."
+  (if-let ((project (or (konix/agent-shell-workspace--held-projects-in file)
+                     (konix/agent-shell-workspace--projects-in file))))
+      (concat (format konix/agent-shell-workspace-project-said project) "\n\n")
     ""))
 (defconst konix/agent-shell-workspace-pressing-said
   (concat "\n\nThe user has marked « %s » [#%s], the highest standing there:"
@@ -561,11 +609,12 @@ implies for you:
 (defun konix/agent-shell-workspace--the-pressing-one (file)
   "Return what FILE says of the priority its questions carry, or nothing."
   (konix/agent-shell-workspace--read-file file
-    (let (best)
+    (let ((questions (konix/agent-shell-workspace--every-question))
+          best)
       (goto-char (point-min))
       (while (konix/agent-shell-workspace--search-state
               konix/agent-shell-workspace-writers-regexp)
-        (when-let* (((konix/agent-shell-workspace--the-writers-at-point-p))
+        (when-let* (((konix/agent-shell-workspace--free-to-take-at-point-p questions))
                     (priority (org-element-property
                                :priority (org-element-at-point)))
                     (higher (or (null best) (< priority (car best)))))
@@ -580,11 +629,11 @@ implies for you:
   "What a nudge ends on, the writer's prose going nowhere.")
 
 (defun konix/agent-shell-workspace--nudge (writer)
-  "Return what WRITER is told, the goal and the workspace's headings with it."
+  "Return what WRITER is told, the projects and the workspace's headings with it."
   (if-let ((file (konix/agent-shell-workspace-file writer))
            (readable (file-readable-p file)))
       (let ((left (konix/agent-shell-workspace--listing file t)))
-        (concat (konix/agent-shell-workspace--goal-line file)
+        (concat (konix/agent-shell-workspace--project-line file)
                 (if left
                     (concat "There is something for you in the workspace:\n\n"
                             left
@@ -593,9 +642,11 @@ implies for you:
                            " write, never work to do."
                            (konix/agent-shell-workspace--the-pressing-one file)
                            konix/agent-shell-workspace-unread-said)
-                  (concat "Nothing in the workspace is yours, so there is nothing to"
-                          " do here. Do not invent a question to have something to"
-                          " do."))))
+                  (if (konix/agent-shell-workspace--plan-owed-p file)
+                      (konix/agent-shell-workspace--plan-next-text file)
+                    (concat "Nothing in the workspace is yours, so there is nothing to"
+                            " do here. Do not invent a question to have something to"
+                            " do.")))))
     "There is something for you in the workspace. Read it back and take it up."))
  (defvar-local konix/agent-shell-workspace--briefed nil
    "Non-nil once this writer has been told what a workspace of its is.")
@@ -608,13 +659,14 @@ A writer bound to nothing is owed none."
          text
        (setq-local konix/agent-shell-workspace--briefed t)
        (concat (konix/agent-shell-workspace-binding-briefing
-                (konix/agent-shell-workspace--goal-in file))
+                (konix/agent-shell-workspace--projects-in file))
                "\n\n" text))))
 (defun konix/agent-shell-workspace--say-now (writer text)
   "Say TEXT to WRITER, whose turn is over."
   (agent-shell--insert-to-shell-buffer
    :shell-buffer writer :text text :submit t :no-focus t)
   t)
+
 (defun konix/agent-shell-workspace--refuse-telling (writer text)
   "Put the steering on WRITER again, and refuse telling it TEXT where it may not be."
   (ignore-errors (konix/agent-shell-workspace--install-steering writer))
@@ -666,7 +718,7 @@ make way for it."
                                         "cancelled"))))
                (konix/agent-shell-workspace--say-now writer text)))))))
 (defun konix/agent-shell-workspace--anything-left-p ()
-  "Non-nil when this buffer holds work of the writer's own it can take up."
+  "Non-nil when this buffer holds a question of the writer's own it can take up."
   (let ((questions (konix/agent-shell-workspace--every-question)))
     (seq-some
      (lambda (one)
@@ -705,13 +757,13 @@ make way for it."
                      :shell-buffer writer :existing-only t)))
     (tracking-remove-buffer shown)))
 
-(defun konix/agent-shell-workspace--nothing-here-for-the-user-p ()
+(defun konix/agent-shell-workspace--nothing-left-for-the-writer-p ()
   "Non-nil when this session's own workspace leaves it nothing to do."
   (when-let ((file (konix/agent-shell-workspace-file (current-buffer))))
     (konix/agent-shell-workspace--writer-done-p file)))
 
 (add-hook 'konix/agent-shell-track-ready-skip-functions
-          #'konix/agent-shell-workspace--nothing-here-for-the-user-p)
+          #'konix/agent-shell-workspace--nothing-left-for-the-writer-p)
 (defface konix/agent-shell-workspace-nothing-left-face
   '((t :inherit shadow :weight bold))
   "Face the badge of a session whose workspace leaves it nothing wears."
@@ -760,14 +812,14 @@ make way for it."
   "Return the face for this session's badge, its workspace leaving it nothing.
 One asking the user something, one whose questions are held back, or one with a
 run going that will give it work as it ends, wears a face of its own."
-  (when (konix/agent-shell-workspace--nothing-here-for-the-user-p)
+  (when (konix/agent-shell-workspace--nothing-left-for-the-writer-p)
     (cond
+     ((konix/agent-shell-workspace--run-going-here-p)
+      'konix/agent-shell-workspace-run-going-face)
      ((konix/agent-shell-workspace--asking-for-p)
       'konix/agent-shell-workspace-asking-face)
      ((konix/agent-shell-workspace--held-back-p)
       'konix/agent-shell-workspace-held-back-face)
-     ((konix/agent-shell-workspace--run-going-here-p)
-      'konix/agent-shell-workspace-run-going-face)
      (t 'konix/agent-shell-workspace-nothing-left-face))))
 
 (add-hook 'konix/mcp-server-status-face-functions
@@ -794,20 +846,96 @@ run going that will give it work as it ends, wears a face of its own."
               ((file-readable-p file))
               ((konix/agent-shell-workspace--listing file t)))
     (ignore-errors (konix/agent-shell-workspace--submit writer))))
+(defconst konix/agent-shell-workspace-nudge-first-wait 60
+  "Seconds a writer the steering stops again waits to be set going, nothing changed.")
+
+(defconst konix/agent-shell-workspace-nudge-last-wait 3600
+  "Seconds no telling waits longer than.")
+
+(defconst konix/agent-shell-workspace-nudge-priorities '("low" "default" "high" "urgent")
+  "The notices a writer told again and again gives the user, the quietest first.")
+
+(defvar-local konix/agent-shell-workspace--nudges 0
+  "How many tellings in a row found the workspace as the one before left it.")
+
+(defvar-local konix/agent-shell-workspace--nudged-stamp nil
+  "When the workspace file had last changed, at this writer's last telling.")
+
+(defvar-local konix/agent-shell-workspace--nudge-timer nil
+  "The telling this writer waits for, or nil.")
+
+(defun konix/agent-shell-workspace--notify (priority message)
+  "Notify the user of MESSAGE at PRIORITY."
+  (ignore-errors
+    (start-process "clk-ntfy" nil "clk" "ntfy" "--priority" priority message)))
+
+(defun konix/agent-shell-workspace--tell-to-go-on (writer)
+  "Tell WRITER to carry on and to plan, whichever it owes."
+  (when (buffer-live-p writer)
+    (konix/agent-shell-workspace--push-on writer)
+    (konix/agent-shell-workspace--plan-next writer)))
+
+(defun konix/agent-shell-workspace--go-on (writer)
+  "Set WRITER, which the steering stopped, going now, or later if nothing changed since."
+  (when-let* ((file (konix/agent-shell-workspace-file writer))
+              ((file-readable-p file))
+              ((or (konix/agent-shell-workspace--listing file t)
+                   (konix/agent-shell-workspace--plan-owed-p file))))
+    (with-current-buffer writer
+      (let ((stamp (file-attribute-modification-time (file-attributes file))))
+        (setq-local konix/agent-shell-workspace--nudges
+                    (if (equal stamp konix/agent-shell-workspace--nudged-stamp)
+                        (1+ konix/agent-shell-workspace--nudges)
+                      0))
+        (setq-local konix/agent-shell-workspace--nudged-stamp stamp))
+      (when (timerp konix/agent-shell-workspace--nudge-timer)
+        (cancel-timer konix/agent-shell-workspace--nudge-timer))
+      (let ((again konix/agent-shell-workspace--nudges))
+        (if (zerop again)
+            (konix/agent-shell-workspace--tell-to-go-on writer)
+          (let ((wait (min konix/agent-shell-workspace-nudge-last-wait
+                           (* konix/agent-shell-workspace-nudge-first-wait
+                              (expt 2 (1- again))))))
+            (konix/agent-shell-workspace--notify
+             (nth (min (1- again)
+                       (1- (length konix/agent-shell-workspace-nudge-priorities)))
+                  konix/agent-shell-workspace-nudge-priorities)
+             (format "%s was stopped by its steering again; set going in %d minutes"
+                     (buffer-name writer) (/ wait 60)))
+            (setq-local konix/agent-shell-workspace--nudge-timer
+                        (run-at-time wait nil
+                                     #'konix/agent-shell-workspace--tell-to-go-on
+                                     writer))))))))
+
+(defun konix/agent-shell-workspace--steered-back (writer)
+  "Set WRITER, which the steering stopped, going: at once, or later if nothing changed."
+  (run-at-time 0 nil
+               (lambda ()
+                 (when (buffer-live-p writer)
+                   (konix/agent-shell-workspace--go-on writer)))))
+
 (defun konix/agent-shell-workspace--turn-ended (event)
-  "Say on EVENT what a cut turn was, or push a writer that stopped with work left."
+  "Say on EVENT what a cut turn was, or tell a writer that stopped to go on."
+  (let ((steered (and (bound-and-true-p konix/agent-shell-steering--cap-stopped)
+                      (konix/agent-shell-workspace-file (current-buffer)))))
+    (when steered
+      (konix/agent-shell-workspace--steered-back (current-buffer)))
+    (konix/agent-shell-workspace--turn-ended-as-ever event steered)))
+
+(defun konix/agent-shell-workspace--turn-ended-as-ever (event steered)
+  "Do what every end of turn EVENT does, telling the writer to go on unless STEERED."
   (konix/agent-shell-workspace--say-cut event)
   (setq-local konix/agent-shell-workspace--cut nil)
   (setq-local konix/agent-shell-workspace--taking-up nil)
-  (when (konix/agent-shell-workspace--nothing-here-for-the-user-p)
+  (when (konix/agent-shell-workspace--nothing-left-for-the-writer-p)
     (konix/agent-shell-workspace--leave-the-round (current-buffer)))
   (when-let* ((file (konix/agent-shell-workspace-file (current-buffer)))
               (workspace (find-buffer-visiting file)))
     (with-current-buffer workspace
       (konix/agent-shell-workspace--tracked-or-not workspace t)))
-  (when (equal (map-elt (map-elt event :data) :stop-reason) "end_turn")
-    (konix/agent-shell-workspace--push-on (current-buffer))
-    (konix/agent-shell-workspace--plan-next (current-buffer))))
+  (when (and (not steered)
+             (equal (map-elt (map-elt event :data) :stop-reason) "end_turn"))
+    (konix/agent-shell-workspace--tell-to-go-on (current-buffer))))
 
 (defvar-local konix/agent-shell-workspace--watching nil
   "Non-nil once this shell is listening for the end of its turns.")
@@ -826,26 +954,56 @@ run going that will give it work as it ends, wears a face of its own."
 
 (add-hook 'agent-shell-mode-hook #'konix/agent-shell-workspace--watch-turns)
 (defconst konix/agent-shell-workspace-plan-next-said
-  (concat "Nothing is in motion toward the goal, « %s ». Make a plan: call"
-          " set_workspace_plan with the next steps toward it. If you hold the goal"
-          " reached, call workspace_goal_reached instead, saying why. Nothing else is"
-          " allowed you until you have done one of the two.")
+  (concat "Nothing is in motion toward the project « %s », %s. Make a plan: call"
+          " set_workspace_plan with the next steps toward it, each naming that project."
+          " If you hold it done, call workspace_project_done instead, saying why."
+          " This is told you again whenever you are idle, until you have done one of"
+          " the two.")
   "What a writer owed a plan is told, and told again while it owes it.")
 
-(defun konix/agent-shell-workspace--plan-owed-p (file)
-  "Non-nil when FILE names a goal and has nothing in motion toward it."
-  (and (konix/agent-shell-workspace--goal-in file)
-       (konix/agent-shell-workspace--read-file file
-         (konix/agent-shell-workspace--all-settled-p))))
-
-(defun konix/agent-shell-workspace--all-settled-p ()
-  "Non-nil when every question of this buffer is settled or put off, or it holds none."
+(defun konix/agent-shell-workspace--in-motion-for-p (project)
+  "Non-nil when a question of this buffer for PROJECT is neither settled nor put off."
   (save-excursion
     (goto-char (point-min))
-    (not (konix/agent-shell-workspace--search-state
-          (konix/agent-shell-workspace--keyword-regexp
-           (remove konix/agent-shell-workspace-later-keyword
-                   konix/agent-shell-workspace-open-keywords))))))
+    (let (found)
+      (while (and (not found)
+                  (re-search-forward
+                   (konix/agent-shell-workspace--said-line-regexp
+                    konix/agent-shell-workspace-for-said project)
+                   nil t))
+        (save-excursion
+          (konix/agent-shell-workspace--goto-question)
+          (setq found (member (org-get-todo-state)
+                              (remove konix/agent-shell-workspace-later-keyword
+                                      konix/agent-shell-workspace-open-keywords)))))
+      found)))
+
+(defun konix/agent-shell-workspace--starving-project ()
+  "Return (ID . WORDS) of the first open project of this buffer nothing moves, or nil."
+  (save-excursion
+    (goto-char (point-min))
+    (let ((questions (konix/agent-shell-workspace--every-question))
+          starving)
+      (while (and (not starving)
+                  (konix/agent-shell-workspace--next-open-project))
+        (let ((id (org-entry-get (point) "ID")))
+          (unless (or (konix/agent-shell-workspace--in-motion-for-p id)
+                      (konix/agent-shell-workspace--holding-back id questions))
+            (setq starving
+                  (cons id (string-trim (substring-no-properties
+                                         (org-get-heading t t t t))))))))
+      starving)))
+
+(defun konix/agent-shell-workspace--plan-owed-p (file)
+  "Return (ID . WORDS) of the project of FILE owed a plan, or nil."
+  (when (and file (file-readable-p file))
+    (konix/agent-shell-workspace--read-file file
+      (konix/agent-shell-workspace--starving-project))))
+
+(defun konix/agent-shell-workspace--plan-next-text (file)
+  "Return what the writer of FILE is told to plan, or nil where nothing is owed."
+  (when-let ((project (konix/agent-shell-workspace--plan-owed-p file)))
+    (format konix/agent-shell-workspace-plan-next-said (cdr project) (car project))))
 (defun konix/agent-shell-workspace--plan-next (writer)
   "Tell WRITER to make a plan, where its workspace owes one and it is idle."
   (when-let* ((file (konix/agent-shell-workspace-file writer))
@@ -853,8 +1011,7 @@ run going that will give it work as it ends, wears a face of its own."
               ((not (with-current-buffer writer (shell-maker-busy)))))
     (ignore-errors
       (konix/agent-shell-workspace--submit
-       writer (format konix/agent-shell-workspace-plan-next-said
-                      (konix/agent-shell-workspace--goal-in file))))))
+       writer (konix/agent-shell-workspace--plan-next-text file)))))
 
 (defun konix/agent-shell-workspace--plan-next-soon ()
   "In a workspace, tell its idle writer to plan, once what the user is doing is done."
@@ -865,34 +1022,43 @@ run going that will give it work as it ends, wears a face of its own."
 
 (add-hook 'org-after-todo-state-change-hook
           #'konix/agent-shell-workspace--plan-next-soon)
-    (defun konix/mcp-server-workspace-goal-reached (why)
-      "Ask the user whether the workspace's goal is reached, WHY being the writer's say.
+    (defconst konix/agent-shell-workspace-project-check-property "PROJECT-CHECK"
+      "Property naming the project a question asks the user to say done.")
+
+    (defun konix/mcp-server-workspace-project-done (why)
+      "Ask the user whether the project owed a plan is done, WHY being the writer's say.
 
 MCP Parameters:
-  why - JSON array of « intention :: text » bullets: what makes the goal reached"
+  why - JSON array of « intention :: text » bullets: what makes the project done"
       (mcp-server-lib-with-error-handling
-       (let ((file (konix/agent-shell-workspace--file-or-error)))
-         (unless (konix/agent-shell-workspace--goal-in file)
-           (error "This workspace names no goal"))
-         (konix/mcp-server-set-workspace-question "Is our goal reached?" why)
+       (let* ((file (konix/agent-shell-workspace--file-or-error))
+              (project (or (konix/agent-shell-workspace--plan-owed-p file)
+                        (error "No project is owed a plan, so none is to be said done"))))
+         (konix/mcp-server-set-workspace-question
+          (format "Is the project « %s » done?" (cdr project))
+          why nil nil nil nil nil nil nil nil (car project))
          (let ((id (konix/agent-shell-workspace--last-question-id file)))
            (konix/agent-shell-workspace--edit
             (lambda ()
               (konix/agent-shell-workspace--goto-id id)
-              (org-entry-put (point) "GOAL-CHECK" "t"))))
+              (org-entry-put (point) konix/agent-shell-workspace-project-check-property
+                             (car project)))))
          "Put to the user; stop there.")))
 
-    (defun konix/agent-shell-workspace--goal-agreed (id)
-      "Where the question ID asks whether the goal is reached, drop it and the goal.
+    (defun konix/agent-shell-workspace--project-agreed (id)
+      "Where the question ID asks whether a project is done, drop it and settle that project.
     Return non-nil where it did."
       (save-excursion
-        (when (and id (konix/agent-shell-workspace--goto-id id)
-                   (org-entry-get (point) "GOAL-CHECK"))
+        (when-let* ((id)
+                    ((konix/agent-shell-workspace--goto-id id))
+                    (project (org-entry-get
+                              (point) konix/agent-shell-workspace-project-check-property)))
           (konix/agent-shell-workspace--write
             (konix/agent-shell-workspace--goto-id id)
             (delete-region (point) (konix/agent-shell-workspace--question-end))
-            (konix/agent-shell-workspace--ensure-goal ""))
-          (message "The goal is reached, and gone with its question")
+            (when (konix/agent-shell-workspace--goto-id project)
+              (org-todo konix/agent-shell-workspace-done-keyword)))
+          (message "The project is done, settled with its question gone")
           t)))
 (defun konix/agent-shell-workspace-see-to-the-writer ()
   "Do to this session's writer what the end of a turn does: steer, cut, or push it."
@@ -909,9 +1075,7 @@ MCP Parameters:
         (progn
           (konix/agent-shell-workspace--cut-short writer)
           (message "Nothing is %s's any more" (buffer-name writer)))
-      (if (konix/agent-shell-workspace--plan-owed-p file)
-          (konix/agent-shell-workspace--plan-next writer)
-        (konix/agent-shell-workspace--push-on writer))
+      (konix/agent-shell-workspace--tell-to-go-on writer)
       (message "%s was told to carry on" (buffer-name writer)))))
 (defun konix/agent-shell-workspace--ids-linked-from (start limit)
   "Return the ids linked from between START and LIMIT."
@@ -990,10 +1154,6 @@ MCP Parameters:
 (defconst konix/agent-shell-workspace-taken-up-key "@workspace-nothing-taken-up"
   "Steering key holding back a writer that holds no question.")
 
-(defun konix/agent-shell-workspace--only-thinking-p (subject)
-  "Non-nil when SUBJECT is the session thinking rather than working."
-  (equal (map-elt subject :kind) "think"))
-
 (defconst konix/agent-shell-workspace-schema-tool "ToolSearch"
   "Tool a session fetches another tool's own schema with.")
 
@@ -1005,7 +1165,7 @@ MCP Parameters:
           (concat server "set_workspace_state")
           (concat server "set_workspace_question")
           (concat server "set_workspace_plan")
-          (concat server "workspace_goal_reached")
+          (concat server "workspace_project_done")
           (concat server "delete_workspace_question")
           konix/agent-shell-workspace-schema-tool
           "mcp__konix-coord__coord_get_messages"
@@ -1015,9 +1175,8 @@ MCP Parameters:
 (defconst konix/agent-shell-workspace-taken-up-guidance
   (concat "Take a question up before you work on anything, and then act. If this"
           " refusal arrived in the middle of a turn, you hold none: either you put"
-          " yours down, or the user took it away underneath you. A workspace is"
-          " already bound, so set_workspace is not the way on and calling it again"
-          " only costs you the turn. The one you take up is the only thing you work"
+          " yours down, or the user took it away underneath you. The one you take up"
+          " is the only thing you work"
           " on: whatever else you notice is a question to write, not work to do. And a"
           " place is a link you pass file and line for, never directions in prose.")
   "What a writer is told when it works while holding no question.")
@@ -1026,16 +1185,26 @@ MCP Parameters:
   "Return what a writer holding no question is told, naming what in FILE is left to it."
   (let ((left (when (and file (file-readable-p file))
                 (konix/agent-shell-workspace--listing file t))))
-    (if (and file (konix/agent-shell-workspace--plan-owed-p file))
-        (format konix/agent-shell-workspace-plan-next-said
-                (konix/agent-shell-workspace--goal-in file))
-    (concat konix/agent-shell-workspace-taken-up-guidance
-            (if left
-                (concat "\n\nWhat is left to you:\n" left)
-              (concat "\n\nNothing there is yours to take, so there is nothing to do"
-                      " and this turn is being cut short for you. Do not invent a"
-                      " question to have something to do — only what the user has just"
-                      " told you belongs there."))))))
+    (cond
+     ((and file (konix/agent-shell-workspace--plan-owed-p file))
+      (konix/agent-shell-workspace--plan-next-text file))
+     (left
+      (concat konix/agent-shell-workspace-taken-up-guidance
+              "\n\nWhat is left to you:\n" left))
+     (t
+      (concat "Nothing there is yours to take, so there is nothing to do"
+              " and this turn is being cut short for you. Do not invent a"
+              " question to have something to do — only what the user has just"
+              " told you belongs there.")))))
+(defun konix/agent-shell-workspace--own-tool-p (subject)
+  "Non-nil when SUBJECT is a call to one of the workspace's own tools."
+  (string-prefix-p (format "mcp__%s__" konix/agent-shell-workspace-server-name)
+                   (or (map-elt subject :title) "")))
+
+(defun konix/agent-shell-workspace--only-thinking-p (subject)
+  "Non-nil when SUBJECT is the session thinking rather than working."
+  (equal (map-elt subject :kind) "think"))
+
 (defun konix/agent-shell-workspace--nothing-taken-up-p (file)
   "Non-nil when FILE holds no question the writer has taken up."
   (and (file-readable-p file)
@@ -1076,11 +1245,6 @@ MCP Parameters:
           " back with the tool instead.")
   "What a writer is told when it goes for the workspace file itself.")
 
-(defun konix/agent-shell-workspace--own-tool-p (subject)
-  "Non-nil when SUBJECT is a call to one of the workspace's own tools."
-  (string-prefix-p (format "mcp__%s__" konix/agent-shell-workspace-server-name)
-                   (or (map-elt subject :title) "")))
-
 (konix/agent-shell-define-tool-evaluator "workspace-read-directly" (subject)
   "Hold back a call reading the bound workspace file rather than asking for it."
   (and (map-elt subject :title)
@@ -1112,17 +1276,36 @@ A dot or a filler says nothing, so it is no talking."
 (defconst konix/agent-shell-workspace-bound-guidance
   "Shut up and work, I won't read what you write."
   "What a writer is told when it writes prose while a workspace is bound.")
+(defconst konix/agent-shell-workspace-background-key "@background"
+  "The user's own steering key against running a command in the background.")
+
+(defconst konix/agent-shell-workspace-background-guidance
+  (concat "Await it if needed: set_workspace_state with act await, passing the"
+          " command, rather than running it in the background.")
+  "What a bound writer is told instead when it runs a command in the background.")
+
+(defconst konix/agent-shell-workspace-coord-sleep-key "@workspace-coord-sleep"
+  "Steering key holding back a bound writer sleeping through the coordination tools.")
+
+(defconst konix/agent-shell-workspace-coord-sleep-guidance
+  (concat "Do not sleep: await instead, with set_workspace_state, act await, passing"
+          " a command that ends when what you wait for holds, and take up another"
+          " meanwhile.")
+  "What a bound writer is told when it reaches for the coordination tools' sleep.")
+
+(konix/agent-shell-define-tool-evaluator "workspace-coord-sleep" (subject)
+  "Match a bound writer calling the coordination tools' sleep."
+  (and (equal (map-elt subject :title) "mcp__konix-coord__coord_sleep")
+       (konix/agent-shell-workspace-file (current-buffer))
+       t))
+
 (defconst konix/agent-shell-workspace-steering-keys
   (list konix/agent-shell-workspace-bound-key
         konix/agent-shell-workspace-taken-up-key
-        konix/agent-shell-workspace-read-directly-key)
+        konix/agent-shell-workspace-read-directly-key
+        konix/agent-shell-workspace-background-key
+        konix/agent-shell-workspace-coord-sleep-key)
   "Steering keys the workspace installs on a bound session.")
-(defun konix/agent-shell-workspace--left-said (file)
-  "Return what FILE leaves the writer, as a paragraph to end a telling on, or empty."
-  (if-let* ((left (and file (file-readable-p file)
-                       (konix/agent-shell-workspace--listing file t))))
-      (concat "\n\nWhat is left to you:\n" left)
-    ""))
 (defconst konix/agent-shell-workspace-steering-guidance
   (list
    (cons konix/agent-shell-workspace-bound-key
@@ -1130,26 +1313,28 @@ A dot or a filler says nothing, so it is no talking."
    (cons konix/agent-shell-workspace-taken-up-key
          konix/agent-shell-workspace-taken-up-guidance)
    (cons konix/agent-shell-workspace-read-directly-key
-         konix/agent-shell-workspace-read-directly-guidance))
+         konix/agent-shell-workspace-read-directly-guidance)
+   (cons konix/agent-shell-workspace-background-key
+         konix/agent-shell-workspace-background-guidance)
+   (cons konix/agent-shell-workspace-coord-sleep-key
+         konix/agent-shell-workspace-coord-sleep-guidance))
   "What a writer is steered with, per key.")
 
 (defun konix/agent-shell-workspace--steering-guidance (shell)
-  "Return what SHELL is steered with, the workspace's goal after each."
+  "Return what SHELL is steered with, the workspace's projects after each."
   (let* ((file (konix/agent-shell-workspace-file shell))
-         (goal (string-trim (if file (konix/agent-shell-workspace--goal-line file) "")))
+         (project (string-trim (if file (konix/agent-shell-workspace--project-line file) "")))
          (said konix/agent-shell-workspace-steering-guidance))
     (append
      (mapcar
       (lambda (entry)
         (cons (car entry)
-              (concat (cond
-                       ((equal (car entry) konix/agent-shell-workspace-taken-up-key)
-                        (konix/agent-shell-workspace--taken-up-said file))
-                       ((equal (car entry) konix/agent-shell-workspace-bound-key)
-                        (concat (cdr entry)
-                                (konix/agent-shell-workspace--left-said file)))
-                       (t (cdr entry)))
-                      (unless (string-empty-p goal) (concat "\n\n" goal)))))
+              (if (equal (car entry) konix/agent-shell-workspace-bound-key)
+                  (cdr entry)
+                (concat (if (equal (car entry) konix/agent-shell-workspace-taken-up-key)
+                            (konix/agent-shell-workspace--taken-up-said file)
+                          (cdr entry))
+                        (unless (string-empty-p project) (concat "\n\n" project))))))
       said)
      (konix/agent-shell-workspace--its-own-steering file))))
 (defvar-local konix/agent-shell-workspace--its-own-keys nil
@@ -1203,6 +1388,12 @@ A dot or a filler says nothing, so it is no talking."
                 " root true and the command without sudo; the user gives the password."))
   "The blacklist rule every bound session carries, pointing root runs to await.")
 
+(defun konix/agent-shell-workspace--refuse-the-sudo-key (line)
+  "Refuse LINE, a workspace rule, where it names the sudo rule's key."
+  (when (and line (string-prefix-p (car konix/agent-shell-workspace-sudo-rule)
+                                   (string-trim line)))
+    (user-error "Every bound session refuses sudo; a workspace cannot change that")))
+
 (defun konix/agent-shell-workspace--install-its-own (shell)
   "Put, silently, the whitelist and blacklist SHELL's workspace names itself on it."
   (when-let ((file (konix/agent-shell-workspace-file shell)))
@@ -1213,10 +1404,14 @@ A dot or a filler says nothing, so it is no talking."
          (car konix/agent-shell-workspace-sudo-rule)
          (cdr konix/agent-shell-workspace-sudo-rule)))
       (dolist (one (konix/agent-shell-workspace--declared file "WHITELIST"))
-        (ignore-errors
-          (konix/agent-shell-policy--set-session
-           konix/agent-shell--whitelist (car one) (cdr one))))
-      (dolist (one (konix/agent-shell-workspace--declared file "BLACKLIST"))
+        (unless (equal (car one) (car konix/agent-shell-workspace-sudo-rule))
+          (ignore-errors
+            (konix/agent-shell-policy--set-session
+             konix/agent-shell--whitelist (car one) (cdr one)))))
+      (dolist (one (seq-remove
+                    (lambda (one)
+                      (equal (car one) (car konix/agent-shell-workspace-sudo-rule)))
+                    (konix/agent-shell-workspace--declared file "BLACKLIST")))
         (ignore-errors
           (konix/agent-shell-policy--remove-session
            konix/agent-shell--blacklist (car one)))
@@ -1282,6 +1477,8 @@ A dot or a filler says nothing, so it is no talking."
    (konix/agent-shell-workspace--rule-panel "WHITELIST")))
 (defun konix/agent-shell-workspace--rule-write (key what now)
   "Make this workspace's KEY line for WHAT read NOW, or drop it when NOW is nil."
+  (unless (equal key "STEERING")
+    (konix/agent-shell-workspace--refuse-the-sudo-key now))
   (konix/agent-shell-workspace--write
     (save-excursion
       (goto-char (point-min))
@@ -1411,16 +1608,17 @@ matching it."
     (konix/agent-shell-workspace--rule-write
      (konix/agent-shell-workspace--policy-key policy) what now)))
 (defun konix/agent-shell-workspace--policy-set (policy what said)
-  "Name WHAT, told SAID, among the workspace's POLICY rules, and on the session."
+  "Name WHAT, told SAID, among the workspace's POLICY rules; re-steering carries it on."
+  (konix/agent-shell-workspace--refuse-the-sudo-key what)
   (konix/agent-shell-workspace--policy-write
    policy (car (assoc what (konix/agent-shell-workspace--policy-entries policy)))
-   (format "%s :: %s" what (or said "")))
-  (konix/agent-shell-policy--set-session policy what said))
+   (format "%s :: %s" what (or said ""))))
 
 (defun konix/agent-shell-workspace--policy-remove (policy what)
   "Take WHAT off the workspace's POLICY rules, and off the session."
   (konix/agent-shell-workspace--policy-write policy what nil)
-  (konix/agent-shell-policy--remove-session policy what))
+  (unless (equal what (car konix/agent-shell-workspace-sudo-rule))
+    (konix/agent-shell-policy--remove-session policy what)))
 
 (setq konix/agent-shell-policy-extra-axes
       (list (list :header "Workspace" :key "w"
@@ -1451,43 +1649,8 @@ matching it."
                   agent-shell-viewport-edit-mode
                   konix/agent-shell-workspace-mode))
   (interactive)
-  (let ((shell (konix/agent-shell-workspace--shell-here)))
-    (konix/agent-shell-workspace--forget shell)
-    (konix/agent-shell-workspace--submit
-     shell
-     (concat "The workspace is unbound. Talk in this chat again, as you"
-             " would without one."))
-    (message "Workspace unbound")))
-(defun konix/agent-shell-workspace-cleanup ()
-  "Take this workspace away for good: its writer, its buffer and its file."
-  (declare (modes agent-shell-mode
-                  agent-shell-viewport-view-mode
-                  agent-shell-viewport-edit-mode
-                  konix/agent-shell-workspace-mode))
-  (interactive)
-  (let* ((here (bound-and-true-p konix/agent-shell-workspace-mode))
-         (writer (if here
-                     konix/agent-shell-workspace--writer-buffer
-                   (konix/agent-shell--current-shell-or-error)))
-         (file (or (if here
-                       buffer-file-name
-                     (konix/agent-shell-workspace-file writer))
-                   (user-error "No workspace here to take away")))
-         (buffer (find-buffer-visiting file)))
-    (unless (yes-or-no-p (format "Take %s away for good, its writer with it? "
-                                 (file-name-nondirectory file)))
-      (user-error "Left where it was"))
-    (when (buffer-live-p writer)
-      (konix/agent-shell-workspace--forget writer)
-      (run-with-timer 0 nil
-                      (lambda ()
-                        (konix/mcp-server--kill-buffers (list writer)))))
-    (when (buffer-live-p buffer)
-      (let ((kill-buffer-query-functions nil))
-        (kill-buffer buffer)))
-    (when (file-exists-p file)
-      (delete-file file t))
-    (message "%s is gone" (file-name-nondirectory file))))
+  (konix/agent-shell-workspace--forget (konix/agent-shell-workspace--shell-here))
+  (message "Workspace unbound"))
 (defconst konix/agent-shell-workspace-server-name "konix-emacs-workspace"
   "MCP server holding the tools a bound writer answers with.")
 
@@ -1506,30 +1669,24 @@ Matched on the tool title, which for an MCP tool is `mcp__SERVER__TOOL'."
     (make-directory (file-name-directory file) t)
     (write-region "" nil file)))
 (defconst konix/agent-shell-workspace-directory ".ws"
-  "Where under a project the prompt offers to put a workspace.")
+  "Where under a working directory the prompt offers to put a workspace.")
 
 (defconst konix/agent-shell-workspace-suffix ".ws.org"
   "What a workspace's name ends in, which is what opens it as one.")
 
-(defun konix/agent-shell-workspace--named-as-one (file)
-  "Return FILE, an Org file, named the way a workspace is."
-  (if (string-suffix-p konix/agent-shell-workspace-suffix file)
-      file
-    (concat (file-name-sans-extension file) konix/agent-shell-workspace-suffix)))
-
 (defun konix/agent-shell-workspace--read-file-name ()
-  "Read where a workspace goes, offering this project's own place for it."
+  "Read where a workspace goes, offering this working directory's own place for it."
   (let ((where (file-name-as-directory
                 (expand-file-name
                  konix/agent-shell-workspace-directory
-                 (konix/agent-shell-workspace--project-of (current-buffer))))))
+                 (konix/agent-shell-workspace--working-directory-of (current-buffer))))))
     (expand-file-name
      (minibuffer-with-setup-hook
          (lambda () (search-backward konix/agent-shell-workspace-suffix nil t))
        (read-file-name "Workspace: " where nil nil
                        konix/agent-shell-workspace-suffix)))))
 (defun konix/agent-shell-workspace--read-what-to-bind ()
-  "Read the workspace to bind and its goal, refusing a session or a name that cannot."
+  "Read the workspace to bind and its project, refusing a session or a name that cannot."
   (unless (member konix/agent-shell-workspace-server-name
                   (konix/agent-shell-mcp-session-server-names))
     (user-error "This session has no %s tools to answer with"
@@ -1539,10 +1696,9 @@ Matched on the tool title, which for an MCP tool is `mcp__SERVER__TOOL'."
       (user-error "A workspace is named *%s, which opens it as one: %s"
                   konix/agent-shell-workspace-suffix file))
     (list file
-          (read-string "What the work is (empty for none): "
-                       (konix/agent-shell-workspace--goal-in file)))))
-(defun konix/agent-shell-workspace-bind (file &optional goal)
-  "Bind FILE as the workspace of the agent-shell this is called from, on GOAL."
+          (read-string "A project to add (empty for none): "))))
+(defun konix/agent-shell-workspace-bind (file &optional project)
+  "Bind FILE as the workspace of the agent-shell this is called from, on PROJECT."
   (declare (modes agent-shell-mode
                   agent-shell-viewport-view-mode
                   agent-shell-viewport-edit-mode))
@@ -1553,7 +1709,7 @@ Matched on the tool title, which for an MCP tool is `mcp__SERVER__TOOL'."
     (konix/agent-shell-workspace--write-file file
       (konix/agent-shell-workspace--ensure-well-formed)
       (konix/agent-shell-workspace--ensure-session-link shell)
-      (konix/agent-shell-workspace--ensure-goal goal))
+      (konix/agent-shell-workspace--ensure-project project))
     (konix/agent-shell-workspace--remember shell file)
     (let ((buffer (konix/agent-shell-workspace--show file shell t)))
       (if (konix/agent-shell-workspace--writer-done-p file)
@@ -1577,31 +1733,45 @@ Matched on the tool title, which for an MCP tool is `mcp__SERVER__TOOL'."
     (pop-to-buffer (konix/agent-shell-workspace--show file shell nil))
     (konix/agent-shell-workspace--land-on-a-users-question)))
 
+(defun konix/agent-shell-workspace--prompt-text ()
+  "Return what the user has typed at the shell's last prompt so far."
+  (save-excursion
+    (goto-char (point-max))
+    (if (re-search-backward comint-prompt-regexp nil t)
+        (string-trim (buffer-substring-no-properties (match-end 0) (point-max)))
+      "")))
+
+(defun konix/agent-shell-workspace-goto-unless-writing ()
+  "Go to the workspace, unless a message is being written at the prompt."
+  (interactive)
+  (if (and (shell-maker-point-at-last-prompt-p)
+           (not (shell-maker-busy))
+           (not (string-empty-p (konix/agent-shell-workspace--prompt-text))))
+      (self-insert-command 1)
+    (call-interactively #'konix/agent-shell-workspace-goto)))
+
 (with-eval-after-load 'agent-shell
   (define-key agent-shell-mode-map (kbd "O")
-              (lambda ()
-                (interactive)
-                (konix/agent-shell--permission-key-maybe-insert
-                 #'konix/agent-shell-workspace-goto)))
+              #'konix/agent-shell-workspace-goto-unless-writing)
   (define-key agent-shell-viewport-view-mode-map (kbd "O")
               #'konix/agent-shell-workspace-goto))
-(defun konix/agent-shell-workspace--of-this-project ()
-  "Return the workspaces of the project this buffer sits in, by their paths."
+(defun konix/agent-shell-workspace--of-this-working-directory ()
+  "Return the workspaces of the working directory this buffer sits in, by their paths."
   (let ((where (file-name-as-directory
                 (expand-file-name
                  konix/agent-shell-workspace-directory
-                 (konix/agent-shell-workspace--project-of (current-buffer))))))
+                 (konix/agent-shell-workspace--working-directory-of (current-buffer))))))
     (when (file-directory-p where)
       (seq-filter (lambda (file)
                     (string-suffix-p konix/agent-shell-workspace-suffix file))
                   (directory-files where t)))))
 
 (defun konix/agent-shell-workspace-pick ()
-  "Go to one of this project's workspaces, starting nothing."
+  "Go to one of this working directory's workspaces, starting nothing."
   (interactive)
-  (let* ((files (konix/agent-shell-workspace--of-this-project))
+  (let* ((files (konix/agent-shell-workspace--of-this-working-directory))
          (file (pcase (length files)
-                 (0 (user-error "No workspace of this project to pick from"))
+                 (0 (user-error "No workspace of this working directory to pick from"))
                  (1 (car files))
                  (_ (expand-file-name
                      (completing-read "Workspace: "
@@ -1783,7 +1953,7 @@ The question this diff was opened from waits on it."
   (define-key map "y" #'konix/agent-shell-workspace-answer-yes)
   (define-key map "n" #'konix/agent-shell-workspace-answer-no)
   (define-key map "?" #'konix/agent-shell-workspace-answer-what)
-  (define-key map "g" #'konix/agent-shell-workspace-answer-goal)
+  (define-key map "g" #'konix/agent-shell-workspace-answer-project)
   (define-key map "." #'konix/agent-shell-workspace-answer-done)
   (dolist (digit (number-sequence ?1 ?9))
     (define-key map (string digit) #'konix/agent-shell-workspace-answer-choice))
@@ -1805,10 +1975,10 @@ The question this diff was opened from waits on it."
   (define-key map "k" #'konix/agent-shell-workspace-drop)
   (define-key map (kbd "C-k") #'konix/agent-shell-workspace-drop-at-once)
   (define-key map "K" #'konix/agent-shell-workspace-clean)
-  (define-key map "F" #'konix/agent-shell-workspace-clean-facts)
   (define-key map "p" #'konix/agent-shell-workspace-pin))
 (let ((map konix/agent-shell-workspace-mode-map))
   (define-key map "D" #'konix/agent-shell-workspace-needs)
+  (define-key map "X" #'konix/agent-shell-workspace-take-back)
   (define-key map (kbd "M-<left>") #'konix/agent-shell-workspace-goto-waited-on)
   (define-key map (kbd "M-<right>") #'konix/agent-shell-workspace-goto-holding-back)
   (define-key map (kbd "M-<up>") #'konix/agent-shell-workspace-move-up)
@@ -1818,8 +1988,10 @@ The question this diff was opened from waits on it."
   (define-key map "S" #'konix/agent-shell-workspace-steering-menu)
   (define-key map "B" #'konix/agent-shell-workspace-blacklist-menu)
   (define-key map "W" #'konix/agent-shell-workspace-whitelist-menu)
-  (define-key map "w" #'konix/agent-shell-workspace-set-goal)
-  (define-key map (kbd "C-w") #'konix/agent-shell-workspace-goal-again)
+  (define-key map "w" #'konix/agent-shell-workspace-set-project)
+  (define-key map "^" #'konix/agent-shell-workspace-promote-to-project)
+  (define-key map "@" #'konix/agent-shell-workspace-toggle-project)
+  (define-key map (kbd "C-w") #'konix/agent-shell-workspace-project-again)
   (define-key map "C" #'konix/agent-shell-workspace-set-run-cap)
   (define-key map "V" #'konix/agent-shell-workspace-review)
   (define-key map "v" #'konix/agent-shell-workspace-show-review)
@@ -1860,7 +2032,7 @@ Returns t whatever the answer, the workspace going either way."
         (konix/agent-shell-workspace--no-logging)
         (konix/agent-shell-workspace--colour-keywords)
         (konix/agent-shell-workspace--show-what-waits)
-        (konix/agent-shell-workspace--show-reviews)
+        (konix/agent-shell-workspace--show-labels)
         (konix/agent-shell-workspace--show-ages)
         (add-hook 'after-revert-hook
                   #'konix/agent-shell-workspace--after-revert nil t)
@@ -1902,16 +2074,10 @@ What a workspace file opens as."
   (konix/agent-shell-workspace-mode 1)
   (konix/agent-shell-workspace--no-logging)
   (konix/agent-shell-workspace--colour-keywords)
-  (konix/agent-shell-workspace-focus-question))
+  (konix/agent-shell-workspace--focus-standing-still))
 (defconst konix/agent-shell-workspace-link-regexp
   "\\[\\[file\\(?:\\+emacs\\)?:\\([^]]+?\\)::\\([0-9]+\\)\\]"
   "Regexp matching a location link of the workspace.")
-
-(defconst konix/agent-shell-workspace-pointing-regexp
-  (concat "^ *- \\(?:.* : \\)?\\(?:"
-          konix/agent-shell-workspace-link-regexp
-          "\\|\\[\\[[a-z][a-z0-9+.-]*:[^]]+\\]\\]\\)")
-  "Regexp matching a line saying only where to look: a place, or an address.")
 
 (defun konix/agent-shell-workspace--link-on-line ()
   "Return (FILE . LINE) for a location link on the current line, or nil."
@@ -1978,8 +2144,8 @@ NOERROR returns nil where the heading names no place at all."
   "Non-nil when the heading point is on is a fact rather than a question."
   (and (equal (org-current-level) 1)
        (not (konix/agent-shell-workspace--state-at-point))))
-(defun konix/agent-shell-workspace--asked-of-each-question (question)
-  "Return what QUESTION, run on each question of the workspace, says of it, by id."
+(defun konix/agent-shell-workspace--asked-of-each-question (ask)
+  "Return what ASK, run on each question of the workspace, says of it, by id."
   (let ((said (make-hash-table :test 'equal)))
     (save-excursion
       (goto-char (point-min))
@@ -1988,7 +2154,7 @@ NOERROR returns nil where the heading names no place at all."
       (while (org-at-heading-p)
         (let ((id (org-entry-get nil "ID")))
           (when (and id (org-get-todo-state))
-            (when-let ((this (funcall question)))
+            (when-let ((this (funcall ask)))
               (puthash id this said))))
         (outline-next-heading)))
     said))
@@ -2000,27 +2166,32 @@ NOERROR returns nil where the heading names no place at all."
      (when-let ((priority (org-element-property :priority
                                                 (org-element-at-point))))
        (format "[#%c] " priority)))))
-(defun konix/agent-shell-workspace--standing-at-point ()
-  "Return how high the heading point stands on stands, as org reckons it."
-  (org-get-priority (buffer-substring-no-properties
-                     (line-beginning-position) (line-end-position))))
+  (defun konix/agent-shell-workspace--standing-at-point ()
+    "Return how high the heading point stands on stands, as org reckons it."
+    (org-get-priority (buffer-substring-no-properties
+                       (line-beginning-position) (line-end-position))))
 
-(defun konix/agent-shell-workspace--standing-highest ()
-  "Return (HOW-HIGH . HEADING) for the highest the writer's own stand, or nil."
-  (let (best)
-    (save-excursion
-      (goto-char (point-min))
-      (while (konix/agent-shell-workspace--search-state
-              konix/agent-shell-workspace-writers-regexp)
-        (let ((how-high (konix/agent-shell-workspace--standing-at-point)))
-          (when (and (konix/agent-shell-workspace--the-writers-at-point-p)
-                     (or (null best) (> how-high (car best))))
-            (setq best (cons how-high (org-get-heading t t t t)))))))
-    best))
-(defun konix/agent-shell-workspace--states ()
-  "Return each question's keyword, keyed by its id."
-  (konix/agent-shell-workspace--asked-of-each-question #'org-get-todo-state))
+  (defun konix/agent-shell-workspace--free-to-take-at-point-p (questions)
+    "Non-nil when the writer's question at point is held back by none of QUESTIONS.
+The one it holds counts as free, being the one it works on."
+    (and (konix/agent-shell-workspace--the-writers-at-point-p)
+         (or (equal (org-get-todo-state) konix/agent-shell-workspace-working-keyword)
+             (not (konix/agent-shell-workspace--holding-back
+                   (org-entry-get (point) "ID") questions)))))
 
+  (defun konix/agent-shell-workspace--standing-highest ()
+    "Return (HOW-HIGH . HEADING) for the highest the writer's own free ones stand, or nil."
+    (let ((questions (konix/agent-shell-workspace--every-question))
+          best)
+      (save-excursion
+        (goto-char (point-min))
+        (while (konix/agent-shell-workspace--search-state
+                konix/agent-shell-workspace-writers-regexp)
+          (let ((how-high (konix/agent-shell-workspace--standing-at-point)))
+            (when (and (konix/agent-shell-workspace--free-to-take-at-point-p questions)
+                       (or (null best) (> how-high (car best))))
+              (setq best (cons how-high (org-get-heading t t t t)))))))
+      best))
 (defun konix/agent-shell-workspace--revisions ()
   "Return the revision each heading is read against, keyed by its id."
   (let ((said (make-hash-table :test 'equal)))
@@ -2064,6 +2235,24 @@ NOERROR returns nil where the heading names no place at all."
   "Return the ids the question point stands on says it waits on."
   (konix/agent-shell-workspace--named-at-point
    konix/agent-shell-workspace-waits-said))
+(defconst konix/agent-shell-workspace-after-said "after"
+  "What a line naming one the question comes after opens on.")
+
+(defconst konix/agent-shell-workspace-before-said "before"
+  "What a line naming one the question comes before opens on.")
+
+(defun konix/agent-shell-workspace--afters-at-point ()
+  "Return the ids the question point stands on says it comes after."
+  (konix/agent-shell-workspace--named-at-point
+   konix/agent-shell-workspace-after-said))
+
+(defun konix/agent-shell-workspace--edge-words (loose)
+  "Return (SAID . MIRROR), the words of the stricter order or, where LOOSE, the looser."
+  (if loose
+      (cons konix/agent-shell-workspace-after-said
+            konix/agent-shell-workspace-before-said)
+    (cons konix/agent-shell-workspace-waits-said
+          konix/agent-shell-workspace-holds-said)))
 (defun konix/agent-shell-workspace--unlink-under (here there said)
   "Take out the line under HERE saying SAID of THERE."
   (save-excursion
@@ -2094,30 +2283,13 @@ NOERROR returns nil where the heading names no place at all."
   (let ((words (konix/agent-shell-workspace--edge-words loose)))
     (konix/agent-shell-workspace--unlink-under mine other (car words))
     (konix/agent-shell-workspace--unlink-under other mine (cdr words))))
-(defconst konix/agent-shell-workspace-after-said "after"
-  "What a line naming one the question comes after opens on.")
-
-(defconst konix/agent-shell-workspace-before-said "before"
-  "What a line naming one the question comes before opens on.")
-
-(defun konix/agent-shell-workspace--afters-at-point ()
-  "Return the ids the question point stands on says it comes after."
-  (konix/agent-shell-workspace--named-at-point
-   konix/agent-shell-workspace-after-said))
-
-(defun konix/agent-shell-workspace--edge-words (loose)
-  "Return (SAID . MIRROR), the words of the stricter order or, where LOOSE, the looser."
-  (if loose
-      (cons konix/agent-shell-workspace-after-said
-            konix/agent-shell-workspace-before-said)
-    (cons konix/agent-shell-workspace-waits-said
-          konix/agent-shell-workspace-holds-said)))
 (defun konix/agent-shell-workspace--waited-on ()
   "Return the headings of what still holds the question point stands on back."
   (let ((questions (konix/agent-shell-workspace--every-question)))
     (mapcar (lambda (id) (nth 1 (assoc id questions)))
             (konix/agent-shell-workspace--holding-back
              (org-entry-get (point) "ID") questions))))
+
 (defun konix/agent-shell-workspace--wait-on-each (mine needs &optional loose)
   "Say that MINE waits on each of NEEDS, or comes after each where LOOSE."
   (dolist (need needs)
@@ -2135,12 +2307,24 @@ NOERROR returns nil where the heading names no place at all."
                     ((or (member id needs)
                          (not (equal (konix/agent-shell-workspace--state-at-point)
                                      konix/agent-shell-workspace-done-keyword)))))
-          (push (cons (substring-no-properties (org-get-heading t t t t)) id)
+          (push (cons (konix/agent-shell-workspace--labelled-heading) id)
                 found))))
     (nreverse found)))
+
+(defun konix/agent-shell-workspace--labelled-heading ()
+  "Return the heading at point as plain words, its label and keyword ahead of them."
+  (let* ((tags (org-get-tags nil t))
+         (label (seq-some (lambda (labelled)
+                            (and (member (car labelled) tags)
+                                 (string-trim (nth 1 labelled))))
+                          konix/agent-shell-workspace-labels))
+         (keyword (org-get-todo-state)))
+    (concat (when label (concat label " "))
+            (when keyword (concat (substring-no-properties keyword) " "))
+            (substring-no-properties (org-get-heading t t t t)))))
   (defun konix/agent-shell-workspace-needs (&optional loose)
     "Say what the question point stands in waits on, or that it does no longer.
-LOOSE says what it comes after instead, held back only while that one is the writer's."
+LOOSE says what it comes after instead, held back by it only in the looser way."
     (interactive "P")
     (save-excursion
       (konix/agent-shell-workspace--goto-question)
@@ -2167,6 +2351,33 @@ LOOSE says what it comes after instead, held back only while that one is the wri
         (konix/agent-shell-workspace--tell-if-freed had)
         (message "It %s that one %s" (if loose "comes after" "waits on")
                  (if off "no longer" "now")))))
+(defun konix/agent-shell-workspace-take-back (&optional all)
+  "Take back what the question point stands in waits on or comes after, or ALL of it."
+  (interactive "P")
+  (save-excursion
+    (konix/agent-shell-workspace--goto-question)
+    (let* ((mine (or (org-entry-get (point) "ID")
+                     (user-error "That one has no id to be held back by")))
+           (questions (konix/agent-shell-workspace--every-question))
+           (heading (lambda (id)
+                      (substring-no-properties (or (nth 1 (assoc id questions)) id))))
+           (orders (append
+                    (mapcar (lambda (id)
+                              (list (concat "waits on " (funcall heading id)) id nil))
+                            (konix/agent-shell-workspace--needs-at-point))
+                    (mapcar (lambda (id)
+                              (list (concat "after " (funcall heading id)) id t))
+                            (konix/agent-shell-workspace--afters-at-point))))
+           (chosen (cond ((null orders) (user-error "Nothing holds this one back"))
+                         ((or all (null (cdr orders))) orders)
+                         (t (list (assoc (completing-read "Take back: " orders nil t)
+                                         orders)))))
+           (had (konix/agent-shell-workspace--anything-left-p)))
+      (konix/agent-shell-workspace--write
+        (dolist (order chosen)
+          (konix/agent-shell-workspace--unsay-waiting mine (nth 1 order) (nth 2 order))))
+      (konix/agent-shell-workspace--tell-if-freed had)
+      (message "%d taken back" (length chosen)))))
 (defun konix/agent-shell-workspace--goto-one-of (ids prompt)
   "Go to one of IDS, asking at PROMPT where there are several, nil where none."
   (let* ((questions (konix/agent-shell-workspace--every-question))
@@ -2185,7 +2396,7 @@ LOOSE says what it comes after instead, held back only while that one is the wri
                   (cdar them))))
         (goto-char (point-min))
         (konix/agent-shell-workspace--goto-id id)
-        (konix/agent-shell-workspace-focus-question)
+        (konix/agent-shell-workspace--land-on (point))
         id))))
 (defun konix/agent-shell-workspace-goto-waited-on ()
   "Go to what the question point stands in waits on."
@@ -2219,16 +2430,11 @@ LOOSE says what it comes after instead, held back only while that one is the wri
   (unless (string-match "\\`\\([^ ].*?\\) :: .+\\'" bullet)
     (error "Bullet under \"%s\" is not « intention :: text »: %s" heading bullet))
   (let ((intention (match-string 1 bullet))
-        (words (cons konix/agent-shell-workspace-goal-intention
-                     konix/note-intention-words)))
+        (words konix/note-intention-words))
     (unless (assoc intention words)
       (error "Unknown intention \"%s\" under \"%s\" — one of: %s"
              intention heading
              (mapconcat #'car words ", ")))))
-
-(defconst konix/agent-shell-workspace-goal-intention
-  (cons "goal" "how the question moves the workspace's goal forward")
-  "The intention word a workspace adds to the notes' own, for its goal.")
 (defun konix/agent-shell-workspace--check-body (heading bullets captions)
   "Refuse a question's BULLETS and CAPTIONS under HEADING unless they stay short."
   (dolist (bullet bullets)
@@ -2244,8 +2450,8 @@ LOOSE says what it comes after instead, held back only while that one is the wri
     (when (> total konix/agent-shell-workspace-body-max)
       (konix/agent-shell-workspace--past-a-limit
        "Body" total konix/agent-shell-workspace-body-max heading
-       (concat "Drop a bullet rather than an address: a web address goes in url"
-               " and a place in file and line, neither counting here")))))
+       (concat "Drop a bullet rather than an address: places and web addresses go"
+               " in their own fields, which count against nothing")))))
 (defun konix/agent-shell-workspace--places (entry)
   "Return ENTRY's places as a list of (FILE LINE CAPTION), the ones it names."
   (seq-filter
@@ -2275,9 +2481,9 @@ LOOSE says what it comes after instead, held back only while that one is the wri
         (error "A caption is one line, or it opens a heading of its own: %S"
                caption))
       (when (> (length caption) konix/agent-shell-workspace-bullet-max)
-        (error "Caption of %d chars under \"%s\", max %d: %s"
-               (length caption) heading
-               konix/agent-shell-workspace-bullet-max caption)))))
+        (konix/agent-shell-workspace--past-a-limit
+         "Caption" (length caption) konix/agent-shell-workspace-bullet-max heading
+         (format "Here: %s" caption))))))
 
 (defun konix/agent-shell-workspace--addresses-written (addresses)
   "Return ADDRESSES as the lines of a heading, each whole and as a link."
@@ -2293,7 +2499,7 @@ LOOSE says what it comes after instead, held back only while that one is the wri
     (if (and (symbolp mode)
              (string-suffix-p "-mode" (symbol-name mode)))
         (string-remove-suffix "-mode" (symbol-name mode))
-      (or (file-name-extension file) "text"))))
+      "text")))
 (defconst konix/agent-shell-workspace-context-lines 4
   "Lines shown either side of the line a place names.")
 
@@ -2354,63 +2560,16 @@ Its message comes first, as `git show' gives it, then its diff."
          (erase-buffer)
          (setq-local default-directory directory)
          (unless (zerop (apply #'call-process "git" nil t nil args))
-           (error "git diff failed: %s" (buffer-string)))
+           (error "git show failed: %s" (buffer-string)))
          (when (= (point-min) (point-max))
            (error "Empty diff for %s" revspec))
          (diff-mode)
          (konix/agent-shell-workspace-diff-mode 1)
          (goto-char (point-min))))
      buffer))
-(defun konix/agent-shell-workspace-hunk-line-position (start line limit)
-  "Return where new-side LINE sits in the hunk body following point.
-START is the hunk's first new-side line and LIMIT bounds its body."
-  (forward-line 1)
-  (let ((current start)
-        position)
-    (while (and (not position)
-                (< (point) limit)
-                (memq (char-after) '(?\s ?+ ?-)))
-      (cond
-       ((eq (char-after) ?-) (forward-line 1))
-       ((= current line) (setq position (point)))
-       (t (setq current (1+ current))
-          (forward-line 1))))
-    position))
-(defun konix/agent-shell-workspace-diff-position (file line &optional exact)
-  "Return where FILE:LINE sits in the diff held by the current buffer.
-Nil when FILE is absent from the diff."
-  (save-excursion
-    (goto-char (point-min))
-    (let (file-start)
-      (while (and (not file-start)
-                  (re-search-forward "^\\+\\+\\+ b?/?\\(.+\\)$" nil t))
-        (when (string-suffix-p (match-string 1) file)
-          (setq file-start (match-beginning 0))))
-      (when file-start
-        (goto-char file-start)
-        (forward-line 1)
-        (let ((limit (or (save-excursion (re-search-forward "^\\+\\+\\+ " nil t))
-                         (point-max)))
-              covering first)
-          (while (and (not covering)
-                      (re-search-forward
-                       "^@@ -[0-9,]+ \\+\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? @@"
-                       limit t))
-            (let ((start (string-to-number (match-string 1)))
-                  (count (if (match-string 2)
-                             (string-to-number (match-string 2))
-                           1)))
-              (unless first (setq first (match-beginning 0)))
-              (when (and (<= start line) (< line (+ start count)))
-                (setq covering
-                      (or (konix/agent-shell-workspace-hunk-line-position
-                           start line limit)
-                          (match-beginning 0))))))
-          (or covering (unless exact first)))))))
-     (defun konix/agent-shell-workspace--render-question (entry states
-                                                               &optional cookies
-                                                               revisions)
-       "Return ENTRY as one Org question, keeping the state STATES says it stood in.
+     (defun konix/agent-shell-workspace--render-question (entry &optional cookies
+                                                                revisions)
+       "Return ENTRY as one Org question, in the state its writer's act names, or REFINE.
 COOKIES carries the priority each question wears and REVISIONS the revision it
 is read against, so a rewrite keeps them."
        (let* ((places (konix/agent-shell-workspace--places entry))
@@ -2421,10 +2580,7 @@ is read against, so a rewrite keeps them."
                             (error "A label is what you are asking the user — there is none"))))
               (id (or (alist-get 'id entry) (org-id-new)))
               (revspec (konix/agent-shell-workspace--revision-of id revisions))
-              (settled (list konix/agent-shell-workspace-done-keyword
-                             konix/agent-shell-workspace-later-keyword))
               (state (or (alist-get 'keyword entry)
-                         (car (member (gethash id states) settled))
                          konix/agent-shell-workspace-refine-keyword))
               (cookie (or (and cookies (gethash id cookies)) "")))
          (unless (member state konix/agent-shell-workspace-keywords)
@@ -2549,20 +2705,26 @@ is read against, so a rewrite keeps them."
   (remove-overlays (point-min) (point-max) 'konix/agent-shell-workspace-age t)
   (save-excursion
     (goto-char (point-min))
-    (while (re-search-forward org-outline-regexp-bol nil t)
-      (when-let ((touched (konix/agent-shell-workspace--touched-at-point)))
-        (let ((overlay (make-overlay (line-beginning-position)
-                                     (line-beginning-position))))
-          (overlay-put overlay 'konix/agent-shell-workspace-age t)
-          (overlay-put overlay 'before-string
-                       (propertize
-                        (format "%s "
-                                (konix/agent-shell-workspace--age-said
-                                 (truncate (float-time
-                                            (time-subtract
-                                             nil (org-time-string-to-time touched))))))
-                        'face 'konix/agent-shell-workspace-age-face))))
-      (end-of-line))))
+    (let (ages)
+      (while (re-search-forward org-outline-regexp-bol nil t)
+        (let ((touched (konix/agent-shell-workspace--touched-at-point)))
+          (push (cons (line-beginning-position)
+                      (if touched
+                          (konix/agent-shell-workspace--age-said
+                           (truncate (float-time
+                                      (time-subtract
+                                       nil (org-time-string-to-time touched)))))
+                        ""))
+                ages))
+        (end-of-line))
+      (let ((width (apply #'max 0 (mapcar (lambda (age) (length (cdr age))) ages))))
+        (when (> width 0)
+          (pcase-dolist (`(,where . ,said) ages)
+            (let ((overlay (make-overlay where where)))
+              (overlay-put overlay 'konix/agent-shell-workspace-age t)
+              (overlay-put overlay 'before-string
+                           (propertize (format (format "%%%ds " width) said)
+                                       'face 'konix/agent-shell-workspace-age-face)))))))))
 (defun konix/agent-shell-workspace--show-ages-shown ()
   "Show the ages again in every workspace a window shows."
   (dolist (window (window-list-1 nil 'nomini 'visible))
@@ -2603,7 +2765,9 @@ STOPPED nil, the writer is asked whether it is busy."
                        (konix/agent-shell-workspace--search-state
                         konix/agent-shell-workspace-writers-regexp))
              (beginning-of-line)
-             (setq its (konix/agent-shell-workspace--the-writers-at-point-p))
+             (setq its (or (konix/agent-shell-workspace--the-writers-at-point-p)
+                           (equal (konix/agent-shell-workspace--state-at-point)
+                                  konix/agent-shell-workspace-awaiting-keyword)))
              (end-of-line))
            (not its)))
        (or stopped
@@ -2616,13 +2780,24 @@ STOPPED nil, the writer is asked whether it is busy."
   (let ((wanted (or (konix/agent-shell-workspace--asking-here)
                     (and (konix/agent-shell-workspace--free-here-p stopped) 'free))))
     (if wanted
-        (unless (equal wanted konix/agent-shell-workspace--nudged)
+        (when (if (listp wanted)
+                  (seq-difference wanted (and (listp konix/agent-shell-workspace--nudged)
+                                              konix/agent-shell-workspace--nudged))
+                (not (equal wanted konix/agent-shell-workspace--nudged)))
           (tracking-add-buffer buffer))
       (tracking-remove-buffer buffer))
     (setq-local konix/agent-shell-workspace--nudged wanted)))
+(defun konix/agent-shell-workspace--focus-standing-still ()
+  "Settle the view as `konix/agent-shell-workspace-focus-question' does, point kept."
+  (let ((standing (point-marker)))
+    (konix/agent-shell-workspace-focus-question)
+    (goto-char standing)
+    (org-fold-show-context)
+    (set-marker standing nil)))
+
 (defun konix/agent-shell-workspace--show (file writer fresh)
   "Prepare the workspace FILE, telling it the WRITER that asked.
-Point and folding are placed only when FRESH."
+Point and folding are placed only when FRESH; otherwise point stays where it was."
   (let* ((existing (find-buffer-visiting file))
          (buffer (or existing (find-file-noselect file))))
     (konix/agent-shell-workspace--settling-now buffer)
@@ -2638,7 +2813,7 @@ Point and folding are placed only when FRESH."
             (goto-char (point-min))
             (org-next-visible-heading 1)
             (konix/agent-shell-workspace-focus-question))
-        (konix/agent-shell-workspace-focus-question))
+        (konix/agent-shell-workspace--focus-standing-still))
       (konix/agent-shell-workspace--tracked-or-not buffer))
     (when (buffer-live-p writer)
       (konix/agent-shell-workspace--steer writer)
@@ -2664,23 +2839,12 @@ Returns its path."
       (funcall mutate))
     (konix/agent-shell-workspace--show file writer nil)
     file))
-(defconst konix/agent-shell-workspace-aimless-error
-  (concat "This workspace has a goal: say how this question moves it forward, a"
-          " « goal :: … » bullet. If it doesn't, don't ask it.")
-  "What a writer is told when it hands the user a question saying nothing of the goal.")
-
-(defun konix/agent-shell-workspace--refuse-aimless (act note)
-  "Refuse a question ACT hands the user, under a goal, NOTE saying nothing of it."
-  (when (and (konix/agent-shell-workspace--users-act-p act)
-             (konix/agent-shell-workspace--goal-in
-              (konix/agent-shell-workspace--file-or-error))
-             (not (seq-some (lambda (bullet) (string-prefix-p "goal :: " bullet))
-                            (konix/mcp-server-decode-json-list note))))
-    (error "%s" konix/agent-shell-workspace-aimless-error)))
-(defconst konix/agent-shell-workspace-new-question-error
-  (concat "A question you have just made comes back to the user, so ask it and wait."
-          " Take one up only once they have had their say on it.")
-  "What a writer is told when it makes a question and keeps it.")
+(defconst konix/agent-shell-workspace-kept-error
+  (concat "A question you write, made or rewritten, comes back to the user, so they"
+          " know exactly what you are to do: ask it and wait, or close it once the"
+          " work is done. To take one up or put it down, use set_workspace_state,"
+          " which leaves its words alone.")
+  "What a writer is told when it writes a question and keeps it its own.")
 
 (defun konix/agent-shell-workspace--users-act-p (act)
   "Non-nil when ACT hands a question to the user, naming none doing so too."
@@ -2690,11 +2854,39 @@ Returns its path."
                                       konix/agent-shell-workspace-acts t))
                    konix/agent-shell-workspace-users-keywords)
            t)))
+(defconst konix/agent-shell-workspace-for-said "for"
+  "What the line linking a question to the project it moves forward opens on.")
+
+(defconst konix/agent-shell-workspace-aimless-error
+  (concat "This workspace has projects: pass project, the id of the project this question"
+          " moves forward, as the listing gives it. If it moves none, don't ask it.")
+  "What a writer is told when it writes a question naming no project, projects being there.")
+
+(defun konix/agent-shell-workspace--project-ids (project)
+  "Return the ids PROJECT names: one id, or a JSON array of them; nil for none."
+  (cond
+   ((or (null project) (string-empty-p (string-trim project))) nil)
+   ((string-prefix-p "[" (string-trim project)) (konix/mcp-server-decode-json-list project))
+   (t (list (string-trim project)))))
+
+(defun konix/agent-shell-workspace--refuse-aimless (id projects)
+  "Refuse a new question, its id ID nil, naming no PROJECTS where projects are, or a bad one."
+  (konix/agent-shell-workspace--read-file (konix/agent-shell-workspace--file-or-error)
+    (if projects
+        (dolist (project projects)
+          (unless (and (konix/agent-shell-workspace--goto-id project)
+                       (konix/agent-shell-workspace--project-at-point-p)
+                       (not (member (org-get-todo-state)
+                                    (list konix/agent-shell-workspace-later-keyword
+                                          konix/agent-shell-workspace-done-keyword))))
+            (error "%s is no open project of this workspace" project)))
+      (when (and (null id) (konix/agent-shell-workspace--projects-here))
+        (error "%s" konix/agent-shell-workspace-aimless-error)))))
     (defun konix/mcp-server-set-workspace-question
-        (label &optional note file line says also act id url needs)
+        (label &optional note file line says also act id url needs project)
       "Write one question of the workspace, replacing or adding it, at FILE and LINE if any.
 
-Without ACT the question comes back to the user.
+The question comes back to the user, whatever ACT.
 
 MCP Parameters:
   label - What this question asks the user
@@ -2703,21 +2895,21 @@ MCP Parameters:
   note - Optional JSON array of « intention :: text » bullets
   says - Optional caption for the link itself
   also - Optional JSON array of further {file, line, says} or {url, says}
-  act - Optional work, refine, put-down or close; settling is the user's own
+  act - Optional refine or close: what you write comes back to the user
   id - Optional id of the question to rewrite, as the listing tool gives it
   url - Optional web address, written out whole and counting against no limit
-  needs - Optional JSON array of ids it also waits on, held back until settled; none is taken off"
+  needs - Optional JSON array of ids it also waits on, held back until settled; none is taken off
+  project - Id of the project it moves forward, or a JSON array of several; required new, under projects"
 (mcp-server-lib-with-error-handling
  (when (konix/agent-shell-workspace--awaiting-act-p act)
    (error "%s" (concat "Await with set_workspace_state, passing the command it"
                        " awaits: a rewrite has no command to run.")))
- (when (and (null id)
-            (not (konix/agent-shell-workspace--users-act-p act)))
-   (error "%s" konix/agent-shell-workspace-new-question-error))
- (when (and (konix/agent-shell-workspace--users-act-p act)
-            (null (konix/mcp-server-decode-json-list note)))
+ (unless (konix/agent-shell-workspace--users-act-p act)
+   (error "%s" konix/agent-shell-workspace-kept-error))
+ (when (null (konix/mcp-server-decode-json-list note))
    (error "%s" konix/agent-shell-workspace-empty-handover-error))
- (konix/agent-shell-workspace--refuse-aimless act note)
+ (setq project (konix/agent-shell-workspace--project-ids project))
+ (konix/agent-shell-workspace--refuse-aimless id project)
  (let* ((line (if (stringp line) (string-to-number line) (or line 1)))
         (keyword (and act (not (string-empty-p (string-trim act)))
                       (konix/agent-shell-workspace--act-keyword act)))
@@ -2733,11 +2925,10 @@ MCP Parameters:
         (when (and id (konix/agent-shell-workspace--goto-id id))
           (konix/agent-shell-workspace--refuse-closing-the-asked keyword)))
       (let* ((question (konix/agent-shell-workspace--render-question
-                        entry (konix/agent-shell-workspace--states)
-                        (konix/agent-shell-workspace--priorities)
+                        entry (konix/agent-shell-workspace--priorities)
                         (konix/agent-shell-workspace--revisions))))
 (if (konix/agent-shell-workspace--goto-id id)
-    (setq kept (konix/agent-shell-workspace--take-out-to-rewrite id keyword))
+    (setq kept (konix/agent-shell-workspace--take-out-to-rewrite id))
   (when id
     (error "No heading %s in the workspace" id))
   (goto-char (point-max))
@@ -2745,12 +2936,17 @@ MCP Parameters:
 (let ((at (point)))
   (insert question)
   (konix/agent-shell-workspace--put-back-what-stays id at kept)
-  (save-excursion
-    (konix/agent-shell-workspace--wait-on-each
-     (or id (save-excursion
-              (goto-char at)
-              (org-entry-get (point) "ID")))
-     (konix/mcp-server-decode-json-list needs)))))))
+  (let ((mine (or id (save-excursion
+                       (goto-char at)
+                       (org-entry-get (point) "ID")))))
+    (save-excursion
+      (konix/agent-shell-workspace--wait-on-each
+       mine (konix/mcp-server-decode-json-list needs)))
+    (dolist (one project)
+      (save-excursion
+        (konix/agent-shell-workspace--link-under
+         mine one (konix/agent-shell-workspace--heading-by-id-here one)
+         konix/agent-shell-workspace-for-said))))))))
 (if added
     (if file (format "Added a question at %s:%s" file line) "Added a question")
   (format "Rewrote %s" id)))))
@@ -2795,6 +2991,7 @@ One the user made by hand is kept as theirs."
                     (konix/agent-shell-workspace--said-line-regexp said)
                     line))
                  (list konix/agent-shell-workspace-waits-said
+                       konix/agent-shell-workspace-for-said
                        konix/agent-shell-workspace-holds-said
                        konix/agent-shell-workspace-after-said
                        konix/agent-shell-workspace-before-said
@@ -2841,7 +3038,7 @@ Nothing is put where the question still reads HEADING."
               links)))
     (nreverse links)))
     (defun konix/mcp-server-delete-workspace-question (id)
-      "Remove the workspace's question, fact or answer whose id is ID.
+      "Remove the workspace's settled question whose id is ID.
 
 MCP Parameters:
   id - Id of the heading to remove, as the listing tool gives it"
@@ -2850,28 +3047,30 @@ MCP Parameters:
         (lambda ()
           (unless (konix/agent-shell-workspace--goto-id id)
             (error "No heading %s in the workspace" id))
-          (if (equal (org-current-level) 2)
-              (delete-region (point) (konix/agent-shell-workspace--answer-end))
-            (when-let ((state (konix/agent-shell-workspace--state-at-point))
-                       (open (not (equal state
-                                         konix/agent-shell-workspace-done-keyword))))
-              (error "That question is not settled — close it, and the user settles it"))
-            (delete-region (point) (konix/agent-shell-workspace--question-end)))))
+          (when (equal (org-current-level) 2)
+            (error "An answer is the user's to remove, not yours: %s" id))
+          (when (konix/agent-shell-workspace--project-at-point-p)
+            (error "%s" konix/agent-shell-workspace-project-error))
+          (unless (konix/agent-shell-workspace--state-at-point)
+            (error "A fact is the user's to drop, not yours: %s" id))
+          (unless (equal (konix/agent-shell-workspace--state-at-point)
+                         konix/agent-shell-workspace-done-keyword)
+            (error "That question is not settled — close it, and the user settles it"))
+          (delete-region (point) (konix/agent-shell-workspace--question-end))))
        (format "Dropped %s" id)))
-(defun konix/agent-shell-workspace--take-out-to-rewrite (id keyword)
-  "Take the question ID at point out for a rewrite in KEYWORD, refusing what may not be.
+(defun konix/agent-shell-workspace--take-out-to-rewrite (id)
+  "Take the question ID at point out for a rewrite, refusing what may not be.
 Return (ANSWERS LINKS SAID HEADING RUN LEAVE), what outlives the rewrite."
   (unless (konix/agent-shell-workspace--state-at-point)
     (error "%s is no question of yours to rewrite" id))
+  (when (konix/agent-shell-workspace--project-at-point-p)
+    (error "%s" konix/agent-shell-workspace-project-error))
   (when (equal (konix/agent-shell-workspace--state-at-point)
                konix/agent-shell-workspace-done-keyword)
     (error "That question is settled — ask a new question rather than rewriting it"))
-  (konix/agent-shell-workspace--refuse-a-second-held
-   keyword (konix/agent-shell-workspace--state-at-point))
-  (konix/agent-shell-workspace--refuse-the-lower
-   keyword (konix/agent-shell-workspace--state-at-point))
-  (konix/agent-shell-workspace--refuse-the-blocked
-   keyword (konix/agent-shell-workspace--state-at-point))
+  (when (equal (konix/agent-shell-workspace--state-at-point)
+               konix/agent-shell-workspace-later-keyword)
+    (error "%s" konix/agent-shell-workspace-put-off-error))
   (let* ((limit (konix/agent-shell-workspace--question-end))
          (kept (list (konix/agent-shell-workspace--answers-under (point) limit)
                      (konix/agent-shell-workspace--links-under (point) limit)
@@ -2953,25 +3152,36 @@ Return (ANSWERS LINKS SAID HEADING RUN LEAVE), what outlives the rewrite."
       "Write the STEPS of a plan as questions, and the order between them.
 
 MCP Parameters:
-  steps - JSON array of {name, file, line, label, note, needs, after}: names or ids"
+  steps - JSON array of {name, file, line, label, note, needs, after, project}: names or ids"
       (mcp-server-lib-with-error-handling
        (let* ((steps (append (json-parse-string steps :object-type 'alist
                                                 :array-type 'list)
                              nil))
               (file (konix/agent-shell-workspace--file-or-error))
+              (before (konix/agent-shell-workspace--read-file file (buffer-string)))
               ids)
          (konix/agent-shell-workspace--check-plan steps)
-         (dolist (step steps)
-           (konix/mcp-server-set-workspace-question
-            (alist-get 'label step)
-            (json-encode (alist-get 'note step))
-            (alist-get 'file step)
-            (alist-get 'line step))
-           (push (cons (alist-get 'name step)
-                       (konix/agent-shell-workspace--last-question-id file))
-                 ids))
-         (konix/agent-shell-workspace--edit
-          (lambda () (konix/agent-shell-workspace--plan-order steps ids)))
+         (condition-case refused
+             (progn
+               (dolist (step steps)
+                 (konix/mcp-server-set-workspace-question
+                  (alist-get 'label step)
+                  (json-encode (alist-get 'note step))
+                  (alist-get 'file step)
+                  (alist-get 'line step)
+                  nil nil nil nil nil nil
+                  (let ((project (alist-get 'project step)))
+                    (if (listp project) (and project (json-encode project)) project)))
+                 (push (cons (alist-get 'name step)
+                             (konix/agent-shell-workspace--last-question-id file))
+                       ids))
+               (konix/agent-shell-workspace--edit
+                (lambda () (konix/agent-shell-workspace--plan-order steps ids))))
+           (error
+            (konix/agent-shell-workspace--write-file file
+              (erase-buffer)
+              (insert before))
+            (signal (car refused) (cdr refused))))
          (concat "Wrote the plan: "
                  (mapconcat (lambda (one) (format "%s is %s" (car one) (cdr one)))
                             (reverse ids) ", ")))))
@@ -2995,23 +3205,36 @@ MCP Parameters:
         (cons "close" konix/agent-shell-workspace-closing-keyword))
   "Where each act the writer can name leaves a question.")
 
-(defconst konix/agent-shell-workspace-users-acts
-  '("settle" "done" "maybe")
-  "Acts that are the user's own, which the writer is refused.")
-
 (defconst konix/agent-shell-workspace-settling-error
   (concat "Settling is the user's move, never yours. Finish it instead and leave the"
           " settling to them.")
   "What a writer is told when it tries to settle a question itself.")
 
+(defconst konix/agent-shell-workspace-putting-off-error
+  (concat "Putting a question off is the user's move, never yours. Put it down"
+          " instead, or ask them whether it can wait.")
+  "What a writer is told when it tries to put a question off itself.")
+
+(defconst konix/agent-shell-workspace-users-acts
+  (list (cons "settle" konix/agent-shell-workspace-settling-error)
+        (cons "done" konix/agent-shell-workspace-settling-error)
+        (cons "maybe" konix/agent-shell-workspace-putting-off-error))
+  "Acts that are the user's own, which the writer is refused, each with its refusal.")
+
 (defun konix/agent-shell-workspace--act-keyword (act)
   "Return where ACT leaves a question, refusing a word that names no act."
   (let ((named (string-trim (or act ""))))
-    (when (member-ignore-case named konix/agent-shell-workspace-users-acts)
-      (error "%s" konix/agent-shell-workspace-settling-error))
+    (when-let ((refused (assoc-string named konix/agent-shell-workspace-users-acts t)))
+      (error "%s" (cdr refused)))
     (or (cdr (assoc-string named konix/agent-shell-workspace-acts t))
         (error "Unknown act \"%s\" — one of: %s" act
                (mapconcat #'car konix/agent-shell-workspace-acts ", ")))))
+(defconst konix/agent-shell-workspace-refine-here-error
+  (concat "refine is not an act of this tool: rewrite the question with"
+          " set_workspace_question, its id passed and act refine, its heading asking"
+          " what you need to know and its body saying why.")
+  "What a writer is told when it hands a question back to the user by state alone.")
+
 (defconst konix/agent-shell-workspace-still-asked-error
   (concat "The user's last word on it asks you something: « %s ». Answering it hands"
           " the question back to them, it is not done: write the answer, then refine.")
@@ -3038,10 +3261,10 @@ MCP Parameters:
 
 (defun konix/agent-shell-workspace--refuse-closing-the-asked (keyword)
   "Refuse KEYWORD closing the question at point while the user's last word asks."
-  (when-let* (((equal keyword konix/agent-shell-workspace-closing-keyword))
-              (said (konix/agent-shell-workspace--users-last-word))
-              ((string-suffix-p "?" said)))
-    (error "%s" (format konix/agent-shell-workspace-still-asked-error said))))
+  (when (and (equal keyword konix/agent-shell-workspace-closing-keyword)
+             (konix/agent-shell-workspace--asked-back-p))
+    (error "%s" (format konix/agent-shell-workspace-still-asked-error
+                        (konix/agent-shell-workspace--users-last-word)))))
     (defun konix/mcp-server-set-workspace-state (id &optional act command on root)
       "Perform ACT on the workspace's question whose id is ID.
 
@@ -3052,7 +3275,7 @@ another question whose run it awaits too.
 MCP Parameters:
   id - Id of the question to act on, as the listing tool gives it
   act - work, put-down, await or close; refine goes through set_workspace_question
-  command - With await, and only then: the shell command to run, told you when it ends
+  command - With await, and only then: the shell command to run, told you when it ends; none, its own run still going, to await that run again
   on - With await, instead of command: id of a question awaiting the run this one waits on
   root - With command: \"true\" to run it as root, which always waits on the user's leave"
       (mcp-server-lib-with-error-handling
@@ -3063,7 +3286,7 @@ MCP Parameters:
        (when (equal (konix/agent-shell-workspace--act-keyword act)
                     konix/agent-shell-workspace-refine-keyword)
          (error "%s" konix/agent-shell-workspace-refine-here-error))
-       (konix/agent-shell-workspace--refuse-a-bad-await act command on)
+       (konix/agent-shell-workspace--refuse-a-bad-await act command on id)
        (setq root (and root (not (member (downcase (format "%s" root)) '("" "false" "nil")))))
        (when (and root (not command))
          (error "root goes with a command to await"))
@@ -3080,67 +3303,6 @@ MCP Parameters:
               (when (or command on)
                 (konix/agent-shell-workspace--await-at-point id command on run)))))
           (konix/agent-shell-workspace--await-said command on run))))))
-(defun konix/agent-shell-workspace--permit-run (command &optional writer)
-  "Non-nil when WRITER's permissions let COMMAND run, the calling writer's by default.
-A blacklisted COMMAND is refused with its reason."
-  (let* ((call (list (cons :title command) (cons :kind "execute")
-                     (cons :raw-input (list (cons 'command command)))))
-         (verdict (with-current-buffer (or writer (konix/agent-shell-workspace--writer))
-                    (cons (konix/agent-shell-policy--match
-                           konix/agent-shell--blacklist call)
-                          (konix/agent-shell-policy--match
-                           konix/agent-shell--whitelist call)))))
-    (when (car verdict)
-      (error "%s is blacklisted: %s" command (or (cdar verdict) "")))
-    (cdr verdict)))
-(defconst konix/agent-shell-workspace-run-asked-said
-  (concat "« %s » %s, so nothing runs yet: the question asks the"
-          " user's leave. On their yes it runs, and you hear when it ends; on their"
-          " no it is yours again, refused.")
-  "What a writer is told when the run it awaits needs the user's leave.")
-
-(defconst konix/agent-shell-workspace-asks-leave-said "asks leave"
-  "What the line of a run waiting on the user's leave opens on.")
-
-(defun konix/agent-shell-workspace--ask-leave-to-run (id command &optional root)
-  "Put the question ID in PERM, asking the user's leave to run COMMAND, as root if ROOT."
-  (let ((directory (konix/agent-shell-workspace--run-directory
-                    (konix/agent-shell-workspace--writer))))
-    (konix/agent-shell-workspace--edit
-     (lambda ()
-       (konix/agent-shell-workspace--goto-id id)
-       (org-todo konix/agent-shell-workspace-permission-keyword)
-       (org-entry-put (point) "PENDING-RUN" command)
-       (when root (org-entry-put (point) "PENDING-ROOT" "t"))
-       (org-end-of-meta-data)
-       (insert (format "  - %s :: =%s= in %s%s: y runs it, n refuses it\n"
-                       konix/agent-shell-workspace-asks-leave-said
-                       command directory (if root ", as root" "")))))
-    (format konix/agent-shell-workspace-run-asked-said command
-            (if root "runs as root" "is not whitelisted"))))
-(defun konix/agent-shell-workspace--run-to-come (id &optional writer)
-  "Return (FILE DIRECTORY LOG AHEAD) for a run the question ID is to await.
-WRITER is whose run it is, the calling one where nil."
-  (let* ((writer (or writer (konix/agent-shell-workspace--writer)))
-         (directory (konix/agent-shell-workspace--run-directory writer))
-         (file (konix/agent-shell-workspace-file writer)))
-    (list file directory
-          (konix/agent-shell-workspace--run-log directory id)
-          (konix/agent-shell-workspace--runs-ahead file))))
-
-(defun konix/agent-shell-workspace--await-said (command on run)
-  "Return what the writer is told of awaiting COMMAND, or the run ON awaits.
-RUN is (FILE DIRECTORY LOG AHEAD) for COMMAND."
-  (pcase-let ((`(,file ,directory ,log ,ahead) run))
-    (concat
-     (when on
-       (format konix/agent-shell-workspace-run-joined-said on))
-     (when command
-       (format konix/agent-shell-workspace-run-started-said
-               (if ahead "Queued" "Running") command directory log))
-     (when ahead
-       (format konix/agent-shell-workspace-run-queued-said
-               (konix/agent-shell-workspace--run-cap file) ahead)))))
 (defun konix/agent-shell-workspace--set-the-keyword (id keyword)
   "Put the question ID in KEYWORD, its every other character left alone."
   (let* ((was (konix/agent-shell-workspace--refuse-the-act id keyword))
@@ -3150,30 +3312,11 @@ RUN is (FILE DIRECTORY LOG AHEAD) for COMMAND."
     (goto-char word-start)
     (insert keyword)
     (save-excursion (konix/agent-shell-workspace--touch))))
-(defun konix/agent-shell-workspace--await-at-point (id command on run &optional root)
-  "Have the question ID at point await COMMAND, as root if ROOT, or the run ON awaits.
-RUN is (FILE DIRECTORY LOG AHEAD), where and how COMMAND goes."
-  (pcase-let ((`(,file ,directory ,log ,ahead) run))
-    (konix/agent-shell-workspace--forget-run-lines)
-    (when command
-      (org-end-of-meta-data)
-      (insert (format "  - %s :: =%s=%s [[file+emacs:%s][its output]]\n"
-                      (if ahead
-                          konix/agent-shell-workspace-queued-said
-                        konix/agent-shell-workspace-running-said)
-                      command (if root " as root" "") log))
-      (konix/agent-shell-workspace--run-or-queue
-       file id (lambda ()
-                 (konix/agent-shell-workspace--run-for
-                  file id command directory log root))))
-    (when on
-      (konix/agent-shell-workspace--link-under
-       id on (format "the run of « %s »"
-                     (konix/agent-shell-workspace--heading-by-id-here on))
-       konix/agent-shell-workspace-running-said)
-      (puthash on (append (gethash on konix/agent-shell-workspace--joiners)
-                          (list id))
-               konix/agent-shell-workspace--joiners))))
+(defconst konix/agent-shell-workspace-await-sleep-error
+  (concat "Do not await a sleep: await a command that ends when what you wait for"
+          " holds, a check of that very condition.")
+  "What a writer is told when it awaits time passing rather than a condition.")
+
 (defun konix/agent-shell-workspace--awaiting-act-p (act)
   "Non-nil when ACT is await, told by its name alone."
   (string-equal-ignore-case (string-trim (or act "")) "await"))
@@ -3183,21 +3326,20 @@ RUN is (FILE DIRECTORY LOG AHEAD), where and how COMMAND goes."
           " yourself. Emacs runs it and hands the question back to you when it ends.")
   "What a writer is told when it awaits without saying what.")
 
-(defconst konix/agent-shell-workspace-refine-here-error
-  (concat "refine is not an act of this tool: rewrite the question with"
-          " set_workspace_question, its id passed and act refine, its heading asking"
-          " what you need to know and its body saying why.")
-  "What a writer is told when it hands a question back to the user by state alone.")
-
-(defun konix/agent-shell-workspace--refuse-a-bad-await (act command on)
-  "Refuse ACT with COMMAND or ON where they do not make one await."
+(defun konix/agent-shell-workspace--refuse-a-bad-await (act command on &optional id)
+  "Refuse ACT with COMMAND or ON where they do not make one await.
+With neither, the question ID awaits its own run again, where that run still goes."
   (let ((awaiting (konix/agent-shell-workspace--awaiting-act-p act)))
     (when (and (or command on) (not awaiting))
       (error "A command, or a run to join, goes with await alone"))
     (when (and command on)
       (error "Await a command of your own, or join the run of another: not both"))
-    (when (and awaiting (not command) (not on))
+    (when (and awaiting (not command) (not on)
+               (not (and id (konix/agent-shell-workspace--run-going-p id))))
       (error "%s" konix/agent-shell-workspace-await-no-command-error))
+    (when (and command
+               (string-match-p "\\`[ \t]*sleep[ \t]+[0-9.]+[smhd]?[ \t]*\\'" command))
+      (error "%s" konix/agent-shell-workspace-await-sleep-error))
     (when (and on (not (konix/agent-shell-workspace--run-going-p on)))
       (error "%s awaits no run to join; pass the command instead" on))))
 (defconst konix/agent-shell-workspace-running-said "running"
@@ -3274,16 +3416,110 @@ Read off Emacs's own processes, so a run lost to a restart is simply over."
         joined)))
 (defun konix/agent-shell-workspace--the-writers-p (state id)
   "Non-nil when a question in STATE, going by ID, is the writer's just now.
-An awaiting one is the writer's once its run is over, and nobody's until then."
-  (or (member state konix/agent-shell-workspace-writers-keywords)
-      (and (equal state konix/agent-shell-workspace-awaiting-keyword)
-           (not (konix/agent-shell-workspace--run-going-p id)))))
+An awaiting one is the writer's once its run is over, and nobody's until then;
+a project is never the writer's."
+  (and (or (member state konix/agent-shell-workspace-writers-keywords)
+           (and (equal state konix/agent-shell-workspace-awaiting-keyword)
+                (not (konix/agent-shell-workspace--run-going-p id))))
+       (not (and id (save-excursion
+                      (and (konix/agent-shell-workspace--goto-id id)
+                           (konix/agent-shell-workspace--project-at-point-p)))))))
 
 (defun konix/agent-shell-workspace--the-writers-at-point-p ()
   "Non-nil when the question at point is the writer's just now."
   (konix/agent-shell-workspace--the-writers-p
    (konix/agent-shell-workspace--state-at-point)
    (org-entry-get (point) "ID")))
+(defun konix/agent-shell-workspace--permit-run (command &optional writer)
+  "Non-nil when WRITER's permissions let COMMAND run, the calling writer's by default.
+A blacklisted COMMAND is refused with its reason."
+  (let* ((call (list (cons :title command) (cons :kind "execute")
+                     (cons :raw-input (list (cons 'command command)))))
+         (verdict (with-current-buffer (or writer (konix/agent-shell-workspace--writer))
+                    (cons (konix/agent-shell-policy--match
+                           konix/agent-shell--blacklist call)
+                          (konix/agent-shell-policy--match
+                           konix/agent-shell--whitelist call)))))
+    (when (car verdict)
+      (error "%s is blacklisted: %s" command (or (cdar verdict) "")))
+    (cdr verdict)))
+(defconst konix/agent-shell-workspace-run-asked-said
+  (concat "« %s » %s, so nothing runs yet: the question asks the"
+          " user's leave. On their yes it runs, and you hear when it ends; on their"
+          " no it is yours again, refused.")
+  "What a writer is told when the run it awaits needs the user's leave.")
+
+(defconst konix/agent-shell-workspace-asks-leave-said "asks leave"
+  "What the line of a run waiting on the user's leave opens on.")
+
+(defun konix/agent-shell-workspace--ask-leave-to-run (id command &optional root)
+  "Put the question ID in PERM, asking the user's leave to run COMMAND, as root if ROOT."
+  (let ((directory (konix/agent-shell-workspace--run-directory
+                    (konix/agent-shell-workspace--writer))))
+    (konix/agent-shell-workspace--edit
+     (lambda ()
+       (konix/agent-shell-workspace--refuse-the-act
+        id konix/agent-shell-workspace-awaiting-keyword)
+       (org-todo konix/agent-shell-workspace-permission-keyword)
+       (org-entry-put (point) "PENDING-RUN" command)
+       (when root (org-entry-put (point) "PENDING-ROOT" "t"))
+       (org-end-of-meta-data)
+       (insert (format "  - %s :: =%s= in %s%s: y runs it, n refuses it\n"
+                       konix/agent-shell-workspace-asks-leave-said
+                       command directory (if root ", as root" "")))))
+    (format konix/agent-shell-workspace-run-asked-said command
+            (if root "runs as root" "is not whitelisted"))))
+(defun konix/agent-shell-workspace--run-to-come (id &optional writer)
+  "Return (FILE DIRECTORY LOG AHEAD) for a run the question ID is to await.
+WRITER is whose run it is, the calling one where nil."
+  (let* ((writer (or writer (konix/agent-shell-workspace--writer)))
+         (directory (konix/agent-shell-workspace--run-directory writer))
+         (file (konix/agent-shell-workspace-file writer)))
+    (list file directory
+          (konix/agent-shell-workspace--run-log directory id)
+          (konix/agent-shell-workspace--runs-ahead file))))
+
+(defun konix/agent-shell-workspace--await-said (command on run)
+  "Return what the writer is told of awaiting COMMAND, or the run ON awaits.
+RUN is (FILE DIRECTORY LOG AHEAD) for COMMAND."
+  (pcase-let ((`(,file ,directory ,log ,ahead) run))
+    (concat
+     (when on
+       (format konix/agent-shell-workspace-run-joined-said on))
+     (when command
+       (format konix/agent-shell-workspace-run-started-said
+               (if ahead "Queued" "Running") command directory log))
+     (when ahead
+       (format konix/agent-shell-workspace-run-queued-said
+               (konix/agent-shell-workspace--run-cap file) ahead)))))
+(defun konix/agent-shell-workspace--await-at-point (id command on run &optional root)
+  "Have the question ID at point await COMMAND, as root if ROOT, or the run ON awaits.
+RUN is (FILE DIRECTORY LOG AHEAD), where and how COMMAND goes."
+  (pcase-let ((`(,file ,directory ,log ,ahead) run))
+    (konix/agent-shell-workspace--stop-run id)
+    (maphash (lambda (run joiners)
+               (puthash run (delete id joiners) konix/agent-shell-workspace--joiners))
+             konix/agent-shell-workspace--joiners)
+    (konix/agent-shell-workspace--forget-run-lines)
+    (when command
+      (org-end-of-meta-data)
+      (insert (format "  - %s :: =%s=%s [[file+emacs:%s][its output]]\n"
+                      (if ahead
+                          konix/agent-shell-workspace-queued-said
+                        konix/agent-shell-workspace-running-said)
+                      command (if root " as root" "") log))
+      (konix/agent-shell-workspace--run-or-queue
+       file id (lambda ()
+                 (konix/agent-shell-workspace--run-for
+                  file id command directory log root))))
+    (when on
+      (konix/agent-shell-workspace--link-under
+       id on (format "the run of « %s »"
+                     (konix/agent-shell-workspace--heading-by-id-here on))
+       konix/agent-shell-workspace-running-said)
+      (puthash on (append (gethash on konix/agent-shell-workspace--joiners)
+                          (list id))
+               konix/agent-shell-workspace--joiners))))
 (defun konix/agent-shell-workspace--run-line (file id now)
   "Make the line naming the run the question ID awaits in FILE open on NOW."
   (when (and file (file-readable-p file))
@@ -3294,15 +3530,21 @@ An awaiting one is the writer's once its run is over, and nobody's until then."
                (konix/agent-shell-workspace--question-end) t)
           (replace-match now t t nil 1))))))
 
-(defun konix/agent-shell-workspace--run-over (file id how)
-  "Say under the question ID of FILE HOW its run went, now that it is over."
+(defun konix/agent-shell-workspace--run-over (file id how &optional log)
+  "Say under the question ID of FILE HOW its run went, now that it is over.
+LOG, where given, keeps to the line naming it: the log of its own run, or the
+link to the question whose run it joined."
   (konix/agent-shell-workspace--write-file file
     (when (konix/agent-shell-workspace--goto-id id)
       (let ((limit (konix/agent-shell-workspace--question-end)))
         (when (re-search-forward
-               (konix/agent-shell-workspace--run-line-regexp
-                (list konix/agent-shell-workspace-running-said
-                      konix/agent-shell-workspace-queued-said))
+               (concat
+                (string-remove-suffix
+                 ".*\n" (konix/agent-shell-workspace--run-line-regexp
+                         (list konix/agent-shell-workspace-running-said
+                               konix/agent-shell-workspace-queued-said)))
+                (if log (concat ".*" (regexp-quote log)) "")
+                ".*\n")
                limit t)
           (replace-match (format "  - %s :: %s\n"
                                  konix/agent-shell-workspace-ran-said how)
@@ -3323,8 +3565,8 @@ An awaiting one is the writer's once its run is over, and nobody's until then."
     (make-temp-file (expand-file-name (format "awaited-%s-" id) where) nil ".log")))
 
 (defun konix/agent-shell-workspace--run-directory (writer)
-  "Return where a run WRITER awaits goes: its project, or where it stands."
-  (or (konix/agent-shell-workspace--project-of writer) default-directory))
+  "Return where a run WRITER awaits goes: its working directory, or where it stands."
+  (or (konix/agent-shell-workspace--working-directory-of writer) default-directory))
 (defconst konix/agent-shell-workspace-default-run-timeout 30
   "How many minutes a run of a workspace naming no timeout may go.")
 
@@ -3375,18 +3617,35 @@ One still going past the workspace's timeout is killed."
   (process-put process 'konix/agent-shell-workspace file)
   (process-put process 'konix/agent-shell-workspace-id id)
   process)
+(defun konix/agent-shell-workspace--run-still-named-p (file id log)
+  "Non-nil when the question ID of FILE still names the run writing into LOG."
+  (and (file-readable-p file)
+       (konix/agent-shell-workspace--read-file file
+         (when (konix/agent-shell-workspace--goto-id id)
+           (re-search-forward (regexp-quote log)
+                              (konix/agent-shell-workspace--question-end) t)))))
+
 (defun konix/agent-shell-workspace--the-run-ended (file id command log exit)
+  "Say under the question ID of FILE, and its joiners, that COMMAND exited EXIT.
+A run the question awaits no more touches nothing but the queue."
+  (if (not (konix/agent-shell-workspace--run-still-named-p file id log))
+      (konix/agent-shell-workspace--run-ended file)
+    (konix/agent-shell-workspace--the-awaited-run-ended file id command log exit)))
+
+(defun konix/agent-shell-workspace--the-awaited-run-ended (file id command log exit)
   "Say under the question ID of FILE, and its joiners, that COMMAND exited EXIT."
   (ignore-errors
     (konix/agent-shell-workspace--run-over
      file id (format "=%s= exited %s, [[file+emacs:%s][its output]]"
-                     command exit log)))
+                     command exit log)
+     log))
   (dolist (joined (gethash id konix/agent-shell-workspace--joiners))
     (ignore-errors
       (konix/agent-shell-workspace--run-over
        file joined (format "the run of [[id:%s][%s]] exited %s, [[file+emacs:%s][its output]]"
                            id (konix/agent-shell-workspace--heading-of id file)
-                           exit log))))
+                           exit log)
+       (format "[[id:%s]" id))))
   (remhash id konix/agent-shell-workspace--joiners)
   (konix/agent-shell-workspace--run-ended file)
   (when-let ((writer (konix/agent-shell-workspace--writer-of file)))
@@ -3484,8 +3743,8 @@ Only taking one up is refused, and only where the writer has a higher one of its
         (error "%s" (format konix/agent-shell-workspace-lower-error
                             (cdr highest)))))))
 (defconst konix/agent-shell-workspace-blocked-error
-  (concat "That one waits on another first: « %s ». It comes back to you once the user"
-          " has settled that one.")
+  (concat "That one waits on another first: « %s ». It comes back to you once that one"
+          " no longer holds it back.")
   "What a writer is told when it takes up one waiting on another.")
 
 (defun konix/agent-shell-workspace--refuse-the-blocked (keyword was)
@@ -3508,6 +3767,10 @@ Only taking one up is refused, and only where the writer has a higher one of its
   (concat "Only the one you hold can await a run of yours. Work on it first, start the"
           " run, then say await.")
   "What a writer is told when it awaits one it does not hold.")
+(defconst konix/agent-shell-workspace-project-error
+  "That is a project, the user's alone: no act or rewrite of yours reaches it."
+  "What a writer is told when it acts on, or rewrites, a project.")
+
 (defun konix/agent-shell-workspace--refuse-the-act (id keyword)
   "Refuse KEYWORD on the question ID, or return the state it stands in.
 Point is left on its heading and not a character of it is written."
@@ -3517,6 +3780,8 @@ Point is left on its heading and not a character of it is written."
     (error "An answer is the user's to move, not yours: %s" id))
   (let ((was (or (konix/agent-shell-workspace--state-at-point)
                  (error "A fact stands in no state, so there is none to act on"))))
+    (when (konix/agent-shell-workspace--project-at-point-p)
+      (error "%s" konix/agent-shell-workspace-project-error))
     (konix/agent-shell-workspace--refuse-a-second-held keyword was)
     (when (and (equal keyword konix/agent-shell-workspace-awaiting-keyword)
                (not (equal was konix/agent-shell-workspace-working-keyword)))
@@ -3544,12 +3809,13 @@ Point is left on its heading and not a character of it is written."
           " gets done. Where what it asks is itself unclear, refine it and say what"
           " you need — do not hesitate and do not guess: a guess costs you the work"
           " it sends you off to do, and them the reading of it, where asking costs"
-          " one sentence. Nothing lets you off it but putting it down or handing it"
-          " back, and either of those is said with set_workspace_state.")
+          " one sentence. Nothing lets you off it but putting it down, with"
+          " set_workspace_state, or handing it back, by rewriting it with"
+          " set_workspace_question, act refine.")
   "What a writer is told as it takes one up, that question's words filled in.")
 
-(defconst konix/agent-shell-workspace-no-goal-said
-  (concat "This workspace names no goal, so ask the user what the work is before"
+(defconst konix/agent-shell-workspace-no-project-said
+  (concat "This workspace names no project, so ask the user what the work is before"
           " you go far into that one.")
   "What a writer is told where nothing says what the work is.")
 (defun konix/agent-shell-workspace--heading-of (id file)
@@ -3565,15 +3831,15 @@ Point is left on its heading and not a character of it is written."
    (concat (format "%s: %s" act id)
            (when (equal (konix/agent-shell-workspace--act-keyword act)
                         konix/agent-shell-workspace-working-keyword)
-             (let ((goal (konix/agent-shell-workspace--goal-line file))
+             (let ((project (konix/agent-shell-workspace--project-line file))
                    (asked (konix/agent-shell-workspace--heading-of id file)))
                (concat "\n\n"
                        (format konix/agent-shell-workspace-holding-said
                                (if asked (format "« %s »" asked) "that one"))
                        "\n\n"
-                       (if (string-empty-p goal)
-                           konix/agent-shell-workspace-no-goal-said
-                         goal)))))))
+                       (if (string-empty-p project)
+                           konix/agent-shell-workspace-no-project-said
+                         project)))))))
 (defun konix/agent-shell-workspace--working-p ()
   "Non-nil when a question of this buffer is one the writer is on."
   (save-excursion
@@ -3587,12 +3853,14 @@ Point is left on its heading and not a character of it is written."
   "What a writer is told when it hands over a question carrying no body.")
 
 (defun konix/agent-shell-workspace--the-users-own-p ()
-  "Non-nil when the heading at point asks nothing, so the user raised it."
-  (save-excursion
-    (beginning-of-line)
-    (not (string-suffix-p
-          "?" (string-trim (buffer-substring-no-properties
-                            (point) (line-end-position)))))))
+  "Non-nil when the user raised the heading at point.
+Its BY says so, or it asks nothing."
+  (or (konix/agent-shell-workspace--by-hand-p)
+      (save-excursion
+        (beginning-of-line)
+        (not (string-suffix-p
+              "?" (string-trim (buffer-substring-no-properties
+                                (point) (line-end-position))))))))
 
 (defun konix/agent-shell-workspace--nothing-written-p ()
   "Non-nil when nothing is written under the question at point.
@@ -3617,6 +3885,11 @@ Return non-nil where it was added."
            (goto-char (point-max))
            t)
     (insert fact)))
+     (defconst konix/agent-shell-workspace-fact-about-nothing-error
+       (concat "A fact reports on a question: pass about with the id of the one it"
+               " reports on, so that question links to it.")
+       "What a writer is told when its fact names no question it reports on.")
+
      (defun konix/mcp-server-set-workspace-fact
          (label &optional note id about file line says also url)
        "Write one fact of the workspace, replacing the one ID names or adding it.
@@ -3625,13 +3898,15 @@ MCP Parameters:
   label - What the fact is called, ending in no question mark and opening on no state
   note - Optional JSON array of « intention :: text » bullets
   id - Optional id of the fact to rewrite, as the listing tool gives it
-  about - Optional id of the question this reports on, which then links to it
+  about - Id of the question this reports on, which then links to it; required
   file - Optional absolute path of a place this fact points at
   line - Line in that file
   says - Optional caption for the link itself
   also - Optional JSON array of further {file, line, says} or {url, says}
   url - Optional web address, written out whole and counting against no limit"
        (mcp-server-lib-with-error-handling
+        (when (string-empty-p (string-trim (or about "")))
+          (error "%s" konix/agent-shell-workspace-fact-about-nothing-error))
         (let* ((its-id (or id (org-id-new)))
                (entry (list (cons 'label label) (cons 'note note) (cons 'id its-id)
                             (cons 'file file)
@@ -3642,8 +3917,7 @@ MCP Parameters:
            (lambda ()
              (setq added (konix/agent-shell-workspace--put-fact
                           id (konix/agent-shell-workspace--render-fact entry)))
-             (when about
-               (konix/agent-shell-workspace--link-both about its-id label))))
+             (konix/agent-shell-workspace--link-both about its-id label)))
           (if added
               (format "Added the fact \"%s\"" label)
             (format "Rewrote %s" id)))))
@@ -3701,10 +3975,21 @@ ONLY-ACTIONABLE keeps back whatever the writer has nothing to do about."
                   (goto-char start)
                   (konix/agent-shell-workspace--listed-p state id only-actionable highest))
             (push (format "%s %s %s — %s"
-                          (if (konix/agent-shell-workspace--the-writers-p state id)
-                              (konix/agent-shell-workspace--standing
-                               konix/agent-shell-workspace-fresh-keyword)
-                            (konix/agent-shell-workspace--standing state))
+                          (cond
+                           ((save-excursion (goto-char start)
+                                            (konix/agent-shell-workspace--project-at-point-p))
+                            (concat (pcase state
+                                      ((pred (equal konix/agent-shell-workspace-later-keyword))
+                                       "later ")
+                                      ((pred (equal konix/agent-shell-workspace-done-keyword))
+                                       "settled ")
+                                      (_ ""))
+                                    "project"))
+                           ((and (not (equal state konix/agent-shell-workspace-working-keyword))
+                                 (konix/agent-shell-workspace--the-writers-p state id))
+                            (konix/agent-shell-workspace--standing
+                             konix/agent-shell-workspace-fresh-keyword))
+                           (t (konix/agent-shell-workspace--standing state)))
                           (or id "-")
                           (if (re-search-forward
                                konix/agent-shell-workspace-link-regexp limit t)
@@ -3750,7 +4035,7 @@ A question comes with its state and place, then a fact."
    (let ((file (konix/agent-shell-workspace--file-or-error)))
      (unless (file-readable-p file)
        (error "No workspace here"))
-     (concat (konix/agent-shell-workspace--goal-line file)
+     (concat (konix/agent-shell-workspace--project-line file)
              (or (konix/agent-shell-workspace--listing file)
                  "The workspace has nothing in it")))))
 (defconst konix/agent-shell-workspace-standings
@@ -3770,13 +4055,20 @@ A question comes with its state and place, then a fact."
 (defun konix/agent-shell-workspace--listed-p (state id only-actionable highest)
   "Non-nil when the question at point, in STATE, going by ID, is listed.
 ONLY-ACTIONABLE keeps to what the writer may take up, HIGHEST standing first."
-  (and (null (konix/agent-shell-workspace--waited-on))
+  (and (or (null (konix/agent-shell-workspace--waited-on))
+           (equal state konix/agent-shell-workspace-working-keyword))
        (or (not only-actionable)
            (and (konix/agent-shell-workspace--the-writers-p state id)
                 (or (null highest)
                     (equal state konix/agent-shell-workspace-working-keyword)
                     (>= (konix/agent-shell-workspace--standing-at-point)
                         highest))))))
+(defconst konix/agent-shell-workspace-pointing-regexp
+  (concat "^ *- \\(?:.* : \\)?\\(?:"
+          konix/agent-shell-workspace-link-regexp
+          "\\|\\[\\[[a-z][a-z0-9+.-]*:[^]]+\\]\\]\\)")
+  "Regexp matching a line saying only where to look: a place, or an address.")
+
 (defun konix/agent-shell-workspace--body-lines (start limit)
   "Return what is written between START and LIMIT, stopping at the first place.
 
@@ -3831,9 +4123,11 @@ of it is ever returned."
         (org-todo (if later
                       konix/agent-shell-workspace-fresh-keyword
                     konix/agent-shell-workspace-later-keyword)))
-      (when later
-        (konix/agent-shell-workspace--submit
-         (konix/agent-shell-workspace--target-writer))))))
+      (when-let* ((later)
+                  (writer (konix/agent-shell-workspace--target-writer))
+                  (file (konix/agent-shell-workspace-file writer))
+                  ((not (konix/agent-shell-workspace--writer-done-p file))))
+        (konix/agent-shell-workspace--submit writer)))))
 (defun konix/agent-shell-workspace-set-priority ()
   "Set the priority of the question at point, and save so the writer reads it."
   (interactive)
@@ -3887,7 +4181,7 @@ Whatever the user was reading, standing in it, is left in view."
         (org-fold-show-context)))
     (org-fold-hide-drawer-all)
     (konix/agent-shell-workspace--show-what-waits)
-    (konix/agent-shell-workspace--show-reviews)
+    (konix/agent-shell-workspace--show-labels)
     (konix/agent-shell-workspace--show-ages)
     (when reading (set-marker reading nil))))
 (defface konix/agent-shell-workspace-blocked-face
@@ -3921,8 +4215,11 @@ Whatever the user was reading, standing in it, is left in view."
                    (konix/agent-shell-workspace--heading-if-open need questions))
                  (nth 3 one))
      (seq-filter (lambda (before)
-                   (konix/agent-shell-workspace--heading-if-the-writers
-                    before questions))
+                   (or (konix/agent-shell-workspace--heading-if-the-writers
+                        before questions)
+                       (and (member (nth 2 one) konix/agent-shell-workspace-users-keywords)
+                            (member (nth 2 (assoc before questions))
+                                    konix/agent-shell-workspace-users-keywords))))
                  (nth 4 one)))))
 (defface konix/agent-shell-workspace-ringed-face
   '((t :inherit error))
@@ -3951,12 +4248,12 @@ SEEN keeps it from going round."
   "Non-nil when ID waits, however far round, on itself."
   (konix/agent-shell-workspace--reaches-p id id questions (list id)))
 (defface konix/agent-shell-workspace-after-face
-  '((t :inherit font-lock-comment-face))
-  "Face of a question held back only until another leaves the writer's hands."
+  '((t :inherit shadow :slant italic))
+  "Face of a question held back only by what it comes after."
   :group 'agent-shell)
 
 (face-spec-set 'konix/agent-shell-workspace-after-face
-               '((t :inherit font-lock-comment-face))
+               '((t :inherit shadow :slant italic))
                'face-defface-spec)
 (defun konix/agent-shell-workspace--show-what-waits ()
   "Dim the words of every open question another is holding back."
@@ -3969,6 +4266,8 @@ SEEN keeps it from going round."
               konix/agent-shell-workspace-state-regexp)
         (when-let* ((words (point))
                     (id (org-entry-get (point) "ID"))
+                    ((not (equal (nth 2 (assoc id questions))
+                                 konix/agent-shell-workspace-closing-keyword)))
                     ((konix/agent-shell-workspace--heading-if-open id questions))
                     ((or (konix/agent-shell-workspace--holding-back id questions)
                          (konix/agent-shell-workspace--ringed-p id questions)))
@@ -4012,10 +4311,15 @@ SEEN keeps it from going round."
   "Return (FILE . LINE) for the file line the block line point is on stands for."
   (save-excursion
     (let ((here (line-beginning-position))
-          switches body file line)
-      (when (re-search-backward "^#\\+begin_src\\([^\n]*\\)$" nil t)
-        (setq switches (match-string 1)
-              body (save-excursion (forward-line 1) (point))
+          (heading (save-excursion (konix/agent-shell-workspace--goto-heading) (point)))
+          switches indent body file line)
+      (when (and (re-search-backward "^\\([ \t]*\\)#\\+begin_src\\([^\n]*\\)$" heading t)
+                 (setq indent (match-string 1)
+                       switches (match-string 2))
+                 (save-excursion
+                   (re-search-forward "^[ \t]*#\\+end_src" nil t)
+                   (> (line-beginning-position) here)))
+        (setq body (save-excursion (forward-line 1) (point))
               file (save-excursion
                      (when (re-search-backward
                             konix/agent-shell-workspace-link-regexp nil t)
@@ -4029,16 +4333,18 @@ SEEN keeps it from going round."
             (forward-line 1)))
          ((string-match-p "diff" switches)
           (goto-char body)
-          (when (looking-at "^@@ -[0-9]+\\(?:,[0-9]+\\)? \\+\\([0-9]+\\)")
-            (setq line (string-to-number (match-string 1)))
+          (when (looking-at (concat "\\(" indent "\\)?"
+                                    "@@ -[0-9]+\\(?:,[0-9]+\\)? \\+\\([0-9]+\\)"))
+            (setq line (string-to-number (match-string 2))
+                  indent (if (match-beginning 1) indent ""))
             (forward-line 1)
             (while (< (point) here)
-              (unless (looking-at "^-")
+              (unless (looking-at (concat indent "-"))
                 (setq line (1+ line)))
               (forward-line 1)))))
         (when (and file line) (cons file line))))))
 (defun konix/agent-shell-workspace-open-at-point ()
-  "Open where point stands: the file a diff line stands for, or the link on it."
+  "Open where point stands: the file line a block's line stands for, or the link on it."
   (interactive)
   (if-let ((place (konix/agent-shell-workspace--place-here)))
       (let ((buffer (find-file-noselect (car place))))
@@ -4059,8 +4365,13 @@ SEEN keeps it from going round."
                      (konix/agent-shell-workspace--goto-question)
                      (org-get-todo-state)))))
       (unless (member state konix/agent-shell-workspace-users-keywords)
-        (goto-char (point-min))
-        (konix/agent-shell-workspace--goto-waiting)))))
+        (when-let ((first (seq-find
+                           (lambda (at)
+                             (save-excursion
+                               (goto-char at)
+                               (konix/agent-shell-workspace--state-at-point)))
+                           (konix/agent-shell-workspace--waiting-on-the-user))))
+          (konix/agent-shell-workspace--land-on first))))))
 (defvar konix/agent-shell-workspace--settling nil
   "The workspace a rewrite is settling in, until the user's next keystroke.")
 
@@ -4110,21 +4421,6 @@ SEEN keeps it from going round."
   (when-let ((window (get-buffer-window (current-buffer))))
     (with-selected-window window (recenter 0)))
   position)
-
-(defun konix/agent-shell-workspace--goto-question-matching (regexp &optional backwards)
-  "Move to the next heading matching REGEXP from point on, wrapping round, and open it.
-BACKWARDS looks the other way.  Return where it landed, or nil when none matches."
-  (let* ((position (or (save-excursion
-                         (and (konix/agent-shell-workspace--search-state
-                               regexp nil backwards)
-                              (match-beginning 0)))
-                       (save-excursion
-                         (goto-char (if backwards (point-max) (point-min)))
-                         (and (konix/agent-shell-workspace--search-state
-                               regexp nil backwards)
-                              (match-beginning 0))))))
-    (when position
-      (konix/agent-shell-workspace--land-on position))))
 (defun konix/agent-shell-workspace--facts ()
   "Return where each fact begins, in the order they stand in the workspace."
   (let (facts)
@@ -4210,11 +4506,6 @@ BACKWARDS looks the other way.  Return where it landed, nil where nothing waits.
                 (t (car all)))))
     (when next
       (konix/agent-shell-workspace--land-on next))))
-
-(defun konix/agent-shell-workspace--goto-settled-question ()
-  "Move to the next question the user has settled, wrapping round, and open it."
-  (konix/agent-shell-workspace--goto-question-matching
-   konix/agent-shell-workspace-settled-regexp))
 (defun konix/agent-shell-workspace-toggle-read ()
   "Say the fact point stands in is read and walk on, or take that back."
   (interactive)
@@ -4236,25 +4527,22 @@ BACKWARDS looks the other way.  Return where it landed, nil where nothing waits.
     (konix/agent-shell-workspace--submit
      konix/agent-shell-workspace--writer-buffer)))
  (defun konix/agent-shell-workspace--settle-question ()
-   "Move the question at point to done, or back to the user where it is there."
-   (let ((settling (not (equal (org-get-todo-state)
-                               konix/agent-shell-workspace-done-keyword)))
-         (had (konix/agent-shell-workspace--anything-left-p)))
+   "Move the question at point to done, refusing one already there."
+   (when (equal (org-get-todo-state) konix/agent-shell-workspace-done-keyword)
+     (user-error "Already settled: answer it with r to reopen it"))
+   (let ((had (konix/agent-shell-workspace--anything-left-p)))
      (konix/agent-shell-workspace--write
-       (org-todo (if settling
-                     konix/agent-shell-workspace-done-keyword
-                   konix/agent-shell-workspace-closing-keyword)))
+       (org-todo konix/agent-shell-workspace-done-keyword))
      (konix/agent-shell-workspace--tell-if-freed had)
-     (when settling
-       (let ((here (point)))
-         (end-of-line)
-         (unless (konix/agent-shell-workspace--goto-waiting)
-           (goto-char here))
-         (konix/agent-shell-workspace-focus-question)))))
+     (let ((here (point)))
+       (end-of-line)
+       (unless (konix/agent-shell-workspace--goto-waiting)
+         (goto-char here))
+       (konix/agent-shell-workspace-focus-question))))
 
  (defun konix/agent-shell-workspace-done-with-it ()
    "Be through with what point stands in: a question settled, a fact read.
-Pressed again it takes that back."
+On a fact read already it takes that back."
    (interactive)
    (konix/agent-shell-workspace--goto-question)
    (cond
@@ -4263,6 +4551,25 @@ Pressed again it takes that back."
     ((org-get-todo-state)
      (konix/agent-shell-workspace--settle-question))
     (t (user-error "This is neither a question to settle nor a fact to read"))))
+(defun konix/agent-shell-workspace--goto-question-matching (regexp &optional backwards)
+  "Move to the next heading matching REGEXP from point on, wrapping round, and open it.
+BACKWARDS looks the other way.  Return where it landed, or nil when none matches."
+  (let* ((position (or (save-excursion
+                         (and (konix/agent-shell-workspace--search-state
+                               regexp nil backwards)
+                              (match-beginning 0)))
+                       (save-excursion
+                         (goto-char (if backwards (point-max) (point-min)))
+                         (and (konix/agent-shell-workspace--search-state
+                               regexp nil backwards)
+                              (match-beginning 0))))))
+    (when position
+      (konix/agent-shell-workspace--land-on position))))
+
+(defun konix/agent-shell-workspace--goto-settled-question ()
+  "Move to the next question the user has settled, wrapping round, and open it."
+  (konix/agent-shell-workspace--goto-question-matching
+   konix/agent-shell-workspace-settled-regexp))
 (defun konix/agent-shell-workspace--stop-run (id)
   "Kill the run the question ID awaits, or take it out of the queue it waits in."
   (dolist (process (process-list))
@@ -4274,10 +4581,9 @@ Pressed again it takes that back."
                       konix/agent-shell-workspace--queued))
            konix/agent-shell-workspace--queued))
 
-(defun konix/agent-shell-workspace--take-away (confirm guidance whatever-state)
+(defun konix/agent-shell-workspace--take-away (confirm guidance)
   "Take away what point stands in, and tell the writer GUIDANCE.
-CONFIRM asks the user first.  WHATEVER-STATE tells the writer wherever it had got to;
-without it, only a writer working on the question is told."
+CONFIRM asks the user first.  Only a writer working on the question is told."
   (when (org-before-first-heading-p)
     (user-error "Point stands in no heading, so there is nothing here to drop"))
   (konix/agent-shell-workspace--goto-heading)
@@ -4298,7 +4604,7 @@ without it, only a writer working on the question is told."
         (delete-region (point) end))
       (when id
         (konix/agent-shell-workspace--stop-run id))
-      (when-let* (((or whatever-state worked-on))
+      (when-let* ((worked-on)
                   (writer (konix/agent-shell-workspace--target-writer))
                   (file (konix/agent-shell-workspace-file writer))
                   ((not (konix/agent-shell-workspace--writer-done-p file))))
@@ -4314,13 +4620,13 @@ without it, only a writer working on the question is told."
   "Drop what point stands in, asking the user first."
   (interactive)
   (konix/agent-shell-workspace--take-away
-   t konix/agent-shell-workspace-dropped-guidance nil))
+   t konix/agent-shell-workspace-dropped-guidance))
 
 (defun konix/agent-shell-workspace-drop-at-once ()
   "Drop what point stands in, asking nothing."
   (interactive)
   (konix/agent-shell-workspace--take-away
-   nil konix/agent-shell-workspace-dropped-guidance nil))
+   nil konix/agent-shell-workspace-dropped-guidance))
 (defun konix/agent-shell-workspace--drop-unreached-facts ()
   "Drop every fact no question reaches, and return how many went."
   (let ((ids (konix/agent-shell-workspace--unlinked-facts)))
@@ -4331,18 +4637,6 @@ without it, only a writer working on the question is told."
             (delete-region (point)
                            (konix/agent-shell-workspace--question-end))))))
     (length ids)))
-
-(defun konix/agent-shell-workspace-clean-facts ()
-  "Drop every fact no question reaches, leaving the questions alone."
-  (interactive)
-  (let ((orphans (length (konix/agent-shell-workspace--unlinked-facts))))
-    (if (zerop orphans)
-        (message "Nothing to clean: every fact is reached")
-      (when (y-or-n-p (format "Drop %d fact%s nothing reaches? "
-                              orphans (if (= orphans 1) "" "s")))
-        (message "%d fact%s gone"
-                 (konix/agent-shell-workspace--drop-unreached-facts)
-                 (if (= orphans 1) "" "s"))))))
 (defun konix/agent-shell-workspace--settled-questions ()
   "Return where each question the user has settled begins."
   (let (found)
@@ -4365,10 +4659,9 @@ without it, only a writer working on the question is told."
           (goto-char where)
           (delete-region (point)
                          (konix/agent-shell-workspace--question-end))))
-      (message "%d settled and %d fact%s gone"
-               settled
-               (konix/agent-shell-workspace--drop-unreached-facts)
-               (if (= orphans 1) "" "s")))))
+      (let ((gone (konix/agent-shell-workspace--drop-unreached-facts)))
+        (message "%d settled and %d fact%s gone"
+                 settled gone (if (= gone 1) "" "s"))))))
  (defconst konix/agent-shell-workspace-prompt-map
    (let ((map (make-sparse-keymap)))
      (set-keymap-parent map minibuffer-local-map)
@@ -4439,11 +4732,12 @@ LATER leaves it to hear it as its turn ends."
   (unless (string-match-p "\\`[^\n]+\\'" (string-trim heading))
     (user-error "A heading is one line — select less")))
  (defun konix/agent-shell-workspace-add-subject
-     (subject &optional body file line quoted needs loose held)
+     (subject &optional body file line quoted needs loose held project)
    "Put SUBJECT, and BODY under it, at the end of this workspace.
 FILE and LINE, when given, come out under it as the place it is about, and
 QUOTED as what was selected there.  NEEDS are the ids of the questions it
-waits on, or merely comes after where LOOSE; HELD those that wait on it."
+waits on, or merely comes after where LOOSE; HELD those that wait on it.
+PROJECT is the id of the project it is for."
    (interactive (konix/agent-shell-workspace--read-heading-and-body "Subject: "))
    (konix/agent-shell-workspace--write
      (let ((id (org-id-new)))
@@ -4459,7 +4753,12 @@ waits on, or merely comes after where LOOSE; HELD those that wait on it."
                (konix/agent-shell-workspace--subject-place file line quoted)))
       (konix/agent-shell-workspace--wait-on-each id needs loose)
       (dolist (waiting held)
-        (konix/agent-shell-workspace--say-waiting waiting id))))
+        (konix/agent-shell-workspace--say-waiting waiting id))
+      (when project
+        (save-excursion
+          (konix/agent-shell-workspace--link-under
+           id project (konix/agent-shell-workspace--heading-by-id-here project)
+           konix/agent-shell-workspace-for-said)))))
    (konix/agent-shell-workspace-focus-question)
    (konix/agent-shell-workspace--submit
     (konix/agent-shell-workspace--target-writer)))
@@ -4476,24 +4775,42 @@ waits on, or merely comes after where LOOSE; HELD those that wait on it."
                 (if link (format "  --- %s\n" link) "")
                 "  #+END_QUOTE\n")
       (if link (format "  - %s\n" link) ""))))
- (defun konix/agent-shell-workspace-add-subject-after (subject &optional body loose)
+ (defun konix/agent-shell-workspace--followed ()
+   "Return (ID HEADING PROJECT) of the question point stands in, for a subject to follow."
+   (save-excursion
+     (konix/agent-shell-workspace--goto-question)
+     (unless (konix/agent-shell-workspace--state-at-point)
+       (user-error "A fact is nobody's to do, so nothing waits on it"))
+     (list (or (org-entry-get (point) "ID")
+               (user-error "That one has no id to be waited on by"))
+           (substring-no-properties (org-get-heading t t t t))
+           (and (konix/agent-shell-workspace--project-at-point-p) t))))
+
+ (defun konix/agent-shell-workspace-add-subject-after
+     (subject &optional body loose followed)
    "Put SUBJECT, and BODY under it, at the end, waiting on the question at point.
-LOOSE has it merely come after that one instead."
+Where that one is a project, the subject is for it instead, waiting on nothing.
+LOOSE has it merely come after that one instead.  FOLLOWED is (ID HEADING
+PROJECT) of that question, read at point where nil."
    (interactive
-    (let ((loose current-prefix-arg))
+    (let* ((loose current-prefix-arg)
+           (followed (konix/agent-shell-workspace--followed)))
       (append (konix/agent-shell-workspace--read-heading-and-body
-               (if loose "Comes after it: " "Waits on it: "))
-              (list loose))))
-   (let ((need (save-excursion
-                 (konix/agent-shell-workspace--goto-question)
-                 (unless (konix/agent-shell-workspace--state-at-point)
-                   (user-error "A fact is nobody's to do, so nothing waits on it"))
-                 (or (org-entry-get (point) "ID")
-                     (user-error "That one has no id to be waited on by")))))
-     (konix/agent-shell-workspace-add-subject
-      subject body nil nil nil (list need) loose)))
-(defun konix/agent-shell-workspace--project-of (buffer)
-  "Return the project BUFFER sits in, by its root, or its directory."
+               (format "%s « %s »: "
+                       (cond ((nth 2 followed) "For")
+                             (loose "Comes after")
+                             (t "Waits on"))
+                       (nth 1 followed)))
+              (list loose followed))))
+   (pcase-let ((`(,need ,_heading ,project)
+                (or followed (konix/agent-shell-workspace--followed))))
+     (if project
+         (konix/agent-shell-workspace-add-subject
+          subject body nil nil nil nil nil nil need)
+       (konix/agent-shell-workspace-add-subject
+        subject body nil nil nil (list need) loose))))
+(defun konix/agent-shell-workspace--working-directory-of (buffer)
+  "Return the working directory BUFFER sits in: its project root, or its directory."
   (when (buffer-live-p buffer)
     (with-current-buffer buffer
       (or (when-let ((project (ignore-errors (project-current nil))))
@@ -4501,8 +4818,8 @@ LOOSE has it merely come after that one instead."
           (and default-directory (expand-file-name default-directory))))))
 
 (defun konix/agent-shell-workspace--open-one ()
-  "Return this project's workspace whose writer lives, asking of several."
-  (let* ((here (konix/agent-shell-workspace--project-of (current-buffer)))
+  "Return this working directory's workspace whose writer lives, asking of several."
+  (let* ((here (konix/agent-shell-workspace--working-directory-of (current-buffer)))
          (candidates
           (seq-filter
            (lambda (buffer)
@@ -4511,10 +4828,10 @@ LOOSE has it merely come after that one instead."
                (and (buffer-local-value 'konix/agent-shell-workspace-mode buffer)
                     (buffer-live-p writer)
                     (equal here
-                           (konix/agent-shell-workspace--project-of writer)))))
+                           (konix/agent-shell-workspace--working-directory-of writer)))))
            (buffer-list))))
     (pcase (length candidates)
-      (0 (user-error "No workspace of this project has a living writer"))
+      (0 (user-error "No workspace of this working directory has a living writer"))
       (1 (car candidates))
       (_ (get-buffer (completing-read "Raise it with which writer: "
                                       (mapcar #'buffer-name candidates)
@@ -4592,10 +4909,11 @@ coming once."
   "Return where this workspace's commits are asked of git."
   (file-name-as-directory
    (or (konix/agent-shell-workspace--keyword "DIRECTORY")
-       (konix/agent-shell-workspace--project-of (current-buffer)))))
+       (konix/agent-shell-workspace--working-directory-of (current-buffer)))))
 
 (defun konix/agent-shell-workspace--review-range ()
-  "Return the range a review of this project starts from: the remote it follows to HEAD."
+  "Return the range a review of this working directory starts from.
+That is the remote it follows, else the last commit alone, to HEAD."
   (let ((default-directory (konix/agent-shell-workspace--review-directory)))
     (format "%s..HEAD"
             (or (seq-some
@@ -4606,35 +4924,142 @@ coming once."
                        "rev-parse" "--abbrev-ref" remote))))
                  '("@{upstream}" "origin/HEAD"))
                 "HEAD~1"))))
- (defconst konix/agent-shell-workspace-review-notes-root "refs/notes/workspaces/"
-   "Where each workspace's git notes ref stands.")
+(defconst konix/agent-shell-workspace-review-tag "review"
+  "Tag a question put up for the review of a commit wears.")
 
- (defun konix/agent-shell-workspace--review-notes ()
-   "Return the git notes ref this workspace's reviewed commits carry its ids in."
-   (concat konix/agent-shell-workspace-review-notes-root
-           (replace-regexp-in-string "[^[:alnum:]._-]" "-"
-                                     (file-name-base buffer-file-name))))
+(defun konix/agent-shell-workspace--review-heading (commit)
+  "Make the question at point ask about COMMIT, (SHA . SUBJECT), keeping its state."
+  (org-edit-headline (format "%s %s"
+                             (cdr commit) (substring (car commit) 0 8)))
+  (org-toggle-tag konix/agent-shell-workspace-review-tag 'on)
+  (org-entry-put (point) "REVSPEC" (concat (car commit) "^!")))
+(defface konix/agent-shell-workspace-review-face
+  '((t :inherit (diff-refine-added bold)))
+  "Face of the label a review question wears."
+  :group 'agent-shell)
 
- (defun konix/agent-shell-workspace--review-notes-follow ()
-   "Have git carry the review notes along when commits are rewritten."
-   (let ((glob (concat konix/agent-shell-workspace-review-notes-root "*")))
-     (unless (member glob (split-string
-                           (or (ignore-errors
-                                 (konix/agent-shell-workspace--git
-                                  "config" "--get-all" "notes.rewriteRef"))
-                               "")))
-       (konix/agent-shell-workspace--git "config" "--add" "notes.rewriteRef" glob))))
+(face-spec-set 'konix/agent-shell-workspace-review-face
+               '((t :inherit (diff-refine-added bold)))
+               'face-defface-spec)
+(defconst konix/agent-shell-workspace-review-label " REVIEW "
+  "What a review question shows ahead of its keyword.")
 
- (defun konix/agent-shell-workspace--review-note (sha)
-   "Return (ID STATE PATCH-ID) for each question the commit SHA carries.
-Several where it was squashed, the first first; STATE and PATCH-ID are nil where
-none was noted."
-   (ignore-errors
-     (mapcar #'split-string
-             (split-string (konix/agent-shell-workspace--git
-                            "notes" (concat "--ref=" (konix/agent-shell-workspace--review-notes))
-                            "show" sha)
-                           "\n" t "[ \t]+"))))
+(defconst konix/agent-shell-workspace-labels
+  (list (list konix/agent-shell-workspace-review-tag
+              konix/agent-shell-workspace-review-label
+              'konix/agent-shell-workspace-review-face)
+        (list konix/agent-shell-workspace-project-tag
+              (format " %s " konix/agent-shell-workspace-project-label)
+              'konix/agent-shell-workspace-project-face))
+  "(TAG LABEL FACE) for each label a heading shows ahead of its keyword.")
+
+(defun konix/agent-shell-workspace--show-labels ()
+  "Label every labelled heading of this buffer, its labels ahead of its keyword."
+  (remove-overlays (point-min) (point-max) 'konix/agent-shell-workspace-label t)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^\\* " nil t)
+      (let* ((where (point))
+             (tags (org-get-tags nil t))
+             (labels (delq nil
+                           (list (seq-find (lambda (label) (member (car label) tags))
+                                           konix/agent-shell-workspace-labels)
+                                 (when (konix/agent-shell-workspace--asked-back-p)
+                                   konix/agent-shell-workspace-asks-label)))))
+        (when labels
+          (let ((overlay (make-overlay where where)))
+            (overlay-put overlay 'konix/agent-shell-workspace-label t)
+            (overlay-put overlay 'before-string
+                         (mapconcat (lambda (label)
+                                      (concat (propertize (nth 1 label)
+                                                          'face (nth 2 label))
+                                              " "))
+                                    labels ""))))))))
+(defface konix/agent-shell-workspace-asks-face
+  '((t :inherit (warning bold)))
+  "Face of the label a question asked back wears."
+  :group 'agent-shell)
+
+(face-spec-set 'konix/agent-shell-workspace-asks-face
+               '((t :inherit (warning bold)))
+               'face-defface-spec)
+
+(defconst konix/agent-shell-workspace-asks-label
+  (list nil " ASKS " 'konix/agent-shell-workspace-asks-face)
+  "(TAG LABEL FACE) a question shows while the user's last answer asks something.")
+
+(defun konix/agent-shell-workspace--asked-back-p ()
+  "Non-nil when the user's last answer under the open question at point asks something."
+  (when-let (((not (equal (org-get-todo-state)
+                         konix/agent-shell-workspace-done-keyword)))
+             (said (konix/agent-shell-workspace--users-last-word)))
+    (string-suffix-p "?" said)))
+(defun konix/agent-shell-workspace-show-review ()
+  "Show the review's questions alone, the rest folded away; again to see all."
+  (interactive)
+  (if (eq last-command this-command)
+      (progn (setq this-command nil)
+             (konix/agent-shell-workspace-focus-question))
+    (org-match-sparse-tree nil konix/agent-shell-workspace-review-tag)))
+(defconst konix/agent-shell-workspace-review-notes-root "refs/notes/workspaces/"
+  "Where each workspace's git notes ref stands.")
+
+(defun konix/agent-shell-workspace--review-notes ()
+  "Return the git notes ref this workspace's review notes stand under."
+  (concat konix/agent-shell-workspace-review-notes-root
+          (replace-regexp-in-string "[^[:alnum:]._-]" "-"
+                                    (file-name-base buffer-file-name))))
+
+(defun konix/agent-shell-workspace--review-key (sha)
+  "Return the object the note of the commit SHA's change hangs on."
+  (string-trim (konix/agent-shell-workspace--git-fed
+                (or (ignore-errors (konix/agent-shell-workspace--patch-id-of sha)) sha)
+                nil "hash-object" "-w" "--stdin")))
+
+(defun konix/agent-shell-workspace--review-lines (key)
+  "Return (ID STATE) for each question the note on KEY names, in its order."
+  (mapcar #'split-string
+          (split-string (or (ignore-errors
+                              (konix/agent-shell-workspace--git
+                               "notes" (concat "--ref=" (konix/agent-shell-workspace--review-notes))
+                               "show" key))
+                            "")
+                        "\n" t "[ \t]+")))
+
+(defun konix/agent-shell-workspace--review-note (sha)
+  "Return (ID STATE) for each question the commit SHA's change was noted with."
+  (ignore-errors
+    (konix/agent-shell-workspace--review-lines
+     (konix/agent-shell-workspace--review-key sha))))
+(defun konix/agent-shell-workspace--review-take-over ()
+  "Move the review notes found hung on commits onto their patch-ids."
+  (let ((ref (concat "--ref=" (konix/agent-shell-workspace--review-notes))))
+    (ignore-errors
+      (konix/agent-shell-workspace--git
+       "config" "--fixed-value" "--unset" "notes.rewriteRef"
+       (concat konix/agent-shell-workspace-review-notes-root "*")))
+    (dolist (line (split-string (or (ignore-errors
+                                      (konix/agent-shell-workspace--git "notes" ref "list"))
+                                    "")
+                                "\n" t))
+      (let ((object (cadr (split-string line))))
+        (when (equal (ignore-errors
+                       (string-trim (konix/agent-shell-workspace--git
+                                     "cat-file" "-t" object)))
+                     "commit")
+          (dolist (noted (mapcar #'split-string
+                                 (split-string (konix/agent-shell-workspace--git
+                                                "notes" ref "show" object)
+                                               "\n" t)))
+            (let ((key (if (nth 2 noted)
+                           (string-trim (konix/agent-shell-workspace--git-fed
+                                         (nth 2 noted) nil "hash-object" "-w" "--stdin"))
+                         (konix/agent-shell-workspace--review-key object))))
+              (unless (assoc (car noted)
+                             (konix/agent-shell-workspace--review-lines key))
+                (konix/agent-shell-workspace--review-put
+                 key (car noted) (nth 1 noted)))))
+          (konix/agent-shell-workspace--git "notes" ref "remove" object))))))
 (defun konix/agent-shell-workspace--patch-id-of (sha)
   "Return the patch-id of the commit SHA: what it changes, whatever it sits on."
   (let ((shown (konix/agent-shell-workspace--git "show" sha)))
@@ -4645,21 +5070,25 @@ none was noted."
         (user-error "git patch-id, of %s in %s: %s" sha default-directory
                     (string-trim (buffer-string))))
       (car (split-string (buffer-string))))))
+(defun konix/agent-shell-workspace--review-put (key id state)
+  "Note on KEY that the question ID stands in STATE, its line kept in its place."
+  (let* ((lines (konix/agent-shell-workspace--review-lines key))
+         (lines (if (assoc id lines)
+                    (mapcar (lambda (line) (if (equal (car line) id) (list id state) line))
+                            lines)
+                  (append lines (list (list id state))))))
+    (konix/agent-shell-workspace--git
+     "notes" (concat "--ref=" (konix/agent-shell-workspace--review-notes))
+     "add" "-f" "-m"
+     (mapconcat (lambda (line) (string-join line " ")) lines "\n")
+     key)))
 
-(defun konix/agent-shell-workspace--review-validated-p (noted patch)
-  "Non-nil when NOTED, (ID STATE PATCH-ID), was settled on PATCH, the commit's now."
-  (and (equal (nth 1 noted) konix/agent-shell-workspace-done-keyword)
-       (or (null (nth 2 noted))
-           (equal (nth 2 noted) patch))))
 (defun konix/agent-shell-workspace--review-note-down (sha id state)
-  "Note in the commit SHA that its question is ID, standing in STATE, and its patch-id."
-  (konix/agent-shell-workspace--git
-   "notes" (concat "--ref=" (konix/agent-shell-workspace--review-notes))
-   "add" "-f" "-m"
-   (format "%s %s %s" id state (konix/agent-shell-workspace--patch-id-of sha))
-   sha))
+  "Note of the commit SHA's change that its question is ID, standing in STATE."
+  (konix/agent-shell-workspace--review-put
+   (konix/agent-shell-workspace--review-key sha) id state))
 (defun konix/agent-shell-workspace--review-remember ()
-  "Note in its commit the state the review question at point now stands in."
+  "Note against its commit's change the state the review question at point stands in."
   (when-let* (((bound-and-true-p konix/agent-shell-workspace-mode))
               ((member konix/agent-shell-workspace-review-tag (org-get-tags nil t)))
               (revspec (org-entry-get (point) "REVSPEC"))
@@ -4674,7 +5103,7 @@ none was noted."
           #'konix/agent-shell-workspace--review-remember)
 
 (defun konix/agent-shell-workspace--review-remember-all ()
-  "Note in each reviewed commit the state its question stands in now."
+  "Note against each reviewed commit's change the state its question stands in now."
   (save-excursion
     (goto-char (point-min))
     (while (re-search-forward
@@ -4696,27 +5125,21 @@ none was noted."
   (konix/agent-shell-workspace--review-heading commit)
   (konix/agent-shell-workspace--review-note-down
    (car commit) id (konix/agent-shell-workspace--state-at-point)))
- (defun konix/agent-shell-workspace--review-follow (commit)
+ (defun konix/agent-shell-workspace--review-follow (commit taken)
    "Follow COMMIT, (SHA . SUBJECT), with its question, putting one up where none stands.
-Return (ID . NEW), NEW where the question was put up just now."
-   (let* ((noted (konix/agent-shell-workspace--review-note (car commit)))
-          (patch (konix/agent-shell-workspace--patch-id-of (car commit)))
-          (standing (seq-find (lambda (one)
-                                (save-excursion
-                                  (konix/agent-shell-workspace--goto-id (car one))))
-                              noted)))
-     (if (not standing)
-         (let ((id (or (caar noted) (org-id-new))))
+The ids TAKEN are its forerunners'. Return (ID . NEW), NEW where put up just now."
+   (let ((noted (seq-find (lambda (line) (not (member (car line) taken)))
+                          (konix/agent-shell-workspace--review-note (car commit)))))
+     (if (not (and noted
+                   (save-excursion
+                     (konix/agent-shell-workspace--goto-id (car noted)))))
+         (let ((id (or (car noted) (org-id-new))))
            (konix/agent-shell-workspace--review-put-up
-            commit id (konix/agent-shell-workspace--review-validated-p (car noted) patch))
+            commit id (equal (nth 1 noted) konix/agent-shell-workspace-done-keyword))
            (cons id t))
-       (konix/agent-shell-workspace--goto-id (car standing))
+       (konix/agent-shell-workspace--goto-id (car noted))
        (konix/agent-shell-workspace--review-heading commit)
-       (when (and (equal (konix/agent-shell-workspace--state-at-point)
-                         konix/agent-shell-workspace-done-keyword)
-                  (not (konix/agent-shell-workspace--review-validated-p standing patch)))
-         (org-todo konix/agent-shell-workspace-refine-keyword))
-       (cons (car standing) nil))))
+       (cons (car noted) nil))))
  (defun konix/agent-shell-workspace--review-in-commit-order (kept)
    "Set the review's questions KEPT, ids in commit order, where the first stood.
 The review's questions KEPT does not name are dropped; return how many."
@@ -4745,64 +5168,18 @@ The review's questions KEPT does not name are dropped; return how many."
          (commits (or (konix/agent-shell-workspace--commits-of revspec)
                       (user-error "%s names no commit" revspec)))
          (added 0) kept gone)
-    (konix/agent-shell-workspace--review-notes-follow)
+    (konix/agent-shell-workspace--review-take-over)
     (konix/agent-shell-workspace--write
       (konix/agent-shell-workspace--review-remember-all)
       (save-excursion
         (dolist (commit commits)
-          (let ((followed (konix/agent-shell-workspace--review-follow commit)))
+          (let ((followed (konix/agent-shell-workspace--review-follow commit kept)))
             (push (car followed) kept)
             (when (cdr followed) (setq added (1+ added)))))
         (setq gone (konix/agent-shell-workspace--review-in-commit-order
                     (reverse kept)))))
     (message "%d commits: %d new, %d followed, %d gone"
              (length commits) added (- (length commits) added) gone)))
-(defconst konix/agent-shell-workspace-review-tag "review"
-  "Tag a question put up for the review of a commit wears.")
-
-(defun konix/agent-shell-workspace--review-heading (commit)
-  "Make the question at point ask about COMMIT, (SHA . SUBJECT), keeping its state."
-  (org-edit-headline (format "%s %s"
-                             (cdr commit) (substring (car commit) 0 8)))
-  (org-set-tags (list konix/agent-shell-workspace-review-tag))
-  (org-entry-put (point) "REVSPEC" (concat (car commit) "^!")))
-(defface konix/agent-shell-workspace-review-face
-  '((t :inherit (diff-refine-added bold)))
-  "Face of the mark a review question wears."
-  :group 'agent-shell)
-
-(face-spec-set 'konix/agent-shell-workspace-review-face
-               '((t :inherit (diff-refine-added bold)))
-               'face-defface-spec)
-
-(defconst konix/agent-shell-workspace-review-mark " REVIEW "
-  "What a review question shows ahead of its words.")
-
-(defun konix/agent-shell-workspace--show-reviews ()
-  "Mark every review question of this buffer, ahead of its words."
-  (remove-overlays (point-min) (point-max) 'konix/agent-shell-workspace-review t)
-  (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward
-            (format "^\\* .*:%s:" konix/agent-shell-workspace-review-tag) nil t)
-      (beginning-of-line)
-      (when (konix/agent-shell-workspace--search-state
-             konix/agent-shell-workspace-state-regexp (line-end-position))
-        (let ((overlay (make-overlay (point) (point))))
-          (overlay-put overlay 'konix/agent-shell-workspace-review t)
-          (overlay-put overlay 'before-string
-                       (concat (propertize konix/agent-shell-workspace-review-mark
-                                           'face
-                                           'konix/agent-shell-workspace-review-face)
-                               " "))))
-      (forward-line 1))))
-(defun konix/agent-shell-workspace-show-review ()
-  "Show the review's questions alone, the rest folded away; again to see all."
-  (interactive)
-  (if (eq last-command this-command)
-      (progn (setq this-command nil)
-             (konix/agent-shell-workspace-focus-question))
-    (org-match-sparse-tree nil konix/agent-shell-workspace-review-tag)))
 (defun konix/agent-shell-workspace-review-forget ()
   "Forget the review: its questions here, and this workspace's notes in the repository."
   (interactive)
@@ -4878,8 +5255,7 @@ The review's questions KEPT does not name are dropped; return how many."
 Return ((OLD . NEW) ...) for each commit rewritten."
    (let ((updates (konix/agent-shell-workspace--replayed sha new)))
      (konix/agent-shell-workspace--move updates)
-     (konix/agent-shell-workspace--notes-follow
-      (cons (cons sha new) (konix/agent-shell-workspace--rewritten sha new updates)))))
+     (cons (cons sha new) (konix/agent-shell-workspace--rewritten sha new updates))))
 
  (defun konix/agent-shell-workspace--move (updates)
    "Move the branches as UPDATES say, (REF NEW-TIP OLD-TIP) each, the tree following."
@@ -4909,13 +5285,6 @@ Return ((OLD . NEW) ...) for each commit rewritten."
                (when (= (length (split-string old)) (length (split-string now)))
                  (cl-mapcar #'cons (split-string old) (split-string now)))))
            updates)))
-
-(defun konix/agent-shell-workspace--notes-follow (pairs)
-  "Copy the review notes along PAIRS, (OLD . NEW) each, and return them."
-  (konix/agent-shell-workspace--git-fed
-   (mapconcat (lambda (pair) (format "%s %s\n" (car pair) (cdr pair))) pairs "")
-   nil "notes" "copy" "--for-rewrite=rebase")
-  pairs)
 (defun konix/agent-shell-workspace--review-rewritten (workspace id pairs)
   "Have WORKSPACE's review follow PAIRS, (OLD . NEW) each, question ID edited."
   (with-current-buffer workspace
@@ -4926,10 +5295,17 @@ Return ((OLD . NEW) ...) for each commit rewritten."
           (while (re-search-forward
                   (format "^\\* .*:%s:" konix/agent-shell-workspace-review-tag) nil t)
             (when-let* ((revspec (org-entry-get (point) "REVSPEC"))
-                        (new (cdr (assoc (string-remove-suffix "^!" revspec) pairs))))
+                        (old (string-remove-suffix "^!" revspec))
+                        (new (cdr (assoc old pairs))))
               (konix/agent-shell-workspace--review-heading
                (cons new (string-trim (konix/agent-shell-workspace--git
                                        "log" "-1" "--format=%s" new))))
+              (when (and (not (equal (org-entry-get (point) "ID") id))
+                         (equal (konix/agent-shell-workspace--state-at-point)
+                                konix/agent-shell-workspace-done-keyword)
+                         (not (equal (konix/agent-shell-workspace--review-key old)
+                                     (konix/agent-shell-workspace--review-key new))))
+                (org-todo konix/agent-shell-workspace-refine-keyword))
               (konix/agent-shell-workspace--review-remember))
             (end-of-line))))
       (konix/agent-shell-workspace--goto-id id)
@@ -5117,7 +5493,6 @@ Return ((OLD . NEW) ...) for each commit rewritten."
                                     (konix/agent-shell-workspace--git "rev-parse" "HEAD")))
                                  old))))
         (konix/agent-shell-workspace--move updates)
-        (konix/agent-shell-workspace--notes-follow (list (cons sha new)))
         (konix/agent-shell-workspace--resolve-end worktree)
         (konix/agent-shell-workspace--review-rewritten
          workspace id
@@ -5177,86 +5552,108 @@ Return ((OLD . NEW) ...) for each commit rewritten."
               (agent-shell-viewport--buffer
                :shell-buffer writer :existing-only t))
          writer))))
-(defconst konix/agent-shell-workspace-afk-said
-  (concat "You asked for something I cannot allow while the user is away."
-          " Do not work around it: refine what you hold, saying what you"
-          " need, and take up another.")
-  "What a writer is told when it asks the user for something they are away from.")
+(defconst konix/agent-shell-workspace-project-guidance
+  "Read the projects again, the headings the listing calls project, and pick up from there."
+  "What a writer is told when it has slipped off its projects.")
 
-(defun konix/agent-shell-workspace--still-its-own-p (writer)
-  "Non-nil when WRITER's workspace leaves it something of its own to do."
-  (when-let* ((file (konix/agent-shell-workspace-file writer)))
-    (not (konix/agent-shell-workspace--writer-done-p file))))
-
-(defun konix/agent-shell-workspace--send-away (writer)
-  "Cut WRITER short and tell it the user is away from what it asked."
-  (konix/agent-shell-workspace--submit
-   writer konix/agent-shell-workspace-afk-said t))
-(defun konix/agent-shell-workspace--writers ()
-  "Return every live agent-shell with a workspace bound to it."
-  (seq-filter (lambda (buffer)
-                (with-current-buffer buffer
-                  (and (derived-mode-p 'agent-shell-mode)
-                       (konix/agent-shell-workspace-file buffer))))
-              (buffer-list)))
-
-(defun konix/agent-shell-workspace--send-the-stuck-away ()
-  "Send off every writer already waiting on the user with work of its own left."
-  (dolist (writer (konix/agent-shell-workspace--writers))
-    (when (and (with-current-buffer writer
-                 (konix/agent-shell--pending-permission-ids))
-               (konix/agent-shell-workspace--still-its-own-p writer))
-      (with-current-buffer writer
-        (konix/agent-shell--cancel-pending-permissions))
-      (konix/agent-shell-workspace--send-away writer))))
-
-(define-minor-mode konix/agent-shell-workspace-afk-mode
-  "Send off whichever writer needs the user, the user being away from them."
-  :global t
-  :lighter " AFK"
-  :group 'agent-shell
-  (when konix/agent-shell-workspace-afk-mode
-    (konix/agent-shell-workspace--send-the-stuck-away)))
-(defun konix/agent-shell-workspace--afk-responder (permission)
-  "Refuse PERMISSION for the user, away, and send its writer off what it holds."
-  (when (and konix/agent-shell-workspace-afk-mode
-             (konix/agent-shell-workspace--still-its-own-p (current-buffer)))
-    (when-let* ((refusal (seq-find
-                          (lambda (option)
-                            (equal (map-elt option :kind) "reject_once"))
-                          (map-elt permission :options))))
-      (funcall (map-elt permission :respond) (map-elt refusal :option-id))
-      (konix/agent-shell-workspace--send-away (current-buffer))
-      t)))
-
-(add-hook 'konix/agent-shell-permission-responder-functions
-          #'konix/agent-shell-workspace--afk-responder 50)
-(defconst konix/agent-shell-workspace-goal-guidance
-  "Read the goal again, the GOAL line above the questions, and pick up from there."
-  "What a writer is told when it has slipped off the goal.")
-
-(defun konix/agent-shell-workspace-set-goal (goal)
-  "Declare GOAL the goal of this workspace, and save so the writer reads it."
-  (interactive
-   (list (read-from-minibuffer
-          "Goal: " (konix/agent-shell-workspace--keyword "GOAL"))))
+(defun konix/agent-shell-workspace-set-project (project)
+  "Add PROJECT to the projects of this workspace, and save so the writer reads it."
+  (interactive (list (read-from-minibuffer "New project: ")))
+  (when (string-empty-p (string-trim project))
+    (user-error "A project is what it says — there is none"))
   (konix/agent-shell-workspace--write
-    (konix/agent-shell-workspace--ensure-goal goal))
-  (message "%s" (if (string-empty-p (string-trim goal))
-                    "The goal is gone, this workspace naming none"
-                  (format "The goal is now: %s" (string-trim goal)))))
+    (konix/agent-shell-workspace--ensure-project project))
+  (message "A project now: %s" (string-trim project)))
 
-(defun konix/agent-shell-workspace-goal-again ()
-  "Tell the writer to read the goal again."
+(defun konix/agent-shell-workspace--show-project (project)
+  "Show the project PROJECT, an id, and the questions for it alone, the rest hidden away."
+  (konix/agent-shell-workspace-focus-question)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^\\* " nil t)
+      (let* ((start (line-beginning-position))
+             (end (save-excursion (org-end-of-subtree t t) (point)))
+             (kept (or (equal (org-entry-get start "ID") project)
+                       (save-excursion
+                         (re-search-forward
+                          (konix/agent-shell-workspace--said-line-regexp
+                           konix/agent-shell-workspace-for-said project)
+                          end t)))))
+        (unless kept
+          (org-fold-region (max (point-min) (1- start)) (max (point-min) (1- end))
+                           t 'outline))
+        (goto-char (max (1+ start) (1- end)))))))
+
+(defun konix/agent-shell-workspace-toggle-project ()
+  "Say the question at point is for a project picked by its words, or no longer is.
+On a project, show it and its questions alone; again to see all."
   (interactive)
-  (unless (konix/agent-shell-workspace--keyword "GOAL")
-    (user-error "This workspace names no goal"))
+  (if (save-excursion (konix/agent-shell-workspace--goto-question)
+                      (konix/agent-shell-workspace--project-at-point-p))
+      (if (eq last-command this-command)
+          (progn (setq this-command nil)
+                 (org-fold-show-all)
+                 (konix/agent-shell-workspace-focus-question))
+        (konix/agent-shell-workspace--show-project
+         (save-excursion (konix/agent-shell-workspace--goto-question)
+                         (org-entry-get (point) "ID"))))
+    (konix/agent-shell-workspace--toggle-project-of-question)))
+
+(defun konix/agent-shell-workspace--toggle-project-of-question ()
+  "Say the question at point is for a project picked by its words, or no longer is."
+  (let* ((question (save-excursion
+                     (konix/agent-shell-workspace--goto-question)
+                     (when (or (null (org-get-todo-state))
+                               (konix/agent-shell-workspace--project-at-point-p))
+                       (user-error "Only a question is for a project"))
+                     (org-entry-get (point) "ID")))
+         (projects (save-excursion
+                  (goto-char (point-min))
+                  (let (found)
+                    (while (konix/agent-shell-workspace--next-open-project)
+                      (push (cons (string-trim (substring-no-properties
+                                                (org-get-heading t t t t)))
+                                  (org-entry-get (point) "ID"))
+                            found))
+                    (or (nreverse found)
+                        (user-error "This workspace has no open project")))))
+         (picked (completing-read "Project: " projects nil t))
+         (project (cdr (assoc picked projects))))
+    (konix/agent-shell-workspace--write
+      (konix/agent-shell-workspace--goto-id question)
+      (if (re-search-forward
+           (konix/agent-shell-workspace--said-line-regexp
+            konix/agent-shell-workspace-for-said project)
+           (konix/agent-shell-workspace--question-end) t)
+          (delete-region (line-beginning-position)
+                         (min (point-max) (1+ (line-end-position))))
+        (konix/agent-shell-workspace--link-under
+         question project picked konix/agent-shell-workspace-for-said)))))
+
+(defun konix/agent-shell-workspace-promote-to-project ()
+  "Make the question point stands in a project of the workspace."
+  (interactive)
+  (save-excursion
+    (konix/agent-shell-workspace--goto-question)
+    (unless (org-get-todo-state)
+      (user-error "A fact is no question to make a project of"))
+    (when (konix/agent-shell-workspace--project-at-point-p)
+      (user-error "That is a project already"))
+    (konix/agent-shell-workspace--write
+      (org-toggle-tag konix/agent-shell-workspace-project-tag 'on)))
+  (message "A project now"))
+
+(defun konix/agent-shell-workspace-project-again ()
+  "Tell the writer to read the projects again."
+  (interactive)
+  (unless (konix/agent-shell-workspace--projects-here)
+    (user-error "This workspace names no project"))
   (let ((writer (konix/agent-shell-workspace--target-writer)))
     (message
      (if (eq t (konix/agent-shell-workspace--submit
-                writer konix/agent-shell-workspace-goal-guidance))
-         "Sent the writer back to the goal"
-       "Queued — the writer goes back to the goal at the turn's end"))))
+                writer konix/agent-shell-workspace-project-guidance))
+         "Sent the writer back to the projects"
+       "Queued — the writer goes back to the projects at the turn's end"))))
 (defun konix/agent-shell-workspace--line-here ()
   "Return the words of the line point is on, quoted, the markup dropped."
   (let ((words (if (org-at-heading-p)
@@ -5354,7 +5751,7 @@ its turn to end."
 On one asking leave to run a command, run it."
   (interactive "P")
   (let ((question (konix/agent-shell-workspace--standing-on-a-question)))
-    (unless (or (konix/agent-shell-workspace--goal-agreed (nth 1 question))
+    (unless (or (konix/agent-shell-workspace--project-agreed (nth 1 question))
                 (konix/agent-shell-workspace--grant-the-run (nth 1 question)))
       (konix/agent-shell-workspace--send question "yes" later))))
 
@@ -5403,12 +5800,12 @@ On one asking leave to run a command, refuse it."
    (konix/agent-shell-workspace--standing-on-a-question)
    (string last-command-event) later))
 
-(defun konix/agent-shell-workspace-answer-goal (&optional later)
-  "Ask the writer whether what point stands on helps the goal, at once unless LATER."
+(defun konix/agent-shell-workspace-answer-project (&optional later)
+  "Tell the writer to focus on the project, on what point stands on, at once unless LATER."
   (interactive "P")
   (konix/agent-shell-workspace--send
    (konix/agent-shell-workspace--standing-on-a-question)
-   "focus on the goal" later))
+   "focus on the project" later))
 
 (defun konix/agent-shell-workspace-answer-done (&optional later)
   "Tell the writer the user did what point stands on asks, at once unless LATER."
@@ -5474,171 +5871,25 @@ Sends back the region, or the whole question when nothing is selected."
 Selects its window when SELECT is non-nil."
   (let ((revspec (or (konix/agent-shell-workspace--revision-here)
                      (user-error "This question is about no commit: V writes those")))
-        (workspace (current-buffer))
-        (place (konix/agent-shell-workspace--location-at-point t)))
+        (workspace (current-buffer)))
     (let* ((buffer (konix/agent-shell-workspace--render-diff
                     revspec (konix/agent-shell-workspace--review-directory)))
            (question (save-excursion
                        (konix/agent-shell-workspace--goto-question)
                        (list nil (org-entry-get (point) "ID")
                              (konix/agent-shell-workspace--line-here))))
-           (position (with-current-buffer buffer
-                       (setq-local konix/agent-shell-workspace--buffer workspace)
-                       (setq-local konix/agent-shell-workspace--diff-question question)
-                       (or (and place
-                                (ignore-errors
-                                  (konix/agent-shell-workspace-diff-position
-                                   (car place) (cdr place))))
-                           (point-min))))
            (window (display-buffer buffer)))
+      (with-current-buffer buffer
+        (setq-local konix/agent-shell-workspace--buffer workspace)
+        (setq-local konix/agent-shell-workspace--diff-question question))
       (with-selected-window window
-        (goto-char position)
+        (goto-char (point-min))
         (recenter 0))
       (when select (select-window window)))))
 (defun konix/agent-shell-workspace-goto-diff ()
-  "Show the change the question point sits in is about, at its own place."
+  "Show the change the question point sits in is about, whole, from its top."
   (interactive)
   (konix/agent-shell-workspace--show-diff-at-point t))
-(defconst konix/agent-shell-workspace-list-tool
-       (list 'konix/mcp-server-list-workspace-questions
-             :id "list_workspace_questions"
-             :description
-             (concat "List the workspace's headings and what is written under them."
-                     " A question comes out with whose turn it is — yours, held,"
-                     " awaiting, asked, finished, settled or later — its id, its anchor"
-                     " and its heading, its priority opening it where it has one, and"
-                     " what is written"
-                     " under it indented below, an answer of the user's likewise; a"
-                     " fact comes out after them, marked FACT, with its id and its"
-                     " heading. yours and held are yours to act on, asked and finished"
-                     " wait on the user, settled is done and later the user put off."
-                     " Read what is written before you choose which heading to work"
-                     " on.")
-             :read-only t)
-  "The tool reading the workspace back.")
-(defconst konix/agent-shell-workspace-question-tool
-       (list 'konix/mcp-server-set-workspace-question
-             :id "set_workspace_question"
-             :description
-             (concat "Write one question of the workspace, rewriting the one whose"
-                     " id you pass or adding a new one when you pass none, and"
-                     " touching no other question but for the id a heading the user"
-                     " made by hand gains. A new one always comes out waiting on the"
-                     " user, and one waiting on the user carries a body or the call is"
-                     " refused. file and line only where it is about a place, file"
-                     " absolute,"
-                     " note a JSON array of short bullets, says a caption for that"
-                     " link, also further {file, line, says}. needs is"
-                     " a JSON array of the ids it waits on: it is held back, from you"
-                     " as from anyone, until the user settles each of them."))
-  "The tool writing one question.")
-
-(defconst konix/agent-shell-workspace-plan-tool
-       (list 'konix/mcp-server-set-workspace-plan
-             :id "set_workspace_plan"
-             :description
-             (concat "Write a plan: several questions and the order between them, in"
-                     " one call. steps is a JSON array of {name, file, line, label,"
-                     " note, needs, after}: name is yours for this call only, note is"
-                     " the bullets as for one question, needs names the steps, or the"
-                     " ids of questions already there, that this one waits on until the"
-                     " user settles them, and after the ones it merely comes after:"
-                     " held back only while those are yours to do. Use it"
-                     " whenever the work you are asked for has an order, rather than"
-                     " writing the questions one by one and leaving the order unsaid."
-                     " Nothing is written unless every step would be."))
-  "The tool writing a plan.")
-(defconst konix/agent-shell-workspace-state-tool
-       (list 'konix/mcp-server-set-workspace-state
-             :id "set_workspace_state"
-             :description
-             (concat "Perform one act on the question whose id you pass, each named"
-                     " after where it leaves it: work, put-down, await, close."
-                     " Its heading text, its body and its anchor come through untouched."
-                     " work before you act on it, so the user sees which one you are"
-                     " on. Then close it once the work is done and only the user's"
-                     " agreement is left; while their last word on it asks you"
-                     " something, answering it is a refine, not a close. refine is"
-                     " not taken here: rewrite the question with set_workspace_question"
-                     " and act refine, as soon as what it asks is unclear, saying what"
-                     " you need; a guess costs far more than one asking."
-                     " put-down lets it go untouched. await sets the one you hold"
-                     " aside while a run of yours goes, a test suite say, so you may"
-                     " take up another: pass that run as command, which it requires,"
-                     " never running it yourself, or pass as on the id of a question"
-                     " already awaiting that run. A command needing root: pass root"
-                     " true, never sudo in it; it waits on the user's leave, and they"
-                     " give the password. Emacs runs it; once it ends the"
-                     " question is yours again, saying how it went, and you are told."
-                     " Settling is the user's own"
-                     " move and is refused you. close carries a body or it is"
-                     " refused, a fact and an answer are refused, work is refused"
-                     " while you hold one, and a question waiting on the user or one"
-                     " they put off is refused every act."))
-  "The tool performing an act on a question.")
-
-(defconst konix/agent-shell-workspace-delete-tool
-       (list 'konix/mcp-server-delete-workspace-question
-             :id "delete_workspace_question"
-             :description
-             (concat "Remove the workspace's heading whose id you pass. A question"
-                     " has to be settled first; a fact you may take back at any time."))
-  "The tool taking a heading away.")
-(defconst konix/agent-shell-workspace-fact-tool
-       (list 'konix/mcp-server-set-workspace-fact
-             :id "set_workspace_fact"
-             :description
-             (concat "Write one fact of the workspace, rewriting the one whose id"
-                     " you pass or adding a new one when you pass none. This is how"
-                     " you report: whatever only tells the user something goes here,"
-                     " never in a question that asks nothing. Pass about with the id"
-                     " of the question you are reporting on and it will link to this"
-                     " fact, which is what keeps it reachable. Its heading must ask"
-                     " nothing and open on no state word, or the call is refused."
-                     " note is a JSON array of short « intention :: text » bullets,"
-                     " under the same limits a question's body answers to. Pass file"
-                     " and line for a place it points at, and also for further ones:"
-                     " each comes out as a link the user opens with one keystroke."
-                     " Where you are telling them where"
-                     " something is, that is what to use rather than saying the path"
-                     " in words."))
-  "The tool writing one fact.")
-
-(defconst konix/agent-shell-workspace-goal-tool
-       (list 'konix/mcp-server-workspace-goal-reached
-             :id "workspace_goal_reached"
-             :description
-             (concat "Say you hold the workspace's goal reached, why being a JSON"
-                     " array of short « intention :: text » bullets. It is put to the"
-                     " user as a question; while it stands, nothing tells you to plan"
-                     " toward the goal. Call it only when every question is"
-                     " settled and you see no next step worth proposing."))
-  "The tool saying the goal is reached.")
-
-(defconst konix/agent-shell-workspace-bind-tool
-       (list 'konix/mcp-server-set-workspace
-             :id "set_workspace"
-             :description
-             (concat "Bind an Org document as the workspace this session writes"
-                     " its questions into. Use it when the user asks you to work"
-                     " in a document they author: questions are written one by"
-                     " one, since rewriting their document whole is never right."
-                     " Nothing can be written before a workspace is bound. Binding"
-                     " also makes the session steer itself back to the workspace"
-                     " while questions there are still yours."))
-  "The tool binding a workspace.")
-(defvar konix/mcp-server-extra-tools nil)
-
-(setf (alist-get "konix-emacs-workspace"
-                 konix/mcp-server-extra-tools nil nil #'equal)
-      (list konix/agent-shell-workspace-list-tool
-            konix/agent-shell-workspace-question-tool
-            konix/agent-shell-workspace-plan-tool
-            konix/agent-shell-workspace-state-tool
-            konix/agent-shell-workspace-delete-tool
-            konix/agent-shell-workspace-fact-tool
-            konix/agent-shell-workspace-goal-tool
-            konix/agent-shell-workspace-bind-tool))
 (provide 'KONIX_agent-shell-workspace)
 ;;; KONIX_agent-shell-workspace.el ends here
 ;; -*- lexical-binding: t; -*- ends here

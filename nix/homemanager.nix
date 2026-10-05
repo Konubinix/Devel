@@ -16,24 +16,33 @@ let
   libDir = "${develDir}/lib";
   cacheDir = "${homeDir}/.cache";
 
-  # Wrap a package's binaries so that LD_LIBRARY_PATH includes NIX_LD_LIBRARY_PATH.
+  # Wrap a package's python interpreters so that LD_LIBRARY_PATH includes NIX_LD_LIBRARY_PATH.
   # This lets pip-installed native extensions (numpy, etc.) find libstdc++ and friends
   # without polluting LD_LIBRARY_PATH globally (which breaks Nix-built binaries).
   # See https://bvngee.com/blogs/using-python-virtualenvs-in-nixos
   # Use symlinkJoin so the wrapper output mirrors the original directory structure
   # (including lib/python3.*/site-packages). This lets Python resolve its prefix
   # from the wrapper path and find nix-provided packages (lxml, etc.).
-  wrapWithNixLD =
+  allowNativePipWheels =
     program:
     pkgs.symlinkJoin {
       name = "${program.pname or program.name}-nix-ld-wrapped";
       paths = [ program ];
       postBuild = ''
-              # Replace bin/ symlinks with wrapper scripts that set LD_LIBRARY_PATH
+              # Replace the python* symlinks with wrapper scripts that set LD_LIBRARY_PATH.
+              # Other entry points run the bare store python, which never loads the
+              # sitecustomize.py below, so wrapping them would leak into their children.
               rm -rf $out/bin
               mkdir -p $out/bin
               for file in ${program}/bin/*; do
                 new_file=$out/bin/$(basename $file)
+                case "$(basename $file)" in
+                  python*) ;;
+                  *)
+                    ln -s $file $new_file
+                    continue
+                    ;;
+                esac
                 echo "#! ${pkgs.bash}/bin/bash -e" >> $new_file
                 # Save original LD_LIBRARY_PATH so sitecustomize.py can restore it for
                 # child processes (prevents nix-ld libs from leaking into nix-built binaries).
@@ -230,7 +239,7 @@ in
       # gmpc did not find the correct name so far
 
       # python — wrapped so venvs/pipx can find nix-ld libraries (libstdc++, zlib, …)
-      (wrapWithNixLD config.konix.pythonEnv)
+      (allowNativePipWheels config.konix.pythonEnv)
 
       # misc
       which

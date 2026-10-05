@@ -19,6 +19,10 @@ config.load_autoconfig()
 # a command reaching qutebrowser over its socket raises the window unless this is silent
 c.new_instance_open_target = "tab-silent"
 
+# :agent-run, for the MCP server: see the "remote control qutebrowser" note
+config.source("agent_run.py")
+
+
 config.set(
     "content.user_stylesheets",
     [

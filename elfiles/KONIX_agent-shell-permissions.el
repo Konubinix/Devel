@@ -72,7 +72,6 @@
 (require 'KONIX_agent-shell-panel)
 (require 'KONIX_agent-shell-mcp)
 (require 'KONIX_dir-locals)
-(require 'treesit)
 (require 'KONIX_shell-search)
 
 (declare-function agent-shell--state "agent-shell")
@@ -168,10 +167,6 @@ form updates the registered evaluator."
            (debug (&define sexp lambda-list def-body)))
   `(setf (alist-get ,name konix/agent-shell-tool-evaluators nil nil #'equal)
          (lambda ,arglist ,@body)))
-
-(konix/agent-shell-define-tool-evaluator "destructive" (tool-call)
-  "Example evaluator: match tools whose kind is `delete' or `move'."
-  (member (map-elt tool-call :kind) '("delete" "move")))
 
 (konix/agent-shell-define-tool-evaluator "spawn-agent" (tool-call)
   "Match the built-in `Task' tool spawning a sub-agent.
@@ -493,7 +488,7 @@ others -- no separate concept:
 
   (konix/agent-shell-define-tool-evaluator \"risky\" (tc)
     (konix/agent-shell-tool-match-p
-     \\='(and \"^execute$\" (or \"\\\\brm\\\\b\" \"@destructive\")) tc))"
+     \\='(and \"^rm\\\\b\" (not \"@inside\")) tc))"
   (konix/agent-shell--spec-matches-p
    spec tool-call (konix/agent-shell--tool-haystack tool-call)))
 
@@ -1733,51 +1728,6 @@ a now-whitelisted one auto-approved.  Returns the number resolved."
 ;; verbatim, plus the offered options and the rules that already fire, so you
 ;; can craft the regexp/evaluator with confidence rather than by guessing.
 
-(defun konix/agent-shell--rule-suggestions (tool-call)
-  "Return a block of example policy KEYs that would match TOOL-CALL.
-Concrete, copy-pasteable starting points for a blacklist/whitelist rule:
-regexps on the title/kind/command, one-off `(lambda ...)' predicate forms,
-and a named-evaluator definition referenced as `@NAME' -- the three KEY
-shapes `konix/agent-shell--key-matches-p' understands, prefilled from this
-request's own fields."
-  (let* ((title (map-elt tool-call :title))
-         (kind (map-elt tool-call :kind))
-         (command (ignore-errors
-                    (agent-shell--tool-call-command-to-string
-                     (map-elt (map-elt tool-call :raw-input) 'command))))
-         (cmd-token (and command (string-match "[^[:space:]]+" command)
-                         (match-string 0 command)))
-         (have-title (and (stringp title) (not (string-empty-p title))))
-         (have-kind (and (stringp kind) (not (string-empty-p kind))))
-         lines)
-    (when have-title
-      (push (format "  regexp on title   : %s" (regexp-quote title)) lines))
-    (when have-kind
-      (push (format "  regexp on kind    : ^%s$" (regexp-quote kind)) lines))
-    (when cmd-token
-      (push (format "  regexp on command : \\b%s\\b" (regexp-quote cmd-token)) lines))
-    (when have-kind
-      (push (format "  (lambda ...) key  : (lambda (tc) (equal (map-elt tc :kind) %S))"
-                    kind)
-            lines))
-    (when have-title
-      (push (format "  (lambda ...) key  : (lambda (tc) (string-match-p %S (or (map-elt tc :title) \"\")))"
-                    (regexp-quote title))
-            lines))
-    ;; A lisp-only key matching the agent's narration (never available to a
-    ;; regexp).  Always offered -- it is the way to weigh what the agent said.
-    (push "  (lambda ...) key  : (lambda (tc) (string-match-p \"<agent prose>\" (or (map-elt tc :agent-said) \"\")))"
-          lines)
-    (when have-kind
-      (push (concat
-             "  @evaluator        : eval this once, then use the key @my-rule\n"
-             (format "      (konix/agent-shell-define-tool-evaluator \"my-rule\" (tc)\n        (equal (map-elt tc :kind) %S))"
-                     kind))
-            lines))
-    (if lines
-        (mapconcat #'identity (nreverse lines) "\n")
-      "  (no fields to suggest from)")))
-
 (defun konix/agent-shell--describe-commands (tool-call)
   "Return TOOL-CALL's `konix/agent-shell--tool-call-argvs', one per line, or nil."
   (when-let* ((argvs (konix/agent-shell--tool-call-argvs tool-call)))
@@ -1842,12 +1792,10 @@ already match."
              (if blacklisted
                  (konix/agent-shell--policy-format-entries blacklisted)
                "    (none)"))
-     (format "Matching whitelist entries (allow):\n%s\n\n"
+     (format "Matching whitelist entries (allow):\n%s\n"
              (if whitelisted
                  (konix/agent-shell--policy-format-entries whitelisted)
-               "    (none)"))
-     "Suggested KEYs (paste into a blacklist/whitelist rule):\n"
-     (konix/agent-shell--rule-suggestions tool-call) "\n")))
+               "    (none)")))))
 
 ;;;###autoload
 (defun konix/agent-shell-describe-permission ()
@@ -1985,46 +1933,6 @@ blacklist, which wins).  KEY matches as in
          (read-string "Note (optional): " nil nil "")
          (konix/agent-shell--prefix-axis)))
   (konix/agent-shell--policy-do-add konix/agent-shell--whitelist key note where))
-
-;;;###autoload
-(defun konix/agent-shell-unblacklist-tool (key)
-  "Remove KEY from the global, project and session blacklists."
-  (interactive
-   (list (konix/agent-shell--policy-read-existing
-          konix/agent-shell--blacklist "Unblacklist tool: ")))
-  (konix/agent-shell--policy-do-unset konix/agent-shell--blacklist key))
-
-;;;###autoload
-(defun konix/agent-shell-unwhitelist-tool (key)
-  "Remove KEY from the global, project and session whitelists."
-  (interactive
-   (list (konix/agent-shell--policy-read-existing
-          konix/agent-shell--whitelist "Unwhitelist tool: ")))
-  (konix/agent-shell--policy-do-unset konix/agent-shell--whitelist key))
-
-;;;###autoload
-(defun konix/agent-shell-blacklist-clear ()
-  "Clear the current session's (ephemeral) tool blacklist."
-  (interactive)
-  (konix/agent-shell--policy-do-clear konix/agent-shell--blacklist))
-
-;;;###autoload
-(defun konix/agent-shell-whitelist-clear ()
-  "Clear the current session's (ephemeral) tool whitelist."
-  (interactive)
-  (konix/agent-shell--policy-do-clear konix/agent-shell--whitelist))
-
-;;;###autoload
-(defun konix/agent-shell-blacklist-show ()
-  "Show the global, project and session tool blacklists."
-  (interactive)
-  (konix/agent-shell--policy-do-show konix/agent-shell--blacklist))
-
-;;;###autoload
-(defun konix/agent-shell-whitelist-show ()
-  "Show the global, project and session tool whitelists."
-  (interactive)
-  (konix/agent-shell--policy-do-show konix/agent-shell--whitelist))
 
 ;;; Control panel --------------------------------------------------------------
 ;; The blacklist/whitelist panels are `konix/agent-shell-panel' instances: the

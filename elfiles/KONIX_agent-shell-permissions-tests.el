@@ -663,11 +663,11 @@ PATH defaults to `konix/agent-shell-tests--review'."
       (konix/agent-shell--matching-entries
        entries '((:kind . "delete")) "echo foobar\ndelete"))
   ((("echo \\(.+\\)" . "do not print foobar")
-    ("@destructive" . "keep \\1 verbatim")
+    ("(lambda (tc) t)" . "keep \\1 verbatim")
     ("echo" . "invalid \\d escape kept"))
    . '(("echo \\(.+\\)" . "do not print \\1")
        ("cat \\(.+\\)" . "do not read \\1")
-       ("@destructive" . "keep \\1 verbatim")
+       ("(lambda (tc) t)" . "keep \\1 verbatim")
        ("echo" . "invalid \\d escape kept"))))
 
 (konix/agent-shell-tests-deftable

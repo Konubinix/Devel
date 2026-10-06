@@ -1383,7 +1383,7 @@ A dot or a filler says nothing, so it is no talking."
                 (member (car one) konix/agent-shell-workspace-steering-keys))
               (konix/agent-shell-workspace--declared file "STEERING")))
 (defconst konix/agent-shell-workspace-sudo-rule
-  (cons "@hascommand(sudo)"
+  (cons "^sudo\\b"
         (concat "Never sudo in your shell: await the command with set_workspace_state,"
                 " root true and the command without sudo; the user gives the password."))
   "The blacklist rule every bound session carries, pointing root runs to await.")

@@ -72,7 +72,7 @@
 (require 'KONIX_agent-shell-panel)
 (require 'KONIX_agent-shell-mcp)
 (require 'KONIX_dir-locals)
-(require 'KONIX_shell-parse)
+(require 'treesit)
 (require 'KONIX_shell-search)
 
 (declare-function agent-shell--state "agent-shell")
@@ -117,11 +117,13 @@ introduces can be completed rather than typed out -- see
 
 (defun konix/agent-shell--tool-call-candidates (tool-call)
   "Return the policy-completion candidates TOOL-CALL yields.
-Its title and kind, plus whatever
-`konix/agent-shell-tool-candidate-functions' make of it."
+Its title -- unless it runs a command line, which the shell candidates read
+better -- and kind, plus whatever `konix/agent-shell-tool-candidate-functions'
+make of it."
   (append (seq-filter (lambda (field)
                         (and (stringp field) (not (string-empty-p field))))
-                      (list (map-elt tool-call :title)
+                      (list (unless (konix/agent-shell--tool-call-command tool-call)
+                              (map-elt tool-call :title))
                             (map-elt tool-call :kind)))
           (mapcan (lambda (function)
                     (ignore-errors (funcall function tool-call)))
@@ -367,8 +369,13 @@ SPEC is `NAME' or `NAME(ARG, ARG, ...)'; ARGS are split as for `#+call:' with
             (org-babel-ref-split-args (match-string 2 spec)))
     (cons spec nil)))
 
-(declare-function konix/agent-shell--spec-matches-p
-                  "KONIX_agent-shell-permissions")
+(defvar konix/agent-shell--matched-text nil
+  "The text the last regexp key was matched against.")
+
+(defvar konix/agent-shell--regexp-any-command nil
+  "When non-nil, a regexp key matches a shell call when any of its commands
+does, rather than every one, or when its raw text does.  Bound for the
+blacklist.")
 
 (defun konix/agent-shell--key-matches-p (key tool-call haystack)
   "Return non-nil when policy KEY matches TOOL-CALL.
@@ -381,7 +388,11 @@ KEY is a string and is interpreted as:
   evaluated to a predicate function called with the TOOL-CALL alist;
 - otherwise a regexp tested case-insensitively against HAYSTACK (the tool
   title, kind, command line and input -- the request only, never the wider
-  conversation).
+  conversation); for a shell call, against its kind or else every one of its
+  `konix/agent-shell--tool-call-argvs' -- for the blacklist, any one of them
+  or HAYSTACK;
+- `$ GLOB' -- a shell glob that must match a whole command of a shell call,
+  read as above, e.g. `$ curl -sS * https://*.example.org/*'.
 A KEY that is already a function is called with TOOL-CALL.  Errors in a
 predicate are swallowed (treated as no match).
 
@@ -406,8 +417,30 @@ whole narration, not just the request."
           (konix/agent-shell--spec-matches-p form tool-call haystack)
         (ignore-errors (funcall (eval form t) tool-call)))))
    (t
-    (let ((case-fold-search t))
-      (string-match key haystack)))))
+    (let* ((case-fold-search t)
+           (glob (string-prefix-p "$ " key))
+           (key (if glob (wildcard-to-regexp (substring key 2)) key))
+           (argvs (and (listp tool-call)
+                       (konix/agent-shell--tool-call-argvs
+                        tool-call (not konix/agent-shell--regexp-any-command)))))
+      (if (null argvs)
+          (unless glob
+            (string-match key (setq konix/agent-shell--matched-text haystack)))
+        (or (and (not glob)
+                 (string-match key (setq konix/agent-shell--matched-text
+                                         (or (map-elt tool-call :kind) ""))))
+            (funcall (if konix/agent-shell--regexp-any-command
+                         #'seq-some
+                       #'seq-every-p)
+                     (lambda (argv)
+                       (and argv
+                            (string-match
+                             key (setq konix/agent-shell--matched-text argv))))
+                     argvs)
+            (and konix/agent-shell--regexp-any-command
+                 (not glob)
+                 (string-match key (setq konix/agent-shell--matched-text
+                                         haystack)))))))))
 
 (defun konix/agent-shell--spec-matches-p (spec tool-call haystack)
   "Return non-nil when SPEC matches TOOL-CALL against HAYSTACK.
@@ -441,11 +474,13 @@ whose backreferences KEY captured nothing for is kept verbatim."
         (mapcar
          (lambda (entry)
            (set-match-data nil)
-           (when (konix/agent-shell--key-matches-p (car entry) subject haystack)
-             (cons (car entry)
-                   (or (ignore-errors
-                         (match-substitute-replacement (cdr entry) t nil haystack))
-                       (cdr entry)))))
+           (let ((konix/agent-shell--matched-text haystack))
+             (when (konix/agent-shell--key-matches-p (car entry) subject haystack)
+               (cons (car entry)
+                     (or (ignore-errors
+                           (match-substitute-replacement
+                            (cdr entry) t nil konix/agent-shell--matched-text))
+                         (cdr entry))))))
          entries)))
 
 (defun konix/agent-shell-tool-match-p (spec tool-call)
@@ -461,17 +496,6 @@ others -- no separate concept:
      \\='(and \"^execute$\" (or \"\\\\brm\\\\b\" \"@destructive\")) tc))"
   (konix/agent-shell--spec-matches-p
    spec tool-call (konix/agent-shell--tool-haystack tool-call)))
-
-(konix/agent-shell-define-tool-evaluator "destructive-command" (tool-call)
-  "Example evaluator composing the three leaf kinds with
-`konix/agent-shell-tool-match-p': a regexp, an inline `(lambda ...)' form
-\(written as a string), and another evaluator reference (`@destructive')."
-  (konix/agent-shell-tool-match-p
-   '(or
-     "git reset --hard"                                              ; regexp leaf
-     "(lambda (tc) (string-match-p \"sudo\" (or (map-elt tc :title) \"\")))" ; lambda leaf
-     "@destructive")                                                 ; evaluator leaf
-   tool-call))
 
 (konix/agent-shell-define-tool-evaluator "edit-dir-locals" (tool-call)
   "Match tool calls that would modify .dir-locals.el (edits, writes, deletes,
@@ -499,9 +523,16 @@ project `.dir-locals.el' or a Claude settings file.  Composes
 (defun konix/agent-shell--bash-ast-buffer (tool-call)
   "Return (BUFFER . ROOT) for TOOL-CALL's command line, or nil for a non-shell
 tool.  BUFFER owns ROOT and must be killed once done with it, which
-`konix/agent-shell--with-bash-ast' takes care of."
-  (konix/shell-parse-bash-ast-buffer
-   (konix/agent-shell--tool-call-command tool-call)))
+`konix/agent-shell--with-bash-ast' takes care of.  Signals an error when the
+bash tree-sitter grammar is unavailable."
+  (let ((command (konix/agent-shell--tool-call-command tool-call)))
+    (unless (or (null command) (string-empty-p command))
+      (unless (treesit-language-available-p 'bash)
+        (error "The bash tree-sitter grammar is required (treesit-install-language-grammar 'bash)"))
+      (let ((buffer (generate-new-buffer " *konix-bash-ast*" t)))
+        (with-current-buffer buffer
+          (insert command)
+          (cons buffer (treesit-parser-root-node (treesit-parser-create 'bash))))))))
 
 (defmacro konix/agent-shell--with-bash-ast (root tool-call &rest body)
   "Bind ROOT to TOOL-CALL's bash AST root, evaluate BODY, then release the tree.
@@ -518,29 +549,9 @@ BODY must return plain data: nodes die with the tree."
            (when (buffer-live-p ,buffer)
              (kill-buffer ,buffer)))))))
 
-(defun konix/agent-shell--toplevel-command-p (node)
-  "Non-nil when NODE is a command not in the branch of another command."
-  (let ((parent (treesit-node-parent node)) (top t))
-    (while (and parent top)
-      (when (equal (treesit-node-type parent) "command") (setq top nil))
-      (setq parent (treesit-node-parent parent)))
-    top))
-
-(defun konix/agent-shell--command-nodes (root &optional toplevel-only)
-  "Return ROOT's command nodes, or only its top-level ones when TOPLEVEL-ONLY.
-See `konix/agent-shell--toplevel-command-p'."
-  (let ((commands (mapcar #'cdr (treesit-query-capture root '((command) @c)))))
-    (if toplevel-only
-        (seq-filter #'konix/agent-shell--toplevel-command-p commands)
-      commands)))
-
-(defun konix/agent-shell--command-word-arguments (command)
-  "Return COMMAND node's bare `word' arguments (no name, no quoted values)."
-  (seq-keep (lambda (c)
-              (and (equal (treesit-node-field-name c) "argument")
-                   (equal (treesit-node-type c) "word")
-                   (treesit-node-text c t)))
-            (treesit-node-children command t)))
+(defun konix/agent-shell--command-nodes (root)
+  "Return ROOT's command nodes."
+  (mapcar #'cdr (treesit-query-capture root '((command) @c))))
 
 (defun konix/agent-shell--argument-literal (node)
   "Return NODE's value as the literal string the shell would pass along, or nil
@@ -577,8 +588,8 @@ callers use this to decide what a command really touches."
 
 (defun konix/agent-shell--command-argument-literals (command)
   "Return COMMAND node's arguments as literals, one entry per argument, in order.
-Unlike `konix/agent-shell--command-word-arguments' this sees through quoting and
-`~'/`$HOME' expansion, and it keeps a nil placeholder for every argument whose
+This sees through quoting and `~'/`$HOME' expansion, and it keeps a nil
+placeholder for every argument whose
 value is not statically knowable (see `konix/agent-shell--argument-literal')
 instead of dropping it -- callers that walk a command line need `argument 1 is
 something we cannot read' to stay distinguishable from `there is no argument 1'."
@@ -591,88 +602,82 @@ something we cannot read' to stay distinguishable from `there is no argument 1'.
   (when-let ((n (treesit-node-child-by-field-name command "name")))
     (treesit-node-text n t)))
 
+(defun konix/agent-shell--command-unwrapped (command)
+  "Return COMMAND node as (NAME ARGUMENT...), without its wrappers."
+  (konix/agent-shell--sans-command-wrapper
+   (cons (konix/agent-shell--command-name command)
+         (konix/agent-shell--command-argument-literals command))))
+
+(defun konix/agent-shell--normalized-command-name (name)
+  "Return NAME, a path inside the project rewritten as `./RELATIVE'."
+  (if (and (string-search "/" name)
+           (konix/agent-shell--path-inside-project-p name))
+      (concat "./" (file-relative-name (expand-file-name name)))
+    name))
+
+(defun konix/agent-shell--command-argv (command)
+  "Return COMMAND node as the line a regexp key reads, or nil.
+No wrappers nor redirections, the name normalized, an argument holding
+whitespace single-quoted and one not statically knowable kept as written."
+  (let ((words (konix/agent-shell--sans-command-wrapper
+                (cons (konix/agent-shell--command-name command)
+                      (mapcar (lambda (node)
+                                (if-let* ((word (konix/agent-shell--argument-literal
+                                                 node)))
+                                    (if (string-match-p "[[:space:]]" word)
+                                        (concat "'" (string-replace "'" "'\\''" word) "'")
+                                      word)
+                                  (treesit-node-text node t)))
+                              (seq-filter (lambda (c)
+                                            (equal (treesit-node-field-name c)
+                                                   "argument"))
+                                          (treesit-node-children command t)))))))
+    (when (car words)
+      (string-join (cons (konix/agent-shell--normalized-command-name (car words))
+                         (cdr words))
+                   " "))))
+
+(defun konix/agent-shell--tool-call-argvs (tool-call &optional working)
+  "Return the `konix/agent-shell--command-argv' of TOOL-CALL's commands, each
+preceded by the `NAME=VALUE' assignments it runs with.  With WORKING, its
+transparent filters are left out, see
+`konix/agent-shell--transparent-filter-p'."
+  (ignore-errors
+    (konix/agent-shell--with-bash-ast root tool-call
+      (mapcan (lambda (command)
+                (append (mapcar (lambda (node) (treesit-node-text node t))
+                                (seq-filter (lambda (c)
+                                              (equal (treesit-node-type c)
+                                                     "variable_assignment"))
+                                            (treesit-node-children command t)))
+                        (list (konix/agent-shell--command-argv command))))
+              (if working
+                  (konix/agent-shell--working-command-nodes root)
+                (konix/agent-shell--command-nodes root))))))
+
+(defun konix/agent-shell--shell-candidates (tool-call)
+  "Return the policy keys offered for TOOL-CALL's commands, or nil.
+Each command as a `$ GLOB', as a regexp prefix and as itself with any arguments
+when it has some, and its name as a regexp."
+  (delete-dups
+   (mapcan (lambda (argv)
+             (unless (or (null argv)
+                         (string-match-p "\\`[[:alpha:]_][[:alnum:]_]*=" argv))
+               (let ((name (car (split-string argv " "))))
+                 (append (unless (string-match-p "[*?[]" argv)
+                           (list (concat "$ " argv)))
+                         (when (string-search " " argv)
+                           (list (concat "^" (regexp-quote argv))
+                                 (format "$ %s *" name)))
+                         (list (format "^%s\\b" (regexp-quote name)))))))
+           (konix/agent-shell--tool-call-argvs tool-call t))))
+
+(add-to-list 'konix/agent-shell-tool-candidate-functions
+             #'konix/agent-shell--shell-candidates)
+
 (defun konix/agent-shell--command-name-matches (command regexp)
   "Non-nil when COMMAND node's name matches the string REGEXP."
   (string-match-p regexp (konix/agent-shell--command-name command)))
-
-(defun konix/agent-shell--command-matches-p (command spec)
-  "Non-nil when COMMAND node matches SPEC, a whitespace-separated command +
-subcommand prefix like `gh pr check' (trailing args free); a single-word SPEC
-like `grep' matches on command name alone."
-  (when-let ((toks (split-string spec)))
-    (and (konix/agent-shell--command-name-matches
-          command (concat "\\`\\(?:" (car toks) "\\)\\'"))
-         (equal (cdr toks)
-                (seq-take (konix/agent-shell--command-word-arguments command)
-                          (length (cdr toks)))))))
-
-(defun konix/agent-shell--command-matches-any-p (command specs)
-  "Non-nil when COMMAND matches any SPEC in SPECS.
-See `konix/agent-shell--command-matches-p'."
-  (seq-some (lambda (s) (konix/agent-shell--command-matches-p command s)) specs))
-
-(defun konix/agent-shell--several-match-p (commands specs)
-  "Non-nil when more than one of COMMANDS matches SPECS, or -- when SPECS is
-nil -- when COMMANDS simply has more than one entry."
-  (> (length (if specs
-                 (seq-filter (lambda (c)
-                               (konix/agent-shell--command-matches-any-p c specs))
-                             commands)
-               commands))
-     1))
-
-(konix/agent-shell-define-tool-evaluator "hascommand" (tool-call &rest specs)
-  "Match a line running a command matching one of SPECS.
-Each SPEC is a `konix/agent-shell--command-matches-p' spec (name or subcommand
-prefix), e.g. `@hascommand(cd, gh pr check)'."
-  (konix/agent-shell--with-bash-ast root tool-call
-    (seq-some (lambda (c) (konix/agent-shell--command-matches-any-p c specs))
-              (konix/agent-shell--command-nodes root))))
-
-(konix/agent-shell-define-tool-evaluator "severalcommands" (tool-call &rest specs)
-  "Match a command line with several commands (matching one of SPECS, if given).
-SPECS are as in `hascommand'."
-  (konix/agent-shell--with-bash-ast root tool-call
-    (konix/agent-shell--several-match-p
-     (konix/agent-shell--command-nodes root) specs)))
-
-(konix/agent-shell-define-tool-evaluator "severaltoplevelcommands" (tool-call &rest specs)
-  "Match a command line with several top-level commands (matching one of SPECS,
-if given).  SPECS are as in `hascommand'."
-  (konix/agent-shell--with-bash-ast root tool-call
-    (konix/agent-shell--several-match-p
-     (konix/agent-shell--command-nodes root t) specs)))
-
-(konix/agent-shell-define-tool-evaluator "onlycommand" (tool-call &rest specs)
-  "Match a line that runs exactly one command and nothing else (no `;', `|',
-`&&', `&', subshell or `$(...)' chaining).  When SPECS is given (as in
-`hascommand'), that lone command must match one of them, so
-`@onlycommand(gh pr check)' matches `gh pr check 123' but not `gh pr create'."
-  (konix/agent-shell--with-bash-ast root tool-call
-    (let ((commands (konix/agent-shell--command-nodes root)))
-      (and (= (length commands) 1)
-           (or (null specs)
-               (konix/agent-shell--command-matches-any-p (car commands) specs))))))
-
-(konix/agent-shell-define-tool-evaluator "argv" (tool-call regexp)
-  "Match a line every command of which has an argv matching REGEXP.
-The argv is the command name and its argument literals joined by spaces, so
-redirections are not part of it: `clk foo --help > FILE' reads `clk foo --help'.
-An argument whose value is not statically knowable makes the command fail to
-match.  Reference it as `@argv(REGEXP)'; REGEXP cannot hold a top-level comma."
-  (konix/agent-shell--with-bash-ast root tool-call
-    (let ((commands (konix/agent-shell--command-nodes root)))
-      (and commands
-           (seq-every-p
-            (lambda (c)
-              (let ((arguments (konix/agent-shell--command-argument-literals c)))
-                (and (not (memq nil arguments))
-                     (string-match-p
-                      regexp
-                      (string-join (cons (konix/agent-shell--command-name c)
-                                         arguments)
-                                   " ")))))
-            commands)))))
 
 (konix/agent-shell-define-tool-evaluator "lost-search" (tool-call)
   "Match a `find'/`grep'/`rg'/`ag'/`ack' scan of a whole aggregating directory
@@ -752,7 +757,7 @@ is a credential even though the call itself is a read.")
 Skips any option word sitting between `gh' and its subcommand, and stops at
 the first option word after it -- so both `gh issue list --state all' and
 `gh --foo issue list' yield (\"issue\" \"list\").  TOKENS comes from
-`konix/shell-parse-tokenize'."
+`konix/agent-shell--command-unwrapped'."
   (let ((rest (cdr tokens))
         (path '()))
     (while (and rest (string-prefix-p "-" (car rest)))
@@ -792,18 +797,18 @@ parameters and it stays a read."
      (or (seq-some (lambda (m) (string-match-p read-method-re m)) method-tokens)
          (not (seq-some (lambda (tk) (string-match-p field-re tk)) tokens))))))
 
-(defun konix/agent-shell--gh-read-segment-p (segment)
-  "Return non-nil when SEGMENT is a read-only `gh' invocation.
-SEGMENT is one pipeline stage (no `|').  Read-only means its subcommand is
-listed in `konix/agent-shell--gh-read-subcommands', or it is a `gh api' call
-that reads (see `konix/agent-shell--gh-api-read-p').  A `--web' anywhere
-disqualifies it: that form prints nothing and pops a browser window open
-instead.  Tokenized with `konix/shell-parse-tokenize'."
-  (let* ((tokens (konix/agent-shell--sans-command-wrapper
-                  (konix/shell-parse-tokenize segment)))
+(defun konix/agent-shell--gh-read-p (command)
+  "Return non-nil when COMMAND node is a read-only `gh' invocation.
+Read-only means its subcommand is listed in
+`konix/agent-shell--gh-read-subcommands', or it is a `gh api' call that reads
+\(see `konix/agent-shell--gh-api-read-p').  A `--web' anywhere disqualifies
+it: that form prints nothing and pops a browser window open instead.  An
+argument whose value is not statically knowable is refused."
+  (let* ((tokens (konix/agent-shell--command-unwrapped command))
          (path (konix/agent-shell--gh-subcommand-path tokens)))
     (and
      tokens
+     (not (memq nil tokens))
      (equal (car tokens) "gh")
      path
      (not (seq-intersection '("-w" "--web") tokens))
@@ -811,10 +816,6 @@ instead.  Tokenized with `konix/shell-parse-tokenize'."
          (konix/agent-shell--gh-api-read-p tokens)
        (or (member (list (car path)) konix/agent-shell--gh-read-subcommands)
            (member path konix/agent-shell--gh-read-subcommands))))))
-
-(defun konix/agent-shell--command-sans-stdout-redirect (command)
-  "Return COMMAND without its trailing `> FILE', when it has a plain one."
-  (or (car (konix/shell-parse-split-stdout-redirect command)) command))
 
 (defconst konix/agent-shell--file-write-redirect-operators
   '(">" ">>" "&>" "&>>" ">|" ">&")
@@ -858,59 +859,63 @@ Reference it as `@writes-outside(DIRECTORY)'."
                                             (expand-file-name directory)))))))
      (treesit-query-capture root '((file_redirect) @r)))))
 
+(defun konix/agent-shell--reads-inside-p (node directory)
+  "Non-nil when every file NODE's `<' redirections read is inside DIRECTORY.
+An unreadable target counts as outside."
+  (seq-every-p
+   (lambda (capture)
+     (let* ((redirect (cdr capture))
+            (destination (treesit-node-child-by-field-name redirect "destination")))
+       (or (not (seq-some (lambda (child)
+                            (member (treesit-node-type child) '("<" "<>")))
+                          (treesit-node-children redirect)))
+           (konix/agent-shell--path-inside-p
+            (konix/agent-shell--argument-literal destination) directory))))
+   (treesit-query-capture node '((file_redirect) @r))))
+
+(defun konix/agent-shell--transparent-filter-p (command)
+  "Non-nil when COMMAND node is a read-only filter fed by a pipe and reading
+nothing outside the project: it changes nothing of what its line does."
+  (let* ((parent (treesit-node-parent command))
+         (stage (if (equal (treesit-node-type parent) "redirected_statement")
+                    parent
+                  command))
+         (pipeline (treesit-node-parent stage))
+         (outer (treesit-node-parent pipeline))
+         (words (konix/agent-shell--command-unwrapped command)))
+    (and (equal (treesit-node-type pipeline) "pipeline")
+         (not (treesit-node-eq stage (treesit-node-child pipeline 0 t)))
+         (member (car words) konix/agent-shell--read-only-filters)
+         (seq-every-p #'konix/agent-shell--path-inside-project-p (cdr words))
+         ;; a `<' after the pipeline is bound to it as a whole
+         (konix/agent-shell--reads-inside-p
+          (if (equal (treesit-node-type outer) "redirected_statement") outer stage)
+          default-directory))))
+
+(defun konix/agent-shell--working-command-nodes (root)
+  "Return ROOT's command nodes but its transparent filters, see
+`konix/agent-shell--transparent-filter-p'."
+  (seq-remove #'konix/agent-shell--transparent-filter-p
+              (konix/agent-shell--command-nodes root)))
+
+(konix/agent-shell-define-tool-evaluator "severalcommands" (tool-call)
+  "Match a command line running several commands, its transparent filters
+aside (see `konix/agent-shell--transparent-filter-p')."
+  (konix/agent-shell--with-bash-ast root tool-call
+    (> (length (konix/agent-shell--working-command-nodes root)) 1)))
+
 (konix/agent-shell-define-tool-evaluator "gh-read" (tool-call)
   "Match read-only `gh' calls (so they can be auto-approved).
 That is a `gh api' GET, or one of the listing/viewing subcommands enumerated
 in `konix/agent-shell--gh-read-subcommands' -- `gh issue list', `gh pr diff',
-`gh run view', ...  True only when the whole command line *is* that read --
-never a `gh' read buried in a larger one-liner that also does unrelated work:
-- it must not chain beyond a single pipeline (no `;', `&', `&&', `||', `<',
-  subshell, backtick or `$(...)' -- see `konix/shell-parse-chained-p', which
-  respects quoting);
-- its first pipeline stage must be a read-only `gh' (see
-  `konix/agent-shell--gh-read-segment-p');
-- any further pipeline stages must be read-only filters such as `jq' (see
-  `konix/agent-shell--read-only-filters'), so `gh issue list ... | jq ...' is
-  fine while `gh api ... | sh' is not.
-Anything else falls through to a manual prompt."
-  (let ((command (konix/agent-shell--command-sans-stdout-redirect
-                  (or (konix/agent-shell--tool-call-command tool-call) ""))))
-    (and
-     (not (string-empty-p (string-trim command)))
-     (not (konix/shell-parse-chained-p command))
-     (let ((segments (konix/shell-parse-pipeline-segments command)))
-       (and (konix/agent-shell--gh-read-segment-p (car segments))
-            (seq-every-p
-             (lambda (seg)
-               (let ((tokens (konix/shell-parse-tokenize seg)))
-                 (and tokens
-                      (member (car tokens)
-                              konix/agent-shell--read-only-filters))))
-             (cdr segments)))))))
-
-(konix/agent-shell-define-tool-evaluator "wrapped-script-run" (tool-call script-re)
-  "Match a line whose only work is running the script SCRIPT-RE names.
-SCRIPT-RE must appear on it, and every command it runs -- read through its
-wrapper prefix -- must be that script or a read-only filter.
-Reference it as the key `@wrapped-script-run(REGEXP)'."
+`gh run view', ...  True only when that read is the only command of the line,
+its transparent filters aside (see `konix/agent-shell--transparent-filter-p'),
+and it reads no file outside the project."
   (konix/agent-shell--with-bash-ast root tool-call
-    (let ((commands (konix/agent-shell--command-nodes root)))
-      (and commands
-           ;; the script is referenced somewhere on the line
-           (seq-some
-            (lambda (c)
-              (seq-some (lambda (w) (string-match-p script-re w))
-                        (cons (or (konix/agent-shell--command-name c) "")
-                              (konix/agent-shell--command-word-arguments c))))
-            commands)
-           (seq-every-p
-            (lambda (c)
-              (when-let ((name (car (konix/agent-shell--sans-command-wrapper
-                                     (cons (konix/agent-shell--command-name c)
-                                           (konix/agent-shell--command-argument-literals c))))))
-                (or (string-match-p script-re name)
-                    (member name konix/agent-shell--read-only-filters))))
-            commands)))))
+    (let ((commands (konix/agent-shell--working-command-nodes root)))
+      (and (= (length commands) 1)
+           (konix/agent-shell--gh-read-p (car commands))
+           (konix/agent-shell--reads-inside-p root default-directory)))))
 
 (defconst konix/agent-shell--sed-read-only-options
   '("-n" "--quiet" "--silent" "-E" "-r" "--regexp-extended" "-s" "--separate"
@@ -980,18 +985,18 @@ statically knowable is refused, as are the `-e' and `-f' forms."
 (konix/agent-shell-define-tool-evaluator "read-only-sed" (tool-call &optional directory)
   "Match a lone read-only `sed', e.g.
 `sed -n \\='/from/,/to/p\\=' .agent-shell/tmp/notes.txt' -- auto-approvable.
-`sed' is in neither `konix/agent-shell-command-whitelist' nor
+`sed' is in neither the harmless commands of
+`konix/agent-shell-tool-whitelist-global' nor
 `konix/agent-shell--read-only-filters' because it also writes and executes,
 so the invocation is read instead (`konix/agent-shell--sed-read-only-p').
-Combining commands is `@severalcommands'' business: here the line must run that
-`sed' alone (`konix/shell-parse-chained-p'), give or take a plain `> FILE'."
-  (unless (konix/shell-parse-chained-p
-           (konix/agent-shell--command-sans-stdout-redirect
-            (or (konix/agent-shell--tool-call-command tool-call) "")))
-    (konix/agent-shell--with-bash-ast root tool-call
-      (let ((commands (konix/agent-shell--command-nodes root)))
-        (and (= (length commands) 1)
-             (konix/agent-shell--sed-read-only-p (car commands) directory))))))
+The line must run that `sed' alone, its transparent filters aside (see
+`konix/agent-shell--transparent-filter-p'), and read no file outside DIRECTORY."
+  (konix/agent-shell--with-bash-ast root tool-call
+    (let ((commands (konix/agent-shell--working-command-nodes root)))
+      (and (= (length commands) 1)
+           (konix/agent-shell--sed-read-only-p (car commands) directory)
+           (konix/agent-shell--reads-inside-p
+            root (or directory default-directory))))))
 
 (defun konix/agent-shell--not-a-path-p (argument)
   "Non-nil when ARGUMENT holds a backslash and names no file.
@@ -1019,21 +1024,24 @@ or not statically knowable does not, unless it is no path at all
      (konix/agent-shell--command-nodes root))))
 
 (konix/agent-shell-define-tool-evaluator "command-args-inside"
-    (tool-call &optional spec directory)
-  "Match a command matching SPEC called on something inside DIRECTORY.
-SPEC is a `konix/agent-shell--command-matches-p' spec (name or subcommand
-prefix); reference the pair as `@command-args-inside(SPEC, DIRECTORY)'.  One
-argument of that command resolving inside DIRECTORY is enough; an argument
+    (tool-call &optional name directory)
+  "Match a command whose name matches the regexp NAME, called on something
+inside DIRECTORY.  Reference the pair as `@command-args-inside(NAME,
+DIRECTORY)'.  One argument resolving inside DIRECTORY is enough; an argument
 whose value is not statically knowable resolves nowhere."
-  (and spec directory
+  (and name directory
        (konix/agent-shell--with-bash-ast root tool-call
          (seq-some
           (lambda (command)
-            (and (konix/agent-shell--command-matches-p command spec)
-                 (seq-some
-                  (lambda (argument)
-                    (konix/agent-shell--path-inside-p argument directory))
-                  (konix/agent-shell--command-argument-literals command))))
+            (let ((words (konix/agent-shell--command-unwrapped command)))
+              (and (car words)
+                   (string-match-p (concat "\\`\\(?:" name "\\)\\'")
+                                   (konix/agent-shell--normalized-command-name
+                                    (car words)))
+                   (seq-some
+                    (lambda (argument)
+                      (konix/agent-shell--path-inside-p argument directory))
+                    (cdr words)))))
           (konix/agent-shell--command-nodes root)))))
 
 (defun konix/agent-shell--file-tool-target-paths (tool-call)
@@ -1064,26 +1072,6 @@ other way, so both fail closed: one target inside is enough here."
                    (konix/agent-shell--path-inside-p path directory))
                  (konix/agent-shell--file-tool-target-paths tool-call))))
 
-(defcustom konix/agent-shell-command-whitelist
-  '("diff" "echo" "grep" "sort" "head" "uniq" "which" "awk" "plantuml"
-  "openscad" "argdown" "ls" "head" "true" "false" "cat")
-  "Command specs any combination of which `@whitelisted-commands' auto-approves.
-Each is a `konix/agent-shell--command-matches-p' spec (name or subcommand prefix)."
-  :type '(repeat string)
-  :group 'konix)
-
-(konix/agent-shell-define-tool-evaluator "whitelisted-commands" (tool-call &rest extra)
-  "Match when every command on the line matches a whitelisted spec.
-The whitelist is `konix/agent-shell-command-whitelist' plus the EXTRA specs from
-the reference, e.g. `@whitelisted-commands(ls, gh pr check)'."
-  (konix/agent-shell--with-bash-ast root tool-call
-    (let ((commands (konix/agent-shell--command-nodes root))
-          (whitelist (append konix/agent-shell-command-whitelist extra)))
-      (and commands
-           (seq-every-p (lambda (c)
-                          (konix/agent-shell--command-matches-any-p c whitelist))
-                        commands)))))
-
 (konix/agent-shell-define-tool-evaluator "use-a-wrong-tmp-dir" (tool-call)
   "Match a tool call reaching into a temp directory other than ./.agent-shell/tmp.
 The wrong ones are ~/tmp, /tmp, /var/tmp and $TMPDIR; a command called on
@@ -1098,7 +1086,7 @@ $TMPDIR or /tmp without ever naming the directory."
                                 (unless (or (null tmpdir) (string-empty-p tmpdir))
                                   (list tmpdir)))))))
     (konix/agent-shell-tool-match-p
-     `(or "@hascommand(mktemp)"
+     `(or "^mktemp\\b"
           ,@(mapcan (lambda (dir)
                       (list (format "@command-args-inside(.+, %s)" dir)
                             (format "@targets-inside(%s)" dir)))
@@ -1118,17 +1106,16 @@ $TMPDIR or /tmp without ever naming the directory."
     ("python3 -m json.tool" . "jq")
     ("@severalcommands" . "One command at a time. Use redirection to a file in ./.agent-shell/tmp if needing to chain stuff")
     ("@lost-search" . "You are lost, simply ask the user for guidance. Don't try to do all by yourself, make a team with the user.")
-    ("@hascommand(cd)" . "Don't cd")
+    ("^cd\\b" . "Don't cd")
     ("^\\(bash -c\\|python3? -c\\|python3? - <<\\)" . "No oneliner")
     ("@edit-agent-permissions" . "Ask the user to do this")
     ("@command-args-inside(find, ~/.emacs.d)" . "Use the mcp tools")
     )
   "GLOBAL baseline alist of (KEY . REASON) blacklisted tools.
 Applied to every session, beneath the project and session layers which
-shadow it.  KEY is a regexp (matched against the tool title, kind, command
-line and input), a predicate form when it starts with `(', an `@evaluator'
-reference, or an `and'/`or'/`not' combination of those -- see
-`konix/agent-shell--spec-matches-p'.  Set it in your init or via Customize;
+shadow it.  KEY is a regexp, a `$ GLOB', a predicate form when it starts with
+`(', an `@evaluator' reference, or an `and'/`or'/`not' combination of those --
+see `konix/agent-shell--key-matches-p'.  Set it in your init or via Customize;
 like the MCP global baseline it is not persisted by the runtime panel toggle."
   :type '(alist :key-type string :value-type string)
   :group 'konix)
@@ -1143,7 +1130,7 @@ in the project.")
 
 (defcustom konix/agent-shell-tool-whitelist-global
   '(("@edits-inside(.agent-shell/tmp)" . "Edits and writes confined to ./.agent-shell/tmp/")
-    ("(and \"@onlycommand(wc, rm, man, grep, date, uniq, head, awk, sed, mmdc, plantuml, jq, strings, base64, ls, sqlite3, rg, tail, sort, cut, mkdir, unzip)\" \"@project-paths\")")
+    ("(and \"^\\\\(tar\\\\|wc\\\\|rm\\\\|man\\\\|grep\\\\|date\\\\|uniq\\\\|head\\\\|awk\\\\|sed\\\\|mmdc\\\\|plantuml\\\\|jq\\\\|strings\\\\|base64\\\\|ls\\\\|sqlite3\\\\|rg\\\\|tail\\\\|sort\\\\|cut\\\\|mkdir\\\\|unzip\\\\|diff\\\\|echo\\\\|which\\\\|openscad\\\\|argdown\\\\|true\\\\|false\\\\|cat\\\\)\\\\( \\\\|$\\\\)\" \"@project-paths\")" . "commands on project files")
     ("^\\(ba\\)?sh -n")
     ("^mcp__konix-browser__readonly")
     ("^nix-instantiate --parse")
@@ -1153,7 +1140,7 @@ in the project.")
     ("@read-only-sed" . "sed that only reads project files and prints")
     ("@read-only-find" . "find that only walks project files and prints")
     ("@gh-read" . "gh api GETs and the list/view subcommands")
-    ("(and \"@onlycommand\" \"@argv(^clk .+ --help$)\")" . "clk help pages"))
+    ("^clk .+ --help$" . "clk help pages"))
   "GLOBAL baseline alist of (KEY . NOTE) whitelisted (auto-approved) tools.
 Applied to every session, beneath the project and session layers which
 shadow it.  KEY matches as in `konix/agent-shell-tool-blacklist-global';
@@ -1476,10 +1463,12 @@ LETTER is a `konix/agent-shell-policy--disable-decider' \"s\"/\"p\"/\"G\"."
   "Return every POLICY entry matching TOOL-CALL, in effective order.
 Entries are matched by `konix/agent-shell--matching-entries', so a regexp
 key's captures appear in the returned reasons."
-  (konix/agent-shell--matching-entries
-   (konix/agent-shell-policy--effective policy)
-   tool-call
-   (konix/agent-shell--tool-haystack tool-call)))
+  (let ((konix/agent-shell--regexp-any-command
+         (eq policy konix/agent-shell--blacklist)))
+    (konix/agent-shell--matching-entries
+     (konix/agent-shell-policy--effective policy)
+     tool-call
+     (konix/agent-shell--tool-haystack tool-call))))
 
 (defun konix/agent-shell-policy--match (policy tool-call)
   "Return POLICY's first matching entry for TOOL-CALL, or nil."
@@ -1825,28 +1814,9 @@ request's own fields."
       "  (no fields to suggest from)")))
 
 (defun konix/agent-shell--describe-commands (tool-call)
-  "Return a description of TOOL-CALL's bash commands, or nil.
-Parses the command line with the bash tree-sitter grammar and lists every
-`command' node -- its name (marked `*' when top-level, i.e. not nested in
-another command's branch) and its flattened text -- so the reader can
-author `hascommand'/`severalcommands'/`severaltoplevelcommands' KEYs.
-Returns nil for a non-shell tool or when the grammar is unavailable."
-  (when (treesit-language-available-p 'bash)
-    (konix/agent-shell--with-bash-ast root tool-call
-      (when-let ((commands (mapcar #'cdr
-                                   (treesit-query-capture root '((command) @c)))))
-        (mapconcat
-         (lambda (cmd)
-           (let ((name (or (when-let ((n (treesit-node-child-by-field-name
-                                          cmd "name")))
-                             (treesit-node-text n t))
-                           "?"))
-                 (text (replace-regexp-in-string
-                        "[ \t\n]+" " " (string-trim (treesit-node-text cmd t)))))
-             (format "  %s %-12s %s"
-                     (if (konix/agent-shell--toplevel-command-p cmd) "*" " ")
-                     name text)))
-         commands "\n")))))
+  "Return TOOL-CALL's `konix/agent-shell--tool-call-argvs', one per line, or nil."
+  (when-let* ((argvs (konix/agent-shell--tool-call-argvs tool-call)))
+    (mapconcat (lambda (argv) (concat "  " (or argv "?"))) argvs "\n")))
 
 (defun konix/agent-shell--describe-tool-call (id tool-call)
   "Return a multi-line string describing TOOL-CALL (with id ID).
@@ -1878,10 +1848,11 @@ already match."
      (format "  Kind   : %s\n" (or (map-elt tool-call :kind) "(none)"))
      (when command (format "  Command: %s\n" command))
      (when-let ((commands (konix/agent-shell--describe-commands tool-call)))
-       (concat "\nCommands (bash tree-sitter parse; `*' = top-level -- for "
-               "`hascommand'/`severalcommands' KEYs):\n"
+       (concat "\nCommands (what a regexp or `$ GLOB' KEY is matched against, "
+               "case-insensitively):\n"
                dash "\n" commands "\n" dash "\n"))
-     "\nHaystack (what a regexp KEY is matched against, case-insensitively):\n"
+     "\nHaystack (what a regexp KEY is matched against for any other tool, "
+     "and by the blacklist too):\n"
      dash "\n" haystack "\n" dash "\n\n"
      ;; The agent's narration is NOT in the haystack -- only `(lambda ...)' /
      ;; `@evaluator' keys see it, via `(map-elt tc :agent-said)'.
@@ -2028,7 +1999,7 @@ predicate form starting with `(' (see `konix/agent-shell--key-matches-p').
 WHERE selects the axis: no prefix -> ephemeral SESSION; one prefix ->
 project `.dir-locals.el'; two prefixes -> GLOBAL baseline (running Emacs)."
   (interactive
-   (list (completing-read "Blacklist tool (regexp, @evaluator, or (lambda ...)): "
+   (list (completing-read "Blacklist tool (regexp, $ glob, @evaluator, or (lambda ...)): "
                           (konix/agent-shell--tool-candidates)
                           nil nil nil 'regexp-history)
          (read-string "Reason (sent to the agent): " nil nil "Don't use this tool.")
@@ -2043,7 +2014,7 @@ matches KEY are auto-approved without a dialog (unless they also match the
 blacklist, which wins).  KEY matches as in
 `konix/agent-shell-blacklist-tool'; WHERE selects the axis likewise."
   (interactive
-   (list (completing-read "Whitelist tool (regexp, @evaluator, or (lambda ...)): "
+   (list (completing-read "Whitelist tool (regexp, $ glob, @evaluator, or (lambda ...)): "
                           (konix/agent-shell--tool-candidates)
                           nil nil nil 'regexp-history)
          (read-string "Note (optional): " nil nil "")
@@ -2208,49 +2179,43 @@ buffer, so a rule just added/edited here acts on what is already waiting."
   (with-current-buffer (konix/agent-shell-panel--origin-buffer)
     (call-interactively #'konix/agent-shell-reapply-policies)))
 
-(defun konix/agent-shell--command-before-redirection (tool-call)
-  "Return TOOL-CALL's command line up to its first redirection, or nil.
-The whole command line when it has none, or when its AST is unavailable."
-  (when-let ((command (konix/agent-shell--tool-call-command tool-call)))
-    (or (ignore-errors
-          (konix/agent-shell--with-bash-ast root tool-call
-            (when-let ((starts (mapcar (lambda (capture)
-                                         (treesit-node-start (cdr capture)))
-                                       (treesit-query-capture
-                                        root '([(file_redirect)
-                                                (heredoc_redirect)] @r)))))
-              (string-trim (substring command 0 (1- (apply #'min starts)))))))
-        command)))
-
-(defun konix/agent-shell--tool-call-policy-key (tool-call)
+(defun konix/agent-shell--tool-call-policy-key (tool-call &optional exact)
   "Return a policy KEY matching TOOL-CALL, or nil.
 An MCP call gets an `@mcp' candidate of
 `konix/agent-shell--mcp-candidates', the one holding an argument when there
-is one.  Anything else (a shell command, an edit, a write) gets its command
-line up to its first redirection, falling back to its title then its kind,
-regexp-quoted and anchored with `^': `konix/agent-shell--tool-haystack'
-gives each of those its own line."
+is one.  A shell call gets its commands as `konix/agent-shell--command-argv'
+reads them: a prefix, or with EXACT -- as a whitelist wants -- that very
+command.  Anything else (an edit, a write) gets its title, falling back to
+its kind, regexp-quoted and anchored with `^':
+`konix/agent-shell--tool-haystack' gives each of those its own line."
   (if-let* ((candidates (and (fboundp 'konix/agent-shell--mcp-candidates)
                              (konix/agent-shell--mcp-candidates tool-call))))
       (or (cadr candidates) (car candidates))
-    (when-let* ((field (seq-find (lambda (field)
-                                   (and (stringp field)
-                                        (not (string-empty-p field))))
-                                 (list (konix/agent-shell--command-before-redirection
-                                        tool-call)
-                                       (map-elt tool-call :title)
-                                       (map-elt tool-call :kind)))))
-      (concat "^" (regexp-quote field)))))
+    (if-let* ((argvs (konix/agent-shell--tool-call-argvs tool-call t))
+              ((not (memq nil argvs))))
+        (cond ((cdr argvs)
+               (concat "^\\(" (mapconcat #'regexp-quote argvs "\\|") "\\)$"))
+              ((not exact) (concat "^" (regexp-quote (car argvs))))
+              ((string-match-p "[*?[]" (car argvs))
+               (concat "^" (regexp-quote (car argvs)) "$"))
+              (t (concat "$ " (car argvs))))
+      (when-let* ((field (seq-find (lambda (field)
+                                     (and (stringp field)
+                                          (not (string-empty-p field))))
+                                   (list (map-elt tool-call :title)
+                                         (map-elt tool-call :kind)))))
+        (concat "^" (regexp-quote field))))))
 
-(defun konix/agent-shell--pending-policy-key ()
-  "Return `konix/agent-shell--tool-call-policy-key' of the waiting request.
-Nil when none is waiting.  Call it in the shell buffer or in a viewport of it."
+(defun konix/agent-shell--pending-policy-key (&optional exact)
+  "Return `konix/agent-shell--tool-call-policy-key' of the waiting request,
+EXACT passed along.  Nil when none is waiting.  Call it in the shell buffer or
+in a viewport of it."
   (when-let* ((shell (ignore-errors (konix/agent-shell--current-shell-or-error))))
     (with-current-buffer shell
       (when-let* ((id (car (konix/agent-shell--pending-permission-ids)))
                   (tool-call (map-nested-elt (agent-shell--state)
                                              (list :tool-calls id))))
-        (konix/agent-shell--tool-call-policy-key tool-call)))))
+        (konix/agent-shell--tool-call-policy-key tool-call exact)))))
 
 (defun konix/agent-shell-policy-menu-add ()
   "Add an entry to a chosen axis of the panel's policy.
@@ -2261,11 +2226,12 @@ when a permission request is waiting in the origin session."
          (origin (konix/agent-shell-panel--origin-buffer))
          (key (with-current-buffer origin
                 (completing-read
-                 (format "%s tool (regexp, @evaluator, or (lambda ...)): "
+                 (format "%s tool (regexp, $ glob, @evaluator, or (lambda ...)): "
                          (capitalize (konix/agent-shell-policy-name policy)))
                  (ignore-errors (konix/agent-shell-policy--candidates policy))
                  nil nil
-                 (when-let ((prefill (konix/agent-shell--pending-policy-key)))
+                 (when-let ((prefill (konix/agent-shell--pending-policy-key
+                                      (eq policy konix/agent-shell--whitelist))))
                    (cons prefill 0))
                  'regexp-history)))
          (value (read-string (konix/agent-shell-policy-value-prompt policy)
@@ -2303,7 +2269,7 @@ If the key changes, the old one is replaced on each axis it occupied."
                         (seq-filter (lambda (extra)
                                       (assoc key (funcall (plist-get extra :entries) policy)))
                                     konix/agent-shell-policy-extra-axes)))
-           (new-key (read-string "Key (regexp, @evaluator, or (lambda ...)): " key 'regexp-history))
+           (new-key (read-string "Key (regexp, $ glob, @evaluator, or (lambda ...)): " key 'regexp-history))
            (new-value (read-string (konix/agent-shell-policy-value-prompt policy)
                                    (with-current-buffer origin
                                      (konix/agent-shell-policy--value-for policy key))))

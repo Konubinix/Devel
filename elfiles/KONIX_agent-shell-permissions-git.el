@@ -127,7 +127,7 @@ See `konix/agent-shell--git-write-subcommands'; a listing form is no write."
 
 (konix/agent-shell-define-tool-evaluator "git-readonly" (tool-call)
   "Match a line running a `git' that only reads, see
-`konix/agent-shell--git-read-only-p'.  One is enough, as with `@hascommand'."
+`konix/agent-shell--git-read-only-p'.  One is enough."
   (konix/agent-shell--with-bash-ast root tool-call
     (seq-some #'konix/agent-shell--git-read-only-p
               (konix/agent-shell--command-nodes root))))
@@ -136,7 +136,7 @@ See `konix/agent-shell--git-write-subcommands'; a listing form is no write."
   "Match a line running a `git' that writes, see `konix/agent-shell--git-write-p'.
 When SUBCOMMANDS is given, that `git' must run one of them, so
 `@git-write(commit)' matches `git -C sub commit' too.
-One is enough, as with `@hascommand': how many commands the line runs is
+One is enough: how many commands the line runs is
 `@severalcommands'' business."
   (konix/agent-shell--with-bash-ast root tool-call
     (seq-some (lambda (c)

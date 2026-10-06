@@ -38,7 +38,6 @@
 ;;; Code:
 
 (require 'subr-x)
-(require 'KONIX_shell-parse)
 (require 'KONIX_agent-shell-permissions)
 
 (defconst konix/agent-shell--find-link-flags '("-H" "-L" "-P")
@@ -131,19 +130,20 @@ statically knowable."
 (konix/agent-shell-define-tool-evaluator "read-only-find" (tool-call &optional directory)
   "Match a lone read-only `find', e.g.
 `find .agent-shell/tmp -maxdepth 2 -name \\='*.txt\\='' -- auto-approvable.
-`find' is in neither `konix/agent-shell-command-whitelist' nor
+`find' is in neither the harmless commands of
+`konix/agent-shell-tool-whitelist-global' nor
 `konix/agent-shell--read-only-filters' because it also writes, removes and
 executes, so the invocation is read instead
-\(`konix/agent-shell--find-read-only-p').  Combining commands is
-`@severalcommands'' business: here the line must run that `find' alone
-\(`konix/shell-parse-chained-p'), give or take a plain `> FILE'."
-  (unless (konix/shell-parse-chained-p
-           (konix/agent-shell--command-sans-stdout-redirect
-            (or (konix/agent-shell--tool-call-command tool-call) "")))
-    (konix/agent-shell--with-bash-ast root tool-call
-      (let ((commands (konix/agent-shell--command-nodes root)))
-        (and (= (length commands) 1)
-             (konix/agent-shell--find-read-only-p (car commands) directory))))))
+\(`konix/agent-shell--find-read-only-p').  The line must run that `find'
+alone, its transparent filters aside (see
+`konix/agent-shell--transparent-filter-p'), and read no file outside
+DIRECTORY."
+  (konix/agent-shell--with-bash-ast root tool-call
+    (let ((commands (konix/agent-shell--working-command-nodes root)))
+      (and (= (length commands) 1)
+           (konix/agent-shell--find-read-only-p (car commands) directory)
+           (konix/agent-shell--reads-inside-p
+            root (or directory default-directory))))))
 
 (provide 'KONIX_agent-shell-permissions-find)
 ;;; KONIX_agent-shell-permissions-find.el ends here

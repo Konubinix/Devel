@@ -157,68 +157,6 @@ parsing, so KEY may carry arguments."
        (lambda (command) (konix/agent-shell-tests--key ,key command))
      ,@cases))
 
-(konix/agent-shell-tests-deftable
-    konix/agent-shell-test-shell-parse-chained
-    (lambda (command) (and (konix/shell-parse-chained-p command) t))
-  (nil . "gh issue list")
-  (nil . "a | b | c")
-  (nil . "gh api foo | jq \".[] | select(.a > 1)\"")
-  (nil . "gh issue list | grep \"a>b\"")
-  (nil . "sed -n \"1p;5p\" f.txt")
-  (nil . "echo \"a && b\"")
-  (nil . "a=1 b")
-  (nil . "")
-  (t . "a ; b")
-  (t . "a && b")
-  (t . "a || b")
-  (t . "a &")
-  (t . "a | b &")
-  (t . "a > f")
-  (t . "a < f")
-  (t . "(a)")
-  (t . "{ a; }")
-  (t . "a $(b)")
-  (t . "a `b`")
-  (t . "a <(b)")
-  (t . "if a; then b; fi"))
-
-(konix/agent-shell-tests-deftable
-    konix/agent-shell-test-shell-parse-pipeline-segments
-    #'konix/shell-parse-pipeline-segments
-  (("gh issue list") . "gh issue list")
-  (("a" "b" "c") . "a | b | c")
-  (("a > f" "b") . "a > f | b")
-  (("gh pr diff 352" "head -50") . "gh pr diff 352 | head -50")
-  ;; a pipe the shell never reads as one
-  (("jq \".a | .b\" f") . "jq \".a | .b\" f")
-  (("grep 'a|b' f") . "grep 'a|b' f")
-  (("") . ""))
-
-(konix/agent-shell-tests-deftable
-    konix/agent-shell-test-shell-parse-split-stdout-redirect
-    #'konix/shell-parse-split-stdout-redirect
-  (("a " "f" nil) . "a > f")
-  (("a " "f" t) . "a >> f")
-  (("a " "f" nil) . "a &> f")
-  (("a " "f" t) . "a &>> f")
-  (("a " "f" nil) . "a > f 2>&1")
-  (("a " "f" nil) . "a 2>&1 > f")
-  (("a | b " "f" nil) . "a | b > f")
-  (("a " "$HOME/x" nil) . "a > \"$HOME/x\"")
-  ;; declined, so the caller keeps the whole line
-  (nil . "a")
-  (nil . "a < f")
-  (nil . "a 2> f")
-  (nil . "a > b > c")
-  (nil . "a >| f")
-  (nil . "a >& f")
-  (nil . "a > $(whoami).txt")
-  (nil . "a > f ; b")
-  (nil . "a > f | b")
-  (nil . "> f")
-  (nil . "grep \"a>b\" f")
-  (nil . "cat <<EOF\nhi\nEOF"))
-
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-sed-accepts "read-only-sed"
   (t . "sed -n '/client renderer/,/the residual/p' .agent-shell/tmp/headings2.txt")
@@ -234,7 +172,10 @@ parsing, so KEY may carry arguments."
   (t . (format "sed -n '1,5p' %s" (expand-file-name "notes.txt")))
   ;; where the output lands is `@writes-outside'' business, not this one's
   (t . "sed -n '1p' foo.txt > out.txt")
-  (t . "sed -n '2518,2545p' ./.agent-shell/tmp/run-failed.txt > ./.agent-shell/tmp/missing-keys.txt 2>&1"))
+  (t . "sed -n '1p' foo.txt 2> err.txt")
+  (t . "sed -n '2518,2545p' ./.agent-shell/tmp/run-failed.txt > ./.agent-shell/tmp/missing-keys.txt 2>&1")
+  (t . "sed -n '1p' foo.txt | head -3")         ; a read-only filter changes nothing
+  (t . "sed -n '1p' < foo.txt"))
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-sed-refuses-writes "read-only-sed"
@@ -243,9 +184,7 @@ parsing, so KEY may carry arguments."
   (nil . "sed --in-place 's/a/b/' foo.txt")
   (nil . "sed -n '/a/w out.txt' foo.txt")
   (nil . "sed -n 'w out.txt' foo.txt")
-  (nil . "sed 's/a/b/w out.txt' foo.txt")
-  (nil . "sed -n '1p' foo.txt 2> err.txt")
-  (nil . "sed -n '1p' < /etc/shadow"))
+  (nil . "sed 's/a/b/w out.txt' foo.txt"))
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-sed-refuses-execution "read-only-sed"
@@ -263,7 +202,9 @@ parsing, so KEY may carry arguments."
   (nil . "sed -n '1,5p' /etc/shadow")
   (nil . "sed -n '1,5p' ~/.ssh/id_rsa")
   (nil . "sed -n '1,5p' $HOME/.ssh/id_rsa")
-  (nil . "sed -n '1,5p' ../other/secret"))
+  (nil . "sed -n '1,5p' ../other/secret")
+  (nil . "sed -n '1p' < /etc/shadow")
+  (nil . "sed -n '1p' foo.txt | head -3 /etc/shadow")) ; that filter reads a file
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-read-only-sed-in-a-given-directory
@@ -312,7 +253,6 @@ parsing, so KEY may carry arguments."
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-sed-refuses-unrecognized "read-only-sed"
   (nil . "grep foo bar")
-  (nil . "sed -n '1p' foo.txt | head -3")        ; @severalcommands' business
   (nil . "sed --posix -n '1a hello' foo.txt")    ; text command, not parsed
   (nil . "sed -n '/a/b end' foo.txt")            ; branching, not parsed
   (nil . "sed -n -e '1p' foo.txt")               ; -e form, not parsed
@@ -337,7 +277,9 @@ parsing, so KEY may carry arguments."
   (t . "find . -path './.git' -prune -o -print")
   ;; where the output lands is `@writes-outside'' business, not this one's
   (t . "find . -name '*.el' > ./.agent-shell/tmp/els.txt")
-  (t . "find . -name '*.el' >> .agent-shell/tmp/els.txt 2>&1"))
+  (t . "find . -name '*.el' >> .agent-shell/tmp/els.txt 2>&1")
+  (t . "find . -name '*.el' 2> err.txt")
+  (t . "find . -name '*.el' | head -3"))         ; a read-only filter changes nothing
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-find-refuses-writes "read-only-find"
@@ -346,7 +288,6 @@ parsing, so KEY may carry arguments."
   (nil . "find . -name '*.el' -fprint0 out.txt")
   (nil . "find . -name '*.el' -fprintf out.txt '%p\\n'")
   (nil . "find . -name '*.el' -fls out.txt")
-  (nil . "find . -name '*.el' 2> err.txt")
   (nil . "find . -files0-from paths.txt"))
 
 (konix/agent-shell-tests-deftest-evaluator
@@ -393,7 +334,6 @@ parsing, so KEY may carry arguments."
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-find-refuses-unrecognized "read-only-find"
   (nil . "grep foo bar")
-  (nil . "find . -name '*.el' | head -3")         ; @severalcommands' business
   (nil . "find . -name")                          ; dangling value: misread line
   (nil . "find . -newer")
   (nil . "find . -D tree -name '*.el'")           ; -D form, not parsed
@@ -407,7 +347,9 @@ parsing, so KEY may carry arguments."
   ;; where the output lands is `@writes-outside'' business, not this one's
   (t . "gh api repos/o/r/issues/352/comments --jq '.[] | \"\\(.user.login)\"' > ./.agent-shell/tmp/c.txt")
   (t . "gh api foo >> .agent-shell/tmp/o.json")
-  (t . "gh api foo | jq . > /etc/passwd"))
+  (t . "gh api foo | jq . > /etc/passwd")
+  (t . "gh api foo 2> e.txt")
+  (t . "gh api foo > a > b"))
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-gh-read-accepts-subcommand-reads "gh-read"
@@ -454,8 +396,7 @@ parsing, so KEY may carry arguments."
   (nil . "gh api foo > o.txt; rm -rf /")
   (nil . "gh api foo && rm -rf /")
   (nil . "gh api foo > $(whoami).txt")
-  (nil . "gh api foo 2> e.txt")                  ; unreadable redirection
-  (nil . "gh api foo > a > b")
+  (nil . "gh api foo | jq . /etc/shadow")         ; that filter reads a file
   (nil . "gh issue list | sh")
   (nil . "gh issue list && rm -rf /")
   (nil . "gh")
@@ -519,16 +460,18 @@ parsing, so KEY may carry arguments."
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-lone-reader-accepts
-    "(and \"@onlycommand(grep, tail, sort, cut)\" \"@project-paths\")"
+    "(and \"^\\\\(grep\\\\|tail\\\\|sort\\\\|cut\\\\|cat\\\\|uniq\\\\)\\\\( \\\\|$\\\\)\" \"@project-paths\")"
   (t . "grep -iE \"error|not found|cannot|failed to\" ./.agent-shell/tmp/libs-fail.txt > ./.agent-shell/tmp/libs-errors.txt 2>&1")
   (t . "grep -rn foo")
   (t . "tail -n 50 .agent-shell/tmp/run.txt")
   (t . "sort -u .agent-shell/tmp/keys.txt > .agent-shell/tmp/sorted.txt")
-  (t . "cut -d, -f1 data.csv"))
+  (t . "cut -d, -f1 data.csv")
+  (t . "sort notes.txt | uniq"))                   ; every command on the line is listed
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-lone-reader-refuses
-    "(and \"@onlycommand(grep, tail, sort, cut)\" \"@project-paths\")"
+    "(and \"^\\\\(grep\\\\|tail\\\\|sort\\\\|cut\\\\|cat\\\\|uniq\\\\)\\\\( \\\\|$\\\\)\" \"@project-paths\")"
+  (nil . "sortx notes.txt")                        ; not a listed command
   (nil . "grep foo bar | sh")
   (nil . "grep foo bar && rm -rf /")
   (nil . "grep foo $(ls)")
@@ -536,28 +479,8 @@ parsing, so KEY may carry arguments."
   (nil . "tail -n 5 ~/.ssh/id_rsa")
   (nil . "tail -n 5 $HOME/.ssh/id_rsa")
   (nil . "sort ../other/secret")
-  (nil . "cat foo.txt")
-  (nil . "sed -n '1p' foo.txt"))
-
-(konix/agent-shell-tests-deftest-key
-    konix/agent-shell-test-wrapped-script-run-accepts
-    "@wrapped-script-run(ci\\.sh)"
-  (t . "./ci.sh --foo")
-  (t . "timeout 570 ./ci.sh --foo")
-  (t . "timeout -k 5 570 ./ci.sh | head -20")
-  (t . "timeout --preserve-status 5m ./ci.sh")
-  (t . "./ci.sh | grep -i error")
-  (t . "grep foo ./ci.sh"))                        ; a filter reading it, no run
-
-(konix/agent-shell-tests-deftest-key
-    konix/agent-shell-test-wrapped-script-run-refuses
-    "@wrapped-script-run(ci\\.sh)"
-  (nil . "timeout 570 rm -rf ./ci.sh")             ; timeout runs rm, not the script
-  (nil . "timeout --signal TERM 570 ./ci.sh")      ; value read as the command
-  (nil . "./ci.sh && rm -rf /")
-  (nil . "echo hi; ./ci.sh")
-  (nil . "bash ./ci.sh")
-  (nil . "grep foo other.sh"))
+  (nil . "sed -n '1p' foo.txt")
+  (nil . ""))
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-edits-inside-scopes-edits-to-a-directory
@@ -706,10 +629,21 @@ PATH defaults to `konix/agent-shell-tests--review'."
               "mcp__konix-emacs-elisp__load_file"
               'file-path konix/agent-shell-tests--review)
              '((:kind . "other"))))
-  ;; a shell call yields its title and kind only
-  (("Run a command" "execute")
-   . (konix/agent-shell-tests--shell-call
-      (concat "rm " konix/agent-shell-tests--review))))
+  ;; a shell call yields its kind and the keys its commands make
+  (("execute" "^rm -f tests/\\.coverage\\.\\*" "$ rm *" "^rm\\b")
+   . (konix/agent-shell-tests--shell-call "rm -f tests/.coverage.*")))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-shell-candidates
+    (lambda (command)
+      (konix/agent-shell--shell-candidates
+       (konix/agent-shell-tests--shell-call command)))
+  (("$ ls -la" "^ls -la" "$ ls *" "^ls\\b") . "timeout 5 ls -la > out.txt")
+  (("$ ./tangle.sh" "^\\./tangle\\.sh\\b") . (expand-file-name "tangle.sh"))
+  (("$ ls" "^ls\\b") . "ls | head -3")             ; the filter makes no key
+  (("^rm -f tests/\\.coverage\\.\\*" "$ rm *" "^rm\\b")
+   . "rm -f tests/.coverage.*")                    ; a glob character, no exact glob
+  (("$ ls" "^ls\\b") . "FOO=1 ls"))
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-mcp-candidates-skip-unwritable-values
@@ -735,6 +669,15 @@ PATH defaults to `konix/agent-shell-tests--review'."
        ("@destructive" . "keep \\1 verbatim")
        ("echo" . "invalid \\d escape kept"))))
 
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-matching-entries-quotes-the-command
+    (lambda (command)
+      (let ((call (konix/agent-shell-tests--shell-call command)))
+        (konix/agent-shell--matching-entries
+         '(("^echo \\(.+\\)" . "do not print \\1"))
+         call (konix/agent-shell--tool-haystack call))))
+  ((("^echo \\(.+\\)" . "do not print foobar")) . "timeout 5 echo foobar > out.txt"))
+
 (defun konix/agent-shell-tests--shell-policy-key (command)
   "Return the prefill policy key of a shell call running COMMAND."
   (konix/agent-shell--tool-call-policy-key
@@ -743,18 +686,31 @@ PATH defaults to `konix/agent-shell-tests--review'."
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-policy-key-of-a-shell-call
     #'konix/agent-shell-tests--shell-policy-key
-  ("^clk --help" . "clk --help")
-  ;; where the output goes is no part of the rule
   ("^clk --help" . "clk --help > /tmp/out.txt")
-  ("^clk --help" . "clk --help >/tmp/out.txt")
-  ("^clk --help" . "clk --help >> /tmp/out.txt")
-  ("^clk --help" . "clk --help 2> /tmp/err.txt")
-  ("^clk --help" . "clk --help > /tmp/out.txt 2>&1")
-  ("^clk --help" . "clk --help < /tmp/in.txt")
-  ("^cat" . "cat <<EOF\nhi\nEOF")
-  ("^echo hi | tee /tmp/out\\.txt" . "echo hi | tee /tmp/out.txt")
+  ("^\\./tangle\\.sh" . (expand-file-name "tangle.sh"))
+  ("^\\(echo hi\\|tee /tmp/out\\.txt\\)$" . "echo hi | tee /tmp/out.txt")
   ;; a `>' the shell never reads as a redirection
   ("^grep 'a > b' f" . "grep 'a > b' f"))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-whitelist-key-of-a-shell-call
+    (lambda (command)
+      (konix/agent-shell--tool-call-policy-key
+       (konix/agent-shell-tests--shell-call command) t))
+  ("$ foobar 'some thing'" . "timeout 5 foobar 'some thing' > out.txt")
+  ("$ ./tangle.sh" . (expand-file-name "tangle.sh"))
+  ("^rm -f tests/\\.coverage\\.\\*$" . "rm -f tests/.coverage.*") ; no glob then
+  ("^\\(echo hi\\|tee /tmp/out\\.txt\\)$" . "echo hi | tee /tmp/out.txt"))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-whitelist-key-matches-its-own-call-only
+    (lambda (command)
+      (konix/agent-shell-tests--key
+       (konix/agent-shell--tool-call-policy-key
+        (konix/agent-shell-tests--shell-call "foobar 'some thing'") t)
+       command))
+  (t . "foobar 'some thing'")
+  (nil . "foobar 'some thing' /etc/passwd"))
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-policy-key-matches-its-own-call
@@ -800,40 +756,84 @@ PATH defaults to `konix/agent-shell-tests--review'."
         "mcp__konix-emacs-elisp__load_file"
         'file-path konix/agent-shell-tests--review)))
 
-(konix/agent-shell-tests-deftest-key
-    konix/agent-shell-test-whitelisted-commands-accepts
-    "@whitelisted-commands"
-  (t . "grep -n foo bar.el")
-  (t . "ls -la")
-  (t . "cat notes.txt")
-  (t . "which nix")
-  (t . "sort notes.txt | uniq"))          ; every command on the line is listed
-
-(konix/agent-shell-tests-deftest-key
-    konix/agent-shell-test-whitelisted-commands-refuses
-    "@whitelisted-commands"
-  (nil . "rm -rf .")
-  (nil . "cd /tmp")
-  (nil . "sed -n '1p' notes.txt")         ; `sed' is not on the list
-  (nil . "grep foo bar && rm -rf /")      ; one command off the list is enough
-  (nil . ""))
-
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-severalcommands "severalcommands"
   (nil . "ls -la")
   (nil . "grep 'a|b' notes.txt")          ; a pipe the shell never reads as one
   (nil . "timeout 60 ls")                 ; a wrapper prefix is one command node
+  (nil . "ls | head -3")                  ; a read-only filter is no command
   (t . "ls && rm -rf .")
-  (t . "ls | head -3")
+  (t . "ls | sh")
+  (t . "ls | head -3 /etc/shadow")        ; that filter reads a file
+  (t . "head -3 notes.txt | ls")          ; first, it feeds the line
   (t . "echo $(ls)"))
 
+(konix/agent-shell-tests-deftest-verdict
+    konix/agent-shell-test-verdict-filters-are-transparent
+    ((konix/agent-shell-tool-blacklist-global
+      '(("@severalcommands" . "One command at a time")))
+     (konix/agent-shell-tool-whitelist-global '(("$ ./ci.sh" . "")))
+     (konix/agent-shell-tool-blacklist-disabled-global nil)
+     (konix/agent-shell-tool-whitelist-disabled-global nil))
+  (allow . "./ci.sh | head -20")
+  (allow . "timeout 570 ./ci.sh | grep -i error | sort")
+  (deny . "./ci.sh | sh")
+  (deny . "./ci.sh | grep foo /etc/shadow")
+  (deny . "./ci.sh | head < /etc/shadow"))
+
+;; What a regexp or `$ GLOB' key reads of a shell call: one line per command.
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-argv
+    (lambda (command)
+      (konix/agent-shell--tool-call-argvs
+       (konix/agent-shell-tests--shell-call command)))
+  (("ruff format clk/") . "nice -n 5 timeout 60 ruff format clk/")
+  (("./tangle.sh") . (expand-file-name "tangle.sh"))
+  (("tangle.sh") . "tangle.sh")                    ; looked up in PATH
+  (("clk foo --help") . "clk foo --help > out.txt 2>&1 < in.txt")
+  (("cat") . "cat <<EOF\nhi\nEOF")
+  (("FOO=1" "ls") . "FOO=1 ls")
+  (("ls" "head -3") . "ls | head -3")
+  (("cat $FOO") . "cat $FOO")                      ; unreadable, kept as written
+  (("sed -n 1,5p f") . "sed -n '1,5p' f")
+  (("sed -n '1p /x' /etc/shadow") . "sed -n '1p /x' /etc/shadow")
+  (("grep 'foo bar' x") . "grep \"foo bar\" x")
+  (("echo 'it'\\''s here'") . "echo \"it's here\""))
+
 (konix/agent-shell-tests-deftest-key
-    konix/agent-shell-test-onlycommand "@onlycommand(cd)"
-  (t . "cd /tmp")
-  (nil . "cd /tmp && ls")
-  (nil . "echo $(cd /tmp)")
-  (nil . "ls -la")
-  (nil . "echo cd"))
+    konix/agent-shell-test-regexp-reads-every-command "^ruff format\\b"
+  (t . "ruff format")
+  (nil . "ruff check")
+  (nil . "echo ruff format")
+  (nil . "ruff format; rm -rf ~")
+  (nil . "ruff format | tee out.txt"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-regexp-reads-the-arguments
+    "^\\./org-process\\.sh\\( --[a-z-]+\\)*\\( doc/use_case[^ ]*\\)?$"
+  (t . "./org-process.sh")
+  (t . "./org-process.sh --option doc/use_cases/a.org")
+  (nil . "./org-process.sh /etc/passwd")
+  (nil . "./org-process.sh doc/use_cases/a.org /etc/passwd"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-regexp-still-reads-the-kind "^execute$"
+  (t . "ls"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-glob-reads-the-command
+    "$ curl -sS * https://*.example.org/*"
+  (t . "curl -sS -H 'a: b' https://api.example.org/x")
+  (nil . "curl -sS -X GET https://api.examplexorg/")
+  (nil . "curl -sS -X GET https://api.example.com/")
+  (nil . "wget -sS -X GET https://api.example.org/")
+  (nil . "echo curl -sS -X GET https://api.example.org/")) ; whole command
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-glob-wants-a-shell-call
+    (lambda (call) (and (konix/agent-shell-tool-match-p "$ *" call) t))
+  (t . (konix/agent-shell-tests--shell-call "ls"))
+  (nil . (konix/agent-shell-tests--edit-call 'file_path "notes.txt")))
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-git-readonly "git-readonly"
@@ -963,15 +963,15 @@ own alist to check that project."
     konix/agent-shell-test-evaluator-names
     #'konix/agent-shell-tests--evaluator-names
   (("gh-read") . "@gh-read")
-  (("onlycommand" "project-paths")
-   . "(and \"@onlycommand(grep, ls)\" \"@project-paths\")")
+  (("edits-inside" "project-paths")
+   . "(and \"@edits-inside(doc)\" \"@project-paths\")")
   (nil . "^curl .+@example\\.com")
   (nil . nil))
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-unknown-evaluator-keys
     #'konix/agent-shell-tests-unknown-evaluator-keys
-  ((("@ghapi" . "")) . '(("@ghapi" . "") ("@gh-read" . "") ("^earthly" . "")))
+  ((("@ghapi" . "")) . '(("@ghapi" . "") ("@gh-read" . "") ("^make" . "")))
   ;; a mistyped `@NAME' makes a rule that can never fire, in silence
   (nil . konix/agent-shell-tool-blacklist-global)
   (nil . konix/agent-shell-tool-whitelist-global))
@@ -1015,8 +1015,41 @@ says which configuration it runs on."
      (konix/agent-shell-tool-blacklist-disabled-global nil)
      (konix/agent-shell-tool-whitelist-disabled-global nil))
   (allow . "ls -la")
-  (deny . "ls | head -3")                 ; the whitelist said allow
+  (deny . "ls | sh")                      ; the whitelist said allow
   (prompt . "npm install"))
+
+(konix/agent-shell-tests-deftest-verdict
+    konix/agent-shell-test-verdict-blacklist-reads-any-command
+    ((konix/agent-shell-tool-blacklist-global '(("^foobar" . "")))
+     (konix/agent-shell-tool-whitelist-global '(("^ls" . "")))
+     (konix/agent-shell-tool-blacklist-disabled-global nil)
+     (konix/agent-shell-tool-whitelist-disabled-global nil))
+  (deny . "ls ; foobar")
+  (deny . "timeout 5 foobar x")
+  (allow . "ls -la")
+  (prompt . "ls ; npm install")
+  (prompt . "echo foobar"))
+
+(konix/agent-shell-tests-deftest-verdict
+    konix/agent-shell-test-verdict-blacklist-reads-the-raw-text
+    ((konix/agent-shell-tool-blacklist-global '(("SECRET_TOKEN" . "")))
+     (konix/agent-shell-tool-whitelist-global '(("^ruff format\\b" . "")))
+     (konix/agent-shell-tool-blacklist-disabled-global nil)
+     (konix/agent-shell-tool-whitelist-disabled-global nil))
+  (deny . "SECRET_TOKEN=x ls")
+  (deny . "echo $SECRET_TOKEN")
+  (deny . "export SECRET_TOKEN=x")
+  (deny . "cat > out.txt <<EOF\nSECRET_TOKEN\nEOF")
+  (allow . "ruff format")
+  (prompt . "LD_PRELOAD=/tmp/evil.so ruff format"))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-blacklist-reads-an-edit-content
+    (lambda (call)
+      (let ((konix/agent-shell--regexp-any-command t))
+        (and (konix/agent-shell-tool-match-p "SECRET_TOKEN" call) t)))
+  (t . (konix/agent-shell-tests--edit-call
+        'file_path "notes.txt" 'new_string "export SECRET_TOKEN=x")))
 
 ;; The loaded configuration, asked in the safe direction only -- never `allow'
 ;; -- so customizing a policy cannot break this, while dropping a guard during

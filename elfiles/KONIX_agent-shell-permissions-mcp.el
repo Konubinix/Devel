@@ -20,17 +20,8 @@
 
 ;;; Commentary:
 
-;; Matching MCP tool calls by name AND argument, for the policy engine of
-;; `KONIX_agent-shell-permissions'.  An MCP request carries its tool name in
-;; the tool-call `:title' (`mcp__SERVER__TOOL') and its arguments in
-;; `:raw-input'; `konix/agent-shell--tool-haystack' puts those on separate
-;; lines and a regexp `.' does not cross a newline, so no single regexp can
-;; name a tool and one of its arguments at once.  `@mcp' reads the title and
-;; the raw input directly instead, matching a regexp against the name and one
-;; against each argument value -- regexps as everywhere else in the policy,
-;; with no JSON quoting in the way.  The calls a session makes are turned into
-;; ready `@mcp(...)' completions through
-;; `konix/agent-shell-tool-candidate-functions'.
+;; The `@mcp' evaluator, matching MCP calls by tool name and argument values.
+;; The haystack puts those on separate lines, out of reach of one regexp.
 
 ;;; Code:
 
@@ -45,9 +36,7 @@
   :group 'konix)
 
 (defun konix/agent-shell--mcp-tool-name (tool-call)
-  "Return TOOL-CALL's MCP tool name, or nil when it is not an MCP call.
-The name is the `:title' agent-shell took from the ACP request, which for an
-MCP tool is `mcp__SERVER__TOOL'."
+  "Return TOOL-CALL's `mcp__SERVER__TOOL' name, or nil if not an MCP call."
   (when-let* ((title (map-elt tool-call :title))
               ((stringp title))
               (name (string-trim title))
@@ -55,18 +44,14 @@ MCP tool is `mcp__SERVER__TOOL'."
     name))
 
 (defun konix/agent-shell--mcp-name-matches-p (name spec)
-  "Return non-nil when SPEC, a regexp, is found in the MCP tool NAME.
-NAME is the whole `mcp__SERVER__TOOL'.  SPEC is searched in it unanchored and
-case-insensitively, like every other regexp of the policy: the bare `TOOL'
-part names a tool, `mcp__SERVER__' scopes a rule to one server, and anchors
-pin whichever end matters."
+  "Return non-nil when regexp SPEC is found in the MCP tool NAME.
+The search is unanchored and case-insensitive."
   (let ((case-fold-search t))
     (string-match-p spec name)))
 
 (defun konix/agent-shell--raw-input-values (value)
-  "Return every string VALUE holds, walking its cons tree and vectors.
-VALUE is a parsed ACP `:raw-input' -- `acp' reads JSON objects as alists with
-symbol keys, so this yields the arguments' values and never their names."
+  "Return every string in VALUE, a parsed `:raw-input'.
+JSON keys are symbols, so only argument values are returned."
   (cond ((stringp value) (list value))
         ((consp value) (append (konix/agent-shell--raw-input-values (car value))
                                (konix/agent-shell--raw-input-values (cdr value))))
@@ -74,14 +59,9 @@ symbol keys, so this yields the arguments' values and never their names."
                                  (append value nil)))))
 
 (konix/agent-shell-define-tool-evaluator "mcp" (tool-call tool &rest values)
-  "Match the MCP tool TOOL called with every one of VALUES among its arguments.
-TOOL is a regexp searched in the whole `mcp__SERVER__TOOL' name; each of
-VALUES is a regexp that must be found in one of the call's argument values --
-their values only, never their names.  So `@mcp(load_file)' scopes a rule to
-a tool and `@mcp(load_file, /abs/dir/probe-.+)' to that tool called on a file
-of that directory.  The search is unanchored, so a VALUES naming one exact
-file also matches the longer paths holding it: end it with `$' when the rule
-is a whitelist and the extra match would not be wanted."
+  "Match a call to MCP tool TOOL with every one of VALUES among its arguments.
+TOOL and VALUES are unanchored regexps: in a whitelist, end a path with `$'
+lest it match longer paths too."
   (when-let ((name (konix/agent-shell--mcp-tool-name tool-call)))
     (and (konix/agent-shell--mcp-name-matches-p name (string-trim tool))
          (let ((arguments (konix/agent-shell--raw-input-values
@@ -98,18 +78,15 @@ is a whitelist and the extra match would not be wanted."
 
 (defun konix/agent-shell--mcp-candidate-value-p (value)
   "Return non-nil when VALUE fits inside an `@mcp' completion candidate.
-A short one-liner.  A value holding a comma is excluded: it cannot be written
-as an `@mcp' argument, `konix/agent-shell--parse-evaluator-ref' splitting it
-in two."
+Commas are excluded: the evaluator parser would split the value in two."
   (and (stringp value)
        (not (string-empty-p value))
        (<= (length value) konix/agent-shell-mcp-candidate-value-max-length)
        (not (string-match-p "[\n,]" value))))
 
 (defun konix/agent-shell--mcp-candidates (tool-call)
-  "Return the `@mcp' completion candidates TOOL-CALL yields, or nil.
-The bare tool, and one per argument value it carries, so writing a rule over
-a call the session just made is a completion rather than a transcription."
+  "Return the `@mcp' completion candidates for TOOL-CALL, or nil.
+One for the bare tool, plus one per argument value."
   (when-let ((name (konix/agent-shell--mcp-tool-name tool-call)))
     (cons (format "@mcp(%s)" name)
           (mapcar (lambda (value) (format "@mcp(%s, %s)" name value))

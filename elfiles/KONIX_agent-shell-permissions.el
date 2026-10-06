@@ -19,44 +19,21 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;;; Commentary:
 
-;; Per-session tool blacklist *and* whitelist for agent-shell.
+;; Per-session tool blacklist and whitelist for agent-shell, hooked into
+;; `agent-shell-permission-responder-function'.
 ;;
-;; agent-shell asks for permission before running a tool.  Through the
-;; `agent-shell-permission-responder-function' hook -- invoked with the
-;; session's shell buffer as `current-buffer' -- we match the requested
-;; tool against two policies of (KEY . VALUE) entries:
+;; - blacklist: matching tools are rejected; the entry's REASON is sent as a
+;;   follow-up prompt, the ACP response having no feedback channel.
+;; - whitelist: matching tools are approved without a dialog.
+;; Deny wins over allow.
 ;;
-;; - blacklist: matching tools are auto-rejected.  Since the ACP
-;;   permission response has no feedback channel to the agent, the entry's
-;;   REASON is delivered as a follow-up prompt to steer it ("don't use
-;;   this tool, prefer X or Y").
-;; - whitelist: matching tools are auto-approved (no dialog).  The entry's
-;;   VALUE is just an optional note.
+;; KEY is a regexp, a `$ GLOB', an `@NAME' evaluator or a `(' Lisp form; see
+;; `konix/agent-shell--key-matches-p'.  Lisp keys also get `:agent-said'
+;; (what the agent said this turn), kept out of the regexp haystack to avoid
+;; false positives on its prose.
 ;;
-;; A blacklist match wins over a whitelist match (deny over allow).
-;;
-;; KEY is a string.  Normally it is a regexp tested (case-insensitively)
-;; against the tool's title, kind, command line and raw input.  For logic
-;; a regexp cannot express, KEY can instead be `@NAME' -- a named
-;; evaluator registered with `konix/agent-shell-define-tool-evaluator' --
-;; or, for a one-off, an Emacs Lisp form starting with `(' that evaluates
-;; to a predicate.  Both are called with the tool-call alist.  See
-;; `konix/agent-shell--key-matches-p'.
-;;
-;; The tool-call those lisp keys receive is enriched with `:agent-said' --
-;; everything the agent said this turn (its messages since the last user
-;; message).  So a `@NAME'/`(lambda ...)' key can decide on the agent's stated
-;; intent, not just the mechanical tool-call.  This context is intentionally
-;; kept OUT of the regexp haystack (which still sees only the tool-call), so a
-;; command-targeting regexp does not get false positives from the agent's prose.
-;;
-;; Each policy has three axes mirroring the MCP server setup:
-;;   Global  -- a defcustom baseline applied to every session.
-;;   Project -- set in a project's `.dir-locals.el', inherited by every
-;;              session started there.
-;;   Session -- buffer-local in the shell buffer, ephemeral.
-;; The effective policy is their union, Session shadowing Project
-;; shadowing Global for the same key.
+;; Each policy is the union of Global (defcustom), Project (`.dir-locals.el')
+;; and Session (buffer-local) entries, the narrower shadowing the wider.
 
 ;;; Code:
 
@@ -94,31 +71,19 @@
 (defconst konix/agent-shell-tool-kinds
   '("read" "edit" "delete" "move" "search" "execute" "think" "fetch" "other")
   "The ACP tool-call kinds, always offered as policy completions.
-See https://agentclientprotocol.com/protocol/schema#toolkind .  Unlike
-individual tool names -- which are not enumerable in Emacs (they live on
-the MCP servers / agent runtime) -- the kind set is fixed, so it can be
-matched without waiting for a matching tool to appear in a session.")
+Unlike tool names, this set is fixed.")
 
 (defvar-local konix/agent-shell-tool-history nil
-  "Buffer-local list of policy candidates this session's tool calls yielded.
-Accumulated as tool calls happen (see
-`konix/agent-shell--record-tool-call') and never cleared, unlike
-agent-shell's own `:tool-calls' state which is wiped at the end of every
-turn.  Used to offer past tools as policy completions.")
+  "Policy candidates this session's tool calls yielded.
+Never cleared, unlike agent-shell's per-turn `:tool-calls'.")
 
 (defvar konix/agent-shell-tool-candidate-functions nil
   "Functions returning further policy candidates for a tool call.
-Each is called with the tool-call alist and returns a list of strings, added
-to `konix/agent-shell-tool-history' beside the call's title and kind.  The
-extension point a matcher module registers into, so a rule shape it
-introduces can be completed rather than typed out -- see
-`KONIX_agent-shell-permissions-mcp'.")
+Each takes the tool-call alist and returns a list of strings.")
 
 (defun konix/agent-shell--tool-call-candidates (tool-call)
   "Return the policy-completion candidates TOOL-CALL yields.
-Its title -- unless it runs a command line, which the shell candidates read
-better -- and kind, plus whatever `konix/agent-shell-tool-candidate-functions'
-make of it."
+The title is skipped for a command line, the shell candidates being better."
   (append (seq-filter (lambda (field)
                         (and (stringp field) (not (string-empty-p field))))
                       (list (unless (konix/agent-shell--tool-call-command tool-call)
@@ -129,10 +94,8 @@ make of it."
                   konix/agent-shell-tool-candidate-functions)))
 
 (defun konix/agent-shell--record-tool-call (state _tool-call-id tool-call)
-  "Record the candidates TOOL-CALL yields into the session's tool history.
-An `:after' advice on `agent-shell--save-tool-call'.  STATE carries the
-shell `:buffer', where `konix/agent-shell-tool-history' lives, so the
-history survives the per-turn clearing of STATE's `:tool-calls'."
+  "Record TOOL-CALL's candidates into the history of STATE's shell buffer.
+Kept there to survive the per-turn clearing of STATE's `:tool-calls'."
   (when-let* ((buffer (map-elt state :buffer))
               ((buffer-live-p buffer)))
     (with-current-buffer buffer
@@ -143,26 +106,16 @@ history survives the per-turn clearing of STATE's `:tool-calls'."
             #'konix/agent-shell--record-tool-call)
 
 ;;; Named evaluators -----------------------------------------------------------
-;; The friendly way to provide a dynamic matcher: define a named predicate
-;; once with `konix/agent-shell-define-tool-evaluator' (full Lisp, no string
-;; escaping), then reference it in a policy as the key `@NAME'.  The add
-;; commands and the control panel offer the registered names as completions,
-;; so you pick one instead of typing a lambda.  Evaluators are plain
-;; functions, so one can aggregate others with `konix/agent-shell-tool-match-p'
-;; (and/or/not over matcher keys) -- composition needs no separate concept.
+;; Named predicates referenced in a policy as `@NAME', written in plain Lisp
+;; to avoid string escaping.
 
 (defvar konix/agent-shell-tool-evaluators nil
-  "Alist of (NAME . FUNCTION) named tool evaluators.
-NAME is a string; FUNCTION is a predicate taking the tool-call alist (with
-`:title', `:kind', `:raw-input', ...) and returning non-nil to match.
-Reference an evaluator in a blacklist/whitelist with the key `@NAME'.
-Register entries with `konix/agent-shell-define-tool-evaluator'.")
+  "Alist of (NAME . FUNCTION) named tool evaluators, referenced as `@NAME'.
+FUNCTION takes the tool-call alist and returns non-nil to match.")
 
 (defmacro konix/agent-shell-define-tool-evaluator (name arglist &rest body)
-  "Define and register a named tool evaluator NAME (a string).
-ARGLIST takes one argument -- the tool-call alist; BODY returns non-nil to
-match.  Reference it in a policy as the key `@NAME'.  Re-evaluating the
-form updates the registered evaluator."
+  "Register the tool evaluator NAME, a string, as (lambda ARGLIST BODY).
+ARGLIST's first argument is the tool-call alist."
   (declare (indent 2) (doc-string 3)
            (debug (&define sexp lambda-list def-body)))
   `(setf (alist-get ,name konix/agent-shell-tool-evaluators nil nil #'equal)
@@ -170,26 +123,14 @@ form updates the registered evaluator."
 
 (konix/agent-shell-define-tool-evaluator "spawn-agent" (tool-call)
   "Match the built-in `Task' tool spawning a sub-agent.
-Its `:raw-input' carries a `subagent_type' key, which no other tool has, so
-this fires only on a real spawn -- not when the agent merely mentions
-\"subagent_type\" in its prose.  MCP spawners (`spawn_buddy' / `spawn_auditor')
-are deliberately NOT matched."
+MCP spawners are deliberately not matched."
   (let ((raw (map-elt tool-call :raw-input)))
     (and (listp raw) (map-elt raw 'subagent_type))))
 
 (konix/agent-shell-define-tool-evaluator "background" (subject)
   "Match a tool call that launches a command in the background.
-Usable as the key `@background' in BOTH a permission policy and an
-autoresponse rule, which pass different SUBJECTs through
-`konix/agent-shell--key-matches-p':
-- a permission check passes the tool-call alist (with `:raw-input'), so we
-  inspect it directly with `konix/agent-shell--background-tool-p';
-- an autoresponse check passes `((:agent-said . ...) (:last-message . ...))'
-  -- no tool call -- so we fall back to the per-turn flag
-  `konix/agent-shell--background-launched' that the tracking module sets from
-  the live `tool-call-update' stream.
-The `:last-message' key, present only on the autoresponse subject, tells the
-two apart."
+An autoresponse SUBJECT, told apart by its `:last-message', carries no tool
+call, so the per-turn flag is used instead."
   (if (assq :last-message subject)
       (bound-and-true-p konix/agent-shell--background-launched)
     (konix/agent-shell--background-tool-p subject)))
@@ -200,13 +141,7 @@ two apart."
           konix/agent-shell-tool-evaluators))
 
 (defun konix/agent-shell--tool-candidates ()
-  "Return policy completion candidates for the current session.
-The fixed ACP tool kinds (`konix/agent-shell-tool-kinds'), what the tool
-calls seen so far this session yielded
-\(`konix/agent-shell-tool-history' -- their titles and kinds, and the rules
-`konix/agent-shell-tool-candidate-functions' made of them), and the
-registered named evaluators (`konix/agent-shell-tool-evaluators') as
-`@NAME'."
+  "Return policy completion candidates for the current session."
   (with-current-buffer (konix/agent-shell--current-shell-or-error)
     (delete-dups
      (append (copy-sequence konix/agent-shell-tool-kinds)
@@ -214,20 +149,12 @@ registered named evaluators (`konix/agent-shell-tool-evaluators') as
              (konix/agent-shell--evaluator-candidates)))))
 
 ;;; Conversation context (what the agent said) --------------------------------
-;; Beyond the request itself (the tool-call, or the agent's last message), a
-;; rule may want to weigh *everything the agent said this turn* -- its narration
-;; since the last user message.  That richer context is exposed ONLY to lisp
-;; matchers (an `@evaluator' or `(lambda ...)' key, which receive the subject
-;; alist) as `:agent-said'.  It is deliberately kept OUT of the regexp haystack:
-;; a regexp written to target a tool command or a single message would otherwise
-;; match the agent's surrounding prose and fire far too often.
+;; Lisp matchers get the turn's narration as `:agent-said'; regexps do not,
+;; lest they fire on the agent's prose.
 
 (defun konix/agent-shell--agent-message-blocks-since-last-user ()
   "Return the agent's message bodies since the last user message, oldest first.
-Reads the current session's transcript file (markdown with `## User (...)' /
-`## Agent (...)' / `## Agent's Thoughts (...)' headers) and collects the
-`## Agent' section bodies after the last `## User' header -- excluding the
-agent's thoughts.  Returns nil when nothing is available."
+Read from the transcript file; the agent's thoughts are excluded."
   (when-let* ((file (and (boundp 'agent-shell--transcript-file)
                          agent-shell--transcript-file))
               ((stringp file))
@@ -235,7 +162,6 @@ agent's thoughts.  Returns nil when nothing is available."
     (with-temp-buffer
       (insert-file-contents file)
       (goto-char (point-max))
-      ;; Restrict to the last turn: from the last `## User' header onward.
       ;; A message not ending in a newline gets the next header glued to its
       ;; last line, so headers are found anywhere on a line, by their date.
       (let ((header-regexp "## \\(\\(?:User\\|Agent\\)[^\n]*([0-9-]+ [0-9:]+)\\)$")
@@ -259,29 +185,19 @@ agent's thoughts.  Returns nil when nothing is available."
         (nreverse blocks)))))
 
 (defun konix/agent-shell--agent-said-since-last-user ()
-  "Return ALL the agent said this turn (its messages since the last user
-message), joined, or nil.  This is the full narration a lisp matcher sees as
-`:agent-said'."
+  "Return all the agent said since the last user message, or nil."
   (when-let ((blocks (konix/agent-shell--agent-message-blocks-since-last-user)))
     (let ((text (string-trim (mapconcat #'identity blocks "\n\n"))))
       (unless (string-empty-p text) text))))
 
 (defun konix/agent-shell--last-agent-message ()
-  "Return only the agent's LAST message block (the last thing it said), or nil.
-This is the narrow text a regexp matcher is tested against, to avoid the false
-positives that matching the whole turn's narration would cause."
+  "Return the agent's last message, or nil."
   (when-let ((blocks (konix/agent-shell--agent-message-blocks-since-last-user)))
     (let ((text (string-trim (car (last blocks)))))
       (unless (string-empty-p text) text))))
 
 (defun konix/agent-shell--tool-call-with-context (tool-call)
-  "Return TOOL-CALL enriched with `:agent-said' for lisp matchers.
-`:agent-said' is everything the agent said this session since the last user
-message (see `konix/agent-shell--agent-said-since-last-user'), so an
-`@evaluator' or `(lambda ...)' key can weigh the agent's stated intent, not
-only the mechanical tool invocation.  The regexp haystack is left untouched
-\(it still sees only the tool-call), so regexps do not get false positives from
-the agent's prose."
+  "Return TOOL-CALL with `:agent-said' added for lisp matchers."
   (if (or (not (listp tool-call)) (assq :agent-said tool-call))
       tool-call
     (cons (cons :agent-said
@@ -290,12 +206,7 @@ the agent's prose."
           tool-call)))
 
 (defun konix/agent-shell--tool-call-command (tool-call)
-  "Return TOOL-CALL's executed command line as a string, or nil.
-Reads `command' from `:raw-input' and normalizes it with
-`agent-shell--tool-call-command-to-string' (so an argv vector becomes a
-single line).  Returns nil when there is no command (e.g. an MCP tool).
-Useful in evaluators that want to reason about the shell command itself --
-e.g. tokenize it with `split-string-shell-command'."
+  "Return TOOL-CALL's command line as a string, or nil."
   (ignore-errors
     (agent-shell--tool-call-command-to-string
      (map-elt (map-elt tool-call :raw-input) 'command))))
@@ -303,15 +214,11 @@ e.g. tokenize it with `split-string-shell-command'."
 (defconst konix/agent-shell--path-input-keys
   '(file_path filePath file-path path notebook_path notebookPath)
   "The `:raw-input' keys naming a file a tool call targets.
-Claude Code sends `file_path' (`Edit', `Write') and `notebook_path'
-\(`NotebookEdit'); the other spellings cover the other agents and the MCP
-tools.")
+Several spellings, to cover the various agents and MCP tools.")
 
 (defun konix/agent-shell--tool-call-target-paths (tool-call)
   "Return the file paths TOOL-CALL's input names, as strings.
-Only the keys of `konix/agent-shell--path-input-keys' are read, so a path
-quoted inside an edit's `old_string'/`new_string' is not taken for a target.
-A non-string value yields nothing."
+Only known keys are read, so a path quoted in an edit's text is no target."
   (let ((raw-input (map-elt tool-call :raw-input)))
     (when (listp raw-input)
       (seq-keep (lambda (key)
@@ -322,12 +229,7 @@ A non-string value yields nothing."
                 konix/agent-shell--path-input-keys))))
 
 (defun konix/agent-shell--tool-haystack (tool-call)
-  "Return the text a policy regexp is matched against for TOOL-CALL.
-Joins the tool `:title', `:kind', the executed command line (from
-`:raw-input''s `command', normalized by
-`agent-shell--tool-call-command-to-string') and the whole `:raw-input' as
-JSON -- so a regexp can target a command line or any tool argument
-\(paths, MCP arguments, expressions), not just the title."
+  "Return the text a policy regexp is matched against for TOOL-CALL."
   (let* ((raw-input (map-elt tool-call :raw-input))
          (command (konix/agent-shell--tool-call-command tool-call))
          (raw-string (when raw-input
@@ -341,24 +243,16 @@ JSON -- so a regexp can target a command line or any tool argument
 
 (defun konix/agent-shell--tool-output-text (tool-call)
   "Return the text TOOL-CALL has produced so far.
-Joins the `text' of its `:content' blocks.  Outside the regexp haystack, which
-carries the request only, so reading a tool's output needs a lisp matcher."
+Not in the regexp haystack: reading it needs a lisp matcher."
   (mapconcat (lambda (item) (or (map-nested-elt item '(content text)) ""))
              (append (map-elt tool-call :content) nil)
              "\n"))
 
 ;;; Parametrizable evaluators --------------------------------------------------
-;; An evaluator may take parameters, referenced as `@NAME(ARG, ARG, ...)' --
-;; the call syntax of Org Babel's `#+call: NAME(ARG, ARG)'.  The argument list
-;; is parsed with Org's own `org-babel-ref-split-args' (top-level commas, with
-;; balanced parens and quotes respected) and the strings are passed to the
-;; evaluator after the tool-call.  A bare `@NAME' passes no extra argument, so a
-;; zero-parameter evaluator keeps working unchanged.
+;; `@NAME(ARG, ...)' uses Org Babel's `#+call:' syntax.
 
 (defun konix/agent-shell--parse-evaluator-ref (spec)
-  "Parse SPEC, an `@'-key with its leading `@' removed, into (NAME . ARGS).
-SPEC is `NAME' or `NAME(ARG, ARG, ...)'; ARGS are split as for `#+call:' with
-`org-babel-ref-split-args', and nil when SPEC has no parenthesised list."
+  "Parse SPEC, an `@'-key without its `@', into (NAME . ARGS)."
   (if (string-match "\\`\\([^(]+\\)(\\(.*\\))\\'" spec)
       (cons (match-string 1 spec)
             (org-babel-ref-split-args (match-string 2 spec)))
@@ -368,35 +262,15 @@ SPEC is `NAME' or `NAME(ARG, ARG, ...)'; ARGS are split as for `#+call:' with
   "The text the last regexp key was matched against.")
 
 (defvar konix/agent-shell--regexp-any-command nil
-  "When non-nil, a regexp key matches a shell call when any of its commands
-does, rather than every one, or when its raw text does.  Bound for the
-blacklist.")
+  "Non-nil to have a regexp key match a shell call if any command does.
+Rather than every one, or its raw text.  Bound for the blacklist.")
 
 (defun konix/agent-shell--key-matches-p (key tool-call haystack)
   "Return non-nil when policy KEY matches TOOL-CALL.
-KEY is a string and is interpreted as:
-- `@NAME' or `@NAME(ARG,ARG)' -- the named evaluator NAME from
-  `konix/agent-shell-tool-evaluators', called with the TOOL-CALL alist and any
-  comma-separated ARGs as extra arguments;
-- a form starting with `(' -- an `and'/`or'/`not' combination of matcher keys
-  (dispatched through `konix/agent-shell--spec-matches-p'), else read and
-  evaluated to a predicate function called with the TOOL-CALL alist;
-- otherwise a regexp tested case-insensitively against HAYSTACK (the tool
-  title, kind, command line and input -- the request only, never the wider
-  conversation); for a shell call, against its kind or else every one of its
-  `konix/agent-shell--tool-call-argvs' -- for the blacklist, any one of them
-  or HAYSTACK;
-- `$ GLOB' -- a shell glob that must match a whole command of a shell call,
-  read as above, e.g. `$ curl -sS * https://*.example.org/*'.
-A KEY that is already a function is called with TOOL-CALL.  Errors in a
-predicate are swallowed (treated as no match).
-
-TOOL-CALL is the subject alist the lisp keys (`@NAME', `(lambda ...)' and
-function keys) receive.  For a permission request it is the tool-call,
-enriched with `:agent-said' (everything the agent said since the last user
-message); for an auto-response it is the message context, also carrying
-`:agent-said'.  So a lisp matcher -- unlike a regexp -- can weigh the agent's
-whole narration, not just the request."
+KEY is `@NAME(ARGS)', a `(' Lisp form, a `$ GLOB' or a case-insensitive
+regexp on HAYSTACK; for a shell call the last two are tested on each
+command (every one, any one for the blacklist).  Predicate errors mean no
+match."
   (cond
    ((functionp key)
     (ignore-errors (funcall key tool-call)))
@@ -439,9 +313,7 @@ whole narration, not just the request."
 
 (defun konix/agent-shell--spec-matches-p (spec tool-call haystack)
   "Return non-nil when SPEC matches TOOL-CALL against HAYSTACK.
-SPEC is a matcher key (see `konix/agent-shell--key-matches-p'), a
-function, or a boolean combination `(and SPEC...)', `(or SPEC...)' or
-`(not SPEC)'."
+SPEC is a key, a function or an `and'/`or'/`not' of SPECs."
   (pcase spec
     (`(and . ,specs)
      (seq-every-p (lambda (s)
@@ -459,12 +331,8 @@ function, or a boolean combination `(and SPEC...)', `(or SPEC...)' or
      (konix/agent-shell--key-matches-p spec tool-call haystack))))
 
 (defun konix/agent-shell--matching-entries (entries subject haystack)
-  "Return the (KEY . VALUE) ENTRIES whose KEY matches SUBJECT/HAYSTACK, in order.
-A regexp KEY leaves its match data live, so the returned VALUE has its `\\N'
-backreferences replaced by the captures: the blacklist entry
-\(\"echo \\\\(.+\\\\)\" . \"do not print \\\\1\") declines `echo foobar' with
-\"do not print foobar\".  Match data is cleared before each KEY, so a VALUE
-whose backreferences KEY captured nothing for is kept verbatim."
+  "Return the (KEY . VALUE) ENTRIES whose KEY matches SUBJECT/HAYSTACK.
+A regexp KEY's captures replace the `\\N' backreferences in VALUE."
   (delq nil
         (mapcar
          (lambda (entry)
@@ -480,46 +348,32 @@ whose backreferences KEY captured nothing for is kept verbatim."
 
 (defun konix/agent-shell-tool-match-p (spec tool-call)
   "Return non-nil when SPEC matches TOOL-CALL.
-SPEC composes matchers with `and', `or' and `not'; each leaf is a matcher
-key as understood by `konix/agent-shell--key-matches-p' (a regexp, an
-`@evaluator' reference, or a `(lambda ...)' form) or a function of the
-tool-call.  Evaluators are plain functions, so this is how one aggregates
-others -- no separate concept:
-
-  (konix/agent-shell-define-tool-evaluator \"risky\" (tc)
-    (konix/agent-shell-tool-match-p
-     \\='(and \"^rm\\\\b\" (not \"@inside\")) tc))"
+SPEC is a key, a function or an `and'/`or'/`not' of SPECs."
   (konix/agent-shell--spec-matches-p
    spec tool-call (konix/agent-shell--tool-haystack tool-call)))
 
 (konix/agent-shell-define-tool-evaluator "edit-dir-locals" (tool-call)
-  "Match tool calls that would modify .dir-locals.el (edits, writes, deletes,
-shell commands targeting it).  Read-only access is excluded."
+  "Match a non-read tool call targeting `.dir-locals.el'."
   (konix/agent-shell-tool-match-p
    '(and "\\.dir-locals\\.el" (not "^read$"))
    tool-call))
 
 (konix/agent-shell-define-tool-evaluator "edit-claude-settings" (tool-call)
-  "Match tool calls that would modify a Claude settings file -- e.g.
-.claude/settings.json or .claude/settings.local.json (edits, writes,
-deletes, shell commands targeting it).  Read-only access is excluded."
+  "Match a non-read tool call targeting a `.claude/settings*.json' file."
   (konix/agent-shell-tool-match-p
    '(and "\\.claude[^/[:space:]]*/settings[^/[:space:]]*\\.json" (not "^read$"))
    tool-call))
 
 (konix/agent-shell-define-tool-evaluator "edit-agent-permissions" (tool-call)
-  "Match tool calls that would modify a file governing agent permissions --
-project `.dir-locals.el' or a Claude settings file.  Composes
-`@edit-dir-locals' and `@edit-claude-settings'."
+  "Match a tool call modifying a file governing agent permissions."
   (konix/agent-shell-tool-match-p
    '(or "@edit-dir-locals" "@edit-claude-settings")
    tool-call))
 
 (defun konix/agent-shell--bash-ast-buffer (tool-call)
-  "Return (BUFFER . ROOT) for TOOL-CALL's command line, or nil for a non-shell
-tool.  BUFFER owns ROOT and must be killed once done with it, which
-`konix/agent-shell--with-bash-ast' takes care of.  Signals an error when the
-bash tree-sitter grammar is unavailable."
+  "Return (BUFFER . ROOT), the bash AST of TOOL-CALL's command, or nil.
+BUFFER owns ROOT and must be killed; prefer
+`konix/agent-shell--with-bash-ast'."
   (let ((command (konix/agent-shell--tool-call-command tool-call)))
     (unless (or (null command) (string-empty-p command))
       (unless (treesit-language-available-p 'bash)
@@ -549,14 +403,9 @@ BODY must return plain data: nodes die with the tree."
   (mapcar #'cdr (treesit-query-capture root '((command) @c))))
 
 (defun konix/agent-shell--argument-literal (node)
-  "Return NODE's value as the literal string the shell would pass along, or nil
-when that value is not statically knowable.
-
-Quoting is undone (`\"/home/sam\"' and `'/home/sam'' both give `/home/sam') and
-the two expansions that still denote a fixed path are resolved: a leading `~'
-and `$HOME'/`${HOME}'.  Any other expansion, command substitution or process
-substitution makes the whole argument unknown -- nil rather than a guess, since
-callers use this to decide what a command really touches."
+  "Return NODE's value as the shell would pass it, or nil if not static.
+Quoting, a leading `~' and `$HOME' are resolved; any other expansion gives
+nil rather than a guess."
   (pcase (treesit-node-type node)
     ((or "word" "number")
      (let ((text (treesit-node-text node t)))
@@ -573,21 +422,15 @@ callers use this to decide what a command really touches."
                            t))))
        (when (equal (treesit-node-text var t) "HOME")
          (expand-file-name "~"))))
-    ;; A `string' holds its content in children (empty when `""'), and a
-    ;; `concatenation' glues pieces like `$HOME' and `/prog' together: both are
-    ;; only known when every piece is.
+    ;; Known only when every piece is.
     ((or "string" "concatenation")
      (let ((parts (mapcar #'konix/agent-shell--argument-literal
                           (treesit-node-children node t))))
        (unless (memq nil parts) (apply #'concat parts))))))
 
 (defun konix/agent-shell--command-argument-literals (command)
-  "Return COMMAND node's arguments as literals, one entry per argument, in order.
-This sees through quoting and `~'/`$HOME' expansion, and it keeps a nil
-placeholder for every argument whose
-value is not statically knowable (see `konix/agent-shell--argument-literal')
-instead of dropping it -- callers that walk a command line need `argument 1 is
-something we cannot read' to stay distinguishable from `there is no argument 1'."
+  "Return COMMAND node's arguments as literals, in order.
+An unknowable argument stays as nil, not dropped, to keep positions."
   (mapcar #'konix/agent-shell--argument-literal
           (seq-filter (lambda (c) (equal (treesit-node-field-name c) "argument"))
                       (treesit-node-children command t))))
@@ -612,8 +455,8 @@ something we cannot read' to stay distinguishable from `there is no argument 1'.
 
 (defun konix/agent-shell--command-argv (command)
   "Return COMMAND node as the line a regexp key reads, or nil.
-No wrappers nor redirections, the name normalized, an argument holding
-whitespace single-quoted and one not statically knowable kept as written."
+Wrappers and redirections dropped, arguments with whitespace quoted,
+unknowable ones kept as written."
   (let ((words (konix/agent-shell--sans-command-wrapper
                 (cons (konix/agent-shell--command-name command)
                       (mapcar (lambda (node)
@@ -633,10 +476,8 @@ whitespace single-quoted and one not statically knowable kept as written."
                    " "))))
 
 (defun konix/agent-shell--tool-call-argvs (tool-call &optional working)
-  "Return the `konix/agent-shell--command-argv' of TOOL-CALL's commands, each
-preceded by the `NAME=VALUE' assignments it runs with.  With WORKING, its
-transparent filters are left out, see
-`konix/agent-shell--transparent-filter-p'."
+  "Return the argv lines of TOOL-CALL's commands, with their assignments.
+With WORKING, transparent filters are left out."
   (ignore-errors
     (konix/agent-shell--with-bash-ast root tool-call
       (mapcan (lambda (command)
@@ -651,9 +492,7 @@ transparent filters are left out, see
                 (konix/agent-shell--command-nodes root))))))
 
 (defun konix/agent-shell--shell-candidates (tool-call)
-  "Return the policy keys offered for TOOL-CALL's commands, or nil.
-Each command as a `$ GLOB', as a regexp prefix and as itself with any arguments
-when it has some, and its name as a regexp."
+  "Return the policy keys offered for TOOL-CALL's commands, or nil."
   (delete-dups
    (mapcan (lambda (argv)
              (unless (or (null argv)
@@ -675,12 +514,9 @@ when it has some, and its name as a regexp."
   (string-match-p regexp (konix/agent-shell--command-name command)))
 
 (konix/agent-shell-define-tool-evaluator "lost-search" (tool-call)
-  "Match a `find'/`grep'/`rg'/`ag'/`ack' scan of a whole aggregating directory
-\(see `konix/shell-search-broad-roots') -- the mark of an agent that has lost
-track of where something lives and is brute-forcing everything instead of
-asking the user for guidance.  A scan bounded to a project, or to named files,
-is left alone.  Which arguments a command really walks comes from its own
-command line grammar, see `KONIX_shell-search'."
+  "Match a recursive search over a broad root.
+See `konix/shell-search-broad-roots'.  The mark of a lost agent brute-forcing
+instead of asking."
   (konix/agent-shell--with-bash-ast root tool-call
     (seq-some
      (lambda (c)
@@ -694,9 +530,8 @@ command line grammar, see `KONIX_shell-search'."
 (defconst konix/agent-shell--read-only-filters
   '("jq" "cat" "head" "tail" "less" "more" "wc" "sort" "uniq"
     "column" "cut" "grep" "rg" "tr" "fold" "nl" "fmt")
-  "Commands that only read stdin and write stdout -- safe pipeline stages.
-Deliberately excludes anything that can execute (`sh', `xargs', `awk', ...)
-or write files (`tee', `sed -i', `yq -i', ...).")
+  "Commands only reading stdin and writing stdout.
+Nothing that can execute or write files belongs here.")
 
 (defconst konix/agent-shell--command-wrappers
   '(("timeout" . "\\`[0-9]+\\(?:\\.[0-9]+\\)?[smhd]?\\'")
@@ -705,12 +540,10 @@ or write files (`tee', `sed -i', `yq -i', ...).")
     ("stdbuf")
     ("time"))
   "Commands running the command that follows them, as (NAME . VALUE-REGEXP).
-NAME's own words are its options plus the one value VALUE-REGEXP matches, nil
-for a wrapper taking options alone.")
+VALUE-REGEXP matches NAME's one positional value; nil if it has none.")
 
 (defun konix/agent-shell--sans-command-wrapper (tokens)
-  "Return TOKENS without their leading `konix/agent-shell--command-wrappers'.
-What comes back starts at the command TOKENS run."
+  "Return TOKENS without their leading `konix/agent-shell--command-wrappers'."
   (if-let ((wrapper (assoc (car tokens) konix/agent-shell--command-wrappers)))
       (let ((rest (cdr tokens)))
         (while (and (stringp (car rest))
@@ -737,22 +570,12 @@ What comes back starts at the command TOKENS run."
     ("project" "item-list") ("project" "field-list")
     ("search" "issues") ("search" "prs") ("search" "repos")
     ("search" "code") ("search" "commits"))
-  "`gh' subcommand paths that only print to stdout -- safe to auto-approve.
-Each entry is the (GROUP VERB) pair naming the subcommand, or a one-element
-list for a top-level command.  `gh api' is deliberately absent: whether it
-reads depends on its flags, see `konix/agent-shell--gh-api-read-p'.
-
-Kept out on purpose: anything writing the working tree (`repo clone',
-`release download', `run download'), anything mutating GitHub (`create',
-`edit', `merge', `close', ...), and the secret/variable readers, whose output
-is a credential even though the call itself is a read.")
+  "`gh' subcommand paths that only print to stdout.
+Secret/variable readers are left out: their output is a credential.")
 
 (defun konix/agent-shell--gh-subcommand-path (tokens)
   "Return the leading subcommand words of the `gh' call TOKENS, at most two.
-Skips any option word sitting between `gh' and its subcommand, and stops at
-the first option word after it -- so both `gh issue list --state all' and
-`gh --foo issue list' yield (\"issue\" \"list\").  TOKENS comes from
-`konix/agent-shell--command-unwrapped'."
+Options before the subcommand are skipped."
   (let ((rest (cdr tokens))
         (path '()))
     (while (and rest (string-prefix-p "-" (car rest)))
@@ -764,18 +587,11 @@ the first option word after it -- so both `gh issue list --state all' and
 
 (defun konix/agent-shell--gh-api-read-p (tokens)
   "Return non-nil when the `gh api' call TOKENS only reads.
-`gh api' is a GET (read) by default, silently becomes a POST when fields are
-supplied with `-f'/`-F'/`--field'/`--raw-field'/`--input', and is an explicit
-write when `-X'/`--method' names POST/PUT/PATCH/DELETE.  Read-only means: it
-names no write method and carries no implicit-POST field/input flag -- unless
-the method is explicitly GET/HEAD, in which case the fields are mere query
-parameters and it stays a read."
+Field flags silently turn it into a POST unless GET/HEAD is explicit."
   (let* ((write-method-re "\\`\\(?:-X\\|--method\\)?\\(?:POST\\|PUT\\|PATCH\\|DELETE\\)\\'")
          (read-method-re "\\`\\(?:-X\\|--method\\)?\\(?:GET\\|HEAD\\)\\'")
          ;; No `\\='' anchor: also catches glued `-fkey=val' / `--field=...'.
          (field-re "\\`\\(?:-[fF]\\|--field\\|--raw-field\\|--input\\)")
-         ;; Walk (flag value) pairs so `-X POST' is seen as a write even when
-         ;; the method is a separate token; also catch the glued `-XPOST' form.
          (method-tokens
           (let (acc)
             (dotimes (i (length tokens))
@@ -794,11 +610,7 @@ parameters and it stays a read."
 
 (defun konix/agent-shell--gh-read-p (command)
   "Return non-nil when COMMAND node is a read-only `gh' invocation.
-Read-only means its subcommand is listed in
-`konix/agent-shell--gh-read-subcommands', or it is a `gh api' call that reads
-\(see `konix/agent-shell--gh-api-read-p').  A `--web' anywhere disqualifies
-it: that form prints nothing and pops a browser window open instead.  An
-argument whose value is not statically knowable is refused."
+`--web' disqualifies it: it opens a browser."
   (let* ((tokens (konix/agent-shell--command-unwrapped command))
          (path (konix/agent-shell--gh-subcommand-path tokens)))
     (and
@@ -818,14 +630,10 @@ argument whose value is not statically knowable is refused."
 
 (defconst konix/agent-shell--null-devices
   '("/dev/null" "/dev/zero")
-  "Character devices that discard whatever is written to them.
-Redirecting into one leaves no file behind, so it is not a write for the
-purpose of `writes-outside' and its kin.")
+  "Devices discarding what is written; redirecting there is no write.")
 
 (defun konix/agent-shell--redirect-target (redirect)
-  "Return the file REDIRECT opens for writing, `unknown' when unreadable, else nil.
-REDIRECT is a `file_redirect' node.  A `<', a descriptor destination
-\(`2>&1', `2>&-') and a null device (`2>/dev/null') open no file."
+  "Return the file REDIRECT node writes, `unknown' if unreadable, else nil."
   (let ((operator (seq-some
                    (lambda (child)
                      (member (treesit-node-type child)
@@ -840,10 +648,8 @@ REDIRECT is a `file_redirect' node.  A `<', a descriptor destination
               (t target))))))
 
 (konix/agent-shell-define-tool-evaluator "writes-outside" (tool-call &optional directory)
-  "Match a line opening a file for writing outside DIRECTORY.
-Redirections are read from the bash AST, so a `>' inside a quoted argument
-opens nothing.  An unreadable target and a missing DIRECTORY count as outside.
-Reference it as `@writes-outside(DIRECTORY)'."
+  "Match a line redirecting into a file outside DIRECTORY.
+An unreadable target or a nil DIRECTORY counts as outside."
   (konix/agent-shell--with-bash-ast root tool-call
     (seq-some
      (lambda (capture)
@@ -869,8 +675,7 @@ An unreadable target counts as outside."
    (treesit-query-capture node '((file_redirect) @r))))
 
 (defun konix/agent-shell--transparent-filter-p (command)
-  "Non-nil when COMMAND node is a read-only filter fed by a pipe and reading
-nothing outside the project: it changes nothing of what its line does."
+  "Non-nil when COMMAND node is a piped read-only filter of project files."
   (let* ((parent (treesit-node-parent command))
          (stage (if (equal (treesit-node-type parent) "redirected_statement")
                     parent
@@ -888,24 +693,18 @@ nothing outside the project: it changes nothing of what its line does."
           default-directory))))
 
 (defun konix/agent-shell--working-command-nodes (root)
-  "Return ROOT's command nodes but its transparent filters, see
-`konix/agent-shell--transparent-filter-p'."
+  "Return ROOT's command nodes but its transparent filters."
   (seq-remove #'konix/agent-shell--transparent-filter-p
               (konix/agent-shell--command-nodes root)))
 
 (konix/agent-shell-define-tool-evaluator "severalcommands" (tool-call)
-  "Match a command line running several commands, its transparent filters
-aside (see `konix/agent-shell--transparent-filter-p')."
+  "Match a line running several commands, transparent filters aside."
   (konix/agent-shell--with-bash-ast root tool-call
     (> (length (konix/agent-shell--working-command-nodes root)) 1)))
 
 (konix/agent-shell-define-tool-evaluator "gh-read" (tool-call)
-  "Match read-only `gh' calls (so they can be auto-approved).
-That is a `gh api' GET, or one of the listing/viewing subcommands enumerated
-in `konix/agent-shell--gh-read-subcommands' -- `gh issue list', `gh pr diff',
-`gh run view', ...  True only when that read is the only command of the line,
-its transparent filters aside (see `konix/agent-shell--transparent-filter-p'),
-and it reads no file outside the project."
+  "Match a line whose only command is a read-only `gh' call.
+Transparent filters aside, and reading no file outside the project."
   (konix/agent-shell--with-bash-ast root tool-call
     (let ((commands (konix/agent-shell--working-command-nodes root)))
       (and (= (length commands) 1)
@@ -916,8 +715,7 @@ and it reads no file outside the project."
   '("-n" "--quiet" "--silent" "-E" "-r" "--regexp-extended" "-s" "--separate"
     "-z" "--null-data" "-u" "--unbuffered" "--posix" "--sandbox")
   "`sed' options that cannot make it write or execute anything.
-Absent on purpose: `-i'/`--in-place' (rewrites the file) and `-f'/`--file' (a
-script we cannot see).")
+`-f' is absent: its script cannot be seen.")
 
 (defconst konix/agent-shell--sed-read-only-script-re
   (rx-to-string
@@ -928,17 +726,12 @@ script we cannot see).")
                              (* (or (seq "\\" nonl) (not (any "/")))) "/"
                              (* (any "gpiImM0-9"))))))
      `(seq bos ,address ,command (* (seq ";" ,address ,command)) (* " ") eos)))
-  "Regexp of the sed scripts we accept: addresses, then `p', `d', `=' or a
-`s/../../' -- nothing else, since `w'/`W'/`s///w' write, `r'/`R' read more
-files and `e'/`s///e' run a shell.  Only matching what is positively read-only
-keeps a `w' command from hiding behind the `w' of a regexp like `/window/'.")
+  "Regexp of the accepted sed scripts: addresses, then `p', `d', `=' or `s'.
+An allowlist, so a `w' or `e' command cannot hide inside a regexp.")
 
 (defun konix/agent-shell--path-inside-p (path directory)
-  "Non-nil when PATH, canonicalized, is inside DIRECTORY.
-Both are resolved with `file-truename', which expands a relative name
-against `default-directory' and walks the symlinks.  DIRECTORY need not
-exist, unlike with `file-in-directory-p'.  A remote name is refused before
-canonicalizing it, which would have Tramp reach the host it names."
+  "Non-nil when PATH, symlinks resolved, is inside DIRECTORY.
+DIRECTORY need not exist.  Remote names are refused, lest Tramp connect."
   (and (stringp path) (stringp directory)
        (not (file-remote-p path))
        (not (file-remote-p directory))
@@ -948,18 +741,12 @@ canonicalizing it, which would have Tramp reach the host it names."
         (file-name-as-directory (file-truename path)))))
 
 (defun konix/agent-shell--path-inside-project-p (path)
-  "Non-nil when PATH, canonicalized, is inside the project `default-directory'.
-See `konix/agent-shell--path-inside-p'."
+  "Non-nil when PATH is inside the project `default-directory'."
   (konix/agent-shell--path-inside-p path default-directory))
 
 (defun konix/agent-shell--sed-read-only-p (command &optional directory)
   "Non-nil when COMMAND, a `sed' node, only reads DIRECTORY and writes stdout.
-DIRECTORY defaults to the project `default-directory'.
-Reads the invocation as `sed OPTIONS SCRIPT FILES...', all three parts checked:
-`konix/agent-shell--sed-read-only-options',
-`konix/agent-shell--sed-read-only-script-re' and
-`konix/agent-shell--path-inside-p'.  An argument whose value is not
-statically knowable is refused, as are the `-e' and `-f' forms."
+DIRECTORY defaults to the project.  Unknowable arguments are refused."
   (when (konix/agent-shell--command-name-matches command "^sed$")
     (let* ((directory (or directory default-directory))
            (arguments (konix/agent-shell--command-argument-literals command))
@@ -978,14 +765,8 @@ statically knowable is refused, as are the `-e' and `-f' forms."
                         files)))))
 
 (konix/agent-shell-define-tool-evaluator "read-only-sed" (tool-call &optional directory)
-  "Match a lone read-only `sed', e.g.
-`sed -n \\='/from/,/to/p\\=' .agent-shell/tmp/notes.txt' -- auto-approvable.
-`sed' is in neither the harmless commands of
-`konix/agent-shell-tool-whitelist-global' nor
-`konix/agent-shell--read-only-filters' because it also writes and executes,
-so the invocation is read instead (`konix/agent-shell--sed-read-only-p').
-The line must run that `sed' alone, its transparent filters aside (see
-`konix/agent-shell--transparent-filter-p'), and read no file outside DIRECTORY."
+  "Match a line whose only command is a read-only `sed' within DIRECTORY.
+Transparent filters aside."
   (konix/agent-shell--with-bash-ast root tool-call
     (let ((commands (konix/agent-shell--working-command-nodes root)))
       (and (= (length commands) 1)
@@ -995,17 +776,14 @@ The line must run that `sed' alone, its transparent filters aside (see
 
 (defun konix/agent-shell--not-a-path-p (argument)
   "Non-nil when ARGUMENT holds a backslash and names no file.
-Once the shell has removed the quoting, a backslash left is part of the name,
-which a real file name hardly ever has: `/^\\.\\/foo$/d' is a regexp.  A remote
-name is refused before checking it, which would have Tramp reach the host."
+Such an argument is most likely a regexp."
   (and (string-search "\\" argument)
        (not (file-remote-p (expand-file-name argument)))
        (not (file-exists-p argument))))
 
 (defun konix/agent-shell--call-paths (tool-call)
-  "Return the paths TOOL-CALL names: its commands' arguments when it runs a
-command line -- nil for one not statically knowable -- its targets otherwise.
-Where a shell command writes is `@writes-outside''s business."
+  "Return the paths TOOL-CALL names: its command arguments, or its targets.
+An unknowable argument is nil."
   (if (konix/agent-shell--tool-call-command tool-call)
       (konix/agent-shell--with-bash-ast root tool-call
         (mapcan #'konix/agent-shell--command-argument-literals
@@ -1013,10 +791,9 @@ Where a shell command writes is `@writes-outside''s business."
     (konix/agent-shell--tool-call-target-paths tool-call)))
 
 (konix/agent-shell-define-tool-evaluator "inside" (tool-call &optional directory)
-  "Match a call every path of which is inside DIRECTORY, the project by default.
-See `konix/agent-shell--call-paths'.  One not statically knowable is outside,
-unless it is no path at all (`konix/agent-shell--not-a-path-p').  A file tool
-naming no target matches nothing.  Reference it as `@inside(DIRECTORY)'."
+  "Match a call whose paths are all inside DIRECTORY, the project by default.
+An unknowable path counts as outside; a file tool with no target never
+matches."
   (let ((directory (or directory default-directory))
         (paths (konix/agent-shell--call-paths tool-call)))
     (and (or paths (konix/agent-shell--tool-call-command tool-call))
@@ -1027,20 +804,15 @@ naming no target matches nothing.  Reference it as `@inside(DIRECTORY)'."
                       paths))))
 
 (konix/agent-shell-define-tool-evaluator "touches" (tool-call &optional directory)
-  "Match a call naming a path inside DIRECTORY, one being enough.
-See `konix/agent-shell--call-paths'; one not statically knowable is nowhere.
-Reference it as `@touches(DIRECTORY)'."
+  "Match a call naming at least one path inside DIRECTORY."
   (and directory
        (seq-some (lambda (path)
                    (and path (konix/agent-shell--path-inside-p path directory)))
                  (konix/agent-shell--call-paths tool-call))))
 
 (konix/agent-shell-define-tool-evaluator "use-a-wrong-tmp-dir" (tool-call)
-  "Match a tool call reaching into a temp directory other than ./.agent-shell/tmp.
-The wrong ones are ~/tmp, /tmp, /var/tmp and $TMPDIR; a command called on
-something inside one of them matches, so does a file tool targeting something
-inside one.  `mktemp' matches whatever its arguments say, as it lands in
-$TMPDIR or /tmp without ever naming the directory."
+  "Match a call using a temp directory other than ./.agent-shell/tmp.
+`mktemp' always matches: it uses $TMPDIR or /tmp without naming it."
   (let* ((tmpdir (getenv "TMPDIR"))
          (dirs (delete-dups
                 (mapcar (lambda (dir)
@@ -1054,9 +826,7 @@ $TMPDIR or /tmp without ever naming the directory."
      tool-call)))
 
 ;;; Policy variables -----------------------------------------------------------
-;; Each policy has Global (defcustom) / Project (.dir-locals.el, declared
-;; `safe-local-variable' in `999-KONIX-safe-values.el') / Session
-;; (buffer-local) axes.
+;; Project variables are declared safe in `999-KONIX-safe-values.el'.
 
 (defcustom konix/agent-shell-tool-blacklist-global
   `(("@use-a-wrong-tmp-dir" . "Write temp files into ./.agent-shell/tmp/ instead")
@@ -1071,22 +841,17 @@ $TMPDIR or /tmp without ever naming the directory."
     ("@edit-agent-permissions" . "Ask the user to do this")
     ("(and \"^find\\\\b\" \"@touches(~/.emacs.d)\")" . "Use the mcp tools")
     )
-  "GLOBAL baseline alist of (KEY . REASON) blacklisted tools.
-Applied to every session, beneath the project and session layers which
-shadow it.  KEY is a regexp, a `$ GLOB', a predicate form when it starts with
-`(', an `@evaluator' reference, or an `and'/`or'/`not' combination of those --
-see `konix/agent-shell--key-matches-p'.  Set it in your init or via Customize;
-like the MCP global baseline it is not persisted by the runtime panel toggle."
+  "Global alist of (KEY . REASON) blacklisted tools.
+KEY is as in `konix/agent-shell--key-matches-p'; REASON is sent to the
+agent."
   :type '(alist :key-type string :value-type string)
   :group 'konix)
 
 (defvar konix/agent-shell-tool-blacklist-project nil
-  "PROJECT alist of (KEY . REASON) blacklisted tools.
-Set in a project's `.dir-locals.el'; inherited by every session started
-in the project.")
+  "Project alist of (KEY . REASON) blacklisted tools, from `.dir-locals.el'.")
 
 (defvar-local konix/agent-shell-tool-blacklist nil
-  "Buffer-local SESSION alist of (KEY . REASON) blacklisted tools.")
+  "Session alist of (KEY . REASON) blacklisted tools.")
 
 (defcustom konix/agent-shell-tool-whitelist-global
   '(("(and \"^edit$\" \"@inside(.agent-shell/tmp)\")" . "Edits and writes confined to ./.agent-shell/tmp/")
@@ -1101,30 +866,23 @@ in the project.")
     ("@read-only-find" . "find that only walks project files and prints")
     ("@gh-read" . "gh api GETs and the list/view subcommands")
     ("^clk .+ --help$" . "clk help pages"))
-  "GLOBAL baseline alist of (KEY . NOTE) whitelisted (auto-approved) tools.
-Applied to every session, beneath the project and session layers which
-shadow it.  KEY matches as in `konix/agent-shell-tool-blacklist-global';
-NOTE is just documentation.  Set it in your init or via Customize."
+  "Global alist of (KEY . NOTE) auto-approved tools.
+KEY is as in `konix/agent-shell--key-matches-p'; NOTE is documentation."
   :type '(alist :key-type string :value-type string)
   :group 'konix)
 
 (defvar konix/agent-shell-tool-whitelist-project nil
-  "PROJECT alist of (KEY . NOTE) whitelisted tools.
-Set in a project's `.dir-locals.el'; inherited by every session started
-in the project.")
+  "Project alist of (KEY . NOTE) whitelisted tools, from `.dir-locals.el'.")
 
 (defvar-local konix/agent-shell-tool-whitelist nil
-  "Buffer-local SESSION alist of (KEY . NOTE) whitelisted tools.")
+  "Session alist of (KEY . NOTE) whitelisted tools.")
 
 ;;; Disabled overlay -----------------------------------------------------------
-;; Per-axis enable/disable markers, one alist per axis mapping KEY ->
-;; "off"/"once"/"on" (unset = enabled).  Resolved session>project>global and
-;; subtracted from the effective policy, so a rule can be turned off without
-;; deleting it, and a global "off" overridden by a narrower "on".  "once" is a
-;; one-shot "off": the next request the rule would have matched spends it.
+;; KEY -> "off"/"once"/"on" markers, to turn a rule off without deleting it.
+;; "once" is spent by the next request the rule would have matched.
 
 (defcustom konix/agent-shell-tool-blacklist-disabled-global nil
-  "GLOBAL blacklist enable/disable markers (alist of KEY -> \"off\"/\"once\"/\"on\")."
+  "Global blacklist markers, an alist of KEY -> \"off\"/\"once\"/\"on\"."
   :type '(alist :key-type string :value-type string)
   :group 'konix)
 
@@ -1135,7 +893,7 @@ in the project.")
   "SESSION blacklist enable/disable markers.")
 
 (defcustom konix/agent-shell-tool-whitelist-disabled-global nil
-  "GLOBAL whitelist enable/disable markers (alist of KEY -> \"off\"/\"once\"/\"on\")."
+  "Global whitelist markers, an alist of KEY -> \"off\"/\"once\"/\"on\"."
   :type '(alist :key-type string :value-type string)
   :group 'konix)
 
@@ -1149,18 +907,9 @@ in the project.")
 
 (cl-defstruct (konix/agent-shell-policy
                (:constructor konix/agent-shell-policy--make))
-  "A tool policy (blacklist or whitelist) over three axes.
-NAME labels it in prompts and messages.  GLOBAL-VAR / PROJECT-VAR /
-SESSION-VAR are the symbols of the three axis variables (PROJECT-VAR
-doubles as the `.dir-locals.el' key).  DEFAULT is the fallback value when
-none is known; VALUE-LABEL is the panel's value-column header and
-VALUE-PROMPT the minibuffer prompt for that value.  CANDIDATES-FN, when
-non-nil, is a zero-argument function (run in the origin buffer) returning
-the key-completion candidates for this policy; it defaults to
-`konix/agent-shell--tool-candidates' so the tool policies keep their
-tool-aware completion while other policies (e.g. autoresponse) can supply
-their own.  DISABLED-POLICY, when non-nil, is a companion whose \"off\" keys
-`konix/agent-shell-policy--effective' subtracts."
+  "A policy over the global, project and session axes.
+PROJECT-VAR doubles as the `.dir-locals.el' key.  CANDIDATES-FN returns key
+completions.  DISABLED-POLICY holds the markers subtracted from it."
   name global-var project-var session-var default value-label value-prompt
   candidates-fn disabled-policy)
 
@@ -1207,41 +956,38 @@ their own.  DISABLED-POLICY, when non-nil, is a companion whose \"off\" keys
   "The whitelist policy: matching tools are auto-approved.")
 
 (defun konix/agent-shell-policy--candidates (policy)
-  "Return POLICY's key-completion candidates (run in the origin buffer).
-Uses POLICY's `candidates-fn' when set, else `konix/agent-shell--tool-candidates'."
+  "Return POLICY's key-completion candidates."
   (funcall (or (konix/agent-shell-policy-candidates-fn policy)
                #'konix/agent-shell--tool-candidates)))
 
 ;;; Axis primitives ------------------------------------------------------------
-;; Global acts on the defcustom (running Emacs only); Session on the live
-;; buffer-local variable in the shell buffer; Project reads/writes the
-;; persisted `.dir-locals.el', exactly like the MCP toggles.
+;; Only the project axis is persisted, in `.dir-locals.el'.
 
 (defun konix/agent-shell-policy--global-entries (policy)
   "Return a fresh copy of POLICY's global alist."
   (copy-alist (symbol-value (konix/agent-shell-policy-global-var policy))))
 
 (defun konix/agent-shell-policy--set-global (policy key value)
-  "Add or update KEY -> VALUE in POLICY's global axis (running Emacs)."
+  "Set KEY to VALUE in POLICY's global axis."
   (let* ((var (konix/agent-shell-policy-global-var policy))
          (alist (copy-alist (symbol-value var))))
     (setf (alist-get key alist nil nil #'equal) value)
     (set var alist)))
 
 (defun konix/agent-shell-policy--remove-global (policy key)
-  "Remove KEY from POLICY's global axis (running Emacs)."
+  "Remove KEY from POLICY's global axis."
   (let* ((var (konix/agent-shell-policy-global-var policy))
          (alist (copy-alist (symbol-value var))))
     (setf (alist-get key alist nil t #'equal) nil)
     (set var alist)))
 
 (defun konix/agent-shell-policy--session-entries (policy)
-  "Return a fresh copy of POLICY's session alist (from the shell buffer)."
+  "Return a fresh copy of POLICY's session alist."
   (with-current-buffer (konix/agent-shell--current-shell-or-error)
     (copy-alist (symbol-value (konix/agent-shell-policy-session-var policy)))))
 
 (defun konix/agent-shell-policy--set-session (policy key value)
-  "Add or update KEY -> VALUE in POLICY's session axis."
+  "Set KEY to VALUE in POLICY's session axis."
   (with-current-buffer (konix/agent-shell--current-shell-or-error)
     (let* ((var (konix/agent-shell-policy-session-var policy))
            (alist (copy-alist (symbol-value var))))
@@ -1261,14 +1007,11 @@ Uses POLICY's `candidates-fn' when set, else `konix/agent-shell--tool-candidates
   (konix/agent-shell-mcp--project-dir-locals-file))
 
 (defvar konix/agent-shell-policy--warned-dir-locals nil
-  "Alist of (FILE . MTIME) already warned about as malformed, to warn once.")
+  "Alist of (FILE . MTIME) already warned about as malformed.")
 
 (defun konix/agent-shell-policy--warn-malformed (file detail)
-  "Warn once per broken state that FILE is not a readable dir-locals alist.
-DETAIL says what went wrong.  Keyed on FILE's modification time so a fixed
-file that later re-breaks warns again.  A leftover git conflict marker is
-the usual culprit; while it stands the project's agent-shell rules are
-ignored."
+  "Warn once per FILE modification that it is not a dir-locals alist.
+DETAIL says what went wrong."
   (let ((mtime (file-attribute-modification-time (file-attributes file))))
     (unless (equal mtime (cdr (assoc file konix/agent-shell-policy--warned-dir-locals)))
       (setf (alist-get file konix/agent-shell-policy--warned-dir-locals
@@ -1282,21 +1025,16 @@ are being IGNORED -- a leftover git conflict marker is a likely cause."
        :warning))))
 
 (defun konix/agent-shell-policy--project-in-file (policy file)
-  "Return POLICY's project alist stored in FILE.
-Reads the `nil'-mode entry of FILE's directory-local alist; a fresh list,
-or nil when FILE is absent or sets no such variable.  A garbled or
-conflict-marked file (whose first sexp may `read' as a bare symbol, or fail
-to parse) yields nil and a one-shot `konix/agent-shell-policy--warn-malformed'
-warning, rather than crashing callers."
+  "Return a fresh copy of POLICY's project alist stored in FILE.
+A garbled FILE yields nil and a warning rather than an error."
   (when (file-exists-p file)
     (let ((raw (with-temp-buffer
                  (insert-file-contents file)
                  (goto-char (point-min))
                  (condition-case err
                      (cons 'ok (read (current-buffer)))
-                   ;; No complete sexp: an empty (or comment-only) file is fine.
+                   ;; An empty or comment-only file is fine.
                    (end-of-file (cons 'empty nil))
-                   ;; Any other read error means the file is garbled.
                    (error (cons 'error err))))))
       (pcase raw
         (`(empty . ,_) nil)
@@ -1319,8 +1057,7 @@ warning, rather than crashing callers."
                nil)))))))))
 
 (defun konix/agent-shell-policy--write-project (policy new file)
-  "Persist NEW as POLICY's project variable in FILE.
-Deletes the variable when NEW is empty."
+  "Persist NEW as POLICY's project variable in FILE."
   (konix/dir-locals-modify
    file (konix/agent-shell-policy-project-var policy) new))
 
@@ -1330,7 +1067,7 @@ Deletes the variable when NEW is empty."
    policy (konix/agent-shell-policy--project-file)))
 
 (defun konix/agent-shell-policy--set-project (policy key value)
-  "Add or update KEY -> VALUE in POLICY's project axis (`.dir-locals.el')."
+  "Set KEY to VALUE in POLICY's project axis."
   (let* ((file (konix/agent-shell-policy--project-file))
          (current (konix/agent-shell-policy--project-in-file policy file)))
     (konix/agent-shell-policy--write-project
@@ -1343,7 +1080,7 @@ Deletes the variable when NEW is empty."
      file)))
 
 (defun konix/agent-shell-policy--remove-project (policy key)
-  "Remove KEY from POLICY's project axis (`.dir-locals.el')."
+  "Remove KEY from POLICY's project axis."
   (let* ((file (konix/agent-shell-policy--project-file))
          (current (konix/agent-shell-policy--project-in-file policy file)))
     (konix/agent-shell-policy--write-project
@@ -1364,12 +1101,9 @@ Deletes the variable when NEW is empty."
       (konix/agent-shell-policy-default policy)))
 
 (defun konix/agent-shell-policy--effective (policy)
-  "Return the union of POLICY's global, project and session entries.
-Read in the current buffer (the responder runs in the shell buffer);
-session shadows project shadows global for the same key.  The project axis
-is read from the live `.dir-locals.el' (not the session's start-time
-buffer-local snapshot), so rules added to a project at runtime take effect
-in the running session.  Keys disabled via POLICY's DISABLED-POLICY are dropped."
+  "Return POLICY's enabled entries, the narrower axis shadowing the wider.
+The project axis is read from the live `.dir-locals.el', so runtime edits
+apply."
   (let ((result (copy-alist (symbol-value (konix/agent-shell-policy-global-var policy)))))
     (dolist (entry (konix/agent-shell-policy--project-entries policy))
       (setf (alist-get (car entry) result nil nil #'equal) (cdr entry)))
@@ -1382,18 +1116,17 @@ in the running session.  Keys disabled via POLICY's DISABLED-POLICY are dropped.
     result))
 
 (defun konix/agent-shell-policy--disabled-state (policy key)
-  "Return KEY's resolved marker in POLICY's disabled companion, or nil.
-One of \"on\", \"off\" or \"once\"; nil when POLICY has no companion."
+  "Return KEY's resolved marker in POLICY's disabled companion, or nil."
   (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
     (konix/agent-shell-policy--value-for off key)))
 
 (defun konix/agent-shell-policy--disabled-p (policy key)
-  "Non-nil when KEY resolves to \"off\" or \"once\" in POLICY's disabled companion."
+  "Non-nil when KEY is marked \"off\" or \"once\" in POLICY."
   (member (konix/agent-shell-policy--disabled-state policy key) '("off" "once")))
 
 (defun konix/agent-shell-policy--disable-decider (policy key)
-  "Return (LEVEL . STATE) for the most-specific axis marking KEY, or nil.
-LEVEL is \"s\"/\"p\"/\"G\"; STATE its \"off\"/\"once\"/\"on\"."
+  "Return (LEVEL . STATE) for the narrowest axis marking KEY, or nil.
+LEVEL is \"s\", \"p\" or \"G\"."
   (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
     (cl-loop for (level . entries-fn)
              in `(("s" . ,#'konix/agent-shell-policy--session-entries)
@@ -1403,8 +1136,7 @@ LEVEL is \"s\"/\"p\"/\"G\"; STATE its \"off\"/\"once\"/\"on\"."
              when cell return (cons level (cdr cell)))))
 
 (defun konix/agent-shell-policy--set-disabled (policy key level state)
-  "Write KEY's marker for POLICY on LEVEL (session/project/global) to STATE.
-STATE is \"off\", \"once\", \"on\", or nil to unset it (defer to the broader axis)."
+  "Set KEY's marker for POLICY on LEVEL to STATE, nil to unset it."
   (let ((off (konix/agent-shell-policy-disabled-policy policy)))
     (pcase level
       ('global  (if state (konix/agent-shell-policy--set-global off key state)
@@ -1415,14 +1147,11 @@ STATE is \"off\", \"once\", \"on\", or nil to unset it (defer to the broader axi
                   (konix/agent-shell-policy--remove-session off key))))))
 
 (defun konix/agent-shell-policy--decider-level (letter)
-  "Return the `konix/agent-shell-policy--set-disabled' level for LETTER.
-LETTER is a `konix/agent-shell-policy--disable-decider' \"s\"/\"p\"/\"G\"."
+  "Return the level symbol for the decider LETTER."
   (pcase letter ("G" 'global) ("p" 'project) (_ 'session)))
 
 (defun konix/agent-shell--policy-matches (policy tool-call)
-  "Return every POLICY entry matching TOOL-CALL, in effective order.
-Entries are matched by `konix/agent-shell--matching-entries', so a regexp
-key's captures appear in the returned reasons."
+  "Return every POLICY entry matching TOOL-CALL, in effective order."
   (let ((konix/agent-shell--regexp-any-command
          (eq policy konix/agent-shell--blacklist)))
     (konix/agent-shell--matching-entries
@@ -1437,38 +1166,27 @@ key's captures appear in the returned reasons."
 ;;; Blacklist steering ---------------------------------------------------------
 
 (defcustom konix/agent-shell-blacklist-interrupt t
-  "Whether a blacklisted-tool rejection interrupts the running turn.
-When non-nil, auto-rejecting a blacklisted tool that carries a reason
-also force-cancels the current turn and delivers the reason as the very
-next prompt, so the agent is redirected immediately instead of only
-learning why once the whole turn finishes.  When nil, the reason is
-queued the usual way and arrives at the natural end of the turn."
+  "Whether a blacklist rejection with a reason interrupts the turn.
+If nil, the reason is queued until the turn ends."
   :type 'boolean
   :group 'konix)
 
 (defvar-local konix/agent-shell--reason-delivery-scheduled nil
-  "Non-nil while an immediate reason delivery is pending for this turn.
-`auto-submit' when the reason will be submitted as the next prompt,
-`handback' when a DELIVER-FN surfaces it to the user instead.")
+  "Pending reason delivery for this turn: `auto-submit', `handback' or nil.")
 
 (defun konix/agent-shell--automation-continues-p ()
   "Return non-nil when the cancelled turn's reason goes back to the agent.
-It is submitted as the next prompt as soon as the turn ends, so the buffer
-falls idle in between with nothing waiting for the user.  A `handback'
-delivery, which gives the reason to the user instead, does not count."
+The buffer then looks idle without waiting for the user."
   (eq konix/agent-shell--reason-delivery-scheduled 'auto-submit))
 
 (defun konix/agent-shell--enqueue-reason (reason)
-  "Enqueue REASON as a follow-up prompt, unless already pending.
-Runs in the session's shell buffer (the responder's `current-buffer')."
+  "Enqueue REASON as a follow-up prompt, unless already pending."
   (when (derived-mode-p 'agent-shell-mode)
     (unless (member reason (map-elt (agent-shell--state) :pending-requests))
       (agent-shell--enqueue-request :prompt reason))))
 
 (defun konix/agent-shell--show-in-stop-reason (text)
-  "Rewrite the cancelled turn's stop-reason block to say TEXT.
-Replaces the bare `Cancelled' agent-shell puts there, so the reason shows
-in the transcript.  Falls back to a new block when there is none."
+  "Rewrite the cancelled turn's stop-reason block to say TEXT."
   (when (derived-mode-p 'agent-shell-mode)
     (agent-shell--update-fragment
      :state (agent-shell--state)
@@ -1477,26 +1195,10 @@ in the transcript.  Falls back to a new block when there is none."
      :body text)))
 
 (defun konix/agent-shell--interrupt-and-deliver (reason &optional deliver-fn)
-  "Force-cancel the current turn, then deliver REASON once the turn has ended.
-Runs in the session's shell buffer.  The turn is cancelled with
-`agent-shell-interrupt' so the agent stops at once.  Delivery is driven by the
-session event bus, not by polling `shell-maker-busy':
-
-- a `permission-request' subscription cancels any permission the soft-cancelled
-  query still surfaces, the instant it is displayed -- so its widget does not
-  linger (we are still on the cancelled turn's `:request-count', so
-  `agent-shell--delete-fragment' removes it under the right namespace) and a
-  pending permission cannot keep the turn from completing;
-- a one-shot `turn-complete' subscription fires once the cancelled turn has
-  truly ended (it is emitted on cancel too, with stop-reason \"cancelled\"); it
-  tears both subscriptions down and delivers REASON.
-
-By default REASON is SUBMITTED as the next prompt (steering/blacklist
-redirect).  DELIVER-FN, when non-nil, is called with REASON instead -- so
-control is handed back to the human while REASON is surfaced some other way
-\(the steering cap writes it into the turn's stop-reason block).  Only one
-delivery is
-scheduled per turn (`konix/agent-shell--reason-delivery-scheduled')."
+  "Cancel the current turn, then submit REASON as the next prompt.
+With DELIVER-FN, call it with REASON instead, handing control back to the
+user.  Permissions the soft cancel still surfaces are cancelled at once, lest
+they linger or block the turn's end."
   (when (and (derived-mode-p 'agent-shell-mode)
              (not konix/agent-shell--reason-delivery-scheduled))
     (setq konix/agent-shell--reason-delivery-scheduled
@@ -1504,8 +1206,7 @@ scheduled per turn (`konix/agent-shell--reason-delivery-scheduled')."
     (let ((buffer (current-buffer))
           (perm-token nil)
           (done-token nil))
-      ;; Subscribe BEFORE interrupting, so the `turn-complete' the cancel
-      ;; triggers is not missed.
+      ;; Subscribe first, not to miss the cancel's `turn-complete'.
       (setq perm-token
             (agent-shell-subscribe-to
              :shell-buffer buffer :event 'permission-request
@@ -1533,18 +1234,13 @@ scheduled per turn (`konix/agent-shell--reason-delivery-scheduled')."
 ;;; Responder ------------------------------------------------------------------
 
 (defun konix/agent-shell--entry-has-reason-p (entry)
-  "Non-nil when blacklist ENTRY carries a non-blank reason (its cdr)."
+  "Non-nil when blacklist ENTRY carries a non-blank reason."
   (let ((reason (cdr entry)))
     (and (stringp reason) (not (string-empty-p (string-trim reason))))))
 
 (defun konix/agent-shell--blacklist-entry-notice (entry &optional default-reason)
-  "Return the `Autoamtic decline...' line for one matched blacklist ENTRY.
-X = the rule that fired (its key/pattern); Y = its recorded reason.  When the
-entry carries no reason, DEFAULT-REASON is used if given (the caller's generic
-explanation), otherwise the line is just `because of KEY'.  This single
-formatter is shared by every place that steers the agent on a blacklist match
-\(the permission responder and the background-launch steering in the tracking
-module), so when several rules fire they all read the same way."
+  "Return the decline line for the matched blacklist ENTRY.
+DEFAULT-REASON stands in when ENTRY has no reason."
   (cond
    ((konix/agent-shell--entry-has-reason-p entry)
     (format "Automatic decline because of %s: %s" (car entry) (cdr entry)))
@@ -1553,26 +1249,15 @@ module), so when several rules fire they all read the same way."
    (t (format "Automatic decline because of %s" (car entry)))))
 
 (defun konix/agent-shell--blacklist-notice (entries &optional default-reason)
-  "Join the decline lines for every matched blacklist ENTRY into one notice.
-Each entry contributes a `konix/agent-shell--blacklist-entry-notice' line (in
-ENTRIES order), so when several rules match the same request the agent is told
-about all of them, not just the first.  DEFAULT-REASON fills in entries that
-carry no reason of their own."
+  "Return the decline lines of all blacklist ENTRIES, joined.
+DEFAULT-REASON stands in for entries without a reason."
   (mapconcat (lambda (entry)
                (konix/agent-shell--blacklist-entry-notice entry default-reason))
              entries "\n"))
 
 (defun konix/agent-shell--blacklist-act (permission entries)
-  "Auto-reject PERMISSION's tool for the matched blacklist ENTRIES.
-Reject via the `reject_once' option, steer the agent with every matched
-ENTRY's reason and notify the user.  ENTRIES is the list of all blacklist
-entries that matched (see `konix/agent-shell--policy-matches'); each
-contributes its own `because of KEY[: REASON]' line via
-`konix/agent-shell--blacklist-notice', so when several rules fire the agent
-sees them all -- not just the first.  The combined notice is both echoed and
-delivered to the agent, so the keys stay visible in the transcript (the echo
-area is transient).  Return non-nil when handled, nil (fall back to the
-dialog) when there is no reject option."
+  "Reject PERMISSION's tool and steer the agent with matched ENTRIES' reasons.
+Return nil, falling back to the dialog, when there is no reject option."
   (when-let ((reject (seq-find (lambda (option)
                                  (equal (map-elt option :kind) "reject_once"))
                                (map-elt permission :options))))
@@ -1587,24 +1272,20 @@ dialog) when there is no reject option."
     t))
 
 (defun konix/agent-shell--whitelist-act (permission entry)
-  "Auto-approve PERMISSION's tool for the matched whitelist ENTRY.
-Approve via the `allow_once' option and notify the user.  Return non-nil
-when handled, nil (fall back to the dialog) when there is no allow option."
+  "Approve PERMISSION's tool for the matched whitelist ENTRY.
+Return nil, falling back to the dialog, when there is no allow option."
   (when-let ((allow (seq-find (lambda (option)
                                 (equal (map-elt option :kind) "allow_once"))
                               (map-elt permission :options))))
     (let ((note (cdr entry)))
       (funcall (map-elt permission :respond) (map-elt allow :option-id))
-      ;; X = the rule that fired (its key/pattern); Y = its recorded note.
       (message "Automatic approve because of %s%s"
                (car entry)
                (if (and note (not (string-empty-p note))) (format ": %s" note) "")))
     t))
 
 (defun konix/agent-shell-policy--consume-once (policy tool-call)
-  "Spend POLICY's \"once\" markers whose rule matches TOOL-CALL.
-The rule was left out of the effective policy for this request; clearing
-its marker on the axis that set it puts it back on for the next one."
+  "Spend POLICY's \"once\" markers whose rule matches TOOL-CALL."
   (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
     (let ((haystack (konix/agent-shell--tool-haystack tool-call)))
       (dolist (entry (konix/agent-shell-policy--effective off))
@@ -1619,13 +1300,8 @@ its marker on the axis that set it puts it back on for the next one."
                    (car entry) (konix/agent-shell-policy-name policy)))))))
 
 (defun konix/agent-shell--policy-responder (permission)
-  "Auto-reject blacklisted and auto-approve whitelisted tools.
-A blacklist match takes precedence over a whitelist match (deny over
-allow).  Rules marked \"once\" are skipped here and spent by
-`konix/agent-shell-policy--consume-once'.  Return non-nil when handled,
-nil to let the next responder on
-`konix/agent-shell-permission-responder-functions' try.  This is the base
-responder registered on that hook."
+  "Reject blacklisted and approve whitelisted PERMISSION tools.
+Return nil when unhandled, to let the next responder try."
   (let* ((tool-call (konix/agent-shell--tool-call-with-context
                      (map-elt permission :tool-call)))
          (blacklisted (konix/agent-shell--policy-matches
@@ -1644,8 +1320,7 @@ responder registered on that hook."
           #'konix/agent-shell--policy-responder)
 
 (defun konix/agent-shell--pending-permission-ids ()
-  "Return the tool-call ids of the session's still-pending permissions.
-Pending tool calls keep a `:permission-request-id' until answered."
+  "Return the tool-call ids of the session's pending permissions."
   (let (ids)
     (map-do (lambda (id tool-call)
               (when (map-elt tool-call :permission-request-id)
@@ -1654,18 +1329,9 @@ Pending tool calls keep a `:permission-request-id' until answered."
     (nreverse ids)))
 
 (defun konix/agent-shell--cancel-pending-permissions ()
-  "Cancel every still-pending permission request in this session.
-Send a `:cancelled' response for each (which deletes its widget fragment via
-`agent-shell--delete-fragment') and return the count.
-
-`agent-shell-interrupt' only rejects the permissions pending at the instant it
-runs, but its cancel is soft -- the SDK query keeps going and can surface a
-permission afterwards.  Such a straggler's widget would otherwise linger and
-keep the buffer looking actionable (`konix/agent-shell--has-permission-button-p'):
-once the follow-up prompt advances `:request-count', the fragment can no longer
-be deleted (it is namespaced by the request-count of the turn that drew it).
-So this is called from the delivery poll, and after a cap-stop cancel, to clear
-those stragglers while the request-count still names the cancelled turn."
+  "Cancel the session's pending permission requests; return their count.
+Must run before the next prompt: the widgets of permissions surfacing after
+a soft interrupt can no longer be deleted once `:request-count' moves on."
   (when (derived-mode-p 'agent-shell-mode)
     (let ((state (agent-shell--state))
           (count 0))
@@ -1682,11 +1348,8 @@ those stragglers while the request-count still names the cancelled turn."
       count)))
 
 (defun konix/agent-shell-reapply-policies ()
-  "Re-evaluate the session's pending permission requests against the policies.
-A permission that arrived before a rule existed is not retouched by the
-responder, so after adding a rule call this to act on what is already
-waiting: a now-blacklisted tool is auto-rejected (and the agent steered),
-a now-whitelisted one auto-approved.  Returns the number resolved."
+  "Apply the policies to the pending permission requests; return the count.
+Useful after adding a rule, as the responder only sees new requests."
   (interactive)
   (with-current-buffer (konix/agent-shell--current-shell-or-error)
     (let* ((state (agent-shell--state))
@@ -1722,25 +1385,15 @@ a now-whitelisted one auto-approved.  Returns the number resolved."
       resolved)))
 
 ;;; Inspecting a pending request -----------------------------------------------
-;; When a dialog is waiting, you usually want to write a rule that matches *it*
-;; -- but the responder matches against a haystack you never see (title, kind,
-;; command line and the whole raw input as JSON).  This dumps that haystack
-;; verbatim, plus the offered options and the rules that already fire, so you
-;; can craft the regexp/evaluator with confidence rather than by guessing.
+;; Shows the otherwise invisible haystack, to write a rule matching a request.
 
 (defun konix/agent-shell--describe-commands (tool-call)
-  "Return TOOL-CALL's `konix/agent-shell--tool-call-argvs', one per line, or nil."
+  "Return TOOL-CALL's argv lines, one per line, or nil."
   (when-let* ((argvs (konix/agent-shell--tool-call-argvs tool-call)))
     (mapconcat (lambda (argv) (concat "  " (or argv "?"))) argvs "\n")))
 
 (defun konix/agent-shell--describe-tool-call (id tool-call)
-  "Return a multi-line string describing TOOL-CALL (with id ID).
-Surfaces what a blacklist/whitelist KEY can be written against: the title
-and kind, the normalized command line, the verbatim haystack a regexp is
-tested on (the single most useful thing), and the raw input as pretty JSON
-\(redundant with the haystack but easier to read for structure).  Also
-lists the offered permission options and which existing policy entries
-already match."
+  "Return a description of TOOL-CALL, of id ID, for rule authoring."
   (let* ((tool-call (konix/agent-shell--tool-call-with-context tool-call))
          (raw-input (map-elt tool-call :raw-input))
          (command (ignore-errors
@@ -1769,8 +1422,6 @@ already match."
      "\nHaystack (what a regexp KEY is matched against for any other tool, "
      "and by the blacklist too):\n"
      dash "\n" haystack "\n" dash "\n\n"
-     ;; The agent's narration is NOT in the haystack -- only `(lambda ...)' /
-     ;; `@evaluator' keys see it, via `(map-elt tc :agent-said)'.
      "Agent said since last user message"
      " (only `(lambda ...)'/`@evaluator' keys see this, as :agent-said):\n"
      dash "\n"
@@ -1799,12 +1450,7 @@ already match."
 
 ;;;###autoload
 (defun konix/agent-shell-describe-permission ()
-  "Pretty-print the session's pending permission request(s) for rule authoring.
-Shows, in a dedicated buffer, everything a blacklist/whitelist KEY can
-match on -- the tool title, kind, command line, the verbatim haystack and
-the raw input -- plus the offered options and which existing policy
-entries already fire.  Read it, then write the regexp/evaluator with
-`konix/agent-shell-blacklist-tool' or `konix/agent-shell-whitelist-tool'."
+  "Show what the session's pending permission requests can be matched on."
   (interactive)
   (with-current-buffer (konix/agent-shell--current-shell-or-error)
     (let* ((state (agent-shell--state))
@@ -1827,18 +1473,15 @@ entries already fire.  Read it, then write the regexp/evaluator with
         (display-buffer buffer)))))
 
 ;;; Commands -------------------------------------------------------------------
-;; Per-policy commands are thin wrappers over generic cores; their interactive
-;; specs differ only in prompt wording.
 
 (defun konix/agent-shell--prefix-axis ()
-  "Map the current prefix argument to an axis symbol.
-No prefix -> `session'; one prefix -> `project'; two -> `global'."
+  "Return the axis the prefix argument selects: session, project or global."
   (cond ((equal current-prefix-arg '(16)) 'global)
         (current-prefix-arg 'project)
         (t 'session)))
 
 (defun konix/agent-shell--policy-do-add (policy key value where)
-  "Add KEY -> VALUE to POLICY on the WHERE axis and report it."
+  "Set KEY to VALUE in POLICY on the WHERE axis and report it."
   (let ((verb (concat (capitalize (konix/agent-shell-policy-name policy)) "ed")))
     (pcase where
       ('global  (konix/agent-shell-policy--set-global policy key value)
@@ -1849,7 +1492,7 @@ No prefix -> `session'; one prefix -> `project'; two -> `global'."
                 (message "%s %S in session" verb key)))))
 
 (defun konix/agent-shell--policy-do-unset (policy key)
-  "Remove KEY from all three axes of POLICY and report it."
+  "Remove KEY from every axis of POLICY and report it."
   (konix/agent-shell-policy--remove-session policy key)
   (konix/agent-shell-policy--remove-project policy key)
   (konix/agent-shell-policy--remove-global policy key)
@@ -1868,7 +1511,7 @@ No prefix -> `session'; one prefix -> `project'; two -> `global'."
     (completing-read prompt cands nil t)))
 
 (defun konix/agent-shell--policy-do-clear (policy)
-  "Clear POLICY's ephemeral session axis and report it."
+  "Clear POLICY's session axis and report it."
   (with-current-buffer (konix/agent-shell--current-shell-or-error)
     (set (konix/agent-shell-policy-session-var policy) nil))
   (message "Session tool %s cleared" (konix/agent-shell-policy-name policy)))
@@ -1904,13 +1547,8 @@ No prefix -> `session'; one prefix -> `project'; two -> `global'."
 
 ;;;###autoload
 (defun konix/agent-shell-blacklist-tool (key reason &optional where)
-  "Blacklist tools matching KEY with REASON.
-Future permission requests whose tool title, kind, command line or input
-matches KEY are auto-rejected, and REASON (when non-empty) steers the
-agent.  KEY is a regexp, an `@NAME' named evaluator, or a one-off
-predicate form starting with `(' (see `konix/agent-shell--key-matches-p').
-WHERE selects the axis: no prefix -> ephemeral SESSION; one prefix ->
-project `.dir-locals.el'; two prefixes -> GLOBAL baseline (running Emacs)."
+  "Blacklist tools matching KEY, steering the agent with REASON.
+WHERE is the axis: session, or project and global with one or two prefixes."
   (interactive
    (list (completing-read "Blacklist tool (regexp, $ glob, @evaluator, or (lambda ...)): "
                           (konix/agent-shell--tool-candidates)
@@ -1921,11 +1559,8 @@ project `.dir-locals.el'; two prefixes -> GLOBAL baseline (running Emacs)."
 
 ;;;###autoload
 (defun konix/agent-shell-whitelist-tool (key note &optional where)
-  "Whitelist (auto-approve) tools matching KEY, with an optional NOTE.
-Future permission requests whose tool title, kind, command line or input
-matches KEY are auto-approved without a dialog (unless they also match the
-blacklist, which wins).  KEY matches as in
-`konix/agent-shell-blacklist-tool'; WHERE selects the axis likewise."
+  "Auto-approve tools matching KEY, with an optional NOTE.
+WHERE is the axis, as in `konix/agent-shell-blacklist-tool'."
   (interactive
    (list (completing-read "Whitelist tool (regexp, $ glob, @evaluator, or (lambda ...)): "
                           (konix/agent-shell--tool-candidates)
@@ -1935,17 +1570,11 @@ blacklist, which wins).  KEY matches as in
   (konix/agent-shell--policy-do-add konix/agent-shell--whitelist key note where))
 
 ;;; Control panel --------------------------------------------------------------
-;; The blacklist/whitelist panels are `konix/agent-shell-panel' instances: the
-;; generic backend owns the tabulated-list mechanics, while this describes the
-;; policy's rows (its keys), the three Global/Project/Session axis toggles, the
-;; value column and the add/edit/delete keys.
 
 (defun konix/agent-shell--policy-axis (policy header key entries-fn set-fn remove-fn
                                               &optional width)
-  "Build a `konix/agent-shell-panel-axis' for POLICY.
-HEADER/KEY/WIDTH describe the column; ENTRIES-FN/SET-FN/REMOVE-FN are the
-axis accessors.  Toggling adds the key (with its known value) or removes
-it."
+  "Return a panel axis for POLICY, titled HEADER and toggled by KEY.
+ENTRIES-FN, SET-FN and REMOVE-FN access the axis; WIDTH is the column's."
   (konix/agent-shell-panel-axis-create
    :header header :key key :width (or width 9)
    :member-p (lambda (k) (assoc k (funcall entries-fn policy)))
@@ -1956,17 +1585,15 @@ it."
                         (konix/agent-shell-policy--value-for policy k))))))
 
 (defun konix/agent-shell-policy--enabled-cell (policy key)
-  "Render KEY's enabled state in POLICY's panel: ✓ on, ✗ off, 1 one-shot off."
+  "Return the panel cell showing whether KEY is enabled in POLICY."
   (pcase (konix/agent-shell-policy--disabled-state policy key)
     ("once" (propertize "1" 'face '(:foreground "orange3" :weight bold)))
     (state (konix/agent-shell-panel--cell (not (equal state "off"))))))
 
 (defvar konix/agent-shell-policy-extra-axes nil
-  "Further axes the policy panels offer beside Global, Project and Session.
-Each is a plist of :header, :key, and the functions :entries (POLICY),
-:set (POLICY KEY VALUE) and :remove (POLICY KEY), called in the shell buffer.
-An optional :available, called there with no argument, offers the axis only
-where it returns non-nil.")
+  "Further policy axes, as plists.
+Keys: :header, :key, :entries (POLICY), :set (POLICY KEY VALUE), :remove
+\(POLICY KEY) and optional :available, all run in the shell buffer.")
 
 (defun konix/agent-shell--policy-extras-here ()
   "Return the extra axes available from the shell here."
@@ -1980,7 +1607,7 @@ where it returns non-nil.")
               konix/agent-shell-policy-extra-axes))
 
 (defun konix/agent-shell--policy-extra-axis (policy extra)
-  "Build the panel axis EXTRA, one of `konix/agent-shell-policy-extra-axes', for POLICY."
+  "Return the panel axis for the extra axis EXTRA of POLICY."
   (konix/agent-shell--policy-axis
    policy (plist-get extra :header) (plist-get extra :key)
    (plist-get extra :entries) (plist-get extra :set) (plist-get extra :remove)))
@@ -2045,22 +1672,14 @@ where it returns non-nil.")
      ("r"   . konix/agent-shell-policy-menu-reapply))))
 
 (defun konix/agent-shell-policy-menu-reapply ()
-  "Reapply the policies to the session's pending permission requests.
-Runs `konix/agent-shell-reapply-policies' in the panel's origin (shell)
-buffer, so a rule just added/edited here acts on what is already waiting."
+  "Reapply the policies to the origin session's pending requests."
   (interactive)
   (with-current-buffer (konix/agent-shell-panel--origin-buffer)
     (call-interactively #'konix/agent-shell-reapply-policies)))
 
 (defun konix/agent-shell--tool-call-policy-key (tool-call &optional exact)
-  "Return a policy KEY matching TOOL-CALL, or nil.
-An MCP call gets an `@mcp' candidate of
-`konix/agent-shell--mcp-candidates', the one holding an argument when there
-is one.  A shell call gets its commands as `konix/agent-shell--command-argv'
-reads them: a prefix, or with EXACT -- as a whitelist wants -- that very
-command.  Anything else (an edit, a write) gets its title, falling back to
-its kind, regexp-quoted and anchored with `^':
-`konix/agent-shell--tool-haystack' gives each of those its own line."
+  "Return a policy key matching TOOL-CALL, or nil.
+A shell command gives a prefix, or with EXACT the very command."
   (if-let* ((candidates (and (fboundp 'konix/agent-shell--mcp-candidates)
                              (konix/agent-shell--mcp-candidates tool-call))))
       (or (cadr candidates) (car candidates))
@@ -2080,9 +1699,8 @@ its kind, regexp-quoted and anchored with `^':
         (concat "^" (regexp-quote field))))))
 
 (defun konix/agent-shell--pending-policy-key (&optional exact)
-  "Return `konix/agent-shell--tool-call-policy-key' of the waiting request,
-EXACT passed along.  Nil when none is waiting.  Call it in the shell buffer or
-in a viewport of it."
+  "Return a policy key for the waiting permission request, or nil.
+EXACT is as for `konix/agent-shell--tool-call-policy-key'."
   (when-let* ((shell (ignore-errors (konix/agent-shell--current-shell-or-error))))
     (with-current-buffer shell
       (when-let* ((id (car (konix/agent-shell--pending-permission-ids)))
@@ -2092,8 +1710,7 @@ in a viewport of it."
 
 (defun konix/agent-shell-policy-menu-add ()
   "Add an entry to a chosen axis of the panel's policy.
-The key prompt starts prefilled with `konix/agent-shell--pending-policy-key'
-when a permission request is waiting in the origin session."
+The key is prefilled from the waiting permission request, if any."
   (interactive)
   (let* ((policy (konix/agent-shell-panel-current-data))
          (origin (konix/agent-shell-panel--origin-buffer))
@@ -2163,10 +1780,8 @@ If the key changes, the old one is replaced on each axis it occupied."
       (konix/agent-shell-panel--refresh))))
 
 (defun konix/agent-shell-policy-menu-toggle-enabled ()
-  "Set the rule at point disabled/once/enabled/inherit on a chosen axis.
-Prompts for the level (session/project/global) and state; the rule's own
-key, value and axes are left intact.  `once' disables the rule for the
-next request it would have matched only, then resets itself."
+  "Set the enabled state of the rule at point on a chosen axis.
+`once' disables it for the next request it would have matched only."
   (interactive)
   (when-let ((key (tabulated-list-get-id)))
     (let* ((policy (konix/agent-shell-panel-current-data))
@@ -2183,8 +1798,7 @@ next request it would have matched only, then resets itself."
     (konix/agent-shell-panel--refresh)))
 
 (defun konix/agent-shell-policy-menu-delete ()
-  "Remove the key at point from all three axes of the panel's policy.
-Also clears any disabled marker so it does not outlive the rule."
+  "Remove the key at point, and its markers, from the panel's policy."
   (interactive)
   (when-let ((key (tabulated-list-get-id)))
     (let* ((policy (konix/agent-shell-panel-current-data))
@@ -2204,9 +1818,8 @@ Also clears any disabled marker so it does not outlive the rule."
     (konix/agent-shell-panel--refresh)))
 
 (defun konix/agent-shell--permission-key-maybe-insert (command)
-  "Run COMMAND, unless in `agent-shell-mode' at the prompt, where we self-insert.
-Mirrors `konix/agent-shell/scroll-or-track' so bare permission keys stay
-typeable while composing a message and only open the panel when reading output."
+  "Run COMMAND, but self-insert at an idle `agent-shell-mode' prompt.
+Keeps the key typeable while composing a message."
   (if (and (eq major-mode 'agent-shell-mode)
            (shell-maker-point-at-last-prompt-p)
            (not (shell-maker-busy)))
@@ -2215,14 +1828,14 @@ typeable while composing a message and only open the panel when reading output."
 
 ;;;###autoload
 (defun konix/agent-shell/blacklist-menu ()
-  "Open the tool-blacklist control panel for global/project/session editing."
+  "Open the tool blacklist panel."
   (interactive)
   (konix/agent-shell-panel-open
    (konix/agent-shell--policy-panel konix/agent-shell--blacklist)))
 
 ;;;###autoload
 (defun konix/agent-shell/whitelist-menu ()
-  "Open the tool-whitelist control panel for global/project/session editing."
+  "Open the tool whitelist panel."
   (interactive)
   (konix/agent-shell-panel-open
    (konix/agent-shell--policy-panel konix/agent-shell--whitelist)))

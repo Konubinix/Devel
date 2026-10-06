@@ -20,8 +20,8 @@
 
 ;;; Commentary:
 
-;; ERT suite for `KONIX_agent-shell-permissions'.  Run it with `M-x ert' in the
-;; running Emacs -- the module needs `agent-shell', so no `-Q' batch run.
+;; ERT suite for `KONIX_agent-shell-permissions'.  Needs `agent-shell', so run
+;; it in the live Emacs, not `-Q'.
 
 ;;; Code:
 
@@ -35,17 +35,11 @@
 (defconst konix/agent-shell-tests-report-file
   (expand-file-name "../.agent-shell/tmp/permissions-tests.txt"
                     (file-name-directory (or load-file-name buffer-file-name)))
-  "File `konix/agent-shell-tests-run' writes its report to.
-Lets a caller that only gets to load this file read the whole report.")
+  "File `konix/agent-shell-tests-run' writes its report to.")
 
 (defun konix/agent-shell-tests-run (&optional selector report-file)
-  "Run SELECTOR's tests, reporting into the `*konix/agent-shell-tests*' buffer.
-SELECTOR defaults to this file's suite and REPORT-FILE to
-`konix/agent-shell-tests-report-file', so a sibling suite passes its own two.
-ERT's batch reporter writes with `message', so capturing that keeps the whole
-report in one small buffer instead of scattered through *Messages*.  The report
-is also written to REPORT-FILE.  Signals that report when a test fails, so
-loading a test file is itself the check."
+  "Run SELECTOR's tests, reporting to a buffer and to REPORT-FILE.
+Signal the report when a test fails."
   (interactive)
   (let ((selector (or selector "\\`konix/agent-shell-test"))
         (report-file (or report-file konix/agent-shell-tests-report-file))
@@ -71,8 +65,7 @@ loading a test file is itself the check."
 ;; The tool calls a test matches against, one builder per shape.
 
 (defmacro konix/agent-shell-tests--in-project (&rest body)
-  "Run BODY in a throwaway project directory holding an empty `.agent-shell/tmp'.
-A path matcher consults the filesystem, so it needs a project to sit in."
+  "Run BODY in a throwaway project holding an empty `.agent-shell/tmp'."
   (declare (indent 0))
   `(let ((default-directory (file-name-as-directory
                              (make-temp-file "konix-agent-shell-test" t))))
@@ -86,23 +79,20 @@ A path matcher consults the filesystem, so it needs a project to sit in."
     (:raw-input . ((command . ,command)))))
 
 (defun konix/agent-shell-tests--edit-call (&rest arguments)
-  "Return an `edit'-kind tool call, its raw input built from ARGUMENTS.
-ARGUMENTS is a plist read as the parsed ACP input: symbol keys, string values."
+  "Return an `edit' tool call with raw input from plist ARGUMENTS."
   (list (cons :title "Edit")
         (cons :kind "edit")
         (cons :raw-input (cl-loop for (key value) on arguments by #'cddr
                                   collect (cons key value)))))
 
 (defun konix/agent-shell-tests--mcp-call (title &rest arguments)
-  "Return an MCP tool-call titled TITLE, its raw input built from ARGUMENTS.
-ARGUMENTS is a plist read as the parsed ACP input: symbol keys, string values."
+  "Return an MCP tool call titled TITLE with raw input from plist ARGUMENTS."
   (list (cons :title title)
         (cons :raw-input (cl-loop for (key value) on arguments by #'cddr
                                   collect (cons key value)))))
 
 ;;; Questions ------------------------------------------------------------------
-;; What a table asks of each of its command lines.  One argument in, one value
-;; out, so a table stays a list of commands and their answers.
+;; What a table asks of each command line.
 
 (defun konix/agent-shell-tests--evaluator (name command)
   "Return non-nil when the evaluator NAME matches the shell COMMAND line."
@@ -117,16 +107,11 @@ ARGUMENTS is a plist read as the parsed ACP input: symbol keys, string values."
        t))
 
 ;;; Tables ---------------------------------------------------------------------
-;; Every table is a list of (EXPECTED . COMMAND), so reading the commands is
-;; reading the test.  The command doubles as the case's label on failure.
+;; Each case is (EXPECTED . COMMAND); the command labels failures.
 
 (defmacro konix/agent-shell-tests-deftable (test asks &rest cases)
-  "Define ERT TEST comparing (funcall ASKS SUBJECT) to EXPECTED, case by case.
-Each case is (EXPECTED . SUBJECT).  SUBJECT is evaluated in the project, so a
-string stands for itself and a form -- `(expand-file-name \"x\")' -- for what
-it returns; EXPECTED is taken as written.  A leading `(:setup FORM...)' is not
-a case: its forms run first, in the throwaway project the cases then run in
-\(`konix/agent-shell-tests--in-project')."
+  "Define ERT TEST checking each (EXPECTED . SUBJECT) with ASKS.
+SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
   (declare (indent 2))
   (let ((setup (when (eq (car-safe (car cases)) :setup)
                  (cdr (pop cases)))))
@@ -149,9 +134,7 @@ a case: its forms run first, in the throwaway project the cases then run in
      ,@cases))
 
 (defmacro konix/agent-shell-tests-deftest-key (test key &rest cases)
-  "Define ERT TEST checking policy KEY against CASES, each (EXPECTED . COMMAND).
-Unlike `konix/agent-shell-tests-deftest-evaluator' this goes through key
-parsing, so KEY may carry arguments."
+  "Define ERT TEST checking policy KEY, arguments allowed, against CASES."
   (declare (indent 2))
   `(konix/agent-shell-tests-deftable ,test
        (lambda (command) (konix/agent-shell-tests--key ,key command))
@@ -170,11 +153,11 @@ parsing, so KEY may carry arguments."
   (t . "sed -n '/a/,$p' foo.txt")
   (t . "sed -n '1p'")                            ; reads stdin
   (t . (format "sed -n '1,5p' %s" (expand-file-name "notes.txt")))
-  ;; where the output lands is `@writes-outside'' business, not this one's
+  ;; redirections are `@writes-outside''s job
   (t . "sed -n '1p' foo.txt > out.txt")
   (t . "sed -n '1p' foo.txt 2> err.txt")
   (t . "sed -n '2518,2545p' ./.agent-shell/tmp/run-failed.txt > ./.agent-shell/tmp/missing-keys.txt 2>&1")
-  (t . "sed -n '1p' foo.txt | head -3")         ; a read-only filter changes nothing
+  (t . "sed -n '1p' foo.txt | head -3")         ; read-only filter
   (t . "sed -n '1p' < foo.txt"))
 
 (konix/agent-shell-tests-deftest-evaluator
@@ -204,7 +187,7 @@ parsing, so KEY may carry arguments."
   (nil . "sed -n '1,5p' $HOME/.ssh/id_rsa")
   (nil . "sed -n '1,5p' ../other/secret")
   (nil . "sed -n '1p' < /etc/shadow")
-  (nil . "sed -n '1p' foo.txt | head -3 /etc/shadow")) ; that filter reads a file
+  (nil . "sed -n '1p' foo.txt | head -3 /etc/shadow")) ; filter reads a file
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-read-only-sed-in-a-given-directory
@@ -235,10 +218,10 @@ parsing, so KEY may carry arguments."
   (nil . "/etc/shadow")
   (nil . "~/.ssh/id_rsa")
   (nil . "escape/shadow")
-  ;; the `..' of a symlinked directory is its target's parent
+  ;; a symlink's `..' is its target's parent
   (nil . "escape/../shadow")
   (nil . "sub/../escape/../shadow")
-  ;; a remote name is refused before Tramp gets to reach the host
+  ;; remote names are refused before Tramp connects
   (nil . "/ssh:host:/etc/shadow")
   (nil . "/sudo::/etc/shadow"))
 
@@ -275,11 +258,11 @@ parsing, so KEY may carry arguments."
   (t . "find . -regextype posix-extended -regex '.*\\.el$' -print0")
   (t . "find . -name '*.el' -ls")
   (t . "find . -path './.git' -prune -o -print")
-  ;; where the output lands is `@writes-outside'' business, not this one's
+  ;; redirections are `@writes-outside''s job
   (t . "find . -name '*.el' > ./.agent-shell/tmp/els.txt")
   (t . "find . -name '*.el' >> .agent-shell/tmp/els.txt 2>&1")
   (t . "find . -name '*.el' 2> err.txt")
-  (t . "find . -name '*.el' | head -3"))         ; a read-only filter changes nothing
+  (t . "find . -name '*.el' | head -3"))         ; read-only filter
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-find-refuses-writes "read-only-find"
@@ -344,7 +327,7 @@ parsing, so KEY may carry arguments."
   (t . "gh api repos/o/r/issues/352/comments")
   (t . "gh api foo | jq .")
   (t . "gh api -X GET foo -f state=open")
-  ;; where the output lands is `@writes-outside'' business, not this one's
+  ;; redirections are `@writes-outside''s job
   (t . "gh api repos/o/r/issues/352/comments --jq '.[] | \"\\(.user.login)\"' > ./.agent-shell/tmp/c.txt")
   (t . "gh api foo >> .agent-shell/tmp/o.json")
   (t . "gh api foo | jq . > /etc/passwd")
@@ -427,7 +410,7 @@ parsing, so KEY may carry arguments."
   (nil . "gh api foo &> .agent-shell/tmp/e.txt")
   (nil . "gh api foo &>> .agent-shell/tmp/e.txt")
   (nil . "gh api foo 2> .agent-shell/tmp/e.txt")
-  ;; an angle bracket the shell never reads as an operator
+  ;; a `>' the shell never reads as an operator
   (nil . "grep --only-matching -i \"doom[^\\\"<>]\\{0,60\\}\" beth.html")
   (nil . "grep -o 'a[^<>]*' f.html")
   (nil . "echo \"a > b\"")
@@ -454,7 +437,7 @@ parsing, so KEY may carry arguments."
   (t . "gh api foo >| /etc/passwd")
   (t . "gh api foo >& /etc/passwd")
   (t . "(gh api foo > /etc/passwd)")
-  ;; a target we cannot read is a target we must assume is outside
+  ;; an unreadable target counts as outside
   (t . "gh api foo > $(mktemp)")
   (t . "gh api foo > >(cat)"))
 
@@ -589,7 +572,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-mcp-scopes-a-tool-to-an-argument
     (lambda (case) (apply #'konix/agent-shell-tests--mcp case))
-  ;; the tool called on that very file, named short or in full
+  ;; that file, the tool named short or in full
   (t . (list konix/agent-shell-tests--review-key
              "mcp__konix-emacs-elisp__load_file"))
   (t . '("@mcp(mcp__konix-emacs-elisp__load_file)"
@@ -605,7 +588,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
                "mcp__konix-emacs-elisp__reload_and_restart"))
   (nil . '("@mcp(mcp__konix-emacs-elisp__load_file)"
            "mcp__other-server__load_file"))
-  ;; the value must be an argument, not one of the argument names
+  ;; the value matches arguments, not their names
   (nil . '("@mcp(load_file, file-path)"
            "mcp__konix-emacs-elisp__load_file")))
 
@@ -615,7 +598,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
       (and (konix/agent-shell-tool-match-p
             konix/agent-shell-tests--review-key call)
            t))
-  ;; a shell call naming the file is not an MCP call at all
+  ;; a shell call naming the file is no MCP call
   (nil . (konix/agent-shell-tests--shell-call
           (concat "rm " konix/agent-shell-tests--review))))
 
@@ -630,7 +613,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
               "mcp__konix-emacs-elisp__load_file"
               'file-path konix/agent-shell-tests--review)
              '((:kind . "other"))))
-  ;; a shell call yields its kind and the keys its commands make
+  ;; a shell call: its kind, then its commands' keys
   (("execute" "^rm -f tests/\\.coverage\\.\\*" "$ rm *" "^rm\\b")
    . (konix/agent-shell-tests--shell-call "rm -f tests/.coverage.*")))
 
@@ -649,7 +632,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-mcp-candidates-skip-unwritable-values
     #'konix/agent-shell--mcp-candidates
-  ;; a blob, a multi-line form and a comma-bearing value make no candidate
+  ;; a blob, a multi-line form, a comma: no candidate
   (("@mcp(mcp__konix-emacs-elisp__load_file)")
    . (konix/agent-shell-tests--mcp-call
       "mcp__konix-emacs-elisp__load_file"
@@ -719,7 +702,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
       (konix/agent-shell-tests--key
        (konix/agent-shell-tests--shell-policy-key "clk --help > /tmp/out.txt")
        command))
-  ;; the key it offers matches the call it came from, not one merely holding it
+  ;; its own call, not one merely holding it
   (t . "clk --help > /tmp/out.txt")
   (t . "clk --help extension")
   (nil . "echo clk --help"))
@@ -727,16 +710,16 @@ PATH defaults to `konix/agent-shell-tests--review'."
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-policy-key-of-other-tools
     #'konix/agent-shell--tool-call-policy-key
-  ;; an MCP call is named by tool and argument
+  ;; MCP: tool and argument
   ("@mcp(mcp__konix-emacs-elisp__load_file, /home/sam/prog/devel/elfiles/KONIX_mcp-server-code-review.el)"
    . (konix/agent-shell-tests--mcp-call
       "mcp__konix-emacs-elisp__load_file"
       'file-path konix/agent-shell-tests--review))
-  ;; no argument to name it by, so the tool alone
+  ;; no argument: the tool alone
   ("@mcp(mcp__konix-emacs-buffers__readonly_list_buffers)"
    . (konix/agent-shell-tests--mcp-call
       "mcp__konix-emacs-buffers__readonly_list_buffers"))
-  ;; an edit, a write and any other non-MCP tool: the title, then the kind
+  ;; other tools: the title, else the kind
   ("^perm\\.org"
    . '((:title . "perm.org") (:kind . "edit")
        (:raw-input . ((file_path . "/home/sam/prog/devel/perm.org")
@@ -938,9 +921,8 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (nil . "gh pr list | xargs rm"))
 
 (defun konix/agent-shell-tests--evaluator-names (key)
-  "Return the evaluator names KEY references, spelt as `@NAME' is.
-Reads a bare `@NAME' key and the `\"@NAME\"' leaves of an `and'/`or'/`not'
-form.  An `@' anywhere else in a regexp key names no evaluator."
+  "Return the evaluator names KEY references.
+Only a bare `@NAME' key or a `\"@NAME\"' form leaf counts."
   (when (stringp key)
     (let ((start 0) (names '()))
       (while (string-match "\\(?:\\`\\|\"\\)@\\([a-z0-9-]+\\)" key start)
@@ -949,10 +931,8 @@ form.  An `@' anywhere else in a regexp key names no evaluator."
       (nreverse names))))
 
 (defun konix/agent-shell-tests-unknown-evaluator-keys (entries)
-  "Return the ENTRIES keys naming an evaluator nobody registered.
-`konix/agent-shell--key-matches-p' resolves such a key to nil and says
-nothing, so the rule never fires and nothing says so.  Call it on a project's
-own alist to check that project."
+  "Return the ENTRIES keys naming an unregistered evaluator.
+Such a rule silently never fires."
   (seq-filter
    (lambda (entry)
      (seq-some (lambda (name)
@@ -973,15 +953,13 @@ own alist to check that project."
     konix/agent-shell-test-unknown-evaluator-keys
     #'konix/agent-shell-tests-unknown-evaluator-keys
   ((("@ghapi" . "")) . '(("@ghapi" . "") ("@gh-read" . "") ("^make" . "")))
-  ;; a mistyped `@NAME' makes a rule that can never fire, in silence
+  ;; a mistyped `@NAME' would silently never fire
   (nil . konix/agent-shell-tool-blacklist-global)
   (nil . konix/agent-shell-tool-whitelist-global))
 
 (defun konix/agent-shell-tests--verdict (command)
-  "Return what the two policies decide for COMMAND: `deny', `allow' or `prompt'.
-Mirrors `konix/agent-shell--policy-responder' without its dialog.  The project
-and session axes are stubbed empty -- reading either wants a live agent-shell
-buffer -- so the verdict is the one the global axis alone gives."
+  "Return `deny', `allow' or `prompt' for COMMAND, global policies only.
+Project and session axes are stubbed: they need a live buffer."
   (cl-letf (((symbol-function 'konix/agent-shell-policy--project-entries)
              (lambda (_policy) nil))
             ((symbol-function 'konix/agent-shell-policy--session-entries)
@@ -995,10 +973,8 @@ buffer -- so the verdict is the one the global axis alone gives."
       (cond (denied 'deny) (allowed 'allow) (t 'prompt)))))
 
 (defmacro konix/agent-shell-tests-deftest-verdict (test policies &rest cases)
-  "Define ERT TEST checking the composed verdict against CASES.
-Each case is (EXPECTED . COMMAND), EXPECTED one of `deny', `allow', `prompt'.
-POLICIES is a `let' binding list installing the two global policies, so a test
-says which configuration it runs on."
+  "Define ERT TEST checking the verdict of each (EXPECTED . COMMAND).
+POLICIES is a `let' binding list setting the global policies."
   (declare (indent 2))
   `(ert-deftest ,test ()
      (konix/agent-shell-tests--in-project
@@ -1052,9 +1028,7 @@ says which configuration it runs on."
   (t . (konix/agent-shell-tests--edit-call
         'file_path "notes.txt" 'new_string "export SECRET_TOKEN=x")))
 
-;; The loaded configuration, asked in the safe direction only -- never `allow'
-;; -- so customizing a policy cannot break this, while dropping a guard during
-;; a refactor will.
+;; The live policies must allow none of these, however customized.
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-live-policies-approve-none-of-these
     (lambda (command) (eq (konix/agent-shell-tests--verdict command) 'allow))

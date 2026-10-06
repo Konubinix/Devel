@@ -1007,70 +1007,38 @@ name is refused before checking it, which would have Tramp reach the host."
        (not (file-remote-p (expand-file-name argument)))
        (not (file-exists-p argument))))
 
-(konix/agent-shell-define-tool-evaluator "project-paths" (tool-call)
-  "Match a line no argument of which reaches outside the project.
-An argument resolving out of it (`konix/agent-shell--path-inside-project-p')
-or not statically knowable does not, unless it is no path at all
-\(`konix/agent-shell--not-a-path-p')."
-  (konix/agent-shell--with-bash-ast root tool-call
-    (seq-every-p
-     (lambda (command)
-       (let ((arguments (konix/agent-shell--command-argument-literals command)))
-         (and (not (memq nil arguments))
-              (seq-every-p (lambda (argument)
-                             (or (konix/agent-shell--path-inside-project-p argument)
-                                 (konix/agent-shell--not-a-path-p argument)))
-                           arguments))))
-     (konix/agent-shell--command-nodes root))))
-
-(konix/agent-shell-define-tool-evaluator "command-args-inside"
-    (tool-call &optional name directory)
-  "Match a command whose name matches the regexp NAME, called on something
-inside DIRECTORY.  Reference the pair as `@command-args-inside(NAME,
-DIRECTORY)'.  One argument resolving inside DIRECTORY is enough; an argument
-whose value is not statically knowable resolves nowhere."
-  (and name directory
-       (konix/agent-shell--with-bash-ast root tool-call
-         (seq-some
-          (lambda (command)
-            (let ((words (konix/agent-shell--command-unwrapped command)))
-              (and (car words)
-                   (string-match-p (concat "\\`\\(?:" name "\\)\\'")
-                                   (konix/agent-shell--normalized-command-name
-                                    (car words)))
-                   (seq-some
-                    (lambda (argument)
-                      (konix/agent-shell--path-inside-p argument directory))
-                    (cdr words)))))
-          (konix/agent-shell--command-nodes root)))))
-
-(defun konix/agent-shell--file-tool-target-paths (tool-call)
-  "Return the paths TOOL-CALL targets, or nil when it runs a command line.
-A shell command writing a file is `@writes-outside''s business.  See
-`konix/agent-shell--tool-call-target-paths'."
-  (unless (konix/agent-shell--tool-call-command tool-call)
+(defun konix/agent-shell--call-paths (tool-call)
+  "Return the paths TOOL-CALL names: its commands' arguments when it runs a
+command line -- nil for one not statically knowable -- its targets otherwise.
+Where a shell command writes is `@writes-outside''s business."
+  (if (konix/agent-shell--tool-call-command tool-call)
+      (konix/agent-shell--with-bash-ast root tool-call
+        (mapcan #'konix/agent-shell--command-argument-literals
+                (konix/agent-shell--command-nodes root)))
     (konix/agent-shell--tool-call-target-paths tool-call)))
 
-(konix/agent-shell-define-tool-evaluator "edits-inside" (tool-call &optional directory)
-  "Match an `edit' tool call every target of which is inside DIRECTORY.
-Reference it as `@edits-inside(DIRECTORY)'.  The call must name at least one
-target; a missing DIRECTORY matches nothing."
-  (and directory
-       (equal (map-elt tool-call :kind) "edit")
-       (let ((paths (konix/agent-shell--file-tool-target-paths tool-call)))
-         (and paths
-              (seq-every-p (lambda (path)
-                             (konix/agent-shell--path-inside-p path directory))
-                           paths)))))
+(konix/agent-shell-define-tool-evaluator "inside" (tool-call &optional directory)
+  "Match a call every path of which is inside DIRECTORY, the project by default.
+See `konix/agent-shell--call-paths'.  One not statically knowable is outside,
+unless it is no path at all (`konix/agent-shell--not-a-path-p').  A file tool
+naming no target matches nothing.  Reference it as `@inside(DIRECTORY)'."
+  (let ((directory (or directory default-directory))
+        (paths (konix/agent-shell--call-paths tool-call)))
+    (and (or paths (konix/agent-shell--tool-call-command tool-call))
+         (seq-every-p (lambda (path)
+                        (and path
+                             (or (konix/agent-shell--path-inside-p path directory)
+                                 (konix/agent-shell--not-a-path-p path))))
+                      paths))))
 
-(konix/agent-shell-define-tool-evaluator "targets-inside" (tool-call &optional directory)
-  "Match a file tool call naming a target inside DIRECTORY, whatever its kind.
-Reference it as `@targets-inside(DIRECTORY)'.  `@edits-inside' quantified the
-other way, so both fail closed: one target inside is enough here."
+(konix/agent-shell-define-tool-evaluator "touches" (tool-call &optional directory)
+  "Match a call naming a path inside DIRECTORY, one being enough.
+See `konix/agent-shell--call-paths'; one not statically knowable is nowhere.
+Reference it as `@touches(DIRECTORY)'."
   (and directory
        (seq-some (lambda (path)
-                   (konix/agent-shell--path-inside-p path directory))
-                 (konix/agent-shell--file-tool-target-paths tool-call))))
+                   (and path (konix/agent-shell--path-inside-p path directory)))
+                 (konix/agent-shell--call-paths tool-call))))
 
 (konix/agent-shell-define-tool-evaluator "use-a-wrong-tmp-dir" (tool-call)
   "Match a tool call reaching into a temp directory other than ./.agent-shell/tmp.
@@ -1087,10 +1055,7 @@ $TMPDIR or /tmp without ever naming the directory."
                                   (list tmpdir)))))))
     (konix/agent-shell-tool-match-p
      `(or "^mktemp\\b"
-          ,@(mapcan (lambda (dir)
-                      (list (format "@command-args-inside(.+, %s)" dir)
-                            (format "@targets-inside(%s)" dir)))
-                    dirs))
+          ,@(mapcar (lambda (dir) (format "@touches(%s)" dir)) dirs))
      tool-call)))
 
 ;;; Policy variables -----------------------------------------------------------
@@ -1109,7 +1074,7 @@ $TMPDIR or /tmp without ever naming the directory."
     ("^cd\\b" . "Don't cd")
     ("^\\(bash -c\\|python3? -c\\|python3? - <<\\)" . "No oneliner")
     ("@edit-agent-permissions" . "Ask the user to do this")
-    ("@command-args-inside(find, ~/.emacs.d)" . "Use the mcp tools")
+    ("(and \"^find\\\\b\" \"@touches(~/.emacs.d)\")" . "Use the mcp tools")
     )
   "GLOBAL baseline alist of (KEY . REASON) blacklisted tools.
 Applied to every session, beneath the project and session layers which
@@ -1129,8 +1094,8 @@ in the project.")
   "Buffer-local SESSION alist of (KEY . REASON) blacklisted tools.")
 
 (defcustom konix/agent-shell-tool-whitelist-global
-  '(("@edits-inside(.agent-shell/tmp)" . "Edits and writes confined to ./.agent-shell/tmp/")
-    ("(and \"^\\\\(tar\\\\|wc\\\\|rm\\\\|man\\\\|grep\\\\|date\\\\|uniq\\\\|head\\\\|awk\\\\|sed\\\\|mmdc\\\\|plantuml\\\\|jq\\\\|strings\\\\|base64\\\\|ls\\\\|sqlite3\\\\|rg\\\\|tail\\\\|sort\\\\|cut\\\\|mkdir\\\\|unzip\\\\|diff\\\\|echo\\\\|which\\\\|openscad\\\\|argdown\\\\|true\\\\|false\\\\|cat\\\\)\\\\( \\\\|$\\\\)\" \"@project-paths\")" . "commands on project files")
+  '(("(and \"^edit$\" \"@inside(.agent-shell/tmp)\")" . "Edits and writes confined to ./.agent-shell/tmp/")
+    ("(and \"^\\\\(tar\\\\|wc\\\\|rm\\\\|man\\\\|grep\\\\|date\\\\|uniq\\\\|head\\\\|awk\\\\|sed\\\\|mmdc\\\\|plantuml\\\\|jq\\\\|strings\\\\|base64\\\\|ls\\\\|sqlite3\\\\|rg\\\\|tail\\\\|sort\\\\|cut\\\\|mkdir\\\\|unzip\\\\|diff\\\\|echo\\\\|which\\\\|openscad\\\\|argdown\\\\|true\\\\|false\\\\|cat\\\\)\\\\( \\\\|$\\\\)\" \"@inside\")" . "commands on project files")
     ("^\\(ba\\)?sh -n")
     ("^mcp__konix-browser__readonly")
     ("^nix-instantiate --parse")

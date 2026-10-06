@@ -460,7 +460,7 @@ parsing, so KEY may carry arguments."
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-lone-reader-accepts
-    "(and \"^\\\\(grep\\\\|tail\\\\|sort\\\\|cut\\\\|cat\\\\|uniq\\\\)\\\\( \\\\|$\\\\)\" \"@project-paths\")"
+    "(and \"^\\\\(grep\\\\|tail\\\\|sort\\\\|cut\\\\|cat\\\\|uniq\\\\)\\\\( \\\\|$\\\\)\" \"@inside\")"
   (t . "grep -iE \"error|not found|cannot|failed to\" ./.agent-shell/tmp/libs-fail.txt > ./.agent-shell/tmp/libs-errors.txt 2>&1")
   (t . "grep -rn foo")
   (t . "tail -n 50 .agent-shell/tmp/run.txt")
@@ -470,7 +470,7 @@ parsing, so KEY may carry arguments."
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-lone-reader-refuses
-    "(and \"^\\\\(grep\\\\|tail\\\\|sort\\\\|cut\\\\|cat\\\\|uniq\\\\)\\\\( \\\\|$\\\\)\" \"@project-paths\")"
+    "(and \"^\\\\(grep\\\\|tail\\\\|sort\\\\|cut\\\\|cat\\\\|uniq\\\\)\\\\( \\\\|$\\\\)\" \"@inside\")"
   (nil . "sortx notes.txt")                        ; not a listed command
   (nil . "grep foo bar | sh")
   (nil . "grep foo bar && rm -rf /")
@@ -483,10 +483,10 @@ parsing, so KEY may carry arguments."
   (nil . ""))
 
 (konix/agent-shell-tests-deftable
-    konix/agent-shell-test-edits-inside-scopes-edits-to-a-directory
+    konix/agent-shell-test-inside-scopes-edits-to-a-directory
     (lambda (path)
       (and (konix/agent-shell-tool-match-p
-            "@edits-inside(.agent-shell/tmp)"
+            "(and \"^edit$\" \"@inside(.agent-shell/tmp)\")"
             (konix/agent-shell-tests--edit-call 'file_path path))
            t))
   (t . ".agent-shell/tmp/notes.txt")
@@ -501,9 +501,10 @@ parsing, so KEY may carry arguments."
   (nil . nil))
 
 (konix/agent-shell-tests-deftable
-    konix/agent-shell-test-edits-inside-reads-targets-only
+    konix/agent-shell-test-inside-reads-targets-only
     (lambda (call)
-      (and (konix/agent-shell-tool-match-p "@edits-inside(.agent-shell/tmp)" call)
+      (and (konix/agent-shell-tool-match-p
+            "(and \"^edit$\" \"@inside(.agent-shell/tmp)\")" call)
            t))
   ;; every target must be inside, not just one
   (nil . (konix/agent-shell-tests--edit-call
@@ -521,8 +522,8 @@ parsing, so KEY may carry arguments."
                           (file_path . ".agent-shell/tmp/n.txt"))))))
 
 (konix/agent-shell-tests-deftest-key
-    konix/agent-shell-test-command-args-inside-scopes-to-the-command
-    "@command-args-inside(find, ~/.emacs.d)"
+    konix/agent-shell-test-touches-scopes-to-the-command
+    "(and \"^find\\\\b\" \"@touches(~/.emacs.d)\")"
   (t . "find ~/.emacs.d -name \"*.el\"")
   (t . "find ~/.emacs.d/elpa -maxdepth 1")
   (t . "find $HOME/.emacs.d -name \"*.el\"")
@@ -534,17 +535,17 @@ parsing, so KEY may carry arguments."
   (nil . "find $(cat list) -name x")               ; unreadable, so a prompt
   (nil . "echo find ~/.emacs.d"))                  ; named, not walked
 
-(defun konix/agent-shell-tests--targets-inside-p (call)
-  "Non-nil when CALL matches `@targets-inside' on the project's `inside/'."
+(defun konix/agent-shell-tests--touches-p (call)
+  "Non-nil when CALL matches `@touches' on the project's `inside/'."
   (and (konix/agent-shell-tool-match-p
-        (format "@targets-inside(%s)" (expand-file-name "inside"))
+        (format "@touches(%s)" (expand-file-name "inside"))
         call)
        t))
 
 (konix/agent-shell-tests-deftable
-    konix/agent-shell-test-targets-inside-catches-any-target
+    konix/agent-shell-test-touches-catches-any-target
     (lambda (path)
-      (konix/agent-shell-tests--targets-inside-p
+      (konix/agent-shell-tests--touches-p
        (konix/agent-shell-tests--edit-call
         'file_path (expand-file-name path))))
   (:setup (make-directory "inside"))
@@ -553,8 +554,8 @@ parsing, so KEY may carry arguments."
   (nil . "outside/notes.txt"))
 
 (konix/agent-shell-tests-deftable
-    konix/agent-shell-test-targets-inside-whatever-the-call
-    #'konix/agent-shell-tests--targets-inside-p
+    konix/agent-shell-test-touches-whatever-the-call
+    #'konix/agent-shell-tests--touches-p
   (:setup (make-directory "inside"))
   ;; whatever the kind of the call
   (t . (cons '(:kind . "read")
@@ -917,7 +918,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
                    case))))
 
 (konix/agent-shell-tests-deftest-key
-    konix/agent-shell-test-project-paths "@project-paths"
+    konix/agent-shell-test-inside "@inside"
   (:setup (make-symbolic-link "/etc" "e\\tc"))
   (t . "grep -n foo bar.el")
   ;; a backslash makes a regexp, not a path
@@ -963,8 +964,8 @@ own alist to check that project."
     konix/agent-shell-test-evaluator-names
     #'konix/agent-shell-tests--evaluator-names
   (("gh-read") . "@gh-read")
-  (("edits-inside" "project-paths")
-   . "(and \"@edits-inside(doc)\" \"@project-paths\")")
+  (("touches" "inside")
+   . "(and \"@touches(doc)\" \"@inside\")")
   (nil . "^curl .+@example\\.com")
   (nil . nil))
 

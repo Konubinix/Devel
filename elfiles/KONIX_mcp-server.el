@@ -376,57 +376,57 @@ MCP Parameters:
                           (let ((ok (funcall konix/mcp-server--orig-confirm info)))
                             (unless ok (setq declined t))
                             ok))))
-              (condition-case err
-                  (let* ((result-str
-                          (if whole
-                              (progn
-                                (when force
-                                  (org-babel-remove-result-one-or-many t))
-                                (org-babel-execute-buffer)
-                                (format "Executed all babel blocks in buffer %s%s"
-                                        buffer-name
-                                        (if force " (forced)" "")))
-                            (let* ((src-pos (org-babel-find-named-block block-name))
-                                   (call-pos (unless src-pos
-                                               (konix/mcp-server--find-named-call block-name)))
-                                   (pos (or src-pos call-pos)))
-                              (unless pos
-                                (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
-                              (goto-char pos)
-                              (let* ((info (if call-pos
-                                               (org-babel-lob-get-info)
-                                             (org-babel-get-src-block-info)))
-                                     (result (progn
-                                               (when force (org-babel-remove-result info))
-                                               (org-babel-execute-src-block nil info))))
-                                (if result
-                                    (format "%s" result)
-                                  "Block executed successfully (no result returned)")))))
-                         (error-buf (get-buffer "*Org-Babel Error Output*"))
-                         (error-output (when error-buf
-                                         (with-current-buffer error-buf
-                                           (buffer-substring-no-properties
-                                            (point-min) (point-max))))))
-                    (if declined
-                        (format "STOP: the babel evaluation was DECLINED by the user at the interactive confirmation prompt%s.  Nothing was evaluated and the buffer was NOT saved.  Do not retry blindly — ask the user how they want to proceed (inspect or adjust the block, run it themselves, or skip it)."
-                                (if whole "" (format " for block '%s'" block-name)))
-                      (prog1
+              (unwind-protect
+                  (condition-case err
+                      (let* ((result-str
+                              (if whole
+                                  (progn
+                                    (when force
+                                      (org-babel-remove-result-one-or-many t))
+                                    (org-babel-execute-buffer)
+                                    (format "Executed all babel blocks in buffer %s%s"
+                                            buffer-name
+                                            (if force " (forced)" "")))
+                                (let* ((src-pos (org-babel-find-named-block block-name))
+                                       (call-pos (unless src-pos
+                                                   (konix/mcp-server--find-named-call block-name)))
+                                       (pos (or src-pos call-pos)))
+                                  (unless pos
+                                    (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
+                                  (goto-char pos)
+                                  (let* ((info (if call-pos
+                                                   (org-babel-lob-get-info)
+                                                 (org-babel-get-src-block-info)))
+                                         (result (progn
+                                                   (when force (org-babel-remove-result info))
+                                                   (org-babel-execute-src-block nil info))))
+                                    (if result
+                                        (format "%s" result)
+                                      "Block executed successfully (no result returned)")))))
+                             (error-buf (get-buffer "*Org-Babel Error Output*"))
+                             (error-output (when error-buf
+                                             (with-current-buffer error-buf
+                                               (buffer-substring-no-properties
+                                                (point-min) (point-max))))))
+                        (if declined
+                            (format "STOP: the babel evaluation was DECLINED by the user at the interactive confirmation prompt%s.  Nothing was evaluated.  Do not retry blindly — ask the user how they want to proceed (inspect or adjust the block, run it themselves, or skip it)."
+                                    (if whole "" (format " for block '%s'" block-name)))
                           (if (and error-output (not (string-empty-p error-output)))
                               (format "%s\n--- *Org-Babel Error Output* ---\n%s"
                                       result-str error-output)
-                            result-str)
-                        (when (buffer-file-name)
-                          (save-buffer)))))
-                (error
-                 (let ((error-buf (get-buffer "*Org-Babel Error Output*")))
-                   (error "Babel execution error in buffer %s%s: %s\n%s"
-                          buffer-name
-                          (if whole "" (format " block '%s'" block-name))
-                          (error-message-string err)
-                          (if error-buf
-                              (with-current-buffer error-buf
-                                (buffer-substring-no-properties (point-min) (point-max)))
-                            "")))))))))))))
+                            result-str)))
+                    (error
+                     (let ((error-buf (get-buffer "*Org-Babel Error Output*")))
+                       (error "Babel execution error in buffer %s%s: %s\n%s"
+                              buffer-name
+                              (if whole "" (format " block '%s'" block-name))
+                              (error-message-string err)
+                              (if error-buf
+                                  (with-current-buffer error-buf
+                                    (buffer-substring-no-properties (point-min) (point-max)))
+                                "")))))
+                (when (and (buffer-file-name) (buffer-modified-p))
+                  (save-buffer)))))))))))
 
 (defun konix/mcp-server--tangle-with-context (tangle)
   "Call TANGLE, and on error re-signal it with the context an agent needs.
@@ -436,8 +436,11 @@ the error and the heading point was under are added to it."
   (let ((org-confirm-babel-evaluate nil)
         (trace nil))
     (condition-case err
-        (handler-bind ((error (lambda (_) (setq trace (backtrace-to-string)))))
-          (funcall tangle))
+        (unwind-protect
+            (handler-bind ((error (lambda (_) (setq trace (backtrace-to-string)))))
+              (funcall tangle))
+          (when (and (buffer-file-name) (buffer-modified-p))
+            (save-buffer)))
       (error
        (error "%s\nat line %d, under heading %S\nbacktrace:\n%s"
               (error-message-string err)

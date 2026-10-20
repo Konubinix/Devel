@@ -2,6 +2,7 @@
 [revset-aliases]
 "mine_deps()" = "bookmarks() ~ (mine | trunk())"
 "dangling()" = "all() ~ (ancestors(bookmarks() | remote_bookmarks() | tags() | @) | root())"
+"immutable_heads()" = 'builtin_immutable_heads() ~ untracked_remote_bookmarks(remote=exact:"fork")'
 [aliases]
 update-mine = ["rebase", "-r", "mine", "-o", "mine_deps()"]
 all = ["logs", "-r", "all()"]

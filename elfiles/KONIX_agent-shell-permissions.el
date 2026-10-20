@@ -520,18 +520,22 @@ unknowable ones kept as written."
   (string-match-p regexp (konix/agent-shell--command-name command)))
 
 (konix/agent-shell-define-tool-evaluator "lost-search" (tool-call)
-  "Match a recursive search over a broad root.
+  "Match a recursive search, or a grep tool call, over a broad root.
 See `konix/shell-search-broad-roots'.  The mark of a lost agent brute-forcing
 instead of asking."
-  (konix/agent-shell--with-bash-ast root tool-call
-    (seq-some
-     (lambda (c)
-       (let ((name (konix/agent-shell--command-name c))
-             (arguments (konix/agent-shell--command-argument-literals c)))
-         (and (konix/shell-search-recursive-p name arguments)
-              (seq-some #'konix/shell-search-broad-root-p
-                        (konix/shell-search-roots name arguments)))))
-     (konix/agent-shell--command-nodes root))))
+  (seq-some
+   #'konix/shell-search-broad-root-p
+   (if (konix/agent-shell--tool-call-command tool-call)
+       (konix/agent-shell--with-bash-ast root tool-call
+         (seq-mapcat
+          (lambda (c)
+            (let ((name (konix/agent-shell--command-name c))
+                  (arguments (konix/agent-shell--command-argument-literals c)))
+              (when (konix/shell-search-recursive-p name arguments)
+                (konix/shell-search-roots name arguments))))
+          (konix/agent-shell--command-nodes root)))
+     (when (string-match-p "grep" (or (map-elt tool-call :title) ""))
+       (konix/agent-shell--call-paths tool-call)))))
 
 (defconst konix/agent-shell--command-wrappers
   '(("timeout" . "\\`[0-9]+\\(?:\\.[0-9]+\\)?[smhd]?\\'")
@@ -849,6 +853,7 @@ matches."
 (defcustom konix/agent-shell-tool-blacklist-global
   `(("@use-a-wrong-tmp-dir" . "Write temp files into ./.agent-shell/tmp/ instead")
     ("^sleep" . "Use the sleep tool")
+    ("^\\(grep\\|rg\\)" . "Use the readonly_grep tool")
     ("@writes-outside(.agent-shell/tmp)" . "Redirect output into ./.agent-shell/tmp/ instead")
     ("^command -v" . "Use nix-shell")
     ("python3 -m json.tool" . "jq")
@@ -874,6 +879,7 @@ agent."
 (defcustom konix/agent-shell-tool-whitelist-global
   '(("(and \"^edit$\" \"@inside(.agent-shell/tmp)\")" . "Edits and writes confined to ./.agent-shell/tmp/")
     ("@project-commands" . "commands on project files")
+    ("(and \"@mcp(konix-files__readonly_grep$)\" (or \"@inside\" \"@inside(/home/sam/prog/devel/)\" \"@own-session\"))" . "grep on project files and the session's own")
     ("^\\(ba\\)?sh -n")
     ("^mcp__konix-browser__readonly")
     ("^nix-instantiate --parse")

@@ -60,6 +60,7 @@ reference-counted server-side so the themed servers coexist safely."
   `(("konix-browser" . ,(konix/agent-shell-mcp-http-server "konix-browser" "browser"))
     ("konix-legal"   . ,(konix/agent-shell-mcp-http-server "konix-legal" "legal"))
     ("konix-notes"   . ,(konix/agent-shell-mcp-http-server "konix-notes" "notes"))
+    ("konix-files"   . ,(konix/agent-shell-mcp-http-server "konix-files" "files"))
     ("konix-coord"   . ,(konix/agent-shell-mcp-http-server "konix-coord" "coord"))
     ("konix-qutebrowser" . ,(konix/agent-shell-mcp-http-server "konix-qutebrowser" "qutebrowser"))
 
@@ -89,7 +90,7 @@ reference-counted server-side so the themed servers coexist safely."
   "Alist of (NAME . SERVER-CONFIG) for all available MCP servers.")
 
 (defcustom konix/agent-shell-mcp-enabled-servers
-  '("konix-coord" "konix-emacs-agents")
+  '("konix-coord" "konix-emacs-agents" "konix-files")
   "Globally enabled MCP server names (the baseline for every project).
 A project adds to this baseline from its `.dir-locals.el' by setting
 `konix/agent-shell-mcp-project-servers' to a list of registry names:

@@ -52,7 +52,6 @@
   "Non-nil while we submit our own guidance, so the round counter is not reset.")
 (defvar-local konix/agent-shell-steering--cap-stopped nil
   "Non-nil once the cap was hit and control handed back; cleared on a human prompt.")
-
 ;;; Trigger events -------------------------------------------------------------
 
 (defcustom konix/agent-shell-steering-trigger-events

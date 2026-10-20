@@ -38,6 +38,8 @@
      (when (and
             (equal major-mode 'org-mode)
             (string-match-p "/\\(wiki\\|roam\\)/" (buffer-file-name))
+            (not (string-match-p "\\.ws\\.org\\'" (buffer-file-name)))
+            (not (string-match-p "/\\.agent-shell/" (buffer-file-name)))
             (not (save-excursion
                    (goto-char (point-min))
                    (re-search-forward "#\\+NODATE" 3000 t)

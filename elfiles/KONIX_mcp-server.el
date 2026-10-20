@@ -44,7 +44,6 @@
 (require 'project)
 (require 'KONIX_mcp-server-introspection)
 (require 'KONIX_mcp-server-agent-shell)
-(require 'KONIX_agent-shell-workspace)
 ;; tangled from how_to_write_and_audit_a_note.org, where the format it checks is stated
 (require 'KONIX_mcp-server-note-mechanics)
 
@@ -54,14 +53,26 @@
   '("konix-emacs-buffers"
     "konix-emacs-org"
     "konix-emacs-agents"
-    "konix-emacs-elisp"
-    "konix-emacs-workspace")
+    "konix-emacs-elisp")
   "List of server-ids exposed by the KONIX MCP server, one per theme.
 Each id is the routing key emacs-mcp-stdio.sh passes via --server-id, and
 the key under which that theme's tools live in `mcp-server-lib's per-server
 tools table.  Splitting the toolset across several server-ids lets each
 theme be mounted as a separate MCP server on the client side, so groups of
-tools can be enabled/disabled independently.")
+tools can be enabled/disabled independently.  Other modules add theirs
+through `konix/mcp-server-extra-tools'.")
+
+(defvar konix/mcp-server-extra-tools nil
+  "Alist of (SERVER-ID . TOOLS) other modules hand this server, as in
+`konix/mcp-server--tools', registered with its own.")
+
+(defvar konix/mcp-server-extra-libraries nil
+  "Libraries other modules name, reloaded with this server.")
+
+(defun konix/mcp-server--all-ids ()
+  "Return every server-id: this server's own, and those other modules hand it."
+  (delete-dups (append konix/mcp-server-ids
+                       (mapcar #'car konix/mcp-server-extra-tools))))
 
 (defcustom konix/mcp-server-coord-url "http://127.0.0.1:9921"
   "Base URL of the coordination HTTP server."
@@ -794,7 +805,7 @@ MCP Parameters:
   "Unregister all KONIX MCP tools to allow re-registration with new schemas.
 Clears ALL tools from every themed server's tools table, not just those in
 the current list."
-  (dolist (server-id konix/mcp-server-ids)
+  (dolist (server-id (konix/mcp-server--all-ids))
     (clrhash (mcp-server-lib--get-server-tools server-id))))
 
 (defun konix/mcp-server-reload-and-restart ()
@@ -810,10 +821,10 @@ MCP Parameters:
           (sibling-files
            (delq nil
                  (mapcar #'locate-library
-                         '("KONIX_mcp-server-introspection"
-                           "KONIX_mcp-server-agent-shell"
-                           "KONIX_agent-shell-workspace"
-                           "KONIX_mcp-server-note-mechanics")))))
+                         (append '("KONIX_mcp-server-introspection"
+                                   "KONIX_mcp-server-agent-shell"
+                                   "KONIX_mcp-server-note-mechanics")
+                                 konix/mcp-server-extra-libraries)))))
      (if server-file
          (progn
            (dolist (f sibling-files)
@@ -1012,32 +1023,7 @@ It lets a client allow them as a batch, with one `mcp__SERVER__readonly_*' rule.
      (konix/mcp-server-introspection-package-location
       :id "package_location"
       :description "Return the local repository directory for a package managed by straight.el."
-      :read-only t))
-
-    ;; The tools of an_agent_shell_workspace.org, where what each does is stated.
-    ("konix-emacs-workspace"
-     (konix/mcp-server-list-workspace-questions
-      :id "list_workspace_questions"
-      :description "List the workspace's headings and what is written under them. A question comes out with whose turn it is — yours, held, awaiting, asked, permission, finished, settled or later — its id, its anchor and its heading, its priority opening it where it has one, and what is written under it indented below, an answer of the user's likewise; a fact comes out after them, marked FACT, with its id and its heading. yours and held are yours to act on, asked, permission and finished wait on the user, settled is done and later the user put off. A project comes out marked project, the user's alone. Read what is written before you choose which heading to work on."
-      :read-only t)
-     (konix/mcp-server-set-workspace-question
-      :id "set_workspace_question"
-      :description "Write one question of the workspace, rewriting the one whose id you pass or adding a new one when you pass none, and touching no other question but for the id a heading the user made by hand gains. Whatever you write comes back to the user, refined or closed, and carries a body or the call is refused. file and line only where it is about a place, file absolute, note a JSON array of short bullets, says a caption for that link, also further {file, line, says}. needs is a JSON array of the ids it waits on: it is held back, from you as from anyone, until the user settles each of them. project is the id of the project it moves forward, or a JSON array of several, which a new one names wherever the workspace has projects.")
-     (konix/mcp-server-set-workspace-plan
-      :id "set_workspace_plan"
-      :description "Write a plan: several questions and the order between them, in one call. steps is a JSON array of {name, file, line, label, note, needs, after, project}: project the id of the project the step moves forward, name is yours for this call only, note is the bullets as for one question, needs names the steps, or the ids of questions already there, that this one waits on until the user settles them, and after the ones it merely comes after: held back only while those are yours to do. Use it whenever the work you are asked for has an order, rather than writing the questions one by one and leaving the order unsaid. Nothing is written unless every step would be.")
-     (konix/mcp-server-set-workspace-state
-      :id "set_workspace_state"
-      :description "Perform one act on the question whose id you pass, each named after where it leaves it: work, put-down, await, close. Its heading text, its body and its anchor come through untouched. work before you act on it, so the user sees which one you are on. Then close it once the work is done and only the user's agreement is left; while their last word on it asks you something, answering it is a refine, not a close. refine is not taken here: rewrite the question with set_workspace_question and act refine, as soon as what it asks is unclear, saying what you need; a guess costs far more than one asking. put-down lets it go untouched. await sets the one you hold aside while a run of yours goes, a test suite say, so you may take up another: pass that run as command, which it requires, never running it yourself, or pass as on the id of a question already awaiting that run. A question whose own run still goes, answered meanwhile, is put back on that run by await with neither. A command needing root: pass root true, never sudo in it; it waits on the user's leave, and they give the password. Emacs runs it; once it ends the question is yours again, saying how it went, and you are told. Settling is the user's own move and is refused you. close carries a body or it is refused, a fact and an answer are refused, work is refused while you hold one, and a question waiting on the user or one they put off is refused every act. A project is the user's alone and refused every act; work is refused on one held back by another or standing below your highest.")
-     (konix/mcp-server-delete-workspace-question
-      :id "delete_workspace_question"
-      :description "Remove the settled question whose id you pass. A fact, an answer of the user's and a project are the user's alone to drop, and refused.")
-     (konix/mcp-server-set-workspace-fact
-      :id "set_workspace_fact"
-      :description "Write one fact of the workspace, rewriting the one whose id you pass or adding a new one when you pass none. This is how you report: whatever only tells the user something goes here, never in a question that asks nothing. Pass about with the id of the question you are reporting on and it will link to this fact, which is what keeps it reachable: a fact naming none is refused. Its heading must ask nothing and open on no state word, or the call is refused. note is a JSON array of short « intention :: text » bullets, under the same limits a question's body answers to. Pass file and line for a place it points at, and also for further ones: each comes out as a link the user opens with one keystroke. Where you are telling them where something is, that is what to use rather than saying the path in words.")
-     (konix/mcp-server-workspace-project-done
-      :id "workspace_project_done"
-      :description "Say you hold the project owed a plan done, why being a JSON array of short « intention :: text » bullets. It is put to the user as a question; while it stands, nothing tells you to plan toward that project. Call it only when you see no next step worth proposing for it.")))
+      :read-only t)))
   "Alist of (SERVER-ID . TOOLS) grouping MCP tools by theme.
 Each TOOLS entry is (FUNCTION . PLIST); SERVER-ID must be one of
 `konix/mcp-server-ids'.")
@@ -1045,8 +1031,8 @@ Each TOOLS entry is (FUNCTION . PLIST); SERVER-ID must be one of
 (defun konix/mcp-server-register-tools ()
   "Register all KONIX MCP tools, each under its theme's server-id.
 A `:read-only t' tool is exposed under `konix/mcp-server-read-only-prefix'
-followed by its id."
-  (dolist (group konix/mcp-server--tools)
+followed by its id.  Those other modules hand it come with them."
+  (dolist (group (append konix/mcp-server--tools konix/mcp-server-extra-tools))
     (let ((server-id (car group)))
       (dolist (tool (cdr group))
         (let ((props (copy-sequence (cdr tool))))

@@ -1275,9 +1275,20 @@ rather than in whatever this function returned to."
    payload
    "\n\nAct on the above and answer through coord: a task with coord_complete_task, a message with coord_send_message, and nothing for a result. The coord tools take no name for you — coord knows which session is calling — so you can answer whether or not you ever registered. Then keep waiting rather than ending your turn."))
 
+(defvar konix/mcp-server-delivered-functions nil
+  "Functions called with BUFFER, PAYLOAD and FROM-BUDDY as coord work is fed to BUFFER.")
+
+(defvar konix/mcp-server-take-functions nil
+  "Functions called with BUFFER, asking who takes its coord work instead of its conversation.
+Each returns nil to let the next one answer, or a function that takes the work in:
+it is called with PAYLOAD and FROM-BUDDY once the delivery is claimed and
+`konix/mcp-server-delivered-functions' have run, and nothing is typed into BUFFER.")
+
 (defun konix/mcp-server--nudge (key buddy-name payload &optional from-buddy delivery)
   "Submit PAYLOAD to the buffer named KEY, as BUDDY-NAME's pending coord work.
-KEY is this Emacs's index; BUDDY-NAME is coord's name for it, shown to the buddy."
+KEY is this Emacs's index; BUDDY-NAME is coord's name for it, shown to the buddy.
+Where `konix/mcp-server-take-functions' names a taker for that buffer, the work
+goes to it instead, and nothing is typed into the buffer."
   (let ((buffer (konix/mcp-server--buffer-for-buddy key)))
     (unless buffer
       (display-warning
@@ -1299,6 +1310,29 @@ KEY is this Emacs's index; BUDDY-NAME is coord's name for it, shown to the buddy
                buddy-name)
        :warning)
       (error "Buddy '%s' has a buffer but no live agent" buddy-name))
+    (if-let* ((take (run-hook-wrapped 'konix/mcp-server-take-functions
+                                      (lambda (function) (funcall function buffer)))))
+        (when (konix/mcp-server--coord-claim-delivery delivery)
+          (let (written)
+            (unwind-protect
+                (progn
+                  (with-current-buffer buffer
+                    (when-let* ((deadline (konix/mcp-server--parse-answer-by payload)))
+                      (konix/mcp-server--arm-deadline-timer deadline)))
+                  (run-hook-with-args 'konix/mcp-server-delivered-functions
+                                      buffer payload from-buddy)
+                  (setq written t))
+              (if written
+                  (konix/mcp-server--coord-commit-delivery delivery)
+                (konix/mcp-server--coord-release-delivery delivery)))
+            (condition-case err
+                (funcall take payload from-buddy)
+              (error
+               (display-warning
+                'konix/mcp-server
+                (format "Coord's work for '%s' is written in, but telling it failed: %s"
+                        buddy-name (error-message-string err))
+                :warning)))))
     (konix/mcp-server--interrupt-and-submit
      buffer
      (konix/mcp-server--nudge-prompt payload from-buddy)
@@ -1313,6 +1347,8 @@ KEY is this Emacs's index; BUDDY-NAME is coord's name for it, shown to the buddy
                  (with-current-buffer buffer
                    (when-let ((deadline (konix/mcp-server--parse-answer-by payload)))
                      (konix/mcp-server--arm-deadline-timer deadline)))
+                 (run-hook-with-args 'konix/mcp-server-delivered-functions
+                                     buffer payload from-buddy)
                  ;; Returning is not evidence of insertion.  With no ACP session
                  ;; id yet, `agent-shell--insert-to-shell-buffer' inserts nothing,
                  ;; signals nothing, and returns a `prompt-ready' subscription
@@ -1333,7 +1369,7 @@ KEY is this Emacs's index; BUDDY-NAME is coord's name for it, shown to the buddy
              ;; either be told the buddy has the text, or get the work back.
              (if inserted
                  (konix/mcp-server--coord-commit-delivery delivery)
-               (konix/mcp-server--coord-release-delivery delivery)))))))
+               (konix/mcp-server--coord-release-delivery delivery))))))))
     (format "Nudged '%s' with its pending work." buddy-name)))
 
 (defun konix/mcp-server--agent-idle-p (key)
@@ -1343,6 +1379,30 @@ Anything else — busy, waiting, awaiting permission, dead, no buffer — is nil
     (and buffer
          (eq (car (konix/mcp-server--agent-status buffer)) 'idle)
          t)))
+
+(defvar konix/mcp-server-wait-begins-functions nil
+  "Functions called with BUFFER, for `konix/mcp-server--wait-begins'.
+Each returns a string naming what the wait is shown as, or nil to let the next
+one answer; anything else is passed over.")
+
+(defun konix/mcp-server--wait-begins (key)
+  "Ask `konix/mcp-server-wait-begins-functions' about the buffer named KEY.
+Return the first string one of them answers, or nil when there is no such
+buffer or none answers a string."
+  (when-let* ((buffer (konix/mcp-server--buffer-for-buddy key)))
+    (run-hook-wrapped 'konix/mcp-server-wait-begins-functions
+                      (lambda (function)
+                        (let ((said (funcall function buffer)))
+                          (and (stringp said) said))))))
+
+(defvar konix/mcp-server-gate-verdict-functions nil
+  "Functions called with TASK-ID and VERDICT, for `konix/mcp-server--gate-verdict'.
+Each returns non-nil when the task was its own.")
+
+(defun konix/mcp-server--gate-verdict (task-id verdict)
+  "Hand VERDICT on the gate's coord task TASK-ID to whichever function owns it."
+  (run-hook-with-args-until-success 'konix/mcp-server-gate-verdict-functions
+                                    task-id verdict))
 
 ;;; Auto-interrupt before a task answer deadline
 
@@ -1558,7 +1618,8 @@ color and readability.")
   "Statuses in which an agent progresses on its own, needing no user.")
 
 (defvar konix/mcp-server-status-face-functions nil
-  "Functions, run in a session's buffer, any of which faces its idle badge.")
+  "Functions, run in a session's buffer with its status, any of which faces its badge.
+A face, or a list of faces whose last gives the colour, the others laid over it.")
 
 (defvar konix/mcp-server-goes-on-functions nil
   "Functions, run in an idle session's buffer, any of which says it will go on alone.")
@@ -1573,9 +1634,22 @@ color and readability.")
 
 (defun konix/mcp-server--given-status-face (buf status)
   "Return the face something else gives BUF's badge, STATUS being what it is in."
-  (when (eq status 'idle)
+  (unless (memq status '(error awaiting-permission))
     (with-current-buffer buf
-      (run-hook-with-args-until-success 'konix/mcp-server-status-face-functions))))
+      (run-hook-with-args-until-success 'konix/mcp-server-status-face-functions status))))
+
+(defun konix/mcp-server--faces-of (face)
+  "Return FACE as a list of faces, FACE being one face or a list of them.
+The last gives the colour; those before it are laid over it."
+  (if (and (consp face) (not (keywordp (car face)))) face (list face)))
+
+(defun konix/mcp-server--face-foreground (face)
+  "Return the foreground FACE, a face name or a plist of attributes, shows."
+  (if (consp face)
+      (or (plist-get face :foreground)
+          (face-foreground (or (car (ensure-list (plist-get face :inherit))) 'default)
+                           nil 'default))
+    (face-foreground face nil 'default)))
 
 (defun konix/mcp-server--status-label (status-cons &optional face)
   "Return a short bracketed, propertized label for STATUS-CONS, a (STATUS . SEEN) cons.
@@ -1622,6 +1696,7 @@ around, so they sort first, ties broken on the buddy name to stay stable."
                 (< oa ob)))))))
 
 (declare-function konix/agent-shell-show-target "KONIX_agent-shell-common")
+(declare-function konix/agent-shell-shown-buffer "KONIX_agent-shell-common")
 
 (defun konix/mcp-server-spawn-tree-show-in-other-window ()
   "Display the agent-shell buffer at point in another window, keeping focus here."
@@ -1725,9 +1800,12 @@ NODES and VIEW are as produced by `konix/mcp-server--collect-agent-nodes' and
                        status-sym
                        (konix/mcp-server--given-status-face buf (car status-sym))))
          (status-face (get-text-property 0 'face status-text))
+         (faces (konix/mcp-server--faces-of status-face))
          (line-face (if seen
-                        (list :slant 'italic
-                              :foreground (face-foreground status-face nil 'default))
+                        (cons (list :slant 'italic
+                                    :foreground (konix/mcp-server--face-foreground
+                                                 (car (last faces))))
+                              (butlast faces))
                       status-face))
          ;; No model yet while a (re)spawned session is still starting.
          (model-name (or (with-current-buffer buf
@@ -1891,12 +1969,8 @@ point if possible."
             (konix/mcp-server--insert-spawn-tree-line b nodes view)))
          (action-fn
           (lambda (b _indent)
-            (let ((vp (and (bound-and-true-p agent-shell-prefer-viewport-interaction)
-                           (fboundp 'agent-shell-viewport--buffer)
-                           (agent-shell-viewport--buffer
-                            :shell-buffer b :existing-only t))))
-              (konix/mcp-server--pop-to-agent-from-tree
-               (konix/agent-shell-show-target (or vp b)))))))
+            (konix/mcp-server--pop-to-agent-from-tree
+             (konix/agent-shell-show-target (konix/agent-shell-shown-buffer b))))))
     (hierarchy-add-trees h (mapcar #'car nodes)
                          #'konix/mcp-server--agent-parent)
     (with-current-buffer buf

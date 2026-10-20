@@ -103,14 +103,20 @@ Passes ARG through to `agent-shell'."
 (defvar konix/agent-shell-entry-buffer-functions nil
   "Functions called with a shell, the first non-nil naming the buffer to go to for it.")
 
-(defun konix/agent-shell-entry-buffer (shell)
-  "Return the buffer the user goes to for SHELL.
-The first of `konix/agent-shell-entry-buffer-functions' to name one, else its
-viewport when `agent-shell-prefer-viewport-interaction' says so, else SHELL."
-  (or (run-hook-with-args-until-success 'konix/agent-shell-entry-buffer-functions shell)
-      (and agent-shell-prefer-viewport-interaction
+(defun konix/agent-shell-shown-buffer (shell)
+  "Return what shows SHELL: its viewport when one exists and
+`agent-shell-prefer-viewport-interaction' says so, else SHELL."
+  (or (and agent-shell-prefer-viewport-interaction
+           (fboundp 'agent-shell-viewport--buffer)
            (agent-shell-viewport--buffer :shell-buffer shell :existing-only t))
       shell))
+
+(defun konix/agent-shell-entry-buffer (shell)
+  "Return the buffer the user goes to for SHELL.
+The first of `konix/agent-shell-entry-buffer-functions' to name one, else
+`konix/agent-shell-shown-buffer'."
+  (or (run-hook-with-args-until-success 'konix/agent-shell-entry-buffer-functions shell)
+      (konix/agent-shell-shown-buffer shell)))
 
 (defun konix/agent-shell/start-with-agent ()
   "Start a shell on an agent picked now, leaving `agent-shell-preferred-agent-config'

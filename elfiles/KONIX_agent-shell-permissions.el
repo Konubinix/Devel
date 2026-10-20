@@ -1676,7 +1676,7 @@ Keys: :header, :key, :entries (POLICY), :set (POLICY KEY VALUE), :remove
   (konix/agent-shell-panel-create
    :buffer-name (format "*Tool %s*" (konix/agent-shell-policy-name policy))
    :mode-name (format "Tool-%s" (capitalize (konix/agent-shell-policy-name policy)))
-   :help (format "Tool %s: G global, p project, s session,%s t enable/disable/once, a add, e/RET edit, d delete, r reapply, g refresh, q quit"
+   :help (format "Tool %s: G global, p project, s session,%s t enable/disable/once, a add, e/RET edit, d delete, r reapply, M ask the writer for merges, g refresh, q quit"
                  (konix/agent-shell-policy-name policy)
                  (mapconcat (lambda (extra)
                               (format " %s %s," (plist-get extra :key)
@@ -1723,7 +1723,8 @@ Keys: :header, :key, :entries (POLICY), :set (POLICY KEY VALUE), :remove
      ("e"   . konix/agent-shell-policy-menu-edit)
      ("RET" . konix/agent-shell-policy-menu-edit)
      ("d"   . konix/agent-shell-policy-menu-delete)
-     ("r"   . konix/agent-shell-policy-menu-reapply))))
+     ("r"   . konix/agent-shell-policy-menu-reapply)
+     ("M"   . konix/agent-shell-policy-menu-ask-merges))))
 
 (defun konix/agent-shell-policy-menu-reapply ()
   "Reapply the policies to the origin session's pending requests."

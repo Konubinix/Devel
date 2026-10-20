@@ -15,6 +15,9 @@
 (add-to-list 'auto-mode-alist
              '("\\.ws\\.org\\'" . konix/agent-shell-workspace-open))
 
+(autoload 'konix/agent-shell-workspace-org-mode
+  "KONIX_agent-shell-workspace")
+
 (autoload 'konix/agent-shell-workspace-see-to-the-writer
   "KONIX_agent-shell-workspace" nil t)
 

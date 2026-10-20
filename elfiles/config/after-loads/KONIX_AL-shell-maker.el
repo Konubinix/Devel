@@ -57,7 +57,8 @@ other, but nothing is waiting for the user there, so it is passed over."
                           (or (agent-shell-viewport--buffer :shell-buffer buffer :existing-only t)
                               buffer)
                         buffer)))
-      (tracking-add-buffer track-buf)
+      (unless (bound-and-true-p konix/agent-shell-workspace--quiet)
+        (tracking-add-buffer track-buf))
       (let ((level (or (konix/get-notification-level track-buf)
                        (and (konix/shell-maker--idle-since-input-p) :flash))))
         (when level

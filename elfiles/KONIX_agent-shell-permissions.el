@@ -61,6 +61,7 @@
 (declare-function agent-shell--send-permission-response "agent-shell")
 (declare-function agent-shell--tool-call-command-to-string "agent-shell")
 (declare-function shell-maker-busy "shell-maker")
+(declare-function konix/agent-shell--claude-session-file "KONIX_agent-shell-naming")
 (declare-function konix/agent-shell-mcp--project-dir-locals-file
                   "KONIX_agent-shell-mcp")
 ;; Buffer-local in the shell buffer; points at the session transcript file.
@@ -783,11 +784,16 @@ Such an argument is most likely a regexp."
 
 (defun konix/agent-shell--call-paths (tool-call)
   "Return the paths TOOL-CALL names: its command arguments, or its targets.
-An unknowable argument is nil."
+An unknowable argument is nil; an option counts only by its `=VALUE'."
   (if (konix/agent-shell--tool-call-command tool-call)
       (konix/agent-shell--with-bash-ast root tool-call
-        (mapcan #'konix/agent-shell--command-argument-literals
-                (konix/agent-shell--command-nodes root)))
+        (mapcan (lambda (argument)
+                  (cond ((not (and argument (string-prefix-p "-" argument)))
+                         (list argument))
+                        ((string-match "=" argument)
+                         (list (substring argument (match-end 0))))))
+                (mapcan #'konix/agent-shell--command-argument-literals
+                        (konix/agent-shell--command-nodes root))))
     (konix/agent-shell--tool-call-target-paths tool-call)))
 
 (konix/agent-shell-define-tool-evaluator "inside" (tool-call &optional directory)
@@ -809,6 +815,43 @@ matches."
        (seq-some (lambda (path)
                    (and path (konix/agent-shell--path-inside-p path directory)))
                  (konix/agent-shell--call-paths tool-call))))
+
+(defun konix/agent-shell--own-session-directory ()
+  "Return this shell's own Claude session folder, holding its tool results, or nil."
+  (when-let* (((derived-mode-p 'agent-shell-mode))
+              ((fboundp 'konix/agent-shell--claude-session-file))
+              (file (konix/agent-shell--claude-session-file
+                     (map-nested-elt (agent-shell--state) '(:session :id)))))
+    (file-name-as-directory (file-name-sans-extension file))))
+
+(konix/agent-shell-define-tool-evaluator "own-session" (tool-call)
+  "Match a call whose paths are all inside this shell's own session folder, or its transcript."
+  (when-let* ((directory (konix/agent-shell--own-session-directory)))
+    (or (konix/agent-shell-tool-match-p (format "@inside(%s)" directory) tool-call)
+        (let ((paths (konix/agent-shell--call-paths tool-call))
+              (transcript (concat (directory-file-name directory) ".jsonl")))
+          (and paths
+               (seq-every-p (lambda (path)
+                              (and path (string= (expand-file-name path) transcript)))
+                            paths))))))
+
+(defcustom konix/agent-shell-project-commands
+  '("argdown" "awk" "base64" "cat" "uuidgen" "cut" "date" "diff" "echo" "false"
+    "head" "jq" "ls" "man" "mkdir" "mmdc" "openscad" "plantuml" "rm"
+    "sed" "sort" "sqlite3" "strings" "tail" "tar" "true" "uniq" "unzip" "wc"
+    "which")
+  "Commands `@project-commands' approves when they only touch project files."
+  :type '(repeat string)
+  :group 'konix)
+
+(konix/agent-shell-define-tool-evaluator "project-commands" (tool-call)
+  "Match a line of `konix/agent-shell-project-commands' on project files only."
+  (and (konix/agent-shell--with-bash-ast root tool-call
+         (seq-every-p (lambda (command)
+                        (member (car (konix/agent-shell--command-unwrapped command))
+                                konix/agent-shell-project-commands))
+                      (konix/agent-shell--command-nodes root)))
+       (konix/agent-shell-tool-match-p "@inside" tool-call)))
 
 (konix/agent-shell-define-tool-evaluator "use-a-wrong-tmp-dir" (tool-call)
   "Match a call using a temp directory other than ./.agent-shell/tmp.
@@ -855,7 +898,7 @@ agent."
 
 (defcustom konix/agent-shell-tool-whitelist-global
   '(("(and \"^edit$\" \"@inside(.agent-shell/tmp)\")" . "Edits and writes confined to ./.agent-shell/tmp/")
-    ("(and \"^\\\\(tar\\\\|wc\\\\|rm\\\\|man\\\\|grep\\\\|date\\\\|uniq\\\\|head\\\\|awk\\\\|sed\\\\|mmdc\\\\|plantuml\\\\|jq\\\\|strings\\\\|base64\\\\|ls\\\\|sqlite3\\\\|rg\\\\|tail\\\\|sort\\\\|cut\\\\|mkdir\\\\|unzip\\\\|diff\\\\|echo\\\\|which\\\\|openscad\\\\|argdown\\\\|true\\\\|false\\\\|cat\\\\)\\\\( \\\\|$\\\\)\" \"@inside\")" . "commands on project files")
+    ("@project-commands" . "commands on project files")
     ("^\\(ba\\)?sh -n")
     ("^mcp__konix-browser__readonly")
     ("^nix-instantiate --parse")

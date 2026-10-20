@@ -30,7 +30,7 @@
             sha256 = "sha256-M7btfOpUWKErIRNnLRSCw+PeluHKf9j46GB2ggNVEAs=";
           };
 
-          SETUPTOOLS_SCM_PRETEND_VERSION = version;
+          env.SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
           propagatedBuildInputs = with pkgs.python3.pkgs; [
             setuptools

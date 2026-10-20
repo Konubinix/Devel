@@ -291,8 +291,7 @@ match."
            (glob (string-prefix-p "$ " key))
            (key (if glob (wildcard-to-regexp (substring key 2)) key))
            (argvs (and (listp tool-call)
-                       (konix/agent-shell--tool-call-argvs
-                        tool-call (not konix/agent-shell--regexp-any-command)))))
+                       (konix/agent-shell--tool-call-argvs tool-call))))
       (if (null argvs)
           (unless glob
             (string-match key (setq konix/agent-shell--matched-text haystack)))
@@ -476,36 +475,38 @@ unknowable ones kept as written."
                          (cdr words))
                    " "))))
 
-(defun konix/agent-shell--tool-call-argvs (tool-call &optional working)
-  "Return the argv lines of TOOL-CALL's commands, with their assignments.
-With WORKING, transparent filters are left out."
+(defun konix/agent-shell--tool-call-argvs (tool-call)
+  "Return the argv lines of TOOL-CALL's commands, prefixed by their assignments."
   (ignore-errors
     (konix/agent-shell--with-bash-ast root tool-call
-      (mapcan (lambda (command)
-                (append (mapcar (lambda (node) (treesit-node-text node t))
-                                (seq-filter (lambda (c)
-                                              (equal (treesit-node-type c)
-                                                     "variable_assignment"))
-                                            (treesit-node-children command t)))
-                        (list (konix/agent-shell--command-argv command))))
-              (if working
-                  (konix/agent-shell--working-command-nodes root)
-                (konix/agent-shell--command-nodes root))))))
+      (mapcar (lambda (command)
+                (when-let* ((argv (konix/agent-shell--command-argv command)))
+                  (string-join
+                   (append (mapcar (lambda (node) (treesit-node-text node t))
+                                   (seq-filter (lambda (c)
+                                                 (equal (treesit-node-type c)
+                                                        "variable_assignment"))
+                                               (treesit-node-children command t)))
+                           (list argv))
+                   " ")))
+              (konix/agent-shell--command-nodes root)))))
 
 (defun konix/agent-shell--shell-candidates (tool-call)
   "Return the policy keys offered for TOOL-CALL's commands, or nil."
   (delete-dups
    (mapcan (lambda (argv)
-             (unless (or (null argv)
-                         (string-match-p "\\`[[:alpha:]_][[:alnum:]_]*=" argv))
-               (let ((name (car (split-string argv " "))))
+             (when argv
+               (let ((name (progn (string-match
+                                   "\\`\\(?:[[:alpha:]_][[:alnum:]_]*=[^ ]* \\)*[^ ]+"
+                                   argv)
+                                  (match-string 0 argv))))
                  (append (unless (string-match-p "[*?[]" argv)
                            (list (concat "$ " argv)))
-                         (when (string-search " " argv)
+                         (unless (equal argv name)
                            (list (concat "^" (regexp-quote argv))
                                  (format "$ %s *" name)))
                          (list (format "^%s\\b" (regexp-quote name)))))))
-           (konix/agent-shell--tool-call-argvs tool-call t))))
+           (konix/agent-shell--tool-call-argvs tool-call))))
 
 (add-to-list 'konix/agent-shell-tool-candidate-functions
              #'konix/agent-shell--shell-candidates)
@@ -527,12 +528,6 @@ instead of asking."
               (seq-some #'konix/shell-search-broad-root-p
                         (konix/shell-search-roots name arguments)))))
      (konix/agent-shell--command-nodes root))))
-
-(defconst konix/agent-shell--read-only-filters
-  '("jq" "cat" "head" "tail" "less" "more" "wc" "sort" "uniq"
-    "column" "cut" "grep" "rg" "tr" "fold" "nl" "fmt")
-  "Commands only reading stdin and writing stdout.
-Nothing that can execute or write files belongs here.")
 
 (defconst konix/agent-shell--command-wrappers
   '(("timeout" . "\\`[0-9]+\\(?:\\.[0-9]+\\)?[smhd]?\\'")
@@ -675,39 +670,16 @@ An unreadable target counts as outside."
             (konix/agent-shell--argument-literal destination) directory))))
    (treesit-query-capture node '((file_redirect) @r))))
 
-(defun konix/agent-shell--transparent-filter-p (command)
-  "Non-nil when COMMAND node is a piped read-only filter of project files."
-  (let* ((parent (treesit-node-parent command))
-         (stage (if (equal (treesit-node-type parent) "redirected_statement")
-                    parent
-                  command))
-         (pipeline (treesit-node-parent stage))
-         (outer (treesit-node-parent pipeline))
-         (words (konix/agent-shell--command-unwrapped command)))
-    (and (equal (treesit-node-type pipeline) "pipeline")
-         (not (treesit-node-eq stage (treesit-node-child pipeline 0 t)))
-         (member (car words) konix/agent-shell--read-only-filters)
-         (seq-every-p #'konix/agent-shell--path-inside-project-p (cdr words))
-         ;; a `<' after the pipeline is bound to it as a whole
-         (konix/agent-shell--reads-inside-p
-          (if (equal (treesit-node-type outer) "redirected_statement") outer stage)
-          default-directory))))
-
-(defun konix/agent-shell--working-command-nodes (root)
-  "Return ROOT's command nodes but its transparent filters."
-  (seq-remove #'konix/agent-shell--transparent-filter-p
-              (konix/agent-shell--command-nodes root)))
-
 (konix/agent-shell-define-tool-evaluator "severalcommands" (tool-call)
-  "Match a line running several commands, transparent filters aside."
+  "Match a line running several commands."
   (konix/agent-shell--with-bash-ast root tool-call
-    (> (length (konix/agent-shell--working-command-nodes root)) 1)))
+    (> (length (konix/agent-shell--command-nodes root)) 1)))
 
 (konix/agent-shell-define-tool-evaluator "gh-read" (tool-call)
   "Match a line whose only command is a read-only `gh' call.
-Transparent filters aside, and reading no file outside the project."
+It reads no file outside the project."
   (konix/agent-shell--with-bash-ast root tool-call
-    (let ((commands (konix/agent-shell--working-command-nodes root)))
+    (let ((commands (konix/agent-shell--command-nodes root)))
       (and (= (length commands) 1)
            (konix/agent-shell--gh-read-p (car commands))
            (konix/agent-shell--reads-inside-p root default-directory)))))
@@ -766,10 +738,9 @@ DIRECTORY defaults to the project.  Unknowable arguments are refused."
                         files)))))
 
 (konix/agent-shell-define-tool-evaluator "read-only-sed" (tool-call &optional directory)
-  "Match a line whose only command is a read-only `sed' within DIRECTORY.
-Transparent filters aside."
+  "Match a line whose only command is a read-only `sed' within DIRECTORY."
   (konix/agent-shell--with-bash-ast root tool-call
-    (let ((commands (konix/agent-shell--working-command-nodes root)))
+    (let ((commands (konix/agent-shell--command-nodes root)))
       (and (= (length commands) 1)
            (konix/agent-shell--sed-read-only-p (car commands) directory)
            (konix/agent-shell--reads-inside-p
@@ -877,7 +848,7 @@ matches."
     ("@writes-outside(.agent-shell/tmp)" . "Redirect output into ./.agent-shell/tmp/ instead")
     ("^command -v" . "Use nix-shell")
     ("python3 -m json.tool" . "jq")
-    ("@severalcommands" . "One command at a time. Use redirection to a file in ./.agent-shell/tmp if needing to chain stuff")
+    ("@severalcommands" . "One command at a time. Don't filter before knowing where to look: write the output to ./.agent-shell/tmp")
     ("@lost-search" . "You are lost, simply ask the user for guidance. Don't try to do all by yourself, make a team with the user.")
     ("^cd\\b" . "Don't cd")
     ("^\\(bash -c\\|python3? -c\\|python3? - <<\\)" . "No oneliner")
@@ -1762,7 +1733,7 @@ A shell command gives a prefix, or with EXACT the very command."
   (if-let* ((candidates (and (fboundp 'konix/agent-shell--mcp-candidates)
                              (konix/agent-shell--mcp-candidates tool-call))))
       (or (cadr candidates) (car candidates))
-    (if-let* ((argvs (konix/agent-shell--tool-call-argvs tool-call t))
+    (if-let* ((argvs (konix/agent-shell--tool-call-argvs tool-call))
               ((not (memq nil argvs))))
         (cond ((cdr argvs)
                (concat "^\\(" (mapconcat #'regexp-quote argvs "\\|") "\\)$"))

@@ -140,6 +140,33 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
        (lambda (command) (konix/agent-shell-tests--key ,key command))
      ,@cases))
 
+(defun konix/agent-shell-tests--verdict (command)
+  "Return `deny', `allow' or `prompt' for COMMAND, global policies only.
+Project and session axes are stubbed: they need a live buffer."
+  (cl-letf (((symbol-function 'konix/agent-shell-policy--project-entries)
+             (lambda (_policy) nil))
+            ((symbol-function 'konix/agent-shell-policy--session-entries)
+             (lambda (_policy) nil)))
+    (let* ((tool-call (konix/agent-shell-tests--shell-call command))
+           (denied (konix/agent-shell--policy-matches
+                    konix/agent-shell--blacklist tool-call))
+           (allowed (unless denied
+                      (konix/agent-shell-policy--match
+                       konix/agent-shell--whitelist tool-call))))
+      (cond (denied 'deny) (allowed 'allow) (t 'prompt)))))
+
+(defmacro konix/agent-shell-tests-deftest-verdict (test policies &rest cases)
+  "Define ERT TEST checking the verdict of each (EXPECTED . COMMAND).
+POLICIES is a `let' binding list setting the global policies."
+  (declare (indent 2))
+  `(ert-deftest ,test ()
+     (konix/agent-shell-tests--in-project
+       (let ,policies
+         (dolist (case ',cases)
+           (ert-info ((cdr case))
+             (should (eq (konix/agent-shell-tests--verdict (cdr case))
+                         (car case)))))))))
+
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-sed-accepts "read-only-sed"
   (t . "sed -n '/client renderer/,/the residual/p' .agent-shell/tmp/headings2.txt")
@@ -157,7 +184,6 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
   (t . "sed -n '1p' foo.txt > out.txt")
   (t . "sed -n '1p' foo.txt 2> err.txt")
   (t . "sed -n '2518,2545p' ./.agent-shell/tmp/run-failed.txt > ./.agent-shell/tmp/missing-keys.txt 2>&1")
-  (t . "sed -n '1p' foo.txt | head -3")         ; read-only filter
   (t . "sed -n '1p' < foo.txt"))
 
 (konix/agent-shell-tests-deftest-evaluator
@@ -175,7 +201,7 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
   (nil . "sed 's/a/b/e' foo.txt")
   (nil . "sed '1r /etc/passwd' foo.txt")
   (nil . "sed -f script.sed foo.txt")
-  (nil . "sed -n '1p' foo.txt | sh")
+  (nil . "sed -n '1p' foo.txt | head -3")
   (nil . "sed -n '1p' foo.txt; rm -rf /")
   (nil . "sed -n '1p' foo.txt && sed -i 's/a/b/' foo.txt")
   (nil . "sed -n \"1p\" $(ls)"))
@@ -186,8 +212,7 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
   (nil . "sed -n '1,5p' ~/.ssh/id_rsa")
   (nil . "sed -n '1,5p' $HOME/.ssh/id_rsa")
   (nil . "sed -n '1,5p' ../other/secret")
-  (nil . "sed -n '1p' < /etc/shadow")
-  (nil . "sed -n '1p' foo.txt | head -3 /etc/shadow")) ; filter reads a file
+  (nil . "sed -n '1p' < /etc/shadow"))
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-read-only-sed-in-a-given-directory
@@ -261,8 +286,7 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
   ;; redirections are `@writes-outside''s job
   (t . "find . -name '*.el' > ./.agent-shell/tmp/els.txt")
   (t . "find . -name '*.el' >> .agent-shell/tmp/els.txt 2>&1")
-  (t . "find . -name '*.el' 2> err.txt")
-  (t . "find . -name '*.el' | head -3"))         ; read-only filter
+  (t . "find . -name '*.el' 2> err.txt"))
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-read-only-find-refuses-writes "read-only-find"
@@ -279,7 +303,7 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
   (nil . "find . -name '*.el' -execdir rm {} \\;")
   (nil . "find . -name '*.el' -ok rm {} \\;")
   (nil . "find . -name '*.el' -okdir rm {} \\;")
-  (nil . "find . -name '*.el' | xargs rm")
+  (nil . "find . -name '*.el' | head -3")
   (nil . "find . -name '*.el'; rm -rf /")
   (nil . "find . -name '*.el' && find . -delete")
   (nil . "find . -name \"*.el\" $(cat dirs.txt)"))
@@ -325,12 +349,10 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-gh-read-accepts-api-reads "gh-read"
   (t . "gh api repos/o/r/issues/352/comments")
-  (t . "gh api foo | jq .")
   (t . "gh api -X GET foo -f state=open")
   ;; redirections are `@writes-outside''s job
   (t . "gh api repos/o/r/issues/352/comments --jq '.[] | \"\\(.user.login)\"' > ./.agent-shell/tmp/c.txt")
   (t . "gh api foo >> .agent-shell/tmp/o.json")
-  (t . "gh api foo | jq . > /etc/passwd")
   (t . "gh api foo 2> e.txt")
   (t . "gh api foo > a > b"))
 
@@ -338,10 +360,10 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
     konix/agent-shell-test-gh-read-accepts-subcommand-reads "gh-read"
   (t . "gh issue list --repo o/r --state all --limit 100 --search \"timeout OR hang\" > ./.agent-shell/tmp/issues.txt 2>&1")
   (t . "gh pr view 352 --json title,body")
-  (t . "gh pr diff 352 | head -50")
+  (t . "gh pr diff 352")
   (t . "gh pr checks 352")
   (t . "gh run list --workflow ci.yml")
-  (t . "gh run view 42 --log | grep -i error")
+  (t . "gh run view 42 --log")
   (t . "gh run watch 33152252167 --interval 60 --exit-status")
   (t . "gh search issues emacsclient --repo o/r")
   (t . "gh repo view o/r")
@@ -354,10 +376,10 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
   (t . "timeout 570 gh pr checks 4816 --watch --fail-fast --required > ./.agent-shell/tmp/ci5.txt 2>&1")
   (t . "timeout 60 gh pr view 352")
   (t . "timeout -k 5 60 gh run list")
-  (t . "timeout --preserve-status 5m gh pr diff 352 | head -50")
+  (t . "timeout --preserve-status 5m gh pr diff 352")
   (t . "nice -n 5 gh pr list")
   (t . "ionice -c 3 gh run list")
-  (t . "stdbuf -oL gh pr diff 352 | head -20")
+  (t . "stdbuf -oL gh pr diff 352")
   (t . "time gh pr view 352")
   (t . "nice -n 5 timeout 60 gh pr checks 4816"))
 
@@ -375,11 +397,10 @@ SUBJECT is evaluated in a throwaway project, after a leading `(:setup ...)'."
     konix/agent-shell-test-gh-read-refuses "gh-read"
   (nil . "gh api -X POST foo")
   (nil . "gh api foo -f title=hi")
-  (nil . "gh api foo | sh")
+  (nil . "gh api foo | jq .")
   (nil . "gh api foo > o.txt; rm -rf /")
   (nil . "gh api foo && rm -rf /")
   (nil . "gh api foo > $(whoami).txt")
-  (nil . "gh api foo | jq . /etc/shadow")         ; that filter reads a file
   (nil . "gh issue list | sh")
   (nil . "gh issue list && rm -rf /")
   (nil . "gh")
@@ -629,10 +650,9 @@ PATH defaults to `konix/agent-shell-tests--review'."
        (konix/agent-shell-tests--shell-call command)))
   (("$ ls -la" "^ls -la" "$ ls *" "^ls\\b") . "timeout 5 ls -la > out.txt")
   (("$ ./tangle.sh" "^\\./tangle\\.sh\\b") . (expand-file-name "tangle.sh"))
-  (("$ ls" "^ls\\b") . "ls | head -3")             ; the filter makes no key
   (("^rm -f tests/\\.coverage\\.\\*" "$ rm *" "^rm\\b")
    . "rm -f tests/.coverage.*")                    ; a glob character, no exact glob
-  (("$ ls" "^ls\\b") . "FOO=1 ls"))
+  (("$ FOO=1 ls" "^FOO=1 ls\\b") . "FOO=1 ls"))
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-mcp-candidates-skip-unwritable-values
@@ -783,25 +803,9 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (nil . "ls -la")
   (nil . "grep 'a|b' notes.txt")          ; a pipe the shell never reads as one
   (nil . "timeout 60 ls")                 ; a wrapper prefix is one command node
-  (nil . "ls | head -3")                  ; a read-only filter is no command
+  (t . "ls | head -3")                    ; a filter is a command too
   (t . "ls && rm -rf .")
-  (t . "ls | sh")
-  (t . "ls | head -3 /etc/shadow")        ; that filter reads a file
-  (t . "head -3 notes.txt | ls")          ; first, it feeds the line
   (t . "echo $(ls)"))
-
-(konix/agent-shell-tests-deftest-verdict
-    konix/agent-shell-test-verdict-filters-are-transparent
-    ((konix/agent-shell-tool-blacklist-global
-      '(("@severalcommands" . "One command at a time")))
-     (konix/agent-shell-tool-whitelist-global '(("$ ./ci.sh" . "")))
-     (konix/agent-shell-tool-blacklist-disabled-global nil)
-     (konix/agent-shell-tool-whitelist-disabled-global nil))
-  (allow . "./ci.sh | head -20")
-  (allow . "timeout 570 ./ci.sh | grep -i error | sort")
-  (deny . "./ci.sh | sh")
-  (deny . "./ci.sh | grep foo /etc/shadow")
-  (deny . "./ci.sh | head < /etc/shadow"))
 
 ;; What a regexp or `$ GLOB' key reads of a shell call: one line per command.
 (konix/agent-shell-tests-deftable
@@ -814,7 +818,8 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (("tangle.sh") . "tangle.sh")                    ; looked up in PATH
   (("clk foo --help") . "clk foo --help > out.txt 2>&1 < in.txt")
   (("cat") . "cat <<EOF\nhi\nEOF")
-  (("FOO=1" "ls") . "FOO=1 ls")
+  (("FOO=1 ls") . "FOO=1 ls")
+  (("FOO=1 BAR=2 ls") . "FOO=1 BAR=2 timeout 5 ls")
   (("ls" "head -3") . "ls | head -3")
   (("cat $FOO") . "cat $FOO")                      ; unreadable, kept as written
   (("sed -n 1,5p f") . "sed -n '1,5p' f")
@@ -828,7 +833,14 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (nil . "ruff check")
   (nil . "echo ruff format")
   (nil . "ruff format; rm -rf ~")
-  (nil . "ruff format | tee out.txt"))
+  (nil . "ruff format | tee out.txt")
+  (nil . "LD_PRELOAD=x.so ruff format"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-regexp-reads-the-assignments "^FOO=1 ls\\b"
+  (t . "FOO=1 ls -la")
+  (nil . "ls")
+  (nil . "FOO=2 ls"))
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-regexp-reads-the-arguments
@@ -1015,33 +1027,6 @@ Such a rule silently never fires."
   ;; a mistyped `@NAME' would silently never fire
   (nil . konix/agent-shell-tool-blacklist-global)
   (nil . konix/agent-shell-tool-whitelist-global))
-
-(defun konix/agent-shell-tests--verdict (command)
-  "Return `deny', `allow' or `prompt' for COMMAND, global policies only.
-Project and session axes are stubbed: they need a live buffer."
-  (cl-letf (((symbol-function 'konix/agent-shell-policy--project-entries)
-             (lambda (_policy) nil))
-            ((symbol-function 'konix/agent-shell-policy--session-entries)
-             (lambda (_policy) nil)))
-    (let* ((tool-call (konix/agent-shell-tests--shell-call command))
-           (denied (konix/agent-shell--policy-matches
-                    konix/agent-shell--blacklist tool-call))
-           (allowed (unless denied
-                      (konix/agent-shell-policy--match
-                       konix/agent-shell--whitelist tool-call))))
-      (cond (denied 'deny) (allowed 'allow) (t 'prompt)))))
-
-(defmacro konix/agent-shell-tests-deftest-verdict (test policies &rest cases)
-  "Define ERT TEST checking the verdict of each (EXPECTED . COMMAND).
-POLICIES is a `let' binding list setting the global policies."
-  (declare (indent 2))
-  `(ert-deftest ,test ()
-     (konix/agent-shell-tests--in-project
-       (let ,policies
-         (dolist (case ',cases)
-           (ert-info ((cdr case))
-             (should (eq (konix/agent-shell-tests--verdict (cdr case))
-                         (car case)))))))))
 
 (konix/agent-shell-tests-deftest-verdict
     konix/agent-shell-test-verdict-prefers-deny-over-allow

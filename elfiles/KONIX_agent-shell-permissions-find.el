@@ -99,10 +99,9 @@ Every expression argument must be whitelisted; unknowable ones are refused."
       ok)))
 
 (konix/agent-shell-define-tool-evaluator "read-only-find" (tool-call &optional directory)
-  "Match a line running only a read-only `find' that reads inside DIRECTORY.
-Transparent filters aside, nothing else may run."
+  "Match a line running only a read-only `find' that reads inside DIRECTORY."
   (konix/agent-shell--with-bash-ast root tool-call
-    (let ((commands (konix/agent-shell--working-command-nodes root)))
+    (let ((commands (konix/agent-shell--command-nodes root)))
       (and (= (length commands) 1)
            (konix/agent-shell--find-read-only-p (car commands) directory)
            (konix/agent-shell--reads-inside-p

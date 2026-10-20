@@ -414,6 +414,10 @@ nil rather than a guess."
                   (expand-file-name text)
                 text)))
     ("raw_string" (string-trim (treesit-node-text node t) "'" "'"))
+    ;; `$'...'', literal when free of escapes.
+    ("ansi_c_string"
+     (let ((text (substring (treesit-node-text node t) 2 -1)))
+       (unless (string-search "\\" text) text)))
     ("string_content" (treesit-node-text node t))
     ((or "simple_expansion" "expansion")
      (when-let* ((var (car (treesit-filter-child

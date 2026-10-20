@@ -1,8 +1,8 @@
 {
-  "lastModified": 1790149054,
-  "narHash": "sha256-FfjXg6mAzKQBCY+7V9keGWOXG4DV2Eym/qA987lFl8A=",
+  "lastModified": 1791487292,
+  "narHash": "sha256-tqM7xDEsaeK1p6VvRygeZ9LkQRpUUkbRT02BHv6hnTM=",
   "owner": "NixOS",
   "repo": "nixpkgs",
-  "rev": "8825bebf6324e0579d012936eff73379af284b6d",
+  "rev": "8edc0c72e3a38faf5434e40d1f19431125fe4b30",
   "type": "github"
 }

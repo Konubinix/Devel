@@ -45,7 +45,7 @@
 
 (setq-default agent-shell-show-welcome-message nil)
 
-(setq-default agent-shell-session-restore-verbosity 'full)
+(setq-default agent-shell-session-restore-verbosity 'last)
 
 (setq-default agent-shell-anthropic-claude-acp-command '("claude-agent-acp"))
 

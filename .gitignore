@@ -3,6 +3,9 @@
 /config/elfiles/comphist.dat
 /config/retroarch
 /config/pronote
+/config/keyban
+/config/pupgui
+/config/unity3d
 *~
 *.elc
 *#

@@ -1082,12 +1082,16 @@ local function streamed_screen()
 end
 
 -- steam_proton is what proton calls a window with no steam app id behind it, i.e. every game
--- bought outside steam and launched by its own sunshine entry.
+-- bought outside steam and launched by its own sunshine entry. STEAM_GAME is the app id steam
+-- puts on every window it launches, native games included.
+awesome.register_xproperty("STEAM_GAME", "number")
+
 local function is_streamed_game(c)
 	return c.valid
 		and c.class
 		and (
-			c.class:match("^steam_app_")
+			c:get_xproperty("STEAM_GAME")
+			or c.class:match("^steam_app_")
 			or c.class == "steam_proton"
 			or c.class:lower() == "retroarch"
 			or c.class:lower() == "dosbox"

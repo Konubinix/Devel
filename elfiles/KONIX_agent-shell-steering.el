@@ -330,8 +330,15 @@ control back to user now\" notice used to lie about."
               (setq konix/agent-shell-steering--cap-stopped t)
               (konix/agent-shell--interrupt-and-deliver
                notice #'konix/agent-shell--show-in-stop-reason))
-          (setq konix/agent-shell-steering--auto-submitting t)
-          (konix/agent-shell--interrupt-and-deliver notice))))))
+          (let ((buffer (current-buffer)))
+            (unless (eq (konix/agent-shell--interrupt-and-deliver
+                         notice nil (eq (map-elt event :event) 'tool-call-update)
+                         (lambda ()
+                           (when (buffer-live-p buffer)
+                             (with-current-buffer buffer
+                               (setq konix/agent-shell-steering--auto-submitting t)))))
+                        'injected)
+              (setq konix/agent-shell-steering--auto-submitting t))))))))
 
 (defun konix/agent-shell-steering--on-input-submitted (_event)
   "Reset the chain on a human prompt; pass through our own delivery."

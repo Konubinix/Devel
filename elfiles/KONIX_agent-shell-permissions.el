@@ -1194,13 +1194,49 @@ The buffer then looks idle without waiting for the user."
                        (map-elt (agent-shell--state) :request-count))
      :body text)))
 
-(defun konix/agent-shell--interrupt-and-deliver (reason &optional deliver-fn)
-  "Cancel the current turn, then submit REASON as the next prompt.
-With DELIVER-FN, call it with REASON instead, handing control back to the
-user.  Permissions the soft cancel still surfaces are cancelled at once, lest
-they linger or block the turn's end."
+(defvar-local konix/agent-shell--injected-count 0
+  "How many injections this shell has shown, naming each one's block.")
+
+(defun konix/agent-shell--inject (text on-refused)
+  "Ask to add TEXT to the running turn, calling ON-REFUSED where the agent refuses it.
+TEXT the agent takes is shown in the shell."
+  (let ((state (agent-shell--state))
+        (buffer (current-buffer)))
+    (acp-send-request
+     :client (map-elt state :client)
+     :request `((:method . "_session/steering")
+                (:params . ((sessionId . ,(map-nested-elt state '(:session :id)))
+                            (prompt . [((type . "text") (text . ,text))]))))
+     :buffer buffer
+     :on-success (lambda (&rest _)
+                   (when (buffer-live-p buffer)
+                     (with-current-buffer buffer
+                       (cl-incf konix/agent-shell--injected-count)
+                       (agent-shell--update-fragment
+                        :state (agent-shell--state)
+                        :block-id (format "injected-%d" konix/agent-shell--injected-count)
+                        :label-left "Injected"
+                        :body text
+                        :expanded t))))
+     :on-failure (lambda (&rest _) (funcall on-refused)))))
+
+(defun konix/agent-shell--interrupt-and-deliver (reason &optional deliver-fn inject on-queued)
+  "Deliver REASON to the agent, by one of three ways.
+With INJECT and no DELIVER-FN, ask to add REASON to the running turn,
+queueing it for the turn's end where the agent refuses, after calling
+ON-QUEUED if given, and return `injected'.  Otherwise cancel the current turn, then submit REASON as the
+next prompt, or with DELIVER-FN call it with REASON, handing control back
+to the user; permissions the soft cancel still surfaces are cancelled at
+once, lest they linger or block the turn's end."
   (when (and (derived-mode-p 'agent-shell-mode)
              (not konix/agent-shell--reason-delivery-scheduled))
+    (if (and inject (not deliver-fn))
+        (progn
+          (konix/agent-shell--inject
+           reason (lambda ()
+                    (when on-queued (funcall on-queued))
+                    (konix/agent-shell--enqueue-reason reason)))
+          'injected)
     (setq konix/agent-shell--reason-delivery-scheduled
           (if deliver-fn 'handback 'auto-submit))
     (let ((buffer (current-buffer))
@@ -1229,7 +1265,7 @@ they linger or block the turn's end."
                                (agent-shell--insert-to-shell-buffer
                                 :shell-buffer buffer :text reason
                                 :submit t :no-focus t)))))))
-      (agent-shell-interrupt t))))
+      (agent-shell-interrupt t)))))
 
 ;;; Responder ------------------------------------------------------------------
 
@@ -1266,7 +1302,7 @@ Return nil, falling back to the dialog, when there is no reject option."
       (funcall (map-elt permission :respond) (map-elt reject :option-id))
       (when has-reason
         (if konix/agent-shell-blacklist-interrupt
-            (konix/agent-shell--interrupt-and-deliver notice)
+            (konix/agent-shell--interrupt-and-deliver notice nil t)
           (konix/agent-shell--enqueue-reason notice)))
       (message "%s" notice))
     t))

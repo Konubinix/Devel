@@ -31,25 +31,21 @@
 
 (define-key agent-shell-viewport-view-mode-map (kbd "u") 'konix/agent-shell-track-ready-buffers)
 (defun konix/agent-shell-pop-to-buffer ()
-  "Select a running agent-shell buffer and pop to it.
-When `agent-shell-prefer-viewport-interaction' is set, pop to the
-viewport buffer instead if one exists."
+  "Select a running agent-shell buffer and pop to where the user goes for it.
+See `konix/agent-shell-entry-buffer'."
   (interactive)
   (if-let ((buffers (agent-shell-buffers)))
       (let* ((nodes (konix/mcp-server--collect-agent-nodes))
              (view (konix/mcp-server--fetch-coord-view))
              (caller (konix/mcp-server--caller-shell-buffer))
              ;; For each shell buffer: its spawn-tree line and the buffer to
-             ;; actually pop to (the viewport buffer when preferred).
+             ;; actually pop to.
              (entries
               (mapcar
                (lambda (buf)
                  (list :line (konix/mcp-server--spawn-tree-line-string buf nodes view)
                        :shell buf
-                       :pop (if agent-shell-prefer-viewport-interaction
-                                (or (agent-shell-viewport--buffer :shell-buffer buf :existing-only t)
-                                    buf)
-                              buf)))
+                       :pop (konix/agent-shell-entry-buffer buf)))
                buffers))
              ;; Drop the buffer we are called from so we always switch somewhere
              ;; else, unless it is the only one.
@@ -69,6 +65,18 @@ viewport buffer instead if one exists."
   (save-excursion
     (goto-char (point-min))
     (text-property-search-forward 'agent-shell-permission-button t t)))
+
+(defun konix/agent-shell--shell-with-viewport-p (name)
+  "Non-nil when NAME is an agent-shell buffer that has a viewport.
+Such a shell is never tracked: its viewport is, whoever asks."
+  (let ((buffer (get-buffer name)))
+    (and buffer
+         (eq (buffer-local-value 'major-mode buffer) 'agent-shell-mode)
+         (with-current-buffer buffer
+           (agent-shell-viewport--buffer :shell-buffer buffer :existing-only t)))))
+
+(with-eval-after-load 'tracking
+  (add-to-list 'tracking-ignored-buffers #'konix/agent-shell--shell-with-viewport-p))
 
 (defvar konix/agent-shell-track-ready-skip-functions nil
   "Functions, run in a ready buffer, any of which keeps it out of the round.")

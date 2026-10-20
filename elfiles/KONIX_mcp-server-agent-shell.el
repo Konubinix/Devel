@@ -1620,11 +1620,14 @@ around, so they sort first, ties broken on the buddy name to stay stable."
                   (string< (or (nth 1 a) "") (or (nth 1 b) ""))
                 (< oa ob)))))))
 
+(declare-function konix/agent-shell-show-target "KONIX_agent-shell-common")
+
 (defun konix/mcp-server-spawn-tree-show-in-other-window ()
   "Display the agent-shell buffer at point in another window, keeping focus here."
   (interactive)
   (when-let ((shell-buf (get-text-property (point) 'konix/shell-buffer)))
-    (konix/mcp-server--display-agent-from-tree shell-buf)))
+    (konix/mcp-server--display-agent-from-tree
+     (konix/agent-shell-show-target shell-buf))))
 
 (defun konix/mcp-server-spawn-tree-rename ()
   "Edit the label of the agent-shell buffer at point.
@@ -1891,7 +1894,8 @@ point if possible."
                            (fboundp 'agent-shell-viewport--buffer)
                            (agent-shell-viewport--buffer
                             :shell-buffer b :existing-only t))))
-              (konix/mcp-server--pop-to-agent-from-tree (or vp b))))))
+              (konix/mcp-server--pop-to-agent-from-tree
+               (konix/agent-shell-show-target (or vp b)))))))
     (hierarchy-add-trees h (mapcar #'car nodes)
                          #'konix/mcp-server--agent-parent)
     (with-current-buffer buf

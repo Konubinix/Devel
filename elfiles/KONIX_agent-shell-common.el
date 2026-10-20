@@ -97,10 +97,20 @@ Passes ARG through to `agent-shell'."
                                               agent-shell-viewport-edit-mode)))
                   (agent-shell--shell-buffer :no-create t :no-error t))))
     (if shell
-        (agent-shell--display-buffer
-         (or (agent-shell-viewport--buffer :shell-buffer shell :existing-only t)
-             shell))
+        (agent-shell--display-buffer (konix/agent-shell-entry-buffer shell))
       (agent-shell arg))))
+
+(defvar konix/agent-shell-entry-buffer-functions nil
+  "Functions called with a shell, the first non-nil naming the buffer to go to for it.")
+
+(defun konix/agent-shell-entry-buffer (shell)
+  "Return the buffer the user goes to for SHELL.
+The first of `konix/agent-shell-entry-buffer-functions' to name one, else its
+viewport when `agent-shell-prefer-viewport-interaction' says so, else SHELL."
+  (or (run-hook-with-args-until-success 'konix/agent-shell-entry-buffer-functions shell)
+      (and agent-shell-prefer-viewport-interaction
+           (agent-shell-viewport--buffer :shell-buffer shell :existing-only t))
+      shell))
 
 (defun konix/agent-shell/start-with-agent ()
   "Start a shell on an agent picked now, leaving `agent-shell-preferred-agent-config'
@@ -507,6 +517,16 @@ load time, since `agent-shell-diff-mode-map' arrives with `agent-shell-diff'."
        (interactive)
        (konix/agent-shell-interrupt-set-default-and-reply ,prompt))
      (konix/agent-shell-define-key ,key #',name)))
+
+(defvar konix/agent-shell-show-target-functions nil
+  "Functions run in turn on a buffer about to be shown for an agent-shell.
+Each takes the buffer and returns the one to show instead.")
+
+(defun konix/agent-shell-show-target (buf)
+  "Return what to show for BUF, after `konix/agent-shell-show-target-functions'."
+  (let ((target buf))
+    (dolist (fn konix/agent-shell-show-target-functions target)
+      (setq target (funcall fn target)))))
 
 (provide 'KONIX_agent-shell-common)
 ;;; KONIX_agent-shell-common.el ends here

@@ -82,9 +82,9 @@ Unknowable arguments are nil."
 (defun konix/agent-shell--git-lists-p (subcommand arguments)
   "Non-nil when SUBCOMMAND with ARGUMENTS is one of its listing forms."
   (unless (memq nil arguments)
-    (if-let ((verbs (assoc subcommand konix/agent-shell--git-listing-verbs)))
+    (if-let* ((verbs (assoc subcommand konix/agent-shell--git-listing-verbs)))
         (member (car arguments) (cdr verbs))
-      (when-let ((allowed (cdr (assoc subcommand
+      (when-let* ((allowed (cdr (assoc subcommand
                                       konix/agent-shell--git-listing-options))))
         (let ((options (seq-filter (lambda (a) (string-prefix-p "-" a))
                                    arguments)))
@@ -160,7 +160,7 @@ An unreadable argument counts as one that may."
                        konix/agent-shell--git-code-running-global-options-re o))
                     global)
           (and from-subcommand (null (car from-subcommand)))
-          (when-let ((re (cdr (assoc (car from-subcommand)
+          (when-let* ((re (cdr (assoc (car from-subcommand)
                                      konix/agent-shell--git-code-running-options))))
             (seq-some (lambda (a) (or (null a) (string-match-p re a)))
                       (cdr from-subcommand)))))))

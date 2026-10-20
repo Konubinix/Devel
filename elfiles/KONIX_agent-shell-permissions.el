@@ -186,13 +186,13 @@ Read from the transcript file; the agent's thoughts are excluded."
 
 (defun konix/agent-shell--agent-said-since-last-user ()
   "Return all the agent said since the last user message, or nil."
-  (when-let ((blocks (konix/agent-shell--agent-message-blocks-since-last-user)))
+  (when-let* ((blocks (konix/agent-shell--agent-message-blocks-since-last-user)))
     (let ((text (string-trim (mapconcat #'identity blocks "\n\n"))))
       (unless (string-empty-p text) text))))
 
 (defun konix/agent-shell--last-agent-message ()
   "Return the agent's last message, or nil."
-  (when-let ((blocks (konix/agent-shell--agent-message-blocks-since-last-user)))
+  (when-let* ((blocks (konix/agent-shell--agent-message-blocks-since-last-user)))
     (let ((text (string-trim (car (last blocks)))))
       (unless (string-empty-p text) text))))
 
@@ -390,7 +390,7 @@ BODY must return plain data: nodes die with the tree."
   (declare (indent 2) (debug (symbolp form body)))
   (let ((cell (make-symbol "cell"))
         (buffer (make-symbol "buffer")))
-    `(when-let ((,cell (konix/agent-shell--bash-ast-buffer ,tool-call)))
+    `(when-let* ((,cell (konix/agent-shell--bash-ast-buffer ,tool-call)))
        (let ((,buffer (car ,cell))
              (,root (cdr ,cell)))
          (unwind-protect
@@ -416,7 +416,7 @@ nil rather than a guess."
     ("raw_string" (string-trim (treesit-node-text node t) "'" "'"))
     ("string_content" (treesit-node-text node t))
     ((or "simple_expansion" "expansion")
-     (when-let ((var (car (treesit-filter-child
+     (when-let* ((var (car (treesit-filter-child
                            node (lambda (c)
                                   (equal (treesit-node-type c) "variable_name"))
                            t))))
@@ -437,7 +437,7 @@ An unknowable argument stays as nil, not dropped, to keep positions."
 
 (defun konix/agent-shell--command-name (command)
   "Return COMMAND node's command name as a string, or nil."
-  (when-let ((n (treesit-node-child-by-field-name command "name")))
+  (when-let* ((n (treesit-node-child-by-field-name command "name")))
     (treesit-node-text n t)))
 
 (defun konix/agent-shell--command-unwrapped (command)
@@ -544,7 +544,7 @@ VALUE-REGEXP matches NAME's one positional value; nil if it has none.")
 
 (defun konix/agent-shell--sans-command-wrapper (tokens)
   "Return TOKENS without their leading `konix/agent-shell--command-wrappers'."
-  (if-let ((wrapper (assoc (car tokens) konix/agent-shell--command-wrappers)))
+  (if-let* ((wrapper (assoc (car tokens) konix/agent-shell--command-wrappers)))
       (let ((rest (cdr tokens)))
         (while (and (stringp (car rest))
                     (or (string-prefix-p "-" (car rest))
@@ -653,7 +653,7 @@ An unreadable target or a nil DIRECTORY counts as outside."
   (konix/agent-shell--with-bash-ast root tool-call
     (seq-some
      (lambda (capture)
-       (when-let ((target (konix/agent-shell--redirect-target (cdr capture))))
+       (when-let* ((target (konix/agent-shell--redirect-target (cdr capture))))
          (or (eq target 'unknown)
              (not (and directory
                        (file-in-directory-p (expand-file-name target)
@@ -1117,7 +1117,7 @@ apply."
 
 (defun konix/agent-shell-policy--disabled-state (policy key)
   "Return KEY's resolved marker in POLICY's disabled companion, or nil."
-  (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
+  (when-let* ((off (konix/agent-shell-policy-disabled-policy policy)))
     (konix/agent-shell-policy--value-for off key)))
 
 (defun konix/agent-shell-policy--disabled-p (policy key)
@@ -1127,7 +1127,7 @@ apply."
 (defun konix/agent-shell-policy--disable-decider (policy key)
   "Return (LEVEL . STATE) for the narrowest axis marking KEY, or nil.
 LEVEL is \"s\", \"p\" or \"G\"."
-  (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
+  (when-let* ((off (konix/agent-shell-policy-disabled-policy policy)))
     (cl-loop for (level . entries-fn)
              in `(("s" . ,#'konix/agent-shell-policy--session-entries)
                   ("p" . ,#'konix/agent-shell-policy--project-entries)
@@ -1258,7 +1258,7 @@ DEFAULT-REASON stands in for entries without a reason."
 (defun konix/agent-shell--blacklist-act (permission entries)
   "Reject PERMISSION's tool and steer the agent with matched ENTRIES' reasons.
 Return nil, falling back to the dialog, when there is no reject option."
-  (when-let ((reject (seq-find (lambda (option)
+  (when-let* ((reject (seq-find (lambda (option)
                                  (equal (map-elt option :kind) "reject_once"))
                                (map-elt permission :options))))
     (let ((notice (konix/agent-shell--blacklist-notice entries))
@@ -1274,7 +1274,7 @@ Return nil, falling back to the dialog, when there is no reject option."
 (defun konix/agent-shell--whitelist-act (permission entry)
   "Approve PERMISSION's tool for the matched whitelist ENTRY.
 Return nil, falling back to the dialog, when there is no allow option."
-  (when-let ((allow (seq-find (lambda (option)
+  (when-let* ((allow (seq-find (lambda (option)
                                 (equal (map-elt option :kind) "allow_once"))
                               (map-elt permission :options))))
     (let ((note (cdr entry)))
@@ -1286,7 +1286,7 @@ Return nil, falling back to the dialog, when there is no allow option."
 
 (defun konix/agent-shell-policy--consume-once (policy tool-call)
   "Spend POLICY's \"once\" markers whose rule matches TOOL-CALL."
-  (when-let ((off (konix/agent-shell-policy-disabled-policy policy)))
+  (when-let* ((off (konix/agent-shell-policy-disabled-policy policy)))
     (let ((haystack (konix/agent-shell--tool-haystack tool-call)))
       (dolist (entry (konix/agent-shell-policy--effective off))
         (when (and (equal (cdr entry) "once")
@@ -1415,7 +1415,7 @@ Useful after adding a rule, as the responder only sees new requests."
      (format "  Title  : %s\n" (or (map-elt tool-call :title) "(none)"))
      (format "  Kind   : %s\n" (or (map-elt tool-call :kind) "(none)"))
      (when command (format "  Command: %s\n" command))
-     (when-let ((commands (konix/agent-shell--describe-commands tool-call)))
+     (when-let* ((commands (konix/agent-shell--describe-commands tool-call)))
        (concat "\nCommands (what a regexp or `$ GLOB' KEY is matched against, "
                "case-insensitively):\n"
                dash "\n" commands "\n" dash "\n"))
@@ -1658,7 +1658,7 @@ Keys: :header, :key, :entries (POLICY), :set (POLICY KEY VALUE), :remove
                (lambda (key)
                  (concat
                   (konix/agent-shell-policy--enabled-cell policy key)
-                  (when-let ((decider (konix/agent-shell-policy--disable-decider
+                  (when-let* ((decider (konix/agent-shell-policy--disable-decider
                                        policy key)))
                     (propertize (car decider) 'face 'shadow)))))
          (list (konix/agent-shell-policy-value-label policy) 40
@@ -1720,7 +1720,7 @@ The key is prefilled from the waiting permission request, if any."
                          (capitalize (konix/agent-shell-policy-name policy)))
                  (ignore-errors (konix/agent-shell-policy--candidates policy))
                  nil nil
-                 (when-let ((prefill (konix/agent-shell--pending-policy-key
+                 (when-let* ((prefill (konix/agent-shell--pending-policy-key
                                       (eq policy konix/agent-shell--whitelist))))
                    (cons prefill 0))
                  'regexp-history)))
@@ -1747,7 +1747,7 @@ The key is prefilled from the waiting permission request, if any."
   "Edit the key and value of the entry at point, keeping its axes.
 If the key changes, the old one is replaced on each axis it occupied."
   (interactive)
-  (when-let ((key (tabulated-list-get-id)))
+  (when-let* ((key (tabulated-list-get-id)))
     (let* ((policy (konix/agent-shell-panel-current-data))
            (origin (konix/agent-shell-panel--origin-buffer))
            (on-global (assoc key (konix/agent-shell-policy--global-entries policy)))
@@ -1783,7 +1783,7 @@ If the key changes, the old one is replaced on each axis it occupied."
   "Set the enabled state of the rule at point on a chosen axis.
 `once' disables it for the next request it would have matched only."
   (interactive)
-  (when-let ((key (tabulated-list-get-id)))
+  (when-let* ((key (tabulated-list-get-id)))
     (let* ((policy (konix/agent-shell-panel-current-data))
            (origin (konix/agent-shell-panel--origin-buffer))
            (level (intern (completing-read
@@ -1800,7 +1800,7 @@ If the key changes, the old one is replaced on each axis it occupied."
 (defun konix/agent-shell-policy-menu-delete ()
   "Remove the key at point, and its markers, from the panel's policy."
   (interactive)
-  (when-let ((key (tabulated-list-get-id)))
+  (when-let* ((key (tabulated-list-get-id)))
     (let* ((policy (konix/agent-shell-panel-current-data))
            (origin (konix/agent-shell-panel--origin-buffer))
            (off (konix/agent-shell-policy-disabled-policy policy)))

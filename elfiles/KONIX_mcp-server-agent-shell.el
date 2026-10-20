@@ -1356,6 +1356,11 @@ or ask for more time rather than letting the blocked caller time out."
 (defvar-local konix/mcp-server--deadline-timer nil
   "One-shot timer that interrupts this buddy shortly before its task deadline.")
 
+(defvar-local konix/mcp-server--deadline-warned nil
+  "The deadline (Emacs time) this buddy was last interrupted about.
+Every coord reply restates the nearest deadline, so without this each
+coord call made after the interrupt would re-arm it for the same deadline.")
+
 (defun konix/mcp-server--tool-call-result-text (tool-call)
   "Return the concatenated text of TOOL-CALL's result content blocks."
   (mapconcat (lambda (item) (or (map-nested-elt item '(content text)) ""))
@@ -1378,11 +1383,12 @@ Returns nil when no marker is present."
     (cancel-timer konix/mcp-server--deadline-timer))
   (setq konix/mcp-server--deadline-timer nil))
 
-(defun konix/mcp-server--deadline-fire (buffer)
-  "Interrupt BUFFER to demand a report before its task deadline lapses."
+(defun konix/mcp-server--deadline-fire (buffer &optional deadline)
+  "Interrupt BUFFER to demand a report before its task DEADLINE lapses."
   (when (buffer-live-p buffer)
     (with-current-buffer buffer
-      (setq konix/mcp-server--deadline-timer nil)
+      (setq konix/mcp-server--deadline-timer nil
+            konix/mcp-server--deadline-warned deadline)
       (konix/mcp-server--interrupt-and-submit
        buffer
        (format "I had to interrupt you to let you know that you only have ~%ds to report to your caller buddy. Just call coord_complete_task with interim=true to answer that you need more time (if you have not drained the task yet, coord_wait to fetch it first). That leaves the task open, so you keep working and report the real result on it afterwards."
@@ -1391,14 +1397,19 @@ Returns nil when no marker is present."
 (defun konix/mcp-server--arm-deadline-timer (deadline)
   "Arm a one-shot interrupt for DEADLINE (Emacs time) in the current buffer.
 Fires `konix/mcp-server-deadline-lead-seconds' before DEADLINE (or right
-away when already inside that window); a deadline already past is ignored."
+away when already inside that window); a deadline already past, or already
+interrupted about, is ignored."
   (konix/mcp-server--cancel-deadline-timer)
   (let* ((remaining (float-time (time-subtract deadline (current-time))))
          (delay (- remaining konix/mcp-server-deadline-lead-seconds)))
-    (when (> remaining 0)
+    (when (and (> remaining 0)
+               (not (and konix/mcp-server--deadline-warned
+                         (time-equal-p deadline
+                                       konix/mcp-server--deadline-warned))))
       (setq konix/mcp-server--deadline-timer
             (run-with-timer (max delay 1) nil
-                            #'konix/mcp-server--deadline-fire (current-buffer))))))
+                            #'konix/mcp-server--deadline-fire
+                            (current-buffer) deadline)))))
 
 (defun konix/mcp-server-watch-deadline-event (event)
   "Arm/cancel this buddy's deadline interrupt from a coord call's EVENT.

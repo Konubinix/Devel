@@ -125,6 +125,10 @@ When SUBCOMMANDS is given, that `git' must run one of them."
                                  subcommands))))
               (konix/agent-shell--command-nodes root))))
 
+(konix/agent-shell-define-tool-evaluator "git-full" (tool-call)
+  "Match a line matching `@git-readonly' or `@git-write'."
+  (konix/agent-shell-tool-match-p '(or "@git-readonly" "@git-write") tool-call))
+
 (defconst konix/agent-shell--git-code-running-global-options-re
   "\\`\\(?:-c\\|--config-env\\|--exec-path\\)"
   "Regexp of git global options that can make it run an arbitrary command.

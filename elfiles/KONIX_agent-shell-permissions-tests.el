@@ -909,6 +909,13 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (nil . "git reset --hard"))
 
 (konix/agent-shell-tests-deftest-evaluator
+    konix/agent-shell-test-git-full "git-full"
+  (t . "git log --oneline")
+  (t . "git commit -m x")
+  (nil . "git push origin main")
+  (nil . "rm -rf ."))
+
+(konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-git-runs-code "git-runs-code"
   (t . "git -c core.pager=less log")
   (t . "git --config-env=core.pager=PAGER log")

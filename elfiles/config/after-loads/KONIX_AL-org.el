@@ -193,6 +193,17 @@
   (message "computed the roam cache")
   (setq konix/roam-compute-idle-timer nil))
 
+(defun konix/org-babel-tangle-collect-blocks/no-raise (orig-fun &rest args)
+  "Run ORIG-FUN on ARGS, its `find-file' only making the file's buffer current.
+`org-babel-map-src-blocks' visits the file with `find-file', which puts the
+buffer first in the buffer list of whoever tangles, a save or a tool."
+  (cl-letf (((symbol-function 'find-file)
+             (lambda (file &rest _) (set-buffer (find-file-noselect file)))))
+    (apply orig-fun args)))
+
+(advice-add 'org-babel-tangle-collect-blocks :around
+            #'konix/org-babel-tangle-collect-blocks/no-raise)
+
 (defun konix/org-mode/after-save-hook ()
   (when
       (save-excursion

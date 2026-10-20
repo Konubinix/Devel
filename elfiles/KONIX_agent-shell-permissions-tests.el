@@ -590,6 +590,11 @@ PATH defaults to `konix/agent-shell-tests--review'."
            "mcp__other-server__load_file"))
   ;; the value matches arguments, not their names
   (nil . '("@mcp(load_file, file-path)"
+           "mcp__konix-emacs-elisp__load_file"))
+  ;; KEY=REGEXP looks at that argument only
+  (t . '("@mcp(load_file, file-path=code-review)"
+         "mcp__konix-emacs-elisp__load_file"))
+  (nil . '("@mcp(load_file, other=code-review)"
            "mcp__konix-emacs-elisp__load_file")))
 
 (konix/agent-shell-tests-deftable
@@ -608,7 +613,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (("mcp__konix-emacs-elisp__load_file"
     "other"
     "@mcp(mcp__konix-emacs-elisp__load_file)"
-    "@mcp(mcp__konix-emacs-elisp__load_file, /home/sam/prog/devel/elfiles/KONIX_mcp-server-code-review.el)")
+    "@mcp(mcp__konix-emacs-elisp__load_file, file-path=^/home/sam/prog/devel/elfiles/KONIX_mcp-server-code-review\\.el$)")
    . (append (konix/agent-shell-tests--mcp-call
               "mcp__konix-emacs-elisp__load_file"
               'file-path konix/agent-shell-tests--review)
@@ -638,7 +643,25 @@ PATH defaults to `konix/agent-shell-tests--review'."
       "mcp__konix-emacs-elisp__load_file"
       'blob (make-string 201 ?x)
       'form "(progn\n  nil)"
-      'listy "a,b")))
+      'listy "a,b"))
+  ;; every combination of the arguments, smallest first
+  (("@mcp(mcp__konix-files__grep)"
+    "@mcp(mcp__konix-files__grep, pattern=^\\^def $)"
+    "@mcp(mcp__konix-files__grep, path=^/tmp/x\\.py$)"
+    "@mcp(mcp__konix-files__grep, pattern=^\\^def $, path=^/tmp/x\\.py$)")
+   . (konix/agent-shell-tests--mcp-call
+      "mcp__konix-files__grep" 'pattern "^def " 'path "/tmp/x.py")))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-mcp-candidate-matches-its-call
+    (lambda (call)
+      (and (konix/agent-shell-tool-match-p
+            (cadr (konix/agent-shell--mcp-candidates call)) call)
+           t))
+  (t . (konix/agent-shell-tests--mcp-call
+        "mcp__konix-files__grep"
+        'pattern "Updating for |seems broken|^[A-Za-z]*Error|^Exception"
+        'path "/var/run/user/1000/memories/memories.py")))
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-matching-entries-quotes-captures
@@ -711,7 +734,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
     konix/agent-shell-test-policy-key-of-other-tools
     #'konix/agent-shell--tool-call-policy-key
   ;; MCP: tool and argument
-  ("@mcp(mcp__konix-emacs-elisp__load_file, /home/sam/prog/devel/elfiles/KONIX_mcp-server-code-review.el)"
+  ("@mcp(mcp__konix-emacs-elisp__load_file, file-path=^/home/sam/prog/devel/elfiles/KONIX_mcp-server-code-review\\.el$)"
    . (konix/agent-shell-tests--mcp-call
       "mcp__konix-emacs-elisp__load_file"
       'file-path konix/agent-shell-tests--review))

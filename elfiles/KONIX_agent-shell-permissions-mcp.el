@@ -61,18 +61,25 @@ JSON keys are symbols, so only argument values are returned."
 (konix/agent-shell-define-tool-evaluator "mcp" (tool-call tool &rest values)
   "Match a call to MCP tool TOOL with every one of VALUES among its arguments.
 TOOL and VALUES are unanchored regexps: in a whitelist, end a path with `$'
-lest it match longer paths too."
+lest it match longer paths too.  A value `KEY=REGEXP' only looks at the
+argument KEY."
   (when-let ((name (konix/agent-shell--mcp-tool-name tool-call)))
     (and (konix/agent-shell--mcp-name-matches-p name (string-trim tool))
-         (let ((arguments (konix/agent-shell--raw-input-values
-                           (map-elt tool-call :raw-input)))
+         (let ((raw-input (map-elt tool-call :raw-input))
                (case-fold-search t))
-           (seq-every-p (lambda (value)
-                          (seq-some (lambda (argument)
-                                      (string-match-p (string-trim value)
-                                                      argument))
-                                    arguments))
-                        values)))))
+           (seq-every-p
+            (lambda (value)
+              (let* ((value (string-trim value))
+                     (keyed (string-match
+                             "\\`\\([[:alnum:]_-]+\\)=\\(.*\\)\\'" value))
+                     (regexp (if keyed (match-string 2 value) value)))
+                (seq-some (lambda (argument)
+                            (string-match-p regexp argument))
+                          (konix/agent-shell--raw-input-values
+                           (if keyed
+                               (map-elt raw-input (intern (match-string 1 value)))
+                             raw-input)))))
+            values)))))
 
 ;;; Completion ------------------------------------------------------------------
 
@@ -86,16 +93,39 @@ Commas are excluded: the evaluator parser would split the value in two."
 
 (defun konix/agent-shell--mcp-candidates (tool-call)
   "Return the `@mcp' completion candidates for TOOL-CALL, or nil.
-One for the bare tool, plus one per argument value."
+One per combination of its arguments as `KEY=VALUE', smallest first."
   (when-let ((name (konix/agent-shell--mcp-tool-name tool-call)))
-    (cons (format "@mcp(%s)" name)
-          (mapcar (lambda (value) (format "@mcp(%s, %s)" name value))
-                  (seq-filter #'konix/agent-shell--mcp-candidate-value-p
-                              (konix/agent-shell--raw-input-values
-                               (map-elt tool-call :raw-input)))))))
+    (let ((subsets '(nil)))
+      (dolist (argument (map-elt tool-call :raw-input))
+        (when (konix/agent-shell--mcp-candidate-value-p (cdr-safe argument))
+          (let ((pair (format "%s=^%s$" (car argument)
+                              (regexp-quote (cdr argument)))))
+            (setq subsets (append subsets
+                                  (mapcar (lambda (subset) (append subset (list pair)))
+                                          subsets))))))
+      (mapcar (lambda (subset)
+                (if subset
+                    (format "@mcp(%s, %s)" name (string-join subset ", "))
+                  (format "@mcp(%s)" name)))
+              (seq-sort-by #'length #'< subsets)))))
 
 (add-to-list 'konix/agent-shell-tool-candidate-functions
              #'konix/agent-shell--mcp-candidates)
+
+;;; Display ---------------------------------------------------------------------
+
+(defun konix/agent-shell--permission-title-show-mcp-input (fn &rest args)
+  "Call FN with ARGS, then append every argument of an MCP call with several.
+Upstream shows the input of a single-argument call only."
+  (let* ((title (apply fn args))
+         (raw-input (map-elt (plist-get args :tool-call) :raw-input)))
+    (if (and (konix/agent-shell--mcp-tool-name (plist-get args :tool-call))
+             (> (length raw-input) 1))
+        (concat title "\n\n" (agent-shell--format-tool-call-input raw-input))
+      title)))
+
+(advice-add 'agent-shell--permission-title :around
+            #'konix/agent-shell--permission-title-show-mcp-input)
 
 (provide 'KONIX_agent-shell-permissions-mcp)
 ;;; KONIX_agent-shell-permissions-mcp.el ends here

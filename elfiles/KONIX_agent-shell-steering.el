@@ -170,6 +170,14 @@ Reads the tool's own output, where Monitor announces `Monitor started (task
           konix/agent-shell-steering-monitor-regexp
           (or (ignore-errors (konix/agent-shell--tool-output-text tool-call)) "")))))
 
+(konix/agent-shell-define-tool-evaluator "subagent" (tool-call)
+  "Match a call spawning, listing or messaging a sub agent.
+An Agent call is titled by its description: it is told by its kind and prompt."
+  (or (konix/agent-shell-tool-named-p tool-call '("ListAgents" "SendMessage"))
+      (and (equal (map-elt tool-call :kind) "think")
+           (map-elt (map-elt tool-call :raw-input) 'prompt)
+           t)))
+
 ;;; Compaction guard ------------------------------------------------------------
 
 (defcustom konix/agent-shell-steering-compaction-regexp
@@ -207,6 +215,8 @@ notice, and the agent's last message block."
     ("@background" . "Use foreground and the sleep mcp tool if needed")
     ("@background-monitor"
      . "Background events are not handled here, nothing will deliver them to you: use the sleep mcp tool to wait instead.")
+    ("@subagent"
+     . "Sub agents aren't supported by this harness: use a buddy instead (spawn_buddy).")
     ("@insecable-character-failure"
      . "That edit to a .org note failed on espaces insécables (U+00A0): its OLD_STRING is in the file, spelled with insecables where you used plain spaces. Do NOT re-anchor around it: run the note_strip_insecables MCP tool on the file, redo all edits, then note_insecables to restore.")
     )

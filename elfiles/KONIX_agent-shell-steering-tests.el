@@ -102,6 +102,17 @@ TITLE defaults to Monitor."
                       (:last-message . "Monitor started (task x, timeout 1ms)")))
                    t)))
 
+(ert-deftest konix/agent-shell-steering-test-subagent ()
+  (dolist (case `((t (:title . "Replay the demo") (:kind . "think")
+                     (:raw-input (description . "Replay the demo") (prompt . "Run it")))
+                  (t (:title . "ListAgents") (:kind . "other"))
+                  (t (:title . "SendMessage") (:kind . "other"))
+                  (nil (:title . "Plan") (:kind . "think") (:raw-input (todos . [])))
+                  (nil (:title . "Read notes.txt") (:kind . "read")
+                       (:raw-input (prompt . "x")))))
+    (should (eq (car case)
+                (and (konix/agent-shell-tool-match-p "@subagent" (cdr case)) t)))))
+
 (ert-deftest konix/agent-shell-steering-test-compacting-p-reads-both-signals ()
   (should (konix/agent-shell-steering-tests--compacting-p "Compacting..." nil))
   ;; a delta holding only part of the notice, caught by the last message block

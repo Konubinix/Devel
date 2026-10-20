@@ -1120,10 +1120,10 @@ end
 -- the one that comes up fullscreen, where there is no property change to hear.
 client.connect_signal("property::fullscreen", clear_notifications_for_stream)
 
--- These games re-apply a geometry of their own after being fullscreened, and awesome takes it,
--- leaving the picture shifted and cropped. So clamp a fullscreen game to its screen.
+-- Some clients re-apply a geometry of their own after being fullscreened, and awesome takes it,
+-- leaving the picture shifted and cropped. So clamp a fullscreen client to its screen.
 client.connect_signal("property::geometry", function(c)
-	if is_streamed_game(c) and c.fullscreen then
+	if c.fullscreen then
 		local g, s = c:geometry(), c.screen.geometry
 		if g.x ~= s.x or g.y ~= s.y or g.width ~= s.width or g.height ~= s.height then
 			c:geometry(s)

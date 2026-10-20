@@ -137,6 +137,24 @@ in
         ps.flake8
         ps.notmuch
         ps.requests
+        # not in nixpkgs; the pronote clk group talks to Pronote through it
+        (ps.buildPythonPackage rec {
+          pname = "pronotepy";
+          version = "2.15.7";
+          format = "wheel";
+          src = ps.fetchPypi {
+            inherit pname version format;
+            dist = "py3";
+            python = "py3";
+            hash = "sha256-CeBANRwDQxbua6mQXY19Q8CaAy9PYXuh8Bvmj736WBI=";
+          };
+          dependencies = [
+            ps.beautifulsoup4
+            ps.pycryptodome
+            ps.requests
+            ps.autoslot
+          ];
+        })
       ]
       ++ (config.konix.extraPythonPackages ps)
     );

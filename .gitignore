@@ -2,6 +2,7 @@
 *.pyc
 /config/elfiles/comphist.dat
 /config/retroarch
+/config/pronote
 *~
 *.elc
 *#

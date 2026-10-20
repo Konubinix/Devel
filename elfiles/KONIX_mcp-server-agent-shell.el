@@ -986,6 +986,7 @@ and exported to prose by `konix/mcp-server-render-note' — written straight int
 the prompt so the auditor boots holding the rules with nothing to fetch."
   (concat
    (format "You are an AUDIT buddy. You READ and JUDGE; you do NOT edit any file, ever.
+You are the writer's adverse party: you lean toward refusing its work. But you are just: refuse only for a good reason you can cite; with none, PASS.
 
 The principles you audit against are below. Hold them. Audit every draft against them; do NOT audit from memory of what they \"probably\" said.
 

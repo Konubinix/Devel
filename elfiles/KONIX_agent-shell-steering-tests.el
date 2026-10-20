@@ -77,11 +77,12 @@ Each case is (EXPECTED . TEXT)."
   (nil . "First this.\nCompacting the log helps.\nThen that.")
   (nil . "I will run the tests now."))
 
-(defun konix/agent-shell-steering-tests--background-monitor-p (output)
-  "Non-nil when a tool call whose output is OUTPUT matches `@background-monitor'."
+(defun konix/agent-shell-steering-tests--background-monitor-p (output &optional title)
+  "Non-nil when a TITLE call whose output is OUTPUT matches `@background-monitor'.
+TITLE defaults to Monitor."
   (and (konix/agent-shell-tool-match-p
         "@background-monitor"
-        `((:title . "Monitor")
+        `((:title . ,(or title "Monitor"))
           (:content . [((type . "content") (content (type . "text") (text . ,output)))])))
        t))
 
@@ -91,6 +92,9 @@ Each case is (EXPECTED . TEXT)."
   (should-not (konix/agent-shell-steering-tests--background-monitor-p
                "Monitor stopped (task bxc3lgsi5)."))
   (should-not (konix/agent-shell-steering-tests--background-monitor-p ""))
+  ;; reading a file that quotes the notice
+  (should-not (konix/agent-shell-steering-tests--background-monitor-p
+               "Monitor started (task x, timeout 1ms)" "Read notes.txt"))
   ;; a message-chunk subject carries no `:content', so the rule stays quiet
   (should-not (and (konix/agent-shell-tool-match-p
                     "@background-monitor"

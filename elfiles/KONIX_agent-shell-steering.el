@@ -165,9 +165,10 @@ have been found had the espaces insécables (U+00A0) been plain spaces."
 Reads the tool's own output, where Monitor announces `Monitor started (task
 ..., timeout ...ms)'."
   (let ((case-fold-search nil))
-    (string-match-p
-     konix/agent-shell-steering-monitor-regexp
-     (or (ignore-errors (konix/agent-shell--tool-output-text tool-call)) ""))))
+    (and (konix/agent-shell-tool-named-p tool-call '("Monitor"))
+         (string-match-p
+          konix/agent-shell-steering-monitor-regexp
+          (or (ignore-errors (konix/agent-shell--tool-output-text tool-call)) "")))))
 
 ;;; Compaction guard ------------------------------------------------------------
 
@@ -280,6 +281,10 @@ control back to user now\" notice used to lie about."
              (null (konix/agent-shell--pending-permission-ids)))
     (when-let* ((pair (ignore-errors
                         (konix/agent-shell-steering--subject-and-haystack event)))
+                ;; A call still pending may carry no or half its input: judge it
+                ;; once it runs, its input whole.
+                ((not (and (consp (car pair))
+                           (equal (map-elt (car pair) :status) "pending"))))
                 (entries (seq-filter
                           (lambda (e)
                             (let ((g (cdr e)))
@@ -302,7 +307,14 @@ control back to user now\" notice used to lie about."
              (reasons (mapconcat
                        (lambda (e) (format "because of %s: %s" (car e) (cdr e)))
                        entries "\n"))
-             (notice (concat header "\n" reasons
+             (call (when (and (eq (map-elt event :event) 'tool-call-update)
+                              (consp (car pair)))
+                     (let ((input (format "%S" (map-elt (car pair) :raw-input))))
+                       (format "on %s (%s): %s\n"
+                               (map-elt (car pair) :title)
+                               (map-elt (car pair) :kind)
+                               (truncate-string-to-width input 300 nil nil "…")))))
+             (notice (concat header "\n" call reasons
                              (if last
                                  "\nGiving control back to user now."
                                ""))))

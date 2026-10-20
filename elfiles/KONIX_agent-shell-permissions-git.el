@@ -29,7 +29,7 @@
 (require 'KONIX_agent-shell-permissions)
 
 (defconst konix/agent-shell--git-read-only-subcommands
-  '("status" "log" "hash-object" "diff" "show" "grep" "ls-files" "ls-tree" "merge-base"
+  '("status" "log" "hash-object" "diff" "rev-list" "show" "grep" "ls-files" "ls-tree" "merge-base"
     "show-ref" "rev-parse")
   "Git subcommands that only read, whatever their arguments.")
 
@@ -53,7 +53,7 @@ Values must be glued (`--merged=main'): a separate word is a name to create,
 unless `-l'/`--list' makes it a pattern.")
 
 (defconst konix/agent-shell--git-write-subcommands
-  '("stash" "rebase" "rm" "update-index" "merge-tree" "update-ref" "branch" "fetch" "reset"
+  '("stash" "rebase" "rm" "update-index" "commit-tree" "cherry" "merge-tree" "update-ref" "branch" "fetch" "reset"
     "cherry-pick" "revert" "restore" "apply" "checkout" "add" "switch" "merge"
     "tag" "reflog" "filter-branch" "filter-repo" "worktree" "commit"
     "pull" "clone" "clean" "mv" "gc")

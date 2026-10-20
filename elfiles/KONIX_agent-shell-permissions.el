@@ -855,7 +855,7 @@ matches."
     ("@severalcommands" . "One command at a time. Don't filter before knowing where to look: write the output to ./.agent-shell/tmp")
     ("@lost-search" . "You are lost, simply ask the user for guidance. Don't try to do all by yourself, make a team with the user.")
     ("^cd\\b" . "Don't cd")
-    ("^\\(bash -c\\|python3? -c\\|python3? - <<\\)" . "No oneliner")
+    ("^\\(bash -c\\|python3? \\(-I \\)?-c\\|python3? - <<\\)" . "No oneliner")
     ("@edit-agent-permissions" . "Ask the user to do this")
     ("(and \"^find\\\\b\" \"@touches(~/.emacs.d)\")" . "Use the mcp tools")
     )

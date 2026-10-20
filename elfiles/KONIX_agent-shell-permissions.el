@@ -1685,7 +1685,7 @@ Keys: :header, :key, :entries (POLICY), :set (POLICY KEY VALUE), :remove
    :name-header "Regexp/predicate"
    :name-width 30
    :data policy
-   :rows (lambda () (konix/agent-shell-policy--all-keys policy))
+   :rows (lambda () (sort (konix/agent-shell-policy--all-keys policy) #'string<))
    :label (lambda (key) (format "%s" key))
    :axes
    (append

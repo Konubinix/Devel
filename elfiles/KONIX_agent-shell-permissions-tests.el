@@ -672,6 +672,18 @@ PATH defaults to `konix/agent-shell-tests--review'."
    . (konix/agent-shell-tests--mcp-call
       "mcp__konix-files__grep" 'pattern "^def " 'path "/tmp/x.py")))
 
+(ert-deftest konix/agent-shell-test-policy-panel-rows-sorted ()
+  (cl-letf (((symbol-function 'konix/agent-shell-policy--session-entries)
+             (lambda (_) '(("^zz") ("@b"))))
+            ((symbol-function 'konix/agent-shell-policy--project-entries)
+             (lambda (_) '(("^mm"))))
+            ((symbol-function 'konix/agent-shell-policy--global-entries)
+             (lambda (_) '(("@a") ("^zz")))))
+    (should (equal (funcall (konix/agent-shell-panel-rows
+                             (konix/agent-shell--policy-panel
+                              konix/agent-shell--whitelist)))
+                   '("@a" "@b" "^mm" "^zz")))))
+
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-own-session-greps-its-own-files
     (lambda (path)

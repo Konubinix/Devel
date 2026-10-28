@@ -815,7 +815,7 @@ matches."
                             paths))))))
 
 (defcustom konix/agent-shell-project-commands
-  '("argdown" "awk" "base64" "cat" "uuidgen" "cut" "date" "diff" "echo" "false"
+  '("argdown" "awk" "base64" "cat" "uuidgen" "cut" "date" "chmod" "diff" "echo" "false"
     "head" "jq" "ls" "man" "mkdir" "mmdc" "openscad" "plantuml" "rm"
     "sed" "sort" "sqlite3" "strings" "tail" "tar" "true" "uniq" "unzip" "wc"
     "which")
@@ -878,6 +878,7 @@ agent."
 
 (defcustom konix/agent-shell-tool-whitelist-global
   '(("(and \"^edit$\" \"@inside(.agent-shell/tmp)\")" . "Edits and writes confined to ./.agent-shell/tmp/")
+    ("^Read .agent-shell/tmp")
     ("@project-commands" . "commands on project files")
     ("(and \"@mcp(konix-files__readonly_grep$)\" (or \"@inside\" \"@inside(/home/sam/prog/devel/)\" \"@own-session\"))" . "grep on project files and the session's own")
     ("^\\(ba\\)?sh -n")
@@ -885,7 +886,7 @@ agent."
     ("^nix-instantiate --parse")
     ("^mcp__konix-emacs-agents__set_label$")
     ("^mcp__konix-coord__")
-    ("^python3? -m py_compile")
+    ("^python3?\\( -I\\)? -m py_compile")
     ("@read-only-sed" . "sed that only reads project files and prints")
     ("@read-only-find" . "find that only walks project files and prints")
     ("@gh-read" . "gh api GETs and the list/view subcommands")

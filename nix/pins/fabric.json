@@ -1,0 +1,11 @@
+{
+  "reason": "invoke 3 breaks fabric, fabric#2376",
+  "nixpkgs": {
+    "lastModified": 1791637130,
+    "narHash": "sha256-TuvwvSjJrpqyIYdjhQ7Wu+ADVfeOpO2Um21/V7TOubw=",
+    "owner": "NixOS",
+    "repo": "nixpkgs",
+    "rev": "ca1659429c950a11a565b5764e37a1b704e17ec8",
+    "type": "github"
+  }
+}

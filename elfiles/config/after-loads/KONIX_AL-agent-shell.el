@@ -74,7 +74,9 @@
   "My work is not a dump of your opinion, todo list or stuff you don't want to forget. Focus on helping me, not having fun.")
 
 
-(konix/agent-shell-define-reply konix/agent-shell-red-herring   "M-h" "that's not helping. Are you lost?")
+(konix/agent-shell-define-reply konix/agent-shell-red-herring
+  "M-h"
+  "that's not helping. Are you lost? Your behavior makes me think you want me to believe you are operational but you are not.")
 
 (konix/agent-shell-define-reply konix/agent-shell-symptoms
   "M-S" "fix the cause, not the symptom")

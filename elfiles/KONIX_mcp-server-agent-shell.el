@@ -1024,7 +1024,7 @@ RESPECT THE CALLER'S DEADLINE: each %3$s carries the deadline the caller set (th
                      ",")
           item))
 
-(defun konix/mcp-server-spawn-auditor (directory &optional label respawn-threshold)
+(defun konix/mcp-server-spawn-auditor (directory &optional label respawn-threshold fresh)
   "Spawn a standing AUDIT buddy with the governing principles baked into its boot prompt.
 
 The auditor only reads and returns verdicts; it never edits.  It audits SUBSTANCE
@@ -1045,7 +1045,8 @@ done; to pick up edits to the principles, kill it and spawn a fresh one.
 MCP Parameters:
   directory - The working directory for the session
   label - Short role label, unique WITHIN your session (e.g. \"auditor\", \"style\"). Defaults to \"auditor\". The coordination name is \"<your-session>::<label>\"; the tool returns the exact name to pass as to_buddy.
-  respawn-threshold - Context-usage percentage (0-100) at which it respawns. Defaults to 80."
+  respawn-threshold - Context-usage percentage (0-100) at which it respawns. Defaults to 80.
+  fresh - \"true\" to kill the standing auditor of that label and spawn a new one, on the note as it now reads."
   (mcp-server-lib-with-error-handling
    (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
           (caller (konix/mcp-server--caller-identity))
@@ -1058,6 +1059,9 @@ MCP Parameters:
                      konix/mcp-server--calling-buffer))
                (error "No governing note is bound to the calling session; open it via an `agent-shell-with-note' org link before spawning an auditor")))
           (existing (konix/mcp-server--buffer-for-buddy name)))
+     (when (and existing (member fresh '(t "true")))
+       (konix/mcp-server--kill-buffers (list existing))
+       (setq existing nil))
      (if existing
          (format "An auditor named \"%s\" is already serving this session (buffer '%s'); reusing it. Send drafts with coord_ask_and_wait to_buddy=\"%s\". To pick up edited principles, kill_buddy it and spawn a fresh one."
                  name (buffer-name existing) name)

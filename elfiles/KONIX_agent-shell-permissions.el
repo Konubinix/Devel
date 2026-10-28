@@ -861,7 +861,7 @@ matches."
     ("@lost-search" . "You are lost, simply ask the user for guidance. Don't try to do all by yourself, make a team with the user.")
     ("^cd\\b" . "Don't cd")
     ("^\\(bash -c\\|python3? \\(-I \\)?-c\\|python3? - <<\\)" . "No oneliner")
-    ("@edit-agent-permissions" . "Ask the user to do this")
+    ("@edit-agent-permissions" . "Never ever mention dir-locals.el or claude settings. Ask the user to work on them if need be")
     ("(and \"^find\\\\b\" \"@touches(~/.emacs.d)\")" . "Use the mcp tools")
     )
   "Global alist of (KEY . REASON) blacklisted tools.

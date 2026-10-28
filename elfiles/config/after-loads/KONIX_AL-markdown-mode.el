@@ -260,9 +260,11 @@
              (let ((output-file (org-babel-temp-file "mermaid-output-" ".png")))
                (with-temp-buffer
                  (insert code-body)
-                 (call-process-region
-                  (point-min) (point-max) "mmdc" nil
-                  nil nil "-w" "1600" "-H" "800" "-i" "-" "-o" output-file "-e" "png"))
+                 (unless (equal 0 (call-process-region
+                                   (point-min) (point-max) "mmdc" nil
+                                   nil nil "--size" "1600x800" "-i" "-" "-o"
+                                   output-file "-e" "png"))
+                   (user-error "mmdc failed")))
                (start-process "mimeopen" nil "mimeopen" output-file))
              )
             ((string= language "python")

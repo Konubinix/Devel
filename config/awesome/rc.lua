@@ -478,6 +478,26 @@ globalkeys = gears.table.join(
 		},
 		keys = { "Tab", "ISO_Left_Tab" },
 	}),
+	-- sent by the pad's Home+Start chord only: cycles Steam and its games
+	awful.key({ modkey, "Control", "Mod1", "Shift" }, "F12", function()
+		local steams = {}
+		for _, c in ipairs(client.get()) do
+			local class = c.class or ""
+			if class == "steam" or class:match("^steam_app_") then
+				table.insert(steams, c)
+			end
+		end
+		if #steams == 0 then
+			return
+		end
+		local idx = 0
+		for i, c in ipairs(steams) do
+			if c == client.focus then
+				idx = i
+			end
+		end
+		steams[idx % #steams + 1]:jump_to()
+	end, { description = "cycle steam windows (pad)", group = "client" }),
 	awful.key({ modkey }, "w", function()
 		mymainmenu:show()
 	end, { description = "show main menu", group = "awesome" }),
@@ -1273,4 +1293,6 @@ end)
 client.connect_signal("unfocus", function(c)
 	c.border_color = beautiful.border_normal
 end)
+-- tangled from streaming_with_sunshine_moonlight.org
+require("sunshine")
 -- }}}

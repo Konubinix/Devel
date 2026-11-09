@@ -25,6 +25,10 @@ in
       lib.types.submodule {
         options = {
           command = lib.mkOption { type = lib.types.str; };
+          target = lib.mkOption {
+            type = lib.types.str;
+            default = "graphical-session.target";
+          };
           autostart = lib.mkOption {
             type = lib.types.bool;
             default = true;
@@ -41,15 +45,15 @@ in
       {
         Unit = {
           Description = name;
-          PartOf = [ "graphical-session.target" ];
-          After = [ "graphical-session.target" ];
+          PartOf = [ job.target ];
+          After = lib.optional (job.target != "default.target") job.target;
         };
         Service = {
           ExecStart = toString (run name job.command);
           Restart = "on-failure";
         };
       }
-      // lib.optionalAttrs job.autostart { Install.WantedBy = [ "graphical-session.target" ]; }
+      // lib.optionalAttrs job.autostart { Install.WantedBy = [ job.target ]; }
     ) config.konix.userJobs;
 
     konix.userJobs = {

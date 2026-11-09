@@ -24,6 +24,8 @@
 (autoload 'konix/agent-shell-workspace-pick
   "KONIX_agent-shell-workspace" nil t)
 
+(keymap-global-set "M-g l p" #'konix/agent-shell-workspace-pick)
+
 (provide '990-KONIX_agent-shell-workspace)
 ;;; 990-KONIX_agent-shell-workspace.el ends here
 ;; opened from startup -*- lexical-binding: t; -*- ends here

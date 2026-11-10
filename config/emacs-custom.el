@@ -1,4 +1,5 @@
 ;;; emacs-custom.el ---                              -*- lexical-binding: t; -*-
+;;; changes of this file mustnot be commited, but spread in the correct files
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

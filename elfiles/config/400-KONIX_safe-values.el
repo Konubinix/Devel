@@ -58,6 +58,7 @@
 (add-to-list 'safe-local-variable-values '(konix/delete-trailing-whitespace . t))
 (add-to-list 'safe-local-variable-values '(org-id-link-to-org-use-id))
 (add-to-list 'safe-local-variable-values '(org-babel-default-header-args:python . ((:preserve-indentation . t))))
+(add-to-list 'safe-local-variable-values '(konix/delete-trailing-whitespace))
 
 
 

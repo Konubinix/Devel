@@ -1,4 +1,5 @@
 ;;; emacs.el ---                                     -*- lexical-binding: t; -*-
+(custom-set-variables '(straight-vc-git-default-clone-depth 1))
 (setq-default load-prefer-newer t)
 (mapc (lambda (file)
         (when (string-prefix-p "ECRYPT" file)

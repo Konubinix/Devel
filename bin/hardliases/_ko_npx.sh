@@ -22,6 +22,6 @@ function npx_run {
     else
         date +%F > "$stamp_file"
         rm -rf "$cache_dir/_cacache"
-        npx --yes --cache "$cache_dir" "$package@latest" "$@"
+        npx --yes --cache "$cache_dir" "$package" "$@"
     fi
 }

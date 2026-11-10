@@ -38,4 +38,4 @@ case "$BACKEND" in
         ;;
 esac
 
-npx_run @agentclientprotocol/claude-agent-acp "$@"
+npx_run @agentclientprotocol/claude-agent-acp@latest "$@"

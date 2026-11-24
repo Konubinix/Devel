@@ -504,6 +504,18 @@ Returns t unconditionally so the kill of this buffer always proceeds."
            (konix/mcp-server--kill-buffers descendants))))))
   t)
 
+(defvar konix/mcp-server-birth-name nil
+  "Bound around the start of an agent-shell, the buddy name it is born with.
+Nil, or held by a live buffer already, it gets a random one.")
+
+(defvar konix/mcp-server--buddy-name-binding
+  (konix/agent-shell-session-binding-create
+   :store (konix/agent-shell-session-store-create
+           :file (expand-file-name "konix/agent-shell-buddy-names.el"
+                                   user-emacs-directory))
+   :variable 'konix/mcp-server--buddy-name)
+  "Each session's buddy name, so a resumed session is born with it.")
+
 (defun konix/mcp-server--name-current-agent-shell ()
   "Give the current agent-shell buffer its buddy name and carry it in its
 buffer-local `agent-shell-mcp-servers' as the konix-emacs --server-id suffix.
@@ -511,12 +523,21 @@ buffer-local `agent-shell-mcp-servers' as the konix-emacs --server-id suffix.
 Every agent-shell buffer gets one, so it is addressable by name before it has
 said anything to coord.  A uuid rather than something derived from the buffer
 name: a rename must not move a buddy's identity out from under a sender that
-just read it."
+just read it.  `konix/mcp-server-birth-name' gives it a stable one instead."
   (when (and (derived-mode-p 'agent-shell-mode)
              (not konix/mcp-server--buddy-name))
     (require 'org-id)
-    (let ((name (format "s%s" (substring (org-id-uuid) 0 8))))
-      (setq-local konix/mcp-server--buddy-name name)
+    (let ((name (or (seq-find
+                     (lambda (name)
+                       (and name (not (konix/mcp-server--buffer-for-buddy name))))
+                     (list konix/mcp-server-birth-name
+                           (konix/agent-shell-session-store-get
+                            (konix/agent-shell-session-binding-store
+                             konix/mcp-server--buddy-name-binding)
+                            (map-elt agent-shell--state :resume-session-id))))
+                    (format "s%s" (substring (org-id-uuid) 0 8)))))
+      (konix/agent-shell-session-binding-bind
+       konix/mcp-server--buddy-name-binding (current-buffer) name)
       (setq-local konix/mcp-server--birth-order
                   (cl-incf konix/mcp-server--birth-counter))
       (konix/mcp-server--register-buddy-name name (current-buffer))

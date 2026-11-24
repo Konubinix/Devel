@@ -47,10 +47,14 @@ See `konix/agent-shell-entry-buffer'."
                        :shell buf
                        :pop (konix/agent-shell-entry-buffer buf)))
                buffers))
-             ;; Drop the buffer we are called from so we always switch somewhere
-             ;; else, unless it is the only one.
-             (others (cl-remove caller entries
-                                :key (lambda (e) (plist-get e :shell))))
+             ;; Drop the buffer we are called from, as a shell or as where one
+             ;; pops to, so we always switch somewhere else, unless it is the
+             ;; only one.
+             (others (cl-remove-if
+                      (lambda (e)
+                        (or (eq (plist-get e :shell) caller)
+                            (eq (plist-get e :pop) (current-buffer))))
+                      entries))
              (candidates (or others entries))
              (alist (mapcar (lambda (e) (cons (plist-get e :line) (plist-get e :pop)))
                             candidates))

@@ -29,25 +29,18 @@
         inherit system;
         overlays = [ (import ./nix/pins-overlay.nix) ];
       };
-      impass = import ./flakes/impass/default.nix { inherit pkgs; };
     in
     {
       overlays.pins = import ./nix/pins-overlay.nix;
 
       # Reusable module for other flakes (e.g. perso.git) to import
-      homeManagerModules.default = {
-        imports = [ ./nix/homemanager.nix ];
-        home.packages = [ impass ];
-      };
+      homeManagerModules.default = ./nix/homemanager.nix;
       nixosModules.default = ./nix/nixos.nix;
 
       # standalone home-manager (devel-only, no perso)
       homeConfigurations."sam" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-        modules = [
-          ./nix/homemanager.nix
-          { home.packages = [ impass ]; }
-        ];
+        modules = [ ./nix/homemanager.nix ];
       };
 
       # NixOS system + home-manager (devel-only, no perso)

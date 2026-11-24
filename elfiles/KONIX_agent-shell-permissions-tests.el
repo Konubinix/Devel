@@ -1246,7 +1246,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
                   (write . "git tag v1")
                   (write . "git stash")            ; a bare stash pushes
                   (write . "git reflog expire --all")
-                  (write . "git worktree add ../x")
+                  (nil . "git worktree add ../x")
                   (write . "git commit -m x")
                   (write . "git clean -fdx")
                   (write . "git pull --rebase")

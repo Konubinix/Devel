@@ -29,7 +29,7 @@
 (require 'KONIX_agent-shell-permissions)
 
 (defconst konix/agent-shell--git-read-only-subcommands
-  '("status" "log" "hash-object" "diff" "rev-list" "show" "grep" "ls-files" "ls-tree" "merge-base"
+  '("status" "log" "hash-object" "diff" "rev-list" "ls-remote" "show" "grep" "ls-files" "ls-tree" "merge-base"
     "show-ref" "rev-parse")
   "Git subcommands that only read, whatever their arguments.")
 
@@ -55,7 +55,7 @@ unless `-l'/`--list' makes it a pattern.")
 (defconst konix/agent-shell--git-write-subcommands
   '("stash" "rebase" "rm" "update-index" "commit-tree" "cherry" "merge-tree" "update-ref" "branch" "fetch" "reset"
     "cherry-pick" "revert" "restore" "apply" "checkout" "add" "switch" "merge"
-    "tag" "reflog" "filter-branch" "filter-repo" "worktree" "commit"
+    "tag" "reflog" "filter-branch" "filter-repo" "commit"
     "pull" "clone" "clean" "mv" "gc")
   "Git subcommands that rewrite history, refs or the working tree.
 `push' is absent: it writes no local state.  Listing forms do not count.")

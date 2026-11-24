@@ -187,7 +187,7 @@ well be bundled with other short options as in `-rln'."
             arguments))))
 
 (defvar konix/shell-search-broad-roots
-  '("/" "~" "~/perso" "~/prog" "~/.local" "/nix/store")
+  '("/" "~" "~/perso" "~/prog" "~/.local" "/nix/store" "~/.emacs.d/elpa")
   "Directories aggregating unrelated stuff, too broad to search as a whole.")
 
 (defun konix/shell-search-broad-root-p (path)

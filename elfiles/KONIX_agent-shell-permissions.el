@@ -565,6 +565,7 @@ instead of asking."
     ("nice" . "\\`-?[0-9]+\\'")
     ("ionice" . "\\`[0-9]+\\'")
     ("stdbuf")
+    ("bkt")
     ("time"))
   "Commands running the command that follows them, as (NAME . VALUE-REGEXP).
 VALUE-REGEXP matches NAME's one positional value; nil if it has none.")
@@ -871,8 +872,8 @@ matches."
 
 (defcustom konix/agent-shell-project-commands
   '("argdown" "awk" "base64" "cat" "uuidgen" "cut" "date" "chmod" "diff" "echo" "false"
-    "head" "jq" "ls" "man" "mkdir" "mmdc" "openscad" "plantuml" "rm"
-    "sed" "sort" "sqlite3" "strings" "tail" "tar" "true" "uniq" "unzip" "wc"
+    "head" "jq" "ls" "man" "mkdir" "mmdc" "pdftotext" "openscad" "plantuml"
+    "sed" "sort" "stat" "sqlite3" "strings" "tail" "tar" "true" "uniq" "unzip" "wc"
     "which")
   "Commands `@project-commands' approves when they only touch project files."
   :type '(repeat string)
@@ -958,11 +959,12 @@ return what fills {why} in the rule's reason: « takes: Y, Z (required: Y) »."
     ("@writes-outside(.agent-shell/tmp)" . "Redirect output into ./.agent-shell/tmp/ instead")
     ("^command -v" . "Use nix-shell")
     ("python3 -m json.tool" . "jq")
+    ("nix-shell -p plantuml --run" . "just plantuml")
     ("@severalcommands" . "One command at a time. Don't filter before knowing where to look: write the output to ./.agent-shell/tmp")
     ("@curl-several-hosts" . "One host per curl: split this into one curl per host")
     ("@lost-search" . "You are lost, simply ask the user for guidance. Don't try to do all by yourself, make a team with the user.")
     ("^cd\\b" . "Don't cd")
-    ("^\\(bash -c\\|python3? \\(-I \\)?-c\\|python3? - <<\\)" . "No oneliner")
+    ("^\\(bash -c\\|python3? \\(-I \\)?\\(-c\\|- <<\\)\\)" . "No oneliner")
     ("@edit-agent-permissions" . "Never ever mention dir-locals.el or claude settings. Ask the user to work on them if need be")
     ("(and \"^find\\\\b\" \"@touches(~/.emacs.d)\")" . "Use the mcp tools")
     )

@@ -108,10 +108,9 @@ Set from the `error' event; cleared when a new turn is submitted.")
                 :message (map-elt data :message)))))
 
 (defcustom konix/agent-shell-waiting-tools
-  '("coord_wait" "coord_ask_and_wait" "coord_complete_task")
+  '("coord_wait" "coord_ask_and_wait")
   "Coordination tool names, matched as a substring of the tool-call title,
-that mean the agent is blocked waiting.  `coord_complete_task' blocks by
-default, handing back the buddy's next task."
+that mean the agent is blocked waiting."
   :type '(repeat string)
   :group 'konix)
 

@@ -750,7 +750,7 @@ CRITICAL RULES:
                           (konix/mcp-server--coord-prompt buddy-name "task")
                           (format "
 
-Execute each task strictly as described; if it fails, report the failure. Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, report with coord_complete_task wait=false, then invoke the kill_buddy tool with your own name \"%s\" to clean yourself up."
+Execute each task strictly as described; if it fails, report the failure. Stay in this loop until you are told to stop or until your goal is fully achieved. When your goal is achieved, report with coord_complete_task, then invoke the kill_buddy tool with your own name \"%s\" to clean yourself up."
                                   buddy-name)
                           (if auto-respawn-on
                               konix/mcp-server--respawn-buddy-prompt-note
@@ -996,7 +996,7 @@ ITEM names what it is sent: \"task\", \"draft\"."
 - coord_wait and coord_ask_and_wait block server-side until there is something to return; just call them and let them block.
 - Your name in coord is \"%1$s\": it is the name every %3$s is sent to you under, and coord already knows you by it. The coord tools take no name: coord knows which session you are.
 
-LOOP: call coord_wait to block until your FIRST %3$s arrives; handle it; report with coord_complete_task. By DEFAULT coord_complete_task blocks and hands back your NEXT %3$s, so do NOT call coord_wait again — handle whatever it returns and report that with coord_complete_task too. To say \"need more time\" on the %3$s you are still on, pass interim=true: it stays open, so you report the real result on it afterwards, and it returns immediately.
+LOOP: call coord_wait to block until your FIRST %3$s arrives; handle it; report with coord_complete_task, then call coord_wait again for your NEXT %3$s. To say \"need more time\" on the %3$s you are still on, pass interim=true: it stays open, so you report the real result on it afterwards, and it returns immediately.
 
 RESPECT THE CALLER'S DEADLINE: each %3$s carries the deadline the caller set (the answer_by / answer_within_seconds / deadline_note fields). The caller is blocked waiting and gives up at that moment — call coord_complete_task BEFORE the deadline or you may be killed. If you cannot finish in time, do NOT go silent: report an interim \"need more time\" with coord_complete_task interim=true (what you have done and what remains), keep working, then report the real result on the SAME %3$s. Every coord reply also ends with a \"COORD_DEADLINE:\" line — your nearest outstanding deadline (or \"none\"). Treat it as an ambient signal: if it is close, or you already know you need more time, report now as above; otherwise keep working. Report once per deadline; do not re-acknowledge it on every coord call."
           buddy-name

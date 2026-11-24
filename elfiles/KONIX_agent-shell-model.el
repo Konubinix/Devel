@@ -92,5 +92,19 @@ Accept Edits) all land here alike."
 
 (add-hook 'agent-shell-mode-hook #'konix/agent-shell--subscribe-model-and-mode)
 
+(defvar-local konix/agent-shell--resumed nil
+  "Non-nil in a shell started to resume a session, which keeps its own mode.")
+
+(defun konix/agent-shell--start-in-manual ()
+  "Switch a new session to Manual once started, so its calls reach the permission rules.
+The agent's own default may be a mode that never asks; a resumed session
+keeps the mode stored for it."
+  (let ((shell (current-buffer)))
+    (konix/agent-shell--once-init-finished shell
+      (unless konix/agent-shell--resumed
+        (konix/agent-shell-set-session-mode "Manual")))))
+
+(add-hook 'agent-shell-mode-hook #'konix/agent-shell--start-in-manual)
+
 (provide 'KONIX_agent-shell-model)
 ;;; KONIX_agent-shell-model.el ends here

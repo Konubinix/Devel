@@ -72,6 +72,8 @@ nil (no record) skips the set and keeps the server's value."
                 :new-session t
                 :session-strategy (if session-id 'new 'prompt)
                 :no-focus t)))
+    (with-current-buffer shell
+      (setq-local konix/agent-shell--resumed t))
     (agent-shell-subscribe-to
      :shell-buffer shell :event 'session-selected
      :on-event (lambda (_) (agent-shell-viewport--show-buffer :shell-buffer shell)))

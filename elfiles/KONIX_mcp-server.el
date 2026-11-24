@@ -459,6 +459,49 @@ the error and the heading point was under are added to it."
               (and (derived-mode-p 'org-mode) (org-get-heading t t t t))
               (truncate-string-to-width (or trace "") 4000))))))
 
+(defun konix/mcp-server--blocks-tangling-to (target)
+  "Lines of the buffer's source blocks whose :tangle file is TARGET."
+  (let (lines)
+    (org-babel-map-src-blocks nil
+      (let ((tfile (cdr (assq :tangle (nth 2 (org-babel-get-src-block-info))))))
+        (when (and (stringp tfile) (not (equal tfile "no"))
+                   (equal (expand-file-name
+                           (org-babel-effective-tangled-filename
+                            (buffer-file-name) lang tfile))
+                          target))
+          (push (line-number-at-pos beg-block) lines))))
+    (nreverse lines)))
+
+(defun konix/mcp-server--refuse-uncommentable (&optional target)
+  "Refuse, naming them, the blocks tangled with comments whose language has none.
+Org would ask for a comment syntax on each, a prompt no one answers over MCP.
+With TARGET, only the blocks tangling to that file."
+  (let ((known (make-hash-table :test #'equal)) found)
+    (org-babel-map-src-blocks nil
+      (let* ((params (nth 2 (org-babel-get-src-block-info 'no-eval)))
+             (tfile (cdr (assq :tangle params))))
+        (when (and (stringp tfile) (not (equal tfile "no"))
+                   (not (equal (cdr (assq :comments params)) "no"))
+                   (or (null target)
+                       (equal (expand-file-name
+                               (org-babel-effective-tangled-filename
+                                (buffer-file-name) lang tfile))
+                              target)))
+          (unless (gethash lang known)
+            (puthash lang
+                     (if (with-temp-buffer
+                           (let ((mode (org-src-get-lang-mode lang)))
+                             (when (fboundp mode)
+                               (let ((delay-mode-hooks t)) (ignore-errors (funcall mode))))
+                             comment-start))
+                         'yes 'no)
+                     known))
+          (when (eq (gethash lang known) 'no)
+            (push (format "line %d (%s)" (line-number-at-pos beg-block) lang) found)))))
+    (when found
+      (error "Refused: %s tangle with comments, but their language has no comment syntax, so org would prompt. Give them :comments no"
+             (string-join (nreverse found) ", ")))))
+
 (defun konix/mcp-server-tangle-babel-block (buffer-name block-name)
   "Tangle a named org-babel source block, writing it to its :tangle target.
 
@@ -482,6 +525,20 @@ MCP Parameters:
              (setq found t)))
          (unless found
            (error "Named babel block '%s' not found in buffer %s" block-name buffer-name))
+         (let* ((info (org-babel-get-src-block-info))
+                (tfile (cdr (assq :tangle (nth 2 info))))
+                (target (and (stringp tfile) (not (equal tfile "no"))
+                             (expand-file-name
+                              (org-babel-effective-tangled-filename
+                               (buffer-file-name) (nth 0 info) tfile))))
+                (lines (and target
+                            (save-excursion
+                              (konix/mcp-server--blocks-tangling-to target)))))
+           (when (cdr lines)
+             (error "Refused: blocks at lines %s all tangle to %s; tangling '%s' alone would write it without the others. Make them one block"
+                    (mapconcat #'number-to-string lines ", ") target block-name))
+           (when target
+             (save-excursion (konix/mcp-server--refuse-uncommentable target))))
          ;; No one is there to answer `org-confirm-babel-evaluate' over MCP, and
          ;; tangling evaluates on its own (noweb `<<block()>>' expansion, lisp-valued
          ;; headers), so a prompt here is a hang, not a safeguard.
@@ -626,6 +683,7 @@ MCP Parameters:
        (error "Buffer %s is not in org-mode" buffer-name))
      ;; See `konix/mcp-server-tangle-babel-block': confirmation cannot be answered
      ;; from here, so it would hang rather than protect anything.
+     (save-excursion (save-restriction (widen) (konix/mcp-server--refuse-uncommentable)))
      (let ((files (konix/mcp-server--tangle-with-context #'org-babel-tangle)))
        (format "Tangled %d file(s) from buffer %s: %s"
                (length files) buffer-name

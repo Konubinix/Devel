@@ -31,6 +31,7 @@
 (require 'KONIX_agent-shell-permissions-mcp)
 (require 'KONIX_agent-shell-permissions-find)
 (require 'KONIX_agent-shell-permissions-git)
+(require 'KONIX_agent-shell-permissions-curl)
 
 (defconst konix/agent-shell-tests-report-file
   (expand-file-name "../.agent-shell/tmp/permissions-tests.txt"
@@ -1064,6 +1065,104 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (nil . "curl -sS -X GET https://api.example.com/")
   (nil . "wget -sS -X GET https://api.example.org/")
   (nil . "echo curl -sS -X GET https://api.example.org/")) ; whole command
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-web-get-url-matches-under-it
+    "@web-get(http://api.example.org:8080/v1/a)"
+  (t . "curl -s -m 30 -o a.json http://api.example.org:8080/v1/a")
+  (t . "curl -s http://api.example.org:8080/v1/a/b?c=d")
+  (t . "curl -s http://api.example.org:8080/v1/a/b http://api.example.org:8080/v1/a/c")
+  (nil . "curl -s http://api.example.org:8080/v1/a/b http://api.example.org:8080/v1/b")
+  (nil . "curl -s http://api.example.org:8080/v1/ab")
+  (nil . "curl -s http://api.example.org:8080/v1/a/../b")
+  (nil . "curl -s http://api.example.org:8080/v1/a/%2E%2E/b")
+  (nil . "curl -s http://api.example.org:8080/v1/b")
+  (nil . "curl -s http://api.example.org:9090/v1/a/b")
+  (nil . "curl -s https://api.example.org:8080/v1/a/b")
+  (nil . "curl -s http://api.example.com:8080/v1/a"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-web-get-bare-url-matches-the-host
+    "@web-get(https://api.example.org)"
+  (t . "curl -s https://api.example.org/v1/a")
+  (t . "curl -s https://api.example.org")
+  (nil . "curl -s https://api.example.orgevil.example.com/v1/a")
+  (nil . "curl -s https://user@api.example.org/v1/a"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-web-get-accepts-dump-header
+    "@web-get(http://home/turtle/)"
+  (t . "curl -s -o /dev/null -w '%{http_code}\\n' -H 'If-None-Match: \"x\"' -D - http://home/turtle/")
+  (t . "curl -s -D headers.txt http://home/turtle/")
+  (nil . "curl -s -D /etc/headers http://home/turtle/"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-curl-several-hosts-is-refused
+    "@curl-several-hosts"
+  (t . "curl -sL -o a.html https://www.philibertnet.com/x -o b.html https://www.ludum.fr/y")
+  (t . "curl -s https://a.example.org/x https://b.example.org/y")
+  (nil . "curl -s https://a.example.org/x https://a.example.org/y")
+  (nil . "curl -s https://a.example.org/x"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-web-get-host-matches-any-path
+    "@web-get(api.example.org)"
+  (t . "curl -s -m 30 -o a.json http://api.example.org:8080/v1/a")
+  (t . "curl -s http://api.example.org:8080/v1/b")
+  (nil . "curl -s http://api.example.com:8080/v1/a"))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-curl-candidates
+    (lambda (command)
+      (konix/agent-shell--curl-candidates
+       (konix/agent-shell-tests--shell-call command)))
+  (("@web-get(http://api.example.org:8080/v1/a)" "@web-get(api.example.org)")
+   . "curl -s -m 30 -o a.json http://api.example.org:8080/v1/a")
+  (("@web-get(api.example.org)")
+   . "curl -s http://api.example.org/a http://api.example.org/b")
+  (nil . "curl -s http://api.example.org/a http://api.example.com/a")
+  (("@curl-post(http://192.168.1.1/ws)")
+   . "curl -s -m 10 -X POST -H 'a: b' -d '{\"m\":\"get\"}' http://192.168.1.1/ws > o.txt 2>&1")
+  (nil . "curl -s -d @secret.json http://192.168.1.1/ws")
+  (nil . "curl -s -X POST -d a http://192.168.1.1/ws http://192.168.1.1/x"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-curl-post-matches-its-url-alone
+    "@curl-post(http://192.168.1.1/ws)"
+  (t . "curl -s -X POST -d '{\"m\":\"get\"}' http://192.168.1.1/ws")
+  (t . "curl -s --data-raw=x http://192.168.1.1/ws")
+  (nil . "curl -s -X POST -d a http://192.168.1.1/ws/b")
+  (nil . "curl -s -X PUT -d a http://192.168.1.1/ws")
+  (nil . "curl -s -d @/etc/passwd http://192.168.1.1/ws")
+  (nil . "curl -s -F a=b http://192.168.1.1/ws"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-web-get-still-refuses-a-post
+    "@web-get(192.168.1.1)"
+  (nil . "curl -s -X POST -d a http://192.168.1.1/ws"))
+
+(defun konix/agent-shell-tests--fetch-call (url)
+  "Return a Fetch tool call reading URL."
+  `((:title . ,(concat "Fetch " url)) (:kind . "fetch")
+    (:raw-input . ((url . ,url) (prompt . "read it")))))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-web-get-matches-a-fetch
+    (lambda (url)
+      (and (konix/agent-shell-tool-match-p
+            "@web-get(https://api.example.org/v1)"
+            (konix/agent-shell-tests--fetch-call url))
+           t))
+  (t . "https://api.example.org/v1/a")
+  (nil . "https://api.example.org/v2/a")
+  (nil . "https://api.example.com/v1/a"))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-web-get-offered-for-a-fetch
+    (lambda (url)
+      (konix/agent-shell--curl-candidates (konix/agent-shell-tests--fetch-call url)))
+  (("@web-get(https://api.example.org/v1/a)" "@web-get(api.example.org)")
+   . "https://api.example.org/v1/a"))
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-glob-wants-a-shell-call

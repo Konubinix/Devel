@@ -959,6 +959,7 @@ return what fills {why} in the rule's reason: « takes: Y, Z (required: Y) »."
     ("^command -v" . "Use nix-shell")
     ("python3 -m json.tool" . "jq")
     ("@severalcommands" . "One command at a time. Don't filter before knowing where to look: write the output to ./.agent-shell/tmp")
+    ("@curl-several-hosts" . "One host per curl: split this into one curl per host")
     ("@lost-search" . "You are lost, simply ask the user for guidance. Don't try to do all by yourself, make a team with the user.")
     ("^cd\\b" . "Don't cd")
     ("^\\(bash -c\\|python3? \\(-I \\)?-c\\|python3? - <<\\)" . "No oneliner")

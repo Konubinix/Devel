@@ -81,6 +81,7 @@ At the prompt, delete backward."
 
 (defun konix/agent-shell-viewport-interrupt-no-confirm ()
   (interactive)
+  (konix/agent-shell--mark-cancelled)
   (let ((agent-shell-confirm-interrupt nil))
     ;; ignore is needed because the function will raise a user-error to say
     ;; everything is ok
@@ -129,6 +130,7 @@ When nothing is in flight, BODY simply runs right away."
   "Stop the agent, read a prompt, then immediately submit it."
   (declare (modes agent-shell-mode))
   (interactive)
+  (konix/agent-shell--mark-cancelled)
   (agent-shell-interrupt t)
   (call-interactively #'agent-shell-prompt-queue))
 

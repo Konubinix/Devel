@@ -402,6 +402,56 @@ the side effects again.  A value bound before that point wins."
 
 (add-hook 'agent-shell-mode-hook #'konix/agent-shell--restore-governing-note)
 
+;;; Your cancel, held till you speak --------------------------------------------
+
+(defcustom konix/agent-shell-cancel-commands
+  '(agent-shell-interrupt agent-shell-viewport-interrupt)
+  "Commands the user cancels an agent's turn with, marked once they end."
+  :type '(repeat symbol) :group 'konix)
+
+(defvar-local konix/agent-shell--cancelled nil
+  "`asked' once the user cancels this shell, `held' once its turn so ended, till they speak.")
+
+(defun konix/agent-shell--mark-cancelled ()
+  "Mark the shell of the current buffer cancelled by the user."
+  (when-let* ((shell (if (derived-mode-p 'agent-shell-mode)
+                         (current-buffer)
+                       (ignore-errors (agent-shell-viewport--shell-buffer)))))
+    (with-current-buffer shell
+      (setq konix/agent-shell--cancelled 'asked))))
+
+(defun konix/agent-shell--note-your-cancel ()
+  "Mark the shell the command just run cancelled."
+  (when (memq this-command konix/agent-shell-cancel-commands)
+    (konix/agent-shell--mark-cancelled)))
+
+(add-hook 'post-command-hook #'konix/agent-shell--note-your-cancel)
+
+(defvar konix/agent-shell--nudging nil
+  "Non-nil while code, not the user, sends to a shell.")
+
+(defun konix/agent-shell--your-word ()
+  "Lift the hold of a cancel on this shell, unless what was sent is a nudge."
+  (unless konix/agent-shell--nudging
+    (setq konix/agent-shell--cancelled nil)))
+
+(defvar-local konix/agent-shell--hearing nil
+  "Non-nil once this shell is listening for what the user sends it.")
+
+(defun konix/agent-shell--hear-your-words ()
+  "Have this shell lift a cancel's hold on what the user sends it, once."
+  (unless konix/agent-shell--hearing
+    (setq-local konix/agent-shell--hearing t)
+    (let ((buffer (current-buffer)))
+      (agent-shell-subscribe-to
+       :shell-buffer buffer :event 'input-submitted
+       :on-event (lambda (_event)
+                   (when (buffer-live-p buffer)
+                     (with-current-buffer buffer
+                       (konix/agent-shell--your-word))))))))
+
+(add-hook 'agent-shell-mode-hook #'konix/agent-shell--hear-your-words)
+
 ;;; Interrupt-and-reply, across shell / viewport / diff -----------------------
 ;; A canned prompt (tl;dr, comment vomit, ...) means the same thing from any
 ;; agent-shell buffer, so `konix/agent-shell-define-reply' spins each one into a
@@ -461,6 +511,24 @@ BODY.  Shell equivalent of `konix/agent-shell-viewport--when-idle'."
                             (with-current-buffer shell-buffer
                               ,@body))))))))
 
+(defun konix/agent-shell--submit-when-free (buffer text)
+  "Submit TEXT in BUFFER now, or at the first turn end that finds it free."
+  (with-current-buffer buffer
+    (if (not (shell-maker-busy))
+        (let ((konix/agent-shell--nudging t))
+          (agent-shell--insert-to-shell-buffer
+           :shell-buffer buffer :text text :submit t :no-focus t))
+      (let (token)
+        (setq token
+              (agent-shell-subscribe-to
+               :shell-buffer buffer :event 'turn-complete
+               :on-event (lambda (_event)
+                           (agent-shell-unsubscribe :subscription token)
+                           (when (and (buffer-live-p buffer)
+                                      (not (buffer-local-value
+                                            'konix/agent-shell--cancelled buffer)))
+                             (konix/agent-shell--submit-when-free buffer text)))))))))
+
 (defmacro konix/agent-shell--once-init-finished (shell &rest body)
   "Run BODY once in SHELL on its first `init-finished', then unsubscribe.
 By that point the session id and its available models are populated, so
@@ -487,7 +555,7 @@ submitted straight away, without a cancel notification."
     (agent-shell-interrupt t))
   (konix/agent-shell--when-idle
    (konix/agent-shell-set-session-mode "Manual")
-   (agent-shell--insert-to-shell-buffer :text prompt :submit t :no-focus t)))
+   (konix/agent-shell--submit-when-free (current-buffer) prompt)))
 
 (defun konix/agent-shell-interrupt-set-default-and-reply (prompt)
   "Interrupt the current session and reply with PROMPT, from any agent-shell buffer.

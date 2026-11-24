@@ -38,6 +38,7 @@
 (require 'color)
 (require 'face-remap)
 (require 'KONIX_mcp-server-spawn-tree-frame)
+(require 'KONIX_agent-shell-common)
 (require 'KONIX_org-transclusion-resolve)
 
 (declare-function agent-shell--start "agent-shell")
@@ -51,6 +52,7 @@
 (declare-function konix/agent-shell-ensure-viewport "KONIX_agent-shell-common")
 (declare-function konix/agent-shell-governing-note "KONIX_agent-shell-common")
 (declare-function konix/agent-shell-set-governing-note "KONIX_agent-shell-common")
+(declare-function konix/agent-shell--submit-when-free "KONIX_agent-shell-common")
 (declare-function konix/agent-shell-mcp-servers-for "KONIX_agent-shell-mcp")
 (declare-function konix/agent-shell-mcp-note-server-names "KONIX_agent-shell-mcp")
 (declare-function konix/agent-shell--rename-pair "KONIX_AL-agent-shell")
@@ -1225,8 +1227,7 @@ rather than in whatever this function returned to."
         ;; ignore-errors: interrupt signals a user-error to say all is well.
         (ignore-errors (agent-shell-interrupt))))
     (let* ((insert (lambda ()
-                     (agent-shell--insert-to-shell-buffer
-                      :shell-buffer buffer :text text :submit t :no-focus t)))
+                     (konix/agent-shell--submit-when-free buffer text)))
            (submit (lambda ()
                      (if around-submit
                          (funcall around-submit insert)

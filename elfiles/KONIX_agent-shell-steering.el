@@ -284,6 +284,7 @@ NOT submitted as a new prompt.  Submitting it (as earlier rounds do, via
 control back to user now\" notice used to lie about."
   (when (and (not konix/agent-shell--reason-delivery-scheduled)
              (not konix/agent-shell-steering--cap-stopped)
+             (not konix/agent-shell--cancelled)
              (not (konix/agent-shell-steering--compacting-p event))
              (shell-maker-busy)
              (null (konix/agent-shell--pending-permission-ids)))
@@ -340,7 +341,7 @@ control back to user now\" notice used to lie about."
                notice #'konix/agent-shell--show-in-stop-reason))
           (let ((buffer (current-buffer)))
             (unless (eq (konix/agent-shell--interrupt-and-deliver
-                         notice nil (eq (map-elt event :event) 'tool-call-update)
+                         notice nil t
                          (lambda ()
                            (when (buffer-live-p buffer)
                              (with-current-buffer buffer

@@ -1372,6 +1372,10 @@ TEXT the agent takes is shown in the shell."
      :on-failure (lambda (&rest _)
                    (funcall on-refused)))))
 
+(defconst konix/agent-shell-steering-not-the-user
+  "The interrupt and any refused tool use just above were automatic, done by this steering: the user did neither."
+  "Opens a steering's prompt: the agent words its cancel as the user's.")
+
 (defun konix/agent-shell--interrupt-and-deliver (reason &optional deliver-fn inject on-queued)
   "Deliver REASON to the agent, by one of three ways.
 With INJECT and no DELIVER-FN, ask to add REASON to the running turn,
@@ -1414,9 +1418,9 @@ once, lest they linger or block the turn's end."
                              (konix/agent-shell--cancel-pending-permissions)
                              (if deliver-fn
                                  (funcall deliver-fn reason)
-                               (agent-shell--insert-to-shell-buffer
-                                :shell-buffer buffer :text reason
-                                :submit t :no-focus t)))))))
+                               (konix/agent-shell--submit-when-free
+                                buffer (concat konix/agent-shell-steering-not-the-user
+                                               "\n" reason))))))))
       (agent-shell-interrupt t)))))
 
 (defun konix/agent-shell-inject (text)

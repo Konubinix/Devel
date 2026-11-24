@@ -276,6 +276,9 @@ match."
    ((functionp key)
     (ignore-errors (funcall key tool-call)))
    ((not (stringp key)) nil)
+   ;; A blank key is an empty regexp, matching every call: in a whitelist it
+   ;; would approve anything, so it matches nothing.
+   ((string-empty-p (string-trim key)) nil)
    ((string-prefix-p "@" key)
     (let* ((ref (konix/agent-shell--parse-evaluator-ref (substring key 1)))
            (fn (cdr (assoc (car ref) konix/agent-shell-tool-evaluators))))

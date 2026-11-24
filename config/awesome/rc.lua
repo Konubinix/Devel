@@ -1038,7 +1038,16 @@ awful.rules.rules = {
 			}, placed_by_hand_classes),
 			name = placed_by_hand,
 		},
-		properties = { ontop = true },
+		properties = { above = true },
+	},
+	{
+		rule = { class = "steam" },
+		properties = { above = true },
+	},
+	-- ############### No notifications over them when fullscreen
+	{
+		rule_any = { class = { "vlc" } },
+		properties = { quiet = true },
 	},
 	-- ####### Placements
 	-- browsers on tag 1
@@ -1109,6 +1118,7 @@ awesome.register_xproperty("STEAM_GAME", "number")
 local function is_streamed_game(c)
 	return c.valid
 		and c.class
+		and c.class ~= "steam"
 		and (
 			c:get_xproperty("STEAM_GAME")
 			or c.class:match("^steam_app_")
@@ -1118,9 +1128,13 @@ local function is_streamed_game(c)
 		)
 end
 
+local function hides_notifications(c)
+	return c.valid and c.quiet and c.fullscreen
+end
+
 naughty.config.notify_callback = function(args)
 	for _, c in ipairs(client.get()) do
-		if is_streamed_game(c) and c.fullscreen then
+		if hides_notifications(c) then
 			return nil
 		end
 	end
@@ -1131,7 +1145,7 @@ end
 -- on screen when the stream starts stays there, on top of the game and streamed with it, until
 -- its own timeout -- and a critical preset has none. So clear the screen at that moment too.
 local function clear_notifications_for_stream(c)
-	if is_streamed_game(c) and c.fullscreen then
+	if hides_notifications(c) then
 		naughty.destroy_all_notifications()
 	end
 end
@@ -1174,6 +1188,7 @@ client.connect_signal("manage", function(c)
 			if s then
 				c.screen = s
 			end
+			c.quiet = true
 			c.fullscreen = true
 			c:raise()
 			clear_notifications_for_stream(c)
@@ -1216,7 +1231,7 @@ local function place_by_hand(c)
 	end
 	c.placed_by_hand = key
 	c.floating = true
-	c.ontop = true
+	c.above = true
 	local geometry = geometry_by_hand[key]
 	if geometry then
 		-- The tags belong to a screen, so tell it about the move, otherwise it

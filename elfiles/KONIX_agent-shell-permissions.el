@@ -429,10 +429,18 @@ nil rather than a guess."
                   (expand-file-name text)
                 text)))
     ("raw_string" (string-trim (treesit-node-text node t) "'" "'"))
-    ;; `$'...'', literal when free of escapes.
+    ;; `$'...'': only \t \n \\ \' are decoded, other escapes give nil.
     ("ansi_c_string"
-     (let ((text (substring (treesit-node-text node t) 2 -1)))
-       (unless (string-search "\\" text) text)))
+     (let ((text (substring (treesit-node-text node t) 2 -1))
+           (known t))
+       (setq text (replace-regexp-in-string
+                   "\\\\\\(.\\)"
+                   (lambda (escape)
+                     (pcase (aref escape 1)
+                       (?t "\t") (?n "\n") (?\\ "\\") (?' "'")
+                       (_ (setq known nil) "")))
+                   text t t))
+       (when known text)))
     ("string_content" (treesit-node-text node t))
     ((or "simple_expansion" "expansion")
      (when-let* ((var (car (treesit-filter-child

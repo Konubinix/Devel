@@ -1168,7 +1168,10 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (t . "grep --file=sub/patterns sub/x.txt")
   (nil . "grep --file=/etc/shadow sub/x.txt") ; the value is a path
   (nil . "grep -f /etc/shadow sub/x.txt")
-  (nil . "grep -o x.txt"))
+  (nil . "grep -o x.txt")
+  (t . "sort -t$'\\t' -k1,1rh -o sub/y.txt sub/x.txt")
+  (t . "cat $'sub/a\\'b\\\\c'")
+  (nil . "cat $'\\x2fetc/shadow'"))       ; only simple escapes are decoded
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-project-commands "project-commands"

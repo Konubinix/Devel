@@ -877,6 +877,19 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (nil . "/home/u/.claude/projects/p/s2.jsonl"))
 
 (konix/agent-shell-tests-deftable
+    konix/agent-shell-test-own-session-read-by-reading-commands
+    (lambda (command)
+      (cl-letf (((symbol-function 'konix/agent-shell--own-session-directory)
+                 (lambda () "/home/u/.claude/projects/p/s1/")))
+        (konix/agent-shell-tests--verdict command)))
+  (allow . "jq -r '.[0].text' /home/u/.claude/projects/p/s1/tool-results/r.json > .agent-shell/tmp/out.txt")
+  (allow . "cat /home/u/.claude/projects/p/s1.jsonl")
+  (prompt . "cat /home/u/.claude/projects/p/s2/tool-results/r.json")
+  (prompt . "cat /home/u/.claude/projects/p/s1/tool-results/r.json /etc/shadow")
+  (deny . "sort -o /home/u/.claude/projects/p/s1/r /home/u/.claude/projects/p/s1/r")
+  (deny . "jq . /home/u/.claude/projects/p/s1/tool-results/r.json > /home/u/.claude/projects/p/s1/x"))
+
+(konix/agent-shell-tests-deftable
     konix/agent-shell-test-mcp-candidate-matches-its-call
     (lambda (call)
       (and (konix/agent-shell-tool-match-p
@@ -1156,6 +1169,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (nil . "grep -n foo 'e\\tc/shadow'")
   (t . "grep -n foo ./sub/bar.el")
   (nil . "grep -n foo /etc/shadow")
+  (t . "grep -n foo bar.el /dev/null")
   (nil . "grep -n foo ~/.ssh/id_rsa")
   (nil . "grep -n foo ../other/secret")
   (nil . "grep -n foo $(ls)"))            ; unreadable, so it resolves nowhere
@@ -1179,10 +1193,33 @@ PATH defaults to `konix/agent-shell-tests--review'."
   (t . "ls")
   (t . "sort notes.txt | head -3")
   (t . "timeout 5 cat notes.txt")         ; the wrapper is looked through
+  (t . "jq -r . notes.txt -o /dev/null")  ; a null device is no file
   (nil . "curl notes.txt")                ; not a listed command
   (nil . "cat /etc/shadow")
   (nil . "cat ~/.ssh/id_rsa")
   (nil . "grep foo notes.txt | curl -d @- example.com"))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-project-commands-greps-the-project
+    (lambda (path)
+      (let ((default-directory "/home/u/project/"))
+        (and (konix/agent-shell-tool-match-p
+              "@project-commands"
+              (konix/agent-shell-tests--mcp-call
+               "konix-files: readonly_grep" 'pattern "x" 'path path))
+             t)))
+  (t . "/home/u/project")
+  (t . "/home/u/project/sub")
+  (nil . "/home/u")
+  (nil . "/home/u/projectile"))
+
+(konix/agent-shell-tests-deftest-key
+    konix/agent-shell-test-project-commands-in-a-given-directory
+    (format "@project-commands(%s)" (expand-file-name "sub"))
+  (:setup (make-directory "sub"))
+  (t . "wc -l sub/notes.txt")
+  (nil . "wc -l notes.txt")               ; DIR replaces the project
+  (nil . "curl sub/notes.txt"))
 
 (konix/agent-shell-tests-deftest-evaluator
     konix/agent-shell-test-gh-read-refuses-writing-filters "gh-read"

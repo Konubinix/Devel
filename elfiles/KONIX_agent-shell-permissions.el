@@ -547,18 +547,18 @@ unknowable ones kept as written."
 See `konix/shell-search-broad-roots'.  The mark of a lost agent brute-forcing
 instead of asking."
   (seq-some
-   #'konix/shell-search-broad-root-p
-   (if (konix/agent-shell--tool-call-command tool-call)
-       (konix/agent-shell--with-bash-ast root tool-call
-         (seq-mapcat
-          (lambda (c)
-            (let ((name (konix/agent-shell--command-name c))
-                  (arguments (konix/agent-shell--command-argument-literals c)))
-              (when (konix/shell-search-recursive-p name arguments)
-                (konix/shell-search-roots name arguments))))
-          (konix/agent-shell--command-nodes root)))
-     (when (string-match-p "grep" (or (map-elt tool-call :title) ""))
-       (konix/agent-shell--call-paths tool-call)))))
+    #'konix/shell-search-broad-root-p
+    (if (konix/agent-shell--tool-call-command tool-call)
+        (konix/agent-shell--with-bash-ast root tool-call
+          (seq-mapcat
+           (lambda (c)
+             (let ((name (konix/agent-shell--command-name c))
+                   (arguments (konix/agent-shell--command-argument-literals c)))
+               (when (konix/shell-search-recursive-p name arguments)
+                 (konix/shell-search-roots name arguments))))
+           (konix/agent-shell--command-nodes root)))
+      (when (string-match-p "grep" (or (map-elt tool-call :title) ""))
+        (konix/agent-shell--call-paths tool-call)))))
 
 (defconst konix/agent-shell--command-wrappers
   '(("timeout" . "\\`[0-9]+\\(?:\\.[0-9]+\\)?[smhd]?\\'")
@@ -816,11 +816,13 @@ Such an argument is most likely a regexp."
 
 (defun konix/agent-shell--call-paths (tool-call)
   "Return the paths TOOL-CALL names: its command arguments, or its targets.
-An unknowable argument is nil; an option counts only by its `=VALUE'."
+An unknowable argument is nil; an option counts only by its `=VALUE';
+a null device is no file."
   (if (konix/agent-shell--tool-call-command tool-call)
       (konix/agent-shell--with-bash-ast root tool-call
         (mapcan (lambda (argument)
-                  (cond ((not (and argument (string-prefix-p "-" argument)))
+                  (cond ((member argument konix/agent-shell--null-devices) nil)
+                        ((not (and argument (string-prefix-p "-" argument)))
                          (list argument))
                         ((string-match "=" argument)
                          (list (substring argument (match-end 0))))))
@@ -876,14 +878,42 @@ matches."
   :type '(repeat string)
   :group 'konix)
 
-(konix/agent-shell-define-tool-evaluator "project-commands" (tool-call)
-  "Match a line of `konix/agent-shell-project-commands' on project files only."
-  (and (konix/agent-shell--with-bash-ast root tool-call
-         (seq-every-p (lambda (command)
-                        (member (car (konix/agent-shell--command-unwrapped command))
-                                konix/agent-shell-project-commands))
-                      (konix/agent-shell--command-nodes root)))
-       (konix/agent-shell-tool-match-p "@inside" tool-call)))
+(defcustom konix/agent-shell-reading-commands
+  '("cat" "cut" "diff" "head" "jq" "ls" "strings" "tail" "wc")
+  "Commands `@project-commands' also approves on the session's own files: they write none."
+  :type '(repeat string)
+  :group 'konix)
+
+(konix/agent-shell-define-tool-evaluator "project-commands" (tool-call &optional directory)
+  "Match a line of `konix/agent-shell-project-commands' on files in DIRECTORY,
+the project by default, or of `konix/agent-shell-reading-commands' also on
+this shell's own session, or a `readonly_grep' within DIRECTORY."
+  (let ((directory (or directory default-directory))
+        reading)
+    (if (equal (konix/agent-shell-mcp-call tool-call) '("konix-files" . "readonly_grep"))
+        (let ((paths (konix/agent-shell--call-paths tool-call)))
+          (and paths
+               (seq-every-p (lambda (path) (konix/agent-shell--path-inside-p path directory))
+                            paths)))
+    (and (konix/agent-shell--with-bash-ast root tool-call
+           (let ((names (mapcar (lambda (command)
+                                  (car (konix/agent-shell--command-unwrapped command)))
+                                (konix/agent-shell--command-nodes root))))
+             (setq reading (seq-every-p (lambda (name)
+                                          (member name konix/agent-shell-reading-commands))
+                                        names))
+             (seq-every-p (lambda (name) (member name konix/agent-shell-project-commands))
+                          names)))
+       (let* ((session (and reading (konix/agent-shell--own-session-directory)))
+              (transcript (and session (concat (directory-file-name session) ".jsonl"))))
+         (seq-every-p (lambda (path)
+                        (and path
+                             (or (konix/agent-shell--path-inside-p path directory)
+                                 (konix/agent-shell--not-a-path-p path)
+                                 (konix/agent-shell--path-inside-p path session)
+                                 (and transcript
+                                      (string= (expand-file-name path) transcript)))))
+                      (konix/agent-shell--call-paths tool-call)))))))
 
 (konix/agent-shell-define-tool-evaluator "use-a-wrong-tmp-dir" (tool-call)
   "Match a call using a temp directory other than ./.agent-shell/tmp.
@@ -951,8 +981,9 @@ agent."
   '(("(and \"^edit$\" \"@inside(.agent-shell/tmp)\")" . "Edits and writes confined to ./.agent-shell/tmp/")
     ("^Read .agent-shell/tmp")
     ("@project-commands" . "commands on project files")
-    ("(and \"@mcp(konix-files__readonly_grep$)\" (or \"@inside\" \"@inside(/home/sam/prog/devel/)\" \"@own-session\"))" . "grep on project files and the session's own")
     ("^\\(ba\\)?sh -n")
+    ("@own-session")
+    ("sha256sum")
     ("^nix-instantiate --parse")
     ("^python3?\\( -I\\)? -m py_compile")
     ("@read-only-sed" . "sed that only reads project files and prints")

@@ -331,6 +331,17 @@ SPEC is a key, a function or an `and'/`or'/`not' of SPECs."
     (_
      (konix/agent-shell--key-matches-p spec tool-call haystack))))
 
+(defconst konix/agent-shell-reason-why "{why}"
+  "Placeholder in a rule's reason for the text its `@NAME' evaluator returned.")
+
+(defun konix/agent-shell--reason-why (reason matched)
+  "Return REASON, its `konix/agent-shell-reason-why' filled with MATCHED.
+MATCHED is what the rule's key returned: only a string fills it; a reason
+without the placeholder is left as written."
+  (if (and (stringp reason) (stringp matched))
+      (string-replace konix/agent-shell-reason-why matched reason)
+    reason))
+
 (defun konix/agent-shell--matching-entries (entries subject haystack)
   "Return the (KEY . VALUE) ENTRIES whose KEY matches SUBJECT/HAYSTACK.
 A regexp KEY's captures replace the `\\N' backreferences in VALUE."
@@ -339,12 +350,15 @@ A regexp KEY's captures replace the `\\N' backreferences in VALUE."
          (lambda (entry)
            (set-match-data nil)
            (let ((konix/agent-shell--matched-text haystack))
-             (when (konix/agent-shell--key-matches-p (car entry) subject haystack)
+             (when-let* ((matched (konix/agent-shell--key-matches-p
+                                   (car entry) subject haystack)))
                (cons (car entry)
-                     (or (ignore-errors
-                           (match-substitute-replacement
-                            (cdr entry) t nil konix/agent-shell--matched-text))
-                         (cdr entry))))))
+                     (konix/agent-shell--reason-why
+                      (or (ignore-errors
+                            (match-substitute-replacement
+                             (cdr entry) t nil konix/agent-shell--matched-text))
+                          (cdr entry))
+                      matched)))))
          entries)))
 
 (defun konix/agent-shell-tool-match-p (spec tool-call)
@@ -848,12 +862,30 @@ matches."
           ,@(mapcar (lambda (dir) (format "@touches(%s)" dir)) dirs))
      tool-call)))
 
+(declare-function konix/mcp-server--bad-arguments "KONIX_mcp-server")
+(declare-function konix/mcp-server--tool-schema "KONIX_mcp-server")
+
+(konix/agent-shell-define-tool-evaluator "bad-arguments" (tool-call)
+  "Match a call to an Emacs tool naming an argument it does not take, or missing one.
+The tool's schema is read by `konix/mcp-server--bad-arguments'.  On a match,
+return what fills {why} in the rule's reason: « takes: Y, Z (required: Y) »."
+  (when-let* (((fboundp 'konix/mcp-server--bad-arguments))
+              (call (konix/agent-shell-mcp-call tool-call))
+              ((konix/mcp-server--bad-arguments call (map-elt tool-call :raw-input)))
+              (schema (konix/mcp-server--tool-schema call)))
+    (format "takes: %s (required: %s)"
+            (mapconcat (lambda (property) (format "%s" (car property)))
+                       (alist-get 'properties schema) ", ")
+            (mapconcat (lambda (name) (format "%s" name))
+                       (alist-get 'required schema) ", "))))
+
 ;;; Policy variables -----------------------------------------------------------
 ;; Project variables are declared safe in `999-KONIX-safe-values.el'.
 
 (defcustom konix/agent-shell-tool-blacklist-global
   `(("@use-a-wrong-tmp-dir" . "Write temp files into ./.agent-shell/tmp/ instead")
     ("^sleep" . "Use the sleep tool")
+    ("@bad-arguments" . "You did not use the tool correctly: {why}")
     ("^\\(grep\\|rg\\)" . "Use the readonly_grep tool")
     ("@writes-outside(.agent-shell/tmp)" . "Redirect output into ./.agent-shell/tmp/ instead")
     ("^command -v" . "Use nix-shell")
@@ -1390,18 +1422,38 @@ Return nil, falling back to the dialog, when there is no allow option."
           (message "One-shot skip spent: %s is back on in the %s"
                    (car entry) (konix/agent-shell-policy-name policy)))))))
 
-(defun konix/agent-shell--policy-responder (permission)
-  "Reject blacklisted and approve whitelisted PERMISSION tools.
-Return nil when unhandled, to let the next responder try."
-  (let* ((tool-call (konix/agent-shell--tool-call-with-context
-                     (map-elt permission :tool-call)))
-         (blacklisted (konix/agent-shell--policy-matches
-                       konix/agent-shell--blacklist tool-call))
+(defcustom konix/agent-shell-priority-rules '("@bad-arguments")
+  "Blacklist keys that, when they refuse a call, are its only reason given.
+Global or session alike, so a call refused for being malformed is not also
+blamed on a rule it never got to."
+  :type '(repeat string)
+  :group 'konix)
+
+(defun konix/agent-shell--priority-only (entries)
+  "Return the ENTRIES whose key is a priority rule, or ENTRIES when none is."
+  (or (seq-filter (lambda (entry) (member (car entry) konix/agent-shell-priority-rules))
+                  entries)
+      entries))
+
+(defun konix/agent-shell--policy-judge (tool-call)
+  "Return (BLACKLISTED . WHITELISTED) for TOOL-CALL, spending its once-skips.
+BLACKLISTED is the matched blacklist entries, WHITELISTED the whitelist entry."
+  (let* ((tool-call (konix/agent-shell--tool-call-with-context tool-call))
+         (blacklisted (konix/agent-shell--priority-only
+                       (konix/agent-shell--policy-matches
+                        konix/agent-shell--blacklist tool-call)))
          (whitelisted (unless blacklisted
                         (konix/agent-shell-policy--match
                          konix/agent-shell--whitelist tool-call))))
     (konix/agent-shell-policy--consume-once konix/agent-shell--blacklist tool-call)
     (konix/agent-shell-policy--consume-once konix/agent-shell--whitelist tool-call)
+    (cons blacklisted whitelisted)))
+
+(defun konix/agent-shell--policy-responder (permission)
+  "Reject blacklisted and approve whitelisted PERMISSION tools.
+Return nil when unhandled, to let the next responder try."
+  (pcase-let ((`(,blacklisted . ,whitelisted)
+               (konix/agent-shell--policy-judge (map-elt permission :tool-call))))
     (cond
      (blacklisted (konix/agent-shell--blacklist-act permission blacklisted))
      (whitelisted (konix/agent-shell--whitelist-act permission whitelisted))

@@ -1045,6 +1045,28 @@ followed by its id.  Those other modules hand it come with them."
                  :server-id server-id
                  props))))))
 
+;;; Calls that misname a tool's arguments
+
+(defun konix/mcp-server--tool-schema (call)
+  "Return the live :schema of CALL's tool, CALL being (SERVER . TOOL), or nil.
+Nil too when Emacs does not serve that tool."
+  (when-let* ((call)
+              (table (ignore-errors (mcp-server-lib--get-server-tools (car call))))
+              ((hash-table-p table)))
+    (plist-get (gethash (cdr call) table) :schema)))
+
+(defun konix/mcp-server--bad-arguments (call input)
+  "Return the argument names INPUT gets wrong for CALL: unknown ones, then required ones missing.
+CALL is (SERVER . TOOL).  Nil when all are right, or when Emacs does not serve
+that tool."
+  (when-let* ((schema (konix/mcp-server--tool-schema call))
+              ((listp input)))
+    (let ((known (mapcar (lambda (property) (format "%s" (car property)))
+                         (alist-get 'properties schema)))
+          (given (mapcar (lambda (pair) (format "%s" (car pair))) input)))
+      (append (seq-difference given known)
+              (seq-difference (append (alist-get 'required schema) nil) given)))))
+
 ;;; Server start/stop
 
 (defun konix/mcp-server-start ()

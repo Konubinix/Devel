@@ -1270,6 +1270,14 @@ Such a rule silently never fires."
   (nil . "sed -i 's/a/b/' /etc/hosts")
   (nil . "find / -name id_rsa"))
 
+(ert-deftest konix/agent-shell-test-priority-rule-speaks-alone ()
+  "A priority rule among the refusing ones is the only reason given; else all are."
+  (let ((konix/agent-shell-priority-rules '("@bad-arguments"))
+        (voice '("@voice-away" . "away"))
+        (bad '("@bad-arguments" . "takes: file-path")))
+    (should (equal (konix/agent-shell--priority-only (list voice bad)) (list bad)))
+    (should (equal (konix/agent-shell--priority-only (list voice)) (list voice)))))
+
 ;; Loading this file runs the suite.
 (konix/agent-shell-tests-run)
 

@@ -135,3 +135,4 @@
 /wally
 /systemd/user/udiskie.service
 /systemd/user/graphical-session.target.wants/udiskie.service
+/virt-viewer

@@ -156,7 +156,9 @@ base server-id so existing tool lookups keep working."
                (konix/mcp-server--calling-agent caller)
                (konix/mcp-server--calling-buffer
                 (and caller (gethash caller konix/mcp-server--buddy-buffers))))
-    (funcall orig-fn json base)))
+    (funcall orig-fn
+             (if (multibyte-string-p json) json (decode-coding-string json 'utf-8))
+             base)))
 
 (defun konix/mcp-server--caller-identity ()
   "Return a stable identity string for the calling session, or error.
@@ -734,17 +736,13 @@ MCP Parameters:
   auto-respawn - When t, this buddy automatically replaces itself with a FRESH copy (same name, empty context) once its context usage crosses respawn-threshold, retiring at the seam right after it completes a task. The replacement keeps the name but has NO memory of earlier tasks, so only enable this when every task you send is self-contained (all needed state in the task or in files it points to). Enable it knowingly: a buddy spawned this way may reset between tasks. Defaults to nil (the buddy lives until explicitly killed).
   respawn-threshold - Context-usage percentage (0-100) that triggers a respawn. Ignored unless auto-respawn is t. Defaults to 80."
   (mcp-server-lib-with-error-handling
-   (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
-          (task (decode-coding-string task 'utf-8))
-          (buddy-name (decode-coding-string buddy-name 'utf-8))
+   (let* ((directory (expand-file-name directory))
           (mcp-changes (when (and mcp-config-changes
                                   (not (string-empty-p mcp-config-changes)))
                          (konix/mcp-server--normalize-mcp-changes
-                          (json-parse-string
-                           (decode-coding-string mcp-config-changes 'utf-8)
-                           :object-type 'alist))))
+                          (json-parse-string mcp-config-changes :object-type 'alist))))
           (model-asked (when (and model (not (string-empty-p model)))
-                         (decode-coding-string model 'utf-8)))
+                         model))
           (caller-model (konix/mcp-server--caller-model-id))
           ;; Asking for no model inherits the spawner's, like the agent config
           ;; below.  Left to the server it was the cheapest tier, since
@@ -974,7 +972,7 @@ their code, and every link an absolute path.  Read fresh on each call.
 MCP Parameters:
   note-path - Absolute path of the note to render."
   (mcp-server-lib-with-error-handling
-   (let ((note-path (expand-file-name (decode-coding-string note-path 'utf-8))))
+   (let ((note-path (expand-file-name note-path)))
      (unless (file-readable-p note-path)
        (error "Note not readable: %s" note-path))
      (konix/mcp-server--note-substance
@@ -1050,9 +1048,9 @@ MCP Parameters:
   respawn-threshold - Context-usage percentage (0-100) at which it respawns. Defaults to 80.
   fresh - \"true\" to kill the standing auditor of that label and spawn a new one, on the note as it now reads."
   (mcp-server-lib-with-error-handling
-   (let* ((directory (expand-file-name (decode-coding-string directory 'utf-8)))
+   (let* ((directory (expand-file-name directory))
           (caller (konix/mcp-server--caller-identity))
-          (label (let ((l (and label (string-trim (decode-coding-string label 'utf-8)))))
+          (label (let ((l (and label (string-trim label))))
                    (if (or (null l) (string-empty-p l)) "auditor" l)))
           (name (concat caller konix/mcp-server--caller-delimiter label))
           (governing-note
@@ -1099,7 +1097,7 @@ MCP Parameters:
   (mcp-server-lib-with-error-handling
    (let ((shell (or konix/mcp-server--calling-buffer
                     (error "Cannot identify the calling session; no agent-shell buffer is bound to this request")))
-         (note (expand-file-name (decode-coding-string note-path 'utf-8))))
+         (note (expand-file-name note-path)))
      (when-let ((existing (konix/agent-shell-governing-note shell)))
        (error "A governing note is already bound to this session (%s); an agent may not change its own governing note — ask the user to rebind it"
               existing))
@@ -1145,8 +1143,7 @@ MCP Parameters:
   buddy-name - The buddy name used when spawning
   non-recursive - When t, kill only this buddy; otherwise also kill all its descendant buddies recursively (default)"
   (mcp-server-lib-with-error-handling
-   (let* ((buddy-name (decode-coding-string buddy-name 'utf-8))
-          (buffer (konix/mcp-server--buffer-for-buddy buddy-name)))
+   (let* ((buffer (konix/mcp-server--buffer-for-buddy buddy-name)))
      (unless buffer
        (error "No coordinated buddy found with name '%s'" buddy-name))
      ;; Checked here rather than left to the lookup: every agent-shell buffer is

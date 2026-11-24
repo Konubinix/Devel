@@ -167,7 +167,7 @@
   (use-package majutsu :straight (:type git :host github :repo "0WD0/majutsu"))
   ;; not used as a git UI, but provides magit-wip-mode (replaces git-wip)
   (use-package magit)
-  (use-package mcp-server-lib :straight (:fork t :branch "mine"))
+  (use-package mcp-server-lib)
   ;; (use-package marginalia) -> too much information that I barely look at
   (use-package mic-paren)
   (use-package michelson :straight (:type git :host github :repo "MiloDavis/michelson-mode"))

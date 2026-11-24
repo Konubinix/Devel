@@ -557,6 +557,41 @@ submitted straight away, without a cancel notification."
    (konix/agent-shell-set-session-mode "Manual")
    (konix/agent-shell--submit-when-free (current-buffer) prompt)))
 
+(defun konix/agent-shell--hold-queue-across-cancel (&rest _)
+  "Keep queued prompts through the cancel this interrupt causes.
+A `:before' advice on `agent-shell-interrupt'.  agent-shell asks whether to
+continue with prompts queued at a cancelled turn's end; hide them until that
+end is handled, so they stay queued for the next turn instead."
+  (when-let* ((buffer (agent-shell--shell-buffer :no-create t :no-error t)))
+    (with-current-buffer buffer
+      (when-let* (((shell-maker-busy))
+                  (held (map-elt agent-shell--state :pending-prompts)))
+        (map-put! agent-shell--state :pending-prompts nil)
+        (let (tokens)
+          (setq tokens
+                (mapcar
+                 (lambda (event)
+                   (agent-shell-subscribe-to
+                    :shell-buffer buffer :event event
+                    :on-event
+                    (lambda (_event)
+                      (dolist (token tokens)
+                        (agent-shell-unsubscribe :subscription token))
+                      ;; The end-of-turn code runs right after the event.
+                      (run-at-time
+                       0 nil
+                       (lambda ()
+                         (when (buffer-live-p buffer)
+                           (with-current-buffer buffer
+                             (map-put! agent-shell--state :pending-prompts
+                                       (append held
+                                               (map-elt agent-shell--state
+                                                        :pending-prompts))))))))))
+                 '(turn-complete error))))))))
+
+(advice-add 'agent-shell-interrupt :before
+            #'konix/agent-shell--hold-queue-across-cancel)
+
 (defun konix/agent-shell-interrupt-set-default-and-reply (prompt)
   "Interrupt the current session and reply with PROMPT, from any agent-shell buffer.
 Uses the viewport mechanism when in (or resolving to) a viewport, and the plain

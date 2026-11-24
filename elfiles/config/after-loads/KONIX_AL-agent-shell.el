@@ -33,7 +33,6 @@
 
 ;;; Feature modules ----------------------------------------------------------
 (require 'KONIX_agent-shell-common)
-(require 'KONIX_agent-shell-panel)
 (require 'KONIX_agent-shell-mcp)
 (require 'KONIX_agent-shell-naming)
 (require 'KONIX_agent-shell-model)
@@ -41,6 +40,7 @@
 (require 'KONIX_agent-shell-resume)
 (require 'KONIX_agent-shell-session-ops)
 (require 'KONIX_agent-shell-permissions)
+(require 'KONIX_agent-shell-mcp-menu)
 (require 'KONIX_agent-shell-permissions-mcp)
 (require 'KONIX_agent-shell-permissions-find)
 (require 'KONIX_agent-shell-permissions-git)

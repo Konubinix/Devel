@@ -44,9 +44,7 @@
 (require 'treesit)
 (require 'ob-ref)
 (require 'files-x)
-(require 'tabulated-list)
 (require 'KONIX_agent-shell-common)
-(require 'KONIX_agent-shell-panel)
 (require 'KONIX_agent-shell-mcp)
 (require 'KONIX_dir-locals)
 (require 'KONIX_shell-search)
@@ -934,9 +932,13 @@ KEY is as in `konix/agent-shell--key-matches-p'; NOTE is documentation."
                (:constructor konix/agent-shell-policy--make))
   "A policy over the global, project and session axes.
 PROJECT-VAR doubles as the `.dir-locals.el' key.  CANDIDATES-FN returns key
-completions.  DISABLED-POLICY holds the markers subtracted from it."
+completions.  DISABLED-POLICY holds the markers subtracted from it.
+READ-ONLY-AXES are shown, never written, in its list.  SESSION-ENTRIES-FN,
+when set, gives the session alist instead of SESSION-VAR.  KEY-PROMPT, when
+set, reads keys that are no tools."
   name global-var project-var session-var default value-label value-prompt
-  candidates-fn disabled-policy)
+  candidates-fn disabled-policy (read-only-axes '("Global")) session-entries-fn
+  key-prompt)
 
 (defvar konix/agent-shell--blacklist-disabled
   (konix/agent-shell-policy--make
@@ -1009,7 +1011,9 @@ completions.  DISABLED-POLICY holds the markers subtracted from it."
 (defun konix/agent-shell-policy--session-entries (policy)
   "Return a fresh copy of POLICY's session alist."
   (with-current-buffer (konix/agent-shell--current-shell-or-error)
-    (copy-alist (symbol-value (konix/agent-shell-policy-session-var policy)))))
+    (if-let* ((fn (konix/agent-shell-policy-session-entries-fn policy)))
+        (funcall fn)
+      (copy-alist (symbol-value (konix/agent-shell-policy-session-var policy))))))
 
 (defun konix/agent-shell-policy--set-session (policy key value)
   "Set KEY to VALUE in POLICY's session axis."
@@ -1141,6 +1145,9 @@ apply."
   (let ((result (copy-alist (symbol-value (konix/agent-shell-policy-global-var policy)))))
     (dolist (entry (konix/agent-shell-policy--project-entries policy))
       (setf (alist-get (car entry) result nil nil #'equal) (cdr entry)))
+    (dolist (extra (konix/agent-shell--policy-extras-here))
+      (dolist (entry (funcall (plist-get extra :entries) policy))
+        (setf (alist-get (car entry) result nil nil #'equal) (cdr entry))))
     (dolist (entry (symbol-value (konix/agent-shell-policy-session-var policy)))
       (setf (alist-get (car entry) result nil nil #'equal) (cdr entry)))
     (when (konix/agent-shell-policy-disabled-policy policy)
@@ -1653,30 +1660,11 @@ WHERE is the axis, as in `konix/agent-shell-blacklist-tool'."
          (konix/agent-shell--prefix-axis)))
   (konix/agent-shell--policy-do-add konix/agent-shell--whitelist key note where))
 
-;;; Control panel --------------------------------------------------------------
-
-(defun konix/agent-shell--policy-axis (policy header key entries-fn set-fn remove-fn
-                                              &optional width)
-  "Return a panel axis for POLICY, titled HEADER and toggled by KEY.
-ENTRIES-FN, SET-FN and REMOVE-FN access the axis; WIDTH is the column's."
-  (konix/agent-shell-panel-axis-create
-   :header header :key key :width (or width 9)
-   :member-p (lambda (k) (assoc k (funcall entries-fn policy)))
-   :toggle (lambda (k)
-             (if (assoc k (funcall entries-fn policy))
-                 (funcall remove-fn policy k)
-               (funcall set-fn policy k
-                        (konix/agent-shell-policy--value-for policy k))))))
-
-(defun konix/agent-shell-policy--enabled-cell (policy key)
-  "Return the panel cell showing whether KEY is enabled in POLICY."
-  (pcase (konix/agent-shell-policy--disabled-state policy key)
-    ("once" (propertize "1" 'face '(:foreground "orange3" :weight bold)))
-    (state (konix/agent-shell-panel--cell (not (equal state "off"))))))
+;;; Policy axes ----------------------------------------------------------------
 
 (defvar konix/agent-shell-policy-extra-axes nil
   "Further policy axes, as plists.
-Keys: :header, :key, :entries (POLICY), :set (POLICY KEY VALUE), :remove
+Keys: :header, :entries (POLICY), :set (POLICY KEY VALUE), :remove
 \(POLICY KEY) and optional :available, all run in the shell buffer.")
 
 (defun konix/agent-shell--policy-extras-here ()
@@ -1689,78 +1677,6 @@ Keys: :header, :key, :entries (POLICY), :set (POLICY KEY VALUE), :remove
                               (current-buffer))
                         (funcall available)))))
               konix/agent-shell-policy-extra-axes))
-
-(defun konix/agent-shell--policy-extra-axis (policy extra)
-  "Return the panel axis for the extra axis EXTRA of POLICY."
-  (konix/agent-shell--policy-axis
-   policy (plist-get extra :header) (plist-get extra :key)
-   (plist-get extra :entries) (plist-get extra :set) (plist-get extra :remove)))
-
-(defun konix/agent-shell--policy-extra-named (name)
-  "Return the extra axis whose header is NAME, whatever its case."
-  (seq-find (lambda (extra) (string-equal-ignore-case (plist-get extra :header) name))
-            konix/agent-shell-policy-extra-axes))
-
-(defun konix/agent-shell--policy-panel (policy)
-  "Return the `konix/agent-shell-panel' that edits POLICY."
-  (konix/agent-shell-panel-create
-   :buffer-name (format "*Tool %s*" (konix/agent-shell-policy-name policy))
-   :mode-name (format "Tool-%s" (capitalize (konix/agent-shell-policy-name policy)))
-   :help (format "Tool %s: G global, p project, s session,%s t enable/disable/once, a add, e/RET edit, d delete, r reapply, M ask the writer for merges, g refresh, q quit"
-                 (konix/agent-shell-policy-name policy)
-                 (mapconcat (lambda (extra)
-                              (format " %s %s," (plist-get extra :key)
-                                      (downcase (plist-get extra :header))))
-                            (konix/agent-shell--policy-extras-here) ""))
-   :name-header "Regexp/predicate"
-   :name-width 30
-   :data policy
-   :rows (lambda () (sort (konix/agent-shell-policy--all-keys policy) #'string<))
-   :label (lambda (key) (format "%s" key))
-   :axes
-   (append
-    (list
-     (konix/agent-shell--policy-axis
-      policy "Global" "G"
-      #'konix/agent-shell-policy--global-entries
-      #'konix/agent-shell-policy--set-global
-      #'konix/agent-shell-policy--remove-global 8)
-     (konix/agent-shell--policy-axis
-      policy "Project" "p"
-      #'konix/agent-shell-policy--project-entries
-      #'konix/agent-shell-policy--set-project
-      #'konix/agent-shell-policy--remove-project)
-     (konix/agent-shell--policy-axis
-      policy "Session" "s"
-      #'konix/agent-shell-policy--session-entries
-      #'konix/agent-shell-policy--set-session
-      #'konix/agent-shell-policy--remove-session))
-    (mapcar (lambda (extra) (konix/agent-shell--policy-extra-axis policy extra))
-            (konix/agent-shell--policy-extras-here)))
-   :value-columns
-   (list (list "On" 6
-               (lambda (key)
-                 (concat
-                  (konix/agent-shell-policy--enabled-cell policy key)
-                  (when-let* ((decider (konix/agent-shell-policy--disable-decider
-                                       policy key)))
-                    (propertize (car decider) 'face 'shadow)))))
-         (list (konix/agent-shell-policy-value-label policy) 40
-               (lambda (key) (konix/agent-shell-policy--value-for policy key))))
-   :extra-keys
-   '(("t"   . konix/agent-shell-policy-menu-toggle-enabled)
-     ("a"   . konix/agent-shell-policy-menu-add)
-     ("e"   . konix/agent-shell-policy-menu-edit)
-     ("RET" . konix/agent-shell-policy-menu-edit)
-     ("d"   . konix/agent-shell-policy-menu-delete)
-     ("r"   . konix/agent-shell-policy-menu-reapply)
-     ("M"   . konix/agent-shell-policy-menu-ask-merges))))
-
-(defun konix/agent-shell-policy-menu-reapply ()
-  "Reapply the policies to the origin session's pending requests."
-  (interactive)
-  (with-current-buffer (konix/agent-shell-panel--origin-buffer)
-    (call-interactively #'konix/agent-shell-reapply-policies)))
 
 (defun konix/agent-shell--tool-call-policy-key (tool-call &optional exact)
   "Return a policy key matching TOOL-CALL, or nil.
@@ -1783,124 +1699,42 @@ A shell command gives a prefix, or with EXACT the very command."
                                          (map-elt tool-call :kind)))))
         (concat "^" (regexp-quote field))))))
 
+(defvar konix/agent-shell--offering nil
+  "A tool call the panel being opened offers before the waiting permission's.
+Let-bind it around the opening: the panel keeps it, so it dies with that opening.")
+
+(defun konix/agent-shell--pending-tool-call (&optional offer)
+  "Return OFFER, or the shell's waiting permission's tool call, or nil."
+  (or offer
+      (when-let* ((shell (ignore-errors (konix/agent-shell--current-shell-or-error))))
+        (with-current-buffer shell
+          (when-let* ((id (car (konix/agent-shell--pending-permission-ids))))
+            (map-nested-elt (agent-shell--state) (list :tool-calls id)))))))
+
 (defun konix/agent-shell--pending-policy-key (&optional exact)
   "Return a policy key for the waiting permission request, or nil.
 EXACT is as for `konix/agent-shell--tool-call-policy-key'."
-  (when-let* ((shell (ignore-errors (konix/agent-shell--current-shell-or-error))))
-    (with-current-buffer shell
-      (when-let* ((id (car (konix/agent-shell--pending-permission-ids)))
-                  (tool-call (map-nested-elt (agent-shell--state)
-                                             (list :tool-calls id))))
-        (konix/agent-shell--tool-call-policy-key tool-call exact)))))
+  (when-let* ((tool-call (konix/agent-shell--pending-tool-call)))
+    (konix/agent-shell--tool-call-policy-key tool-call exact)))
 
-(defun konix/agent-shell-policy-menu-add ()
-  "Add an entry to a chosen axis of the panel's policy.
-The key is prefilled from the waiting permission request, if any."
-  (interactive)
-  (let* ((policy (konix/agent-shell-panel-current-data))
-         (origin (konix/agent-shell-panel--origin-buffer))
-         (key (with-current-buffer origin
-                (completing-read
-                 (format "%s tool (regexp, $ glob, @evaluator, or (lambda ...)): "
-                         (capitalize (konix/agent-shell-policy-name policy)))
-                 (ignore-errors (konix/agent-shell-policy--candidates policy))
-                 nil nil
-                 (when-let* ((prefill (konix/agent-shell--pending-policy-key
-                                      (eq policy konix/agent-shell--whitelist))))
-                   (cons prefill 0))
-                 'regexp-history)))
-         (value (read-string (konix/agent-shell-policy-value-prompt policy)
-                             (with-current-buffer origin
-                               (konix/agent-shell-policy--value-for policy key))))
-         (axis (completing-read "Axis: "
-                                (append '("session" "project" "global")
-                                        (mapcar (lambda (extra)
-                                                  (downcase (plist-get extra :header)))
-                                                (with-current-buffer origin
-                                                  (konix/agent-shell--policy-extras-here))))
-                                nil t)))
-    (with-current-buffer origin
-      (pcase axis
-        ("global"  (konix/agent-shell-policy--set-global policy key value))
-        ("project" (konix/agent-shell-policy--set-project policy key value))
-        ("session" (konix/agent-shell-policy--set-session policy key value))
-        (_ (funcall (plist-get (konix/agent-shell--policy-extra-named axis) :set)
-                    policy key value))))
-    (konix/agent-shell-panel--refresh)))
-
-(defun konix/agent-shell-policy-menu-edit ()
-  "Edit the key and value of the entry at point, keeping its axes.
-If the key changes, the old one is replaced on each axis it occupied."
-  (interactive)
-  (when-let* ((key (tabulated-list-get-id)))
-    (let* ((policy (konix/agent-shell-panel-current-data))
-           (origin (konix/agent-shell-panel--origin-buffer))
-           (on-global (assoc key (konix/agent-shell-policy--global-entries policy)))
-           (on-project (with-current-buffer origin
-                         (assoc key (konix/agent-shell-policy--project-entries policy))))
-           (on-session (with-current-buffer origin
-                         (assoc key (konix/agent-shell-policy--session-entries policy))))
-           (on-extras (with-current-buffer origin
-                        (seq-filter (lambda (extra)
-                                      (assoc key (funcall (plist-get extra :entries) policy)))
-                                    konix/agent-shell-policy-extra-axes)))
-           (new-key (read-string "Key (regexp, $ glob, @evaluator, or (lambda ...)): " key 'regexp-history))
-           (new-value (read-string (konix/agent-shell-policy-value-prompt policy)
-                                   (with-current-buffer origin
-                                     (konix/agent-shell-policy--value-for policy key))))
-           (renamed (not (string= new-key key))))
-      (when on-global
-        (when renamed (konix/agent-shell-policy--remove-global policy key))
-        (konix/agent-shell-policy--set-global policy new-key new-value))
-      (with-current-buffer origin
-        (when on-project
-          (when renamed (konix/agent-shell-policy--remove-project policy key))
-          (konix/agent-shell-policy--set-project policy new-key new-value))
-        (when on-session
-          (when renamed (konix/agent-shell-policy--remove-session policy key))
-          (konix/agent-shell-policy--set-session policy new-key new-value))
-        (dolist (extra on-extras)
-          (when renamed (funcall (plist-get extra :remove) policy key))
-          (funcall (plist-get extra :set) policy new-key new-value)))
-      (konix/agent-shell-panel--refresh))))
-
-(defun konix/agent-shell-policy-menu-toggle-enabled ()
-  "Set the enabled state of the rule at point on a chosen axis.
-`once' disables it for the next request it would have matched only."
-  (interactive)
-  (when-let* ((key (tabulated-list-get-id)))
-    (let* ((policy (konix/agent-shell-panel-current-data))
-           (origin (konix/agent-shell-panel--origin-buffer))
-           (level (intern (completing-read
-                           "Level: " '("session" "project" "global") nil t
-                           nil nil "session")))
-           (state (pcase (completing-read
-                          "State: " '("disabled" "once" "enabled" "unset") nil t
-                          nil nil "disabled")
-                    ("disabled" "off") ("once" "once") ("enabled" "on") (_ nil))))
-      (with-current-buffer origin
-        (konix/agent-shell-policy--set-disabled policy key level state)))
-    (konix/agent-shell-panel--refresh)))
-
-(defun konix/agent-shell-policy-menu-delete ()
-  "Remove the key at point, and its markers, from the panel's policy."
-  (interactive)
-  (when-let* ((key (tabulated-list-get-id)))
-    (let* ((policy (konix/agent-shell-panel-current-data))
-           (origin (konix/agent-shell-panel--origin-buffer))
-           (off (konix/agent-shell-policy-disabled-policy policy)))
-      (konix/agent-shell-policy--remove-global policy key)
-      (when off (konix/agent-shell-policy--remove-global off key))
-      (with-current-buffer origin
-        (konix/agent-shell-policy--remove-session policy key)
-        (konix/agent-shell-policy--remove-project policy key)
-        (dolist (extra konix/agent-shell-policy-extra-axes)
-          (when (assoc key (funcall (plist-get extra :entries) policy))
-            (funcall (plist-get extra :remove) policy key)))
-        (when off
-          (konix/agent-shell-policy--remove-session off key)
-          (konix/agent-shell-policy--remove-project off key))))
-    (konix/agent-shell-panel--refresh)))
+(defun konix/agent-shell--policy-key-table (candidates first)
+  "Return a completion table of CANDIDATES with FIRST on top, grouped.
+FIRST, the waiting call's own keys, make the group « This call », in their
+order; then come « Evaluators » and « Others », as given."
+  (let ((all (delete-dups (append first candidates)))
+        (evaluators (konix/agent-shell--evaluator-candidates)))
+    (lambda (string predicate action)
+      (if (eq action 'metadata)
+          `(metadata
+            (display-sort-function . identity)
+            (cycle-sort-function . identity)
+            (group-function
+             . ,(lambda (candidate transform)
+                  (cond (transform candidate)
+                        ((member candidate first) "This call")
+                        ((member candidate evaluators) "Evaluators")
+                        (t "Others")))))
+        (complete-with-action action all string predicate)))))
 
 (defun konix/agent-shell--permission-key-maybe-insert (command)
   "Run COMMAND, but self-insert at an idle `agent-shell-mode' prompt.
@@ -1911,26 +1745,341 @@ Keeps the key typeable while composing a message."
       (self-insert-command 1)
     (command-execute command)))
 
-;;;###autoload
-(defun konix/agent-shell/blacklist-menu ()
-  "Open the tool blacklist panel."
-  (interactive)
-  (konix/agent-shell-panel-open
-   (konix/agent-shell--policy-panel konix/agent-shell--blacklist)))
+;;; Editable policy list -------------------------------------------------------
 
-;;;###autoload
-(defun konix/agent-shell/whitelist-menu ()
-  "Open the tool whitelist panel."
+(defconst konix/agent-shell-policy-edit--width 80)
+
+(defvar-local konix/agent-shell-policy-edit--policy nil)
+(defvar-local konix/agent-shell-policy-edit--origin nil)
+(defvar-local konix/agent-shell-policy-edit--offer nil
+  "The tool call this opening of the panel offers first, from `konix/agent-shell--offering'.")
+
+(defun konix/agent-shell-policy-edit-buffer-name (policy)
+  "Return the name of POLICY's editable list."
+  (format "*Tool %s list*" (konix/agent-shell-policy-name policy)))
+
+(defun konix/agent-shell-policy-edit--axes (policy)
+  "Return POLICY's axes here as (HEADER ENTRIES SET REMOVE)."
+  (append
+   (list (list "Global" #'konix/agent-shell-policy--global-entries
+               #'konix/agent-shell-policy--set-global
+               #'konix/agent-shell-policy--remove-global)
+         (list "Project" #'konix/agent-shell-policy--project-entries
+               #'konix/agent-shell-policy--set-project
+               #'konix/agent-shell-policy--remove-project))
+   (mapcar (lambda (extra)
+             (list (plist-get extra :header) (plist-get extra :entries)
+                   (plist-get extra :set) (plist-get extra :remove)))
+           (konix/agent-shell--policy-extras-here))
+   (list (list "Session" #'konix/agent-shell-policy--session-entries
+               #'konix/agent-shell-policy--set-session
+               #'konix/agent-shell-policy--remove-session))))
+
+(defun konix/agent-shell-policy-edit--reason-of (value)
+  "Return VALUE as the one-line reason shown."
+  (string-trim (replace-regexp-in-string "[ \t\n]+" " " (format "%s" (or value "")))))
+
+(defun konix/agent-shell-policy-edit--row ()
+  "Return the row of the rule at point: (AXIS TEXT REASON KEY VALUE OFF).
+OFF is (LEVEL . STATE) of the narrowest level marking the rule, or nil."
+  (get-text-property (line-beginning-position) 'konix-policy-row))
+
+(defface konix/agent-shell-policy-edit-off-face
+  '((t :inherit error))
+  "Face of the tag saying a rule of the rules panel is switched off.
+Not warning: the theme gives that colour to the panel's headings."
+  :group 'konix)
+
+(face-spec-set 'konix/agent-shell-policy-edit-off-face '((t :inherit error)) 'face-defface-spec)
+
+(defun konix/agent-shell-policy-edit--insert-rule (row)
+  "Insert ROW's rule, a line per line of it, then its reason filled under it.
+A rule switched off, or off once, is dimmed, tagged in a colour with its state and level."
+  (let* ((start (point))
+         (lines (split-string (nth 1 row) "\n"))
+         (off (nth 5 row))
+         (dimmed (and off (member (cdr off) '("off" "once"))))
+         tag)
+    (insert "  " (car lines))
+    (when dimmed
+      (setq tag (point))
+      (insert (format "  [%s %s]" (cdr off) (car off))))
+    (insert "\n")
+    (dolist (line (cdr lines))
+      (insert "  ⏎ " line "\n"))
+    (unless (string-empty-p (nth 2 row))
+      (dolist (line (split-string (with-temp-buffer
+                                    (let ((fill-column (- konix/agent-shell-policy-edit--width 6)))
+                                      (insert (nth 2 row))
+                                      (fill-region (point-min) (point-max))
+                                      (buffer-string)))
+                                  "\n" t))
+        (insert "      " line "\n")))
+    (when dimmed
+      (put-text-property start (point) 'font-lock-face 'shadow)
+      (put-text-property (+ tag 2) (save-excursion (goto-char tag) (line-end-position))
+                         'font-lock-face 'konix/agent-shell-policy-edit-off-face))
+    (put-text-property start (point) 'konix-policy-row row)))
+
+(defun konix/agent-shell-policy-edit--call (axis slot &rest args)
+  "Call AXIS's function at SLOT, 2 to set and 3 to remove, with the policy and ARGS."
+  (let ((policy konix/agent-shell-policy-edit--policy))
+    (with-current-buffer konix/agent-shell-policy-edit--origin
+      (apply (nth slot (assoc axis (konix/agent-shell-policy-edit--axes policy))) policy args))))
+
+(defun konix/agent-shell-policy-edit--key (text)
+  "Return the key TEXT stands for."
+  (if (string-prefix-p "(" text) (car (read-from-string text)) text))
+
+(defun konix/agent-shell-policy-edit--row-or-error ()
+  "Return the row at point, or refuse."
+  (let ((row (or (konix/agent-shell-policy-edit--row) (user-error "No rule here"))))
+    (when (member (car row) (konix/agent-shell-policy-edit--read-only))
+      (user-error "%s rules are not edited here" (car row)))
+    row))
+
+(defun konix/agent-shell-policy-edit--read-only ()
+  "Return the axes of this list's policy that are shown, never written."
+  (konix/agent-shell-policy-read-only-axes konix/agent-shell-policy-edit--policy))
+
+(defun konix/agent-shell-policy-edit--writable ()
+  "Return the axes of this list's policy that are written."
+  (cl-set-difference (mapcar #'car (with-current-buffer konix/agent-shell-policy-edit--origin
+                                     (konix/agent-shell-policy-edit--axes
+                                      konix/agent-shell-policy-edit--policy)))
+                     (konix/agent-shell-policy-edit--read-only)
+                     :test #'equal))
+
+(defun konix/agent-shell-policy-edit--step (n)
+  "Go to the start of the N-th next shown rule, N negative going back."
+  (let ((here (konix/agent-shell-policy-edit--row)) (from (point)))
+    (forward-line 0)
+    (while (and (zerop (forward-line (if (< n 0) -1 1)))
+                (not (eobp))
+                (or (null (konix/agent-shell-policy-edit--row))
+                    (eq (konix/agent-shell-policy-edit--row) here)
+                    (invisible-p (point)))))
+    (if (or (null (konix/agent-shell-policy-edit--row))
+            (eq (konix/agent-shell-policy-edit--row) here))
+        (goto-char from)
+      (while (and (not (bobp))
+                  (eq (save-excursion (forward-line -1) (konix/agent-shell-policy-edit--row))
+                      (konix/agent-shell-policy-edit--row)))
+        (forward-line -1))
+      (skip-chars-forward " "))))
+
+(defun konix/agent-shell-policy-edit-next ()
+  "Go to the next rule."
   (interactive)
-  (konix/agent-shell-panel-open
-   (konix/agent-shell--policy-panel konix/agent-shell--whitelist)))
+  (konix/agent-shell-policy-edit--step 1))
+
+(defun konix/agent-shell-policy-edit-previous ()
+  "Go to the previous rule."
+  (interactive)
+  (konix/agent-shell-policy-edit--step -1))
+
+(defun konix/agent-shell-policy-edit-edit ()
+  "Edit the rule at point, then its reason, written at once."
+  (interactive)
+  (pcase-let* ((`(,axis ,text ,reason ,key ,value) (konix/agent-shell-policy-edit--row-or-error))
+               (new-text (read-string "Rule: " text))
+               (new-reason (read-string "Reason: " reason)))
+    (unless (equal new-text text)
+      (konix/agent-shell-policy-edit--call axis 3 key))
+    (konix/agent-shell-policy-edit--call
+     axis 2 (if (equal new-text text) key (konix/agent-shell-policy-edit--key new-text))
+     (if (equal new-reason reason) value new-reason))
+    (konix/agent-shell-policy-edit--fill new-text)))
+
+(defun konix/agent-shell-policy-edit-delete ()
+  "Delete the rule at point, once confirmed."
+  (interactive)
+  (pcase-let ((`(,axis ,text ,_ ,key) (konix/agent-shell-policy-edit--row-or-error)))
+    (when (y-or-n-p (format "Delete %s from %s? " text axis))
+      (konix/agent-shell-policy-edit--call axis 3 key)
+      (when-let* ((off (konix/agent-shell-policy-disabled-policy
+                        konix/agent-shell-policy-edit--policy)))
+        (with-current-buffer konix/agent-shell-policy-edit--origin
+          (konix/agent-shell-policy--remove-session off key)
+          (konix/agent-shell-policy--remove-project off key)))
+      (konix/agent-shell-policy-edit--fill))))
+
+(defun konix/agent-shell-policy-edit-move ()
+  "Move the rule at point to another axis."
+  (interactive)
+  (pcase-let* ((`(,axis ,text ,_ ,key ,value) (konix/agent-shell-policy-edit--row-or-error))
+               (to (completing-read (format "Move %s to: " text)
+                                    (remove axis (konix/agent-shell-policy-edit--writable))
+                                    nil t)))
+    (konix/agent-shell-policy-edit--call to 2 key value)
+    (konix/agent-shell-policy-edit--call axis 3 key)
+    (konix/agent-shell-policy-edit--fill text)))
+
+(defun konix/agent-shell-policy-edit--fill (&optional land)
+  "Write the policy's rules into this buffer afresh, an axis per section, point on LAND's rule."
+  (let* ((policy konix/agent-shell-policy-edit--policy)
+         (land (or land (nth 1 (konix/agent-shell-policy-edit--row))))
+         (inhibit-read-only t)
+         (window (get-buffer-window))
+         (row (when window
+                (with-selected-window window
+                  (count-screen-lines (window-start) (line-beginning-position)))))
+         (folded (save-excursion
+                   (goto-char (point-min))
+                   (let (names)
+                     (while (re-search-forward "^\\* \\(.*\\) (" nil t)
+                       (when (invisible-p (line-end-position))
+                         (push (match-string 1) names)))
+                     names)))
+         (axes (with-current-buffer konix/agent-shell-policy-edit--origin
+                 (mapcar (lambda (axis)
+                           (cons (car axis)
+                                 (sort (mapcar (lambda (entry)
+                                                 (list (car axis)
+                                                       (substring-no-properties
+                                                        (format "%s" (car entry)))
+                                                       (konix/agent-shell-policy-edit--reason-of
+                                                        (cdr entry))
+                                                       (car entry) (cdr entry)
+                                                       (konix/agent-shell-policy--disable-decider
+                                                        policy (car entry))))
+                                               (funcall (nth 1 axis) policy))
+                                       (lambda (x y) (string< (nth 1 x) (nth 1 y))))))
+                         (konix/agent-shell-policy-edit--axes policy)))))
+    (erase-buffer)
+    (dolist (axis axes)
+      (insert (format "* %s (%d)\n" (car axis) (length (cdr axis))))
+      (mapc #'konix/agent-shell-policy-edit--insert-rule (cdr axis)))
+    (set-buffer-modified-p nil)
+    (goto-char (point-min))
+    (while (re-search-forward "^\\* \\(.*\\) (" nil t)
+      (when (member (match-string 1) folded)
+        (org-fold-hide-subtree)))
+    (goto-char (point-min))
+    (when-let* ((land)
+                (match (text-property-search-forward
+                        'konix-policy-row land (lambda (text row) (equal text (nth 1 row))))))
+      (goto-char (prop-match-beginning match))
+      (skip-chars-forward " ")
+      (org-fold-show-set-visibility 'ancestors))
+    (when row
+      (with-selected-window window
+        (recenter row)))))
+
+(defun konix/agent-shell-policy-edit-add ()
+  "Add a rule to a chosen axis, the waiting call's keys first, the suggested one on top."
+  (interactive)
+  (let* ((policy konix/agent-shell-policy-edit--policy)
+         (origin konix/agent-shell-policy-edit--origin)
+         (offer konix/agent-shell-policy-edit--offer)
+         (key-prompt (konix/agent-shell-policy-key-prompt policy))
+         (key (with-current-buffer origin
+                (completing-read
+                 (or key-prompt
+                     (format "%s tool (regexp, $ glob, @evaluator, or (lambda ...)): "
+                             (capitalize (konix/agent-shell-policy-name policy))))
+                 (konix/agent-shell--policy-key-table
+                  (ignore-errors (konix/agent-shell-policy--candidates policy))
+                  (when-let* (((not key-prompt))
+                              (tool-call (konix/agent-shell--pending-tool-call offer)))
+                    (delq nil
+                          (cons (konix/agent-shell--tool-call-policy-key
+                                 tool-call (eq policy konix/agent-shell--whitelist))
+                                (konix/agent-shell--tool-call-candidates tool-call)))))
+                 nil nil nil
+                 'regexp-history)))
+         (value (with-current-buffer origin
+                  (konix/agent-shell-policy--value-for policy key)))
+         (axes (konix/agent-shell-policy-edit--writable))
+         (axis (completing-read "Axis: " axes nil t nil t (car (last axes)))))
+    (konix/agent-shell-policy-edit--call axis 2 key value)
+    (konix/agent-shell-policy-edit--fill key)))
+
+(defun konix/agent-shell-policy-edit-toggle-enabled ()
+  "Set the enabled state of the rule at point on a chosen level.
+`once' disables it for the next request it would have matched only."
+  (interactive)
+  (let* ((policy konix/agent-shell-policy-edit--policy)
+         (origin konix/agent-shell-policy-edit--origin)
+         (key (nth 3 (or (konix/agent-shell-policy-edit--row) (user-error "No rule here"))))
+         (level (intern (completing-read
+                         "Level: " '("session" "project" "global") nil t
+                         nil nil "session")))
+         (state (pcase (completing-read
+                        "State: " '("disabled" "once" "enabled" "unset") nil t
+                        nil nil "disabled")
+                  ("disabled" "off") ("once" "once") ("enabled" "on") (_ nil))))
+    (with-current-buffer origin
+      (konix/agent-shell-policy--set-disabled policy key level state))
+    (konix/agent-shell-policy-edit--fill)))
+
+(defun konix/agent-shell-policy-edit-reapply ()
+  "Reapply the policies to the origin session's pending requests."
+  (interactive)
+  (with-current-buffer konix/agent-shell-policy-edit--origin
+    (call-interactively #'konix/agent-shell-reapply-policies)))
+
+(defvar konix/agent-shell-policy-edit-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "n" #'konix/agent-shell-policy-edit-next)
+    (define-key map "p" #'konix/agent-shell-policy-edit-previous)
+    (define-key map "e" #'konix/agent-shell-policy-edit-edit)
+    (define-key map "a" #'konix/agent-shell-policy-edit-add)
+    (define-key map "d" #'konix/agent-shell-policy-edit-delete)
+    (define-key map "m" #'konix/agent-shell-policy-edit-move)
+    (define-key map "t" #'konix/agent-shell-policy-edit-toggle-enabled)
+    (define-key map "r" #'konix/agent-shell-policy-edit-reapply)
+    (define-key map "M" #'konix/agent-shell-policy-edit-ask-merges)
+    (define-key map "g" #'konix/agent-shell-policy-edit-refresh)
+    (define-key map "q" #'quit-window)
+    map))
+
+(defun konix/agent-shell-policy-edit-refresh ()
+  "Read the rules afresh."
+  (interactive)
+  (konix/agent-shell-policy-edit--fill))
+
+(define-derived-mode konix/agent-shell-policy-edit-mode org-mode "Tool-Policy"
+  "Browse a tool policy: an axis per section, a rule per line, its reason under it."
+  (setq buffer-read-only t)
+  (setq header-line-format
+        "n/p move, TAB fold, e edit, a add, d delete, m move to axis, t on/off, r reapply, M merges, g refresh, q quit")
+  (font-lock-add-keywords nil '(("^      .*$" 0 'shadow t)) t))
+
+(defun konix/agent-shell-policy-edit (policy)
+  "Open POLICY's rules of the session here as a list, each key writing at once."
+  (let ((origin (or (ignore-errors (konix/agent-shell--current-shell-or-error))
+                    (current-buffer)))
+        (dir default-directory)
+        (offer konix/agent-shell--offering)
+        (buffer (get-buffer-create (konix/agent-shell-policy-edit-buffer-name policy))))
+    (with-current-buffer buffer
+      (let ((inhibit-read-only t)) (erase-buffer))
+      (konix/agent-shell-policy-edit-mode)
+      (setq default-directory dir
+            konix/agent-shell-policy-edit--policy policy
+            konix/agent-shell-policy-edit--origin origin
+            konix/agent-shell-policy-edit--offer offer)
+      (konix/agent-shell-policy-edit--fill)
+      (org-overview))
+    (pop-to-buffer buffer)))
+
+(defun konix/agent-shell/whitelist-list ()
+  "Open the tool whitelist as a list, each key writing at once."
+  (interactive)
+  (konix/agent-shell-policy-edit konix/agent-shell--whitelist))
+
+(defun konix/agent-shell/blacklist-list ()
+  "Open the tool blacklist as a list, each key writing at once."
+  (interactive)
+  (konix/agent-shell-policy-edit konix/agent-shell--blacklist))
 
 (define-key agent-shell-mode-map               (kbd "B")
-            (lambda () (interactive) (konix/agent-shell--permission-key-maybe-insert #'konix/agent-shell/blacklist-menu)))
-(define-key agent-shell-viewport-view-mode-map (kbd "B") #'konix/agent-shell/blacklist-menu)
+            (lambda () (interactive) (konix/agent-shell--permission-key-maybe-insert #'konix/agent-shell/blacklist-list)))
+(define-key agent-shell-viewport-view-mode-map (kbd "B") #'konix/agent-shell/blacklist-list)
 (define-key agent-shell-mode-map               (kbd "W")
-            (lambda () (interactive) (konix/agent-shell--permission-key-maybe-insert #'konix/agent-shell/whitelist-menu)))
-(define-key agent-shell-viewport-view-mode-map (kbd "W") #'konix/agent-shell/whitelist-menu)
+            (lambda () (interactive) (konix/agent-shell--permission-key-maybe-insert #'konix/agent-shell/whitelist-list)))
+(define-key agent-shell-viewport-view-mode-map (kbd "W") #'konix/agent-shell/whitelist-list)
 (define-key agent-shell-mode-map               (kbd "I")
             (lambda () (interactive) (konix/agent-shell--permission-key-maybe-insert #'konix/agent-shell-describe-permission)))
 (define-key agent-shell-viewport-view-mode-map (kbd "I") #'konix/agent-shell-describe-permission)

@@ -33,7 +33,6 @@
 (require 'rx)
 (require 'seq)
 (require 'KONIX_agent-shell-common)
-(require 'KONIX_agent-shell-panel)
 (require 'KONIX_agent-shell-permissions)
 
 (declare-function agent-shell-subscribe-to "agent-shell")
@@ -422,13 +421,12 @@ KEY matches the agent's mid-turn prose or tool calls (regexp, @evaluator, or
   (konix/agent-shell--policy-do-show konix/agent-shell--steering))
 
 ;;;###autoload
-(defun konix/agent-shell-steering/menu ()
-  "Open the steering control panel."
+(defun konix/agent-shell-steering/list ()
+  "Open the steering rules as a list, each key writing at once."
   (interactive)
-  (konix/agent-shell-panel-open
-   (konix/agent-shell--policy-panel konix/agent-shell--steering)))
+  (konix/agent-shell-policy-edit konix/agent-shell--steering))
 
-(define-key agent-shell-viewport-view-mode-map (kbd "S") #'konix/agent-shell-steering/menu)
+(define-key agent-shell-viewport-view-mode-map (kbd "S") #'konix/agent-shell-steering/list)
 
 (provide 'KONIX_agent-shell-steering)
 ;;; KONIX_agent-shell-steering.el ends here

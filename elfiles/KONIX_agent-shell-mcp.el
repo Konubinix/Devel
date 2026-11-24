@@ -26,7 +26,6 @@
 (require 'json)
 (require 'KONIX_dir-locals)
 (require 'KONIX_agent-shell-common)
-(require 'KONIX_agent-shell-panel)
 (require 'KONIX_org-transclusion-resolve)
 
 (defvar konix/agent-shell-mcp-base-url "http://192.168.2.5:9920"
@@ -90,20 +89,20 @@ reference-counted server-side so the themed servers coexist safely."
   "Alist of (NAME . SERVER-CONFIG) for all available MCP servers.")
 
 (defcustom konix/agent-shell-mcp-enabled-servers
-  '("konix-coord" "konix-emacs-agents" "konix-files")
+  '(("konix-coord" . "") ("konix-emacs-agents" . "") ("konix-files" . ""))
   "Globally enabled MCP server names (the baseline for every project).
 A project adds to this baseline from its `.dir-locals.el' by setting
 `konix/agent-shell-mcp-project-servers' to a list of registry names:
 
-  ((nil . ((konix/agent-shell-mcp-project-servers . (\"chrome-devtools-mcp\")))))
+  ((nil . ((konix/agent-shell-mcp-project-servers . ((\"chrome-devtools-mcp\" . \"\"))))))
 
 See `konix/agent-shell-mcp-project-servers'."
-  :type '(repeat string)
-  :group 'konix
-  :set (lambda (sym val)
-         (set-default sym val)
-         (when (fboundp 'konix/agent-shell-mcp-servers-sync)
-           (konix/agent-shell-mcp-servers-sync))))
+  :type '(alist :key-type string :value-type string)
+  :group 'konix)
+
+(defun konix/agent-shell-mcp-names (entries)
+  "Return the server names of ENTRIES, an alist of (NAME . WHY)."
+  (mapcar (lambda (entry) (or (car-safe entry) entry)) entries))
 
 (defun konix/agent-shell-mcp-servers-for (names)
   "Resolve MCP server NAMES against the registry into server configs.
@@ -113,13 +112,17 @@ Duplicates are dropped; names absent from the registry are ignored."
            when entry
            collect (cdr entry)))
 
-(defun konix/agent-shell-mcp-servers-sync ()
-  "Recompute the default `agent-shell-mcp-servers' from the global enabled set."
-  (setq-default
-   agent-shell-mcp-servers
-   (konix/agent-shell-mcp-servers-for konix/agent-shell-mcp-enabled-servers)))
+(defun konix/agent-shell-mcp-servers-sync (&optional _symbol entries operation _where)
+  "Recompute the default `agent-shell-mcp-servers' from the global ENTRIES.
+A watcher of `konix/agent-shell-mcp-enabled-servers', OPERATION being how it changed."
+  (when (memq operation '(nil set))
+    (setq-default
+     agent-shell-mcp-servers
+     (konix/agent-shell-mcp-servers-for
+      (konix/agent-shell-mcp-names (if operation entries konix/agent-shell-mcp-enabled-servers))))))
 
 (konix/agent-shell-mcp-servers-sync)
+(add-variable-watcher 'konix/agent-shell-mcp-enabled-servers #'konix/agent-shell-mcp-servers-sync)
 
 ;; Example project `.dir-locals.el' opting into extra MCP servers:
 ;;
@@ -153,8 +156,9 @@ spawner's `with-temp-buffer' resolution path."
   (when konix/agent-shell-mcp-project-servers
     (setq-local agent-shell-mcp-servers
                 (konix/agent-shell-mcp-servers-for
-                 (append konix/agent-shell-mcp-enabled-servers
-                         konix/agent-shell-mcp-project-servers)))))
+                 (konix/agent-shell-mcp-names
+                  (append konix/agent-shell-mcp-enabled-servers
+                          konix/agent-shell-mcp-project-servers))))))
 
 (add-hook 'hack-local-variables-hook #'konix/agent-shell-mcp-apply-project-servers)
 
@@ -229,7 +233,7 @@ marked with a trailing \"*\"."
                (length effective)
                (mapconcat
                 (lambda (name)
-                  (if (member name konix/agent-shell-mcp-enabled-servers)
+                  (if (assoc name konix/agent-shell-mcp-enabled-servers)
                       name
                     (concat name "*")))
                 effective ", ")))))
@@ -247,7 +251,7 @@ nil when no server is enabled in this session."
             (:description
              . ,(mapconcat
                  (lambda (name)
-                   (if (member name konix/agent-shell-mcp-enabled-servers)
+                   (if (assoc name konix/agent-shell-mcp-enabled-servers)
                        name
                      (concat name "*")))
                  effective " "))))))
@@ -282,35 +286,6 @@ need not exist (it is created on demand by the writer)."
    (or (locate-dominating-file default-directory dir-locals-file)
        (locate-dominating-file default-directory ".git")
        default-directory)))
-
-(defun konix/agent-shell-mcp--project-servers-in-file (file)
-  "Return the `konix/agent-shell-mcp-project-servers' list stored in FILE.
-Reads the `nil'-mode entry of FILE's directory-local alist.  Returns a fresh
-list (safe to mutate), or nil when FILE is absent or sets no such variable."
-  (when (file-exists-p file)
-    (let ((alist (with-temp-buffer
-                   (insert-file-contents file)
-                   (goto-char (point-min))
-                   (ignore-errors (read (current-buffer))))))
-      (copy-sequence
-       (alist-get 'konix/agent-shell-mcp-project-servers
-                  (alist-get nil alist))))))
-
-(defun konix/agent-shell-mcp--toggle-project (name)
-  "Flip MCP server NAME in the current project's `.dir-locals.el'.
-The control-panel primitive behind the \"Project\" column: it edits
-`konix/agent-shell-mcp-project-servers' in the project's `.dir-locals.el',
-creating the file when there is none yet and deleting the variable when the
-list becomes empty.  This is the *persistent* axis only — sessions started
-afterwards pick it up; the running session is left untouched (use the Session
-column, or `agent-shell-reload', to apply it now)."
-  (let* ((file (konix/agent-shell-mcp--project-dir-locals-file))
-         (current (konix/agent-shell-mcp--project-servers-in-file file))
-         (new (if (member name current)
-                  (delete name current)
-                (append current (list name)))))
-    (konix/dir-locals-modify
-     file 'konix/agent-shell-mcp-project-servers new)))
 
 (defun konix/agent-shell-mcp--server-config->json-value (config)
   "Convert a registry server CONFIG alist to a `.mcp.json' value alist.
@@ -353,7 +328,7 @@ copy it to the kill ring."
           "Servers for .mcp.json: "
           (mapcar #'car konix/agent-shell-mcp-server-registry)
           nil t
-          (mapconcat #'identity konix/agent-shell-mcp-enabled-servers ","))))
+          (string-join (konix/agent-shell-mcp-names konix/agent-shell-mcp-enabled-servers) ","))))
   (let ((json (konix/agent-shell-mcp-servers->json names)))
     (kill-new json)
     (with-current-buffer (get-buffer-create "*mcp.json*")
@@ -365,68 +340,9 @@ copy it to the kill ring."
     (message "Generated .mcp.json for %d server%s (copied to kill ring)"
              (length names) (if (= (length names) 1) "" "s"))))
 
-;;; MCP server control panel ------------------------------------------------
-;; A `konix/agent-shell-panel' matrix of every registry server against the
-;; Global baseline (`konix/agent-shell-mcp-enabled-servers'), the persisted
-;; Project (`.dir-locals.el') and the live Session (the origin shell's
-;; buffer-local `agent-shell-mcp-servers').  `G'/`p' flip the first two;
-;; Session is read-only, derived from global + project + governing note.
-
-(defun konix/agent-shell-mcp--toggle-global (name)
-  "Flip MCP server NAME in the global baseline.
-Mutates `konix/agent-shell-mcp-enabled-servers' in the running Emacs and
-resyncs the default server set, so sessions started afterwards pick it up.
-Not persisted -- set the variable in your init or via Customize for that."
-  (let ((names konix/agent-shell-mcp-enabled-servers))
-    (setq konix/agent-shell-mcp-enabled-servers
-          (if (member name names)
-              (delete name (copy-sequence names))
-            (append names (list name))))
-    (konix/agent-shell-mcp-servers-sync)))
-
-(defun konix/agent-shell-mcp--panel ()
-  "Return the `konix/agent-shell-panel' describing the MCP server matrix."
-  (konix/agent-shell-panel-create
-   :buffer-name "*MCP servers*"
-   :mode-name "MCP-Servers"
-   :help "MCP servers: G global, p project, g refresh, q quit (Session is read-only)"
-   :name-header "Server"
-   :name-width 24
-   :rows (lambda () (mapcar #'car konix/agent-shell-mcp-server-registry))
-   :label #'identity
-   :axes
-   (list
-    (konix/agent-shell-panel-axis-create
-     :header "Global" :key "G" :width 8
-     :member-p (lambda (name) (member name konix/agent-shell-mcp-enabled-servers))
-     :toggle #'konix/agent-shell-mcp--toggle-global)
-    (konix/agent-shell-panel-axis-create
-     :header "Project" :key "p"
-     :member-p (lambda (name)
-                 (member name (konix/agent-shell-mcp--project-servers-in-file
-                               (konix/agent-shell-mcp--project-dir-locals-file))))
-     :toggle #'konix/agent-shell-mcp--toggle-project)
-    (konix/agent-shell-panel-axis-create
-     :header "Session"
-     :member-p (lambda (name)
-                 (member name (ignore-errors
-                                (konix/agent-shell-mcp-session-server-names))))))))
-
-(defun konix/agent-shell/mcp-servers-menu ()
-  "Open the MCP server control panel.
-`G' toggles the global baseline (running Emacs), `p' the project's
-`.dir-locals.el' (persistent, future sessions).  The Session column is
-read-only: it reflects global + project + governing-note state."
-  (interactive)
-  (konix/agent-shell-panel-open (konix/agent-shell-mcp--panel)))
-
 (define-key agent-shell-mode-map (kbd "C-c m") 'konix/agent-shell/list-mcp-servers)
 (define-key agent-shell-viewport-view-mode-map (kbd "C-c m") 'konix/agent-shell/list-mcp-servers)
 (define-key agent-shell-viewport-edit-mode-map (kbd "C-c m") 'konix/agent-shell/list-mcp-servers)
-
-;; `M' opens the MCP server control panel from the viewport, coherent with
-;; `B'/`W' for the blacklist/whitelist panels.
-(define-key agent-shell-viewport-view-mode-map (kbd "M") 'konix/agent-shell/mcp-servers-menu)
 
 (provide 'KONIX_agent-shell-mcp)
 ;;; KONIX_agent-shell-mcp.el ends here

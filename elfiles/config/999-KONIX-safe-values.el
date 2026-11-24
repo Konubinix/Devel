@@ -28,13 +28,6 @@
 (add-to-list 'safe-local-variable-values '(org-drill-maximum-duration . 5))
 (add-to-list 'safe-local-variable-values '(org-drill-maximum-duration . 15))
 
-;; A project opts into extra agent-shell MCP servers by setting this in its
-;; `.dir-locals.el' (a list of registry names).  Declared safe here, at
-;; startup, so it is accepted without a prompt even before agent-shell (and its
-;; after-load `KONIX_AL-agent-shell.el', which consumes it) is loaded.
-(put 'konix/agent-shell-mcp-project-servers 'safe-local-variable
-     (lambda (val) (and (listp val) (seq-every-p #'stringp val))))
-
 ;; A project black/whitelists agent-shell tools by setting these in its
 ;; `.dir-locals.el' (each an alist of (KEY . VALUE), both strings).  Declared
 ;; safe here so they are accepted without a prompt even before agent-shell is
@@ -49,6 +42,8 @@
   (put 'konix/agent-shell-tool-blacklist-project 'safe-local-variable
        alist-of-strings-p)
   (put 'konix/agent-shell-tool-whitelist-project 'safe-local-variable
+       alist-of-strings-p)
+  (put 'konix/agent-shell-mcp-project-servers 'safe-local-variable
        alist-of-strings-p)
   ;; And the per-project set of disabled (kept-but-inert) rules for each.
   (put 'konix/agent-shell-tool-blacklist-disabled-project 'safe-local-variable

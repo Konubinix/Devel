@@ -1295,4 +1295,6 @@ client.connect_signal("unfocus", function(c)
 end)
 -- tangled from streaming_with_sunshine_moonlight.org
 require("sunshine")
+-- tangled from false_camera_showing_a_screen_portion_instead.org
+require("screencam")
 -- }}}

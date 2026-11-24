@@ -140,7 +140,7 @@ in
     pulseaudio # pactl + libpulse.so for pulsectl (PipeWire-compatible)
     pavucontrol
     pasystray
-    ffmpeg
+    ffmpeg-full # x11grab, zmq: clk x screencam
     # gmpc did not find the correct name so far
     (import ../flakes/yt-dlp/default.nix { inherit pkgs; })
 

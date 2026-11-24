@@ -82,6 +82,8 @@ in
         ps.flake8
         ps.notmuch
         ps.requests
+        ps.python-xlib # clk screencam
+        ps.pyzmq # clk screencam
         # not in nixpkgs; the pronote clk group talks to Pronote through it
         (ps.buildPythonPackage rec {
           pname = "pronotepy";

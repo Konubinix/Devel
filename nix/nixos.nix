@@ -13,6 +13,7 @@
     ./voyager-ergol.nix
     ./zsa-udev.nix
     ./voyager-disco.nix
+    ./v4l2loopback.nix
   ];
 
   nixpkgs.overlays = [ (import ./pins-overlay.nix) ];

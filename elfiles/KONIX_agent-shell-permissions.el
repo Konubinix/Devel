@@ -1419,6 +1419,17 @@ once, lest they linger or block the turn's end."
                                 :submit t :no-focus t)))))))
       (agent-shell-interrupt t)))))
 
+(defun konix/agent-shell-inject (text)
+  "Add TEXT to the writer's running turn, never cancelling it.
+Where the agent refuses, TEXT waits for the turn's end; with no turn
+running, it is simply submitted."
+  (interactive (list (read-string "Inject: ")))
+  (with-current-buffer (agent-shell--shell-buffer :no-create t)
+    (if (shell-maker-busy)
+        (konix/agent-shell--inject
+         text (lambda () (konix/agent-shell--enqueue-reason text)))
+      (agent-shell-prompt-queue text))))
+
 ;;; Responder ------------------------------------------------------------------
 
 (defun konix/agent-shell--entry-has-reason-p (entry)

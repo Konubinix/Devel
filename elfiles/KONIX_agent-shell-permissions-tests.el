@@ -1438,6 +1438,37 @@ Such a rule silently never fires."
   (nil . "sed -i 's/a/b/' /etc/hosts")
   (nil . "find / -name id_rsa"))
 
+(ert-deftest konix/agent-shell-test-inject-command-never-interrupts ()
+  "M-x konix/agent-shell-inject steers into a busy turn, queues where refused,
+submits when idle, and never interrupts."
+  (let (calls refuse)
+    (with-temp-buffer
+      (let ((buffer (current-buffer)))
+        (cl-letf (((symbol-function 'agent-shell--shell-buffer) (lambda (&rest _) buffer))
+                  ((symbol-function 'agent-shell--state) #'ignore)
+                  ((symbol-function 'derived-mode-p) #'always)
+                  ((symbol-function 'agent-shell--update-fragment) #'ignore)
+                  ((symbol-function 'agent-shell-interrupt)
+                   (lambda (&rest _) (push 'interrupt calls)))
+                  ((symbol-function 'acp-send-request)
+                   (lambda (&rest args)
+                     (push (list 'steer (alist-get :method (plist-get args :request))) calls)
+                     (funcall (plist-get args (if refuse :on-failure :on-success)))))
+                  ((symbol-function 'agent-shell--prompt-queue-enqueue)
+                   (lambda (&rest args) (push (list 'queued (plist-get args :prompt)) calls)))
+                  ((symbol-function 'agent-shell-prompt-queue)
+                   (lambda (text) (push (list 'submitted text) calls))))
+          (cl-letf (((symbol-function 'shell-maker-busy) #'always))
+            (konix/agent-shell-inject "taken")
+            (setq refuse t)
+            (konix/agent-shell-inject "refused"))
+          (cl-letf (((symbol-function 'shell-maker-busy) #'ignore))
+            (konix/agent-shell-inject "idle")))))
+    (should (equal (reverse calls)
+                   '((steer "_session/steering")
+                     (steer "_session/steering") (queued "refused")
+                     (submitted "idle"))))))
+
 (ert-deftest konix/agent-shell-test-priority-rule-speaks-alone ()
   "A priority rule among the refusing ones is the only reason given; else all are."
   (let ((konix/agent-shell-priority-rules '("@bad-arguments"))

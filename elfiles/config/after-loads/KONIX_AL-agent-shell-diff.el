@@ -58,6 +58,7 @@ DOCSTRING documents the generated command."
             #'konix/agent-shell-diff-read-interrupt-and-submit)
 (define-key agent-shell-diff-mode-map (kbd "v")
             #'konix/agent-shell-diff-pop-to-viewport)
+(define-key agent-shell-diff-mode-map (kbd "M-j") #'konix/agent-shell-inject)
 
 (provide 'KONIX_AL-agent-shell-diff)
 ;;; KONIX_AL-agent-shell-diff.el ends here

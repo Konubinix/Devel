@@ -134,6 +134,41 @@
 (keymap-set konix/global-ement-key-map "m" 'ement-notify-switch-to-mentions-buffer)
 (keymap-set konix/global-ement-key-map "n" 'ement-notify-switch-to-notifications-buffer)
 
+;;; Sync watchdog ------------------------------------------------------------
+
+(defvar konix/ement-sync-watchdog-timer nil)
+
+(defvar konix/ement-sync-stalled nil
+  "(SESSION . PROCESS) for each session not syncing on the last tick.
+PROCESS is its dead sync, or nil when ement dropped it after an error.")
+
+(defun konix/ement-sync-watchdog-tick ()
+  "Restart the sync of a connected session not syncing on this tick and the last.
+Either its process died, or ement dropped it on a network error."
+  (unwind-protect
+      (let (stalled)
+        (dolist (entry ement-sessions)
+          (let* ((session (cdr entry))
+                 (process (map-elt ement-syncs session)))
+            (unless (process-live-p process)
+              (if (not (eq (alist-get session konix/ement-sync-stalled 'none) process))
+                  (push (cons session process) stalled)
+                (let ((user (car entry)))
+                  (message "Ement: the sync for %s had stopped; restarting it" user)
+                  (condition-case err
+                      (ement--sync session :force t)
+                    (error (message "Ement: restarting the sync for %s failed: %S"
+                                    user err))))))))
+        (setq konix/ement-sync-stalled stalled))
+    (when (and (timerp konix/ement-sync-watchdog-timer)
+               (memq konix/ement-sync-watchdog-timer timer-list))
+      (setf (timer--triggered konix/ement-sync-watchdog-timer) nil))))
+
+(when (timerp konix/ement-sync-watchdog-timer)
+  (cancel-timer konix/ement-sync-watchdog-timer))
+(setq konix/ement-sync-watchdog-timer
+      (run-with-timer 60 60 #'konix/ement-sync-watchdog-tick))
+
 ;;; Feature modules ----------------------------------------------------------
 (require 'KONIX_ement-tracking)
 (require 'KONIX_ement-reactions)

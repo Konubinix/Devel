@@ -3,10 +3,11 @@
 
 set -eu
 
-PINS_DIR="$(realpath "$(dirname "$0")/../nix/pins")"
+NIX_DIR="$(realpath "$(dirname "$0")/../nix")"
+PINS_DIR="$NIX_DIR/pins"
 FLAKE_DIR="$(realpath "$1")"
 log="$2"
-previous="$PINS_DIR/../nixpkgs-previous.json"
+previous="$NIX_DIR/nixpkgs-previous.json"
 previous_rev="$(jq -r .rev "$previous")"
 current_rev="$(jq -r .nodes.nixpkgs.locked.rev "$FLAKE_DIR/flake.lock")"
 
@@ -55,6 +56,7 @@ do
     read -rp "$pkg: builder failed, pin it to ${previous_rev:0:8} (cached)? [y/N] " ans < /dev/tty
     if [[ "$ans" =~ ^[Yy]$ ]]
     then
+        mkdir -p "$PINS_DIR"
         jq --arg r "builder failed at ${current_rev:0:8}" '{reason: $r, nixpkgs: .}' "$previous" > "$PINS_DIR/$pkg.json"
         git -C "$PINS_DIR" add "$pkg.json"
         echo "$pkg: pinned, edit the reason in $PINS_DIR/$pkg.json and rebuild"

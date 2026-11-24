@@ -9,4 +9,4 @@ prev.lib.mapAttrs' (
     (import (builtins.fetchTree pin.nixpkgs) {
       system = prev.stdenv.hostPlatform.system;
     }).${name}
-) (builtins.readDir ./pins)
+) (if builtins.pathExists ./pins then builtins.readDir ./pins else { })

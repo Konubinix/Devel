@@ -532,25 +532,6 @@ just read it."
 
 (add-hook 'agent-shell-mode-hook #'konix/mcp-server--name-current-agent-shell)
 
-;;; Caller detection helpers (used by set_label)
-
-(defun konix/mcp-server--busy-agent-shells ()
-  "Return the list of `agent-shell-mode' buffers currently mid-turn."
-  (seq-filter
-   (lambda (b)
-     (with-current-buffer b
-       (and (derived-mode-p 'agent-shell-mode)
-            (shell-maker-busy))))
-   (buffer-list)))
-
-(defun konix/mcp-server--calling-agent-buffer ()
-  "Return the agent-shell buffer that is currently invoking an MCP tool, or nil.
-Resolution is by `shell-maker-busy': during a tool call the calling
-agent's shell is the unique mid-turn `agent-shell-mode' buffer.  Returns
-nil if zero or more than one buffer is busy."
-  (let ((busy (konix/mcp-server--busy-agent-shells)))
-    (and busy (null (cdr busy)) (car busy))))
-
 ;;; Auto-respawn on context pressure
 
 (defvar-local konix/mcp-server--auto-respawn nil
@@ -2040,18 +2021,13 @@ MCP Parameters:
    (unless (and (fboundp 'konix/agent-shell--rename-with-label)
                 (fboundp 'konix/agent-shell--append-claude-title))
      (error "konix agent-shell rename helpers not loaded"))
-   (let* ((label (decode-coding-string label 'utf-8))
-          (shell
-           (or (and (buffer-live-p konix/mcp-server--calling-buffer)
-                    konix/mcp-server--calling-buffer)
-               (let ((busy-shells (konix/mcp-server--busy-agent-shells)))
-                 (cond
-                  ((null busy-shells)
-                   (error "No busy agent-shell buffer found (cannot identify caller)"))
-                  ((cdr busy-shells)
-                   (error "Ambiguous: %d busy agent-shell buffers; cannot identify caller"
-                          (length busy-shells)))
-                  (t (car busy-shells))))))
+   (let* ((shell
+           (if (buffer-live-p konix/mcp-server--calling-buffer)
+               konix/mcp-server--calling-buffer
+             (display-warning 'konix-mcp
+                              "A set_label call named no shell: its server was started untagged"
+                              :error)
+             (error "Cannot tell which session is calling, so nothing is renamed")))
           (truncated (konix/agent-shell--rename-with-label shell label)))
      (konix/agent-shell--append-claude-title
       (with-current-buffer shell

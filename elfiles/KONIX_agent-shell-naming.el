@@ -129,6 +129,9 @@ project directories."
       (when (= (length matches) 1)
         (car matches)))))
 
+(defvar konix/agent-shell--claude-titles (make-hash-table :test #'equal)
+  "Per JSONL path, (OFFSET . TITLE): the bytes read so far, whole lines only.")
+
 (defun konix/agent-shell--claude-title-from-file (path)
   "Return the LAST aiTitle string from JSONL PATH, or nil.
 Returns nil if PATH is unreadable or contains no parseable `ai-title'
@@ -136,23 +139,43 @@ record.  Claude rewrites `ai-title' records as the session evolves,
 so the last one is the current title.  Tolerates a torn final line —
 the file may be live-appended while the agent is mid-turn."
   (when (and path (file-readable-p path))
-    (with-temp-buffer
-      (insert-file-contents path)
-      (goto-char (point-min))
-      (let (title)
-        (while (not (eobp))
-          (let ((line (buffer-substring-no-properties
-                       (line-beginning-position)
-                       (line-end-position))))
-            (when (string-match-p "\"type\":\"ai-title\"" line)
-              (condition-case nil
-                  (let* ((obj (json-parse-string line :object-type 'alist))
-                         (val (alist-get 'aiTitle obj)))
-                    (when (and (stringp val) (not (string-empty-p val)))
-                      (setq title val)))
-                (error nil))))
-          (forward-line 1))
-        title))))
+    (let* ((size (file-attribute-size (file-attributes path)))
+           (kept (gethash path konix/agent-shell--claude-titles))
+           ;; Claude only appends: a file shorter than what was read is new.
+           (offset (if (and kept (<= (car kept) size)) (car kept) 0))
+           (title (and (> offset 0) (cdr kept))))
+      (if (= offset size)
+          title
+        (with-temp-buffer
+          (insert-file-contents-literally path nil offset size)
+          (goto-char (point-max))
+          ;; Only whole lines are read; a torn last one waits for its end.
+          (when (search-backward "\n" nil t)
+            (forward-char 1)
+            (setq offset (+ offset (1- (point))))
+            (narrow-to-region (point-min) (point))
+            (decode-coding-region (point-min) (point-max) 'utf-8)
+            (goto-char (point-min))
+            (setq title (or (konix/agent-shell--claude-title-here) title)))
+          (puthash path (cons offset title) konix/agent-shell--claude-titles)
+          title)))))
+
+(defun konix/agent-shell--claude-title-here ()
+  "Return the last aiTitle of the JSONL buffer from point on, or nil."
+  (let (title)
+    (while (not (eobp))
+      (let ((line (buffer-substring-no-properties
+                   (line-beginning-position)
+                   (line-end-position))))
+        (when (string-match-p "\"type\":\"ai-title\"" line)
+          (condition-case nil
+              (let* ((obj (json-parse-string line :object-type 'alist))
+                     (val (alist-get 'aiTitle obj)))
+                (when (and (stringp val) (not (string-empty-p val)))
+                  (setq title val)))
+            (error nil))))
+      (forward-line 1))
+    title))
 
 (defun konix/agent-shell--append-claude-title (session-id title)
   "Append an ai-title JSONL record for SESSION-ID with TITLE.

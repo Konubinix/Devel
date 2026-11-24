@@ -655,5 +655,26 @@ Each takes the buffer and returns the one to show instead.")
     (dolist (fn konix/agent-shell-show-target-functions target)
       (setq target (funcall fn target)))))
 
+(defvar konix/agent-shell--file-reads (make-hash-table :test #'equal)
+  "What a reader made of a file, keyed by (READER FILE), with the file's stamp then.")
+
+(defun konix/agent-shell--file-read-once (file reader)
+  "Return what READER, a function symbol, makes of a buffer holding FILE.
+READER is called with point at the start; FILE is read again only once its
+modification time or size changed."
+  (let* ((key (list reader file))
+         (attributes (file-attributes file))
+         (stamp (list (file-attribute-modification-time attributes)
+                      (file-attribute-size attributes)))
+         (kept (gethash key konix/agent-shell--file-reads)))
+    (if (equal (car kept) stamp)
+        (cdr kept)
+      (let ((value (with-temp-buffer
+                     (insert-file-contents file)
+                     (goto-char (point-min))
+                     (funcall reader))))
+        (puthash key (cons stamp value) konix/agent-shell--file-reads)
+        value))))
+
 (provide 'KONIX_agent-shell-common)
 ;;; KONIX_agent-shell-common.el ends here

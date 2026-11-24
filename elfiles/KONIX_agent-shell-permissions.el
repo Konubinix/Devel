@@ -158,30 +158,33 @@ Read from the transcript file; the agent's thoughts are excluded."
                          agent-shell--transcript-file))
               ((stringp file))
               ((file-readable-p file)))
-    (with-temp-buffer
-      (insert-file-contents file)
-      (goto-char (point-max))
-      ;; A message not ending in a newline gets the next header glued to its
-      ;; last line, so headers are found anywhere on a line, by their date.
-      (let ((header-regexp "## \\(\\(?:User\\|Agent\\)[^\n]*([0-9-]+ [0-9:]+)\\)$")
-            (blocks '()))
-        (narrow-to-region (if (re-search-backward "## User ([0-9-]+ [0-9:]+)$" nil t)
-                              (point)
-                            (point-min))
-                          (point-max))
-        (goto-char (point-min))
-        (while (re-search-forward header-regexp nil t)
-          (let ((header (match-string 1))
-                (body-start (progn (forward-line 1) (point)))
-                (body-end (if (re-search-forward header-regexp nil t)
-                              (match-beginning 0)
-                            (point-max))))
-            (when (string-prefix-p "Agent (" header)
-              (push (string-trim
-                     (buffer-substring-no-properties body-start body-end))
-                    blocks))
-            (goto-char body-end)))
-        (nreverse blocks)))))
+    (konix/agent-shell--file-read-once
+     file #'konix/agent-shell--agent-message-blocks-here)))
+
+(defun konix/agent-shell--agent-message-blocks-here ()
+  "Return the agent's message bodies since the last user message of this buffer."
+  (goto-char (point-max))
+  ;; A message not ending in a newline gets the next header glued to its
+  ;; last line, so headers are found anywhere on a line, by their date.
+  (let ((header-regexp "## \\(\\(?:User\\|Agent\\)[^\n]*([0-9-]+ [0-9:]+)\\)$")
+        (blocks '()))
+    (narrow-to-region (if (re-search-backward "## User ([0-9-]+ [0-9:]+)$" nil t)
+                          (point)
+                        (point-min))
+                      (point-max))
+    (goto-char (point-min))
+    (while (re-search-forward header-regexp nil t)
+      (let ((header (match-string 1))
+            (body-start (progn (forward-line 1) (point)))
+            (body-end (if (re-search-forward header-regexp nil t)
+                          (match-beginning 0)
+                        (point-max))))
+        (when (string-prefix-p "Agent (" header)
+          (push (string-trim
+                 (buffer-substring-no-properties body-start body-end))
+                blocks))
+        (goto-char body-end)))
+    (nreverse blocks)))
 
 (defun konix/agent-shell--agent-said-since-last-user ()
   "Return all the agent said since the last user message, or nil."

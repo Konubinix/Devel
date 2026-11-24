@@ -2,8 +2,18 @@
 source _ko_npx.sh
 ME="$(basename "${0}")"
 
-if [ ! -d "$HOME/.appium/node_modules/appium-uiautomator2-driver" ]; then
+driver_dir="$HOME/.appium/node_modules/appium-uiautomator2-driver"
+if [ ! -d "${driver_dir}" ]; then
     npx_run "${ME}" driver install uiautomator2
+fi
+
+# warn when the driver was made for another Appium major than the server's:
+# npx follows the latest server, while the driver stays as first installed
+wanted_major="$(jq -r '.peerDependencies.appium // empty' "${driver_dir}/package.json" | sed -E 's/^[^0-9]*([0-9]+).*/\1/')"
+server_major="$(npx_run "${ME}" --version 2>/dev/null | sed -E 's/^([0-9]+).*/\1/')"
+if [ -n "${wanted_major}" ] && [ -n "${server_major}" ] && [ "${wanted_major}" != "${server_major}" ]
+then
+    clk ntfy --priority high "uiautomator2 wants Appium ${wanted_major}, server is Appium ${server_major}: run « ${ME} driver uninstall uiautomator2 », then ${ME} reinstalls it"
 fi
 
 npx_run "${ME}" "$@"

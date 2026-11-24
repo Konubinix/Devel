@@ -579,7 +579,7 @@ POLICIES is a `let' binding list setting the global policies."
   "The file the MCP tables have a tool called on.")
 
 (defconst konix/agent-shell-tests--review-key
-  (format "@mcp(load_file, %s$)" konix/agent-shell-tests--review)
+  (format "@mcp(konix-emacs-elisp, load_file, %s$)" konix/agent-shell-tests--review)
   "A policy key scoping `load_file' to `konix/agent-shell-tests--review'.")
 
 (defun konix/agent-shell-tests--mcp (key title &optional path)
@@ -593,30 +593,40 @@ PATH defaults to `konix/agent-shell-tests--review'."
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-mcp-scopes-a-tool-to-an-argument
     (lambda (case) (apply #'konix/agent-shell-tests--mcp case))
-  ;; that file, the tool named short or in full
   (t . (list konix/agent-shell-tests--review-key
-             "mcp__konix-emacs-elisp__load_file"))
-  (t . '("@mcp(mcp__konix-emacs-elisp__load_file)"
-         "mcp__konix-emacs-elisp__load_file"))
+             "konix-emacs-elisp: load_file"))
+  ;; the server alone, or with its tool
+  (t . '("@mcp(konix-emacs-elisp)" "konix-emacs-elisp: load_file"))
+  (t . '("@mcp(konix-emacs-elisp, load_file)" "konix-emacs-elisp: load_file"))
   ;; the value is a regexp, so a family of files is one rule
-  (t . '("@mcp(load_file, /home/sam/prog/devel/elfiles/KONIX_mcp-server-.+\\.el$)"
-         "mcp__konix-emacs-elisp__load_file"))
+  (t . '("@mcp(konix-emacs-elisp, load_file, /home/sam/prog/devel/elfiles/KONIX_mcp-server-.+\\.el$)"
+         "konix-emacs-elisp: load_file"))
   ;; another file, another tool, another server's same-named tool
   (nil . (list konix/agent-shell-tests--review-key
-               "mcp__konix-emacs-elisp__load_file"
+               "konix-emacs-elisp: load_file"
                (concat konix/agent-shell-tests--review "-bak")))
   (nil . (list konix/agent-shell-tests--review-key
-               "mcp__konix-emacs-elisp__reload_and_restart"))
-  (nil . '("@mcp(mcp__konix-emacs-elisp__load_file)"
-           "mcp__other-server__load_file"))
+               "konix-emacs-elisp: reload_and_restart"))
+  (nil . '("@mcp(konix-emacs-elisp, load_file)"
+           "other-server: load_file"))
   ;; the value matches arguments, not their names
-  (nil . '("@mcp(load_file, file-path)"
-           "mcp__konix-emacs-elisp__load_file"))
+  (nil . '("@mcp(konix-emacs-elisp, load_file, file-path)"
+           "konix-emacs-elisp: load_file"))
   ;; KEY=REGEXP looks at that argument only
-  (t . '("@mcp(load_file, file-path=code-review)"
-         "mcp__konix-emacs-elisp__load_file"))
-  (nil . '("@mcp(load_file, other=code-review)"
-           "mcp__konix-emacs-elisp__load_file")))
+  (t . '("@mcp(konix-emacs-elisp, load_file, file-path=code-review)"
+         "konix-emacs-elisp: load_file"))
+  (nil . '("@mcp(konix-emacs-elisp, load_file, other=code-review)"
+           "konix-emacs-elisp: load_file")))
+
+(konix/agent-shell-tests-deftable
+    konix/agent-shell-test-mcp-call-reads-the-title
+    (lambda (title) (konix/agent-shell-mcp-call (list (cons :title title))))
+  (("konix-emacs-elisp" . "load_file") . "konix-emacs-elisp: load_file")
+  (("claude_ai_Claude_Docs" . "batch") . "claude_ai_Claude_Docs: batch")
+  (nil . "mcp__konix-emacs-elisp__load_file")
+  (nil . "Read /tmp/x")
+  (nil . "Write .agent-shell/tmp/a.el")
+  (nil . nil))
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-mcp-key-wants-an-mcp-call
@@ -631,12 +641,12 @@ PATH defaults to `konix/agent-shell-tests--review'."
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-mcp-completes-the-calls-it-sees
     #'konix/agent-shell--tool-call-candidates
-  (("mcp__konix-emacs-elisp__load_file"
+  (("konix-emacs-elisp: load_file"
     "other"
-    "@mcp(mcp__konix-emacs-elisp__load_file)"
-    "@mcp(mcp__konix-emacs-elisp__load_file, file-path=^/home/sam/prog/devel/elfiles/KONIX_mcp-server-code-review\\.el$)")
+    "@mcp(^konix-emacs-elisp$, ^load_file$)"
+    "@mcp(^konix-emacs-elisp$, ^load_file$, file-path=^/home/sam/prog/devel/elfiles/KONIX_mcp-server-code-review\\.el$)")
    . (append (konix/agent-shell-tests--mcp-call
-              "mcp__konix-emacs-elisp__load_file"
+              "konix-emacs-elisp: load_file"
               'file-path konix/agent-shell-tests--review)
              '((:kind . "other"))))
   ;; a shell call: its kind, then its commands' keys
@@ -658,26 +668,26 @@ PATH defaults to `konix/agent-shell-tests--review'."
     konix/agent-shell-test-mcp-candidates-skip-unwritable-values
     #'konix/agent-shell--mcp-candidates
   ;; a blob, a multi-line form, a comma: no candidate
-  (("@mcp(mcp__konix-emacs-elisp__load_file)")
+  (("@mcp(^konix-emacs-elisp$, ^load_file$)")
    . (konix/agent-shell-tests--mcp-call
-      "mcp__konix-emacs-elisp__load_file"
+      "konix-emacs-elisp: load_file"
       'blob (make-string 201 ?x)
       'form "(progn\n  nil)"
       'listy "a,b"))
   ;; every combination of the arguments, smallest first
-  (("@mcp(mcp__konix-files__grep)"
-    "@mcp(mcp__konix-files__grep, pattern=^\\^def $)"
-    "@mcp(mcp__konix-files__grep, path=^/tmp/x\\.py$)"
-    "@mcp(mcp__konix-files__grep, pattern=^\\^def $, path=^/tmp/x\\.py$)")
+  (("@mcp(^konix-files$, ^grep$)"
+    "@mcp(^konix-files$, ^grep$, pattern=^\\^def $)"
+    "@mcp(^konix-files$, ^grep$, path=^/tmp/x\\.py$)"
+    "@mcp(^konix-files$, ^grep$, pattern=^\\^def $, path=^/tmp/x\\.py$)")
    . (konix/agent-shell-tests--mcp-call
-      "mcp__konix-files__grep" 'pattern "^def " 'path "/tmp/x.py")))
+      "konix-files: grep" 'pattern "^def " 'path "/tmp/x.py")))
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-lost-search-catches-a-grep-tool
     (lambda (path)
       (and (funcall (cdr (assoc "lost-search" konix/agent-shell-tool-evaluators))
                     (konix/agent-shell-tests--mcp-call
-                     "mcp__konix-files__readonly_grep" 'pattern "x" 'path path))
+                     "konix-files: readonly_grep" 'pattern "x" 'path path))
            t))
   (t . "/")
   (t . "~/prog")
@@ -703,7 +713,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
         (and (konix/agent-shell-tool-match-p
               "@own-session"
               (konix/agent-shell-tests--mcp-call
-               "mcp__konix-files__readonly_grep" 'pattern "x" 'path path))
+               "konix-files: readonly_grep" 'pattern "x" 'path path))
              t)))
   (t . "/home/u/.claude/projects/p/s1/tool-results/r.txt")
   (nil . "/home/u/.claude/projects/p/s2/tool-results/r.txt")
@@ -717,7 +727,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
             (cadr (konix/agent-shell--mcp-candidates call)) call)
            t))
   (t . (konix/agent-shell-tests--mcp-call
-        "mcp__konix-files__grep"
+        "konix-files: grep"
         'pattern "Updating for |seems broken|^[A-Za-z]*Error|^Exception"
         'path "/var/run/user/1000/memories/memories.py")))
 
@@ -792,14 +802,14 @@ PATH defaults to `konix/agent-shell-tests--review'."
     konix/agent-shell-test-policy-key-of-other-tools
     #'konix/agent-shell--tool-call-policy-key
   ;; MCP: tool and argument
-  ("@mcp(mcp__konix-emacs-elisp__load_file, file-path=^/home/sam/prog/devel/elfiles/KONIX_mcp-server-code-review\\.el$)"
+  ("@mcp(^konix-emacs-elisp$, ^load_file$, file-path=^/home/sam/prog/devel/elfiles/KONIX_mcp-server-code-review\\.el$)"
    . (konix/agent-shell-tests--mcp-call
-      "mcp__konix-emacs-elisp__load_file"
+      "konix-emacs-elisp: load_file"
       'file-path konix/agent-shell-tests--review))
   ;; no argument: the tool alone
-  ("@mcp(mcp__konix-emacs-buffers__readonly_list_buffers)"
+  ("@mcp(^konix-emacs-buffers$, ^readonly_list_buffers$)"
    . (konix/agent-shell-tests--mcp-call
-      "mcp__konix-emacs-buffers__readonly_list_buffers"))
+      "konix-emacs-buffers: readonly_list_buffers"))
   ;; other tools: the title, else the kind
   ("^perm\\.org"
    . '((:title . "perm.org") (:kind . "edit")
@@ -818,7 +828,7 @@ PATH defaults to `konix/agent-shell-tests--review'."
             (konix/agent-shell--tool-call-policy-key call) call)
            t))
   (t . (konix/agent-shell-tests--mcp-call
-        "mcp__konix-emacs-elisp__load_file"
+        "konix-emacs-elisp: load_file"
         'file-path konix/agent-shell-tests--review)))
 
 (konix/agent-shell-tests-deftest-evaluator

@@ -166,6 +166,20 @@ agent-shell.  Shared by the permission policy (the `@background' evaluator)
 and the tracking module (the per-turn background flag)."
   (and (map-elt (map-elt tool-call :raw-input) 'run_in_background) t))
 
+;;; MCP calls ------------------------------------------------------------------
+
+(defconst konix/agent-shell-mcp-title-format
+  "\\`\\([[:alnum:]_-]+\\): \\([[:alnum:]_]+\\)\\'"
+  "Regexp reading an MCP call's title: group 1 its server, group 2 its tool.")
+
+(defun konix/agent-shell-mcp-call (tool-call)
+  "Return TOOL-CALL's MCP (SERVER . TOOL), or nil when it calls no MCP tool."
+  (when-let* ((title (map-elt tool-call :title))
+              ((stringp title))
+              (title (string-trim title))
+              ((string-match konix/agent-shell-mcp-title-format title)))
+    (cons (match-string 1 title) (match-string 2 title))))
+
 ;;; Permission responder hook --------------------------------------------------
 ;; agent-shell exposes a single `agent-shell-permission-responder-function'.
 ;; We fan it out into an abnormal hook so independent modules can each

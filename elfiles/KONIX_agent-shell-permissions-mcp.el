@@ -35,19 +35,12 @@
   :type 'integer
   :group 'konix)
 
-(defun konix/agent-shell--mcp-tool-name (tool-call)
-  "Return TOOL-CALL's `mcp__SERVER__TOOL' name, or nil if not an MCP call."
-  (when-let* ((title (map-elt tool-call :title))
-              ((stringp title))
-              (name (string-trim title))
-              ((string-prefix-p "mcp__" name)))
-    name))
-
 (defun konix/agent-shell--mcp-name-matches-p (name spec)
-  "Return non-nil when regexp SPEC is found in the MCP tool NAME.
+  "Return non-nil when regexp SPEC is found in NAME, or SPEC is nil.
 The search is unanchored and case-insensitive."
-  (let ((case-fold-search t))
-    (string-match-p spec name)))
+  (or (null spec)
+      (let ((case-fold-search t))
+        (string-match-p (string-trim spec) name))))
 
 (defun konix/agent-shell--raw-input-values (value)
   "Return every string in VALUE, a parsed `:raw-input'.
@@ -58,13 +51,14 @@ JSON keys are symbols, so only argument values are returned."
         ((vectorp value) (mapcan #'konix/agent-shell--raw-input-values
                                  (append value nil)))))
 
-(konix/agent-shell-define-tool-evaluator "mcp" (tool-call tool &rest values)
-  "Match a call to MCP tool TOOL with every one of VALUES among its arguments.
-TOOL and VALUES are unanchored regexps: in a whitelist, end a path with `$'
-lest it match longer paths too.  A value `KEY=REGEXP' only looks at the
-argument KEY."
-  (when-let ((name (konix/agent-shell--mcp-tool-name tool-call)))
-    (and (konix/agent-shell--mcp-name-matches-p name (string-trim tool))
+(konix/agent-shell-define-tool-evaluator "mcp" (tool-call server &optional tool &rest values)
+  "Match a call to SERVER's TOOL with every one of VALUES among its arguments.
+No TOOL matches every tool of SERVER.  SERVER, TOOL and VALUES are unanchored
+regexps: in a whitelist, end a path with `$' lest it match longer paths too.
+A value `KEY=REGEXP' only looks at the argument KEY."
+  (when-let ((call (konix/agent-shell-mcp-call tool-call)))
+    (and (konix/agent-shell--mcp-name-matches-p (car call) server)
+         (konix/agent-shell--mcp-name-matches-p (cdr call) tool)
          (let ((raw-input (map-elt tool-call :raw-input))
                (case-fold-search t))
            (seq-every-p
@@ -94,7 +88,9 @@ Commas are excluded: the evaluator parser would split the value in two."
 (defun konix/agent-shell--mcp-candidates (tool-call)
   "Return the `@mcp' completion candidates for TOOL-CALL, or nil.
 One per combination of its arguments as `KEY=VALUE', smallest first."
-  (when-let ((name (konix/agent-shell--mcp-tool-name tool-call)))
+  (when-let* ((call (konix/agent-shell-mcp-call tool-call))
+              (name (format "^%s$, ^%s$" (regexp-quote (car call))
+                            (regexp-quote (cdr call)))))
     (let ((subsets '(nil)))
       (dolist (argument (map-elt tool-call :raw-input))
         (when (konix/agent-shell--mcp-candidate-value-p (cdr-safe argument))
@@ -119,7 +115,7 @@ One per combination of its arguments as `KEY=VALUE', smallest first."
 Upstream shows the input of a single-argument call only."
   (let* ((title (apply fn args))
          (raw-input (map-elt (plist-get args :tool-call) :raw-input)))
-    (if (and (konix/agent-shell--mcp-tool-name (plist-get args :tool-call))
+    (if (and (konix/agent-shell-mcp-call (plist-get args :tool-call))
              (> (length raw-input) 1))
         (concat title "\n\n" (agent-shell--format-tool-call-input raw-input))
       title)))

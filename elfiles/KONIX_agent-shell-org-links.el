@@ -199,13 +199,9 @@ Non-nil only in a shell armed by `konix/org-agent-shell--note-boot-arm'; while
 non-nil the `@note-boot-gate' blacklist rule declines every other tool.")
 
 (defun konix/org-agent-shell--note-boot-tool (tool-call)
-  "Return the required boot tool TOOL-CALL invokes, or nil.
-The tool name is matched as a substring of the call's `:title', so a bare
-`set_label', an `mcp__...__set_label' id or any decorated title all count."
-  (let ((title (or (map-elt tool-call :title) ""))
-        (case-fold-search t))
-    (seq-find (lambda (name) (string-match-p (regexp-quote name) title))
-              konix/org-agent-shell--note-boot-required)))
+  "Return the required boot tool TOOL-CALL invokes, or nil."
+  (car (member (cdr (konix/agent-shell-mcp-call tool-call))
+               konix/org-agent-shell--note-boot-required)))
 
 (konix/agent-shell-define-tool-evaluator "note-boot-gate" (tool-call)
   "Match any tool but the required boot tools while the boot gate is armed."

@@ -418,7 +418,7 @@
     (while t
       (konix/goto-random-line)
       (while (or
-              (not (get-text-property (point) 'todo-state))
+              (not (get-text-property (point) 'title))
               (member (point) visited-points)
               )
         (konix/goto-random-line)

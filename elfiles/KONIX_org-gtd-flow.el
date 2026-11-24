@@ -378,7 +378,7 @@
 (defun konix/org-get-todo-children-markers-no-recursion ()
   (let (
         (first-child-begin (save-excursion (if (org-goto-first-child) (point) nil)))
-        (end-of-subtree (save-excursion (org-end-of-subtree) (point)))
+        (end-of-subtree (save-excursion (org-end-of-subtree t) (point)))
         )
     (when first-child-begin
       (save-excursion
@@ -483,7 +483,7 @@
              )
         (save-restriction
           (save-excursion
-            (org-back-to-heading)
+            (org-back-to-heading t)
             (org-show-subtree)
             (mapc
              (lambda (marker)

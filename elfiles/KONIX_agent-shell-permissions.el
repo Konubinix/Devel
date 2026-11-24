@@ -1119,11 +1119,20 @@ A garbled FILE yields nil and a warning rather than an error."
            (mapcar #'car (konix/agent-shell-policy--global-entries policy)))))
 
 (defun konix/agent-shell-policy--value-for (policy key)
-  "Return a known value for KEY in POLICY (session, project, then global)."
+  "Return a known value for KEY in POLICY (session, project, then global).
+Else POLICY's default, never KEY: an empty value is read as its key by
+`konix/agent-shell-policy-entry-message'."
   (or (cdr (assoc key (konix/agent-shell-policy--session-entries policy)))
       (cdr (assoc key (konix/agent-shell-policy--project-entries policy)))
       (cdr (assoc key (konix/agent-shell-policy--global-entries policy)))
       (konix/agent-shell-policy-default policy)))
+
+(defun konix/agent-shell-policy-entry-message (entry)
+  "Return ENTRY's message: its value when non-blank, else its key."
+  (let ((value (cdr entry)))
+    (if (and (stringp value) (not (string-empty-p (string-trim value))))
+        value
+      (format "%s" (car entry)))))
 
 (defun konix/agent-shell-policy--effective (policy)
   "Return POLICY's enabled entries, the narrower axis shadowing the wider.
@@ -1345,12 +1354,19 @@ Return nil, falling back to the dialog, when there is no allow option."
   (when-let* ((allow (seq-find (lambda (option)
                                 (equal (map-elt option :kind) "allow_once"))
                               (map-elt permission :options))))
-    (let ((note (cdr entry)))
-      (funcall (map-elt permission :respond) (map-elt allow :option-id))
-      (message "Automatic approve because of %s%s"
-               (car entry)
-               (if (and note (not (string-empty-p note))) (format ": %s" note) "")))
+    (funcall (map-elt permission :respond) (map-elt allow :option-id))
+    (konix/agent-shell--whitelist-approved (map-elt permission :tool-call) entry)
     t))
+
+(defun konix/agent-shell--whitelist-approved (tool-call entry)
+  "Say TOOL-CALL is approved because of the whitelist ENTRY."
+  (let ((note (konix/agent-shell-policy-entry-message entry))
+        (call (or (konix/agent-shell--tool-call-command tool-call)
+                  (map-elt tool-call :title))))
+    (message "Automatic approve %sbecause of %s%s"
+             (if call (format "of `%s' " call) "")
+             (car entry)
+             (if (equal note (format "%s" (car entry))) "" (format ": %s" note)))))
 
 (defun konix/agent-shell-policy--consume-once (policy tool-call)
   "Spend POLICY's \"once\" markers whose rule matches TOOL-CALL."

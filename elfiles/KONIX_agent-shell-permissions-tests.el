@@ -704,6 +704,38 @@ PATH defaults to `konix/agent-shell-tests--review'."
                              (konix/agent-shell--policy-panel
                               konix/agent-shell--whitelist)))
                    '("@a" "@b" "^mm" "^zz")))))
+(ert-deftest konix/agent-shell-test-empty-note-reads-as-the-key-never-stored ()
+  (let (added)
+    (cl-letf (((symbol-function 'konix/agent-shell-policy--session-entries) #'ignore)
+              ((symbol-function 'konix/agent-shell-policy--project-entries) #'ignore)
+              ((symbol-function 'konix/agent-shell-policy--global-entries) #'ignore)
+              ((symbol-function 'konix/agent-shell--policy-do-add)
+               (lambda (_policy key value _where) (push (cons key value) added))))
+      (dolist (policy (list konix/agent-shell--whitelist konix/agent-shell--blacklist))
+        (should (equal (konix/agent-shell-policy--value-for policy "^ls") "")))
+      (konix/agent-shell-whitelist-tool "^ls" "")
+      (konix/agent-shell-whitelist-tool "^cat" "reads")
+      (should (equal added '(("^cat" . "reads") ("^ls" . ""))))
+      (should (equal (konix/agent-shell-policy-entry-message '("^ls" . "")) "^ls"))
+      (should (equal (konix/agent-shell-policy-entry-message '("^cat" . "reads")) "reads")))))
+
+(ert-deftest konix/agent-shell-test-approve-message-names-the-call ()
+  (cl-flet ((said (tool-call entry)
+              (let (said)
+                (cl-letf (((symbol-function 'message)
+                           (lambda (&rest args) (setq said (apply #'format args)))))
+                  (konix/agent-shell--whitelist-act
+                   `((:options . (((:kind . "allow_once") (:option-id . "a"))))
+                     (:respond . ignore)
+                     (:tool-call . ,tool-call))
+                   entry))
+                said)))
+    (should (equal (said '((:title . "wc") (:raw-input . ((command . "wc -l notes.txt"))))
+                         '("@project-commands" . "commands on project files"))
+                   "Automatic approve of `wc -l notes.txt' because of @project-commands: commands on project files"))
+    (should (equal (said '((:title . "Read notes.txt")) '("@inside" . "@inside"))
+                   "Automatic approve of `Read notes.txt' because of @inside"))))
+
 
 (konix/agent-shell-tests-deftable
     konix/agent-shell-test-own-session-greps-its-own-files

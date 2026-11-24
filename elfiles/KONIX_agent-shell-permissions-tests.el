@@ -440,12 +440,22 @@ POLICIES is a `let' binding list setting the global policies."
   (nil . "gh api foo 2>&-")
   (nil . "cat < in.txt")
   (nil . "cat <<EOF\nhi\nEOF")
-  (nil . "gh api foo > .agent-shell/tmp/a.txt >> .agent-shell/tmp/b.txt"))
+  (nil . "gh api foo > .agent-shell/tmp/a.txt >> .agent-shell/tmp/b.txt")
+  (nil . "sort -o .agent-shell/tmp/s.txt notes.txt")
+  (nil . "sort --output=.agent-shell/tmp/s.txt notes.txt")
+  (nil . "timeout 5 sort -o.agent-shell/tmp/s.txt notes.txt")
+  (nil . "sort notes.txt"))
 
 (konix/agent-shell-tests-deftest-key
     konix/agent-shell-test-writes-outside-catches-writes
     "@writes-outside(.agent-shell/tmp)"
   (t . "gh api foo > o.txt")
+  (t . "sort -o notes.txt notes.txt")
+  (t . "sort --output notes.txt notes.txt")
+  (t . "sort --output=/etc/passwd notes.txt")
+  (t . "sort -o/etc/passwd notes.txt")
+  (t . "timeout 5 sort -o notes.txt notes.txt")
+  (t . "sort -o \"$OUT\" notes.txt")
   (t . "gh api foo > /etc/passwd")
   (t . "gh api foo > ~/.ssh/authorized_keys")
   (t . "gh api foo > .agent-shell/tmp/../../../etc/passwd")

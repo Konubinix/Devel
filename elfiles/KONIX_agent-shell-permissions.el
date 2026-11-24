@@ -666,18 +666,48 @@ Field flags silently turn it into a POST unless GET/HEAD is explicit."
               ((member target konix/agent-shell--null-devices) nil)
               (t target))))))
 
+(defconst konix/agent-shell--output-options
+  '(("sort" "-o" "--output"))
+  "Options naming the file a command writes, as (NAME OPTION...).")
+
+(defun konix/agent-shell--option-targets (command)
+  "Return the files COMMAND node writes through its output options.
+An unreadable one is `unknown'."
+  (let* ((tokens (konix/agent-shell--command-unwrapped command))
+         (options (cdr (assoc (car tokens) konix/agent-shell--output-options)))
+         (arguments (cdr tokens))
+         targets)
+    (while (and options arguments)
+      (let* ((argument (pop arguments))
+             (glued (and argument
+                         (seq-some (lambda (option)
+                                     (let ((prefix (if (string-prefix-p "--" option)
+                                                       (concat option "=")
+                                                     option)))
+                                       (when (string-prefix-p prefix argument)
+                                         (substring argument (length prefix)))))
+                                   options))))
+        (cond ((null argument))
+              ((member argument options)
+               (push (or (pop arguments) 'unknown) targets))
+              (glued (push glued targets)))))
+    targets))
+
 (konix/agent-shell-define-tool-evaluator "writes-outside" (tool-call &optional directory)
-  "Match a line redirecting into a file outside DIRECTORY.
+  "Match a line writing a file outside DIRECTORY, by redirection or output option.
 An unreadable target or a nil DIRECTORY counts as outside."
   (konix/agent-shell--with-bash-ast root tool-call
     (seq-some
-     (lambda (capture)
-       (when-let* ((target (konix/agent-shell--redirect-target (cdr capture))))
-         (or (eq target 'unknown)
-             (not (and directory
-                       (file-in-directory-p (expand-file-name target)
-                                            (expand-file-name directory)))))))
-     (treesit-query-capture root '((file_redirect) @r)))))
+     (lambda (target)
+       (or (eq target 'unknown)
+           (not (and directory
+                     (file-in-directory-p (expand-file-name target)
+                                          (expand-file-name directory))))))
+     (append
+      (seq-keep (lambda (capture) (konix/agent-shell--redirect-target (cdr capture)))
+                (treesit-query-capture root '((file_redirect) @r)))
+      (mapcan #'konix/agent-shell--option-targets
+              (konix/agent-shell--command-nodes root))))))
 
 (defun konix/agent-shell--reads-inside-p (node directory)
   "Non-nil when every file NODE's `<' redirections read is inside DIRECTORY.

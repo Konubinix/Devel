@@ -235,8 +235,8 @@ marked with a trailing \"*\"."
                 effective ", ")))))
 
 (defun konix/agent-shell--mcp-bindings ()
-  "Return a `:bindings'-shaped list describing the session's MCP servers.
-A single entry suitable for `agent-shell--make-header' :bindings, so the
+  "Return a `:key-hints'-shaped list describing the session's MCP servers.
+A single entry suitable for `agent-shell--make-header-model' :key-hints, so the
 MCP-server list renders in place of the key-hint row (Next/Previous/Reply/…).
 Project-added servers (absent from `konix/agent-shell-mcp-enabled-servers')
 keep a trailing \"*\", as in `konix/agent-shell/list-mcp-servers'.  Returns
@@ -253,20 +253,23 @@ nil when no server is enabled in this session."
                  effective " "))))))
 
 (defun konix/agent-shell--make-header-mcp-bindings (args)
-  "Replace the `:bindings' in `agent-shell--make-header' ARGS with the MCP list.
-`:filter-args' advice on `agent-shell--make-header', through which both the
-shell-buffer (`agent-shell--update-header-and-mode-line') and the viewport
-\(`agent-shell-viewport--update-header') header updaters build the header.
-The MCP-server list takes the place of the key-hint row.  The call runs with
-the shell buffer current (callers wrap it in `with-current-buffer'), so the
-session's servers are read correctly.  ARGS is left untouched when no server
-is enabled, preserving the original key hints."
+  "Replace the `:key-hints' in header-model ARGS with the MCP list.
+`:filter-args' advice on `agent-shell--make-header-model', through which both
+the shell-buffer (`agent-shell--update-header-and-mode-line') and the viewport
+\(`agent-shell-viewport--update-header', via `agent-shell--make-header') header
+updaters build the header.  The MCP-server list takes the place of the
+key-hint row.  The call runs with the shell buffer current (callers wrap it in
+`with-current-buffer'), so the session's servers are read correctly.  ARGS is
+left untouched when no server is enabled, preserving the original key hints."
   (if-let ((bindings (konix/agent-shell--mcp-bindings)))
       (cons (car args)
-            (plist-put (copy-sequence (cdr args)) :bindings bindings))
+            (plist-put (copy-sequence (cdr args)) :key-hints bindings))
     args))
 
-(advice-add 'agent-shell--make-header :filter-args
+;; Formerly on `agent-shell--make-header'; drop it there on reload.
+(advice-remove 'agent-shell--make-header
+               #'konix/agent-shell--make-header-mcp-bindings)
+(advice-add 'agent-shell--make-header-model :filter-args
             #'konix/agent-shell--make-header-mcp-bindings)
 
 (defun konix/agent-shell-mcp--project-dir-locals-file ()

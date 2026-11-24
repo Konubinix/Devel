@@ -55,9 +55,9 @@
 ;;; Trigger events -------------------------------------------------------------
 
 (defcustom konix/agent-shell-steering-trigger-events
-  '(agent-message-chunk tool-call-update)
+  '(agent-message-rendered tool-call-update)
   "Bus events that drive steering (see `agent-shell-subscribe-to').
-`agent-message-chunk' / `agent-thought-chunk' are backfilled by
+`agent-message-rendered' / `agent-thought-chunk' are emitted by
 `KONIX_agent-shell-common'.  Each is reacted to immediately."
   :type '(repeat symbol) :group 'konix)
 

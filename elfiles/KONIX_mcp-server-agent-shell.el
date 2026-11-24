@@ -41,6 +41,7 @@
 (require 'KONIX_org-transclusion-resolve)
 
 (declare-function agent-shell--start "agent-shell")
+(declare-function agent-shell--resolved-agent-configs "agent-shell")
 (declare-function agent-shell-anthropic-make-claude-code-config "agent-shell-anthropic")
 (declare-function agent-shell-viewport--buffer "agent-shell-viewport")
 (declare-function agent-shell-viewport--shell-buffer "agent-shell-viewport")
@@ -63,6 +64,7 @@
 (defvar agent-shell-mcp-servers)
 (defvar agent-shell-cwd-function)
 (defvar agent-shell--state)
+(defvar agent-shell-session-strategy)
 (defvar agent-shell-prefer-viewport-interaction)
 (defvar konix/agent-shell-buffer-label)
 (defvar konix/mcp-server-coord-url)
@@ -597,7 +599,7 @@ the model it was spawned with."
                                     konix/mcp-server--calling-buffer)
                                    :identifier)))
     (seq-find (lambda (config) (eq (map-elt config :identifier) identifier))
-              agent-shell-agent-configs)))
+              (agent-shell--resolved-agent-configs))))
 
 (defconst konix/mcp-server--respawn-buddy-prompt-note
   "\n\nYOUR LIFECYCLE — IMPORTANT: you may be automatically replaced by a FRESH \
@@ -1353,22 +1355,22 @@ goes to it instead, and nothing is typed into the buffer."
                      (konix/mcp-server--arm-deadline-timer deadline)))
                  (run-hook-with-args 'konix/mcp-server-delivered-functions
                                      buffer payload from-buddy)
-                 ;; Returning is not evidence of insertion.  With no ACP session
-                 ;; id yet, `agent-shell--insert-to-shell-buffer' inserts nothing,
-                 ;; signals nothing, and returns a `prompt-ready' subscription
-                 ;; token; only a real insert answers with an alist carrying :end.
-                 ;; Committing on the token would drop the work with no lease left
-                 ;; to recover it from.
-                 (let ((result (funcall insert)))
+                 ;; With no ACP session id yet, `agent-shell--insert-to-shell-buffer'
+                 ;; inserts nothing, signals nothing, and leaves behind a
+                 ;; `prompt-ready' subscription that inserts the text later,
+                 ;; behind coord's back and after we have handed the work back —
+                 ;; delivering it twice.  It no longer returns that subscription,
+                 ;; so it cannot be dropped afterwards: don't call it at all
+                 ;; then, and let coord re-nudge once the session is up.  Only a
+                 ;; real insert answers with an alist carrying :end; committing on
+                 ;; anything else would drop the work with no lease left to
+                 ;; recover it from.
+                 (when (with-current-buffer buffer
+                         (or (map-nested-elt agent-shell--state '(:session :id))
+                             (eq agent-shell-session-strategy 'new-deferred)))
                    (setq inserted
-                         (integerp (ignore-errors (alist-get :end result))))
-                   (unless inserted
-                     ;; That subscription would insert this text later, behind
-                     ;; coord's back and after we have handed the work back —
-                     ;; delivering it twice. Drop it and let coord re-nudge once
-                     ;; the session is actually up.
-                     (ignore-errors
-                       (agent-shell-unsubscribe :subscription result)))))
+                         (integerp (ignore-errors
+                                     (alist-get :end (funcall insert)))))))
              ;; Runs on a `C-g' or an error too, which is the point: coord must
              ;; either be told the buddy has the text, or get the work back.
              (if inserted

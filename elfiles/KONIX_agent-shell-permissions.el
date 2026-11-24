@@ -52,7 +52,7 @@
 (require 'KONIX_shell-search)
 
 (declare-function agent-shell--state "agent-shell")
-(declare-function agent-shell--enqueue-request "agent-shell")
+(declare-function agent-shell--prompt-queue-enqueue "agent-shell-prompt-queue")
 (declare-function agent-shell--save-tool-call "agent-shell")
 (declare-function agent-shell-interrupt "agent-shell")
 (declare-function agent-shell-subscribe-to "agent-shell")
@@ -1207,8 +1207,8 @@ The buffer then looks idle without waiting for the user."
 (defun konix/agent-shell--enqueue-reason (reason)
   "Enqueue REASON as a follow-up prompt, unless already pending."
   (when (derived-mode-p 'agent-shell-mode)
-    (unless (member reason (map-elt (agent-shell--state) :pending-requests))
-      (agent-shell--enqueue-request :prompt reason))))
+    (unless (member reason (map-elt (agent-shell--state) :pending-prompts))
+      (agent-shell--prompt-queue-enqueue :prompt reason))))
 
 (defun konix/agent-shell--show-in-stop-reason (text)
   "Rewrite the cancelled turn's stop-reason block to say TEXT."
@@ -1237,13 +1237,20 @@ TEXT the agent takes is shown in the shell."
                    (when (buffer-live-p buffer)
                      (with-current-buffer buffer
                        (cl-incf konix/agent-shell--injected-count)
-                       (agent-shell--update-fragment
-                        :state (agent-shell--state)
-                        :block-id (format "injected-%d" konix/agent-shell--injected-count)
-                        :label-left "Injected"
-                        :body text
-                        :expanded t))))
-     :on-failure (lambda (&rest _) (funcall on-refused)))))
+                       (let* ((state (agent-shell--state))
+                              (group-id (and (member (map-elt state :last-entry-type)
+                                                     agent-shell--activity-group-run-entry-types)
+                                             (agent-shell--activity-group-latest-id state))))
+                         (agent-shell--update-fragment
+                          :state state
+                          :block-id (format "injected-%d" konix/agent-shell--injected-count)
+                          :label-left "Injected"
+                          :body text
+                          :group-id group-id
+                          :group-label (and group-id agent-shell--activity-group-label)
+                          :expanded t)))))
+     :on-failure (lambda (&rest _)
+                   (funcall on-refused)))))
 
 (defun konix/agent-shell--interrupt-and-deliver (reason &optional deliver-fn inject on-queued)
   "Deliver REASON to the agent, by one of three ways.

@@ -192,7 +192,7 @@ arrives the command has already executed, so a cancel prevents nothing -- and
 it is actively harmful here.  Claude Code's cancel is soft (the SDK does not
 yield promptly; agent-shell force-completes the turn while the underlying
 query keeps running), and a turn that ends as \"cancelled\" never drains the
-pending-request queue (`agent-shell--process-pending-request' runs only on
+prompt queue (`agent-shell--prompt-queue-process-next' runs only on
 \"end_turn\"), so an interrupt swallows the reason entirely.  Enqueueing and
 letting the turn finish normally delivers it reliably at the next turn
 boundary."

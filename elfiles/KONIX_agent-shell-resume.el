@@ -46,7 +46,7 @@ session id goes through (new, resumed, forked) in the shell's buffer."
   (when-let ((identifier (konix/agent-shell-session-store-get
                           konix/agent-shell-session-configs-store session-id)))
     (seq-find (lambda (config) (eq (map-elt config :identifier) identifier))
-              agent-shell-agent-configs)))
+              (agent-shell--resolved-agent-configs))))
 
 (cl-defun konix/agent-shell--resume-start (&key config session-id)
   "Start a shell on CONFIG resuming SESSION-ID, or asking which session.

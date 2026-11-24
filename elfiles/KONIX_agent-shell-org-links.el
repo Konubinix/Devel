@@ -177,6 +177,7 @@ the whole stored set back.  Point ends in the last stored session."
 (declare-function konix/mcp-server-render-note "KONIX_mcp-server-agent-shell")
 (declare-function agent-shell--insert-to-shell-buffer "agent-shell")
 (declare-function agent-shell--resolve-preferred-config "agent-shell")
+(declare-function agent-shell--resolved-agent-configs "agent-shell")
 (declare-function agent-shell-select-config "agent-shell")
 (declare-function agent-shell--state "agent-shell")
 (declare-function agent-shell-subscribe-to "agent-shell")
@@ -301,13 +302,14 @@ and \"claude\" land on the Claude Code config."
                 (list (downcase (symbol-name (map-elt config :identifier)))
                       (downcase (or (map-elt config :mode-line-name) "")))))
       (unless (string-empty-p name)
-        (or (seq-find (lambda (config) (member name (names config)))
-                      agent-shell-agent-configs)
-            (seq-find (lambda (config)
-                        (seq-some (lambda (candidate)
-                                    (string-prefix-p name candidate))
-                                  (names config)))
-                      agent-shell-agent-configs))))))
+        (let ((configs (agent-shell--resolved-agent-configs)))
+          (or (seq-find (lambda (config) (member name (names config)))
+                        configs)
+              (seq-find (lambda (config)
+                          (seq-some (lambda (candidate)
+                                      (string-prefix-p name candidate))
+                                    (names config)))
+                        configs)))))))
 
 (defun konix/org-agent-shell--provider-label (agent)
   "Return the display name of the agent AGENT designates.
@@ -440,8 +442,8 @@ Make sure you provide absolute paths in audit requests.%s"
                                  (agent-shell--state)))
                         nil nil)))
             (unless (string-empty-p model)
-              (agent-shell--set-default-model
-               :shell-buffer shell :model-id model)))))
+              (with-current-buffer shell
+                (agent-shell--set-default-model :model-id model))))))
       (with-current-buffer shell
         (setq-local agent-shell-cwd-function (lambda () base))
         (konix/agent-shell-set-governing-note shell note)
@@ -490,7 +492,7 @@ of the link, which then starts on `konix/agent-shell-default-model-id'."
                        "Agent: "
                        (mapcar (lambda (config)
                                  (symbol-name (map-elt config :identifier)))
-                               agent-shell-agent-configs)
+                               (agent-shell--resolved-agent-configs))
                        nil t nil nil
                        (when preferred
                          (symbol-name (map-elt preferred :identifier)))))

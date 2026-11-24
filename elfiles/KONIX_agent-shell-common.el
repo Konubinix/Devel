@@ -201,13 +201,12 @@ dialog."
 
 ;;; Backfill streaming-prose events --------------------------------------------
 ;; agent-shell emits bus events (`agent-shell--emit-event') for tool calls,
-;; permissions, file writes, turn completion, etc., but NOT for the agent's
-;; streamed prose: `agent_message_chunk' / `agent_thought_chunk' notifications
-;; are rendered straight to the buffer by `agent-shell--update-fragment' without
-;; an event.  So a reaction wanting to watch what the agent SAYS mid-turn has no
-;; event to subscribe to.  We backfill the missing events here by advising the
-;; renderer: each prose chunk re-emits as `agent-message-chunk' /
-;; `agent-thought-chunk' on the bus, making prose and tool activity uniformly
+;; permissions, file writes, turn completion, etc.  For the agent's streamed
+;; prose it emits `agent-message-chunk' only, and before the chunk is rendered,
+;; so the buffer does not hold it yet; thoughts get no event at all.  We emit
+;; events here by advising the renderer: each prose chunk, once rendered,
+;; emits `agent-message-rendered' / `agent-thought-chunk' on the bus, making
+;; prose and tool activity uniformly
 ;; subscribable (see `KONIX_agent-shell-steering').  agent-shell tags the prose
 ;; fragments with a BLOCK-ID ending in the notification type, which is how we
 ;; tell a prose chunk from any other fragment update.
@@ -216,7 +215,7 @@ dialog."
 (declare-function agent-shell--state "agent-shell")
 
 (defconst konix/agent-shell--prose-fragment-suffixes
-  '(("agent_message_chunk" . agent-message-chunk)
+  '(("agent_message_chunk" . agent-message-rendered)
     ("agent_thought_chunk" . agent-thought-chunk))
   "Map a prose fragment BLOCK-ID suffix to the bus event to emit for it.")
 
@@ -394,11 +393,11 @@ the side effects again.  A value bound before that point wins."
 ;; agent-shell buffer, so `konix/agent-shell-define-reply' spins each one into a
 ;; command bound across every keymap in a single line.  Two mechanisms deliver
 ;; it: the viewport reply/compose flow (defined in `KONIX_agent-shell-viewport')
-;; when a viewport is in play, and the plain `agent-shell-queue-request'
+;; when a viewport is in play, and the plain `agent-shell-prompt-queue'
 ;; otherwise.
 
 (declare-function agent-shell-interrupt "agent-shell")
-(declare-function agent-shell-queue-request "agent-shell")
+(declare-function agent-shell-prompt-queue "agent-shell-prompt-queue")
 (declare-function agent-shell-set-session-mode "agent-shell")
 (declare-function agent-shell--shell-buffer "agent-shell")
 (declare-function agent-shell-viewport--buffer "agent-shell-viewport")
@@ -406,14 +405,19 @@ the side effects again.  A value bound before that point wins."
                   "KONIX_agent-shell-viewport")
 
 (defun konix/agent-shell-ensure-viewport (shell-buffer)
-  "Create SHELL-BUFFER's viewport companion without displaying it.  Return it.
+  "Create SHELL-BUFFER's viewport companion in view mode without displaying it.  Return it.
 For shells started with `:no-focus', where
 `agent-shell-viewport--show-buffer' would steal the selected window.
 Call BEFORE submitting the first prompt: agent-shell only mirrors
-fragments into a viewport that already exists, and the submit is what
-switches it to view mode."
+fragments into a viewport that already exists."
   (when (buffer-live-p shell-buffer)
-    (agent-shell-viewport--buffer :shell-buffer shell-buffer)))
+    (let ((viewport (agent-shell-viewport--buffer :shell-buffer shell-buffer)))
+      (with-current-buffer viewport
+        (when (and (derived-mode-p 'agent-shell-viewport-edit-mode)
+                   (string-blank-p (buffer-string)))
+          (agent-shell-viewport-view-mode)
+          (agent-shell-viewport--initialize)))
+      viewport)))
 
 (defun konix/agent-shell-set-session-mode (mode-name)
   "Switch the current session to the mode named MODE-NAME, without prompting.
@@ -461,7 +465,7 @@ BODY can read `agent-shell--state' safely (e.g. set the model)."
 
 (defun konix/agent-shell--interrupt-set-default-and-reply (prompt)
   "Interrupt the agent, switch to the Manual mode, then reply with PROMPT.
-Unlike `agent-shell-queue-request', this submits PROMPT directly once the
+Unlike `agent-shell-prompt-queue', this submits PROMPT directly once the
 interrupted turn has completed (mirroring the viewport flow) instead of
 enqueuing it as a pending request.  An idle shell is left alone: PROMPT is
 submitted straight away, without a cancel notification."

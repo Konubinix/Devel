@@ -130,7 +130,7 @@ When nothing is in flight, BODY simply runs right away."
   (declare (modes agent-shell-mode))
   (interactive)
   (agent-shell-interrupt t)
-  (call-interactively #'agent-shell-queue-request))
+  (call-interactively #'agent-shell-prompt-queue))
 
 (defun konix/agent-shell-viewport-read-then-interrupt-or-queue ()
   "Read a prompt, then ask whether to interrupt-and-submit (like M-r) or queue it (like r)."
@@ -148,7 +148,7 @@ When nothing is in flight, BODY simply runs right away."
       (let ((shell-buffer (or (agent-shell--current-shell)
                               (user-error "Not in an agent-shell buffer"))))
         (with-current-buffer shell-buffer
-          (agent-shell-queue-request prompt))))))
+          (agent-shell-prompt-queue prompt))))))
 
 (defun konix/agent-shell-viewport-reply-hello ()
   "Interrupt, reply with \"hello\" and send immediately."

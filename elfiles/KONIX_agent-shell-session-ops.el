@@ -70,9 +70,8 @@ uniquified to `<saved-name><2>'."
         (konix/agent-shell--once-init-finished new-shell
           (unless (equal saved-model-id
                          (agent-shell--current-model-id (agent-shell--state)))
-            (agent-shell--set-default-model
-             :shell-buffer new-shell
-             :model-id saved-model-id)))))))
+            (with-current-buffer new-shell
+              (agent-shell--set-default-model :model-id saved-model-id))))))))
 
 (defun konix/agent-shell-reload ()
   "Reload the current agent-shell session, preserving its buffer name.

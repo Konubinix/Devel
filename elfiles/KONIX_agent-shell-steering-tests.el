@@ -51,7 +51,7 @@ Each case is (EXPECTED . TEXT)."
   (cl-letf (((symbol-function 'konix/agent-shell--last-agent-message)
              (lambda () last-message)))
     (and (konix/agent-shell-steering--compacting-p
-          (list (cons :event 'agent-message-chunk)
+          (list (cons :event 'agent-message-rendered)
                 (cons :data (list (cons :text chunk)))))
          t)))
 

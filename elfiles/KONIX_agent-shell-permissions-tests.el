@@ -38,9 +38,21 @@
                     (file-name-directory (or load-file-name buffer-file-name)))
   "File `konix/agent-shell-tests-run' writes its report to.")
 
+(defun konix/agent-shell-tests--failures (stats)
+  "Return one line per test of STATS that went unexpectedly, saying why."
+  (let ((print-length 20) (print-level 8))
+    (cl-loop for test across (ert--stats-tests stats)
+             for result = (ert-test-most-recent-result test)
+             unless (ert-test-result-expected-p test result)
+             collect (format "%s: %S" (ert-test-name test)
+                             (if (ert-test-result-with-condition-p result)
+                                 (ert-test-result-with-condition-condition result)
+                               (type-of result))))))
+
 (defun konix/agent-shell-tests-run (&optional selector report-file)
   "Run SELECTOR's tests, reporting to a buffer and to REPORT-FILE.
-Signal the report when a test fails."
+Say how many ran; when a test fails, signal its name and failing
+condition, the whole run staying in REPORT-FILE."
   (interactive)
   (let ((selector (or selector "\\`konix/agent-shell-test"))
         (report-file (or report-file konix/agent-shell-tests-report-file))
@@ -58,9 +70,14 @@ Signal the report when a test fails."
                     (string-trim (buffer-string)))))
       (make-directory (file-name-directory report-file) t)
       (with-temp-file report-file (insert report "\n"))
-      (if (> (ert-stats-completed-unexpected stats) 0)
-          (error "%s" report)
-        (message "%s" (car (last (split-string report "\n"))))))))
+      (let ((summary (format "%d run, %d unexpected, report in %s"
+                             (ert-stats-total stats)
+                             (ert-stats-completed-unexpected stats)
+                             report-file)))
+        (if (> (ert-stats-completed-unexpected stats) 0)
+            (error "%s\n%s" summary
+                   (string-join (konix/agent-shell-tests--failures stats) "\n"))
+          (message "%s" summary))))))
 
 ;;; Subjects -------------------------------------------------------------------
 ;; The tool calls a test matches against, one builder per shape.
@@ -69,7 +86,9 @@ Signal the report when a test fails."
   "Run BODY in a throwaway project holding an empty `.agent-shell/tmp'."
   (declare (indent 0))
   `(let ((default-directory (file-name-as-directory
-                             (make-temp-file "konix-agent-shell-test" t))))
+                             ;; Outside the temp directories @use-a-wrong-tmp-dir refuses.
+                             (let ((temporary-file-directory "/dev/shm/"))
+                               (make-temp-file "konix-agent-shell-test" t)))))
      (unwind-protect
          (progn (make-directory ".agent-shell/tmp" t) ,@body)
        (delete-directory default-directory t))))

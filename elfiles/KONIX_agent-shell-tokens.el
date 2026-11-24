@@ -124,6 +124,17 @@
 (defvar konix/agent-shell-tokens--timer nil
   "Timer redrawing the mode lines as the minutes go.")
 
+(defvar konix/agent-shell-tokens-minute-hook nil
+  "Run each minute, as the mode lines are redrawn.")
+
+(defun konix/agent-shell-tokens--minute ()
+  "Redraw the mode lines, then run what watches the minutes go."
+  (force-mode-line-update t)
+  (run-hooks 'konix/agent-shell-tokens-minute-hook))
+
+(when (timerp konix/agent-shell-tokens--timer)
+  (timer-set-function konix/agent-shell-tokens--timer #'konix/agent-shell-tokens--minute))
+
 (defun konix/agent-shell-tokens--watch ()
   "Show in this shell's mode line whether it is still warm."
   (setq-local mode-line-misc-info
@@ -131,7 +142,7 @@
                     (default-value 'mode-line-misc-info)))
   (unless (timerp konix/agent-shell-tokens--timer)
     (setq konix/agent-shell-tokens--timer
-          (run-at-time 60 60 #'force-mode-line-update t)))
+          (run-at-time 60 60 #'konix/agent-shell-tokens--minute)))
   (let ((shell (current-buffer)))
     (pcase-dolist (`(,event . ,react)
                    '((init-finished . konix/agent-shell-tokens--session-starts)

@@ -1580,6 +1580,9 @@ a soft interrupt can no longer be deleted once `:request-count' moves on."
           (cl-incf count)))
       count)))
 
+(defvar konix/agent-shell-reapply-functions nil
+  "Functions reapply calls in the shell, each returning how many waits it resolved.")
+
 (defun konix/agent-shell-reapply-policies ()
   "Apply the policies to the pending permission requests; return the count.
 Useful after adding a rule, as the responder only sees new requests."
@@ -1605,16 +1608,18 @@ Useful after adding a rule, as the responder only sees new requests."
                                    t)))))
           (when (konix/agent-shell--policy-responder permission)
             (cl-incf resolved))))
+      (dolist (reapply konix/agent-shell-reapply-functions)
+        (cl-incf resolved (funcall reapply)))
       (when (called-interactively-p 'interactive)
         (message
          (cond
-          ((null pending)
+          ((and (null pending) (zerop resolved))
            "Reapply policies: no permission request is waiting in this session")
           ((zerop resolved)
            (format "Reapply policies: %d waiting, but none matched a policy"
                    (length pending)))
-          (t (format "Reapply policies: resolved %d of %d waiting permission(s)"
-                     resolved (length pending))))))
+          (t (format "Reapply policies: resolved %d waiting permission(s)"
+                     resolved)))))
       resolved)))
 
 ;;; Inspecting a pending request -----------------------------------------------

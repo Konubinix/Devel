@@ -259,6 +259,11 @@ prevent."
 Coord requeues the work and re-nudges, rather than waiting out the whole lease."
   (konix/mcp-server--delivery-request 'delete "deliveries" delivery))
 
+(defvar konix/mcp-server-idle-unreported-functions nil
+  "Functions called with BUFFER, for `konix/mcp-server--coord-report-idle'.
+One returning non-nil keeps BUFFER's idleness from coord, so it is not reminded:
+something else wakes it.")
+
 (defun konix/mcp-server--coord-report-idle (buffer)
   "Tell coord BUFFER's turn ended and nothing will go on with it.
 Coord then reminds the buddy of any task it holds open, which is what keeps a
@@ -267,7 +272,9 @@ interim followed by an ended turn, typically.  Left to an idle buffer only: one
 an autoresponse is about to restart is not stopped.  Asynchronous, since it
 runs from `turn-complete' and coord being away must not stall the buffer."
   (when (and (buffer-live-p buffer)
-             (not (konix/mcp-server--working-p buffer)))
+             (not (konix/mcp-server--working-p buffer))
+             (not (run-hook-with-args-until-success
+                   'konix/mcp-server-idle-unreported-functions buffer)))
     (when-let* ((name (buffer-local-value 'konix/mcp-server--buddy-name buffer)))
       (ignore-errors
         (plz 'post (format "%s/coord/idle/%s"
@@ -1076,15 +1083,20 @@ MCP Parameters:
               (konix/mcp-server--extra-mcp-servers
                (konix/agent-shell-mcp-servers-for
                 (konix/agent-shell-mcp-note-server-names governing-note))))
-         (konix/mcp-server-spawn-agent
-          directory
-          (format "audit: %s" governing-note)
-          name
-          nil
-          "default"
-          nil
-          t
-          respawn-threshold))))))
+         (prog1 (konix/mcp-server-spawn-agent
+                 directory
+                 (format "audit: %s" governing-note)
+                 name
+                 nil
+                 "default"
+                 nil
+                 t
+                 respawn-threshold)
+           (run-hook-with-args 'konix/mcp-server-auditor-spawned-functions
+                               konix/mcp-server--calling-buffer name)))))))
+
+(defvar konix/mcp-server-auditor-spawned-functions nil
+  "Called with the calling buffer and the coord name of the auditor it just spawned.")
 
 (defun konix/mcp-server-set-governing-note (note-path)
   "Bind NOTE-PATH as the CALLING session's governing note, once.

@@ -51,6 +51,13 @@
   "Non-nil while we submit our own guidance, so the round counter is not reset.")
 (defvar-local konix/agent-shell-steering--cap-stopped nil
   "Non-nil once the cap was hit and control handed back; cleared on a human prompt.")
+(defvar konix/agent-shell-steering-handed-back-hook nil
+  "Run in the shell once the cap's notice is shown, control handed back.")
+
+(defun konix/agent-shell-steering--hand-back (notice)
+  "Show NOTICE in the cancelled turn's stop reason, then run the handed-back hook."
+  (konix/agent-shell--show-in-stop-reason notice)
+  (run-hooks 'konix/agent-shell-steering-handed-back-hook))
 ;;; Trigger events -------------------------------------------------------------
 
 (defcustom konix/agent-shell-steering-trigger-events
@@ -338,7 +345,7 @@ control back to user now\" notice used to lie about."
             (progn
               (setq konix/agent-shell-steering--cap-stopped t)
               (konix/agent-shell--interrupt-and-deliver
-               notice #'konix/agent-shell--show-in-stop-reason))
+               notice #'konix/agent-shell-steering--hand-back))
           (let ((buffer (current-buffer)))
             (unless (eq (konix/agent-shell--interrupt-and-deliver
                          notice nil t

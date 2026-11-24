@@ -202,13 +202,26 @@ run later, a responder that always returns nil (it only observes, e.g. the
 notification in `KONIX_agent-shell-notifications') fires only when no earlier
 responder handled the request.")
 
+(defvar konix/agent-shell-permission-answered-functions nil
+  "Functions called with PERMISSION and what answered it once the responders ran.
+That is the responder that answered, nil when none did and the dialog is left,
+or the error a responder signalled.")
+
 (defun konix/agent-shell-permission-responder (permission)
   "Run `konix/agent-shell-permission-responder-functions' until one handles.
 Installed as `agent-shell-permission-responder-function'.  Returns non-nil
 when a responder answered PERMISSION, nil to fall back to the interactive
 dialog."
-  (run-hook-with-args-until-success
-   'konix/agent-shell-permission-responder-functions permission))
+  (let (answered)
+    (unwind-protect
+        (condition-case err
+            (run-hook-wrapped 'konix/agent-shell-permission-responder-functions
+                              (lambda (responder)
+                                (and (funcall responder permission)
+                                     (setq answered responder))))
+          (error (setq answered err) (signal (car err) (cdr err))))
+      (run-hook-with-args 'konix/agent-shell-permission-answered-functions
+                          permission answered))))
 
 (setq-default agent-shell-permission-responder-function
               #'konix/agent-shell-permission-responder)

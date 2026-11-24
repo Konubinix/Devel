@@ -186,11 +186,15 @@ Names are separated by commas or whitespace, and deduplicated."
 (defun konix/agent-shell-mcp-apply-note-servers (shell note-path)
   "Enable in SHELL the MCP servers NOTE-PATH declares with `#+MCP_SERVERS:'.
 On `konix/agent-shell-governing-note-functions', so every note-binding
-path folds them into the session's buffer-local `agent-shell-mcp-servers'.
+path folds them into the session's buffer-local `agent-shell-mcp-servers'."
+  (konix/agent-shell-mcp-add-servers
+   shell (konix/agent-shell-mcp-note-server-names note-path)))
+
+(defun konix/agent-shell-mcp-add-servers (shell names)
+  "Enable in SHELL the MCP servers NAMES, effective at its next reload.
 Servers already effective are left untouched; new entries get the session
-tag the mode hook gave the baseline ones.  Mid-conversation the change
-takes effect at the next reload."
-  (when-let ((names (konix/agent-shell-mcp-note-server-names note-path)))
+tag the mode hook gave the baseline ones."
+  (when names
     (with-current-buffer shell
       (let* ((present (delq nil (mapcar (lambda (server) (alist-get 'name server))
                                         agent-shell-mcp-servers)))

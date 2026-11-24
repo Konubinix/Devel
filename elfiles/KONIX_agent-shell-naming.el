@@ -295,13 +295,26 @@ stays in sync — otherwise sending input after rename fails because
 `get-buffer-create' fabricates a process-less buffer, and
 `shell-maker--process' returns nil."
   (let ((viewport (agent-shell-viewport--buffer
-                   :shell-buffer shell-buf :existing-only t)))
+                   :shell-buffer shell-buf :existing-only t))
+        (old (buffer-name shell-buf)))
     (shell-maker-set-buffer-name shell-buf new-name)
+    (konix/agent-shell--retrack old shell-buf)
     (when (buffer-live-p viewport)
+      (setq old (buffer-name viewport))
       (with-current-buffer viewport
         (rename-buffer (concat (buffer-name shell-buf)
                                agent-shell-viewport--suffix)
-                       t)))))
+                       t))
+      (konix/agent-shell--retrack old viewport))))
+
+(defun konix/agent-shell--retrack (old buffer)
+  "Move OLD's entry in the tracked buffers to BUFFER's name, its face kept."
+  (when-let* ((entry (and (bound-and-true-p tracking-buffers)
+                          (member old tracking-buffers))))
+    (let ((new (copy-sequence (buffer-name buffer))))
+      (set-text-properties 0 (length new) (text-properties-at 0 (car entry)) new)
+      (setcar entry new))
+    (setq tracking-mode-line-buffers (tracking-status))))
 
 (defun konix/agent-shell--rename-with-label (shell label)
   "Truncate LABEL, format it, and rename SHELL when the result differs.

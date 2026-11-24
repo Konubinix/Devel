@@ -77,7 +77,7 @@
 
 (konix/agent-shell-define-reply konix/agent-shell-red-herring
   "M-h"
-  "that's not helping. Are you lost? Your behavior makes me think you want me to believe you are operational but you are not.")
+  "that's inappropriate. Are you lost? Your behavior makes me think you want me to believe you are operational but you are not.")
 
 (konix/agent-shell-define-reply konix/agent-shell-symptoms
   "M-S" "fix the cause, not the symptom")

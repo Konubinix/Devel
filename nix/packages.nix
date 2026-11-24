@@ -142,6 +142,7 @@ in
     pasystray
     ffmpeg
     # gmpc did not find the correct name so far
+    (import ../flakes/yt-dlp/default.nix { inherit pkgs; })
 
     # python — wrapped so venvs/pipx can find nix-ld libraries (libstdc++, zlib, …)
     (allowNativePipWheels config.konix.pythonEnv)

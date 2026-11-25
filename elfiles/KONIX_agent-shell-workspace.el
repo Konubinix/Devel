@@ -4806,77 +4806,85 @@ Nil when TASK gates nothing."
   (when-let* ((gate (gethash task konix/agent-shell-workspace--gates))
               (inhibit-quit t))
     (remhash task konix/agent-shell-workspace--gates)
-    (pcase-let* ((`(,id ,keyword ,file ,writer ,was ,auditor ,resent) gate)
-                 (read (konix/agent-shell-workspace--verdict-read verdict))
-                 (passed (car read)))
-      (if (and (not (nth 2 read)) (not resent))
-          (konix/agent-shell-workspace--write-file file
-            (let ((again (konix/agent-shell-workspace--post-to-auditor
-                          auditor konix/agent-shell-workspace-gate-resend-ask id)))
-              (puthash again (list id keyword file writer was auditor t)
-                       konix/agent-shell-workspace--gates)
-              (konix/agent-shell-workspace--goto-id id)
-              (when (re-search-forward
-                     (format "^ *- %s :: .*\n"
-                             (regexp-quote konix/agent-shell-workspace-auditing-said))
-                     (konix/agent-shell-workspace--question-end) t)
-                (replace-match (konix/agent-shell-workspace--auditing-line
-                                auditor again was)
-                               t t))))
-      (if (and (not passed) (null was))
-          (let (heading)
+    (handler-bind
+        ((error (lambda (err)
+                  (puthash task gate konix/agent-shell-workspace--gates)
+                  (ignore-errors
+                    (konix/agent-shell-workspace--debug
+                     'failing (file-name-nondirectory (nth 2 gate))
+                     "verdict of task #%s: %s\n%s" task
+                     (error-message-string err) (backtrace-to-string))))))
+      (pcase-let* ((`(,id ,keyword ,file ,writer ,was ,auditor ,resent) gate)
+                   (read (konix/agent-shell-workspace--verdict-read verdict))
+                   (passed (car read)))
+        (if (and (not (nth 2 read)) (not resent))
             (konix/agent-shell-workspace--write-file file
-              (when (konix/agent-shell-workspace--goto-id id)
-                (setq heading (org-get-heading t t t t))
-                (delete-region (point) (save-excursion (org-end-of-subtree t t) (point)))))
-            (when (buffer-live-p writer)
-              (konix/agent-shell-workspace--submit
-               writer (format konix/agent-shell-workspace-gate-dropped-said
-                              heading (if read (cadr read) verdict)))))
-      (progn
-      (konix/agent-shell-workspace--write-file file
-        (when (konix/agent-shell-workspace--goto-id id)
-          (when (re-search-forward
-                 (format "^ *- %s :: .*\n"
-                         (regexp-quote konix/agent-shell-workspace-auditing-said))
-                 (konix/agent-shell-workspace--question-end) t)
-            (replace-match ""))
-          (konix/agent-shell-workspace--goto-id id)
-          (when (equal (konix/agent-shell-workspace--state-at-point)
-                       konix/agent-shell-workspace-awaiting-keyword)
-            (org-todo (if passed keyword was)))
-          (unless passed
+              (let ((again (konix/agent-shell-workspace--post-to-auditor
+                            auditor konix/agent-shell-workspace-gate-resend-ask id)))
+                (puthash again (list id keyword file writer was auditor t)
+                         konix/agent-shell-workspace--gates)
+                (konix/agent-shell-workspace--goto-id id)
+                (when (re-search-forward
+                       (format "^ *- %s :: .*\n"
+                               (regexp-quote konix/agent-shell-workspace-auditing-said))
+                       (konix/agent-shell-workspace--question-end) t)
+                  (replace-match (konix/agent-shell-workspace--auditing-line
+                                  auditor again was)
+                                 t t))))
+        (if (and (not passed) (null was))
+            (let (heading)
+              (konix/agent-shell-workspace--write-file file
+                (when (konix/agent-shell-workspace--goto-id id)
+                  (setq heading (org-get-heading t t t t))
+                  (delete-region (point) (save-excursion (org-end-of-subtree t t) (point)))))
+              (when (buffer-live-p writer)
+                (konix/agent-shell-workspace--submit
+                 writer (format konix/agent-shell-workspace-gate-dropped-said
+                                heading (if read (cadr read) verdict)))))
+        (progn
+        (konix/agent-shell-workspace--write-file file
+          (when (konix/agent-shell-workspace--goto-id id)
+            (when (re-search-forward
+                   (format "^ *- %s :: .*\n"
+                           (regexp-quote konix/agent-shell-workspace-auditing-said))
+                   (konix/agent-shell-workspace--question-end) t)
+              (replace-match ""))
             (konix/agent-shell-workspace--goto-id id)
-            (org-entry-put (point) konix/agent-shell-workspace-rejects-property
-                           (number-to-string
-                            (1+ (string-to-number
-                                 (or (org-entry-get (point)
-                                                    konix/agent-shell-workspace-rejects-property)
-                                     "0"))))))
-          (konix/agent-shell-workspace--goto-id id)
-          (org-end-of-meta-data)
-          (unless passed
-            (save-excursion
-              (when (re-search-forward
-                     "^ *#\\+BEGIN_QUOTE\n\\(?:.*\n\\)*? *#\\+END_QUOTE\n"
-                     (save-excursion (outline-next-heading) (point)) t)
-                (replace-match ""))))
-          (insert (format "  - %s :: %s\n" konix/agent-shell-workspace-audited-said
-                          (if passed "passed" "needs work")))
-          (unless passed
-            (insert "    #+BEGIN_QUOTE\n"
-                    (konix/agent-shell-workspace--quote-wrapped
-                     (if read (cadr read) verdict))
-                    "\n    #+END_QUOTE\n"))))
-      (when (buffer-live-p writer)
-        (konix/agent-shell-workspace--submit
-         writer (if passed
-                    (format (if (equal keyword konix/agent-shell-workspace-closing-keyword)
-                                konix/agent-shell-workspace-close-passed-said
-                              konix/agent-shell-workspace-refine-passed-said)
-                            id)
-                  (format konix/agent-shell-workspace-gate-failed-said id
-                          (if read (cadr read) verdict))))))))
+            (when (equal (konix/agent-shell-workspace--state-at-point)
+                         konix/agent-shell-workspace-awaiting-keyword)
+              (org-todo (if passed keyword was)))
+            (unless passed
+              (konix/agent-shell-workspace--goto-id id)
+              (org-entry-put (point) konix/agent-shell-workspace-rejects-property
+                             (number-to-string
+                              (1+ (string-to-number
+                                   (or (org-entry-get (point)
+                                                      konix/agent-shell-workspace-rejects-property)
+                                       "0"))))))
+            (konix/agent-shell-workspace--goto-id id)
+            (org-end-of-meta-data)
+            (unless passed
+              (save-excursion
+                (when (re-search-forward
+                       "^ *#\\+BEGIN_QUOTE\n\\(?:.*\n\\)*? *#\\+END_QUOTE\n"
+                       (save-excursion (outline-next-heading) (point)) t)
+                  (replace-match ""))))
+            (insert (format "  - %s :: %s\n" konix/agent-shell-workspace-audited-said
+                            (if passed "passed" "needs work")))
+            (unless passed
+              (insert "    #+BEGIN_QUOTE\n"
+                      (konix/agent-shell-workspace--quote-wrapped
+                       (if read (cadr read) verdict))
+                      "\n    #+END_QUOTE\n"))))
+        (when (buffer-live-p writer)
+          (konix/agent-shell-workspace--submit
+           writer (if passed
+                      (format (if (equal keyword konix/agent-shell-workspace-closing-keyword)
+                                  konix/agent-shell-workspace-close-passed-said
+                                konix/agent-shell-workspace-refine-passed-said)
+                              id)
+                    (format konix/agent-shell-workspace-gate-failed-said id
+                            (if read (cadr read) verdict)))))))))
       t)))
 
 (add-hook 'konix/mcp-server-gate-verdict-functions
